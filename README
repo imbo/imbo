@@ -41,7 +41,6 @@ PHPIMS comes with a user database that can be manipulated to give users access t
 parts of the system. LDAP should also be supported. The authentication system must be pluggable so
 existing auth systems can be used. 
 
-
 Metadata
 --------
 Some metadata should be used to categorize the images. The images belongs to a category tree. This 
