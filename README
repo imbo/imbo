@@ -19,11 +19,11 @@ REST API
 --------
 Users place the original images in the server by using a REST interface:
 
-* GET    => Fetch images (via the 404 handler)
-* PUT    => Place an original file on the server along with meta information
+* GET    => Fetch an image
 * DELETE => Delete the original image or one of the generated variations. When an original image is 
             deleted all variations should also be deleted.
-* POST   => Change a stored image. Can be used to manipulate metadata
+* POST   => Place a new image on the server along with metadata. Can be used to manipulate metadata 
+            when used with a hash
 * HEAD   => Fetches metadata about an image
 
 PHP client
