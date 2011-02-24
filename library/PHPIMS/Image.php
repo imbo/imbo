@@ -39,5 +39,119 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 class PHPIMS_Image {
+    /**
+     * ID of the image
+     *
+     * Unique identifier. Type depends on the underlying database driver. If
+     * PHPIMS_Database_Driver_MongoDB is used the value will be a 24 byte string, and if
+     * PHPIMS_Database_Driver_MySQL is used it will be an integer.
+     *
+     * @var mixed
+     */
+    protected $id = null;
 
+    /**
+     * Original filename
+     *
+     * @var string
+     */
+    protected $filename = null;
+
+    /**
+     * Size of the file
+     *
+     * @var int
+     */
+    protected $filesize = null;
+
+    /**
+     * The metadata collection attached to this image
+     *
+     * @var PHPIMS_Image_Metadata_Collection
+     */
+    protected $metadataCollection = null;
+
+    /**
+     * Get the ID
+     *
+     * @return mixed
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    /**
+     * Set the ID
+     *
+     * @param mixed $id Unique ID to set
+     * @return PHPIMS_Image
+     */
+    public function setId($id) {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the filename
+     *
+     * @return string
+     */
+    public function getFilename() {
+        return $this->filename;
+    }
+
+    /**
+     * Set the filename
+     *
+     * @param string $filename The original name of the image
+     * @return PHPIMS_Image
+     */
+    public function setFilename($filename) {
+        $this->filename = $filename;
+
+        return $this;
+    }
+
+    /**
+     * Get the size in bytes
+     *
+     * @return int
+     */
+    public function getFilesize() {
+        return $this->filesize;
+    }
+
+    /**
+     * Set the size in bytes
+     *
+     * @param int $filesize The size to set
+     * @return PHPIMS_Image
+     */
+    public function setFilesize($filesize) {
+        $this->filesize = $filesize;
+
+        return $this;
+    }
+
+    /**
+     * Get the metadata collection
+     *
+     * @return PHPIMS_Image_Metadata_Collection
+     */
+    public function getMetadataCollection() {
+        return $this->metadataCollection;
+    }
+
+    /**
+     * Set the metadata collection
+     *
+     * @param PHPIMS_Image_Metadata_Collection $collection The collection to set
+     * @return PHPIMS_Image
+     */
+    public function setMetadataCollection(PHPIMS_Image_Metadata_Collection $collection) {
+        $this->metadataCollection = $collection;
+
+        return $this;
+    }
 }

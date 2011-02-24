@@ -23,7 +23,6 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Client
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,7 +30,9 @@
  */
 
 /**
- * Autoloader used by PHPIMS
+ * Storage driver interface
+ *
+ * This is an interface for different storage drivers for PHPIMS.
  *
  * @package PHPIMS
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -39,41 +40,19 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Autoload {
+class PHPIMS_Storage_Driver_Filesystem implements PHPIMS_Storage_Driver_Interface {
     /**
-     * PHPIMS  classes
+     * Save an image to the storage medium
      *
-     * @var array
-     */
-    static public $classes = array(
-        'phpims_autoload' => '/Autoload.php',
-        'phpims_client' => '/Client.php',
-        'phpims_client_exception' => '/Client/Exception.php',
-        'phpims_database_driver_interface' => '/Database/Driver/Interface.php',
-        'phpims_database_driver_mongodb' => '/Database/Driver/MongoDB.php',
-        'phpims_database_exception' => '/Database/Exception.php',
-        'phpims_exception' => '/Exception.php',
-        'phpims_frontcontroller' => '/FrontController.php',
-        'phpims_image' => '/Image.php',
-        'phpims_image_metadata' => '/Image/Metadata.php',
-        'phpims_image_metadata_collection' => '/Image/Metadata/Collection.php',
-        'phpims_storage_driver_filesystem' => '/Storage/Driver/Filesystem.php',
-        'phpims_storage_driver_interface' => '/Storage/Driver/Interface.php',
-        'phpims_storage_exception' => '/Storage/Exception.php'
-    );
-
-    /**
-     * Load a class
+     * This method will take an image object, and store that object on the current storage medium.
+     * If an error occurs the driver should throw an exception based on PHPIMS_Storage_Exception.
+     * If storing the image is successfull, the implementation should update the image object with
+     * information regarding the save operation.
      *
-     * @param string $class The name of the class to load
+     * @param PHPIMS_Image $image The image object to store
+     * @return boolean Returns true on success or false on failure
      */
-    static function load($class) {
-        $className = strtolower($class);
+    public function saveImage(PHPIMS_Image $image) {
 
-        if (isset(static::$classes[$className])) {
-            require __DIR__ . static::$classes[$className];
-        }
     }
 }
-
-spl_autoload_register('PHPIMS_Autoload::load');

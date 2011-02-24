@@ -80,7 +80,6 @@ class PHPIMS_Client {
         curl_setopt_array($this->curlHandle, array(
             CURLOPT_USERAGENT      => get_class($this),
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HEADER         => true,
             CURLOPT_HTTPHEADER     => array('Expect:'),
         ));
     }
@@ -168,9 +167,10 @@ class PHPIMS_Client {
      * Get an image
      *
      * @param string $imageId The image identifier
+     * @param array $params Parameters for the operation
      * @return PHPIMS_Image
      */
-    public function get($imageId) {
+    public function get($imageId, array $params = array()) {
 
     }
 
@@ -182,9 +182,24 @@ class PHPIMS_Client {
      * @return array Returns an array with status information about the request. The resulting
      *               image identifier will be included in the response. This identification must be
      *               used for other operations regarding the image.
+     * @throws PHPIMS_Client_Exception
      */
-    public function add($path, PHPIMS_Image_Metadata_Collection $metadata) {
+    public function add($path, PHPIMS_Image_Metadata_Collection $metadata = null) {
+        if (!is_file($path)) {
+            throw new PHPIMS_Client_Exception('File does not exist: ' . $path);
+        }
 
+        $data = array(
+            'file' => '@' . $path,
+        );
+
+        curl_setopt_array($this->curlHandle, array(
+            CURLOPT_URL        => $this->serverUrl,
+            CURLOPT_POST       => true,
+            CURLOPT_POSTFIELDS => $data,
+        ));
+
+        return json_decode(curl_exec($this->curlHandle));
     }
 
     /**
@@ -202,9 +217,8 @@ class PHPIMS_Client {
      *
      * @param string $imageId The image identifier
      * @param PHPIMS_Image_Metadata_Collection $metadata Metadata to connect to the image
-     * @param boolean $replace Wether or not to replace existing metadata with the $metadata
-     *                         parameter
-     * @return array Returne an array with status information about the request
+     * @param boolean $replace Wether or not to replace existing metadata
+     * @return array Returns an array with status information about the request
      */
     public function edit($imageId, PHPIMS_Image_Metadata_Collection $metadata, $replace = false) {
 

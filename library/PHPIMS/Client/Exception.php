@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,49 +31,15 @@
  */
 
 /**
- * Autoloader used by PHPIMS
+ * Base exception class for the client
  *
  * @package PHPIMS
+ * @subpackage Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Autoload {
-    /**
-     * PHPIMS  classes
-     *
-     * @var array
-     */
-    static public $classes = array(
-        'phpims_autoload' => '/Autoload.php',
-        'phpims_client' => '/Client.php',
-        'phpims_client_exception' => '/Client/Exception.php',
-        'phpims_database_driver_interface' => '/Database/Driver/Interface.php',
-        'phpims_database_driver_mongodb' => '/Database/Driver/MongoDB.php',
-        'phpims_database_exception' => '/Database/Exception.php',
-        'phpims_exception' => '/Exception.php',
-        'phpims_frontcontroller' => '/FrontController.php',
-        'phpims_image' => '/Image.php',
-        'phpims_image_metadata' => '/Image/Metadata.php',
-        'phpims_image_metadata_collection' => '/Image/Metadata/Collection.php',
-        'phpims_storage_driver_filesystem' => '/Storage/Driver/Filesystem.php',
-        'phpims_storage_driver_interface' => '/Storage/Driver/Interface.php',
-        'phpims_storage_exception' => '/Storage/Exception.php'
-    );
+class PHPIMS_Client_Exception extends PHPIMS_Exception {
 
-    /**
-     * Load a class
-     *
-     * @param string $class The name of the class to load
-     */
-    static function load($class) {
-        $className = strtolower($class);
-
-        if (isset(static::$classes[$className])) {
-            require __DIR__ . static::$classes[$className];
-        }
-    }
 }
-
-spl_autoload_register('PHPIMS_Autoload::load');
