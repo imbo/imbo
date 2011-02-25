@@ -57,6 +57,12 @@ class PHPIMS_Autoload {
         'phpims_image' => '/Image.php',
         'phpims_image_metadata' => '/Image/Metadata.php',
         'phpims_image_metadata_collection' => '/Image/Metadata/Collection.php',
+        'phpims_operation_abstract' => '/Operation/Abstract.php',
+        'phpims_operation_addimage' => '/Operation/AddImage.php',
+        'phpims_operation_deleteimage' => '/Operation/DeleteImage.php',
+        'phpims_operation_editimage' => '/Operation/EditImage.php',
+        'phpims_operation_exception' => '/Operation/Exception.php',
+        'phpims_operation_getimage' => '/Operation/GetImage.php',
         'phpims_storage_driver_filesystem' => '/Storage/Driver/Filesystem.php',
         'phpims_storage_driver_interface' => '/Storage/Driver/Interface.php',
         'phpims_storage_exception' => '/Storage/Exception.php'

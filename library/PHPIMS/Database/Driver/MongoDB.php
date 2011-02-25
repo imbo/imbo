@@ -23,6 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
+ * @subpackage DatabaseDriver
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -35,6 +36,7 @@
  * A MongoDB database driver for PHPIMS
  *
  * @package PHPIMS
+ * @subpackage DatabaseDriver
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -47,6 +49,16 @@ class PHPIMS_Database_Driver_MongoDB implements PHPIMS_Database_Driver_Interface
      * @var MongoDB
      */
     static protected $database = null;
+
+    /**
+     * Method to check if an image hash is valid for this driver
+     *
+     * @param string $hash The hash to check
+     * @return boolean Returns true if valid, false otherwise
+     */
+    public function isValidHash($hash) {
+        return preg_match('/^[a-zA-Z0-9]{24}$/', $hash);
+    }
 
     /**
      * Get the database

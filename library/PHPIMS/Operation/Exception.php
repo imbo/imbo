@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage StorageDriver
+ * @subpackage Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,30 +31,15 @@
  */
 
 /**
- * Storage driver interface
- *
- * This is an interface for different storage drivers for PHPIMS.
+ * Base exception class for operations
  *
  * @package PHPIMS
- * @subpackage StorageDriver
+ * @subpackage Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Storage_Driver_Filesystem implements PHPIMS_Storage_Driver_Interface {
-    /**
-     * Save an image to the storage medium
-     *
-     * This method will take an image object, and store that object on the current storage medium.
-     * If an error occurs the driver should throw an exception based on PHPIMS_Storage_Exception.
-     * If storing the image is successfull, the implementation should update the image object with
-     * information regarding the save operation.
-     *
-     * @param PHPIMS_Image $image The image object to store
-     * @return boolean Returns true on success or false on failure
-     */
-    public function saveImage(PHPIMS_Image $image) {
+class PHPIMS_Operation_Exception extends PHPIMS_Exception {
 
-    }
 }

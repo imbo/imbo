@@ -35,5 +35,7 @@ set_include_path(__DIR__ . '/../library' . PATH_SEPARATOR . get_include_path());
 /** @see PHPIMS_Autoload */
 require_once 'PHPIMS/Autoload.php';
 
-$frontController = new PHPIMS_FrontController();
-$frontController->handle();
+$config = require __DIR__ . '/../config/server.php';
+
+$frontController = new PHPIMS_FrontController($config);
+$frontController->handle($_SERVER['REQUEST_METHOD'], $_SERVER['REDIRECT_URL']);

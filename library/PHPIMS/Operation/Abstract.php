@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage StorageDriver
+ * @subpackage Operations
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,30 +31,76 @@
  */
 
 /**
- * Storage driver interface
- *
- * This is an interface for different storage drivers for PHPIMS.
+ * Abstract operation class
  *
  * @package PHPIMS
- * @subpackage StorageDriver
+ * @subpackage Operations
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Storage_Driver_Filesystem implements PHPIMS_Storage_Driver_Interface {
+abstract class PHPIMS_Operation_Abstract {
     /**
-     * Save an image to the storage medium
+     * The current hash value (if present)
      *
-     * This method will take an image object, and store that object on the current storage medium.
-     * If an error occurs the driver should throw an exception based on PHPIMS_Storage_Exception.
-     * If storing the image is successfull, the implementation should update the image object with
-     * information regarding the save operation.
-     *
-     * @param PHPIMS_Image $image The image object to store
-     * @return boolean Returns true on success or false on failure
+     * @param string
      */
-    public function saveImage(PHPIMS_Image $image) {
+    protected $hash = null;
 
+    /**
+     * Front controller
+     *
+     * @var PHPIMS_FrontController
+     */
+    protected $frontController = null;
+
+    /**
+     * Get the current hash
+     *
+     * @return string
+     */
+    public function getHash() {
+        return $this->hash;
     }
+
+    /**
+     * Set the hash property
+     *
+     * @param string $hash The hash to set
+     * @return PHPIMS_Operation_Abstract
+     */
+    public function setHash($hash) {
+        $this->hash = $hash;
+
+        return $this;
+    }
+
+    /**
+     * Get the front controller
+     *
+     * @return PHPIMS_FrontController
+     */
+    public function getFrontController() {
+        return $this->frontController;
+    }
+
+    /**
+     * Set the front controller
+     *
+     * @param PHPIMS_FrontController $frontController The front controller instance
+     * @return PHPIMS_Operation_Abstract
+     */
+    public function setFrontController(PHPIMS_FrontController $frontController) {
+        $this->frontController = $frontController;
+
+        return $this;
+    }
+
+    /**
+     * Execute the operation
+     *
+     * @throws PHPIMS_Operation_Exception
+     */
+    abstract public function exec();
 }
