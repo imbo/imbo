@@ -65,11 +65,11 @@ class PHPIMS_Image {
     protected $filesize = null;
 
     /**
-     * The metadata collection attached to this image
+     * The metadata attached to this image
      *
-     * @var PHPIMS_Image_Metadata_Collection
+     * @var array An array of PHPIMS_Image_Metadata objects
      */
-    protected $metadataCollection = null;
+    protected $metadata = null;
 
     /**
      * Get the ID
@@ -135,22 +135,22 @@ class PHPIMS_Image {
     }
 
     /**
-     * Get the metadata collection
+     * Get the metadata
      *
-     * @return PHPIMS_Image_Metadata_Collection
+     * @return array
      */
-    public function getMetadataCollection() {
-        return $this->metadataCollection;
+    public function getMetadata() {
+        return $this->metadata;
     }
 
     /**
-     * Set the metadata collection
+     * Set the metadata
      *
-     * @param PHPIMS_Image_Metadata_Collection $collection The collection to set
+     * @param array $metadata An array of PHPIMS_Image_Metadata objects
      * @return PHPIMS_Image
      */
-    public function setMetadataCollection(PHPIMS_Image_Metadata_Collection $collection) {
-        $this->metadataCollection = $collection;
+    public function setMetadata(array $metadata) {
+        $this->metadata = $metadata;
 
         return $this;
     }
