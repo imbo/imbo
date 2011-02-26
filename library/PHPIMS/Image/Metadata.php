@@ -32,8 +32,7 @@
 /**
  * Metadata block
  *
- * An instance of this class represents a single metadata block that usually is a part of a larger
- * collection.
+ * An instance of this class represents a single metadata block with a key and a value.
  *
  * @package PHPIMS
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -57,13 +56,6 @@ class PHPIMS_Image_Metadata {
     protected $value = null;
 
     /**
-     * The collcetion this block is a part of
-     *
-     * @var PHPIMS_Image_Metadata_Collection
-     */
-    protected $collection = null;
-
-    /**
      * The image this block belongs to
      *
      * @var PHPIMS_Image
@@ -75,20 +67,15 @@ class PHPIMS_Image_Metadata {
      *
      * @param string $key The key to the block
      * @param string $value The value
-     * @param PHPIMS_Image_Metadata_Collection $collection The collection this block is a part of
      * @param PHPIMS_Image $image The image this block belongs to
      */
-    public function __construct($key = null, $value = null, $collection = null, $image = null) {
+    public function __construct($key = null, $value = null, $image = null) {
         if ($key !== null) {
             $this->setKey($key);
         }
 
         if ($value !== null) {
             $this->setValue($value);
-        }
-
-        if ($collection !== null) {
-            $this->setCollection($collection);
         }
 
         if ($image !== null) {
@@ -134,27 +121,6 @@ class PHPIMS_Image_Metadata {
      */
     public function setValue($value) {
         $this->value = $value;
-
-        return $this;
-    }
-
-    /**
-     * Get the collection
-     *
-     * @return PHPIMS_Image_Metadata_Collection
-     */
-    public function getCollection() {
-        return $this->collection;
-    }
-
-    /**
-     * Set the collection
-     *
-     * @param PHPIMS_Image_Metadata_Collection $collection The collection to set
-     * @return PHPIMS_Image
-     */
-    public function setCollection(PHPIMS_Image_Metadata_Collection $collection) {
-        $this->collection = $collection;
 
         return $this;
     }
