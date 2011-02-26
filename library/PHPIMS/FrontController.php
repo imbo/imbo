@@ -62,20 +62,6 @@ class PHPIMS_FrontController {
     protected $config = null;
 
     /**
-     * The database driver
-     *
-     * @var PHPIMS_Database_Driver_Interface
-     */
-    protected $database = null;
-
-    /**
-     * The storage driver
-     *
-     * @var PHPIMS_Storage_Driver_Interface
-     */
-    protected $storage = null;
-
-    /**
      * Class constructor
      *
      * @param array $config Configuration array
@@ -83,26 +69,6 @@ class PHPIMS_FrontController {
     public function __construct(array $config = null) {
         if ($config !== null) {
             $this->setConfig($config);
-
-            if (!empty($config['database']['driver'])) {
-                $params = array();
-
-                if (isset($config['database']['params'])) {
-                    $params = $config['database']['params'];
-                }
-
-                $this->setDatabase(new $config['database']['driver']($params));
-            }
-
-            if (!empty($config['storage']['driver'])) {
-                $params = array();
-
-                if (isset($config['storage']['params'])) {
-                    $params = $config['storage']['params'];
-                }
-
-                $this->setStorage(new $config['storage']['driver']($params));
-            }
         }
     }
 
@@ -112,7 +78,7 @@ class PHPIMS_FrontController {
      * @param string $method The current method
      * @return boolean True if $method is valid, false otherwise
      */
-    public function isValidMethod($method) {
+    static public function isValidMethod($method) {
         switch ($method) {
             case self::GET:
             case self::POST:
@@ -146,48 +112,6 @@ class PHPIMS_FrontController {
     }
 
     /**
-     * Get the database driver
-     *
-     * @return PHPIMS_Database_Driver_Interface
-     */
-    public function getDatabase() {
-        return $this->database;
-    }
-
-    /**
-     * Set the database driver
-     *
-     * @param PHPIMS_Database_Driver_Interface $driver The driver instance
-     * @return PHPIMS_FrontController
-     */
-    public function setDatabase(PHPIMS_Database_Driver_Interface $driver) {
-        $this->database = $driver;
-
-        return $this;
-    }
-
-    /**
-     * Get the storage driver
-     *
-     * @return PHPIMS_Storage_Driver_Interface
-     */
-    public function getStorage() {
-        return $this->storage;
-    }
-
-    /**
-     * Set the storage driver
-     *
-     * @param PHPIMS_Storage_Driver_Interface $driver The driver instance
-     * @return PHPIMS_FrontController
-     */
-    public function setStorage(PHPIMS_Storage_Driver_Interface $driver) {
-        $this->storage = $driver;
-
-        return $this;
-    }
-
-    /**
      * Handle a request
      *
      * @param string $method The HTTP method (one of the defined constants)
@@ -195,37 +119,35 @@ class PHPIMS_FrontController {
      * @throws PHPIMS_Exception
      */
     public function handle($method, $path) {
-        if (!$this->isValidMethod($method)) {
+        if (!self::isValidMethod($method)) {
             throw new PHPIMS_Exception('Invalid HTTP method: ' . $method);
         }
 
         // Remove starting and trailing slashes
         $hash = trim($path, '/');
 
-        if (!empty($hash) && !$this->getDatabase()->isValidHash($hash)) {
+        $databaseDriver = $this->config['database']['driver'];
+
+        if (!empty($hash) && !$databaseDriver::isValidHash($hash)) {
             throw new PHPIMS_Exception('Invalid hash: ' . $hash);
         }
 
         if ($method === self::GET && !empty($hash)) {
-            $operation = new PHPIMS_Operation_GetImage();
+            $operation = new PHPIMS_Operation_GetImage($hash);
         } else if ($method === self::POST) {
             if (empty($hash)) {
                 $operation = new PHPIMS_Operation_AddImage();
             } else {
-                $operation = new PHPIMS_Operation_EditImage();
+                $operation = new PHPIMS_Operation_EditImage($hash);
             }
         } else if ($method === self::DELETE && !empty($hash)) {
-            $operation = new PHPIMS_Operation_DeleteImage();
+            $operation = new PHPIMS_Operation_DeleteImage($hash);
         } else {
             throw new PHPIMS_Exception('Unsupported operation');
         }
 
-        if (!empty($hash)) {
-            $operation->setHash($hash);
-        }
-
         try {
-            $operation->setFrontController($this)->exec();
+            $operation->init($this->config)->exec();
         } catch (PHPIMS_Operation_Exception $e) {
 
         }

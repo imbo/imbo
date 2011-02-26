@@ -42,7 +42,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Database_Driver_MongoDB implements PHPIMS_Database_Driver_Interface {
+class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     /**
      * A MongoDB connection
      *
@@ -56,7 +56,7 @@ class PHPIMS_Database_Driver_MongoDB implements PHPIMS_Database_Driver_Interface
      * @param string $hash The hash to check
      * @return boolean Returns true if valid, false otherwise
      */
-    public function isValidHash($hash) {
+    static public function isValidHash($hash) {
         return preg_match('/^[a-zA-Z0-9]{24}$/', $hash);
     }
 
@@ -91,22 +91,25 @@ class PHPIMS_Database_Driver_MongoDB implements PHPIMS_Database_Driver_Interface
      *
      * This method will insert a new image into the database. The method should update the $image
      * object if successfull by setting the newly created ID. On errors throw exceptions that
-     * extends PHPIMS_Database_Driver_Exception.
+     * extends PHPIMS_Database_Exception.
      *
      * @param PHPIMS_Image $image The image object to insert
      * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Database_Driver_Exception
+     * @throws PHPIMS_Database_Exception
      */
     public function insertNewImage(PHPIMS_Image $image) {
-        $collection = $this->getDatabase()->images;
+        $data = array();
 
-        $data = array(
-            'name' => $image->getFilename(),
-            'size' => $image->getFilesize(),
-        );
+        foreach ($image->getMetadata() as $key => $value) {
+            $data[$key] = $value;
+        }
+
+        $data['name'] = $image->getFilename();
+        $data['size'] = $image->getFilesize();
 
         try {
-            $collection->insert($data, array('safe' => true));
+            $mongoCollection = $this->getDatabase()->images;
+            $mongoCollection->insert($data, array('safe' => true));
         } catch (MongoCursorException $e) {
             throw new PHPIMS_Database_Exception('Could not insert image', 0, $e);
         }

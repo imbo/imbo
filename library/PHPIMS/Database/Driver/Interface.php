@@ -49,18 +49,18 @@ interface PHPIMS_Database_Driver_Interface {
      * @param string $hash The hash to check
      * @return boolean Returns true if valid, false otherwise
      */
-    public function isValidHash($hash);
+    static public function isValidHash($hash);
 
     /**
      * Insert a new image
      *
      * This method will insert a new image into the database. The method should update the $image
      * object if successfull by setting the newly created ID. On errors throw exceptions that
-     * extends PHPIMS_Database_Driver_Exception.
+     * extends PHPIMS_Database_Exception.
      *
      * @param PHPIMS_Image $image The image object to insert
      * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Database_Driver_Exception
+     * @throws PHPIMS_Database_Exception
      */
     public function insertNewImage(PHPIMS_Image $image);
 }

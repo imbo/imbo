@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Interfaces
+ * @subpackage DatabaseDriver
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,30 +31,52 @@
  */
 
 /**
- * Storage driver interface
- *
- * This is an interface for different storage drivers for PHPIMS.
+ * Abstract class for database drivers
  *
  * @package PHPIMS
- * @subpackage Interfaces
+ * @subpackage DatabaseDriver
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface PHPIMS_Storage_Driver_Interface {
+abstract class PHPIMS_Database_Driver_Abstract implements PHPIMS_Database_Driver_Interface {
     /**
-     * Store an image
+     * Parameters for the current database driver
      *
-     * This image will take a temporary path (usually from the $_FILES array) and place it
-     * somewhere suited for the actual storage driver. A Filesystem driver will just move the file
-     * to the current data location. If an error occurs the driver should throw an exception based
-     * on PHPIMS_Storage_Exception.
-     *
-     * @param string $path Path to the temporary file
-     * @param PHPIMS_Image $image The image object
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Storage_Exception
+     * @var array
      */
-    public function store($path, PHPIMS_Image $image);
+    protected $params = array();
+
+    /**
+     * Class constructor
+     *
+     * @param array $params Optional parameters
+     */
+    public function __construct(array $params = null) {
+        if ($params !== null) {
+            $this->setParams($params);
+        }
+    }
+
+    /**
+     * Get all params
+     *
+     * @return array
+     */
+    public function getParams() {
+        return $this->params;
+    }
+
+    /**
+     * Set the params
+     *
+     * @param array $params An array of parameters
+     * @return PHPIMS_Database_Driver_Abstract
+     */
+    public function setParams(array $params) {
+        $this->params = $params;
+
+        return $this;
+    }
 }

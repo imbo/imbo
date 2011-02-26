@@ -49,14 +49,22 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
      * @throws PHPIMS_Operation_Exception
      */
     public function exec() {
-        $collection = new PHPIMS_Image_Metadata_Collection();
-
         $image = new PHPIMS_Image();
         $image->setFilename($_FILES['file']['name'])
               ->setFilesize($_FILES['file']['size'])
-              ->setMetadataCollection($collection);
+              ->setMetadata($_POST);
 
-        $this->getFrontController()->getDatabase()->insertNewImage($image);
+        try {
+            $this->getDatabase()->insertNewImage($image);
+        } catch (PHPIMS_Database_Exception $e) {
+            throw new PHPIMS_Operation_Exception('Could not insert image to the database', 0, $e);
+        }
+
+        try {
+            $this->getStorage()->store($_FILES['file']['tmp_name'], $image);
+        } catch (PHPIMS_Storage_Exception $e) {
+            throw new PHPIMS_Operation_Exception('Could not store image', 0, $e);
+        }
 
         print(json_encode(array('id' => $image->getId())));
     }

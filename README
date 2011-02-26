@@ -79,3 +79,10 @@ backends that should be included by default is S3 (amazon) and FS (filesystem). 
 used as session storage for the dashboard part of the system, as well as caching of metadata and 
 other information. The cache layer should also be configurable. APC and Memcache should work out of 
 the box.
+
+Predefined helpers
+------------------
+PHPIMS should come with some predefined helpers that can resize, crop, zoom and do other things one
+might want to hook into some of the operations. These should have well defined configuration 
+options so that it's easy to define hooks that can generate different sizes of an image as soon as
+it's added. These helpers should be able to run directly on the server, or as gearman jobs.

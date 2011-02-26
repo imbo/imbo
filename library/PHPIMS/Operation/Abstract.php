@@ -49,11 +49,58 @@ abstract class PHPIMS_Operation_Abstract {
     protected $hash = null;
 
     /**
-     * Front controller
+     * The database driver
      *
-     * @var PHPIMS_FrontController
+     * @var PHPIMS_Database_Driver_Interface
      */
-    protected $frontController = null;
+    protected $database = null;
+
+    /**
+     * The storage driver
+     *
+     * @var PHPIMS_Storage_Driver_Interface
+     */
+    protected $storage = null;
+
+    /**
+     * Class constructor
+     *
+     * @param string $hash An optional hash for the operation to work with
+     */
+    public function __construct($hash = null) {
+        if ($hash !== null) {
+            $this->setHash($hash);
+        }
+    }
+
+    /**
+     * Init method
+     *
+     * @param array $config Configuration passed on from the front controller
+     */
+    public function init(array $config) {
+        if (!empty($config['database']['driver'])) {
+            $params = array();
+
+            if (isset($config['database']['params'])) {
+                $params = $config['database']['params'];
+            }
+
+            $this->setDatabase(new $config['database']['driver']($params));
+        }
+
+        if (!empty($config['storage']['driver'])) {
+            $params = array();
+
+            if (isset($config['storage']['params'])) {
+                $params = $config['storage']['params'];
+            }
+
+            $this->setStorage(new $config['storage']['driver']($params));
+        }
+
+        return $this;
+    }
 
     /**
      * Get the current hash
@@ -77,22 +124,43 @@ abstract class PHPIMS_Operation_Abstract {
     }
 
     /**
-     * Get the front controller
+     * Get the database driver
      *
-     * @return PHPIMS_FrontController
+     * @return PHPIMS_Database_Driver_Interface
      */
-    public function getFrontController() {
-        return $this->frontController;
+    public function getDatabase() {
+        return $this->database;
     }
 
     /**
-     * Set the front controller
+     * Set the database driver
      *
-     * @param PHPIMS_FrontController $frontController The front controller instance
-     * @return PHPIMS_Operation_Abstract
+     * @param PHPIMS_Database_Driver_Interface $driver The driver instance
+     * @return PHPIMS_FrontController
      */
-    public function setFrontController(PHPIMS_FrontController $frontController) {
-        $this->frontController = $frontController;
+    public function setDatabase(PHPIMS_Database_Driver_Interface $driver) {
+        $this->database = $driver;
+
+        return $this;
+    }
+
+    /**
+     * Get the storage driver
+     *
+     * @return PHPIMS_Storage_Driver_Interface
+     */
+    public function getStorage() {
+        return $this->storage;
+    }
+
+    /**
+     * Set the storage driver
+     *
+     * @param PHPIMS_Storage_Driver_Interface $driver The driver instance
+     * @return PHPIMS_FrontController
+     */
+    public function setStorage(PHPIMS_Storage_Driver_Interface $driver) {
+        $this->storage = $driver;
 
         return $this;
     }

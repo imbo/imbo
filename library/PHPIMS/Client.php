@@ -194,12 +194,17 @@ class PHPIMS_Client {
         );
 
         curl_setopt_array($this->curlHandle, array(
-            CURLOPT_URL        => $this->serverUrl,
-            CURLOPT_POST       => true,
-            CURLOPT_POSTFIELDS => $data,
+            CURLOPT_URL            => $this->serverUrl,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $data,
+            CURLOPT_CONNECTTIMEOUT => $this->getConnectTimeout(),
+            CURLOPT_TIMEOUT        => $this->getTimeout(),
         ));
 
-        return json_decode(curl_exec($this->curlHandle));
+        $response = curl_exec($this->curlHandle);
+        var_dump($response); exit;
+
+        return json_decode($response);
     }
 
     /**

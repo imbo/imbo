@@ -42,19 +42,27 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Storage_Driver_Filesystem implements PHPIMS_Storage_Driver_Interface {
+class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
     /**
-     * Save an image to the storage medium
+     * Store an image
      *
-     * This method will take an image object, and store that object on the current storage medium.
-     * If an error occurs the driver should throw an exception based on PHPIMS_Storage_Exception.
-     * If storing the image is successfull, the implementation should update the image object with
-     * information regarding the save operation.
+     * This image will take a temporary path (usually from the $_FILES array) and place it
+     * somewhere suited for the actual storage driver. A Filesystem driver will just move the file
+     * to the current data location. If an error occurs the driver should throw an exception based
+     * on PHPIMS_Storage_Exception.
      *
-     * @param PHPIMS_Image $image The image object to store
+     * @param string $path Path to the temporary file
+     * @param PHPIMS_Image $image The image object
      * @return boolean Returns true on success or false on failure
+     * @throws PHPIMS_Storage_Exception
      */
-    public function saveImage(PHPIMS_Image $image) {
+    public function store($path, PHPIMS_Image $image) {
+        $params = $this->getParams();
 
+        if (!is_writable($params['path'])) {
+            throw new PHPIMS_Storage_Exception($params['path'] . ' is not writable');
+        }
+
+        return move_uploaded_file($path, $params['path'] . '/' . $image->getId());
     }
 }
