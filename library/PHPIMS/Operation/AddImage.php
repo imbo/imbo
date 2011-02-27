@@ -73,7 +73,7 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
         $location = $_SERVER['HTTP_HOST'] . '/' . $image->getId();
         $response = new PHPIMS_Response();
         $response->setCode(201)
-                 ->addHeader('Location: ' . $location)
+                 ->addHeader('Location: http://' . $location)
                  ->setData(array(
                     'id' => $image->getId(),
                  ));
