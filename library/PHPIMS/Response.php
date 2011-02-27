@@ -73,6 +73,27 @@ class PHPIMS_Response {
     protected $data = array();
 
     /**
+     * Class constructor
+     *
+     * @param int $code Optional HTTP status code
+     * @param array $headers Optional headers
+     * @param array $data Optional data
+     */
+    public function __construct($code = null, array $headers = null, array $data = null) {
+        if ($code !== null) {
+            $this->setCode($code);
+        }
+
+        if ($headers !== null) {
+            $this->setHeaders($headers);
+        }
+
+        if ($data !== null) {
+            $this->setData($data);
+        }
+    }
+
+    /**
      * Get the status code
      *
      * @return int
