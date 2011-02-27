@@ -201,10 +201,7 @@ class PHPIMS_Client {
             CURLOPT_TIMEOUT        => $this->getTimeout(),
         ));
 
-        $response = curl_exec($this->curlHandle);
-        var_dump($response); exit;
-
-        return json_decode($response);
+        return json_decode(curl_exec($this->curlHandle), true);
     }
 
     /**
@@ -214,7 +211,14 @@ class PHPIMS_Client {
      * @return array Returne an array with status information about the request
      */
     public function delete($imageId) {
+        curl_setopt_array($this->curlHandle, array(
+            CURLOPT_URL            => $this->serverUrl . '/' . $imageId,
+            CURLOPT_CUSTOMREQUEST  => 'DELETE',
+            CURLOPT_CONNECTTIMEOUT => $this->getConnectTimeout(),
+            CURLOPT_TIMEOUT        => $this->getTimeout(),
+        ));
 
+        return json_decode(curl_exec($this->curlHandle), true);
     }
 
     /**
