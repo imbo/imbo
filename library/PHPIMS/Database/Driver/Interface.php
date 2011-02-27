@@ -63,4 +63,13 @@ interface PHPIMS_Database_Driver_Interface {
      * @throws PHPIMS_Database_Exception
      */
     public function insertNewImage(PHPIMS_Image $image);
+
+    /**
+     * Delete an image from the database
+     *
+     * @param string $hash The unique ID of the image to delete
+     * @return boolean Returns true on success or false on failure
+     * @throws PHPIMS_Database_Exception
+     */
+    public function deleteImage($hash);
 }

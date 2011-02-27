@@ -108,13 +108,31 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
         $data['size'] = $image->getFilesize();
 
         try {
-            $mongoCollection = $this->getDatabase()->images;
-            $mongoCollection->insert($data, array('safe' => true));
+            $collection = $this->getDatabase()->images;
+            $collection->insert($data, array('safe' => true));
         } catch (MongoCursorException $e) {
             throw new PHPIMS_Database_Exception('Could not insert image', 0, $e);
         }
 
         $image->setId((string) $data['_id']);
+
+        return true;
+    }
+
+    /**
+     * Delete an image from the database
+     *
+     * @param string $hash The unique ID of the image to delete
+     * @return boolean Returns true on success or false on failure
+     * @throws PHPIMS_Database_Exception
+     */
+    public function deleteImage($hash) {
+        try {
+            $mongoCollection = $this->getDatabase()->images;
+            $mongoCollection->remove(array('_id' => new MongoId($hash)), array('justOne' => true, 'safe' => true));
+        } catch (MongoCursorException $e) {
+            throw new PHPIMS_Database_Exception('Could not delete image', 0, $e);
+        }
 
         return true;
     }

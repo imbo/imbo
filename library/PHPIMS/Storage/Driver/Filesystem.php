@@ -46,7 +46,7 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
     /**
      * Store an image
      *
-     * This image will take a temporary path (usually from the $_FILES array) and place it
+     * This method will take a temporary path (usually from the $_FILES array) and place it
      * somewhere suited for the actual storage driver. A Filesystem driver will just move the file
      * to the current data location. If an error occurs the driver should throw an exception based
      * on PHPIMS_Storage_Exception.
@@ -64,5 +64,26 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
         }
 
         return move_uploaded_file($path, $params['path'] . '/' . $image->getId());
+    }
+
+    /**
+     * Delete an image
+     *
+     * This method will remove the file associated with $hash from the storage medium
+     *
+     * @param string $hash Unique hash identifying an image
+     * @return boolean Returns true on success or false on failure
+     * @throws PHPIMS_Storage_Exception
+     */
+    public function delete($hash) {
+        $params = $this->getParams();
+
+        $file = $params['path'] . '/' . $hash;
+
+        if (!is_file($file)) {
+            throw new PHPIMS_Storage_Exception('File does not exist');
+        }
+
+        return unlink($file);
     }
 }
