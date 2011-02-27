@@ -147,9 +147,20 @@ class PHPIMS_FrontController {
         }
 
         try {
-            $operation->init($this->config)->exec();
+            $response = $operation->init($this->config)->exec();
         } catch (PHPIMS_Operation_Exception $e) {
-
+            print($e->getMessage());
+            exit;
         }
+
+        $code = $response->getCode();
+        $header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS_Response::$codes[$code]);
+        header($header);
+
+        foreach ($response->getHeaders() as $header) {
+            header($header);
+        }
+
+        print($response);
     }
 }

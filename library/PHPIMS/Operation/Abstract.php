@@ -51,14 +51,14 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * The database driver
      *
-     * @var PHPIMS_Database_Driver_Interface
+     * @var PHPIMS_Database_Driver_Abstract
      */
     protected $database = null;
 
     /**
      * The storage driver
      *
-     * @var PHPIMS_Storage_Driver_Interface
+     * @var PHPIMS_Storage_Driver_Abstract
      */
     protected $storage = null;
 
@@ -126,7 +126,7 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * Get the database driver
      *
-     * @return PHPIMS_Database_Driver_Interface
+     * @return PHPIMS_Database_Driver_Abstract
      */
     public function getDatabase() {
         return $this->database;
@@ -135,10 +135,10 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * Set the database driver
      *
-     * @param PHPIMS_Database_Driver_Interface $driver The driver instance
+     * @param PHPIMS_Database_Driver_Abstract $driver The driver instance
      * @return PHPIMS_FrontController
      */
-    public function setDatabase(PHPIMS_Database_Driver_Interface $driver) {
+    public function setDatabase(PHPIMS_Database_Driver_Abstract $driver) {
         $this->database = $driver;
 
         return $this;
@@ -147,7 +147,7 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * Get the storage driver
      *
-     * @return PHPIMS_Storage_Driver_Interface
+     * @return PHPIMS_Storage_Driver_Abstract
      */
     public function getStorage() {
         return $this->storage;
@@ -156,10 +156,10 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * Set the storage driver
      *
-     * @param PHPIMS_Storage_Driver_Interface $driver The driver instance
+     * @param PHPIMS_Storage_Driver_Abstract $driver The driver instance
      * @return PHPIMS_FrontController
      */
-    public function setStorage(PHPIMS_Storage_Driver_Interface $driver) {
+    public function setStorage(PHPIMS_Storage_Driver_Abstract $driver) {
         $this->storage = $driver;
 
         return $this;
@@ -168,6 +168,10 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * Execute the operation
      *
+     * Operations must implement this method and return a PHPIMS_Response object to return to the
+     * client.
+     *
+     * @return PHPIMS_Response
      * @throws PHPIMS_Operation_Exception
      */
     abstract public function exec();

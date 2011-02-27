@@ -46,6 +46,10 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
     /**
      * Execute the operation
      *
+     * Operations must implement this method and return a PHPIMS_Response object to return to the
+     * client.
+     *
+     * @return PHPIMS_Response
      * @throws PHPIMS_Operation_Exception
      */
     public function exec() {
@@ -66,6 +70,14 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
             throw new PHPIMS_Operation_Exception('Could not store image', 0, $e);
         }
 
-        print(json_encode(array('id' => $image->getId())));
+        $location = $_SERVER['HTTP_HOST'] . '/' . $image->getId();
+        $response = new PHPIMS_Response();
+        $response->setCode(201)
+                 ->addHeader('Location: ' . $location)
+                 ->setData(array(
+                    'id' => $image->getId(),
+                 ));
+
+        return $response;
     }
 }

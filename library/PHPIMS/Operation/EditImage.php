@@ -46,6 +46,10 @@ class PHPIMS_Operation_EditImage extends PHPIMS_Operation_Abstract {
     /**
      * Execute the operation
      *
+     * Operations must implement this method and return a PHPIMS_Response object to return to the
+     * client.
+     *
+     * @return PHPIMS_Response
      * @throws PHPIMS_Operation_Exception
      */
     public function exec() {

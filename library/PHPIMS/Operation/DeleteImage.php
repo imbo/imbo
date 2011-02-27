@@ -46,9 +46,28 @@ class PHPIMS_Operation_DeleteImage extends PHPIMS_Operation_Abstract {
     /**
      * Execute the operation
      *
+     * Operations must implement this method and return a PHPIMS_Response object to return to the
+     * client.
+     *
+     * @return PHPIMS_Response
      * @throws PHPIMS_Operation_Exception
      */
     public function exec() {
+        try {
+            $this->getDatabase()->deleteImage($this->getHash());
+        } catch (PHPIMS_Database_Exception $e) {
+            throw new PHPIMS_Operation_Exception('Could not delete image from the database', 0, $e);
+        }
 
+        try {
+            $this->getStorage()->delete($this->getHash());
+        } catch (PHPIMS_Storage_Exception $e) {
+            throw new PHPIMS_Operation_Exception('Could not delete image', 0, $e);
+        }
+
+        $response = new PHPIMS_Response();
+        $response->setCode(200);
+
+        return $response;
     }
 }
