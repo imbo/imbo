@@ -80,6 +80,7 @@ class PHPIMS_Client {
         curl_setopt_array($this->curlHandle, array(
             CURLOPT_USERAGENT      => get_class($this),
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER         => true,
             CURLOPT_HTTPHEADER     => array('Expect:'),
         ));
     }
@@ -178,30 +179,32 @@ class PHPIMS_Client {
      * Add a new image to the server
      *
      * @param string $path Path to the local image
-     * @param PHPIMS_Image_Metadata_Collection $metadata Metadata to attach to the image
+     * @param array $metadata Metadata to attach to the image
      * @return array Returns an array with status information about the request. The resulting
      *               image identifier will be included in the response. This identification must be
      *               used for other operations regarding the image.
      * @throws PHPIMS_Client_Exception
      */
-    public function add($path, PHPIMS_Image_Metadata_Collection $metadata = null) {
+    public function add($path, array $metadata = null) {
         if (!is_file($path)) {
             throw new PHPIMS_Client_Exception('File does not exist: ' . $path);
         }
 
-        $data = array(
-            'file' => '@' . $path,
-        );
+        if ($metadata !== null) {
+            $data = $metadata;
+        } else {
+            $data = array();
+        }
+
+        // Add the file reference
+        $data['file'] = '@' . $path;
 
         curl_setopt_array($this->curlHandle, array(
-            CURLOPT_URL            => $this->serverUrl,
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $data,
-            CURLOPT_CONNECTTIMEOUT => $this->getConnectTimeout(),
-            CURLOPT_TIMEOUT        => $this->getTimeout(),
         ));
 
-        return json_decode(curl_exec($this->curlHandle), true);
+        return $this->request($this->serverUrl);
     }
 
     /**
@@ -212,13 +215,10 @@ class PHPIMS_Client {
      */
     public function delete($imageId) {
         curl_setopt_array($this->curlHandle, array(
-            CURLOPT_URL            => $this->serverUrl . '/' . $imageId,
             CURLOPT_CUSTOMREQUEST  => 'DELETE',
-            CURLOPT_CONNECTTIMEOUT => $this->getConnectTimeout(),
-            CURLOPT_TIMEOUT        => $this->getTimeout(),
         ));
 
-        return json_decode(curl_exec($this->curlHandle), true);
+        return $this->request($this->serverUrl . '/' . $imageId);
     }
 
     /**
@@ -231,5 +231,32 @@ class PHPIMS_Client {
      */
     public function edit($imageId, PHPIMS_Image_Metadata_Collection $metadata, $replace = false) {
 
+    }
+
+    /**
+     * Make a request
+     *
+     * @param string $url The URL to request
+     * @return PHPIMS_Client_Response
+     * @throws PHPIMS_Client_Exception
+     */
+    protected function request($url) {
+        // Set the timeout options
+        curl_setopt_array($this->curlHandle, array(
+            CURLOPT_URL            => $url,
+            CURLOPT_CONNECTTIMEOUT => $this->getConnectTimeout(),
+            CURLOPT_TIMEOUT        => $this->getTimeout(),
+        ));
+
+        $content = curl_exec($this->curlHandle);
+        $responseCode = (int) curl_getinfo($this->curlHandle, CURLINFO_HTTP_CODE);
+
+        if ($content === false) {
+            throw new PHPIMS_Client_Exception('An error occured. Could not complete request.');
+        }
+
+        $response = PHPIMS_Client_Response::factory($content, $responseCode);
+
+        return $response;
     }
 }
