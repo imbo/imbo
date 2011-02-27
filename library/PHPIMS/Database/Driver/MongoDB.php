@@ -110,8 +110,8 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
         try {
             $collection = $this->getDatabase()->images;
             $collection->insert($data, array('safe' => true));
-        } catch (MongoCursorException $e) {
-            throw new PHPIMS_Database_Exception('Could not insert image', 0, $e);
+        } catch (MongoException $e) {
+            throw new PHPIMS_Database_Exception('Could not save image data to database', 0, $e);
         }
 
         $image->setId((string) $data['_id']);
