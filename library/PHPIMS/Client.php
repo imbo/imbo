@@ -156,26 +156,6 @@ class PHPIMS_Client {
     }
 
     /**
-     * Fetch metadata about an image
-     *
-     * @return PHPIMS_Image_Metadata_Collection
-     */
-    public function getMetaData() {
-
-    }
-
-    /**
-     * Get an image
-     *
-     * @param string $imageId The image identifier
-     * @param array $params Parameters for the operation
-     * @return PHPIMS_Image
-     */
-    public function get($imageId, array $params = array()) {
-
-    }
-
-    /**
      * Add a new image to the server
      *
      * @param string $path Path to the local image
