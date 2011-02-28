@@ -52,6 +52,7 @@ abstract class PHPIMS_Database_Driver_Abstract implements PHPIMS_Database_Driver
      * Class constructor
      *
      * @param array $params Optional parameters
+     * @codeCoverageIgnore
      */
     public function __construct(array $params = null) {
         if ($params !== null) {

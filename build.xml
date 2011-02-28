@@ -25,6 +25,7 @@
       <arg line="-d ${basedir}/library/PHPIMS 
                  -t ${basedir}/build/docs
                  -ti 'API docs for PHPIMS'
+                 -ct codeCoverageIgnore
                  ${basedir}/library/PHPIMS" />
     </exec>
   </target>
