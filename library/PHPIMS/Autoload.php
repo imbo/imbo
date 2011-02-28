@@ -57,7 +57,6 @@ class PHPIMS_Autoload {
         'phpims_exception' => '/Exception.php',
         'phpims_frontcontroller' => '/FrontController.php',
         'phpims_image' => '/Image.php',
-        'phpims_image_metadata' => '/Image/Metadata.php',
         'phpims_operation_abstract' => '/Operation/Abstract.php',
         'phpims_operation_addimage' => '/Operation/AddImage.php',
         'phpims_operation_deleteimage' => '/Operation/DeleteImage.php',

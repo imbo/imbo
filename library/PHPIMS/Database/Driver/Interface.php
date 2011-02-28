@@ -77,7 +77,7 @@ interface PHPIMS_Database_Driver_Interface {
      * Edit an image
      *
      * @param string $hash The unique ID of the image to edit
-     * @param array $metadata An array of PHPIMS_Image_Metadata objects
+     * @param array $metadata An array with metadata
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS_Database_Exception
      */

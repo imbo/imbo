@@ -67,9 +67,9 @@ class PHPIMS_Image {
     /**
      * The metadata attached to this image
      *
-     * @var array An array of PHPIMS_Image_Metadata objects
+     * @var array
      */
-    protected $metadata = null;
+    protected $metadata = array();
 
     /**
      * Get the ID
@@ -146,7 +146,7 @@ class PHPIMS_Image {
     /**
      * Set the metadata
      *
-     * @param array $metadata An array of PHPIMS_Image_Metadata objects
+     * @param array $metadata An array with metadata
      * @return PHPIMS_Image
      */
     public function setMetadata(array $metadata) {

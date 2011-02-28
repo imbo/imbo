@@ -98,12 +98,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      * @throws PHPIMS_Database_Exception
      */
     public function insertNewImage(PHPIMS_Image $image) {
-        $data = array();
-
-        foreach ($image->getMetadata() as $key => $value) {
-            $data[$key] = $value;
-        }
-
+        $data = $image->getMetadata();
         $data['name'] = $image->getFilename();
         $data['size'] = $image->getFilesize();
 
@@ -141,7 +136,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      * Edit an image
      *
      * @param string $hash The unique ID of the image to edit
-     * @param array $metadata An array of PHPIMS_Image_Metadata objects
+     * @param array $metadata An array with metadata
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS_Database_Exception
      */
