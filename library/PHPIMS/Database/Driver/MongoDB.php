@@ -157,4 +157,22 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
 
         return true;
     }
+
+    /**
+     * Get all metadata associated with an image
+     *
+     * @param string $hash The unique ID of the image to get metadata from
+     * @return array Returns the metadata as an array
+     * @throws PHPIMS_Database_Exception
+     */
+    public function getImageMetadata($hash) {
+        try {
+            $mongoCollection = $this->getDatabase()->images;
+            $data = $mongoCollection->findOne(array('_id' => new MongoID($hash)));
+        } catch (MongoException $e) {
+            throw new PHPIMS_Database_Exception('Unable to get image metadata', 0, $e);
+        }
+
+        return $data;
+    }
 }
