@@ -225,12 +225,16 @@ class PHPIMS_Client {
      * Edit an image
      *
      * @param string $imageId The image identifier
-     * @param PHPIMS_Image_Metadata_Collection $metadata Metadata to connect to the image
-     * @param boolean $replace Wether or not to replace existing metadata
+     * @param array $metadata An array of metadata
      * @return array Returns an array with status information about the request
      */
-    public function edit($imageId, PHPIMS_Image_Metadata_Collection $metadata, $replace = false) {
+    public function edit($imageId, array $metadata) {
+        curl_setopt_array($this->curlHandle, array(
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $metadata,
+        ));
 
+        return $this->request($this->serverUrl . '/' . $imageId);
     }
 
     /**
