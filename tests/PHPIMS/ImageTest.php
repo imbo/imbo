@@ -38,43 +38,52 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
+class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
     /**
-     * Client instance
+     * Image instance
      *
-     * @var PHPIMS_Client
+     * @var PHPIMS_Image
      */
-    protected $client = null;
+    protected $image = null;
 
     /**
      * Set up method
      */
     public function setUp() {
-        $this->client = new PHPIMS_Client();
+        $this->image = new PHPIMS_Image();
     }
 
     /**
      * Tear down method
      */
     public function tearDown() {
-        $this->client = null;
+        $this->image = null;
     }
 
-    public function testSetGetServerUrl() {
-        $url = 'http://localhost';
-        $this->client->setServerUrl($url);
-        $this->assertSame($url, $this->client->getServerUrl());
+    public function testSetGetId() {
+        $id = '123123213';
+        $this->image->setId($id);
+        $this->assertSame($id, $this->image->getId());
     }
 
-    public function testSetGetTimeout() {
-        $timeout = 123;
-        $this->client->setTimeout($timeout);
-        $this->assertSame($timeout, $this->client->getTimeout());
+    public function testSetGetFilename() {
+        $name = 'someName.jpg';
+        $this->image->setFilename($name);
+        $this->assertSame($name, $this->image->getFilename());
     }
 
-    public function testSetGetConnectTimeout() {
-        $timeout = 123;
-        $this->client->setConnectTimeout($timeout);
-        $this->assertSame($timeout, $this->client->getConnectTimeout());
+    public function testSetGetFilesize() {
+        $size = 9854;
+        $this->image->setFilesize($size);
+        $this->assertSame($size, $this->image->getFilesize());
+    }
+
+    public function testSetGetMetadata() {
+        $data = array(
+            'foo' => 'bar',
+            'bar' => 'foo',
+        );
+        $this->image->setMetadata($data);
+        $this->assertSame($data, $this->image->getMetadata());
     }
 }
