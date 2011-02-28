@@ -154,7 +154,7 @@ class PHPIMS_FrontController {
         }
 
         $code = $response->getCode();
-        $header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS_Response::$codes[$code]);
+        $header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS_Server_Response::$codes[$code]);
         header($header);
 
         foreach ($response->getHeaders() as $header) {

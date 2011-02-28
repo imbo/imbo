@@ -38,11 +38,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_ResponseTest extends PHPUnit_Framework_TestCase {
+class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
     /**
      * Response instance
      *
-     * @var PHPIMS_Response
+     * @var PHPIMS_Server_Response
      */
     protected $response = null;
 
@@ -50,7 +50,7 @@ class PHPIMS_ResponseTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->response = new PHPIMS_Response();
+        $this->response = new PHPIMS_Server_Response();
     }
 
     /**
@@ -109,7 +109,7 @@ class PHPIMS_ResponseTest extends PHPUnit_Framework_TestCase {
             'foo' => 'bar',
             'bar' => 'foo',
         );
-        $response = new PHPIMS_Response($code, $headers, $data);
+        $response = new PHPIMS_Server_Response($code, $headers, $data);
         $this->assertSame($code, $response->getCode());
         $this->assertSame($headers, $response->getHeaders());
         $this->assertSame($data, $response->getData());

@@ -63,7 +63,7 @@ class PHPIMS_Autoload {
         'phpims_operation_editimage' => '/Operation/EditImage.php',
         'phpims_operation_exception' => '/Operation/Exception.php',
         'phpims_operation_getimage' => '/Operation/GetImage.php',
-        'phpims_response' => '/Response.php',
+        'phpims_server_response' => '/Server/Response.php',
         'phpims_storage_driver_abstract' => '/Storage/Driver/Abstract.php',
         'phpims_storage_driver_filesystem' => '/Storage/Driver/Filesystem.php',
         'phpims_storage_driver_interface' => '/Storage/Driver/Interface.php',

@@ -38,7 +38,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Response {
+class PHPIMS_Server_Response {
     /**
      * Different status codes
      *
@@ -106,7 +106,7 @@ class PHPIMS_Response {
      * Set the code
      *
      * @param int $code The HTTP status code to use in the response
-     * @return PHPIMS_Response
+     * @return PHPIMS_Server_Response
      */
     public function setCode($code) {
         $this->code = (int) $code;
@@ -127,7 +127,7 @@ class PHPIMS_Response {
      * Set all headers
      *
      * @param array $headers An array of headers to set
-     * @return PHPIMS_Response
+     * @return PHPIMS_Server_Response
      */
     public function setHeaders(array $headers) {
         $this->headers = $headers;
@@ -139,7 +139,7 @@ class PHPIMS_Response {
      * Add a single header
      *
      * @param string $header A header string to add
-     * @return PHPIMS_Response
+     * @return PHPIMS_Server_Response
      */
     public function addHeader($header) {
         $this->headers[] = $header;
@@ -160,7 +160,7 @@ class PHPIMS_Response {
      * Set the data
      *
      * @param array $data The data to be encoded
-     * @return PHPIMS_Response
+     * @return PHPIMS_Server_Response
      */
     public function setData(array $data) {
         $this->data = $data;
