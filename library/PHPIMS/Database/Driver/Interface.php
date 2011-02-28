@@ -72,4 +72,14 @@ interface PHPIMS_Database_Driver_Interface {
      * @throws PHPIMS_Database_Exception
      */
     public function deleteImage($hash);
+
+    /**
+     * Edit an image
+     *
+     * @param string $hash The unique ID of the image to edit
+     * @param array $metadata An array of PHPIMS_Image_Metadata objects
+     * @return boolean Returns true on success or false on failure
+     * @throws PHPIMS_Database_Exception
+     */
+    public function editImage($hash, array $metadata);
 }

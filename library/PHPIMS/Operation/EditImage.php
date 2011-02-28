@@ -53,6 +53,12 @@ class PHPIMS_Operation_EditImage extends PHPIMS_Operation_Abstract {
      * @throws PHPIMS_Operation_Exception
      */
     public function exec() {
+        try {
+            $this->getDatabase()->editImage($this->getHash(), $_POST);
+        } catch (PHPIMS_Database_Exception $e) {
+            throw new PHPIMS_Operation_Exception('Could not edit image', 0, $e);
+        }
 
+        return new PHPIMS_Response(200);
     }
 }

@@ -130,8 +130,34 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
         try {
             $mongoCollection = $this->getDatabase()->images;
             $mongoCollection->remove(array('_id' => new MongoId($hash)), array('justOne' => true, 'safe' => true));
-        } catch (MongoCursorException $e) {
+        } catch (MongoException $e) {
             throw new PHPIMS_Database_Exception('Could not delete image', 0, $e);
+        }
+
+        return true;
+    }
+
+    /**
+     * Edit an image
+     *
+     * @param string $hash The unique ID of the image to edit
+     * @param array $metadata An array of PHPIMS_Image_Metadata objects
+     * @return boolean Returns true on success or false on failure
+     * @throws PHPIMS_Database_Exception
+     */
+    public function editImage($hash, array $metadata) {
+        try {
+            $mongoCollection = $this->getDatabase()->images;
+            $mongoCollection->update(
+                array('_id' => new MongoID($hash)),
+                array('$set' => $metadata),
+                array(
+                    'safe' => true,
+                    'multiple' => false
+                )
+            );
+        } catch (MongoException $e) {
+            throw new PHPIMS_Database_Exception('Unable to edit image data', 0, $e);
         }
 
         return true;
