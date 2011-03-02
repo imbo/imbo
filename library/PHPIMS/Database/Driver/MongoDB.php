@@ -57,7 +57,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      * @return boolean Returns true if valid, false otherwise
      */
     static public function isValidHash($hash) {
-        return preg_match('/^[a-zA-Z0-9]{24}$/', $hash);
+        return (bool) preg_match('/^[a-zA-Z0-9]{24}$/', $hash);
     }
 
     /**
