@@ -62,13 +62,6 @@ class PHPIMS_FrontController {
     protected $config = null;
 
     /**
-     * Name of the operation factory class
-     *
-     * @var string
-     */
-    protected $operationFactoryClass = 'PHPIMS_Operation';
-
-    /**
      * Class constructor
      *
      * @param array $config Configuration array
@@ -119,27 +112,6 @@ class PHPIMS_FrontController {
     }
 
     /**
-     * Get the operationFactoryClass property
-     *
-     * @return string
-     */
-    public function getOperationFactoryClass() {
-        return $this->operationFactoryClass;
-    }
-
-    /**
-     * Set the operationFactoryClass property
-     *
-     * @param string $className The name of the class
-     * @return PHPIMS_FrontController
-     */
-    public function setOperationFactoryClass($className) {
-        $this->operationFactoryClass = $className;
-
-        return $this;
-    }
-
-    /**
      * Generate an operation object based on some parameters
      *
      * @param string $method The HTTP method
@@ -167,7 +139,7 @@ class PHPIMS_FrontController {
             throw new PHPIMS_Exception('Unsupported operation');
         }
 
-        $factoryClass = $this->getOperationFactoryClass();
+        $factoryClass = $this->config['operation']['factory'];
 
         return $factoryClass::factory($operation, $hash);;
     }

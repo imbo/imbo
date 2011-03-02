@@ -47,10 +47,21 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     protected $controller = null;
 
     /**
+     * Configuration for the controller
+     *
+     * @var array
+     */
+    protected $controllerConfig = array(
+        'database' => array(
+            'driver' => 'PHPIMS_Database_Driver_Test',
+        ),
+    );
+
+    /**
      * Set up method
      */
     public function setUp() {
-        $this->controller = new PHPIMS_FrontController();
+        $this->controller = new PHPIMS_FrontController($this->controllerConfig);
     }
 
     /**
@@ -78,5 +89,21 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
         );
         $this->controller->setConfig($config);
         $this->assertSame($config, $this->controller->getConfig());
+    }
+
+    /**
+     * @expectedException PHPIMS_Exception
+     */
+    public function testHandleInvalidMethod() {
+        $this->controller->handle('foobar', '/some/path');
+    }
+
+    /**
+     * @expectedException PHPIMS_Exception
+     * @expectedExceptionMessage Invalid hash: invalidhash
+     */
+    public function testHandleWithInvalidImageHash() {
+        PHPIMS_Database_Driver_Test::$nextValidHashResult = false;
+        $this->controller->handle('GET', '/invalidhash/extra');
     }
 }
