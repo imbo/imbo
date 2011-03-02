@@ -121,10 +121,12 @@ class PHPIMS_FrontController {
      * @return PHPIMS_Operation_Abstract
      */
     protected function resolveOperation($method, $hash = null, $extra = null) {
+        $operation = null;
+
         if ($method === self::GET && !empty($hash)) {
             if ($extra === 'meta') {
                 $operation = 'PHPIMS_Operation_GetMetadata';
-            } else {
+            } else if (empty($extra)) {
                 $operation = 'PHPIMS_Operation_GetImage';
             }
         } else if ($method === self::POST) {
@@ -135,7 +137,9 @@ class PHPIMS_FrontController {
             }
         } else if ($method === self::DELETE && !empty($hash)) {
             $operation = 'PHPIMS_Operation_DeleteImage';
-        } else {
+        }
+
+        if ($operation === null) {
             throw new PHPIMS_Exception('Unsupported operation');
         }
 
@@ -186,8 +190,10 @@ class PHPIMS_FrontController {
         header($header);
 
         foreach ($response->getHeaders() as $header) {
+            // @codeCoverageIgnoreStart
             header($header);
         }
+        // @codeCoverageIgnoreEnd
 
         print($response);
     }

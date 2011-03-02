@@ -47,6 +47,15 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     protected $controller = null;
 
     /**
+     * Array of mock objects used by the stand-in operation factory
+     *
+     * This array should be filled with mock objects by the tests that needs them.
+     *
+     * @var array
+     */
+    static public $mocks = array();
+
+    /**
      * Configuration for the controller
      *
      * @var array
@@ -55,13 +64,24 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
         'database' => array(
             'driver' => 'PHPIMS_Database_Driver_Test',
         ),
+        'operation' => array(
+            'factory' => __CLASS__,
+        ),
     );
+
+    /**
+     * Factory used in this test as a stand-in for PHPIMS_Operation
+     */
+    static public function factory($operation, $hash = null) {
+        return self::$mocks[$operation];
+    }
 
     /**
      * Set up method
      */
     public function setUp() {
         $this->controller = new PHPIMS_FrontController($this->controllerConfig);
+        self::$mocks = array();
     }
 
     /**
@@ -69,6 +89,39 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->controller = null;
+        self::$mocks = array();
+    }
+
+    /**
+     * Get a PHPIMS_Server_Response mock object
+     *
+     * @param int $code The code to get when calling getCode()
+     * @param array $headers The headers to get when calling getHeaders()
+     * @return PHPIMS_Server_Response A mock of PHPIMS_Server_Response
+     */
+    protected function getResponseMock($code = 200, array $headers = array()) {
+        $response = $this->getMock('PHPIMS_Server_Response');
+        $response->expects($this->once())->method('getCode')->will($this->returnValue($code));
+        $response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
+
+        return $response;
+    }
+
+    /**
+     * Get a PHPIMS_Operation_Abstract mock object
+     *
+     * @param string $operationClass The class name of the operation to mock
+     */
+    protected function getOperationMock($operationClass, PHPIMS_Server_Response $response = null) {
+        if ($response === null) {
+            $response = $this->getResponseMock();
+        }
+
+        $operation = $this->getMock($operationClass);
+        $operation->expects($this->once())->method('init')->with($this->controllerConfig)->will($this->returnValue($operation));
+        $operation->expects($this->once())->method('exec')->will($this->returnValue($response));
+
+        return $operation;
     }
 
     public function testIsValidMethodWithSupportedMethods() {
@@ -105,5 +158,52 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     public function testHandleWithInvalidImageHash() {
         PHPIMS_Database_Driver_Test::$nextValidHashResult = false;
         $this->controller->handle('GET', '/invalidhash/extra');
+    }
+
+    public function testHandleAddImage() {
+        $operation = $this->getOperationMock('PHPIMS_Operation_AddImage');
+        self::$mocks['PHPIMS_Operation_AddImage'] = $operation;
+
+        $this->controller->handle('POST', '');
+    }
+
+    public function testHandleEditImage() {
+        $operation = $this->getOperationMock('PHPIMS_Operation_EditImage');
+        self::$mocks['PHPIMS_Operation_EditImage'] = $operation;
+        PHPIMS_Database_Driver_Test::$nextValidHashResult = true;
+
+        $this->controller->handle('POST', 'some hash value');
+    }
+
+    public function testHandleGetImage() {
+        $operation = $this->getOperationMock('PHPIMS_Operation_GetImage');
+        self::$mocks['PHPIMS_Operation_GetImage'] = $operation;
+        PHPIMS_Database_Driver_Test::$nextValidHashResult = true;
+
+        $this->controller->handle('GET', 'some hash value');
+    }
+
+    public function testHandleGetMetadata() {
+        $operation = $this->getOperationMock('PHPIMS_Operation_GetMetadata');
+        self::$mocks['PHPIMS_Operation_GetMetadata'] = $operation;
+        PHPIMS_Database_Driver_Test::$nextValidHashResult = true;
+
+        $this->controller->handle('GET', 'some hash value/meta');
+    }
+
+    public function testHandleDeleteImage() {
+        $operation = $this->getOperationMock('PHPIMS_Operation_DeleteImage');
+        self::$mocks['PHPIMS_Operation_DeleteImage'] = $operation;
+        PHPIMS_Database_Driver_Test::$nextValidHashResult = true;
+
+        $this->controller->handle('DELETE', 'some hash value');
+    }
+
+    /**
+     * @expectedException PHPIMS_Exception
+     * @expectedExceptionMessage Unsupported operation
+     */
+    public function testHandleUnsupportedOperation() {
+        $this->controller->handle('GET', 'some hash value/metadata');
     }
 }
