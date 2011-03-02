@@ -53,6 +53,7 @@ class PHPIMS_Autoload {
         'phpims_database_driver_abstract' => '/Database/Driver/Abstract.php',
         'phpims_database_driver_interface' => '/Database/Driver/Interface.php',
         'phpims_database_driver_mongodb' => '/Database/Driver/MongoDB.php',
+        'phpims_database_driver_test' => '/Database/Driver/Test.php',
         'phpims_database_exception' => '/Database/Exception.php',
         'phpims_exception' => '/Exception.php',
         'phpims_frontcontroller' => '/FrontController.php',
