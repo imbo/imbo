@@ -62,6 +62,13 @@ class PHPIMS_FrontController {
     protected $config = null;
 
     /**
+     * Name of the operation factory class
+     *
+     * @var string
+     */
+    protected $operationFactoryClass = 'PHPIMS_Operation';
+
+    /**
      * Class constructor
      *
      * @param array $config Configuration array
@@ -112,19 +119,80 @@ class PHPIMS_FrontController {
     }
 
     /**
+     * Get the operationFactoryClass property
+     *
+     * @return string
+     */
+    public function getOperationFactoryClass() {
+        return $this->operationFactoryClass;
+    }
+
+    /**
+     * Set the operationFactoryClass property
+     *
+     * @param string $className The name of the class
+     * @return PHPIMS_FrontController
+     */
+    public function setOperationFactoryClass($className) {
+        $this->operationFactoryClass = $className;
+
+        return $this;
+    }
+
+    /**
+     * Generate an operation object based on some parameters
+     *
+     * @param string $method The HTTP method
+     * @param string $hash   Optional hash
+     * @param string $extra  Optional extra argument
+     * @throws PHPIMS_Exception
+     * @return PHPIMS_Operation_Abstract
+     */
+    protected function resolveOperation($method, $hash = null, $extra = null) {
+        if ($method === self::GET && !empty($hash)) {
+            if ($extra === 'meta') {
+                $operation = 'PHPIMS_Operation_GetMetadata';
+            } else {
+                $operation = 'PHPIMS_Operation_GetImage';
+            }
+        } else if ($method === self::POST) {
+            if (empty($hash)) {
+                $operation = 'PHPIMS_Operation_AddImage';
+            } else {
+                $operation = 'PHPIMS_Operation_EditImage';
+            }
+        } else if ($method === self::DELETE && !empty($hash)) {
+            $operation = 'PHPIMS_Operation_DeleteImage';
+        } else {
+            throw new PHPIMS_Exception('Unsupported operation');
+        }
+
+        $factoryClass = $this->getOperationFactoryClass();
+
+        return $factoryClass::factory($operation, $hash);;
+    }
+
+    /**
      * Handle a request
      *
      * @param string $method The HTTP method (one of the defined constants)
-     * @param string $path   The path accessed
+     * @param string $url    The url accessed
      * @throws PHPIMS_Exception
      */
-    public function handle($method, $path) {
+    public function handle($method, $url) {
         if (!self::isValidMethod($method)) {
             throw new PHPIMS_Exception('Invalid HTTP method: ' . $method);
         }
 
         // Remove starting and trailing slashes
-        $hash = trim($path, '/');
+        $url = trim($url, '/');
+        $parts = explode('/', $url);
+        $hash = $parts[0];
+        $extra = null;
+
+        if (isset($parts[1])) {
+            $extra = $parts[1];
+        }
 
         $databaseDriver = $this->config['database']['driver'];
 
@@ -132,19 +200,7 @@ class PHPIMS_FrontController {
             throw new PHPIMS_Exception('Invalid hash: ' . $hash);
         }
 
-        if ($method === self::GET && !empty($hash)) {
-            $operation = new PHPIMS_Operation_GetImage($hash);
-        } else if ($method === self::POST) {
-            if (empty($hash)) {
-                $operation = new PHPIMS_Operation_AddImage();
-            } else {
-                $operation = new PHPIMS_Operation_EditImage($hash);
-            }
-        } else if ($method === self::DELETE && !empty($hash)) {
-            $operation = new PHPIMS_Operation_DeleteImage($hash);
-        } else {
-            throw new PHPIMS_Exception('Unsupported operation');
-        }
+        $operation = $this->resolveOperation($method, $hash, $extra);
 
         try {
             $response = $operation->init($this->config)->exec();
