@@ -85,6 +85,7 @@ class PHPIMS_Operation_DeleteImageTest extends PHPUnit_Framework_TestCase {
      */
     public function testExecWhenStorageFails() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
+        $database->expects($this->once())->method('deleteImage')->with($this->hash);
         $this->operation->setDatabase($database);
 
         $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
@@ -96,9 +97,11 @@ class PHPIMS_Operation_DeleteImageTest extends PHPUnit_Framework_TestCase {
 
     public function testSuccessfullExec() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
+        $database->expects($this->once())->method('deleteImage')->with($this->hash);
         $this->operation->setDatabase($database);
 
         $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
+        $storage->expects($this->once())->method('delete')->with($this->hash);
         $this->operation->setStorage($storage);
 
         $response = $this->operation->exec();
