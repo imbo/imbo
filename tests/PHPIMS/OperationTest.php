@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Operations
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,34 +31,32 @@
  */
 
 /**
- * Operation factory
- *
  * @package PHPIMS
- * @subpackage Operations
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation {
-    /**
-     * Factory method
-     *
-     * @param string $operation The name of the operation class to instantiate
-     * @param string $hash Optional hash that will be passed to the operations constructor
-     * @return PHPIMS_Operation_Abstract
-     * @throws PHPIMS_Operation_Exception
-     */
-    static public function factory($operation, $hash = null) {
-        switch ($operation) {
-            case 'PHPIMS_Operation_AddImage':
-            case 'PHPIMS_Operation_DeleteImage':
-            case 'PHPIMS_Operation_EditImage':
-            case 'PHPIMS_Operation_GetImage':
-            case 'PHPIMS_Operation_GetMetadata':
-                return new $operation($hash);
-            default:
-                throw new PHPIMS_Operation_Exception('Invalid operation class: ' . $operation);
+class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
+    public function testFactory() {
+        $operations = array(
+            'PHPIMS_Operation_AddImage',
+            'PHPIMS_Operation_DeleteImage',
+            'PHPIMS_Operation_EditImage',
+            'PHPIMS_Operation_GetImage',
+            'PHPIMS_Operation_GetMetadata',
+        );
+
+        foreach ($operations as $className) {
+            $this->assertInstanceOf($className, PHPIMS_Operation::factory($className));
         }
+    }
+
+    /**
+     * @expectedException PHPIMS_Operation_Exception
+     */
+    public function testFactoryWithUnSupportedOperation() {
+        PHPIMS_Operation::factory('foobar');
     }
 }
