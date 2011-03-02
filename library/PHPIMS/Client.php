@@ -218,6 +218,16 @@ class PHPIMS_Client {
     }
 
     /**
+     * Get metadata
+     *
+     * @param string $imageId The image identifier
+     * @return array Returns an array with metadata
+     */
+    public function getMetadata($imageId) {
+        return $this->request($this->serverUrl . '/' . $imageId . '/meta');
+    }
+
+    /**
      * Make a request
      *
      * @param string $url The URL to request
