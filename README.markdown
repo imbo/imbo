@@ -4,7 +4,7 @@ PHP Image Server (**PHPIMS**) is an image "server" that can be used to add/get/d
 
 REST API
 --------
-PHPIMS uses a REST API:
+PHPIMS uses a REST API
 
 **GET /&lt;hash&gt;**
 
