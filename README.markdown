@@ -15,15 +15,23 @@ REST API
 --------
 Users place the original images in the server by using a REST interface:
 
-* **GET /<hash>**: Fetch the image identified by <hash>. The following options are supported:
- * (int) width Width of the image in pixels
- * (int) height Height of the image in pixels
- * (string) format The file format (supported formats: jpg, gif and png)
- * (int) quality The quality of the resulting image (0-100 where 100 is the best quality. Not all image formats supports this)
-* **GET /<hash>/meta**: Get metadata related to the image identified by <hash>.
-* **DELETE /<hash>**: Delete the image identified by <hash>.
-* **POST**: Place a new image on the server along with metadata. Can be used to manipulate metadata when used with a hash
-* **HEAD /<hash>**: Fetches extra header information about a single image
+**GET /<hash>**
+Fetch the image identified by <hash>. The following options are supported:
+* (int) width Width of the image in pixels
+* (int) height Height of the image in pixels
+* (string) format The file format (supported formats: jpg, gif and png)
+* (int) quality The quality of the resulting image (0-100 where 100 is the best quality. Not all image formats supports this)
+
+**GET /<hash>/meta**
+Get metadata related to the image identified by <hash>.
+
+**DELETE /<hash>**
+Delete the image identified by <hash>.
+
+**POST /[<hash>]**
+Place a new image on the server along with metadata. Can be used to manipulate metadata when used with a hash.
+
+**HEAD /[<hash>]**: Fetches extra header information about a single image or about the site in general when used without <hash>.
 
 PHP client
 ----------
