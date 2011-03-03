@@ -1,19 +1,10 @@
 PHP Image Server
 ================
-
-The image server will consist of the following elements:
-
-Front controller
------------
-A front controller is responsible for all possible operations against the server part of PHPIMS. All requests are forwarded to this by using mod_rewrite.
-
-Crontab
--------
-PHPIMS will include a crontab that deletes files that has not been accessed for a while or simply delete all images that was created x minutes/hours/days/weeks ago. This must be configurable.
+PHP Image Server (**PHPIMS**) is an image "server" that can be used to add/get/delete images using a REST interface. There is also support for adding metadata to an image.
 
 REST API
 --------
-Users place the original images in the server by using a REST interface:
+PHPIMS uses a REST API:
 
 **GET /&lt;hash&gt;**
 
@@ -39,44 +30,47 @@ Place a new image on the server along with metadata. Can be used to manipulate m
 
 Fetches extra header information about a single image or about the site in general when used without &lt;hash&gt;.
 
+All these methods (with the exception of **HEAD** returns JSON encoded data about the triggered operation.
+
 PHP client
 ----------
-A PHP client must be made available that supports all actions in the REST interface so developers can easily use PHPIMS as a backend.
+A PHP client is included in PHPIMS that supports all the REST methods and includes some convenience methods.
 
-Dashboard
----------
-The server must also consist of a web based dashboard where users can browse the images stored on the server. Users can use this dashboard to manually upload images, delete images and manipulate metadata (basically everything associated with the content on the server).
+** Add an image **
 
-PHPIMS comes with a user database that can be manipulated to give users access to the different parts of the system. LDAP should also be supported. The authentication system must be pluggable so existing auth systems can be used. 
+    <?php
+    require 'PHPIMS/Autoload.php';
 
-Metadata
---------
-Some metadata should be used to categorize the images. The images belongs to a category tree. This is to make the dashboard easier to navigate. Instead of having one page with thousands of images PHPIMS will have a category tree. Categories should be created as they come in alongside images and must be editable in the dashboard. Since the categories is not needed when GETing an image it does not really matter which category an image belongs to. It's purely for administrative purposes. 
+    $client = new PHPIMS_Client();
+    $client->setServerUrl('http://<hostname>');
+    
+    $image = '/path/to/image.png';
+    $metadata = array(
+        'foo' => 'bar', 
+        'bar' => 'foo',
+    );
+    $response = $client->add($image, $metadata);
+    
+In the response you will find the image hash that you will need to identify the image in other operations.
 
-Config
-------
-Different parts of the system must be highly configurable. For instance:
+    <?php
+    print($response); // {"id":"4d6f3dd32f07a9e605000000"}
+    
+The response from the client is a `PHPIMS_Client_Response` object that holds all response headers and the body. When used in a string context it will return the body as JSON-encoded data. Other options that can be used are:
 
-* Disk usage of the cached images
-* How long they should stay on disk
-* Which database driver to use
-* Which storage driver to use
-* Which cache component to use
-* How much memory the cache component should be able to use
-* Who should be able to use the REST interface (should be editable via the dashboard)
+* array `getHeaders(void)`
+* array `asArray(void)`
+* stdClass `asObject(void)`
+* boolean `isOk(void)`
+* int `getStatusCode(void)`
 
-Search
-------
-Sphinx should be used to search all metadata on the server via the dashboard (and the client)
+** Delete an image **
 
-Signed requests
----------------
-PHPIMS should support the use of signed requests when generating images so people can not openly use the RESTful interface.
+    <?php
+    require 'PHPIMS/Autoload.php';
 
-Pluggable backends
-------------------
-PHPIMS will use MongoDB as a backend for the metadata and image information. The storage itself should be made using a plugin architecture so developers can make their own backends. Storage backends that should be included by default is S3 (amazon) and FS (filesystem). Memcache will be used as session storage for the dashboard part of the system, as well as caching of metadata and other information. The cache layer should also be configurable. APC and Memcache should work out of the box.
-
-Predefined helpers
-------------------
-PHPIMS should come with some predefined helpers that can resize, crop, zoom and do other things one might want to hook into some of the operations. These should have well defined configuration options so that it's easy to define hooks that can generate different sizes of an image as soon as it's added. These helpers should be able to run directly on the server, or as gearman jobs. 
+    $client = new PHPIMS_Client();
+    $client->setServerUrl('http://<hostname>');
+    
+    $hash = '<some hash>';
+    $response = $client->deleteImage($image); 
