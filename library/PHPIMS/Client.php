@@ -165,7 +165,7 @@ class PHPIMS_Client {
      *               used for other operations regarding the image.
      * @throws PHPIMS_Client_Exception
      */
-    public function add($path, array $metadata = null) {
+    public function addImage($path, array $metadata = null) {
         if (!is_file($path)) {
             throw new PHPIMS_Client_Exception('File does not exist: ' . $path);
         }
@@ -193,7 +193,7 @@ class PHPIMS_Client {
      * @param string $imageId Image identifier
      * @return array Returne an array with status information about the request
      */
-    public function delete($imageId) {
+    public function deleteImage($imageId) {
         curl_setopt_array($this->curlHandle, array(
             CURLOPT_CUSTOMREQUEST  => 'DELETE',
         ));
@@ -208,7 +208,7 @@ class PHPIMS_Client {
      * @param array $metadata An array of metadata
      * @return array Returns an array with status information about the request
      */
-    public function edit($imageId, array $metadata) {
+    public function editMetadata($imageId, array $metadata) {
         curl_setopt_array($this->curlHandle, array(
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $metadata,
