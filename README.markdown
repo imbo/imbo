@@ -16,6 +16,7 @@ REST API
 Users place the original images in the server by using a REST interface:
 
 **GET /&lt;hash&gt;**
+
 Fetch the image identified by &lt;hash&gt;. The following options are supported:
 * (int) width Width of the image in pixels
 * (int) height Height of the image in pixels
@@ -23,15 +24,19 @@ Fetch the image identified by &lt;hash&gt;. The following options are supported:
 * (int) quality The quality of the resulting image (0-100 where 100 is the best quality. Not all image formats supports this)
 
 **GET /&lt;hash&gt;/meta**
+
 Get metadata related to the image identified by &lt;hash&gt;.
 
 **DELETE /&lt;hash&gt;**
+
 Delete the image identified by &lt;hash&gt;.
 
 **POST /[&lt;hash&gt;]**
+
 Place a new image on the server along with metadata. Can be used to manipulate metadata when used with a hash.
 
 **HEAD /[&lt;hash&gt;]**
+
 Fetches extra header information about a single image or about the site in general when used without &lt;hash&gt;.
 
 PHP client
