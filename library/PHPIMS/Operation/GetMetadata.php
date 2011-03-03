@@ -56,11 +56,11 @@ class PHPIMS_Operation_GetMetadata extends PHPIMS_Operation_Abstract {
         try {
             $data = $this->getDatabase()->getImageMetadata($this->getHash());
         } catch (PHPIMS_Database_Exception $e) {
-            throw new PHPIMS_Operation_Exception('Could not get metadata', 0, $e);
+            throw new PHPIMS_Operation_Exception('Unable to fetch metadata', 500, $e);
         }
 
         $response = new PHPIMS_Server_Response(200);
-        $response->setData($data);
+        $response->setBody($data);
 
         return $response;
     }

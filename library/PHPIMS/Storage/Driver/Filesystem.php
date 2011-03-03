@@ -60,7 +60,7 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
         $params = $this->getParams();
 
         if (!is_writable($params['path'])) {
-            throw new PHPIMS_Storage_Exception($params['path'] . ' is not writable');
+            throw new PHPIMS_Storage_Exception('Could not store image', 500);
         }
 
         return move_uploaded_file($path, $params['path'] . '/' . $image->getId());
@@ -81,7 +81,7 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
         $file = $params['path'] . '/' . $hash;
 
         if (!is_file($file)) {
-            throw new PHPIMS_Storage_Exception('File does not exist');
+            throw new PHPIMS_Storage_Exception('File does not exist on the file system', 500);
         }
 
         return unlink($file);

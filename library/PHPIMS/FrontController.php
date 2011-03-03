@@ -140,7 +140,7 @@ class PHPIMS_FrontController {
         }
 
         if ($operation === null) {
-            throw new PHPIMS_Exception('Unsupported operation');
+            throw new PHPIMS_Exception('Unsupported operation', 400);
         }
 
         $factoryClass = $this->config['operation']['factory'];
@@ -157,7 +157,7 @@ class PHPIMS_FrontController {
      */
     public function handle($method, $url) {
         if (!self::isValidMethod($method)) {
-            throw new PHPIMS_Exception('Invalid HTTP method: ' . $method);
+            throw new PHPIMS_Exception('Invalid HTTP method: ' . $method, 400);
         }
 
         // Remove starting and trailing slashes
@@ -173,28 +173,11 @@ class PHPIMS_FrontController {
         $databaseDriver = $this->config['database']['driver'];
 
         if (!empty($hash) && !$databaseDriver::isValidHash($hash)) {
-            throw new PHPIMS_Exception('Invalid hash: ' . $hash);
+            throw new PHPIMS_Exception('Invalid hash: ' . $hash, 400);
         }
 
         $operation = $this->resolveOperation($method, $hash, $extra);
 
-        try {
-            $response = $operation->init($this->config)->exec();
-        } catch (PHPIMS_Operation_Exception $e) {
-            print($e->getMessage());
-            exit;
-        }
-
-        $code = $response->getCode();
-        $header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS_Server_Response::$codes[$code]);
-        header($header);
-
-        foreach ($response->getHeaders() as $header) {
-            // @codeCoverageIgnoreStart
-            header($header);
-        }
-        // @codeCoverageIgnoreEnd
-
-        print($response);
+        return $operation->init($this->config)->exec();
     }
 }

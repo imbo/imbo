@@ -56,13 +56,13 @@ class PHPIMS_Operation_DeleteImage extends PHPIMS_Operation_Abstract {
         try {
             $this->getDatabase()->deleteImage($this->getHash());
         } catch (PHPIMS_Database_Exception $e) {
-            throw new PHPIMS_Operation_Exception('Could not delete image from the database', 0, $e);
+            throw new PHPIMS_Operation_Exception('Unable to delete image from database', 500, $e);
         }
 
         try {
             $this->getStorage()->delete($this->getHash());
         } catch (PHPIMS_Storage_Exception $e) {
-            throw new PHPIMS_Operation_Exception('Could not delete image', 0, $e);
+            throw new PHPIMS_Operation_Exception('Unable to delete image', 500, $e);
         }
 
         $response = new PHPIMS_Server_Response();

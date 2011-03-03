@@ -35,7 +35,24 @@ set_include_path(__DIR__ . '/../library' . PATH_SEPARATOR . get_include_path());
 /** @see PHPIMS_Autoload */
 require_once 'PHPIMS/Autoload.php';
 
+// Fetch configuration
 $config = require __DIR__ . '/../config/server.php';
 
-$frontController = new PHPIMS_FrontController($config);
-$frontController->handle($_SERVER['REQUEST_METHOD'], $_SERVER['REDIRECT_URL']);
+try {
+    $frontController = new PHPIMS_FrontController($config);
+    $response = $frontController->handle($_SERVER['REQUEST_METHOD'],
+                                         $_SERVER['REDIRECT_URL']);
+} catch (PHPIMS_Exception $e) {
+    $response = PHPIMS_Server_Response::fromException($e);
+}
+
+$code = $response->getCode();
+$header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS_Server_Response::$codes[$code]);
+
+header($header);
+
+foreach ($response->getHeaders() as $header) {
+    header($header);
+}
+
+print($response);

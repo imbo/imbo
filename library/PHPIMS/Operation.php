@@ -58,7 +58,7 @@ class PHPIMS_Operation {
             case 'PHPIMS_Operation_GetMetadata':
                 return new $operation($hash);
             default:
-                throw new PHPIMS_Operation_Exception('Invalid operation class: ' . $operation);
+                throw new PHPIMS_Operation_Exception('Invalid operation', 500);
         }
     }
 }

@@ -52,10 +52,13 @@ class PHPIMS_Operation_AddImageTest extends PHPUnit_Framework_TestCase {
     public function setUp() {
         $this->operation = new PHPIMS_Operation_AddImage();
 
-        $_FILES['file']['name']     = 'somename';
-        $_FILES['file']['tmp_name'] = '/tmp/foobar';
-        $_FILES['file']['size']     = 42;
-        $_SERVER['HTTP_HOST']       = 'some host';
+        $_FILES['file'] = array(
+            'name'     => 'somename',
+            'tmp_name' => '/tmp/foobar',
+            'size'     => 42,
+        );
+
+        $_SERVER['HTTP_HOST'] = 'some host';
     }
 
     /**
@@ -64,13 +67,13 @@ class PHPIMS_Operation_AddImageTest extends PHPUnit_Framework_TestCase {
     public function tearDown() {
         $this->operation = null;
 
-        $_FILES = null;
-        $_SERVER = null;
+        unset($_FILES['file']);
+        unset($_SERVER['HTTP_HOST']);
     }
 
     /**
      * @expectedException PHPIMS_Operation_Exception
-     * @expectedExceptionMessage Could not insert image to the database
+     * @expectedExceptionMessage Unable to add image to the database
      */
     public function testExecWhenDatabaseFails() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
@@ -82,7 +85,7 @@ class PHPIMS_Operation_AddImageTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException PHPIMS_Operation_Exception
-     * @expectedExceptionMessage Could not store image
+     * @expectedExceptionMessage Unable to store the image
      */
     public function testExecWhenStorageFails() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');

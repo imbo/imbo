@@ -69,7 +69,7 @@ class PHPIMS_Operation_DeleteImageTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException PHPIMS_Operation_Exception
-     * @expectedExceptionMessage Could not delete image from the database
+     * @expectedExceptionMessage Unable to delete image from database
      */
     public function testExecWhenDatabaseFails() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
@@ -81,7 +81,7 @@ class PHPIMS_Operation_DeleteImageTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException PHPIMS_Operation_Exception
-     * @expectedExceptionMessage Could not delete image
+     * @expectedExceptionMessage Unable to delete image
      */
     public function testExecWhenStorageFails() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');

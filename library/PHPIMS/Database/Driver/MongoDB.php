@@ -106,7 +106,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
             $collection = $this->getDatabase()->images;
             $collection->insert($data, array('safe' => true));
         } catch (MongoException $e) {
-            throw new PHPIMS_Database_Exception('Could not save image data to database', 0, $e);
+            throw new PHPIMS_Database_Exception('Unable to save image data', 500, $e);
         }
 
         $image->setId((string) $data['_id']);
@@ -126,7 +126,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
             $mongoCollection = $this->getDatabase()->images;
             $mongoCollection->remove(array('_id' => new MongoId($hash)), array('justOne' => true, 'safe' => true));
         } catch (MongoException $e) {
-            throw new PHPIMS_Database_Exception('Could not delete image', 0, $e);
+            throw new PHPIMS_Database_Exception('Unable to delete image data', 500, $e);
         }
 
         return true;
@@ -152,7 +152,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
                 )
             );
         } catch (MongoException $e) {
-            throw new PHPIMS_Database_Exception('Unable to edit image data', 0, $e);
+            throw new PHPIMS_Database_Exception('Unable to edit image data', 500, $e);
         }
 
         return true;
@@ -170,7 +170,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
             $mongoCollection = $this->getDatabase()->images;
             $data = $mongoCollection->findOne(array('_id' => new MongoID($hash)));
         } catch (MongoException $e) {
-            throw new PHPIMS_Database_Exception('Unable to get image metadata', 0, $e);
+            throw new PHPIMS_Database_Exception('Unable to fetch image metadata', 500, $e);
         }
 
         return $data;

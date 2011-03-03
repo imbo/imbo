@@ -45,8 +45,57 @@ class PHPIMS_Server_Response {
      * @var array
      */
     static public $codes = array(
+        // 1xx Informational
+        100 => 'Continue',
+        101 => 'Switching Protocols',
+
+        // 2xx Success
         200 => 'OK',
         201 => 'Created',
+        202 => 'Accepted',
+        203 => 'Non-Authoritative Information', // 1.1
+        204 => 'No Content',
+        205 => 'Reset Content',
+        206 => 'Partial Content',
+
+        // 3xx Redirection
+        300 => 'Multiple Choices',
+        301 => 'Moved Permanently',
+        302 => 'Found',
+        303 => 'See Other', // 1.1
+        304 => 'Not Modified',
+        305 => 'Use Proxy', // 1.1
+        306 => 'Switch Proxy',
+        307 => 'Temporary Redirect', // 1.1
+
+        // 4xx Client Error
+        400 => 'Bad Request',
+        401 => 'Unauthorized',
+        402 => 'Payment Required',
+        403 => 'Forbidden',
+        404 => 'Not Found',
+        405 => 'Method Not Allowed',
+        406 => 'Not Acceptable',
+        407 => 'Proxy Authentication Required',
+        408 => 'Request Timeout',
+        409 => 'Conflict',
+        410 => 'Gone',
+        411 => 'Length Required',
+        412 => 'Precondition Failed',
+        413 => 'Request Entity Too Large',
+        414 => 'Request-URI Too Long',
+        415 => 'Unsupported Media Type',
+        416 => 'Requested Range Not Satisfiable',
+        417 => 'Expectation Failed',
+
+        // 5xx Server Error
+        500 => 'Internal Server Error',
+        501 => 'Not Implemented',
+        502 => 'Bad Gateway',
+        503 => 'Service Unavailable',
+        504 => 'Gateway Timeout',
+        505 => 'HTTP Version Not Supported',
+        509 => 'Bandwidth Limit Exceeded',
     );
 
     /**
@@ -64,22 +113,22 @@ class PHPIMS_Server_Response {
     protected $headers = array();
 
     /**
-     * The data to send
+     * The body of the response
      *
      * The data to send back to the client. Will be sent as a json encoded array
      *
      * @var array
      */
-    protected $data = array();
+    protected $body = array();
 
     /**
      * Class constructor
      *
      * @param int $code Optional HTTP status code
      * @param array $headers Optional headers
-     * @param array $data Optional data
+     * @param array $body Optional body content
      */
-    public function __construct($code = null, array $headers = null, array $data = null) {
+    public function __construct($code = null, array $headers = null, array $body = null) {
         if ($code !== null) {
             $this->setCode($code);
         }
@@ -88,8 +137,8 @@ class PHPIMS_Server_Response {
             $this->setHeaders($headers);
         }
 
-        if ($data !== null) {
-            $this->setData($data);
+        if ($body !== null) {
+            $this->setBody($body);
         }
     }
 
@@ -148,22 +197,22 @@ class PHPIMS_Server_Response {
     }
 
     /**
-     * Get the data
+     * Get the body
      *
      * @return array
      */
-    public function getData() {
-        return $this->data;
+    public function getBody() {
+        return $this->body;
     }
 
     /**
-     * Set the data
+     * Set the body
      *
-     * @param array $data The data to be encoded
+     * @param array $body The body content
      * @return PHPIMS_Server_Response
      */
-    public function setData(array $data) {
-        $this->data = $data;
+    public function setBody(array $body) {
+        $this->body = $body;
 
         return $this;
     }
@@ -171,11 +220,29 @@ class PHPIMS_Server_Response {
     /**
      * Magic to string method
      *
-     * This magic method will encode the data array to a JSON string and return that
+     * This magic method will encode the body to a JSON string and return that.
      *
      * @return string
      */
     public function __toString() {
-        return json_encode($this->getData());
+        return json_encode($this->getBody());
+    }
+
+    /**
+     * Create a response based on an exception object
+     *
+     * @param PHPIMS_Exception $e
+     * @return PHPIMS_Server_Response
+     */
+    static public function fromException(PHPIMS_Exception $e) {
+        $response = new static($e->getCode());
+        $response->setBody(array(
+            'error' => array(
+                'code'    => $e->getCode(),
+                'message' => $e->getMessage(),
+            ),
+        ));
+
+        return $response;
     }
 }

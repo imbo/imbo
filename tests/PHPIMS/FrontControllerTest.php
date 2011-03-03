@@ -93,29 +93,12 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Get a PHPIMS_Server_Response mock object
-     *
-     * @param int $code The code to get when calling getCode()
-     * @param array $headers The headers to get when calling getHeaders()
-     * @return PHPIMS_Server_Response A mock of PHPIMS_Server_Response
-     */
-    protected function getResponseMock($code = 200, array $headers = array()) {
-        $response = $this->getMock('PHPIMS_Server_Response');
-        $response->expects($this->once())->method('getCode')->will($this->returnValue($code));
-        $response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
-
-        return $response;
-    }
-
-    /**
      * Get a PHPIMS_Operation_Abstract mock object
      *
      * @param string $operationClass The class name of the operation to mock
      */
-    protected function getOperationMock($operationClass, PHPIMS_Server_Response $response = null) {
-        if ($response === null) {
-            $response = $this->getResponseMock();
-        }
+    protected function getOperationMock($operationClass) {
+        $response = $this->getMock('PHPIMS_Server_Response');
 
         $operation = $this->getMock($operationClass);
         $operation->expects($this->once())->method('init')->with($this->controllerConfig)->will($this->returnValue($operation));

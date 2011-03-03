@@ -84,19 +84,19 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
         $this->assertSame($headers, $this->response->getHeaders());
     }
 
-    public function testSetGetData() {
-        $data = array(
+    public function testSetGetBody() {
+        $body = array(
             'foo' => 'bar',
             'bar' => 'foo',
         );
-        $this->response->setData($data);
-        $this->assertSame($data, $this->response->getData());
+        $this->response->setBody($body);
+        $this->assertSame($body, $this->response->getBody());
     }
 
     public function testToStringMagicMethod() {
-        $data = array('foo' => 'bar', 'bar' => 42);
-        $this->response->setData($data);
-        $this->assertSame(json_encode($data), (string) $this->response);
+        $body = array('foo' => 'bar', 'bar' => 42);
+        $this->response->setBody($body);
+        $this->assertSame(json_encode($body), (string) $this->response);
     }
 
     public function testUseFullConstructor() {
@@ -105,13 +105,13 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
             'Location: http://foo/bar',
             'x-Some: Value',
         );
-        $data = array(
+        $body = array(
             'foo' => 'bar',
             'bar' => 'foo',
         );
-        $response = new PHPIMS_Server_Response($code, $headers, $data);
+        $response = new PHPIMS_Server_Response($code, $headers, $body);
         $this->assertSame($code, $response->getCode());
         $this->assertSame($headers, $response->getHeaders());
-        $this->assertSame($data, $response->getData());
+        $this->assertSame($body, $response->getBody());
     }
 }
