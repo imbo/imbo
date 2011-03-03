@@ -182,4 +182,22 @@ class PHPIMS_Client_Response {
 
         return $response;
     }
+
+    /**
+     * Return the body as an array
+     *
+     * @return array
+     */
+    public function asArray() {
+        return json_decode($this->getBody(), true);
+    }
+
+    /**
+     * Return the body as an object
+     *
+     * @return stdClass
+     */
+    public function asObject() {
+        return json_decode($this->getBody());
+    }
 }
