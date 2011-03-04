@@ -122,13 +122,20 @@ class PHPIMS_Server_Response {
     protected $body = array();
 
     /**
+     * Raw data to be sent
+     *
+     * @var string
+     */
+    protected $rawData = null;
+
+    /**
      * Class constructor
      *
      * @param int $code Optional HTTP status code
      * @param array $headers Optional headers
      * @param array $body Optional body content
      */
-    public function __construct($code = null, array $headers = null, array $body = null) {
+    public function __construct($code = null, array $headers = null, array $body = null, $rawData = null) {
         if ($code !== null) {
             $this->setCode($code);
         }
@@ -139,6 +146,10 @@ class PHPIMS_Server_Response {
 
         if ($body !== null) {
             $this->setBody($body);
+        }
+
+        if ($rawData !== null) {
+            $this->setRawData($rawData);
         }
     }
 
@@ -218,13 +229,41 @@ class PHPIMS_Server_Response {
     }
 
     /**
+     * Get the raw data
+     *
+     * @return string
+     */
+    public function getRawData() {
+        return $this->rawData;
+    }
+
+    /**
+     * Set the raw data
+     *
+     * @param string $data The data to set
+     * @return PHPIMS_Server_Response
+     */
+    public function setRawData($data) {
+        $this->rawData = $data;
+
+        return $this;
+    }
+
+    /**
      * Magic to string method
      *
-     * This magic method will encode the body to a JSON string and return that.
+     * This magic method will encode the body to a JSON string and return that unless the object
+     * contains raw data (like an image blob).
      *
      * @return string
      */
     public function __toString() {
+        $data = $this->getRawData();
+
+        if ($data) {
+            return $data;
+        }
+
         return json_encode($this->getBody());
     }
 
