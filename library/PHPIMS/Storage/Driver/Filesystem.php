@@ -86,4 +86,25 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
 
         return unlink($file);
     }
+
+    /**
+     * Fetch an image
+     *
+     * This method will return the image data as a blob based on the hash.
+     *
+     * @param string $hash Unique hash identifying an image
+     * @return array
+     * @throws PHPIMS_Storage_Exception
+     */
+    public function fetch($hash) {
+        $params = $this->getParams();
+
+        $file = $params['path'] . '/' . $hash;
+
+        if (!is_file($file)) {
+            throw new PHPIMS_Storage_Exception('File does not exist on the file system', 404);
+        }
+
+        return file_get_contents($file);
+    }
 }
