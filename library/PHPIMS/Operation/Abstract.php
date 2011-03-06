@@ -63,6 +63,13 @@ abstract class PHPIMS_Operation_Abstract {
     protected $storage = null;
 
     /**
+     * Plugins for the current operation
+     *
+     * @var array An array of objects extending the PHPIMS_Operation_Plugin_Abstract class
+     */
+    protected $plugins = array();
+
+    /**
      * Class constructor
      *
      * @param string $hash An optional hash for the operation to work with
@@ -98,6 +105,39 @@ abstract class PHPIMS_Operation_Abstract {
 
             $this->setStorage(new $config['storage']['driver']($params));
         }
+
+        if (!empty($config['plugins'][__CLASS__])) {
+            foreach ($config['plugins'][__CLASS__] as $pluginName => $pluginParams) {
+                $plugin = new $pluginName($pluginParams, $this);
+                $this->addPlugin($plugin);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Pre exec method
+     *
+     * This method will trigger the preExec method on all registered plugins
+     *
+     * @return PHPIMS_Operation_Abstract
+     */
+    public function preExec() {
+        array_map(function ($plugin) { $plugin->preExec(); }, $this->getPlugins());
+
+        return $this;
+    }
+
+    /**
+     * Post exec method
+     *
+     * This method will trigger the postExec method on all registered plugins
+     *
+     * @return PHPIMS_Operation_Abstract
+     */
+    public function postExec() {
+        array_map(function ($plugin) { $plugin->postExec(); }, $this->getPlugins());
 
         return $this;
     }
@@ -136,7 +176,7 @@ abstract class PHPIMS_Operation_Abstract {
      * Set the database driver
      *
      * @param PHPIMS_Database_Driver_Abstract $driver The driver instance
-     * @return PHPIMS_FrontController
+     * @return PHPIMS_Operation_Abstract
      */
     public function setDatabase(PHPIMS_Database_Driver_Abstract $driver) {
         $this->database = $driver;
@@ -157,10 +197,43 @@ abstract class PHPIMS_Operation_Abstract {
      * Set the storage driver
      *
      * @param PHPIMS_Storage_Driver_Abstract $driver The driver instance
-     * @return PHPIMS_FrontController
+     * @return PHPIMS_Operation_Abstract
      */
     public function setStorage(PHPIMS_Storage_Driver_Abstract $driver) {
         $this->storage = $driver;
+
+        return $this;
+    }
+
+    /**
+     * Return the plugins
+     *
+     * @return array
+     */
+    public function getPlugins() {
+        return $this->plugins;
+    }
+
+    /**
+     * Set all plugins (will remove ones already registered)
+     *
+     * @param array $plugins An array of objects extending PHPIMS_Operation_Plugin_Abstract
+     * @return PHPIMS_Operation_Abstract
+     */
+    public function setPlugins(array $plugins) {
+        $this->plugins = $plugins;
+
+        return $this;
+    }
+
+    /**
+     * Add a single plugin
+     *
+     * @param PHPIMS_Operation_Plugin_Abstract $plugin The plugin to append to the array of plugins
+     * @return PHPIMS_Operation_Abstract
+     */
+    public function addPlugin(PHPIMS_Operation_Plugin_Abstract $plugin) {
+        $this->plugins[] = $plugin;
 
         return $this;
     }

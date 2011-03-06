@@ -35,6 +35,15 @@
  *
  * A MongoDB database driver for PHPIMS
  *
+ * Valid parameters for this driver:
+ *
+ * Required:
+ * - <none>
+ *
+ * Optional:
+ * - (string) database => Name of the database. Defaults to 'phpims'
+ * - (string) collection => Name of the collection to store data in. Defaults to 'images'
+ *
  * @package PHPIMS
  * @subpackage DatabaseDriver
  * @author Christer Edvartsen <cogo@starzinger.net>

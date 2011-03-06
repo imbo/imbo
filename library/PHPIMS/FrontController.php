@@ -178,6 +178,11 @@ class PHPIMS_FrontController {
 
         $operation = $this->resolveOperation($method, $hash, $extra);
 
-        return $operation->init($this->config)->exec();
+        $operation->init($this->config);
+        $operation->preExec();
+        $response = $operation->exec();
+        $operation->postExec();
+
+        return $response;
     }
 }
