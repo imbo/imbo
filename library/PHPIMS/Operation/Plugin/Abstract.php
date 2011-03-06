@@ -115,6 +115,8 @@ abstract class PHPIMS_Operation_Plugin_Abstract {
 
     /**
      * Method that will be triggered before the operation exec() kicks in
+     *
+     * @throws PHPIMS_Operation_Plugin_Exception
      */
     public function preExec() {
         // Must be implemented by plugins
@@ -122,6 +124,8 @@ abstract class PHPIMS_Operation_Plugin_Abstract {
 
     /**
      * Method that will be triggered after the operations exec() method is finished
+     *
+     * @throws PHPIMS_Operation_Plugin_Exception
      */
     public function postExec() {
         // Must be implemented by plugins

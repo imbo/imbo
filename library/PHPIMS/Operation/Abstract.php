@@ -124,7 +124,13 @@ abstract class PHPIMS_Operation_Abstract {
      * @return PHPIMS_Operation_Abstract
      */
     public function preExec() {
-        array_map(function ($plugin) { $plugin->preExec(); }, $this->getPlugins());
+        array_map(function ($plugin) {
+            try {
+                $plugin->preExec();
+            } catch (PHPIMS_Operation_Plugin_Exception $e) {
+                trigger_error(sprintf('Plugin "%s" failed: %s', get_class($plugin), $e->getMessage()), E_USER_WARNING);
+            }
+        }, $this->getPlugins());
 
         return $this;
     }
@@ -137,7 +143,13 @@ abstract class PHPIMS_Operation_Abstract {
      * @return PHPIMS_Operation_Abstract
      */
     public function postExec() {
-        array_map(function ($plugin) { $plugin->postExec(); }, $this->getPlugins());
+        array_map(function ($plugin) {
+            try {
+                $plugin->postExec();
+            } catch (PHPIMS_Operation_Plugin_Exception $e) {
+                trigger_error(sprintf('Plugin "%s" failed: %s', get_class($plugin), $e->getMessage()), E_USER_WARNING);
+            }
+        }, $this->getPlugins());
 
         return $this;
     }
