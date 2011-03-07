@@ -86,4 +86,10 @@ class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
         $this->image->setMetadata($data);
         $this->assertSame($data, $this->image->getMetadata());
     }
+
+    public function testSetGetPath() {
+        $path = '/some/path.jpg';
+        $this->image->setPath($path);
+        $this->assertSame($path, $this->image->getPath());
+    }
 }
