@@ -112,4 +112,26 @@ class PHPIMS_Database_Driver_Test extends PHPIMS_Database_Driver_Abstract {
             'bar' => 'foo',
         );
     }
+
+    /**
+     * Get the mime-type of an image
+     *
+     * @param string $hash The unique ID of the image to get the mime-type of
+     * @return string The mime type that can be placed in a Content-Type header
+     * @throws PHPIMS_Database_Exception
+     */
+    public function getImageMimetype($hash) {
+        return 'image/png';
+    }
+
+    /**
+     * Get the file size of an image
+     *
+     * @param string $hash The unique ID of the image to get the size of
+     * @return int The size of the file in bytes
+     * @throws PHPIMS_Database_Exception
+     */
+    public function getImageSize($hash) {
+        return 1337;
+    }
 }

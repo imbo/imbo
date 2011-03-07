@@ -54,13 +54,24 @@ class PHPIMS_Operation_GetImage extends PHPIMS_Operation_Abstract {
      */
     public function exec() {
         try {
-            $data = $this->getStorage()->fetch($this->getHash());
+            // Prepare headers for the response
+            $headers = array(
+                'Content-Type'   => $this->getDatabase()->getImageMimeType($this->getHash()),
+                'Content-Length' => $this->getDatabase()->getImageSize($this->getHash()),
+            );
+        } catch (PHPIMS_Database_Exception $e) {
+            throw new PHPIMS_Operation_Exception('Unable to fetch information about the image', 500, $e);
+        }
+
+        try {
+            $fileContents = $this->getStorage()->fetch($this->getHash());
         } catch (PHPIMS_Storage_Exception $e) {
             throw new PHPIMS_Operation_Exception('Unable to fetch the image', 500, $e);
         }
 
         $this->getResponse()->setCode(200)
-                            ->setBody($data);
+                            ->setHeaders($headers)
+                            ->setRawData($fileContents);
 
         return $this;
     }

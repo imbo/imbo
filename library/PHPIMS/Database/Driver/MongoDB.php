@@ -192,4 +192,40 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
 
         return $data;
     }
+
+    /**
+     * Get the mime-type of an image
+     *
+     * @param string $hash The unique ID of the image to get the mime-type of
+     * @return string The mime type that can be placed in a Content-Type header
+     * @throws PHPIMS_Database_Exception
+     */
+    public function getImageMimetype($hash) {
+        try {
+            $mongoCollection = $this->getDatabase()->images;
+            $data = $mongoCollection->findOne(array('_id' => new MongoID($hash)), array('_mime'));
+        } catch (MongoException $e) {
+            throw new PHPIMS_Database_Exception('Unable to fetch image metadata', 500, $e);
+        }
+
+        return $data['_mime'];
+    }
+
+    /**
+     * Get the file size of an image
+     *
+     * @param string $hash The unique ID of the image to get the size of
+     * @return int The size of the file in bytes
+     * @throws PHPIMS_Database_Exception
+     */
+    public function getImageSize($hash) {
+        try {
+            $mongoCollection = $this->getDatabase()->images;
+            $data = $mongoCollection->findOne(array('_id' => new MongoID($hash)), array('_size'));
+        } catch (MongoException $e) {
+            throw new PHPIMS_Database_Exception('Unable to fetch image metadata', 500, $e);
+        }
+
+        return (int) $data['_size'];
+    }
 }
