@@ -77,4 +77,66 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
         $this->operation->setStorage($driver);
         $this->assertSame($driver, $this->operation->getStorage());
     }
+
+    public function testSetGetImage() {
+        $image = $this->getMock('PHPIMS_Image');
+        $this->operation->setImage($image);
+        $this->assertSame($image, $this->operation->getImage());
+
+    }
+
+    public function testSetGetAndAddPlugins() {
+        $plugin1 = $this->getMockForAbstractClass('PHPIMS_Operation_Plugin_Abstract');
+        $plugin2 = $this->getMockForAbstractClass('PHPIMS_Operation_Plugin_Abstract');
+        $plugin3 = $this->getMockForAbstractClass('PHPIMS_Operation_Plugin_Abstract');
+
+        $this->operation->setPlugins(array($plugin1, $plugin2));
+        $this->assertSame(array($plugin1, $plugin2), $this->operation->getPlugins());
+
+        $this->operation->addPlugin($plugin3);
+        $this->assertSame(array($plugin1, $plugin2, $plugin3), $this->operation->getPlugins());
+
+        $this->operation->setPlugins(array($plugin3));
+        $this->assertSame(array($plugin3), $this->operation->getPlugins());
+    }
+
+    public function testPreAndPostExec() {
+        $plugin1 = $this->getMock('PHPIMS_Operation_Plugin_Abstract');
+        $plugin1->expects($this->once())->method('preExec');
+        $plugin1->expects($this->once())->method('postExec');
+
+        $plugin2 = $this->getMock('PHPIMS_Operation_Plugin_Abstract');
+        $plugin2->expects($this->once())->method('preExec');
+        $plugin2->expects($this->once())->method('postExec');
+
+        $this->operation->setPlugins(array($plugin1, $plugin2));
+        $this->operation->preExec();
+        $this->operation->postExec();
+    }
+
+    public function testPreExecWhenAPluginFails() {
+        $plugin1 = $this->getMock('PHPIMS_Operation_Plugin_Abstract');
+        $plugin1->expects($this->once())->method('preExec');
+
+        $message = 'some message';
+        $plugin2 = $this->getMock('PHPIMS_Operation_Plugin_Abstract');
+        $plugin2->expects($this->once())->method('preExec')->will($this->throwException(new PHPIMS_Operation_Plugin_Exception($message)));
+
+        $this->operation->setPlugins(array($plugin1, $plugin2));
+        $this->setExpectedException('PHPUnit_Framework_Error_Warning');
+        $this->operation->preExec();
+    }
+
+    public function testPostExecWhenAPluginFails() {
+        $plugin1 = $this->getMock('PHPIMS_Operation_Plugin_Abstract');
+        $plugin1->expects($this->once())->method('postExec');
+
+        $message = 'some message';
+        $plugin2 = $this->getMock('PHPIMS_Operation_Plugin_Abstract');
+        $plugin2->expects($this->once())->method('postExec')->will($this->throwException(new PHPIMS_Operation_Plugin_Exception($message)));
+
+        $this->operation->setPlugins(array($plugin1, $plugin2));
+        $this->setExpectedException('PHPUnit_Framework_Error_Warning');
+        $this->operation->postExec();
+    }
 }

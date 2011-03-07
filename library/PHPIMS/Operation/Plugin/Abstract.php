@@ -60,6 +60,7 @@ abstract class PHPIMS_Operation_Plugin_Abstract {
      *
      * @param array $params Parameters to the plugin
      * @param PHPIMS_Operation_Abstract $operation Operation that owns this plugin
+     * @codeCoverageIgnore
      */
     public function __construct(array $params = null, PHPIMS_Operation_Abstract $operation = null) {
         if ($params !== null) {
@@ -117,6 +118,7 @@ abstract class PHPIMS_Operation_Plugin_Abstract {
      * Method that will be triggered before the operation exec() kicks in
      *
      * @throws PHPIMS_Operation_Plugin_Exception
+     * @codeCoverageIgnore
      */
     public function preExec() {
         // Must be implemented by plugins
@@ -126,6 +128,7 @@ abstract class PHPIMS_Operation_Plugin_Abstract {
      * Method that will be triggered after the operations exec() method is finished
      *
      * @throws PHPIMS_Operation_Plugin_Exception
+     * @codeCoverageIgnore
      */
     public function postExec() {
         // Must be implemented by plugins

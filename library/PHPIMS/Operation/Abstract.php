@@ -70,6 +70,13 @@ abstract class PHPIMS_Operation_Abstract {
     protected $plugins = array();
 
     /**
+     * Image objects shared by the operation and plugins
+     *
+     * @var PHPIMS_Image
+     */
+    protected $image = null;
+
+    /**
      * Class constructor
      *
      * @param string $hash An optional hash for the operation to work with
@@ -246,6 +253,27 @@ abstract class PHPIMS_Operation_Abstract {
      */
     public function addPlugin(PHPIMS_Operation_Plugin_Abstract $plugin) {
         $this->plugins[] = $plugin;
+
+        return $this;
+    }
+
+    /**
+     * Get the current image
+     *
+     * @return PHPIMS_Image
+     */
+    public function getImage() {
+        return $this->image;
+    }
+
+    /**
+     * Set the image
+     *
+     * @param PHPIMS_Image $image The image object to set
+     * @return PHPIMS_Operation_Abstract
+     */
+    public function setImage(PHPIMS_Image $image) {
+        $this->image = $image;
 
         return $this;
     }
