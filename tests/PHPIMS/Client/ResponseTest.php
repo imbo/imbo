@@ -128,4 +128,14 @@ class PHPIMS_Client_ResponseTest extends PHPUnit_Framework_TestCase {
         $this->assertSame('Some content', $response->getBody());
         $this->assertSame(6, count($response->getHeaders()));
     }
+
+    public function testAsArray() {
+        $this->response->setBody(json_encode(array('foo' => 'bar')));
+        $this->assertInternalType('array', $this->response->asArray());
+    }
+
+    public function testAsObject() {
+        $this->response->setBody(json_encode(array('foo' => 'bar')));
+        $this->assertInstanceOf('stdClass', $this->response->asObject());
+    }
 }
