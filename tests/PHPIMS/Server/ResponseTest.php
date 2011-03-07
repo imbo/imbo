@@ -97,6 +97,10 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
         $body = array('foo' => 'bar', 'bar' => 42);
         $this->response->setBody($body);
         $this->assertSame(json_encode($body), (string) $this->response);
+
+        $rawData = 'some data';
+        $this->response->setRawData($rawData);
+        $this->assertSame($rawData, (string) $this->response);
     }
 
     public function testUseFullConstructor() {
@@ -109,9 +113,28 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
             'foo' => 'bar',
             'bar' => 'foo',
         );
-        $response = new PHPIMS_Server_Response($code, $headers, $body);
+        $rawData = 'some data';
+
+        $response = new PHPIMS_Server_Response($code, $headers, $body, $rawData);
         $this->assertSame($code, $response->getCode());
         $this->assertSame($headers, $response->getHeaders());
         $this->assertSame($body, $response->getBody());
+        $this->assertSame($rawData, $response->getRawData());
+    }
+
+    public function testSetGetRawData() {
+        $rawData = 'some data';
+        $this->response->setRawData($rawData);
+        $this->assertSame($rawData, $this->response->getRawData());
+    }
+
+    public function testStaticFromException() {
+        $code = 404;
+        $message = 'some message';
+        $e = new PHPIMS_Exception($message, $code);
+
+        $response = PHPIMS_Server_Response::fromException($e);
+        $this->assertSame($code, $response->getCode());
+        $this->assertSame(array('error' => array('code' => $code, 'message' => $message)), $response->getBody());
     }
 }
