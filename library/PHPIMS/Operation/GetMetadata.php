@@ -49,7 +49,7 @@ class PHPIMS_Operation_GetMetadata extends PHPIMS_Operation_Abstract {
      * Operations must implement this method and return a PHPIMS_Server_Response object to return
      * to the client.
      *
-     * @return PHPIMS_Server_Response
+     * @return PHPIMS_Operation_GetMetadata
      * @throws PHPIMS_Operation_Exception
      */
     public function exec() {
@@ -59,9 +59,9 @@ class PHPIMS_Operation_GetMetadata extends PHPIMS_Operation_Abstract {
             throw new PHPIMS_Operation_Exception('Unable to fetch metadata', 500, $e);
         }
 
-        $response = new PHPIMS_Server_Response(200);
-        $response->setBody($data);
+        $this->getResponse()->setCode(200)
+                            ->setBody($data);
 
-        return $response;
+        return $this;
     }
 }

@@ -49,7 +49,7 @@ class PHPIMS_Operation_EditImage extends PHPIMS_Operation_Abstract {
      * Operations must implement this method and return a PHPIMS_Server_Response object to return
      * to the client.
      *
-     * @return PHPIMS_Server_Response
+     * @return PHPIMS_Operation_EditImage
      * @throws PHPIMS_Operation_Exception
      */
     public function exec() {
@@ -59,6 +59,8 @@ class PHPIMS_Operation_EditImage extends PHPIMS_Operation_Abstract {
             throw new PHPIMS_Operation_Exception('Unable to edit image data', 500, $e);
         }
 
-        return new PHPIMS_Server_Response(200);
+        $this->getResponse()->setCode(200);
+
+        return $this;
     }
 }

@@ -88,8 +88,8 @@ class PHPIMS_Operation_GetMetadataTest extends PHPUnit_Framework_TestCase {
         $database->expects($this->once())->method('getImageMetadata')->with($this->hash)->will($this->returnValue($data));
         $this->operation->setDatabase($database);
 
-        $response = $this->operation->exec();
-        $this->assertInstanceOf('PHPIMS_Server_Response', $response);
-        $this->assertSame($data, $response->getBody());
+        $this->operation->exec();
+
+        $this->assertSame($data, $this->operation->getResponse()->getBody());
     }
 }

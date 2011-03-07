@@ -108,7 +108,6 @@ class PHPIMS_Operation_AddImageTest extends PHPUnit_Framework_TestCase {
         $storage->expects($this->once())->method('store')->with($_FILES['file']['tmp_name']);
         $this->operation->setStorage($storage);
 
-        $response = $this->operation->exec();
-        $this->assertInstanceOf('PHPIMS_Server_Response', $response);
+        $this->operation->exec();
     }
 }

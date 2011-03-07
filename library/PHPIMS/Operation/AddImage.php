@@ -49,11 +49,11 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
      * Operations must implement this method and return a PHPIMS_Server_Response object to return
      * to the client.
      *
-     * @return PHPIMS_Server_Response
+     * @return PHPIMS_Operation_AddImage
      * @throws PHPIMS_Operation_Exception
      */
     public function exec() {
-        $image = new PHPIMS_Image();
+        $image = $this->getImage();
         $image->setFilename($_FILES['file']['name'])
               ->setFilesize($_FILES['file']['size'])
               ->setMetadata($_POST);
@@ -71,11 +71,13 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
         }
 
         $location = $_SERVER['HTTP_HOST'] . '/' . $image->getId();
-        $response = new PHPIMS_Server_Response();
-        $response->setCode(201)
-                 ->addHeader('Location: http://' . $location)
-                 ->setBody(array('id' => $image->getId()));
 
-        return $response;
+        $this->getResponse()->setCode(201)
+                            ->addHeader('Location: http://' . $location)
+                            ->setBody(array(
+                                'id' => $image->getId(),
+                            ));
+
+        return $this;
     }
 }

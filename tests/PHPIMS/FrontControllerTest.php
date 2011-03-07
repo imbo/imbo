@@ -102,7 +102,9 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
 
         $operation = $this->getMock($operationClass);
         $operation->expects($this->once())->method('init')->with($this->controllerConfig)->will($this->returnValue($operation));
-        $operation->expects($this->once())->method('exec')->will($this->returnValue($response));
+        $operation->expects($this->once())->method('preExec')->will($this->returnValue($operation));
+        $operation->expects($this->once())->method('exec')->will($this->returnValue($operation));
+        $operation->expects($this->once())->method('postExec')->will($this->returnValue($operation));
 
         return $operation;
     }

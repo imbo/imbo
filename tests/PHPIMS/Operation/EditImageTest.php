@@ -84,7 +84,6 @@ class PHPIMS_Operation_EditImageTest extends PHPUnit_Framework_TestCase {
         $database->expects($this->once())->method('editImage')->with($this->hash, $_POST);
         $this->operation->setDatabase($database);
 
-        $response = $this->operation->exec();
-        $this->assertInstanceOf('PHPIMS_Server_Response', $response);
+        $this->operation->exec();
     }
 }

@@ -70,27 +70,54 @@ abstract class PHPIMS_Operation_Abstract {
     protected $plugins = array();
 
     /**
-     * Image objects shared by the operation and plugins
+     * Image instance
+     *
+     * The image object is populated with en empty instance of PHPIMS_Image when the operation
+     * initializes.
      *
      * @var PHPIMS_Image
      */
     protected $image = null;
 
     /**
+     * Response instance
+     *
+     * The response object is populated with en empty instance of PHPIMS_Server_Response when the
+     * operation initializes.
+     *
+     * @var PHPIMS_Image
+     */
+    protected $response = null;
+
+    /**
      * Class constructor
      *
      * @param string $hash An optional hash for the operation to work with
+     * @param PHPIMS_Image $image Optional image object
+     * @param PHPIMS_Server_Response $response Optional response object
      */
-    public function __construct($hash = null) {
+    public function __construct($hash = null, PHPIMS_Image $image = null, PHPIMS_Server_Response $response = null) {
         if ($hash !== null) {
             $this->setHash($hash);
         }
+
+        if ($image === null) {
+            $image = new PHPIMS_Image();
+        }
+
+        if ($response === null) {
+            $response = new PHPIMS_Server_Response();
+        }
+
+        $this->setImage($image);
+        $this->setResponse($response);
     }
 
     /**
      * Init method
      *
      * @param array $config Configuration passed on from the front controller
+     * @return PHPIMS_Operation_Abstract
      */
     public function init(array $config) {
         if (!empty($config['database']['driver'])) {
@@ -279,12 +306,33 @@ abstract class PHPIMS_Operation_Abstract {
     }
 
     /**
+     * Get the response object
+     *
+     * @return PHPIMS_Server_Response
+     */
+    public function getResponse() {
+        return $this->response;
+    }
+
+    /**
+     * Set the response instance
+     *
+     * @param PHPIMS_Server_Response $response A response object
+     * @return PHPIMS_Operation_Abstract
+     */
+    public function setResponse(PHPIMS_Server_Response $response) {
+        $this->response = $response;
+
+        return $this;
+    }
+
+    /**
      * Execute the operation
      *
      * Operations must implement this method and return a PHPIMS_Server_Response object to return
      * to the client.
      *
-     * @return PHPIMS_Server_Response
+     * @return PHPIMS_Operation_Abstract
      * @throws PHPIMS_Operation_Exception
      */
     abstract public function exec();

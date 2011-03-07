@@ -104,7 +104,6 @@ class PHPIMS_Operation_DeleteImageTest extends PHPUnit_Framework_TestCase {
         $storage->expects($this->once())->method('delete')->with($this->hash);
         $this->operation->setStorage($storage);
 
-        $response = $this->operation->exec();
-        $this->assertInstanceOf('PHPIMS_Server_Response', $response);
+        $this->operation->exec();
     }
 }
