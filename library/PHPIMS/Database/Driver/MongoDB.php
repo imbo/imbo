@@ -108,8 +108,16 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      */
     public function insertNewImage(PHPIMS_Image $image) {
         $data = $image->getMetadata();
-        $data['name'] = $image->getFilename();
-        $data['size'] = $image->getFilesize();
+
+        $data['_name']  = $image->getFilename();
+        $data['_size']  = $image->getFilesize();
+        $data['_added'] = time();
+        $data['_md5']   = md5_file($image->getPath());
+
+        // Add some special data about the image
+        $fp = finfo_open(FILEINFO_MIME_TYPE);
+        $data['_mime'] = finfo_file($fp, $image->getPath());
+        finfo_close($fp);
 
         try {
             $collection = $this->getDatabase()->images;

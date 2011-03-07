@@ -63,7 +63,15 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
             throw new PHPIMS_Storage_Exception('Could not store image', 500);
         }
 
-        return move_uploaded_file($path, $params['path'] . '/' . $image->getId());
+        $newPath = $params['path'] . '/' . $image->getId();
+        $result = move_uploaded_file($path, $newPath);
+
+        if ($result) {
+            // Update image path if the operation was successful
+            $image->setPath($newPath);
+        }
+
+        return $result;
     }
 
     /**

@@ -56,6 +56,7 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
         $image = $this->getImage();
         $image->setFilename($_FILES['file']['name'])
               ->setFilesize($_FILES['file']['size'])
+              ->setPath($_FILES['file']['tmp_name'])
               ->setMetadata($_POST);
 
         try {
