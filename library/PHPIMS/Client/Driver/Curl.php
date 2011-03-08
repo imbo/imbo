@@ -75,6 +75,28 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
+     * Add an image
+     *
+     * @param string $path The path to the image to add
+     * @param string $url The URL to push data to
+     * @param array $metadata Metadata to add along with the image
+     * @return PHPIMS_Client_Response
+     * @throws PHPIMS_Client_Driver_Exception
+     */
+    public function addImage($path, $url, array $metadata = null) {
+        $data = array();
+
+        if ($metadata !== null) {
+            $data = $metadata;
+        }
+
+        // Add the file reference
+        $data['file'] = '@' . $path;
+
+        $this->post($data, $url);
+    }
+
+    /**
      * POST some data to an URL
      *
      * @param array $data The data to POST

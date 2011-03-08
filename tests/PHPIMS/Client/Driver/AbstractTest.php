@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,54 +31,38 @@
  */
 
 /**
- * Client driver interface
- *
- * This is an interface for different client drivers.
- *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface PHPIMS_Client_Driver_Interface {
+class PHPIMS_Client_Driver_AbstractTest extends PHPUnit_Framework_TestCase {
     /**
-     * POST some data to an URL
+     * Driver instance
      *
-     * @param array $data The data to POST
-     * @param string $url The URL to POST to
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @var PHPIMS_Client_Driver_Abstract
      */
-    public function post(array $data, $url);
+    protected $driver = null;
 
     /**
-     * Perform a GET to $url
-     *
-     * @param string $url The URL to GET
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * Set up method
      */
-    public function get($url);
+    public function setUp() {
+        $this->driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
+    }
 
     /**
-     * Perform a DELETE request to $url
-     *
-     * @param string $url The URL to DELETE
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * Tear down method
      */
-    public function delete($url);
+    public function tearDown() {
+        $this->driver = null;
+    }
 
-    /**
-     * Add an image
-     *
-     * @param string $path The path to the image to add
-     * @param string $url The URL to push data to
-     * @param array $metadata Metadata to add along with the image
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
-     */
-    public function addImage($path, $url, array $metadata = null);
+    public function testSetGetClient() {
+        $client = $this->getMock('PHPIMS_Client');
+        $this->driver->setClient($client);
+        $this->assertSame($client, $this->driver->getClient());
+    }
 }
