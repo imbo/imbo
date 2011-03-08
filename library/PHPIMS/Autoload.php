@@ -48,6 +48,10 @@ class PHPIMS_Autoload {
     static public $classes = array(
         'phpims_autoload' => '/Autoload.php',
         'phpims_client' => '/Client.php',
+        'phpims_client_driver_abstract' => '/Client/Driver/Abstract.php',
+        'phpims_client_driver_curl' => '/Client/Driver/Curl.php',
+        'phpims_client_driver_exception' => '/Client/Driver/Exception.php',
+        'phpims_client_driver_interface' => '/Client/Driver/Interface.php',
         'phpims_client_exception' => '/Client/Exception.php',
         'phpims_client_response' => '/Client/Response.php',
         'phpims_database_driver_abstract' => '/Database/Driver/Abstract.php',

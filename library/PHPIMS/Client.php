@@ -33,7 +33,8 @@
 /**
  * Client that interacts with the server part of PHPIMS
  *
- * This client includes methods that can be used to easily interact with a PHPIMS server
+ * This client includes methods that can be used to easily interact with a PHPIMS server. All
+ * requests made by the client goes through a driver.
  *
  * @package PHPIMS
  * @subpackage Client
@@ -51,13 +52,6 @@ class PHPIMS_Client {
     protected $serverUrl = null;
 
     /**
-     * The cURL handle used by the client
-     *
-     * @var resource
-     */
-    protected $curlHandle = null;
-
-    /**
      * Default timeout
      *
      * @var int
@@ -72,24 +66,21 @@ class PHPIMS_Client {
     protected $connectTimeout = 2;
 
     /**
-     * Class constructor
+     * Driver used for the client
+     *
+     * @var PHPIMS_Client_Driver_Abstract
      */
-    public function __construct() {
-        $this->curlHandle = curl_init();
-
-        curl_setopt_array($this->curlHandle, array(
-            CURLOPT_USERAGENT      => get_class($this),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HEADER         => true,
-            CURLOPT_HTTPHEADER     => array('Expect:'),
-        ));
-    }
+    protected $driver = null;
 
     /**
-     * Class destructor
+     * Class constructor
+     *
+     * @param PHPIMS_Client_Driver_Abstract $driver Optional driver to set
      */
-    public function __destruct() {
-        curl_close($this->curlHandle);
+    public function __construct(PHPIMS_Client_Driver_Abstract $driver = null) {
+        if ($driver !== null) {
+            $this->setDriver($driver);
+        }
     }
 
     /**
@@ -156,13 +147,33 @@ class PHPIMS_Client {
     }
 
     /**
+     * Get the current driver
+     *
+     * @return PHPIMS_Client_Driver_Abstract
+     */
+    public function getDriver() {
+        return $this->driver;
+    }
+
+    /**
+     * Set the driver
+     *
+     * @param PHPIMS_Client_Driver_Abstract $driver A driver instance
+     * @return PHPIMS_Client
+     */
+    public function setDriver(PHPIMS_Client_Driver_Abstract $driver) {
+        $driver->setClient($this);
+        $this->driver = $driver;
+
+        return $this;
+    }
+
+    /**
      * Add a new image to the server
      *
      * @param string $path Path to the local image
      * @param array $metadata Metadata to attach to the image
-     * @return array Returns an array with status information about the request. The resulting
-     *               image identifier will be included in the response. This identification must be
-     *               used for other operations regarding the image.
+     * @return PHPIMS_Client_Response
      * @throws PHPIMS_Client_Exception
      */
     public function addImage($path, array $metadata = null) {
@@ -179,12 +190,7 @@ class PHPIMS_Client {
         // Add the file reference
         $data['file'] = '@' . $path;
 
-        curl_setopt_array($this->curlHandle, array(
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => $data,
-        ));
-
-        return $this->request($this->serverUrl);
+        return $this->getDriver()->post($data, $this->serverUrl);
     }
 
     /**
@@ -194,11 +200,7 @@ class PHPIMS_Client {
      * @return array Returne an array with status information about the request
      */
     public function deleteImage($imageId) {
-        curl_setopt_array($this->curlHandle, array(
-            CURLOPT_CUSTOMREQUEST  => 'DELETE',
-        ));
-
-        return $this->request($this->serverUrl . '/' . $imageId);
+        return $this->getDriver()->delete($this->serverUrl . '/' . $imageId);
     }
 
     /**
@@ -209,12 +211,7 @@ class PHPIMS_Client {
      * @return array Returns an array with status information about the request
      */
     public function editMetadata($imageId, array $metadata) {
-        curl_setopt_array($this->curlHandle, array(
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => $metadata,
-        ));
-
-        return $this->request($this->serverUrl . '/' . $imageId);
+        return $this->getDriver()->post($metadata, $this->serverUrl . '/' . $imageId);
     }
 
     /**
@@ -224,33 +221,6 @@ class PHPIMS_Client {
      * @return array Returns an array with metadata
      */
     public function getMetadata($imageId) {
-        return $this->request($this->serverUrl . '/' . $imageId . '/meta');
-    }
-
-    /**
-     * Make a request
-     *
-     * @param string $url The URL to request
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Exception
-     */
-    protected function request($url) {
-        // Set the timeout options
-        curl_setopt_array($this->curlHandle, array(
-            CURLOPT_URL            => $url,
-            CURLOPT_CONNECTTIMEOUT => $this->getConnectTimeout(),
-            CURLOPT_TIMEOUT        => $this->getTimeout(),
-        ));
-
-        $content = curl_exec($this->curlHandle);
-        $responseCode = (int) curl_getinfo($this->curlHandle, CURLINFO_HTTP_CODE);
-
-        if ($content === false) {
-            throw new PHPIMS_Client_Exception('An error occured. Could not complete request.');
-        }
-
-        $response = PHPIMS_Client_Response::factory($content, $responseCode);
-
-        return $response;
+        return $this->getDriver()->get($this->serverUrl . '/' . $imageId . '/meta');
     }
 }
