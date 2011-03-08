@@ -181,16 +181,7 @@ class PHPIMS_Client {
             throw new PHPIMS_Client_Exception('File does not exist: ' . $path);
         }
 
-        if ($metadata !== null) {
-            $data = $metadata;
-        } else {
-            $data = array();
-        }
-
-        // Add the file reference
-        $data['file'] = '@' . $path;
-
-        return $this->getDriver()->post($data, $this->serverUrl);
+        return $this->getDriver()->addImage($path, $this->serverUrl, $metadata);
     }
 
     /**

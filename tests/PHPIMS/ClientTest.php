@@ -77,4 +77,96 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
         $this->client->setConnectTimeout($timeout);
         $this->assertSame($timeout, $this->client->getConnectTimeout());
     }
+
+    public function testSetGetDriver() {
+        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
+        $this->client->setDriver($driver);
+        $this->assertSame($driver, $this->client->getDriver());
+    }
+
+    public function testConstructorParams() {
+        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
+        $client = new PHPIMS_Client($driver);
+        $this->assertSame($driver, $client->getDriver());
+    }
+
+    /**
+     * @expectedException PHPIMS_Client_Exception
+     * @expectedExceptionMessage File does not exist: foobar
+     */
+    public function testAddImageThatDoesNotExist() {
+        $this->client->addImage('foobar');
+    }
+
+    public function testAddImage() {
+        $url      = 'http://host';
+        $image    = __FILE__;
+        $metadata = array(
+            'foo' => 'bar',
+            'bar' => 'foo',
+        );
+
+        $response = $this->getMock('PHPIMS_Client_Response');
+
+        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
+        $driver->expects($this->once())->method('addImage')->with($image, $url, $metadata)->will($this->returnValue($response));
+
+        $result = $this->client->setDriver($driver)
+                               ->setServerUrl($url)
+                               ->addImage($image, $metadata);
+
+        $this->assertSame($result, $response);
+    }
+
+    public function testDeleteImage() {
+        $url  = 'http://host';
+        $hash = 'Some hash';
+
+        $response = $this->getMock('PHPIMS_Client_Response');
+
+        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
+        $driver->expects($this->once())->method('delete')->with($url . '/' . $hash)->will($this->returnValue($response));
+
+        $result = $this->client->setDriver($driver)
+                               ->setServerUrl($url)
+                               ->deleteImage($hash);
+
+        $this->assertSame($result, $response);
+    }
+
+    public function testEditMetaData() {
+        $url  = 'http://host';
+        $hash = 'Some hash';
+        $data = array(
+            'foo' => 'bar',
+            'bar' => 'foo',
+        );
+
+        $response = $this->getMock('PHPIMS_Client_Response');
+
+        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
+        $driver->expects($this->once())->method('post')->with($data, $url . '/' . $hash)->will($this->returnValue($response));
+
+        $result = $this->client->setDriver($driver)
+                               ->setServerUrl($url)
+                               ->editMetaData($hash, $data);
+
+        $this->assertSame($result, $response);
+    }
+
+    public function testGetMetaData() {
+        $url  = 'http://host';
+        $hash = 'Some hash';
+
+        $response = $this->getMock('PHPIMS_Client_Response');
+
+        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
+        $driver->expects($this->once())->method('get')->with($url . '/' . $hash . '/meta')->will($this->returnValue($response));
+
+        $result = $this->client->setDriver($driver)
+                               ->setServerUrl($url)
+                               ->getMetadata($hash);
+
+        $this->assertSame($result, $response);
+    }
 }
