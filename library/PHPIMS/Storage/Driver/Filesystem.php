@@ -67,9 +67,11 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
         $result = move_uploaded_file($path, $newPath);
 
         if ($result) {
+            // @codeCoverageIgnoreStart
             // Update image path if the operation was successful
             $image->setPath($newPath);
         }
+        // @codeCoverageIgnoreEnd
 
         return $result;
     }
