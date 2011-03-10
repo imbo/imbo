@@ -139,4 +139,44 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
         $this->setExpectedException('PHPUnit_Framework_Error_Warning');
         $this->operation->postExec();
     }
+
+    public function testInitMethod() {
+        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
+        $databaseClassName = get_class($database);
+        $databaseParams = array('someparam' => true, 'otherparam' => false);
+
+        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
+        $storageClassName = get_class($storage);
+        $storageParams = array('someparam' => false, 'otherparam' => true);
+
+        $plugin = $this->getMockForAbstractClass('PHPIMS_Operation_Plugin_Abstract');
+        $pluginClassName = get_class($plugin);
+        $pluginParams = array('someparam' => true, 'someotherparam' => false);
+
+        $config = array(
+            'database' => array(
+                'driver' => $databaseClassName,
+                'params' => $databaseParams,
+            ),
+            'storage' => array(
+                'driver' => $storageClassName,
+                'params' => $storageParams,
+            ),
+            'plugins' => array(
+                'PHPIMS_Operation_Abstract' => array(
+                    $pluginClassName => $pluginParams,
+                ),
+            ),
+        );
+
+        $this->operation->init($config);
+        $this->assertInstanceOf($databaseClassName, $this->operation->getDatabase());
+        $this->assertSame($databaseParams, $this->operation->getDatabase()->getParams());
+        $this->assertInstanceOf($storageClassName, $this->operation->getStorage());
+        $this->assertSame($storageParams, $this->operation->getStorage()->getParams());
+
+        $plugins = $this->operation->getPlugins();
+        $this->assertInstanceOf($pluginClassName, $plugins[0]);
+        $this->assertSame($pluginParams, $plugins[0]->getParams());
+    }
 }
