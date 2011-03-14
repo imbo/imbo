@@ -57,7 +57,28 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      *
      * @var MongoDB
      */
-    static protected $database = null;
+    protected $mongo = null;
+
+    /**
+     * The name of the database we want to use
+     *
+     * @var string
+     */
+    protected $databaseName = 'phpims';
+
+    /**
+     * Name of the collection to store the images in
+     *
+     * @var string
+     */
+    protected $collectionName = 'images';
+
+    /**
+     * The collection used by the driver
+     *
+     * @var MongoCollection
+     */
+    protected $collection = null;
 
     /**
      * Method to check if an image hash is valid for this driver
@@ -70,17 +91,88 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     }
 
     /**
+     * Get the database name
+     *
+     * @return string
+     */
+    public function getDatabaseName() {
+        return $this->databaseName;
+    }
+
+    /**
+     * Set the database name
+     *
+     * @param string $name The name to set
+     * @return PHPIMS_Database_Driver_MongoDB
+     */
+    public function setDatabaseName($name) {
+        $this->databaseName = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get the collection name
+     *
+     * @return string
+     */
+    public function getCollectionName() {
+        return $this->collectionName;
+    }
+
+    /**
+     * Set the collection name
+     *
+     * @param string $name The name to set
+     * @return PHPIMS_Database_Driver_MongoDB
+     */
+    public function setCollectionName($name) {
+        $this->collectionName = $name;
+
+        return $this;
+    }
+
+    /**
      * Get the database
      *
      * @return MongoDB
      */
     public function getDatabase() {
-        if (self::$database === null) {
+        if ($this->mongo === null) {
+            // @codeCoverageIgnoreStart
             $mongo = new Mongo();
-            self::$database = $mongo->phpims;
+            $this->mongo = $mongo->{$this->databaseName};
         }
+        // @codeCoverageIgnoreEnd
 
-        return self::$database;
+        return $this->mongo;
+    }
+
+    /**
+     * Get the mongo collection
+     *
+     * @return MongoCollection
+     */
+    public function getCollection() {
+        if ($this->collection === null) {
+            // @codeCoverageIgnoreStart
+            $this->setCollection($this->getDatabase()->{$this->collectionName});
+        }
+        // @codeCoverageIgnoreEnd
+
+        return $this->collection;
+    }
+
+    /**
+     * Set the collection
+     *
+     * @param MongoCollection $collection The collection to set
+     * @return PHPIMS_Database_Driver_MongoDB
+     */
+    public function setCollection(MongoCollection $collection) {
+        $this->collection = $collection;
+
+        return $this;
     }
 
     /**
@@ -90,7 +182,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      * @return PHPIMS_Database_Driver_MongoDB
      */
     public function setDatabase(MongoDB $database) {
-        self::$database = $database;
+        $this->mongo = $database;
 
         return $this;
     }
@@ -120,8 +212,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
         finfo_close($fp);
 
         try {
-            $collection = $this->getDatabase()->images;
-            $collection->insert($data, array('safe' => true));
+            $this->getCollection()->insert($data, array('safe' => true));
         } catch (MongoException $e) {
             throw new PHPIMS_Database_Exception('Unable to save image data', 500, $e);
         }
@@ -140,8 +231,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      */
     public function deleteImage($hash) {
         try {
-            $mongoCollection = $this->getDatabase()->images;
-            $mongoCollection->remove(array('_id' => new MongoId($hash)), array('justOne' => true, 'safe' => true));
+            $this->getCollection()->remove(array('_id' => new MongoId($hash)), array('justOne' => true, 'safe' => true));
         } catch (MongoException $e) {
             throw new PHPIMS_Database_Exception('Unable to delete image data', 500, $e);
         }
@@ -159,8 +249,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      */
     public function editImage($hash, array $metadata) {
         try {
-            $mongoCollection = $this->getDatabase()->images;
-            $mongoCollection->update(
+            $this->getCollection()->update(
                 array('_id' => new MongoID($hash)),
                 array('$set' => $metadata),
                 array(
@@ -184,8 +273,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      */
     public function getImageMetadata($hash) {
         try {
-            $mongoCollection = $this->getDatabase()->images;
-            $data = $mongoCollection->findOne(array('_id' => new MongoID($hash)));
+            $data = $this->getCollection()->findOne(array('_id' => new MongoID($hash)));
         } catch (MongoException $e) {
             throw new PHPIMS_Database_Exception('Unable to fetch image metadata', 500, $e);
         }
@@ -202,8 +290,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      */
     public function getImageMimetype($hash) {
         try {
-            $mongoCollection = $this->getDatabase()->images;
-            $data = $mongoCollection->findOne(array('_id' => new MongoID($hash)), array('_mime'));
+            $data = $this->getCollection()->findOne(array('_id' => new MongoID($hash)), array('_mime'));
         } catch (MongoException $e) {
             throw new PHPIMS_Database_Exception('Unable to fetch image metadata', 500, $e);
         }
@@ -220,8 +307,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      */
     public function getImageSize($hash) {
         try {
-            $mongoCollection = $this->getDatabase()->images;
-            $data = $mongoCollection->findOne(array('_id' => new MongoID($hash)), array('_size'));
+            $data = $this->getCollection()->findOne(array('_id' => new MongoID($hash)), array('_size'));
         } catch (MongoException $e) {
             throw new PHPIMS_Database_Exception('Unable to fetch image metadata', 500, $e);
         }
