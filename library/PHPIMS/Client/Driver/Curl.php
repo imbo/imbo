@@ -93,7 +93,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
         // Add the file reference
         $data['file'] = '@' . $path;
 
-        $this->post($data, $url);
+        return $this->post($data, $url);
     }
 
     /**
