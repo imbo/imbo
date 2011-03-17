@@ -152,6 +152,13 @@ class PHPIMS_Client {
      * @return PHPIMS_Client_Driver_Abstract
      */
     public function getDriver() {
+        if ($this->driver === null) {
+            // @codeCoverageIgnoreStart
+            $this->driver = new PHPIMS_Client_Driver_Curl();
+            $this->driver->setClient($this);
+        }
+        // @codeCoverageIgnoreEnd
+
         return $this->driver;
     }
 
