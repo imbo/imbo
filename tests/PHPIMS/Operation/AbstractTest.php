@@ -153,6 +153,12 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
         $pluginClassName = get_class($plugin);
         $pluginParams = array('someparam' => true, 'someotherparam' => false);
 
+        $internalPlugin = $this->getMockForAbstractClass('PHPIMS_Operation_Plugin_Abstract');
+        $internalPluginClassName = get_class($internalPlugin);
+        $internalPluginParams = array('someparam' => true, 'someotherparam' => false);
+
+        $this->operation->setInternalPluginsSpec(array($internalPluginClassName => $internalPluginParams));
+
         $config = array(
             'database' => array(
                 'driver' => $databaseClassName,
@@ -178,5 +184,13 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
         $plugins = $this->operation->getPlugins();
         $this->assertInstanceOf($pluginClassName, $plugins[0]);
         $this->assertSame($pluginParams, $plugins[0]->getParams());
+    }
+
+    public function testSetGetInternalPluginsSpec() {
+        $spec = array(
+            'ClassName' => array(),
+        );
+        $this->operation->setInternalPluginsSpec($spec);
+        $this->assertSame($spec, $this->operation->getInternalPluginsSpec());
     }
 }

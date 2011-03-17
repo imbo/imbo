@@ -44,6 +44,15 @@
  */
 class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
     /**
+     * Internal plugins
+     *
+     * @var array
+     */
+    protected $internalPlugins = array(
+        'PHPIMS_Operation_Plugin_PrepareImage' => array(),
+    );
+
+    /**
      * Execute the operation
      *
      * Operations must implement this method and return a PHPIMS_Server_Response object to return
@@ -54,10 +63,6 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
      */
     public function exec() {
         $image = $this->getImage();
-        $image->setFilename($_FILES['file']['name'])
-              ->setFilesize($_FILES['file']['size'])
-              ->setPath($_FILES['file']['tmp_name'])
-              ->setMetadata($_POST);
 
         try {
             $this->getDatabase()->insertNewImage($image);

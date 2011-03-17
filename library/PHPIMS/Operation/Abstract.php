@@ -90,6 +90,24 @@ abstract class PHPIMS_Operation_Abstract {
     protected $response = null;
 
     /**
+     * Array that can be set by operations if they want to specify internal plugins (not added via
+     * configuration). The keys of the array are the complete classname of the plugins, and the
+     * values are parameters for the different plugins.
+     *
+     * Example usage:
+     *
+     * <code>
+     * protected $internalPluginsSpec = array(
+     *     'PHPIMS_Operation_Plugin_SomePlugin' => array(),
+     *     'PHPIMS_Operation_Plugin_SomeOtherPlugin' => array('foo' => 'bar'),
+     * );
+     * </code>
+     *
+     * @var array
+     */
+    protected $internalPluginsSpec = array();
+
+    /**
      * Class constructor
      *
      * @param string $hash An optional hash for the operation to work with
@@ -140,11 +158,20 @@ abstract class PHPIMS_Operation_Abstract {
             $this->setStorage(new $config['storage']['driver']($params));
         }
 
-        if (!empty($config['plugins'][__CLASS__])) {
-            foreach ($config['plugins'][__CLASS__] as $pluginName => $pluginParams) {
-                $plugin = new $pluginName($pluginParams, $this);
-                $this->addPlugin($plugin);
-            }
+        // Initialize the plugins spec
+        $pluginsSpec = $this->internalPluginsSpec;
+
+        if (!empty($config['plugins'][__CLASS__]) && is_array($config['plugins'][__CLASS__])) {
+            // Use the + operator to keep plugins in the configuration from overriding internal
+            // plugins. This will also keep the plugins in the correct order. array_merge would
+            // either override the internal plugins, or mess up the order.
+            $pluginsSpec += $config['plugins'][__CLASS__];
+        }
+
+        // First, add internal plugins specified in the operations themselves
+        foreach ($pluginsSpec as $pluginName => $pluginParams) {
+            $plugin = new $pluginName($pluginParams, $this);
+            $this->addPlugin($plugin);
         }
 
         return $this;
@@ -322,6 +349,28 @@ abstract class PHPIMS_Operation_Abstract {
      */
     public function setResponse(PHPIMS_Server_Response $response) {
         $this->response = $response;
+
+        return $this;
+    }
+
+    /**
+     * Get the internal plugins spec
+     *
+     * @return array
+     */
+    public function getInternalPluginsSpec() {
+        return $this->internalPluginsSpec;
+    }
+
+    /**
+     * Set the internal plugins specs
+     *
+     * @param array $spec An associative array with classnames as keys and parameters for the
+     *                    plugin class as values
+     * @return PHPIMS_Operation_Abstract
+     */
+    public function setInternalPluginsSpec(array $spec) {
+        $this->internalPluginsSpec = $spec;
 
         return $this;
     }
