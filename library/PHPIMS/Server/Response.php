@@ -113,6 +113,13 @@ class PHPIMS_Server_Response {
     protected $headers = array();
 
     /**
+     * Content-Type of the response
+     *
+     * @var string
+     */
+    protected $contentType = null;
+
+    /**
      * The body of the response
      *
      * The data to send back to the client. Will be sent as a json encoded array
@@ -127,31 +134,6 @@ class PHPIMS_Server_Response {
      * @var string
      */
     protected $rawData = null;
-
-    /**
-     * Class constructor
-     *
-     * @param int $code Optional HTTP status code
-     * @param array $headers Optional headers
-     * @param array $body Optional body content
-     */
-    public function __construct($code = null, array $headers = null, array $body = null, $rawData = null) {
-        if ($code !== null) {
-            $this->setCode($code);
-        }
-
-        if ($headers !== null) {
-            $this->setHeaders($headers);
-        }
-
-        if ($body !== null) {
-            $this->setBody($body);
-        }
-
-        if ($rawData !== null) {
-            $this->setRawData($rawData);
-        }
-    }
 
     /**
      * Get the status code
@@ -190,7 +172,9 @@ class PHPIMS_Server_Response {
      * @return PHPIMS_Server_Response
      */
     public function setHeaders(array $headers) {
-        $this->headers = $headers;
+        foreach ($headers as $name => $value) {
+            $this->setHeader($name, $value);
+        }
 
         return $this;
     }
@@ -198,11 +182,33 @@ class PHPIMS_Server_Response {
     /**
      * Add a single header
      *
-     * @param string $header A header string to add
+     * @param string $name The header name
+     * @param string $value The header value
      * @return PHPIMS_Server_Response
      */
-    public function addHeader($header) {
-        $this->headers[] = $header;
+    public function setHeader($name, $value) {
+        $this->headers[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get the Content-Type
+     *
+     * @return string
+     */
+    public function getContentType() {
+        return $this->contentType;
+    }
+
+    /**
+     * Set the Content-Type
+     *
+     * @param string $type The type to set. For instance "application/json" or "image/png"
+     * @return PHPIMS_Server_Response
+     */
+    public function setContentType($type) {
+        $this->contentType = $type;
 
         return $this;
     }
@@ -274,12 +280,10 @@ class PHPIMS_Server_Response {
      * @return PHPIMS_Server_Response
      */
     static public function fromException(PHPIMS_Exception $e) {
-        $response = new static($e->getCode());
-        $response->setBody(array(
-            'error' => array(
-                'code'    => $e->getCode(),
-                'message' => $e->getMessage(),
-            ),
+        $response = new static();
+        $response->setCode($e->getCode())
+                 ->setBody(array('error' => array('code'    => $e->getCode(),
+                                                  'message' => $e->getMessage()),
         ));
 
         return $response;
