@@ -65,6 +65,20 @@ class PHPIMS_Image {
     protected $filesize = null;
 
     /**
+     * Mime type of the image
+     *
+     * @var string
+     */
+    protected $mimeType = null;
+
+    /**
+     * MD5 hash of the image
+     *
+     * @var string
+     */
+    protected $md5 = null;
+
+    /**
      * The metadata attached to this image
      *
      * @var array
@@ -137,6 +151,48 @@ class PHPIMS_Image {
      */
     public function setFilesize($filesize) {
         $this->filesize = $filesize;
+
+        return $this;
+    }
+
+    /**
+     * Get the mime type
+     *
+     * @return string
+     */
+    public function getMimeType() {
+        return $this->mimeType;
+    }
+
+    /**
+     * Set the mime type
+     *
+     * @param string $mimeType The mime type, for instance "image/png"
+     * @return PHPIMS_Image
+     */
+    public function setMimeType($mimeType) {
+        $this->mimeType = $mimeType;
+
+        return $this;
+    }
+
+    /**
+     * Get the md5 hash
+     *
+     * @return string
+     */
+    public function getMd5() {
+        return $this->md5;
+    }
+
+    /**
+     * Set the md5 hash
+     *
+     * @param string $hash The md5 hash
+     * @return PHPIMS_Image
+     */
+    public function setMd5($hash) {
+        $this->md5 = $hash;
 
         return $this;
     }
