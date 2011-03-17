@@ -75,12 +75,16 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
         $this->assertSame($headers, $this->response->getHeaders());
     }
 
-    public function testAddHeader() {
-        $header1 = 'Location: http://foo/bar';
-        $header2 = 'x-Some: Value';
-        $headers = array($header1, $header2);
-        $this->response->addHeader($header1);
-        $this->response->addHeader($header2);
+    public function testSetHeader() {
+        $headers = array(
+            'Location' => 'http://foo/bar',
+            'X-Some'   => 'Value',
+        );
+
+        foreach ($headers as $name => $value) {
+            $this->response->setHeader($name, $value);
+        }
+
         $this->assertSame($headers, $this->response->getHeaders());
     }
 
@@ -103,25 +107,6 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
         $this->assertSame($rawData, (string) $this->response);
     }
 
-    public function testUseFullConstructor() {
-        $code = 404;
-        $headers = array(
-            'Location: http://foo/bar',
-            'x-Some: Value',
-        );
-        $body = array(
-            'foo' => 'bar',
-            'bar' => 'foo',
-        );
-        $rawData = 'some data';
-
-        $response = new PHPIMS_Server_Response($code, $headers, $body, $rawData);
-        $this->assertSame($code, $response->getCode());
-        $this->assertSame($headers, $response->getHeaders());
-        $this->assertSame($body, $response->getBody());
-        $this->assertSame($rawData, $response->getRawData());
-    }
-
     public function testSetGetRawData() {
         $rawData = 'some data';
         $this->response->setRawData($rawData);
@@ -136,5 +121,11 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
         $response = PHPIMS_Server_Response::fromException($e);
         $this->assertSame($code, $response->getCode());
         $this->assertSame(array('error' => array('code' => $code, 'message' => $message)), $response->getBody());
+    }
+
+    public function testSetGetContentType() {
+        $type = 'application/json';
+        $this->response->setContentType($type);
+        $this->assertSame($type, $this->response->getContentType());
     }
 }

@@ -60,7 +60,8 @@ class PHPIMS_Operation_GetMetadata extends PHPIMS_Operation_Abstract {
         }
 
         $this->getResponse()->setCode(200)
-                            ->setBody($data);
+                            ->setBody($data)
+                            ->setContentType('application/json');
 
         return $this;
     }

@@ -76,13 +76,12 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
             throw new PHPIMS_Operation_Exception('Unable to store the image', 500, $e);
         }
 
-        $location = $_SERVER['HTTP_HOST'] . '/' . $image->getId();
-
         $this->getResponse()->setCode(201)
-                            ->addHeader('Location: http://' . $location)
+                            ->setHeader('Location', 'http://' . $_SERVER['HTTP_HOST'] . '/' . $image->getId())
                             ->setBody(array(
                                 'id' => $image->getId(),
-                            ));
+                            ))
+                            ->setContentType('application/json');
 
         return $this;
     }
