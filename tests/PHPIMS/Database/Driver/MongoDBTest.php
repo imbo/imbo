@@ -67,4 +67,28 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPUnit_Framework_TestCase {
         $id = 123;
         $this->assertFalse(PHPIMS_Database_Driver_MongoDB::isValidHash($id));
     }
+
+    public function testSetGetDatabaseName() {
+        $name = 'someName';
+        $this->driver->setDatabaseName($name);
+        $this->assertSame($name, $this->driver->getDatabaseName());
+    }
+
+    public function testSetGetCollectionName() {
+        $name = 'someName';
+        $this->driver->setCollectionName($name);
+        $this->assertSame($name, $this->driver->getCollectionName());
+    }
+
+    public function testSetGetDatabase() {
+        $mongo = $this->getMockBuilder('MongoDB')->disableOriginalConstructor()->getMock();
+        $this->driver->setDatabase($mongo);
+        $this->assertSame($mongo, $this->driver->getDatabase());
+    }
+
+    public function testSetGetCollection() {
+        $collection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
+        $this->driver->setCollection($collection);
+        $this->assertSame($collection, $this->driver->getCollection());
+    }
 }
