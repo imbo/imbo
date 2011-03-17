@@ -48,11 +48,12 @@ class PHPIMS_Operation_Plugin_PrepareImage extends PHPIMS_Operation_Plugin_Abstr
      * Method that will be triggered before the operation exec() kicks in
      */
     public function preExec() {
-        $image = $this->getImage();
+        $image = $this->getOperation()->getImage();
         $image->setFilename($_FILES['file']['name'])
               ->setFilesize($_FILES['file']['size'])
               ->setPath($_FILES['file']['tmp_name'])
-              ->setMetadata($_POST);
+              ->setMetadata($_POST)
+              ->setMd5(md5_file($image->getPath()));
 
         // Add some special data about the image
         $fp = finfo_open(FILEINFO_MIME_TYPE);
