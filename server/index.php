@@ -51,8 +51,13 @@ $header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS_Server_Response::$codes[$code]
 
 header($header);
 
-foreach ($response->getHeaders() as $header => $value) {
-    header($header . ': ' . $value);
+foreach ($response->getHeaders() as $header) {
+    header($header);
 }
 
-print($response);
+$output = (string) $response;
+
+header('Content-Type: ' . $response->getContentType());
+header('Content-Length: ' . strlen($output));
+
+print($output);
