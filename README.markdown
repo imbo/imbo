@@ -21,13 +21,21 @@ If no options are specified the original image will be returned.
 
 Get metadata related to the image identified by &lt;hash&gt;. The metadata will be JSON encoded.
 
+**POST /&lt;hash&gt;**
+
+Place a new image on the server along with metadata. The &lt;hash&gt; is the md5 sum of the file itself.
+
+**POST /&lt;hash&gt;/meta**
+
+Edit the metadata attached to the image identified by &lt;hash&gt;.
+
 **DELETE /&lt;hash&gt;**
 
 Delete the image identified by &lt;hash&gt; along with all metadata. This action is not reversable.
 
-**POST /[&lt;hash&gt;]**
+**DELETE /&lt;hash&gt;/meta**
 
-Place a new image on the server along with metadata. Can be used to manipulate metadata when used with a &lt;hash&gt;.
+Delete the metadata attache to the image identified by &lt;hash&gt;. The image is kept on the server.
 
 **HEAD /[&lt;hash&gt;]**
 
@@ -61,7 +69,7 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     // Make the request
     $response = $client->addImage($path, $metadata);
     
-In the `$response` variable you will find the image hash that you will need to identify the added image in other operations.
+In the `$response` variable you will find the image hash that you will need to identify the added image in other operations. This hash is the md5 sum of the file itself. 
 
     <?php
     print($response); // {"id":"64223c5af0bfd3d90cf30af553ceea13"}
