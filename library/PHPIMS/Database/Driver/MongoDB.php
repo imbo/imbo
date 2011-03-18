@@ -284,6 +284,19 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      * @throws PHPIMS_Database_Exception
      */
     public function deleteMetadata($hash) {
+        try {
+            $this->getCollection()->update(
+                array('hash' => $hash),
+                array('$set' => array('data' => array())),
+                array(
+                    'safe' => true,
+                    'multiple' => false
+                )
+            );
+        } catch (MongoException $e) {
+            throw new PHPIMS_Database_Exception('Unable to remove metadata', 500, $e);
+        }
 
+        return true;
     }
 }
