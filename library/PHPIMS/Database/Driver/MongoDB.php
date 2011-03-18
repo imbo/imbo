@@ -189,13 +189,14 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      * @throws PHPIMS_Database_Exception
      */
     public function insertImage(PHPIMS_Image $image) {
-        $data = $image->getMetadata();
-
-        $data['name']  = $image->getFilename();
-        $data['size']  = $image->getFilesize();
-        $data['added'] = time();
-        $data['hash']  = $image->getHash();
-        $data['mime']  = $image->getMimeType();
+        $data = array(
+            'name'  => $image->getFilename(),
+            'size'  => $image->getFilesize(),
+            'hash'  => $image->getHash(),
+            'mime'  => $image->getMimeType(),
+            'data'  => $image->getMetadata(),
+            'added' => time(),
+        );
 
         try {
             // See if the image already exists
