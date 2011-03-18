@@ -188,37 +188,50 @@ class PHPIMS_Client {
             throw new PHPIMS_Client_Exception('File does not exist: ' . $path);
         }
 
-        return $this->getDriver()->addImage($path, $this->serverUrl, $metadata);
+        // Generate md5
+        $hash = md5_file($path);
+
+        return $this->getDriver()->addImage($path, $this->serverUrl . '/' . $hash, $metadata);
     }
 
     /**
      * Delete an image from the server
      *
-     * @param string $imageId Image identifier
-     * @return array Returne an array with status information about the request
+     * @param string $hash The image identifier
+     * @return PHPIMS_Client_Response
      */
-    public function deleteImage($imageId) {
-        return $this->getDriver()->delete($this->serverUrl . '/' . $imageId);
+    public function deleteImage($hash) {
+        return $this->getDriver()->delete($this->serverUrl . '/' . $hash);
     }
 
     /**
      * Edit an image
      *
-     * @param string $imageId The image identifier
+     * @param string $hash The image identifier
      * @param array $metadata An array of metadata
-     * @return array Returns an array with status information about the request
+     * @return PHPIMS_Client_Response
      */
-    public function editMetadata($imageId, array $metadata) {
-        return $this->getDriver()->post($metadata, $this->serverUrl . '/' . $imageId);
+    public function editImageMetadata($hash, array $metadata) {
+        return $this->getDriver()->post($this->serverUrl . '/' . $hash . '/meta', $metadata);
+    }
+
+    /**
+     * Delete metadata
+     *
+     * @param string $hash The image identifier
+     * @return PHPIMS_Client_Response
+     */
+    public function deleteImageMetadata($hash) {
+        return $this->getDriver()->delete($this->serverUrl . '/' . $hash . '/meta');
     }
 
     /**
      * Get metadata
      *
-     * @param string $imageId The image identifier
+     * @param string $hash The image identifier
      * @return array Returns an array with metadata
      */
-    public function getMetadata($imageId) {
-        return $this->getDriver()->get($this->serverUrl . '/' . $imageId . '/meta');
+    public function getImageMetadata($hash) {
+        return $this->getDriver()->get($this->serverUrl . '/' . $hash . '/meta');
     }
 }

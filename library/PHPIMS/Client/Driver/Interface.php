@@ -46,12 +46,12 @@ interface PHPIMS_Client_Driver_Interface {
     /**
      * POST some data to an URL
      *
-     * @param array $data The data to POST
      * @param string $url The URL to POST to
+     * @param array $data The data to POST
      * @return PHPIMS_Client_Response
      * @throws PHPIMS_Client_Driver_Exception
      */
-    public function post(array $data, $url);
+    public function post($url, array $data = null);
 
     /**
      * Perform a GET to $url
@@ -61,6 +61,15 @@ interface PHPIMS_Client_Driver_Interface {
      * @throws PHPIMS_Client_Driver_Exception
      */
     public function get($url);
+
+    /**
+     * Perform a HEAD to $url
+     *
+     * @param string $url The URL to HEAD
+     * @return PHPIMS_Client_Response
+     * @throws PHPIMS_Client_Driver_Exception
+     */
+    public function head($url);
 
     /**
      * Perform a DELETE request to $url

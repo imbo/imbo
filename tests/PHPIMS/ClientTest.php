@@ -105,11 +105,12 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
             'foo' => 'bar',
             'bar' => 'foo',
         );
+        $md5 = md5_file(__FILE__);
 
         $response = $this->getMock('PHPIMS_Client_Response');
 
         $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
-        $driver->expects($this->once())->method('addImage')->with($image, $url, $metadata)->will($this->returnValue($response));
+        $driver->expects($this->once())->method('addImage')->with($image, $url . '/' . $md5, $metadata)->will($this->returnValue($response));
 
         $result = $this->client->setDriver($driver)
                                ->setServerUrl($url)
@@ -134,7 +135,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
         $this->assertSame($result, $response);
     }
 
-    public function testEditMetaData() {
+    public function testEditImageMetaData() {
         $url  = 'http://host';
         $hash = 'Some hash';
         $data = array(
@@ -145,16 +146,32 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
         $response = $this->getMock('PHPIMS_Client_Response');
 
         $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
-        $driver->expects($this->once())->method('post')->with($data, $url . '/' . $hash)->will($this->returnValue($response));
+        $driver->expects($this->once())->method('post')->with($url . '/' . $hash . '/meta', $data)->will($this->returnValue($response));
 
         $result = $this->client->setDriver($driver)
                                ->setServerUrl($url)
-                               ->editMetaData($hash, $data);
+                               ->editImageMetaData($hash, $data);
 
         $this->assertSame($result, $response);
     }
 
-    public function testGetMetaData() {
+    public function testDeleteImageMetaData() {
+        $url  = 'http://host';
+        $hash = 'Some hash';
+
+        $response = $this->getMock('PHPIMS_Client_Response');
+
+        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
+        $driver->expects($this->once())->method('delete')->with($url . '/' . $hash . '/meta')->will($this->returnValue($response));
+
+        $result = $this->client->setDriver($driver)
+                               ->setServerUrl($url)
+                               ->deleteImageMetaData($hash);
+
+        $this->assertSame($result, $response);
+    }
+
+    public function testGetImageMetaData() {
         $url  = 'http://host';
         $hash = 'Some hash';
 
@@ -165,7 +182,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
 
         $result = $this->client->setDriver($driver)
                                ->setServerUrl($url)
-                               ->getMetadata($hash);
+                               ->getImageMetadata($hash);
 
         $this->assertSame($result, $response);
     }

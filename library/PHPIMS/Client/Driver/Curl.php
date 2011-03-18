@@ -67,7 +67,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
         $this->curlHandle = curl_init();
 
         curl_setopt_array($this->curlHandle, array(
-            CURLOPT_USERAGENT      => 'PHPIMS_Client',
+            CURLOPT_USERAGENT      => __CLASS__,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER         => true,
             CURLOPT_HTTPHEADER     => array('Expect:'),
@@ -75,39 +75,17 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
-     * Add an image
-     *
-     * @param string $path The path to the image to add
-     * @param string $url The URL to push data to
-     * @param array $metadata Metadata to add along with the image
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
-     */
-    public function addImage($path, $url, array $metadata = null) {
-        $data = array();
-
-        if ($metadata !== null) {
-            $data = $metadata;
-        }
-
-        // Add the file reference
-        $data['file'] = '@' . $path;
-
-        return $this->post($data, $url);
-    }
-
-    /**
      * POST some data to an URL
      *
-     * @param array $data The data to POST
      * @param string $url The URL to POST to
+     * @param array $data The data to POST
      * @return PHPIMS_Client_Response
      * @throws PHPIMS_Client_Driver_Exception
      */
-    public function post(array $data, $url) {
+    public function post($url, array $data = null) {
         curl_setopt_array($this->curlHandle, array(
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => $data,
+            CURLOPT_POST       => true,
+            CURLOPT_POSTFIELDS => $data,
         ));
 
         return $this->request($url);
@@ -126,6 +104,17 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
         ));
 
         return $this->request($url);
+    }
+
+    /**
+     * Perform a HEAD to $url
+     *
+     * @param string $url The URL to HEAD
+     * @return PHPIMS_Client_Response
+     * @throws PHPIMS_Client_Driver_Exception
+     */
+    public function head($url) {
+        throw new PHPIMS_Client_Driver_Exception('not yet implemented');
     }
 
     /**
@@ -171,5 +160,27 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
         $response = PHPIMS_Client_Response::factory($content, $responseCode);
 
         return $response;
+    }
+
+    /**
+     * Add an image
+     *
+     * @param string $path The path to the image to add
+     * @param string $url The URL to push data to
+     * @param array $metadata Metadata to add along with the image
+     * @return PHPIMS_Client_Response
+     * @throws PHPIMS_Client_Driver_Exception
+     */
+    public function addImage($path, $url, array $metadata = null) {
+        $data = array();
+
+        if ($metadata !== null) {
+            $data = $metadata;
+        }
+
+        // Add the file reference
+        $data['file'] = '@' . $path;
+
+        return $this->post($url, $data);
     }
 }
