@@ -117,7 +117,7 @@ class PHPIMS_Server_Response {
      *
      * @var string
      */
-    protected $contentType = null;
+    protected $contentType = 'application/json; charset=utf-8';
 
     /**
      * The body of the response

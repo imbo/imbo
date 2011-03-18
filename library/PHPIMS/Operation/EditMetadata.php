@@ -31,7 +31,9 @@
  */
 
 /**
- * Operation factory
+ * Edit image operation
+ *
+ * This operation will change a stored image.
  *
  * @package PHPIMS
  * @subpackage Operations
@@ -40,26 +42,25 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation {
+class PHPIMS_Operation_EditMetadata extends PHPIMS_Operation_Abstract {
     /**
-     * Factory method
+     * Execute the operation
      *
-     * @param string $operation The name of the operation class to instantiate
-     * @param string $hash Optional hash that will be passed to the operations constructor
-     * @return PHPIMS_Operation_Abstract
+     * Operations must implement this method and return a PHPIMS_Server_Response object to return
+     * to the client.
+     *
+     * @return PHPIMS_Operation_EditMetadata
      * @throws PHPIMS_Operation_Exception
      */
-    static public function factory($operation, $hash = null) {
-        switch ($operation) {
-            case 'PHPIMS_Operation_AddImage':
-            case 'PHPIMS_Operation_DeleteImage':
-            case 'PHPIMS_Operation_EditMetadata':
-            case 'PHPIMS_Operation_GetImage':
-            case 'PHPIMS_Operation_GetMetadata':
-            case 'PHPIMS_Operation_DeleteMetadata':
-                return new $operation($hash);
-            default:
-                throw new PHPIMS_Operation_Exception('Invalid operation', 500);
+    public function exec() {
+        try {
+            $this->getDatabase()->editMetadata($this->getHash(), $_POST);
+        } catch (PHPIMS_Database_Exception $e) {
+            throw new PHPIMS_Operation_Exception('Unable to edit image data', 500, $e);
         }
+
+        $this->getResponse()->setCode(200);
+
+        return $this;
     }
 }

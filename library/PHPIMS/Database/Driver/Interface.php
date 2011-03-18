@@ -73,7 +73,7 @@ interface PHPIMS_Database_Driver_Interface {
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS_Database_Exception
      */
-    public function editImage($hash, array $metadata);
+    public function editMetadata($hash, array $metadata);
 
     /**
      * Get all metadata associated with an image

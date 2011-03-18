@@ -114,29 +114,35 @@ class PHPIMS_FrontController {
     /**
      * Generate an operation object based on some parameters
      *
+     * Valid requests are: (GET|POST|DELETE|HEAD) /<hash>[/meta]
+     *
      * @param string $method The HTTP method
-     * @param string $hash   Optional hash
+     * @param string $hash   Image hash (md5)
      * @param string $extra  Optional extra argument
      * @throws PHPIMS_Exception
      * @return PHPIMS_Operation_Abstract
      */
-    protected function resolveOperation($method, $hash = null, $extra = null) {
+    protected function resolveOperation($method, $hash, $extra = null) {
         $operation = null;
 
-        if ($method === self::GET && !empty($hash)) {
+        if ($method === self::GET) {
             if ($extra === 'meta') {
                 $operation = 'PHPIMS_Operation_GetMetadata';
             } else if (empty($extra)) {
                 $operation = 'PHPIMS_Operation_GetImage';
             }
         } else if ($method === self::POST) {
-            if (empty($hash)) {
-                $operation = 'PHPIMS_Operation_AddImage';
+            if ($extra === 'meta') {
+                $operation = 'PHPIMS_Operation_EditMetadata';
             } else {
-                $operation = 'PHPIMS_Operation_EditImage';
+                $operation = 'PHPIMS_Operation_AddImage';
             }
-        } else if ($method === self::DELETE && !empty($hash)) {
-            $operation = 'PHPIMS_Operation_DeleteImage';
+        } else if ($method === self::DELETE) {
+            if ($extra === 'meta') {
+                $operation = 'PHPIMS_Operation_DeleteMetadata';
+            } else {
+                $operation = 'PHPIMS_Operation_DeleteImage';
+            }
         }
 
         if ($operation === null) {
@@ -152,18 +158,25 @@ class PHPIMS_FrontController {
      * Handle a request
      *
      * @param string $method The HTTP method (one of the defined constants)
-     * @param string $url    The url accessed
+     * @param string $path The path requested
      * @throws PHPIMS_Exception
      */
-    public function handle($method, $url) {
+    public function handle($method, $path) {
         if (!self::isValidMethod($method)) {
             throw new PHPIMS_Exception('Invalid HTTP method: ' . $method, 400);
         }
 
         // Remove starting and trailing slashes
-        $url = trim($url, '/');
-        $parts = explode('/', $url);
+        $path = trim($path, '/');
+        $parts = explode('/', $path, 2);
         $hash = $parts[0];
+
+        if (empty($hash)) {
+            throw new PHPIMS_Exception('Missing hash', 400);
+        } else if (!preg_match('/^[a-f0-9]{32}$/', $hash)) {
+            throw new PHPIMS_Exception('Invalid hash: ' . $hash, 400);
+        }
+
         $extra = null;
 
         if (isset($parts[1])) {

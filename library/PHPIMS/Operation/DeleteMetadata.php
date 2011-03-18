@@ -31,9 +31,9 @@
  */
 
 /**
- * Edit image operation
+ * Delete metadata operation
  *
- * This operation will change a stored image.
+ * This operation will delete all metadata related to an image
  *
  * @package PHPIMS
  * @subpackage Operations
@@ -42,24 +42,26 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_EditImage extends PHPIMS_Operation_Abstract {
+class PHPIMS_Operation_DeleteMetadata extends PHPIMS_Operation_Abstract {
     /**
      * Execute the operation
      *
      * Operations must implement this method and return a PHPIMS_Server_Response object to return
      * to the client.
      *
-     * @return PHPIMS_Operation_EditImage
+     * @return PHPIMS_Operation_GetMetadata
      * @throws PHPIMS_Operation_Exception
      */
     public function exec() {
         try {
-            $this->getDatabase()->editImage($this->getHash(), $_POST);
+            $data = $this->getDatabase()->deleteMetadata($this->getHash());
         } catch (PHPIMS_Database_Exception $e) {
-            throw new PHPIMS_Operation_Exception('Unable to edit image data', 500, $e);
+            throw new PHPIMS_Operation_Exception('Unable to delete metadata', 500, $e);
         }
 
-        $this->getResponse()->setCode(200);
+        $this->getResponse()->setCode(200)
+                            ->setBody($data)
+                            ->setContentType('application/json');
 
         return $this;
     }

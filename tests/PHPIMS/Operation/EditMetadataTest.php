@@ -38,11 +38,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_EditImageTest extends PHPUnit_Framework_TestCase {
+class PHPIMS_Operation_EditMetadataTest extends PHPUnit_Framework_TestCase {
     /**
      * Operation instance
      *
-     * @var PHPIMS_Operation_EditImage
+     * @var PHPIMS_Operation_EditMetadata
      */
     protected $operation = null;
 
@@ -57,7 +57,7 @@ class PHPIMS_Operation_EditImageTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->operation = new PHPIMS_Operation_EditImage($this->hash);
+        $this->operation = new PHPIMS_Operation_EditMetadata($this->hash);
     }
 
     /**
@@ -73,7 +73,7 @@ class PHPIMS_Operation_EditImageTest extends PHPUnit_Framework_TestCase {
      */
     public function testExecWhenDatabaseFails() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('editImage')->with($this->hash, $_POST)->will($this->throwException(new PHPIMS_Database_Exception()));
+        $database->expects($this->once())->method('editMetadata')->with($this->hash, $_POST)->will($this->throwException(new PHPIMS_Database_Exception()));
         $this->operation->setDatabase($database);
 
         $this->operation->exec();
@@ -81,7 +81,7 @@ class PHPIMS_Operation_EditImageTest extends PHPUnit_Framework_TestCase {
 
     public function testSuccessfullExec() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('editImage')->with($this->hash, $_POST);
+        $database->expects($this->once())->method('editMetadata')->with($this->hash, $_POST);
         $this->operation->setDatabase($database);
 
         $this->operation->exec();

@@ -60,14 +60,6 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPUnit_Framework_TestCase {
         $this->driver = null;
     }
 
-    public function testStaticIsValidHash() {
-        $id = new MongoId();
-        $this->assertTrue(PHPIMS_Database_Driver_MongoDB::isValidHash((string) $id));
-
-        $id = 123;
-        $this->assertFalse(PHPIMS_Database_Driver_MongoDB::isValidHash($id));
-    }
-
     public function testSetGetDatabaseName() {
         $name = 'someName';
         $this->driver->setDatabaseName($name);

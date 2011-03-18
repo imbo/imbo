@@ -128,44 +128,68 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException PHPIMS_Exception
+     * @expectedExceptionMessage Invalid HTTP method: foobar
      */
     public function testHandleInvalidMethod() {
         $this->controller->handle('foobar', '/some/path');
+    }
+
+    /**
+     * @expectedException PHPIMS_Exception
+     * @expectedExceptionMessage Missing hash
+     */
+    public function testHandleWithMissingHash() {
+        $this->controller->handle('GET', '/');
+    }
+
+    /**
+     * @expectedException PHPIMS_Exception
+     * @expectedExceptionMessage Invalid hash: hash
+     */
+    public function testHandleWithInvalidHash() {
+        $this->controller->handle('GET', '/hash');
     }
 
     public function testHandleAddImage() {
         $operation = $this->getOperationMock('PHPIMS_Operation_AddImage');
         self::$mocks['PHPIMS_Operation_AddImage'] = $operation;
 
-        $this->controller->handle('POST', '');
+        $this->controller->handle('POST', md5(microtime()));
     }
 
     public function testHandleEditImage() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_EditImage');
-        self::$mocks['PHPIMS_Operation_EditImage'] = $operation;
+        $operation = $this->getOperationMock('PHPIMS_Operation_EditMetadata');
+        self::$mocks['PHPIMS_Operation_EditMetadata'] = $operation;
 
-        $this->controller->handle('POST', 'some hash value');
+        $this->controller->handle('POST', md5(microtime()) . '/meta');
     }
 
     public function testHandleGetImage() {
         $operation = $this->getOperationMock('PHPIMS_Operation_GetImage');
         self::$mocks['PHPIMS_Operation_GetImage'] = $operation;
 
-        $this->controller->handle('GET', 'some hash value');
+        $this->controller->handle('GET', md5(microtime()));
     }
 
     public function testHandleGetMetadata() {
         $operation = $this->getOperationMock('PHPIMS_Operation_GetMetadata');
         self::$mocks['PHPIMS_Operation_GetMetadata'] = $operation;
 
-        $this->controller->handle('GET', 'some hash value/meta');
+        $this->controller->handle('GET', md5(microtime()) . '/meta');
     }
 
     public function testHandleDeleteImage() {
         $operation = $this->getOperationMock('PHPIMS_Operation_DeleteImage');
         self::$mocks['PHPIMS_Operation_DeleteImage'] = $operation;
 
-        $this->controller->handle('DELETE', 'some hash value');
+        $this->controller->handle('DELETE', md5(microtime()));
+    }
+
+    public function testHandleDeleteMetadata() {
+        $operation = $this->getOperationMock('PHPIMS_Operation_DeleteMetadata');
+        self::$mocks['PHPIMS_Operation_DeleteMetadata'] = $operation;
+
+        $this->controller->handle('DELETE', md5(microtime()) . '/meta');
     }
 
     /**
@@ -173,6 +197,6 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unsupported operation
      */
     public function testHandleUnsupportedOperation() {
-        $this->controller->handle('GET', 'some hash value/metadata');
+        $this->controller->handle('GET', md5(microtime()) . '/metadata');
     }
 }

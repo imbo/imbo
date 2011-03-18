@@ -43,9 +43,10 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
         $operations = array(
             'PHPIMS_Operation_AddImage',
             'PHPIMS_Operation_DeleteImage',
-            'PHPIMS_Operation_EditImage',
+            'PHPIMS_Operation_EditMetadata',
             'PHPIMS_Operation_GetImage',
             'PHPIMS_Operation_GetMetadata',
+            'PHPIMS_Operation_DeleteMetadata',
         );
 
         foreach ($operations as $className) {

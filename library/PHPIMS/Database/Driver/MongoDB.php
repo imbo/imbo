@@ -233,7 +233,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS_Database_Exception
      */
-    public function editImage($hash, array $metadata) {
+    public function editMetadata($hash, array $metadata) {
         try {
             $this->getCollection()->update(
                 array('_id' => new MongoID($hash)),
