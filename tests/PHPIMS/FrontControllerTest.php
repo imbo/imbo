@@ -61,9 +61,6 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
      * @var array
      */
     protected $controllerConfig = array(
-        'database' => array(
-            'driver' => 'PHPIMS_Database_Driver_Test',
-        ),
         'operation' => array(
             'factory' => __CLASS__,
         ),
@@ -136,15 +133,6 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
         $this->controller->handle('foobar', '/some/path');
     }
 
-    /**
-     * @expectedException PHPIMS_Exception
-     * @expectedExceptionMessage Invalid hash: invalidhash
-     */
-    public function testHandleWithInvalidImageHash() {
-        PHPIMS_Database_Driver_Test::$nextValidHashResult = false;
-        $this->controller->handle('GET', '/invalidhash/extra');
-    }
-
     public function testHandleAddImage() {
         $operation = $this->getOperationMock('PHPIMS_Operation_AddImage');
         self::$mocks['PHPIMS_Operation_AddImage'] = $operation;
@@ -155,7 +143,6 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     public function testHandleEditImage() {
         $operation = $this->getOperationMock('PHPIMS_Operation_EditImage');
         self::$mocks['PHPIMS_Operation_EditImage'] = $operation;
-        PHPIMS_Database_Driver_Test::$nextValidHashResult = true;
 
         $this->controller->handle('POST', 'some hash value');
     }
@@ -163,7 +150,6 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     public function testHandleGetImage() {
         $operation = $this->getOperationMock('PHPIMS_Operation_GetImage');
         self::$mocks['PHPIMS_Operation_GetImage'] = $operation;
-        PHPIMS_Database_Driver_Test::$nextValidHashResult = true;
 
         $this->controller->handle('GET', 'some hash value');
     }
@@ -171,7 +157,6 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     public function testHandleGetMetadata() {
         $operation = $this->getOperationMock('PHPIMS_Operation_GetMetadata');
         self::$mocks['PHPIMS_Operation_GetMetadata'] = $operation;
-        PHPIMS_Database_Driver_Test::$nextValidHashResult = true;
 
         $this->controller->handle('GET', 'some hash value/meta');
     }
@@ -179,7 +164,6 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     public function testHandleDeleteImage() {
         $operation = $this->getOperationMock('PHPIMS_Operation_DeleteImage');
         self::$mocks['PHPIMS_Operation_DeleteImage'] = $operation;
-        PHPIMS_Database_Driver_Test::$nextValidHashResult = true;
 
         $this->controller->handle('DELETE', 'some hash value');
     }

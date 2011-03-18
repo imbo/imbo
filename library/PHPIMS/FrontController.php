@@ -170,12 +170,6 @@ class PHPIMS_FrontController {
             $extra = $parts[1];
         }
 
-        $databaseDriver = $this->config['database']['driver'];
-
-        if (!empty($hash) && !$databaseDriver::isValidHash($hash)) {
-            throw new PHPIMS_Exception('Invalid hash: ' . $hash, 400);
-        }
-
         $operation = $this->resolveOperation($method, $hash, $extra);
         $operation->init($this->config)
                   ->preExec()

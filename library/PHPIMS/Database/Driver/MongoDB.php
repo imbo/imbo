@@ -81,16 +81,6 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     protected $collection = null;
 
     /**
-     * Method to check if an image hash is valid for this driver
-     *
-     * @param string $hash The hash to check
-     * @return boolean Returns true if valid, false otherwise
-     */
-    static public function isValidHash($hash) {
-        return (bool) preg_match('/^[a-zA-Z0-9]{24}$/', $hash);
-    }
-
-    /**
      * Get the database name
      *
      * @return string

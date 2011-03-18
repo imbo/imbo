@@ -44,14 +44,6 @@
  */
 interface PHPIMS_Database_Driver_Interface {
     /**
-     * Method to check if an image hash is valid for this driver
-     *
-     * @param string $hash The hash to check
-     * @return boolean Returns true if valid, false otherwise
-     */
-    static public function isValidHash($hash);
-
-    /**
      * Insert a new image
      *
      * This method will insert a new image into the database. The method should update the $image
