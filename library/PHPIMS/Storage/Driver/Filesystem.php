@@ -123,9 +123,7 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
      * @throws PHPIMS_Storage_Exception
      */
     public function delete($hash) {
-        $params = $this->getParams();
-
-        $file = $params['dataDir'] . '/' . $hash;
+        $file = $this->getImagePathFromHash($hash);
 
         if (!is_file($file)) {
             throw new PHPIMS_Storage_Exception('File does not exist on the file system', 500);
