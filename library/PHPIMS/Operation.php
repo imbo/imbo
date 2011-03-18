@@ -45,11 +45,11 @@ class PHPIMS_Operation {
      * Factory method
      *
      * @param string $operation The name of the operation class to instantiate
-     * @param string $hash Optional hash that will be passed to the operations constructor
+     * @param string $hash Hash that will be passed to the operations constructor
      * @return PHPIMS_Operation_Abstract
      * @throws PHPIMS_Operation_Exception
      */
-    static public function factory($operation, $hash = null) {
+    static public function factory($operation, $hash) {
         switch ($operation) {
             case 'PHPIMS_Operation_AddImage':
             case 'PHPIMS_Operation_DeleteImage':

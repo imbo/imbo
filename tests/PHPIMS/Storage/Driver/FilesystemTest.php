@@ -68,7 +68,7 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage File does not exist on the file system
      */
     public function testDeleteFileThatDoesNotExist() {
-        $this->driver->setParams(array('path' => 'foobar'));
+        $this->driver->setParams(array('dataDir' => 'foobar'));
         $this->driver->delete('asdasdasasd');
     }
 
@@ -81,7 +81,7 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
         $root->addChild(vfsStream::newFile($hash));
 
         $this->driver->setParams(array(
-            'path' => vfsStream::url($dir),
+            'dataDir' => vfsStream::url($dir),
         ));
 
         $this->assertTrue(vfsStreamWrapper::getRoot()->hasChild($hash));
@@ -94,7 +94,7 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage File does not exist on the file system
      */
     public function testFetchFileThatDoesNotExist() {
-        $this->driver->setParams(array('path' => 'foobar'));
+        $this->driver->setParams(array('dataDir' => 'foobar'));
         $this->driver->fetch('asdasdasasd');
     }
 
@@ -111,7 +111,7 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
         $root->addChild($file);
 
         $this->driver->setParams(array(
-            'path' => vfsStream::url($dir),
+            'dataDir' => vfsStream::url($dir),
         ));
 
         $this->assertSame($content, $this->driver->fetch($hash));
@@ -129,7 +129,7 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
         vfsStream::setup($dir, 0);
 
         $this->driver->setParams(array(
-            'path' => vfsStream::url($dir),
+            'dataDir' => vfsStream::url($dir),
         ));
 
         $this->driver->store('some path', $image);
@@ -150,7 +150,7 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
         vfsStream::setup($dir);
 
         $this->driver->setParams(array(
-            'path' => vfsStream::url($dir),
+            'dataDir' => vfsStream::url($dir),
         ));
 
         $this->assertFalse($this->driver->store('some path', $image));

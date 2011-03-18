@@ -58,6 +58,15 @@ abstract class PHPIMS_Storage_Driver_Abstract implements PHPIMS_Storage_Driver_I
         if ($params !== null) {
             $this->setParams($params);
         }
+
+        $this->init();
+    }
+
+    /**
+     * Init method
+     */
+    protected function init() {
+        // Can be implemented by child classes
     }
 
     /**

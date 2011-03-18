@@ -97,7 +97,7 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     protected function getOperationMock($operationClass) {
         $response = $this->getMock('PHPIMS_Server_Response');
 
-        $operation = $this->getMock($operationClass);
+        $operation = $this->getMockBuilder($operationClass)->disableOriginalConstructor()->getMock();
         $operation->expects($this->once())->method('init')->with($this->controllerConfig)->will($this->returnValue($operation));
         $operation->expects($this->once())->method('preExec')->will($this->returnValue($operation));
         $operation->expects($this->once())->method('exec')->will($this->returnValue($operation));

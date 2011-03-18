@@ -50,7 +50,7 @@ class PHPIMS_Operation_AddImageTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->operation = new PHPIMS_Operation_AddImage();
+        $this->operation = new PHPIMS_Operation_AddImage(md5(microtime()));
 
         $_FILES['file'] = array(
             'name'     => 'somename',

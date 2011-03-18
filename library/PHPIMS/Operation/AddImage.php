@@ -77,11 +77,10 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
         }
 
         $this->getResponse()->setCode(201)
-                            ->setHeader('Location', 'http://' . $_SERVER['HTTP_HOST'] . '/' . $image->getId())
+                            ->setHeader('Location', 'http://' . $_SERVER['HTTP_HOST'] . '/' . $image->getHash())
                             ->setBody(array(
-                                'id' => $image->getId(),
-                            ))
-                            ->setContentType('application/json');
+                                'hash' => $image->getHash(),
+                            ));
 
         return $this;
     }

@@ -50,7 +50,7 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
         );
 
         foreach ($operations as $className) {
-            $this->assertInstanceOf($className, PHPIMS_Operation::factory($className));
+            $this->assertInstanceOf($className, PHPIMS_Operation::factory($className, md5(microtime())));
         }
     }
 
@@ -58,6 +58,6 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
      * @expectedException PHPIMS_Operation_Exception
      */
     public function testFactoryWithUnSupportedOperation() {
-        PHPIMS_Operation::factory('foobar');
+        PHPIMS_Operation::factory('foobar', md5(microtime()));
     }
 }

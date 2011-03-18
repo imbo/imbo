@@ -42,7 +42,7 @@
  */
 abstract class PHPIMS_Operation_Abstract {
     /**
-     * The current hash value (if present)
+     * The current hash value
      *
      * @param string
      */
@@ -110,14 +110,12 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * Class constructor
      *
-     * @param string $hash An optional hash for the operation to work with
+     * @param string $hash An image hash
      * @param PHPIMS_Image $image Optional image object
      * @param PHPIMS_Server_Response $response Optional response object
      */
-    public function __construct($hash = null, PHPIMS_Image $image = null, PHPIMS_Server_Response $response = null) {
-        if ($hash !== null) {
-            $this->setHash($hash);
-        }
+    public function __construct($hash, PHPIMS_Image $image = null, PHPIMS_Server_Response $response = null) {
+        $this->setHash($hash);
 
         if ($image === null) {
             $image = new PHPIMS_Image();

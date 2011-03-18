@@ -64,7 +64,9 @@ class PHPIMS_Operation_Plugin_AbstractTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetOperation() {
-        $operation = $this->getMockForAbstractClass('PHPIMS_Operation_Abstract');
+        $operation = $this->getMockBuilder('PHPIMS_Operation_Abstract')
+                          ->disableOriginalConstructor()
+                          ->getMockForAbstractClass();
         $this->plugin->setOperation($operation);
         $this->assertSame($operation, $this->plugin->getOperation());
     }

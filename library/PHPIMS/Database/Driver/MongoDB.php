@@ -194,7 +194,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
         $data['_name']  = $image->getFilename();
         $data['_size']  = $image->getFilesize();
         $data['_added'] = time();
-        $data['_md5']   = $image->getMd5();
+        $data['_md5']   = $image->getHash();
         $data['_mime']  = $image->getMimeType();
 
         try {

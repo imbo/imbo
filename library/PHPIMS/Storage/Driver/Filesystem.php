@@ -59,11 +59,11 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
     public function store($path, PHPIMS_Image $image) {
         $params = $this->getParams();
 
-        if (!is_writable($params['path'])) {
+        if (!is_writable($params['dataDir'])) {
             throw new PHPIMS_Storage_Exception('Could not store image', 500);
         }
 
-        $newPath = $params['path'] . '/' . $image->getId();
+        $newPath = $params['dataDir'] . '/' . $image->getId();
         $result = move_uploaded_file($path, $newPath);
 
         if ($result) {
@@ -88,7 +88,7 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
     public function delete($hash) {
         $params = $this->getParams();
 
-        $file = $params['path'] . '/' . $hash;
+        $file = $params['dataDir'] . '/' . $hash;
 
         if (!is_file($file)) {
             throw new PHPIMS_Storage_Exception('File does not exist on the file system', 500);
@@ -109,7 +109,7 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
     public function fetch($hash) {
         $params = $this->getParams();
 
-        $file = $params['path'] . '/' . $hash;
+        $file = $params['dataDir'] . '/' . $hash;
 
         if (!is_file($file)) {
             throw new PHPIMS_Storage_Exception('File does not exist on the file system', 404);

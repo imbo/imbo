@@ -151,7 +151,7 @@ class PHPIMS_FrontController {
 
         $factoryClass = $this->config['operation']['factory'];
 
-        return $factoryClass::factory($operation, $hash);;
+        return $factoryClass::factory($operation, $hash);
     }
 
     /**
