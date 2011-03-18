@@ -100,17 +100,17 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
 
     public function testAddImage() {
         $url      = 'http://host';
-        $image    = __FILE__;
+        $image    = __DIR__ . '/_files/image.png';
         $metadata = array(
             'foo' => 'bar',
             'bar' => 'foo',
         );
-        $md5 = md5_file(__FILE__);
+        $md5 = md5_file($image);
 
         $response = $this->getMock('PHPIMS_Client_Response');
 
         $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
-        $driver->expects($this->once())->method('addImage')->with($image, $url . '/' . $md5, $metadata)->will($this->returnValue($response));
+        $driver->expects($this->once())->method('addImage')->with($image, $url . '/' . $md5 . '.png', $metadata)->will($this->returnValue($response));
 
         $result = $this->client->setDriver($driver)
                                ->setServerUrl($url)

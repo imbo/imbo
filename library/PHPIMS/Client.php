@@ -188,10 +188,15 @@ class PHPIMS_Client {
             throw new PHPIMS_Client_Exception('File does not exist: ' . $path);
         }
 
-        // Generate md5
+        // Generate MD5
         $hash = md5_file($path);
 
-        return $this->getDriver()->addImage($path, $this->serverUrl . '/' . $hash, $metadata);
+        // Get extension
+        $info = getimagesize($path);
+        $extension = image_type_to_extension($info[2], false);
+        $url = $this->serverUrl . '/' . $hash . '.' . $extension;
+
+        return $this->getDriver()->addImage($path, $url, $metadata);
     }
 
     /**
