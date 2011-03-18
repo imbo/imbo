@@ -71,32 +71,6 @@ class PHPIMS_Operation_AddImageTest extends PHPUnit_Framework_TestCase {
         unset($_SERVER['HTTP_HOST']);
     }
 
-    /**
-     * @expectedException PHPIMS_Database_Exception
-     */
-    public function testExecWhenDatabaseFails() {
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('insertImage')->will($this->throwException(new PHPIMS_Database_Exception()));
-        $this->operation->setDatabase($database);
-
-        $this->operation->exec();
-    }
-
-    /**
-     * @expectedException PHPIMS_Storage_Exception
-     */
-    public function testExecWhenStorageFails() {
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('insertImage');
-        $this->operation->setDatabase($database);
-
-        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
-        $storage->expects($this->once())->method('store')->with($_FILES['file']['tmp_name'])->will($this->throwException(new PHPIMS_Storage_Exception()));
-        $this->operation->setStorage($storage);
-
-        $this->operation->exec();
-    }
-
     public function testSuccessfullExec() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
         $database->expects($this->once())->method('insertImage');

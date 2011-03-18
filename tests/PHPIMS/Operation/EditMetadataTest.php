@@ -67,17 +67,6 @@ class PHPIMS_Operation_EditMetadataTest extends PHPUnit_Framework_TestCase {
         $this->operation = null;
     }
 
-    /**
-     * @expectedException PHPIMS_Database_Exception
-     */
-    public function testExecWhenDatabaseFails() {
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('editMetadata')->with($this->hash, $_POST)->will($this->throwException(new PHPIMS_Database_Exception()));
-        $this->operation->setDatabase($database);
-
-        $this->operation->exec();
-    }
-
     public function testSuccessfullExec() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
         $database->expects($this->once())->method('editMetadata')->with($this->hash, $_POST);

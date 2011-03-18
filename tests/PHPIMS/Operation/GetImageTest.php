@@ -38,11 +38,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_DeleteImageTest extends PHPUnit_Framework_TestCase {
+class PHPIMS_Operation_GetImageTest extends PHPUnit_Framework_TestCase {
     /**
      * Operation instance
      *
-     * @var PHPIMS_Operation_DeleteImage
+     * @var PHPIMS_Operation_GetImage
      */
     protected $operation = null;
 
@@ -57,7 +57,7 @@ class PHPIMS_Operation_DeleteImageTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->operation = new PHPIMS_Operation_DeleteImage($this->hash);
+        $this->operation = new PHPIMS_Operation_GetImage($this->hash);
     }
 
     /**
@@ -68,14 +68,16 @@ class PHPIMS_Operation_DeleteImageTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testSuccessfullExec() {
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('deleteImage')->with($this->hash);
-        $this->operation->setDatabase($database);
-
+        $url = 'http://some/url';
         $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
-        $storage->expects($this->once())->method('delete')->with($this->hash);
+        $storage->expects($this->once())->method('getImageUrl')->with($this->hash)->will($this->returnValue($url));
         $this->operation->setStorage($storage);
 
         $this->operation->exec();
+
+        $headers = $this->operation->getResponse()->getHeaders();
+
+        $this->assertArrayHasKey('Location', $headers);
+        $this->assertSame($url, $headers['Location']);
     }
 }
