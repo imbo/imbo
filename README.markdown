@@ -13,6 +13,7 @@ PHPIMS uses a REST API to manage the images. Each image will be identified by a 
 **GET /images/&lt;hash&gt;**
 
 Fetch the image identified by &lt;hash&gt;. The following options are supported:
+
 * (int) width Width of the image in pixels
 * (int) height Height of the image in pixels
 * (string) format The file format (supported formats: jpg, gif and png)
