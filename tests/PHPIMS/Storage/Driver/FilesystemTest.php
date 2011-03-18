@@ -72,23 +72,6 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
         $this->driver->delete('asdasdasasd');
     }
 
-    public function testDeleteFile() {
-        $dir  = 'directory';
-        $hash = 'asdasdasdasd';
-
-        // Create the virtual directory
-        $root = vfsStream::setup($dir);
-        $root->addChild(vfsStream::newFile($hash));
-
-        $this->driver->setParams(array(
-            'dataDir' => vfsStream::url($dir),
-        ));
-
-        $this->assertTrue(vfsStreamWrapper::getRoot()->hasChild($hash));
-        $this->driver->delete($hash);
-        $this->assertFalse(vfsStreamWrapper::getRoot()->hasChild($hash));
-    }
-
     /**
      * @expectedException PHPIMS_Storage_Exception
      * @expectedExpectionMessage Could not store image
