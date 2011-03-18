@@ -14,10 +14,10 @@ PHPIMS uses a REST API to manage the images. Each image will be identified by a 
 
 Fetch the image identified by &lt;hash&gt;. The following options are supported:
 
-* (int) width Width of the image in pixels
-* (int) height Height of the image in pixels
-* (string) format The file format (supported formats: jpg, gif and png)
-* (int) quality The quality of the resulting image (0-100 where 100 is the best quality. Not all image formats supports this)
+* `(int) width` Width of the image in pixels
+* `(int) height` Height of the image in pixels
+* `(string) format` The file format (supported formats: jpg, gif and png)
+* `(int) quality` The quality of the resulting image (0-100 where 100 is the best quality. Not all image formats supports this)
 
 If no options are specified the original image will be returned.
 
