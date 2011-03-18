@@ -28,9 +28,9 @@ Get metadata related to the image identified by &lt;hash&gt;. The metadata will 
 
 Delete the image identified by &lt;hash&gt;.
 
-**POST /[&lt;hash&gt;]**
+**POST /[images/&lt;hash&gt;]**
 
-Place a new image on the server along with metadata. Can be used to manipulate metadata when used with a hash. If
+Place a new image on the server along with metadata. Can be used to manipulate metadata when used with a hash.
 
 **HEAD /[images/&lt;hash&gt;]**
 
