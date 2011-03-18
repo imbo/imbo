@@ -32,9 +32,9 @@ Delete the image identified by &lt;hash&gt;.
 
 Place a new image on the server along with metadata. Can be used to manipulate metadata when used with a hash. If
 
-**HEAD /[&lt;hash&gt;]**
+**HEAD /[images/&lt;hash&gt;]**
 
-Fetches extra header information about a single image or about the site in general when used without &lt;hash&gt;.
+Fetches extra header information about a single image or about the site in general when used without the &lt;hash&gt;.
 
 Extra headers
 -------------
