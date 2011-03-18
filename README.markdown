@@ -4,42 +4,41 @@ PHP Image Server (**PHPIMS**) is an image "server" that can be used to add/get/d
 
 REST API
 --------
-PHPIMS uses a REST API to manage the images. Each image will be identified by am MD5 hash that will be referred to as &lt;hash&gt; for the remainder of this document. The hash will be generated on the image server when an image is added.
+PHPIMS uses a REST API to manage the images. Each image will be identified by an MD5 sum of the image itself and the original file extension, that will be referred to as &lt;image&gt; for the remainder of this document.
 
-**GET /&lt;hash&gt;**
+**GET /&lt;image&gt;**
 
-Fetch the image identified by &lt;hash&gt;. The following query parameters are supported:
+Fetch the image identified by &lt;image&gt;. The following query parameters are supported:
 
 * `(int) width` Width of the image in pixels.
 * `(int) height` Height of the image in pixels.
-* `(string) format` The file format (supported formats: jpg, gif and png). If ommited the format of the original image will be used.
-* `(int) quality` The quality of the resulting image (0-100 where 100 is the best quality). Not all image formats supports this.
+* `(string) format` The file format (supported formats: jpg, gif and png).
 
 If no options are specified the original image will be returned.
 
-**GET /&lt;hash&gt;/meta**
+**GET /&lt;image&gt;/meta**
 
-Get metadata related to the image identified by &lt;hash&gt;. The metadata will be JSON encoded.
+Get metadata related to the image identified by &lt;image&gt;. The metadata will be JSON encoded.
 
-**POST /&lt;hash&gt;**
+**POST /&lt;image&gt;**
 
-Place a new image on the server along with metadata. The &lt;hash&gt; is the md5 sum of the file itself.
+Place a new image on the server along with metadata.
 
-**POST /&lt;hash&gt;/meta**
+**POST /&lt;image&gt;/meta**
 
-Edit the metadata attached to the image identified by &lt;hash&gt;.
+Edit the metadata attached to the image identified by &lt;image&gt;.
 
-**DELETE /&lt;hash&gt;**
+**DELETE /&lt;image&gt;**
 
-Delete the image identified by &lt;hash&gt; along with all metadata. This action is not reversable.
+Delete the image identified by &lt;image&gt; along with all metadata. This action is not reversable.
 
-**DELETE /&lt;hash&gt;/meta**
+**DELETE /&lt;image&gt;/meta**
 
-Delete the metadata attache to the image identified by &lt;hash&gt;. The image is kept on the server.
+Delete the metadata attache to the image identified by &lt;image&gt;. The image is kept on the server. This action is not reversable.
 
-**HEAD /[&lt;hash&gt;]**
+**HEAD /&lt;image&gt;**
 
-Fetches extra header information about a single image or about the site in general when used without the &lt;hash&gt;.
+Fetches extra header information about a single image identified by &lt;image&gt;.
 
 Extra response headers
 -------------
@@ -69,10 +68,10 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     // Make the request
     $response = $client->addImage($path, $metadata);
     
-In the `$response` variable you will find the image hash that you will need to identify the added image in other operations. This hash is the md5 sum of the file itself. 
+In the `$response` variable you will find the image hash that you will need to identify the added image in other operations. This hash is as mentioned above the MD5 sum of the file itself and the original file extension. 
 
     <?php
-    print($response); // {"id":"64223c5af0bfd3d90cf30af553ceea13"}
+    print($response); // {"hash":"64223c5af0bfd3d90cf30af553ceea13"}
     
 The response from the client is actually a `PHPIMS_Client_Response` object that holds all response headers and the body. When used in a string context it will return the body as JSON-encoded data. The response object has the following methods:
 
@@ -91,7 +90,7 @@ The response from the client is actually a `PHPIMS_Client_Response` object that 
     $client->setServerUrl('http://<hostname>');
     
     $hash = '<hash>';
-    $response = $client->getMetadata($hash);
+    $response = $client->getImageMetadata($hash);
 
 ** Delete an image **
 
@@ -103,3 +102,14 @@ The response from the client is actually a `PHPIMS_Client_Response` object that 
     
     $hash = '<hash>';
     $response = $client->deleteImage($hash);
+    
+** Delete all metadata attached to an image **
+
+    <?php
+    require 'PHPIMS/Autoload.php';
+
+    $client = new PHPIMS_Client();
+    $client->setServerUrl('http://<hostname>');
+    
+    $hash = '<hash>';
+    $response = $client->deleteImageMetadata($hash);
