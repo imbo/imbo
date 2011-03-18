@@ -4,15 +4,11 @@ PHP Image Server (**PHPIMS**) is an image "server" that can be used to add/get/d
 
 REST API
 --------
-PHPIMS uses a REST API to manage the images. Each image will be identified by a unique hash that will be referred to as &lt;hash&gt; for the remainder of this document. The hash will be generated on the image server when an image is added and will look like:
+PHPIMS uses a REST API to manage the images. Each image will be identified by am MD5 hash that will be referred to as &lt;hash&gt; for the remainder of this document. The hash will be generated on the image server when an image is added.
 
-([a-f0-9]/){3}[a-f0-9]{32} where the first three letters is the first three letters of the hash. For instance:
+**GET /&lt;hash&gt;**
 
-1/a/f/1af52abe5101aa01db6544ad28db5a16 
-
-**GET /images/&lt;hash&gt;**
-
-Fetch the image identified by &lt;hash&gt;. The following options are supported:
+Fetch the image identified by &lt;hash&gt;. The following query parameters are supported:
 
 * `(int) width` Width of the image in pixels.
 * `(int) height` Height of the image in pixels.
@@ -21,19 +17,19 @@ Fetch the image identified by &lt;hash&gt;. The following options are supported:
 
 If no options are specified the original image will be returned.
 
-**GET /images/&lt;hash&gt;/meta**
+**GET /&lt;hash&gt;/meta**
 
 Get metadata related to the image identified by &lt;hash&gt;. The metadata will be JSON encoded.
 
-**DELETE /images/&lt;hash&gt;**
+**DELETE /&lt;hash&gt;**
 
-Delete the image identified by &lt;hash&gt;.
+Delete the image identified by &lt;hash&gt; along with all metadata. This action is not reversable.
 
-**POST /[images/&lt;hash&gt;]**
+**POST /[&lt;hash&gt;]**
 
 Place a new image on the server along with metadata. Can be used to manipulate metadata when used with a hash.
 
-**HEAD /[images/&lt;hash&gt;]**
+**HEAD /[&lt;hash&gt;]**
 
 Fetches extra header information about a single image or about the site in general when used without the &lt;hash&gt;.
 
@@ -54,7 +50,7 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     $client->setServerUrl('http://<hostname>');
 
     // Path to local image    
-    $image = '/path/to/image.png';
+    $path = '/path/to/image.png';
     
     // Add some metadata to the image
     $metadata = array(
@@ -63,7 +59,7 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     );
     
     // Make the request
-    $response = $client->add($image, $metadata);
+    $response = $client->addImage($path, $metadata);
     
 In the `$response` variable you will find the image hash that you will need to identify the added image in other operations.
 
@@ -99,5 +95,3 @@ The response from the client is actually a `PHPIMS_Client_Response` object that 
     
     $hash = '<hash>';
     $response = $client->deleteImage($hash);
-    
-This will permanently remove the image from the image server.
