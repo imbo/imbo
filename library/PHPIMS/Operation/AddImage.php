@@ -67,7 +67,7 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
         try {
             $this->getDatabase()->insertNewImage($image);
         } catch (PHPIMS_Database_Exception $e) {
-            throw new PHPIMS_Operation_Exception('Unable to add image to the database', 500, $e);
+            throw new PHPIMS_Operation_Exception('Unable to add image to the database: ' . $e->getMessage(), 500, $e);
         }
 
         try {
@@ -77,7 +77,6 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
         }
 
         $this->getResponse()->setCode(201)
-                            ->setHeader('Location', 'http://' . $_SERVER['HTTP_HOST'] . '/' . $image->getHash())
                             ->setBody(array(
                                 'hash' => $image->getHash(),
                             ));

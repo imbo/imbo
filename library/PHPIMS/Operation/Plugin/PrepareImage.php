@@ -50,22 +50,20 @@ class PHPIMS_Operation_Plugin_PrepareImage extends PHPIMS_Operation_Plugin_Abstr
     public function preExec() {
         $image = $this->getOperation()->getImage();
 
-        $image->setFilename($_FILES['file']['name'])
-              ->setFilesize($_FILES['file']['size'])
-              ->setPath($_FILES['file']['tmp_name'])
-              ->setMetadata($_POST)
-              ->setHash($this->getOperation()->getHash());
+        $imagePath = $_FILES['file']['tmp_name'];
+        $info = getimagesize($imagePath);
+        $extension = image_type_to_extension($info[2], false);
+        $actualHash = md5_file($imagePath) . '.' . $extension;
+        $hashFromRequest = $this->getOperation()->getHash();
 
-        // Make sure the image hash matches the one given in the request
-        $actualHash = md5_file($image->getPath());
-
-        if ($actualHash !== $image->getHash()) {
+        if ($actualHash !== $hashFromRequest) {
             throw new PHPIMS_Operation_Plugin_Exception('Hash mismatch', 400);
         }
 
-        // Add some special data about the image
-        $fp = finfo_open(FILEINFO_MIME_TYPE);
-        $image->setMimeType(finfo_file($fp, $image->getPath()));
-        finfo_close($fp);
+        $image->setFilename($_FILES['file']['name'])
+              ->setFilesize($_FILES['file']['size'])
+              ->setMetadata($_POST)
+              ->setHash($hashFromRequest)
+              ->setMimeType($info['mime']);
     }
 }

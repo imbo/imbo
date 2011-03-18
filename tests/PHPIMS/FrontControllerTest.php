@@ -154,42 +154,42 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
         $operation = $this->getOperationMock('PHPIMS_Operation_AddImage');
         self::$mocks['PHPIMS_Operation_AddImage'] = $operation;
 
-        $this->controller->handle('POST', md5(microtime()));
+        $this->controller->handle('POST', md5(microtime()) . '.png');
     }
 
     public function testHandleEditImage() {
         $operation = $this->getOperationMock('PHPIMS_Operation_EditMetadata');
         self::$mocks['PHPIMS_Operation_EditMetadata'] = $operation;
 
-        $this->controller->handle('POST', md5(microtime()) . '/meta');
+        $this->controller->handle('POST', md5(microtime()) . '.png/meta');
     }
 
     public function testHandleGetImage() {
         $operation = $this->getOperationMock('PHPIMS_Operation_GetImage');
         self::$mocks['PHPIMS_Operation_GetImage'] = $operation;
 
-        $this->controller->handle('GET', md5(microtime()));
+        $this->controller->handle('GET', md5(microtime()) . '.png');
     }
 
     public function testHandleGetMetadata() {
         $operation = $this->getOperationMock('PHPIMS_Operation_GetMetadata');
         self::$mocks['PHPIMS_Operation_GetMetadata'] = $operation;
 
-        $this->controller->handle('GET', md5(microtime()) . '/meta');
+        $this->controller->handle('GET', md5(microtime()) . '.png/meta');
     }
 
     public function testHandleDeleteImage() {
         $operation = $this->getOperationMock('PHPIMS_Operation_DeleteImage');
         self::$mocks['PHPIMS_Operation_DeleteImage'] = $operation;
 
-        $this->controller->handle('DELETE', md5(microtime()));
+        $this->controller->handle('DELETE', md5(microtime()) . '.png');
     }
 
     public function testHandleDeleteMetadata() {
         $operation = $this->getOperationMock('PHPIMS_Operation_DeleteMetadata');
         self::$mocks['PHPIMS_Operation_DeleteMetadata'] = $operation;
 
-        $this->controller->handle('DELETE', md5(microtime()) . '/meta');
+        $this->controller->handle('DELETE', md5(microtime()) . '.png/meta');
     }
 
     /**
@@ -197,6 +197,6 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unsupported operation
      */
     public function testHandleUnsupportedOperation() {
-        $this->controller->handle('GET', md5(microtime()) . '/metadata');
+        $this->controller->handle('GET', md5(microtime()) . '.png/metadata');
     }
 }

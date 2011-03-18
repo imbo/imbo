@@ -134,25 +134,4 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
 
         $this->driver->store('some path', $image);
     }
-
-    public function testStoreImageWithFileNotUploadedUsingHttpPost() {
-        $hash = 'asdsadsada';
-        $image = $this->getMock('PHPIMS_Image');
-        $image->expects($this->once())->method('getId')->will($this->returnValue($hash));
-
-        $tmpRoot = vfsStream::setup('tmp');
-        $file = vfsStream::newFile('tmpname');
-        $tmpRoot->addChild($file);
-
-        $dir = 'directory';
-
-        // Create the virtual directory with no permissions
-        vfsStream::setup($dir);
-
-        $this->driver->setParams(array(
-            'dataDir' => vfsStream::url($dir),
-        ));
-
-        $this->assertFalse($this->driver->store('some path', $image));
-    }
 }

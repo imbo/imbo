@@ -194,10 +194,17 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
         $data['_name']  = $image->getFilename();
         $data['_size']  = $image->getFilesize();
         $data['_added'] = time();
-        $data['_md5']   = $image->getHash();
+        $data['_hash']  = $image->getHash();
         $data['_mime']  = $image->getMimeType();
 
         try {
+            // See if the image already exists
+            $row = $this->getCollection()->findOne(array('_hash' => $data['_hash']));
+
+            if ($row) {
+                throw new PHPIMS_Database_Exception('Image already exists', 400);
+            }
+
             $this->getCollection()->insert($data, array('safe' => true));
         } catch (MongoException $e) {
             throw new PHPIMS_Database_Exception('Unable to save image data', 500, $e);

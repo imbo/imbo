@@ -173,7 +173,7 @@ class PHPIMS_FrontController {
 
         if (empty($hash)) {
             throw new PHPIMS_Exception('Missing hash', 400);
-        } else if (!preg_match('/^[a-f0-9]{32}$/', $hash)) {
+        } else if (!preg_match('/^[a-f0-9]{32}\.[a-zA-Z]{3,4}$/', $hash)) {
             throw new PHPIMS_Exception('Invalid hash: ' . $hash, 400);
         }
 
