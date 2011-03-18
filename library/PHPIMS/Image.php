@@ -42,13 +42,19 @@ class PHPIMS_Image {
     /**
      * ID of the image
      *
-     * Unique identifier. Type depends on the underlying database driver. If
-     * PHPIMS_Database_Driver_MongoDB is used the value will be a 24 byte string, and if
-     * PHPIMS_Database_Driver_MySQL is used it will be an integer.
+     * This is the ID from the underlying database driver
      *
      * @var mixed
      */
     protected $id = null;
+
+    /**
+     * MD5 hash identifying the image. This is the value that PHPIMS uses to identify the image.
+     * The hash is an MD5 of the file itself.
+     *
+     * @var string
+     */
+    protected $hash = null;
 
     /**
      * Original filename
@@ -70,13 +76,6 @@ class PHPIMS_Image {
      * @var string
      */
     protected $mimeType = null;
-
-    /**
-     * MD5 hash of the image
-     *
-     * @var string
-     */
-    protected $md5 = null;
 
     /**
      * The metadata attached to this image
@@ -109,6 +108,27 @@ class PHPIMS_Image {
      */
     public function setId($id) {
         $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the hash
+     *
+     * @return string
+     */
+    public function getHash() {
+        return $this->hash;
+    }
+
+    /**
+     * Set the hash
+     *
+     * @param string $hash Hash to set
+     * @return PHPIMS_Image
+     */
+    public function setHash($hash) {
+        $this->hash = $hash;
 
         return $this;
     }
@@ -172,27 +192,6 @@ class PHPIMS_Image {
      */
     public function setMimeType($mimeType) {
         $this->mimeType = $mimeType;
-
-        return $this;
-    }
-
-    /**
-     * Get the md5 hash
-     *
-     * @return string
-     */
-    public function getMd5() {
-        return $this->md5;
-    }
-
-    /**
-     * Set the md5 hash
-     *
-     * @param string $hash The md5 hash
-     * @return PHPIMS_Image
-     */
-    public function setMd5($hash) {
-        $this->md5 = $hash;
 
         return $this;
     }

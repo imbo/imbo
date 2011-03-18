@@ -66,6 +66,12 @@ class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
         $this->assertSame($id, $this->image->getId());
     }
 
+    public function testSetGetHash() {
+        $hash = md5(microtime());
+        $this->image->setHash($hash);
+        $this->assertSame($hash, $this->image->getHash());
+    }
+
     public function testSetGetFilename() {
         $name = 'someName.jpg';
         $this->image->setFilename($name);
@@ -97,11 +103,5 @@ class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
         $mimeType = 'image/png';
         $this->image->setMimeType($mimeType);
         $this->assertSame($mimeType, $this->image->getMimeType());
-    }
-
-    public function testSetGetMd5() {
-        $md5 = md5(microtime());
-        $this->image->setMd5($md5);
-        $this->assertSame($md5, $this->image->getMd5());
     }
 }
