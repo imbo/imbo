@@ -27,13 +27,13 @@ Delete the image identified by &lt;hash&gt; along with all metadata. This action
 
 **POST /[&lt;hash&gt;]**
 
-Place a new image on the server along with metadata. Can be used to manipulate metadata when used with a hash.
+Place a new image on the server along with metadata. Can be used to manipulate metadata when used with a &lt;hash&gt;.
 
 **HEAD /[&lt;hash&gt;]**
 
 Fetches extra header information about a single image or about the site in general when used without the &lt;hash&gt;.
 
-Extra headers
+Extra response headers
 -------------
 PHPIMS will usually inject extra response headers to the different requests. All response headers from PHPIMS will be prefixed with **X-PHPIMS-**.
 
