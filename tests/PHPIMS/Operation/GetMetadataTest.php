@@ -68,8 +68,7 @@ class PHPIMS_Operation_GetMetadataTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Exception
-     * @expectedExceptionMessage Unable to fetch metadata
+     * @expectedException PHPIMS_Database_Exception
      */
     public function testExecWhenDatabaseFails() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');

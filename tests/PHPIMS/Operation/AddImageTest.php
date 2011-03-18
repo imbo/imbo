@@ -72,8 +72,7 @@ class PHPIMS_Operation_AddImageTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Exception
-     * @expectedExceptionMessage Unable to add image to the database
+     * @expectedException PHPIMS_Database_Exception
      */
     public function testExecWhenDatabaseFails() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
@@ -84,8 +83,7 @@ class PHPIMS_Operation_AddImageTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Exception
-     * @expectedExceptionMessage Unable to store the image
+     * @expectedException PHPIMS_Storage_Exception
      */
     public function testExecWhenStorageFails() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
