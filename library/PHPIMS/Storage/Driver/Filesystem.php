@@ -44,6 +44,37 @@
  */
 class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
     /**
+     * Fetch the complete image path on disk based on the hash value
+     *
+     * @param string $hash Hash identifying the image
+     * @return string
+     */
+    protected function getImagePathFromHash($hash) {
+        $params = $this->getParams();
+        $base = realpath($params['dataDir']);
+        $imageDir = $base . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2];
+        $imagePath = $imageDir . '/' . $hash;
+
+        return $imagePath;
+    }
+
+    /**
+     * Fetch the direct url to the image based on a hash
+     *
+     * @param string $hash Hash identifying the image
+     * @return string
+     */
+    protected function getImageUrlFromHash($hash, $path = null) {
+        if ($path === null) {
+            $path = $this->getImagePathFromHash($hash);
+        }
+
+        $imageUrl = 'http://' . $_SERVER['HTTP_HOST'] . str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
+
+        return $imageUrl;
+    }
+
+    /**
      * Store an image
      *
      * This method will take a temporary path (usually from the $_FILES array) and place it
@@ -112,15 +143,10 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
      * @return array
      * @throws PHPIMS_Storage_Exception
      */
-    public function fetch($hash) {
-        $params = $this->getParams();
+    public function getImageUrl($hash) {
+        $imagePath = $this->getImagePathFromHash($hash);
+        $url = $this->getImageUrlFromHash($hash, $imagePath);
 
-        $file = $params['dataDir'] . '/' . $hash;
-
-        if (!is_file($file)) {
-            throw new PHPIMS_Storage_Exception('File does not exist on the file system', 404);
-        }
-
-        return file_get_contents($file);
+        return $url;
     }
 }

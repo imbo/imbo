@@ -53,15 +53,7 @@ class PHPIMS_Operation_DeleteMetadata extends PHPIMS_Operation_Abstract {
      * @throws PHPIMS_Operation_Exception
      */
     public function exec() {
-        try {
-            $data = $this->getDatabase()->deleteMetadata($this->getHash());
-        } catch (PHPIMS_Database_Exception $e) {
-            throw new PHPIMS_Operation_Exception('Unable to delete metadata', 500, $e);
-        }
-
-        $this->getResponse()->setCode(200)
-                            ->setBody($data)
-                            ->setContentType('application/json');
+        $this->getDatabase()->deleteMetadata($this->getHash());
 
         return $this;
     }

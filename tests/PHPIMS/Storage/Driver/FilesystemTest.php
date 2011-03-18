@@ -91,34 +91,6 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException PHPIMS_Storage_Exception
-     * @expectedExceptionMessage File does not exist on the file system
-     */
-    public function testFetchFileThatDoesNotExist() {
-        $this->driver->setParams(array('dataDir' => 'foobar'));
-        $this->driver->fetch('asdasdasasd');
-    }
-
-    public function testFetchFile() {
-        $dir  = 'directory';
-        $hash = 'asdasdasdasd';
-        $content = 'content of the file';
-
-        // Create the virtual directory
-        $root = vfsStream::setup($dir);
-        $file = vfsStream::newFile($hash);
-        $file->setContent($content);
-
-        $root->addChild($file);
-
-        $this->driver->setParams(array(
-            'dataDir' => vfsStream::url($dir),
-        ));
-
-        $this->assertSame($content, $this->driver->fetch($hash));
-    }
-
-    /**
-     * @expectedException PHPIMS_Storage_Exception
      * @expectedExpectionMessage Could not store image
      */
     public function testStoreToUnwritablePath() {

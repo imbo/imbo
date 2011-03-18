@@ -53,15 +53,8 @@ class PHPIMS_Operation_GetMetadata extends PHPIMS_Operation_Abstract {
      * @throws PHPIMS_Operation_Exception
      */
     public function exec() {
-        try {
-            $data = $this->getDatabase()->getImageMetadata($this->getHash());
-        } catch (PHPIMS_Database_Exception $e) {
-            throw new PHPIMS_Operation_Exception('Unable to fetch metadata', 500, $e);
-        }
-
-        $this->getResponse()->setCode(200)
-                            ->setBody($data)
-                            ->setContentType('application/json');
+        $data = $this->getDatabase()->getImageMetadata($this->getHash());
+        $this->getResponse()->setBody($data);
 
         return $this;
     }

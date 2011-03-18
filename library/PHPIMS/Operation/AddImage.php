@@ -64,18 +64,8 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
     public function exec() {
         $image = $this->getImage();
 
-        try {
-            $this->getDatabase()->insertNewImage($image);
-        } catch (PHPIMS_Database_Exception $e) {
-            throw new PHPIMS_Operation_Exception('Unable to add image to the database: ' . $e->getMessage(), 500, $e);
-        }
-
-        try {
-            $this->getStorage()->store($_FILES['file']['tmp_name'], $image);
-        } catch (PHPIMS_Storage_Exception $e) {
-            throw new PHPIMS_Operation_Exception('Unable to store the image', 500, $e);
-        }
-
+        $this->getDatabase()->insertNewImage($image);
+        $this->getStorage()->store($_FILES['file']['tmp_name'], $image);
         $this->getResponse()->setCode(201)
                             ->setBody(array(
                                 'hash' => $image->getHash(),

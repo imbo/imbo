@@ -70,13 +70,10 @@ interface PHPIMS_Storage_Driver_Interface {
     public function delete($hash);
 
     /**
-     * Fetch an image
-     *
-     * This method will return the image data as a blob based on the hash.
+     * Get the image url
      *
      * @param string $hash Unique hash identifying an image
-     * @return array
-     * @throws PHPIMS_Storage_Exception
+     * @return string
      */
-    public function fetch($hash);
+    public function getImageUrl($hash);
 }

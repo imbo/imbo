@@ -191,15 +191,15 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     public function insertNewImage(PHPIMS_Image $image) {
         $data = $image->getMetadata();
 
-        $data['_name']  = $image->getFilename();
-        $data['_size']  = $image->getFilesize();
-        $data['_added'] = time();
-        $data['_hash']  = $image->getHash();
-        $data['_mime']  = $image->getMimeType();
+        $data['name']  = $image->getFilename();
+        $data['size']  = $image->getFilesize();
+        $data['added'] = time();
+        $data['hash']  = $image->getHash();
+        $data['mime']  = $image->getMimeType();
 
         try {
             // See if the image already exists
-            $row = $this->getCollection()->findOne(array('_hash' => $data['_hash']));
+            $row = $this->getCollection()->findOne(array('hash' => $data['hash']));
 
             if ($row) {
                 throw new PHPIMS_Database_Exception('Image already exists', 400);
@@ -224,7 +224,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      */
     public function deleteImage($hash) {
         try {
-            $this->getCollection()->remove(array('_id' => new MongoId($hash)), array('justOne' => true, 'safe' => true));
+            $this->getCollection()->remove(array('hash' => $hash), array('justOne' => true, 'safe' => true));
         } catch (MongoException $e) {
             throw new PHPIMS_Database_Exception('Unable to delete image data', 500, $e);
         }
@@ -243,7 +243,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     public function editMetadata($hash, array $metadata) {
         try {
             $this->getCollection()->update(
-                array('_id' => new MongoID($hash)),
+                array('hash' => $hash),
                 array('$set' => $metadata),
                 array(
                     'safe' => true,
@@ -266,7 +266,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      */
     public function getImageMetadata($hash) {
         try {
-            $data = $this->getCollection()->findOne(array('_id' => new MongoID($hash)));
+            $data = $this->getCollection()->findOne(array('hash' => $hash));
         } catch (MongoException $e) {
             throw new PHPIMS_Database_Exception('Unable to fetch image metadata', 500, $e);
         }
