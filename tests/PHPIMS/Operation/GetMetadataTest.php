@@ -72,7 +72,7 @@ class PHPIMS_Operation_GetMetadataTest extends PHPUnit_Framework_TestCase {
      */
     public function testExecWhenDatabaseFails() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('getImageMetadata')->with($this->hash)->will($this->throwException(new PHPIMS_Database_Exception()));
+        $database->expects($this->once())->method('getMetadata')->with($this->hash)->will($this->throwException(new PHPIMS_Database_Exception()));
         $this->operation->setDatabase($database);
 
         $this->operation->exec();
@@ -84,7 +84,7 @@ class PHPIMS_Operation_GetMetadataTest extends PHPUnit_Framework_TestCase {
             'bar' => 'foo',
         );
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('getImageMetadata')->with($this->hash)->will($this->returnValue($data));
+        $database->expects($this->once())->method('getMetadata')->with($this->hash)->will($this->returnValue($data));
         $this->operation->setDatabase($database);
 
         $this->operation->exec();

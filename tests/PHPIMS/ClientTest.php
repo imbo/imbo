@@ -135,7 +135,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
         $this->assertSame($result, $response);
     }
 
-    public function testEditImageMetaData() {
+    public function testEditMetaData() {
         $url  = 'http://host';
         $hash = 'Some hash';
         $data = array(
@@ -150,12 +150,12 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
 
         $result = $this->client->setDriver($driver)
                                ->setServerUrl($url)
-                               ->editImageMetaData($hash, $data);
+                               ->editMetaData($hash, $data);
 
         $this->assertSame($result, $response);
     }
 
-    public function testDeleteImageMetaData() {
+    public function testDeleteMetaData() {
         $url  = 'http://host';
         $hash = 'Some hash';
 
@@ -166,12 +166,12 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
 
         $result = $this->client->setDriver($driver)
                                ->setServerUrl($url)
-                               ->deleteImageMetaData($hash);
+                               ->deleteMetaData($hash);
 
         $this->assertSame($result, $response);
     }
 
-    public function testGetImageMetaData() {
+    public function testGetMetaData() {
         $url  = 'http://host';
         $hash = 'Some hash';
 
@@ -182,7 +182,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
 
         $result = $this->client->setDriver($driver)
                                ->setServerUrl($url)
-                               ->getImageMetadata($hash);
+                               ->getMetadata($hash);
 
         $this->assertSame($result, $response);
     }

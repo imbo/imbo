@@ -53,7 +53,7 @@ class PHPIMS_Operation_GetMetadata extends PHPIMS_Operation_Abstract {
      * @throws PHPIMS_Operation_Exception
      */
     public function exec() {
-        $data = $this->getDatabase()->getImageMetadata($this->getHash());
+        $data = $this->getDatabase()->getMetadata($this->getHash());
         $this->getResponse()->setBody($data);
 
         return $this;

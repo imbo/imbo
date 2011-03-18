@@ -216,7 +216,7 @@ class PHPIMS_Client {
      * @param array $metadata An array of metadata
      * @return PHPIMS_Client_Response
      */
-    public function editImageMetadata($hash, array $metadata) {
+    public function editMetadata($hash, array $metadata) {
         return $this->getDriver()->post($this->serverUrl . '/' . $hash . '/meta', $metadata);
     }
 
@@ -226,7 +226,7 @@ class PHPIMS_Client {
      * @param string $hash The image identifier
      * @return PHPIMS_Client_Response
      */
-    public function deleteImageMetadata($hash) {
+    public function deleteMetadata($hash) {
         return $this->getDriver()->delete($this->serverUrl . '/' . $hash . '/meta');
     }
 
@@ -236,7 +236,7 @@ class PHPIMS_Client {
      * @param string $hash The image identifier
      * @return array Returns an array with metadata
      */
-    public function getImageMetadata($hash) {
+    public function getMetadata($hash) {
         return $this->getDriver()->get($this->serverUrl . '/' . $hash . '/meta');
     }
 }

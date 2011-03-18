@@ -188,7 +188,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS_Database_Exception
      */
-    public function insertNewImage(PHPIMS_Image $image) {
+    public function insertImage(PHPIMS_Image $image) {
         $data = $image->getMetadata();
 
         $data['name']  = $image->getFilename();
@@ -233,7 +233,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     }
 
     /**
-     * Edit an image
+     * Edit metadata
      *
      * @param string $hash The unique ID of the image to edit
      * @param array $metadata An array with metadata
@@ -264,50 +264,25 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      * @return array Returns the metadata as an array
      * @throws PHPIMS_Database_Exception
      */
-    public function getImageMetadata($hash) {
+    public function getMetadata($hash) {
         try {
             $data = $this->getCollection()->findOne(array('hash' => $hash));
         } catch (MongoException $e) {
             throw new PHPIMS_Database_Exception('Unable to fetch image metadata', 500, $e);
         }
 
-        // Create a string of the MongoID object
-        $data['_id'] = (string) $data['_id'];
-
         return $data;
     }
 
     /**
-     * Get the mime-type of an image
+     * Delete all metadata associated with an image (with the exception of the MongoID and the hash
+     * itself)
      *
-     * @param string $hash The unique ID of the image to get the mime-type of
-     * @return string The mime type that can be placed in a Content-Type header
+     * @param string $hash The unique ID of the image to delete metadata from
+     * @return boolean Returns true on success or false on failure
      * @throws PHPIMS_Database_Exception
      */
-    public function getImageMimetype($hash) {
-        try {
-            $data = $this->getCollection()->findOne(array('_id' => new MongoID($hash)), array('_mime'));
-        } catch (MongoException $e) {
-            throw new PHPIMS_Database_Exception('Unable to fetch image metadata', 500, $e);
-        }
+    public function deleteMetadata($hash) {
 
-        return $data['_mime'];
-    }
-
-    /**
-     * Get the file size of an image
-     *
-     * @param string $hash The unique ID of the image to get the size of
-     * @return int The size of the file in bytes
-     * @throws PHPIMS_Database_Exception
-     */
-    public function getImageSize($hash) {
-        try {
-            $data = $this->getCollection()->findOne(array('_id' => new MongoID($hash)), array('_size'));
-        } catch (MongoException $e) {
-            throw new PHPIMS_Database_Exception('Unable to fetch image metadata', 500, $e);
-        }
-
-        return (int) $data['_size'];
     }
 }

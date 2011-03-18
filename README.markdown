@@ -90,7 +90,7 @@ The response from the client is actually a `PHPIMS_Client_Response` object that 
     $client->setServerUrl('http://<hostname>');
     
     $hash = '<hash>';
-    $response = $client->getImageMetadata($hash);
+    $response = $client->getMetadata($hash);
 
 ** Delete an image **
 
@@ -112,4 +112,4 @@ The response from the client is actually a `PHPIMS_Client_Response` object that 
     $client->setServerUrl('http://<hostname>');
     
     $hash = '<hash>';
-    $response = $client->deleteImageMetadata($hash);
+    $response = $client->deleteMetadata($hash);
