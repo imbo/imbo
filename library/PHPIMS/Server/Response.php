@@ -193,6 +193,18 @@ class PHPIMS_Server_Response {
     }
 
     /**
+     * Remove a single header element
+     *
+     * @param string $name The name of the header. For instance 'Location'
+     * @return PHPIMS_Server_Response
+     */
+    public function removeHeader($name) {
+        unset($this->headers[$name]);
+
+        return $this;
+    }
+
+    /**
      * Get the Content-Type
      *
      * @return string
