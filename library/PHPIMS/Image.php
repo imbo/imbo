@@ -85,11 +85,11 @@ class PHPIMS_Image {
     protected $metadata = array();
 
     /**
-     * Direct url to the image (not via the REST API)
+     * Path to the image
      *
      * @var string
      */
-    protected $url = null;
+    protected $path = null;
 
     /**
      * Get the ID
@@ -218,22 +218,22 @@ class PHPIMS_Image {
     }
 
     /**
-     * Get the image url
+     * Get the image path
      *
      * @return string
      */
-    public function getUrl() {
-        return $this->url;
+    public function getPath() {
+        return $this->path;
     }
 
     /**
-     * Set the url
+     * Set the path
      *
-     * @param string $url Direct url to the image
+     * @param string $path Path to the image
      * @return PHPIMS_Image
      */
-    public function setUrl($url) {
-        $this->url = $url;
+    public function setPath($path) {
+        $this->path = $path;
 
         return $this;
     }
