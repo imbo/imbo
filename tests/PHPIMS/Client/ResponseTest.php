@@ -93,13 +93,13 @@ class PHPIMS_Client_ResponseTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Test the isOk method
+     * Test the isSuccess method
      */
     public function testIsOk() {
         $this->response->setStatusCode(200);
-        $this->assertTrue($this->response->isOk());
+        $this->assertTrue($this->response->isSuccess());
         $this->response->setStatusCode(404);
-        $this->assertFalse($this->response->isOk());
+        $this->assertFalse($this->response->isSuccess());
     }
 
     /**
