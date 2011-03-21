@@ -89,4 +89,15 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
 
         $this->driver->store('some path', $image);
     }
+
+    public function testSetGetScheme() {
+        $scheme = 'vfs';
+        $this->driver->setScheme($scheme);
+        $this->assertSame($scheme, $this->driver->getScheme());
+    }
+
+    public function testGetImagePath() {
+        $this->driver->setParams(array('dataDir' => 'foobar'));
+        $this->assertSame('file:///a/s/d/asdasdasd.png', $this->driver->getImagePath('asdasdasd.png'));
+    }
 }
