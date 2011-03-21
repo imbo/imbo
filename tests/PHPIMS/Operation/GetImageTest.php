@@ -68,16 +68,15 @@ class PHPIMS_Operation_GetImageTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testSuccessfullExec() {
-        $url = 'http://some/url';
+        $path = 'file:///some/path/image.png';
         $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
-        $storage->expects($this->once())->method('getImageUrl')->with($this->hash)->will($this->returnValue($url));
+        $storage->expects($this->once())->method('getImagePath')->with($this->hash)->will($this->returnValue($path));
         $this->operation->setStorage($storage);
 
+        $image = $this->getMock('PHPIMS_Image');
+        $image->expects($this->once())->method('setPath')->with($path);
+        $this->operation->setImage($image);
+
         $this->operation->exec();
-
-        $headers = $this->operation->getResponse()->getHeaders();
-
-        $this->assertArrayHasKey('Location', $headers);
-        $this->assertSame($url, $headers['Location']);
     }
 }
