@@ -70,10 +70,10 @@ interface PHPIMS_Storage_Driver_Interface {
     public function delete($hash);
 
     /**
-     * Get the image url
+     * Get the image path
      *
      * @param string $hash Unique hash identifying an image
      * @return string
      */
-    public function getImageUrl($hash);
+    public function getImagePath($hash);
 }
