@@ -126,12 +126,14 @@ class PHPIMS_Client_Response {
     }
 
     /**
-     * Wether or not the response is "200 OK"
+     * Wether or not the response is a success (in the 2xx range)
      *
      * @return boolean
      */
-    public function isOk() {
-        return $this->getStatusCode() === 200;
+    public function isSuccess() {
+        $code = $this->getStatusCode();
+
+        return ($code < 300 && $code >= 200);
     }
 
     /**
