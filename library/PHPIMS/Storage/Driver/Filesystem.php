@@ -44,34 +44,31 @@
  */
 class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
     /**
-     * Fetch the complete image path on disk based on the hash value
+     * The stream wrapper scheme
      *
-     * @param string $hash Hash identifying the image
+     * @var string
+     */
+    protected $scheme = 'file';
+
+    /**
+     * Get the scheme
+     *
      * @return string
      */
-    protected function getImagePathFromHash($hash) {
-        $params = $this->getParams();
-        $base = realpath($params['dataDir']);
-        $imageDir = $base . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2];
-        $imagePath = $imageDir . '/' . $hash;
-
-        return $imagePath;
+    public function getScheme() {
+        return $this->scheme;
     }
 
     /**
-     * Fetch the direct url to the image based on a hash
+     * Set the scheme
      *
-     * @param string $hash Hash identifying the image
-     * @return string
+     * @param string $scheme The scheme to use
+     * @return PHPIMS_Storage_Driver_Filesystem
      */
-    protected function getImageUrlFromHash($hash, $path = null) {
-        if ($path === null) {
-            $path = $this->getImagePathFromHash($hash);
-        }
+    public function setScheme($scheme) {
+        $this->scheme = $scheme;
 
-        $imageUrl = 'http://' . $_SERVER['HTTP_HOST'] . str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
-
-        return $imageUrl;
+        return $this;
     }
 
     /**
@@ -123,7 +120,7 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
      * @throws PHPIMS_Storage_Exception
      */
     public function delete($hash) {
-        $file = $this->getImagePathFromHash($hash);
+        $file = $this->getImagePath($hash);
 
         if (!is_file($file)) {
             throw new PHPIMS_Storage_Exception('File does not exist on the file system', 500);
@@ -141,10 +138,12 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
      * @return array
      * @throws PHPIMS_Storage_Exception
      */
-    public function getImageUrl($hash) {
-        $imagePath = $this->getImagePathFromHash($hash);
-        $url = $this->getImageUrlFromHash($hash, $imagePath);
+    public function getImagePath($hash) {
+        $params = $this->getParams();
+        $base = realpath($params['dataDir']);
+        $imageDir = $this->getScheme() . '://' . $base . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2];
+        $imagePath = $imageDir . '/' . $hash;
 
-        return $url;
+        return $imagePath;
     }
 }
