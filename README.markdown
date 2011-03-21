@@ -104,8 +104,8 @@ All client methods returns an instance of `PHPIMS_Client_Response`. In this inst
 
 The response instance includes all response headers and the body, and has the following methods:
 
-* `array` `getHeaders(void)`: Get all response headers 
-* `array` `asArray(void)`: Get the body as a native PHP array instead of a JSON-encoded string
-* `stdClass` `asObject(void)`: Get the body as an instance of stdClass instead of a JSON-encoded string
-* `boolean` `isSuccess(void)`: Wether or not the response was a success (true if the HTTP status code is in the 2xx range) 
-* `int` `getStatusCode(void)`: Get the status code
+* `array` `getHeaders(void)` Get all response headers 
+* `array` `asArray(void)` Get the body as a native PHP array instead of a JSON-encoded string
+* `stdClass` `asObject(void)` Get the body as an instance of stdClass instead of a JSON-encoded string
+* `boolean` `isSuccess(void)` Wether or not the response was a success (true if the HTTP status code is in the 2xx range) 
+* `int` `getStatusCode(void)` Get the status code
