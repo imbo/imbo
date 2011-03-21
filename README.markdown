@@ -12,7 +12,6 @@ Fetch the image identified by &lt;image&gt;. The following query parameters are 
 
 * `(int) width` Width of the image in pixels.
 * `(int) height` Height of the image in pixels.
-* `(string) format` The file format (supported formats: jpg, gif and png).
 
 If no options are specified the original image will be returned.
 
