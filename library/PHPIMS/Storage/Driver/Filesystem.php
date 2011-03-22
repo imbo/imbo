@@ -94,7 +94,7 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
             throw new PHPIMS_Storage_Exception('File not found', 404);
         }
 
-        $this->getOperation()->getResponse()->setRawData(file_get_contents($path));
+        $this->getOperation()->getImage()->setBlob(file_get_contents($path));
 
         return true;
     }

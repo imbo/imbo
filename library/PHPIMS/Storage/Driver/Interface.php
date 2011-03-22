@@ -71,11 +71,11 @@ interface PHPIMS_Storage_Driver_Interface {
      * Load the image identified by $hash
      *
      * The implementation of this method must fetch the content of the file identified by hash and
-     * populate the current working response object.
+     * populate the current working image objects blob property.
      *
      * <code>
-     * $response = $this->getOperation()->getResponse();
-     * $response->setRawData(<data>);
+     * $image = $this->getOperation()->getImage();
+     * $image->setBlob(<data>);
      * </code>
      *
      * @param string $hash Unique hash identifying an image

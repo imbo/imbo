@@ -48,9 +48,9 @@ class PHPIMS_Operation_Plugin_IdentifyImage extends PHPIMS_Operation_Plugin_Abst
      * @see PHPIMS_Operation_Plugin_Abstract::postExec
      */
     public function postExec() {
-        $response = $this->getOperation()->getResponse();
+        $image = $this->getOperation()->getImage();
 
-        $finfo = new finfo(FILEINFO_MIME);
-        $response->setContentType($finfo->buffer($response->getRawData()));
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $image->setMimeType($finfo->buffer($image->getBlob()));
     }
 }

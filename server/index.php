@@ -55,13 +55,16 @@ foreach ($response->getHeaders() as $name => $value) {
     header($name . ':' . $value);
 }
 
-$responseBody = $response->getBody();
-
-if (!empty($responseBody)) {
-    $output = (string) $response;
-
-    header('Content-Type: ' . $response->getContentType());
-    header('Content-Length: ' . strlen($output));
-
-    print($output);
+if ($response->hasImage()) {
+    $image = $response->getImage();
+    $output = $image->getBlob();
+    $contentType = $image->getMimeType();
+} else {
+    $output = json_encode($response->getBody());
+    $contentType = $response->getContentType();
 }
+
+header('Content-Type: ' . $contentType);
+header('Content-Length: ' . strlen($output));
+
+print($output);
