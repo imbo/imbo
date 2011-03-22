@@ -44,13 +44,7 @@
  */
 class PHPIMS_Operation_EditMetadata extends PHPIMS_Operation_Abstract {
     /**
-     * Execute the operation
-     *
-     * Operations must implement this method and return a PHPIMS_Server_Response object to return
-     * to the client.
-     *
-     * @return PHPIMS_Operation_EditMetadata
-     * @throws PHPIMS_Operation_Exception
+     * @see PHPIMS_Operation_Abstract::exec()
      */
     public function exec() {
         $this->getDatabase()->editMetadata($this->getHash(), $_POST);
