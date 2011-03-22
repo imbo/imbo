@@ -45,7 +45,7 @@
  */
 class PHPIMS_Operation_Plugin_PrepareImage extends PHPIMS_Operation_Plugin_Abstract {
     /**
-     * Method that will be triggered before the operation exec() kicks in
+     * @see PHPIMS_Operation_Plugin_Abstract::preExec
      */
     public function preExec() {
         $image = $this->getOperation()->getImage();
