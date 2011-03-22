@@ -44,17 +44,19 @@
  */
 class PHPIMS_Operation_GetImage extends PHPIMS_Operation_Abstract {
     /**
-     * Execute the operation
+     * Internal plugins
      *
-     * Operations must implement this method and return a PHPIMS_Server_Response object to return
-     * to the client.
-     *
-     * @return PHPIMS_Operation_GetImage
-     * @throws PHPIMS_Operation_Exception
+     * @var array
+     */
+    protected $internalPluginsSpec = array(
+        'PHPIMS_Operation_Plugin_IdentifyImage' => array(),
+    );
+
+    /**
+     * @see PHPIMS_Operation_Abstract::exec()
      */
     public function exec() {
-        $url = $this->getStorage()->getImageUrl($this->getHash());
-        $this->getResponse()->setHeader('Location', $url);
+        $this->getStorage()->load($this->getHash());
 
         return $this;
     }
