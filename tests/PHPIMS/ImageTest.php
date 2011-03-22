@@ -98,4 +98,10 @@ class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
         $this->image->setMimeType($mimeType);
         $this->assertSame($mimeType, $this->image->getMimeType());
     }
+
+    public function testSetGetBlob() {
+        $blob = 'some string';
+        $this->image->setBlob($blob);
+        $this->assertSame($blob, $this->image->getBlob());
+    }
 }

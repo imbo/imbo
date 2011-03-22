@@ -97,22 +97,6 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
         $this->assertSame($body, $this->response->getBody());
     }
 
-    public function testToStringMagicMethod() {
-        $body = array('foo' => 'bar', 'bar' => 42);
-        $this->response->setBody($body);
-        $this->assertSame(json_encode($body), (string) $this->response);
-
-        $rawData = 'some data';
-        $this->response->setRawData($rawData);
-        $this->assertSame($rawData, (string) $this->response);
-    }
-
-    public function testSetGetRawData() {
-        $rawData = 'some data';
-        $this->response->setRawData($rawData);
-        $this->assertSame($rawData, $this->response->getRawData());
-    }
-
     public function testStaticFromException() {
         $code = 404;
         $message = 'some message';
@@ -127,6 +111,19 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
         $type = 'application/json';
         $this->response->setContentType($type);
         $this->assertSame($type, $this->response->getContentType());
+    }
+
+    public function testSetGetImage() {
+        $image = $this->getMock('PHPIMS_Image');
+        $this->response->setImage($image);
+        $this->assertSame($image, $this->response->getImage());
+    }
+
+    public function testHasImage() {
+        $this->assertFalse($this->response->hasImage());
+        $image = $this->getMock('PHPIMS_Image');
+        $this->response->setImage($image);
+        $this->assertTrue($this->response->hasImage());
     }
 
     public function testRemoveHeader() {

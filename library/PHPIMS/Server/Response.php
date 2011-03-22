@@ -129,11 +129,11 @@ class PHPIMS_Server_Response {
     protected $body = array();
 
     /**
-     * Raw data to be sent
+     * Optional image attached to the response
      *
-     * @var string
+     * @var PHPIMS_Image
      */
-    protected $rawData = null;
+    protected $image = null;
 
     /**
      * Get the status code
@@ -247,42 +247,33 @@ class PHPIMS_Server_Response {
     }
 
     /**
-     * Get the raw data
+     * Get the image
      *
-     * @return string
+     * @return PHPIMS_Image
      */
-    public function getRawData() {
-        return $this->rawData;
+    public function getImage() {
+        return $this->image;
     }
 
     /**
-     * Set the raw data
+     * Set the image
      *
-     * @param string $data The data to set
+     * @param PHPIMS_Image $image The image object
      * @return PHPIMS_Server_Response
      */
-    public function setRawData($data) {
-        $this->rawData = $data;
+    public function setImage(PHPIMS_Image $image) {
+        $this->image = $image;
 
         return $this;
     }
 
     /**
-     * Magic to string method
+     * See if the response has an image attached to it
      *
-     * This magic method will encode the body to a JSON string and return that unless the object
-     * contains raw data (like an image blob).
-     *
-     * @return string
+     * @return boolean
      */
-    public function __toString() {
-        $data = $this->getRawData();
-
-        if ($data) {
-            return $data;
-        }
-
-        return json_encode($this->getBody());
+    public function hasImage() {
+        return !($this->image === null);
     }
 
     /**

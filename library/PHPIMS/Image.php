@@ -78,6 +78,13 @@ class PHPIMS_Image {
     protected $mimeType = null;
 
     /**
+     * Blob containing the image itself
+     *
+     * @var string
+     */
+    protected $blob = null;
+
+    /**
      * The metadata attached to this image
      *
      * @var array
@@ -185,6 +192,27 @@ class PHPIMS_Image {
      */
     public function setMimeType($mimeType) {
         $this->mimeType = $mimeType;
+
+        return $this;
+    }
+
+    /**
+     * Get the blob
+     *
+     * @return string
+     */
+    public function getBlob() {
+        return $this->blob;
+    }
+
+    /**
+     * Set the blob
+     *
+     * @param string $blob The binary data to set
+     * @return PHPIMS_Image
+     */
+    public function setBlob($blob) {
+        $this->blob = $blob;
 
         return $this;
     }
