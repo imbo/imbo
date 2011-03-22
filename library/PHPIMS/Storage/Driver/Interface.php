@@ -47,16 +47,14 @@ interface PHPIMS_Storage_Driver_Interface {
      * Store an image
      *
      * This method will take a temporary path (usually from the $_FILES array) and place it
-     * somewhere suited for the actual storage driver. A Filesystem driver will just move the file
-     * to the current data location. If an error occurs the driver should throw an exception based
-     * on PHPIMS_Storage_Exception.
+     * somewhere suited for the actual storage driver. If an error occurs the driver should throw
+     * an exception based on PHPIMS_Storage_Exception.
      *
      * @param string $path Path to the temporary file
-     * @param PHPIMS_Image $image The image object
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS_Storage_Exception
      */
-    public function store($path, PHPIMS_Image $image);
+    public function store($path);
 
     /**
      * Delete an image
@@ -70,10 +68,19 @@ interface PHPIMS_Storage_Driver_Interface {
     public function delete($hash);
 
     /**
-     * Get the image path
+     * Load the image identified by $hash
+     *
+     * The implementation of this method must fetch the content of the file identified by hash and
+     * populate the current working response object.
+     *
+     * <code>
+     * $response = $this->getOperation()->getResponse();
+     * $response->setRawData(<data>);
+     * </code>
      *
      * @param string $hash Unique hash identifying an image
-     * @return string
+     * @return boolean Returns true on success or false on failure
+     * @throws PHPIMS_Storage_Exception
      */
-    public function getImagePath($hash);
+    public function load($hash);
 }

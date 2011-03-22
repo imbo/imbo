@@ -44,57 +44,20 @@
  */
 class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
     /**
-     * The stream wrapper scheme
-     *
-     * @var string
+     * @see PHPIMS_Storage_Driver_Interface::store
      */
-    protected $scheme = 'file';
-
-    /**
-     * Get the scheme
-     *
-     * @return string
-     */
-    public function getScheme() {
-        return $this->scheme;
-    }
-
-    /**
-     * Set the scheme
-     *
-     * @param string $scheme The scheme to use
-     * @return PHPIMS_Storage_Driver_Filesystem
-     */
-    public function setScheme($scheme) {
-        $this->scheme = $scheme;
-
-        return $this;
-    }
-
-    /**
-     * Store an image
-     *
-     * This method will take a temporary path (usually from the $_FILES array) and place it
-     * somewhere suited for the actual storage driver. A Filesystem driver will just move the file
-     * to the current data location. If an error occurs the driver should throw an exception based
-     * on PHPIMS_Storage_Exception.
-     *
-     * @param string $path Path to the temporary file
-     * @param PHPIMS_Image $image The image object
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Storage_Exception
-     */
-    public function store($path, PHPIMS_Image $image) {
+    public function store($path) {
         $params = $this->getParams();
 
         if (!is_writable($params['dataDir'])) {
             throw new PHPIMS_Storage_Exception('Could not store image', 500);
         }
 
+        $image = $this->getOperation()->getImage();
+
         // Create path for the image
         $hash = $image->getHash();
-        $base = realpath($params['dataDir']);
-        $imageDir = $base . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2];
+        $imageDir = $params['dataDir'] . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2];
         $oldUmask = umask(0);
 
         if (!is_dir($imageDir)) {
@@ -104,45 +67,47 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
         umask($oldUmask);
 
         $imagePath = $imageDir . '/' . $image->getHash();
-        $imageUrl = 'http://' . $_SERVER['HTTP_HOST'] . str_replace($_SERVER['DOCUMENT_ROOT'], '', $imagePath);
-        $image->setUrl($imageUrl);
 
         return move_uploaded_file($path, $imagePath);
     }
 
     /**
-     * Delete an image
-     *
-     * This method will remove the file associated with $hash from the storage medium
-     *
-     * @param string $hash Unique hash identifying an image
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Storage_Exception
+     * @see PHPIMS_Storage_Driver_Interface::delete
      */
     public function delete($hash) {
-        $file = $this->getImagePath($hash);
+        $path = $this->getImagePath($hash);
 
-        if (!is_file($file)) {
-            throw new PHPIMS_Storage_Exception('File does not exist on the file system', 500);
+        if (!is_file($path)) {
+            throw new PHPIMS_Storage_Exception('File not found', 404);
         }
 
-        return unlink($file);
+        return unlink($path);
     }
 
     /**
-     * Fetch an image
-     *
-     * This method will return the image data as a blob based on the hash.
+     * @see PHPIMS_Storage_Driver_Interface::load
+     */
+    public function load($hash) {
+        $path = $this->getImagePath($hash);
+
+        if (!is_file($path)) {
+            throw new PHPIMS_Storage_Exception('File not found', 404);
+        }
+
+        $this->getOperation()->getResponse()->setRawData(file_get_contents($path));
+
+        return true;
+    }
+
+    /**
+     * Get the path to an image identified by $hash
      *
      * @param string $hash Unique hash identifying an image
-     * @return array
-     * @throws PHPIMS_Storage_Exception
+     * @return string
      */
     public function getImagePath($hash) {
         $params = $this->getParams();
-        $base = realpath($params['dataDir']);
-        $imageDir = $this->getScheme() . '://' . $base . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2];
-        $imagePath = $imageDir . '/' . $hash;
+        $imagePath = $params['dataDir'] . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2] . '/' . $hash;
 
         return $imagePath;
     }
