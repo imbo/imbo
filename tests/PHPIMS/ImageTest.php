@@ -98,10 +98,4 @@ class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
         $this->image->setMimeType($mimeType);
         $this->assertSame($mimeType, $this->image->getMimeType());
     }
-
-    public function testSetGetPath() {
-        $path = 'file:///path/foo.png';
-        $this->image->setPath($path);
-        $this->assertSame($path, $this->image->getPath());
-    }
 }

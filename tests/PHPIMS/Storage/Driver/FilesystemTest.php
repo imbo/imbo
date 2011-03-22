@@ -65,11 +65,33 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException PHPIMS_Storage_Exception
-     * @expectedExceptionMessage File does not exist on the file system
+     * @expectedExceptionMessage File not found
      */
     public function testDeleteFileThatDoesNotExist() {
         $this->driver->setParams(array('dataDir' => 'foobar'));
         $this->driver->delete('asdasdasasd');
+    }
+
+    public function testDelete() {
+        $hash = 'cfe95b64ac715d64275365ede690ee7c.png';
+
+        vfsStream::setup('basedir');
+        $this->driver->setParams(array('dataDir' => vfsStream::url('basedir')));
+
+        $root = vfsStreamWrapper::getRoot();
+        $last = $root;
+
+        foreach (array($hash[0], $hash[1], $hash[2]) as $letter) {
+            $d = vfsStream::newDirectory($letter);
+            $last->addChild($d);
+            $last = $d;
+        }
+
+        $last->addChild(vfsStream::newFile($hash));
+
+        $this->assertTrue($last->hasChild($hash));
+        $this->driver->delete($hash);
+        $this->assertFalse($last->hasChild($hash));
     }
 
     /**
@@ -90,14 +112,8 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
         $this->driver->store('some path', $image);
     }
 
-    public function testSetGetScheme() {
-        $scheme = 'vfs';
-        $this->driver->setScheme($scheme);
-        $this->assertSame($scheme, $this->driver->getScheme());
-    }
-
     public function testGetImagePath() {
-        $this->driver->setParams(array('dataDir' => 'foobar'));
-        $this->assertSame('file:///a/s/d/asdasdasd.png', $this->driver->getImagePath('asdasdasd.png'));
+        $this->driver->setParams(array('dataDir' => '/tmp'));
+        $this->assertSame('/tmp/a/s/d/asdasdasd.png', $this->driver->getImagePath('asdasdasd.png'));
     }
 }

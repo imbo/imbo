@@ -128,4 +128,11 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
         $this->response->setContentType($type);
         $this->assertSame($type, $this->response->getContentType());
     }
+
+    public function testRemoveHeader() {
+        $this->response->setHeader('Location', 'http://foobar');
+        $this->assertArrayHasKey('Location', $this->response->getHeaders());
+        $this->response->removeHeader('Location');
+        $this->assertArrayNotHasKey('Location', $this->response->getHeaders());
+    }
 }
