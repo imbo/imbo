@@ -143,7 +143,10 @@ abstract class PHPIMS_Operation_Abstract {
                 $params = $config['database']['params'];
             }
 
-            $this->setDatabase(new $config['database']['driver']($params));
+            $driver = new $config['database']['driver']($params);
+            $driver->setOperation($this);
+
+            $this->setDatabase($driver);
         }
 
         if (!empty($config['storage']['driver'])) {
@@ -153,7 +156,10 @@ abstract class PHPIMS_Operation_Abstract {
                 $params = $config['storage']['params'];
             }
 
-            $this->setStorage(new $config['storage']['driver']($params));
+            $driver = new $config['storage']['driver']($params);
+            $driver->setOperation($this);
+
+            $this->setStorage($driver);
         }
 
         // Initialize the plugins spec
