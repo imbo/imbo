@@ -48,13 +48,18 @@ interface PHPIMS_Database_Driver_Interface {
      *
      * This method will insert a new image into the database. The method should update the $image
      * object if successfull by setting the newly created ID. On errors throw exceptions that
-     * extends PHPIMS_Database_Exception.
+     * extends PHPIMS_Database_Exception. The current image must be fetched from the operation:
      *
-     * @param PHPIMS_Image $image The image object to insert
+     * <code>
+     * $image = $this->getOperation()->getImage();
+     * ...
+     * $image->setId(<id>);
+     * </code>
+     *
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS_Database_Exception
      */
-    public function insertImage(PHPIMS_Image $image);
+    public function insertImage();
 
     /**
      * Delete an image from the database

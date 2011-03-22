@@ -178,17 +178,11 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     }
 
     /**
-     * Insert a new image
-     *
-     * This method will insert a new image into the database. The method should update the $image
-     * object if successfull by setting the newly created ID. On errors throw exceptions that
-     * extends PHPIMS_Database_Exception.
-     *
-     * @param PHPIMS_Image $image The image object to insert
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Database_Exception
+     * @see PHPIMS_Database_Driver_Interface::insertImage
      */
-    public function insertImage(PHPIMS_Image $image) {
+    public function insertImage() {
+        $image = $this->getOperation()->getImage();
+
         $data = array(
             'name'  => $image->getFilename(),
             'size'  => $image->getFilesize(),
@@ -217,11 +211,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     }
 
     /**
-     * Delete an image from the database
-     *
-     * @param string $hash The unique ID of the image to delete
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Database_Exception
+     * @see PHPIMS_Database_Driver_Interface::deleteImage
      */
     public function deleteImage($hash) {
         try {
@@ -234,12 +224,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     }
 
     /**
-     * Edit metadata
-     *
-     * @param string $hash The unique ID of the image to edit
-     * @param array $metadata An array with metadata
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Database_Exception
+     * @see PHPIMS_Database_Driver_Interface::editMetadata
      */
     public function editMetadata($hash, array $metadata) {
         try {
@@ -259,11 +244,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     }
 
     /**
-     * Get all metadata associated with an image
-     *
-     * @param string $hash The unique ID of the image to get metadata from
-     * @return array Returns the metadata as an array
-     * @throws PHPIMS_Database_Exception
+     * @see PHPIMS_Database_Driver_Interface::getMetadata
      */
     public function getMetadata($hash) {
         try {
@@ -276,12 +257,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     }
 
     /**
-     * Delete all metadata associated with an image (with the exception of the MongoID and the hash
-     * itself)
-     *
-     * @param string $hash The unique ID of the image to delete metadata from
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Database_Exception
+     * @see PHPIMS_Database_Driver_Interface::deleteMetadata
      */
     public function deleteMetadata($hash) {
         try {
