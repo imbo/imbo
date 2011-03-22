@@ -85,13 +85,6 @@ class PHPIMS_Image {
     protected $metadata = array();
 
     /**
-     * Path to the image
-     *
-     * @var string
-     */
-    protected $path = null;
-
-    /**
      * Get the ID
      *
      * @return mixed
@@ -213,27 +206,6 @@ class PHPIMS_Image {
      */
     public function setMetadata(array $metadata) {
         $this->metadata = $metadata;
-
-        return $this;
-    }
-
-    /**
-     * Get the image path
-     *
-     * @return string
-     */
-    public function getPath() {
-        return $this->path;
-    }
-
-    /**
-     * Set the path
-     *
-     * @param string $path Path to the image
-     * @return PHPIMS_Image
-     */
-    public function setPath($path) {
-        $this->path = $path;
 
         return $this;
     }
