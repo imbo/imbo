@@ -53,19 +53,13 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
     );
 
     /**
-     * Execute the operation
-     *
-     * Operations must implement this method and return a PHPIMS_Server_Response object to return
-     * to the client.
-     *
-     * @return PHPIMS_Operation_AddImage
-     * @throws PHPIMS_Operation_Exception
+     * @see PHPIMS_Operation_Abstract::exec()
      */
     public function exec() {
         $image = $this->getImage();
 
-        $this->getDatabase()->insertImage($image);
-        $this->getStorage()->store($_FILES['file']['tmp_name'], $image);
+        $this->getDatabase()->insertImage();
+        $this->getStorage()->store($_FILES['file']['tmp_name']);
         $this->getResponse()->setCode(201)
                             ->setBody(array(
                                 'hash' => $image->getHash(),
