@@ -49,6 +49,13 @@ abstract class PHPIMS_Database_Driver_Abstract implements PHPIMS_Database_Driver
     protected $params = array();
 
     /**
+     * The current operation
+     *
+     * @var PHPIMS_Operation_Abstract
+     */
+    protected $operation = null;
+
+    /**
      * Class constructor
      *
      * @param array $params Optional parameters
@@ -86,6 +93,27 @@ abstract class PHPIMS_Database_Driver_Abstract implements PHPIMS_Database_Driver
      */
     public function setParams(array $params) {
         $this->params = $params;
+
+        return $this;
+    }
+
+    /**
+     * Get the current operation
+     *
+     * @return PHPIMS_Operation_Abstract
+     */
+    public function getOperation() {
+        return $this->operation;
+    }
+
+    /**
+     * Set the current operation
+     *
+     * @param PHPIMS_Operation_Abstract $operation The operation instance
+     * @return PHPIMS_Database_Driver_Abstract
+     */
+    public function setOperation(PHPIMS_Operation_Abstract $operation) {
+        $this->operation = $operation;
 
         return $this;
     }
