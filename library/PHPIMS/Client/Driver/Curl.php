@@ -58,10 +58,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
-     * Init method
-     *
-     * The init method for this driver will create a cURL handle that will be used for all requests
-     * made against the server.
+     * @see PHPIMS_Client_Driver_Abstract::init()
      */
     protected function init() {
         $this->curlHandle = curl_init();
@@ -75,12 +72,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
-     * POST some data to an URL
-     *
-     * @param string $url The URL to POST to
-     * @param array $data The data to POST
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @see PHPIMS_Client_Driver_Interface::post()
      */
     public function post($url, array $data = null) {
         curl_setopt_array($this->curlHandle, array(
@@ -92,11 +84,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
-     * Perform a GET to $url
-     *
-     * @param string $url The URL to GET
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @see PHPIMS_Client_Driver_Interface::get()
      */
     public function get($url) {
         curl_setopt_array($this->curlHandle, array(
@@ -107,22 +95,14 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
-     * Perform a HEAD to $url
-     *
-     * @param string $url The URL to HEAD
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @see PHPIMS_Client_Driver_Interface::head()
      */
     public function head($url) {
         throw new PHPIMS_Client_Driver_Exception('not yet implemented');
     }
 
     /**
-     * Perform a DELETE request to $url
-     *
-     * @param string $url The URL to DELETE
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @see PHPIMS_Client_Driver_Interface::delete()
      */
     public function delete($url) {
         curl_setopt_array($this->curlHandle, array(
@@ -163,13 +143,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
-     * Add an image
-     *
-     * @param string $path The path to the image to add
-     * @param string $url The URL to push data to
-     * @param array $metadata Metadata to add along with the image
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @see PHPIMS_Client_Driver_Interface::addImage()
      */
     public function addImage($path, $url, array $metadata = null) {
         $data = array();
