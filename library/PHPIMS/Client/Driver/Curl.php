@@ -98,7 +98,11 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
      * @see PHPIMS_Client_Driver_Interface::head()
      */
     public function head($url) {
-        throw new PHPIMS_Client_Driver_Exception('not yet implemented');
+        curl_setopt_array($this->curlHandle, array(
+            CURLOPT_NOBODY => true,
+        ));
+
+        return $this->request($url);
     }
 
     /**
