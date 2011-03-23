@@ -9,6 +9,11 @@
             <directory suffix="Test.php">tests/PHPIMS</directory>
         </testsuite>
     </testsuites>
+    
+    <php>
+        <const name="PHPIMS_ENABLE_CLIENT_TESTS" value="false" />
+        <const name="PHPIMS_CLIENT_TESTS_URL" value="" />
+    </php>
   
     <logging>
         <log type="coverage-html" target="build/coverage" title="Code coverage for PHPIMS"
