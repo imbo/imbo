@@ -78,6 +78,13 @@ class PHPIMS_Image {
     protected $mimeType = null;
 
     /**
+     * Extension of the file without the dot
+     *
+     * @var string
+     */
+    protected $extension = null;
+
+    /**
      * Blob containing the image itself
      *
      * @var string
@@ -192,6 +199,27 @@ class PHPIMS_Image {
      */
     public function setMimeType($mimeType) {
         $this->mimeType = $mimeType;
+
+        return $this;
+    }
+
+    /**
+     * Get the extension
+     *
+     * @return string
+     */
+    public function getExtension() {
+        return $this->extension;
+    }
+
+    /**
+     * Set the extension
+     *
+     * @param string $extension The file extension
+     * @return PHPIMS_Image
+     */
+    public function setExtension($extension) {
+        $this->extension = $extension;
 
         return $this;
     }
