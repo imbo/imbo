@@ -38,26 +38,12 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Database_Driver_MongoDBTest extends PHPUnit_Framework_TestCase {
+class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTests {
     /**
-     * Driver instance
-     *
-     * @var PHPIMS_Database_Driver_MongoDB
+     * @see PHPIMS_Database_Driver_DriverTests::getNewDriver()
      */
-    protected $driver = null;
-
-    /**
-     * Set up method
-     */
-    public function setUp() {
-        $this->driver = new PHPIMS_Database_Driver_MongoDB();
-    }
-
-    /**
-     * Tear down method
-     */
-    public function tearDown() {
-        $this->driver = null;
+    protected function getNewDriver() {
+        return new PHPIMS_Database_Driver_MongoDB();
     }
 
     public function testSetGetDatabaseName() {

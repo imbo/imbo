@@ -44,15 +44,6 @@
  */
 class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
     /**
-     * Internal plugins
-     *
-     * @var array
-     */
-    protected $internalPluginsSpec = array(
-        'PHPIMS_Operation_Plugin_PrepareImage' => array(),
-    );
-
-    /**
      * @see PHPIMS_Operation_Abstract::exec()
      */
     public function exec() {

@@ -87,61 +87,6 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
 
     }
 
-    public function testSetGetAndAddPlugins() {
-        $plugin1 = $this->getMockForAbstractClass('PHPIMS_Operation_Plugin_Abstract');
-        $plugin2 = $this->getMockForAbstractClass('PHPIMS_Operation_Plugin_Abstract');
-        $plugin3 = $this->getMockForAbstractClass('PHPIMS_Operation_Plugin_Abstract');
-
-        $this->operation->setPlugins(array($plugin1, $plugin2));
-        $this->assertSame(array($plugin1, $plugin2), $this->operation->getPlugins());
-
-        $this->operation->addPlugin($plugin3);
-        $this->assertSame(array($plugin1, $plugin2, $plugin3), $this->operation->getPlugins());
-
-        $this->operation->setPlugins(array($plugin3));
-        $this->assertSame(array($plugin3), $this->operation->getPlugins());
-    }
-
-    public function testPreAndPostExec() {
-        $plugin1 = $this->getMock('PHPIMS_Operation_Plugin_Abstract');
-        $plugin1->expects($this->once())->method('preExec');
-        $plugin1->expects($this->once())->method('postExec');
-
-        $plugin2 = $this->getMock('PHPIMS_Operation_Plugin_Abstract');
-        $plugin2->expects($this->once())->method('preExec');
-        $plugin2->expects($this->once())->method('postExec');
-
-        $this->operation->setPlugins(array($plugin1, $plugin2));
-        $this->operation->preExec();
-        $this->operation->postExec();
-    }
-
-    public function testPreExecWhenAPluginFails() {
-        $plugin1 = $this->getMock('PHPIMS_Operation_Plugin_Abstract');
-        $plugin1->expects($this->once())->method('preExec');
-
-        $message = 'some message';
-        $plugin2 = $this->getMock('PHPIMS_Operation_Plugin_Abstract');
-        $plugin2->expects($this->once())->method('preExec')->will($this->throwException(new PHPIMS_Operation_Plugin_Exception($message)));
-
-        $this->operation->setPlugins(array($plugin1, $plugin2));
-        $this->setExpectedException('PHPUnit_Framework_Error_Warning');
-        $this->operation->preExec();
-    }
-
-    public function testPostExecWhenAPluginFails() {
-        $plugin1 = $this->getMock('PHPIMS_Operation_Plugin_Abstract');
-        $plugin1->expects($this->once())->method('postExec');
-
-        $message = 'some message';
-        $plugin2 = $this->getMock('PHPIMS_Operation_Plugin_Abstract');
-        $plugin2->expects($this->once())->method('postExec')->will($this->throwException(new PHPIMS_Operation_Plugin_Exception($message)));
-
-        $this->operation->setPlugins(array($plugin1, $plugin2));
-        $this->setExpectedException('PHPUnit_Framework_Error_Warning');
-        $this->operation->postExec();
-    }
-
     public function testInitMethod() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
         $databaseClassName = get_class($database);
@@ -150,16 +95,6 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
         $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
         $storageClassName = get_class($storage);
         $storageParams = array('someparam' => false, 'otherparam' => true);
-
-        $plugin = $this->getMockForAbstractClass('PHPIMS_Operation_Plugin_Abstract');
-        $pluginClassName = get_class($plugin);
-        $pluginParams = array('someparam' => true, 'someotherparam' => false);
-
-        $internalPlugin = $this->getMockForAbstractClass('PHPIMS_Operation_Plugin_Abstract');
-        $internalPluginClassName = get_class($internalPlugin);
-        $internalPluginParams = array('someparam' => true, 'someotherparam' => false);
-
-        $this->operation->setInternalPluginsSpec(array($internalPluginClassName => $internalPluginParams));
 
         $config = array(
             'database' => array(
@@ -170,11 +105,7 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
                 'driver' => $storageClassName,
                 'params' => $storageParams,
             ),
-            'plugins' => array(
-                'PHPIMS_Operation_Abstract' => array(
-                    $pluginClassName => $pluginParams,
-                ),
-            ),
+            'plugins' => array(),
         );
 
         $this->operation->init($config);
@@ -182,17 +113,5 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
         $this->assertSame($databaseParams, $this->operation->getDatabase()->getParams());
         $this->assertInstanceOf($storageClassName, $this->operation->getStorage());
         $this->assertSame($storageParams, $this->operation->getStorage()->getParams());
-
-        $plugins = $this->operation->getPlugins();
-        $this->assertInstanceOf($pluginClassName, $plugins[0]);
-        $this->assertSame($pluginParams, $plugins[0]->getParams());
-    }
-
-    public function testSetGetInternalPluginsSpec() {
-        $spec = array(
-            'ClassName' => array(),
-        );
-        $this->operation->setInternalPluginsSpec($spec);
-        $this->assertSame($spec, $this->operation->getInternalPluginsSpec());
     }
 }

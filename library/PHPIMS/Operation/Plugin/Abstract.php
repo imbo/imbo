@@ -42,6 +42,35 @@
  */
 abstract class PHPIMS_Operation_Plugin_Abstract {
     /**
+     * Array of events this plugin will be triggered for
+     *
+     * All operations has two entry points for plugins, pre-exec and post-exec. Events use the
+     * operations name as prefix with lcfirst(). The PHPIMS_Operation_AddImage entry points will
+     * be:
+     *
+     * - addImagePreExec
+     * - addImagePostExec
+     *
+     * If you want a plugin a be executed for instance after the PHPIMS_Operation_DeleteImage has
+     * finished execution, create a plugin and set the $events array to:
+     *
+     * <code>
+     * static public $events = array(
+     *     'deleteImagePostExec' => <priority>
+     * );
+     * </code>
+     *
+     * where <priority> is a number. This is used to specify a specific execution order. If this
+     * value is set to 0, the plugin will not execute when that specific event occurs. This can be
+     * used to dynamically disable plugins. Internal plugins will typicall start at 100, so you
+     * have a possibility to add 100 custom plugins pr. event and let them execute before the
+     * internal plugins will.
+     *
+     * @var array
+     */
+    static public $events = array();
+
+    /**
      * Parameters for the plugin
      *
      * @var array
@@ -115,22 +144,9 @@ abstract class PHPIMS_Operation_Plugin_Abstract {
     }
 
     /**
-     * Method that will be triggered before the operation exec() kicks in
+     * Plugins exec method
      *
      * @throws PHPIMS_Operation_Plugin_Exception
-     * @codeCoverageIgnore
      */
-    public function preExec() {
-        // Must be implemented by plugins
-    }
-
-    /**
-     * Method that will be triggered after the operations exec() method is finished
-     *
-     * @throws PHPIMS_Operation_Plugin_Exception
-     * @codeCoverageIgnore
-     */
-    public function postExec() {
-        // Must be implemented by plugins
-    }
+    abstract public function exec();
 }

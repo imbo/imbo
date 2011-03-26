@@ -43,14 +43,61 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_IdentifyImage extends PHPIMS_Operation_Plugin_Abstract {
+class PHPIMS_Operation_Plugin_IdentifyImagePlugin extends PHPIMS_Operation_Plugin_Abstract {
     /**
-     * @see PHPIMS_Operation_Plugin_Abstract::postExec
+     * Supported mime types and the correct file extension
+     *
+     * @var array
      */
-    public function postExec() {
+    static public $mimeTypes = array(
+        'image/png'  => 'png',
+        'image/jpeg' => 'jpeg',
+        'image/gif'  => 'gif',
+    );
+
+    /**
+     * @see PHPIMS_Operation_Plugin_Abstract::$events
+     */
+    static public $events = array(
+        'getImagePostExec' => 100,
+        'addImagePreExec'  => 100,
+    );
+
+    /**
+     * @see PHPIMS_Operation_Plugin_Abstract::exec()
+     */
+    public function exec() {
         $image = $this->getOperation()->getImage();
 
         $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $image->setMimeType($finfo->buffer($image->getBlob()));
+        $mime = $finfo->buffer($image->getBlob());
+
+        if (!static::supportedMimeType($mime)) {
+            throw new PHPIMS_Operation_Plugin_Exception('Unsupported image type: ' . $mime, 415);
+        }
+
+        $image->setMimeType($mime)
+              ->setExtension(static::getFileExtension($mime));
+    }
+
+    /**
+     * Check if a mime type is supported by PHPIMS
+     *
+     * @param string $mime The mime type to check. For instance "image/png"
+     * @return boolean
+     */
+    static public function supportedMimeType($mime) {
+        return isset(static::$mimeTypes[$mime]);
+    }
+
+    /**
+     * Get the file extension mapped to a mime type
+     *
+     * @param string $mime The mime type. For instance "image/png"
+     * @return boolean|string The extension (without the leading dot) on success or boolean false
+     *                        if the mime type is not supported.
+     */
+    static public function getFileExtension($mime) {
+        return isset(static::$mimeTypes[$mime]) ? static::$mimeTypes[$mime] : false;
     }
 }

@@ -63,13 +63,6 @@ abstract class PHPIMS_Operation_Abstract {
     protected $storage = null;
 
     /**
-     * Plugins for the current operation
-     *
-     * @var array An array of objects extending the PHPIMS_Operation_Plugin_Abstract class
-     */
-    protected $plugins = array();
-
-    /**
      * Image instance
      *
      * The image object is populated with en empty instance of PHPIMS_Image when the operation
@@ -90,22 +83,12 @@ abstract class PHPIMS_Operation_Abstract {
     protected $response = null;
 
     /**
-     * Array that can be set by operations if they want to specify internal plugins (not added via
-     * configuration). The keys of the array are the complete classname of the plugins, and the
-     * values are parameters for the different plugins.
-     *
-     * Example usage:
-     *
-     * <code>
-     * protected $internalPluginsSpec = array(
-     *     'PHPIMS_Operation_Plugin_SomePlugin' => array(),
-     *     'PHPIMS_Operation_Plugin_SomeOtherPlugin' => array('foo' => 'bar'),
-     * );
-     * </code>
+     * Array of class names to plugins to execute. The array has two elements, 'preExec' and
+     * 'postExec' which both are numerically indexed.
      *
      * @var array
      */
-    protected $internalPluginsSpec = array();
+    protected $plugins = array();
 
     /**
      * Class constructor
@@ -130,93 +113,147 @@ abstract class PHPIMS_Operation_Abstract {
     }
 
     /**
+     * Initialize the database driver
+     *
+     * @param array $config Part of the confguration array passed from the front controller
+     */
+    protected function initDatabaseDriver(array $config) {
+        $params = array();
+
+        if (isset($config['params'])) {
+            $params = $config['params'];
+        }
+
+        $driver = new $config['driver']($params);
+        $driver->setOperation($this);
+
+        $this->setDatabase($driver);
+    }
+
+    /**
+     * Initialize the storage driver
+     *
+     * @param array $config Part of the confguration array passed from the front controller
+     */
+    protected function initStorageDriver(array $config) {
+        $params = array();
+
+        if (isset($config['params'])) {
+            $params = $config['params'];
+        }
+
+        $driver = new $config['driver']($params);
+        $driver->setOperation($this);
+
+        $this->setStorage($driver);
+    }
+
+    /**
+     * Initialize plugins for this operation
+     *
+     * @param array $config Part of the confguration array passed from the front controller
+     */
+    protected function initPlugins(array $config) {
+        // Operation name
+        $operationName = $this->getOperationName();
+
+        // Loop through the plugin paths, and see if there are any plugins that wants to execute
+        // before and/or after this operation. Also sort them based in the priorities set in each
+        // plugin class.
+        $pluginPaths = array(
+            dirname(dirname(__DIR__)) => 'PHPIMS_Operation_Plugin_',
+        );
+
+        // Append plugin paths from configuration
+        foreach ($config as $spec) {
+            $pluginPaths[$spec['path']] = isset($spec['prefix']) ? $spec['prefix'] : '';
+        }
+
+        // Initialize array for the plugins that will be executed
+        $plugins = array(
+            'preExec'  => array(),
+            'postExec' => array()
+        );
+
+        foreach ($pluginPaths as $path => $prefix) {
+            $path = rtrim($path, '/̈́') . '/';
+
+            if (!empty($prefix)) {
+                $path .= str_replace('_', '/', $prefix);
+            }
+
+            if (empty($path) || !is_dir($path)) {
+                continue;
+            }
+
+            $iterator = new GlobIterator($path . '*Plugin.php');
+
+            foreach ($iterator as $file) {
+                $className = $prefix . $file->getBasename('.php');
+
+                if (is_subclass_of($className, 'PHPIMS_Operation_Plugin_Abstract')) {
+                    $events = $className::$events;
+
+                    $key = $operationName . 'PreExec';
+
+                    if (isset($events[$key])) {
+                        $priority = (int) $events[$key];
+                        $plugins['preExec'][$priority] = $className;
+                    }
+
+                    $key = $operationName . 'PostExec';
+
+                    if (isset($events[$key])) {
+                        $priority = (int) $events[$key];
+                        $plugins['postExec'][$priority] = $className;
+                    }
+                }
+            }
+        }
+
+        // Sort to get the correct order
+        ksort($plugins['preExec']);
+        ksort($plugins['postExec']);
+
+        $this->setPlugins($plugins);
+    }
+
+    /**
+     * Set plugins array
+     *
+     * @param array $plugins Associative array with two keys: 'preExec' and 'postExec' which both
+     *                       should be sorted numerically indexed arrays.
+     */
+    protected function setPlugins(array $plugins) {
+        $this->plugins = $plugins;
+    }
+
+    /**
      * Init method
      *
      * @param array $config Configuration passed on from the front controller
      * @return PHPIMS_Operation_Abstract
      */
     public function init(array $config) {
-        if (!empty($config['database']['driver'])) {
-            $params = array();
-
-            if (isset($config['database']['params'])) {
-                $params = $config['database']['params'];
-            }
-
-            $driver = new $config['database']['driver']($params);
-            $driver->setOperation($this);
-
-            $this->setDatabase($driver);
-        }
-
-        if (!empty($config['storage']['driver'])) {
-            $params = array();
-
-            if (isset($config['storage']['params'])) {
-                $params = $config['storage']['params'];
-            }
-
-            $driver = new $config['storage']['driver']($params);
-            $driver->setOperation($this);
-
-            $this->setStorage($driver);
-        }
-
-        // Initialize the plugins spec
-        $pluginsSpec = $this->internalPluginsSpec;
-
-        if (!empty($config['plugins'][__CLASS__]) && is_array($config['plugins'][__CLASS__])) {
-            // Use the + operator to keep plugins in the configuration from overriding internal
-            // plugins. This will also keep the plugins in the correct order. array_merge would
-            // either override the internal plugins, or mess up the order.
-            $pluginsSpec += $config['plugins'][__CLASS__];
-        }
-
-        // First, add internal plugins specified in the operations themselves
-        foreach ($pluginsSpec as $pluginName => $pluginParams) {
-            $plugin = new $pluginName($pluginParams, $this);
-            $this->addPlugin($plugin);
-        }
+        $this->initDatabaseDriver($config['database']);
+        $this->initStorageDriver($config['storage']);
+        $this->initPlugins($config['plugins']);
 
         return $this;
     }
 
     /**
-     * Pre exec method
+     * Get the current operation name
      *
-     * This method will trigger the preExec method on all registered plugins
-     *
-     * @return PHPIMS_Operation_Abstract
+     * @return string
      */
-    public function preExec() {
-        array_map(function ($plugin) {
-            try {
-                $plugin->preExec();
-            } catch (PHPIMS_Operation_Plugin_Exception $e) {
-                trigger_error(sprintf('Plugin "%s" failed: %s', get_class($plugin), $e->getMessage()), E_USER_WARNING);
-            }
-        }, $this->getPlugins());
+    protected function getOperationName() {
+        $className = get_class($this);
 
-        return $this;
-    }
+        $operationName = substr($className, strrpos($className, '_') + 1);
+        $operationName = lcfirst($operationName);
 
-    /**
-     * Post exec method
-     *
-     * This method will trigger the postExec method on all registered plugins
-     *
-     * @return PHPIMS_Operation_Abstract
-     */
-    public function postExec() {
-        array_map(function ($plugin) {
-            try {
-                $plugin->postExec();
-            } catch (PHPIMS_Operation_Plugin_Exception $e) {
-                trigger_error(sprintf('Plugin "%s" failed: %s', get_class($plugin), $e->getMessage()), E_USER_WARNING);
-            }
-        }, $this->getPlugins());
-
-        return $this;
+        return $operationName;
     }
 
     /**
@@ -283,39 +320,6 @@ abstract class PHPIMS_Operation_Abstract {
     }
 
     /**
-     * Return the plugins
-     *
-     * @return array
-     */
-    public function getPlugins() {
-        return $this->plugins;
-    }
-
-    /**
-     * Set all plugins (will remove ones already registered)
-     *
-     * @param array $plugins An array of objects extending PHPIMS_Operation_Plugin_Abstract
-     * @return PHPIMS_Operation_Abstract
-     */
-    public function setPlugins(array $plugins) {
-        $this->plugins = $plugins;
-
-        return $this;
-    }
-
-    /**
-     * Add a single plugin
-     *
-     * @param PHPIMS_Operation_Plugin_Abstract $plugin The plugin to append to the array of plugins
-     * @return PHPIMS_Operation_Abstract
-     */
-    public function addPlugin(PHPIMS_Operation_Plugin_Abstract $plugin) {
-        $this->plugins[] = $plugin;
-
-        return $this;
-    }
-
-    /**
      * Get the current image
      *
      * @return PHPIMS_Image
@@ -358,23 +362,33 @@ abstract class PHPIMS_Operation_Abstract {
     }
 
     /**
-     * Get the internal plugins spec
+     * Trigger for registered "preExec" plugins
      *
-     * @return array
+     * @return PHPIMS_Operation_Abstract
+     * @throws PHPIMS_Operation_Plugin_Exception
      */
-    public function getInternalPluginsSpec() {
-        return $this->internalPluginsSpec;
+    public function preExec() {
+        foreach ($this->plugins['preExec'] as $className) {
+            $plugin = new $className();
+            $plugin->setOperation($this)
+                   ->exec();
+        }
+
+        return $this;
     }
 
     /**
-     * Set the internal plugins specs
+     * Trigger for registered "postExec" plugins
      *
-     * @param array $spec An associative array with classnames as keys and parameters for the
-     *                    plugin class as values
      * @return PHPIMS_Operation_Abstract
+     * @throws PHPIMS_Operation_Plugin_Exception
      */
-    public function setInternalPluginsSpec(array $spec) {
-        $this->internalPluginsSpec = $spec;
+    public function postExec() {
+        foreach ($this->plugins['postExec'] as $className) {
+            $plugin = new $className();
+            $plugin->setOperation($this)
+                   ->exec();
+        }
 
         return $this;
     }

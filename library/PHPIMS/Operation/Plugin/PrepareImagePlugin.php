@@ -43,17 +43,22 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_PrepareImage extends PHPIMS_Operation_Plugin_Abstract {
+class PHPIMS_Operation_Plugin_PrepareImagePlugin extends PHPIMS_Operation_Plugin_Abstract {
     /**
-     * @see PHPIMS_Operation_Plugin_Abstract::preExec
+     * @see PHPIMS_Operation_Plugin_Abstract::$events
      */
-    public function preExec() {
+    static public $events = array(
+        'addImagePreExec' => 101,
+    );
+
+    /**
+     * @see PHPIMS_Operation_Plugin_Abstract::exec()
+     */
+    public function exec() {
         $image = $this->getOperation()->getImage();
 
         $imagePath = $_FILES['file']['tmp_name'];
-        $info = getimagesize($imagePath);
-        $extension = image_type_to_extension($info[2], false);
-        $actualHash = md5_file($imagePath) . '.' . $extension;
+        $actualHash = md5_file($imagePath) . '.' . $image->getExtension();
         $hashFromRequest = $this->getOperation()->getHash();
 
         if ($actualHash !== $hashFromRequest) {
@@ -63,7 +68,6 @@ class PHPIMS_Operation_Plugin_PrepareImage extends PHPIMS_Operation_Plugin_Abstr
         $image->setFilename($_FILES['file']['name'])
               ->setFilesize($_FILES['file']['size'])
               ->setMetadata($_POST)
-              ->setHash($hashFromRequest)
-              ->setMimeType($info['mime']);
+              ->setHash($hashFromRequest);
     }
 }

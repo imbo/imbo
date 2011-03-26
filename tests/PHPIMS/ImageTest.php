@@ -104,4 +104,10 @@ class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
         $this->image->setBlob($blob);
         $this->assertSame($blob, $this->image->getBlob());
     }
+
+    public function testSetGetExtension() {
+        $extension = 'png';
+        $this->image->setExtension($extension);
+        $this->assertSame($extension, $this->image->getExtension());
+    }
 }

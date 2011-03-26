@@ -40,9 +40,7 @@
  */
 class PHPIMS_Client_Driver_CurlTest extends PHPIMS_Client_Driver_DriverTests {
     /**
-     * Return an instance of the driver we are testing
-     *
-     * @return PHPIMS_Client_Driver_Abstract
+     * @see PHPIMS_Client_Driver_DriverTests::getNewDriver()
      */
     protected function getNewDriver() {
         return new PHPIMS_Client_Driver_Curl();

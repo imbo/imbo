@@ -199,4 +199,12 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     public function testHandleUnsupportedOperation() {
         $this->controller->handle('GET', md5(microtime()) . '.png/metadata');
     }
+
+    /**
+     * @expectedException PHPIMS_Exception
+     * @expectedExceptionCode 418
+     */
+    public function testHandleBrew() {
+        $this->controller->handle('BREW', md5(microtime()) . '.png');
+    }
 }

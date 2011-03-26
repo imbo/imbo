@@ -52,6 +52,7 @@ class PHPIMS_FrontController {
     const POST   = 'POST';
     const HEAD   = 'HEAD';
     const DELETE = 'DELETE';
+    const BREW   = 'BREW';
     /**#@-*/
 
     /**
@@ -84,6 +85,7 @@ class PHPIMS_FrontController {
             case self::POST:
             case self::HEAD:
             case self::DELETE:
+            case self::BREW:
                 return true;
             default:
                 return false;
@@ -143,6 +145,8 @@ class PHPIMS_FrontController {
             } else {
                 $operation = 'PHPIMS_Operation_DeleteImage';
             }
+        } else if ($method === self::BREW) {
+            throw new PHPIMS_Exception('I\'m a teapot!', 418);
         }
 
         if ($operation === null) {
