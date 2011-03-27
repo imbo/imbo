@@ -128,7 +128,7 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException PHPIMS_Exception
-     * @expectedExceptionMessage Invalid HTTP method: foobar
+     * @expectedExceptionCode 501
      */
     public function testHandleInvalidMethod() {
         $this->controller->handle('foobar', '/some/path');
@@ -136,6 +136,7 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException PHPIMS_Exception
+     * @expectedExceptionCode 400
      * @expectedExceptionMessage Missing hash
      */
     public function testHandleWithMissingHash() {
@@ -144,6 +145,7 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException PHPIMS_Exception
+     * @expectedExceptionCode 400
      * @expectedExceptionMessage Invalid hash: hash
      */
     public function testHandleWithInvalidHash() {
@@ -194,6 +196,7 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException PHPIMS_Exception
+     * @expectedExceptionCode 400
      * @expectedExceptionMessage Unsupported operation
      */
     public function testHandleUnsupportedOperation() {

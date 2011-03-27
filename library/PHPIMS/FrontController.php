@@ -167,7 +167,7 @@ class PHPIMS_FrontController {
      */
     public function handle($method, $path) {
         if (!self::isValidMethod($method)) {
-            throw new PHPIMS_Exception('Invalid HTTP method: ' . $method, 400);
+            throw new PHPIMS_Exception($method . ' not implemented', 501);
         }
 
         // Remove starting and trailing slashes
