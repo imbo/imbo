@@ -57,21 +57,20 @@ class PHPIMS_Operation_Plugin_PrepareImagePlugin extends PHPIMS_Operation_Plugin
     public function exec() {
         // Make sure there is an image attached
         if (empty($_FILES)) {
-            throw new PHPIMS_Operation_Exception('No image attached', 400);
+            throw new PHPIMS_Operation_Plugin_Exception('No image attached', 400);
         }
-
-        $image = $this->getOperation()->getImage();
 
         $imagePath = $_FILES['file']['tmp_name'];
         $actualHash = md5_file($imagePath);
 
         // Get hash from request without the extension
-        $hashFromRequest = substr($this->getOperation()->getHash(), 0, 32);
+        $hashFromRequest = $this->getOperation()->getHash();
 
-        if ($actualHash !== $hashFromRequest) {
+        if ($actualHash !== substr($hashFromRequest, 0, 32)) {
             throw new PHPIMS_Operation_Plugin_Exception('Hash mismatch', 400);
         }
 
+        $image = $this->getOperation()->getImage();
         $image->setFilename($_FILES['file']['name'])
               ->setFilesize($_FILES['file']['size'])
               ->setMetadata($_POST)
