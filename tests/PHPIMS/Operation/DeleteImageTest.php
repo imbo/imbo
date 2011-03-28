@@ -38,33 +38,17 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_DeleteImageTest extends PHPUnit_Framework_TestCase {
-    /**
-     * Operation instance
-     *
-     * @var PHPIMS_Operation_DeleteImage
-     */
-    protected $operation = null;
+class PHPIMS_Operation_DeleteImageTest extends PHPIMS_Operation_OperationTests {
+    protected $hash = null;
 
-    /**
-     * Hash value sent to the database driver
-     *
-     * @var string
-     */
-    protected $hash = 'some hash value';
+    protected function getNewOperation() {
+        $this->hash = md5(microtime());
 
-    /**
-     * Set up method
-     */
-    public function setUp() {
-        $this->operation = new PHPIMS_Operation_DeleteImage($this->hash);
+        return new PHPIMS_Operation_DeleteImage($this->hash);
     }
 
-    /**
-     * Tear down method
-     */
-    public function tearDown() {
-        $this->operation = null;
+    public function getOperationName() {
+        return 'deleteImage';
     }
 
     public function testSuccessfullExec() {

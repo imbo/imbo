@@ -38,24 +38,47 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_EditMetadataTest extends PHPIMS_Operation_OperationTests {
-    protected $hash = null;
+abstract class PHPIMS_Operation_OperationTests extends PHPUnit_Framework_TestCase {
+    /**
+     * Operation instance
+     *
+     * @var PHPIMS_Operation_Abstract
+     */
+    protected $operation = null;
 
-    protected function getNewOperation() {
-        $this->hash = md5(microtime());
-
-        return new PHPIMS_Operation_EditMetadata($this->hash);
+    /**
+     * Set up method
+     */
+    public function setUp() {
+        $this->operation = $this->getNewOperation();
     }
 
-    public function getOperationName() {
-        return 'editMetadata';
+    /**
+     * Tear down method
+     */
+    public function tearDown() {
+        $this->operation = null;
     }
 
-    public function testSuccessfullExec() {
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('editMetadata')->with($this->hash, $_POST);
-        $this->operation->setDatabase($database);
+    /**
+     * Get a new operation instance
+     *
+     * @return PHPIMS_Operation_Abstract
+     */
+    abstract protected function getNewOperation();
 
-        $this->operation->exec();
+    /**
+     * Get the operation name
+     *
+     * @return string
+     */
+    abstract protected function getOperationName();
+
+    public function testGetOperationName() {
+        $reflection = new ReflectionClass($this->operation);
+        $method = $reflection->getMethod('getOperationName');
+        $method->setAccessible(true);
+
+        $this->assertSame($this->getOperationName(), $method->invokeArgs($this->operation, array()));
     }
 }

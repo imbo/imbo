@@ -38,40 +38,20 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_AddImageTest extends PHPUnit_Framework_TestCase {
-    /**
-     * Operation instance
-     *
-     * @var PHPIMS_Operation_AddImage
-     */
-    protected $operation = null;
-
-    /**
-     * Set up method
-     */
-    public function setUp() {
-        $this->operation = new PHPIMS_Operation_AddImage(md5(microtime()));
-
-        $_FILES['file'] = array(
-            'name'     => 'somename',
-            'tmp_name' => '/tmp/foobar',
-            'size'     => 42,
-        );
-
-        $_SERVER['HTTP_HOST'] = 'some host';
+class PHPIMS_Operation_AddImageTest extends PHPIMS_Operation_OperationTests {
+    protected function getNewOperation() {
+        return new PHPIMS_Operation_AddImage(md5(microtime()));
     }
 
-    /**
-     * Tear down method
-     */
-    public function tearDown() {
-        $this->operation = null;
-
-        unset($_FILES['file']);
-        unset($_SERVER['HTTP_HOST']);
+    public function getOperationName() {
+        return 'addImage';
     }
 
     public function testSuccessfullExec() {
+        $_FILES['file'] = array(
+            'tmp_name' => '/tmp/foobar',
+        );
+
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
         $database->expects($this->once())->method('insertImage');
         $this->operation->setDatabase($database);
