@@ -116,4 +116,45 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
         $this->driver->setParams(array('dataDir' => '/tmp'));
         $this->assertSame('/tmp/a/s/d/asdasdasd.png', $this->driver->getImagePath('asdasdasd.png'));
     }
+
+    /**
+     * @expectedException PHPIMS_Storage_Exception
+     * @expectedExceptionCode 404
+     */
+    public function testLoadFileThatDoesNotExist() {
+        $this->driver->setParams(array('dataDir' => '/some/path'));
+        $this->driver->load(md5(microtime()) . '.png');
+    }
+
+    public function testLoad() {
+        $hash = md5(microtime());
+
+        vfsStream::setup('basedir');
+        $this->driver->setParams(array('dataDir' => vfsStream::url('basedir')));
+
+        $root = vfsStreamWrapper::getRoot();
+        $last = $root;
+
+        foreach (array($hash[0], $hash[1], $hash[2]) as $letter) {
+            $d = vfsStream::newDirectory($letter);
+            $last->addChild($d);
+            $last = $d;
+        }
+
+        $content = 'some binary content';
+        $file = vfsStream::newFile($hash);
+        $file->setContent($content);
+        $last->addChild($file);
+
+        $image = $this->getMock('PHPIMS_Image');
+        $image->expects($this->once())->method('setBlob')->with($content);
+
+        $operation = $this->getMockBuilder('PHPIMS_Operation_Abstract')
+                          ->disableOriginalConstructor()
+                          ->getMock();
+        $operation->expects($this->once())->method('getImage')->will($this->returnValue($image));
+
+        $this->driver->setOperation($operation);
+        $this->assertTrue($this->driver->load($hash));
+    }
 }
