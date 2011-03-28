@@ -198,14 +198,18 @@ abstract class PHPIMS_Operation_Abstract {
 
                     if (isset($events[$key])) {
                         $priority = (int) $events[$key];
-                        $plugins['preExec'][$priority] = $className;
+                        $plugin = new $className();
+                        $plugin->setOperation($this);
+                        $plugins['preExec'][$priority] = $plugin;
                     }
 
                     $key = $operationName . 'PostExec';
 
                     if (isset($events[$key])) {
                         $priority = (int) $events[$key];
-                        $plugins['postExec'][$priority] = $className;
+                        $plugin = new $className();
+                        $plugin->setOperation($this);
+                        $plugins['postExec'][$priority] = $plugin;
                     }
                 }
             }
@@ -216,6 +220,15 @@ abstract class PHPIMS_Operation_Abstract {
         ksort($plugins['postExec']);
 
         $this->setPlugins($plugins);
+    }
+
+    /**
+     * Get plugins array
+     *
+     * @return array
+     */
+    protected function getPlugins() {
+        return $this->plugins;
     }
 
     /**
@@ -233,6 +246,7 @@ abstract class PHPIMS_Operation_Abstract {
      *
      * @param array $config Configuration passed on from the front controller
      * @return PHPIMS_Operation_Abstract
+     * @codeCoverageIgnore
      */
     public function init(array $config) {
         $this->initDatabaseDriver($config['database']);
@@ -368,11 +382,9 @@ abstract class PHPIMS_Operation_Abstract {
      * @throws PHPIMS_Operation_Plugin_Exception
      */
     public function preExec() {
-        foreach ($this->plugins['preExec'] as $className) {
-            $plugin = new $className();
-            $plugin->setOperation($this)
-                   ->exec();
-        }
+        array_map(function($plugin) {
+            $plugin->exec();
+        }, $this->plugins['preExec']);
 
         return $this;
     }
@@ -384,11 +396,9 @@ abstract class PHPIMS_Operation_Abstract {
      * @throws PHPIMS_Operation_Plugin_Exception
      */
     public function postExec() {
-        foreach ($this->plugins['postExec'] as $className) {
-            $plugin = new $className();
-            $plugin->setOperation($this)
-                   ->exec();
-        }
+        array_map(function($plugin) {
+            $plugin->exec();
+        }, $this->plugins['postExec']);
 
         return $this;
     }
