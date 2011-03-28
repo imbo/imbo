@@ -30,6 +30,11 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+require '_pluginsWithoutPrefix/CustomPlugin.php';
+require '_pluginsWithoutPrefix/OtherCustomPlugin.php';
+require '_pluginsWithPrefix/Some/Prefix/CustomPlugin.php';
+require '_pluginsWithPrefix/Some/Prefix/OtherCustomPlugin.php';
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -50,9 +55,18 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->operation = $this->getMockBuilder('PHPIMS_Operation_Abstract')
+        $this->operation = $this->getMockBuilder('PHPIMS_Operation_Abstract')->setMethods(array('getOperationName', 'exec'))
                                 ->disableOriginalConstructor()
-                                ->getMockForAbstractClass();
+                                ->getMock();
+
+        // Make the operation return "addImage" as if it was the PHPIMS_Operation_AddImage
+        // operation class
+        $this->operation->expects($this->any())
+                        ->method('getOperationName')
+                        ->will($this->returnValue('addImage'));
+
+        $this->operation->expects($this->any())
+                        ->method('exec');
     }
 
     /**
@@ -87,31 +101,125 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
 
     }
 
-    public function testInitMethod() {
+    public function testSetGetResponse() {
+        $response = $this->getMock('PHPIMS_Server_Response');
+        $this->operation->setResponse($response);
+        $this->assertSame($response, $this->operation->getResponse());
+    }
+
+    public function testInitDatabaseDriver() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
         $databaseClassName = get_class($database);
         $databaseParams = array('someparam' => true, 'otherparam' => false);
 
+        $config = array(
+            'driver' => $databaseClassName,
+            'params' => $databaseParams,
+        );
+
+        $reflection = new ReflectionClass($this->operation);
+        $method = $reflection->getMethod('initDatabaseDriver');
+        $method->setAccessible(true);
+
+        $method->invokeArgs($this->operation, array($config));
+
+        $this->assertInstanceOf($databaseClassName, $this->operation->getDatabase());
+        $this->assertSame($databaseParams, $this->operation->getDatabase()->getParams());
+    }
+
+    public function testInitStorageDriver() {
         $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
         $storageClassName = get_class($storage);
         $storageParams = array('someparam' => false, 'otherparam' => true);
 
         $config = array(
-            'database' => array(
-                'driver' => $databaseClassName,
-                'params' => $databaseParams,
-            ),
-            'storage' => array(
-                'driver' => $storageClassName,
-                'params' => $storageParams,
-            ),
-            'plugins' => array(),
+            'driver' => $storageClassName,
+            'params' => $storageParams,
         );
 
-        $this->operation->init($config);
-        $this->assertInstanceOf($databaseClassName, $this->operation->getDatabase());
-        $this->assertSame($databaseParams, $this->operation->getDatabase()->getParams());
+        $reflection = new ReflectionClass($this->operation);
+        $method = $reflection->getMethod('initStorageDriver');
+        $method->setAccessible(true);
+
+        $method->invokeArgs($this->operation, array($config));
+
         $this->assertInstanceOf($storageClassName, $this->operation->getStorage());
         $this->assertSame($storageParams, $this->operation->getStorage()->getParams());
+    }
+
+    public function testInitPlugins() {
+        // Add a directory that has no custom plugins and a directory that has some plugins
+        $config = array(
+            array(
+                'path' => '/some/path',
+                'prefix' => 'Some_Prefix',
+            ),
+            array(
+                'path' => __DIR__ . '/_pluginsWithPrefix',
+                'prefix' => 'Some_Prefix_',
+            ),
+            array(
+                'path' => __DIR__ . '/_pluginsWithoutPrefix',
+            ),
+        );
+
+        $reflection = new ReflectionClass($this->operation);
+        $method = $reflection->getMethod('initPlugins');
+        $method->setAccessible(true);
+        $method->invokeArgs($this->operation, array($config));
+
+        $reflection = new ReflectionClass($this->operation);
+        $method = $reflection->getMethod('getPlugins');
+        $method->setAccessible(true);
+
+        $plugins = $method->invoke($this->operation);
+
+        $this->assertInstanceOf('Some_Prefix_CustomPlugin', $plugins['preExec'][1]);
+        $this->assertInstanceOf('CustomPlugin', $plugins['preExec'][10]);
+        $this->assertInstanceOf('OtherCustomPlugin', $plugins['preExec'][12]);
+        $this->assertInstanceOf('Some_Prefix_OtherCustomPlugin', $plugins['preExec'][42]);
+        $this->assertInstanceOf('PHPIMS_Operation_Plugin_PrepareImagePlugin', $plugins['preExec'][100]);
+        $this->assertInstanceOf('PHPIMS_Operation_Plugin_IdentifyImagePlugin', $plugins['preExec'][101]);
+
+        $this->assertInstanceOf('Some_Prefix_CustomPlugin', $plugins['postExec'][1]);
+        $this->assertInstanceOf('OtherCustomPlugin', $plugins['postExec'][8]);
+        $this->assertInstanceOf('CustomPlugin', $plugins['postExec'][20]);
+        $this->assertInstanceOf('Some_Prefix_OtherCustomPlugin', $plugins['postExec'][78]);
+    }
+
+    public function testPreAndPostExec() {
+        $plugin1 = $this->getMockBuilder('PHPIMS_Operation_Plugin_Abstract')->disableOriginalConstructor()->getMockForAbstractClass();
+        $plugin1->expects($this->exactly(2))->method('exec');
+
+        $plugin2 = $this->getMockBuilder('PHPIMS_Operation_Plugin_Abstract')->disableOriginalConstructor()->getMockForAbstractClass();
+        $plugin2->expects($this->exactly(2))->method('exec');
+
+        $plugin3 = $this->getMockBuilder('PHPIMS_Operation_Plugin_Abstract')->disableOriginalConstructor()->getMockForAbstractClass();
+        $plugin3->expects($this->once())->method('exec');
+
+        $plugin4 = $this->getMockBuilder('PHPIMS_Operation_Plugin_Abstract')->disableOriginalConstructor()->getMockForAbstractClass();
+        $plugin4->expects($this->once())->method('exec');
+
+        $plugins = array(
+            'preExec' => array(
+                1 => $plugin1,
+                2 => $plugin2,
+                3 => $plugin4,
+            ),
+            'postExec' => array(
+                1 => $plugin1,
+                2 => $plugin2,
+                3 => $plugin3,
+            ),
+        );
+
+        $reflection = new ReflectionClass($this->operation);
+        $method = $reflection->getMethod('setPlugins');
+        $method->setAccessible(true);
+
+        $method->invokeArgs($this->operation, array($plugins));
+
+        $this->operation->preExec();
+        $this->operation->postExec();
     }
 }
