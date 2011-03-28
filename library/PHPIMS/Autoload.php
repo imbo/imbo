@@ -73,6 +73,7 @@ class PHPIMS_Autoload {
         'phpims_operation_plugin_abstract' => '/Operation/Plugin/Abstract.php',
         'phpims_operation_plugin_exception' => '/Operation/Plugin/Exception.php',
         'phpims_operation_plugin_identifyimageplugin' => '/Operation/Plugin/IdentifyImagePlugin.php',
+        'phpims_operation_plugin_manipulateimageplugin' => '/Operation/Plugin/ManipulateImagePlugin.php',
         'phpims_operation_plugin_prepareimageplugin' => '/Operation/Plugin/PrepareImagePlugin.php',
         'phpims_server_response' => '/Server/Response.php',
         'phpims_storage_driver_abstract' => '/Storage/Driver/Abstract.php',
