@@ -69,7 +69,7 @@ abstract class PHPIMS_Client_Driver_DriverTests extends PHPUnit_Framework_TestCa
         }
 
         $this->driver = $this->getNewDriver();
-        $client = $this->getMock('PHPIMS_Client', array('getTimeout', 'getConnectTimeout'));
+        $client = $this->getMockBuilder('PHPIMS_Client')->disableOriginalConstructor()->setMethods(array('getTimeout', 'getConnectTimeout'))->getMock();
         $client->expects($this->any())->method('getConnectTimeout')->will($this->returnValue(2));
         $client->expects($this->any())->method('getTimeout')->will($this->returnValue(2));
 

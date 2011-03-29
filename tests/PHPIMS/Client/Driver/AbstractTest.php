@@ -61,7 +61,7 @@ class PHPIMS_Client_Driver_AbstractTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetClient() {
-        $client = $this->getMock('PHPIMS_Client');
+        $client = $this->getMockBuilder('PHPIMS_Client')->disableOriginalConstructor()->getMock();
         $this->driver->setClient($client);
         $this->assertSame($client, $this->driver->getClient());
     }

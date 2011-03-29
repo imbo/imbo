@@ -47,10 +47,17 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
     protected $client = null;
 
     /**
+     * The server url passed to the constructor
+     *
+     * @var string
+     */
+    protected $serverUrl = 'http://serverUrl/';
+
+    /**
      * Set up method
      */
     public function setUp() {
-        $this->client = new PHPIMS_Client();
+        $this->client = new PHPIMS_Client($this->serverUrl);
     }
 
     /**
@@ -86,7 +93,8 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
 
     public function testConstructorParams() {
         $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
-        $client = new PHPIMS_Client($driver);
+        $client = new PHPIMS_Client($this->serverUrl, $driver);
+        $this->assertSame($this->serverUrl, $client->getServerUrl());
         $this->assertSame($driver, $client->getDriver());
     }
 
