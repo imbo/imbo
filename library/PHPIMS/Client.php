@@ -106,6 +106,16 @@ class PHPIMS_Client {
 
         return $this;
     }
+    
+    /**
+     * Get the base server path for a hash
+     *
+     * @return string
+     */
+    public function getServerPath($hash) {
+        return $this->serverUrl . '/' . $hash;    
+    }
+    
 
     /**
      * Get the timeout
@@ -197,7 +207,7 @@ class PHPIMS_Client {
         // Get extension
         $info = getimagesize($path);
         $extension = image_type_to_extension($info[2], false);
-        $url = $this->serverUrl . '/' . $hash . '.' . $extension;
+        $url = $this->getServerPath($hash) . '.' . $extension;
 
         return $this->getDriver()->addImage($path, $url, $metadata);
     }
@@ -209,7 +219,7 @@ class PHPIMS_Client {
      * @return PHPIMS_Client_Response
      */
     public function deleteImage($hash) {
-        return $this->getDriver()->delete($this->serverUrl . '/' . $hash);
+        return $this->getDriver()->delete($this->getServerPath($hash));
     }
 
     /**
@@ -220,7 +230,7 @@ class PHPIMS_Client {
      * @return PHPIMS_Client_Response
      */
     public function editMetadata($hash, array $metadata) {
-        return $this->getDriver()->post($this->serverUrl . '/' . $hash . '/meta', $metadata);
+        return $this->getDriver()->post($this->getServerPath($hash) . '/meta', $metadata);
     }
 
     /**
@@ -230,7 +240,7 @@ class PHPIMS_Client {
      * @return PHPIMS_Client_Response
      */
     public function deleteMetadata($hash) {
-        return $this->getDriver()->delete($this->serverUrl . '/' . $hash . '/meta');
+        return $this->getDriver()->delete($this->getServerPath($hash) . '/meta');
     }
 
     /**
@@ -240,6 +250,6 @@ class PHPIMS_Client {
      * @return array Returns an array with metadata
      */
     public function getMetadata($hash) {
-        return $this->getDriver()->get($this->serverUrl . '/' . $hash . '/meta');
+        return $this->getDriver()->get($this->getServerPath($hash) . '/meta');
     }
 }
