@@ -45,15 +45,14 @@ Fetches extra header information about the metadata attached to the image identi
 PHPIMS will usually inject extra response headers to the different requests. All response headers from PHPIMS will be prefixed with **X-PHPIMS-**.
 
 ##PHP client
-A PHP client is included in PHPIMS that supports all the REST methods and includes some convenience methods.
+A PHP client is included in PHPIMS that supports all the REST methods and includes some convenience methods. The client requires the URL to the PHPIMS server as an argument to the constructor.
 
 ###Add an image
 
     <?php
     require 'PHPIMS/Autoload.php';
 
-    $client = new PHPIMS_Client();
-    $client->setServerUrl('http://<hostname>');
+    $client = new PHPIMS_Client('http://<hostname>');
 
     // Path to local image    
     $path = '/path/to/image.png';
@@ -71,8 +70,7 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     <?php
     require 'PHPIMS/Autoload.php';
 
-    $client = new PHPIMS_Client();
-    $client->setServerUrl('http://<hostname>');
+    $client = new PHPIMS_Client('http://<hostname>');
     
     $hash = '<hash>';
     $response = $client->getMetadata($hash);
@@ -82,8 +80,7 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     <?php
     require 'PHPIMS/Autoload.php';
 
-    $client = new PHPIMS_Client();
-    $client->setServerUrl('http://<hostname>');
+    $client = new PHPIMS_Client('http://<hostname>');
     
     $hash = '<hash>';
     $response = $client->deleteImage($hash);
@@ -93,8 +90,7 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     <?php
     require 'PHPIMS/Autoload.php';
 
-    $client = new PHPIMS_Client();
-    $client->setServerUrl('http://<hostname>');
+    $client = new PHPIMS_Client('http://<hostname>');
     
     $hash = '<hash>';
     $response = $client->deleteMetadata($hash);

@@ -75,9 +75,12 @@ class PHPIMS_Client {
     /**
      * Class constructor
      *
+     * @param string $url The URL to the PHPIMS server, including protocol
      * @param PHPIMS_Client_Driver_Abstract $driver Optional driver to set
      */
-    public function __construct(PHPIMS_Client_Driver_Abstract $driver = null) {
+    public function __construct($serverUrl, PHPIMS_Client_Driver_Abstract $driver = null) {
+        $this->setServerUrl($serverUrl);
+        
         if ($driver !== null) {
             $this->setDriver($driver);
         }
