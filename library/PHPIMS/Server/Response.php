@@ -285,8 +285,9 @@ class PHPIMS_Server_Response {
     static public function fromException(PHPIMS_Exception $e) {
         $response = new static();
         $response->setCode($e->getCode())
-                 ->setBody(array('error' => array('code'    => $e->getCode(),
-                                                  'message' => $e->getMessage()),
+                 ->setBody(array('error' => array('code'      => $e->getCode(),
+                                                  'message'   => $e->getMessage(),
+                                                  'timestamp' => gmdate('Y-m-d\TH:i\Z')),
         ));
 
         return $response;

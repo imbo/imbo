@@ -104,7 +104,12 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
 
         $response = PHPIMS_Server_Response::fromException($e);
         $this->assertSame($code, $response->getCode());
-        $this->assertSame(array('error' => array('code' => $code, 'message' => $message)), $response->getBody());
+        $responseBody = $response->getBody();
+
+        $this->assertArrayHasKey('error', $responseBody);
+        $this->assertSame($code, $responseBody['error']['code']);
+        $this->assertSame($message, $responseBody['error']['message']);
+        $this->assertArrayHasKey('timestamp', $responseBody['error']);
     }
 
     public function testSetGetContentType() {
