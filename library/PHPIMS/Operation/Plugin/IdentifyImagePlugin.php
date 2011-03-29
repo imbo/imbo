@@ -67,7 +67,8 @@ class PHPIMS_Operation_Plugin_IdentifyImagePlugin extends PHPIMS_Operation_Plugi
      * @see PHPIMS_Operation_Plugin_Abstract::exec()
      */
     public function exec() {
-        $image = $this->getOperation()->getImage();
+        $op = $this->getOperation();
+        $image = $op->getImage();
 
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mime = $finfo->buffer($image->getBlob());
@@ -76,8 +77,15 @@ class PHPIMS_Operation_Plugin_IdentifyImagePlugin extends PHPIMS_Operation_Plugi
             throw new PHPIMS_Operation_Plugin_Exception('Unsupported image type: ' . $mime, 415);
         }
 
+        $extension = static::getFileExtension($mime);
+
         $image->setMimeType($mime)
-              ->setExtension(static::getFileExtension($mime));
+              ->setExtension($extension);
+
+        // Update hash in case it has a wrong extension
+        $hash = $op->getHash();
+        $hash = substr($hash, 0, 32) . '.' . $extension;
+        $op->setHash($hash);
     }
 
     /**

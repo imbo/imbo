@@ -186,7 +186,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
         $data = array(
             'name'  => $image->getFilename(),
             'size'  => $image->getFilesize(),
-            'hash'  => $image->getHash(),
+            'hash'  => $this->getOperation()->getHash(),
             'mime'  => $image->getMimeType(),
             'data'  => $image->getMetadata(),
             'added' => time(),

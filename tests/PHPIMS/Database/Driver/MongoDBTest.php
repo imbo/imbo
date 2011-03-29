@@ -85,12 +85,13 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
      */
     public function testInsertImageThatAlreadyExists() {
         $image = m::mock('PHPIMS_Image');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getHash', 'getMimeType', 'getMetadata')
+        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getMetadata')
               ->once()
               ->andReturn('some value');
 
         $operation = m::mock('PHPIMS_Operation_AddImage');
         $operation->shouldReceive('getImage')->once()->andReturn($image);
+        $operation->shouldReceive('getHash')->once()->andReturn(md5(microtime()) . '.png');
 
         $data = array(
             'hash' => 'b8533858299b04af3afc9a3713e69358.jpeg',
@@ -111,12 +112,13 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
      */
     public function testInsertImageWhenCollectionThrowsException() {
         $image = m::mock('PHPIMS_Image');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getHash', 'getMimeType', 'getMetadata')
+        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getMetadata')
               ->once()
               ->andReturn('some value');
 
         $operation = m::mock('PHPIMS_Operation_AddImage');
         $operation->shouldReceive('getImage')->once()->andReturn($image);
+        $operation->shouldReceive('getHash')->once()->andReturn(md5(microtime()) . '.png');
 
         $data = array(
             'hash' => 'b8533858299b04af3afc9a3713e69358.jpeg',

@@ -66,12 +66,6 @@ class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
         $this->assertSame($id, $this->image->getId());
     }
 
-    public function testSetGetHash() {
-        $hash = md5(microtime());
-        $this->image->setHash($hash);
-        $this->assertSame($hash, $this->image->getHash());
-    }
-
     public function testSetGetFilename() {
         $name = 'someName.jpg';
         $this->image->setFilename($name);

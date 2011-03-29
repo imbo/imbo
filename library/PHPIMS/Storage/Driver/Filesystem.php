@@ -53,10 +53,8 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
             throw new PHPIMS_Storage_Exception('Could not store image', 500);
         }
 
-        $image = $this->getOperation()->getImage();
-
         // Create path for the image
-        $hash = $image->getHash();
+        $hash = $this->getOperation()->getHash();
         $imageDir = $params['dataDir'] . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2];
         $oldUmask = umask(0);
 
@@ -66,7 +64,7 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
 
         umask($oldUmask);
 
-        $imagePath = $imageDir . '/' . $image->getHash();
+        $imagePath = $imageDir . '/' . $hash;
 
         return move_uploaded_file($path, $imagePath);
     }

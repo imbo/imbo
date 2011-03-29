@@ -102,9 +102,6 @@ class PHPIMS_Operation_Plugin_PrepareImagePluginTest extends PHPUnit_Framework_T
               ->method('setMetadata')->with($_POST)
               ->will($this->returnValue($image));
         $image->expects($this->once())
-              ->method('setHash')->with($hash)
-              ->will($this->returnValue($image));
-        $image->expects($this->once())
               ->method('setBlob')->with(file_get_contents($_FILES['file']['tmp_name']))
               ->will($this->returnValue($image));
 

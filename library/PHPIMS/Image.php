@@ -49,14 +49,6 @@ class PHPIMS_Image {
     protected $id = null;
 
     /**
-     * MD5 hash identifying the image. This is the value that PHPIMS uses to identify the image.
-     * The hash is an MD5 of the file itself.
-     *
-     * @var string
-     */
-    protected $hash = null;
-
-    /**
      * Original filename
      *
      * @var string
@@ -115,27 +107,6 @@ class PHPIMS_Image {
      */
     public function setId($id) {
         $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * Get the hash
-     *
-     * @return string
-     */
-    public function getHash() {
-        return $this->hash;
-    }
-
-    /**
-     * Set the hash
-     *
-     * @param string $hash Hash to set
-     * @return PHPIMS_Image
-     */
-    public function setHash($hash) {
-        $this->hash = $hash;
 
         return $this;
     }

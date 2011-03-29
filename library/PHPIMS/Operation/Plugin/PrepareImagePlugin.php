@@ -74,7 +74,6 @@ class PHPIMS_Operation_Plugin_PrepareImagePlugin extends PHPIMS_Operation_Plugin
         $image->setFilename($_FILES['file']['name'])
               ->setFilesize($_FILES['file']['size'])
               ->setMetadata($_POST)
-              ->setHash($hashFromRequest)
               ->setBlob(file_get_contents($imagePath));
     }
 }

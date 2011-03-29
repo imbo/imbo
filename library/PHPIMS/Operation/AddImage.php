@@ -53,7 +53,7 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
         $this->getStorage()->store($_FILES['file']['tmp_name']);
         $this->getResponse()->setCode(201)
                             ->setBody(array(
-                                'hash' => $image->getHash(),
+                                'hash' => $this->getHash(),
                             ));
 
         return $this;
