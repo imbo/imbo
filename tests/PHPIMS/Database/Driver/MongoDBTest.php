@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -44,6 +46,12 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
      */
     protected function getNewDriver() {
         return new PHPIMS_Database_Driver_MongoDB();
+    }
+
+    public function teardown() {
+        parent::tearDown();
+
+        m::close();
     }
 
     public function testSetGetDatabaseName() {
@@ -68,5 +76,57 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
         $collection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
         $this->driver->setCollection($collection);
         $this->assertSame($collection, $this->driver->getCollection());
+    }
+
+    /**
+     * @expectedException PHPIMS_Database_Exception
+     * @expectedExceptionCode 400
+     * @expectedExceptionMessage Image already exists
+     */
+    public function testInsertImageThatAlreadyExists() {
+        $image = m::mock('PHPIMS_Image');
+        $image->shouldReceive('getFilename', 'getFilesize', 'getHash', 'getMimeType', 'getMetadata')
+              ->once()
+              ->andReturn('some value');
+
+        $operation = m::mock('PHPIMS_Operation_AddImage');
+        $operation->shouldReceive('getImage')->once()->andReturn($image);
+
+        $data = array(
+            'hash' => 'b8533858299b04af3afc9a3713e69358.jpeg',
+        );
+
+        $collection = m::mock('MongoCollection');
+        $collection->shouldReceive('findOne')->once()->andReturn($data);
+
+        $this->driver->setOperation($operation)
+                     ->setCollection($collection)
+                     ->insertImage();
+    }
+
+    /**
+     * @expectedException PHPIMS_Database_Exception
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Unable to save image data
+     */
+    public function testInsertImageWhenCollectionThrowsException() {
+        $image = m::mock('PHPIMS_Image');
+        $image->shouldReceive('getFilename', 'getFilesize', 'getHash', 'getMimeType', 'getMetadata')
+              ->once()
+              ->andReturn('some value');
+
+        $operation = m::mock('PHPIMS_Operation_AddImage');
+        $operation->shouldReceive('getImage')->once()->andReturn($image);
+
+        $data = array(
+            'hash' => 'b8533858299b04af3afc9a3713e69358.jpeg',
+        );
+
+        $collection = m::mock('MongoCollection');
+        $collection->shouldReceive('findOne')->once()->andThrow('MongoException');
+
+        $this->driver->setOperation($operation)
+                     ->setCollection($collection)
+                     ->insertImage();
     }
 }
