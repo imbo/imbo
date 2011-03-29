@@ -1,5 +1,5 @@
 #PHP Image Server
-PHP Image Server (**PHPIMS**) is an image "server" that can be used to add/get/delete images using a REST interface. There is also support for adding metadata to an image. The main idea behind PHPIMS is to have a place to store high quality original images and to use the REST interface to fetch variations of those images. PHPIMS will resize, rotate, crop, switch formats (amonst other features) on the fly so you won't have to store all the different variations. PHPIMS comes with an administration dashboard that can be used to locate images. The dashboard will also support editing of metadata.
+PHP Image Server (**PHPIMS**) is an image "server" that can be used to add/get/delete images using a REST interface. There is also support for adding metadata to an image. The main idea behind PHPIMS is to have a place to store high quality original images and to use the REST interface to fetch variations of those images. PHPIMS will resize, rotate, crop, switch formats (amongst other features) on the fly so you won't have to store all the different variations. PHPIMS comes with an administration dashboard that can be used to locate images. The dashboard will also support editing of metadata.
 
 ##REST API
 PHPIMS uses a REST API to manage the images. Each image will be identified by an MD5 sum of the image itself and the original file extension, that will be referred to as &lt;image&gt; for the remainder of this document.
@@ -31,7 +31,7 @@ Delete the image identified by &lt;image&gt; along with all metadata. This actio
 
 ###DELETE /&lt;image&gt;/meta
 
-Delete the metadata attache to the image identified by &lt;image&gt;. The image is kept on the server. This action is not reversable.
+Delete the metadata attached to the image identified by &lt;image&gt;. The image is kept on the server. This action is not reversable.
 
 ###HEAD /&lt;image&gt;
 
