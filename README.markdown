@@ -26,19 +26,19 @@ If you want to run all tests you will have to change the contants in `phpunit.xm
 
 ### Commands for installing needed files
     
-    $ pear channel-discover pear.phpunit.de
-    $ pear channel-discover components.ez.no
-    $ pear channel-discover pear.symfony-project.com
-    $ pear channel-discover pear.survivethedeepend.com
-    $ pear channel-discover hamcrest.googlecode.com/svn/pear
-    $ pear channel-discover pear.php-tools.net
+    pear channel-discover pear.phpunit.de
+    pear channel-discover components.ez.no
+    pear channel-discover pear.symfony-project.com
+    pear channel-discover pear.survivethedeepend.com
+    pear channel-discover hamcrest.googlecode.com/svn/pear
+    pear channel-discover pear.php-tools.net
     
-    $ pear install --alldeps phpunit/PHPUnit
-    $ pear install --alldeps deepend/Mockery
-    $ pear install --alldeps hamcrest/Hamcrest
-    $ pear install pat/vfsStream-beta
-    $ apt-get install mongodb
-    $ pear install pecl/mongo
+    pear install --alldeps phpunit/PHPUnit
+    pear install --alldeps deepend/Mockery
+    pear install --alldeps hamcrest/Hamcrest
+    pear install pat/vfsStream-beta
+    apt-get install mongodb
+    pear install pecl/mongo
 
 ##REST API
 PHPIMS uses a REST API to manage the images. Each image will be identified by an MD5 sum of the image itself and the original file extension, that will be referred to as &lt;image&gt; for the remainder of this document.
