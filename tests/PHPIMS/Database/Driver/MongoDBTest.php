@@ -53,6 +53,14 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
 
         m::close();
     }
+    
+    public function setUp() {
+        if (!extension_loaded('mongo')) {
+            $this->markTestSkipped(
+              'The MongoDB extension is not available.'
+            );
+        }    
+    }
 
     public function testSetGetDatabaseName() {
         $name = 'someName';
