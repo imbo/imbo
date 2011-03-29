@@ -253,7 +253,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
             throw new PHPIMS_Database_Exception('Unable to fetch image metadata', 500, $e);
         }
 
-        return $data;
+        return isset($data['data']) ? $data['data'] : array();
     }
 
     /**
