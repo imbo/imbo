@@ -51,3 +51,12 @@ spl_autoload_register(function($class) {
         return true;
     }
 });
+
+/** \Mockery\Loader */
+require_once 'Mockery/Loader.php';
+
+/** Hamcrest */
+require_once 'Hamcrest/hamcrest.php';
+
+$loader = new \Mockery\Loader();
+$loader->register();
