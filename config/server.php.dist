@@ -1,5 +1,11 @@
 <?php
 return array(
+    // Auth
+    'auth' => array(
+        'publicKey' => '',
+        'privateKey' => '',
+    ),
+    
     // Configuration for the database driver
     'database' => array(
         'driver' => 'PHPIMS_Database_Driver_MongoDB',
