@@ -39,12 +39,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 class PHPIMS_Operation_GetImageTest extends PHPIMS_Operation_OperationTests {
-    protected $hash = null;
-
     protected function getNewOperation() {
-        $this->hash = md5(microtime());
-
-        return new PHPIMS_Operation_GetImage($this->hash);
+        return new PHPIMS_Operation_GetImage();
     }
 
     public function getOperationName() {
@@ -55,6 +51,12 @@ class PHPIMS_Operation_GetImageTest extends PHPIMS_Operation_OperationTests {
         $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
         $storage->expects($this->once())->method('load')->with($this->hash)->will($this->returnValue(true));
         $this->operation->setStorage($storage);
+
+        $image = $this->getMock('PHPIMS_Image');
+        $response = $this->getMock('PHPIMS_Server_Response');
+        $response->expects($this->once())->method('setImage')->with($image)->will($this->returnValue($response));
+
+        $this->operation->setResponse($response)->setImage($image);
 
         $this->operation->exec();
     }

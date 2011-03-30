@@ -60,8 +60,10 @@ class PHPIMS_Operation_GetMetadataTest extends PHPIMS_Operation_OperationTests {
         $database->expects($this->once())->method('getMetadata')->with($this->hash)->will($this->returnValue($data));
         $this->operation->setDatabase($database);
 
-        $this->operation->exec();
+        $response = $this->getMock('PHPIMS_Server_Response');
+        $response->expects($this->once())->method('setBody')->with($data);
 
-        $this->assertSame($data, $this->operation->getResponse()->getBody());
+        $this->operation->setResponse($response);
+        $this->operation->exec();
     }
 }

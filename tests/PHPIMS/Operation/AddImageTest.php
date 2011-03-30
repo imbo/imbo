@@ -40,7 +40,7 @@
  */
 class PHPIMS_Operation_AddImageTest extends PHPIMS_Operation_OperationTests {
     protected function getNewOperation() {
-        return new PHPIMS_Operation_AddImage(md5(microtime()));
+        return new PHPIMS_Operation_AddImage();
     }
 
     public function getOperationName() {
@@ -51,6 +51,11 @@ class PHPIMS_Operation_AddImageTest extends PHPIMS_Operation_OperationTests {
         $_FILES['file'] = array(
             'tmp_name' => '/tmp/foobar',
         );
+
+        $response = $this->getMock('PHPIMS_Server_Response');
+        $response->expects($this->once())->method('setCode')->with(201)->will($this->returnValue($response));
+        $response->expects($this->once())->method('setBody')->with(array('hash' => $this->hash))->will($this->returnValue($response));
+        $this->operation->setResponse($response);
 
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
         $database->expects($this->once())->method('insertImage');

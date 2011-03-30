@@ -41,16 +41,16 @@
 class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
     public function testFactory() {
         $operations = array(
-            'PHPIMS_Operation_AddImage',
-            'PHPIMS_Operation_DeleteImage',
-            'PHPIMS_Operation_EditMetadata',
-            'PHPIMS_Operation_GetImage',
-            'PHPIMS_Operation_GetMetadata',
-            'PHPIMS_Operation_DeleteMetadata',
+            'POST'   => 'PHPIMS_Operation_AddImage',
+            'POST'   => 'PHPIMS_Operation_EditMetadata',
+            'DELETE' => 'PHPIMS_Operation_DeleteImage',
+            'DELETE' => 'PHPIMS_Operation_DeleteMetadata',
+            'GET'    => 'PHPIMS_Operation_GetImage',
+            'GET'    => 'PHPIMS_Operation_GetMetadata',
         );
 
-        foreach ($operations as $className) {
-            $this->assertInstanceOf($className, PHPIMS_Operation::factory($className, md5(microtime())));
+        foreach ($operations as $method => $className) {
+            $this->assertInstanceOf($className, PHPIMS_Operation::factory($className, $method, md5(microtime())));
         }
     }
 
@@ -58,6 +58,6 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
      * @expectedException PHPIMS_Operation_Exception
      */
     public function testFactoryWithUnSupportedOperation() {
-        PHPIMS_Operation::factory('foobar', md5(microtime()));
+        PHPIMS_Operation::factory('foobar', 'GET', md5(microtime()));
     }
 }

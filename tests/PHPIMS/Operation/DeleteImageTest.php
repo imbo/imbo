@@ -39,12 +39,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 class PHPIMS_Operation_DeleteImageTest extends PHPIMS_Operation_OperationTests {
-    protected $hash = null;
-
     protected function getNewOperation() {
-        $this->hash = md5(microtime());
-
-        return new PHPIMS_Operation_DeleteImage($this->hash);
+        return new PHPIMS_Operation_DeleteImage();
     }
 
     public function getOperationName() {

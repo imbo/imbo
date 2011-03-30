@@ -47,10 +47,19 @@ abstract class PHPIMS_Operation_OperationTests extends PHPUnit_Framework_TestCas
     protected $operation = null;
 
     /**
+     * Hash used for the operation
+     *
+     * @var string
+     */
+    protected $hash = null;
+
+    /**
      * Set up method
      */
     public function setUp() {
+        $this->hash = md5(microtime());
         $this->operation = $this->getNewOperation();
+        $this->operation->setHash($this->hash);
     }
 
     /**
