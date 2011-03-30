@@ -178,8 +178,9 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('CustomPlugin', $plugins['preExec'][10]);
         $this->assertInstanceOf('OtherCustomPlugin', $plugins['preExec'][12]);
         $this->assertInstanceOf('Some_Prefix_OtherCustomPlugin', $plugins['preExec'][42]);
-        $this->assertInstanceOf('PHPIMS_Operation_Plugin_PrepareImagePlugin', $plugins['preExec'][100]);
-        $this->assertInstanceOf('PHPIMS_Operation_Plugin_IdentifyImagePlugin', $plugins['preExec'][101]);
+        $this->assertInstanceOf('PHPIMS_Operation_Plugin_AuthPlugin', $plugins['preExec'][100]);
+        $this->assertInstanceOf('PHPIMS_Operation_Plugin_PrepareImagePlugin', $plugins['preExec'][101]);
+        $this->assertInstanceOf('PHPIMS_Operation_Plugin_IdentifyImagePlugin', $plugins['preExec'][102]);
 
         $this->assertInstanceOf('Some_Prefix_CustomPlugin', $plugins['postExec'][1]);
         $this->assertInstanceOf('OtherCustomPlugin', $plugins['postExec'][8]);
