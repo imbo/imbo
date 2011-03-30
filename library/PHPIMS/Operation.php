@@ -44,20 +44,28 @@ class PHPIMS_Operation {
     /**
      * Factory method
      *
-     * @param string $operation The name of the operation class to instantiate
+     * @param string $className The name of the operation class to instantiate
+     * @param string $method The HTTP method used
      * @param string $hash Hash that will be passed to the operations constructor
      * @return PHPIMS_Operation_Abstract
      * @throws PHPIMS_Operation_Exception
      */
-    static public function factory($operation, $hash) {
-        switch ($operation) {
+    static public function factory($className, $method, $hash) {
+        switch ($className) {
             case 'PHPIMS_Operation_AddImage':
             case 'PHPIMS_Operation_DeleteImage':
             case 'PHPIMS_Operation_EditMetadata':
             case 'PHPIMS_Operation_GetImage':
             case 'PHPIMS_Operation_GetMetadata':
             case 'PHPIMS_Operation_DeleteMetadata':
-                return new $operation($hash);
+                $operation = new $className();
+
+                $operation->setHash($hash);
+                $operation->setMethod($method);
+                $operation->setImage(new PHPIMS_Image());
+                $operation->setResponse(new PHPIMS_Server_Response());
+
+                return $operation;
             default:
                 throw new PHPIMS_Operation_Exception('Invalid operation', 500);
         }
