@@ -49,6 +49,13 @@ abstract class PHPIMS_Operation_Abstract {
     protected $hash = null;
 
     /**
+     * HTTP method
+     *
+     * @var string
+     */
+    protected $method = null;
+
+    /**
      * The database driver
      *
      * @var PHPIMS_Database_Driver_Abstract
@@ -89,28 +96,6 @@ abstract class PHPIMS_Operation_Abstract {
      * @var array
      */
     protected $plugins = array();
-
-    /**
-     * Class constructor
-     *
-     * @param string $hash An image hash
-     * @param PHPIMS_Image $image Optional image object
-     * @param PHPIMS_Server_Response $response Optional response object
-     */
-    public function __construct($hash, PHPIMS_Image $image = null, PHPIMS_Server_Response $response = null) {
-        $this->setHash($hash);
-
-        if ($image === null) {
-            $image = new PHPIMS_Image();
-        }
-
-        if ($response === null) {
-            $response = new PHPIMS_Server_Response();
-        }
-
-        $this->setImage($image);
-        $this->setResponse($response);
-    }
 
     /**
      * Initialize the database driver
@@ -292,6 +277,27 @@ abstract class PHPIMS_Operation_Abstract {
     }
 
     /**
+     * Get the method
+     *
+     * @return string
+     */
+    public function getMethod() {
+        return $this->method;
+    }
+
+    /**
+     * Set the method
+     *
+     * @param string $method The method to set
+     * @return PHPIMS_Operation_Abstract
+     */
+    public function setMethod($method) {
+        $this->method = $method;
+
+        return $this;
+    }
+
+    /**
      * Get the database driver
      *
      * @return PHPIMS_Database_Driver_Abstract
@@ -382,9 +388,9 @@ abstract class PHPIMS_Operation_Abstract {
      * @throws PHPIMS_Operation_Plugin_Exception
      */
     public function preExec() {
-        array_map(function($plugin) {
+        foreach ($this->plugins['preExec'] as $plugin) {
             $plugin->exec();
-        }, $this->plugins['preExec']);
+        }
 
         return $this;
     }
@@ -396,9 +402,9 @@ abstract class PHPIMS_Operation_Abstract {
      * @throws PHPIMS_Operation_Plugin_Exception
      */
     public function postExec() {
-        array_map(function($plugin) {
+        foreach ($this->plugins['postExec'] as $plugin) {
             $plugin->exec();
-        }, $this->plugins['postExec']);
+        }
 
         return $this;
     }
