@@ -98,6 +98,13 @@ abstract class PHPIMS_Operation_Abstract {
     protected $plugins = array();
 
     /**
+     * Configuration passed from the front controller
+     *
+     * @var array
+     */
+    protected $config = array();
+
+    /**
      * Initialize the database driver
      *
      * @param array $config Part of the confguration array passed from the front controller
@@ -234,6 +241,8 @@ abstract class PHPIMS_Operation_Abstract {
      * @codeCoverageIgnore
      */
     public function init(array $config) {
+        $this->setConfig($config);
+
         $this->initDatabaseDriver($config['database']);
         $this->initStorageDriver($config['storage']);
         $this->initPlugins($config['plugins']);
@@ -377,6 +386,32 @@ abstract class PHPIMS_Operation_Abstract {
      */
     public function setResponse(PHPIMS_Server_Response $response) {
         $this->response = $response;
+
+        return $this;
+    }
+
+    /**
+     * Get the configuration array
+     *
+     * @param string $key Optional key. If not specified the whole array will be returned
+     * @return array
+     */
+    public function getConfig($key = null) {
+        if ($key !== null) {
+            return $this->config[$key];
+        }
+
+        return $this->config;
+    }
+
+    /**
+     * Set the configuration array
+     *
+     * @param array $config Configuration array
+     * @return PHPIMS_Operation_Abstract
+     */
+    public function setConfig(array $config) {
+        $this->config = $config;
 
         return $this;
     }
