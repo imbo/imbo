@@ -382,9 +382,9 @@ abstract class PHPIMS_Operation_Abstract {
      * @throws PHPIMS_Operation_Plugin_Exception
      */
     public function preExec() {
-        array_map(function($plugin) {
+        foreach ($this->plugins['preExec'] as $plugin) {
             $plugin->exec();
-        }, $this->plugins['preExec']);
+        }
 
         return $this;
     }
@@ -396,9 +396,9 @@ abstract class PHPIMS_Operation_Abstract {
      * @throws PHPIMS_Operation_Plugin_Exception
      */
     public function postExec() {
-        array_map(function($plugin) {
+        foreach ($this->plugins['postExec'] as $plugin) {
             $plugin->exec();
-        }, $this->plugins['postExec']);
+        }
 
         return $this;
     }
