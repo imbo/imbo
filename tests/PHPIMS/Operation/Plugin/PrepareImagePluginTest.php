@@ -85,10 +85,8 @@ class PHPIMS_Operation_Plugin_PrepareImagePluginTest extends PHPUnit_Framework_T
         $_FILES['file']['tmp_name'] = __DIR__ . '/../../_files/image.png';
         $_FILES['file']['name'] = 'image.png';
         $_FILES['file']['size'] = 41423;
-        $_POST = array(
-            'foo' => 'bar',
-            'bar' => 'foo',
-        );
+        $metadata = array('foo' => 'bar', 'bar' => 'foo');
+        $_POST = array('metadata' => json_encode($metadata));
         $hash = md5_file($_FILES['file']['tmp_name']) . '.png';
 
         $image = $this->getMock('PHPIMS_Image');
@@ -99,7 +97,7 @@ class PHPIMS_Operation_Plugin_PrepareImagePluginTest extends PHPUnit_Framework_T
               ->method('setFilesize')->with(41423)
               ->will($this->returnValue($image));
         $image->expects($this->once())
-              ->method('setMetadata')->with($_POST)
+              ->method('setMetadata')->with($metadata)
               ->will($this->returnValue($image));
         $image->expects($this->once())
               ->method('setBlob')->with(file_get_contents($_FILES['file']['tmp_name']))

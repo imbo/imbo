@@ -85,15 +85,16 @@ abstract class PHPIMS_Client_Driver_DriverTests extends PHPUnit_Framework_TestCa
     }
 
     public function testPost() {
-        $data = array(
+        $metadata = array(
             'foo' => 'bar',
             'bar' => 'foo',
         );
-        $response = $this->driver->post($this->testUrl, $data);
+        $response = $this->driver->post($this->testUrl, $metadata);
         $this->assertInstanceOf('PHPIMS_Client_Response', $response);
+
         $result = unserialize($response->getBody());
         $this->assertSame('POST', $result['method']);
-        $this->assertSame($data, $result['data']);
+        $this->assertSame($metadata, json_decode($result['data']['metadata'], true));
     }
 
     public function testGet() {
