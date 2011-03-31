@@ -47,11 +47,13 @@ interface PHPIMS_Client_Driver_Interface {
      * POST some data to an URL
      *
      * @param string $url The URL to POST to
-     * @param array $data The data to POST
+     * @param array $metadata The metadata to POST. This array will be json_encoded and sent to the
+     *                        server as $_POST['metadata']
+     * @param string $filePath Optional path to a file we want to add to the POST
      * @return PHPIMS_Client_Response
      * @throws PHPIMS_Client_Driver_Exception
      */
-    public function post($url, array $data = null);
+    public function post($url, array $metadata = null, $filePath = null);
 
     /**
      * Perform a GET to $url

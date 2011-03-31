@@ -74,10 +74,18 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     /**
      * @see PHPIMS_Client_Driver_Interface::post()
      */
-    public function post($url, array $data = null) {
+    public function post($url, array $metadata = null, $filePath = null) {
+        $postFields = array(
+            'metadata' => json_encode($metadata),
+        );
+
+        if ($filePath !== null) {
+            $postFields['file'] = '@' . $filePath;
+        }
+
         curl_setopt_array($this->curlHandle, array(
             CURLOPT_POST       => true,
-            CURLOPT_POSTFIELDS => $data,
+            CURLOPT_POSTFIELDS => $postFields,
         ));
 
         return $this->request($url);
@@ -150,15 +158,6 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
      * @see PHPIMS_Client_Driver_Interface::addImage()
      */
     public function addImage($path, $url, array $metadata = null) {
-        $data = array();
-
-        if ($metadata !== null) {
-            $data = $metadata;
-        }
-
-        // Add the file reference
-        $data['file'] = '@' . $path;
-
-        return $this->post($url, $data);
+        return $this->post($url, $metadata, $path);
     }
 }

@@ -180,21 +180,19 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     /**
      * @see PHPIMS_Database_Driver_Interface::insertImage
      */
-    public function insertImage() {
-        $image = $this->getOperation()->getImage();
+    public function insertImage($hash, PHPIMS_Image $image) {
+        $data = new stdClass();
 
-        $data = array(
-            'name'  => $image->getFilename(),
-            'size'  => $image->getFilesize(),
-            'hash'  => $this->getOperation()->getHash(),
-            'mime'  => $image->getMimeType(),
-            'data'  => $image->getMetadata(),
-            'added' => time(),
-        );
+        $data->name  = $image->getFilename();
+        $data->size  = $image->getFilesize();
+        $data->hash  = $hash;
+        $data->mime  = $image->getMimeType();
+        $data->data  = $image->getMetadata();
+        $data->added = time();
 
         try {
             // See if the image already exists
-            $row = $this->getCollection()->findOne(array('hash' => $data['hash']));
+            $row = $this->getCollection()->findOne(array('hash' => $data->hash));
 
             if ($row) {
                 throw new PHPIMS_Database_Exception('Image already exists', 400);
@@ -205,7 +203,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
             throw new PHPIMS_Database_Exception('Unable to save image data', 500, $e);
         }
 
-        $image->setId((string) $data['_id']);
+        $image->setId((string) $data->_id);
 
         return true;
     }
