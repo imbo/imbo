@@ -107,6 +107,12 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
         $this->assertSame($response, $this->operation->getResponse());
     }
 
+    public function testSetGetMethod() {
+        $method = 'DELETE';
+        $this->operation->setMethod($method);
+        $this->assertSame($method, $this->operation->getMethod());
+    }
+
     public function testInitDatabaseDriver() {
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
         $databaseClassName = get_class($database);
@@ -222,5 +228,21 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
 
         $this->operation->preExec();
         $this->operation->postExec();
+    }
+
+    public function testSetGetConfig() {
+        $config = array(
+            'foo' => 'bar',
+            'bar' => 'foo',
+
+            'sub' => array(
+                'foo' => 'bar',
+                'bar' => 'foo',
+            ),
+        );
+
+        $this->operation->setConfig($config);
+        $this->assertSame($config, $this->operation->getConfig());
+        $this->assertSame($config['sub'], $this->operation->getConfig('sub'));
     }
 }
