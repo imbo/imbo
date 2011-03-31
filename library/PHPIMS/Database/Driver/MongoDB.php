@@ -180,13 +180,11 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     /**
      * @see PHPIMS_Database_Driver_Interface::insertImage
      */
-    public function insertImage() {
-        $image = $this->getOperation()->getImage();
-
+    public function insertImage($hash, PHPIMS_Image $image) {
         $data = array(
             'name'  => $image->getFilename(),
             'size'  => $image->getFilesize(),
-            'hash'  => $this->getOperation()->getHash(),
+            'hash'  => $hash,
             'mime'  => $image->getMimeType(),
             'data'  => $image->getMetadata(),
             'added' => time(),
