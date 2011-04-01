@@ -137,19 +137,10 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     /**
      * @expectedException PHPIMS_Exception
      * @expectedExceptionCode 400
-     * @expectedExceptionMessage Missing hash
+     * @expectedExceptionMessage Invalid request: /
      */
-    public function testHandleWithMissingHash() {
+    public function testHandleInvalidRequest() {
         $this->controller->handle('GET', '/');
-    }
-
-    /**
-     * @expectedException PHPIMS_Exception
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Invalid hash: hash
-     */
-    public function testHandleWithInvalidHash() {
-        $this->controller->handle('GET', '/hash');
     }
 
     public function testHandleAddImage() {

@@ -170,22 +170,14 @@ class PHPIMS_FrontController {
             throw new PHPIMS_Exception($method . ' not implemented', 501);
         }
 
-        // Remove starting and trailing slashes
-        $path = trim($path, '/');
-        $parts = explode('/', $path, 2);
-        $hash = $parts[0];
+        $matches = array();
 
-        if (empty($hash)) {
-            throw new PHPIMS_Exception('Missing hash', 400);
-        } else if (!preg_match('/^[a-f0-9]{32}\.[a-zA-Z]{3,4}$/', $hash)) {
-            throw new PHPIMS_Exception('Invalid hash: ' . $hash, 400);
+        if (!preg_match('|(?<hash>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>.*))?$|', $path, $matches)) {
+            throw new PHPIMS_Exception('Invalid request: ' . $path, 400);
         }
 
-        $extra = null;
-
-        if (isset($parts[1])) {
-            $extra = $parts[1];
-        }
+        $hash = $matches['hash'];
+        $extra = isset($matches['extra']) ? $matches['extra'] : null;
 
         $operation = $this->resolveOperation($method, $hash, $extra);
         $operation->init($this->config)
