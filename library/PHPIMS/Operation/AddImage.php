@@ -48,8 +48,11 @@ class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
      */
     public function exec() {
         $hash = $this->getHash();
+        $database = $this->getDatabase();
+        $image = $this->getImage();
 
-        $this->getDatabase()->insertImage($hash, $this->getImage(), $this->getResponse());
+        $database->insertImage($hash, $image);
+        $database->updateMetadata($hash, $image->getMetadata());
         $this->getStorage()->store($hash, $_FILES['file']['tmp_name']);
         $this->getResponse()->setCode(201)
                             ->setBody(array(

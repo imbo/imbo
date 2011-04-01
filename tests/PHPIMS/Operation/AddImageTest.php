@@ -54,25 +54,22 @@ class PHPIMS_Operation_AddImageTest extends PHPIMS_Operation_OperationTests {
             'tmp_name' => '/tmp/foobar',
         );
 
-        /*
-         * $this->getDatabase()->insertImage($this->getHash(), $this->getImage(), $this->getResponse());
-        $this->getStorage()->store($hash, $_FILES['file']['tmp_name']);
-        $this->getResponse()->setCode(201)
-                            ->setBody(array(
-                                'hash' => $this->getHash(),
-                            ));
-
-        return $this;
-         * */
-
         $hash = md5(microtime()) . '.png';
+        $metadata = array(
+            'foo' => 'bar',
+            'bar' => array(
+                'foo' => 'bar',
+            ),
+        );
         $image = m::mock('PHPIMS_Image');
+        $image->shouldReceive('getMetadata')->once()->andReturn($metadata);
         $response = m::mock('PHPIMS_Server_Response');
         $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
         $response->shouldReceive('setBody')->once()->with(array('hash' => $hash))->andReturn($response);
 
         $database = m::mock('PHPIMS_Database_Driver_Abstract');
-        $database->shouldReceive('insertImage')->once()->with($hash, $image, $response);
+        $database->shouldReceive('insertImage')->once()->with($hash, $image);
+        $database->shouldReceive('updateMetadata')->once()->with($hash, $metadata);
 
         $storage = m::mock('PHPIMS_Storage_Driver_Abstract');
         $storage->shouldReceive('store')->once()->with($hash, $_FILES['file']['tmp_name']);

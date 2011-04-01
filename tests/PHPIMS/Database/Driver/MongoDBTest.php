@@ -186,7 +186,7 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to edit image data
      */
-    public function testEditMetadataWhenCollectionThrowsAnException() {
+    public function testUpdateMetadataWhenCollectionThrowsAnException() {
         $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
         $metadata = array(
             'foo' => 'bar',
@@ -197,10 +197,10 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
         $collection = m::mock('MongoCollection');
         $collection->shouldReceive('update')->once()->with(array('hash' => $hash), array('$set' => $metadata), m::type('array'))->andThrow('MongoException');
 
-        $this->driver->setCollection($collection)->editMetadata($hash, $metadata);
+        $this->driver->setCollection($collection)->updateMetadata($hash, $metadata);
     }
 
-    public function testSucessfullEditMetadata() {
+    public function testSucessfullUpdateMetadata() {
         $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
         $metadata = array(
             'foo' => 'bar',
@@ -211,7 +211,7 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
         $collection = m::mock('MongoCollection');
         $collection->shouldReceive('update')->once()->with(array('hash' => $hash), array('$set' => $metadata), m::type('array'))->andReturn(true);
 
-        $result = $this->driver->setCollection($collection)->editMetadata($hash, $metadata);
+        $result = $this->driver->setCollection($collection)->updateMetadata($hash, $metadata);
         $this->assertTrue($result);
     }
 

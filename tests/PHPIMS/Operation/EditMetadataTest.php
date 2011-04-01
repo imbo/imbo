@@ -52,8 +52,11 @@ class PHPIMS_Operation_EditMetadataTest extends PHPIMS_Operation_OperationTests 
     }
 
     public function testSuccessfullExec() {
+        $metadata = array('foo' => 'bar', 'bar' => array('foo', 'bar'));
+        $_POST['metadata'] = json_encode($metadata);
+
         $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('editMetadata')->with($this->hash, $_POST);
+        $database->expects($this->once())->method('updateMetadata')->with($this->hash, $metadata);
         $this->operation->setDatabase($database);
 
         $this->operation->exec();
