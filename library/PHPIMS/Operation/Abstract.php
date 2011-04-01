@@ -197,7 +197,6 @@ abstract class PHPIMS_Operation_Abstract {
                     if (isset($events[$key])) {
                         $priority = (int) $events[$key];
                         $plugin = new $className();
-                        $plugin->setOperation($this);
                         $plugins['preExec'][$priority] = $plugin;
                     }
 
@@ -206,7 +205,6 @@ abstract class PHPIMS_Operation_Abstract {
                     if (isset($events[$key])) {
                         $priority = (int) $events[$key];
                         $plugin = new $className();
-                        $plugin->setOperation($this);
                         $plugins['postExec'][$priority] = $plugin;
                     }
                 }
@@ -381,7 +379,7 @@ abstract class PHPIMS_Operation_Abstract {
      */
     public function preExec() {
         foreach ($this->plugins['preExec'] as $plugin) {
-            $plugin->exec();
+            $plugin->exec($this);
         }
 
         return $this;
@@ -395,7 +393,7 @@ abstract class PHPIMS_Operation_Abstract {
      */
     public function postExec() {
         foreach ($this->plugins['postExec'] as $plugin) {
-            $plugin->exec();
+            $plugin->exec($this);
         }
 
         return $this;

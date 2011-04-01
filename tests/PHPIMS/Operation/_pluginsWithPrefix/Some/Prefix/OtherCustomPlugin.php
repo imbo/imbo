@@ -50,7 +50,7 @@ class Some_Prefix_OtherCustomPlugin extends PHPIMS_Operation_Plugin_Abstract {
     /**
      * @see PHPIMS_Operation_Plugin_Abstract::exec()
      */
-    public function exec() {
+    public function exec(PHPIMS_Operation_Abstract $operation) {
 
     }
 }
