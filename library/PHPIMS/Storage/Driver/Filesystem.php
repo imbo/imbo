@@ -46,7 +46,7 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
     /**
      * @see PHPIMS_Storage_Driver_Interface::store
      */
-    public function store($path) {
+    public function store($hash, $path) {
         $params = $this->getParams();
 
         if (!is_writable($params['dataDir'])) {
@@ -54,7 +54,6 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
         }
 
         // Create path for the image
-        $hash = $this->getOperation()->getHash();
         $imageDir = $params['dataDir'] . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2];
         $oldUmask = umask(0);
 
@@ -85,14 +84,14 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
     /**
      * @see PHPIMS_Storage_Driver_Interface::load
      */
-    public function load($hash) {
+    public function load($hash, PHPIMS_Image $image) {
         $path = $this->getImagePath($hash);
 
         if (!is_file($path)) {
             throw new PHPIMS_Storage_Exception('File not found', 404);
         }
 
-        $this->getOperation()->getImage()->setBlob(file_get_contents($path));
+        $image->setBlob(file_get_contents($path));
 
         return true;
     }

@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -52,14 +54,34 @@ class PHPIMS_Operation_AddImageTest extends PHPIMS_Operation_OperationTests {
             'tmp_name' => '/tmp/foobar',
         );
 
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('insertImage');
-        $this->operation->setDatabase($database);
+        /*
+         * $this->getDatabase()->insertImage($this->getHash(), $this->getImage(), $this->getResponse());
+        $this->getStorage()->store($hash, $_FILES['file']['tmp_name']);
+        $this->getResponse()->setCode(201)
+                            ->setBody(array(
+                                'hash' => $this->getHash(),
+                            ));
 
-        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
-        $storage->expects($this->once())->method('store')->with($_FILES['file']['tmp_name']);
-        $this->operation->setStorage($storage);
+        return $this;
+         * */
 
-        $this->operation->exec();
+        $hash = md5(microtime()) . '.png';
+        $image = m::mock('PHPIMS_Image');
+        $response = m::mock('PHPIMS_Server_Response');
+        $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
+        $response->shouldReceive('setBody')->once()->with(array('hash' => $hash))->andReturn($response);
+
+        $database = m::mock('PHPIMS_Database_Driver_Abstract');
+        $database->shouldReceive('insertImage')->once()->with($hash, $image, $response);
+
+        $storage = m::mock('PHPIMS_Storage_Driver_Abstract');
+        $storage->shouldReceive('store')->once()->with($hash, $_FILES['file']['tmp_name']);
+
+        $this->operation->setStorage($storage)
+                        ->setDatabase($database)
+                        ->setResponse($response)
+                        ->setHash($hash)
+                        ->setImage($image)
+                        ->exec();
     }
 }

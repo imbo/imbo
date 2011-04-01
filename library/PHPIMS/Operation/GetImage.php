@@ -56,11 +56,13 @@ class PHPIMS_Operation_GetImage extends PHPIMS_Operation_Abstract {
      * @see PHPIMS_Operation_Abstract::exec()
      */
     public function exec() {
+        $image = $this->getImage();
+
         // Load the image
-        $this->getStorage()->load($this->getHash());
+        $this->getStorage()->load($this->getHash(), $image);
 
         // Attach the current image object to the response
-        $this->getResponse()->setImage($this->getImage());
+        $this->getResponse()->setImage($image);
 
         return $this;
     }

@@ -125,7 +125,6 @@ abstract class PHPIMS_Operation_Abstract {
         }
 
         $driver = new $config['driver']($params);
-        $driver->setOperation($this);
 
         $this->setDatabase($driver);
     }
@@ -143,7 +142,6 @@ abstract class PHPIMS_Operation_Abstract {
         }
 
         $driver = new $config['driver']($params);
-        $driver->setOperation($this);
 
         $this->setStorage($driver);
     }

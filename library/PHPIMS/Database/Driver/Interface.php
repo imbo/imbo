@@ -58,10 +58,11 @@ interface PHPIMS_Database_Driver_Interface {
      *
      * @param string $hash The hash identifying the image
      * @param PHPIMS_Image $image The image to insert
+     * @param PHPIMS_Server_Response $response The response object that will be sent to the client
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS_Database_Exception
      */
-    public function insertImage($hash, PHPIMS_Image $image);
+    public function insertImage($hash, PHPIMS_Image $image, PHPIMS_Server_Response $response);
 
     /**
      * Delete an image from the database

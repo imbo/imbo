@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+use \Mockery as m;
+
 /** vfsStream */
 require_once 'vfsStream/vfsStream.php';
 
@@ -122,8 +124,9 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 404
      */
     public function testLoadFileThatDoesNotExist() {
+        $image = m::mock('PHPIMS_Image');
         $this->driver->setParams(array('dataDir' => '/some/path'));
-        $this->driver->load(md5(microtime()) . '.png');
+        $this->driver->load(md5(microtime()) . '.png', $image);
     }
 
     public function testLoad() {
@@ -149,12 +152,6 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
         $image = $this->getMock('PHPIMS_Image');
         $image->expects($this->once())->method('setBlob')->with($content);
 
-        $operation = $this->getMockBuilder('PHPIMS_Operation_Abstract')
-                          ->disableOriginalConstructor()
-                          ->getMock();
-        $operation->expects($this->once())->method('getImage')->will($this->returnValue($image));
-
-        $this->driver->setOperation($operation);
-        $this->assertTrue($this->driver->load($hash));
+        $this->assertTrue($this->driver->load($hash, $image));
     }
 }

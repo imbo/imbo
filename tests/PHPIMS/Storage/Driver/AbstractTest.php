@@ -68,10 +68,4 @@ class PHPIMS_Storage_Driver_AbstractTest extends PHPUnit_Framework_TestCase {
         $this->driver->setParams($params);
         $this->assertSame($params, $this->driver->getParams());
     }
-
-    public function testSetGetOperation() {
-        $operation = $this->getMockBuilder('PHPIMS_Operation_Abstract')->disableOriginalConstructor()->getMockForAbstractClass();
-        $this->driver->setOperation($operation);
-        $this->assertSame($operation, $this->driver->getOperation());
-    }
 }
