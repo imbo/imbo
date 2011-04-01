@@ -48,7 +48,7 @@ class PHPIMS_Operation_Plugin_PrepareImagePlugin extends PHPIMS_Operation_Plugin
      * @see PHPIMS_Operation_Plugin_Abstract::$events
      */
     static public $events = array(
-        'addImagePreExec' => 100,
+        'addImagePreExec' => 101,
     );
 
     /**

@@ -60,7 +60,7 @@ class PHPIMS_Operation_Plugin_IdentifyImagePlugin extends PHPIMS_Operation_Plugi
      */
     static public $events = array(
         'getImagePostExec' => 100,
-        'addImagePreExec'  => 101,
+        'addImagePreExec'  => 102,
     );
 
     /**
