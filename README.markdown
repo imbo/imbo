@@ -7,7 +7,7 @@ Since this is a work in progress there is no automatic installation. Developers 
 ### Fork PHPIMS and checkout your fork
 Click on the fork button on github and clone your fork:
 
-$ git clone git@github.com:<username>/Imagine.git
+    git clone git@github.com:<username>/phpims.git
 
 ### Software needed
 To fully develop PHPIMS you will need to have the following software installed:
