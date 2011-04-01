@@ -143,25 +143,49 @@ The response instance includes all response headers and the body, and has the fo
 ## Developer notes
 Here you will find some notes about how PHPIMS works internally.
 
-### Front controller
-The front controller is responsible for validating the request, and picking the correct operation class for the request.
+### Front controller 
+The `PHPIMS_FrontController` class is responsible for validating the request, and picking the correct operation class for the request. It will create an instance of the operation, execute the operation and then return the response.
+
 ### Operations
 The combination of the HTTP method (GET, POST, DELETE, HEAD) and the URL decides which operation to use. All operations extend the base `PHPIMS_Operation_Abstract` class, and implements a main `exec()` method. The `exec()` method typically calls methods in the current database and storage drivers.
+
+An `exec()` method for an operation can for instance look like this:
+
+    public function exec() {
+        $image = $this->getImage();
+
+        $this->getStorage()->load($this->getHash(), $image);
+        $this->getResponse()->setImage($image);
+
+        return $this;
+    }
+    
+Here we fetch the image, and calls the `load()` method in the storage driver and supplies the current hash and current image object that the driver can work with. Then it adds the image to the response object and returns itself. The above exampls is from the `PHPIMS_Operation_GetImage` operation.     
+
 ### Operation plugins
-Plugins contain extra features for the different operations. Plugins can hook in before and/or after the current operation executes its `exec()` method. All plugins must extend the base `PHPIMS_Operation_Plugin_Abstract` class, and must implement an `exec()` method that takes the operation as argument. If plugins want to change the current image or the response object they can fetch these via the operation instance:
+Plugins contain extra features for the different operations. Plugins can hook in before and/or after the current operation executes its `exec()` method. All plugins must extend the base `PHPIMS_Operation_Plugin_Abstract` class and must implement an `exec()` method that takes the operation as argument. If plugins want to change the current image or the response objects they can fetch these via the operation instance:
 
     public function exec(PHPIMS_Operation_Abstract $operation) {
         $image = $operation->getImage(); // Fetches the current PHPIMS_Image object
         $response = $operation->getResponse(); // Fetches the current PHPIMS_Server_Response object
     }
     
-Each plugin must also specify which operations it wants to hook into along with a priority so that plugins can be executed in a special order. This is done via the `static public $events` property. Consider the ManipulateImage plugin:
+Each plugin must also specify which operations it wants to hook into along with a priority so that plugins can be executed in a specific order. This is done via the `static public $events` property. Consider the `PHPIMS_Operation_Plugin_ManipulateImage` plugin:
 
     static public $events = array(
         'getImagePostExec' => 101,
     );
     
-This plugin will run after the `PHPIMS_Operation_GetImage::exec()` has finished executing. It will run with an index of 101 meaning that 100 plugins can be executed prior to this one for this specific hook. Internal plugins starts with an index of 100, and custom plugins given the index of 1 is the first to be executed. If you want a plugin to run before the GetImage operation, and after DeleteImage and DeleteMetadata the `$events` array can look like:
+This plugin will run after the `PHPIMS_Operation_GetImage::exec()` has finished executing. It will run with an index of 101 meaning that 100 plugins can be executed prior to this one for this specific hook. Internal plugins starts with an index of 100, and custom plugins given the index of 1 is the first to be executed. The name of the operation specified in the array is the last part of the operation class name along with "PostExec" or "PreExec". Here are the different names for all operations:
+
+* PHPIMS_Operation_AddImage => "addImagePreExec" and "addImagePostExec"
+* PHPIMS_Operation_DeleteImage => "deleteImagePreExec" and "deleteImagePostExec"
+* PHPIMS_Operation_DeleteMetadata => "deleteMetadataPreExec" and "deleteMetadataPostExec"
+* PHPIMS_Operation_EditMetadata => "editMetadataPreExec" and "editMetadataPostExec"
+* PHPIMS_Operation_GetImage => "getImagePreExec" and "getImagePostExec"
+* PHPIMS_Operation_GetMetadata => "getMetadataPreExec" and "getMetadataPostExec"
+
+If you want a plugin to run before the `PHPIMS_Operation_GetImage` operation, and after `PHPIMS_Operation_DeleteImage` and `PHPIMS_Operation_DeleteMetadata` the `$events` array can look like:
 
     static public $events = array(
         'getImagePreExec' => 1,
@@ -169,7 +193,7 @@ This plugin will run after the `PHPIMS_Operation_GetImage::exec()` has finished 
         'deleteMetadataPostExec' => 10,
     );
     
-Whenever the GetImage operation is triggered this plugin will be executed before any other plugin *before* the operation executes `exec()` and it will run with index 20 *after* DeleteImage is finished, and with an index of 20 *after* DeleteMetadata is finished. It's important to notice that one request to PHPIMS triggers one operation. A single request can not trigger many operations.    
+Whenever the `PHPIMS_Operation_GetImage` operation is triggered this plugin will be executed before any other plugin *before* the operation executes `exec()` and it will run with index 20 *after* `PHPIMS_Operation_DeleteImage` is finished, and with an index of 20 *after* `PHPIMS_Operation_DeleteMetadata` is finished. It's important to notice that one request to PHPIMS triggers one operation. A single request can not trigger several operations.    
 
 ### Storage drivers
 PHPIMS supports plugable storage drivers. All storage drivers must extend the base `PHPIMS_Storage_Driver_Abstract` class (which implements `PHPIMS_Storage_Driver_Interface`. 
