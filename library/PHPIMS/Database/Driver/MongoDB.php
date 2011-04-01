@@ -224,7 +224,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     /**
      * @see PHPIMS_Database_Driver_Interface::editMetadata
      */
-    public function editMetadata($hash, array $metadata) {
+    public function updateMetadata($hash, array $metadata) {
         try {
             $this->getCollection()->update(
                 array('hash' => $hash),
@@ -259,15 +259,8 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
      */
     public function deleteMetadata($hash) {
         try {
-            $this->getCollection()->update(
-                array('hash' => $hash),
-                array('$set' => array('data' => array())),
-                array(
-                    'safe' => true,
-                    'multiple' => false
-                )
-            );
-        } catch (MongoException $e) {
+            $this->updateMetadata($hash, array('data' => array()));
+        } catch (PHPIMS_Database_Exception $e) {
             throw new PHPIMS_Database_Exception('Unable to remove metadata', 500, $e);
         }
 

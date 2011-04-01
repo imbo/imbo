@@ -53,13 +53,13 @@ class PHPIMS_Operation_Plugin_ManipulateImagePlugin extends PHPIMS_Operation_Plu
     /**
      * @see PHPIMS_Operation_Plugin_Abstract::exec()
      */
-    public function exec() {
+    public function exec(PHPIMS_Operation_Abstract $operation) {
         if (isset($_GET['width']) || isset($_GET['height'])) {
             $width  = (isset($_GET['width']) ? $_GET['width'] : 0);
             $height = (isset($_GET['height']) ? $_GET['height'] : 0);
 
             // Fetch the original image object
-            $originalImage = $this->getOperation()->getImage();
+            $originalImage = $operation->getImage();
 
             // Load the image into imagine
             $imagine = new \Imagine\Imagick\Imagine();

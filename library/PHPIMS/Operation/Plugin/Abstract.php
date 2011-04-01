@@ -123,30 +123,10 @@ abstract class PHPIMS_Operation_Plugin_Abstract {
     }
 
     /**
-     * Get the operation
-     *
-     * @return PHPIMS_Operation_Abstract
-     */
-    public function getOperation() {
-        return $this->operation;
-    }
-
-    /**
-     * Set the operation
-     *
-     * @param PHPIMS_Operation_Abstract $operation The operation this plugins is attached to
-     * @return PHPIMS_Operation_Plugin_Abstract
-     */
-    public function setOperation(PHPIMS_Operation_Abstract $operation) {
-        $this->operation = $operation;
-
-        return $this;
-    }
-
-    /**
      * Plugins exec method
      *
+     * @param PHPIMS_Opertaion_Abstract $operation The operation the current plugin is working on
      * @throws PHPIMS_Operation_Plugin_Exception
      */
-    abstract public function exec();
+    abstract public function exec(PHPIMS_Operation_Abstract $operation);
 }

@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -52,19 +54,31 @@ class PHPIMS_Operation_AddImageTest extends PHPIMS_Operation_OperationTests {
             'tmp_name' => '/tmp/foobar',
         );
 
-        $response = $this->getMock('PHPIMS_Server_Response');
-        $response->expects($this->once())->method('setCode')->with(201)->will($this->returnValue($response));
-        $response->expects($this->once())->method('setBody')->with(array('hash' => $this->hash))->will($this->returnValue($response));
-        $this->operation->setResponse($response);
+        $hash = md5(microtime()) . '.png';
+        $metadata = array(
+            'foo' => 'bar',
+            'bar' => array(
+                'foo' => 'bar',
+            ),
+        );
+        $image = m::mock('PHPIMS_Image');
+        $image->shouldReceive('getMetadata')->once()->andReturn($metadata);
+        $response = m::mock('PHPIMS_Server_Response');
+        $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
+        $response->shouldReceive('setBody')->once()->with(array('hash' => $hash))->andReturn($response);
 
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('insertImage');
-        $this->operation->setDatabase($database);
+        $database = m::mock('PHPIMS_Database_Driver_Abstract');
+        $database->shouldReceive('insertImage')->once()->with($hash, $image);
+        $database->shouldReceive('updateMetadata')->once()->with($hash, $metadata);
 
-        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
-        $storage->expects($this->once())->method('store')->with($_FILES['file']['tmp_name']);
-        $this->operation->setStorage($storage);
+        $storage = m::mock('PHPIMS_Storage_Driver_Abstract');
+        $storage->shouldReceive('store')->once()->with($hash, $_FILES['file']['tmp_name']);
 
-        $this->operation->exec();
+        $this->operation->setStorage($storage)
+                        ->setDatabase($database)
+                        ->setResponse($response)
+                        ->setHash($hash)
+                        ->setImage($image)
+                        ->exec();
     }
 }

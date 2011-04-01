@@ -87,8 +87,7 @@ class PHPIMS_Operation_Plugin_IdentifyImagePluginTest extends PHPUnit_Framework_
                   ->method('getImage')
                   ->will($this->returnValue($image));
 
-        $this->plugin->setOperation($operation)
-                     ->exec();
+        $this->plugin->exec($operation);
     }
 
     public function testExecWithValidImage() {
@@ -116,7 +115,6 @@ class PHPIMS_Operation_Plugin_IdentifyImagePluginTest extends PHPUnit_Framework_
                   ->method('getImage')
                   ->will($this->returnValue($image));
 
-        $this->plugin->setOperation($operation)
-                     ->exec();
+        $this->plugin->exec($operation);
     }
 }

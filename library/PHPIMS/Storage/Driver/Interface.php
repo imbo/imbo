@@ -50,11 +50,12 @@ interface PHPIMS_Storage_Driver_Interface {
      * somewhere suited for the actual storage driver. If an error occurs the driver should throw
      * an exception based on PHPIMS_Storage_Exception.
      *
+     * @param string $hash The image hash
      * @param string $path Path to the temporary file
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS_Storage_Exception
      */
-    public function store($path);
+    public function store($hash, $path);
 
     /**
      * Delete an image
@@ -71,16 +72,16 @@ interface PHPIMS_Storage_Driver_Interface {
      * Load the image identified by $hash
      *
      * The implementation of this method must fetch the content of the file identified by hash and
-     * populate the current working image objects blob property.
+     * populate the blob property of $image.
      *
      * <code>
-     * $image = $this->getOperation()->getImage();
      * $image->setBlob(<data>);
      * </code>
      *
      * @param string $hash Unique hash identifying an image
+     * @param PHPIMS_Image $image The image object
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS_Storage_Exception
      */
-    public function load($hash);
+    public function load($hash, PHPIMS_Image $image);
 }

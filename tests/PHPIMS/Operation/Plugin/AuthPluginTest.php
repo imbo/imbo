@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,28 +40,60 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_AbstractTest extends PHPUnit_Framework_TestCase {
+class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase {
     /**
      * Plugin instance
      *
-     * @var PHPIMS_Operation_Plugin_Abstract
+     * @var PHPIMS_Operation_Plugin_AuthPlugin
      */
     protected $plugin = null;
 
     public function setUp() {
-        $this->plugin = $this->getMockForAbstractClass('PHPIMS_Operation_Plugin_Abstract');
+        $this->plugin = new PHPIMS_Operation_Plugin_AuthPlugin();
     }
 
     public function tearDown() {
         $this->plugin = null;
     }
 
-    public function testSetGetParams() {
-        $params = array(
-            'foo' => 'bar',
-            'bar' => 'foo',
-        );
-        $this->plugin->setParams($params);
-        $this->assertSame($params, $this->plugin->getParams());
+    /**
+     * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedExceptionCode 400
+     */
+    public function testExecWithMissingParameters() {
+        $operation = m::mock('PHPIMS_Operation_Abstract');
+        $this->plugin->exec($operation);
+    }
+
+    /**
+     * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedExceptionCode 401
+     * @expectedExceptionMessage Timestamp expired
+     */
+    public function testExecWithTimestampTooFarInTheFuture() {
+        $_GET['signature'] = 'some signature';
+        $_GET['publicKey'] = 'some key';
+        // Set timestamp 5 minutes and 5 seconds in the future
+        $_GET['timestamp'] = gmdate('Y-m-d\TH:i\Z', time() + 305);
+
+        $operation = m::mock('PHPIMS_Operation_Abstract');
+
+        $this->plugin->exec($operation);
+    }
+
+    /**
+     * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedExceptionCode 401
+     * @expectedExceptionMessage Timestamp expired
+     */
+    public function testExecWithTimestampTooOld() {
+        $_GET['signature'] = 'some signature';
+        $_GET['publicKey'] = 'some key';
+        // Set timestamp 5 minutes and 5 seconds in the past
+        $_GET['timestamp'] = gmdate('Y-m-d\TH:i\Z', time() - 305);
+
+        $operation = m::mock('PHPIMS_Operation_Abstract');
+
+        $this->plugin->exec($operation);
     }
 }

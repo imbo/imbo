@@ -47,7 +47,7 @@ class PHPIMS_Operation_EditMetadata extends PHPIMS_Operation_Abstract {
      * @see PHPIMS_Operation_Abstract::exec()
      */
     public function exec() {
-        $this->getDatabase()->editMetadata($this->getHash(), $_POST);
+        $this->getDatabase()->updateMetadata($this->getHash(), json_decode($_POST['metadata'], true));
 
         return $this;
     }
