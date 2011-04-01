@@ -19,13 +19,8 @@ To fully develop PHPIMS you will need to have the following software installed:
 * [mongoDB](http://www.mongodb.org/)
 * [Mongo extension for PHP](http://pecl.php.net/package/mongo)
 
-### Copy .dist files
-To run the testsuite you should copy `phpunit.xml.dist` to `phpunit.xml`. Some tests will be skipped unless you set up a local working PHPIMS installation with for instance Apache. There is a vhost.conf.dist file that you can use as a base. Customize the paths, and restart Apache.
+Run the following commands as root to install the software (on Ubuntu):
 
-If you want to run all tests you will have to change the contants in `phpunit.xml`. Set `PHPIMS_ENABLE_CLIENT_TESTS` to true, and change `PHPIMS_CLIENT_TESTS_URL` to point to `tests/PHPIMS/Client/Driver/_files/driver.php`.
-
-### Commands for installing needed files
-    
     pear channel-discover pear.phpunit.de
     pear channel-discover components.ez.no
     pear channel-discover pear.symfony-project.com
