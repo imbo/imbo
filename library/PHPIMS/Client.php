@@ -73,14 +73,38 @@ class PHPIMS_Client {
     protected $driver = null;
 
     /**
+     * Public key
+     *
+     * @var string
+     */
+    protected $publicKey = null;
+
+    /**
+     * Private key
+     *
+     * @var string
+     */
+    protected $privateKey = null;
+
+    /**
      * Class constructor
      *
-     * @param string $url The URL to the PHPIMS server, including protocol
+     * @param string $serverUrl The URL to the PHPIMS server, including protocol
+     * @param string $publicKey The public key to use. Only some operations need this
+     * @param string $privateKey The private key to use. Only some operations need this
      * @param PHPIMS_Client_Driver_Abstract $driver Optional driver to set
      */
-    public function __construct($serverUrl, PHPIMS_Client_Driver_Abstract $driver = null) {
+    public function __construct($serverUrl, $publicKey = null, $privateKey = null, PHPIMS_Client_Driver_Abstract $driver = null) {
         $this->setServerUrl($serverUrl);
-        
+
+        if ($publicKey !== null) {
+            $this->setPublicKey($publicKey);
+        }
+
+        if ($privateKey !== null) {
+            $this->setPrivateKey($privateKey);
+        }
+
         if ($driver !== null) {
             $this->setDriver($driver);
         }
@@ -106,16 +130,17 @@ class PHPIMS_Client {
 
         return $this;
     }
-    
+
     /**
-     * Get the base server path for a hash
+     * Get the server path for a hash
      *
+     * @param string $hash The image hash
      * @return string
      */
     public function getServerPath($hash) {
-        return $this->serverUrl . '/' . $hash;    
+        return $this->getServerUrl() . '/' . $hash;
     }
-    
+
 
     /**
      * Get the timeout
@@ -201,13 +226,14 @@ class PHPIMS_Client {
             throw new PHPIMS_Client_Exception('File does not exist: ' . $path);
         }
 
-        // Generate MD5
-        $hash = md5_file($path);
-
         // Get extension
         $info = getimagesize($path);
         $extension = image_type_to_extension($info[2], false);
-        $url = $this->getServerPath($hash) . '.' . $extension;
+
+        // Generate MD5
+        $hash = md5_file($path) . '.' . $extension;
+
+        $url = $this->getSignedUrl('POST', $hash);
 
         return $this->getDriver()->addImage($path, $url, $metadata);
     }
@@ -219,7 +245,9 @@ class PHPIMS_Client {
      * @return PHPIMS_Client_Response
      */
     public function deleteImage($hash) {
-        return $this->getDriver()->delete($this->getServerPath($hash));
+        $url = $this->getSignedUrl('DELETE', $hash);
+
+        return $this->getDriver()->delete($url);
     }
 
     /**
@@ -230,7 +258,9 @@ class PHPIMS_Client {
      * @return PHPIMS_Client_Response
      */
     public function editMetadata($hash, array $metadata) {
-        return $this->getDriver()->post($this->getServerPath($hash) . '/meta', $metadata);
+        $url = $this->getSignedUrl('POST', $hash . '/meta');
+
+        return $this->getDriver()->post($url, $metadata);
     }
 
     /**
@@ -240,7 +270,9 @@ class PHPIMS_Client {
      * @return PHPIMS_Client_Response
      */
     public function deleteMetadata($hash) {
-        return $this->getDriver()->delete($this->getServerPath($hash) . '/meta');
+        $url = $this->getSignedUrl('DELETE', $hash . '/meta');
+
+        return $this->getDriver()->delete($url);
     }
 
     /**
@@ -250,6 +282,85 @@ class PHPIMS_Client {
      * @return array Returns an array with metadata
      */
     public function getMetadata($hash) {
-        return $this->getDriver()->get($this->getServerPath($hash) . '/meta');
+        return $this->getDriver()->get($this->getServerPath($hash . '/meta'));
+    }
+
+    /**
+     * Get the public key
+     *
+     * @return string
+     */
+    public function getPublicKey() {
+        return $this->publicKey;
+    }
+
+    /**
+     * Set the public key
+     *
+     * @param string $key The key to set
+     * @return PHPIMS_Client
+     */
+    public function setPublicKey($key) {
+        $this->publicKey = $key;
+
+        return $this;
+    }
+
+    /**
+     * Get the private key
+     *
+     * @return string
+     */
+    public function getPrivateKey() {
+        return $this->privateKey;
+    }
+
+    /**
+     * Set the private key
+     *
+     * @param string $key The key to set
+     * @return PHPIMS_Client
+     */
+    public function setPrivateKey($key) {
+        $this->privateKey = $key;
+
+        return $this;
+    }
+
+    /**
+     * Generate a signature that can be sent to the server
+     *
+     * @param string $method HTTP method (POST or DELETE)
+     * @param string $path The path requested (for instance "<hash>/meta")
+     * @param string $timestamp GMT timestamp
+     * @return string
+     */
+    protected function generateSignature($method, $path, $timestamp) {
+        $data = $method . $path . $this->getPublicKey() . $timestamp;
+
+        // Generate binary hash key
+        $hash = hash_hmac('sha256', $data, $this->getPrivateKey(), true);
+
+        // Generate signature for the request
+        $signature = base64_encode($hash);
+
+        return $signature;
+    }
+
+    /**
+     * Get a signed url
+     *
+     * @param string $method HTTP method
+     * @param string $path The path we want to request
+     * @return string Returns a string with the necessary parts for authenticating
+     */
+    protected function getSignedUrl($method, $hash) {
+        $timestamp = gmdate('Y-m-d\TH:i\Z');
+        $signature = $this->generateSignature($method, $hash, $timestamp);
+
+        $url = $this->getServerPath($hash)
+             . sprintf('?signature=%s&publicKey=%s&timestamp=%s', rawurlencode($signature), $this->getPublicKey(), rawurlencode($timestamp));
+
+        return $url;
     }
 }
