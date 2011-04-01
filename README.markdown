@@ -160,7 +160,7 @@ An `exec()` method for an operation can for instance look like this:
         return $this;
     }
     
-Here we fetch the image, and calls the `load()` method in the storage driver and supplies the current hash and current image object that the driver can work with. Then it adds the image to the response object and returns itself. The above exampls is from the `PHPIMS_Operation_GetImage` operation.     
+Here we fetch the image, and calls the `load()` method in the storage driver and supplies the current hash and current image object that the driver can work with. Then it adds the image to the response object and returns itself. The above example is from the `PHPIMS_Operation_GetImage` operation.     
 
 ### Operation plugins
 Plugins contain extra features for the different operations. Plugins can hook in before and/or after the current operation executes its `exec()` method. All plugins must extend the base `PHPIMS_Operation_Plugin_Abstract` class and must implement an `exec()` method that takes the operation as argument. If plugins want to change the current image or the response objects they can fetch these via the operation instance:
@@ -189,11 +189,11 @@ If you want a plugin to run before the `PHPIMS_Operation_GetImage` operation, an
 
     static public $events = array(
         'getImagePreExec' => 1,
-        'deleteImagePostExec' => 10,
-        'deleteMetadataPostExec' => 10,
+        'deleteImagePostExec' => 20,
+        'deleteMetadataPostExec' => 20,
     );
     
-Whenever the `PHPIMS_Operation_GetImage` operation is triggered this plugin will be executed before any other plugin *before* the operation executes `exec()` and it will run with index 20 *after* `PHPIMS_Operation_DeleteImage` is finished, and with an index of 20 *after* `PHPIMS_Operation_DeleteMetadata` is finished. It's important to notice that one request to PHPIMS triggers one operation. A single request can not trigger several operations.    
+Whenever the `PHPIMS_Operation_GetImage` operation is triggered this plugin will be executed before any other plugin *before* the operation executes and it will run with index 20 *after* `PHPIMS_Operation_DeleteImage` is finished, and with an index of 20 *after* `PHPIMS_Operation_DeleteMetadata` is finished. It's important to notice that one request to PHPIMS triggers one operation. A single request can not trigger several operations.    
 
 ### Storage drivers
 PHPIMS supports plugable storage drivers. All storage drivers must extend the base `PHPIMS_Storage_Driver_Abstract` class (which implements `PHPIMS_Storage_Driver_Interface`. 
@@ -227,7 +227,7 @@ The database and storage drivers use the 'database' and 'storage' elements in th
 which makes PHPIMS use MongoDB as database and the filesystem for storage. The 'params' part will be sent to the drivers' constructor.
 
 #### Add custom plugins
-To add custom plugins you will need to change the `plugins` element of the configuration array. It can for instance look like this:
+To add custom plugins you will need to change the 'plugins' element of the configuration array. It can for instance look like this:
 
     // Custom plugins
     'plugins' => array(
@@ -235,7 +235,7 @@ To add custom plugins you will need to change the `plugins` element of the confi
         array('path' => '/some/other/path', 'prefix' => 'My_Custom_Plugins_'),
     ),
 
-Each element is an array consisting of one or two elements: `path` and the optional `prefix`. Path is a base path to your plugin classes. The prefix is the "namespace" of your classes. For the example above, you can have plugins stored like this:
+Each element is an array consisting of one or two elements: 'path' and the optional 'prefix'. Path is a base path to your plugin classes. The prefix is the "namespace" of your classes. For the example above, you can have plugins stored like this:
 
 * /some/path/SomePlugin.php // Classname: SomePlugin
 * /some/path/SomeOtherPlugin.php // Classname: SomeOtherPlugin
