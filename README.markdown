@@ -13,6 +13,7 @@ Click on the fork button on github and clone your fork:
 To fully develop PHPIMS you will need to have the following software installed:
 
 * [PHPUnit](http://phpunit.de/)
+* [Autoload (phpab)](https://github.com/theseer/Autoload)
 * [Mockery](https://github.com/padraic/mockery)
 * [vfsStream](http://code.google.com/p/bovigo/wiki/vfsStream)
 * [Imagine](https://github.com/avalanche123/Imagine/)
@@ -27,13 +28,19 @@ Run the following commands as root to install the software (on Ubuntu):
     pear channel-discover pear.survivethedeepend.com
     pear channel-discover hamcrest.googlecode.com/svn/pear
     pear channel-discover pear.php-tools.net
+    pear channel-discover pear.netpirates.net
     
     pear install --alldeps phpunit/PHPUnit
     pear install --alldeps deepend/Mockery
     pear install --alldeps hamcrest/Hamcrest
     pear install pat/vfsStream-beta
-    apt-get install mongodb
+    pear install theseer/Autoload
     pear install pecl/mongo
+    apt-get install ant
+    
+For MongoDB I followed the steps on http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages when I installed it.
+
+It's worth noting that you don't need all of the above software to just do a quick fix and send me a pull request. If you want to run the complete test suite or the whole build process you will need all of it.     
 
 ## REST API
 PHPIMS uses a REST API to manage the images. Each image will be identified by an MD5 sum of the image itself and the original file extension, that will be referred to as &lt;image&gt; for the remainder of this document.
