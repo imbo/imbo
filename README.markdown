@@ -10,7 +10,7 @@ Click on the fork button on github and clone your fork:
     git clone git@github.com:<username>/phpims.git
 
 ### Software needed
-To fully develop PHPIMS you will need to have the following software installed:
+To fully develop PHPIMS (as in run the complete build process) you will need to have the following software installed:
 
 * [PHPUnit](http://phpunit.de/)
 * [Autoload (phpab)](https://github.com/theseer/Autoload)
@@ -31,11 +31,14 @@ Run the following commands as root to install the software (on Ubuntu):
     pear channel-discover pear.netpirates.net
     
     pear install --alldeps phpunit/PHPUnit
+    pear install --alldeps phpunit/PHP_CodeBrowser
     pear install --alldeps deepend/Mockery
     pear install --alldeps hamcrest/Hamcrest
     pear install pat/vfsStream-beta
     pear install theseer/Autoload
     pear install pecl/mongo
+    pear install phpDocumentor
+    pear install phpunit/phploc
     apt-get install ant
     
 For MongoDB I followed the steps on http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages when I installed it.
@@ -149,6 +152,10 @@ The response instance includes all response headers and the body, and has the fo
 
 ## Developer notes
 Here you will find some notes about how PHPIMS works internally.
+
+* [API Documentation](http://ci.starzinger.net/job/PHPIMS/API_Documentation/?)
+* [Code Coverage](http://ci.starzinger.net/job/PHPIMS/Code_Coverage/?)
+* [Code Browser](http://ci.starzinger.net/job/PHPIMS/Code_Browser/?)
 
 ### Front controller 
 The `PHPIMS_FrontController` class is responsible for validating the request, and picking the correct operation class for the request. It will create an instance of the operation, execute the operation and then return the response.
