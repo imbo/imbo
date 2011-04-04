@@ -44,6 +44,28 @@
                  --output ${basedir}/build/code-browser" />
     </exec>
   </target>
+  
+  <target name="phpcpd">
+    <exec executable="phpcpd">
+      <arg line="--log-pmd ${basedir}/build/logs/pmd-cpd.xml
+                 ${basedir}/library/PHPIMS" />
+    </exec>
+  </target>
+  
+  <target name="pdepend">
+    <exec executable="pdepend">
+      <arg line="--jdepend-xml=${basedir}/build/logs/jdepend.xml 
+                 ${basedir}/library/PHPIMS" />
+    </exec>
+  </target>
+  
+  <target name="phpmd">
+    <exec executable="phpmd">
+      <arg line="${basedir}/library/PHPIMS xml codesize,unusedcode 
+                 --reportfile ${basedir}/build/logs/pmd.xml" />
 
-  <target name="build" depends="clean,phpab,phpunit,phpdoc,phploc,phpcb"/>
+    </exec>
+  </target>
+
+  <target name="build" depends="clean,phpab,phpunit,phpdoc,phploc,phpcb,phpcpd,pdepend,phpmd"/>
 </project>
