@@ -94,10 +94,8 @@ class PHPIMS_Operation_Plugin_AuthPlugin extends PHPIMS_Operation_Plugin_Abstrac
             throw new PHPIMS_Operation_Plugin_Exception('Timestamp expired', 401);
         }
 
-        $path = ltrim($_SERVER['REDIRECT_URL'], '/');
-
         $config = $operation->getConfig('auth');
-        $data = $operation->getMethod() . $path . $_GET['publicKey'] . $_GET['timestamp'];
+        $data = $operation->getMethod() . $operation->getRequestPath() . $_GET['publicKey'] . $_GET['timestamp'];
 
         // Generate binary hash key
         $actualSignature = hash_hmac('sha256', $data, $config['privateKey'], true);
