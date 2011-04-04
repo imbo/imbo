@@ -47,8 +47,12 @@ class PHPIMS_Operation_EditMetadataTest extends PHPIMS_Operation_OperationTests 
         return new PHPIMS_Operation_EditMetadata($this->hash);
     }
 
-    public function getOperationName() {
+    public function getExpectedOperationName() {
         return 'editMetadata';
+    }
+
+    public function getExpectedRequestPath() {
+        return $this->hash . '/meta';
     }
 
     public function testSuccessfullExec() {

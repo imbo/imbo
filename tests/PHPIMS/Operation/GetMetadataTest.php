@@ -47,8 +47,12 @@ class PHPIMS_Operation_GetMetadataTest extends PHPIMS_Operation_OperationTests {
         return new PHPIMS_Operation_GetMetadata($this->hash);
     }
 
-    public function getOperationName() {
+    public function getExpectedOperationName() {
         return 'getMetadata';
+    }
+
+    public function getExpectedRequestPath() {
+        return $this->hash . '/meta';
     }
 
     public function testSuccessfullExec() {

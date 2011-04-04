@@ -43,8 +43,12 @@ class PHPIMS_Operation_DeleteImageTest extends PHPIMS_Operation_OperationTests {
         return new PHPIMS_Operation_DeleteImage();
     }
 
-    public function getOperationName() {
+    public function getExpectedOperationName() {
         return 'deleteImage';
+    }
+
+    public function getExpectedRequestPath() {
+        return $this->hash;
     }
 
     public function testSuccessfullExec() {

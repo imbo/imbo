@@ -55,7 +55,7 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->operation = $this->getMockBuilder('PHPIMS_Operation_Abstract')->setMethods(array('getOperationName', 'exec'))
+        $this->operation = $this->getMockBuilder('PHPIMS_Operation_Abstract')->setMethods(array('getOperationName', 'exec', 'getRequestPath'))
                                 ->disableOriginalConstructor()
                                 ->getMock();
 
@@ -67,6 +67,9 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
 
         $this->operation->expects($this->any())
                         ->method('exec');
+
+        $this->operation->expects($this->any())
+                        ->method('getRequestPath');
     }
 
     /**

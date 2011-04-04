@@ -450,4 +450,16 @@ abstract class PHPIMS_Operation_Abstract {
      * @throws PHPIMS_Operation_Exception
      */
     abstract public function exec();
+
+    /**
+     * Return the request path that the operation currently answers
+     *
+     * Each operation answers only a specific url format, and this method must return the current
+     * complete request. The AddImage operation will for instance return <hash>.<ext> while the
+     * GetMetadata operation returns <hash>.<ext>/meta. This information is used in the AuthPlugin
+     * when generating the signature for requests that require this.
+     *
+     * @return string
+     */
+    abstract public function getRequestPath();
 }

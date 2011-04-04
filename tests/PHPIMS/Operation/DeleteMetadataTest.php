@@ -47,8 +47,12 @@ class PHPIMS_Operation_DeleteMetadataTest extends PHPIMS_Operation_OperationTest
         return new PHPIMS_Operation_DeleteMetadata($this->hash);
     }
 
-    public function getOperationName() {
+    public function getExpectedOperationName() {
         return 'deleteMetadata';
+    }
+
+    public function getExpectedRequestPath() {
+        return $this->hash . '/meta';
     }
 
     public function testSuccessfullExec() {

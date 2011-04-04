@@ -43,8 +43,12 @@ class PHPIMS_Operation_GetImageTest extends PHPIMS_Operation_OperationTests {
         return new PHPIMS_Operation_GetImage();
     }
 
-    public function getOperationName() {
+    public function getExpectedOperationName() {
         return 'getImage';
+    }
+
+    public function getExpectedRequestPath() {
+        return $this->hash;
     }
 
     public function testSuccessfullExec() {

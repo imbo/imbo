@@ -77,17 +77,28 @@ abstract class PHPIMS_Operation_OperationTests extends PHPUnit_Framework_TestCas
     abstract protected function getNewOperation();
 
     /**
-     * Get the operation name
+     * Get the expected operation name for the operation class
      *
      * @return string
      */
-    abstract protected function getOperationName();
+    abstract protected function getExpectedOperationName();
+
+    /**
+     * Get the expected request path for the operation class
+     *
+     * @return string
+     */
+    abstract protected function getExpectedRequestPath();
 
     public function testGetOperationName() {
         $reflection = new ReflectionClass($this->operation);
         $method = $reflection->getMethod('getOperationName');
         $method->setAccessible(true);
 
-        $this->assertSame($this->getOperationName(), $method->invokeArgs($this->operation, array()));
+        $this->assertSame($this->getExpectedOperationName(), $method->invoke($this->operation));
+    }
+
+    public function testGetRequestPath() {
+        $this->assertSame($this->getExpectedRequestPath(), $this->operation->getRequestPath());
     }
 }
