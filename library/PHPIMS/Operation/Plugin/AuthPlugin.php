@@ -101,7 +101,7 @@ class PHPIMS_Operation_Plugin_AuthPlugin extends PHPIMS_Operation_Plugin_Abstrac
         $actualSignature = hash_hmac('sha256', $data, $config['privateKey'], true);
 
         if ($actualSignature !== base64_decode($_GET['signature'])) {
-            throw new PHPIMS_Operation_Plugin_Exception('Signature mismatch: ' . $actualSignature . ' !== ' . $_GET['signature'], 401);
+            throw new PHPIMS_Operation_Plugin_Exception('Signature mismatch', 401);
         }
     }
 }
