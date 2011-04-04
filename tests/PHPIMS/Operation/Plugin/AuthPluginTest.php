@@ -111,4 +111,54 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
 
         $this->plugin->exec($operation);
     }
+
+    public function testExecWithCorrectSignature() {
+        $publicKey = md5(microtime());
+        $privateKey = md5($publicKey);
+
+        $this->signRequest($publicKey, $privateKey);
+    }
+
+    /**
+     * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedExceptionCode 401
+     * @expectedExceptionMessage Signature mismatch
+     */
+    public function testExecWithIncorrectSignature() {
+        $publicKey = md5(microtime());
+        $privateKey = md5($publicKey);
+
+        $this->signRequest($publicKey, $privateKey, 'wrong signature');
+    }
+
+    protected function signRequest($publicKey, $privateKey, $signature = null) {
+        // Emulate a call to the deleteMetadata operation
+        $method = 'DELETE';
+        $requestPath = md5(microtime()) . '.png/meta';
+        $timestamp = gmdate('Y-m-d\TH:i\Z');
+
+        $config = array(
+            'publicKey'  => $publicKey,
+            'privateKey' => $privateKey,
+        );
+
+        // The data used to create the hash
+        $data = $method . $requestPath . $publicKey . $timestamp;
+
+        $operation = m::mock('PHPIMS_Operation_Abstract');
+        $operation->shouldReceive('getMethod')->once()->andReturn($method);
+        $operation->shouldReceive('getConfig')->once()->andReturn($config);
+        $operation->shouldReceive('getRequestPath')->once()->andReturn($requestPath);
+
+        if ($signature === null) {
+            // No signature given. Create the correct signature
+            $signature = base64_encode(hash_hmac('sha256', $data, $privateKey, true));
+        }
+
+        $_GET['signature'] = $signature;
+        $_GET['publicKey'] = $publicKey;
+        $_GET['timestamp'] = $timestamp;
+
+        $this->plugin->exec($operation);
+    }
 }
