@@ -67,6 +67,21 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
 
     /**
      * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedExceptionCode 400
+     * @expectedExceptionMessage Invalid timestamp format:
+     */
+    public function testExecWithInvalidTimestampFormat() {
+        $_GET['signature'] = 'some signature';
+        $_GET['publicKey'] = 'some key';
+        $_GET['timestamp'] = 123123123;
+
+        $operation = m::mock('PHPIMS_Operation_Abstract');
+
+        $this->plugin->exec($operation);
+    }
+
+    /**
+     * @expectedException PHPIMS_Operation_Plugin_Exception
      * @expectedExceptionCode 401
      * @expectedExceptionMessage Timestamp expired
      */
