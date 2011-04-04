@@ -10,7 +10,7 @@ Click on the fork button on github and clone your fork:
     git clone git@github.com:<username>/phpims.git
 
 ### Software needed
-To fully develop PHPIMS (as in run the complete build process) you will need to have the following software installed:
+To fully develop PHPIMS (as in run the complete build process, which most likely you will never do) you will need to have the following software installed:
 
 * [PHPUnit](http://phpunit.de/)
 * [Autoload (phpab)](https://github.com/theseer/Autoload)
@@ -29,6 +29,8 @@ Run the following commands as root to install the software (on Ubuntu):
     pear channel-discover hamcrest.googlecode.com/svn/pear
     pear channel-discover pear.php-tools.net
     pear channel-discover pear.netpirates.net
+    pear channel-discover pear.pdepend.org 
+    pear channel-discover pear.phpmd.org
     
     pear install --alldeps phpunit/PHPUnit
     pear install --alldeps phpunit/PHP_CodeBrowser
@@ -39,11 +41,15 @@ Run the following commands as root to install the software (on Ubuntu):
     pear install pecl/mongo
     pear install phpDocumentor
     pear install phpunit/phploc
+    pear install pdepend/PHP_Depend
+    pear install phpunit/phpcpd
     apt-get install ant
     
 For MongoDB I followed the steps on http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages when I installed it.
 
-It's worth noting that you don't need all of the above software to just do a quick fix and send me a pull request. If you want to run the complete test suite or the whole build process you will need all of it.     
+It's worth noting that you don't need all of the above software to just do a quick fix and send me a pull request. If you want to run the complete test suite or the whole build process you will need all of it.
+
+If you send me a pull request I would appreciate it if you include tests for all new code as well and make sure that the test suite passes.     
 
 ## REST API
 PHPIMS uses a REST API to manage the images. Each image will be identified by an MD5 sum of the image itself and the original file extension, that will be referred to as &lt;image&gt; for the remainder of this document.
