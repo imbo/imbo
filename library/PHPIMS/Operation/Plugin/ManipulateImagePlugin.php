@@ -72,9 +72,9 @@
  *     <pre>border</pre>
  *     If you want to add a border around the image, use this transformation.
  *     <ul>
- *       <li><pre>(int) color</pre>Color in hexadecimal. Defaults to "000000" (also supports short variants, for instance '000' or 'f00')</li>
- *       <li><pre>(string) width</pre>Width of the border on the left and right sides of the image. Defaults to 1</li>
- *       <li><pre>(string) height</pre>Height of the border on the top and bottoms sides of the image. Defaults to 1</li>
+ *       <li><pre>(string) color</pre>Color in hexadecimal. Defaults to "000000" (also supports short variants, for instance '000' or 'f00')</li>
+ *       <li><pre>(int) width</pre>Width of the border on the left and right sides of the image. Defaults to 1</li>
+ *       <li><pre>(int) height</pre>Height of the border on the top and bottoms sides of the image. Defaults to 1</li>
  *     </ul>
  *   </li>
  * </ul>

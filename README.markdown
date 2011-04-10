@@ -267,7 +267,7 @@ PHPIMS does not autoload any other classes than the ones included in PHPIMS itse
 ## Image transformations
 PHPIMS supports some image transformations out of the box using the [Imagine](https://github.com/avalanche123/Imagine/) image manipulation library.
 
-Transformations are made using the <code>t[]</code> query parameter. This GET parameter should be used as an array to that multiple transformations can be made. The transformations are made in the order they are specified in the url.
+Transformations are made using the <code>t[]</code> query parameter. This GET parameter should be used as an array so that multiple transformations can be made. The transformations are made in the order they are specified in the url.
 
 ### resize
 This transformation will resize the image. Two parameters are supported and at least one of them must be supplied to apply this transformation.
@@ -307,9 +307,9 @@ Examples:
 ### border 
 If you want to add a border around the image, use this transformation.
 
-* `(int) color` Color in hexadecimal. Defaults to "000000" (also supports short values like "f00" ("ff0000")).
-* `(string) width` Width of the border on the left and right sides of the image. Defaults to 1.
-* `(string) height` Height of the border on the top and bottoms sides of the image. Defaults to 1.
+* `(string) color` Color in hexadecimal. Defaults to "000000" (also supports short values like "f00" ("ff0000")).
+* `(int) width` Width of the border on the left and right sides of the image. Defaults to 1.
+* `(int) height` Height of the border on the top and bottoms sides of the image. Defaults to 1.
 
 Examples:
 
