@@ -263,3 +263,56 @@ Each element is an array consisting of one or two elements: 'path' and the optio
 * /some/other/path/My/Custom/Plugins/SomeOtherPlugin.php // Classname: My_Custom_Plugins_SomeOtherPlugin
 
 PHPIMS does not autoload any other classes than the ones included in PHPIMS itself, so you will have to add an autoloader yourself for your custom plugins. This autoloader can for instance be specified in the server.php script along with the configuration.
+
+## Image transformations
+PHPIMS supports some image transformations out of the box using the [Imagine](https://github.com/avalanche123/Imagine/) image manipulation library.
+
+Transformations are made using the <code>t[]</code> query parameter. This GET parameter should be used as an array to that multiple transformations can be made. The transformations are made in the order they are specified in the url.
+
+### resize
+This transformation will resize the image. Two parameters are supported and at least one of them must be supplied to apply this transformation.
+
+* `(int) width` The width of the resulting image in pixels. If not specified the width will be calculated using the same ratio as the original image.
+* `(int) height` The height of the resulting image in pixels. If not specified the height will be calculated using the same ratio as the original image.
+
+Examples:
+
+* `?t[]=resize:width=100`
+* `?t[]=resize:height=100`
+* `?t[]=resize:width=100,height=50`
+ 
+### crop
+This transformation will crop the image. All four arguments are required.
+
+* `(int) x` The X coordinate of the cropped region's top left corner.
+* `(int) y` The Y coordinate of the cropped region's top left corner.
+* `(int) width` The width of the crop.
+* `(int) height` The height of the crop.
+
+Examples:
+
+* `?t[]=crop:x=10,y=25,width=250,height=150`
+
+### rotate
+Use this transformation to rotate the image.
+
+* `(int) angle` The number of degrees to rotate the image.
+* `(string) bg` Background color in hexadecimal. Defaults to "000000" (also supports short values like "f00" ("ff0000")).
+
+Examples:
+
+* `?t[]=rotate:angle=90`
+* `?t[]=rotate:angle=45,bg=fff`
+
+### border 
+If you want to add a border around the image, use this transformation.
+
+* `(int) color` Color in hexadecimal. Defaults to "000000" (also supports short values like "f00" ("ff0000")).
+* `(string) width` Width of the border on the left and right sides of the image. Defaults to 1.
+* `(string) height` Height of the border on the top and bottoms sides of the image. Defaults to 1.
+
+Examples:
+
+* `?t[]=border`
+* `?t[]=border:color=000`
+* `?t[]=border:color=f00,width=2,height=2`
