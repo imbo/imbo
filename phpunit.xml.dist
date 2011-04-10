@@ -10,8 +10,6 @@
     <php>
         <const name="PHPIMS_ENABLE_CLIENT_TESTS" value="false" />
         <const name="PHPIMS_CLIENT_TESTS_URL" value="" />
-        <const name="PHPIMS_PUBLIC_KEY" value="" />
-        <const name="PHPIMS_PRIVATE_KEY" value="" />
     </php>
   
     <logging>
