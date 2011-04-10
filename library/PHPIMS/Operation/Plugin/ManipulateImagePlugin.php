@@ -39,7 +39,7 @@
  *
  * <pre>t[]=transformation:param=value[,param=value[, ... ]]</pre>
  *
- * Valid values for <transformation> and theire respective parameters are:
+ * Valid values for <transformation> and their respective parameters are:
  *
  * <ul>
  *   <li>
