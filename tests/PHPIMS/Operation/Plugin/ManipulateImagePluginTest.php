@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,40 +40,27 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
+class PHPIMS_Operation_Plugin_ManipulateImagePluginTest extends PHPUnit_Framework_TestCase {
+    /**
+     * Plugin instance
+     *
+     * @var PHPIMS_Operation_Plugin_ManipulateImagePlugin
+     */
+    protected $plugin = null;
 
-/** @see PHPIMS_Autoload */
-require __DIR__ . '/../library/PHPIMS/Autoload.php';
-
-// Autoloader for custom test classes inside the tests directory
-spl_autoload_register(function($class) {
-    $path = str_replace('_', DIRECTORY_SEPARATOR, $class);
-    $file = __DIR__ . '/' . $path . '.php';
-
-    if (file_exists($file)) {
-        require $file;
-        return true;
+    public function setUp() {
+        $this->plugin = new PHPIMS_Operation_Plugin_ManipulateImagePlugin();
     }
-});
 
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
-        }
+    public function tearDown() {
+        $this->plugin = null;
     }
-});
 
-/** \Mockery\Loader */
-require_once 'Mockery/Loader.php';
-
-/** Hamcrest */
-require_once 'Hamcrest/hamcrest.php';
-
-$loader = new \Mockery\Loader();
-$loader->register();
+    public function testIsValidTransformation() {
+        $this->assertTrue(PHPIMS_Operation_Plugin_ManipulateImagePlugin::isValidTransformation('resize'));
+        $this->assertTrue(PHPIMS_Operation_Plugin_ManipulateImagePlugin::isValidTransformation('crop'));
+        $this->assertTrue(PHPIMS_Operation_Plugin_ManipulateImagePlugin::isValidTransformation('rotate'));
+        $this->assertTrue(PHPIMS_Operation_Plugin_ManipulateImagePlugin::isValidTransformation('border'));
+        $this->assertFalse(PHPIMS_Operation_Plugin_ManipulateImagePlugin::isValidTransformation('foobar'));
+    }
+}
