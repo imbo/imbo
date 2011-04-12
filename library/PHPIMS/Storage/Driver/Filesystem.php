@@ -31,9 +31,13 @@
  */
 
 /**
- * Storage driver interface
+ * Filesystem storage driver
  *
- * This is an interface for different storage drivers for PHPIMS.
+ * This storage driver stores image files in a local filesystem.
+ *
+ * Configuration options supported by this driver:
+ *
+ * - <pre>(string) dataDir</pre> Absolute path to the base directory the images should be stored in
  *
  * @package PHPIMS
  * @subpackage StorageDriver

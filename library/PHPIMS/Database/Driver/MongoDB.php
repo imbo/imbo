@@ -37,12 +37,8 @@
  *
  * Valid parameters for this driver:
  *
- * Required:
- * - <none>
- *
- * Optional:
- * - (string) database => Name of the database. Defaults to 'phpims'
- * - (string) collection => Name of the collection to store data in. Defaults to 'images'
+ * - <pre>(string) database</pre> Name of the database. Defaults to 'phpims'
+ * - <pre>(string) collection</pre> Name of the collection to store data in. Defaults to 'images'
  *
  * @package PHPIMS
  * @subpackage DatabaseDriver
