@@ -31,9 +31,7 @@
  */
 
 /**
- * Client driver interface
- *
- * This is an interface for different client drivers.
+ * Abstract class for client drivers
  *
  * @package PHPIMS
  * @subpackage Client
@@ -42,54 +40,48 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface PHPIMS_Client_Driver_Interface {
+abstract class PHPIMS_Client_Driver implements PHPIMS_Client_DriverInterface {
     /**
-     * POST some data to an URL
+     * Client this driver does requests for
      *
-     * @param string $url The URL to POST to
-     * @param array $metadata The metadata to POST. This array will be json_encoded and sent to the
-     *                        server as $_POST['metadata']
-     * @param string $filePath Optional path to a file we want to add to the POST
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @var PHPIMS_Client
      */
-    public function post($url, array $metadata = null, $filePath = null);
+    protected $client = null;
 
     /**
-     * Perform a GET to $url
+     * Class constructor
      *
-     * @param string $url The URL to GET
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * The constructor calls the init method
      */
-    public function get($url);
+    public function __construct() {
+        $this->init();
+    }
 
     /**
-     * Perform a HEAD to $url
-     *
-     * @param string $url The URL to HEAD
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * Custom init method that can be implemented
      */
-    public function head($url);
+    protected function init() {
+        // Should be implemented by driver implementations
+    }
 
     /**
-     * Perform a DELETE request to $url
+     * Get the client
      *
-     * @param string $url The URL to DELETE
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @return PHPIMS_Client
      */
-    public function delete($url);
+    public function getClient() {
+        return $this->client;
+    }
 
     /**
-     * Add an image
+     * Set the client
      *
-     * @param string $path The path to the image to add
-     * @param string $url The URL to push data to
-     * @param array $metadata Metadata to add along with the image
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @param PHPIMS_Client $client Instance of the client
+     * @return PHPIMS_Client_Driver
      */
-    public function addImage($path, $url, array $metadata = null);
+    public function setClient(PHPIMS_Client $client) {
+        $this->client = $client;
+
+        return $this;
+    }
 }

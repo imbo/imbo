@@ -68,7 +68,7 @@ class PHPIMS_Client {
     /**
      * Driver used for the client
      *
-     * @var PHPIMS_Client_Driver_Abstract
+     * @var PHPIMS_Client_Driver
      */
     protected $driver = null;
 
@@ -92,9 +92,9 @@ class PHPIMS_Client {
      * @param string $serverUrl The URL to the PHPIMS server, including protocol
      * @param string $publicKey The public key to use. Only some operations need this
      * @param string $privateKey The private key to use. Only some operations need this
-     * @param PHPIMS_Client_Driver_Abstract $driver Optional driver to set
+     * @param PHPIMS_Client_Driver $driver Optional driver to set
      */
-    public function __construct($serverUrl, $publicKey = null, $privateKey = null, PHPIMS_Client_Driver_Abstract $driver = null) {
+    public function __construct($serverUrl, $publicKey = null, $privateKey = null, PHPIMS_Client_Driver $driver = null) {
         $this->setServerUrl($serverUrl);
 
         if ($publicKey !== null) {
@@ -187,7 +187,7 @@ class PHPIMS_Client {
     /**
      * Get the current driver
      *
-     * @return PHPIMS_Client_Driver_Abstract
+     * @return PHPIMS_Client_Driver
      */
     public function getDriver() {
         if ($this->driver === null) {
@@ -203,10 +203,10 @@ class PHPIMS_Client {
     /**
      * Set the driver
      *
-     * @param PHPIMS_Client_Driver_Abstract $driver A driver instance
+     * @param PHPIMS_Client_Driver $driver A driver instance
      * @return PHPIMS_Client
      */
-    public function setDriver(PHPIMS_Client_Driver_Abstract $driver) {
+    public function setDriver(PHPIMS_Client_Driver $driver) {
         $driver->setClient($this);
         $this->driver = $driver;
 

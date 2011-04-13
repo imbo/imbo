@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Client
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,38 +31,65 @@
  */
 
 /**
+ * Client driver interface
+ *
+ * This is an interface for different client drivers.
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Client
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Client_Driver_AbstractTest extends PHPUnit_Framework_TestCase {
+interface PHPIMS_Client_DriverInterface {
     /**
-     * Driver instance
+     * POST some data to an URL
      *
-     * @var PHPIMS_Client_Driver_Abstract
+     * @param string $url The URL to POST to
+     * @param array $metadata The metadata to POST. This array will be json_encoded and sent to the
+     *                        server as $_POST['metadata']
+     * @param string $filePath Optional path to a file we want to add to the POST
+     * @return PHPIMS_Client_Response
+     * @throws PHPIMS_Client_Driver_Exception
      */
-    protected $driver = null;
+    public function post($url, array $metadata = null, $filePath = null);
 
     /**
-     * Set up method
+     * Perform a GET to $url
+     *
+     * @param string $url The URL to GET
+     * @return PHPIMS_Client_Response
+     * @throws PHPIMS_Client_Driver_Exception
      */
-    public function setUp() {
-        $this->driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
-    }
+    public function get($url);
 
     /**
-     * Tear down method
+     * Perform a HEAD to $url
+     *
+     * @param string $url The URL to HEAD
+     * @return PHPIMS_Client_Response
+     * @throws PHPIMS_Client_Driver_Exception
      */
-    public function tearDown() {
-        $this->driver = null;
-    }
+    public function head($url);
 
-    public function testSetGetClient() {
-        $client = $this->getMockBuilder('PHPIMS_Client')->disableOriginalConstructor()->getMock();
-        $this->driver->setClient($client);
-        $this->assertSame($client, $this->driver->getClient());
-    }
+    /**
+     * Perform a DELETE request to $url
+     *
+     * @param string $url The URL to DELETE
+     * @return PHPIMS_Client_Response
+     * @throws PHPIMS_Client_Driver_Exception
+     */
+    public function delete($url);
+
+    /**
+     * Add an image
+     *
+     * @param string $path The path to the image to add
+     * @param string $url The URL to push data to
+     * @param array $metadata Metadata to add along with the image
+     * @return PHPIMS_Client_Response
+     * @throws PHPIMS_Client_Driver_Exception
+     */
+    public function addImage($path, $url, array $metadata = null);
 }

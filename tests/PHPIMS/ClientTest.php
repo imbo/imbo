@@ -100,7 +100,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
 
         $this->client = new PHPIMS_Client($this->serverUrl, $this->publicKey, $this->privateKey);
 
-        $this->driver = m::mock('PHPIMS_Client_Driver_Abstract');
+        $this->driver = m::mock('PHPIMS_Client_Driver');
         $this->driver->shouldReceive('setClient')->once()->with($this->client)->andReturn($this->driver);
 
         $this->client->setDriver($this->driver);
@@ -132,7 +132,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetDriver() {
-        $driver = m::mock('PHPIMS_Client_Driver_Abstract');
+        $driver = m::mock('PHPIMS_Client_Driver');
         $driver->shouldReceive('setClient')->with($this->client)->andReturn($driver);
         $this->client->setDriver($driver);
         $this->assertSame($driver, $this->client->getDriver());
@@ -151,7 +151,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testConstructorParams() {
-        $driver = m::mock('PHPIMS_Client_Driver_Abstract');
+        $driver = m::mock('PHPIMS_Client_Driver');
         $driver->shouldReceive('setClient')->with(m::type('PHPIMS_Client'))->andReturn($driver);
         $client = new PHPIMS_Client($this->serverUrl, $this->publicKey, $this->privateKey, $driver);
 

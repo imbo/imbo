@@ -42,7 +42,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
+class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver {
     /**
      * The cURL handle used by the client
      *
@@ -58,7 +58,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Client_Driver_Abstract::init()
+     * @see PHPIMS_Client_Driver::init()
      */
     protected function init() {
         $this->curlHandle = curl_init();
@@ -72,7 +72,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Client_Driver_Interface::post()
+     * @see PHPIMS_Client_DriverInterface::post()
      */
     public function post($url, array $metadata = null, $filePath = null) {
         $postFields = array(
@@ -92,7 +92,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Client_Driver_Interface::get()
+     * @see PHPIMS_Client_DriverInterface::get()
      */
     public function get($url) {
         curl_setopt_array($this->curlHandle, array(
@@ -103,7 +103,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Client_Driver_Interface::head()
+     * @see PHPIMS_Client_DriverInterface::head()
      */
     public function head($url) {
         curl_setopt_array($this->curlHandle, array(
@@ -114,7 +114,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Client_Driver_Interface::delete()
+     * @see PHPIMS_Client_DriverInterface::delete()
      */
     public function delete($url) {
         curl_setopt_array($this->curlHandle, array(
@@ -155,7 +155,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Client_Driver_Interface::addImage()
+     * @see PHPIMS_Client_DriverInterface::addImage()
      */
     public function addImage($path, $url, array $metadata = null) {
         return $this->post($url, $metadata, $path);

@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,57 +31,38 @@
  */
 
 /**
- * Abstract class for client drivers
- *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Client_Driver_Abstract implements PHPIMS_Client_Driver_Interface {
+class PHPIMS_Client_DriverTest extends PHPUnit_Framework_TestCase {
     /**
-     * Client this driver does requests for
+     * Driver instance
      *
-     * @var PHPIMS_Client
+     * @var PHPIMS_Client_Driver
      */
-    protected $client = null;
+    protected $driver = null;
 
     /**
-     * Class constructor
-     *
-     * The constructor calls the init method
+     * Set up method
      */
-    public function __construct() {
-        $this->init();
+    public function setUp() {
+        $this->driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver');
     }
 
     /**
-     * Custom init method that can be implemented
+     * Tear down method
      */
-    protected function init() {
-        // Should be implemented by driver implementations
+    public function tearDown() {
+        $this->driver = null;
     }
 
-    /**
-     * Get the client
-     *
-     * @return PHPIMS_Client
-     */
-    public function getClient() {
-        return $this->client;
-    }
-
-    /**
-     * Set the client
-     *
-     * @param PHPIMS_Client $client Instance of the client
-     * @return PHPIMS_Client_Driver_Abstract
-     */
-    public function setClient(PHPIMS_Client $client) {
-        $this->client = $client;
-
-        return $this;
+    public function testSetGetClient() {
+        $client = $this->getMockBuilder('PHPIMS_Client')->disableOriginalConstructor()->getMock();
+        $this->driver->setClient($client);
+        $this->assertSame($client, $this->driver->getClient());
     }
 }
