@@ -71,11 +71,11 @@ class PHPIMS_Operation_AddImageTest extends PHPIMS_Operation_OperationTests {
         $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
         $response->shouldReceive('setBody')->once()->with(array('hash' => $hash))->andReturn($response);
 
-        $database = m::mock('PHPIMS_Database_Driver_Abstract');
+        $database = m::mock('PHPIMS_Database_Driver');
         $database->shouldReceive('insertImage')->once()->with($hash, $image);
         $database->shouldReceive('updateMetadata')->once()->with($hash, $metadata);
 
-        $storage = m::mock('PHPIMS_Storage_Driver_Abstract');
+        $storage = m::mock('PHPIMS_Storage_Driver');
         $storage->shouldReceive('store')->once()->with($hash, $_FILES['file']['tmp_name']);
 
         $this->operation->setStorage($storage)

@@ -42,7 +42,7 @@ abstract class PHPIMS_Database_Driver_DriverTests extends PHPUnit_Framework_Test
     /**
      * Return an instance of the driver we are testing
      *
-     * @return PHPIMS_Database_Driver_Abstract
+     * @return PHPIMS_Database_Driver
      */
     abstract protected function getNewDriver();
 

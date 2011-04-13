@@ -52,11 +52,11 @@ class PHPIMS_Operation_DeleteImageTest extends PHPIMS_Operation_OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
+        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver');
         $database->expects($this->once())->method('deleteImage')->with($this->hash);
         $this->operation->setDatabase($database);
 
-        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
+        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver');
         $storage->expects($this->once())->method('delete')->with($this->hash);
         $this->operation->setStorage($storage);
 

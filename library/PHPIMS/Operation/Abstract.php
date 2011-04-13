@@ -58,14 +58,14 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * The database driver
      *
-     * @var PHPIMS_Database_Driver_Abstract
+     * @var PHPIMS_Database_Driver
      */
     protected $database = null;
 
     /**
      * The storage driver
      *
-     * @var PHPIMS_Storage_Driver_Abstract
+     * @var PHPIMS_Storage_Driver
      */
     protected $storage = null;
 
@@ -305,7 +305,7 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * Get the database driver
      *
-     * @return PHPIMS_Database_Driver_Abstract
+     * @return PHPIMS_Database_Driver
      */
     public function getDatabase() {
         return $this->database;
@@ -314,10 +314,10 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * Set the database driver
      *
-     * @param PHPIMS_Database_Driver_Abstract $driver The driver instance
+     * @param PHPIMS_Database_Driver $driver The driver instance
      * @return PHPIMS_Operation_Abstract
      */
-    public function setDatabase(PHPIMS_Database_Driver_Abstract $driver) {
+    public function setDatabase(PHPIMS_Database_Driver $driver) {
         $this->database = $driver;
 
         return $this;
@@ -326,7 +326,7 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * Get the storage driver
      *
-     * @return PHPIMS_Storage_Driver_Abstract
+     * @return PHPIMS_Storage_Driver
      */
     public function getStorage() {
         return $this->storage;
@@ -335,10 +335,10 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * Set the storage driver
      *
-     * @param PHPIMS_Storage_Driver_Abstract $driver The driver instance
+     * @param PHPIMS_Storage_Driver $driver The driver instance
      * @return PHPIMS_Operation_Abstract
      */
-    public function setStorage(PHPIMS_Storage_Driver_Abstract $driver) {
+    public function setStorage(PHPIMS_Storage_Driver $driver) {
         $this->storage = $driver;
 
         return $this;

@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage DatabaseDriver
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,62 +31,41 @@
  */
 
 /**
- * Abstract class for database drivers
- *
  * @package PHPIMS
- * @subpackage DatabaseDriver
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Database_Driver_Abstract implements PHPIMS_Database_Driver_Interface {
+class PHPIMS_Database_DriverTest extends PHPUnit_Framework_TestCase {
     /**
-     * Parameters for the current database driver
+     * Driver instance
      *
-     * @var array
+     * @var PHPIMS_Database_Driver
      */
-    protected $params = array();
+    protected $driver = null;
 
     /**
-     * Class constructor
-     *
-     * @param array $params Optional parameters
-     * @codeCoverageIgnore
+     * Set up method
      */
-    public function __construct(array $params = null) {
-        if ($params !== null) {
-            $this->setParams($params);
-        }
-
-        $this->init();
+    public function setUp() {
+        $this->driver = $this->getMockForAbstractClass('PHPIMS_Database_Driver');
     }
 
     /**
-     * Init method
+     * Tear down method
      */
-    protected function init() {
-        // Can be implemented by child classes
+    public function tearDown() {
+        $this->driver = null;
     }
 
-    /**
-     * Get all params
-     *
-     * @return array
-     */
-    public function getParams() {
-        return $this->params;
-    }
-
-    /**
-     * Set the params
-     *
-     * @param array $params An array of parameters
-     * @return PHPIMS_Database_Driver_Abstract
-     */
-    public function setParams(array $params) {
-        $this->params = $params;
-
-        return $this;
+    public function testSetGetParams() {
+        $params = array(
+            'foo' => 'bar',
+            'bar' => 'foo',
+        );
+        $this->driver->setParams($params);
+        $this->assertSame($params, $this->driver->getParams());
     }
 }

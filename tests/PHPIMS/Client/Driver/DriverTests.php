@@ -42,7 +42,7 @@ abstract class PHPIMS_Client_Driver_DriverTests extends PHPUnit_Framework_TestCa
     /**
      * The driver instance
      *
-     * @var PHPIMS_Client_Driver_Abstract
+     * @var PHPIMS_Client_Driver
      */
     protected $driver = null;
 
@@ -56,7 +56,7 @@ abstract class PHPIMS_Client_Driver_DriverTests extends PHPUnit_Framework_TestCa
     /**
      * Return an instance of the driver we are testing
      *
-     * @return PHPIMS_Client_Driver_Abstract
+     * @return PHPIMS_Client_Driver
      */
     abstract protected function getNewDriver();
 

@@ -86,13 +86,13 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetDatabase() {
-        $driver = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
+        $driver = $this->getMockForAbstractClass('PHPIMS_Database_Driver');
         $this->operation->setDatabase($driver);
         $this->assertSame($driver, $this->operation->getDatabase());
     }
 
     public function testSetGetStorage() {
-        $driver = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
+        $driver = $this->getMockForAbstractClass('PHPIMS_Storage_Driver');
         $this->operation->setStorage($driver);
         $this->assertSame($driver, $this->operation->getStorage());
     }
@@ -117,7 +117,7 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testInitDatabaseDriver() {
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
+        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver');
         $databaseClassName = get_class($database);
         $databaseParams = array('someparam' => true, 'otherparam' => false);
 
@@ -137,7 +137,7 @@ class PHPIMS_Operation_AbstractTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testInitStorageDriver() {
-        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
+        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver');
         $storageClassName = get_class($storage);
         $storageParams = array('someparam' => false, 'otherparam' => true);
 

@@ -46,9 +46,9 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
+class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver {
     /**
-     * @see PHPIMS_Storage_Driver_Interface::store
+     * @see PHPIMS_Storage_DriverInterface::store()
      */
     public function store($hash, $path) {
         $params = $this->getParams();
@@ -73,7 +73,7 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Storage_Driver_Interface::delete
+     * @see PHPIMS_Storage_DriverInterface::delete()
      */
     public function delete($hash) {
         $path = $this->getImagePath($hash);
@@ -86,7 +86,7 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Storage_Driver_Interface::load
+     * @see PHPIMS_Storage_DriverInterface::load()
      */
     public function load($hash, PHPIMS_Image $image) {
         $path = $this->getImagePath($hash);

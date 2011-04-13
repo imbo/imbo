@@ -60,7 +60,7 @@ class PHPIMS_Operation_GetMetadataTest extends PHPIMS_Operation_OperationTests {
             'foo' => 'bar',
             'bar' => 'foo',
         );
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
+        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver');
         $database->expects($this->once())->method('getMetadata')->with($this->hash)->will($this->returnValue($data));
         $this->operation->setDatabase($database);
 

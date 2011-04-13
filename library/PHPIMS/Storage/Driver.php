@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Interfaces
+ * @subpackage StorageDriver
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,57 +31,62 @@
  */
 
 /**
- * Storage driver interface
- *
- * This is an interface for different storage drivers for PHPIMS.
+ * Abstract storage driver
  *
  * @package PHPIMS
- * @subpackage Interfaces
+ * @subpackage StorageDriver
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface PHPIMS_Storage_Driver_Interface {
+abstract class PHPIMS_Storage_Driver implements PHPIMS_Storage_DriverInterface {
     /**
-     * Store an image
+     * Parameters for the current storage driver
      *
-     * This method will take a temporary path (usually from the $_FILES array) and place it
-     * somewhere suited for the actual storage driver. If an error occurs the driver should throw
-     * an exception based on PHPIMS_Storage_Exception.
-     *
-     * @param string $hash The image hash
-     * @param string $path Path to the temporary file
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Storage_Exception
+     * @var array
      */
-    public function store($hash, $path);
+    protected $params = array();
 
     /**
-     * Delete an image
+     * Class constructor
      *
-     * This method will remove the file associated with $hash from the storage medium
-     *
-     * @param string $hash Unique hash identifying an image
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Storage_Exception
+     * @param array $params Optional parameters
+     * @codeCoverageIgnore
      */
-    public function delete($hash);
+    public function __construct(array $params = null) {
+        if ($params !== null) {
+            $this->setParams($params);
+        }
+
+        $this->init();
+    }
 
     /**
-     * Load the image identified by $hash
-     *
-     * The implementation of this method must fetch the content of the file identified by hash and
-     * populate the blob property of $image.
-     *
-     * <code>
-     * $image->setBlob(<data>);
-     * </code>
-     *
-     * @param string $hash Unique hash identifying an image
-     * @param PHPIMS_Image $image The image object
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Storage_Exception
+     * Init method
      */
-    public function load($hash, PHPIMS_Image $image);
+    protected function init() {
+        // Can be implemented by child classes
+    }
+
+    /**
+     * Get all params
+     *
+     * @return array
+     */
+    public function getParams() {
+        return $this->params;
+    }
+
+    /**
+     * Set the params
+     *
+     * @param array $params An array of parameters
+     * @return PHPIMS_Storage_Driver
+     */
+    public function setParams(array $params) {
+        $this->params = $params;
+
+        return $this;
+    }
 }

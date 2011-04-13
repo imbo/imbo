@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage StorageDriver
+ * @subpackage DatabaseDriver
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,18 +31,18 @@
  */
 
 /**
- * Abstract storage driver
+ * Abstract class for database drivers
  *
  * @package PHPIMS
- * @subpackage StorageDriver
+ * @subpackage DatabaseDriver
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Storage_Driver_Abstract implements PHPIMS_Storage_Driver_Interface {
+abstract class PHPIMS_Database_Driver implements PHPIMS_Database_DriverInterface {
     /**
-     * Parameters for the current storage driver
+     * Parameters for the current database driver
      *
      * @var array
      */
@@ -82,7 +82,7 @@ abstract class PHPIMS_Storage_Driver_Abstract implements PHPIMS_Storage_Driver_I
      * Set the params
      *
      * @param array $params An array of parameters
-     * @return PHPIMS_Storage_Driver_Abstract
+     * @return PHPIMS_Database_Driver
      */
     public function setParams(array $params) {
         $this->params = $params;

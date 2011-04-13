@@ -38,11 +38,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Database_Driver_AbstractTest extends PHPUnit_Framework_TestCase {
+class PHPIMS_Storage_DriverTest extends PHPUnit_Framework_TestCase {
     /**
      * Driver instance
      *
-     * @var PHPIMS_Database_Driver_Abstract
+     * @var PHPIMS_Storage_Driver
      */
     protected $driver = null;
 
@@ -50,7 +50,7 @@ class PHPIMS_Database_Driver_AbstractTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->driver = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
+        $this->driver = $this->getMockForAbstractClass('PHPIMS_Storage_Driver');
     }
 
     /**

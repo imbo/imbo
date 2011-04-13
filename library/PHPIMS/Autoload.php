@@ -54,9 +54,9 @@ class PHPIMS_Autoload {
         'phpims_client_driverinterface' => '/Client/DriverInterface.php',
         'phpims_client_exception' => '/Client/Exception.php',
         'phpims_client_response' => '/Client/Response.php',
-        'phpims_database_driver_abstract' => '/Database/Driver/Abstract.php',
-        'phpims_database_driver_interface' => '/Database/Driver/Interface.php',
+        'phpims_database_driver' => '/Database/Driver.php',
         'phpims_database_driver_mongodb' => '/Database/Driver/MongoDB.php',
+        'phpims_database_driverinterface' => '/Database/DriverInterface.php',
         'phpims_database_exception' => '/Database/Exception.php',
         'phpims_exception' => '/Exception.php',
         'phpims_frontcontroller' => '/FrontController.php',
@@ -82,9 +82,9 @@ class PHPIMS_Autoload {
         'phpims_operation_plugin_manipulateimageplugin_transformation_rotate' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Rotate.php',
         'phpims_operation_plugin_prepareimageplugin' => '/Operation/Plugin/PrepareImagePlugin.php',
         'phpims_server_response' => '/Server/Response.php',
-        'phpims_storage_driver_abstract' => '/Storage/Driver/Abstract.php',
+        'phpims_storage_driver' => '/Storage/Driver.php',
         'phpims_storage_driver_filesystem' => '/Storage/Driver/Filesystem.php',
-        'phpims_storage_driver_interface' => '/Storage/Driver/Interface.php',
+        'phpims_storage_driverinterface' => '/Storage/DriverInterface.php',
         'phpims_storage_exception' => '/Storage/Exception.php'
     );
 

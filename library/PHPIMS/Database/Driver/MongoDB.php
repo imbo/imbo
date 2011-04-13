@@ -47,7 +47,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
+class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver {
     /**
      * A MongoDB connection
      *
@@ -174,7 +174,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Database_Driver_Interface::insertImage
+     * @see PHPIMS_Database_DriverInterface::insertImage()
      */
     public function insertImage($hash, PHPIMS_Image $image) {
         $data = new stdClass();
@@ -205,7 +205,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Database_Driver_Interface::deleteImage
+     * @see PHPIMS_Database_DriverInterface::deleteImage()
      */
     public function deleteImage($hash) {
         try {
@@ -218,7 +218,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Database_Driver_Interface::editMetadata
+     * @see PHPIMS_Database_DriverInterface::editMetadata()
      */
     public function updateMetadata($hash, array $metadata) {
         try {
@@ -238,7 +238,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Database_Driver_Interface::getMetadata
+     * @see PHPIMS_Database_DriverInterface::getMetadata()
      */
     public function getMetadata($hash) {
         try {
@@ -251,7 +251,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver_Abstract {
     }
 
     /**
-     * @see PHPIMS_Database_Driver_Interface::deleteMetadata
+     * @see PHPIMS_Database_DriverInterface::deleteMetadata()
      */
     public function deleteMetadata($hash) {
         try {

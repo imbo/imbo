@@ -56,7 +56,7 @@ class PHPIMS_Operation_DeleteMetadataTest extends PHPIMS_Operation_OperationTest
     }
 
     public function testSuccessfullExec() {
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
+        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver');
         $database->expects($this->once())->method('deleteMetadata')->with($this->hash);
         $this->operation->setDatabase($database);
 

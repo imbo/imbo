@@ -52,7 +52,7 @@ class PHPIMS_Operation_GetImageTest extends PHPIMS_Operation_OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
+        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver');
         $storage->expects($this->once())->method('load')->with($this->hash)->will($this->returnValue(true));
         $this->operation->setStorage($storage);
 
