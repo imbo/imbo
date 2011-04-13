@@ -42,7 +42,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_GetImage extends PHPIMS_Operation_Abstract {
+class PHPIMS_Operation_GetImage extends PHPIMS_Operation {
     /**
      * Internal plugins
      *
@@ -53,14 +53,14 @@ class PHPIMS_Operation_GetImage extends PHPIMS_Operation_Abstract {
     );
 
     /**
-     * @see PHPIMS_Operation_Abstract::getRequestPath()
+     * @see PHPIMS_Operation::getRequestPath()
      */
     public function getRequestPath() {
         return $this->getHash();
     }
 
     /**
-     * @see PHPIMS_Operation_Abstract::exec()
+     * @see PHPIMS_Operation::exec()
      */
     public function exec() {
         $image = $this->getImage();

@@ -66,7 +66,7 @@ class PHPIMS_Operation_Plugin_IdentifyImagePlugin extends PHPIMS_Operation_Plugi
     /**
      * @see PHPIMS_Operation_Plugin_Abstract::exec()
      */
-    public function exec(PHPIMS_Operation_Abstract $operation) {
+    public function exec(PHPIMS_Operation $operation) {
         $image = $operation->getImage();
 
         $finfo = new finfo(FILEINFO_MIME_TYPE);

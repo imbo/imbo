@@ -50,7 +50,7 @@ class CustomPlugin extends PHPIMS_Operation_Plugin_Abstract {
     /**
      * @see PHPIMS_Operation_Plugin_Abstract::exec()
      */
-    public function exec(PHPIMS_Operation_Abstract $operation) {
+    public function exec(PHPIMS_Operation $operation) {
 
     }
 }

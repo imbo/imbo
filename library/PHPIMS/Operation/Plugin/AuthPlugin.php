@@ -66,7 +66,7 @@ class PHPIMS_Operation_Plugin_AuthPlugin extends PHPIMS_Operation_Plugin_Abstrac
     /**
      * @see PHPIMS_Operation_Plugin_Abstract::exec()
      */
-    public function exec(PHPIMS_Operation_Abstract $operation) {
+    public function exec(PHPIMS_Operation $operation) {
         $requiredParams = array('signature', 'publicKey', 'timestamp');
 
         foreach ($requiredParams as $param) {

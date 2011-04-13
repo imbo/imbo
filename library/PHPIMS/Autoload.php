@@ -62,7 +62,6 @@ class PHPIMS_Autoload {
         'phpims_frontcontroller' => '/FrontController.php',
         'phpims_image' => '/Image.php',
         'phpims_operation' => '/Operation.php',
-        'phpims_operation_abstract' => '/Operation/Abstract.php',
         'phpims_operation_addimage' => '/Operation/AddImage.php',
         'phpims_operation_deleteimage' => '/Operation/DeleteImage.php',
         'phpims_operation_deletemetadata' => '/Operation/DeleteMetadata.php',

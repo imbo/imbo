@@ -90,7 +90,7 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Get a PHPIMS_Operation_Abstract mock object
+     * Get a PHPIMS_Operation mock object
      *
      * @param string $operationClass The class name of the operation to mock
      */

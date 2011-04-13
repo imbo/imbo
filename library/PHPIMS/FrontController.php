@@ -122,7 +122,7 @@ class PHPIMS_FrontController {
      * @param string $hash   Image hash (md5)
      * @param string $extra  Optional extra argument
      * @throws PHPIMS_Exception
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      */
     protected function resolveOperation($method, $hash, $extra = null) {
         $operation = null;

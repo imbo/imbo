@@ -138,7 +138,7 @@ class PHPIMS_Operation_Plugin_ManipulateImagePlugin extends PHPIMS_Operation_Plu
     /**
      * @see PHPIMS_Operation_Plugin_Abstract::exec()
      */
-    public function exec(PHPIMS_Operation_Abstract $operation) {
+    public function exec(PHPIMS_Operation $operation) {
         if (isset($_GET['t']) && is_array($_GET['t'])) {
             $originalImage = $operation->getImage();
 

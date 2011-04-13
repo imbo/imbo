@@ -61,7 +61,7 @@ class PHPIMS_Operation_Plugin_PrepareImagePluginTest extends PHPUnit_Framework_T
      * @expectedExceptionCode 400
      */
     public function testExecWithNoImageInFilesArray() {
-        $operation = m::mock('PHPIMS_Operation_Abstract');
+        $operation = m::mock('PHPIMS_Operation');
         $this->plugin->exec($operation);
     }
 

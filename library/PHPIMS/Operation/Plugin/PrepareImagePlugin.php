@@ -54,7 +54,7 @@ class PHPIMS_Operation_Plugin_PrepareImagePlugin extends PHPIMS_Operation_Plugin
     /**
      * @see PHPIMS_Operation_Plugin_Abstract::exec()
      */
-    public function exec(PHPIMS_Operation_Abstract $operation) {
+    public function exec(PHPIMS_Operation $operation) {
         // Make sure there is an image attached
         if (empty($_FILES)) {
             throw new PHPIMS_Operation_Plugin_Exception('No image attached', 400);

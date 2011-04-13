@@ -61,7 +61,7 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
      * @expectedExceptionCode 400
      */
     public function testExecWithMissingParameters() {
-        $operation = m::mock('PHPIMS_Operation_Abstract');
+        $operation = m::mock('PHPIMS_Operation');
         $this->plugin->exec($operation);
     }
 
@@ -75,7 +75,7 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
         $_GET['publicKey'] = 'some key';
         $_GET['timestamp'] = 123123123;
 
-        $operation = m::mock('PHPIMS_Operation_Abstract');
+        $operation = m::mock('PHPIMS_Operation');
 
         $this->plugin->exec($operation);
     }
@@ -91,7 +91,7 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
         // Set timestamp 5 minutes and 5 seconds in the future
         $_GET['timestamp'] = gmdate('Y-m-d\TH:i\Z', time() + 305);
 
-        $operation = m::mock('PHPIMS_Operation_Abstract');
+        $operation = m::mock('PHPIMS_Operation');
 
         $this->plugin->exec($operation);
     }
@@ -107,7 +107,7 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
         // Set timestamp 5 minutes and 5 seconds in the past
         $_GET['timestamp'] = gmdate('Y-m-d\TH:i\Z', time() - 305);
 
-        $operation = m::mock('PHPIMS_Operation_Abstract');
+        $operation = m::mock('PHPIMS_Operation');
 
         $this->plugin->exec($operation);
     }
@@ -145,7 +145,7 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
         // The data used to create the hash
         $data = $method . $requestPath . $publicKey . $timestamp;
 
-        $operation = m::mock('PHPIMS_Operation_Abstract');
+        $operation = m::mock('PHPIMS_Operation');
         $operation->shouldReceive('getMethod')->once()->andReturn($method);
         $operation->shouldReceive('getConfig')->once()->andReturn($config);
         $operation->shouldReceive('getRequestPath')->once()->andReturn($requestPath);

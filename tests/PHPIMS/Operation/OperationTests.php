@@ -42,7 +42,7 @@ abstract class PHPIMS_Operation_OperationTests extends PHPUnit_Framework_TestCas
     /**
      * Operation instance
      *
-     * @var PHPIMS_Operation_Abstract
+     * @var PHPIMS_Operation
      */
     protected $operation = null;
 
@@ -72,7 +72,7 @@ abstract class PHPIMS_Operation_OperationTests extends PHPUnit_Framework_TestCas
     /**
      * Get a new operation instance
      *
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      */
     abstract protected function getNewOperation();
 

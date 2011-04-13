@@ -80,7 +80,7 @@ abstract class PHPIMS_Operation_Plugin_Abstract {
     /**
      * Operation this plugins is attached to
      *
-     * @var PHPIMS_Operation_Abstract
+     * @var PHPIMS_Operation
      */
     protected $operation = null;
 
@@ -88,10 +88,10 @@ abstract class PHPIMS_Operation_Plugin_Abstract {
      * Class constructor
      *
      * @param array $params Parameters to the plugin
-     * @param PHPIMS_Operation_Abstract $operation Operation that owns this plugin
+     * @param PHPIMS_Operation $operation Operation that owns this plugin
      * @codeCoverageIgnore
      */
-    public function __construct(array $params = null, PHPIMS_Operation_Abstract $operation = null) {
+    public function __construct(array $params = null, PHPIMS_Operation $operation = null) {
         if ($params !== null) {
             $this->setParams($params);
         }
@@ -128,5 +128,5 @@ abstract class PHPIMS_Operation_Plugin_Abstract {
      * @param PHPIMS_Opertaion_Abstract $operation The operation the current plugin is working on
      * @throws PHPIMS_Operation_Plugin_Exception
      */
-    abstract public function exec(PHPIMS_Operation_Abstract $operation);
+    abstract public function exec(PHPIMS_Operation $operation);
 }

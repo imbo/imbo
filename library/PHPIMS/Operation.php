@@ -40,7 +40,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Operation_Abstract {
+abstract class PHPIMS_Operation {
     /**
      * The current hash value
      *
@@ -151,7 +151,7 @@ abstract class PHPIMS_Operation_Abstract {
         // before and/or after this operation. Also sort them based in the priorities set in each
         // plugin class.
         $pluginPaths = array(
-            dirname(dirname(__DIR__)) => 'PHPIMS_Operation_Plugin_',
+            dirname(__DIR__) => 'PHPIMS_Operation_Plugin_',
         );
 
         // Append plugin paths from configuration
@@ -233,7 +233,7 @@ abstract class PHPIMS_Operation_Abstract {
      * Init method
      *
      * @param array $config Configuration passed on from the front controller
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      * @codeCoverageIgnore
      */
     public function init(array $config) {
@@ -273,7 +273,7 @@ abstract class PHPIMS_Operation_Abstract {
      * Set the hash property
      *
      * @param string $hash The hash to set
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      */
     public function setHash($hash) {
         $this->hash = $hash;
@@ -294,7 +294,7 @@ abstract class PHPIMS_Operation_Abstract {
      * Set the method
      *
      * @param string $method The method to set
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      */
     public function setMethod($method) {
         $this->method = $method;
@@ -315,7 +315,7 @@ abstract class PHPIMS_Operation_Abstract {
      * Set the database driver
      *
      * @param PHPIMS_Database_Driver $driver The driver instance
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      */
     public function setDatabase(PHPIMS_Database_Driver $driver) {
         $this->database = $driver;
@@ -336,7 +336,7 @@ abstract class PHPIMS_Operation_Abstract {
      * Set the storage driver
      *
      * @param PHPIMS_Storage_Driver $driver The driver instance
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      */
     public function setStorage(PHPIMS_Storage_Driver $driver) {
         $this->storage = $driver;
@@ -357,7 +357,7 @@ abstract class PHPIMS_Operation_Abstract {
      * Set the image
      *
      * @param PHPIMS_Image $image The image object to set
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      */
     public function setImage(PHPIMS_Image $image) {
         $this->image = $image;
@@ -378,7 +378,7 @@ abstract class PHPIMS_Operation_Abstract {
      * Set the response instance
      *
      * @param PHPIMS_Server_Response $response A response object
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      */
     public function setResponse(PHPIMS_Server_Response $response) {
         $this->response = $response;
@@ -404,7 +404,7 @@ abstract class PHPIMS_Operation_Abstract {
      * Set the configuration array
      *
      * @param array $config Configuration array
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      */
     public function setConfig(array $config) {
         $this->config = $config;
@@ -415,7 +415,7 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * Trigger for registered "preExec" plugins
      *
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      * @throws PHPIMS_Operation_Plugin_Exception
      */
     public function preExec() {
@@ -429,7 +429,7 @@ abstract class PHPIMS_Operation_Abstract {
     /**
      * Trigger for registered "postExec" plugins
      *
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      * @throws PHPIMS_Operation_Plugin_Exception
      */
     public function postExec() {
@@ -446,7 +446,7 @@ abstract class PHPIMS_Operation_Abstract {
      * Operations must implement this method and return a PHPIMS_Server_Response object to return
      * to the client.
      *
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS_Operation
      * @throws PHPIMS_Operation_Exception
      */
     abstract public function exec();
@@ -462,4 +462,34 @@ abstract class PHPIMS_Operation_Abstract {
      * @return string
      */
     abstract public function getRequestPath();
+
+    /**
+     * Factory method
+     *
+     * @param string $className The name of the operation class to instantiate
+     * @param string $method The HTTP method used
+     * @param string $hash Hash that will be passed to the operations constructor
+     * @return PHPIMS_Operation
+     * @throws PHPIMS_Operation_Exception
+     */
+    static public function factory($className, $method, $hash) {
+        switch ($className) {
+            case 'PHPIMS_Operation_AddImage':
+            case 'PHPIMS_Operation_DeleteImage':
+            case 'PHPIMS_Operation_EditMetadata':
+            case 'PHPIMS_Operation_GetImage':
+            case 'PHPIMS_Operation_GetMetadata':
+            case 'PHPIMS_Operation_DeleteMetadata':
+                $operation = new $className();
+
+                $operation->setHash($hash);
+                $operation->setMethod($method);
+                $operation->setImage(new PHPIMS_Image());
+                $operation->setResponse(new PHPIMS_Server_Response());
+
+                return $operation;
+            default:
+                throw new PHPIMS_Operation_Exception('Invalid operation', 500);
+        }
+    }
 }
