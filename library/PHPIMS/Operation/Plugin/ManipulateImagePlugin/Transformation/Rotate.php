@@ -42,9 +42,9 @@
  * @see PHPIMS_Operation_Plugin_ManipulateImagePlugin
  */
 class PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Rotate implements
-      PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Interface {
+      PHPIMS_Operation_Plugin_ManipulateImagePlugin_TransformationInterface {
     /**
-     * @see PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Interface::apply()
+     * @see PHPIMS_Operation_Plugin_ManipulateImagePlugin_TransformationInterface::apply()
      */
     public function apply(\Imagine\Imagick\Image $image, array $params = array()) {
         if (!isset($params['bg'])) {
