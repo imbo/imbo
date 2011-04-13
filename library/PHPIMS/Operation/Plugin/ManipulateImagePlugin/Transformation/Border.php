@@ -41,8 +41,8 @@
  * @link https://github.com/christeredvartsen/phpims
  * @see PHPIMS_Operation_Plugin_ManipulateImagePlugin
  */
-class PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Border extends
-      PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Abstract {
+class PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Border implements
+      PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Interface {
     /**
      * @see PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Interface::apply()
      */
@@ -59,20 +59,7 @@ class PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Border extend
             $params['height'] = 1;
         }
 
-        $color = new \Imagine\Image\Color($params['color']);
-        $width = $image->getSize()->getWidth();
-        $height = $image->getSize()->getHeight();
-
-        // Draw top and bottom lines
-        for ($i = 0; $i < $params['height']; $i++) {
-            $image->draw()->line(new \Imagine\Image\Point(0, $i), new \Imagine\Image\Point($width - 1, $i), $color)
-                          ->line(new \Imagine\Image\Point($width - 1, $height - ($i + 1)), new \Imagine\Image\Point(0, $height - ($i + 1)), $color);
-        }
-
-        // Draw sides
-        for ($i = 0; $i < $params['width']; $i++) {
-            $image->draw()->line(new \Imagine\Image\Point($i, 0), new \Imagine\Image\Point($i, $height - 1), $color)
-                          ->line(new \Imagine\Image\Point($width - ($i + 1), 0), new \Imagine\Image\Point($width - ($i + 1), $height - 1), $color);
-        }
+        $transformation = new \Imagine\Filter\Transformation();
+        $transformation->applyFilter($image, new \Imagine\Filter\Advanced\Border(new \Imagine\Image\Color($params['color']), $params['width'], $params['height']));
     }
 }

@@ -41,8 +41,8 @@
  * @link https://github.com/christeredvartsen/phpims
  * @see PHPIMS_Operation_Plugin_ManipulateImagePlugin
  */
-class PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Crop extends
-      PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Abstract {
+class PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Crop implements
+      PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Interface {
     /**
      * @see PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Interface::apply()
      */

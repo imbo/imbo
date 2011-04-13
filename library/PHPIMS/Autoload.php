@@ -75,7 +75,6 @@ class PHPIMS_Autoload {
         'phpims_operation_plugin_exception' => '/Operation/Plugin/Exception.php',
         'phpims_operation_plugin_identifyimageplugin' => '/Operation/Plugin/IdentifyImagePlugin.php',
         'phpims_operation_plugin_manipulateimageplugin' => '/Operation/Plugin/ManipulateImagePlugin.php',
-        'phpims_operation_plugin_manipulateimageplugin_transformation_abstract' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Abstract.php',
         'phpims_operation_plugin_manipulateimageplugin_transformation_border' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Border.php',
         'phpims_operation_plugin_manipulateimageplugin_transformation_crop' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Crop.php',
         'phpims_operation_plugin_manipulateimageplugin_transformation_interface' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Interface.php',
