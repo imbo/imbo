@@ -40,7 +40,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Operation {
+abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     /**
      * The current hash value
      *
@@ -439,29 +439,6 @@ abstract class PHPIMS_Operation {
 
         return $this;
     }
-
-    /**
-     * Execute the operation
-     *
-     * Operations must implement this method and return a PHPIMS_Server_Response object to return
-     * to the client.
-     *
-     * @return PHPIMS_Operation
-     * @throws PHPIMS_Operation_Exception
-     */
-    abstract public function exec();
-
-    /**
-     * Return the request path that the operation currently answers
-     *
-     * Each operation answers only a specific url format, and this method must return the current
-     * complete request. The AddImage operation will for instance return <hash>.<ext> while the
-     * GetMetadata operation returns <hash>.<ext>/meta. This information is used in the AuthPlugin
-     * when generating the signature for requests that require this.
-     *
-     * @return string
-     */
-    abstract public function getRequestPath();
 
     /**
      * Factory method

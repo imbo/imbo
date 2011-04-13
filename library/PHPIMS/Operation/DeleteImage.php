@@ -44,14 +44,14 @@
  */
 class PHPIMS_Operation_DeleteImage extends PHPIMS_Operation {
     /**
-     * @see PHPIMS_Operation::getRequestPath()
+     * @see PHPIMS_OperationInterface::getRequestPath()
      */
     public function getRequestPath() {
         return $this->getHash();
     }
 
     /**
-     * @see PHPIMS_Operation::exec()
+     * @see PHPIMS_OperationInterface::exec()
      */
     public function exec() {
         $this->getDatabase()->deleteImage($this->getHash());

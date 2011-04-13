@@ -53,14 +53,14 @@ class PHPIMS_Operation_GetImage extends PHPIMS_Operation {
     );
 
     /**
-     * @see PHPIMS_Operation::getRequestPath()
+     * @see PHPIMS_OperationInterface::getRequestPath()
      */
     public function getRequestPath() {
         return $this->getHash();
     }
 
     /**
-     * @see PHPIMS_Operation::exec()
+     * @see PHPIMS_OperationInterface::exec()
      */
     public function exec() {
         $image = $this->getImage();

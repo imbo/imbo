@@ -80,6 +80,7 @@ class PHPIMS_Autoload {
         'phpims_operation_plugin_manipulateimageplugin_transformation_rotate' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Rotate.php',
         'phpims_operation_plugin_manipulateimageplugin_transformationinterface' => '/Operation/Plugin/ManipulateImagePlugin/TransformationInterface.php',
         'phpims_operation_plugin_prepareimageplugin' => '/Operation/Plugin/PrepareImagePlugin.php',
+        'phpims_operationinterface' => '/OperationInterface.php',
         'phpims_server_response' => '/Server/Response.php',
         'phpims_storage_driver' => '/Storage/Driver.php',
         'phpims_storage_driver_filesystem' => '/Storage/Driver/Filesystem.php',
