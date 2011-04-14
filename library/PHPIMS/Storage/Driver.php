@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Storage;
+
 /**
  * Abstract storage driver
  *
@@ -40,7 +42,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Storage_Driver implements PHPIMS_Storage_DriverInterface {
+abstract class Driver implements DriverInterface {
     /**
      * Parameters for the current storage driver
      *
@@ -82,7 +84,7 @@ abstract class PHPIMS_Storage_Driver implements PHPIMS_Storage_DriverInterface {
      * Set the params
      *
      * @param array $params An array of parameters
-     * @return PHPIMS_Storage_Driver
+     * @return PHPIMS\Storage\Driver
      */
     public function setParams(array $params) {
         $this->params = $params;
