@@ -305,9 +305,9 @@ To add custom plugins you will need to change the 'plugins' element of the confi
 
 Each element is an array consisting of one or two elements: 'path' and the optional 'prefix'. Path is a base path to your plugin classes. The prefix is the namespace of your classes. For the example above, you can have plugins stored like this:
 
-* `/some/path/SomePlugin.php` Classname: `SomePlugin`
-* `/some/path/SomeOtherPlugin.php` Classname: `SomeOtherPlugin`
-* `/some/other/path/My/Custom/Plugins/SomePlugin.php` Classname: `My\Custom\Plugins\SomePlugin`
-* `/some/other/path/My/Custom/Plugins/SomeOtherPlugin.php` Classname: `My\Custom\Plugins\SomeOtherPlugin`
+* `/some/path/SomePlugin.php` => `SomePlugin`
+* `/some/path/SomeOtherPlugin.php` => `SomeOtherPlugin`
+* `/some/other/path/My/Custom/Plugins/SomePlugin.php` => `My\Custom\Plugins\SomePlugin`
+* `/some/other/path/My/Custom/Plugins/SomeOtherPlugin.php` => `My\Custom\Plugins\SomeOtherPlugin`
 
 PHPIMS does not autoload any other classes than the ones included in PHPIMS itself, so you will have to add an autoloader yourself for your custom plugins. This autoloader can for instance be specified in the `config/server.php` script along with the configuration.
