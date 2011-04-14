@@ -223,4 +223,19 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame($result, $response);
     }
+
+    public function testGetImageUrl() {
+        $url = $this->client->getImageUrl($this->hash);
+        $this->assertSame($url, $this->serverUrl . '/' . $this->hash);
+    }
+
+    public function testGetImageUrlWithTransformations() {
+        $imageUrl = $this->serverUrl . '/' . $this->hash;
+        $completeUrl = $imageUrl . '?t[]=border:width=2,height=2,color=fff&t[]=resize:width=200,height=100&t[]=rotate:angle=45,bg=fff&t[]=crop:x=20,y=10,width=20,height=40';
+        $transformation = m::mock('PHPIMS\\Client\\Transformation');
+        $transformation->shouldReceive('apply')->once()->with($imageUrl)->andReturn($completeUrl);
+
+        $url = $this->client->getImageUrl($this->hash, $transformation);
+        $this->assertSame($url, $completeUrl);
+    }
 }
