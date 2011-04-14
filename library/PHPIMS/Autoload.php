@@ -69,7 +69,7 @@ class PHPIMS_Autoload {
         'phpims_operation_exception' => '/Operation/Exception.php',
         'phpims_operation_getimage' => '/Operation/GetImage.php',
         'phpims_operation_getmetadata' => '/Operation/GetMetadata.php',
-        'phpims_operation_plugin_abstract' => '/Operation/Plugin/Abstract.php',
+        'phpims_operation_plugin' => '/Operation/Plugin.php',
         'phpims_operation_plugin_authplugin' => '/Operation/Plugin/AuthPlugin.php',
         'phpims_operation_plugin_exception' => '/Operation/Plugin/Exception.php',
         'phpims_operation_plugin_identifyimageplugin' => '/Operation/Plugin/IdentifyImagePlugin.php',

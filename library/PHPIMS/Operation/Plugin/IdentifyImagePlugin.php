@@ -43,7 +43,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_IdentifyImagePlugin extends PHPIMS_Operation_Plugin_Abstract {
+class PHPIMS_Operation_Plugin_IdentifyImagePlugin extends PHPIMS_Operation_Plugin {
     /**
      * Supported mime types and the correct file extension
      *
@@ -56,7 +56,7 @@ class PHPIMS_Operation_Plugin_IdentifyImagePlugin extends PHPIMS_Operation_Plugi
     );
 
     /**
-     * @see PHPIMS_Operation_Plugin_Abstract::$events
+     * @see PHPIMS_Operation_Plugin::$events
      */
     static public $events = array(
         'getImagePostExec' => 100,
@@ -64,7 +64,7 @@ class PHPIMS_Operation_Plugin_IdentifyImagePlugin extends PHPIMS_Operation_Plugi
     );
 
     /**
-     * @see PHPIMS_Operation_Plugin_Abstract::exec()
+     * @see PHPIMS_Operation_Plugin::exec()
      */
     public function exec(PHPIMS_Operation $operation) {
         $image = $operation->getImage();

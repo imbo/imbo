@@ -52,9 +52,9 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_AuthPlugin extends PHPIMS_Operation_Plugin_Abstract {
+class PHPIMS_Operation_Plugin_AuthPlugin extends PHPIMS_Operation_Plugin {
     /**
-     * @see PHPIMS_Operation_Plugin_Abstract::$events
+     * @see PHPIMS_Operation_Plugin::$events
      */
     static public $events = array(
         'addImagePreExec'       => 100,
@@ -64,7 +64,7 @@ class PHPIMS_Operation_Plugin_AuthPlugin extends PHPIMS_Operation_Plugin_Abstrac
     );
 
     /**
-     * @see PHPIMS_Operation_Plugin_Abstract::exec()
+     * @see PHPIMS_Operation_Plugin::exec()
      */
     public function exec(PHPIMS_Operation $operation) {
         $requiredParams = array('signature', 'publicKey', 'timestamp');

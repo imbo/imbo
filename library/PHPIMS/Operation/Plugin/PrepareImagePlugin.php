@@ -43,16 +43,16 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_PrepareImagePlugin extends PHPIMS_Operation_Plugin_Abstract {
+class PHPIMS_Operation_Plugin_PrepareImagePlugin extends PHPIMS_Operation_Plugin {
     /**
-     * @see PHPIMS_Operation_Plugin_Abstract::$events
+     * @see PHPIMS_Operation_Plugin::$events
      */
     static public $events = array(
         'addImagePreExec' => 101,
     );
 
     /**
-     * @see PHPIMS_Operation_Plugin_Abstract::exec()
+     * @see PHPIMS_Operation_Plugin::exec()
      */
     public function exec(PHPIMS_Operation $operation) {
         // Make sure there is an image attached

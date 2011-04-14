@@ -40,7 +40,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Operation_Plugin_Abstract {
+abstract class PHPIMS_Operation_Plugin {
     /**
      * Array of events this plugin will be triggered for
      *
@@ -114,7 +114,7 @@ abstract class PHPIMS_Operation_Plugin_Abstract {
      * Set plugin parameters
      *
      * @param array $params Parameters to set
-     * @return PHPIMS_Operation_Plugin_Abstract
+     * @return PHPIMS_Operation_Plugin
      */
     public function setParams(array $params) {
         $this->params = $params;
@@ -125,7 +125,7 @@ abstract class PHPIMS_Operation_Plugin_Abstract {
     /**
      * Plugins exec method
      *
-     * @param PHPIMS_Opertaion_Abstract $operation The operation the current plugin is working on
+     * @param PHPIMS_Opertaion $operation The operation the current plugin is working on
      * @throws PHPIMS_Operation_Plugin_Exception
      */
     abstract public function exec(PHPIMS_Operation $operation);

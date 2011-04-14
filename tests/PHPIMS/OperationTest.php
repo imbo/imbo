@@ -197,17 +197,17 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('Some_Prefix_OtherCustomPlugin', $plugins['postExec'][78]);
     }
 
-    public function ttestPreAndPostExec() {
-        $plugin1 = $this->getMockBuilder('PHPIMS_Operation_Plugin_Abstract')->disableOriginalConstructor()->getMockForAbstractClass();
+    public function testPreAndPostExec() {
+        $plugin1 = $this->getMockBuilder('PHPIMS_Operation_Plugin')->disableOriginalConstructor()->getMockForAbstractClass();
         $plugin1->expects($this->exactly(2))->method('exec');
 
-        $plugin2 = $this->getMockBuilder('PHPIMS_Operation_Plugin_Abstract')->disableOriginalConstructor()->getMockForAbstractClass();
+        $plugin2 = $this->getMockBuilder('PHPIMS_Operation_Plugin')->disableOriginalConstructor()->getMockForAbstractClass();
         $plugin2->expects($this->exactly(2))->method('exec');
 
-        $plugin3 = $this->getMockBuilder('PHPIMS_Operation_Plugin_Abstract')->disableOriginalConstructor()->getMockForAbstractClass();
+        $plugin3 = $this->getMockBuilder('PHPIMS_Operation_Plugin')->disableOriginalConstructor()->getMockForAbstractClass();
         $plugin3->expects($this->once())->method('exec');
 
-        $plugin4 = $this->getMockBuilder('PHPIMS_Operation_Plugin_Abstract')->disableOriginalConstructor()->getMockForAbstractClass();
+        $plugin4 = $this->getMockBuilder('PHPIMS_Operation_Plugin')->disableOriginalConstructor()->getMockForAbstractClass();
         $plugin4->expects($this->once())->method('exec');
 
         $plugins = array(

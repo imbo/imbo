@@ -91,9 +91,9 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_ManipulateImagePlugin extends PHPIMS_Operation_Plugin_Abstract {
+class PHPIMS_Operation_Plugin_ManipulateImagePlugin extends PHPIMS_Operation_Plugin {
     /**
-     * @see PHPIMS_Operation_Plugin_Abstract::$events
+     * @see PHPIMS_Operation_Plugin::$events
      */
     static public $events = array(
         'getImagePostExec' => 101,
@@ -136,7 +136,7 @@ class PHPIMS_Operation_Plugin_ManipulateImagePlugin extends PHPIMS_Operation_Plu
     }
 
     /**
-     * @see PHPIMS_Operation_Plugin_Abstract::exec()
+     * @see PHPIMS_Operation_Plugin::exec()
      */
     public function exec(PHPIMS_Operation $operation) {
         if (isset($_GET['t']) && is_array($_GET['t'])) {

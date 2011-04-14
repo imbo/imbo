@@ -181,7 +181,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
             foreach ($iterator as $file) {
                 $className = $prefix . $file->getBasename('.php');
 
-                if (is_subclass_of($className, 'PHPIMS_Operation_Plugin_Abstract')) {
+                if (is_subclass_of($className, 'PHPIMS_Operation_Plugin')) {
                     $events = $className::$events;
 
                     $key = $operationName . 'PreExec';
