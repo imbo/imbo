@@ -369,4 +369,14 @@ class Client {
 
         return $url;
     }
+
+    /**
+     * Get the image url
+     *
+     * @param string $hash Image hash
+     * @return string
+     */
+    public function getImageUrl($hash) {
+        return $this->getServerUrl() . '/' . $hash;
+    }
 }

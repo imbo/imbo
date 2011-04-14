@@ -223,4 +223,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame($result, $response);
     }
+
+    public function testGetImageUrl() {
+        $url = $this->client->getImageUrl($this->hash);
+        $this->assertSame($url, $this->serverUrl . '/' . $this->hash);
+    }
 }
