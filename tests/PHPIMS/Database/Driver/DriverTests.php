@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Database\Driver;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,11 +40,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Database_Driver_DriverTests extends PHPUnit_Framework_TestCase {
+abstract class DriverTests extends \PHPUnit_Framework_TestCase {
     /**
      * Return an instance of the driver we are testing
      *
-     * @return PHPIMS_Database_Driver
+     * @return PHPIMS\Database\Driver
      */
     abstract protected function getNewDriver();
 

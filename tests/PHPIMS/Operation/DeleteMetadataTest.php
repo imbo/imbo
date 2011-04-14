@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,13 +40,13 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_DeleteMetadataTest extends PHPIMS_Operation_OperationTests {
+class DeleteMetadataTest extends OperationTests {
     protected $hash = null;
 
     protected function getNewOperation() {
         $this->hash = md5(microtime());
 
-        return new PHPIMS_Operation_DeleteMetadata($this->hash);
+        return new DeleteMetadata($this->hash);
     }
 
     public function getExpectedOperationName() {
@@ -56,7 +58,7 @@ class PHPIMS_Operation_DeleteMetadataTest extends PHPIMS_Operation_OperationTest
     }
 
     public function testSuccessfullExec() {
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver');
+        $database = $this->getMockForAbstractClass('PHPIMS\\Database\\Driver');
         $database->expects($this->once())->method('deleteMetadata')->with($this->hash);
         $this->operation->setDatabase($database);
 

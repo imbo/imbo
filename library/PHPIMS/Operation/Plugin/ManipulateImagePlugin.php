@@ -34,10 +34,6 @@ namespace PHPIMS\Operation\Plugin;
 
 use PHPIMS\Operation\Plugin;
 use PHPIMS\Operation;
-use PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Resize;
-use PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Crop;
-use PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Rotate;
-use PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Border;
 
 /**
  * Manipulate image plugin
@@ -128,10 +124,10 @@ class ManipulateImagePlugin extends Plugin {
      * @var array
      */
     static public $transformationClasses = array(
-        self::RESIZE => 'Resize',
-        self::CROP   => 'Crop',
-        self::ROTATE => 'Rotate',
-        self::BORDER => 'Border',
+        self::RESIZE => 'PHPIMS\\Operation\\Plugin\\ManipulateImagePlugin\\Transformation\\Resize',
+        self::CROP   => 'PHPIMS\\Operation\\Plugin\\ManipulateImagePlugin\\Transformation\\Crop',
+        self::ROTATE => 'PHPIMS\\Operation\\Plugin\\ManipulateImagePlugin\\Transformation\\Rotate',
+        self::BORDER => 'PHPIMS\\Operation\\Plugin\\ManipulateImagePlugin\\Transformation\\Border',
     );
 
     /**

@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,11 +40,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
+class ImageTest extends \PHPUnit_Framework_TestCase {
     /**
      * Image instance
      *
-     * @var PHPIMS_Image
+     * @var PHPIMS\Image
      */
     protected $image = null;
 
@@ -50,7 +52,7 @@ class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->image = new PHPIMS_Image();
+        $this->image = new Image();
     }
 
     /**

@@ -46,7 +46,7 @@ class DriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * Driver instance
      *
-     * @var PHPIMS_Client_Driver
+     * @var PHPIMS\Client\Driver
      */
     protected $driver = null;
 
@@ -54,7 +54,7 @@ class DriverTest extends \PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->driver = $this->getMockForAbstractClass('PHPIMS\Client\Driver');
+        $this->driver = $this->getMockForAbstractClass('PHPIMS\\Client\\Driver');
     }
 
     /**
@@ -65,7 +65,7 @@ class DriverTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetClient() {
-        $client = $this->getMockBuilder('PHPIMS\Client')->disableOriginalConstructor()->getMock();
+        $client = $this->getMockBuilder('PHPIMS\\Client')->disableOriginalConstructor()->getMock();
         $this->driver->setClient($client);
         $this->assertSame($client, $this->driver->getClient());
     }

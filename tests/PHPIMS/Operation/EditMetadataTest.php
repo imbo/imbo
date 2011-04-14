@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,13 +40,13 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_EditMetadataTest extends PHPIMS_Operation_OperationTests {
+class EditMetadataTest extends OperationTests {
     protected $hash = null;
 
     protected function getNewOperation() {
         $this->hash = md5(microtime());
 
-        return new PHPIMS_Operation_EditMetadata($this->hash);
+        return new EditMetadata($this->hash);
     }
 
     public function getExpectedOperationName() {
@@ -59,7 +61,7 @@ class PHPIMS_Operation_EditMetadataTest extends PHPIMS_Operation_OperationTests 
         $metadata = array('foo' => 'bar', 'bar' => array('foo', 'bar'));
         $_POST['metadata'] = json_encode($metadata);
 
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver');
+        $database = $this->getMockForAbstractClass('PHPIMS\\Database\\Driver');
         $database->expects($this->once())->method('updateMetadata')->with($this->hash, $metadata);
         $this->operation->setDatabase($database);
 

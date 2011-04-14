@@ -183,7 +183,7 @@ class MongoDB extends DatabaseDriver {
      * @see PHPIMS\Database\DriverInterface::insertImage()
      */
     public function insertImage($hash, Image $image) {
-        $data = new stdClass();
+        $data = new \stdClass();
 
         $data->name  = $image->getFilename();
         $data->size  = $image->getFilesize();

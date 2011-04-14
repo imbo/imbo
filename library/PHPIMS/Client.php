@@ -34,7 +34,7 @@ namespace PHPIMS;
 
 use PHPIMS\Client\Driver;
 use PHPIMS\Client\Driver\Curl as DefaultDriver;
-use PHPIMS\Client\Exception;
+use PHPIMS\Client\Exception as ClientException;
 
 /**
  * Client that interacts with the server part of PHPIMS
@@ -229,7 +229,7 @@ class Client {
      */
     public function addImage($path, array $metadata = null) {
         if (!is_file($path)) {
-            throw new Exception('File does not exist: ' . $path);
+            throw new ClientException('File does not exist: ' . $path);
         }
 
         // Get extension

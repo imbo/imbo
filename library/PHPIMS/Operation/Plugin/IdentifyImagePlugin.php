@@ -74,7 +74,7 @@ class IdentifyImagePlugin extends Plugin {
     public function exec(Operation $operation) {
         $image = $operation->getImage();
 
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mime = $finfo->buffer($image->getBlob());
 
         if (!static::supportedMimeType($mime)) {

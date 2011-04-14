@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Database;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,11 +40,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Database_DriverTest extends PHPUnit_Framework_TestCase {
+class DriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * Driver instance
      *
-     * @var PHPIMS_Database_Driver
+     * @var PHPIMS\Database\Driver
      */
     protected $driver = null;
 
@@ -50,7 +52,7 @@ class PHPIMS_Database_DriverTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->driver = $this->getMockForAbstractClass('PHPIMS_Database_Driver');
+        $this->driver = $this->getMockForAbstractClass('PHPIMS\\Database\\Driver');
     }
 
     /**

@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation\Plugin;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,16 +40,16 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_IdentifyImagePluginTest extends PHPUnit_Framework_TestCase {
+class IdentifyImagePluginTest extends \PHPUnit_Framework_TestCase {
     /**
      * Plugin instance
      *
-     * @var PHPIMS_Operation_Plugin_IdentifyImagePlugin
+     * @var PHPIMS\Operation\Plugin\IdentifyImagePlugin
      */
     protected $plugin = null;
 
     public function setUp() {
-        $this->plugin = new PHPIMS_Operation_Plugin_IdentifyImagePlugin();
+        $this->plugin = new IdentifyImagePlugin();
     }
 
     public function tearDown() {
@@ -55,30 +57,30 @@ class PHPIMS_Operation_Plugin_IdentifyImagePluginTest extends PHPUnit_Framework_
     }
 
     public function testSupportedMimeType() {
-        $this->assertTrue(PHPIMS_Operation_Plugin_IdentifyImagePlugin::supportedMimeType('image/png'));
-        $this->assertTrue(PHPIMS_Operation_Plugin_IdentifyImagePlugin::supportedMimeType('image/jpeg'));
-        $this->assertTrue(PHPIMS_Operation_Plugin_IdentifyImagePlugin::supportedMimeType('image/gif'));
-        $this->assertFalse(PHPIMS_Operation_Plugin_IdentifyImagePlugin::supportedMimeType('image/tiff'));
+        $this->assertTrue(IdentifyImagePlugin::supportedMimeType('image/png'));
+        $this->assertTrue(IdentifyImagePlugin::supportedMimeType('image/jpeg'));
+        $this->assertTrue(IdentifyImagePlugin::supportedMimeType('image/gif'));
+        $this->assertFalse(IdentifyImagePlugin::supportedMimeType('image/tiff'));
     }
 
     public function testGetFileExtension() {
-        $this->assertSame('png', PHPIMS_Operation_Plugin_IdentifyImagePlugin::getFileExtension('image/png'));
-        $this->assertSame('jpeg', PHPIMS_Operation_Plugin_IdentifyImagePlugin::getFileExtension('image/jpeg'));
-        $this->assertSame('gif', PHPIMS_Operation_Plugin_IdentifyImagePlugin::getFileExtension('image/gif'));
-        $this->assertFalse(PHPIMS_Operation_Plugin_IdentifyImagePlugin::getFileExtension('image/tiff'));
+        $this->assertSame('png', IdentifyImagePlugin::getFileExtension('image/png'));
+        $this->assertSame('jpeg', IdentifyImagePlugin::getFileExtension('image/jpeg'));
+        $this->assertSame('gif', IdentifyImagePlugin::getFileExtension('image/gif'));
+        $this->assertFalse(IdentifyImagePlugin::getFileExtension('image/tiff'));
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedException PHPIMS\Operation\Plugin\Exception
      * @expectedExceptionCode 415
      */
     public function testExecWithUnsupportedImageType() {
-        $image = $this->getMock('PHPIMS_Image', array('getBlob'));
+        $image = $this->getMock('PHPIMS\\Image', array('getBlob'));
         $image->expects($this->once())
               ->method('getBlob')
               ->will($this->returnValue(file_get_contents(__FILE__)));
 
-        $operation = $this->getMockBuilder('PHPIMS_Operation_AddImage')
+        $operation = $this->getMockBuilder('PHPIMS\\Operation\\AddImage')
                           ->setMethods(array('getImage'))
                           ->disableOriginalConstructor()
                           ->getMock();
@@ -93,7 +95,7 @@ class PHPIMS_Operation_Plugin_IdentifyImagePluginTest extends PHPUnit_Framework_
     public function testExecWithValidImage() {
         $imageFile = __DIR__ . '/../../_files/image.png';
 
-        $image = $this->getMock('PHPIMS_Image', array('getBlob', 'setMimeType', 'setExtension'));
+        $image = $this->getMock('PHPIMS\\Image', array('getBlob', 'setMimeType', 'setExtension'));
         $image->expects($this->once())
               ->method('getBlob')
               ->will($this->returnValue(file_get_contents($imageFile)));
@@ -106,7 +108,7 @@ class PHPIMS_Operation_Plugin_IdentifyImagePluginTest extends PHPUnit_Framework_
               ->method('setExtension')->with('png')
               ->will($this->returnValue($image));
 
-        $operation = $this->getMockBuilder('PHPIMS_Operation_AddImage')
+        $operation = $this->getMockBuilder('PHPIMS\\Operation\\AddImage')
                           ->setMethods(array('getImage'))
                           ->disableOriginalConstructor()
                           ->getMock();

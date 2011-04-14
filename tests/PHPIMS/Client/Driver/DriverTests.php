@@ -95,7 +95,7 @@ abstract class DriverTests extends \PHPUnit_Framework_TestCase {
             'bar' => 'foo',
         );
         $response = $this->driver->post($this->testUrl, $metadata);
-        $this->assertInstanceOf('PHPIMS\Client\Response', $response);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
 
         $result = unserialize($response->getBody());
         $this->assertSame('POST', $result['method']);
@@ -105,7 +105,7 @@ abstract class DriverTests extends \PHPUnit_Framework_TestCase {
     public function testGet() {
         $url = $this->testUrl . '?foo=bar&bar=foo';
         $response = $this->driver->get($url);
-        $this->assertInstanceOf('PHPIMS\Client\Response', $response);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
         $result = unserialize($response->getBody());
         $this->assertSame('GET', $result['method']);
         $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $result['data']);
@@ -113,13 +113,13 @@ abstract class DriverTests extends \PHPUnit_Framework_TestCase {
 
     public function testHead() {
         $response = $this->driver->head($this->testUrl);
-        $this->assertInstanceOf('PHPIMS\Client\Response', $response);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
         $this->assertEmpty($response->getBody());
     }
 
     public function testDelete() {
         $response = $this->driver->delete($this->testUrl);
-        $this->assertInstanceOf('PHPIMS\Client\Response', $response);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
         $result = unserialize($response->getBody());
         $this->assertSame('DELETE', $result['method']);
     }
@@ -130,7 +130,7 @@ abstract class DriverTests extends \PHPUnit_Framework_TestCase {
             'bar' => 'foo',
         );
         $response = $this->driver->addImage(__FILE__, $this->testUrl, $data);
-        $this->assertInstanceOf('PHPIMS\Client\Response', $response);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
         $result = unserialize($response->getBody());
         $this->assertSame('POST', $result['method']);
         $this->assertArrayHasKey('files', $result);

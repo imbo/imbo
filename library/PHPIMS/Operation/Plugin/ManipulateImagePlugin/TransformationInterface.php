@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-use PHPIMS\Operation\Plugin\ManipulateImagePlugin;
+namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin;
 
 /**
  * Image transformation interface

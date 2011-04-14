@@ -35,7 +35,7 @@ namespace PHPIMS;
 use PHPIMS\Database\Driver as DatabaseDriver;
 use PHPIMS\Storage\Driver as StorageDriver;
 use PHPIMS\Server\Response;
-use PHPIMS\Operation\Exception;
+use PHPIMS\Operation\Exception as OperationException;
 
 /**
  * Abstract operation class
@@ -183,7 +183,7 @@ abstract class Operation implements OperationInterface {
                 continue;
             }
 
-            $iterator = new GlobIterator($path . '*Plugin.php');
+            $iterator = new \GlobIterator($path . '*Plugin.php');
 
             foreach ($iterator as $file) {
                 $className = $prefix . $file->getBasename('.php');
@@ -473,7 +473,7 @@ abstract class Operation implements OperationInterface {
 
                 return $operation;
             default:
-                throw new Exception('Invalid operation', 500);
+                throw new OperationException('Invalid operation', 500);
         }
     }
 }

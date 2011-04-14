@@ -30,6 +30,11 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace Some\Prefix;
+
+use PHPIMS\Operation\Plugin;
+use PHPIMS\Operation;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,9 +43,9 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Some_Prefix_OtherCustomPlugin extends PHPIMS_Operation_Plugin {
+class OtherCustomPlugin extends Plugin {
     /**
-     * @see PHPIMS_Operation_Plugin::$events
+     * @see PHPIMS\Operation\Plugin::$events
      */
     static public $events = array(
         'addImagePreExec'  => 42,
@@ -48,9 +53,9 @@ class Some_Prefix_OtherCustomPlugin extends PHPIMS_Operation_Plugin {
     );
 
     /**
-     * @see PHPIMS_Operation_Plugin::exec()
+     * @see PHPIMS\Operation\Plugin::exec()
      */
-    public function exec(PHPIMS_Operation $operation) {
+    public function exec(Operation $operation) {
 
     }
 }

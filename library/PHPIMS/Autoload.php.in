@@ -65,4 +65,4 @@ class Autoload {
     }
 }
 
-spl_autoload_register('Autoload::load');
+spl_autoload_register('PHPIMS\\Autoload::load');

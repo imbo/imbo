@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation\Plugin;
+
 use \Mockery as m;
 
 /**
@@ -40,16 +42,16 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase {
+class AuthPluginTest extends \PHPUnit_Framework_TestCase {
     /**
      * Plugin instance
      *
-     * @var PHPIMS_Operation_Plugin_AuthPlugin
+     * @var PHPIMS\Operation\Plugin\AuthPlugin
      */
     protected $plugin = null;
 
     public function setUp() {
-        $this->plugin = new PHPIMS_Operation_Plugin_AuthPlugin();
+        $this->plugin = new AuthPlugin();
     }
 
     public function tearDown() {
@@ -57,16 +59,16 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedException PHPIMS\Operation\Plugin\Exception
      * @expectedExceptionCode 400
      */
     public function testExecWithMissingParameters() {
-        $operation = m::mock('PHPIMS_Operation');
+        $operation = m::mock('PHPIMS\\Operation');
         $this->plugin->exec($operation);
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedException PHPIMS\Operation\Plugin\Exception
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Invalid timestamp format:
      */
@@ -75,13 +77,13 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
         $_GET['publicKey'] = 'some key';
         $_GET['timestamp'] = 123123123;
 
-        $operation = m::mock('PHPIMS_Operation');
+        $operation = m::mock('PHPIMS\\Operation');
 
         $this->plugin->exec($operation);
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedException PHPIMS\Operation\Plugin\Exception
      * @expectedExceptionCode 401
      * @expectedExceptionMessage Timestamp expired
      */
@@ -91,13 +93,13 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
         // Set timestamp 5 minutes and 5 seconds in the future
         $_GET['timestamp'] = gmdate('Y-m-d\TH:i\Z', time() + 305);
 
-        $operation = m::mock('PHPIMS_Operation');
+        $operation = m::mock('PHPIMS\\Operation');
 
         $this->plugin->exec($operation);
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedException PHPIMS\Operation\Plugin\Exception
      * @expectedExceptionCode 401
      * @expectedExceptionMessage Timestamp expired
      */
@@ -107,7 +109,7 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
         // Set timestamp 5 minutes and 5 seconds in the past
         $_GET['timestamp'] = gmdate('Y-m-d\TH:i\Z', time() - 305);
 
-        $operation = m::mock('PHPIMS_Operation');
+        $operation = m::mock('PHPIMS\\Operation');
 
         $this->plugin->exec($operation);
     }
@@ -120,7 +122,7 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedException PHPIMS\Operation\Plugin\Exception
      * @expectedExceptionCode 401
      * @expectedExceptionMessage Signature mismatch
      */
@@ -145,7 +147,7 @@ class PHPIMS_Operation_Plugin_AuthPluginTest extends PHPUnit_Framework_TestCase 
         // The data used to create the hash
         $data = $method . $requestPath . $publicKey . $timestamp;
 
-        $operation = m::mock('PHPIMS_Operation');
+        $operation = m::mock('PHPIMS\\Operation');
         $operation->shouldReceive('getMethod')->once()->andReturn($method);
         $operation->shouldReceive('getConfig')->once()->andReturn($config);
         $operation->shouldReceive('getRequestPath')->once()->andReturn($requestPath);

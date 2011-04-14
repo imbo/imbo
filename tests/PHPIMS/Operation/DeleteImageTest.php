@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,9 +40,9 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_DeleteImageTest extends PHPIMS_Operation_OperationTests {
+class DeleteImageTest extends OperationTests {
     protected function getNewOperation() {
-        return new PHPIMS_Operation_DeleteImage();
+        return new DeleteImage();
     }
 
     public function getExpectedOperationName() {
@@ -52,11 +54,11 @@ class PHPIMS_Operation_DeleteImageTest extends PHPIMS_Operation_OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver');
+        $database = $this->getMockForAbstractClass('PHPIMS\\Database\\Driver');
         $database->expects($this->once())->method('deleteImage')->with($this->hash);
         $this->operation->setDatabase($database);
 
-        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver');
+        $storage = $this->getMockForAbstractClass('PHPIMS\\Storage\\Driver');
         $storage->expects($this->once())->method('delete')->with($this->hash);
         $this->operation->setStorage($storage);
 

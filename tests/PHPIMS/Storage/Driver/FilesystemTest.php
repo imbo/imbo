@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Storage\Driver;
+
 use \Mockery as m;
 
 /** vfsStream */
@@ -43,11 +45,11 @@ require_once 'vfsStream/vfsStream.php';
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
+class FilesystemTest extends \PHPUnit_Framework_TestCase {
     /**
      * Driver instance
      *
-     * @var PHPIMS_Storage_Driver_Filesystem
+     * @var PHPIMS\Storage\Driver\Filesystem
      */
     protected $driver = null;
 
@@ -55,7 +57,7 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->driver = new PHPIMS_Storage_Driver_Filesystem();
+        $this->driver = new Filesystem();
     }
 
     /**
@@ -66,7 +68,7 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException PHPIMS_Storage_Exception
+     * @expectedException PHPIMS\Storage\Exception
      * @expectedExceptionMessage File not found
      */
     public function testDeleteFileThatDoesNotExist() {
@@ -77,19 +79,19 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
     public function testDelete() {
         $hash = 'cfe95b64ac715d64275365ede690ee7c.png';
 
-        vfsStream::setup('basedir');
-        $this->driver->setParams(array('dataDir' => vfsStream::url('basedir')));
+        \vfsStream::setup('basedir');
+        $this->driver->setParams(array('dataDir' => \vfsStream::url('basedir')));
 
-        $root = vfsStreamWrapper::getRoot();
+        $root = \vfsStreamWrapper::getRoot();
         $last = $root;
 
         foreach (array($hash[0], $hash[1], $hash[2]) as $letter) {
-            $d = vfsStream::newDirectory($letter);
+            $d = \vfsStream::newDirectory($letter);
             $last->addChild($d);
             $last = $d;
         }
 
-        $last->addChild(vfsStream::newFile($hash));
+        $last->addChild(\vfsStream::newFile($hash));
 
         $this->assertTrue($last->hasChild($hash));
         $this->driver->delete($hash);
@@ -97,18 +99,18 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException PHPIMS_Storage_Exception
+     * @expectedException PHPIMS\Storage\Exception
      * @expectedExpectionMessage Could not store image
      */
     public function testStoreToUnwritablePath() {
-        $image = $this->getMock('PHPIMS_Image');
+        $image = $this->getMock('PHPIMS\\Image');
         $dir = 'unwritableDirectory';
 
         // Create the virtual directory with no permissions
-        vfsStream::setup($dir, 0);
+        \vfsStream::setup($dir, 0);
 
         $this->driver->setParams(array(
-            'dataDir' => vfsStream::url($dir),
+            'dataDir' => \vfsStream::url($dir),
         ));
 
         $this->driver->store('some path', $image);
@@ -120,11 +122,11 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException PHPIMS_Storage_Exception
+     * @expectedException PHPIMS\Storage\Exception
      * @expectedExceptionCode 404
      */
     public function testLoadFileThatDoesNotExist() {
-        $image = m::mock('PHPIMS_Image');
+        $image = m::mock('PHPIMS\\Image');
         $this->driver->setParams(array('dataDir' => '/some/path'));
         $this->driver->load(md5(microtime()) . '.png', $image);
     }
@@ -132,24 +134,24 @@ class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
     public function testLoad() {
         $hash = md5(microtime());
 
-        vfsStream::setup('basedir');
-        $this->driver->setParams(array('dataDir' => vfsStream::url('basedir')));
+        \vfsStream::setup('basedir');
+        $this->driver->setParams(array('dataDir' => \vfsStream::url('basedir')));
 
-        $root = vfsStreamWrapper::getRoot();
+        $root = \vfsStreamWrapper::getRoot();
         $last = $root;
 
         foreach (array($hash[0], $hash[1], $hash[2]) as $letter) {
-            $d = vfsStream::newDirectory($letter);
+            $d = \vfsStream::newDirectory($letter);
             $last->addChild($d);
             $last = $d;
         }
 
         $content = 'some binary content';
-        $file = vfsStream::newFile($hash);
+        $file = \vfsStream::newFile($hash);
         $file->setContent($content);
         $last->addChild($file);
 
-        $image = $this->getMock('PHPIMS_Image');
+        $image = $this->getMock('PHPIMS\\Image');
         $image->expects($this->once())->method('setBlob')->with($content);
 
         $this->assertTrue($this->driver->load($hash, $image));

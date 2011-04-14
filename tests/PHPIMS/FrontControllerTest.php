@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,11 +40,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
+class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     /**
      * Front controller instance
      *
-     * @var PHPIMS_FrontController
+     * @var PHPIMS\FrontController
      */
     protected $controller = null;
 
@@ -67,7 +69,7 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     );
 
     /**
-     * Factory used in this test as a stand-in for PHPIMS_Operation
+     * Factory used in this test as a stand-in for PHPIMS\Operation
      */
     static public function factory($operation, $hash = null) {
         return self::$mocks[$operation];
@@ -77,7 +79,7 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->controller = new PHPIMS_FrontController($this->controllerConfig);
+        $this->controller = new FrontController($this->controllerConfig);
         self::$mocks = array();
     }
 
@@ -90,12 +92,12 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Get a PHPIMS_Operation mock object
+     * Get a PHPIMS\Operation mock object
      *
      * @param string $operationClass The class name of the operation to mock
      */
     protected function getOperationMock($operationClass) {
-        $response = $this->getMock('PHPIMS_Server_Response');
+        $response = $this->getMock('PHPIMS\\Server\\Response');
 
         $operation = $this->getMockBuilder($operationClass)->disableOriginalConstructor()->getMock();
         $operation->expects($this->once())->method('init')->with($this->controllerConfig)->will($this->returnValue($operation));
@@ -107,14 +109,14 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testIsValidMethodWithSupportedMethods() {
-        $this->assertTrue(PHPIMS_FrontController::isValidMethod('POST'));
-        $this->assertTrue(PHPIMS_FrontController::isValidMethod('GET'));
-        $this->assertTrue(PHPIMS_FrontController::isValidMethod('HEAD'));
-        $this->assertTrue(PHPIMS_FrontController::isValidMethod('DELETE'));
+        $this->assertTrue(FrontController::isValidMethod('POST'));
+        $this->assertTrue(FrontController::isValidMethod('GET'));
+        $this->assertTrue(FrontController::isValidMethod('HEAD'));
+        $this->assertTrue(FrontController::isValidMethod('DELETE'));
     }
 
     public function testIsValidMethodWithInvalidMethod() {
-        $this->assertFalse(PHPIMS_FrontController::isValidMethod('foobar'));
+        $this->assertFalse(FrontController::isValidMethod('foobar'));
     }
 
     public function testSetGetConfig() {
@@ -127,7 +129,7 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException PHPIMS_Exception
+     * @expectedException PHPIMS\Exception
      * @expectedExceptionCode 501
      */
     public function testHandleInvalidMethod() {
@@ -135,7 +137,7 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException PHPIMS_Exception
+     * @expectedException PHPIMS\Exception
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Invalid request: /
      */
@@ -144,49 +146,49 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testHandleAddImage() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_AddImage');
-        self::$mocks['PHPIMS_Operation_AddImage'] = $operation;
+        $operation = $this->getOperationMock('PHPIMS\\Operation\\AddImage');
+        self::$mocks['PHPIMS\\Operation\\AddImage'] = $operation;
 
         $this->controller->handle('POST', md5(microtime()) . '.png');
     }
 
     public function testHandleEditImage() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_EditMetadata');
-        self::$mocks['PHPIMS_Operation_EditMetadata'] = $operation;
+        $operation = $this->getOperationMock('PHPIMS\\Operation\\EditMetadata');
+        self::$mocks['PHPIMS\\Operation\\EditMetadata'] = $operation;
 
         $this->controller->handle('POST', md5(microtime()) . '.png/meta');
     }
 
     public function testHandleGetImage() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_GetImage');
-        self::$mocks['PHPIMS_Operation_GetImage'] = $operation;
+        $operation = $this->getOperationMock('PHPIMS\\Operation\\GetImage');
+        self::$mocks['PHPIMS\\Operation\\GetImage'] = $operation;
 
         $this->controller->handle('GET', md5(microtime()) . '.png');
     }
 
     public function testHandleGetMetadata() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_GetMetadata');
-        self::$mocks['PHPIMS_Operation_GetMetadata'] = $operation;
+        $operation = $this->getOperationMock('PHPIMS\\Operation\\GetMetadata');
+        self::$mocks['PHPIMS\\Operation\\GetMetadata'] = $operation;
 
         $this->controller->handle('GET', md5(microtime()) . '.png/meta');
     }
 
     public function testHandleDeleteImage() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_DeleteImage');
-        self::$mocks['PHPIMS_Operation_DeleteImage'] = $operation;
+        $operation = $this->getOperationMock('PHPIMS\\Operation\\DeleteImage');
+        self::$mocks['PHPIMS\\Operation\\DeleteImage'] = $operation;
 
         $this->controller->handle('DELETE', md5(microtime()) . '.png');
     }
 
     public function testHandleDeleteMetadata() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_DeleteMetadata');
-        self::$mocks['PHPIMS_Operation_DeleteMetadata'] = $operation;
+        $operation = $this->getOperationMock('PHPIMS\\Operation\\DeleteMetadata');
+        self::$mocks['PHPIMS\\Operation\\DeleteMetadata'] = $operation;
 
         $this->controller->handle('DELETE', md5(microtime()) . '.png/meta');
     }
 
     /**
-     * @expectedException PHPIMS_Exception
+     * @expectedException PHPIMS\Exception
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Unsupported operation
      */
@@ -195,7 +197,7 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException PHPIMS_Exception
+     * @expectedException PHPIMS\Exception
      * @expectedExceptionCode 418
      */
     public function testHandleBrew() {

@@ -64,30 +64,30 @@ class Autoload {
         'phpims\\frontcontroller' => '/FrontController.php',
         'phpims\\image' => '/Image.php',
         'phpims\\operation' => '/Operation.php',
+        'phpims\\operation\\addimage' => '/Operation/AddImage.php',
+        'phpims\\operation\\deleteimage' => '/Operation/DeleteImage.php',
+        'phpims\\operation\\deletemetadata' => '/Operation/DeleteMetadata.php',
+        'phpims\\operation\\editmetadata' => '/Operation/EditMetadata.php',
+        'phpims\\operation\\exception' => '/Operation/Exception.php',
+        'phpims\\operation\\getimage' => '/Operation/GetImage.php',
+        'phpims\\operation\\getmetadata' => '/Operation/GetMetadata.php',
+        'phpims\\operation\\plugin' => '/Operation/Plugin.php',
+        'phpims\\operation\\plugin\\authplugin' => '/Operation/Plugin/AuthPlugin.php',
+        'phpims\\operation\\plugin\\exception' => '/Operation/Plugin/Exception.php',
+        'phpims\\operation\\plugin\\identifyimageplugin' => '/Operation/Plugin/IdentifyImagePlugin.php',
+        'phpims\\operation\\plugin\\manipulateimageplugin' => '/Operation/Plugin/ManipulateImagePlugin.php',
+        'phpims\\operation\\plugin\\manipulateimageplugin\\transformation\\border' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Border.php',
+        'phpims\\operation\\plugin\\manipulateimageplugin\\transformation\\crop' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Crop.php',
+        'phpims\\operation\\plugin\\manipulateimageplugin\\transformation\\resize' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Resize.php',
+        'phpims\\operation\\plugin\\manipulateimageplugin\\transformation\\rotate' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Rotate.php',
+        'phpims\\operation\\plugin\\manipulateimageplugin\\transformationinterface' => '/Operation/Plugin/ManipulateImagePlugin/TransformationInterface.php',
+        'phpims\\operation\\plugin\\prepareimageplugin' => '/Operation/Plugin/PrepareImagePlugin.php',
         'phpims\\operationinterface' => '/OperationInterface.php',
         'phpims\\server\\response' => '/Server/Response.php',
         'phpims\\storage\\driver' => '/Storage/Driver.php',
         'phpims\\storage\\driver\\filesystem' => '/Storage/Driver/Filesystem.php',
         'phpims\\storage\\driverinterface' => '/Storage/DriverInterface.php',
-        'phpims\\storage\\exception' => '/Storage/Exception.php',
-        'phpims_operation_addimage' => '/Operation/AddImage.php',
-        'phpims_operation_deleteimage' => '/Operation/DeleteImage.php',
-        'phpims_operation_deletemetadata' => '/Operation/DeleteMetadata.php',
-        'phpims_operation_editmetadata' => '/Operation/EditMetadata.php',
-        'phpims_operation_exception' => '/Operation/Exception.php',
-        'phpims_operation_getimage' => '/Operation/GetImage.php',
-        'phpims_operation_getmetadata' => '/Operation/GetMetadata.php',
-        'phpims_operation_plugin' => '/Operation/Plugin.php',
-        'phpims_operation_plugin_authplugin' => '/Operation/Plugin/AuthPlugin.php',
-        'phpims_operation_plugin_exception' => '/Operation/Plugin/Exception.php',
-        'phpims_operation_plugin_identifyimageplugin' => '/Operation/Plugin/IdentifyImagePlugin.php',
-        'phpims_operation_plugin_manipulateimageplugin' => '/Operation/Plugin/ManipulateImagePlugin.php',
-        'phpims_operation_plugin_manipulateimageplugin_transformation_border' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Border.php',
-        'phpims_operation_plugin_manipulateimageplugin_transformation_crop' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Crop.php',
-        'phpims_operation_plugin_manipulateimageplugin_transformation_resize' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Resize.php',
-        'phpims_operation_plugin_manipulateimageplugin_transformation_rotate' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Rotate.php',
-        'phpims_operation_plugin_manipulateimageplugin_transformationinterface' => '/Operation/Plugin/ManipulateImagePlugin/TransformationInterface.php',
-        'phpims_operation_plugin_prepareimageplugin' => '/Operation/Plugin/PrepareImagePlugin.php'
+        'phpims\\storage\\exception' => '/Storage/Exception.php'
     );
 
     /**
@@ -104,4 +104,4 @@ class Autoload {
     }
 }
 
-spl_autoload_register('Autoload::load');
+spl_autoload_register('PHPIMS\\Autoload::load');
