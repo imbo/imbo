@@ -30,6 +30,11 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
+use PHPIMS\Operation;
+use PHPIMS\Operation\Plugin\IdentifyImage;
+
 /**
  * Get image operation
  *
@@ -42,25 +47,25 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_GetImage extends PHPIMS_Operation {
+class GetImage extends Operation {
     /**
      * Internal plugins
      *
      * @var array
      */
     protected $internalPluginsSpec = array(
-        'PHPIMS_Operation_Plugin_IdentifyImage' => array(),
+        'IdentifyImage' => array(),
     );
 
     /**
-     * @see PHPIMS_OperationInterface::getRequestPath()
+     * @see PHPIMS\OperationInterface::getRequestPath()
      */
     public function getRequestPath() {
         return $this->getHash();
     }
 
     /**
-     * @see PHPIMS_OperationInterface::exec()
+     * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
         $image = $this->getImage();

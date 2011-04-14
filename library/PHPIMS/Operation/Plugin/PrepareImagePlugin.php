@@ -30,6 +30,11 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation\Plugin;
+
+use PHPIMS\Operation\Plugin;
+use PHPIMS\Operation;
+
 /**
  * Prepare image plugin
  *
@@ -43,21 +48,21 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_PrepareImagePlugin extends PHPIMS_Operation_Plugin {
+class PrepareImagePlugin extends Plugin {
     /**
-     * @see PHPIMS_Operation_Plugin::$events
+     * @see PHPIMS\Operation\Plugin::$events
      */
     static public $events = array(
         'addImagePreExec' => 101,
     );
 
     /**
-     * @see PHPIMS_Operation_Plugin::exec()
+     * @see PHPIMS\Operation\Plugin::exec()
      */
-    public function exec(PHPIMS_Operation $operation) {
+    public function exec(Operation $operation) {
         // Make sure there is an image attached
         if (empty($_FILES)) {
-            throw new PHPIMS_Operation_Plugin_Exception('No image attached', 400);
+            throw new Exception('No image attached', 400);
         }
 
         $imagePath = $_FILES['file']['tmp_name'];
@@ -67,7 +72,7 @@ class PHPIMS_Operation_Plugin_PrepareImagePlugin extends PHPIMS_Operation_Plugin
         $hashFromRequest = $operation->getHash();
 
         if ($actualHash !== substr($hashFromRequest, 0, 32)) {
-            throw new PHPIMS_Operation_Plugin_Exception('Hash mismatch', 400);
+            throw new Exception('Hash mismatch', 400);
         }
 
         $image = $operation->getImage();

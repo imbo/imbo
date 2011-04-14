@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+use PHPIMS\Operation\Plugin\ManipulateImagePlugin;
+
 /**
  * Image transformation interface
  *
@@ -40,14 +42,14 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface PHPIMS_Operation_Plugin_ManipulateImagePlugin_TransformationInterface {
+interface TransformationInterface {
     /**
      * Method that will transform the image
      *
      * @param \Imagine\Imagick\Image $image Image object
      * @param array $params Parameters for the transformation
      * @return string Return the transformed binary image data
-     * @throws PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Exception
+     * @throws PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Exception
      */
     public function apply(\Imagine\Imagick\Image $image, array $params = array());
 }

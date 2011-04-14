@@ -30,6 +30,15 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation\Plugin;
+
+use PHPIMS\Operation\Plugin;
+use PHPIMS\Operation;
+use PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Resize;
+use PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Crop;
+use PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Rotate;
+use PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Border;
+
 /**
  * Manipulate image plugin
  *
@@ -91,9 +100,9 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_ManipulateImagePlugin extends PHPIMS_Operation_Plugin {
+class ManipulateImagePlugin extends Plugin {
     /**
-     * @see PHPIMS_Operation_Plugin::$events
+     * @see PHPIMS\Operation\Plugin::$events
      */
     static public $events = array(
         'getImagePostExec' => 101,
@@ -119,10 +128,10 @@ class PHPIMS_Operation_Plugin_ManipulateImagePlugin extends PHPIMS_Operation_Plu
      * @var array
      */
     static public $transformationClasses = array(
-        self::RESIZE => 'PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Resize',
-        self::CROP   => 'PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Crop',
-        self::ROTATE => 'PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Rotate',
-        self::BORDER => 'PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Border',
+        self::RESIZE => 'Resize',
+        self::CROP   => 'Crop',
+        self::ROTATE => 'Rotate',
+        self::BORDER => 'Border',
     );
 
     /**
@@ -136,9 +145,9 @@ class PHPIMS_Operation_Plugin_ManipulateImagePlugin extends PHPIMS_Operation_Plu
     }
 
     /**
-     * @see PHPIMS_Operation_Plugin::exec()
+     * @see PHPIMS\Operation\Plugin::exec()
      */
-    public function exec(PHPIMS_Operation $operation) {
+    public function exec(Operation $operation) {
         if (isset($_GET['t']) && is_array($_GET['t'])) {
             $originalImage = $operation->getImage();
 
