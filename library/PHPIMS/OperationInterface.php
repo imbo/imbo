@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
 /**
  * Operation interface
  *
@@ -40,14 +42,14 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface PHPIMS_OperationInterface {
+interface OperationInterface {
     /**
      * Execute the operation
      *
      * The main exec method of the operation.
      *
-     * @return PHPIMS_Operation
-     * @throws PHPIMS_Operation_Exception
+     * @return PHPIMS\Operation
+     * @throws PHPIMS\Operation\Exception
      */
     public function exec();
 

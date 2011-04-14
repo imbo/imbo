@@ -30,6 +30,13 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
+use PHPIMS\Database\Driver as DatabaseDriver;
+use PHPIMS\Storage\Driver as StorageDriver;
+use PHPIMS\Server\Response;
+use PHPIMS\Operation\Exception;
+
 /**
  * Abstract operation class
  *
@@ -40,7 +47,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
+abstract class Operation implements OperationInterface {
     /**
      * The current hash value
      *
@@ -58,34 +65,34 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     /**
      * The database driver
      *
-     * @var PHPIMS_Database_Driver
+     * @var PHPIMS\Database\Driver
      */
     protected $database = null;
 
     /**
      * The storage driver
      *
-     * @var PHPIMS_Storage_Driver
+     * @var PHPIMS\Storage\Driver
      */
     protected $storage = null;
 
     /**
      * Image instance
      *
-     * The image object is populated with en empty instance of PHPIMS_Image when the operation
+     * The image object is populated with en empty instance of PHPIMS\Image when the operation
      * initializes.
      *
-     * @var PHPIMS_Image
+     * @var PHPIMS\Image
      */
     protected $image = null;
 
     /**
      * Response instance
      *
-     * The response object is populated with en empty instance of PHPIMS_Server_Response when the
+     * The response object is populated with en empty instance of PHPIMS\Server\Response when the
      * operation initializes.
      *
-     * @var PHPIMS_Image
+     * @var PHPIMS\Image
      */
     protected $response = null;
 
@@ -151,7 +158,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
         // before and/or after this operation. Also sort them based in the priorities set in each
         // plugin class.
         $pluginPaths = array(
-            dirname(__DIR__) => 'PHPIMS_Operation_Plugin_',
+            dirname(__DIR__) => 'PHPIMS\\Operation\\Plugin\\',
         );
 
         // Append plugin paths from configuration
@@ -169,7 +176,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
             $path = rtrim($path, '/̈́') . '/';
 
             if (!empty($prefix)) {
-                $path .= str_replace('_', '/', $prefix);
+                $path .= str_replace('\\', '/', $prefix);
             }
 
             if (empty($path) || !is_dir($path)) {
@@ -181,7 +188,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
             foreach ($iterator as $file) {
                 $className = $prefix . $file->getBasename('.php');
 
-                if (is_subclass_of($className, 'PHPIMS_Operation_Plugin')) {
+                if (is_subclass_of($className, 'PHPIMS\\Operation\\Plugin')) {
                     $events = $className::$events;
 
                     $key = $operationName . 'PreExec';
@@ -233,7 +240,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
      * Init method
      *
      * @param array $config Configuration passed on from the front controller
-     * @return PHPIMS_Operation
+     * @return PHPIMS\Operation
      * @codeCoverageIgnore
      */
     public function init(array $config) {
@@ -254,7 +261,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     protected function getOperationName() {
         $className = get_class($this);
 
-        $operationName = substr($className, strrpos($className, '_') + 1);
+        $operationName = substr($className, strrpos($className, '\\') + 1);
         $operationName = lcfirst($operationName);
 
         return $operationName;
@@ -273,7 +280,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
      * Set the hash property
      *
      * @param string $hash The hash to set
-     * @return PHPIMS_Operation
+     * @return PHPIMS\Operation
      */
     public function setHash($hash) {
         $this->hash = $hash;
@@ -294,7 +301,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
      * Set the method
      *
      * @param string $method The method to set
-     * @return PHPIMS_Operation
+     * @return PHPIMS\Operation
      */
     public function setMethod($method) {
         $this->method = $method;
@@ -305,7 +312,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     /**
      * Get the database driver
      *
-     * @return PHPIMS_Database_Driver
+     * @return PHPIMS\Database\Driver
      */
     public function getDatabase() {
         return $this->database;
@@ -314,10 +321,10 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     /**
      * Set the database driver
      *
-     * @param PHPIMS_Database_Driver $driver The driver instance
-     * @return PHPIMS_Operation
+     * @param PHPIMS\Database\Driver $driver The driver instance
+     * @return PHPIMS\Operation
      */
-    public function setDatabase(PHPIMS_Database_Driver $driver) {
+    public function setDatabase(DatabaseDriver $driver) {
         $this->database = $driver;
 
         return $this;
@@ -326,7 +333,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     /**
      * Get the storage driver
      *
-     * @return PHPIMS_Storage_Driver
+     * @return PHPIMS\Storage\Driver
      */
     public function getStorage() {
         return $this->storage;
@@ -335,10 +342,10 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     /**
      * Set the storage driver
      *
-     * @param PHPIMS_Storage_Driver $driver The driver instance
-     * @return PHPIMS_Operation
+     * @param PHPIMS\Storage\Driver $driver The driver instance
+     * @return PHPIMS\Operation
      */
-    public function setStorage(PHPIMS_Storage_Driver $driver) {
+    public function setStorage(StorageDriver $driver) {
         $this->storage = $driver;
 
         return $this;
@@ -347,7 +354,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     /**
      * Get the current image
      *
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function getImage() {
         return $this->image;
@@ -356,10 +363,10 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     /**
      * Set the image
      *
-     * @param PHPIMS_Image $image The image object to set
-     * @return PHPIMS_Operation
+     * @param PHPIMS\Image $image The image object to set
+     * @return PHPIMS\Operation
      */
-    public function setImage(PHPIMS_Image $image) {
+    public function setImage(Image $image) {
         $this->image = $image;
 
         return $this;
@@ -368,7 +375,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     /**
      * Get the response object
      *
-     * @return PHPIMS_Server_Response
+     * @return PHPIMS\Server\Response
      */
     public function getResponse() {
         return $this->response;
@@ -377,10 +384,10 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     /**
      * Set the response instance
      *
-     * @param PHPIMS_Server_Response $response A response object
-     * @return PHPIMS_Operation
+     * @param PHPIMS\Server\Response $response A response object
+     * @return PHPIMS\Operation
      */
-    public function setResponse(PHPIMS_Server_Response $response) {
+    public function setResponse(Response $response) {
         $this->response = $response;
 
         return $this;
@@ -404,7 +411,7 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
      * Set the configuration array
      *
      * @param array $config Configuration array
-     * @return PHPIMS_Operation
+     * @return PHPIMS\Operation
      */
     public function setConfig(array $config) {
         $this->config = $config;
@@ -415,8 +422,8 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     /**
      * Trigger for registered "preExec" plugins
      *
-     * @return PHPIMS_Operation
-     * @throws PHPIMS_Operation_Plugin_Exception
+     * @return PHPIMS\Operation
+     * @throws PHPIMS\Operation\Plugin\Exception
      */
     public function preExec() {
         foreach ($this->plugins['preExec'] as $plugin) {
@@ -429,8 +436,8 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
     /**
      * Trigger for registered "postExec" plugins
      *
-     * @return PHPIMS_Operation
-     * @throws PHPIMS_Operation_Plugin_Exception
+     * @return PHPIMS\Operation
+     * @throws PHPIMS\Operation\Plugin\Exception
      */
     public function postExec() {
         foreach ($this->plugins['postExec'] as $plugin) {
@@ -446,27 +453,27 @@ abstract class PHPIMS_Operation implements PHPIMS_OperationInterface {
      * @param string $className The name of the operation class to instantiate
      * @param string $method The HTTP method used
      * @param string $hash Hash that will be passed to the operations constructor
-     * @return PHPIMS_Operation
-     * @throws PHPIMS_Operation_Exception
+     * @return PHPIMS\Operation
+     * @throws PHPIMS\Operation\Exception
      */
     static public function factory($className, $method, $hash) {
         switch ($className) {
-            case 'PHPIMS_Operation_AddImage':
-            case 'PHPIMS_Operation_DeleteImage':
-            case 'PHPIMS_Operation_EditMetadata':
-            case 'PHPIMS_Operation_GetImage':
-            case 'PHPIMS_Operation_GetMetadata':
-            case 'PHPIMS_Operation_DeleteMetadata':
+            case 'PHPIMS\\Operation\\AddImage':
+            case 'PHPIMS\\Operation\\DeleteImage':
+            case 'PHPIMS\\Operation\\EditMetadata':
+            case 'PHPIMS\\Operation\\GetImage':
+            case 'PHPIMS\\Operation\\GetMetadata':
+            case 'PHPIMS\\Operation\\DeleteMetadata':
                 $operation = new $className();
 
                 $operation->setHash($hash);
                 $operation->setMethod($method);
-                $operation->setImage(new PHPIMS_Image());
-                $operation->setResponse(new PHPIMS_Server_Response());
+                $operation->setImage(new Image());
+                $operation->setResponse(new Response());
 
                 return $operation;
             default:
-                throw new PHPIMS_Operation_Exception('Invalid operation', 500);
+                throw new Exception('Invalid operation', 500);
         }
     }
 }
