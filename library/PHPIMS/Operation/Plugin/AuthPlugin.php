@@ -30,6 +30,11 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation\Plugin;
+
+use PHPIMS\Operation\Plugin;
+use PHPIMS\Operation;
+
 /**
  * Auth plugin
  *
@@ -52,9 +57,9 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_AuthPlugin extends PHPIMS_Operation_Plugin {
+class AuthPlugin extends Plugin {
     /**
-     * @see PHPIMS_Operation_Plugin::$events
+     * @see PHPIMS\Operation\Plugin::$events
      */
     static public $events = array(
         'addImagePreExec'       => 100,
@@ -64,20 +69,20 @@ class PHPIMS_Operation_Plugin_AuthPlugin extends PHPIMS_Operation_Plugin {
     );
 
     /**
-     * @see PHPIMS_Operation_Plugin::exec()
+     * @see PHPIMS\Operation\Plugin::exec()
      */
-    public function exec(PHPIMS_Operation $operation) {
+    public function exec(Operation $operation) {
         $requiredParams = array('signature', 'publicKey', 'timestamp');
 
         foreach ($requiredParams as $param) {
             if (empty($_GET[$param])) {
-                throw new PHPIMS_Operation_Plugin_Exception('Missing required parameter: ' . $param, 400);
+                throw new Exception('Missing required parameter: ' . $param, 400);
             }
         }
 
         // Make sure the timestamp is in the correct format
         if (!preg_match('/[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}Z/', $_GET['timestamp'])) {
-            throw new PHPIMS_Operation_Plugin_Exception('Invalid timestamp format: ' . $_GET['timestamp'], 400);
+            throw new Exception('Invalid timestamp format: ' . $_GET['timestamp'], 400);
         }
 
         $year   = substr($_GET['timestamp'], 0, 4);
@@ -91,7 +96,7 @@ class PHPIMS_Operation_Plugin_AuthPlugin extends PHPIMS_Operation_Plugin {
         $diff = time() - $timestamp;
 
         if ($diff > 300 || $diff < 0) {
-            throw new PHPIMS_Operation_Plugin_Exception('Timestamp expired', 401);
+            throw new Exception('Timestamp expired', 401);
         }
 
         $config = $operation->getConfig('auth');
@@ -101,7 +106,7 @@ class PHPIMS_Operation_Plugin_AuthPlugin extends PHPIMS_Operation_Plugin {
         $actualSignature = hash_hmac('sha256', $data, $config['privateKey'], true);
 
         if ($actualSignature !== base64_decode($_GET['signature'])) {
-            throw new PHPIMS_Operation_Plugin_Exception('Signature mismatch', 401);
+            throw new Exception('Signature mismatch', 401);
         }
     }
 }

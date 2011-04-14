@@ -8,7 +8,7 @@ return array(
     
     // Configuration for the database driver
     'database' => array(
-        'driver' => 'PHPIMS_Database_Driver_MongoDB',
+        'driver' => 'PHPIMS\\Database\\Driver\\MongoDB',
         'params' => array(
             'database'   => 'phpims',
             'collection' => 'images',
@@ -17,7 +17,7 @@ return array(
 
     // Configuration for the storage driver
     'storage' => array(
-        'driver' => 'PHPIMS_Storage_Driver_Filesystem',
+        'driver' => 'PHPIMS\\Storage\\Driver\\Filesystem',
         'params' => array(
             'dataDir' => realpath('/some/path'),
         ),
@@ -28,6 +28,6 @@ return array(
 
     // The operation factory
     'operation' => array(
-        'factory' => 'PHPIMS_Operation',
+        'factory' => 'PHPIMS\\Operation',
     ),
 );

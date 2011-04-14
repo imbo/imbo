@@ -29,6 +29,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
 /**
  * Class that represents a single image
  *
@@ -38,7 +40,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Image {
+class Image {
     /**
      * ID of the image
      *
@@ -103,7 +105,7 @@ class PHPIMS_Image {
      * Set the ID
      *
      * @param mixed $id Unique ID to set
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setId($id) {
         $this->id = $id;
@@ -124,7 +126,7 @@ class PHPIMS_Image {
      * Set the filename
      *
      * @param string $filename The original name of the image
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setFilename($filename) {
         $this->filename = $filename;
@@ -145,7 +147,7 @@ class PHPIMS_Image {
      * Set the size in bytes
      *
      * @param int $filesize The size to set
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setFilesize($filesize) {
         $this->filesize = $filesize;
@@ -166,7 +168,7 @@ class PHPIMS_Image {
      * Set the mime type
      *
      * @param string $mimeType The mime type, for instance "image/png"
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setMimeType($mimeType) {
         $this->mimeType = $mimeType;
@@ -187,7 +189,7 @@ class PHPIMS_Image {
      * Set the extension
      *
      * @param string $extension The file extension
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setExtension($extension) {
         $this->extension = $extension;
@@ -208,7 +210,7 @@ class PHPIMS_Image {
      * Set the blob
      *
      * @param string $blob The binary data to set
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setBlob($blob) {
         $this->blob = $blob;
@@ -229,7 +231,7 @@ class PHPIMS_Image {
      * Set the metadata
      *
      * @param array $metadata An array with metadata
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setMetadata(array $metadata) {
         $this->metadata = $metadata;

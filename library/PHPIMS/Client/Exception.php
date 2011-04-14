@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Client;
+
+use PHPIMS\Exception as BaseException;
+
 /**
  * Base exception class for the client
  *
@@ -40,6 +44,6 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Client_Exception extends PHPIMS_Exception {
+class Exception extends BaseException {
 
 }

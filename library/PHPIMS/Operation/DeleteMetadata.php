@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
+use PHPIMS\Operation;
+
 /**
  * Delete metadata operation
  *
@@ -42,16 +46,16 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_DeleteMetadata extends PHPIMS_Operation {
+class DeleteMetadata extends Operation {
     /**
-     * @see PHPIMS_OperationInterface::getRequestPath()
+     * @see PHPIMS\OperationInterface::getRequestPath()
      */
     public function getRequestPath() {
         return $this->getHash() . '/meta';
     }
 
     /**
-     * @see PHPIMS_OperationInterface::exec()
+     * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
         $this->getDatabase()->deleteMetadata($this->getHash());

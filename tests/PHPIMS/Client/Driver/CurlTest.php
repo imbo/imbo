@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Client\Driver;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,11 +40,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Client_Driver_CurlTest extends PHPIMS_Client_Driver_DriverTests {
+class CurlTest extends DriverTests {
     /**
-     * @see PHPIMS_Client_Driver_DriverTests::getNewDriver()
+     * @see PHPIMS\Client\Driver\DriverTests::getNewDriver()
      */
     protected function getNewDriver() {
-        return new PHPIMS_Client_Driver_Curl();
+        return new Curl();
     }
 }

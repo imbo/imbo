@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Client\Driver;
+
+use PHPIMS\Client\Exception as ClientException;
+
 /**
  * Base exception class for the client drivers
  *
@@ -40,6 +44,6 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Client_Driver_Exception extends PHPIMS_Client_Exception {
+class Exception extends ClientException {
 
 }

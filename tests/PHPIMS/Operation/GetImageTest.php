@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,9 +40,9 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_GetImageTest extends PHPIMS_Operation_OperationTests {
+class GetImageTest extends OperationTests {
     protected function getNewOperation() {
-        return new PHPIMS_Operation_GetImage();
+        return new GetImage();
     }
 
     public function getExpectedOperationName() {
@@ -52,12 +54,12 @@ class PHPIMS_Operation_GetImageTest extends PHPIMS_Operation_OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver');
+        $storage = $this->getMockForAbstractClass('PHPIMS\\Storage\\Driver');
         $storage->expects($this->once())->method('load')->with($this->hash)->will($this->returnValue(true));
         $this->operation->setStorage($storage);
 
-        $image = $this->getMock('PHPIMS_Image');
-        $response = $this->getMock('PHPIMS_Server_Response');
+        $image = $this->getMock('PHPIMS\\Image');
+        $response = $this->getMock('PHPIMS\\Server\\Response');
         $response->expects($this->once())->method('setImage')->with($image)->will($this->returnValue($response));
 
         $this->operation->setResponse($response)->setImage($image);

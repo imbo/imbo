@@ -30,6 +30,12 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Database\Driver;
+
+use PHPIMS\Database\Exception as DatabaseException;
+use PHPIMS\Database\Driver as DatabaseDriver;
+use PHPIMS\Image;
+
 /**
  * MongoDB database driver
  *
@@ -47,7 +53,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver {
+class MongoDB extends DatabaseDriver {
     /**
      * A MongoDB connection
      *
@@ -89,7 +95,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver {
      * Set the database name
      *
      * @param string $name The name to set
-     * @return PHPIMS_Database_Driver_MongoDB
+     * @return PHPIMS\Database\Driver\MongoDB
      */
     public function setDatabaseName($name) {
         $this->databaseName = $name;
@@ -110,7 +116,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver {
      * Set the collection name
      *
      * @param string $name The name to set
-     * @return PHPIMS_Database_Driver_MongoDB
+     * @return PHPIMS\Database\Driver\MongoDB
      */
     public function setCollectionName($name) {
         $this->collectionName = $name;
@@ -126,7 +132,7 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver {
     public function getDatabase() {
         if ($this->mongo === null) {
             // @codeCoverageIgnoreStart
-            $mongo = new Mongo();
+            $mongo = new \Mongo();
             $this->mongo = $mongo->{$this->databaseName};
         }
         // @codeCoverageIgnoreEnd
@@ -153,9 +159,9 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver {
      * Set the collection
      *
      * @param MongoCollection $collection The collection to set
-     * @return PHPIMS_Database_Driver_MongoDB
+     * @return PHPIMS\Database\Driver\MongoDB
      */
-    public function setCollection(MongoCollection $collection) {
+    public function setCollection(\MongoCollection $collection) {
         $this->collection = $collection;
 
         return $this;
@@ -165,19 +171,19 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver {
      * Set the database instance
      *
      * @param MongoDB $database The MongoDB database to set
-     * @return PHPIMS_Database_Driver_MongoDB
+     * @return PHPIMS\Database\Driver\MongoDB
      */
-    public function setDatabase(MongoDB $database) {
+    public function setDatabase(\MongoDB $database) {
         $this->mongo = $database;
 
         return $this;
     }
 
     /**
-     * @see PHPIMS_Database_DriverInterface::insertImage()
+     * @see PHPIMS\Database\DriverInterface::insertImage()
      */
-    public function insertImage($hash, PHPIMS_Image $image) {
-        $data = new stdClass();
+    public function insertImage($hash, Image $image) {
+        $data = new \stdClass();
 
         $data->name  = $image->getFilename();
         $data->size  = $image->getFilesize();
@@ -191,12 +197,12 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver {
             $row = $this->getCollection()->findOne(array('hash' => $data->hash));
 
             if ($row) {
-                throw new PHPIMS_Database_Exception('Image already exists', 400);
+                throw new DatabaseException('Image already exists', 400);
             }
 
             $this->getCollection()->insert($data, array('safe' => true));
-        } catch (MongoException $e) {
-            throw new PHPIMS_Database_Exception('Unable to save image data', 500, $e);
+        } catch (\MongoException $e) {
+            throw new DatabaseException('Unable to save image data', 500, $e);
         }
 
         $image->setId((string) $data->_id);
@@ -205,20 +211,20 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver {
     }
 
     /**
-     * @see PHPIMS_Database_DriverInterface::deleteImage()
+     * @see PHPIMS\Database\DriverInterface::deleteImage()
      */
     public function deleteImage($hash) {
         try {
             $this->getCollection()->remove(array('hash' => $hash), array('justOne' => true, 'safe' => true));
-        } catch (MongoException $e) {
-            throw new PHPIMS_Database_Exception('Unable to delete image data', 500, $e);
+        } catch (\MongoException $e) {
+            throw new DatabaseException('Unable to delete image data', 500, $e);
         }
 
         return true;
     }
 
     /**
-     * @see PHPIMS_Database_DriverInterface::editMetadata()
+     * @see PHPIMS\Database\DriverInterface::editMetadata()
      */
     public function updateMetadata($hash, array $metadata) {
         try {
@@ -230,34 +236,34 @@ class PHPIMS_Database_Driver_MongoDB extends PHPIMS_Database_Driver {
                     'multiple' => false
                 )
             );
-        } catch (MongoException $e) {
-            throw new PHPIMS_Database_Exception('Unable to edit image data', 500, $e);
+        } catch (\MongoException $e) {
+            throw new DatabaseException('Unable to edit image data', 500, $e);
         }
 
         return true;
     }
 
     /**
-     * @see PHPIMS_Database_DriverInterface::getMetadata()
+     * @see PHPIMS\Database\DriverInterface::getMetadata()
      */
     public function getMetadata($hash) {
         try {
             $data = $this->getCollection()->findOne(array('hash' => $hash));
-        } catch (MongoException $e) {
-            throw new PHPIMS_Database_Exception('Unable to fetch image metadata', 500, $e);
+        } catch (\MongoException $e) {
+            throw new DatabaseException('Unable to fetch image metadata', 500, $e);
         }
 
         return isset($data['data']) ? $data['data'] : array();
     }
 
     /**
-     * @see PHPIMS_Database_DriverInterface::deleteMetadata()
+     * @see PHPIMS\Database\DriverInterface::deleteMetadata()
      */
     public function deleteMetadata($hash) {
         try {
             $this->updateMetadata($hash, array('data' => array()));
-        } catch (PHPIMS_Database_Exception $e) {
-            throw new PHPIMS_Database_Exception('Unable to remove metadata', 500, $e);
+        } catch (DatabaseException $e) {
+            throw new DatabaseException('Unable to remove metadata', 500, $e);
         }
 
         return true;

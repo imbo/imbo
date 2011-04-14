@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation\Plugin;
+
 use \Mockery as m;
 
 /**
@@ -40,16 +42,16 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_PrepareImagePluginTest extends PHPUnit_Framework_TestCase {
+class PrepareImagePluginTest extends \PHPUnit_Framework_TestCase {
     /**
      * Plugin instance
      *
-     * @var PHPIMS_Operation_Plugin_PrepareImagePlugin
+     * @var PHPIMS\Operation\Plugin\PrepareImagePlugin
      */
     protected $plugin = null;
 
     public function setUp() {
-        $this->plugin = new PHPIMS_Operation_Plugin_PrepareImagePlugin();
+        $this->plugin = new PrepareImagePlugin();
     }
 
     public function tearDown() {
@@ -57,23 +59,23 @@ class PHPIMS_Operation_Plugin_PrepareImagePluginTest extends PHPUnit_Framework_T
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedException PHPIMS\Operation\Plugin\Exception
      * @expectedExceptionCode 400
      */
     public function testExecWithNoImageInFilesArray() {
-        $operation = m::mock('PHPIMS_Operation');
+        $operation = m::mock('PHPIMS\\Operation');
         $this->plugin->exec($operation);
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Plugin_Exception
+     * @expectedException PHPIMS\Operation\Plugin\Exception
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Hash mismatch
      */
     public function testExecWithHashMismatch() {
         $_FILES['file']['tmp_name'] = __DIR__ . '/../../_files/image.png';
 
-        $operation = m::mock('PHPIMS_Operation_AddImage');
+        $operation = m::mock('PHPIMS\\Operation\\AddImage');
         $operation->shouldReceive('getHash')->once()->andReturn(str_repeat('a', 32) . '.png');
 
         $this->plugin->exec($operation);
@@ -87,13 +89,13 @@ class PHPIMS_Operation_Plugin_PrepareImagePluginTest extends PHPUnit_Framework_T
         $_POST = array('metadata' => json_encode($metadata));
         $hash = md5_file($_FILES['file']['tmp_name']) . '.png';
 
-        $image = m::mock('PHPIMS_Image');
+        $image = m::mock('PHPIMS\\Image');
         $image->shouldReceive('setFilename')->once()->with('image.png')->andReturn($image);
         $image->shouldReceive('setFilesize')->once()->with(41423)->andReturn($image);
         $image->shouldReceive('setMetadata')->once()->with($metadata)->andReturn($image);
         $image->shouldReceive('setBlob')->once()->with(file_get_contents($_FILES['file']['tmp_name']))->andReturn($image);
 
-        $operation = m::mock('PHPIMS_Operation_AddImage');
+        $operation = m::mock('PHPIMS\\Operation\\AddImage');
         $operation->shouldReceive('getHash')->once()->andReturn($hash);
         $operation->shouldReceive('getImage')->once()->andReturn($image);
 

@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Server;
+
+use PHPIMS\Exception;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,11 +42,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
+class ResponseTest extends \PHPUnit_Framework_TestCase {
     /**
      * Response instance
      *
-     * @var PHPIMS_Server_Response
+     * @var PHPIMS\Server\Response
      */
     protected $response = null;
 
@@ -50,7 +54,7 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->response = new PHPIMS_Server_Response();
+        $this->response = new Response();
     }
 
     /**
@@ -100,9 +104,9 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
     public function testStaticFromException() {
         $code = 404;
         $message = 'some message';
-        $e = new PHPIMS_Exception($message, $code);
+        $e = new Exception($message, $code);
 
-        $response = PHPIMS_Server_Response::fromException($e);
+        $response = Response::fromException($e);
         $this->assertSame($code, $response->getCode());
         $responseBody = $response->getBody();
 
@@ -119,14 +123,14 @@ class PHPIMS_Server_ResponseTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetImage() {
-        $image = $this->getMock('PHPIMS_Image');
+        $image = $this->getMock('PHPIMS\\Image');
         $this->response->setImage($image);
         $this->assertSame($image, $this->response->getImage());
     }
 
     public function testHasImage() {
         $this->assertFalse($this->response->hasImage());
-        $image = $this->getMock('PHPIMS_Image');
+        $image = $this->getMock('PHPIMS\\Image');
         $this->response->setImage($image);
         $this->assertTrue($this->response->hasImage());
     }

@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
+
+use PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface;
+
 /**
  * Crop transformation
  *
@@ -39,12 +43,11 @@
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
- * @see PHPIMS_Operation_Plugin_ManipulateImagePlugin
+ * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin
  */
-class PHPIMS_Operation_Plugin_ManipulateImagePlugin_Transformation_Crop implements
-      PHPIMS_Operation_Plugin_ManipulateImagePlugin_TransformationInterface {
+class Crop implements TransformationInterface {
     /**
-     * @see PHPIMS_Operation_Plugin_ManipulateImagePlugin_TransformationInterface::apply()
+     * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface::apply()
      */
     public function apply(\Imagine\Imagick\Image $image, array $params = array()) {
         // Resize image and store in the image object

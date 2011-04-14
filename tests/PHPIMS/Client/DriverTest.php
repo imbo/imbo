@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Client;
+
+use PHPIMS\Client;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,11 +42,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Client_DriverTest extends PHPUnit_Framework_TestCase {
+class DriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * Driver instance
      *
-     * @var PHPIMS_Client_Driver
+     * @var PHPIMS\Client\Driver
      */
     protected $driver = null;
 
@@ -50,7 +54,7 @@ class PHPIMS_Client_DriverTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver');
+        $this->driver = $this->getMockForAbstractClass('PHPIMS\\Client\\Driver');
     }
 
     /**
@@ -61,7 +65,7 @@ class PHPIMS_Client_DriverTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetClient() {
-        $client = $this->getMockBuilder('PHPIMS_Client')->disableOriginalConstructor()->getMock();
+        $client = $this->getMockBuilder('PHPIMS\\Client')->disableOriginalConstructor()->getMock();
         $this->driver->setClient($client);
         $this->assertSame($client, $this->driver->getClient());
     }

@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Client;
+
+use PHPIMS\Client;
+
 /**
  * Abstract class for client drivers
  *
@@ -40,11 +44,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Client_Driver implements PHPIMS_Client_DriverInterface {
+abstract class Driver implements DriverInterface {
     /**
      * Client this driver does requests for
      *
-     * @var PHPIMS_Client
+     * @var PHPIMS\Client
      */
     protected $client = null;
 
@@ -67,7 +71,7 @@ abstract class PHPIMS_Client_Driver implements PHPIMS_Client_DriverInterface {
     /**
      * Get the client
      *
-     * @return PHPIMS_Client
+     * @return PHPIMS\Client
      */
     public function getClient() {
         return $this->client;
@@ -76,10 +80,10 @@ abstract class PHPIMS_Client_Driver implements PHPIMS_Client_DriverInterface {
     /**
      * Set the client
      *
-     * @param PHPIMS_Client $client Instance of the client
-     * @return PHPIMS_Client_Driver
+     * @param PHPIMS\Client $client Instance of the client
+     * @return PHPIMS\Client\Driver
      */
-    public function setClient(PHPIMS_Client $client) {
+    public function setClient(Client $client) {
         $this->client = $client;
 
         return $this;

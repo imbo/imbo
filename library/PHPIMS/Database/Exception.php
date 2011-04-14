@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Database;
+
+use PHPIMS\Exception as BaseException;
+
 /**
  * Database exception class for PHPIMS
  *
@@ -40,6 +44,6 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Database_Exception extends PHPIMS_Exception {
+class Exception extends BaseException {
 
 }

@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Storage;
+
+use PHPIMS\Image;
+
 /**
  * Storage driver interface
  *
@@ -42,18 +46,18 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface PHPIMS_Storage_DriverInterface {
+interface DriverInterface {
     /**
      * Store an image
      *
      * This method will take a temporary path (usually from the $_FILES array) and place it
      * somewhere suited for the actual storage driver. If an error occurs the driver should throw
-     * an exception based on PHPIMS_Storage_Exception.
+     * an exception based on PHPIMS\Storage\Exception.
      *
      * @param string $hash The image hash
      * @param string $path Path to the temporary file
      * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Storage_Exception
+     * @throws PHPIMS\Storage\Exception
      */
     public function store($hash, $path);
 
@@ -64,7 +68,7 @@ interface PHPIMS_Storage_DriverInterface {
      *
      * @param string $hash Unique hash identifying an image
      * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Storage_Exception
+     * @throws PHPIMS\Storage\Exception
      */
     public function delete($hash);
 
@@ -79,9 +83,9 @@ interface PHPIMS_Storage_DriverInterface {
      * </code>
      *
      * @param string $hash Unique hash identifying an image
-     * @param PHPIMS_Image $image The image object
+     * @param PHPIMS\Image $image The image object
      * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Storage_Exception
+     * @throws PHPIMS\Storage\Exception
      */
-    public function load($hash, PHPIMS_Image $image);
+    public function load($hash, Image $image);
 }

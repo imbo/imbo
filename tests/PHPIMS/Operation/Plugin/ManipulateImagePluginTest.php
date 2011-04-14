@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation\Plugin;
+
 use \Mockery as m;
 
 /**
@@ -40,16 +42,16 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_ManipulateImagePluginTest extends PHPUnit_Framework_TestCase {
+class ManipulateImagePluginTest extends \PHPUnit_Framework_TestCase {
     /**
      * Plugin instance
      *
-     * @var PHPIMS_Operation_Plugin_ManipulateImagePlugin
+     * @var PHPIMS\Operation\Plugin\ManipulateImagePlugin
      */
     protected $plugin = null;
 
     public function setUp() {
-        $this->plugin = new PHPIMS_Operation_Plugin_ManipulateImagePlugin();
+        $this->plugin = new ManipulateImagePlugin();
     }
 
     public function tearDown() {
@@ -57,10 +59,10 @@ class PHPIMS_Operation_Plugin_ManipulateImagePluginTest extends PHPUnit_Framewor
     }
 
     public function testIsValidTransformation() {
-        $this->assertTrue(PHPIMS_Operation_Plugin_ManipulateImagePlugin::isValidTransformation('resize'));
-        $this->assertTrue(PHPIMS_Operation_Plugin_ManipulateImagePlugin::isValidTransformation('crop'));
-        $this->assertTrue(PHPIMS_Operation_Plugin_ManipulateImagePlugin::isValidTransformation('rotate'));
-        $this->assertTrue(PHPIMS_Operation_Plugin_ManipulateImagePlugin::isValidTransformation('border'));
-        $this->assertFalse(PHPIMS_Operation_Plugin_ManipulateImagePlugin::isValidTransformation('foobar'));
+        $this->assertTrue(ManipulateImagePlugin::isValidTransformation('resize'));
+        $this->assertTrue(ManipulateImagePlugin::isValidTransformation('crop'));
+        $this->assertTrue(ManipulateImagePlugin::isValidTransformation('rotate'));
+        $this->assertTrue(ManipulateImagePlugin::isValidTransformation('border'));
+        $this->assertFalse(ManipulateImagePlugin::isValidTransformation('foobar'));
     }
 }

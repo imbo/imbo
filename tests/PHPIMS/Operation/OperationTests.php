@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,11 +40,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Operation_OperationTests extends PHPUnit_Framework_TestCase {
+abstract class OperationTests extends \PHPUnit_Framework_TestCase {
     /**
      * Operation instance
      *
-     * @var PHPIMS_Operation
+     * @var PHPIMS\Operation
      */
     protected $operation = null;
 
@@ -72,7 +74,7 @@ abstract class PHPIMS_Operation_OperationTests extends PHPUnit_Framework_TestCas
     /**
      * Get a new operation instance
      *
-     * @return PHPIMS_Operation
+     * @return PHPIMS\Operation
      */
     abstract protected function getNewOperation();
 
@@ -91,7 +93,7 @@ abstract class PHPIMS_Operation_OperationTests extends PHPUnit_Framework_TestCas
     abstract protected function getExpectedRequestPath();
 
     public function testGetOperationName() {
-        $reflection = new ReflectionClass($this->operation);
+        $reflection = new \ReflectionClass($this->operation);
         $method = $reflection->getMethod('getOperationName');
         $method->setAccessible(true);
 

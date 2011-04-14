@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Database\Driver;
+
 use \Mockery as m;
 
 /**
@@ -40,12 +42,12 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTests {
+class MongoDBTest extends DriverTests {
     /**
-     * @see PHPIMS_Database_Driver_DriverTests::getNewDriver()
+     * @see PHPIMS\Database\Driver\DriverTests::getNewDriver()
      */
     protected function getNewDriver() {
-        return new PHPIMS_Database_Driver_MongoDB();
+        return new MongoDB();
     }
 
     public function teardown() {
@@ -89,17 +91,17 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
     }
 
     /**
-     * @expectedException PHPIMS_Database_Exception
+     * @expectedException PHPIMS\Database\Exception
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Image already exists
      */
     public function testInsertImageThatAlreadyExists() {
-        $image = m::mock('PHPIMS_Image');
+        $image = m::mock('PHPIMS\\Image');
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getMetadata')
               ->once()
               ->andReturn('some value');
 
-        $response = m::mock('PHPIMS_Server_Response');
+        $response = m::mock('PHPIMS\\Server\\Response');
 
         $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
         $data = array(
@@ -114,17 +116,17 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
     }
 
     /**
-     * @expectedException PHPIMS_Database_Exception
+     * @expectedException PHPIMS\Database\Exception
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to save image data
      */
     public function testInsertImageWhenCollectionThrowsException() {
-        $image = m::mock('PHPIMS_Image');
+        $image = m::mock('PHPIMS\\Image');
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getMetadata')
               ->once()
               ->andReturn('some value');
 
-        $response = m::mock('PHPIMS_Server_Response');
+        $response = m::mock('PHPIMS\\Server\\Response');
 
         $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
         $collection = m::mock('MongoCollection');
@@ -136,7 +138,7 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
 
     public function testSucessfullInsert() {
         $id = 'some id';
-        $image = m::mock('PHPIMS_Image');
+        $image = m::mock('PHPIMS\\Image');
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getMetadata')
               ->once()
               ->andReturn('some value');
@@ -152,7 +154,7 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
         $collection->shouldReceive('findOne')->once()->with($data)->andReturn(array());
         $collection->shouldReceive('insert')->once()->with(m::on(function($data) use($id) { $data->_id = $id; return true; }), m::type('array'))->andReturn(true);
 
-        $response = m::mock('PHPIMS_Server_Response');
+        $response = m::mock('PHPIMS\\Server\\Response');
 
         $result = $this->driver->setCollection($collection)
                                ->insertImage($hash, $image, $response);
@@ -160,7 +162,7 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
     }
 
     /**
-     * @expectedException PHPIMS_Database_Exception
+     * @expectedException PHPIMS\Database\Exception
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to delete image data
      */
@@ -182,7 +184,7 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
     }
 
     /**
-     * @expectedException PHPIMS_Database_Exception
+     * @expectedException PHPIMS\Database\Exception
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to edit image data
      */
@@ -216,7 +218,7 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
     }
 
     /**
-     * @expectedException PHPIMS_Database_Exception
+     * @expectedException PHPIMS\Database\Exception
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to fetch image metadata
      */
@@ -245,7 +247,7 @@ class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTe
     }
 
     /**
-     * @expectedException PHPIMS_Database_Exception
+     * @expectedException PHPIMS\Database\Exception
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to remove metadata
      */

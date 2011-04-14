@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Client;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,11 +40,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Client_ResponseTest extends PHPUnit_Framework_TestCase {
+class ResponseTest extends \PHPUnit_Framework_TestCase {
     /**
      * Response instance
      *
-     * @var PHPIMS_Client_Response
+     * @var PHPIMS\Client\Response
      */
     protected $response = null;
 
@@ -50,7 +52,7 @@ class PHPIMS_Client_ResponseTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->response = new PHPIMS_Client_Response();
+        $this->response = new Response();
     }
 
     /**
@@ -121,9 +123,9 @@ class PHPIMS_Client_ResponseTest extends PHPUnit_Framework_TestCase {
                    'Content-Type: text/html; charset=UTF-8' . PHP_EOL . PHP_EOL .
                    'Some content';
 
-        $response = PHPIMS_Client_Response::factory($content);
+        $response = Response::factory($content);
 
-        $this->assertInstanceOf('PHPIMS_Client_Response', $response);
+        $this->assertInstanceOf('PHPIMS\Client\Response', $response);
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('Some content', $response->getBody());
         $this->assertSame(6, count($response->getHeaders()));

@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Database;
+
+use PHPIMS\Image;
+
 /**
  * Database driver interface
  *
@@ -42,27 +46,27 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface PHPIMS_Database_DriverInterface {
+interface DriverInterface {
     /**
      * Insert a new image
      *
      * This method will insert a new image into the database. The method should update the $image
      * object if successfull by setting the newly created ID. On errors throw exceptions that
-     * extends PHPIMS_Database_Exception.
+     * extends PHPIMS\Database\Exception.
      *
      * @param string $hash The hash identifying the image
-     * @param PHPIMS_Image $image The image to insert
+     * @param PHPIMS\Image $image The image to insert
      * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Database_Exception
+     * @throws PHPIMS\Database\Exception
      */
-    public function insertImage($hash, PHPIMS_Image $image);
+    public function insertImage($hash, Image $image);
 
     /**
      * Delete an image from the database
      *
      * @param string $hash The unique ID of the image to delete
      * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Database_Exception
+     * @throws PHPIMS\Database\Exception
      */
     public function deleteImage($hash);
 
@@ -72,7 +76,7 @@ interface PHPIMS_Database_DriverInterface {
      * @param string $hash The unique ID of the image to edit
      * @param array $metadata An array with metadata
      * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Database_Exception
+     * @throws PHPIMS\Database\Exception
      */
     public function updateMetadata($hash, array $metadata);
 
@@ -81,7 +85,7 @@ interface PHPIMS_Database_DriverInterface {
      *
      * @param string $hash The unique ID of the image to get metadata from
      * @return array Returns the metadata as an array
-     * @throws PHPIMS_Database_Exception
+     * @throws PHPIMS\Database\Exception
      */
     public function getMetadata($hash);
 
@@ -90,7 +94,7 @@ interface PHPIMS_Database_DriverInterface {
      *
      * @param string $hash The unique ID of the image to delete metadata from
      * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS_Database_Exception
+     * @throws PHPIMS\Database\Exception
      */
     public function deleteMetadata($hash);
 }

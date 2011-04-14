@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
 require 'Operation/_pluginsWithoutPrefix/CustomPlugin.php';
 require 'Operation/_pluginsWithoutPrefix/OtherCustomPlugin.php';
 require 'Operation/_pluginsWithPrefix/Some/Prefix/CustomPlugin.php';
@@ -43,11 +45,11 @@ require 'Operation/_pluginsWithPrefix/Some/Prefix/OtherCustomPlugin.php';
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
+class OperationTest extends \PHPUnit_Framework_TestCase {
     /**
      * Operation instance
      *
-     * @var PHPIMS_Operation
+     * @var PHPIMS\Operation
      */
     protected $operation = null;
 
@@ -55,11 +57,11 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->operation = $this->getMockBuilder('PHPIMS_Operation')->setMethods(array('getOperationName', 'exec', 'getRequestPath'))
+        $this->operation = $this->getMockBuilder('PHPIMS\\Operation')->setMethods(array('getOperationName', 'exec', 'getRequestPath'))
                                 ->disableOriginalConstructor()
                                 ->getMock();
 
-        // Make the operation return "addImage" as if it was the PHPIMS_Operation_AddImage
+        // Make the operation return "addImage" as if it was the PHPIMS\Operation\AddImage
         // operation class
         $this->operation->expects($this->any())
                         ->method('getOperationName')
@@ -86,26 +88,26 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetDatabase() {
-        $driver = $this->getMockForAbstractClass('PHPIMS_Database_Driver');
+        $driver = $this->getMockForAbstractClass('PHPIMS\\Database\\Driver');
         $this->operation->setDatabase($driver);
         $this->assertSame($driver, $this->operation->getDatabase());
     }
 
     public function testSetGetStorage() {
-        $driver = $this->getMockForAbstractClass('PHPIMS_Storage_Driver');
+        $driver = $this->getMockForAbstractClass('PHPIMS\\Storage\\Driver');
         $this->operation->setStorage($driver);
         $this->assertSame($driver, $this->operation->getStorage());
     }
 
     public function testSetGetImage() {
-        $image = $this->getMock('PHPIMS_Image');
+        $image = $this->getMock('PHPIMS\\Image');
         $this->operation->setImage($image);
         $this->assertSame($image, $this->operation->getImage());
 
     }
 
     public function testSetGetResponse() {
-        $response = $this->getMock('PHPIMS_Server_Response');
+        $response = $this->getMock('PHPIMS\\Server\\Response');
         $this->operation->setResponse($response);
         $this->assertSame($response, $this->operation->getResponse());
     }
@@ -117,7 +119,7 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testInitDatabaseDriver() {
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver');
+        $database = $this->getMockForAbstractClass('PHPIMS\\Database\\Driver');
         $databaseClassName = get_class($database);
         $databaseParams = array('someparam' => true, 'otherparam' => false);
 
@@ -126,7 +128,7 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
             'params' => $databaseParams,
         );
 
-        $reflection = new ReflectionClass($this->operation);
+        $reflection = new \ReflectionClass($this->operation);
         $method = $reflection->getMethod('initDatabaseDriver');
         $method->setAccessible(true);
 
@@ -137,7 +139,7 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testInitStorageDriver() {
-        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver');
+        $storage = $this->getMockForAbstractClass('PHPIMS\\Storage\\Driver');
         $storageClassName = get_class($storage);
         $storageParams = array('someparam' => false, 'otherparam' => true);
 
@@ -146,7 +148,7 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
             'params' => $storageParams,
         );
 
-        $reflection = new ReflectionClass($this->operation);
+        $reflection = new \ReflectionClass($this->operation);
         $method = $reflection->getMethod('initStorageDriver');
         $method->setAccessible(true);
 
@@ -161,53 +163,53 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
         $config = array(
             array(
                 'path' => '/some/path',
-                'prefix' => 'Some_Prefix',
+                'prefix' => 'Some\\Prefix',
             ),
             array(
                 'path' => __DIR__ . '/Operation/_pluginsWithPrefix',
-                'prefix' => 'Some_Prefix_',
+                'prefix' => 'Some\\Prefix\\',
             ),
             array(
                 'path' => __DIR__ . '/Operation/_pluginsWithoutPrefix',
             ),
         );
 
-        $reflection = new ReflectionClass($this->operation);
+        $reflection = new \ReflectionClass($this->operation);
         $method = $reflection->getMethod('initPlugins');
         $method->setAccessible(true);
         $method->invokeArgs($this->operation, array($config));
 
-        $reflection = new ReflectionClass($this->operation);
+        $reflection = new \ReflectionClass($this->operation);
         $method = $reflection->getMethod('getPlugins');
         $method->setAccessible(true);
 
         $plugins = $method->invoke($this->operation);
 
-        $this->assertInstanceOf('Some_Prefix_CustomPlugin', $plugins['preExec'][1]);
+        $this->assertInstanceOf('Some\\Prefix\\CustomPlugin', $plugins['preExec'][1]);
         $this->assertInstanceOf('CustomPlugin', $plugins['preExec'][10]);
         $this->assertInstanceOf('OtherCustomPlugin', $plugins['preExec'][12]);
-        $this->assertInstanceOf('Some_Prefix_OtherCustomPlugin', $plugins['preExec'][42]);
-        $this->assertInstanceOf('PHPIMS_Operation_Plugin_AuthPlugin', $plugins['preExec'][100]);
-        $this->assertInstanceOf('PHPIMS_Operation_Plugin_PrepareImagePlugin', $plugins['preExec'][101]);
-        $this->assertInstanceOf('PHPIMS_Operation_Plugin_IdentifyImagePlugin', $plugins['preExec'][102]);
+        $this->assertInstanceOf('Some\\Prefix\\OtherCustomPlugin', $plugins['preExec'][42]);
+        $this->assertInstanceOf('PHPIMS\\Operation\\Plugin\\AuthPlugin', $plugins['preExec'][100]);
+        $this->assertInstanceOf('PHPIMS\\Operation\\Plugin\\PrepareImagePlugin', $plugins['preExec'][101]);
+        $this->assertInstanceOf('PHPIMS\\Operation\\Plugin\\IdentifyImagePlugin', $plugins['preExec'][102]);
 
-        $this->assertInstanceOf('Some_Prefix_CustomPlugin', $plugins['postExec'][1]);
+        $this->assertInstanceOf('Some\\Prefix\\CustomPlugin', $plugins['postExec'][1]);
         $this->assertInstanceOf('OtherCustomPlugin', $plugins['postExec'][8]);
         $this->assertInstanceOf('CustomPlugin', $plugins['postExec'][20]);
-        $this->assertInstanceOf('Some_Prefix_OtherCustomPlugin', $plugins['postExec'][78]);
+        $this->assertInstanceOf('Some\\Prefix\\OtherCustomPlugin', $plugins['postExec'][78]);
     }
 
     public function testPreAndPostExec() {
-        $plugin1 = $this->getMockBuilder('PHPIMS_Operation_Plugin')->disableOriginalConstructor()->getMockForAbstractClass();
+        $plugin1 = $this->getMockBuilder('PHPIMS\\Operation\\Plugin')->disableOriginalConstructor()->getMockForAbstractClass();
         $plugin1->expects($this->exactly(2))->method('exec');
 
-        $plugin2 = $this->getMockBuilder('PHPIMS_Operation_Plugin')->disableOriginalConstructor()->getMockForAbstractClass();
+        $plugin2 = $this->getMockBuilder('PHPIMS\\Operation\\Plugin')->disableOriginalConstructor()->getMockForAbstractClass();
         $plugin2->expects($this->exactly(2))->method('exec');
 
-        $plugin3 = $this->getMockBuilder('PHPIMS_Operation_Plugin')->disableOriginalConstructor()->getMockForAbstractClass();
+        $plugin3 = $this->getMockBuilder('PHPIMS\\Operation\\Plugin')->disableOriginalConstructor()->getMockForAbstractClass();
         $plugin3->expects($this->once())->method('exec');
 
-        $plugin4 = $this->getMockBuilder('PHPIMS_Operation_Plugin')->disableOriginalConstructor()->getMockForAbstractClass();
+        $plugin4 = $this->getMockBuilder('PHPIMS\\Operation\\Plugin')->disableOriginalConstructor()->getMockForAbstractClass();
         $plugin4->expects($this->once())->method('exec');
 
         $plugins = array(
@@ -223,7 +225,7 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
             ),
         );
 
-        $reflection = new ReflectionClass($this->operation);
+        $reflection = new \ReflectionClass($this->operation);
         $method = $reflection->getMethod('setPlugins');
         $method->setAccessible(true);
 
@@ -251,23 +253,23 @@ class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
 
     public function testFactory() {
         $operations = array(
-            'POST'   => 'PHPIMS_Operation_AddImage',
-            'POST'   => 'PHPIMS_Operation_EditMetadata',
-            'DELETE' => 'PHPIMS_Operation_DeleteImage',
-            'DELETE' => 'PHPIMS_Operation_DeleteMetadata',
-            'GET'    => 'PHPIMS_Operation_GetImage',
-            'GET'    => 'PHPIMS_Operation_GetMetadata',
+            'POST'   => 'PHPIMS\\Operation\\AddImage',
+            'POST'   => 'PHPIMS\\Operation\\EditMetadata',
+            'DELETE' => 'PHPIMS\\Operation\\DeleteImage',
+            'DELETE' => 'PHPIMS\\Operation\\DeleteMetadata',
+            'GET'    => 'PHPIMS\\Operation\\GetImage',
+            'GET'    => 'PHPIMS\\Operation\\GetMetadata',
         );
 
         foreach ($operations as $method => $className) {
-            $this->assertInstanceOf($className, PHPIMS_Operation::factory($className, $method, md5(microtime())));
+            $this->assertInstanceOf($className, Operation::factory($className, $method, md5(microtime())));
         }
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Exception
+     * @expectedException PHPIMS\Operation\Exception
      */
     public function testFactoryWithUnSupportedOperation() {
-        PHPIMS_Operation::factory('foobar', 'GET', md5(microtime()));
+        Operation::factory('foobar', 'GET', md5(microtime()));
     }
 }

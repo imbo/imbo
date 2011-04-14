@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
 /**
  * Client that interacts with the server part of PHPIMS
  *
@@ -42,7 +44,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_FrontController {
+class FrontController {
     /**#@+
      * Supported HTTP methods
      *
@@ -105,7 +107,7 @@ class PHPIMS_FrontController {
      * Set the config array
      *
      * @param array $config The configuration array to set
-     * @return PHPIMS_FrontController
+     * @return PHPIMS\FrontController
      */
     public function setConfig(array $config) {
         $this->config = $config;
@@ -121,36 +123,36 @@ class PHPIMS_FrontController {
      * @param string $method The HTTP method
      * @param string $hash   Image hash (md5)
      * @param string $extra  Optional extra argument
-     * @throws PHPIMS_Exception
-     * @return PHPIMS_Operation
+     * @throws PHPIMS\Exception
+     * @return PHPIMS\Operation
      */
     protected function resolveOperation($method, $hash, $extra = null) {
         $operation = null;
 
         if ($method === self::GET) {
             if ($extra === 'meta') {
-                $operation = 'PHPIMS_Operation_GetMetadata';
+                $operation = 'PHPIMS\\Operation\\GetMetadata';
             } else if (empty($extra)) {
-                $operation = 'PHPIMS_Operation_GetImage';
+                $operation = 'PHPIMS\\Operation\\GetImage';
             }
         } else if ($method === self::POST) {
             if ($extra === 'meta') {
-                $operation = 'PHPIMS_Operation_EditMetadata';
+                $operation = 'PHPIMS\\Operation\\EditMetadata';
             } else {
-                $operation = 'PHPIMS_Operation_AddImage';
+                $operation = 'PHPIMS\\Operation\\AddImage';
             }
         } else if ($method === self::DELETE) {
             if ($extra === 'meta') {
-                $operation = 'PHPIMS_Operation_DeleteMetadata';
+                $operation = 'PHPIMS\\Operation\\DeleteMetadata';
             } else {
-                $operation = 'PHPIMS_Operation_DeleteImage';
+                $operation = 'PHPIMS\\Operation\\DeleteImage';
             }
         } else if ($method === self::BREW) {
-            throw new PHPIMS_Exception('I\'m a teapot!', 418);
+            throw new Exception('I\'m a teapot!', 418);
         }
 
         if ($operation === null) {
-            throw new PHPIMS_Exception('Unsupported operation', 400);
+            throw new Exception('Unsupported operation', 400);
         }
 
         $factoryClass = $this->config['operation']['factory'];
@@ -163,17 +165,17 @@ class PHPIMS_FrontController {
      *
      * @param string $method The HTTP method (one of the defined constants)
      * @param string $path The path requested
-     * @throws PHPIMS_Exception
+     * @throws PHPIMS\Exception
      */
     public function handle($method, $path) {
         if (!self::isValidMethod($method)) {
-            throw new PHPIMS_Exception($method . ' not implemented', 501);
+            throw new Exception($method . ' not implemented', 501);
         }
 
         $matches = array();
 
         if (!preg_match('|(?<hash>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>.*))?$|', $path, $matches)) {
-            throw new PHPIMS_Exception('Invalid request: ' . $path, 400);
+            throw new Exception('Invalid request: ' . $path, 400);
         }
 
         $hash = $matches['hash'];

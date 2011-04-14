@@ -30,6 +30,11 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Client\Driver;
+
+use PHPIMS\Client;
+use PHPIMS\Client\Response;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,11 +43,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Client_Driver_DriverTests extends PHPUnit_Framework_TestCase {
+abstract class DriverTests extends \PHPUnit_Framework_TestCase {
     /**
      * The driver instance
      *
-     * @var PHPIMS_Client_Driver
+     * @var PHPIMS\Client\Driver
      */
     protected $driver = null;
 
@@ -56,7 +61,7 @@ abstract class PHPIMS_Client_Driver_DriverTests extends PHPUnit_Framework_TestCa
     /**
      * Return an instance of the driver we are testing
      *
-     * @return PHPIMS_Client_Driver
+     * @return PHPIMS\Client\Driver
      */
     abstract protected function getNewDriver();
 
@@ -69,7 +74,7 @@ abstract class PHPIMS_Client_Driver_DriverTests extends PHPUnit_Framework_TestCa
         }
 
         $this->driver = $this->getNewDriver();
-        $client = $this->getMockBuilder('PHPIMS_Client')->disableOriginalConstructor()->setMethods(array('getTimeout', 'getConnectTimeout'))->getMock();
+        $client = $this->getMockBuilder('PHPIMS\\Client')->disableOriginalConstructor()->setMethods(array('getTimeout', 'getConnectTimeout'))->getMock();
         $client->expects($this->any())->method('getConnectTimeout')->will($this->returnValue(2));
         $client->expects($this->any())->method('getTimeout')->will($this->returnValue(2));
 
@@ -90,7 +95,7 @@ abstract class PHPIMS_Client_Driver_DriverTests extends PHPUnit_Framework_TestCa
             'bar' => 'foo',
         );
         $response = $this->driver->post($this->testUrl, $metadata);
-        $this->assertInstanceOf('PHPIMS_Client_Response', $response);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
 
         $result = unserialize($response->getBody());
         $this->assertSame('POST', $result['method']);
@@ -100,7 +105,7 @@ abstract class PHPIMS_Client_Driver_DriverTests extends PHPUnit_Framework_TestCa
     public function testGet() {
         $url = $this->testUrl . '?foo=bar&bar=foo';
         $response = $this->driver->get($url);
-        $this->assertInstanceOf('PHPIMS_Client_Response', $response);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
         $result = unserialize($response->getBody());
         $this->assertSame('GET', $result['method']);
         $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $result['data']);
@@ -108,13 +113,13 @@ abstract class PHPIMS_Client_Driver_DriverTests extends PHPUnit_Framework_TestCa
 
     public function testHead() {
         $response = $this->driver->head($this->testUrl);
-        $this->assertInstanceOf('PHPIMS_Client_Response', $response);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
         $this->assertEmpty($response->getBody());
     }
 
     public function testDelete() {
         $response = $this->driver->delete($this->testUrl);
-        $this->assertInstanceOf('PHPIMS_Client_Response', $response);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
         $result = unserialize($response->getBody());
         $this->assertSame('DELETE', $result['method']);
     }
@@ -125,14 +130,14 @@ abstract class PHPIMS_Client_Driver_DriverTests extends PHPUnit_Framework_TestCa
             'bar' => 'foo',
         );
         $response = $this->driver->addImage(__FILE__, $this->testUrl, $data);
-        $this->assertInstanceOf('PHPIMS_Client_Response', $response);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
         $result = unserialize($response->getBody());
         $this->assertSame('POST', $result['method']);
         $this->assertArrayHasKey('files', $result);
     }
 
     /**
-     * @expectedException PHPIMS_Client_Driver_Exception
+     * @expectedException PHPIMS\Client\Driver\Exception
      */
     public function testReadTimeout() {
         $url = $this->testUrl . '?sleep=3';

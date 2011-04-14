@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
 use \Mockery as m;
 
 /**
@@ -40,9 +42,9 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_AddImageTest extends PHPIMS_Operation_OperationTests {
+class AddImageTest extends OperationTests {
     protected function getNewOperation() {
-        return new PHPIMS_Operation_AddImage();
+        return new AddImage();
     }
 
     public function getExpectedOperationName() {
@@ -65,17 +67,17 @@ class PHPIMS_Operation_AddImageTest extends PHPIMS_Operation_OperationTests {
                 'foo' => 'bar',
             ),
         );
-        $image = m::mock('PHPIMS_Image');
+        $image = m::mock('PHPIMS\\Image');
         $image->shouldReceive('getMetadata')->once()->andReturn($metadata);
-        $response = m::mock('PHPIMS_Server_Response');
+        $response = m::mock('PHPIMS\\Server\\Response');
         $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
         $response->shouldReceive('setBody')->once()->with(array('hash' => $hash))->andReturn($response);
 
-        $database = m::mock('PHPIMS_Database_Driver');
+        $database = m::mock('PHPIMS\\Database\\Driver');
         $database->shouldReceive('insertImage')->once()->with($hash, $image);
         $database->shouldReceive('updateMetadata')->once()->with($hash, $metadata);
 
-        $storage = m::mock('PHPIMS_Storage_Driver');
+        $storage = m::mock('PHPIMS\\Storage\\Driver');
         $storage->shouldReceive('store')->once()->with($hash, $_FILES['file']['tmp_name']);
 
         $this->operation->setStorage($storage)

@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
+use PHPIMS\Operation;
+
 /**
  * Abstract class for operation plugins
  *
@@ -40,18 +44,18 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Operation_Plugin {
+abstract class Plugin {
     /**
      * Array of events this plugin will be triggered for
      *
      * All operations has two entry points for plugins, pre-exec and post-exec. Events use the
-     * operations name as prefix with lcfirst(). The PHPIMS_Operation_AddImage entry points will
+     * operations name as prefix with lcfirst(). The PHPIMS\Operation\AddImage entry points will
      * be:
      *
      * - addImagePreExec
      * - addImagePostExec
      *
-     * If you want a plugin a be executed for instance after the PHPIMS_Operation_DeleteImage has
+     * If you want a plugin a be executed for instance after the PHPIMS\Operation\DeleteImage has
      * finished execution, create a plugin and set the $events array to:
      *
      * <code>
@@ -80,7 +84,7 @@ abstract class PHPIMS_Operation_Plugin {
     /**
      * Operation this plugins is attached to
      *
-     * @var PHPIMS_Operation
+     * @var PHPIMS\Operation
      */
     protected $operation = null;
 
@@ -88,10 +92,10 @@ abstract class PHPIMS_Operation_Plugin {
      * Class constructor
      *
      * @param array $params Parameters to the plugin
-     * @param PHPIMS_Operation $operation Operation that owns this plugin
+     * @param PHPIMS\Operation $operation Operation that owns this plugin
      * @codeCoverageIgnore
      */
-    public function __construct(array $params = null, PHPIMS_Operation $operation = null) {
+    public function __construct(array $params = null, Operation $operation = null) {
         if ($params !== null) {
             $this->setParams($params);
         }
@@ -114,7 +118,7 @@ abstract class PHPIMS_Operation_Plugin {
      * Set plugin parameters
      *
      * @param array $params Parameters to set
-     * @return PHPIMS_Operation_Plugin
+     * @return PHPIMS\Operation\Plugin
      */
     public function setParams(array $params) {
         $this->params = $params;
@@ -125,8 +129,8 @@ abstract class PHPIMS_Operation_Plugin {
     /**
      * Plugins exec method
      *
-     * @param PHPIMS_Opertaion $operation The operation the current plugin is working on
-     * @throws PHPIMS_Operation_Plugin_Exception
+     * @param PHPIMS\Opertaion $operation The operation the current plugin is working on
+     * @throws PHPIMS\Operation\Plugin\Exception
      */
-    abstract public function exec(PHPIMS_Operation $operation);
+    abstract public function exec(Operation $operation);
 }

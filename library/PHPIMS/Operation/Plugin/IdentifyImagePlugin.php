@@ -30,6 +30,11 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation\Plugin;
+
+use PHPIMS\Operation\Plugin;
+use PHPIMS\Operation;
+
 /**
  * Identify image plugin
  *
@@ -43,7 +48,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_IdentifyImagePlugin extends PHPIMS_Operation_Plugin {
+class IdentifyImagePlugin extends Plugin {
     /**
      * Supported mime types and the correct file extension
      *
@@ -56,7 +61,7 @@ class PHPIMS_Operation_Plugin_IdentifyImagePlugin extends PHPIMS_Operation_Plugi
     );
 
     /**
-     * @see PHPIMS_Operation_Plugin::$events
+     * @see PHPIMS\Operation\Plugin::$events
      */
     static public $events = array(
         'getImagePostExec' => 100,
@@ -64,16 +69,16 @@ class PHPIMS_Operation_Plugin_IdentifyImagePlugin extends PHPIMS_Operation_Plugi
     );
 
     /**
-     * @see PHPIMS_Operation_Plugin::exec()
+     * @see PHPIMS\Operation\Plugin::exec()
      */
-    public function exec(PHPIMS_Operation $operation) {
+    public function exec(Operation $operation) {
         $image = $operation->getImage();
 
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mime = $finfo->buffer($image->getBlob());
 
         if (!static::supportedMimeType($mime)) {
-            throw new PHPIMS_Operation_Plugin_Exception('Unsupported image type: ' . $mime, 415);
+            throw new Exception('Unsupported image type: ' . $mime, 415);
         }
 
         $extension = static::getFileExtension($mime);

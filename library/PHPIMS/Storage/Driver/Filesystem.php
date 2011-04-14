@@ -30,6 +30,12 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Storage\Driver;
+
+use PHPIMS\Storage\Driver as StorageDriver;
+use PHPIMS\Storage\Exception as StorageException;
+use PHPIMS\Image;
+
 /**
  * Filesystem storage driver
  *
@@ -46,15 +52,15 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver {
+class Filesystem extends StorageDriver {
     /**
-     * @see PHPIMS_Storage_DriverInterface::store()
+     * @see PHPIMS\Storage\DriverInterface::store()
      */
     public function store($hash, $path) {
         $params = $this->getParams();
 
         if (!is_writable($params['dataDir'])) {
-            throw new PHPIMS_Storage_Exception('Could not store image', 500);
+            throw new StorageException('Could not store image', 500);
         }
 
         // Create path for the image
@@ -73,26 +79,26 @@ class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver {
     }
 
     /**
-     * @see PHPIMS_Storage_DriverInterface::delete()
+     * @see PHPIMS\Storage\DriverInterface::delete()
      */
     public function delete($hash) {
         $path = $this->getImagePath($hash);
 
         if (!is_file($path)) {
-            throw new PHPIMS_Storage_Exception('File not found', 404);
+            throw new StorageException('File not found', 404);
         }
 
         return unlink($path);
     }
 
     /**
-     * @see PHPIMS_Storage_DriverInterface::load()
+     * @see PHPIMS\Storage\DriverInterface::load()
      */
-    public function load($hash, PHPIMS_Image $image) {
+    public function load($hash, Image $image) {
         $path = $this->getImagePath($hash);
 
         if (!is_file($path)) {
-            throw new PHPIMS_Storage_Exception('File not found', 404);
+            throw new StorageException('File not found', 404);
         }
 
         $image->setBlob(file_get_contents($path));

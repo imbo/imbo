@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Storage;
+
+use PHPIMS\Exception as BaseException;
+
 /**
  * Storage exception class for PHPIMS
  *
@@ -40,6 +44,6 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Storage_Exception extends PHPIMS_Exception {
+class Exception extends BaseException {
 
 }

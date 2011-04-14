@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,16 +40,16 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_PluginTest extends PHPUnit_Framework_TestCase {
+class PluginTest extends \PHPUnit_Framework_TestCase {
     /**
      * Plugin instance
      *
-     * @var PHPIMS_Operation_Plugin
+     * @var PHPIMS\Operation\Plugin
      */
     protected $plugin = null;
 
     public function setUp() {
-        $this->plugin = $this->getMockForAbstractClass('PHPIMS_Operation_Plugin');
+        $this->plugin = $this->getMockForAbstractClass('PHPIMS\\Operation\\Plugin');
     }
 
     public function tearDown() {

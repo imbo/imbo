@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation\Plugin;
+
+use PHPIMS\Operation\Exception as BaseException;
+
 /**
  * Base exception class for operation plugins
  *
@@ -40,6 +44,6 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_Plugin_Exception extends PHPIMS_Operation_Exception {
+class Exception extends BaseException {
 
 }

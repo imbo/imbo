@@ -39,19 +39,13 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-/** @see PHPIMS_Autoload */
+/** @see PHPIMS\Autoload */
 require __DIR__ . '/../library/PHPIMS/Autoload.php';
 
-// Autoloader for custom test classes inside the tests directory
-spl_autoload_register(function($class) {
-    $path = str_replace('_', DIRECTORY_SEPARATOR, $class);
-    $file = __DIR__ . '/' . $path . '.php';
-
-    if (file_exists($file)) {
-        require $file;
-        return true;
-    }
-});
+set_include_path(
+    get_include_path() . PATH_SEPARATOR .
+    __DIR__
+);
 
 // Autoloader for namespaced classes in the include_path
 spl_autoload_register(function($className) {
