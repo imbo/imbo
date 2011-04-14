@@ -198,11 +198,11 @@ All client methods returns an instance of `PHPIMS\Client\Response`. In this inst
 
 The response instance includes all response headers and the body, and has the following methods:
 
-* `array` `getHeaders(void)` Get all response headers 
-* `array` `asArray(void)` Get the body as a native PHP array instead of a JSON-encoded string
-* `stdClass` `asObject(void)` Get the body as an instance of stdClass instead of a JSON-encoded string
-* `boolean` `isSuccess(void)` Wether or not the response was a success (true if the HTTP status code is in the 2xx range) 
-* `int` `getStatusCode(void)` Get the status code
+* `array getHeaders(void)` Get all response headers 
+* `array asArray(void)` Get the body as a native PHP array instead of a JSON-encoded string
+* `stdClass asObject(void)` Get the body as an instance of stdClass instead of a JSON-encoded string
+* `boolean isSuccess(void)` Wether or not the response was a success (true if the HTTP status code is in the 2xx range) 
+* `int getStatusCode(void)` Get the status code
 
 ## Developer notes
 Here you will find some notes about how PHPIMS works internally.
@@ -246,12 +246,12 @@ Each plugin must also specify which operations it wants to hook into along with 
     
 This plugin will run after the `PHPIMS\Operation\GetImage::exec()` has finished executing. It will run with an index of 101 meaning that 100 plugins can be executed prior to this one for this specific hook. Internal plugins starts with an index of 100, and custom plugins given the index of 1 is the first to be executed. The name of the operation specified in the array is the last part of the operation class name along with "PostExec" or "PreExec". Here are the different names for all operations:
 
-* PHPIMS\Operation\AddImage => "addImagePreExec" and "addImagePostExec"
-* PHPIMS\Operation\DeleteImage => "deleteImagePreExec" and "deleteImagePostExec"
-* PHPIMS\Operation\DeleteMetadata => "deleteMetadataPreExec" and "deleteMetadataPostExec"
-* PHPIMS\Operation\EditMetadata => "editMetadataPreExec" and "editMetadataPostExec"
-* PHPIMS\Operation\GetImage => "getImagePreExec" and "getImagePostExec"
-* PHPIMS\Operation\GetMetadata => "getMetadataPreExec" and "getMetadataPostExec"
+* `PHPIMS\Operation\AddImage` "addImagePreExec" and "addImagePostExec"
+* `PHPIMS\Operation\DeleteImage` "deleteImagePreExec" and "deleteImagePostExec"
+* `PHPIMS\Operation\DeleteMetadata` "deleteMetadataPreExec" and "deleteMetadataPostExec"
+* `PHPIMS\Operation\EditMetadata` "editMetadataPreExec" and "editMetadataPostExec"
+* `PHPIMS\Operation\GetImage` "getImagePreExec" and "getImagePostExec"
+* `PHPIMS\Operation\GetMetadata` "getMetadataPreExec" and "getMetadataPostExec"
 
 If you want a plugin to run before the `PHPIMS\Operation\GetImage` operation, and after `PHPIMS\Operation\DeleteImage` and `PHPIMS\Operation\DeleteMetadata` the `$events` array can look like:
 
@@ -264,10 +264,10 @@ If you want a plugin to run before the `PHPIMS\Operation\GetImage` operation, an
 Whenever the `PHPIMS\Operation\GetImage` operation is triggered this plugin will be executed before any other plugin *before* the operation executes and it will run with index 20 *after* `PHPIMS\Operation\DeleteImage` is finished, and with an index of 20 *after* `PHPIMS\Operation\DeleteMetadata` is finished. It's important to notice that one request to PHPIMS triggers one operation. A single request can not trigger several operations.    
 
 ### Storage drivers
-PHPIMS supports plugable storage drivers. All storage drivers must extend the base `PHPIMS\Storage\Driver` class (which implements `PHPIMS\Storage\DriverInterface`. 
+PHPIMS supports plugable storage drivers. All storage drivers must extend the base `PHPIMS\Storage\Driver` class (which implements `PHPIMS\Storage\DriverInterface`). 
 
 ### Database drivers
-PHPIMS supports plugable database drivers. All database drivers must extend the base `PHPIMS\Database\Driver` class (which implements `PHPIMS\Database\DriverInterface`.
+PHPIMS supports plugable database drivers. All database drivers must extend the base `PHPIMS\Database\Driver` class (which implements `PHPIMS\Database\DriverInterface`).
 
 ### Configuration
 When installing PHPIMS you need to copy the config/server.php.dist file to config/server.php and change the values so they suit your needs.
@@ -305,9 +305,9 @@ To add custom plugins you will need to change the 'plugins' element of the confi
 
 Each element is an array consisting of one or two elements: 'path' and the optional 'prefix'. Path is a base path to your plugin classes. The prefix is the namespace of your classes. For the example above, you can have plugins stored like this:
 
-* /some/path/SomePlugin.php // Classname: SomePlugin
-* /some/path/SomeOtherPlugin.php // Classname: SomeOtherPlugin
-* /some/other/path/My/Custom/Plugins/SomePlugin.php // Classname: My\Custom\Plugins\SomePlugin
-* /some/other/path/My/Custom/Plugins/SomeOtherPlugin.php // Classname: My\Custom\Plugins\SomeOtherPlugin
+* `/some/path/SomePlugin.php` Classname: `SomePlugin`
+* `/some/path/SomeOtherPlugin.php` Classname: `SomeOtherPlugin`
+* `/some/other/path/My/Custom/Plugins/SomePlugin.php` Classname: `My\Custom\Plugins\SomePlugin`
+* `/some/other/path/My/Custom/Plugins/SomeOtherPlugin.php` Classname: `My\Custom\Plugins\SomeOtherPlugin`
 
 PHPIMS does not autoload any other classes than the ones included in PHPIMS itself, so you will have to add an autoloader yourself for your custom plugins. This autoloader can for instance be specified in the `config/server.php` script along with the configuration.
