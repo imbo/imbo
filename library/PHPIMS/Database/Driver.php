@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Database;
+
 /**
  * Abstract class for database drivers
  *
@@ -40,7 +42,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Database_Driver implements PHPIMS_Database_DriverInterface {
+abstract class Driver implements DriverInterface {
     /**
      * Parameters for the current database driver
      *
@@ -82,7 +84,7 @@ abstract class PHPIMS_Database_Driver implements PHPIMS_Database_DriverInterface
      * Set the params
      *
      * @param array $params An array of parameters
-     * @return PHPIMS_Database_Driver
+     * @return PHPIMS\Database\Driver
      */
     public function setParams(array $params) {
         $this->params = $params;
