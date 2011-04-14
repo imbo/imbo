@@ -132,7 +132,7 @@ class MongoDB extends DatabaseDriver {
     public function getDatabase() {
         if ($this->mongo === null) {
             // @codeCoverageIgnoreStart
-            $mongo = new Mongo();
+            $mongo = new \Mongo();
             $this->mongo = $mongo->{$this->databaseName};
         }
         // @codeCoverageIgnoreEnd
