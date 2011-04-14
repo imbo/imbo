@@ -30,6 +30,12 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
+use PHPIMS\Client\Driver;
+use PHPIMS\Client\Driver\Curl as DefaultDriver;
+use PHPIMS\Client\Exception;
+
 /**
  * Client that interacts with the server part of PHPIMS
  *
@@ -43,7 +49,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Client {
+class Client {
     /**
      * The server URL
      *
@@ -68,7 +74,7 @@ class PHPIMS_Client {
     /**
      * Driver used for the client
      *
-     * @var PHPIMS_Client_Driver
+     * @var PHPIMS\Client\Driver
      */
     protected $driver = null;
 
@@ -92,9 +98,9 @@ class PHPIMS_Client {
      * @param string $serverUrl The URL to the PHPIMS server, including protocol
      * @param string $publicKey The public key to use. Only some operations need this
      * @param string $privateKey The private key to use. Only some operations need this
-     * @param PHPIMS_Client_Driver $driver Optional driver to set
+     * @param PHPIMS\Client\Driver $driver Optional driver to set
      */
-    public function __construct($serverUrl, $publicKey = null, $privateKey = null, PHPIMS_Client_Driver $driver = null) {
+    public function __construct($serverUrl, $publicKey = null, $privateKey = null, Driver $driver = null) {
         $this->setServerUrl($serverUrl);
 
         if ($publicKey !== null) {
@@ -123,7 +129,7 @@ class PHPIMS_Client {
      * Set the server url
      *
      * @param string $url The URL to set
-     * @return PHPIMS_Client
+     * @return PHPIMS\Client
      */
     public function setServerUrl($url) {
         $this->serverUrl = $url;
@@ -155,7 +161,7 @@ class PHPIMS_Client {
      * Set the timeout
      *
      * @param int $timeout Timeout in seconds
-     * @return VGF_RemoteContent
+     * @return PHPIMS\Client
      */
     public function setTimeout($timeout) {
         $this->timeout = (int) $timeout;
@@ -176,7 +182,7 @@ class PHPIMS_Client {
      * Set the connection timeout
      *
      * @param int $connectTimeout Timeout in seconds
-     * @return VGF_RemoteContent
+     * @return PHPIMS\Client
      */
     public function setConnectTimeout($connectTimeout) {
         $this->connectTimeout = $connectTimeout;
@@ -187,12 +193,12 @@ class PHPIMS_Client {
     /**
      * Get the current driver
      *
-     * @return PHPIMS_Client_Driver
+     * @return PHPIMS\Client\Driver
      */
     public function getDriver() {
         if ($this->driver === null) {
             // @codeCoverageIgnoreStart
-            $this->driver = new PHPIMS_Client_Driver_Curl();
+            $this->driver = new DefaultDriver();
             $this->driver->setClient($this);
         }
         // @codeCoverageIgnoreEnd
@@ -203,10 +209,10 @@ class PHPIMS_Client {
     /**
      * Set the driver
      *
-     * @param PHPIMS_Client_Driver $driver A driver instance
-     * @return PHPIMS_Client
+     * @param PHPIMS\Client\Driver $driver A driver instance
+     * @return PHPIMS\Client
      */
-    public function setDriver(PHPIMS_Client_Driver $driver) {
+    public function setDriver(Driver $driver) {
         $driver->setClient($this);
         $this->driver = $driver;
 
@@ -218,12 +224,12 @@ class PHPIMS_Client {
      *
      * @param string $path Path to the local image
      * @param array $metadata Metadata to attach to the image
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Exception
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Exception
      */
     public function addImage($path, array $metadata = null) {
         if (!is_file($path)) {
-            throw new PHPIMS_Client_Exception('File does not exist: ' . $path);
+            throw new Exception('File does not exist: ' . $path);
         }
 
         // Get extension
@@ -242,7 +248,7 @@ class PHPIMS_Client {
      * Delete an image from the server
      *
      * @param string $hash The image identifier
-     * @return PHPIMS_Client_Response
+     * @return PHPIMS\Client\Response
      */
     public function deleteImage($hash) {
         $url = $this->getSignedUrl('DELETE', $hash);
@@ -255,7 +261,7 @@ class PHPIMS_Client {
      *
      * @param string $hash The image identifier
      * @param array $metadata An array of metadata
-     * @return PHPIMS_Client_Response
+     * @return PHPIMS\Client\Response
      */
     public function editMetadata($hash, array $metadata) {
         $url = $this->getSignedUrl('POST', $hash . '/meta');
@@ -267,7 +273,7 @@ class PHPIMS_Client {
      * Delete metadata
      *
      * @param string $hash The image identifier
-     * @return PHPIMS_Client_Response
+     * @return PHPIMS\Client\Response
      */
     public function deleteMetadata($hash) {
         $url = $this->getSignedUrl('DELETE', $hash . '/meta');
@@ -298,7 +304,7 @@ class PHPIMS_Client {
      * Set the public key
      *
      * @param string $key The key to set
-     * @return PHPIMS_Client
+     * @return PHPIMS\Client
      */
     public function setPublicKey($key) {
         $this->publicKey = $key;
@@ -319,7 +325,7 @@ class PHPIMS_Client {
      * Set the private key
      *
      * @param string $key The key to set
-     * @return PHPIMS_Client
+     * @return PHPIMS\Client
      */
     public function setPrivateKey($key) {
         $this->privateKey = $key;

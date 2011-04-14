@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Client;
+
 /**
  * Client driver interface
  *
@@ -42,7 +44,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface PHPIMS_Client_DriverInterface {
+interface DriverInterface {
     /**
      * POST some data to an URL
      *
@@ -50,8 +52,8 @@ interface PHPIMS_Client_DriverInterface {
      * @param array $metadata The metadata to POST. This array will be json_encoded and sent to the
      *                        server as $_POST['metadata']
      * @param string $filePath Optional path to a file we want to add to the POST
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Driver\Exception
      */
     public function post($url, array $metadata = null, $filePath = null);
 
@@ -59,8 +61,8 @@ interface PHPIMS_Client_DriverInterface {
      * Perform a GET to $url
      *
      * @param string $url The URL to GET
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Driver\Exception
      */
     public function get($url);
 
@@ -68,8 +70,8 @@ interface PHPIMS_Client_DriverInterface {
      * Perform a HEAD to $url
      *
      * @param string $url The URL to HEAD
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Driver\Exception
      */
     public function head($url);
 
@@ -77,8 +79,8 @@ interface PHPIMS_Client_DriverInterface {
      * Perform a DELETE request to $url
      *
      * @param string $url The URL to DELETE
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Driver\Exception
      */
     public function delete($url);
 
@@ -88,8 +90,8 @@ interface PHPIMS_Client_DriverInterface {
      * @param string $path The path to the image to add
      * @param string $url The URL to push data to
      * @param array $metadata Metadata to add along with the image
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Driver\Exception
      */
     public function addImage($path, $url, array $metadata = null);
 }

@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
 use \Mockery as m;
 
 /**
@@ -40,11 +42,11 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
+class ClientTest extends \PHPUnit_Framework_TestCase {
     /**
      * Client instance
      *
-     * @var PHPIMS_Client
+     * @var PHPIMS\Client
      */
     protected $client = null;
 
@@ -98,9 +100,9 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
         $this->privateKey = md5($this->publicKey);
         $this->hash = md5(microtime()) . '.png';
 
-        $this->client = new PHPIMS_Client($this->serverUrl, $this->publicKey, $this->privateKey);
+        $this->client = new Client($this->serverUrl, $this->publicKey, $this->privateKey);
 
-        $this->driver = m::mock('PHPIMS_Client_Driver');
+        $this->driver = m::mock('PHPIMS\\Client\\Driver');
         $this->driver->shouldReceive('setClient')->once()->with($this->client)->andReturn($this->driver);
 
         $this->client->setDriver($this->driver);
@@ -132,7 +134,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetDriver() {
-        $driver = m::mock('PHPIMS_Client_Driver');
+        $driver = m::mock('PHPIMS\\Client\\Driver');
         $driver->shouldReceive('setClient')->with($this->client)->andReturn($driver);
         $this->client->setDriver($driver);
         $this->assertSame($driver, $this->client->getDriver());
@@ -151,9 +153,9 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testConstructorParams() {
-        $driver = m::mock('PHPIMS_Client_Driver');
-        $driver->shouldReceive('setClient')->with(m::type('PHPIMS_Client'))->andReturn($driver);
-        $client = new PHPIMS_Client($this->serverUrl, $this->publicKey, $this->privateKey, $driver);
+        $driver = m::mock('PHPIMS\\Client\\Driver');
+        $driver->shouldReceive('setClient')->with(m::type('PHPIMS\\Client'))->andReturn($driver);
+        $client = new Client($this->serverUrl, $this->publicKey, $this->privateKey, $driver);
 
         $this->assertSame($this->serverUrl, $client->getServerUrl());
         $this->assertSame($this->publicKey, $client->getPublicKey());
@@ -162,7 +164,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException PHPIMS_Client_Exception
+     * @expectedException PHPIMS\Client\Exception
      * @expectedExceptionMessage File does not exist: foobar
      */
     public function testAddImageThatDoesNotExist() {
@@ -177,7 +179,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
         );
         $md5 = md5_file($image);
 
-        $response = m::mock('PHPIMS_Client_Response');
+        $response = m::mock('PHPIMS\\Client\\Response');
         $this->driver->shouldReceive('addImage')->once()->with($image, $this->signedUrlPattern, $metadata)->andReturn($response);
         $result = $this->client->addImage($image, $metadata);
 
@@ -185,7 +187,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testDeleteImage() {
-        $response = m::mock('PHPIMS_Client_Response');
+        $response = m::mock('PHPIMS\\Client\\Response');
         $this->driver->shouldReceive('delete')->once()->with($this->signedUrlPattern)->andReturn($response);
 
         $result = $this->client->deleteImage($this->hash);
@@ -199,7 +201,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
             'bar' => 'foo',
         );
 
-        $response = m::mock('PHPIMS_Client_Response');
+        $response = m::mock('PHPIMS\\Client\\Response');
         $this->driver->shouldReceive('post')->once()->with($this->signedUrlPattern, $data)->andReturn($response);
         $result = $this->client->editMetaData($this->hash, $data);
 
@@ -207,7 +209,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testDeleteMetaData() {
-        $response = m::mock('PHPIMS_Client_Response');
+        $response = m::mock('PHPIMS\\Client\\Response');
         $this->driver->shouldReceive('delete')->once()->with($this->signedUrlPattern)->andReturn($response);
         $result = $this->client->deleteMetaData($this->hash);
 
@@ -215,7 +217,7 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testGetMetaData() {
-        $response = m::mock('PHPIMS_Client_Response');
+        $response = m::mock('PHPIMS\\Client\\Response');
         $this->driver->shouldReceive('get')->once()->with($this->urlPattern)->andReturn($response);
         $result = $this->client->getMetadata($this->hash);
 

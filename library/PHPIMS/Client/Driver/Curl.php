@@ -30,6 +30,11 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Client\Driver;
+
+use PHPIMS\Client\Driver;
+use PHPIMS\Client\Response;
+
 /**
  * cURL client driver
  *
@@ -42,7 +47,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver {
+class Curl extends Driver {
     /**
      * The cURL handle used by the client
      *
@@ -58,7 +63,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver {
     }
 
     /**
-     * @see PHPIMS_Client_Driver::init()
+     * @see PHPIMS\Client\Driver::init()
      */
     protected function init() {
         $this->curlHandle = curl_init();
@@ -72,7 +77,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver {
     }
 
     /**
-     * @see PHPIMS_Client_DriverInterface::post()
+     * @see PHPIMS\Client\DriverInterface::post()
      */
     public function post($url, array $metadata = null, $filePath = null) {
         $postFields = array(
@@ -92,7 +97,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver {
     }
 
     /**
-     * @see PHPIMS_Client_DriverInterface::get()
+     * @see PHPIMS\Client\DriverInterface::get()
      */
     public function get($url) {
         curl_setopt_array($this->curlHandle, array(
@@ -103,7 +108,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver {
     }
 
     /**
-     * @see PHPIMS_Client_DriverInterface::head()
+     * @see PHPIMS\Client\DriverInterface::head()
      */
     public function head($url) {
         curl_setopt_array($this->curlHandle, array(
@@ -114,7 +119,7 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver {
     }
 
     /**
-     * @see PHPIMS_Client_DriverInterface::delete()
+     * @see PHPIMS\Client\DriverInterface::delete()
      */
     public function delete($url) {
         curl_setopt_array($this->curlHandle, array(
@@ -131,8 +136,8 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver {
      * resource.
      *
      * @param string $url The URL to request
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Driver_Exception
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Driver\Exception
      */
     protected function request($url) {
         // Set the timeout options
@@ -146,16 +151,16 @@ class PHPIMS_Client_Driver_Curl extends PHPIMS_Client_Driver {
         $responseCode = (int) curl_getinfo($this->curlHandle, CURLINFO_HTTP_CODE);
 
         if ($content === false) {
-            throw new PHPIMS_Client_Driver_Exception('An error occured. Could not complete request.');
+            throw new Exception('An error occured. Could not complete request.');
         }
 
-        $response = PHPIMS_Client_Response::factory($content, $responseCode);
+        $response = Response::factory($content, $responseCode);
 
         return $response;
     }
 
     /**
-     * @see PHPIMS_Client_DriverInterface::addImage()
+     * @see PHPIMS\Client\DriverInterface::addImage()
      */
     public function addImage($path, $url, array $metadata = null) {
         return $this->post($url, $metadata, $path);

@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
 /**
  * Base exception class for PHPIMS
  *
@@ -40,6 +42,6 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Exception extends RuntimeException {
+class Exception extends \RuntimeException {
 
 }

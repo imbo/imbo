@@ -44,7 +44,7 @@ require __DIR__ . '/../library/PHPIMS/Autoload.php';
 
 // Autoloader for custom test classes inside the tests directory
 spl_autoload_register(function($class) {
-    $path = str_replace('_', DIRECTORY_SEPARATOR, $class);
+    $path = str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, $class);
     $file = __DIR__ . '/' . $path . '.php';
 
     if (file_exists($file)) {
