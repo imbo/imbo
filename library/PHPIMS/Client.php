@@ -33,6 +33,7 @@
 namespace PHPIMS;
 
 use PHPIMS\Client\Driver;
+use PHPIMS\Client\Transformation;
 use PHPIMS\Client\Driver\Curl as DefaultDriver;
 use PHPIMS\Client\Exception as ClientException;
 
@@ -374,9 +375,16 @@ class Client {
      * Get the image url
      *
      * @param string $hash Image hash
+     * @param Transformation $transformation An optional chain of transformations
      * @return string
      */
-    public function getImageUrl($hash) {
-        return $this->getServerUrl() . '/' . $hash;
+    public function getImageUrl($hash, Transformation $transformation = null) {
+        $url = $this->getServerUrl() . '/' . $hash;
+
+        if ($transformation !== null) {
+            $url = $transformation->apply($url);
+        }
+
+        return $url;
     }
 }

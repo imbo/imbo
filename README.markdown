@@ -192,6 +192,67 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     
     $hash = '<hash>';
     $response = $client->deleteMetadata($hash);
+    
+### Get image url
+
+    <?php
+    require 'PHPIMS/Autoload.php';
+
+    $client = new PHPIMS\Client('http://<hostname>');
+    
+    $hash = '<hash>';
+    $url = $client->getImageUrl($hash);
+
+### Get image url with transformations
+
+    <?php
+    require 'PHPIMS/Autoload.php';
+
+    $client = new PHPIMS\Client('http://<hostname>');
+    
+    $hash = '<hash>';
+    $transformation = new PHPIMS\Client\Transformation;
+    $transformation->border()->resize(200)->rotate(45);
+    $url = $client->getImageUrl($hash, $transformation);
+    
+    // OR
+    
+    $hash = '<hash>';
+    $url = $client->getImageUrl($hash);
+    
+    $transformation = new PHPIMS\Client\Transformation;
+    $url = $transformation->border()->resize(200)->rotate(45)->apply($url);
+    
+    // OR
+    
+    $hash = '<hash>';
+    $url = $client->getImageUrl($hash);
+    
+    $transformation = new PHPIMS\Client\Transformation;
+    $transformation->add(new PHPIMS\Client\Filter\Border());
+                   ->add(new PHPIMS\Client\Filter\Resize(200));
+                   ->add(new PHPIMS\Client\Filter\Rotate(45));
+    
+    $url = $transformation->apply($url);
+
+#### Image transformations
+The `PHPIMS\Client\Transformation` class can be used to manipulate the url. The following transformations can be used on an instance of the `PHPIMS\Client\Transformation` class:
+
+* `border(string $color = null, int $width = null, int $height = null)` 
+* `crop(int $x, int $y, int $width, int $height)` 
+* `rotate(int $angle, string $bg = null)` 
+* `resize(int $width = null, int $height = null)` 
+
+These methods can be chained. They can also be added using the following method:
+
+* `add(PHPIMS\Client\FilterInterface $filter)`
+
+The following filters are implemented using the same parameters as above in the constructors:
+
+* `PHPIMS\Client\Filter\Border`
+* `PHPIMS\Client\Filter\Crop`
+* `PHPIMS\Client\Filter\Resize`
+* `PHPIMS\Client\Filter\Rotate`
 
 ### Client response object    
 All client methods returns an instance of `PHPIMS\Client\Response`. In this instance you will find information on the request that was made. 
