@@ -30,9 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\Filter;
+namespace PHPIMS\Client\ImageUrl\Filter;
 
-use PHPIMS\Client\FilterInterface;
+use PHPIMS\Client\ImageUrl\FilterInterface;
+use PHPIMS\Client\ImageUrl\Filter\Exception as FilterException;
 
 /**
  * Border filter
@@ -44,64 +45,51 @@ use PHPIMS\Client\FilterInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Border implements FilterInterface {
+class Resize implements FilterInterface {
     /**
-     * Width of the border
+     * Width of the resize
      *
      * @var int
      */
     private $width = null;
 
     /**
-     * Height of the border
+     * Height of the resize
      *
      * @var int
      */
     private $height = null;
 
     /**
-     * Color of the border
-     *
-     * @var string
-     */
-    private $color = null;
-
-    /**
      * Class constructor
      *
-     * @param string $color The color to set
-     * @param int $width Width of the border
-     * @param int $height Height of the border
+     * @param int $width Width of the resize
+     * @param int $height Height of the resize
+     * @throws PHPIMS\Client\ImageUrl\Filter\Exception
      */
-    public function __construct($color = null, $width = null, $height = null) {
-        $this->color  = $color;
+    public function __construct($width = null, $height = null) {
+        if ($width === null && $height === null) {
+            throw new FilterException('$width and/or $height must be set');
+        }
+
         $this->width  = $width;
         $this->height = $height;
     }
 
     /**
-     * @see PHPIMS\Client\FilterInterface::getFilter()
+     * @see PHPIMS\Client\ImageUrl\FilterInterface::getFilter()
      */
     public function getFilter() {
-        $filter = 't[]=border';
         $params = array();
-
-        if ($this->color !== null) {
-            $params[] = 'color=' . $this->color;
-        }
 
         if ($this->width !== null) {
             $params[] = 'width=' . $this->width;
         }
 
-        if ($this->color !== null) {
+        if ($this->height !== null) {
             $params[] = 'height=' . $this->height;
         }
 
-        if (!empty($params)) {
-            $filter .= ':' . implode(',', $params);
-        }
-
-        return $filter;
+        return 'resize:' . implode(',', $params);
     }
 }

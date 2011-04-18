@@ -202,6 +202,8 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     
     $hash = '<hash>';
     $url = $client->getImageUrl($hash);
+    
+The `getImageUrl` returns an instance of `PHPIMS\Client\ImageUrl` which, when used in string context, represents an url to an image. 
 
 ### Get image url with transformations
 
@@ -220,20 +222,20 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     $hash = '<hash>';
     $url = $client->getImageUrl($hash);
     
-    $transformation = new PHPIMS\Client\Transformation;
-    $url = $transformation->border()->resize(200)->rotate(45)->apply($url);
+    $transformation = new PHPIMS\Client\ImageUrl\Transformation;
+    $transformation->border()->resize(200)->rotate(45)->apply($url);
     
     // OR
     
     $hash = '<hash>';
     $url = $client->getImageUrl($hash);
     
-    $transformation = new PHPIMS\Client\Transformation;
-    $transformation->add(new PHPIMS\Client\Filter\Border());
-                   ->add(new PHPIMS\Client\Filter\Resize(200));
-                   ->add(new PHPIMS\Client\Filter\Rotate(45));
+    $transformation = new PHPIMS\Client\ImageUrl\Transformation;
+    $transformation->add(new PHPIMS\Client\ImageUrl\Filter\Border());
+                   ->add(new PHPIMS\Client\ImageUrl\Filter\Resize(200));
+                   ->add(new PHPIMS\Client\ImageUrl\Filter\Rotate(45));
     
-    $url = $transformation->apply($url);
+    $transformation->apply($url);
 
 #### Image transformations
 The `PHPIMS\Client\Transformation` class can be used to manipulate the url. The following transformations can be used on an instance of the `PHPIMS\Client\Transformation` class:

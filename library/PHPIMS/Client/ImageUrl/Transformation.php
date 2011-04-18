@@ -30,13 +30,15 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client;
+namespace PHPIMS\Client\ImageUrl;
 
-use PHPIMS\Client\FilterInterface;
-use PHPIMS\Client\Filter\Border;
-use PHPIMS\Client\Filter\Crop;
-use PHPIMS\Client\Filter\Resize;
-use PHPIMS\Client\Filter\Rotate;
+use PHPIMS\Client;
+
+use PHPIMS\Client\ImageUrl;
+use PHPIMS\Client\ImageUrl\Filter\Border;
+use PHPIMS\Client\ImageUrl\Filter\Crop;
+use PHPIMS\Client\ImageUrl\Filter\Resize;
+use PHPIMS\Client\ImageUrl\Filter\Rotate;
 
 /**
  * Transformation collection
@@ -53,7 +55,7 @@ class Transformation {
      * Add a filter to the chain
      *
      * @param FilterInterface $filter The filter to add
-     * @return PHPIMS\Client\Transformation
+     * @return PHPIMS\Client\ImageUrl\Transformation
      */
     public function add(FilterInterface $filter) {
         $this->filters[] = $filter;
@@ -62,21 +64,25 @@ class Transformation {
     }
 
     /**
+     * Apply a filter to an url
+     *
+     * @param PHPIMS\Client\ImageUrl ImageUrl $url
+     * @param PHPIMS\Client\ImageUrl\FilterInterface $filter
+     * @return PHPIMS\Client\ImageUrl
+     */
+    public function applyFilter(ImageUrl $url, FilterInterface $filter) {
+        return $url->append($filter->getFilter());
+    }
+
+    /**
      * Apply the filter chain to an url
      *
-     * @param string $url The url to modify
-     * @return string
+     * @param PHPIMS\Client\ImageUrl $imageUrl The url to apply filters to
+     * @return PHPIMS\Client\ImageUrl
      */
-    public function apply($url) {
+    public function apply(ImageUrl $url) {
         if (count($this->filters)) {
-            $url .= '?';
-
-            $url = array_reduce($this->filters, function($url, FilterInterface $filter) {
-                $url .= $filter->getFilter() . '&';
-                return $url;
-            }, $url);
-
-            $url = rtrim($url, '&');
+            return array_reduce($this->filters, array($this, 'applyFilter'), $url);
         }
 
         return $url;
@@ -88,7 +94,7 @@ class Transformation {
      * @param string $color The color to use
      * @param int $width Width of the border
      * @param int $height Height of the border
-     * @return PHPIMS\Client\Transformation
+     * @return PHPIMS\Client\ImageUrl\Transformation
      */
     public function border($color = null, $width = null, $height = null) {
         return $this->add(new Border($color, $width, $height));
@@ -101,7 +107,7 @@ class Transformation {
      * @param int $y Y coordinate of the top left corner of the crop
      * @param int $width Width of the crop
      * @param int $height Height of the crop
-     * @return PHPIMS\Client\Transformation
+     * @return PHPIMS\Client\ImageUrl\Transformation
      */
     public function crop($x, $y, $width, $height) {
         return $this->add(new Crop($x, $y, $width, $height));
@@ -112,7 +118,7 @@ class Transformation {
      *
      * @param int $angle Angle of the rotation
      * @param string $bg Background color
-     * @return PHPIMS\Client\Transformation
+     * @return PHPIMS\Client\ImageUrl\Transformation
      */
     public function rotate($angle, $bg = null) {
         return $this->add(new Rotate($angle, $bg));
@@ -123,7 +129,7 @@ class Transformation {
      *
      * @param int $width Width of the resize
      * @param int $height Height of the resize
-     * @return PHPIMS\Client\Transformation
+     * @return PHPIMS\Client\ImageUrl\Transformation
      */
     public function resize($width = null, $height = null) {
         return $this->add(new Resize($width, $height));

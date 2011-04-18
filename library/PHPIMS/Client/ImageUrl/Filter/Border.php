@@ -23,39 +23,84 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Client
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\Filter;
+namespace PHPIMS\Client\ImageUrl\Filter;
+
+use PHPIMS\Client\ImageUrl\FilterInterface;
 
 /**
+ * Border filter
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Client
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class ResizeTest extends \PHPUnit_Framework_TestCase {
+class Border implements FilterInterface {
     /**
-     * @expectedException PHPIMS\Client\Filter\Exception
+     * Width of the border
+     *
+     * @var int
      */
-    public function testResizeWithNoArguments() {
-        new Resize();
+    private $width = null;
+
+    /**
+     * Height of the border
+     *
+     * @var int
+     */
+    private $height = null;
+
+    /**
+     * Color of the border
+     *
+     * @var string
+     */
+    private $color = null;
+
+    /**
+     * Class constructor
+     *
+     * @param string $color The color to set
+     * @param int $width Width of the border
+     * @param int $height Height of the border
+     */
+    public function __construct($color = null, $width = null, $height = null) {
+        $this->color  = $color;
+        $this->width  = $width;
+        $this->height = $height;
     }
 
-    public function testResize() {
-        $filter = new Resize(100);
-        $this->assertSame('t[]=resize:width=100', $filter->getFilter());
+    /**
+     * @see PHPIMS\Client\ImageUrl\FilterInterface::getFilter()
+     */
+    public function getFilter() {
+        $params = array();
 
-        $filter = new Resize(null, 100);
-        $this->assertSame('t[]=resize:height=100', $filter->getFilter());
+        if ($this->color !== null) {
+            $params[] = 'color=' . $this->color;
+        }
 
-        $filter = new Resize(100, 100);
-        $this->assertSame('t[]=resize:width=100,height=100', $filter->getFilter());
+        if ($this->width !== null) {
+            $params[] = 'width=' . $this->width;
+        }
+
+        if ($this->color !== null) {
+            $params[] = 'height=' . $this->height;
+        }
+
+        if (!empty($params)) {
+            return 'border:' . implode(',', $params);
+        }
+
+        return 'border';
     }
 }

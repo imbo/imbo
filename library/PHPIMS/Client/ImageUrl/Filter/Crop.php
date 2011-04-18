@@ -30,10 +30,12 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client;
+namespace PHPIMS\Client\ImageUrl\Filter;
+
+use PHPIMS\Client\ImageUrl\FilterInterface;
 
 /**
- * Filter interface
+ * Crop filter
  *
  * @package PHPIMS
  * @subpackage Client
@@ -42,11 +44,61 @@ namespace PHPIMS\Client;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface FilterInterface {
+class Crop implements FilterInterface {
     /**
-     * Return the filter
+     * X coordinate of the top left corner of the crop
      *
-     * @return string The filter to add to the url
+     * @var int
      */
-    public function getFilter();
+    private $x = null;
+
+    /**
+     * Y coordinate of the top left corner of the crop
+     *
+     * @var int
+     */
+    private $y = null;
+
+    /**
+     * Width of the crop
+     *
+     * @var int
+     */
+    private $width = null;
+
+    /**
+     * Height of the crop
+     *
+     * @var int
+     */
+    private $height = null;
+
+    /**
+     * Class constructor
+     *
+     * @param int $x X coordinate of the top left corner of the crop
+     * @param int $y Y coordinate of the top left corner of the crop
+     * @param int $width Width of the crop
+     * @param int $height Height of the crop
+     */
+    public function __construct($x, $y, $width, $height) {
+        $this->x      = (int) $x;
+        $this->y      = (int) $y;
+        $this->width  = (int) $width;
+        $this->height = (int) $height;
+    }
+
+    /**
+     * @see PHPIMS\Client\ImageUrl\FilterInterface::getFilter()
+     */
+    public function getFilter() {
+        $params = array(
+            'x=' . $this->x,
+            'y=' . $this->y,
+            'width=' . $this->width,
+            'height=' . $this->height,
+        );
+
+        return 'crop:' . implode(',', $params);
+    }
 }

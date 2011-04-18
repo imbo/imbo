@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\Filter;
+namespace PHPIMS\Client\ImageUrl\Filter;
 
 /**
  * @package PHPIMS
@@ -40,14 +40,9 @@ namespace PHPIMS\Client\Filter;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class BorderTest extends \PHPUnit_Framework_TestCase {
-    public function testBorderWithNoArguments() {
-        $filter = new Border();
-        $this->assertSame('t[]=border', $filter->getFilter());
-    }
-
-    public function testBorderWithAllArguments() {
-        $filter = new Border('333', 2, 4);
-        $this->assertSame('t[]=border:color=333,width=2,height=4', $filter->getFilter());
+class CropTest extends \PHPUnit_Framework_TestCase {
+    public function testCrop() {
+        $filter = new Crop(1, 2, 3, 4);
+        $this->assertSame('crop:x=1,y=2,width=3,height=4', $filter->getFilter());
     }
 }

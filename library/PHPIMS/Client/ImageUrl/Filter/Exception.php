@@ -30,12 +30,12 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\Filter;
+namespace PHPIMS\Client\ImageUrl\Filter;
 
 use PHPIMS\Client\Exception as BaseException;
 
 /**
- * Base exception class for client filter
+ * Base exception class for imageurl filters
  *
  * @package PHPIMS
  * @subpackage Exceptions

@@ -32,9 +32,6 @@
 
 namespace PHPIMS\Client;
 
-use PHPIMS\Client;
-use \Mockery as m;
-
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -43,31 +40,21 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class DriverTest extends \PHPUnit_Framework_TestCase {
-    /**
-     * Driver instance
-     *
-     * @var PHPIMS\Client\Driver
-     */
-    protected $driver = null;
-
-    /**
-     * Set up method
-     */
-    public function setUp() {
-        $this->driver = $this->getMockForAbstractClass('PHPIMS\\Client\\Driver');
+class ImageUrlTest extends \PHPUnit_Framework_TestCase {
+    public function testToStringWithoutData() {
+        $baseUrl = 'http://baseurl/' . md5(microtime()) . '.png';
+        $imageUrl = new ImageUrl($baseUrl);
+        $this->assertSame($baseUrl, (string) $imageUrl);
     }
 
-    /**
-     * Tear down method
-     */
-    public function tearDown() {
-        $this->driver = null;
-    }
+    public function testToStringWithData() {
+        $baseUrl = 'http://baseurl/' . md5(microtime()) . '.png';
+        $imageUrl = new ImageUrl($baseUrl);
+        $imageUrl->append('border')
+                 ->append('rotate:angle=45')
+                 ->append('resize:width=100')
+                 ->append('crop:x=2,y=3,width=10,height=5');
 
-    public function testSetGetClient() {
-        $client = m::mock('PHPIMS\\Client');
-        $this->driver->setClient($client);
-        $this->assertSame($client, $this->driver->getClient());
+        $this->assertSame($baseUrl . '?t[]=border&t[]=rotate:angle=45&t[]=resize:width=100&t[]=crop:x=2,y=3,width=10,height=5', (string) $imageUrl);
     }
 }

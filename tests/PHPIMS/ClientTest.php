@@ -226,16 +226,18 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
 
     public function testGetImageUrl() {
         $url = $this->client->getImageUrl($this->hash);
-        $this->assertSame($url, $this->serverUrl . '/' . $this->hash);
+        $this->assertInstanceOf('PHPIMS\\Client\\ImageUrl', $url);
+        $this->assertSame($this->serverUrl . '/' . $this->hash, (string) $url);
     }
 
     public function testGetImageUrlWithTransformations() {
-        $imageUrl = $this->serverUrl . '/' . $this->hash;
-        $completeUrl = $imageUrl . '?t[]=border:width=2,height=2,color=fff&t[]=resize:width=200,height=100&t[]=rotate:angle=45,bg=fff&t[]=crop:x=20,y=10,width=20,height=40';
-        $transformation = m::mock('PHPIMS\\Client\\Transformation');
-        $transformation->shouldReceive('apply')->once()->with($imageUrl)->andReturn($completeUrl);
+        $baseUrl = $this->serverUrl . '/' . $this->hash;
+        $completeUrl = $baseUrl;
+        $transformation = m::mock('PHPIMS\\Client\\ImageUrl\\Transformation');
+        $transformation->shouldReceive('apply')->once()->with(m::type('PHPIMS\\Client\\ImageUrl'));
 
         $url = $this->client->getImageUrl($this->hash, $transformation);
-        $this->assertSame($url, $completeUrl);
+        $this->assertInstanceOf('PHPIMS\\Client\\ImageUrl', $url);
+        $this->assertSame($completeUrl, (string) $url);
     }
 }

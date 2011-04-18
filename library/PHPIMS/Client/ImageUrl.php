@@ -30,12 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\Filter;
-
-use PHPIMS\Client\FilterInterface;
+namespace PHPIMS\Client;
 
 /**
- * Border filter
+ * URL to an image
  *
  * @package PHPIMS
  * @subpackage Client
@@ -44,45 +42,56 @@ use PHPIMS\Client\FilterInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Rotate implements FilterInterface {
+class ImageUrl {
     /**
-     * Angle of the rotation
-     *
-     * @var int
-     */
-    private $angle = null;
-
-    /**
-     * Background color of the image
+     * Baseurl to the PHPIMS service
      *
      * @var string
      */
-    private $bg = null;
+    private $baseUrl;
+
+    /**
+     * Query data
+     *
+     * @var array
+     */
+    private $data;
 
     /**
      * Class constructor
      *
-     * @param int $angle Angle of the rotation
-     * @param string $bg Background color
+     * @param string $baseUrl The url to an image
      */
-    public function __construct($angle, $bg = null) {
-        $this->angle = (int) $angle;
-        $this->bg = $bg;
+    public function __construct($baseUrl) {
+        $this->baseUrl = $baseUrl;
     }
 
     /**
-     * @see PHPIMS\Client\FilterInterface::getFilter()
+     * Append something to the url
+     *
+     * @param string $part The part to append
+     * @return PHPIMS\Client\ImageUrl
      */
-    public function getFilter() {
-        $filter = 't[]=rotate';
-        $params = array(
-            'angle=' . $this->angle,
-        );
+    public function append($part) {
+        $this->data[] = $part;
 
-        if ($this->bg !== null) {
-            $params[] = 'bg=' . $this->bg;
+        return $this;
+    }
+
+    /**
+     * To string method
+     *
+     * @return string
+     */
+    public function __toString() {
+        if (empty($this->data)) {
+            return $this->baseUrl;
         }
 
-        return $filter . ':' . implode(',', $params);
+        $query = null;
+        $query = array_reduce($this->data, function($query, $element) { return $query . 't[]=' . $element . '&'; }, $query);
+        $query = rtrim($query, '&');
+
+        return $this->baseUrl . '?' . $query;
     }
 }

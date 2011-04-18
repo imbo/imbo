@@ -30,12 +30,12 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\Filter;
+namespace PHPIMS\Client\ImageUrl\Filter;
 
-use PHPIMS\Client\FilterInterface;
+use PHPIMS\Client\ImageUrl\FilterInterface;
 
 /**
- * Crop filter
+ * Border filter
  *
  * @package PHPIMS
  * @subpackage Client
@@ -44,63 +44,44 @@ use PHPIMS\Client\FilterInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Crop implements FilterInterface {
+class Rotate implements FilterInterface {
     /**
-     * X coordinate of the top left corner of the crop
+     * Angle of the rotation
      *
      * @var int
      */
-    private $x = null;
+    private $angle = null;
 
     /**
-     * Y coordinate of the top left corner of the crop
+     * Background color of the image
      *
-     * @var int
+     * @var string
      */
-    private $y = null;
-
-    /**
-     * Width of the crop
-     *
-     * @var int
-     */
-    private $width = null;
-
-    /**
-     * Height of the crop
-     *
-     * @var int
-     */
-    private $height = null;
+    private $bg = null;
 
     /**
      * Class constructor
      *
-     * @param int $x X coordinate of the top left corner of the crop
-     * @param int $y Y coordinate of the top left corner of the crop
-     * @param int $width Width of the crop
-     * @param int $height Height of the crop
+     * @param int $angle Angle of the rotation
+     * @param string $bg Background color
      */
-    public function __construct($x, $y, $width, $height) {
-        $this->x      = (int) $x;
-        $this->y      = (int) $y;
-        $this->width  = (int) $width;
-        $this->height = (int) $height;
+    public function __construct($angle, $bg = null) {
+        $this->angle = (int) $angle;
+        $this->bg = $bg;
     }
 
     /**
-     * @see PHPIMS\Client\FilterInterface::getFilter()
+     * @see PHPIMS\Client\ImageUrl\FilterInterface::getFilter()
      */
     public function getFilter() {
-        $filter  = 't[]=crop';
-
         $params = array(
-            'x=' . $this->x,
-            'y=' . $this->y,
-            'width=' . $this->width,
-            'height=' . $this->height,
+            'angle=' . $this->angle,
         );
 
-        return $filter . ':' . implode(',', $params);
+        if ($this->bg !== null) {
+            $params[] = 'bg=' . $this->bg;
+        }
+
+        return 'rotate:' . implode(',', $params);
     }
 }

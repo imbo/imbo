@@ -23,74 +23,31 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\Filter;
-
-use PHPIMS\Client\FilterInterface;
-use PHPIMS\Client\Filter\Exception as FilterException;
+namespace PHPIMS\Client\ImageUrl\Filter;
 
 /**
- * Border filter
- *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Resize implements FilterInterface {
-    /**
-     * Width of the resize
-     *
-     * @var int
-     */
-    private $width = null;
-
-    /**
-     * Height of the resize
-     *
-     * @var int
-     */
-    private $height = null;
-
-    /**
-     * Class constructor
-     *
-     * @param int $width Width of the resize
-     * @param int $height Height of the resize
-     * @throws PHPIMS\Client\Filter\Exception
-     */
-    public function __construct($width = null, $height = null) {
-        if ($width === null && $height === null) {
-            throw new FilterException('$width and/or $height must be set');
-        }
-
-        $this->width  = $width;
-        $this->height = $height;
+class BorderTest extends \PHPUnit_Framework_TestCase {
+    public function testBorderWithNoArguments() {
+        $filter = new Border();
+        $this->assertSame('border', $filter->getFilter());
     }
 
-    /**
-     * @see PHPIMS\Client\FilterInterface::getFilter()
-     */
-    public function getFilter() {
-        $filter = 't[]=resize';
-        $params = array();
-
-        if ($this->width !== null) {
-            $params[] = 'width=' . $this->width;
-        }
-
-        if ($this->height !== null) {
-            $params[] = 'height=' . $this->height;
-        }
-
-        return $filter . ':' . implode(',', $params);
+    public function testBorderWithAllArguments() {
+        $filter = new Border('333', 2, 4);
+        $this->assertSame('border:color=333,width=2,height=4', $filter->getFilter());
     }
 }

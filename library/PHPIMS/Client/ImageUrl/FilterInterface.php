@@ -23,26 +23,30 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Client
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\Filter;
+namespace PHPIMS\Client\ImageUrl;
 
 /**
+ * Filter interface
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Client
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class CropTest extends \PHPUnit_Framework_TestCase {
-    public function testCrop() {
-        $filter = new Crop(1, 2, 3, 4);
-        $this->assertSame('t[]=crop:x=1,y=2,width=3,height=4', $filter->getFilter());
-    }
+interface FilterInterface {
+    /**
+     * Return the filter
+     *
+     * @return string The filter to add to the url
+     */
+    public function getFilter();
 }

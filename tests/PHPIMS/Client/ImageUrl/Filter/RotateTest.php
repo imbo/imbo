@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\Filter;
+namespace PHPIMS\Client\ImageUrl\Filter;
 
 /**
  * @package PHPIMS
@@ -43,9 +43,9 @@ namespace PHPIMS\Client\Filter;
 class RotateTest extends \PHPUnit_Framework_TestCase {
     public function testRotate() {
         $filter = new Rotate(45);
-        $this->assertSame('t[]=rotate:angle=45', $filter->getFilter());
+        $this->assertSame('rotate:angle=45', $filter->getFilter());
 
         $filter = new Rotate(45, '222');
-        $this->assertSame('t[]=rotate:angle=45,bg=222', $filter->getFilter());
+        $this->assertSame('rotate:angle=45,bg=222', $filter->getFilter());
     }
 }
