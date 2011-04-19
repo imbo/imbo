@@ -91,6 +91,7 @@ class Autoload {
         'phpims\\operation\\plugin\\manipulateimageplugin\\transformation\\rotate' => '/Operation/Plugin/ManipulateImagePlugin/Transformation/Rotate.php',
         'phpims\\operation\\plugin\\manipulateimageplugin\\transformationinterface' => '/Operation/Plugin/ManipulateImagePlugin/TransformationInterface.php',
         'phpims\\operation\\plugin\\prepareimageplugin' => '/Operation/Plugin/PrepareImagePlugin.php',
+        'phpims\\operation\\plugininterface' => '/Operation/PluginInterface.php',
         'phpims\\operationinterface' => '/OperationInterface.php',
         'phpims\\server\\response' => '/Server/Response.php',
         'phpims\\storage\\driver' => '/Storage/Driver.php',
