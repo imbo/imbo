@@ -32,6 +32,8 @@
 
 namespace PHPIMS\Operation;
 
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -58,8 +60,8 @@ class DeleteMetadataTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $database = $this->getMockForAbstractClass('PHPIMS\\Database\\Driver');
-        $database->expects($this->once())->method('deleteMetadata')->with($this->hash);
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $database->shouldReceive('deleteMetadata')->once()->with($this->hash);
         $this->operation->setDatabase($database);
 
         $this->operation->exec();

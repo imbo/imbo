@@ -34,6 +34,7 @@ namespace PHPIMS\Database\Driver;
 
 use PHPIMS\Database\Exception as DatabaseException;
 use PHPIMS\Database\Driver as DatabaseDriver;
+use PHPIMS\Database\DriverInterface;
 use PHPIMS\Image;
 
 /**
@@ -53,7 +54,7 @@ use PHPIMS\Image;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class MongoDB extends DatabaseDriver {
+class MongoDB extends DatabaseDriver implements DriverInterface {
     /**
      * A MongoDB connection
      *

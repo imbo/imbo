@@ -32,8 +32,8 @@
 
 namespace PHPIMS;
 
-use PHPIMS\Database\Driver as DatabaseDriver;
-use PHPIMS\Storage\DriverInterface;
+use PHPIMS\Database\DriverInterface as DatabaseDriverInterface;
+use PHPIMS\Storage\DriverInterface as StorageDriverInterface;
 use PHPIMS\Server\Response;
 use PHPIMS\Operation\Exception as OperationException;
 
@@ -324,7 +324,7 @@ abstract class Operation implements OperationInterface {
      * @param PHPIMS\Database\Driver $driver The driver instance
      * @return PHPIMS\Operation
      */
-    public function setDatabase(DatabaseDriver $driver) {
+    public function setDatabase(DatabaseDriverInterface $driver) {
         $this->database = $driver;
 
         return $this;
@@ -345,7 +345,7 @@ abstract class Operation implements OperationInterface {
      * @param PHPIMS\Storage\DriverInterface $driver The driver instance
      * @return PHPIMS\Operation
      */
-    public function setStorage(DriverInterface $driver) {
+    public function setStorage(StorageDriverInterface $driver) {
         $this->storage = $driver;
 
         return $this;

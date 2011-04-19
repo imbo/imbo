@@ -42,7 +42,7 @@ namespace PHPIMS\Database;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class Driver implements DriverInterface {
+abstract class Driver {
     /**
      * Parameters for the current database driver
      *

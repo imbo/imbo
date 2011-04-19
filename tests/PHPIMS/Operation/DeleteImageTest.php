@@ -56,8 +56,8 @@ class DeleteImageTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $database = $this->getMockForAbstractClass('PHPIMS\\Database\\Driver');
-        $database->expects($this->once())->method('deleteImage')->with($this->hash);
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $database->shouldReceive('deleteImage')->once()->with($this->hash);
         $this->operation->setDatabase($database);
 
         $storage = m::mock('PHPIMS\\Storage\\DriverInterface');

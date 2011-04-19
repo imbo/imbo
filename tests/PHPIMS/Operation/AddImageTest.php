@@ -73,7 +73,7 @@ class AddImageTest extends OperationTests {
         $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
         $response->shouldReceive('setBody')->once()->with(array('hash' => $hash))->andReturn($response);
 
-        $database = m::mock('PHPIMS\\Database\\Driver');
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
         $database->shouldReceive('insertImage')->once()->with($hash, $image);
         $database->shouldReceive('updateMetadata')->once()->with($hash, $metadata);
 

@@ -32,6 +32,8 @@
 
 namespace PHPIMS\Operation;
 
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -62,12 +64,12 @@ class GetMetadataTest extends OperationTests {
             'foo' => 'bar',
             'bar' => 'foo',
         );
-        $database = $this->getMockForAbstractClass('PHPIMS\\Database\\Driver');
-        $database->expects($this->once())->method('getMetadata')->with($this->hash)->will($this->returnValue($data));
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $database->shouldReceive('getMetadata')->once()->with($this->hash)->andReturn($data);
         $this->operation->setDatabase($database);
 
-        $response = $this->getMock('PHPIMS\\Server\\Response');
-        $response->expects($this->once())->method('setBody')->with($data);
+        $response = m::mock('PHPIMS\\Server\\Response');
+        $response->shouldReceive('setBody')->once()->with($data);
 
         $this->operation->setResponse($response);
         $this->operation->exec();

@@ -32,6 +32,8 @@
 
 namespace PHPIMS\Operation;
 
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -61,8 +63,8 @@ class EditMetadataTest extends OperationTests {
         $metadata = array('foo' => 'bar', 'bar' => array('foo', 'bar'));
         $_POST['metadata'] = json_encode($metadata);
 
-        $database = $this->getMockForAbstractClass('PHPIMS\\Database\\Driver');
-        $database->expects($this->once())->method('updateMetadata')->with($this->hash, $metadata);
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $database->shouldReceive('updateMetadata')->once()->with($this->hash, $metadata);
         $this->operation->setDatabase($database);
 
         $this->operation->exec();

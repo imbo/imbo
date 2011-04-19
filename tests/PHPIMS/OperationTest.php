@@ -90,7 +90,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetDatabase() {
-        $driver = $this->getMockForAbstractClass('PHPIMS\\Database\\Driver');
+        $driver = m::mock('PHPIMS\\Database\\DriverInterface');
         $this->operation->setDatabase($driver);
         $this->assertSame($driver, $this->operation->getDatabase());
     }
