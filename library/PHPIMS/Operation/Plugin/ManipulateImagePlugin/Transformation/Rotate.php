@@ -34,6 +34,7 @@ namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
 
 use PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface;
 use \Imagine\ImageInterface;
+use \Imagine\Image\Color;
 
 /**
  * Rotate transformation
@@ -55,7 +56,7 @@ class Rotate implements TransformationInterface {
             $params['bg'] = '000';
         }
 
-        $color = new \Imagine\Image\Color($params['bg']);
+        $color = new Color($params['bg']);
 
         $image->rotate($params['angle'], $color);
     }

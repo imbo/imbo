@@ -52,19 +52,21 @@ class Resize implements TransformationInterface {
      * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface::apply()
      */
     public function apply(ImageInterface $image, array $params = array()) {
-        if (isset($params['width']) || isset($params['height'])) {
-            $width  = (isset($params['width']) ? $params['width'] : 0);
-            $height = (isset($params['height']) ? $params['height'] : 0);
+        if (!isset($params['width']) && !isset($params['height'])) {
+            throw new Exception('Missing parameters width and/or height');
+        }
 
-            // Fetch the size of the original image
-            $size = $image->getSize();
+        $width  = (isset($params['width']) ? (int) $params['width'] : 0);
+        $height = (isset($params['height']) ? (int) $params['height'] : 0);
 
-            // Calculate width or height if not both have been specified
-            if (!$height) {
-                $height = ($size->getHeight() / $size->getWidth()) * $width;
-            } else if (!$width) {
-                $width = ($size->getWidth() / $size->getHeight()) * $height;
-            }
+        // Fetch the size of the original image
+        $size = $image->getSize();
+
+        // Calculate width or height if not both have been specified
+        if (!$height) {
+            $height = ($size->getHeight() / $size->getWidth()) * $width;
+        } else if (!$width) {
+            $width = ($size->getWidth() / $size->getHeight()) * $height;
         }
 
         // Resize image and store in the image object
