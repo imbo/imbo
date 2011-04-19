@@ -1,55 +1,11 @@
 # PHP Image Server
 PHP Image Server (**PHPIMS**) is an image "server" that can be used to add/get/delete images using a REST interface. There is also support for adding meta data to an image. The main idea behind PHPIMS is to have a place to store high quality original images and to use the REST interface to fetch variations of those images. PHPIMS will resize, rotate, crop (amongst other features) on the fly so you won't have to store all the different variations. PHPIMS comes with an administration dashboard that can be used to locate images. The dashboard will also support editing of meta data.
 
+## Requirements
+PHPIMS requires [PHP-5.3](http://php.net/), the [Imagine](https://github.com/avalanche123/imagine) image manipulation library, a running [MongoDB](http://www.mongodb.org/) and the [Mongo extension for PHP](http://pecl.php.net/package/mongo).
+
 ## Installation
-Since this is a work in progress there is no automatic installation. Developers who want to contribute will need to do the following steps:
-
-### Fork PHPIMS and checkout your fork
-Click on the fork button on github and clone your fork:
-
-    git clone git@github.com:<username>/phpims.git
-
-### Software needed
-To fully develop PHPIMS (as in run the complete build process, which most likely you will never do) you will need to have the following software installed:
-
-* [PHPUnit](http://phpunit.de/)
-* [Autoload (phpab)](https://github.com/theseer/Autoload)
-* [Mockery](https://github.com/padraic/mockery)
-* [vfsStream](http://code.google.com/p/bovigo/wiki/vfsStream)
-* [Imagine](https://github.com/avalanche123/Imagine/)
-* [MongoDB](http://www.mongodb.org/)
-* [Mongo extension for PHP](http://pecl.php.net/package/mongo)
-
-Run the following commands as root to install the software (on Ubuntu):
-
-    pear channel-discover pear.phpunit.de
-    pear channel-discover components.ez.no
-    pear channel-discover pear.symfony-project.com
-    pear channel-discover pear.survivethedeepend.com
-    pear channel-discover hamcrest.googlecode.com/svn/pear
-    pear channel-discover pear.php-tools.net
-    pear channel-discover pear.netpirates.net
-    pear channel-discover pear.pdepend.org 
-    pear channel-discover pear.phpmd.org
-    
-    pear install --alldeps phpunit/PHPUnit
-    pear install --alldeps phpunit/PHP_CodeBrowser
-    pear install --alldeps deepend/Mockery
-    pear install --alldeps hamcrest/Hamcrest
-    pear install pat/vfsStream-beta
-    pear install theseer/Autoload
-    pear install pecl/mongo
-    pear install phpDocumentor
-    pear install phpunit/phploc
-    pear install pdepend/PHP_Depend
-    pear install phpunit/phpcpd
-    apt-get install ant
-    
-For MongoDB I followed the steps on <http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages> when I installed it.
-
-It's worth noting that you don't need all of the above software to just do a quick fix and send me a pull request. If you want to run the complete test suite or the whole build process you will need all of it.
-
-If you send me a pull request I would appreciate it if you include tests for all new code as well and make sure that the test suite passes.     
+Since this is a work in progress there is no automatic installation. Simply clone the repository or make your own fork. Automatic installation will be provided later.
 
 ## REST API
 PHPIMS uses a REST API to manage the images. Each image will be identified by an MD5 sum of the file itself and the original file extension, that will be referred to as &lt;image&gt; for the remainder of this document.
@@ -213,8 +169,11 @@ The `getImageUrl` returns an instance of `PHPIMS\Client\ImageUrl` which, when us
     $client = new PHPIMS\Client('http://<hostname>');
     
     $hash = '<hash>';
-    $transformation = new PHPIMS\Client\Transformation;
-    $transformation->border()->resize(200)->rotate(45);
+    $transformation = new PHPIMS\Client\ImageUrl\Transformation;
+    $transformation->border()
+                   ->resize(200)
+                   ->rotate(45);
+                   
     $url = $client->getImageUrl($hash, $transformation);
     
     // OR
@@ -223,7 +182,10 @@ The `getImageUrl` returns an instance of `PHPIMS\Client\ImageUrl` which, when us
     $url = $client->getImageUrl($hash);
     
     $transformation = new PHPIMS\Client\ImageUrl\Transformation;
-    $transformation->border()->resize(200)->rotate(45)->apply($url);
+    $transformation->border()
+                   ->resize(200)
+                   ->rotate(45)
+                   ->apply($url);
     
     // OR
     
@@ -233,12 +195,19 @@ The `getImageUrl` returns an instance of `PHPIMS\Client\ImageUrl` which, when us
     $transformation = new PHPIMS\Client\ImageUrl\Transformation;
     $transformation->add(new PHPIMS\Client\ImageUrl\Filter\Border());
                    ->add(new PHPIMS\Client\ImageUrl\Filter\Resize(200));
-                   ->add(new PHPIMS\Client\ImageUrl\Filter\Rotate(45));
+                   ->add(new PHPIMS\Client\ImageUrl\Filter\Rotate(45))
+                   ->apply($url);
     
-    $transformation->apply($url);
+    // OR
+    
+    $hash = '<hash>';
+    $url = $client->getImageUrl($hash);
+    $filter = new PHPIMS\Client\ImageUrl\Filter\Border();
+    $transformation = new PHPIMS\Client\ImageUrl\Transformation;
+    $transformation->applyFilter($url, $filter);
 
 #### Image transformations
-The `PHPIMS\Client\Transformation` class can be used to manipulate the url. The following transformations can be used on an instance of the `PHPIMS\Client\Transformation` class:
+The `PHPIMS\Client\ImageUrl\Transformation` class can be used to manipulate the url. The following transformations can be added to an instance of the `PHPIMS\Client\ImageUrl\Transformation` class:
 
 * `border(string $color = null, int $width = null, int $height = null)` 
 * `crop(int $x, int $y, int $width, int $height)` 
@@ -247,17 +216,17 @@ The `PHPIMS\Client\Transformation` class can be used to manipulate the url. The 
 
 These methods can be chained. They can also be added using the following method:
 
-* `add(PHPIMS\Client\FilterInterface $filter)`
+* `add(PHPIMS\Client\ImageUrl\FilterInterface $filter)`
 
 The following filters are implemented using the same parameters as above in the constructors:
 
-* `PHPIMS\Client\Filter\Border`
-* `PHPIMS\Client\Filter\Crop`
-* `PHPIMS\Client\Filter\Resize`
-* `PHPIMS\Client\Filter\Rotate`
+* `PHPIMS\Client\ImageUrl\Filter\Border`
+* `PHPIMS\Client\ImageUrl\Filter\Crop`
+* `PHPIMS\Client\ImageUrl\Filter\Resize`
+* `PHPIMS\Client\ImageUrl\Filter\Rotate`
 
 ### Client response object    
-All client methods returns an instance of `PHPIMS\Client\Response`. In this instance you will find information on the request that was made. 
+All client methods returns an instance of `PHPIMS\Client\Response` (with the exception of `getImageUrl` which returns an instance of `PHPIMS\Client\ImageUrl`). In this instance you will find information on the request that was made. 
 
 The response instance includes all response headers and the body, and has the following methods:
 
@@ -267,12 +236,62 @@ The response instance includes all response headers and the body, and has the fo
 * `boolean isSuccess(void)` Wether or not the response was a success (true if the HTTP status code is in the 2xx range) 
 * `int getStatusCode(void)` Get the status code
 
-## Developer notes
-Here you will find some notes about how PHPIMS works internally.
+## Developer/Contributer notes
+Here you will find some notes about how PHPIMS works internally along with information on what is needed to develop PHPIMS.
 
-* [API Documentation](http://ci.starzinger.net/job/PHPIMS/API_Documentation/?)
-* [Code Coverage](http://ci.starzinger.net/job/PHPIMS/Code_Coverage/?)
-* [Code Browser](http://ci.starzinger.net/job/PHPIMS/Code_Browser/?)
+* [Jenkins job](http://ci.starzinger.net/job/PHPIMS/)
+* [API Documentation](http://ci.starzinger.net/job/PHPIMS/API_Documentation/)
+* [Code Coverage](http://ci.starzinger.net/job/PHPIMS/Code_Coverage/)
+* [Code Browser](http://ci.starzinger.net/job/PHPIMS/Code_Browser/)
+
+Developers who want to contribute will need to do one or more of the following steps:
+
+### Fork PHPIMS and checkout your fork
+Click on the fork button on github and clone your fork:
+
+    git clone git@github.com:<username>/phpims.git
+
+### Software needed
+To fully develop PHPIMS (as in run the complete build process, which most likely you will never do) you will need to have the following software installed:
+
+* [PHPUnit](http://phpunit.de/)
+* [Autoload (phpab)](https://github.com/theseer/Autoload)
+* [Mockery](https://github.com/padraic/mockery)
+* [vfsStream](http://code.google.com/p/bovigo/wiki/vfsStream)
+* [Imagine](https://github.com/avalanche123/Imagine/)
+* [MongoDB](http://www.mongodb.org/)
+* [Mongo extension for PHP](http://pecl.php.net/package/mongo)
+
+Run the following commands as root to install the software (on Ubuntu):
+
+    pear channel-discover pear.phpunit.de
+    pear channel-discover components.ez.no
+    pear channel-discover pear.symfony-project.com
+    pear channel-discover pear.survivethedeepend.com
+    pear channel-discover hamcrest.googlecode.com/svn/pear
+    pear channel-discover pear.php-tools.net
+    pear channel-discover pear.netpirates.net
+    pear channel-discover pear.pdepend.org 
+    pear channel-discover pear.phpmd.org
+    
+    pear install --alldeps phpunit/PHPUnit
+    pear install --alldeps phpunit/PHP_CodeBrowser
+    pear install --alldeps deepend/Mockery
+    pear install --alldeps hamcrest/Hamcrest
+    pear install pat/vfsStream-beta
+    pear install theseer/Autoload
+    pear install pecl/mongo
+    pear install phpDocumentor
+    pear install phpunit/phploc
+    pear install pdepend/PHP_Depend
+    pear install phpunit/phpcpd
+    apt-get install ant
+    
+For MongoDB I followed the steps on <http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages> when I installed it.
+
+It's worth noting that you don't need all of the above software to just do a quick fix and send me a pull request. If you want to run the complete test suite or the whole build process you will need all of it.
+
+If you send me a pull request I would appreciate it if you include tests for all new code as well and make sure that the test suite passes.
 
 ### Front controller 
 The `PHPIMS\FrontController` class is responsible for validating the request, and picking the correct operation class for the request. It will create an instance of the operation, execute the operation and then return the response.
