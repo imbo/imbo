@@ -34,6 +34,7 @@ namespace PHPIMS\Operation\Plugin;
 
 use PHPIMS\Operation\Plugin;
 use PHPIMS\Operation;
+use \Imagine\Imagick\Imagine;
 
 /**
  * Manipulate image plugin
@@ -148,7 +149,7 @@ class ManipulateImagePlugin extends Plugin {
             $originalImage = $operation->getImage();
 
             // Load the image into imagine
-            $imagine = new \Imagine\Imagick\Imagine();
+            $imagine = new Imagine;
             $image = $imagine->load($originalImage->getBlob());
 
             foreach ($_GET['t'] as $transformation) {

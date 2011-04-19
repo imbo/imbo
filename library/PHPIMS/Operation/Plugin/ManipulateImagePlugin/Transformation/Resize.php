@@ -33,6 +33,8 @@
 namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
 
 use PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface;
+use \Imagine\ImageInterface;
+use \Imagine\Image\Box;
 
 /**
  * Resize transformation
@@ -49,7 +51,7 @@ class Resize implements TransformationInterface {
     /**
      * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface::apply()
      */
-    public function apply(\Imagine\Imagick\Image $image, array $params = array()) {
+    public function apply(ImageInterface $image, array $params = array()) {
         if (isset($params['width']) || isset($params['height'])) {
             $width  = (isset($params['width']) ? $params['width'] : 0);
             $height = (isset($params['height']) ? $params['height'] : 0);
@@ -66,6 +68,6 @@ class Resize implements TransformationInterface {
         }
 
         // Resize image and store in the image object
-        $image->resize(new \Imagine\Image\Box($width, $height));
+        $image->resize(new Box($width, $height));
     }
 }

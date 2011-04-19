@@ -33,6 +33,9 @@
 namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
 
 use PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface;
+use \Imagine\ImageInterface;
+use \Imagine\Image\Point;
+use \Imagine\Image\Box;
 
 /**
  * Crop transformation
@@ -49,11 +52,11 @@ class Crop implements TransformationInterface {
     /**
      * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface::apply()
      */
-    public function apply(\Imagine\Imagick\Image $image, array $params = array()) {
+    public function apply(ImageInterface $image, array $params = array()) {
         // Resize image and store in the image object
         $image->crop(
-            new \Imagine\Image\Point($params['x'], $params['y']),
-            new \Imagine\Image\Box($params['width'], $params['height'])
+            new Point($params['x'], $params['y']),
+            new Box($params['width'], $params['height'])
         );
     }
 }

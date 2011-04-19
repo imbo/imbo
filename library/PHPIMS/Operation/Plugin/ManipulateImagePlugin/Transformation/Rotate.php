@@ -33,6 +33,7 @@
 namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
 
 use PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface;
+use \Imagine\ImageInterface;
 
 /**
  * Rotate transformation
@@ -49,7 +50,7 @@ class Rotate implements TransformationInterface {
     /**
      * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface::apply()
      */
-    public function apply(\Imagine\Imagick\Image $image, array $params = array()) {
+    public function apply(ImageInterface $image, array $params = array()) {
         if (!isset($params['bg'])) {
             $params['bg'] = '000';
         }

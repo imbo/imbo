@@ -32,6 +32,8 @@
 
 namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin;
 
+use \Imagine\ImageInterface;
+
 /**
  * Image transformation interface
  *
@@ -46,10 +48,10 @@ interface TransformationInterface {
     /**
      * Method that will transform the image
      *
-     * @param \Imagine\Imagick\Image $image Image object
+     * @param \Imagine\ImageInterface $image Image instance
      * @param array $params Parameters for the transformation
      * @return string Return the transformed binary image data
      * @throws PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Exception
      */
-    public function apply(\Imagine\Imagick\Image $image, array $params = array());
+    public function apply(ImageInterface $image, array $params = array());
 }

@@ -33,9 +33,9 @@
 namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
 
 use PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface;
+use \Imagine\ImageInterface;
 use \Imagine\Image\Color;
 use \Imagine\Image\Point;
-use \Imagine\Imagick\Image;
 
 /**
  * Border transformation
@@ -52,7 +52,7 @@ class Border implements TransformationInterface {
     /**
      * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface::apply()
      */
-    public function apply(Image $image, array $params = array()) {
+    public function apply(ImageInterface $image, array $params = array()) {
         if (!isset($params['color'])) {
             $params['color'] = '000';
         }
