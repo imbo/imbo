@@ -96,7 +96,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetStorage() {
-        $driver = $this->getMockForAbstractClass('PHPIMS\\Storage\\Driver');
+        $driver = m::mock('PHPIMS\\Storage\\DriverInterface');
         $this->operation->setStorage($driver);
         $this->assertSame($driver, $this->operation->getStorage());
     }
@@ -118,46 +118,6 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
         $method = 'DELETE';
         $this->operation->setMethod($method);
         $this->assertSame($method, $this->operation->getMethod());
-    }
-
-    public function testInitDatabaseDriver() {
-        $database = $this->getMockForAbstractClass('PHPIMS\\Database\\Driver');
-        $databaseClassName = get_class($database);
-        $databaseParams = array('someparam' => true, 'otherparam' => false);
-
-        $config = array(
-            'driver' => $databaseClassName,
-            'params' => $databaseParams,
-        );
-
-        $reflection = new \ReflectionClass($this->operation);
-        $method = $reflection->getMethod('initDatabaseDriver');
-        $method->setAccessible(true);
-
-        $method->invokeArgs($this->operation, array($config));
-
-        $this->assertInstanceOf($databaseClassName, $this->operation->getDatabase());
-        $this->assertSame($databaseParams, $this->operation->getDatabase()->getParams());
-    }
-
-    public function testInitStorageDriver() {
-        $storage = $this->getMockForAbstractClass('PHPIMS\\Storage\\Driver');
-        $storageClassName = get_class($storage);
-        $storageParams = array('someparam' => false, 'otherparam' => true);
-
-        $config = array(
-            'driver' => $storageClassName,
-            'params' => $storageParams,
-        );
-
-        $reflection = new \ReflectionClass($this->operation);
-        $method = $reflection->getMethod('initStorageDriver');
-        $method->setAccessible(true);
-
-        $method->invokeArgs($this->operation, array($config));
-
-        $this->assertInstanceOf($storageClassName, $this->operation->getStorage());
-        $this->assertSame($storageParams, $this->operation->getStorage()->getParams());
     }
 
     public function testInitPlugins() {
@@ -201,7 +161,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('Some\\Prefix\\OtherCustomPlugin', $plugins['postExec'][78]);
     }
 
-    public function ttestPreAndPostExec() {
+    public function testPreAndPostExec() {
         $plugin1 = m::mock('PHPIMS\\Operation\\PluginInterface');
         $plugin1->shouldReceive('exec')->times(2);
 

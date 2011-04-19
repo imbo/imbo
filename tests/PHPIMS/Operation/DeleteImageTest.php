@@ -32,6 +32,8 @@
 
 namespace PHPIMS\Operation;
 
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -58,8 +60,8 @@ class DeleteImageTest extends OperationTests {
         $database->expects($this->once())->method('deleteImage')->with($this->hash);
         $this->operation->setDatabase($database);
 
-        $storage = $this->getMockForAbstractClass('PHPIMS\\Storage\\Driver');
-        $storage->expects($this->once())->method('delete')->with($this->hash);
+        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
+        $storage->shouldReceive('delete')->once()->with($this->hash);
         $this->operation->setStorage($storage);
 
         $this->operation->exec();

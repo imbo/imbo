@@ -77,7 +77,7 @@ class AddImageTest extends OperationTests {
         $database->shouldReceive('insertImage')->once()->with($hash, $image);
         $database->shouldReceive('updateMetadata')->once()->with($hash, $metadata);
 
-        $storage = m::mock('PHPIMS\\Storage\\Driver');
+        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
         $storage->shouldReceive('store')->once()->with($hash, $_FILES['file']['tmp_name']);
 
         $this->operation->setStorage($storage)

@@ -32,6 +32,8 @@
 
 namespace PHPIMS\Operation;
 
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -54,13 +56,13 @@ class GetImageTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $storage = $this->getMockForAbstractClass('PHPIMS\\Storage\\Driver');
-        $storage->expects($this->once())->method('load')->with($this->hash)->will($this->returnValue(true));
+        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
+        $storage->shouldReceive('load')->once()->with($this->hash, m::type('PHPIMS\\Image'))->andReturn(true);
         $this->operation->setStorage($storage);
 
-        $image = $this->getMock('PHPIMS\\Image');
-        $response = $this->getMock('PHPIMS\\Server\\Response');
-        $response->expects($this->once())->method('setImage')->with($image)->will($this->returnValue($response));
+        $image = m::mock('PHPIMS\\Image');
+        $response = m::mock('PHPIMS\\Server\\Response');
+        $response->shouldReceive('setImage')->once()->with($image)->andReturn($response);
 
         $this->operation->setResponse($response)->setImage($image);
 

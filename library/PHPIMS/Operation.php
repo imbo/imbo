@@ -33,7 +33,7 @@
 namespace PHPIMS;
 
 use PHPIMS\Database\Driver as DatabaseDriver;
-use PHPIMS\Storage\Driver as StorageDriver;
+use PHPIMS\Storage\DriverInterface;
 use PHPIMS\Server\Response;
 use PHPIMS\Operation\Exception as OperationException;
 
@@ -342,10 +342,10 @@ abstract class Operation implements OperationInterface {
     /**
      * Set the storage driver
      *
-     * @param PHPIMS\Storage\Driver $driver The driver instance
+     * @param PHPIMS\Storage\DriverInterface $driver The driver instance
      * @return PHPIMS\Operation
      */
-    public function setStorage(StorageDriver $driver) {
+    public function setStorage(DriverInterface $driver) {
         $this->storage = $driver;
 
         return $this;

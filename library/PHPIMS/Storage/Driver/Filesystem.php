@@ -32,7 +32,8 @@
 
 namespace PHPIMS\Storage\Driver;
 
-use PHPIMS\Storage\Driver as StorageDriver;
+use PHPIMS\Storage\Driver;
+use PHPIMS\Storage\DriverInterface;
 use PHPIMS\Storage\Exception as StorageException;
 use PHPIMS\Image;
 
@@ -52,7 +53,7 @@ use PHPIMS\Image;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Filesystem extends StorageDriver {
+class Filesystem extends Driver implements DriverInterface {
     /**
      * @see PHPIMS\Storage\DriverInterface::store()
      */
