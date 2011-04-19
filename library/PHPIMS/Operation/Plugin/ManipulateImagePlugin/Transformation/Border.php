@@ -33,6 +33,9 @@
 namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
 
 use PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface;
+use \Imagine\Image\Color;
+use \Imagine\Image\Point;
+use \Imagine\Imagick\Image;
 
 /**
  * Border transformation
@@ -49,7 +52,7 @@ class Border implements TransformationInterface {
     /**
      * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface::apply()
      */
-    public function apply(\Imagine\Imagick\Image $image, array $params = array()) {
+    public function apply(Image $image, array $params = array()) {
         if (!isset($params['color'])) {
             $params['color'] = '000';
         }
@@ -62,7 +65,22 @@ class Border implements TransformationInterface {
             $params['height'] = 1;
         }
 
-        $transformation = new \Imagine\Filter\Transformation();
-        $transformation->applyFilter($image, new \Imagine\Filter\Advanced\Border(new \Imagine\Image\Color($params['color']), $params['width'], $params['height']));
+        $color  = new Color($params['color']);
+        $size   = $image->getSize();
+        $width  = $size->getWidth();
+        $height = $size->getHeight();
+        $draw   = $image->draw();
+
+        // Draw top and bottom lines
+        for ($i = 0; $i < $params['height']; $i++) {
+            $draw->line(new Point(0, $i), new Point($width - 1, $i), $color)
+                 ->line(new Point($width - 1, $height - ($i + 1)), new Point(0, $height - ($i + 1)), $color);
+        }
+
+        // Draw sides
+        for ($i = 0; $i < $params['width']; $i++) {
+            $draw->line(new Point($i, 0), new Point($i, $height - 1), $color)
+                 ->line(new Point($width - ($i + 1), 0), new Point($width - ($i + 1), $height - 1), $color);
+        }
     }
 }
