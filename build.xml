@@ -1,10 +1,14 @@
 <project name="phpims" default="build" basedir=".">
+  <!-- Override this value using the -Dclient_tests_url=/some/path when running ant -->
+  <property name="client_tests_path" value="/var/www/phpims/driver.php" />
+  
   <target name="clean">
     <delete dir="${basedir}/build"/>
     <mkdir dir="${basedir}/build/coverage" />
     <mkdir dir="${basedir}/build/logs" />
     <mkdir dir="${basedir}/build/docs" />
     <mkdir dir="${basedir}/build/code-browser" />
+    <copy file="${basedir}/tests/PHPIMS/Client/Driver/_files/driver.php" tofile="${client_tests_path}" /> 
   </target>
 
   <target name="phpab">
