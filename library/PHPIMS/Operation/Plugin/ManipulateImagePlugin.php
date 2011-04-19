@@ -34,6 +34,7 @@ namespace PHPIMS\Operation\Plugin;
 
 use PHPIMS\Operation\Plugin;
 use PHPIMS\Operation;
+use PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Exception as TransformationException;
 use \Imagine\Imagick\Imagine;
 
 /**
@@ -194,7 +195,8 @@ class ManipulateImagePlugin extends Plugin {
                 try {
                     $transformationInstance->apply($image, $transformationParams);
                 } catch (\Imagine\Exception\Exception $e) {
-                    // Drop this transformation
+                    trigger_error('Imagine failed with exception: ' . $e->getMessage(), E_USER_WARNING);
+                } catch (TransformationException $e) {
                     trigger_error('Transformation failed with exception: ' . $e->getMessage(), E_USER_WARNING);
                 }
             }
