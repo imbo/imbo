@@ -52,6 +52,13 @@ use PHPIMS\Client\ImageUrl\Filter\Rotate;
  */
 class Transformation {
     /**
+     * Filters added
+     *
+     * @var array
+     */
+    private $filters = array();
+
+    /**
      * Add a filter to the chain
      *
      * @param FilterInterface $filter The filter to add

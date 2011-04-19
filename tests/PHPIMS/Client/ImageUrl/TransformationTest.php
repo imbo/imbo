@@ -89,4 +89,10 @@ class TransformationTest extends \PHPUnit_Framework_TestCase {
             't[]=border:color=444,width=3,height=3&t[]=crop:x=1,y=2,width=3,height=4&t[]=resize:width=100,height=200&t[]=rotate:angle=88,bg=fff&' .
             't[]=border:color=555,width=2,height=2&t[]=crop:x=5,y=6,width=7,height=8&t[]=resize:width=200,height=100&t[]=rotate:angle=45,bg=888', (string) $this->url);
     }
+
+    public function testApplyWithNoFiltersAdded() {
+        $url = (string) $this->url;
+        $this->transformation->apply($this->url);
+        $this->assertSame($url, (string) $this->url);
+    }
 }
