@@ -125,12 +125,4 @@ abstract class Plugin {
 
         return $this;
     }
-
-    /**
-     * Plugins exec method
-     *
-     * @param PHPIMS\Opertaion $operation The operation the current plugin is working on
-     * @throws PHPIMS\Operation\Plugin\Exception
-     */
-    abstract public function exec(Operation $operation);
 }

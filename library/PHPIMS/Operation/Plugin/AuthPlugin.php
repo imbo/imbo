@@ -33,6 +33,7 @@
 namespace PHPIMS\Operation\Plugin;
 
 use PHPIMS\Operation\Plugin;
+use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 
 /**
@@ -57,7 +58,7 @@ use PHPIMS\Operation;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class AuthPlugin extends Plugin {
+class AuthPlugin extends Plugin implements PluginInterface {
     /**
      * @see PHPIMS\Operation\Plugin::$events
      */
@@ -69,7 +70,7 @@ class AuthPlugin extends Plugin {
     );
 
     /**
-     * @see PHPIMS\Operation\Plugin::exec()
+     * @see PHPIMS\Operation\PluginInterface::exec()
      */
     public function exec(Operation $operation) {
         $requiredParams = array('signature', 'publicKey', 'timestamp');

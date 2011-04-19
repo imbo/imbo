@@ -33,6 +33,7 @@
 namespace PHPIMS\Operation\Plugin;
 
 use PHPIMS\Operation\Plugin;
+use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 use PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Exception as TransformationException;
 use \Imagine\Imagick\Imagine;
@@ -98,7 +99,7 @@ use \Imagine\Imagick\Imagine;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class ManipulateImagePlugin extends Plugin {
+class ManipulateImagePlugin extends Plugin implements PluginInterface {
     /**
      * @see PHPIMS\Operation\Plugin::$events
      */
@@ -143,7 +144,7 @@ class ManipulateImagePlugin extends Plugin {
     }
 
     /**
-     * @see PHPIMS\Operation\Plugin::exec()
+     * @see PHPIMS\Operation\PluginInterface::exec()
      */
     public function exec(Operation $operation) {
         if (isset($_GET['t']) && is_array($_GET['t'])) {

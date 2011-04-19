@@ -33,6 +33,7 @@
 namespace PHPIMS\Operation\Plugin;
 
 use PHPIMS\Operation\Plugin;
+use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 
 /**
@@ -48,7 +49,7 @@ use PHPIMS\Operation;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PrepareImagePlugin extends Plugin {
+class PrepareImagePlugin extends Plugin implements PluginInterface {
     /**
      * @see PHPIMS\Operation\Plugin::$events
      */
@@ -57,7 +58,7 @@ class PrepareImagePlugin extends Plugin {
     );
 
     /**
-     * @see PHPIMS\Operation\Plugin::exec()
+     * @see PHPIMS\Operation\PluginInterface::exec()
      */
     public function exec(Operation $operation) {
         // Make sure there is an image attached
