@@ -50,7 +50,6 @@ class Autoload {
     static public $classes = array(
         'phpims\\autoload' => '/Autoload.php',
         'phpims\\client' => '/Client.php',
-        'phpims\\client\\driver' => '/Client/Driver.php',
         'phpims\\client\\driver\\curl' => '/Client/Driver/Curl.php',
         'phpims\\client\\driver\\exception' => '/Client/Driver/Exception.php',
         'phpims\\client\\driverinterface' => '/Client/DriverInterface.php',
@@ -94,7 +93,6 @@ class Autoload {
         'phpims\\operation\\plugininterface' => '/Operation/PluginInterface.php',
         'phpims\\operationinterface' => '/OperationInterface.php',
         'phpims\\server\\response' => '/Server/Response.php',
-        'phpims\\storage\\driver' => '/Storage/Driver.php',
         'phpims\\storage\\driver\\filesystem' => '/Storage/Driver/Filesystem.php',
         'phpims\\storage\\driverinterface' => '/Storage/DriverInterface.php',
         'phpims\\storage\\exception' => '/Storage/Exception.php'
