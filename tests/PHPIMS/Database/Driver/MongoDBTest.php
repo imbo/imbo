@@ -76,7 +76,6 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->driver = null;
-        // m::close();
     }
 
     /**
@@ -98,7 +97,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         );
 
         $collection = m::mock('\\MongoCollection');
-        $collection->shouldReceive('findOne')->times(2)->andReturn($data);
+        $collection->shouldReceive('findOne')->once()->andReturn($data);
 
         $driver = new MongoDB($this->driverParams, $collection);
         $driver->insertImage($imageIdentifier, $image, $response);

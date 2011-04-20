@@ -2,10 +2,14 @@
 <phpunit colors="true"
          bootstrap="tests/bootstrap.php">
     <testsuites>
-        <testsuite name="phpims">
-            <directory suffix="Test.php">tests/PHPIMS</directory>
+        <testsuite name="PHPIMS test suite">
+            <directory>./tests/PHPIMS</directory>
         </testsuite>
     </testsuites>
+    
+    <listeners>
+        <listener class="\Mockery\Adapter\Phpunit\TestListener" file="Mockery/Adapter/Phpunit/TestListener.php"></listener>
+    </listeners>
     
     <php>
         <const name="PHPIMS_ENABLE_CLIENT_TESTS" value="false" />
