@@ -47,7 +47,7 @@ use PHPIMS\Operation\Exception as OperationException;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class Operation implements OperationInterface {
+abstract class Operation {
     /**
      * The current hash value
      *
@@ -453,7 +453,7 @@ abstract class Operation implements OperationInterface {
      * @param string $className The name of the operation class to instantiate
      * @param string $method The HTTP method used
      * @param string $hash Hash that will be passed to the operations constructor
-     * @return PHPIMS\Operation
+     * @return PHPIMS\OperationInterface
      * @throws PHPIMS\Operation\Exception
      */
     static public function factory($className, $method, $hash) {

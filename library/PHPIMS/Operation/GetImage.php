@@ -33,6 +33,7 @@
 namespace PHPIMS\Operation;
 
 use PHPIMS\Operation;
+use PHPIMS\OperationInterface;
 use PHPIMS\Operation\Plugin\IdentifyImage;
 
 /**
@@ -47,7 +48,7 @@ use PHPIMS\Operation\Plugin\IdentifyImage;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class GetImage extends Operation {
+class GetImage extends Operation implements OperationInterface {
     /**
      * Internal plugins
      *

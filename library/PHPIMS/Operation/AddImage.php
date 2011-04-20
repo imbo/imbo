@@ -33,6 +33,7 @@
 namespace PHPIMS\Operation;
 
 use PHPIMS\Operation;
+use PHPIMS\OperationInterface;
 
 /**
  * Add image operation
@@ -46,7 +47,7 @@ use PHPIMS\Operation;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class AddImage extends Operation {
+class AddImage extends Operation implements OperationInterface {
     /**
      * @see PHPIMS\OperationInterface::getRequestPath()
      */
