@@ -42,6 +42,37 @@ Fetches extra header information about a single image identified by &lt;image&gt
 
 Fetches extra header information about the meta data attached to the image identified by &lt;image&gt;.
 
+## Authentication
+All write operations (POST and DELETE) requires authentication using an Hash-based Message Authentication Code (HMAC). The data PHPIMS uses when generating this code is:
+
+* HTTP method (POST or DELETE)
+* Resource identifier (for instance <image> if your PHPIMS installation answers directly in the document root)
+* Public key (random MD5 hash that exists both on the server and the client)
+* GMT timestamp (YYYY-MM-DDTHH:MMZ, for instance: 2011-02-01T14:33Z)
+
+These elements are concatenated in the above order and a hash is generated using a private key and the sha256 algorithm. The following snippet shows how this can be done using PHP:
+
+    <?php
+    $publicKey  = '<some random MD5 hash>';
+    $privateKey = '<some other random MD5 hash>';
+    $method     = 'DELETE';
+    $resource   = 'b8533858299b04af3afc9a3713e69358.jpeg/meta'
+    $timestamp  = gmdate('Y-m-d\TH:i\Z');
+    
+    $data       = $method . $resource . $publicKey . $timestamp;
+    
+    $hash       = hash_hmac('sha256', $data, $privateKey, true);
+    $signature  = base64_encode($hash);
+    $url        = 'http://<hostname>/b8533858299b04af3afc9a3713e69358.jpeg/meta'
+                . sprintf('?signature=%s&publicKey=%s&timestamp=%s', 
+                          rawurlencode($signature), 
+                          $publicKey, 
+                          rawurlencode($timestamp));
+    
+The above code will generate a signature that must be sent along the request using the `signature` query parameter. The public key and timestamp used must also be provided using the `publicKey` and `timestamp` query parameters respectively so that the signature can be regenerated server-side. A generated signature is only valid for 5 minutes. Both the signature and the timestamp must be url encoded (by using for instance PHPs [rawurlencode](http://php.net/rawurlencode).
+
+The public and private key pair used by clients must be specified in the server configuration.
+
 ## Image transformations
 PHPIMS supports some image transformations out of the box using the [Imagine](https://github.com/avalanche123/Imagine/) image manipulation library.
 
