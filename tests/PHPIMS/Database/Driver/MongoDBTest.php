@@ -42,20 +42,25 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class MongoDBTest extends DriverTests {
+class MongoDBTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @see PHPIMS\Database\Driver\DriverTests::getNewDriver()
+     * Driver instance
+     *
+     * @var PHPIMS\Database\Driver\MongoDB
      */
-    protected function getNewDriver() {
-        return new MongoDB();
-    }
+    protected $driver = null;
 
-    public function teardown() {
-        parent::tearDown();
+    /**
+     * Parameters for the driver
+     */
+    protected $driverParams = array(
+        'databaseName'   => 'phpims_test',
+        'collectionName' => 'images_test',
+    );
 
-        m::close();
-    }
-
+    /**
+     * Set up method
+     */
     public function setUp() {
         if (!extension_loaded('mongo')) {
             $this->markTestSkipped(
@@ -63,31 +68,15 @@ class MongoDBTest extends DriverTests {
             );
         }
 
-        parent::setUp();
+        $this->driver = new MongoDB($this->driverParams);
     }
 
-    public function testSetGetDatabaseName() {
-        $name = 'someName';
-        $this->driver->setDatabaseName($name);
-        $this->assertSame($name, $this->driver->getDatabaseName());
-    }
-
-    public function testSetGetCollectionName() {
-        $name = 'someName';
-        $this->driver->setCollectionName($name);
-        $this->assertSame($name, $this->driver->getCollectionName());
-    }
-
-    public function testSetGetDatabase() {
-        $mongo = m::mock('MongoDB');
-        $this->driver->setDatabase($mongo);
-        $this->assertSame($mongo, $this->driver->getDatabase());
-    }
-
-    public function testSetGetCollection() {
-        $collection = m::mock('MongoCollection');
-        $this->driver->setCollection($collection);
-        $this->assertSame($collection, $this->driver->getCollection());
+    /**
+     * Tear down method
+     */
+    public function tearDown() {
+        $this->driver = null;
+        // m::close();
     }
 
     /**
@@ -103,16 +92,16 @@ class MongoDBTest extends DriverTests {
 
         $response = m::mock('PHPIMS\\Server\\Response');
 
-        $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
         $data = array(
-            'hash' => $hash,
+            'hash' => $imageIdentifier,
         );
 
-        $collection = m::mock('MongoCollection');
-        $collection->shouldReceive('findOne')->once()->andReturn($data);
+        $collection = m::mock('\\MongoCollection');
+        $collection->shouldReceive('findOne')->times(2)->andReturn($data);
 
-        $this->driver->setCollection($collection)
-                     ->insertImage($hash, $image, $response);
+        $driver = new MongoDB($this->driverParams, $collection);
+        $driver->insertImage($imageIdentifier, $image, $response);
     }
 
     /**
@@ -128,12 +117,12 @@ class MongoDBTest extends DriverTests {
 
         $response = m::mock('PHPIMS\\Server\\Response');
 
-        $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
-        $collection = m::mock('MongoCollection');
-        $collection->shouldReceive('findOne')->once()->andThrow('MongoException');
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $collection = m::mock('\\MongoCollection');
+        $collection->shouldReceive('findOne')->once()->andThrow('\\MongoException');
 
-        $this->driver->setCollection($collection)
-                     ->insertImage($hash, $image, $response);
+        $driver = new MongoDB($this->driverParams, $collection);
+        $driver->insertImage($imageIdentifier, $image, $response);
     }
 
     public function testSucessfullInsert() {
@@ -144,20 +133,19 @@ class MongoDBTest extends DriverTests {
               ->andReturn('some value');
         $image->shouldReceive('setId')->once()->with($id)->andReturn($image);
 
-
-        $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
         $data = array(
-            'hash' => $hash,
+            'hash' => $imageIdentifier,
         );
 
-        $collection = m::mock('MongoCollection');
+        $collection = m::mock('\\MongoCollection');
         $collection->shouldReceive('findOne')->once()->with($data)->andReturn(array());
         $collection->shouldReceive('insert')->once()->with(m::on(function($data) use($id) { $data->_id = $id; return true; }), m::type('array'))->andReturn(true);
 
         $response = m::mock('PHPIMS\\Server\\Response');
 
-        $result = $this->driver->setCollection($collection)
-                               ->insertImage($hash, $image, $response);
+        $driver = new MongoDB($this->driverParams, $collection);
+        $result = $driver->insertImage($imageIdentifier, $image, $response);
         $this->assertTrue($result);
     }
 
@@ -167,19 +155,21 @@ class MongoDBTest extends DriverTests {
      * @expectedExceptionMessage Unable to delete image data
      */
     public function testDeleteImageWhenCollectionThrowsAnException() {
-        $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
-        $collection = m::mock('MongoCollection');
-        $collection->shouldReceive('remove')->once()->with(array('hash' => $hash), m::type('array'))->andThrow('MongoException');
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $collection = m::mock('\\MongoCollection');
+        $collection->shouldReceive('remove')->once()->with(array('hash' => $imageIdentifier), m::type('array'))->andThrow('\\MongoException');
 
-        $this->driver->setCollection($collection)->deleteImage($hash);
+        $driver = new MongoDB($this->driverParams, $collection);
+        $driver->deleteImage($imageIdentifier);
     }
 
     public function testSucessfullDeleteImage() {
-        $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
-        $collection = m::mock('MongoCollection');
-        $collection->shouldReceive('remove')->once()->with(array('hash' => $hash), m::type('array'))->andReturn(true);
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $collection = m::mock('\\MongoCollection');
+        $collection->shouldReceive('remove')->once()->with(array('hash' => $imageIdentifier), m::type('array'))->andReturn(true);
 
-        $result = $this->driver->setCollection($collection)->deleteImage($hash);
+        $driver = new MongoDB($this->driverParams, $collection);
+        $result = $driver->deleteImage($imageIdentifier);
         $this->assertTrue($result);
     }
 
@@ -189,31 +179,33 @@ class MongoDBTest extends DriverTests {
      * @expectedExceptionMessage Unable to edit image data
      */
     public function testUpdateMetadataWhenCollectionThrowsAnException() {
-        $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
         $metadata = array(
             'foo' => 'bar',
             'bar' => array(
                 'foobar' => 42,
             ),
         );
-        $collection = m::mock('MongoCollection');
-        $collection->shouldReceive('update')->once()->with(array('hash' => $hash), array('$set' => $metadata), m::type('array'))->andThrow('MongoException');
+        $collection = m::mock('\\MongoCollection');
+        $collection->shouldReceive('update')->once()->with(array('hash' => $imageIdentifier), array('$set' => $metadata), m::type('array'))->andThrow('\\MongoException');
 
-        $this->driver->setCollection($collection)->updateMetadata($hash, $metadata);
+        $driver = new MongoDB($this->driverParams, $collection);
+        $driver->updateMetadata($imageIdentifier, $metadata);
     }
 
     public function testSucessfullUpdateMetadata() {
-        $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
         $metadata = array(
             'foo' => 'bar',
             'bar' => array(
                 'foobar' => 42,
             ),
         );
-        $collection = m::mock('MongoCollection');
-        $collection->shouldReceive('update')->once()->with(array('hash' => $hash), array('$set' => $metadata), m::type('array'))->andReturn(true);
+        $collection = m::mock('\\MongoCollection');
+        $collection->shouldReceive('update')->once()->with(array('hash' => $imageIdentifier), array('$set' => $metadata), m::type('array'))->andReturn(true);
 
-        $result = $this->driver->setCollection($collection)->updateMetadata($hash, $metadata);
+        $driver = new MongoDB($this->driverParams, $collection);
+        $result = $driver->updateMetadata($imageIdentifier, $metadata);
         $this->assertTrue($result);
     }
 
@@ -223,15 +215,16 @@ class MongoDBTest extends DriverTests {
      * @expectedExceptionMessage Unable to fetch image metadata
      */
     public function testGetMetadataWhenCollectionThrowsAnException() {
-        $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
-        $collection = m::mock('MongoCollection');
-        $collection->shouldReceive('findOne')->once()->with(array('hash' => $hash))->andThrow('MongoException');
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $collection = m::mock('\\MongoCollection');
+        $collection->shouldReceive('findOne')->once()->with(array('hash' => $imageIdentifier))->andThrow('\\MongoException');
 
-        $this->driver->setCollection($collection)->getMetadata($hash);
+        $driver = new MongoDB($this->driverParams, $collection);
+        $driver->getMetadata($imageIdentifier);
     }
 
     public function testSucessfullGetMetadata() {
-        $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
         $metadata = array(
             'foo' => 'bar',
             'bar' => array(
@@ -239,10 +232,11 @@ class MongoDBTest extends DriverTests {
             ),
         );
         $data = array('data' => $metadata);
-        $collection = m::mock('MongoCollection');
-        $collection->shouldReceive('findOne')->once()->with(array('hash' => $hash))->andReturn($data);
+        $collection = m::mock('\\MongoCollection');
+        $collection->shouldReceive('findOne')->once()->with(array('hash' => $imageIdentifier))->andReturn($data);
 
-        $result = $this->driver->setCollection($collection)->getMetadata($hash);
+        $driver = new MongoDB($this->driverParams, $collection);
+        $result = $driver->getMetadata($imageIdentifier);
         $this->assertSame($metadata, $result);
     }
 
@@ -252,19 +246,21 @@ class MongoDBTest extends DriverTests {
      * @expectedExceptionMessage Unable to remove metadata
      */
     public function testDeleteMetadataWhenCollectionThrowsAnException() {
-        $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
-        $collection = m::mock('MongoCollection');
-        $collection->shouldReceive('update')->once()->with(array('hash' => $hash), array('$set' => array('data' => array())), m::type('array'))->andThrow('MongoException');
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $collection = m::mock('\\MongoCollection');
+        $collection->shouldReceive('update')->once()->with(array('hash' => $imageIdentifier), array('$set' => array('data' => array())), m::type('array'))->andThrow('\\MongoException');
 
-        $this->driver->setCollection($collection)->deleteMetadata($hash);
+        $driver = new MongoDB($this->driverParams, $collection);
+        $driver->deleteMetadata($imageIdentifier);
     }
 
     public function testSucessfullDeleteMetadata() {
-        $hash = 'b8533858299b04af3afc9a3713e69358.jpeg';
-        $collection = m::mock('MongoCollection');
-        $collection->shouldReceive('update')->once()->with(array('hash' => $hash), array('$set' => array('data' => array())), m::type('array'));
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $collection = m::mock('\\MongoCollection');
+        $collection->shouldReceive('update')->once()->with(array('hash' => $imageIdentifier), array('$set' => array('data' => array())), m::type('array'));
 
-        $result = $this->driver->setCollection($collection)->deleteMetadata($hash);
+        $driver = new MongoDB($this->driverParams, $collection);
+        $result = $driver->deleteMetadata($imageIdentifier);
         $this->assertTrue($result);
     }
 }

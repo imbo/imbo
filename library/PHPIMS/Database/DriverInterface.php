@@ -51,50 +51,50 @@ interface DriverInterface {
      * Insert a new image
      *
      * This method will insert a new image into the database. The method should update the $image
-     * object if successfull by setting the newly created ID. On errors throw exceptions that
+     * object if successful by setting the newly created ID. On errors throw exceptions that
      * extends PHPIMS\Database\Exception.
      *
-     * @param string $hash The hash identifying the image
+     * @param string $imageIdentifier Image identifier
      * @param PHPIMS\Image $image The image to insert
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    public function insertImage($hash, Image $image);
+    public function insertImage($imageIdentifier, Image $image);
 
     /**
      * Delete an image from the database
      *
-     * @param string $hash The unique ID of the image to delete
+     * @param string $imageIdentifier Image identifier
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    public function deleteImage($hash);
+    public function deleteImage($imageIdentifier);
 
     /**
      * Edit metadata
      *
-     * @param string $hash The unique ID of the image to edit
+     * @param string $imageIdentifier Image identifier
      * @param array $metadata An array with metadata
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    public function updateMetadata($hash, array $metadata);
+    public function updateMetadata($imageIdentifier, array $metadata);
 
     /**
      * Get all metadata associated with an image
      *
-     * @param string $hash The unique ID of the image to get metadata from
+     * @param string $imageIdentifier Image identifier
      * @return array Returns the metadata as an array
      * @throws PHPIMS\Database\Exception
      */
-    public function getMetadata($hash);
+    public function getMetadata($imageIdentifier);
 
     /**
      * Delete all metadata associated with an image
      *
-     * @param string $hash The unique ID of the image to delete metadata from
+     * @param string $imageIdentifier Image identifier
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    public function deleteMetadata($hash);
+    public function deleteMetadata($imageIdentifier);
 }
