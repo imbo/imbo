@@ -47,55 +47,34 @@ require_once 'vfsStream/vfsStream.php';
  */
 class FilesystemTest extends \PHPUnit_Framework_TestCase {
     /**
-     * Driver instance
-     *
-     * @var PHPIMS\Storage\Driver\Filesystem
-     */
-    protected $driver = null;
-
-    /**
-     * Set up method
-     */
-    public function setUp() {
-        $this->driver = new Filesystem();
-    }
-
-    /**
-     * Tear down method
-     */
-    public function tearDown() {
-        $this->driver = null;
-    }
-
-    /**
      * @expectedException PHPIMS\Storage\Exception
      * @expectedExceptionMessage File not found
      */
     public function testDeleteFileThatDoesNotExist() {
-        $this->driver->setParams(array('dataDir' => 'foobar'));
-        $this->driver->delete('asdasdasasd');
+        $driver = new Filesystem(array('dataDir' => 'foobar'));
+        $driver->delete('asdasdasasd');
     }
 
     public function testDelete() {
-        $hash = 'cfe95b64ac715d64275365ede690ee7c.png';
+        $imageIdentifier = md5(microtime()) . '.png';
 
         \vfsStream::setup('basedir');
-        $this->driver->setParams(array('dataDir' => \vfsStream::url('basedir')));
+        $driver = new Filesystem(array('dataDir' => \vfsStream::url('basedir')));
 
         $root = \vfsStreamWrapper::getRoot();
         $last = $root;
 
-        foreach (array($hash[0], $hash[1], $hash[2]) as $letter) {
+        foreach (array($imageIdentifier[0], $imageIdentifier[1], $imageIdentifier[2]) as $letter) {
             $d = \vfsStream::newDirectory($letter);
             $last->addChild($d);
             $last = $d;
         }
 
-        $last->addChild(\vfsStream::newFile($hash));
+        $last->addChild(\vfsStream::newFile($imageIdentifier));
 
-        $this->assertTrue($last->hasChild($hash));
-        $this->driver->delete($hash);
-        $this->assertFalse($last->hasChild($hash));
+        $this->assertTrue($last->hasChild($imageIdentifier));
+        $driver->delete($imageIdentifier);
+        $this->assertFalse($last->hasChild($imageIdentifier));
     }
 
     /**
@@ -103,22 +82,20 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @expectedExpectionMessage Could not store image
      */
     public function testStoreToUnwritablePath() {
-        $image = $this->getMock('PHPIMS\\Image');
+        $image = m::mock('PHPIMS\\Image');
         $dir = 'unwritableDirectory';
 
         // Create the virtual directory with no permissions
         \vfsStream::setup($dir, 0);
 
-        $this->driver->setParams(array(
-            'dataDir' => \vfsStream::url($dir),
-        ));
-
-        $this->driver->store('some path', $image);
+        $driver = new Filesystem(array('dataDir' => \vfsStream::url($dir)));
+        $driver->store('some path', $image);
     }
 
     public function testGetImagePath() {
-        $this->driver->setParams(array('dataDir' => '/tmp'));
-        $this->assertSame('/tmp/a/s/d/asdasdasd.png', $this->driver->getImagePath('asdasdasd.png'));
+        $driver = new Filesystem(array('dataDir' => '/tmp'));
+        $this->assertSame('/tmp/a/s/d/asdasdasd.png', $driver->getImagePath('asdasdasd.png'));
+        $this->assertSame('/tmp/a/s/d', $driver->getImagePath('asdasdasd.png', false));
     }
 
     /**
@@ -127,33 +104,33 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      */
     public function testLoadFileThatDoesNotExist() {
         $image = m::mock('PHPIMS\\Image');
-        $this->driver->setParams(array('dataDir' => '/some/path'));
-        $this->driver->load(md5(microtime()) . '.png', $image);
+        $driver = new Filesystem(array('dataDir' => '/some/path'));
+        $driver->load(md5(microtime()) . '.png', $image);
     }
 
     public function testLoad() {
-        $hash = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
 
         \vfsStream::setup('basedir');
-        $this->driver->setParams(array('dataDir' => \vfsStream::url('basedir')));
+        $driver = new Filesystem(array('dataDir' => \vfsStream::url('basedir')));
 
         $root = \vfsStreamWrapper::getRoot();
         $last = $root;
 
-        foreach (array($hash[0], $hash[1], $hash[2]) as $letter) {
+        foreach (array($imageIdentifier[0], $imageIdentifier[1], $imageIdentifier[2]) as $letter) {
             $d = \vfsStream::newDirectory($letter);
             $last->addChild($d);
             $last = $d;
         }
 
         $content = 'some binary content';
-        $file = \vfsStream::newFile($hash);
+        $file = \vfsStream::newFile($imageIdentifier);
         $file->setContent($content);
         $last->addChild($file);
 
-        $image = $this->getMock('PHPIMS\\Image');
-        $image->expects($this->once())->method('setBlob')->with($content);
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('setBlob')->once()->with($content);
 
-        $this->assertTrue($this->driver->load($hash, $image));
+        $this->assertTrue($driver->load($imageIdentifier, $image));
     }
 }

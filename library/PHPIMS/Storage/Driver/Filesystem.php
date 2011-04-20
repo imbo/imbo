@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Storage\Driver;
 
-use PHPIMS\Storage\Driver;
 use PHPIMS\Storage\DriverInterface;
 use PHPIMS\Storage\Exception as StorageException;
 use PHPIMS\Image;
@@ -53,19 +52,35 @@ use PHPIMS\Image;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Filesystem extends Driver implements DriverInterface {
+class Filesystem implements DriverInterface {
+    /**
+     * Parameters for the filesystem driver
+     *
+     * @var array
+     */
+    private $params = array(
+        'dataDir' => null,
+    );
+
+    /**
+     * Class constructor
+     *
+     * @param array $params Parameters for the driver
+     */
+    public function __construct(array $params) {
+        $this->params = array_merge($this->params, $params);
+    }
+
     /**
      * @see PHPIMS\Storage\DriverInterface::store()
      */
-    public function store($hash, $path) {
-        $params = $this->getParams();
-
-        if (!is_writable($params['dataDir'])) {
+    public function store($imageIdentifier, $path) {
+        if (!is_writable($this->params['dataDir'])) {
             throw new StorageException('Could not store image', 500);
         }
 
         // Create path for the image
-        $imageDir = $params['dataDir'] . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2];
+        $imageDir = $this->getImagePath($imageIdentifier, false);
         $oldUmask = umask(0);
 
         if (!is_dir($imageDir)) {
@@ -74,7 +89,7 @@ class Filesystem extends Driver implements DriverInterface {
 
         umask($oldUmask);
 
-        $imagePath = $imageDir . '/' . $hash;
+        $imagePath = $imageDir . '/' . $imageIdentifier;
 
         return move_uploaded_file($path, $imagePath);
     }
@@ -82,8 +97,8 @@ class Filesystem extends Driver implements DriverInterface {
     /**
      * @see PHPIMS\Storage\DriverInterface::delete()
      */
-    public function delete($hash) {
-        $path = $this->getImagePath($hash);
+    public function delete($imageIdentifier) {
+        $path = $this->getImagePath($imageIdentifier);
 
         if (!is_file($path)) {
             throw new StorageException('File not found', 404);
@@ -95,8 +110,8 @@ class Filesystem extends Driver implements DriverInterface {
     /**
      * @see PHPIMS\Storage\DriverInterface::load()
      */
-    public function load($hash, Image $image) {
-        $path = $this->getImagePath($hash);
+    public function load($imageIdentifier, Image $image) {
+        $path = $this->getImagePath($imageIdentifier);
 
         if (!is_file($path)) {
             throw new StorageException('File not found', 404);
@@ -108,14 +123,20 @@ class Filesystem extends Driver implements DriverInterface {
     }
 
     /**
-     * Get the path to an image identified by $hash
+     * Get the path to an image
      *
-     * @param string $hash Unique hash identifying an image
+     * @param string $imageIdentifier Image identifier
+     * @param boolean $includeFilename Wether or not to include the last part of the path (the
+     *                                 filename itself)
      * @return string
      */
-    public function getImagePath($hash) {
-        $params = $this->getParams();
-        $imagePath = $params['dataDir'] . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2] . '/' . $hash;
+    public function getImagePath($imageIdentifier, $includeFilename = true) {
+        $imagePath = $this->params['dataDir'] . '/' . $imageIdentifier[0] . '/'
+                   . $imageIdentifier[1] . '/' . $imageIdentifier[2];
+
+        if ($includeFilename) {
+            $imagePath .= '/' . $imageIdentifier;
+        }
 
         return $imagePath;
     }
