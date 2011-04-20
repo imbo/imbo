@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Client\Driver;
 
-use PHPIMS\Client\Driver;
 use PHPIMS\Client\DriverInterface;
 use PHPIMS\Client\Response;
 
@@ -48,26 +47,35 @@ use PHPIMS\Client\Response;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Curl extends Driver implements DriverInterface {
+class Curl implements DriverInterface {
     /**
      * The cURL handle used by the client
      *
      * @var resource
      */
-    protected $curlHandle = null;
+    private $curlHandle = null;
 
     /**
-     * Class destructor
+     * Parameters for the driver
+     *
+     * @var array
      */
-    public function __destruct() {
-        curl_close($this->curlHandle);
-    }
+    private $params = array(
+        'timeout'        => 2,
+        'connectTimeout' => 2,
+    );
 
     /**
-     * @see PHPIMS\Client\Driver::init()
+     * Class constructor
+     *
+     * @param array $params Parameters for the driver
      */
-    protected function init() {
+    public function __construct(array $params = array()) {
         $this->curlHandle = curl_init();
+
+        if (!empty($params)) {
+            $this->params = array_merge($this->params, $params);
+        }
 
         curl_setopt_array($this->curlHandle, array(
             CURLOPT_USERAGENT      => __CLASS__,
@@ -75,6 +83,13 @@ class Curl extends Driver implements DriverInterface {
             CURLOPT_HEADER         => true,
             CURLOPT_HTTPHEADER     => array('Expect:'),
         ));
+    }
+
+    /**
+     * Class destructor
+     */
+    public function __destruct() {
+        curl_close($this->curlHandle);
     }
 
     /**
@@ -144,8 +159,8 @@ class Curl extends Driver implements DriverInterface {
         // Set the timeout options
         curl_setopt_array($this->curlHandle, array(
             CURLOPT_URL            => $url,
-            CURLOPT_CONNECTTIMEOUT => $this->getClient()->getConnectTimeout(),
-            CURLOPT_TIMEOUT        => $this->getClient()->getTimeout(),
+            CURLOPT_CONNECTTIMEOUT => $this->params['connectTimeout'],
+            CURLOPT_TIMEOUT        => $this->params['timeout'],
         ));
 
         $content = curl_exec($this->curlHandle);

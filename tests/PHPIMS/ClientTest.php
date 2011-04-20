@@ -72,11 +72,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
     protected $serverUrl = 'http://host';
 
     /**
-     * Hash used for tests
+     * Image identifier used for tests
      *
      * @var string
      */
-    protected $hash = null;
+    protected $imageIdentifier = null;
 
     /**
      * Pattern used in the Mockery matchers when url is signed
@@ -98,14 +98,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
     public function setUp() {
         $this->publicKey = md5(microtime());
         $this->privateKey = md5($this->publicKey);
-        $this->hash = md5(microtime()) . '.png';
-
-        $this->client = new Client($this->serverUrl, $this->publicKey, $this->privateKey);
-
+        $this->imageIdentifier = md5(microtime()) . '.png';
         $this->driver = m::mock('PHPIMS\\Client\\DriverInterface');
-        $this->driver->shouldReceive('setClient')->once()->with($this->client)->andReturn($this->driver);
 
-        $this->client->setDriver($this->driver);
+        $this->client = new Client($this->serverUrl, $this->publicKey, $this->privateKey, $this->driver);
     }
 
     /**
@@ -113,54 +109,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->client = null;
-    }
-
-    public function testSetGetServerUrl() {
-        $url = 'http://localhost';
-        $this->client->setServerUrl($url);
-        $this->assertSame($url, $this->client->getServerUrl());
-    }
-
-    public function testSetGetTimeout() {
-        $timeout = 123;
-        $this->client->setTimeout($timeout);
-        $this->assertSame($timeout, $this->client->getTimeout());
-    }
-
-    public function testSetGetConnectTimeout() {
-        $timeout = 123;
-        $this->client->setConnectTimeout($timeout);
-        $this->assertSame($timeout, $this->client->getConnectTimeout());
-    }
-
-    public function testSetGetDriver() {
-        $driver = m::mock('PHPIMS\\Client\\DriverInterface');
-        $driver->shouldReceive('setClient')->with($this->client)->andReturn($driver);
-        $this->client->setDriver($driver);
-        $this->assertSame($driver, $this->client->getDriver());
-    }
-
-    public function testSetGetPublicKey() {
-        $key = md5(microtime());
-        $this->client->setPublicKey($key);
-        $this->assertSame($key, $this->client->getPublicKey());
-    }
-
-    public function testSetGetPrivateKey() {
-        $key = md5(microtime());
-        $this->client->setPrivateKey($key);
-        $this->assertSame($key, $this->client->getPrivateKey());
-    }
-
-    public function testConstructorParams() {
-        $driver = m::mock('PHPIMS\\Client\\DriverInterface');
-        $driver->shouldReceive('setClient')->with(m::type('PHPIMS\\Client'))->andReturn($driver);
-        $client = new Client($this->serverUrl, $this->publicKey, $this->privateKey, $driver);
-
-        $this->assertSame($this->serverUrl, $client->getServerUrl());
-        $this->assertSame($this->publicKey, $client->getPublicKey());
-        $this->assertSame($this->privateKey, $client->getPrivateKey());
-        $this->assertSame($driver, $client->getDriver());
     }
 
     /**
@@ -190,7 +138,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         $response = m::mock('PHPIMS\\Client\\Response');
         $this->driver->shouldReceive('delete')->once()->with($this->signedUrlPattern)->andReturn($response);
 
-        $result = $this->client->deleteImage($this->hash);
+        $result = $this->client->deleteImage($this->imageIdentifier);
 
         $this->assertSame($result, $response);
     }
@@ -203,7 +151,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
 
         $response = m::mock('PHPIMS\\Client\\Response');
         $this->driver->shouldReceive('post')->once()->with($this->signedUrlPattern, $data)->andReturn($response);
-        $result = $this->client->editMetaData($this->hash, $data);
+        $result = $this->client->editMetaData($this->imageIdentifier, $data);
 
         $this->assertSame($result, $response);
     }
@@ -211,7 +159,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
     public function testDeleteMetaData() {
         $response = m::mock('PHPIMS\\Client\\Response');
         $this->driver->shouldReceive('delete')->once()->with($this->signedUrlPattern)->andReturn($response);
-        $result = $this->client->deleteMetaData($this->hash);
+        $result = $this->client->deleteMetaData($this->imageIdentifier);
 
         $this->assertSame($result, $response);
     }
@@ -219,24 +167,24 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
     public function testGetMetaData() {
         $response = m::mock('PHPIMS\\Client\\Response');
         $this->driver->shouldReceive('get')->once()->with($this->urlPattern)->andReturn($response);
-        $result = $this->client->getMetadata($this->hash);
+        $result = $this->client->getMetadata($this->imageIdentifier);
 
         $this->assertSame($result, $response);
     }
 
     public function testGetImageUrl() {
-        $url = $this->client->getImageUrl($this->hash);
+        $url = $this->client->getImageUrl($this->imageIdentifier);
         $this->assertInstanceOf('PHPIMS\\Client\\ImageUrl', $url);
-        $this->assertSame($this->serverUrl . '/' . $this->hash, (string) $url);
+        $this->assertSame($this->serverUrl . '/' . $this->imageIdentifier, (string) $url);
     }
 
     public function testGetImageUrlWithTransformations() {
-        $baseUrl = $this->serverUrl . '/' . $this->hash;
+        $baseUrl = $this->serverUrl . '/' . $this->imageIdentifier;
         $completeUrl = $baseUrl;
         $transformation = m::mock('PHPIMS\\Client\\ImageUrl\\Transformation');
         $transformation->shouldReceive('apply')->once()->with(m::type('PHPIMS\\Client\\ImageUrl'));
 
-        $url = $this->client->getImageUrl($this->hash, $transformation);
+        $url = $this->client->getImageUrl($this->imageIdentifier, $transformation);
         $this->assertInstanceOf('PHPIMS\\Client\\ImageUrl', $url);
         $this->assertSame($completeUrl, (string) $url);
     }

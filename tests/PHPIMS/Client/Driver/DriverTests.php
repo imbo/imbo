@@ -73,12 +73,7 @@ abstract class DriverTests extends \PHPUnit_Framework_TestCase {
             $this->markTestSkipped('PHPIMS_ENABLE_CLIENT_TESTS must be set to true to run these tests');
         }
 
-        $this->driver = $this->getNewDriver();
-        $client = $this->getMockBuilder('PHPIMS\\Client')->disableOriginalConstructor()->setMethods(array('getTimeout', 'getConnectTimeout'))->getMock();
-        $client->expects($this->any())->method('getConnectTimeout')->will($this->returnValue(2));
-        $client->expects($this->any())->method('getTimeout')->will($this->returnValue(2));
-
-        $this->driver->setClient($client);
+        $this->driver  = $this->getNewDriver();
         $this->testUrl = PHPIMS_CLIENT_TESTS_URL;
     }
 
