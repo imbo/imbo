@@ -44,7 +44,7 @@ use PHPIMS\Client;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class Driver implements DriverInterface {
+abstract class Driver {
     /**
      * Client this driver does requests for
      *

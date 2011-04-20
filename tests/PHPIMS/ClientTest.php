@@ -102,7 +102,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
 
         $this->client = new Client($this->serverUrl, $this->publicKey, $this->privateKey);
 
-        $this->driver = m::mock('PHPIMS\\Client\\Driver');
+        $this->driver = m::mock('PHPIMS\\Client\\DriverInterface');
         $this->driver->shouldReceive('setClient')->once()->with($this->client)->andReturn($this->driver);
 
         $this->client->setDriver($this->driver);
@@ -134,7 +134,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetDriver() {
-        $driver = m::mock('PHPIMS\\Client\\Driver');
+        $driver = m::mock('PHPIMS\\Client\\DriverInterface');
         $driver->shouldReceive('setClient')->with($this->client)->andReturn($driver);
         $this->client->setDriver($driver);
         $this->assertSame($driver, $this->client->getDriver());
@@ -153,7 +153,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testConstructorParams() {
-        $driver = m::mock('PHPIMS\\Client\\Driver');
+        $driver = m::mock('PHPIMS\\Client\\DriverInterface');
         $driver->shouldReceive('setClient')->with(m::type('PHPIMS\\Client'))->andReturn($driver);
         $client = new Client($this->serverUrl, $this->publicKey, $this->privateKey, $driver);
 

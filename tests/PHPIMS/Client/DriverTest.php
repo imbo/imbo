@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Client;
 
-use PHPIMS\Client;
 use \Mockery as m;
 
 /**

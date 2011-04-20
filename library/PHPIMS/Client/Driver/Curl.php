@@ -33,6 +33,7 @@
 namespace PHPIMS\Client\Driver;
 
 use PHPIMS\Client\Driver;
+use PHPIMS\Client\DriverInterface;
 use PHPIMS\Client\Response;
 
 /**
@@ -47,7 +48,7 @@ use PHPIMS\Client\Response;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Curl extends Driver {
+class Curl extends Driver implements DriverInterface {
     /**
      * The cURL handle used by the client
      *

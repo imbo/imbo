@@ -32,7 +32,7 @@
 
 namespace PHPIMS;
 
-use PHPIMS\Client\Driver;
+use PHPIMS\Client\DriverInterface;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Client\ImageUrl\Transformation;
 use PHPIMS\Client\Driver\Curl as DefaultDriver;
@@ -76,7 +76,7 @@ class Client {
     /**
      * Driver used for the client
      *
-     * @var PHPIMS\Client\Driver
+     * @var PHPIMS\Client\DriverInterface
      */
     protected $driver = null;
 
@@ -100,9 +100,9 @@ class Client {
      * @param string $serverUrl The URL to the PHPIMS server, including protocol
      * @param string $publicKey The public key to use. Only some operations need this
      * @param string $privateKey The private key to use. Only some operations need this
-     * @param PHPIMS\Client\Driver $driver Optional driver to set
+     * @param PHPIMS\Client\DriverInterface $driver Optional driver to set
      */
-    public function __construct($serverUrl, $publicKey = null, $privateKey = null, Driver $driver = null) {
+    public function __construct($serverUrl, $publicKey = null, $privateKey = null, DriverInterface $driver = null) {
         $this->setServerUrl($serverUrl);
 
         if ($publicKey !== null) {
@@ -195,7 +195,7 @@ class Client {
     /**
      * Get the current driver
      *
-     * @return PHPIMS\Client\Driver
+     * @return PHPIMS\Client\DriverInterface
      */
     public function getDriver() {
         if ($this->driver === null) {
@@ -211,10 +211,10 @@ class Client {
     /**
      * Set the driver
      *
-     * @param PHPIMS\Client\Driver $driver A driver instance
+     * @param PHPIMS\Client\DriverInterface $driver A driver instance
      * @return PHPIMS\Client
      */
-    public function setDriver(Driver $driver) {
+    public function setDriver(DriverInterface $driver) {
         $driver->setClient($this);
         $this->driver = $driver;
 
