@@ -125,18 +125,16 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     public function testSucessfullInsert() {
         $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
         $data = array('hash' => $imageIdentifier);
-        $id = 'some id';
 
         $image = m::mock('PHPIMS\\Image');
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getMetadata')
               ->once()
               ->andReturn('some value');
-        $image->shouldReceive('setId')->once()->with($id)->andReturn($image);
 
         $response = m::mock('PHPIMS\\Server\\Response');
 
         $this->collection->shouldReceive('findOne')->once()->with($data)->andReturn(array());
-        $this->collection->shouldReceive('insert')->once()->with(m::on(function($data) use($id) { $data->_id = $id; return true; }), m::type('array'))->andReturn(true);
+        $this->collection->shouldReceive('insert')->once()->with(m::type('array'), m::type('array'))->andReturn(true);
 
         $result = $this->driver->insertImage($imageIdentifier, $image, $response);
         $this->assertTrue($result);

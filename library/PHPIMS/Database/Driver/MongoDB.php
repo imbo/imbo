@@ -95,18 +95,18 @@ class MongoDB implements DriverInterface {
      * @see PHPIMS\Database\DriverInterface::insertImage()
      */
     public function insertImage($imageIdentifier, Image $image) {
-        $data = new \stdClass;
-
-        $data->name  = $image->getFilename();
-        $data->size  = $image->getFilesize();
-        $data->hash  = $imageIdentifier;
-        $data->mime  = $image->getMimeType();
-        $data->data  = $image->getMetadata();
-        $data->added = time();
+        $data = array(
+            'name'  => $image->getFilename(),
+            'size'  => $image->getFilesize(),
+            'hash'  => $imageIdentifier,
+            'mime'  => $image->getMimeType(),
+            'data'  => $image->getMetadata(),
+            'added' => time(),
+        );
 
         try {
             // See if the image already exists
-            $row = $this->collection->findOne(array('hash' => $data->hash));
+            $row = $this->collection->findOne(array('hash' => $data['hash']));
 
             if ($row) {
                 throw new DatabaseException('Image already exists', 400);
@@ -116,8 +116,6 @@ class MongoDB implements DriverInterface {
         } catch (\MongoException $e) {
             throw new DatabaseException('Unable to save image data', 500, $e);
         }
-
-        $image->setId((string) $data->_id);
 
         return true;
     }

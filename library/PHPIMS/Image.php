@@ -42,15 +42,6 @@ namespace PHPIMS;
  */
 class Image {
     /**
-     * ID of the image
-     *
-     * This is the ID from the underlying database driver
-     *
-     * @var mixed
-     */
-    protected $id = null;
-
-    /**
      * Original filename
      *
      * @var string
@@ -91,27 +82,6 @@ class Image {
      * @var array
      */
     protected $metadata = array();
-
-    /**
-     * Get the ID
-     *
-     * @return mixed
-     */
-    public function getId() {
-        return $this->id;
-    }
-
-    /**
-     * Set the ID
-     *
-     * @param mixed $id Unique ID to set
-     * @return PHPIMS\Image
-     */
-    public function setId($id) {
-        $this->id = $id;
-
-        return $this;
-    }
 
     /**
      * Get the filename

@@ -62,12 +62,6 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
         $this->image = null;
     }
 
-    public function testSetGetId() {
-        $id = '123123213';
-        $this->image->setId($id);
-        $this->assertSame($id, $this->image->getId());
-    }
-
     public function testSetGetFilename() {
         $name = 'someName.jpg';
         $this->image->setFilename($name);

@@ -50,8 +50,7 @@ interface DriverInterface {
     /**
      * Insert a new image
      *
-     * This method will insert a new image into the database. The method should update the $image
-     * object if successful by setting the newly created ID. On errors throw exceptions that
+     * This method will insert a new image into the database. On errors throw exceptions that
      * extends PHPIMS\Database\Exception.
      *
      * @param string $imageIdentifier Image identifier
