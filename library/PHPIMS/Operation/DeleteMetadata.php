@@ -52,14 +52,14 @@ class DeleteMetadata extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::getRequestPath()
      */
     public function getRequestPath() {
-        return $this->getHash() . '/meta';
+        return $this->getImageIdentifier() . '/meta';
     }
 
     /**
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
-        $this->getDatabase()->deleteMetadata($this->getHash());
+        $this->getDatabase()->deleteMetadata($this->getImageIdentifier());
 
         return $this;
     }

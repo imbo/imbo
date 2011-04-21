@@ -43,12 +43,10 @@ use \Mockery as m;
  * @link https://github.com/christeredvartsen/phpims
  */
 class DeleteMetadataTest extends OperationTests {
-    protected $hash = null;
-
     protected function getNewOperation() {
-        $this->hash = md5(microtime());
+        $this->imageIdentifier = md5(microtime()) . '.png';
 
-        return new DeleteMetadata($this->hash);
+        return new DeleteMetadata($this->imageIdentifier);
     }
 
     public function getExpectedOperationName() {
@@ -56,12 +54,12 @@ class DeleteMetadataTest extends OperationTests {
     }
 
     public function getExpectedRequestPath() {
-        return $this->hash . '/meta';
+        return $this->imageIdentifier . '/meta';
     }
 
     public function testSuccessfullExec() {
         $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $database->shouldReceive('deleteMetadata')->once()->with($this->hash);
+        $database->shouldReceive('deleteMetadata')->once()->with($this->imageIdentifier);
         $this->operation->setDatabase($database);
 
         $this->operation->exec();

@@ -71,7 +71,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     /**
      * Factory used in this test as a stand-in for PHPIMS\Operation
      */
-    static public function factory($operation, $hash = null) {
+    static public function factory($operation, $imageIdentifier = null) {
         return self::$mocks[$operation];
     }
 

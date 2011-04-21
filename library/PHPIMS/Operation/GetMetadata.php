@@ -52,14 +52,14 @@ class GetMetadata extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::getRequestPath()
      */
     public function getRequestPath() {
-        return $this->getHash() . '/meta';
+        return $this->getImageIdentifier() . '/meta';
     }
 
     /**
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
-        $data = $this->getDatabase()->getMetadata($this->getHash());
+        $data = $this->getDatabase()->getMetadata($this->getImageIdentifier());
         $this->getResponse()->setBody($data);
 
         return $this;

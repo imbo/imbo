@@ -52,12 +52,12 @@ class GetImageTest extends OperationTests {
     }
 
     public function getExpectedRequestPath() {
-        return $this->hash;
+        return $this->imageIdentifier;
     }
 
     public function testSuccessfullExec() {
         $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
-        $storage->shouldReceive('load')->once()->with($this->hash, m::type('PHPIMS\\Image'))->andReturn(true);
+        $storage->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
         $this->operation->setStorage($storage);
 
         $image = m::mock('PHPIMS\\Image');

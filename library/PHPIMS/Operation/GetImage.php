@@ -62,7 +62,7 @@ class GetImage extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::getRequestPath()
      */
     public function getRequestPath() {
-        return $this->getHash();
+        return $this->getImageIdentifier();
     }
 
     /**
@@ -72,7 +72,7 @@ class GetImage extends Operation implements OperationInterface {
         $image = $this->getImage();
 
         // Load the image
-        $this->getStorage()->load($this->getHash(), $image);
+        $this->getStorage()->load($this->getImageIdentifier(), $image);
 
         // Attach the current image object to the response
         $this->getResponse()->setImage($image);

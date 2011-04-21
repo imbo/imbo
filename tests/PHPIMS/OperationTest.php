@@ -83,10 +83,10 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
         $this->operation = null;
     }
 
-    public function testSetGetHash() {
-        $hash = md5(time());
-        $this->operation->setHash($hash);
-        $this->assertSame($hash, $this->operation->getHash());
+    public function testSetGetImageIdentifier() {
+        $imageIdentifier = md5(time()) . '.png';
+        $this->operation->setImageIdentifier($imageIdentifier);
+        $this->assertSame($imageIdentifier, $this->operation->getImageIdentifier());
     }
 
     public function testSetGetDatabase() {

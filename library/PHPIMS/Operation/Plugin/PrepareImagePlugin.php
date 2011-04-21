@@ -32,6 +32,8 @@
 
 namespace PHPIMS\Operation\Plugin;
 
+use PHPIMS;
+
 use PHPIMS\Operation\Plugin;
 use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
@@ -69,10 +71,10 @@ class PrepareImagePlugin extends Plugin implements PluginInterface {
         $imagePath = $_FILES['file']['tmp_name'];
         $actualHash = md5_file($imagePath);
 
-        // Get hash from request without the extension
-        $hashFromRequest = $operation->getHash();
+        // Get image identifier from request
+        $identifierFromRequest = $operation->getImageIdentifier();
 
-        if ($actualHash !== substr($hashFromRequest, 0, 32)) {
+        if ($actualHash !== substr($identifierFromRequest, 0, 32)) {
             throw new Exception('Hash mismatch', 400);
         }
 

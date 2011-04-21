@@ -52,23 +52,23 @@ class AddImage extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::getRequestPath()
      */
     public function getRequestPath() {
-        return $this->getHash();
+        return $this->getImageIdentifier();
     }
 
     /**
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
-        $hash = $this->getHash();
+        $imageIdentifier = $this->getImageIdentifier();
         $database = $this->getDatabase();
         $image = $this->getImage();
 
-        $database->insertImage($hash, $image);
-        $database->updateMetadata($hash, $image->getMetadata());
-        $this->getStorage()->store($hash, $_FILES['file']['tmp_name']);
+        $database->insertImage($imageIdentifier, $image);
+        $database->updateMetadata($imageIdentifier, $image->getMetadata());
+        $this->getStorage()->store($imageIdentifier, $_FILES['file']['tmp_name']);
         $this->getResponse()->setCode(201)
                             ->setBody(array(
-                                'hash' => $hash,
+                                'hash' => $imageIdentifier,
                             ));
 
         return $this;

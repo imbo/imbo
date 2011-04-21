@@ -87,10 +87,10 @@ class IdentifyImagePlugin extends Plugin implements PluginInterface {
         $image->setMimeType($mime)
               ->setExtension($extension);
 
-        // Update hash in case it has a wrong extension
-        $hash = $operation->getHash();
-        $hash = substr($hash, 0, 32) . '.' . $extension;
-        $operation->setHash($hash);
+        // Update image identifier in case it has a wrong extension
+        $imageIdentifier = $operation->getImageIdentifier();
+        $imageIdentifier = substr($imageIdentifier, 0, 32) . '.' . $extension;
+        $operation->setImageIdentifier($imageIdentifier);
     }
 
     /**

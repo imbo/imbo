@@ -118,15 +118,15 @@ class FrontController {
     /**
      * Generate an operation object based on some parameters
      *
-     * Valid requests are: (GET|POST|DELETE|HEAD) /<hash>[/meta]
+     * Valid requests are: (GET|POST|DELETE|HEAD) /<image>[/meta]
      *
      * @param string $method The HTTP method
-     * @param string $hash   Image hash (md5)
-     * @param string $extra  Optional extra argument
+     * @param string $imageIdentifier Image identifier
+     * @param string $extra Optional extra argument
      * @throws PHPIMS\Exception
-     * @return PHPIMS\Operation
+     * @return PHPIMS\OperationInterface
      */
-    protected function resolveOperation($method, $hash, $extra = null) {
+    protected function resolveOperation($method, $imageIdentifier, $extra = null) {
         $operation = null;
 
         if ($method === self::GET) {
@@ -157,7 +157,7 @@ class FrontController {
 
         $factoryClass = $this->config['operation']['factory'];
 
-        return $factoryClass::factory($operation, $method, $hash);
+        return $factoryClass::factory($operation, $method, $imageIdentifier);
     }
 
     /**
@@ -174,14 +174,14 @@ class FrontController {
 
         $matches = array();
 
-        if (!preg_match('|(?<hash>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>.*))?$|', $path, $matches)) {
+        if (!preg_match('|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>.*))?$|', $path, $matches)) {
             throw new Exception('Invalid request: ' . $path, 400);
         }
 
-        $hash = $matches['hash'];
+        $imageIdentifier = $matches['imageIdentifier'];
         $extra = isset($matches['extra']) ? $matches['extra'] : null;
 
-        $operation = $this->resolveOperation($method, $hash, $extra);
+        $operation = $this->resolveOperation($method, $imageIdentifier, $extra);
         $operation->init($this->config)
                   ->preExec()
                   ->exec()

@@ -52,14 +52,14 @@ class EditMetadata extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::getRequestPath()
      */
     public function getRequestPath() {
-        return $this->getHash() . '/meta';
+        return $this->getImageIdentifier() . '/meta';
     }
 
     /**
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
-        $this->getDatabase()->updateMetadata($this->getHash(), json_decode($_POST['metadata'], true));
+        $this->getDatabase()->updateMetadata($this->getImageIdentifier(), json_decode($_POST['metadata'], true));
 
         return $this;
     }

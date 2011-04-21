@@ -49,19 +49,19 @@ abstract class OperationTests extends \PHPUnit_Framework_TestCase {
     protected $operation = null;
 
     /**
-     * Hash used for the operation
+     * Image identifier used for the operation
      *
      * @var string
      */
-    protected $hash = null;
+    protected $imageIdentifier = null;
 
     /**
      * Set up method
      */
     public function setUp() {
-        $this->hash = md5(microtime());
+        $this->imageIdentifier = md5(microtime()) . '.png';
         $this->operation = $this->getNewOperation();
-        $this->operation->setHash($this->hash);
+        $this->operation->setImageIdentifier($this->imageIdentifier);
     }
 
     /**

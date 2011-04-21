@@ -52,15 +52,16 @@ class DeleteImage extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::getRequestPath()
      */
     public function getRequestPath() {
-        return $this->getHash();
+        return $this->getImageIdentifier();
     }
 
     /**
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
-        $this->getDatabase()->deleteImage($this->getHash());
-        $this->getStorage()->delete($this->getHash());
+        $imageIdentifier = $this->getImageIdentifier();
+        $this->getDatabase()->deleteImage($imageIdentifier);
+        $this->getStorage()->delete($imageIdentifier);
 
         return $this;
     }

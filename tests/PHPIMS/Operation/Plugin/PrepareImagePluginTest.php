@@ -76,7 +76,7 @@ class PrepareImagePluginTest extends \PHPUnit_Framework_TestCase {
         $_FILES['file']['tmp_name'] = __DIR__ . '/../../_files/image.png';
 
         $operation = m::mock('PHPIMS\\Operation\\AddImage');
-        $operation->shouldReceive('getHash')->once()->andReturn(str_repeat('a', 32) . '.png');
+        $operation->shouldReceive('getImageIdentifier')->once()->andReturn(str_repeat('a', 32) . '.png');
 
         $this->plugin->exec($operation);
     }
@@ -87,7 +87,7 @@ class PrepareImagePluginTest extends \PHPUnit_Framework_TestCase {
         $_FILES['file']['size'] = 41423;
         $metadata = array('foo' => 'bar', 'bar' => 'foo');
         $_POST = array('metadata' => json_encode($metadata));
-        $hash = md5_file($_FILES['file']['tmp_name']) . '.png';
+        $imageIdentifier = md5_file($_FILES['file']['tmp_name']) . '.png';
 
         $image = m::mock('PHPIMS\\Image');
         $image->shouldReceive('setFilename')->once()->with('image.png')->andReturn($image);
@@ -96,7 +96,7 @@ class PrepareImagePluginTest extends \PHPUnit_Framework_TestCase {
         $image->shouldReceive('setBlob')->once()->with(file_get_contents($_FILES['file']['tmp_name']))->andReturn($image);
 
         $operation = m::mock('PHPIMS\\Operation\\AddImage');
-        $operation->shouldReceive('getHash')->once()->andReturn($hash);
+        $operation->shouldReceive('getImageIdentifier')->once()->andReturn($imageIdentifier);
         $operation->shouldReceive('getImage')->once()->andReturn($image);
 
         $this->plugin->exec($operation);

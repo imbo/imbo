@@ -49,11 +49,11 @@ use PHPIMS\Operation\Exception as OperationException;
  */
 abstract class Operation {
     /**
-     * The current hash value
+     * The current image identifier
      *
      * @param string
      */
-    protected $hash = null;
+    protected $imageIdentifier = null;
 
     /**
      * HTTP method
@@ -268,22 +268,22 @@ abstract class Operation {
     }
 
     /**
-     * Get the current hash
+     * Get the current image identifier
      *
      * @return string
      */
-    public function getHash() {
-        return $this->hash;
+    public function getImageIdentifier() {
+        return $this->imageIdentifier;
     }
 
     /**
-     * Set the hash property
+     * Set the image identifier property
      *
-     * @param string $hash The hash to set
+     * @param string $imageIdentifier The identifier to set
      * @return PHPIMS\Operation
      */
-    public function setHash($hash) {
-        $this->hash = $hash;
+    public function setImageIdentifier($imageIdentifier) {
+        $this->imageIdentifier = $imageIdentifier;
 
         return $this;
     }
@@ -452,11 +452,11 @@ abstract class Operation {
      *
      * @param string $className The name of the operation class to instantiate
      * @param string $method The HTTP method used
-     * @param string $hash Hash that will be passed to the operations constructor
+     * @param string $imageIdentifier Image identifier
      * @return PHPIMS\OperationInterface
      * @throws PHPIMS\Operation\Exception
      */
-    static public function factory($className, $method, $hash) {
+    static public function factory($className, $method, $imageIdentifier) {
         switch ($className) {
             case 'PHPIMS\\Operation\\AddImage':
             case 'PHPIMS\\Operation\\DeleteImage':
@@ -466,7 +466,7 @@ abstract class Operation {
             case 'PHPIMS\\Operation\\DeleteMetadata':
                 $operation = new $className();
 
-                $operation->setHash($hash);
+                $operation->setImageIdentifier($imageIdentifier);
                 $operation->setMethod($method);
                 $operation->setImage(new Image());
                 $operation->setResponse(new Response());

@@ -52,7 +52,7 @@ class AddImageTest extends OperationTests {
     }
 
     public function getExpectedRequestPath() {
-        return $this->hash;
+        return $this->imageIdentifier;
     }
 
     public function testSuccessfullExec() {
@@ -60,7 +60,7 @@ class AddImageTest extends OperationTests {
             'tmp_name' => '/tmp/foobar',
         );
 
-        $hash = md5(microtime()) . '.png';
+        $imageIdentifier = md5(microtime()) . '.png';
         $metadata = array(
             'foo' => 'bar',
             'bar' => array(
@@ -71,19 +71,19 @@ class AddImageTest extends OperationTests {
         $image->shouldReceive('getMetadata')->once()->andReturn($metadata);
         $response = m::mock('PHPIMS\\Server\\Response');
         $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
-        $response->shouldReceive('setBody')->once()->with(array('hash' => $hash))->andReturn($response);
+        $response->shouldReceive('setBody')->once()->with(array('hash' => $imageIdentifier))->andReturn($response);
 
         $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $database->shouldReceive('insertImage')->once()->with($hash, $image);
-        $database->shouldReceive('updateMetadata')->once()->with($hash, $metadata);
+        $database->shouldReceive('insertImage')->once()->with($imageIdentifier, $image);
+        $database->shouldReceive('updateMetadata')->once()->with($imageIdentifier, $metadata);
 
         $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
-        $storage->shouldReceive('store')->once()->with($hash, $_FILES['file']['tmp_name']);
+        $storage->shouldReceive('store')->once()->with($imageIdentifier, $_FILES['file']['tmp_name']);
 
         $this->operation->setStorage($storage)
                         ->setDatabase($database)
                         ->setResponse($response)
-                        ->setHash($hash)
+                        ->setImageIdentifier($imageIdentifier)
                         ->setImage($image)
                         ->exec();
     }
