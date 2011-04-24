@@ -32,6 +32,8 @@
 
 namespace PHPIMS;
 
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -49,38 +51,10 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     protected $controller = null;
 
     /**
-     * Array of mock objects used by the stand-in operation factory
-     *
-     * This array should be filled with mock objects by the tests that needs them.
-     *
-     * @var array
-     */
-    static public $mocks = array();
-
-    /**
-     * Configuration for the controller
-     *
-     * @var array
-     */
-    protected $controllerConfig = array(
-        'operation' => array(
-            'factory' => __CLASS__,
-        ),
-    );
-
-    /**
-     * Factory used in this test as a stand-in for PHPIMS\Operation
-     */
-    static public function factory($operation, $imageIdentifier = null) {
-        return self::$mocks[$operation];
-    }
-
-    /**
      * Set up method
      */
     public function setUp() {
-        $this->controller = new FrontController($this->controllerConfig);
-        self::$mocks = array();
+        $this->controller = new FrontController();
     }
 
     /**
@@ -88,7 +62,6 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->controller = null;
-        self::$mocks = array();
     }
 
     /**
@@ -97,13 +70,11 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
      * @param string $operationClass The class name of the operation to mock
      */
     protected function getOperationMock($operationClass) {
-        $response = $this->getMock('PHPIMS\\Server\\Response');
-
-        $operation = $this->getMockBuilder($operationClass)->disableOriginalConstructor()->getMock();
-        $operation->expects($this->once())->method('init')->with($this->controllerConfig)->will($this->returnValue($operation));
-        $operation->expects($this->once())->method('preExec')->will($this->returnValue($operation));
-        $operation->expects($this->once())->method('exec')->will($this->returnValue($operation));
-        $operation->expects($this->once())->method('postExec')->will($this->returnValue($operation));
+        $operation = m::mock($operationClass);
+        $operation->shouldReceive('init')->once()->andReturn($operation);
+        $operation->shouldReceive('preExec')->once()->andReturn($operation);
+        $operation->shouldReceive('exec')->once()->andReturn($operation);
+        $operation->shouldReceive('postExec')->once()->andReturn($operation);
 
         return $operation;
     }
@@ -119,72 +90,21 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse(FrontController::isValidMethod('foobar'));
     }
 
-    public function testSetGetConfig() {
-        $config = array(
-            'foo' => 'bar',
-            'bar' => 'foo',
-        );
-        $this->controller->setConfig($config);
-        $this->assertSame($config, $this->controller->getConfig());
-    }
-
     /**
      * @expectedException PHPIMS\Exception
      * @expectedExceptionCode 501
      */
     public function testHandleInvalidMethod() {
-        $this->controller->handle('foobar', '/some/path');
+        $this->controller->handle('/some/path', 'foobar');
     }
 
     /**
      * @expectedException PHPIMS\Exception
      * @expectedExceptionCode 400
-     * @expectedExceptionMessage Invalid request: /
+     * @expectedExceptionMessage Unknown resource
      */
     public function testHandleInvalidRequest() {
-        $this->controller->handle('GET', '/');
-    }
-
-    public function testHandleAddImage() {
-        $operation = $this->getOperationMock('PHPIMS\\Operation\\AddImage');
-        self::$mocks['PHPIMS\\Operation\\AddImage'] = $operation;
-
-        $this->controller->handle('POST', md5(microtime()) . '.png');
-    }
-
-    public function testHandleEditImage() {
-        $operation = $this->getOperationMock('PHPIMS\\Operation\\EditMetadata');
-        self::$mocks['PHPIMS\\Operation\\EditMetadata'] = $operation;
-
-        $this->controller->handle('POST', md5(microtime()) . '.png/meta');
-    }
-
-    public function testHandleGetImage() {
-        $operation = $this->getOperationMock('PHPIMS\\Operation\\GetImage');
-        self::$mocks['PHPIMS\\Operation\\GetImage'] = $operation;
-
-        $this->controller->handle('GET', md5(microtime()) . '.png');
-    }
-
-    public function testHandleGetMetadata() {
-        $operation = $this->getOperationMock('PHPIMS\\Operation\\GetMetadata');
-        self::$mocks['PHPIMS\\Operation\\GetMetadata'] = $operation;
-
-        $this->controller->handle('GET', md5(microtime()) . '.png/meta');
-    }
-
-    public function testHandleDeleteImage() {
-        $operation = $this->getOperationMock('PHPIMS\\Operation\\DeleteImage');
-        self::$mocks['PHPIMS\\Operation\\DeleteImage'] = $operation;
-
-        $this->controller->handle('DELETE', md5(microtime()) . '.png');
-    }
-
-    public function testHandleDeleteMetadata() {
-        $operation = $this->getOperationMock('PHPIMS\\Operation\\DeleteMetadata');
-        self::$mocks['PHPIMS\\Operation\\DeleteMetadata'] = $operation;
-
-        $this->controller->handle('DELETE', md5(microtime()) . '.png/meta');
+        $this->controller->handle('/foobar', 'GET');
     }
 
     /**
@@ -193,7 +113,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unsupported operation
      */
     public function testHandleUnsupportedOperation() {
-        $this->controller->handle('GET', md5(microtime()) . '.png/metadata');
+        $this->controller->handle('images', 'DELETE');
     }
 
     /**
@@ -201,6 +121,6 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 418
      */
     public function testHandleBrew() {
-        $this->controller->handle('BREW', md5(microtime()) . '.png');
+        $this->controller->handle(md5(microtime()) . '.png', 'BREW');
     }
 }

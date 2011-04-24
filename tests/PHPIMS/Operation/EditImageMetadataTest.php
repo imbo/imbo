@@ -42,15 +42,17 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class DeleteMetadataTest extends OperationTests {
+class EditImageMetadataTest extends OperationTests {
+    protected $imageIdentifier = null;
+
     protected function getNewOperation() {
         $this->imageIdentifier = md5(microtime()) . '.png';
 
-        return new DeleteMetadata($this->imageIdentifier);
+        return new EditImageMetadata($this->imageIdentifier);
     }
 
     public function getExpectedOperationName() {
-        return 'deleteMetadata';
+        return 'editImageMetadata';
     }
 
     public function getExpectedRequestPath() {
@@ -58,8 +60,11 @@ class DeleteMetadataTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
+        $metadata = array('foo' => 'bar', 'bar' => array('foo', 'bar'));
+        $_POST['metadata'] = json_encode($metadata);
+
         $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $database->shouldReceive('deleteMetadata')->once()->with($this->imageIdentifier);
+        $database->shouldReceive('updateMetadata')->once()->with($this->imageIdentifier, $metadata);
         $this->operation->setDatabase($database);
 
         $this->operation->exec();

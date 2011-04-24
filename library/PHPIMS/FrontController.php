@@ -62,7 +62,7 @@ class FrontController {
      *
      * @var array
      */
-    protected $config = null;
+    private $config = null;
 
     /**
      * Class constructor
@@ -70,9 +70,7 @@ class FrontController {
      * @param array $config Configuration array
      */
     public function __construct(array $config = null) {
-        if ($config !== null) {
-            $this->setConfig($config);
-        }
+        $this->config = $config;
     }
 
     /**
@@ -95,55 +93,33 @@ class FrontController {
     }
 
     /**
-     * Get the config array
-     *
-     * @return array
-     */
-    public function getConfig() {
-        return $this->config;
-    }
-
-    /**
-     * Set the config array
-     *
-     * @param array $config The configuration array to set
-     * @return PHPIMS\FrontController
-     */
-    public function setConfig(array $config) {
-        $this->config = $config;
-
-        return $this;
-    }
-
-    /**
      * Generate an operation object based on some parameters
      *
-     * Valid requests are: (GET|POST|DELETE|HEAD) /<image>[/meta]
-     *
+     * @param string $resource The accessed resource
      * @param string $method The HTTP method
-     * @param string $imageIdentifier Image identifier
+     * @param string $imageIdentifier Optional Image identifier
      * @param string $extra Optional extra argument
      * @throws PHPIMS\Exception
      * @return PHPIMS\OperationInterface
      */
-    protected function resolveOperation($method, $imageIdentifier, $extra = null) {
+    protected function resolveOperation($resource, $method, $imageIdentifier = null, $extra = null) {
         $operation = null;
 
-        if ($method === self::GET) {
+        if ($method === self::GET && $imageIdentifier) {
             if ($extra === 'meta') {
-                $operation = 'PHPIMS\\Operation\\GetMetadata';
-            } else if (empty($extra)) {
+                $operation = 'PHPIMS\\Operation\\GetImageMetadata';
+            } else {
                 $operation = 'PHPIMS\\Operation\\GetImage';
             }
-        } else if ($method === self::POST) {
+        } else if ($method === self::POST && $imageIdentifier) {
             if ($extra === 'meta') {
-                $operation = 'PHPIMS\\Operation\\EditMetadata';
+                $operation = 'PHPIMS\\Operation\\EditImageMetadata';
             } else {
                 $operation = 'PHPIMS\\Operation\\AddImage';
             }
-        } else if ($method === self::DELETE) {
+        } else if ($method === self::DELETE && $imageIdentifier) {
             if ($extra === 'meta') {
-                $operation = 'PHPIMS\\Operation\\DeleteMetadata';
+                $operation = 'PHPIMS\\Operation\\DeleteImageMetadata';
             } else {
                 $operation = 'PHPIMS\\Operation\\DeleteImage';
             }
@@ -155,33 +131,34 @@ class FrontController {
             throw new Exception('Unsupported operation', 400);
         }
 
-        $factoryClass = $this->config['operation']['factory'];
-
-        return $factoryClass::factory($operation, $method, $imageIdentifier);
+        return Operation::factory($operation, $resource, $method, $imageIdentifier);
     }
 
     /**
      * Handle a request
      *
+     * @param string $resource The resource accessed
      * @param string $method The HTTP method (one of the defined constants)
-     * @param string $path The path requested
      * @throws PHPIMS\Exception
      */
-    public function handle($method, $path) {
+    public function handle($resource, $method) {
         if (!self::isValidMethod($method)) {
             throw new Exception($method . ' not implemented', 501);
         }
 
-        $matches = array();
+        // Trim away slashes
+        $resource = trim($resource, '/');
+        $matches  = array();
 
-        if (!preg_match('|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>.*))?$|', $path, $matches)) {
-            throw new Exception('Invalid request: ' . $path, 400);
+        // See if
+        if (!preg_match('#(images|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>meta))?)$#', $resource, $matches)) {
+            throw new Exception('Unknown resource', 400);
         }
 
-        $imageIdentifier = $matches['imageIdentifier'];
+        $imageIdentifier = isset($matches['imageIdentifier']) ? $matches['imageIdentifier'] : null;
         $extra = isset($matches['extra']) ? $matches['extra'] : null;
 
-        $operation = $this->resolveOperation($method, $imageIdentifier, $extra);
+        $operation = $this->resolveOperation($resource, $method, $imageIdentifier, $extra);
         $operation->init($this->config)
                   ->preExec()
                   ->exec()

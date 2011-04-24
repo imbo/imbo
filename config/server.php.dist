@@ -25,9 +25,4 @@ return array(
 
     // Custom plugins
     'plugins' => array(),
-
-    // The operation factory
-    'operation' => array(
-        'factory' => 'PHPIMS\\Operation',
-    ),
 );

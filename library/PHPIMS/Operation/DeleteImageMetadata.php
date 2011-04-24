@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Operations
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -32,41 +32,35 @@
 
 namespace PHPIMS\Operation;
 
-use \Mockery as m;
+use PHPIMS\Operation;
+use PHPIMS\OperationInterface;
 
 /**
+ * Delete metadata operation
+ *
+ * This operation will delete all metadata related to an image
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Operations
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class EditMetadataTest extends OperationTests {
-    protected $imageIdentifier = null;
-
-    protected function getNewOperation() {
-        $this->imageIdentifier = md5(microtime()) . '.png';
-
-        return new EditMetadata($this->imageIdentifier);
+class DeleteImageMetadata extends Operation implements OperationInterface {
+    /**
+     * @see PHPIMS\OperationInterface::getRequestPath()
+     */
+    public function getRequestPath() {
+        return $this->getImageIdentifier() . '/meta';
     }
 
-    public function getExpectedOperationName() {
-        return 'editMetadata';
-    }
+    /**
+     * @see PHPIMS\OperationInterface::exec()
+     */
+    public function exec() {
+        $this->getDatabase()->deleteMetadata($this->getImageIdentifier());
 
-    public function getExpectedRequestPath() {
-        return $this->imageIdentifier . '/meta';
-    }
-
-    public function testSuccessfullExec() {
-        $metadata = array('foo' => 'bar', 'bar' => array('foo', 'bar'));
-        $_POST['metadata'] = json_encode($metadata);
-
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $database->shouldReceive('updateMetadata')->once()->with($this->imageIdentifier, $metadata);
-        $this->operation->setDatabase($database);
-
-        $this->operation->exec();
+        return $this;
     }
 }

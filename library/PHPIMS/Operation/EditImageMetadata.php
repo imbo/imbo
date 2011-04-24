@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Operations
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -32,46 +32,35 @@
 
 namespace PHPIMS\Operation;
 
-use \Mockery as m;
+use PHPIMS\Operation;
+use PHPIMS\OperationInterface;
 
 /**
+ * Edit image operation
+ *
+ * This operation will change a stored image.
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Operations
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class GetMetadataTest extends OperationTests {
-    protected $imageIdentifier = null;
-
-    protected function getNewOperation() {
-        $this->imageIdentifier = md5(microtime()) . '.png';
-
-        return new GetMetadata($this->imageIdentifier);
+class EditImageMetadata extends Operation implements OperationInterface {
+    /**
+     * @see PHPIMS\OperationInterface::getRequestPath()
+     */
+    public function getRequestPath() {
+        return $this->getImageIdentifier() . '/meta';
     }
 
-    public function getExpectedOperationName() {
-        return 'getMetadata';
-    }
+    /**
+     * @see PHPIMS\OperationInterface::exec()
+     */
+    public function exec() {
+        $this->getDatabase()->updateMetadata($this->getImageIdentifier(), json_decode($_POST['metadata'], true));
 
-    public function getExpectedRequestPath() {
-        return $this->imageIdentifier . '/meta';
-    }
-
-    public function testSuccessfullExec() {
-        $data = array(
-            'foo' => 'bar',
-            'bar' => 'foo',
-        );
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $database->shouldReceive('getMetadata')->once()->with($this->imageIdentifier)->andReturn($data);
-        $this->operation->setDatabase($database);
-
-        $response = m::mock('PHPIMS\\Server\\Response');
-        $response->shouldReceive('setBody')->once()->with($data);
-
-        $this->operation->setResponse($response);
-        $this->operation->exec();
+        return $this;
     }
 }

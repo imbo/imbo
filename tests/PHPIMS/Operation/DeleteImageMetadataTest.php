@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Operations
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -32,35 +32,36 @@
 
 namespace PHPIMS\Operation;
 
-use PHPIMS\Operation;
-use PHPIMS\OperationInterface;
+use \Mockery as m;
 
 /**
- * Edit image operation
- *
- * This operation will change a stored image.
- *
  * @package PHPIMS
- * @subpackage Operations
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class EditMetadata extends Operation implements OperationInterface {
-    /**
-     * @see PHPIMS\OperationInterface::getRequestPath()
-     */
-    public function getRequestPath() {
-        return $this->getImageIdentifier() . '/meta';
+class DeleteImageMetadataTest extends OperationTests {
+    protected function getNewOperation() {
+        $this->imageIdentifier = md5(microtime()) . '.png';
+
+        return new DeleteImageMetadata($this->imageIdentifier);
     }
 
-    /**
-     * @see PHPIMS\OperationInterface::exec()
-     */
-    public function exec() {
-        $this->getDatabase()->updateMetadata($this->getImageIdentifier(), json_decode($_POST['metadata'], true));
+    public function getExpectedOperationName() {
+        return 'deleteImageMetadata';
+    }
 
-        return $this;
+    public function getExpectedRequestPath() {
+        return $this->imageIdentifier . '/meta';
+    }
+
+    public function testSuccessfullExec() {
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $database->shouldReceive('deleteMetadata')->once()->with($this->imageIdentifier);
+        $this->operation->setDatabase($database);
+
+        $this->operation->exec();
     }
 }

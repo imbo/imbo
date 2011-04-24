@@ -63,10 +63,10 @@ class AuthPlugin extends Plugin implements PluginInterface {
      * @see PHPIMS\Operation\Plugin::$events
      */
     static public $events = array(
-        'addImagePreExec'       => 100,
-        'deleteImagePreExec'    => 100,
-        'deleteMetadataPreExec' => 100,
-        'editMetadataPreExec'   => 100,
+        'addImagePreExec'            => 100,
+        'deleteImagePreExec'         => 100,
+        'deleteImageMetadataPreExec' => 100,
+        'editImageMetadataPreExec'   => 100,
     );
 
     /**
