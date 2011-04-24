@@ -55,10 +55,6 @@ class EditImageMetadataTest extends OperationTests {
         return 'editImageMetadata';
     }
 
-    public function getExpectedRequestPath() {
-        return $this->imageIdentifier . '/meta';
-    }
-
     public function testSuccessfullExec() {
         $metadata = array('foo' => 'bar', 'bar' => array('foo', 'bar'));
         $_POST['metadata'] = json_encode($metadata);

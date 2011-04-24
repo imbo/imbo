@@ -53,10 +53,6 @@ class DeleteImageMetadataTest extends OperationTests {
         return 'deleteImageMetadata';
     }
 
-    public function getExpectedRequestPath() {
-        return $this->imageIdentifier . '/meta';
-    }
-
     public function testSuccessfullExec() {
         $database = m::mock('PHPIMS\\Database\\DriverInterface');
         $database->shouldReceive('deleteMetadata')->once()->with($this->imageIdentifier);

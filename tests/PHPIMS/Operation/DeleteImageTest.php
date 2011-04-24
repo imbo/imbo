@@ -51,10 +51,6 @@ class DeleteImageTest extends OperationTests {
         return 'deleteImage';
     }
 
-    public function getExpectedRequestPath() {
-        return $this->imageIdentifier;
-    }
-
     public function testSuccessfullExec() {
         $database = m::mock('PHPIMS\\Database\\DriverInterface');
         $database->shouldReceive('deleteImage')->once()->with($this->imageIdentifier);

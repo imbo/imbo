@@ -49,13 +49,6 @@ use PHPIMS\OperationInterface;
  */
 class DeleteImageMetadata extends Operation implements OperationInterface {
     /**
-     * @see PHPIMS\OperationInterface::getRequestPath()
-     */
-    public function getRequestPath() {
-        return $this->getImageIdentifier() . '/meta';
-    }
-
-    /**
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {

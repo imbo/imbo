@@ -55,10 +55,6 @@ class GetImageMetadataTest extends OperationTests {
         return 'getImageMetadata';
     }
 
-    public function getExpectedRequestPath() {
-        return $this->imageIdentifier . '/meta';
-    }
-
     public function testSuccessfullExec() {
         $data = array(
             'foo' => 'bar',

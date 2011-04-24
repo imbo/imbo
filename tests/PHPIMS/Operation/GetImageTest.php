@@ -51,10 +51,6 @@ class GetImageTest extends OperationTests {
         return 'getImage';
     }
 
-    public function getExpectedRequestPath() {
-        return $this->imageIdentifier;
-    }
-
     public function testSuccessfullExec() {
         $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
         $storage->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);

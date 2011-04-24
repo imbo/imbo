@@ -85,22 +85,11 @@ abstract class OperationTests extends \PHPUnit_Framework_TestCase {
      */
     abstract protected function getExpectedOperationName();
 
-    /**
-     * Get the expected request path for the operation class
-     *
-     * @return string
-     */
-    abstract protected function getExpectedRequestPath();
-
     public function testGetOperationName() {
         $reflection = new \ReflectionClass($this->operation);
         $method = $reflection->getMethod('getOperationName');
         $method->setAccessible(true);
 
         $this->assertSame($this->getExpectedOperationName(), $method->invoke($this->operation));
-    }
-
-    public function testGetRequestPath() {
-        $this->assertSame($this->getExpectedRequestPath(), $this->operation->getRequestPath());
     }
 }
