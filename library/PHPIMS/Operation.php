@@ -49,6 +49,13 @@ use PHPIMS\Operation\Exception as OperationException;
  */
 abstract class Operation {
     /**
+     * The accessed resource
+     *
+     * @var string
+     */
+    protected $resource = null;
+
+    /**
      * The current image identifier
      *
      * @param string
@@ -268,6 +275,27 @@ abstract class Operation {
     }
 
     /**
+     * Get the accessed resource
+     *
+     * @return string
+     */
+    public function getResource() {
+        return $this->resource;
+    }
+
+    /**
+     * Set the accessed resource
+     *
+     * @param string $resource
+     * @return PHPIMS\Operation
+     */
+    public function setResource($resource) {
+        $this->resource = $resource;
+
+        return $this;
+    }
+
+    /**
      * Get the current image identifier
      *
      * @return string
@@ -451,25 +479,26 @@ abstract class Operation {
      * Factory method
      *
      * @param string $className The name of the operation class to instantiate
+     * @param string $resource The accessed resource
      * @param string $method The HTTP method used
-     * @param string $imageIdentifier Image identifier
+     * @param string $imageIdentifier Optional Image identifier
      * @return PHPIMS\OperationInterface
      * @throws PHPIMS\Operation\Exception
      */
-    static public function factory($className, $method, $imageIdentifier) {
+    static public function factory($className, $resource, $method, $imageIdentifier = null) {
         switch ($className) {
             case 'PHPIMS\\Operation\\AddImage':
             case 'PHPIMS\\Operation\\DeleteImage':
-            case 'PHPIMS\\Operation\\EditMetadata':
+            case 'PHPIMS\\Operation\\DeleteImageMetadata':
+            case 'PHPIMS\\Operation\\EditImageMetadata':
             case 'PHPIMS\\Operation\\GetImage':
-            case 'PHPIMS\\Operation\\GetMetadata':
-            case 'PHPIMS\\Operation\\DeleteMetadata':
+            case 'PHPIMS\\Operation\\GetImageMetadata':
                 $operation = new $className();
-
-                $operation->setImageIdentifier($imageIdentifier);
-                $operation->setMethod($method);
-                $operation->setImage(new Image());
-                $operation->setResponse(new Response());
+                $operation->setResource($resource)
+                          ->setImageIdentifier($imageIdentifier)
+                          ->setMethod($method)
+                          ->setImage(new Image())
+                          ->setResponse(new Response());
 
                 return $operation;
             default:
