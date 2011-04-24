@@ -47,7 +47,7 @@ use PHPIMS\OperationInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class DeleteMetadata extends Operation implements OperationInterface {
+class DeleteImageMetadata extends Operation implements OperationInterface {
     /**
      * @see PHPIMS\OperationInterface::getRequestPath()
      */
