@@ -38,10 +38,12 @@ require_once 'PHPIMS/Autoload.php';
 // Fetch configuration
 $config = require __DIR__ . '/../config/server.php';
 
+$excessDir = str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__);
+$resource  = str_replace($excessDir, '', $_SERVER['REDIRECT_URL']);
+
 try {
     $frontController = new PHPIMS\FrontController($config);
-    $response = $frontController->handle($_SERVER['REQUEST_METHOD'],
-                                         $_SERVER['REDIRECT_URL']);
+    $response = $frontController->handle($resource, $_SERVER['REQUEST_METHOD']);
 } catch (PHPIMS\Exception $e) {
     $response = PHPIMS\Server\Response::fromException($e);
 }
