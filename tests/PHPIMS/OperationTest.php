@@ -216,11 +216,11 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
     public function testFactory() {
         $operations = array(
             'POST'   => 'PHPIMS\\Operation\\AddImage',
-            'POST'   => 'PHPIMS\\Operation\\EditMetadata',
+            'POST'   => 'PHPIMS\\Operation\\EditImageMetadata',
             'DELETE' => 'PHPIMS\\Operation\\DeleteImage',
-            'DELETE' => 'PHPIMS\\Operation\\DeleteMetadata',
+            'DELETE' => 'PHPIMS\\Operation\\DeleteImageMetadata',
             'GET'    => 'PHPIMS\\Operation\\GetImage',
-            'GET'    => 'PHPIMS\\Operation\\GetMetadata',
+            'GET'    => 'PHPIMS\\Operation\\GetImageMetadata',
         );
 
         foreach ($operations as $method => $className) {

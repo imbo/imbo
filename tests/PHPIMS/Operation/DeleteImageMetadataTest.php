@@ -42,15 +42,15 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class DeleteMetadataTest extends OperationTests {
+class DeleteImageMetadataTest extends OperationTests {
     protected function getNewOperation() {
         $this->imageIdentifier = md5(microtime()) . '.png';
 
-        return new DeleteMetadata($this->imageIdentifier);
+        return new DeleteImageMetadata($this->imageIdentifier);
     }
 
     public function getExpectedOperationName() {
-        return 'deleteMetadata';
+        return 'deleteImageMetadata';
     }
 
     public function getExpectedRequestPath() {

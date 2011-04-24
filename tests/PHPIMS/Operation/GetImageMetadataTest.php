@@ -42,17 +42,17 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class GetMetadataTest extends OperationTests {
+class GetImageMetadataTest extends OperationTests {
     protected $imageIdentifier = null;
 
     protected function getNewOperation() {
         $this->imageIdentifier = md5(microtime()) . '.png';
 
-        return new GetMetadata($this->imageIdentifier);
+        return new GetImageMetadata($this->imageIdentifier);
     }
 
     public function getExpectedOperationName() {
-        return 'getMetadata';
+        return 'getImageMetadata';
     }
 
     public function getExpectedRequestPath() {
