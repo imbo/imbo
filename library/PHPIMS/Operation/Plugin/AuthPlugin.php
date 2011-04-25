@@ -63,10 +63,10 @@ class AuthPlugin extends Plugin implements PluginInterface {
      * @see PHPIMS\Operation\Plugin::$events
      */
     static public $events = array(
-        'addImagePreExec'       => 100,
-        'deleteImagePreExec'    => 100,
-        'deleteMetadataPreExec' => 100,
-        'editMetadataPreExec'   => 100,
+        'addImagePreExec'            => 100,
+        'deleteImagePreExec'         => 100,
+        'deleteImageMetadataPreExec' => 100,
+        'editImageMetadataPreExec'   => 100,
     );
 
     /**
@@ -101,7 +101,7 @@ class AuthPlugin extends Plugin implements PluginInterface {
         }
 
         $config = $operation->getConfig('auth');
-        $data = $operation->getMethod() . $operation->getRequestPath() . $_GET['publicKey'] . $_GET['timestamp'];
+        $data = $operation->getMethod() . $operation->getResource() . $_GET['publicKey'] . $_GET['timestamp'];
 
         // Generate binary hash key
         $actualSignature = hash_hmac('sha256', $data, $config['privateKey'], true);

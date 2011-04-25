@@ -72,11 +72,11 @@ class Autoload {
         'phpims\\operation' => '/Operation.php',
         'phpims\\operation\\addimage' => '/Operation/AddImage.php',
         'phpims\\operation\\deleteimage' => '/Operation/DeleteImage.php',
-        'phpims\\operation\\deletemetadata' => '/Operation/DeleteMetadata.php',
-        'phpims\\operation\\editmetadata' => '/Operation/EditMetadata.php',
+        'phpims\\operation\\deleteimagemetadata' => '/Operation/DeleteImageMetadata.php',
+        'phpims\\operation\\editimagemetadata' => '/Operation/EditImageMetadata.php',
         'phpims\\operation\\exception' => '/Operation/Exception.php',
         'phpims\\operation\\getimage' => '/Operation/GetImage.php',
-        'phpims\\operation\\getmetadata' => '/Operation/GetMetadata.php',
+        'phpims\\operation\\getimagemetadata' => '/Operation/GetImageMetadata.php',
         'phpims\\operation\\plugin' => '/Operation/Plugin.php',
         'phpims\\operation\\plugin\\authplugin' => '/Operation/Plugin/AuthPlugin.php',
         'phpims\\operation\\plugin\\exception' => '/Operation/Plugin/Exception.php',
@@ -102,7 +102,7 @@ class Autoload {
      *
      * @param string $class The name of the class to load
      */
-    static function load($class) {
+    static public function load($class) {
         $className = strtolower($class);
 
         if (isset(static::$classes[$className])) {

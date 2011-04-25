@@ -361,26 +361,26 @@ This plugin will run after the `PHPIMS\Operation\GetImage::exec()` has finished 
 
 * `PHPIMS\Operation\AddImage` "addImagePreExec" and "addImagePostExec"
 * `PHPIMS\Operation\DeleteImage` "deleteImagePreExec" and "deleteImagePostExec"
-* `PHPIMS\Operation\DeleteMetadata` "deleteMetadataPreExec" and "deleteMetadataPostExec"
-* `PHPIMS\Operation\EditMetadata` "editMetadataPreExec" and "editMetadataPostExec"
+* `PHPIMS\Operation\DeleteImageMetadata` "deleteImageMetadataPreExec" and "deleteImageMetadataPostExec"
+* `PHPIMS\Operation\EditImageMetadata` "editImageMetadataPreExec" and "editImageMetadataPostExec"
 * `PHPIMS\Operation\GetImage` "getImagePreExec" and "getImagePostExec"
-* `PHPIMS\Operation\GetMetadata` "getMetadataPreExec" and "getMetadataPostExec"
+* `PHPIMS\Operation\GetImageMetadata` "getImageMetadataPreExec" and "getImageMetadataPostExec"
 
-If you want a plugin to run before the `PHPIMS\Operation\GetImage` operation, and after `PHPIMS\Operation\DeleteImage` and `PHPIMS\Operation\DeleteMetadata` the `$events` array can look like:
+If you want a plugin to run before the `PHPIMS\Operation\GetImage` operation, and after `PHPIMS\Operation\DeleteImage` and `PHPIMS\Operation\DeleteImageMetadata` the `$events` array can look like:
 
     static public $events = array(
         'getImagePreExec' => 1,
         'deleteImagePostExec' => 20,
-        'deleteMetadataPostExec' => 20,
+        'deleteImageMetadataPostExec' => 20,
     );
     
-Whenever the `PHPIMS\Operation\GetImage` operation is triggered this plugin will be executed before any other plugin *before* the operation executes and it will run with index 20 *after* `PHPIMS\Operation\DeleteImage` is finished, and with an index of 20 *after* `PHPIMS\Operation\DeleteMetadata` is finished. It's important to notice that one request to PHPIMS triggers one operation. A single request can not trigger several operations.    
+Whenever the `PHPIMS\Operation\GetImage` operation is triggered this plugin will be executed before any other plugin *before* the operation executes and it will run with index 20 *after* `PHPIMS\Operation\DeleteImage` is finished, and with an index of 20 *after* `PHPIMS\Operation\DeleteImageMetadata` is finished. It's important to notice that one request to PHPIMS triggers one operation. A single request can not trigger several operations.    
 
 ### Storage drivers
-PHPIMS supports plugable storage drivers. All storage drivers must extend the base `PHPIMS\Storage\Driver` class (which implements `PHPIMS\Storage\DriverInterface`). 
+PHPIMS supports plugable storage drivers. All storage drivers must implement the `PHPIMS\Storage\DriverInterface` interface. 
 
 ### Database drivers
-PHPIMS supports plugable database drivers. All database drivers must extend the base `PHPIMS\Database\Driver` class (which implements `PHPIMS\Database\DriverInterface`).
+PHPIMS supports plugable database drivers. All database drivers must implement the `PHPIMS\Database\DriverInterface` interface.
 
 ### Configuration
 When installing PHPIMS you need to copy the config/server.php.dist file to config/server.php and change the values so they suit your needs.

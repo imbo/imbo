@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Operations
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -32,36 +32,29 @@
 
 namespace PHPIMS\Operation;
 
-use \Mockery as m;
+use PHPIMS\Operation;
+use PHPIMS\OperationInterface;
 
 /**
+ * Get metadata operation
+ *
+ * This operation will return all metadata associated with a single image
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Operations
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class DeleteMetadataTest extends OperationTests {
-    protected function getNewOperation() {
-        $this->imageIdentifier = md5(microtime()) . '.png';
+class GetImageMetadata extends Operation implements OperationInterface {
+    /**
+     * @see PHPIMS\OperationInterface::exec()
+     */
+    public function exec() {
+        $data = $this->getDatabase()->getMetadata($this->getImageIdentifier());
+        $this->getResponse()->setBody($data);
 
-        return new DeleteMetadata($this->imageIdentifier);
-    }
-
-    public function getExpectedOperationName() {
-        return 'deleteMetadata';
-    }
-
-    public function getExpectedRequestPath() {
-        return $this->imageIdentifier . '/meta';
-    }
-
-    public function testSuccessfullExec() {
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $database->shouldReceive('deleteMetadata')->once()->with($this->imageIdentifier);
-        $this->operation->setDatabase($database);
-
-        $this->operation->exec();
+        return $this;
     }
 }

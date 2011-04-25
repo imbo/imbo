@@ -51,10 +51,6 @@ class AddImageTest extends OperationTests {
         return 'addImage';
     }
 
-    public function getExpectedRequestPath() {
-        return $this->imageIdentifier;
-    }
-
     public function testSuccessfullExec() {
         $_FILES['file'] = array(
             'tmp_name' => '/tmp/foobar',

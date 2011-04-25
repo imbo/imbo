@@ -59,7 +59,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->operation = $this->getMockBuilder('PHPIMS\\Operation')->setMethods(array('getOperationName', 'exec', 'getRequestPath'))
+        $this->operation = $this->getMockBuilder('PHPIMS\\Operation')->setMethods(array('getOperationName', 'exec'))
                                 ->disableOriginalConstructor()
                                 ->getMock();
 
@@ -71,9 +71,6 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
 
         $this->operation->expects($this->any())
                         ->method('exec');
-
-        $this->operation->expects($this->any())
-                        ->method('getRequestPath');
     }
 
     /**
@@ -216,11 +213,11 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
     public function testFactory() {
         $operations = array(
             'POST'   => 'PHPIMS\\Operation\\AddImage',
-            'POST'   => 'PHPIMS\\Operation\\EditMetadata',
+            'POST'   => 'PHPIMS\\Operation\\EditImageMetadata',
             'DELETE' => 'PHPIMS\\Operation\\DeleteImage',
-            'DELETE' => 'PHPIMS\\Operation\\DeleteMetadata',
+            'DELETE' => 'PHPIMS\\Operation\\DeleteImageMetadata',
             'GET'    => 'PHPIMS\\Operation\\GetImage',
-            'GET'    => 'PHPIMS\\Operation\\GetMetadata',
+            'GET'    => 'PHPIMS\\Operation\\GetImageMetadata',
         );
 
         foreach ($operations as $method => $className) {

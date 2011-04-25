@@ -49,13 +49,6 @@ use PHPIMS\OperationInterface;
  */
 class DeleteImage extends Operation implements OperationInterface {
     /**
-     * @see PHPIMS\OperationInterface::getRequestPath()
-     */
-    public function getRequestPath() {
-        return $this->getImageIdentifier();
-    }
-
-    /**
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {

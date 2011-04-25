@@ -136,7 +136,7 @@ class AuthPluginTest extends \PHPUnit_Framework_TestCase {
     protected function signRequest($publicKey, $privateKey, $signature = null) {
         // Emulate a call to the deleteMetadata operation
         $method = 'DELETE';
-        $requestPath = md5(microtime()) . '.png/meta';
+        $resource = md5(microtime()) . '.png/meta';
         $timestamp = gmdate('Y-m-d\TH:i\Z');
 
         $config = array(
@@ -145,12 +145,12 @@ class AuthPluginTest extends \PHPUnit_Framework_TestCase {
         );
 
         // The data used to create the hash
-        $data = $method . $requestPath . $publicKey . $timestamp;
+        $data = $method . $resource . $publicKey . $timestamp;
 
         $operation = m::mock('PHPIMS\\Operation');
         $operation->shouldReceive('getMethod')->once()->andReturn($method);
         $operation->shouldReceive('getConfig')->once()->andReturn($config);
-        $operation->shouldReceive('getRequestPath')->once()->andReturn($requestPath);
+        $operation->shouldReceive('getResource')->once()->andReturn($resource);
 
         if ($signature === null) {
             // No signature given. Create the correct signature

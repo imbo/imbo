@@ -36,9 +36,9 @@ use PHPIMS\Operation;
 use PHPIMS\OperationInterface;
 
 /**
- * Get metadata operation
+ * Delete metadata operation
  *
- * This operation will return all metadata associated with a single image
+ * This operation will delete all metadata related to an image
  *
  * @package PHPIMS
  * @subpackage Operations
@@ -47,20 +47,12 @@ use PHPIMS\OperationInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class GetMetadata extends Operation implements OperationInterface {
-    /**
-     * @see PHPIMS\OperationInterface::getRequestPath()
-     */
-    public function getRequestPath() {
-        return $this->getImageIdentifier() . '/meta';
-    }
-
+class DeleteImageMetadata extends Operation implements OperationInterface {
     /**
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
-        $data = $this->getDatabase()->getMetadata($this->getImageIdentifier());
-        $this->getResponse()->setBody($data);
+        $this->getDatabase()->deleteMetadata($this->getImageIdentifier());
 
         return $this;
     }
