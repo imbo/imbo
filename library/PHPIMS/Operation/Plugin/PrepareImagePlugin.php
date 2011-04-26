@@ -81,7 +81,14 @@ class PrepareImagePlugin extends Plugin implements PluginInterface {
         $image = $operation->getImage();
         $image->setFilename($_FILES['file']['name'])
               ->setFilesize($_FILES['file']['size'])
-              ->setMetadata(json_decode($_POST['metadata'], true))
               ->setBlob(file_get_contents($imagePath));
+
+        if (!empty($_POST['metadata'])) {
+            $data = json_decode($_POST['metadata'], true);
+
+            if (is_array($data)) {
+                $image->setMetadata($data);
+            }
+        }
     }
 }
