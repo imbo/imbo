@@ -38,7 +38,12 @@ use PHPIMS\OperationInterface;
 /**
  * Get images operation
  *
- * This operation will let users fetch images based on queries
+ * This operation will let users fetch images based on queries. The following query parameters can
+ * be used:
+ *
+ * page     => Page number. Defaults to 1. Each page includes 50 images at most
+ * metadata => Wether or not to include metadata pr. image. Set to 1 to enable
+ * query    => urlencoded json data to use in the query
  *
  * @package PHPIMS
  * @subpackage Operations
