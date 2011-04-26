@@ -63,7 +63,7 @@ class ImageUrl {
      * @param string $baseUrl The url to an image
      */
     public function __construct($baseUrl) {
-        $this->baseUrl = $baseUrl;
+        $this->baseUrl = rtrim($baseUrl, '/');
     }
 
     /**
