@@ -77,6 +77,7 @@ class Autoload {
         'phpims\\operation\\exception' => '/Operation/Exception.php',
         'phpims\\operation\\getimage' => '/Operation/GetImage.php',
         'phpims\\operation\\getimagemetadata' => '/Operation/GetImageMetadata.php',
+        'phpims\\operation\\getimages' => '/Operation/GetImages.php',
         'phpims\\operation\\plugin' => '/Operation/Plugin.php',
         'phpims\\operation\\plugin\\authplugin' => '/Operation/Plugin/AuthPlugin.php',
         'phpims\\operation\\plugin\\exception' => '/Operation/Plugin/Exception.php',
