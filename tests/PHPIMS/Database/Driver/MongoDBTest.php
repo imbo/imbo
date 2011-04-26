@@ -91,7 +91,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $data = array('hash' => $imageIdentifier);
 
         $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getMetadata')
+        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType')
               ->once()
               ->andReturn('some value');
 
@@ -111,7 +111,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
 
         $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getMetadata')
+        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType')
               ->once()
               ->andReturn('some value');
 
@@ -127,7 +127,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $data = array('hash' => $imageIdentifier);
 
         $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getMetadata')
+        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType')
               ->once()
               ->andReturn('some value');
 
@@ -177,7 +177,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             ),
         );
 
-        $this->collection->shouldReceive('update')->once()->with(array('hash' => $imageIdentifier), array('$set' => $metadata), m::type('array'))->andThrow('\\MongoException');
+        $this->collection->shouldReceive('update')->once()->with(array('hash' => $imageIdentifier), array('$set' => array('data' => $metadata)), m::type('array'))->andThrow('\\MongoException');
 
         $this->driver->updateMetadata($imageIdentifier, $metadata);
     }
@@ -191,7 +191,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             ),
         );
 
-        $this->collection->shouldReceive('update')->once()->with(array('hash' => $imageIdentifier), array('$set' => $metadata), m::type('array'))->andReturn(true);
+        $this->collection->shouldReceive('update')->once()->with(array('hash' => $imageIdentifier), array('$set' => array('data' => $metadata)), m::type('array'))->andReturn(true);
 
         $result = $this->driver->updateMetadata($imageIdentifier, $metadata);
 
