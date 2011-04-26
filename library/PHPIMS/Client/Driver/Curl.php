@@ -164,10 +164,18 @@ class Curl implements DriverInterface {
         ));
 
         $content = curl_exec($this->curlHandle);
+        $connectTime  = (int) curl_getinfo($this->curlHandle, CURLINFO_CONNECT_TIME);
+        $transferTime = (int) curl_getinfo($this->curlHandle, CURLINFO_TOTAL_TIME);
         $responseCode = (int) curl_getinfo($this->curlHandle, CURLINFO_HTTP_CODE);
 
         if ($content === false) {
-            throw new Exception('An error occured. Could not complete request.');
+            if ($connectTime >= $this->params['connectTimeout']) {
+                throw new Exception('An error occured. Request timed out while connecting (limit: ' . $this->params['connectTimeout'] . 's).');
+            } else if ($transferTime >= $this->params['timeout']) {
+                throw new Exception('An error occured. Request timed out during transfer (limit: ' . $this->params['timeout'] . 's).');
+            }
+            
+            throw new Exception('An error occured. Could not complete request (Response code: ' . $responseCode . ').');
         }
 
         $response = Response::factory($content, $responseCode);
