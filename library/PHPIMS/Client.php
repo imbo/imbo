@@ -94,8 +94,10 @@ class Client {
         $this->privateKey = $privateKey;
 
         if ($driver === null) {
+            // @codeCoverageIgnoreStart
             $driver = new DefaultDriver;
         }
+        // @codeCoverageIgnoreEnd
 
         $this->driver = $driver;
     }
