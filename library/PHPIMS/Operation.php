@@ -492,6 +492,7 @@ abstract class Operation {
             case 'PHPIMS\\Operation\\DeleteImageMetadata':
             case 'PHPIMS\\Operation\\EditImageMetadata':
             case 'PHPIMS\\Operation\\GetImage':
+            case 'PHPIMS\\Operation\\GetImages':
             case 'PHPIMS\\Operation\\GetImageMetadata':
                 $operation = new $className();
                 $operation->setResource($resource)
