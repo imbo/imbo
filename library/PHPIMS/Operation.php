@@ -340,7 +340,7 @@ abstract class Operation {
     /**
      * Get the database driver
      *
-     * @return PHPIMS\Database\Driver
+     * @return PHPIMS\Database\DriverInterface
      */
     public function getDatabase() {
         return $this->database;
@@ -349,7 +349,7 @@ abstract class Operation {
     /**
      * Set the database driver
      *
-     * @param PHPIMS\Database\Driver $driver The driver instance
+     * @param PHPIMS\Database\DriverInterface $driver The driver instance
      * @return PHPIMS\Operation
      */
     public function setDatabase(DatabaseDriverInterface $driver) {
@@ -361,7 +361,7 @@ abstract class Operation {
     /**
      * Get the storage driver
      *
-     * @return PHPIMS\Storage\Driver
+     * @return PHPIMS\Storage\DriverInterface
      */
     public function getStorage() {
         return $this->storage;
