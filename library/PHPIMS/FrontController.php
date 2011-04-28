@@ -105,7 +105,9 @@ class FrontController {
     private function resolveOperation($resource, $method, $imageIdentifier = null, $extra = null) {
         $operation = null;
 
-        if ($method === self::GET && $imageIdentifier) {
+        if ($resource === 'images') {
+            $operation = 'PHPIMS\\Operation\\GetImages';
+        } else if ($method === self::GET && $imageIdentifier) {
             if ($extra === 'meta') {
                 $operation = 'PHPIMS\\Operation\\GetImageMetadata';
             } else {
