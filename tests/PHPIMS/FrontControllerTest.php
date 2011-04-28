@@ -123,4 +123,24 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     public function testHandleBrew() {
         $this->controller->handle(md5(microtime()) . '.png', 'BREW');
     }
+
+    public function testResolveOperation() {
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $imageIdentifier;
+
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('resolveOperation');
+        $method->setAccessible(true);
+
+        $this->assertInstanceOf('PHPIMS\\Operation\\GetImage', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier)));
+        $this->assertInstanceOf('PHPIMS\\Operation\\AddImage', $method->invokeArgs($this->controller, array($resource, 'POST', $imageIdentifier)));
+        $this->assertInstanceOf('PHPIMS\\Operation\\DeleteImage', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier)));
+
+        $extra = 'meta';
+        $resource .= '/meta';
+
+        $this->assertInstanceOf('PHPIMS\\Operation\\GetImageMetadata', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier, $extra)));
+        $this->assertInstanceOf('PHPIMS\\Operation\\EditImageMetadata', $method->invokeArgs($this->controller, array($resource, 'POST', $imageIdentifier, $extra)));
+        $this->assertInstanceOf('PHPIMS\\Operation\\DeleteImageMetadata', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier, $extra)));
+    }
 }

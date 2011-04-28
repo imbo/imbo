@@ -100,7 +100,7 @@ class MongoDB implements DriverInterface {
             'size'  => $image->getFilesize(),
             'hash'  => $imageIdentifier,
             'mime'  => $image->getMimeType(),
-            'data'  => $image->getMetadata(),
+            'data'  => array(),
             'added' => time(),
         );
 
@@ -140,10 +140,12 @@ class MongoDB implements DriverInterface {
         try {
             $this->collection->update(
                 array('hash' => $imageIdentifier),
-                array('$set' => $metadata),
+                array('$set' => array(
+                    'data' => $metadata,
+                )),
                 array(
                     'safe' => true,
-                    'multiple' => false
+                    'multiple' => false,
                 )
             );
         } catch (\MongoException $e) {
@@ -171,7 +173,7 @@ class MongoDB implements DriverInterface {
      */
     public function deleteMetadata($imageIdentifier) {
         try {
-            $this->updateMetadata($imageIdentifier, array('data' => array()));
+            $this->updateMetadata($imageIdentifier, array());
         } catch (DatabaseException $e) {
             throw new DatabaseException('Unable to remove metadata', 500, $e);
         }

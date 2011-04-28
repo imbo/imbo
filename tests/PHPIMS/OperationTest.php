@@ -102,7 +102,6 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
         $image = $this->getMock('PHPIMS\\Image');
         $this->operation->setImage($image);
         $this->assertSame($image, $this->operation->getImage());
-
     }
 
     public function testSetGetResponse() {
@@ -230,5 +229,11 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
      */
     public function testFactoryWithUnSupportedOperation() {
         Operation::factory('foobar', 'GET', md5(microtime()));
+    }
+
+    public function testSetGetResource() {
+        $resource = md5(microtime()) . '.png';
+        $this->operation->setResource($resource);
+        $this->assertSame($resource, $this->operation->getResource());
     }
 }

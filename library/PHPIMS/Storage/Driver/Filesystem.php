@@ -84,7 +84,7 @@ class Filesystem implements DriverInterface {
         $oldUmask = umask(0);
 
         if (!is_dir($imageDir)) {
-            mkdir($imageDir, 0755, true);
+            mkdir($imageDir, 0775, true);
         }
 
         umask($oldUmask);

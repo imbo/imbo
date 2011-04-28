@@ -102,7 +102,7 @@ class FrontController {
      * @throws PHPIMS\Exception
      * @return PHPIMS\OperationInterface
      */
-    protected function resolveOperation($resource, $method, $imageIdentifier = null, $extra = null) {
+    private function resolveOperation($resource, $method, $imageIdentifier = null, $extra = null) {
         $operation = null;
 
         if ($method === self::GET && $imageIdentifier) {
