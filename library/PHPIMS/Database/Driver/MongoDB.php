@@ -180,4 +180,32 @@ class MongoDB implements DriverInterface {
 
         return true;
     }
+
+    /**
+     * @see PHPIMS\Database\DriverInterface::getImages()
+     */
+    public function getImages($page = 1, $num = 20, $metadata = false, array $query = array(), $from = null, $to = null) {
+        // Initialize return value
+        $images = array();
+
+        try {
+            $result = $this->collection->find();
+
+            foreach ($result as $image) {
+                $data = array(
+                    'identifier' => $image['hash'],
+                    'size'       => $image['size'],
+                    'name'       => $image['name'],
+                    'mime'       => $image['mime'],
+                    'added'      => $image['added'],
+                );
+
+                $images[] = $data;
+            }
+        } catch (\MongoException $e) {
+            throw new DatabaseException('Unable to search for images', 500, $e);
+        }
+
+        return $images;
+    }
 }

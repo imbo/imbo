@@ -96,4 +96,18 @@ interface DriverInterface {
      * @throws PHPIMS\Database\Exception
      */
     public function deleteMetadata($imageIdentifier);
+
+    /**
+     * Get images based on some query parameters
+     *
+     * @param int $page Page number. Defaults to 1
+     * @param int $num Number of images to return. Defaults to 20.
+     * @param boolean $metadata Wether or not to return metadata. Defaults to false
+     * @param array $query Metadata to query
+     * @param int $from Timestamp to fetch from
+     * @param int $to Timestamp to fetch to
+     * @return array
+     * @throws PHPIMS\Database\Exception
+     */
+    public function getImages($page = 1, $num = 20, $metadata = false, array $query = array(), $from = null, $to = null);
 }
