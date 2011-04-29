@@ -88,7 +88,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      */
     public function testInsertImageThatAlreadyExists() {
         $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
-        $data = array('hash' => $imageIdentifier);
+        $data = array('imageIdentifier' => $imageIdentifier);
 
         $image = m::mock('PHPIMS\\Image');
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType')
@@ -124,7 +124,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
 
     public function testSucessfullInsert() {
         $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
-        $data = array('hash' => $imageIdentifier);
+        $data = array('imageIdentifier' => $imageIdentifier);
 
         $image = m::mock('PHPIMS\\Image');
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType')
@@ -148,7 +148,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     public function testDeleteImageWhenCollectionThrowsAnException() {
         $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
 
-        $this->collection->shouldReceive('remove')->once()->with(array('hash' => $imageIdentifier), m::type('array'))->andThrow('\\MongoException');
+        $this->collection->shouldReceive('remove')->once()->with(array('imageIdentifier' => $imageIdentifier), m::type('array'))->andThrow('\\MongoException');
 
         $this->driver->deleteImage($imageIdentifier);
     }
@@ -156,7 +156,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     public function testSucessfullDeleteImage() {
         $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
 
-        $this->collection->shouldReceive('remove')->once()->with(array('hash' => $imageIdentifier), m::type('array'))->andReturn(true);
+        $this->collection->shouldReceive('remove')->once()->with(array('imageIdentifier' => $imageIdentifier), m::type('array'))->andReturn(true);
 
         $result = $this->driver->deleteImage($imageIdentifier);
 
@@ -177,7 +177,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             ),
         );
 
-        $this->collection->shouldReceive('update')->once()->with(array('hash' => $imageIdentifier), array('$set' => array('data' => $metadata)), m::type('array'))->andThrow('\\MongoException');
+        $this->collection->shouldReceive('update')->once()->with(array('imageIdentifier' => $imageIdentifier), array('$set' => array('data' => $metadata)), m::type('array'))->andThrow('\\MongoException');
 
         $this->driver->updateMetadata($imageIdentifier, $metadata);
     }
@@ -191,7 +191,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             ),
         );
 
-        $this->collection->shouldReceive('update')->once()->with(array('hash' => $imageIdentifier), array('$set' => array('data' => $metadata)), m::type('array'))->andReturn(true);
+        $this->collection->shouldReceive('update')->once()->with(array('imageIdentifier' => $imageIdentifier), array('$set' => array('data' => $metadata)), m::type('array'))->andReturn(true);
 
         $result = $this->driver->updateMetadata($imageIdentifier, $metadata);
 
@@ -206,7 +206,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     public function testGetMetadataWhenCollectionThrowsAnException() {
         $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
 
-        $this->collection->shouldReceive('findOne')->once()->with(array('hash' => $imageIdentifier))->andThrow('\\MongoException');
+        $this->collection->shouldReceive('findOne')->once()->with(array('imageIdentifier' => $imageIdentifier))->andThrow('\\MongoException');
 
         $this->driver->getMetadata($imageIdentifier);
     }
@@ -221,7 +221,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         );
         $data = array('data' => $metadata);
 
-        $this->collection->shouldReceive('findOne')->once()->with(array('hash' => $imageIdentifier))->andReturn($data);
+        $this->collection->shouldReceive('findOne')->once()->with(array('imageIdentifier' => $imageIdentifier))->andReturn($data);
 
         $result = $this->driver->getMetadata($imageIdentifier);
 
@@ -236,7 +236,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     public function testDeleteMetadataWhenCollectionThrowsAnException() {
         $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
 
-        $this->collection->shouldReceive('update')->once()->with(array('hash' => $imageIdentifier), array('$set' => array('data' => array())), m::type('array'))->andThrow('\\MongoException');
+        $this->collection->shouldReceive('update')->once()->with(array('imageIdentifier' => $imageIdentifier), array('$set' => array('data' => array())), m::type('array'))->andThrow('\\MongoException');
 
         $this->driver->deleteMetadata($imageIdentifier);
     }
@@ -244,7 +244,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     public function testSucessfullDeleteMetadata() {
         $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
 
-        $this->collection->shouldReceive('update')->once()->with(array('hash' => $imageIdentifier), array('$set' => array('data' => array())), m::type('array'));
+        $this->collection->shouldReceive('update')->once()->with(array('imageIdentifier' => $imageIdentifier), array('$set' => array('data' => array())), m::type('array'));
 
         $result = $this->driver->deleteMetadata($imageIdentifier);
 

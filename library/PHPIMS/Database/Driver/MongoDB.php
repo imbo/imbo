@@ -96,17 +96,17 @@ class MongoDB implements DriverInterface {
      */
     public function insertImage($imageIdentifier, Image $image) {
         $data = array(
-            'name'  => $image->getFilename(),
-            'size'  => $image->getFilesize(),
-            'hash'  => $imageIdentifier,
-            'mime'  => $image->getMimeType(),
-            'data'  => array(),
-            'added' => time(),
+            'name'            => $image->getFilename(),
+            'size'            => $image->getFilesize(),
+            'imageIdentifier' => $imageIdentifier,
+            'mime'            => $image->getMimeType(),
+            'data'            => array(),
+            'added'           => time(),
         );
 
         try {
             // See if the image already exists
-            $row = $this->collection->findOne(array('hash' => $data['hash']));
+            $row = $this->collection->findOne(array('imageIdentifier' => $data['imageIdentifier']));
 
             if ($row) {
                 throw new DatabaseException('Image already exists', 400);
@@ -125,7 +125,7 @@ class MongoDB implements DriverInterface {
      */
     public function deleteImage($imageIdentifier) {
         try {
-            $this->collection->remove(array('hash' => $imageIdentifier), array('justOne' => true, 'safe' => true));
+            $this->collection->remove(array('imageIdentifier' => $imageIdentifier), array('justOne' => true, 'safe' => true));
         } catch (\MongoException $e) {
             throw new DatabaseException('Unable to delete image data', 500, $e);
         }
@@ -139,7 +139,7 @@ class MongoDB implements DriverInterface {
     public function updateMetadata($imageIdentifier, array $metadata) {
         try {
             $this->collection->update(
-                array('hash' => $imageIdentifier),
+                array('imageIdentifier' => $imageIdentifier),
                 array('$set' => array(
                     'data' => $metadata,
                 )),
@@ -160,7 +160,7 @@ class MongoDB implements DriverInterface {
      */
     public function getMetadata($imageIdentifier) {
         try {
-            $data = $this->collection->findOne(array('hash' => $imageIdentifier));
+            $data = $this->collection->findOne(array('imageIdentifier' => $imageIdentifier));
         } catch (\MongoException $e) {
             throw new DatabaseException('Unable to fetch image metadata', 500, $e);
         }

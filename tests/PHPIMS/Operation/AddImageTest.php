@@ -67,7 +67,7 @@ class AddImageTest extends OperationTests {
         $image->shouldReceive('getMetadata')->once()->andReturn($metadata);
         $response = m::mock('PHPIMS\\Server\\Response');
         $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
-        $response->shouldReceive('setBody')->once()->with(array('hash' => $imageIdentifier))->andReturn($response);
+        $response->shouldReceive('setBody')->once()->with(array('imageIdentifier' => $imageIdentifier))->andReturn($response);
 
         $database = m::mock('PHPIMS\\Database\\DriverInterface');
         $database->shouldReceive('insertImage')->once()->with($imageIdentifier, $image);
