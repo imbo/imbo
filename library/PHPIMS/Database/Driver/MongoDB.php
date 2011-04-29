@@ -192,15 +192,9 @@ class MongoDB implements DriverInterface {
             $result = $this->collection->find();
 
             foreach ($result as $image) {
-                $data = array(
-                    'identifier' => $image['hash'],
-                    'size'       => $image['size'],
-                    'name'       => $image['name'],
-                    'mime'       => $image['mime'],
-                    'added'      => $image['added'],
-                );
+                unset($image['_id']);
 
-                $images[] = $data;
+                $images[] = $image;
             }
         } catch (\MongoException $e) {
             throw new DatabaseException('Unable to search for images', 500, $e);
