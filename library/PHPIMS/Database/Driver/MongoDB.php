@@ -100,7 +100,7 @@ class MongoDB implements DriverInterface {
             'size'            => $image->getFilesize(),
             'imageIdentifier' => $imageIdentifier,
             'mime'            => $image->getMimeType(),
-            'data'            => array(),
+            'metadata'        => array(),
             'added'           => time(),
         );
 
@@ -141,7 +141,7 @@ class MongoDB implements DriverInterface {
             $this->collection->update(
                 array('imageIdentifier' => $imageIdentifier),
                 array('$set' => array(
-                    'data' => $metadata,
+                    'metadata' => $metadata,
                 )),
                 array(
                     'safe' => true,
@@ -165,7 +165,7 @@ class MongoDB implements DriverInterface {
             throw new DatabaseException('Unable to fetch image metadata', 500, $e);
         }
 
-        return isset($data['data']) ? $data['data'] : array();
+        return isset($data['metadata']) ? $data['metadata'] : array();
     }
 
     /**
