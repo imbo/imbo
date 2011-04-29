@@ -41,9 +41,12 @@ use PHPIMS\OperationInterface;
  * This operation will let users fetch images based on queries. The following query parameters can
  * be used:
  *
- * page     => Page number. Defaults to 1. Each page includes 50 images at most
+ * page     => Page number. Defaults to 1
+ * limit    => Limit to a number of images pr. page. Defaults to 20
  * metadata => Wether or not to include metadata pr. image. Set to 1 to enable
  * query    => urlencoded json data to use in the query
+ * from     => Unix timestamp to fetch from
+ * to       => Unit timestamp to fetch to
  *
  * @package PHPIMS
  * @subpackage Operations
@@ -57,6 +60,46 @@ class GetImages extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
+        // Set up default values
+        $page     = 1;
+        $num      = 20;
+        $metadata = false;
+        $query    = array();
+        $from     = null;
+        $to       = null;
 
+        if (isset($_GET['page'])) {
+            $page = (int) $_GET['page'];
+        }
+
+        if (isset($_GET['num'])) {
+            $num = (int) $_GET['num'];
+        }
+
+        if (isset($_GET['metadata'])) {
+            $metadata = (bool) $_GET['metadata'];
+        }
+
+        if (isset($_GET['query'])) {
+            $data = json_decode($_GET['query'], true);
+
+            if (is_array($data)) {
+                $query = $data;
+            }
+        }
+
+        if (isset($_GET['from'])) {
+            $from = (int) $_GET['from'];
+        }
+
+        if (isset($_GET['to'])) {
+            $to = (int) $_GET['to'];
+        }
+
+        $images = $this->getDatabase()->getImages($page, $num, $metadata, $query, $from, $to);
+
+        $this->getResponse()->setBody($images);
+
+        return $this;
     }
 }
