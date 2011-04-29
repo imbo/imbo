@@ -61,7 +61,7 @@ class AddImage extends Operation implements OperationInterface {
         $this->getStorage()->store($imageIdentifier, $_FILES['file']['tmp_name']);
         $this->getResponse()->setCode(201)
                             ->setBody(array(
-                                'hash' => $imageIdentifier,
+                                'imageIdentifier' => $imageIdentifier,
                             ));
 
         return $this;

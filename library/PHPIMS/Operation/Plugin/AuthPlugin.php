@@ -47,7 +47,7 @@ use PHPIMS\Operation;
  * The signature is generated using the following elements:
  *
  * - HTTP method in use (POST or DELETE)
- * - The image hash
+ * - The image identifier
  * - A provided timestamp
  * - The public key (from the URL) and the private key (from the configuration file)
  *
