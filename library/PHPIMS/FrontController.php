@@ -153,7 +153,7 @@ class FrontController {
         $matches  = array();
 
         // See if
-        if (!preg_match('#(images|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>meta))?)$#', $resource, $matches)) {
+        if (!preg_match('#^(images|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>meta))?)$#', $resource, $matches)) {
             throw new Exception('Unknown resource', 400);
         }
 
