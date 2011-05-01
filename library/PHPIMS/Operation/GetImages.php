@@ -34,6 +34,7 @@ namespace PHPIMS\Operation;
 
 use PHPIMS\Operation;
 use PHPIMS\OperationInterface;
+use PHPIMS\Operation\GetImages\Query;
 
 /**
  * Get images operation
@@ -60,43 +61,37 @@ class GetImages extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
-        // Set up default values
-        $page     = 1;
-        $num      = 20;
-        $metadata = false;
-        $query    = array();
-        $from     = null;
-        $to       = null;
+        $query = new Query;
 
         if (isset($_GET['page'])) {
-            $page = (int) $_GET['page'];
+            $query->page($_GET['page']);
         }
 
         if (isset($_GET['num'])) {
-            $num = (int) $_GET['num'];
+            $query->num($_GET['num']);
         }
 
         if (isset($_GET['metadata'])) {
-            $metadata = (bool) $_GET['metadata'];
+            $query->returnMetadata($_GET['metadata']);
         }
 
         if (isset($_GET['query'])) {
             $data = json_decode($_GET['query'], true);
 
             if (is_array($data)) {
-                $query = $data;
+                $query->query($data);
             }
         }
 
         if (isset($_GET['from'])) {
-            $from = (int) $_GET['from'];
+            $query->from($_GET['from']);
         }
 
         if (isset($_GET['to'])) {
-            $to = (int) $_GET['to'];
+            $query->to($_GET['to']);
         }
 
-        $images = $this->getDatabase()->getImages($page, $num, $metadata, $query, $from, $to);
+        $images = $this->getDatabase()->getImages($query);
 
         $this->getResponse()->setBody($images);
 
