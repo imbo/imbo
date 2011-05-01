@@ -33,6 +33,7 @@
 namespace PHPIMS\Operation;
 
 use \Mockery as m;
+use PHPIMS\Operation\GetImages\Query;
 
 /**
  * @package PHPIMS
@@ -51,10 +52,34 @@ class GetImagesTest extends OperationTests {
         return 'getImages';
     }
 
-    public function testExecWithNoParams() {
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $this->operation->setDatabase($database);
+    public function testExec() {
+        $images = array();
 
+        // Set query parameters
+        $_GET = array(
+            'page'     => 2,
+            'num'      => 30,
+            'metadata' => 1,
+            'query'    => json_encode(array('foo' => 'bar')),
+            'from'     => 123123123,
+            'to'       => 234234234,
+        );
+
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $database->shouldReceive('getImages')->once()->with(m::on(function(Query $q) {
+            return $q->page() === $_GET['page'] &&
+                   $q->num() === $_GET['num'] &&
+                   $q->returnMetadata() === true &&
+                   $q->query() === json_decode($_GET['query'], true) &&
+                   $q->from() === $_GET['from'] &&
+                   $q->to() === $_GET['to'];
+        }))->andReturn($images);
+
+        $response = m::mock('PHPIMS\\Server\\Response');
+        $response->shouldReceive('setBody')->once()->with($images);
+
+        $this->operation->setDatabase($database)
+                        ->setResponse($response);
         $this->operation->exec();
     }
 }
