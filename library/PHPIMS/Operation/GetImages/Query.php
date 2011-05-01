@@ -43,5 +43,141 @@ namespace PHPIMS\Operation\GetImages;
  * @link https://github.com/christeredvartsen/phpims
  */
 class Query {
+    /**
+     * The page to get
+     *
+     * @var int
+     */
+    private $page = 1;
 
+    /**
+     * Number of images to get
+     *
+     * @var int
+     */
+    private $num = 20;
+
+    /**
+     * Return metadata or not
+     *
+     * @var string
+     */
+    private $returnMetadata = false;
+
+    /**
+     * Metadata query
+     *
+     * @var array
+     */
+    private $query = array();
+
+    /**
+     * Timestamp to start fetching from
+     *
+     * @var int
+     */
+    private $from;
+
+    /**
+     * Timestamp to fetch to
+     *
+     * @var int
+     */
+    private $to;
+
+    /**
+     * Set or get the page property
+     *
+     * @param int $page Give this a value to set the page property
+     * @return int|PHPIMS\Operation\GetImages\Query
+     */
+    public function page($page = null) {
+        if ($page === null) {
+            return $this->page;
+        }
+
+        $this->page = (int) $page;
+
+        return $this;
+    }
+
+    /**
+     * Set or get the num property
+     *
+     * @param int $num Give this a value to set the num property
+     * @return int|PHPIMS\Operation\GetImages\Query
+     */
+    public function num($num = null) {
+        if ($num === null) {
+            return $this->num;
+        }
+
+        $this->num = (int) $num;
+
+        return $this;
+    }
+
+    /**
+     * Set or get the returnMetadata flag
+     *
+     * @param boolean $returnMetadata Give this a value to set the returnMetadata flag
+     * @return boolean|PHPIMS\Operation\GetImages\Query
+     */
+    public function returnMetadata($returnMetadata = null) {
+        if ($returnMetadata === null) {
+            return $this->returnMetadata;
+        }
+
+        $this->returnMetadata = (bool) $returnMetadata;
+
+        return $this;
+    }
+
+    /**
+     * Set or get the query property
+     *
+     * @param array $query Give this a value to set the query property
+     * @return array|PHPIMS\Operation\GetImages\Query
+     */
+    public function query(array $query = null) {
+        if ($query === null) {
+            return $this->query;
+        }
+
+        $this->query = $query;
+
+        return $this;
+    }
+
+    /**
+     * Set or get the from attribute
+     *
+     * @param int $from Give this a value to set the from property
+     * @return int|PHPIMS\Operation\GetImages\Query
+     */
+    public function from($from = null) {
+        if ($from === null) {
+            return $this->from;
+        }
+
+        $this->from = (int) $from;
+
+        return $this;
+    }
+
+    /**
+     * Set or get the to attribute
+     *
+     * @param int $from Give this a value to set the to property
+     * @return int|PHPIMS\Operation\GetImages\Query
+     */
+    public function to($to = null) {
+        if ($to === null) {
+            return $this->to;
+        }
+
+        $this->to = (int) $to;
+
+        return $this;
+    }
 }
