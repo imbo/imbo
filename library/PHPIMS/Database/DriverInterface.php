@@ -33,6 +33,7 @@
 namespace PHPIMS\Database;
 
 use PHPIMS\Image;
+use PHPIMS\Operation\GetImages\Query;
 
 /**
  * Database driver interface
@@ -96,4 +97,13 @@ interface DriverInterface {
      * @throws PHPIMS\Database\Exception
      */
     public function deleteMetadata($imageIdentifier);
+
+    /**
+     * Get images based on some query parameters
+     *
+     * @param PHPIMS\Operation\GetImages\Query
+     * @return array
+     * @throws PHPIMS\Database\Exception
+     */
+    public function getImages(Query $query);
 }
