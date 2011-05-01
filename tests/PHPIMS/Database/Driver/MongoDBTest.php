@@ -250,4 +250,50 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertTrue($result);
     }
+
+    public function testGetImages() {
+        $query = m::mock('PHPIMS\\Operation\\GetImages\\Query');
+        $query->shouldReceive('from')->once()->andReturn(123123123);
+        $query->shouldReceive('to')->once()->andReturn(234234234);
+        $query->shouldReceive('query')->once()->andReturn(array('category' => 'some category'));
+        $query->shouldReceive('returnMetadata')->once()->andReturn(true);
+        $query->shouldReceive('num')->times(2)->andReturn(30);
+        $query->shouldReceive('page')->once()->andReturn(2);
+
+        $cursor = m::mock('MongoCursor');
+        $cursor->shouldReceive('limit')->once()->with(30)->andReturn($cursor);
+        $cursor->shouldReceive('sort')->once()->with(m::type('array'))->andReturn($cursor);
+        $cursor->shouldReceive('skip')->once()->with(30)->andReturn($cursor);
+        $cursor->shouldReceive('rewind')->once();
+        $cursor->shouldReceive('valid')->times(2)->andReturn(true, false);
+
+        $image = array('foo' => 'bar');
+
+        $cursor->shouldReceive('current')->once()->andReturn($image);
+        $cursor->shouldReceive('next')->once();
+
+        $this->collection->shouldReceive('find')->once()->with(m::type('array'), m::type('array'))->andReturn($cursor);
+
+        $result = $this->driver->getImages($query);
+
+        $this->assertInternalType('array', $result);
+        $this->assertSame(array($image), $result);
+    }
+
+    /**
+     * @expectedException PHPIMS\Database\Exception
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Unable to search for images
+     */
+    public function testGetImagesWhenCollectionThrowsException() {
+        $query = m::mock('PHPIMS\\Operation\\GetImages\\Query');
+        $query->shouldReceive('from')->once();
+        $query->shouldReceive('to')->once();
+        $query->shouldReceive('query')->once();
+        $query->shouldReceive('returnMetadata')->once();
+
+        $this->collection->shouldReceive('find')->once()->with(m::type('array'), m::type('array'))->andThrow('\\MongoException');
+
+        $this->driver->getImages($query);
+    }
 }

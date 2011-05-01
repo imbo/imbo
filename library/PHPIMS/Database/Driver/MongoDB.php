@@ -35,6 +35,7 @@ namespace PHPIMS\Database\Driver;
 use PHPIMS\Database\Exception as DatabaseException;
 use PHPIMS\Database\DriverInterface;
 use PHPIMS\Image;
+use PHPIMS\Operation\GetImages\Query;
 
 /**
  * MongoDB database driver
@@ -184,16 +185,62 @@ class MongoDB implements DriverInterface {
     /**
      * @see PHPIMS\Database\DriverInterface::getImages()
      */
-    public function getImages($page = 1, $num = 20, $metadata = false, array $query = array(), $from = null, $to = null) {
+    public function getImages(Query $query) {
         // Initialize return value
         $images = array();
 
+        // Query data
+        $queryData = array();
+
+        $from = $query->from();
+        $to = $query->to();
+
+        if ($from || $to) {
+            $tmp = array();
+
+            if ($from !== null) {
+                $tmp['$gt'] = $from;
+            }
+
+            if ($to !== null) {
+                $tmp['$lt'] = $to;
+            }
+
+            $queryData['added'] = $tmp;
+        }
+
+        $metadataQuery = $query->query();
+
+        if (!empty($metadataQuery)) {
+            $queryData['metadata'] = $metadataQuery;
+        }
+
+        // Fields to fetch
+        $fields = array(
+            'added',
+            'imageIdentifier',
+            'mime',
+            'name',
+            'size',
+        );
+
+        if ($query->returnMetadata()) {
+            $fields[] = 'metadata';
+        }
+
         try {
-            $result = $this->collection->find();
+            $cursor = $this->collection->find($queryData, $fields)
+                                       ->limit($query->num())
+                                       ->sort(array('added' => -1));
 
-            foreach ($result as $image) {
+            // Skip some images if a page has been set
+            if (($page = $query->page()) > 1) {
+                $skip = $query->num() * ($page - 1);
+                $cursor->skip($skip);
+            }
+
+            foreach ($cursor as $image) {
                 unset($image['_id']);
-
                 $images[] = $image;
             }
         } catch (\MongoException $e) {
