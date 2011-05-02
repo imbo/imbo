@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Operation\Plugin;
 
-use PHPIMS\Operation\Plugin;
 use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 
@@ -49,7 +48,7 @@ use PHPIMS\Operation;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class IdentifyImagePlugin extends Plugin implements PluginInterface {
+class IdentifyImage implements PluginInterface {
     /**
      * Supported mime types and the correct file extension
      *
@@ -62,7 +61,9 @@ class IdentifyImagePlugin extends Plugin implements PluginInterface {
     );
 
     /**
-     * @see PHPIMS\Operation\Plugin::$events
+     * Events this plugin will hook into
+     *
+     * @var array
      */
     static public $events = array(
         'getImagePostExec' => 100,

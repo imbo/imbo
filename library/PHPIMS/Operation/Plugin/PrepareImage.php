@@ -34,7 +34,6 @@ namespace PHPIMS\Operation\Plugin;
 
 use PHPIMS;
 
-use PHPIMS\Operation\Plugin;
 use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 
@@ -51,9 +50,11 @@ use PHPIMS\Operation;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PrepareImagePlugin extends Plugin implements PluginInterface {
+class PrepareImage implements PluginInterface {
     /**
-     * @see PHPIMS\Operation\Plugin::$events
+     * Events this plugin will hook into
+     *
+     * @var array
      */
     static public $events = array(
         'addImagePreExec' => 101,

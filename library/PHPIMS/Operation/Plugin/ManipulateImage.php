@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Operation\Plugin;
 
-use PHPIMS\Operation\Plugin;
 use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 use PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Exception as TransformationException;
@@ -99,9 +98,11 @@ use \Imagine\Imagick\Imagine;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class ManipulateImagePlugin extends Plugin implements PluginInterface {
+class ManipulateImage implements PluginInterface {
     /**
-     * @see PHPIMS\Operation\Plugin::$events
+     * Events this plugin will hook into
+     *
+     * @var array
      */
     static public $events = array(
         'getImagePostExec' => 101,
