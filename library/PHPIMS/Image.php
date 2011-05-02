@@ -46,42 +46,42 @@ class Image {
      *
      * @var string
      */
-    protected $filename = null;
+    private $filename = null;
 
     /**
      * Size of the file
      *
      * @var int
      */
-    protected $filesize = null;
+    private $filesize = null;
 
     /**
      * Mime type of the image
      *
      * @var string
      */
-    protected $mimeType = null;
+    private $mimeType = null;
 
     /**
      * Extension of the file without the dot
      *
      * @var string
      */
-    protected $extension = null;
+    private $extension = null;
 
     /**
      * Blob containing the image itself
      *
      * @var string
      */
-    protected $blob = null;
+    private $blob = null;
 
     /**
      * The metadata attached to this image
      *
      * @var array
      */
-    protected $metadata = array();
+    private $metadata = array();
 
     /**
      * Get the filename
