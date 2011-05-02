@@ -30,10 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace Some\Prefix;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
-use PHPIMS\Operation\Plugin;
-use PHPIMS\Operation;
+use \Mockery as m;
+use \Imagine\ImageInterface;
 
 /**
  * @package PHPIMS
@@ -43,19 +43,29 @@ use PHPIMS\Operation;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class OtherCustomPlugin extends Plugin {
-    /**
-     * @see PHPIMS\Operation\Plugin::$events
-     */
-    static public $events = array(
-        'addImagePreExec'  => 42,
-        'addImagePostExec' => 78,
-    );
+class BorderTest extends \PHPUnit_Framework_TestCase {
+    public function testApply() {
+        $imageHeight = 100;
+        $imageWidth = 200;
 
-    /**
-     * @see PHPIMS\Operation\Plugin::exec()
-     */
-    public function exec(Operation $operation) {
+        $draw  = m::mock('Imagine\\Image\\Draw');
+        $size  = m::mock('Imagine\\Image\\Size');
+        $image = m::mock('Imagine\\ImageInterface');
 
+        $image->shouldReceive('getSize')->once()->andReturn($size);
+        $image->shouldReceive('draw')->once()->andReturn($draw);
+
+        $size->shouldReceive('getHeight')->once()->andReturn($imageHeight);
+        $size->shouldReceive('getWidth')->once()->andReturn($imageWidth);
+
+        $draw->shouldReceive('line')->times(4)
+                                    ->with(
+                                        m::type('Imagine\\Image\\Point'),
+                                        m::type('Imagine\\Image\\Point'),
+                                        m::type('Imagine\\Image\\Color'))
+                                    ->andReturn($draw);
+
+        $transformation = new Border;
+        $transformation->apply($image, array());
     }
 }

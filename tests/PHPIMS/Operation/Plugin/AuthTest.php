@@ -42,16 +42,16 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class AuthPluginTest extends \PHPUnit_Framework_TestCase {
+class AuthTest extends \PHPUnit_Framework_TestCase {
     /**
      * Plugin instance
      *
-     * @var PHPIMS\Operation\Plugin\AuthPlugin
+     * @var PHPIMS\Operation\Plugin\Auth
      */
     protected $plugin = null;
 
     public function setUp() {
-        $this->plugin = new AuthPlugin();
+        $this->plugin = new Auth();
     }
 
     public function tearDown() {

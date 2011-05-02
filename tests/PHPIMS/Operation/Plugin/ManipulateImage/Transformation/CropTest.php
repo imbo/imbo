@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
 use \Mockery as m;
 use \Imagine\ImageInterface;
@@ -43,12 +43,30 @@ use \Imagine\ImageInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class RotateTest extends \PHPUnit_Framework_TestCase {
+class CropTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @expectedException PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
+     * @expectedExceptionMessage Missing parameter
+     */
+    public function testApplyWithMissingParameters() {
+        $image = m::mock('Imagine\\ImageInterface');
+        $transformation = new Crop;
+        $transformation->apply($image);
+    }
+
     public function testApply() {
         $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('rotate')->with(45, m::type('Imagine\\Image\\Color'))->once();
+        $image->shouldReceive('crop')->once()
+                                     ->with(m::type('Imagine\\Image\\Point'), m::type('Imagine\\Image\\Box'));
 
-        $transformation = new Rotate;
-        $transformation->apply($image, array('angle' => 45));
+        $params = array(
+            'x'      => 1,
+            'y'      => 2,
+            'width'  => 3,
+            'height' => 4,
+        );
+
+        $transformation = new Crop;
+        $transformation->apply($image, $params);
     }
 }

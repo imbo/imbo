@@ -30,8 +30,9 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-use PHPIMS\Operation\Plugin;
-use PHPIMS\Operation;
+namespace PHPIMS\Operation\Plugin;
+
+use \Mockery as m;
 
 /**
  * @package PHPIMS
@@ -41,19 +42,27 @@ use PHPIMS\Operation;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class OtherCustomPlugin extends Plugin {
+class ManipulateImageTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @see PHPIMS\Operation\Plugin::$events
+     * Plugin instance
+     *
+     * @var PHPIMS\Operation\Plugin\ManipulateImage
      */
-    static public $events = array(
-        'addImagePreExec'  => 12,
-        'addImagePostExec' => 8,
-    );
+    protected $plugin = null;
 
-    /**
-     * @see PHPIMS\Operation\Plugin::exec()
-     */
-    public function exec(Operation $operation) {
+    public function setUp() {
+        $this->plugin = new ManipulateImage();
+    }
 
+    public function tearDown() {
+        $this->plugin = null;
+    }
+
+    public function testIsValidTransformation() {
+        $this->assertTrue(ManipulateImage::isValidTransformation('resize'));
+        $this->assertTrue(ManipulateImage::isValidTransformation('crop'));
+        $this->assertTrue(ManipulateImage::isValidTransformation('rotate'));
+        $this->assertTrue(ManipulateImage::isValidTransformation('border'));
+        $this->assertFalse(ManipulateImage::isValidTransformation('foobar'));
     }
 }

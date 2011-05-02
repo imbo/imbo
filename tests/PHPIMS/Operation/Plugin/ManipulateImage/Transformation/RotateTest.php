@@ -30,10 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace Some\Prefix;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
-use PHPIMS\Operation\Plugin;
-use PHPIMS\Operation;
+use \Mockery as m;
+use \Imagine\ImageInterface;
 
 /**
  * @package PHPIMS
@@ -43,19 +43,12 @@ use PHPIMS\Operation;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class CustomPlugin extends Plugin {
-    /**
-     * @see PHPIMS\Operation\Plugin::$events
-     */
-    static public $events = array(
-        'addImagePreExec'  => 1,
-        'addImagePostExec' => 1,
-    );
+class RotateTest extends \PHPUnit_Framework_TestCase {
+    public function testApply() {
+        $image = m::mock('Imagine\\ImageInterface');
+        $image->shouldReceive('rotate')->with(45, m::type('Imagine\\Image\\Color'))->once();
 
-    /**
-     * @see PHPIMS\Operation\Plugin::exec()
-     */
-    public function exec(Operation $operation) {
-
+        $transformation = new Rotate;
+        $transformation->apply($image, array('angle' => 45));
     }
 }

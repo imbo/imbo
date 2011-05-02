@@ -40,16 +40,16 @@ namespace PHPIMS\Operation\Plugin;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class IdentifyImagePluginTest extends \PHPUnit_Framework_TestCase {
+class IdentifyImageTest extends \PHPUnit_Framework_TestCase {
     /**
      * Plugin instance
      *
-     * @var PHPIMS\Operation\Plugin\IdentifyImagePlugin
+     * @var PHPIMS\Operation\Plugin\IdentifyImage
      */
     protected $plugin = null;
 
     public function setUp() {
-        $this->plugin = new IdentifyImagePlugin();
+        $this->plugin = new IdentifyImage();
     }
 
     public function tearDown() {
@@ -57,17 +57,17 @@ class IdentifyImagePluginTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSupportedMimeType() {
-        $this->assertTrue(IdentifyImagePlugin::supportedMimeType('image/png'));
-        $this->assertTrue(IdentifyImagePlugin::supportedMimeType('image/jpeg'));
-        $this->assertTrue(IdentifyImagePlugin::supportedMimeType('image/gif'));
-        $this->assertFalse(IdentifyImagePlugin::supportedMimeType('image/tiff'));
+        $this->assertTrue(IdentifyImage::supportedMimeType('image/png'));
+        $this->assertTrue(IdentifyImage::supportedMimeType('image/jpeg'));
+        $this->assertTrue(IdentifyImage::supportedMimeType('image/gif'));
+        $this->assertFalse(IdentifyImage::supportedMimeType('image/tiff'));
     }
 
     public function testGetFileExtension() {
-        $this->assertSame('png', IdentifyImagePlugin::getFileExtension('image/png'));
-        $this->assertSame('jpeg', IdentifyImagePlugin::getFileExtension('image/jpeg'));
-        $this->assertSame('gif', IdentifyImagePlugin::getFileExtension('image/gif'));
-        $this->assertFalse(IdentifyImagePlugin::getFileExtension('image/tiff'));
+        $this->assertSame('png', IdentifyImage::getFileExtension('image/png'));
+        $this->assertSame('jpeg', IdentifyImage::getFileExtension('image/jpeg'));
+        $this->assertSame('gif', IdentifyImage::getFileExtension('image/gif'));
+        $this->assertFalse(IdentifyImage::getFileExtension('image/tiff'));
     }
 
     /**
