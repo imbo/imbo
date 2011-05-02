@@ -91,9 +91,8 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $data = array('imageIdentifier' => $imageIdentifier);
 
         $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType')
-              ->once()
-              ->andReturn('some value');
+        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
+              ->once();
 
         $response = m::mock('PHPIMS\\Server\\Response');
 
@@ -111,9 +110,8 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
 
         $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType')
-              ->once()
-              ->andReturn('some value');
+        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
+              ->once();
 
         $response = m::mock('PHPIMS\\Server\\Response');
 
@@ -127,9 +125,8 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $data = array('imageIdentifier' => $imageIdentifier);
 
         $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType')
-              ->once()
-              ->andReturn('some value');
+        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
+              ->once();
 
         $response = m::mock('PHPIMS\\Server\\Response');
 

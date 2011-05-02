@@ -103,6 +103,8 @@ class MongoDB implements DriverInterface {
             'mime'            => $image->getMimeType(),
             'metadata'        => array(),
             'added'           => time(),
+            'width'           => $image->getWidth(),
+            'height'          => $image->getHeight(),
         );
 
         try {
