@@ -84,6 +84,20 @@ class Image {
     private $metadata = array();
 
     /**
+     * Width of the image
+     *
+     * @var int
+     */
+    private $width = null;
+
+    /**
+     * Heigt of the image
+     *
+     * @var int
+     */
+    private $height = null;
+
+    /**
      * Get the filename
      *
      * @return string
@@ -205,6 +219,48 @@ class Image {
      */
     public function setMetadata(array $metadata) {
         $this->metadata = $metadata;
+
+        return $this;
+    }
+
+    /**
+     * Get the width
+     *
+     * @return int
+     */
+    public function getWidth() {
+        return $this->width;
+    }
+
+    /**
+     * Set the width
+     *
+     * @param int $width Width in pixels
+     * @return PHPIMS\Image
+     */
+    public function setWidth($width) {
+        $this->width = (int) $width;
+
+        return $this;
+    }
+
+    /**
+     * Get the height
+     *
+     * @return int
+     */
+    public function getHeight() {
+        return $this->height;
+    }
+
+    /**
+     * Set the height
+     *
+     * @param int $height Height in pixels
+     * @return PHPIMS\Image
+     */
+    public function setHeight($height) {
+        $this->height = (int) $height;
 
         return $this;
     }

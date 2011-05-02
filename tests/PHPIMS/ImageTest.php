@@ -100,4 +100,16 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
         $this->image->setExtension($extension);
         $this->assertSame($extension, $this->image->getExtension());
     }
+
+    public function testSetGetWidth() {
+        $width = 123;
+        $this->image->setWidth($width);
+        $this->assertSame($width, $this->image->getWidth());
+    }
+
+    public function testSetGetHeight() {
+        $height = 234;
+        $this->image->setHeight($height);
+        $this->assertSame($height, $this->image->getHeight());
+    }
 }
