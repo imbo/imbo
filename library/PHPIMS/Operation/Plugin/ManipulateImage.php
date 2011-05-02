@@ -34,7 +34,7 @@ namespace PHPIMS\Operation\Plugin;
 
 use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
-use PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Exception as TransformationException;
+use PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception as TransformationException;
 use \Imagine\Imagick\Imagine;
 
 /**
@@ -128,10 +128,10 @@ class ManipulateImage implements PluginInterface {
      * @var array
      */
     static public $transformationClasses = array(
-        self::RESIZE => 'PHPIMS\\Operation\\Plugin\\ManipulateImagePlugin\\Transformation\\Resize',
-        self::CROP   => 'PHPIMS\\Operation\\Plugin\\ManipulateImagePlugin\\Transformation\\Crop',
-        self::ROTATE => 'PHPIMS\\Operation\\Plugin\\ManipulateImagePlugin\\Transformation\\Rotate',
-        self::BORDER => 'PHPIMS\\Operation\\Plugin\\ManipulateImagePlugin\\Transformation\\Border',
+        self::RESIZE => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Resize',
+        self::CROP   => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Crop',
+        self::ROTATE => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Rotate',
+        self::BORDER => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Border',
     );
 
     /**
