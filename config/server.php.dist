@@ -6,13 +6,13 @@ return array(
         'privateKey' => '',
     ),
     
-    // Configuration for the database driver
+    // Database driver
     'database' => new PHPIMS\Database\Driver\MongoDB(array(
         'database'   => 'phpims',
         'collection' => 'images',
     )),
 
-    // Configuration for the storage driver
+    // Storage driver
     'storage' => new PHPIMS\Storage\Driver\Filesystem(array(
         'dataDir' => realpath('/some/path'),
     )),

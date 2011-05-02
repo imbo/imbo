@@ -32,8 +32,8 @@
 
 namespace PHPIMS;
 
-use PHPIMS\Database\DriverInterface as DatabaseDriver;
-use PHPIMS\Storage\DriverInterface as StorageDriver;
+use PHPIMS\Database\DriverInterface as Database;
+use PHPIMS\Storage\DriverInterface as Storage;
 use PHPIMS\Server\Response;
 use PHPIMS\Operation\Exception as OperationException;
 use PHPIMS\Operation\PluginInterface as Plugin;
@@ -128,7 +128,7 @@ abstract class Operation {
      * @param PHPIMS\Database\DriverInterface $database Database driver
      * @param PHPIMS\Storage\DriverInterface $storage Storage driver
      */
-    public function __construct(DatabaseDriver $database, StorageDriver $storage) {
+    public function __construct(Database $database, Storage $storage) {
         $this->database = $database;
         $this->storage  = $storage;
 
@@ -240,11 +240,11 @@ abstract class Operation {
     /**
      * Set the database driver
      *
-     * @param PHPIMS\Database\DriverInterface $driver The driver instance
+     * @param PHPIMS\Database\DriverInterface $database The driver instance
      * @return PHPIMS\Operation
      */
-    public function setDatabase(DatabaseDriver $driver) {
-        $this->database = $driver;
+    public function setDatabase(Database $database) {
+        $this->database = $database;
 
         return $this;
     }
@@ -261,11 +261,11 @@ abstract class Operation {
     /**
      * Set the storage driver
      *
-     * @param PHPIMS\Storage\DriverInterface $driver The driver instance
+     * @param PHPIMS\Storage\DriverInterface $storage The driver instance
      * @return PHPIMS\Operation
      */
-    public function setStorage(StorageDriver $driver) {
-        $this->storage = $driver;
+    public function setStorage(Storage $storage) {
+        $this->storage = $storage;
 
         return $this;
     }
@@ -393,7 +393,7 @@ abstract class Operation {
      * @return PHPIMS\OperationInterface
      * @throws PHPIMS\Operation\Exception
      */
-    static public function factory($className, DatabaseDriver $database, StorageDriver $storage, $resource, $method, $imageIdentifier = null) {
+    static public function factory($className, Database $database, Storage $storage, $resource, $method, $imageIdentifier = null) {
         switch ($className) {
             case 'PHPIMS\\Operation\\AddImage':
             case 'PHPIMS\\Operation\\DeleteImage':
