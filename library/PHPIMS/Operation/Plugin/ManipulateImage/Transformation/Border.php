@@ -30,9 +30,9 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface;
+use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Color;
 use \Imagine\Image\Point;
@@ -46,11 +46,11 @@ use \Imagine\Image\Point;
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
- * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
 class Border implements TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface::apply()
+     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
      */
     public function apply(ImageInterface $image, array $params = array()) {
         if (!isset($params['color'])) {
