@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin;
+namespace PHPIMS\Operation\Plugin\ManipulateImage;
 
 use \Imagine\ImageInterface;
 
@@ -51,7 +51,7 @@ interface TransformationInterface {
      * @param \Imagine\ImageInterface $image Image instance
      * @param array $params Parameters for the transformation
      * @return string Return the transformed binary image data
-     * @throws PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Exception
+     * @throws PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
      */
     public function apply(ImageInterface $image, array $params = array());
 }
