@@ -32,8 +32,8 @@
 
 namespace PHPIMS;
 
-use PHPIMS\Database\DriverInterface as DatabaseDriverInterface;
-use PHPIMS\Storage\DriverInterface as StorageDriverInterface;
+use PHPIMS\Database\DriverInterface as DatabaseDriver;
+use PHPIMS\Storage\DriverInterface as StorageDriver;
 use PHPIMS\Server\Response;
 use PHPIMS\Operation\Exception as OperationException;
 
@@ -53,35 +53,35 @@ abstract class Operation {
      *
      * @var string
      */
-    protected $resource = null;
+    private $resource = null;
 
     /**
      * The current image identifier
      *
      * @param string
      */
-    protected $imageIdentifier = null;
+    private $imageIdentifier = null;
 
     /**
      * HTTP method
      *
      * @var string
      */
-    protected $method = null;
+    private $method = null;
 
     /**
      * The database driver
      *
-     * @var PHPIMS\Database\Driver
+     * @var PHPIMS\Database\DriverInterface
      */
-    protected $database = null;
+    private $database = null;
 
     /**
      * The storage driver
      *
-     * @var PHPIMS\Storage\Driver
+     * @var PHPIMS\Storage\DriverInterface
      */
-    protected $storage = null;
+    private $storage = null;
 
     /**
      * Image instance
@@ -91,7 +91,7 @@ abstract class Operation {
      *
      * @var PHPIMS\Image
      */
-    protected $image = null;
+    private $image = null;
 
     /**
      * Response instance
@@ -101,7 +101,7 @@ abstract class Operation {
      *
      * @var PHPIMS\Image
      */
-    protected $response = null;
+    private $response = null;
 
     /**
      * Array of class names to plugins to execute. The array has two elements, 'preExec' and
@@ -109,47 +109,24 @@ abstract class Operation {
      *
      * @var array
      */
-    protected $plugins = array();
+    private $plugins = array();
 
     /**
      * Configuration passed from the front controller
      *
      * @var array
      */
-    protected $config = array();
+    private $config = array();
 
     /**
-     * Initialize the database driver
+     * Class constructor
      *
-     * @param array $config Part of the confguration array passed from the front controller
+     * @param PHPIMS\Database\DriverInterface $database Database driver
+     * @param PHPIMS\Storage\DriverInterface $storage Storage driver
      */
-    protected function initDatabaseDriver(array $config) {
-        $params = array();
-
-        if (isset($config['params'])) {
-            $params = $config['params'];
-        }
-
-        $driver = new $config['driver']($params);
-
-        $this->setDatabase($driver);
-    }
-
-    /**
-     * Initialize the storage driver
-     *
-     * @param array $config Part of the confguration array passed from the front controller
-     */
-    protected function initStorageDriver(array $config) {
-        $params = array();
-
-        if (isset($config['params'])) {
-            $params = $config['params'];
-        }
-
-        $driver = new $config['driver']($params);
-
-        $this->setStorage($driver);
+    public function __construct(DatabaseDriver $database, StorageDriver $storage) {
+        $this->database = $database;
+        $this->storage  = $storage;
     }
 
     /**
@@ -253,8 +230,6 @@ abstract class Operation {
     public function init(array $config) {
         $this->setConfig($config);
 
-        $this->initDatabaseDriver($config['database']);
-        $this->initStorageDriver($config['storage']);
         $this->initPlugins($config['plugins']);
 
         return $this;
@@ -352,7 +327,7 @@ abstract class Operation {
      * @param PHPIMS\Database\DriverInterface $driver The driver instance
      * @return PHPIMS\Operation
      */
-    public function setDatabase(DatabaseDriverInterface $driver) {
+    public function setDatabase(DatabaseDriver $driver) {
         $this->database = $driver;
 
         return $this;
@@ -373,7 +348,7 @@ abstract class Operation {
      * @param PHPIMS\Storage\DriverInterface $driver The driver instance
      * @return PHPIMS\Operation
      */
-    public function setStorage(StorageDriverInterface $driver) {
+    public function setStorage(StorageDriver $driver) {
         $this->storage = $driver;
 
         return $this;
@@ -479,13 +454,15 @@ abstract class Operation {
      * Factory method
      *
      * @param string $className The name of the operation class to instantiate
+     * @param PHPIMS\Database\DriverInterface $database Database driver
+     * @param PHPIMS\Storage\DriverInterface $storage Storage driver
      * @param string $resource The accessed resource
      * @param string $method The HTTP method used
      * @param string $imageIdentifier Optional Image identifier
      * @return PHPIMS\OperationInterface
      * @throws PHPIMS\Operation\Exception
      */
-    static public function factory($className, $resource, $method, $imageIdentifier = null) {
+    static public function factory($className, DatabaseDriver $database, StorageDriver $storage, $resource, $method, $imageIdentifier = null) {
         switch ($className) {
             case 'PHPIMS\\Operation\\AddImage':
             case 'PHPIMS\\Operation\\DeleteImage':
@@ -494,7 +471,7 @@ abstract class Operation {
             case 'PHPIMS\\Operation\\GetImage':
             case 'PHPIMS\\Operation\\GetImages':
             case 'PHPIMS\\Operation\\GetImageMetadata':
-                $operation = new $className();
+                $operation = new $className($database, $storage);
                 $operation->setResource($resource)
                           ->setImageIdentifier($imageIdentifier)
                           ->setMethod($method)

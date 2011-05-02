@@ -44,7 +44,7 @@ use \Mockery as m;
  */
 class GetImageTest extends OperationTests {
     protected function getNewOperation() {
-        return new GetImage();
+        return new GetImage($this->database, $this->storage);
     }
 
     public function getExpectedOperationName() {
@@ -52,13 +52,8 @@ class GetImageTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $database->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
-        $this->operation->setDatabase($database);
-
-        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
-        $storage->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
-        $this->operation->setStorage($storage);
+        $this->database->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
+        $this->storage->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
 
         $image = m::mock('PHPIMS\\Image');
         $image->shouldReceive('getWidth', 'getHeight', 'getFilename', 'getFilesize')->once()->andReturn('some value');

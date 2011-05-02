@@ -7,21 +7,15 @@ return array(
     ),
     
     // Configuration for the database driver
-    'database' => array(
-        'driver' => 'PHPIMS\\Database\\Driver\\MongoDB',
-        'params' => array(
-            'database'   => 'phpims',
-            'collection' => 'images',
-        ),
-    ),
+    'database' => new PHPIMS\Database\Driver\MongoDB(array(
+        'database'   => 'phpims',
+        'collection' => 'images',
+    )),
 
     // Configuration for the storage driver
-    'storage' => array(
-        'driver' => 'PHPIMS\\Storage\\Driver\\Filesystem',
-        'params' => array(
-            'dataDir' => realpath('/some/path'),
-        ),
-    ),
+    'storage' => new PHPIMS\Storage\Driver\Filesystem(array(
+        'dataDir' => realpath('/some/path'),
+    )),
 
     // Custom plugins
     'plugins' => array(),

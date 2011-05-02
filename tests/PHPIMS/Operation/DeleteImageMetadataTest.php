@@ -44,9 +44,7 @@ use \Mockery as m;
  */
 class DeleteImageMetadataTest extends OperationTests {
     protected function getNewOperation() {
-        $this->imageIdentifier = md5(microtime()) . '.png';
-
-        return new DeleteImageMetadata($this->imageIdentifier);
+        return new DeleteImageMetadata($this->database, $this->storage);
     }
 
     public function getExpectedOperationName() {
@@ -54,9 +52,7 @@ class DeleteImageMetadataTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $database->shouldReceive('deleteMetadata')->once()->with($this->imageIdentifier);
-        $this->operation->setDatabase($database);
+        $this->database->shouldReceive('deleteMetadata')->once()->with($this->imageIdentifier);
 
         $this->operation->exec();
     }

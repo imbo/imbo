@@ -218,9 +218,11 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
             'GET'    => 'PHPIMS\\Operation\\GetImage',
             'GET'    => 'PHPIMS\\Operation\\GetImageMetadata',
         );
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
 
         foreach ($operations as $method => $className) {
-            $this->assertInstanceOf($className, Operation::factory($className, $method, md5(microtime())));
+            $this->assertInstanceOf($className, Operation::factory($className, $database, $storage, $method, md5(microtime())));
         }
     }
 
@@ -228,7 +230,10 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
      * @expectedException PHPIMS\Operation\Exception
      */
     public function testFactoryWithUnSupportedOperation() {
-        Operation::factory('foobar', 'GET', md5(microtime()));
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
+
+        Operation::factory('foobar', $database, $storage, 'GET', md5(microtime()));
     }
 
     public function testSetGetResource() {

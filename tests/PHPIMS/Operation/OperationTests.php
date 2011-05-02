@@ -32,6 +32,10 @@
 
 namespace PHPIMS\Operation;
 
+use \Mockery as m;
+use PHPIMS\Database\DriverInterface as DatabaseDriver;
+use PHPIMS\Storage\DriverInterface as StorageDriver;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -41,6 +45,20 @@ namespace PHPIMS\Operation;
  * @link https://github.com/christeredvartsen/phpims
  */
 abstract class OperationTests extends \PHPUnit_Framework_TestCase {
+    /**
+     * Database driver
+     *
+     * @var PHPIMS\Datbase\DriverInterface
+     */
+    protected $database = null;
+
+    /**
+     * Storage driver
+     *
+     * @var PHPIMS\Storage\DriverInterface
+     */
+    protected $storage = null;
+
     /**
      * Operation instance
      *
@@ -59,7 +77,10 @@ abstract class OperationTests extends \PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
+        $this->database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $this->storage = m::mock('PHPIMS\\Storage\\DriverInterface');
         $this->imageIdentifier = md5(microtime()) . '.png';
+
         $this->operation = $this->getNewOperation();
         $this->operation->setImageIdentifier($this->imageIdentifier);
     }

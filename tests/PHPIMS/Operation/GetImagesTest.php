@@ -45,7 +45,7 @@ use PHPIMS\Operation\GetImages\Query;
  */
 class GetImagesTest extends OperationTests {
     protected function getNewOperation() {
-        return new GetImages();
+        return new GetImages($this->database, $this->storage);
     }
 
     public function getExpectedOperationName() {
@@ -65,8 +65,7 @@ class GetImagesTest extends OperationTests {
             'to'       => 234234234,
         );
 
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $database->shouldReceive('getImages')->once()->with(m::on(function(Query $q) {
+        $this->database->shouldReceive('getImages')->once()->with(m::on(function(Query $q) {
             return $q->page() === $_GET['page'] &&
                    $q->num() === $_GET['num'] &&
                    $q->returnMetadata() === true &&
@@ -78,8 +77,7 @@ class GetImagesTest extends OperationTests {
         $response = m::mock('PHPIMS\\Server\\Response');
         $response->shouldReceive('setBody')->once()->with($images);
 
-        $this->operation->setDatabase($database)
-                        ->setResponse($response);
+        $this->operation->setResponse($response);
         $this->operation->exec();
     }
 }
