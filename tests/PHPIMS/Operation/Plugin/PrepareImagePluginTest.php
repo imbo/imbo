@@ -94,6 +94,8 @@ class PrepareImagePluginTest extends \PHPUnit_Framework_TestCase {
         $image->shouldReceive('setFilesize')->once()->with(41423)->andReturn($image);
         $image->shouldReceive('setMetadata')->once()->with($metadata)->andReturn($image);
         $image->shouldReceive('setBlob')->once()->with(file_get_contents($_FILES['file']['tmp_name']))->andReturn($image);
+        $image->shouldReceive('setWidth')->once()->with(665)->andReturn($image);
+        $image->shouldReceive('setHeight')->once()->with(463)->andReturn($image);
 
         $operation = m::mock('PHPIMS\\Operation\\AddImage');
         $operation->shouldReceive('getImageIdentifier')->once()->andReturn($imageIdentifier);
