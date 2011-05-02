@@ -30,14 +30,15 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface;
+use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
 use \Imagine\ImageInterface;
-use \Imagine\Image\Color;
+use \Imagine\Image\Point;
+use \Imagine\Image\Box;
 
 /**
- * Rotate transformation
+ * Crop transformation
  *
  * @package PHPIMS
  * @subpackage ImageTransformation
@@ -45,19 +46,21 @@ use \Imagine\Image\Color;
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
- * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Rotate implements TransformationInterface {
+class Crop implements TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface::apply()
+     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
      */
     public function apply(ImageInterface $image, array $params = array()) {
-        if (!isset($params['bg'])) {
-            $params['bg'] = '000';
+        if (!isset($params['x']) || !isset($params['y']) || !isset($params['width']) || !isset($params['height'])) {
+            throw new Exception('Missing parameter for crop transformation');
         }
 
-        $color = new Color($params['bg']);
-
-        $image->rotate($params['angle'], $color);
+        // Resize image and store in the image object
+        $image->crop(
+            new Point((int) $params['x'], (int) $params['y']),
+            new Box((int) $params['width'], (int) $params['height'])
+        );
     }
 }

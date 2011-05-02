@@ -30,8 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-use PHPIMS\Operation\Plugin;
-use PHPIMS\Operation;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+
+use \Mockery as m;
+use \Imagine\ImageInterface;
 
 /**
  * @package PHPIMS
@@ -41,19 +43,30 @@ use PHPIMS\Operation;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class CustomPlugin extends Plugin {
+class CropTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @see PHPIMS\Operation\Plugin::$events
+     * @expectedException PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
+     * @expectedExceptionMessage Missing parameter
      */
-    static public $events = array(
-        'addImagePreExec'  => 10,
-        'addImagePostExec' => 20,
-    );
+    public function testApplyWithMissingParameters() {
+        $image = m::mock('Imagine\\ImageInterface');
+        $transformation = new Crop;
+        $transformation->apply($image);
+    }
 
-    /**
-     * @see PHPIMS\Operation\Plugin::exec()
-     */
-    public function exec(Operation $operation) {
+    public function testApply() {
+        $image = m::mock('Imagine\\ImageInterface');
+        $image->shouldReceive('crop')->once()
+                                     ->with(m::type('Imagine\\Image\\Point'), m::type('Imagine\\Image\\Box'));
 
+        $params = array(
+            'x'      => 1,
+            'y'      => 2,
+            'width'  => 3,
+            'height' => 4,
+        );
+
+        $transformation = new Crop;
+        $transformation->apply($image, $params);
     }
 }

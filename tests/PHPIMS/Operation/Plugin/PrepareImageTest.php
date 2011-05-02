@@ -42,16 +42,16 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PrepareImagePluginTest extends \PHPUnit_Framework_TestCase {
+class PrepareImageTest extends \PHPUnit_Framework_TestCase {
     /**
      * Plugin instance
      *
-     * @var PHPIMS\Operation\Plugin\PrepareImagePlugin
+     * @var PHPIMS\Operation\Plugin\PrepareImage
      */
     protected $plugin = null;
 
     public function setUp() {
-        $this->plugin = new PrepareImagePlugin();
+        $this->plugin = new PrepareImage();
     }
 
     public function tearDown() {

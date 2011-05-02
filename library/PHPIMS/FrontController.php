@@ -133,7 +133,7 @@ class FrontController {
             throw new Exception('Unsupported operation', 400);
         }
 
-        return Operation::factory($operation, $resource, $method, $imageIdentifier);
+        return Operation::factory($operation, $this->config['database'], $this->config['storage'], $resource, $method, $imageIdentifier);
     }
 
     /**
@@ -161,10 +161,7 @@ class FrontController {
         $extra = isset($matches['extra']) ? $matches['extra'] : null;
 
         $operation = $this->resolveOperation($resource, $method, $imageIdentifier, $extra);
-        $operation->init($this->config)
-                  ->preExec()
-                  ->exec()
-                  ->postExec();
+        $operation->run();
 
         return $operation->getResponse();
     }

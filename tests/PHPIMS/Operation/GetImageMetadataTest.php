@@ -43,12 +43,8 @@ use \Mockery as m;
  * @link https://github.com/christeredvartsen/phpims
  */
 class GetImageMetadataTest extends OperationTests {
-    protected $imageIdentifier = null;
-
     protected function getNewOperation() {
-        $this->imageIdentifier = md5(microtime()) . '.png';
-
-        return new GetImageMetadata($this->imageIdentifier);
+        return new GetImageMetadata($this->database, $this->storage);
     }
 
     public function getExpectedOperationName() {
@@ -60,9 +56,7 @@ class GetImageMetadataTest extends OperationTests {
             'foo' => 'bar',
             'bar' => 'foo',
         );
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $database->shouldReceive('getMetadata')->once()->with($this->imageIdentifier)->andReturn($data);
-        $this->operation->setDatabase($database);
+        $this->database->shouldReceive('getMetadata')->once()->with($this->imageIdentifier)->andReturn($data);
 
         $response = m::mock('PHPIMS\\Server\\Response');
         $response->shouldReceive('setBody')->once()->with($data);

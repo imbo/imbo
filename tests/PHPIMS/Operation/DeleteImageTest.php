@@ -44,7 +44,7 @@ use \Mockery as m;
  */
 class DeleteImageTest extends OperationTests {
     protected function getNewOperation() {
-        return new DeleteImage();
+        return new DeleteImage($this->database, $this->storage);
     }
 
     public function getExpectedOperationName() {
@@ -52,14 +52,8 @@ class DeleteImageTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $database->shouldReceive('deleteImage')->once()->with($this->imageIdentifier);
-        $this->operation->setDatabase($database);
-
-        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
-        $storage->shouldReceive('delete')->once()->with($this->imageIdentifier);
-        $this->operation->setStorage($storage);
-
+        $this->database->shouldReceive('deleteImage')->once()->with($this->imageIdentifier);
+        $this->storage->shouldReceive('delete')->once()->with($this->imageIdentifier);
         $this->operation->exec();
     }
 }

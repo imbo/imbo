@@ -23,32 +23,41 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
-use \Mockery as m;
+use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
 use \Imagine\ImageInterface;
+use \Imagine\Image\Color;
 
 /**
+ * Rotate transformation
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class RotateTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('rotate')->with(45, m::type('Imagine\\Image\\Color'))->once();
+class Rotate implements TransformationInterface {
+    /**
+     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
+     */
+    public function apply(ImageInterface $image, array $params = array()) {
+        if (!isset($params['bg'])) {
+            $params['bg'] = '000';
+        }
 
-        $transformation = new Rotate;
-        $transformation->apply($image, array('angle' => 45));
+        $color = new Color($params['bg']);
+
+        $image->rotate($params['angle'], $color);
     }
 }

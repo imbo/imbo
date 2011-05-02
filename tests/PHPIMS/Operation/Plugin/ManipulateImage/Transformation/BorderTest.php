@@ -23,44 +23,49 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface;
+use \Mockery as m;
 use \Imagine\ImageInterface;
-use \Imagine\Image\Point;
-use \Imagine\Image\Box;
 
 /**
- * Crop transformation
- *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
- * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin
  */
-class Crop implements TransformationInterface {
-    /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface::apply()
-     */
-    public function apply(ImageInterface $image, array $params = array()) {
-        if (!isset($params['x']) || !isset($params['y']) || !isset($params['width']) || !isset($params['height'])) {
-            throw new Exception('Missing parameter for crop transformation');
-        }
+class BorderTest extends \PHPUnit_Framework_TestCase {
+    public function testApply() {
+        $imageHeight = 100;
+        $imageWidth = 200;
 
-        // Resize image and store in the image object
-        $image->crop(
-            new Point((int) $params['x'], (int) $params['y']),
-            new Box((int) $params['width'], (int) $params['height'])
-        );
+        $draw  = m::mock('Imagine\\Image\\Draw');
+        $size  = m::mock('Imagine\\Image\\Size');
+        $image = m::mock('Imagine\\ImageInterface');
+
+        $image->shouldReceive('getSize')->once()->andReturn($size);
+        $image->shouldReceive('draw')->once()->andReturn($draw);
+
+        $size->shouldReceive('getHeight')->once()->andReturn($imageHeight);
+        $size->shouldReceive('getWidth')->once()->andReturn($imageWidth);
+
+        $draw->shouldReceive('line')->times(4)
+                                    ->with(
+                                        m::type('Imagine\\Image\\Point'),
+                                        m::type('Imagine\\Image\\Point'),
+                                        m::type('Imagine\\Image\\Color'))
+                                    ->andReturn($draw);
+
+        $transformation = new Border;
+        $transformation->apply($image, array());
     }
 }

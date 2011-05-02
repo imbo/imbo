@@ -44,7 +44,7 @@ use \Mockery as m;
  */
 class AddImageTest extends OperationTests {
     protected function getNewOperation() {
-        return new AddImage();
+        return new AddImage($this->database, $this->storage);
     }
 
     public function getExpectedOperationName() {
@@ -69,16 +69,12 @@ class AddImageTest extends OperationTests {
         $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
         $response->shouldReceive('setBody')->once()->with(array('imageIdentifier' => $imageIdentifier))->andReturn($response);
 
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $database->shouldReceive('insertImage')->once()->with($imageIdentifier, $image);
-        $database->shouldReceive('updateMetadata')->once()->with($imageIdentifier, $metadata);
+        $this->database->shouldReceive('insertImage')->once()->with($imageIdentifier, $image);
+        $this->database->shouldReceive('updateMetadata')->once()->with($imageIdentifier, $metadata);
 
-        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
-        $storage->shouldReceive('store')->once()->with($imageIdentifier, $_FILES['file']['tmp_name']);
+        $this->storage->shouldReceive('store')->once()->with($imageIdentifier, $_FILES['file']['tmp_name']);
 
-        $this->operation->setStorage($storage)
-                        ->setDatabase($database)
-                        ->setResponse($response)
+        $this->operation->setResponse($response)
                         ->setImageIdentifier($imageIdentifier)
                         ->setImage($image)
                         ->exec();

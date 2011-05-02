@@ -23,39 +23,35 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace Some\Prefix;
+namespace PHPIMS\Operation\Plugin\ManipulateImage;
 
-use PHPIMS\Operation\Plugin;
-use PHPIMS\Operation;
+use \Imagine\ImageInterface;
 
 /**
+ * Image transformation interface
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class OtherCustomPlugin extends Plugin {
+interface TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin::$events
+     * Method that will transform the image
+     *
+     * @param \Imagine\ImageInterface $image Image instance
+     * @param array $params Parameters for the transformation
+     * @return string Return the transformed binary image data
+     * @throws PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
      */
-    static public $events = array(
-        'addImagePreExec'  => 42,
-        'addImagePostExec' => 78,
-    );
-
-    /**
-     * @see PHPIMS\Operation\Plugin::exec()
-     */
-    public function exec(Operation $operation) {
-
-    }
+    public function apply(ImageInterface $image, array $params = array());
 }

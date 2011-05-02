@@ -23,64 +23,46 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
+namespace PHPIMS\Operation\Plugin;
 
-use PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface;
-use \Imagine\ImageInterface;
-use \Imagine\Image\Color;
-use \Imagine\Image\Point;
+use \Mockery as m;
 
 /**
- * Border transformation
- *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
- * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin
  */
-class Border implements TransformationInterface {
+class ManipulateImageTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImagePlugin\TransformationInterface::apply()
+     * Plugin instance
+     *
+     * @var PHPIMS\Operation\Plugin\ManipulateImage
      */
-    public function apply(ImageInterface $image, array $params = array()) {
-        if (!isset($params['color'])) {
-            $params['color'] = '000';
-        }
+    protected $plugin = null;
 
-        if (!isset($params['width'])) {
-            $params['width'] = 1;
-        }
+    public function setUp() {
+        $this->plugin = new ManipulateImage();
+    }
 
-        if (!isset($params['height'])) {
-            $params['height'] = 1;
-        }
+    public function tearDown() {
+        $this->plugin = null;
+    }
 
-        $color  = new Color($params['color']);
-        $size   = $image->getSize();
-        $width  = $size->getWidth();
-        $height = $size->getHeight();
-        $draw   = $image->draw();
-
-        // Draw top and bottom lines
-        for ($i = 0; $i < $params['height']; $i++) {
-            $draw->line(new Point(0, $i), new Point($width - 1, $i), $color)
-                 ->line(new Point($width - 1, $height - ($i + 1)), new Point(0, $height - ($i + 1)), $color);
-        }
-
-        // Draw sides
-        for ($i = 0; $i < $params['width']; $i++) {
-            $draw->line(new Point($i, 0), new Point($i, $height - 1), $color)
-                 ->line(new Point($width - ($i + 1), 0), new Point($width - ($i + 1), $height - 1), $color);
-        }
+    public function testIsValidTransformation() {
+        $this->assertTrue(ManipulateImage::isValidTransformation('resize'));
+        $this->assertTrue(ManipulateImage::isValidTransformation('crop'));
+        $this->assertTrue(ManipulateImage::isValidTransformation('rotate'));
+        $this->assertTrue(ManipulateImage::isValidTransformation('border'));
+        $this->assertFalse(ManipulateImage::isValidTransformation('foobar'));
     }
 }

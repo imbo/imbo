@@ -54,7 +54,11 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->controller = new FrontController();
+        $config = array(
+            'database' => m::mock('PHPIMS\\Database\\DriverInterface'),
+            'storage' => m::mock('PHPIMS\\Storage\\DriverInterface'),
+        );
+        $this->controller = new FrontController($config);
     }
 
     /**
@@ -131,6 +135,9 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $reflection = new \ReflectionClass($this->controller);
         $method = $reflection->getMethod('resolveOperation');
         $method->setAccessible(true);
+
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
 
         $this->assertInstanceOf('PHPIMS\\Operation\\GetImage', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier)));
         $this->assertInstanceOf('PHPIMS\\Operation\\AddImage', $method->invokeArgs($this->controller, array($resource, 'POST', $imageIdentifier)));

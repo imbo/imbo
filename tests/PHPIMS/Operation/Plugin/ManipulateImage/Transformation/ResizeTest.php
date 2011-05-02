@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
 use \Mockery as m;
 use \Imagine\ImageInterface;
@@ -46,7 +46,7 @@ use \Imagine\Image\Box;
  */
 class ResizeTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @expectedException PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Exception
+     * @expectedException PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
      * @expectedExceptionMessage Missing parameters width and/or height
      */
     public function testApplyWithNoParameters() {

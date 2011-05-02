@@ -23,50 +23,64 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
-use \Mockery as m;
+use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
 use \Imagine\ImageInterface;
+use \Imagine\Image\Color;
+use \Imagine\Image\Point;
 
 /**
+ * Border transformation
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class CropTest extends \PHPUnit_Framework_TestCase {
+class Border implements TransformationInterface {
     /**
-     * @expectedException PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation\Exception
-     * @expectedExceptionMessage Missing parameter
+     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
      */
-    public function testApplyWithMissingParameters() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $transformation = new Crop;
-        $transformation->apply($image);
-    }
+    public function apply(ImageInterface $image, array $params = array()) {
+        if (!isset($params['color'])) {
+            $params['color'] = '000';
+        }
 
-    public function testApply() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('crop')->once()
-                                     ->with(m::type('Imagine\\Image\\Point'), m::type('Imagine\\Image\\Box'));
+        if (!isset($params['width'])) {
+            $params['width'] = 1;
+        }
 
-        $params = array(
-            'x'      => 1,
-            'y'      => 2,
-            'width'  => 3,
-            'height' => 4,
-        );
+        if (!isset($params['height'])) {
+            $params['height'] = 1;
+        }
 
-        $transformation = new Crop;
-        $transformation->apply($image, $params);
+        $color  = new Color($params['color']);
+        $size   = $image->getSize();
+        $width  = $size->getWidth();
+        $height = $size->getHeight();
+        $draw   = $image->draw();
+
+        // Draw top and bottom lines
+        for ($i = 0; $i < $params['height']; $i++) {
+            $draw->line(new Point(0, $i), new Point($width - 1, $i), $color)
+                 ->line(new Point($width - 1, $height - ($i + 1)), new Point(0, $height - ($i + 1)), $color);
+        }
+
+        // Draw sides
+        for ($i = 0; $i < $params['width']; $i++) {
+            $draw->line(new Point($i, 0), new Point($i, $height - 1), $color)
+                 ->line(new Point($width - ($i + 1), 0), new Point($width - ($i + 1), $height - 1), $color);
+        }
     }
 }

@@ -23,39 +23,27 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace Some\Prefix;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
-use PHPIMS\Operation\Plugin;
-use PHPIMS\Operation;
+use PHPIMS\Operation\Plugin\Exception as BaseException;
 
 /**
+ * Base exception class for operation plugins
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class CustomPlugin extends Plugin {
-    /**
-     * @see PHPIMS\Operation\Plugin::$events
-     */
-    static public $events = array(
-        'addImagePreExec'  => 1,
-        'addImagePostExec' => 1,
-    );
+class Exception extends BaseException {
 
-    /**
-     * @see PHPIMS\Operation\Plugin::exec()
-     */
-    public function exec(Operation $operation) {
-
-    }
 }

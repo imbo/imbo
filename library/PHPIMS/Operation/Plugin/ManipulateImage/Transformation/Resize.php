@@ -23,37 +23,53 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-use PHPIMS\Operation\Plugin;
-use PHPIMS\Operation;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+
+use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
+use \Imagine\ImageInterface;
+use \Imagine\Image\Box;
 
 /**
+ * Resize transformation
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class OtherCustomPlugin extends Plugin {
+class Resize implements TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin::$events
+     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
      */
-    static public $events = array(
-        'addImagePreExec'  => 12,
-        'addImagePostExec' => 8,
-    );
+    public function apply(ImageInterface $image, array $params = array()) {
+        if (!isset($params['width']) && !isset($params['height'])) {
+            throw new Exception('Missing parameters width and/or height');
+        }
 
-    /**
-     * @see PHPIMS\Operation\Plugin::exec()
-     */
-    public function exec(Operation $operation) {
+        $width  = (isset($params['width']) ? (int) $params['width'] : 0);
+        $height = (isset($params['height']) ? (int) $params['height'] : 0);
 
+        // Fetch the size of the original image
+        $size = $image->getSize();
+
+        // Calculate width or height if not both have been specified
+        if (!$height) {
+            $height = ($size->getHeight() / $size->getWidth()) * $width;
+        } else if (!$width) {
+            $width = ($size->getWidth() / $size->getHeight()) * $height;
+        }
+
+        // Resize image and store in the image object
+        $image->resize(new Box($width, $height));
     }
 }

@@ -23,27 +23,32 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Exceptions
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImagePlugin\Transformation;
+namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
-use PHPIMS\Operation\Plugin\Exception as BaseException;
+use \Mockery as m;
+use \Imagine\ImageInterface;
 
 /**
- * Base exception class for operation plugins
- *
  * @package PHPIMS
- * @subpackage Exceptions
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Exception extends BaseException {
+class RotateTest extends \PHPUnit_Framework_TestCase {
+    public function testApply() {
+        $image = m::mock('Imagine\\ImageInterface');
+        $image->shouldReceive('rotate')->with(45, m::type('Imagine\\Image\\Color'))->once();
 
+        $transformation = new Rotate;
+        $transformation->apply($image, array('angle' => 45));
+    }
 }

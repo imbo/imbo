@@ -32,10 +32,15 @@
 
 namespace PHPIMS;
 
-use PHPIMS\Database\DriverInterface as DatabaseDriverInterface;
-use PHPIMS\Storage\DriverInterface as StorageDriverInterface;
+use PHPIMS\Database\DriverInterface as DatabaseDriver;
+use PHPIMS\Storage\DriverInterface as StorageDriver;
 use PHPIMS\Server\Response;
 use PHPIMS\Operation\Exception as OperationException;
+use PHPIMS\Operation\PluginInterface as Plugin;
+use PHPIMS\Operation\Plugin\Auth;
+use PHPIMS\Operation\Plugin\IdentifyImage;
+use PHPIMS\Operation\Plugin\ManipulateImage;
+use PHPIMS\Operation\Plugin\PrepareImage;
 
 /**
  * Abstract operation class
@@ -53,35 +58,35 @@ abstract class Operation {
      *
      * @var string
      */
-    protected $resource = null;
+    private $resource = null;
 
     /**
      * The current image identifier
      *
      * @param string
      */
-    protected $imageIdentifier = null;
+    private $imageIdentifier = null;
 
     /**
      * HTTP method
      *
      * @var string
      */
-    protected $method = null;
+    private $method = null;
 
     /**
      * The database driver
      *
-     * @var PHPIMS\Database\Driver
+     * @var PHPIMS\Database\DriverInterface
      */
-    protected $database = null;
+    private $database = null;
 
     /**
      * The storage driver
      *
-     * @var PHPIMS\Storage\Driver
+     * @var PHPIMS\Storage\DriverInterface
      */
-    protected $storage = null;
+    private $storage = null;
 
     /**
      * Image instance
@@ -91,7 +96,7 @@ abstract class Operation {
      *
      * @var PHPIMS\Image
      */
-    protected $image = null;
+    private $image = null;
 
     /**
      * Response instance
@@ -101,161 +106,47 @@ abstract class Operation {
      *
      * @var PHPIMS\Image
      */
-    protected $response = null;
+    private $response = null;
 
     /**
-     * Array of class names to plugins to execute. The array has two elements, 'preExec' and
-     * 'postExec' which both are numerically indexed.
+     * Array of plugins
      *
      * @var array
      */
-    protected $plugins = array();
+    private $plugins = array();
 
     /**
      * Configuration passed from the front controller
      *
      * @var array
      */
-    protected $config = array();
+    private $config = array();
 
     /**
-     * Initialize the database driver
+     * Class constructor
      *
-     * @param array $config Part of the confguration array passed from the front controller
+     * @param PHPIMS\Database\DriverInterface $database Database driver
+     * @param PHPIMS\Storage\DriverInterface $storage Storage driver
      */
-    protected function initDatabaseDriver(array $config) {
-        $params = array();
+    public function __construct(DatabaseDriver $database, StorageDriver $storage) {
+        $this->database = $database;
+        $this->storage  = $storage;
 
-        if (isset($config['params'])) {
-            $params = $config['params'];
-        }
-
-        $driver = new $config['driver']($params);
-
-        $this->setDatabase($driver);
+        // Register internal plugins
+        $this->registerPlugin(new Auth())
+             ->registerPlugin(new IdentifyImage())
+             ->registerPlugin(new ManipulateImage())
+             ->registerPlugin(new PrepareImage());
     }
 
     /**
-     * Initialize the storage driver
+     * Register a plugin
      *
-     * @param array $config Part of the confguration array passed from the front controller
-     */
-    protected function initStorageDriver(array $config) {
-        $params = array();
-
-        if (isset($config['params'])) {
-            $params = $config['params'];
-        }
-
-        $driver = new $config['driver']($params);
-
-        $this->setStorage($driver);
-    }
-
-    /**
-     * Initialize plugins for this operation
-     *
-     * @param array $config Part of the confguration array passed from the front controller
-     */
-    protected function initPlugins(array $config) {
-        // Operation name
-        $operationName = $this->getOperationName();
-
-        // Loop through the plugin paths, and see if there are any plugins that wants to execute
-        // before and/or after this operation. Also sort them based in the priorities set in each
-        // plugin class.
-        $pluginPaths = array(
-            dirname(__DIR__) => 'PHPIMS\\Operation\\Plugin\\',
-        );
-
-        // Append plugin paths from configuration
-        foreach ($config as $spec) {
-            $pluginPaths[$spec['path']] = isset($spec['prefix']) ? $spec['prefix'] : '';
-        }
-
-        // Initialize array for the plugins that will be executed
-        $plugins = array(
-            'preExec'  => array(),
-            'postExec' => array()
-        );
-
-        foreach ($pluginPaths as $path => $prefix) {
-            $path = rtrim($path, '/̈́') . '/';
-
-            if (!empty($prefix)) {
-                $path .= str_replace('\\', '/', $prefix);
-            }
-
-            if (empty($path) || !is_dir($path)) {
-                continue;
-            }
-
-            $iterator = new \GlobIterator($path . '*Plugin.php');
-
-            foreach ($iterator as $file) {
-                $className = $prefix . $file->getBasename('.php');
-
-                if (is_subclass_of($className, 'PHPIMS\\Operation\\Plugin')) {
-                    $events = $className::$events;
-
-                    $key = $operationName . 'PreExec';
-
-                    if (isset($events[$key])) {
-                        $priority = (int) $events[$key];
-                        $plugin = new $className();
-                        $plugins['preExec'][$priority] = $plugin;
-                    }
-
-                    $key = $operationName . 'PostExec';
-
-                    if (isset($events[$key])) {
-                        $priority = (int) $events[$key];
-                        $plugin = new $className();
-                        $plugins['postExec'][$priority] = $plugin;
-                    }
-                }
-            }
-        }
-
-        // Sort to get the correct order
-        ksort($plugins['preExec']);
-        ksort($plugins['postExec']);
-
-        $this->setPlugins($plugins);
-    }
-
-    /**
-     * Get plugins array
-     *
-     * @return array
-     */
-    protected function getPlugins() {
-        return $this->plugins;
-    }
-
-    /**
-     * Set plugins array
-     *
-     * @param array $plugins Associative array with two keys: 'preExec' and 'postExec' which both
-     *                       should be sorted numerically indexed arrays.
-     */
-    protected function setPlugins(array $plugins) {
-        $this->plugins = $plugins;
-    }
-
-    /**
-     * Init method
-     *
-     * @param array $config Configuration passed on from the front controller
+     * @param PHPIMS\Operation\PluginInterface $plugin Plugin instance
      * @return PHPIMS\Operation
-     * @codeCoverageIgnore
      */
-    public function init(array $config) {
-        $this->setConfig($config);
-
-        $this->initDatabaseDriver($config['database']);
-        $this->initStorageDriver($config['storage']);
-        $this->initPlugins($config['plugins']);
+    public function registerPlugin(Plugin $plugin) {
+        $this->plugins[] = $plugin;
 
         return $this;
     }
@@ -265,7 +156,7 @@ abstract class Operation {
      *
      * @return string
      */
-    protected function getOperationName() {
+    public function getOperationName() {
         $className = get_class($this);
 
         $operationName = substr($className, strrpos($className, '\\') + 1);
@@ -352,7 +243,7 @@ abstract class Operation {
      * @param PHPIMS\Database\DriverInterface $driver The driver instance
      * @return PHPIMS\Operation
      */
-    public function setDatabase(DatabaseDriverInterface $driver) {
+    public function setDatabase(DatabaseDriver $driver) {
         $this->database = $driver;
 
         return $this;
@@ -373,7 +264,7 @@ abstract class Operation {
      * @param PHPIMS\Storage\DriverInterface $driver The driver instance
      * @return PHPIMS\Operation
      */
-    public function setStorage(StorageDriverInterface $driver) {
+    public function setStorage(StorageDriver $driver) {
         $this->storage = $driver;
 
         return $this;
@@ -448,44 +339,61 @@ abstract class Operation {
     }
 
     /**
-     * Trigger for registered "preExec" plugins
+     * Run the operation
      *
-     * @return PHPIMS\Operation
-     * @throws PHPIMS\Operation\Plugin\Exception
+     * This method will trigger registered plugins along with the main operation.
      */
-    public function preExec() {
-        foreach ($this->plugins['preExec'] as $plugin) {
+    public function run() {
+        $operationName = $this->getOperationName();
+        $preExecKey = $operationName . 'PreExec';
+        $postExecKey = $operationName . 'PostExec';
+
+        $plugins = array(
+            'preExec'  => array(),
+            'postExec' => array(),
+        );
+
+        foreach ($this->plugins as $plugin) {
+            if (isset($plugin::$events[$preExecKey])) {
+                $plugins['preExec'][$plugin::$events[$preExecKey]] = $plugin;
+            }
+
+            if (isset($plugin::$events[$postExecKey])) {
+                $plugins['postExec'][$plugin::$events[$postExecKey]] = $plugin;
+            }
+        }
+
+        // Sort by keys to execute plugins in correct order
+        ksort($plugins['preExec']);
+        ksort($plugins['postExec']);
+
+        // Trigger plugins who want to run before the operation
+        foreach ($plugins['preExec'] as $plugin) {
             $plugin->exec($this);
         }
 
-        return $this;
-    }
+        // Run the operation
+        $this->exec();
 
-    /**
-     * Trigger for registered "postExec" plugins
-     *
-     * @return PHPIMS\Operation
-     * @throws PHPIMS\Operation\Plugin\Exception
-     */
-    public function postExec() {
-        foreach ($this->plugins['postExec'] as $plugin) {
+        // Trigger plugins who want to run after the operation
+        foreach ($plugins['postExec'] as $plugin) {
             $plugin->exec($this);
         }
-
-        return $this;
     }
 
     /**
      * Factory method
      *
      * @param string $className The name of the operation class to instantiate
+     * @param PHPIMS\Database\DriverInterface $database Database driver
+     * @param PHPIMS\Storage\DriverInterface $storage Storage driver
      * @param string $resource The accessed resource
      * @param string $method The HTTP method used
      * @param string $imageIdentifier Optional Image identifier
      * @return PHPIMS\OperationInterface
      * @throws PHPIMS\Operation\Exception
      */
-    static public function factory($className, $resource, $method, $imageIdentifier = null) {
+    static public function factory($className, DatabaseDriver $database, StorageDriver $storage, $resource, $method, $imageIdentifier = null) {
         switch ($className) {
             case 'PHPIMS\\Operation\\AddImage':
             case 'PHPIMS\\Operation\\DeleteImage':
@@ -494,7 +402,7 @@ abstract class Operation {
             case 'PHPIMS\\Operation\\GetImage':
             case 'PHPIMS\\Operation\\GetImages':
             case 'PHPIMS\\Operation\\GetImageMetadata':
-                $operation = new $className();
+                $operation = new $className($database, $storage);
                 $operation->setResource($resource)
                           ->setImageIdentifier($imageIdentifier)
                           ->setMethod($method)

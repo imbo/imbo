@@ -34,11 +34,6 @@ namespace PHPIMS;
 
 use \Mockery as m;
 
-require 'Operation/_pluginsWithoutPrefix/CustomPlugin.php';
-require 'Operation/_pluginsWithoutPrefix/OtherCustomPlugin.php';
-require 'Operation/_pluginsWithPrefix/Some/Prefix/CustomPlugin.php';
-require 'Operation/_pluginsWithPrefix/Some/Prefix/OtherCustomPlugin.php';
-
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -116,83 +111,6 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($method, $this->operation->getMethod());
     }
 
-    public function testInitPlugins() {
-        // Add a directory that has no custom plugins and a directory that has some plugins
-        $config = array(
-            array(
-                'path' => '/some/path',
-                'prefix' => 'Some\\Prefix',
-            ),
-            array(
-                'path' => __DIR__ . '/Operation/_pluginsWithPrefix',
-                'prefix' => 'Some\\Prefix\\',
-            ),
-            array(
-                'path' => __DIR__ . '/Operation/_pluginsWithoutPrefix',
-            ),
-        );
-
-        $reflection = new \ReflectionClass($this->operation);
-        $method = $reflection->getMethod('initPlugins');
-        $method->setAccessible(true);
-        $method->invokeArgs($this->operation, array($config));
-
-        $reflection = new \ReflectionClass($this->operation);
-        $method = $reflection->getMethod('getPlugins');
-        $method->setAccessible(true);
-
-        $plugins = $method->invoke($this->operation);
-
-        $this->assertInstanceOf('Some\\Prefix\\CustomPlugin', $plugins['preExec'][1]);
-        $this->assertInstanceOf('CustomPlugin', $plugins['preExec'][10]);
-        $this->assertInstanceOf('OtherCustomPlugin', $plugins['preExec'][12]);
-        $this->assertInstanceOf('Some\\Prefix\\OtherCustomPlugin', $plugins['preExec'][42]);
-        $this->assertInstanceOf('PHPIMS\\Operation\\Plugin\\AuthPlugin', $plugins['preExec'][100]);
-        $this->assertInstanceOf('PHPIMS\\Operation\\Plugin\\PrepareImagePlugin', $plugins['preExec'][101]);
-        $this->assertInstanceOf('PHPIMS\\Operation\\Plugin\\IdentifyImagePlugin', $plugins['preExec'][102]);
-
-        $this->assertInstanceOf('Some\\Prefix\\CustomPlugin', $plugins['postExec'][1]);
-        $this->assertInstanceOf('OtherCustomPlugin', $plugins['postExec'][8]);
-        $this->assertInstanceOf('CustomPlugin', $plugins['postExec'][20]);
-        $this->assertInstanceOf('Some\\Prefix\\OtherCustomPlugin', $plugins['postExec'][78]);
-    }
-
-    public function testPreAndPostExec() {
-        $plugin1 = m::mock('PHPIMS\\Operation\\PluginInterface');
-        $plugin1->shouldReceive('exec')->times(2);
-
-        $plugin2 = m::mock('PHPIMS\\Operation\\PluginInterface');
-        $plugin2->shouldReceive('exec')->times(2);
-
-        $plugin3 = m::mock('PHPIMS\\Operation\\PluginInterface');
-        $plugin3->shouldReceive('exec')->once();
-
-        $plugin4 = m::mock('PHPIMS\\Operation\\PluginInterface');
-        $plugin4->shouldReceive('exec')->once();
-
-        $plugins = array(
-            'preExec' => array(
-                1 => $plugin1,
-                2 => $plugin2,
-                3 => $plugin4,
-            ),
-            'postExec' => array(
-                1 => $plugin1,
-                2 => $plugin2,
-                3 => $plugin3,
-            ),
-        );
-
-        $reflection = new \ReflectionClass($this->operation);
-        $method = $reflection->getMethod('setPlugins');
-        $method->setAccessible(true);
-
-        $method->invokeArgs($this->operation, array($plugins));
-
-        $this->operation->preExec();
-        $this->operation->postExec();
-    }
-
     public function testSetGetConfig() {
         $config = array(
             'foo' => 'bar',
@@ -218,9 +136,11 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
             'GET'    => 'PHPIMS\\Operation\\GetImage',
             'GET'    => 'PHPIMS\\Operation\\GetImageMetadata',
         );
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
 
         foreach ($operations as $method => $className) {
-            $this->assertInstanceOf($className, Operation::factory($className, $method, md5(microtime())));
+            $this->assertInstanceOf($className, Operation::factory($className, $database, $storage, $method, md5(microtime())));
         }
     }
 
@@ -228,7 +148,10 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
      * @expectedException PHPIMS\Operation\Exception
      */
     public function testFactoryWithUnSupportedOperation() {
-        Operation::factory('foobar', 'GET', md5(microtime()));
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
+
+        Operation::factory('foobar', $database, $storage, 'GET', md5(microtime()));
     }
 
     public function testSetGetResource() {
