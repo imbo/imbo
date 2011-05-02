@@ -16,7 +16,4 @@ return array(
     'storage' => new PHPIMS\Storage\Driver\Filesystem(array(
         'dataDir' => realpath('/some/path'),
     )),
-
-    // Custom plugins
-    'plugins' => array(),
 );
