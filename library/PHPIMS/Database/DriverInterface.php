@@ -106,4 +106,14 @@ interface DriverInterface {
      * @throws PHPIMS\Database\Exception
      */
     public function getImages(Query $query);
+
+    /**
+     * Load information from database into the image object
+     *
+     * @param string $imageIdentifier The image identifier
+     * @param Image $image The image object to populate
+     * @return boolean
+     * @throws PHPIMS\Database\Exception
+     */
+    public function load($imageIdentifier, Image $image);
 }

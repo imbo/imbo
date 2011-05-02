@@ -293,4 +293,37 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
 
         $this->driver->getImages($query);
     }
+
+    /**
+     * @expectedException PHPIMS\Database\Exception
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Unable to fetch image data
+     */
+    public function testLoadWhenCollectionThrowsException() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $this->collection->shouldReceive('findOne')->once()->with(array('imageIdentifier' => $imageIdentifier), m::type('array'))->andThrow('\\MongoException');
+
+        $this->driver->load($imageIdentifier, m::mock('PHPIMS\\Image'));
+    }
+
+    public function testSucessfullLoad() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+
+        $data = array(
+            'name' => 'filename',
+            'size' => 123,
+            'width' => 234,
+            'height' => 345
+        );
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('setFilename')->once()->with($data['name'])->andReturn($image);
+        $image->shouldReceive('setFilesize')->once()->with($data['size'])->andReturn($image);
+        $image->shouldReceive('setWidth')->once()->with($data['width'])->andReturn($image);
+        $image->shouldReceive('setHeight')->once()->with($data['height'])->andReturn($image);
+
+        $this->collection->shouldReceive('findOne')->once()->with(array('imageIdentifier' => $imageIdentifier), m::type('array'))->andReturn($data);
+
+        $this->assertTrue($this->driver->load($imageIdentifier, $image));
+    }
 }

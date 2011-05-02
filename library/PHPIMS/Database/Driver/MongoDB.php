@@ -84,10 +84,12 @@ class MongoDB implements DriverInterface {
         }
 
         if ($collection === null) {
+            // @codeCoverageIgnoreStart
             $mongo      = new \Mongo;
             $database   = $mongo->{$this->params['databaseName']};
             $collection = $database->{$this->params['collectionName']};
         }
+        // @codeCoverageIgnoreEnd
 
         $this->collection = $collection;
     }
@@ -218,13 +220,7 @@ class MongoDB implements DriverInterface {
         }
 
         // Fields to fetch
-        $fields = array(
-            'added',
-            'imageIdentifier',
-            'mime',
-            'name',
-            'size',
-        );
+        $fields = array('added', 'imageIdentifier', 'mime', 'name', 'size', 'width', 'height');
 
         if ($query->returnMetadata()) {
             $fields[] = 'metadata';
@@ -250,5 +246,24 @@ class MongoDB implements DriverInterface {
         }
 
         return $images;
+    }
+
+    /**
+     * @see PHPIMS\Database\DriverInterface::load()
+     */
+    public function load($imageIdentifier, Image $image) {
+        try {
+            $fields = array('name', 'size', 'width', 'height');
+            $data = $this->collection->findOne(array('imageIdentifier' => $imageIdentifier), $fields);
+        } catch (\MongoException $e) {
+            throw new DatabaseException('Unable to fetch image data', 500, $e);
+        }
+
+        $image->setFilename($data['name'])
+              ->setFilesize($data['size'])
+              ->setWidth($data['width'])
+              ->setHeight($data['height']);
+
+        return true;
     }
 }
