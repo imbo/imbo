@@ -161,10 +161,7 @@ class FrontController {
         $extra = isset($matches['extra']) ? $matches['extra'] : null;
 
         $operation = $this->resolveOperation($resource, $method, $imageIdentifier, $extra);
-        $operation->init($this->config)
-                  ->preExec()
-                  ->exec()
-                  ->postExec();
+        $operation->run();
 
         return $operation->getResponse();
     }

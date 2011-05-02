@@ -36,6 +36,11 @@ use PHPIMS\Database\DriverInterface as DatabaseDriver;
 use PHPIMS\Storage\DriverInterface as StorageDriver;
 use PHPIMS\Server\Response;
 use PHPIMS\Operation\Exception as OperationException;
+use PHPIMS\Operation\PluginInterface as Plugin;
+use PHPIMS\Operation\Plugin\Auth;
+use PHPIMS\Operation\Plugin\IdentifyImage;
+use PHPIMS\Operation\Plugin\ManipulateImage;
+use PHPIMS\Operation\Plugin\PrepareImage;
 
 /**
  * Abstract operation class
@@ -104,8 +109,7 @@ abstract class Operation {
     private $response = null;
 
     /**
-     * Array of class names to plugins to execute. The array has two elements, 'preExec' and
-     * 'postExec' which both are numerically indexed.
+     * Array of plugins
      *
      * @var array
      */
@@ -127,110 +131,22 @@ abstract class Operation {
     public function __construct(DatabaseDriver $database, StorageDriver $storage) {
         $this->database = $database;
         $this->storage  = $storage;
+
+        // Register internal plugins
+        $this->registerPlugin(new Auth())
+             ->registerPlugin(new IdentifyImage())
+             ->registerPlugin(new ManipulateImage())
+             ->registerPlugin(new PrepareImage());
     }
 
     /**
-     * Initialize plugins for this operation
+     * Register a plugin
      *
-     * @param array $config Part of the confguration array passed from the front controller
-     */
-    protected function initPlugins(array $config) {
-        // Operation name
-        $operationName = $this->getOperationName();
-
-        // Loop through the plugin paths, and see if there are any plugins that wants to execute
-        // before and/or after this operation. Also sort them based in the priorities set in each
-        // plugin class.
-        $pluginPaths = array(
-            dirname(__DIR__) => 'PHPIMS\\Operation\\Plugin\\',
-        );
-
-        // Append plugin paths from configuration
-        foreach ($config as $spec) {
-            $pluginPaths[$spec['path']] = isset($spec['prefix']) ? $spec['prefix'] : '';
-        }
-
-        // Initialize array for the plugins that will be executed
-        $plugins = array(
-            'preExec'  => array(),
-            'postExec' => array()
-        );
-
-        foreach ($pluginPaths as $path => $prefix) {
-            $path = rtrim($path, '/̈́') . '/';
-
-            if (!empty($prefix)) {
-                $path .= str_replace('\\', '/', $prefix);
-            }
-
-            if (empty($path) || !is_dir($path)) {
-                continue;
-            }
-
-            $iterator = new \GlobIterator($path . '*Plugin.php');
-
-            foreach ($iterator as $file) {
-                $className = $prefix . $file->getBasename('.php');
-
-                if (is_subclass_of($className, 'PHPIMS\\Operation\\Plugin')) {
-                    $events = $className::$events;
-
-                    $key = $operationName . 'PreExec';
-
-                    if (isset($events[$key])) {
-                        $priority = (int) $events[$key];
-                        $plugin = new $className();
-                        $plugins['preExec'][$priority] = $plugin;
-                    }
-
-                    $key = $operationName . 'PostExec';
-
-                    if (isset($events[$key])) {
-                        $priority = (int) $events[$key];
-                        $plugin = new $className();
-                        $plugins['postExec'][$priority] = $plugin;
-                    }
-                }
-            }
-        }
-
-        // Sort to get the correct order
-        ksort($plugins['preExec']);
-        ksort($plugins['postExec']);
-
-        $this->setPlugins($plugins);
-    }
-
-    /**
-     * Get plugins array
-     *
-     * @return array
-     */
-    protected function getPlugins() {
-        return $this->plugins;
-    }
-
-    /**
-     * Set plugins array
-     *
-     * @param array $plugins Associative array with two keys: 'preExec' and 'postExec' which both
-     *                       should be sorted numerically indexed arrays.
-     */
-    protected function setPlugins(array $plugins) {
-        $this->plugins = $plugins;
-    }
-
-    /**
-     * Init method
-     *
-     * @param array $config Configuration passed on from the front controller
+     * @param PHPIMS\Operation\PluginInterface $plugin Plugin instance
      * @return PHPIMS\Operation
-     * @codeCoverageIgnore
      */
-    public function init(array $config) {
-        $this->setConfig($config);
-
-        $this->initPlugins($config['plugins']);
+    public function registerPlugin(Plugin $plugin) {
+        $this->plugins[get_class($plugin)] = $plugin;
 
         return $this;
     }
@@ -423,31 +339,10 @@ abstract class Operation {
     }
 
     /**
-     * Trigger for registered "preExec" plugins
-     *
-     * @return PHPIMS\Operation
-     * @throws PHPIMS\Operation\Plugin\Exception
+     * Run the operation
      */
-    public function preExec() {
-        foreach ($this->plugins['preExec'] as $plugin) {
-            $plugin->exec($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Trigger for registered "postExec" plugins
-     *
-     * @return PHPIMS\Operation
-     * @throws PHPIMS\Operation\Plugin\Exception
-     */
-    public function postExec() {
-        foreach ($this->plugins['postExec'] as $plugin) {
-            $plugin->exec($this);
-        }
-
-        return $this;
+    public function run() {
+        $this->exec();
     }
 
     /**
