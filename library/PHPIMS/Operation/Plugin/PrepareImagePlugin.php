@@ -90,5 +90,10 @@ class PrepareImagePlugin extends Plugin implements PluginInterface {
                 $image->setMetadata($data);
             }
         }
+
+        // Fetch width and height of image
+        $size = getimagesize($_FILES['file']['tmp_name']);
+        $image->setWidth($size[0])
+              ->setHeight($size[1]);
     }
 }
