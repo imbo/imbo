@@ -72,14 +72,26 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
     public function testSetGetHeaders() {
         $headers = array(
-            'Location: http://foo/bar',
-            'x-Some: Value',
+            'Location' => 'http://foo/bar',
+            'x-Some' => 'Value',
         );
         $this->response->setHeaders($headers);
         $this->assertSame($headers, $this->response->getHeaders());
     }
 
-    public function testSetHeader() {
+    public function testSetGetCustomHeaders() {
+        $headers = array(
+            'Location' => 'http://foo/bar',
+            'x-Some' => 'Value',
+        );
+        $this->response->setCustomHeaders($headers);
+        $this->assertSame(array(
+            'X-PHPIMS-Location' => 'http://foo/bar',
+            'X-PHPIMS-x-Some' => 'Value',
+        ), $this->response->getHeaders());
+    }
+
+    public function testSetGetHeader() {
         $headers = array(
             'Location' => 'http://foo/bar',
             'X-Some'   => 'Value',
@@ -90,6 +102,22 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         }
 
         $this->assertSame($headers, $this->response->getHeaders());
+    }
+
+    public function testSetGetCustomHeader() {
+        $headers = array(
+            'foo' => 'foo',
+            'X-bar' => 'bar',
+        );
+
+        foreach ($headers as $name => $value) {
+            $this->response->setCustomHeader($name, $value);
+        }
+
+        $this->assertSame(array(
+            'X-PHPIMS-foo' => 'foo',
+            'X-PHPIMS-X-bar' => 'bar',
+        ), $this->response->getHeaders());
     }
 
     public function testSetGetBody() {

@@ -188,13 +188,37 @@ class Response {
      * Add a single header
      *
      * @param string $name The header name
-     * @param string $value The header value
+     * @param mixed $value The header value
      * @return PHPIMS\Server\Response
      */
     public function setHeader($name, $value) {
         $this->headers[$name] = $value;
 
         return $this;
+    }
+
+    /**
+     * Set custom headers (prefixed with "X-PHPIMS-")
+     *
+     * @param array $headers Headers to set
+     * @return \PHPIMS\Server\Response
+     */
+    public function setCustomHeaders(array $headers) {
+        foreach ($headers as $name => $value) {
+            $this->setCustomHeader($name, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set a custom header (prefixed with "X-PHPIMS-")
+     *
+     * @param string $name The header name
+     * @param mixed $value The header value
+     */
+    public function setCustomHeader($name, $value) {
+        return $this->setHeader('X-PHPIMS-' . $name, $value);
     }
 
     /**
