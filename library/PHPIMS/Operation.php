@@ -146,7 +146,7 @@ abstract class Operation {
      * @return PHPIMS\Operation
      */
     public function registerPlugin(Plugin $plugin) {
-        $this->plugins[get_class($plugin)] = $plugin;
+        $this->plugins[] = $plugin;
 
         return $this;
     }
@@ -156,7 +156,7 @@ abstract class Operation {
      *
      * @return string
      */
-    protected function getOperationName() {
+    public function getOperationName() {
         $className = get_class($this);
 
         $operationName = substr($className, strrpos($className, '\\') + 1);
@@ -340,9 +340,45 @@ abstract class Operation {
 
     /**
      * Run the operation
+     *
+     * This method will trigger registered plugins along with the main operation.
      */
     public function run() {
+        $operationName = $this->getOperationName();
+        $preExecKey = $operationName . 'PreExec';
+        $postExecKey = $operationName . 'PostExec';
+
+        $plugins = array(
+            'preExec'  => array(),
+            'postExec' => array(),
+        );
+
+        foreach ($this->plugins as $plugin) {
+            if (isset($plugin::$events[$preExecKey])) {
+                $plugins['preExec'][$plugin::$events[$preExecKey]] = $plugin;
+            }
+
+            if (isset($plugin::$events[$postExecKey])) {
+                $plugins['postExec'][$plugin::$events[$postExecKey]] = $plugin;
+            }
+        }
+
+        // Sort by keys to execute plugins in correct order
+        ksort($plugins['preExec']);
+        ksort($plugins['postExec']);
+
+        // Trigger plugins who want to run before the operation
+        foreach ($plugins['preExec'] as $plugin) {
+            $plugin->exec($this);
+        }
+
+        // Run the operation
         $this->exec();
+
+        // Trigger plugins who want to run after the operation
+        foreach ($plugins['postExec'] as $plugin) {
+            $plugin->exec($this);
+        }
     }
 
     /**
