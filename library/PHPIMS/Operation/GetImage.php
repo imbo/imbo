@@ -63,12 +63,23 @@ class GetImage extends Operation implements OperationInterface {
      */
     public function exec() {
         $image = $this->getImage();
+        $response = $this->getResponse();
+
+        // Fetch information from the database
+        $this->getDatabase()->load($this->getImageIdentifier(), $image);
+
+        $response->setCustomHeaders(array(
+            'OrignalImageWidth'    => $image->getWidth(),
+            'OrignalImageHeight'   => $image->getHeight(),
+            'OrignalImageFilename' => $image->getFilename(),
+            'OrignalImageSize'     => $image->getFilesize(),
+        ));
 
         // Load the image
         $this->getStorage()->load($this->getImageIdentifier(), $image);
 
         // Attach the current image object to the response
-        $this->getResponse()->setImage($image);
+        $response->setImage($image);
 
         return $this;
     }

@@ -52,13 +52,19 @@ class GetImageTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $database->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
+        $this->operation->setDatabase($database);
+
         $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
         $storage->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
         $this->operation->setStorage($storage);
 
         $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getWidth', 'getHeight', 'getFilename', 'getFilesize')->once()->andReturn('some value');
         $response = m::mock('PHPIMS\\Server\\Response');
         $response->shouldReceive('setImage')->once()->with($image)->andReturn($response);
+        $response->shouldReceive('setCustomHeaders')->once()->with(m::type('array'))->andReturn($response);
 
         $this->operation->setResponse($response)->setImage($image);
 
