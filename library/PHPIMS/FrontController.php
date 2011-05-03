@@ -138,8 +138,10 @@ class FrontController {
         if ($operation === null) {
             throw new Exception('Unsupported operation', 400);
         }
-
-        return Operation::factory($operation, $this->config['database'], $this->config['storage'], $resource, $method, $imageIdentifier);
+        
+        $operation = Operation::factory($operation, $this->config['database'], $this->config['storage'], $resource, $method, $imageIdentifier);
+        $operation->setConfig($this->config);
+        return $operation;
     }
 
     /**
