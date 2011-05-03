@@ -30,6 +30,12 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
+use PHPIMS\Operation;
+use PHPIMS\OperationInterface;
+use PHPIMS\Operation\Plugin\IdentifyImage;
+
 /**
  * Get image operation
  *
@@ -42,25 +48,38 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_GetImage extends PHPIMS_Operation_Abstract {
+class GetImage extends Operation implements OperationInterface {
     /**
      * Internal plugins
      *
      * @var array
      */
     protected $internalPluginsSpec = array(
-        'PHPIMS_Operation_Plugin_IdentifyImage' => array(),
+        'IdentifyImage' => array(),
     );
 
     /**
-     * @see PHPIMS_Operation_Abstract::exec()
+     * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
+        $image = $this->getImage();
+        $response = $this->getResponse();
+
+        // Fetch information from the database
+        $this->getDatabase()->load($this->getImageIdentifier(), $image);
+
+        $response->setCustomHeaders(array(
+            'OrignalImageWidth'    => $image->getWidth(),
+            'OrignalImageHeight'   => $image->getHeight(),
+            'OrignalImageFilename' => $image->getFilename(),
+            'OrignalImageSize'     => $image->getFilesize(),
+        ));
+
         // Load the image
-        $this->getStorage()->load($this->getHash());
+        $this->getStorage()->load($this->getImageIdentifier(), $image);
 
         // Attach the current image object to the response
-        $this->getResponse()->setImage($this->getImage());
+        $response->setImage($image);
 
         return $this;
     }

@@ -6,28 +6,14 @@ return array(
         'privateKey' => '',
     ),
     
-    // Configuration for the database driver
-    'database' => array(
-        'driver' => 'PHPIMS_Database_Driver_MongoDB',
-        'params' => array(
-            'database'   => 'phpims',
-            'collection' => 'images',
-        ),
-    ),
+    // Database driver
+    'database' => new PHPIMS\Database\Driver\MongoDB(array(
+        'database'   => 'phpims',
+        'collection' => 'images',
+    )),
 
-    // Configuration for the storage driver
-    'storage' => array(
-        'driver' => 'PHPIMS_Storage_Driver_Filesystem',
-        'params' => array(
-            'dataDir' => realpath('/some/path'),
-        ),
-    ),
-
-    // Custom plugins
-    'plugins' => array(),
-
-    // The operation factory
-    'operation' => array(
-        'factory' => 'PHPIMS_Operation',
-    ),
+    // Storage driver
+    'storage' => new PHPIMS\Storage\Driver\Filesystem(array(
+        'dataDir' => realpath('/some/path'),
+    )),
 );

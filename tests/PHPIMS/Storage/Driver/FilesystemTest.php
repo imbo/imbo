@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Storage\Driver;
+
+use \Mockery as m;
+
 /** vfsStream */
 require_once 'vfsStream/vfsStream.php';
 
@@ -41,120 +45,92 @@ require_once 'vfsStream/vfsStream.php';
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Storage_Driver_FilesystemTest extends PHPUnit_Framework_TestCase {
+class FilesystemTest extends \PHPUnit_Framework_TestCase {
     /**
-     * Driver instance
-     *
-     * @var PHPIMS_Storage_Driver_Filesystem
-     */
-    protected $driver = null;
-
-    /**
-     * Set up method
-     */
-    public function setUp() {
-        $this->driver = new PHPIMS_Storage_Driver_Filesystem();
-    }
-
-    /**
-     * Tear down method
-     */
-    public function tearDown() {
-        $this->driver = null;
-    }
-
-    /**
-     * @expectedException PHPIMS_Storage_Exception
+     * @expectedException PHPIMS\Storage\Exception
      * @expectedExceptionMessage File not found
      */
     public function testDeleteFileThatDoesNotExist() {
-        $this->driver->setParams(array('dataDir' => 'foobar'));
-        $this->driver->delete('asdasdasasd');
+        $driver = new Filesystem(array('dataDir' => 'foobar'));
+        $driver->delete('asdasdasasd');
     }
 
     public function testDelete() {
-        $hash = 'cfe95b64ac715d64275365ede690ee7c.png';
+        $imageIdentifier = md5(microtime()) . '.png';
 
-        vfsStream::setup('basedir');
-        $this->driver->setParams(array('dataDir' => vfsStream::url('basedir')));
+        \vfsStream::setup('basedir');
+        $driver = new Filesystem(array('dataDir' => \vfsStream::url('basedir')));
 
-        $root = vfsStreamWrapper::getRoot();
+        $root = \vfsStreamWrapper::getRoot();
         $last = $root;
 
-        foreach (array($hash[0], $hash[1], $hash[2]) as $letter) {
-            $d = vfsStream::newDirectory($letter);
+        foreach (array($imageIdentifier[0], $imageIdentifier[1], $imageIdentifier[2]) as $letter) {
+            $d = \vfsStream::newDirectory($letter);
             $last->addChild($d);
             $last = $d;
         }
 
-        $last->addChild(vfsStream::newFile($hash));
+        $last->addChild(\vfsStream::newFile($imageIdentifier));
 
-        $this->assertTrue($last->hasChild($hash));
-        $this->driver->delete($hash);
-        $this->assertFalse($last->hasChild($hash));
+        $this->assertTrue($last->hasChild($imageIdentifier));
+        $driver->delete($imageIdentifier);
+        $this->assertFalse($last->hasChild($imageIdentifier));
     }
 
     /**
-     * @expectedException PHPIMS_Storage_Exception
+     * @expectedException PHPIMS\Storage\Exception
      * @expectedExpectionMessage Could not store image
      */
     public function testStoreToUnwritablePath() {
-        $image = $this->getMock('PHPIMS_Image');
+        $image = m::mock('PHPIMS\\Image');
         $dir = 'unwritableDirectory';
 
         // Create the virtual directory with no permissions
-        vfsStream::setup($dir, 0);
+        \vfsStream::setup($dir, 0);
 
-        $this->driver->setParams(array(
-            'dataDir' => vfsStream::url($dir),
-        ));
-
-        $this->driver->store('some path', $image);
+        $driver = new Filesystem(array('dataDir' => \vfsStream::url($dir)));
+        $driver->store('some path', $image);
     }
 
     public function testGetImagePath() {
-        $this->driver->setParams(array('dataDir' => '/tmp'));
-        $this->assertSame('/tmp/a/s/d/asdasdasd.png', $this->driver->getImagePath('asdasdasd.png'));
+        $driver = new Filesystem(array('dataDir' => '/tmp'));
+        $this->assertSame('/tmp/a/s/d/asdasdasd.png', $driver->getImagePath('asdasdasd.png'));
+        $this->assertSame('/tmp/a/s/d', $driver->getImagePath('asdasdasd.png', false));
     }
 
     /**
-     * @expectedException PHPIMS_Storage_Exception
+     * @expectedException PHPIMS\Storage\Exception
      * @expectedExceptionCode 404
      */
     public function testLoadFileThatDoesNotExist() {
-        $this->driver->setParams(array('dataDir' => '/some/path'));
-        $this->driver->load(md5(microtime()) . '.png');
+        $image = m::mock('PHPIMS\\Image');
+        $driver = new Filesystem(array('dataDir' => '/some/path'));
+        $driver->load(md5(microtime()) . '.png', $image);
     }
 
     public function testLoad() {
-        $hash = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
 
-        vfsStream::setup('basedir');
-        $this->driver->setParams(array('dataDir' => vfsStream::url('basedir')));
+        \vfsStream::setup('basedir');
+        $driver = new Filesystem(array('dataDir' => \vfsStream::url('basedir')));
 
-        $root = vfsStreamWrapper::getRoot();
+        $root = \vfsStreamWrapper::getRoot();
         $last = $root;
 
-        foreach (array($hash[0], $hash[1], $hash[2]) as $letter) {
-            $d = vfsStream::newDirectory($letter);
+        foreach (array($imageIdentifier[0], $imageIdentifier[1], $imageIdentifier[2]) as $letter) {
+            $d = \vfsStream::newDirectory($letter);
             $last->addChild($d);
             $last = $d;
         }
 
         $content = 'some binary content';
-        $file = vfsStream::newFile($hash);
+        $file = \vfsStream::newFile($imageIdentifier);
         $file->setContent($content);
         $last->addChild($file);
 
-        $image = $this->getMock('PHPIMS_Image');
-        $image->expects($this->once())->method('setBlob')->with($content);
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('setBlob')->once()->with($content);
 
-        $operation = $this->getMockBuilder('PHPIMS_Operation_Abstract')
-                          ->disableOriginalConstructor()
-                          ->getMock();
-        $operation->expects($this->once())->method('getImage')->will($this->returnValue($image));
-
-        $this->driver->setOperation($operation);
-        $this->assertTrue($this->driver->load($hash));
+        $this->assertTrue($driver->load($imageIdentifier, $image));
     }
 }

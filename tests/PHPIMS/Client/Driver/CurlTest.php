@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Client\Driver;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,11 +40,92 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Client_Driver_CurlTest extends PHPIMS_Client_Driver_DriverTests {
+class CurlTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @see PHPIMS_Client_Driver_DriverTests::getNewDriver()
+     * The driver instance
+     *
+     * @var PHPIMS\Client\Driver
      */
-    protected function getNewDriver() {
-        return new PHPIMS_Client_Driver_Curl();
+    protected $driver = null;
+
+    /**
+     * URL to the script that the tests should send requests to
+     *
+     * @var string
+     */
+    protected $testUrl = null;
+
+    /**
+     * Setup the driver
+     */
+    public function setUp() {
+        if (!PHPIMS_ENABLE_CLIENT_TESTS) {
+            $this->markTestSkipped('PHPIMS_ENABLE_CLIENT_TESTS must be set to true to run these tests');
+        }
+
+        $this->driver  = new Curl;
+        $this->testUrl = PHPIMS_CLIENT_TESTS_URL;
+    }
+
+    /**
+     * Tear down the driver
+     */
+    public function tearDown() {
+        $this->driver = null;
+    }
+
+    public function testPost() {
+        $metadata = array(
+            'foo' => 'bar',
+            'bar' => 'foo',
+        );
+        $response = $this->driver->post($this->testUrl, $metadata);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
+
+        $result = unserialize($response->getBody());
+        $this->assertSame('POST', $result['method']);
+        $this->assertSame($metadata, json_decode($result['data']['metadata'], true));
+    }
+
+    public function testGet() {
+        $url = $this->testUrl . '?foo=bar&bar=foo';
+        $response = $this->driver->get($url);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
+        $result = unserialize($response->getBody());
+        $this->assertSame('GET', $result['method']);
+        $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $result['data']);
+    }
+
+    public function testHead() {
+        $response = $this->driver->head($this->testUrl);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
+        $this->assertEmpty($response->getBody());
+    }
+
+    public function testDelete() {
+        $response = $this->driver->delete($this->testUrl);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
+        $result = unserialize($response->getBody());
+        $this->assertSame('DELETE', $result['method']);
+    }
+
+    public function testAddImage() {
+        $data = array(
+            'foo' => 'bar',
+            'bar' => 'foo',
+        );
+        $response = $this->driver->addImage(__FILE__, $this->testUrl, $data);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
+        $result = unserialize($response->getBody());
+        $this->assertSame('POST', $result['method']);
+        $this->assertArrayHasKey('files', $result);
+    }
+
+    /**
+     * @expectedException PHPIMS\Client\Driver\Exception
+     */
+    public function testReadTimeout() {
+        $url = $this->testUrl . '?sleep=3';
+        $this->driver->get($url);
     }
 }

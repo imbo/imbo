@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Database\Driver;
+
 use \Mockery as m;
 
 /**
@@ -40,103 +42,288 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Database_Driver_MongoDBTest extends PHPIMS_Database_Driver_DriverTests {
+class MongoDBTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @see PHPIMS_Database_Driver_DriverTests::getNewDriver()
+     * Driver instance
+     *
+     * @var PHPIMS\Database\Driver\MongoDB
      */
-    protected function getNewDriver() {
-        return new PHPIMS_Database_Driver_MongoDB();
-    }
+    protected $driver = null;
 
-    public function teardown() {
-        parent::tearDown();
+    protected $collection = null;
 
-        m::close();
-    }
-    
+    /**
+     * Parameters for the driver
+     */
+    protected $driverParams = array(
+        'databaseName'   => 'phpims_test',
+        'collectionName' => 'images_test',
+    );
+
+    /**
+     * Set up method
+     */
     public function setUp() {
         if (!extension_loaded('mongo')) {
             $this->markTestSkipped(
               'The MongoDB extension is not available.'
             );
-        }    
-    }
+        }
 
-    public function testSetGetDatabaseName() {
-        $name = 'someName';
-        $this->driver->setDatabaseName($name);
-        $this->assertSame($name, $this->driver->getDatabaseName());
-    }
-
-    public function testSetGetCollectionName() {
-        $name = 'someName';
-        $this->driver->setCollectionName($name);
-        $this->assertSame($name, $this->driver->getCollectionName());
-    }
-
-    public function testSetGetDatabase() {
-        $mongo = $this->getMockBuilder('MongoDB')->disableOriginalConstructor()->getMock();
-        $this->driver->setDatabase($mongo);
-        $this->assertSame($mongo, $this->driver->getDatabase());
-    }
-
-    public function testSetGetCollection() {
-        $collection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
-        $this->driver->setCollection($collection);
-        $this->assertSame($collection, $this->driver->getCollection());
+        $this->collection = m::mock('\\MongoCollection');
+        $this->driver = new MongoDB($this->driverParams, $this->collection);
     }
 
     /**
-     * @expectedException PHPIMS_Database_Exception
+     * Tear down method
+     */
+    public function tearDown() {
+        $this->driver = null;
+    }
+
+    /**
+     * @expectedException PHPIMS\Database\Exception
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Image already exists
      */
     public function testInsertImageThatAlreadyExists() {
-        $image = m::mock('PHPIMS_Image');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getMetadata')
-              ->once()
-              ->andReturn('some value');
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $data = array('imageIdentifier' => $imageIdentifier);
 
-        $operation = m::mock('PHPIMS_Operation_AddImage');
-        $operation->shouldReceive('getImage')->once()->andReturn($image);
-        $operation->shouldReceive('getHash')->once()->andReturn(md5(microtime()) . '.png');
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
+              ->once();
 
-        $data = array(
-            'hash' => 'b8533858299b04af3afc9a3713e69358.jpeg',
-        );
+        $response = m::mock('PHPIMS\\Server\\Response');
 
-        $collection = m::mock('MongoCollection');
-        $collection->shouldReceive('findOne')->once()->andReturn($data);
+        $this->collection->shouldReceive('findOne')->once()->andReturn($data);
 
-        $this->driver->setOperation($operation)
-                     ->setCollection($collection)
-                     ->insertImage();
+        $this->driver->insertImage($imageIdentifier, $image, $response);
     }
 
     /**
-     * @expectedException PHPIMS_Database_Exception
+     * @expectedException PHPIMS\Database\Exception
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to save image data
      */
     public function testInsertImageWhenCollectionThrowsException() {
-        $image = m::mock('PHPIMS_Image');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getMetadata')
-              ->once()
-              ->andReturn('some value');
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
 
-        $operation = m::mock('PHPIMS_Operation_AddImage');
-        $operation->shouldReceive('getImage')->once()->andReturn($image);
-        $operation->shouldReceive('getHash')->once()->andReturn(md5(microtime()) . '.png');
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
+              ->once();
 
-        $data = array(
-            'hash' => 'b8533858299b04af3afc9a3713e69358.jpeg',
+        $response = m::mock('PHPIMS\\Server\\Response');
+
+        $this->collection->shouldReceive('findOne')->once()->andThrow('\\MongoException');
+
+        $this->driver->insertImage($imageIdentifier, $image, $response);
+    }
+
+    public function testSucessfullInsert() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $data = array('imageIdentifier' => $imageIdentifier);
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
+              ->once();
+
+        $response = m::mock('PHPIMS\\Server\\Response');
+
+        $this->collection->shouldReceive('findOne')->once()->with($data)->andReturn(array());
+        $this->collection->shouldReceive('insert')->once()->with(m::type('array'), m::type('array'))->andReturn(true);
+
+        $result = $this->driver->insertImage($imageIdentifier, $image, $response);
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @expectedException PHPIMS\Database\Exception
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Unable to delete image data
+     */
+    public function testDeleteImageWhenCollectionThrowsAnException() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+
+        $this->collection->shouldReceive('remove')->once()->with(array('imageIdentifier' => $imageIdentifier), m::type('array'))->andThrow('\\MongoException');
+
+        $this->driver->deleteImage($imageIdentifier);
+    }
+
+    public function testSucessfullDeleteImage() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+
+        $this->collection->shouldReceive('remove')->once()->with(array('imageIdentifier' => $imageIdentifier), m::type('array'))->andReturn(true);
+
+        $result = $this->driver->deleteImage($imageIdentifier);
+
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @expectedException PHPIMS\Database\Exception
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Unable to edit image data
+     */
+    public function testUpdateMetadataWhenCollectionThrowsAnException() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $metadata = array(
+            'foo' => 'bar',
+            'bar' => array(
+                'foobar' => 42,
+            ),
         );
 
-        $collection = m::mock('MongoCollection');
-        $collection->shouldReceive('findOne')->once()->andThrow('MongoException');
+        $this->collection->shouldReceive('update')->once()->with(array('imageIdentifier' => $imageIdentifier), array('$set' => array('metadata' => $metadata)), m::type('array'))->andThrow('\\MongoException');
 
-        $this->driver->setOperation($operation)
-                     ->setCollection($collection)
-                     ->insertImage();
+        $this->driver->updateMetadata($imageIdentifier, $metadata);
+    }
+
+    public function testSucessfullUpdateMetadata() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $metadata = array(
+            'foo' => 'bar',
+            'bar' => array(
+                'foobar' => 42,
+            ),
+        );
+
+        $this->collection->shouldReceive('update')->once()->with(array('imageIdentifier' => $imageIdentifier), array('$set' => array('metadata' => $metadata)), m::type('array'))->andReturn(true);
+
+        $result = $this->driver->updateMetadata($imageIdentifier, $metadata);
+
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @expectedException PHPIMS\Database\Exception
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Unable to fetch image metadata
+     */
+    public function testGetMetadataWhenCollectionThrowsAnException() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+
+        $this->collection->shouldReceive('findOne')->once()->with(array('imageIdentifier' => $imageIdentifier))->andThrow('\\MongoException');
+
+        $this->driver->getMetadata($imageIdentifier);
+    }
+
+    public function testSucessfullGetMetadata() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $metadata = array(
+            'foo' => 'bar',
+            'bar' => array(
+                'foobar' => 42,
+            ),
+        );
+        $data = array('metadata' => $metadata);
+
+        $this->collection->shouldReceive('findOne')->once()->with(array('imageIdentifier' => $imageIdentifier))->andReturn($data);
+
+        $result = $this->driver->getMetadata($imageIdentifier);
+
+        $this->assertSame($metadata, $result);
+    }
+
+    /**
+     * @expectedException PHPIMS\Database\Exception
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Unable to remove metadata
+     */
+    public function testDeleteMetadataWhenCollectionThrowsAnException() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+
+        $this->collection->shouldReceive('update')->once()->with(array('imageIdentifier' => $imageIdentifier), array('$set' => array('metadata' => array())), m::type('array'))->andThrow('\\MongoException');
+
+        $this->driver->deleteMetadata($imageIdentifier);
+    }
+
+    public function testSucessfullDeleteMetadata() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+
+        $this->collection->shouldReceive('update')->once()->with(array('imageIdentifier' => $imageIdentifier), array('$set' => array('metadata' => array())), m::type('array'));
+
+        $result = $this->driver->deleteMetadata($imageIdentifier);
+
+        $this->assertTrue($result);
+    }
+
+    public function testGetImages() {
+        $query = m::mock('PHPIMS\\Operation\\GetImages\\Query');
+        $query->shouldReceive('from')->once()->andReturn(123123123);
+        $query->shouldReceive('to')->once()->andReturn(234234234);
+        $query->shouldReceive('query')->once()->andReturn(array('category' => 'some category'));
+        $query->shouldReceive('returnMetadata')->once()->andReturn(true);
+        $query->shouldReceive('num')->times(2)->andReturn(30);
+        $query->shouldReceive('page')->once()->andReturn(2);
+
+        $cursor = m::mock('MongoCursor');
+        $cursor->shouldReceive('limit')->once()->with(30)->andReturn($cursor);
+        $cursor->shouldReceive('sort')->once()->with(m::type('array'))->andReturn($cursor);
+        $cursor->shouldReceive('skip')->once()->with(30)->andReturn($cursor);
+        $cursor->shouldReceive('rewind')->once();
+        $cursor->shouldReceive('valid')->times(2)->andReturn(true, false);
+
+        $image = array('foo' => 'bar');
+
+        $cursor->shouldReceive('current')->once()->andReturn($image);
+        $cursor->shouldReceive('next')->once();
+
+        $this->collection->shouldReceive('find')->once()->with(m::type('array'), m::type('array'))->andReturn($cursor);
+
+        $result = $this->driver->getImages($query);
+
+        $this->assertInternalType('array', $result);
+        $this->assertSame(array($image), $result);
+    }
+
+    /**
+     * @expectedException PHPIMS\Database\Exception
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Unable to search for images
+     */
+    public function testGetImagesWhenCollectionThrowsException() {
+        $query = m::mock('PHPIMS\\Operation\\GetImages\\Query');
+        $query->shouldReceive('from')->once();
+        $query->shouldReceive('to')->once();
+        $query->shouldReceive('query')->once();
+        $query->shouldReceive('returnMetadata')->once();
+
+        $this->collection->shouldReceive('find')->once()->with(m::type('array'), m::type('array'))->andThrow('\\MongoException');
+
+        $this->driver->getImages($query);
+    }
+
+    /**
+     * @expectedException PHPIMS\Database\Exception
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Unable to fetch image data
+     */
+    public function testLoadWhenCollectionThrowsException() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+        $this->collection->shouldReceive('findOne')->once()->with(array('imageIdentifier' => $imageIdentifier), m::type('array'))->andThrow('\\MongoException');
+
+        $this->driver->load($imageIdentifier, m::mock('PHPIMS\\Image'));
+    }
+
+    public function testSucessfullLoad() {
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358.jpeg';
+
+        $data = array(
+            'name' => 'filename',
+            'size' => 123,
+            'width' => 234,
+            'height' => 345
+        );
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('setFilename')->once()->with($data['name'])->andReturn($image);
+        $image->shouldReceive('setFilesize')->once()->with($data['size'])->andReturn($image);
+        $image->shouldReceive('setWidth')->once()->with($data['width'])->andReturn($image);
+        $image->shouldReceive('setHeight')->once()->with($data['height'])->andReturn($image);
+
+        $this->collection->shouldReceive('findOne')->once()->with(array('imageIdentifier' => $imageIdentifier), m::type('array'))->andReturn($data);
+
+        $this->assertTrue($this->driver->load($imageIdentifier, $image));
     }
 }

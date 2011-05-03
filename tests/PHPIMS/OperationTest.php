@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,26 +42,121 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_OperationTest extends PHPUnit_Framework_TestCase {
-    public function testFactory() {
-        $operations = array(
-            'PHPIMS_Operation_AddImage',
-            'PHPIMS_Operation_DeleteImage',
-            'PHPIMS_Operation_EditMetadata',
-            'PHPIMS_Operation_GetImage',
-            'PHPIMS_Operation_GetMetadata',
-            'PHPIMS_Operation_DeleteMetadata',
+class OperationTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * Operation instance
+     *
+     * @var PHPIMS\Operation
+     */
+    protected $operation = null;
+
+    /**
+     * Set up method
+     */
+    public function setUp() {
+        $this->operation = $this->getMockBuilder('PHPIMS\\Operation')->setMethods(array('getOperationName', 'exec'))
+                                ->disableOriginalConstructor()
+                                ->getMock();
+
+        // Make the operation return "addImage" as if it was the PHPIMS\Operation\AddImage
+        // operation class
+        $this->operation->expects($this->any())
+                        ->method('getOperationName')
+                        ->will($this->returnValue('addImage'));
+
+        $this->operation->expects($this->any())
+                        ->method('exec');
+    }
+
+    /**
+     * Tear down method
+     */
+    public function tearDown() {
+        $this->operation = null;
+    }
+
+    public function testSetGetImageIdentifier() {
+        $imageIdentifier = md5(time()) . '.png';
+        $this->operation->setImageIdentifier($imageIdentifier);
+        $this->assertSame($imageIdentifier, $this->operation->getImageIdentifier());
+    }
+
+    public function testSetGetDatabase() {
+        $driver = m::mock('PHPIMS\\Database\\DriverInterface');
+        $this->operation->setDatabase($driver);
+        $this->assertSame($driver, $this->operation->getDatabase());
+    }
+
+    public function testSetGetStorage() {
+        $driver = m::mock('PHPIMS\\Storage\\DriverInterface');
+        $this->operation->setStorage($driver);
+        $this->assertSame($driver, $this->operation->getStorage());
+    }
+
+    public function testSetGetImage() {
+        $image = $this->getMock('PHPIMS\\Image');
+        $this->operation->setImage($image);
+        $this->assertSame($image, $this->operation->getImage());
+    }
+
+    public function testSetGetResponse() {
+        $response = $this->getMock('PHPIMS\\Server\\Response');
+        $this->operation->setResponse($response);
+        $this->assertSame($response, $this->operation->getResponse());
+    }
+
+    public function testSetGetMethod() {
+        $method = 'DELETE';
+        $this->operation->setMethod($method);
+        $this->assertSame($method, $this->operation->getMethod());
+    }
+
+    public function testSetGetConfig() {
+        $config = array(
+            'foo' => 'bar',
+            'bar' => 'foo',
+
+            'sub' => array(
+                'foo' => 'bar',
+                'bar' => 'foo',
+            ),
         );
 
-        foreach ($operations as $className) {
-            $this->assertInstanceOf($className, PHPIMS_Operation::factory($className, md5(microtime())));
+        $this->operation->setConfig($config);
+        $this->assertSame($config, $this->operation->getConfig());
+        $this->assertSame($config['sub'], $this->operation->getConfig('sub'));
+    }
+
+    public function testFactory() {
+        $operations = array(
+            'POST'   => 'PHPIMS\\Operation\\AddImage',
+            'POST'   => 'PHPIMS\\Operation\\EditImageMetadata',
+            'DELETE' => 'PHPIMS\\Operation\\DeleteImage',
+            'DELETE' => 'PHPIMS\\Operation\\DeleteImageMetadata',
+            'GET'    => 'PHPIMS\\Operation\\GetImage',
+            'GET'    => 'PHPIMS\\Operation\\GetImageMetadata',
+        );
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
+
+        foreach ($operations as $method => $className) {
+            $this->assertInstanceOf($className, Operation::factory($className, $database, $storage, $method, md5(microtime())));
         }
     }
 
     /**
-     * @expectedException PHPIMS_Operation_Exception
+     * @expectedException PHPIMS\Operation\Exception
      */
     public function testFactoryWithUnSupportedOperation() {
-        PHPIMS_Operation::factory('foobar', md5(microtime()));
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
+
+        Operation::factory('foobar', $database, $storage, 'GET', md5(microtime()));
+    }
+
+    public function testSetGetResource() {
+        $resource = md5(microtime()) . '.png';
+        $this->operation->setResource($resource);
+        $this->assertSame($resource, $this->operation->getResource());
     }
 }

@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,26 +42,66 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
+class ClientTest extends \PHPUnit_Framework_TestCase {
     /**
      * Client instance
      *
-     * @var PHPIMS_Client
+     * @var PHPIMS\Client
      */
     protected $client = null;
+
+    /**
+     * Public key
+     *
+     * @var string
+     */
+    protected $publicKey = null;
+
+    /**
+     * Private key
+     *
+     * @var string
+     */
+    protected $privateKey = null;
 
     /**
      * The server url passed to the constructor
      *
      * @var string
      */
-    protected $serverUrl = 'http://serverUrl/';
+    protected $serverUrl = 'http://host';
+
+    /**
+     * Image identifier used for tests
+     *
+     * @var string
+     */
+    protected $imageIdentifier = null;
+
+    /**
+     * Pattern used in the Mockery matchers when url is signed
+     *
+     * @var string
+     */
+    protected $signedUrlPattern = '|^http://host/[a-z0-9]{32}\.png(/meta)?\?signature=(.*?)&publicKey=[a-z0-9]{32}&timestamp=\d\d\d\d-\d\d-\d\dT\d\d%3A\d\dZ$|';
+
+    /**
+     * Pattern used in the Mockery matchers with regular urls
+     *
+     * @var string
+     */
+    protected $urlPattern = '|^http://host/[a-z0-9]{32}\.png(/meta)?$|';
 
     /**
      * Set up method
      */
     public function setUp() {
-        $this->client = new PHPIMS_Client($this->serverUrl);
+        $this->publicKey = md5(microtime());
+        $this->privateKey = md5($this->publicKey);
+        $this->imageIdentifier = md5(microtime()) . '.png';
+        $this->driver = m::mock('PHPIMS\\Client\\DriverInterface');
+
+        $this->client = new Client($this->serverUrl, $this->publicKey, $this->privateKey, $this->driver);
     }
 
     /**
@@ -67,39 +111,8 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
         $this->client = null;
     }
 
-    public function testSetGetServerUrl() {
-        $url = 'http://localhost';
-        $this->client->setServerUrl($url);
-        $this->assertSame($url, $this->client->getServerUrl());
-    }
-
-    public function testSetGetTimeout() {
-        $timeout = 123;
-        $this->client->setTimeout($timeout);
-        $this->assertSame($timeout, $this->client->getTimeout());
-    }
-
-    public function testSetGetConnectTimeout() {
-        $timeout = 123;
-        $this->client->setConnectTimeout($timeout);
-        $this->assertSame($timeout, $this->client->getConnectTimeout());
-    }
-
-    public function testSetGetDriver() {
-        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
-        $this->client->setDriver($driver);
-        $this->assertSame($driver, $this->client->getDriver());
-    }
-
-    public function testConstructorParams() {
-        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
-        $client = new PHPIMS_Client($this->serverUrl, $driver);
-        $this->assertSame($this->serverUrl, $client->getServerUrl());
-        $this->assertSame($driver, $client->getDriver());
-    }
-
     /**
-     * @expectedException PHPIMS_Client_Exception
+     * @expectedException PHPIMS\Client\Exception
      * @expectedExceptionMessage File does not exist: foobar
      */
     public function testAddImageThatDoesNotExist() {
@@ -107,7 +120,6 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testAddImage() {
-        $url      = 'http://host';
         $image    = __DIR__ . '/_files/image.png';
         $metadata = array(
             'foo' => 'bar',
@@ -115,83 +127,65 @@ class PHPIMS_ClientTest extends PHPUnit_Framework_TestCase {
         );
         $md5 = md5_file($image);
 
-        $response = $this->getMock('PHPIMS_Client_Response');
-
-        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
-        $driver->expects($this->once())->method('addImage')->with($image, $url . '/' . $md5 . '.png', $metadata)->will($this->returnValue($response));
-
-        $result = $this->client->setDriver($driver)
-                               ->setServerUrl($url)
-                               ->addImage($image, $metadata);
+        $response = m::mock('PHPIMS\\Client\\Response');
+        $this->driver->shouldReceive('addImage')->once()->with($image, $this->signedUrlPattern, $metadata)->andReturn($response);
+        $result = $this->client->addImage($image, $metadata);
 
         $this->assertSame($result, $response);
     }
 
     public function testDeleteImage() {
-        $url  = 'http://host';
-        $hash = 'Some hash';
+        $response = m::mock('PHPIMS\\Client\\Response');
+        $this->driver->shouldReceive('delete')->once()->with($this->signedUrlPattern)->andReturn($response);
 
-        $response = $this->getMock('PHPIMS_Client_Response');
-
-        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
-        $driver->expects($this->once())->method('delete')->with($url . '/' . $hash)->will($this->returnValue($response));
-
-        $result = $this->client->setDriver($driver)
-                               ->setServerUrl($url)
-                               ->deleteImage($hash);
+        $result = $this->client->deleteImage($this->imageIdentifier);
 
         $this->assertSame($result, $response);
     }
 
     public function testEditMetaData() {
-        $url  = 'http://host';
-        $hash = 'Some hash';
         $data = array(
             'foo' => 'bar',
             'bar' => 'foo',
         );
 
-        $response = $this->getMock('PHPIMS_Client_Response');
-
-        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
-        $driver->expects($this->once())->method('post')->with($url . '/' . $hash . '/meta', $data)->will($this->returnValue($response));
-
-        $result = $this->client->setDriver($driver)
-                               ->setServerUrl($url)
-                               ->editMetaData($hash, $data);
+        $response = m::mock('PHPIMS\\Client\\Response');
+        $this->driver->shouldReceive('post')->once()->with($this->signedUrlPattern, $data)->andReturn($response);
+        $result = $this->client->editMetaData($this->imageIdentifier, $data);
 
         $this->assertSame($result, $response);
     }
 
     public function testDeleteMetaData() {
-        $url  = 'http://host';
-        $hash = 'Some hash';
-
-        $response = $this->getMock('PHPIMS_Client_Response');
-
-        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
-        $driver->expects($this->once())->method('delete')->with($url . '/' . $hash . '/meta')->will($this->returnValue($response));
-
-        $result = $this->client->setDriver($driver)
-                               ->setServerUrl($url)
-                               ->deleteMetaData($hash);
+        $response = m::mock('PHPIMS\\Client\\Response');
+        $this->driver->shouldReceive('delete')->once()->with($this->signedUrlPattern)->andReturn($response);
+        $result = $this->client->deleteMetaData($this->imageIdentifier);
 
         $this->assertSame($result, $response);
     }
 
     public function testGetMetaData() {
-        $url  = 'http://host';
-        $hash = 'Some hash';
-
-        $response = $this->getMock('PHPIMS_Client_Response');
-
-        $driver = $this->getMockForAbstractClass('PHPIMS_Client_Driver_Abstract');
-        $driver->expects($this->once())->method('get')->with($url . '/' . $hash . '/meta')->will($this->returnValue($response));
-
-        $result = $this->client->setDriver($driver)
-                               ->setServerUrl($url)
-                               ->getMetadata($hash);
+        $response = m::mock('PHPIMS\\Client\\Response');
+        $this->driver->shouldReceive('get')->once()->with($this->urlPattern)->andReturn($response);
+        $result = $this->client->getMetadata($this->imageIdentifier);
 
         $this->assertSame($result, $response);
+    }
+
+    public function testGetImageUrl() {
+        $url = $this->client->getImageUrl($this->imageIdentifier);
+        $this->assertInstanceOf('PHPIMS\\Client\\ImageUrl', $url);
+        $this->assertSame($this->serverUrl . '/' . $this->imageIdentifier, (string) $url);
+    }
+
+    public function testGetImageUrlWithTransformations() {
+        $baseUrl = $this->serverUrl . '/' . $this->imageIdentifier;
+        $completeUrl = $baseUrl;
+        $transformation = m::mock('PHPIMS\\Client\\ImageUrl\\Transformation');
+        $transformation->shouldReceive('apply')->once()->with(m::type('PHPIMS\\Client\\ImageUrl'));
+
+        $url = $this->client->getImageUrl($this->imageIdentifier, $transformation);
+        $this->assertInstanceOf('PHPIMS\\Client\\ImageUrl', $url);
+        $this->assertSame($completeUrl, (string) $url);
     }
 }

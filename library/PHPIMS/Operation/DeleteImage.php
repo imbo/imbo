@@ -30,6 +30,11 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
+use PHPIMS\Operation;
+use PHPIMS\OperationInterface;
+
 /**
  * Delete image operation
  *
@@ -42,13 +47,14 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_DeleteImage extends PHPIMS_Operation_Abstract {
+class DeleteImage extends Operation implements OperationInterface {
     /**
-     * @see PHPIMS_Operation_Abstract::exec()
+     * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
-        $this->getDatabase()->deleteImage($this->getHash());
-        $this->getStorage()->delete($this->getHash());
+        $imageIdentifier = $this->getImageIdentifier();
+        $this->getDatabase()->deleteImage($imageIdentifier);
+        $this->getStorage()->delete($imageIdentifier);
 
         return $this;
     }

@@ -32,22 +32,24 @@
 
 set_include_path(__DIR__ . '/../library' . PATH_SEPARATOR . get_include_path());
 
-/** @see PHPIMS_Autoload */
+/** @see PHPIMS\Autoload */
 require_once 'PHPIMS/Autoload.php';
 
 // Fetch configuration
 $config = require __DIR__ . '/../config/server.php';
 
+$excessDir = str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__);
+$resource  = str_replace($excessDir, '', $_SERVER['REDIRECT_URL']);
+
 try {
-    $frontController = new PHPIMS_FrontController($config);
-    $response = $frontController->handle($_SERVER['REQUEST_METHOD'],
-                                         $_SERVER['REDIRECT_URL']);
-} catch (PHPIMS_Exception $e) {
-    $response = PHPIMS_Server_Response::fromException($e);
+    $frontController = new PHPIMS\FrontController($config);
+    $response = $frontController->handle($resource, $_SERVER['REQUEST_METHOD']);
+} catch (PHPIMS\Exception $e) {
+    $response = PHPIMS\Server\Response::fromException($e);
 }
 
 $code = $response->getCode();
-$header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS_Server_Response::$codes[$code]);
+$header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS\Server\Response::$codes[$code]);
 
 header($header);
 

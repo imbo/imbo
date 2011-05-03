@@ -39,16 +39,25 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-/** @see PHPIMS_Autoload */
+/** @see PHPIMS\Autoload */
 require __DIR__ . '/../library/PHPIMS/Autoload.php';
 
-spl_autoload_register(function($class) {
-    $path = str_replace('_', DIRECTORY_SEPARATOR, $class);
-    $file = __DIR__ . '/' . $path . '.php';
+set_include_path(
+    get_include_path() . PATH_SEPARATOR .
+    __DIR__
+);
 
-    if (file_exists($file)) {
-        require $file;
-        return true;
+// Autoloader for namespaced classes in the include_path
+spl_autoload_register(function($className) {
+    $filename = str_replace('\\', '/', $className) . '.php';
+
+    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
+        $absPath = rtrim($path, '/') . '/' . $filename;
+
+        if (is_file($absPath)) {
+            require $absPath;
+            return true;
+        }
     }
 });
 

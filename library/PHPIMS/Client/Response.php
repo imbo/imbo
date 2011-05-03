@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Client;
+
 /**
  * Client response
  *
@@ -40,7 +42,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Client_Response {
+class Response {
     /**
      * Response headers
      *
@@ -75,7 +77,7 @@ class PHPIMS_Client_Response {
      * Set the headers
      *
      * @param array $headers The headers to set
-     * @return PHPIMS_Client_Response
+     * @return PHPIMS\Client\Response
      */
     public function setHeaders(array $headers) {
         $this->headers = $headers;
@@ -96,7 +98,7 @@ class PHPIMS_Client_Response {
      * Set the body contents
      *
      * @param string $body The string to set
-     * @return PHPIMS_Client_Response
+     * @return PHPIMS\Client\Response
      */
     public function setBody($body) {
         $this->body = $body;
@@ -117,7 +119,7 @@ class PHPIMS_Client_Response {
      * Set the status code
      *
      * @param int $code The HTTP status code to set
-     * @return PHPIMS_Client_Response
+     * @return PHPIMS\Client\Response
      */
     public function setStatusCode($code) {
         $this->statusCode = (int) $code;
@@ -151,9 +153,9 @@ class PHPIMS_Client_Response {
      * Create a new instance of this object (based on the $content)
      *
      * @param string $content Content from a curl_exec() call (including the headers)
-     * @param resource $responseCode The responsecode. If not set the factory will try to figure
-     *                               out the code based on the header part of the $content.
-     * @return PHPIMS_Client_Response
+     * @param int $responseCode The responsecode. If not set the factory will try to figure out the
+     *                          code based on the header part of the $content.
+     * @return PHPIMS\Client\Response
      */
     static public function factory($content, $responseCode = null) {
         // Remove \r from the string

@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,23 +42,26 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_GetImageTest extends PHPIMS_Operation_OperationTests {
-    protected $hash = null;
-
+class GetImageTest extends OperationTests {
     protected function getNewOperation() {
-        $this->hash = md5(microtime());
-
-        return new PHPIMS_Operation_GetImage($this->hash);
+        return new GetImage($this->database, $this->storage);
     }
 
-    public function getOperationName() {
+    public function getExpectedOperationName() {
         return 'getImage';
     }
 
     public function testSuccessfullExec() {
-        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
-        $storage->expects($this->once())->method('load')->with($this->hash)->will($this->returnValue(true));
-        $this->operation->setStorage($storage);
+        $this->database->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
+        $this->storage->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getWidth', 'getHeight', 'getFilename', 'getFilesize')->once()->andReturn('some value');
+        $response = m::mock('PHPIMS\\Server\\Response');
+        $response->shouldReceive('setImage')->once()->with($image)->andReturn($response);
+        $response->shouldReceive('setCustomHeaders')->once()->with(m::type('array'))->andReturn($response);
+
+        $this->operation->setResponse($response)->setImage($image);
 
         $this->operation->exec();
     }

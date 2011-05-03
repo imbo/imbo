@@ -30,6 +30,14 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
+use PHPIMS\Client\DriverInterface;
+use PHPIMS\Client\ImageUrl;
+use PHPIMS\Client\ImageUrl\Transformation;
+use PHPIMS\Client\Driver\Curl as DefaultDriver;
+use PHPIMS\Client\Exception as ClientException;
+
 /**
  * Client that interacts with the server part of PHPIMS
  *
@@ -43,139 +51,66 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Client {
+class Client {
     /**
      * The server URL
      *
      * @var string
      */
-    protected $serverUrl = null;
+    private $serverUrl = null;
 
     /**
-     * Default timeout
+     * Driver used by the client
      *
-     * @var int
+     * @var PHPIMS\Client\DriverInterface
      */
-    protected $timeout = 2;
+    private $driver = null;
 
     /**
-     * Default connection timeout
+     * Public key used for signed requests
      *
-     * @var int
+     * @var string
      */
-    protected $connectTimeout = 2;
+    private $publicKey = null;
 
     /**
-     * Driver used for the client
+     * Private key used for signed requests
      *
-     * @var PHPIMS_Client_Driver_Abstract
+     * @var string
      */
-    protected $driver = null;
+    private $privateKey = null;
 
     /**
      * Class constructor
      *
-     * @param string $url The URL to the PHPIMS server, including protocol
-     * @param PHPIMS_Client_Driver_Abstract $driver Optional driver to set
+     * @param string $serverUrl The URL to the PHPIMS server, including protocol
+     * @param string $publicKey The public key to use
+     * @param string $privateKey The private key to use
+     * @param PHPIMS\Client\DriverInterface $driver Optional driver to set
      */
-    public function __construct($serverUrl, PHPIMS_Client_Driver_Abstract $driver = null) {
-        $this->setServerUrl($serverUrl);
-        
-        if ($driver !== null) {
-            $this->setDriver($driver);
-        }
-    }
+    public function __construct($serverUrl, $publicKey, $privateKey, DriverInterface $driver = null) {
+        $this->serverUrl  = $serverUrl;
+        $this->publicKey  = $publicKey;
+        $this->privateKey = $privateKey;
 
-    /**
-     * Get the server URL
-     *
-     * @return string
-     */
-    public function getServerUrl() {
-        return $this->serverUrl;
-    }
-
-    /**
-     * Set the server url
-     *
-     * @param string $url The URL to set
-     * @return PHPIMS_Client
-     */
-    public function setServerUrl($url) {
-        $this->serverUrl = $url;
-
-        return $this;
-    }
-
-    /**
-     * Get the timeout
-     *
-     * @return int
-     */
-    public function getTimeout() {
-        return $this->timeout;
-    }
-
-    /**
-     * Set the timeout
-     *
-     * @param int $timeout Timeout in seconds
-     * @return VGF_RemoteContent
-     */
-    public function setTimeout($timeout) {
-        $this->timeout = (int) $timeout;
-
-        return $this;
-    }
-
-    /**
-     * Get the connection timeout
-     *
-     * @return int
-     */
-    public function getConnectTimeout() {
-        return $this->connectTimeout;
-    }
-
-    /**
-     * Set the connection timeout
-     *
-     * @param int $connectTimeout Timeout in seconds
-     * @return VGF_RemoteContent
-     */
-    public function setConnectTimeout($connectTimeout) {
-        $this->connectTimeout = $connectTimeout;
-
-        return $this;
-    }
-
-    /**
-     * Get the current driver
-     *
-     * @return PHPIMS_Client_Driver_Abstract
-     */
-    public function getDriver() {
-        if ($this->driver === null) {
+        if ($driver === null) {
             // @codeCoverageIgnoreStart
-            $this->driver = new PHPIMS_Client_Driver_Curl();
-            $this->driver->setClient($this);
+            $driver = new DefaultDriver;
         }
         // @codeCoverageIgnoreEnd
 
-        return $this->driver;
+        $this->driver = $driver;
     }
 
     /**
-     * Set the driver
+     * Get the complete url for a resource
      *
-     * @param PHPIMS_Client_Driver_Abstract $driver A driver instance
-     * @return PHPIMS_Client
+     * @param string $resourceIdentifier The resource identifier. For instance "<md5>.png" or
+     *                                   "<md5>.png/meta"
+     * @return string
      */
-    public function setDriver(PHPIMS_Client_Driver_Abstract $driver) {
-        $driver->setClient($this);
-        $this->driver = $driver;
-
-        return $this;
+    public function getResourceUrl($resourceIdentifier) {
+        return $this->serverUrl . '/' . $resourceIdentifier;
     }
 
     /**
@@ -183,63 +118,127 @@ class PHPIMS_Client {
      *
      * @param string $path Path to the local image
      * @param array $metadata Metadata to attach to the image
-     * @return PHPIMS_Client_Response
-     * @throws PHPIMS_Client_Exception
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Exception
      */
     public function addImage($path, array $metadata = null) {
         if (!is_file($path)) {
-            throw new PHPIMS_Client_Exception('File does not exist: ' . $path);
+            throw new ClientException('File does not exist: ' . $path);
         }
 
-        // Generate MD5
-        $hash = md5_file($path);
-
-        // Get extension
+        // Get file extension
         $info = getimagesize($path);
         $extension = image_type_to_extension($info[2], false);
-        $url = $this->serverUrl . '/' . $hash . '.' . $extension;
 
-        return $this->getDriver()->addImage($path, $url, $metadata);
+        // Generate MD5 sum of the file
+        $imageIdentifier = md5_file($path) . '.' . $extension;
+
+        $url = $this->getSignedResourceUrl('POST', $imageIdentifier);
+
+        return $this->driver->addImage($path, $url, $metadata);
     }
 
     /**
      * Delete an image from the server
      *
-     * @param string $hash The image identifier
-     * @return PHPIMS_Client_Response
+     * @param string $imageIdentifier The image identifier
+     * @return PHPIMS\Client\Response
      */
-    public function deleteImage($hash) {
-        return $this->getDriver()->delete($this->serverUrl . '/' . $hash);
+    public function deleteImage($imageIdentifier) {
+        $url = $this->getSignedResourceUrl('DELETE', $imageIdentifier);
+
+        return $this->driver->delete($url);
     }
 
     /**
      * Edit an image
      *
-     * @param string $hash The image identifier
+     * @param string $imageIdentifier The image identifier
      * @param array $metadata An array of metadata
-     * @return PHPIMS_Client_Response
+     * @return PHPIMS\Client\Response
      */
-    public function editMetadata($hash, array $metadata) {
-        return $this->getDriver()->post($this->serverUrl . '/' . $hash . '/meta', $metadata);
+    public function editMetadata($imageIdentifier, array $metadata) {
+        $url = $this->getSignedResourceUrl('POST', $imageIdentifier . '/meta');
+
+        return $this->driver->post($url, $metadata);
     }
 
     /**
      * Delete metadata
      *
-     * @param string $hash The image identifier
-     * @return PHPIMS_Client_Response
+     * @param string $imageIdentifier The image identifier
+     * @return PHPIMS\Client\Response
      */
-    public function deleteMetadata($hash) {
-        return $this->getDriver()->delete($this->serverUrl . '/' . $hash . '/meta');
+    public function deleteMetadata($imageIdentifier) {
+        $url = $this->getSignedResourceUrl('DELETE', $imageIdentifier . '/meta');
+
+        return $this->driver->delete($url);
     }
 
     /**
-     * Get metadata
+     * Get image metadata
      *
-     * @param string $hash The image identifier
+     * @param string $imageIdentifier The image identifier
      * @return array Returns an array with metadata
      */
-    public function getMetadata($hash) {
-        return $this->getDriver()->get($this->serverUrl . '/' . $hash . '/meta');
+    public function getMetadata($imageIdentifier) {
+        $url = $this->getResourceUrl($imageIdentifier . '/meta');
+
+        return $this->driver->get($url);
+    }
+
+    /**
+     * Generate a signature that can be sent to the server
+     *
+     * @param string $method HTTP method (POST or DELETE)
+     * @param string $resourceIdentifier The resource identifier (for instance "<image>/meta")
+     * @param string $timestamp GMT timestamp
+     * @return string
+     */
+    public function generateSignature($method, $resourceIdentifier, $timestamp) {
+        $data = $method . $resourceIdentifier . $this->publicKey . $timestamp;
+
+        // Generate binary hash key
+        $hash = hash_hmac('sha256', $data, $this->privateKey, true);
+
+        // Encode signature for the request
+        $signature = base64_encode($hash);
+
+        return $signature;
+    }
+
+    /**
+     * Get a signed url
+     *
+     * @param string $method HTTP method
+     * @param string $resourceIdentifier The resource identifier (for instance "<image>/meta")
+     * @return string Returns a string with the necessary parts for authenticating
+     */
+    public function getSignedResourceUrl($method, $resourceIdentifier) {
+        $timestamp = gmdate('Y-m-d\TH:i\Z');
+        $signature = $this->generateSignature($method, $resourceIdentifier, $timestamp);
+
+        $url = $this->getResourceUrl($resourceIdentifier)
+             . sprintf('?signature=%s&publicKey=%s&timestamp=%s', rawurlencode($signature), $this->publicKey, rawurlencode($timestamp));
+
+        return $url;
+    }
+
+    /**
+     * Get url to an image
+     *
+     * @param string $imageIdentifier Image identifier
+     * @param Transformation $transformation An optional chain of transformations
+     * @return PHPIMS\Client\ImageUrl
+     */
+    public function getImageUrl($imageIdentifier, Transformation $transformation = null) {
+        $url = $this->getResourceUrl($imageIdentifier);
+        $imageUrl = new ImageUrl($url);
+
+        if ($transformation !== null) {
+            $transformation->apply($imageUrl);
+        }
+
+        return $imageUrl;
     }
 }

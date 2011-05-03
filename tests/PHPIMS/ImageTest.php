@@ -30,6 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,11 +40,11 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
+class ImageTest extends \PHPUnit_Framework_TestCase {
     /**
      * Image instance
      *
-     * @var PHPIMS_Image
+     * @var PHPIMS\Image
      */
     protected $image = null;
 
@@ -50,7 +52,7 @@ class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->image = new PHPIMS_Image();
+        $this->image = new Image();
     }
 
     /**
@@ -58,12 +60,6 @@ class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->image = null;
-    }
-
-    public function testSetGetId() {
-        $id = '123123213';
-        $this->image->setId($id);
-        $this->assertSame($id, $this->image->getId());
     }
 
     public function testSetGetFilename() {
@@ -103,5 +99,17 @@ class PHPIMS_ImageTest extends PHPUnit_Framework_TestCase {
         $extension = 'png';
         $this->image->setExtension($extension);
         $this->assertSame($extension, $this->image->getExtension());
+    }
+
+    public function testSetGetWidth() {
+        $width = 123;
+        $this->image->setWidth($width);
+        $this->assertSame($width, $this->image->getWidth());
+    }
+
+    public function testSetGetHeight() {
+        $height = 234;
+        $this->image->setHeight($height);
+        $this->assertSame($height, $this->image->getHeight());
     }
 }

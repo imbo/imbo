@@ -29,6 +29,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
 /**
  * Class that represents a single image
  *
@@ -38,78 +40,62 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Image {
-    /**
-     * ID of the image
-     *
-     * This is the ID from the underlying database driver
-     *
-     * @var mixed
-     */
-    protected $id = null;
-
+class Image {
     /**
      * Original filename
      *
      * @var string
      */
-    protected $filename = null;
+    private $filename = null;
 
     /**
      * Size of the file
      *
      * @var int
      */
-    protected $filesize = null;
+    private $filesize = null;
 
     /**
      * Mime type of the image
      *
      * @var string
      */
-    protected $mimeType = null;
+    private $mimeType = null;
 
     /**
      * Extension of the file without the dot
      *
      * @var string
      */
-    protected $extension = null;
+    private $extension = null;
 
     /**
      * Blob containing the image itself
      *
      * @var string
      */
-    protected $blob = null;
+    private $blob = null;
 
     /**
      * The metadata attached to this image
      *
      * @var array
      */
-    protected $metadata = array();
+    private $metadata = array();
 
     /**
-     * Get the ID
+     * Width of the image
      *
-     * @return mixed
+     * @var int
      */
-    public function getId() {
-        return $this->id;
-    }
+    private $width = null;
 
     /**
-     * Set the ID
+     * Heigt of the image
      *
-     * @param mixed $id Unique ID to set
-     * @return PHPIMS_Image
+     * @var int
      */
-    public function setId($id) {
-        $this->id = $id;
-
-        return $this;
-    }
+    private $height = null;
 
     /**
      * Get the filename
@@ -124,7 +110,7 @@ class PHPIMS_Image {
      * Set the filename
      *
      * @param string $filename The original name of the image
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setFilename($filename) {
         $this->filename = $filename;
@@ -145,7 +131,7 @@ class PHPIMS_Image {
      * Set the size in bytes
      *
      * @param int $filesize The size to set
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setFilesize($filesize) {
         $this->filesize = $filesize;
@@ -166,7 +152,7 @@ class PHPIMS_Image {
      * Set the mime type
      *
      * @param string $mimeType The mime type, for instance "image/png"
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setMimeType($mimeType) {
         $this->mimeType = $mimeType;
@@ -187,7 +173,7 @@ class PHPIMS_Image {
      * Set the extension
      *
      * @param string $extension The file extension
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setExtension($extension) {
         $this->extension = $extension;
@@ -208,7 +194,7 @@ class PHPIMS_Image {
      * Set the blob
      *
      * @param string $blob The binary data to set
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setBlob($blob) {
         $this->blob = $blob;
@@ -229,10 +215,52 @@ class PHPIMS_Image {
      * Set the metadata
      *
      * @param array $metadata An array with metadata
-     * @return PHPIMS_Image
+     * @return PHPIMS\Image
      */
     public function setMetadata(array $metadata) {
         $this->metadata = $metadata;
+
+        return $this;
+    }
+
+    /**
+     * Get the width
+     *
+     * @return int
+     */
+    public function getWidth() {
+        return $this->width;
+    }
+
+    /**
+     * Set the width
+     *
+     * @param int $width Width in pixels
+     * @return PHPIMS\Image
+     */
+    public function setWidth($width) {
+        $this->width = (int) $width;
+
+        return $this;
+    }
+
+    /**
+     * Get the height
+     *
+     * @return int
+     */
+    public function getHeight() {
+        return $this->height;
+    }
+
+    /**
+     * Set the height
+     *
+     * @param int $height Height in pixels
+     * @return PHPIMS\Image
+     */
+    public function setHeight($height) {
+        $this->height = (int) $height;
 
         return $this;
     }

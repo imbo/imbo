@@ -30,6 +30,12 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
+use \Mockery as m;
+use PHPIMS\Database\DriverInterface as DatabaseDriver;
+use PHPIMS\Storage\DriverInterface as StorageDriver;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,19 +44,45 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-abstract class PHPIMS_Operation_OperationTests extends PHPUnit_Framework_TestCase {
+abstract class OperationTests extends \PHPUnit_Framework_TestCase {
+    /**
+     * Database driver
+     *
+     * @var PHPIMS\Datbase\DriverInterface
+     */
+    protected $database = null;
+
+    /**
+     * Storage driver
+     *
+     * @var PHPIMS\Storage\DriverInterface
+     */
+    protected $storage = null;
+
     /**
      * Operation instance
      *
-     * @var PHPIMS_Operation_Abstract
+     * @var PHPIMS\Operation
      */
     protected $operation = null;
+
+    /**
+     * Image identifier used for the operation
+     *
+     * @var string
+     */
+    protected $imageIdentifier = null;
 
     /**
      * Set up method
      */
     public function setUp() {
+        $this->database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $this->storage = m::mock('PHPIMS\\Storage\\DriverInterface');
+        $this->imageIdentifier = md5(microtime()) . '.png';
+
         $this->operation = $this->getNewOperation();
+        $this->operation->setImageIdentifier($this->imageIdentifier);
     }
 
     /**
@@ -63,22 +95,22 @@ abstract class PHPIMS_Operation_OperationTests extends PHPUnit_Framework_TestCas
     /**
      * Get a new operation instance
      *
-     * @return PHPIMS_Operation_Abstract
+     * @return PHPIMS\Operation
      */
     abstract protected function getNewOperation();
 
     /**
-     * Get the operation name
+     * Get the expected operation name for the operation class
      *
      * @return string
      */
-    abstract protected function getOperationName();
+    abstract protected function getExpectedOperationName();
 
     public function testGetOperationName() {
-        $reflection = new ReflectionClass($this->operation);
+        $reflection = new \ReflectionClass($this->operation);
         $method = $reflection->getMethod('getOperationName');
         $method->setAccessible(true);
 
-        $this->assertSame($this->getOperationName(), $method->invokeArgs($this->operation, array()));
+        $this->assertSame($this->getExpectedOperationName(), $method->invoke($this->operation));
     }
 }

@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,12 +42,12 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_AddImageTest extends PHPIMS_Operation_OperationTests {
+class AddImageTest extends OperationTests {
     protected function getNewOperation() {
-        return new PHPIMS_Operation_AddImage(md5(microtime()));
+        return new AddImage($this->database, $this->storage);
     }
 
-    public function getOperationName() {
+    public function getExpectedOperationName() {
         return 'addImage';
     }
 
@@ -52,14 +56,27 @@ class PHPIMS_Operation_AddImageTest extends PHPIMS_Operation_OperationTests {
             'tmp_name' => '/tmp/foobar',
         );
 
-        $database = $this->getMockForAbstractClass('PHPIMS_Database_Driver_Abstract');
-        $database->expects($this->once())->method('insertImage');
-        $this->operation->setDatabase($database);
+        $imageIdentifier = md5(microtime()) . '.png';
+        $metadata = array(
+            'foo' => 'bar',
+            'bar' => array(
+                'foo' => 'bar',
+            ),
+        );
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getMetadata')->once()->andReturn($metadata);
+        $response = m::mock('PHPIMS\\Server\\Response');
+        $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
+        $response->shouldReceive('setBody')->once()->with(array('imageIdentifier' => $imageIdentifier))->andReturn($response);
 
-        $storage = $this->getMockForAbstractClass('PHPIMS_Storage_Driver_Abstract');
-        $storage->expects($this->once())->method('store')->with($_FILES['file']['tmp_name']);
-        $this->operation->setStorage($storage);
+        $this->database->shouldReceive('insertImage')->once()->with($imageIdentifier, $image);
+        $this->database->shouldReceive('updateMetadata')->once()->with($imageIdentifier, $metadata);
 
-        $this->operation->exec();
+        $this->storage->shouldReceive('store')->once()->with($imageIdentifier, $_FILES['file']['tmp_name']);
+
+        $this->operation->setResponse($response)
+                        ->setImageIdentifier($imageIdentifier)
+                        ->setImage($image)
+                        ->exec();
     }
 }

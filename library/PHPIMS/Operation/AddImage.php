@@ -30,6 +30,11 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Operation;
+
+use PHPIMS\Operation;
+use PHPIMS\OperationInterface;
+
 /**
  * Add image operation
  *
@@ -42,18 +47,21 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Operation_AddImage extends PHPIMS_Operation_Abstract {
+class AddImage extends Operation implements OperationInterface {
     /**
-     * @see PHPIMS_Operation_Abstract::exec()
+     * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
+        $imageIdentifier = $this->getImageIdentifier();
+        $database = $this->getDatabase();
         $image = $this->getImage();
 
-        $this->getDatabase()->insertImage();
-        $this->getStorage()->store($_FILES['file']['tmp_name']);
+        $database->insertImage($imageIdentifier, $image);
+        $database->updateMetadata($imageIdentifier, $image->getMetadata());
+        $this->getStorage()->store($imageIdentifier, $_FILES['file']['tmp_name']);
         $this->getResponse()->setCode(201)
                             ->setBody(array(
-                                'hash' => $this->getHash(),
+                                'imageIdentifier' => $imageIdentifier,
                             ));
 
         return $this;

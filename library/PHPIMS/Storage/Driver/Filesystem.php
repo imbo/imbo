@@ -30,10 +30,20 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS\Storage\Driver;
+
+use PHPIMS\Storage\DriverInterface;
+use PHPIMS\Storage\Exception as StorageException;
+use PHPIMS\Image;
+
 /**
- * Storage driver interface
+ * Filesystem storage driver
  *
- * This is an interface for different storage drivers for PHPIMS.
+ * This storage driver stores image files in a local filesystem.
+ *
+ * Configuration options supported by this driver:
+ *
+ * - <pre>(string) dataDir</pre> Absolute path to the base directory the images should be stored in
  *
  * @package PHPIMS
  * @subpackage StorageDriver
@@ -42,70 +52,91 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_Storage_Driver_Filesystem extends PHPIMS_Storage_Driver_Abstract {
+class Filesystem implements DriverInterface {
     /**
-     * @see PHPIMS_Storage_Driver_Interface::store
+     * Parameters for the filesystem driver
+     *
+     * @var array
      */
-    public function store($path) {
-        $params = $this->getParams();
+    private $params = array(
+        'dataDir' => null,
+    );
 
-        if (!is_writable($params['dataDir'])) {
-            throw new PHPIMS_Storage_Exception('Could not store image', 500);
+    /**
+     * Class constructor
+     *
+     * @param array $params Parameters for the driver
+     */
+    public function __construct(array $params) {
+        $this->params = array_merge($this->params, $params);
+    }
+
+    /**
+     * @see PHPIMS\Storage\DriverInterface::store()
+     */
+    public function store($imageIdentifier, $path) {
+        if (!is_writable($this->params['dataDir'])) {
+            throw new StorageException('Could not store image', 500);
         }
 
         // Create path for the image
-        $hash = $this->getOperation()->getHash();
-        $imageDir = $params['dataDir'] . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2];
+        $imageDir = $this->getImagePath($imageIdentifier, false);
         $oldUmask = umask(0);
 
         if (!is_dir($imageDir)) {
-            mkdir($imageDir, 0755, true);
+            mkdir($imageDir, 0775, true);
         }
 
         umask($oldUmask);
 
-        $imagePath = $imageDir . '/' . $hash;
+        $imagePath = $imageDir . '/' . $imageIdentifier;
 
         return move_uploaded_file($path, $imagePath);
     }
 
     /**
-     * @see PHPIMS_Storage_Driver_Interface::delete
+     * @see PHPIMS\Storage\DriverInterface::delete()
      */
-    public function delete($hash) {
-        $path = $this->getImagePath($hash);
+    public function delete($imageIdentifier) {
+        $path = $this->getImagePath($imageIdentifier);
 
         if (!is_file($path)) {
-            throw new PHPIMS_Storage_Exception('File not found', 404);
+            throw new StorageException('File not found', 404);
         }
 
         return unlink($path);
     }
 
     /**
-     * @see PHPIMS_Storage_Driver_Interface::load
+     * @see PHPIMS\Storage\DriverInterface::load()
      */
-    public function load($hash) {
-        $path = $this->getImagePath($hash);
+    public function load($imageIdentifier, Image $image) {
+        $path = $this->getImagePath($imageIdentifier);
 
         if (!is_file($path)) {
-            throw new PHPIMS_Storage_Exception('File not found', 404);
+            throw new StorageException('File not found', 404);
         }
 
-        $this->getOperation()->getImage()->setBlob(file_get_contents($path));
+        $image->setBlob(file_get_contents($path));
 
         return true;
     }
 
     /**
-     * Get the path to an image identified by $hash
+     * Get the path to an image
      *
-     * @param string $hash Unique hash identifying an image
+     * @param string $imageIdentifier Image identifier
+     * @param boolean $includeFilename Wether or not to include the last part of the path (the
+     *                                 filename itself)
      * @return string
      */
-    public function getImagePath($hash) {
-        $params = $this->getParams();
-        $imagePath = $params['dataDir'] . '/' . $hash[0] . '/' . $hash[1] . '/' . $hash[2] . '/' . $hash;
+    public function getImagePath($imageIdentifier, $includeFilename = true) {
+        $imagePath = $this->params['dataDir'] . '/' . $imageIdentifier[0] . '/'
+                   . $imageIdentifier[1] . '/' . $imageIdentifier[2];
+
+        if ($includeFilename) {
+            $imagePath .= '/' . $imageIdentifier;
+        }
 
         return $imagePath;
     }

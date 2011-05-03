@@ -30,6 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
+namespace PHPIMS;
+
+use \Mockery as m;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -38,47 +42,23 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
+class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     /**
      * Front controller instance
      *
-     * @var PHPIMS_FrontController
+     * @var PHPIMS\FrontController
      */
     protected $controller = null;
-
-    /**
-     * Array of mock objects used by the stand-in operation factory
-     *
-     * This array should be filled with mock objects by the tests that needs them.
-     *
-     * @var array
-     */
-    static public $mocks = array();
-
-    /**
-     * Configuration for the controller
-     *
-     * @var array
-     */
-    protected $controllerConfig = array(
-        'operation' => array(
-            'factory' => __CLASS__,
-        ),
-    );
-
-    /**
-     * Factory used in this test as a stand-in for PHPIMS_Operation
-     */
-    static public function factory($operation, $hash = null) {
-        return self::$mocks[$operation];
-    }
 
     /**
      * Set up method
      */
     public function setUp() {
-        $this->controller = new PHPIMS_FrontController($this->controllerConfig);
-        self::$mocks = array();
+        $config = array(
+            'database' => m::mock('PHPIMS\\Database\\DriverInterface'),
+            'storage' => m::mock('PHPIMS\\Storage\\DriverInterface'),
+        );
+        $this->controller = new FrontController($config);
     }
 
     /**
@@ -86,128 +66,88 @@ class PHPIMS_FrontControllerTest extends PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->controller = null;
-        self::$mocks = array();
     }
 
     /**
-     * Get a PHPIMS_Operation_Abstract mock object
+     * Get a PHPIMS\Operation mock object
      *
      * @param string $operationClass The class name of the operation to mock
      */
     protected function getOperationMock($operationClass) {
-        $response = $this->getMock('PHPIMS_Server_Response');
-
-        $operation = $this->getMockBuilder($operationClass)->disableOriginalConstructor()->getMock();
-        $operation->expects($this->once())->method('init')->with($this->controllerConfig)->will($this->returnValue($operation));
-        $operation->expects($this->once())->method('preExec')->will($this->returnValue($operation));
-        $operation->expects($this->once())->method('exec')->will($this->returnValue($operation));
-        $operation->expects($this->once())->method('postExec')->will($this->returnValue($operation));
+        $operation = m::mock($operationClass);
+        $operation->shouldReceive('init')->once()->andReturn($operation);
+        $operation->shouldReceive('preExec')->once()->andReturn($operation);
+        $operation->shouldReceive('exec')->once()->andReturn($operation);
+        $operation->shouldReceive('postExec')->once()->andReturn($operation);
 
         return $operation;
     }
 
     public function testIsValidMethodWithSupportedMethods() {
-        $this->assertTrue(PHPIMS_FrontController::isValidMethod('POST'));
-        $this->assertTrue(PHPIMS_FrontController::isValidMethod('GET'));
-        $this->assertTrue(PHPIMS_FrontController::isValidMethod('HEAD'));
-        $this->assertTrue(PHPIMS_FrontController::isValidMethod('DELETE'));
+        $this->assertTrue(FrontController::isValidMethod('POST'));
+        $this->assertTrue(FrontController::isValidMethod('GET'));
+        $this->assertTrue(FrontController::isValidMethod('HEAD'));
+        $this->assertTrue(FrontController::isValidMethod('DELETE'));
     }
 
     public function testIsValidMethodWithInvalidMethod() {
-        $this->assertFalse(PHPIMS_FrontController::isValidMethod('foobar'));
-    }
-
-    public function testSetGetConfig() {
-        $config = array(
-            'foo' => 'bar',
-            'bar' => 'foo',
-        );
-        $this->controller->setConfig($config);
-        $this->assertSame($config, $this->controller->getConfig());
+        $this->assertFalse(FrontController::isValidMethod('foobar'));
     }
 
     /**
-     * @expectedException PHPIMS_Exception
+     * @expectedException PHPIMS\Exception
      * @expectedExceptionCode 501
      */
     public function testHandleInvalidMethod() {
-        $this->controller->handle('foobar', '/some/path');
+        $this->controller->handle('/some/path', 'foobar');
     }
 
     /**
-     * @expectedException PHPIMS_Exception
+     * @expectedException PHPIMS\Exception
      * @expectedExceptionCode 400
-     * @expectedExceptionMessage Missing hash
+     * @expectedExceptionMessage Unknown resource
      */
-    public function testHandleWithMissingHash() {
-        $this->controller->handle('GET', '/');
+    public function testHandleInvalidRequest() {
+        $this->controller->handle('/foobar', 'GET');
     }
 
     /**
-     * @expectedException PHPIMS_Exception
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Invalid hash: hash
-     */
-    public function testHandleWithInvalidHash() {
-        $this->controller->handle('GET', '/hash');
-    }
-
-    public function testHandleAddImage() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_AddImage');
-        self::$mocks['PHPIMS_Operation_AddImage'] = $operation;
-
-        $this->controller->handle('POST', md5(microtime()) . '.png');
-    }
-
-    public function testHandleEditImage() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_EditMetadata');
-        self::$mocks['PHPIMS_Operation_EditMetadata'] = $operation;
-
-        $this->controller->handle('POST', md5(microtime()) . '.png/meta');
-    }
-
-    public function testHandleGetImage() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_GetImage');
-        self::$mocks['PHPIMS_Operation_GetImage'] = $operation;
-
-        $this->controller->handle('GET', md5(microtime()) . '.png');
-    }
-
-    public function testHandleGetMetadata() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_GetMetadata');
-        self::$mocks['PHPIMS_Operation_GetMetadata'] = $operation;
-
-        $this->controller->handle('GET', md5(microtime()) . '.png/meta');
-    }
-
-    public function testHandleDeleteImage() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_DeleteImage');
-        self::$mocks['PHPIMS_Operation_DeleteImage'] = $operation;
-
-        $this->controller->handle('DELETE', md5(microtime()) . '.png');
-    }
-
-    public function testHandleDeleteMetadata() {
-        $operation = $this->getOperationMock('PHPIMS_Operation_DeleteMetadata');
-        self::$mocks['PHPIMS_Operation_DeleteMetadata'] = $operation;
-
-        $this->controller->handle('DELETE', md5(microtime()) . '.png/meta');
-    }
-
-    /**
-     * @expectedException PHPIMS_Exception
+     * @expectedException PHPIMS\Exception
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Unsupported operation
      */
     public function testHandleUnsupportedOperation() {
-        $this->controller->handle('GET', md5(microtime()) . '.png/metadata');
+        $this->controller->handle('images', 'DELETE');
     }
 
     /**
-     * @expectedException PHPIMS_Exception
+     * @expectedException PHPIMS\Exception
      * @expectedExceptionCode 418
      */
     public function testHandleBrew() {
-        $this->controller->handle('BREW', md5(microtime()) . '.png');
+        $this->controller->handle(md5(microtime()) . '.png', 'BREW');
+    }
+
+    public function testResolveOperation() {
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $imageIdentifier;
+
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('resolveOperation');
+        $method->setAccessible(true);
+
+        $database = m::mock('PHPIMS\\Database\\DriverInterface');
+        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
+
+        $this->assertInstanceOf('PHPIMS\\Operation\\GetImage', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier)));
+        $this->assertInstanceOf('PHPIMS\\Operation\\AddImage', $method->invokeArgs($this->controller, array($resource, 'POST', $imageIdentifier)));
+        $this->assertInstanceOf('PHPIMS\\Operation\\DeleteImage', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier)));
+
+        $extra = 'meta';
+        $resource .= '/meta';
+
+        $this->assertInstanceOf('PHPIMS\\Operation\\GetImageMetadata', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier, $extra)));
+        $this->assertInstanceOf('PHPIMS\\Operation\\EditImageMetadata', $method->invokeArgs($this->controller, array($resource, 'POST', $imageIdentifier, $extra)));
+        $this->assertInstanceOf('PHPIMS\\Operation\\DeleteImageMetadata', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier, $extra)));
     }
 }
