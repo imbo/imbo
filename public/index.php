@@ -38,7 +38,7 @@ require_once 'PHPIMS/Autoload.php';
 // Fetch configuration
 $config = require __DIR__ . '/../config/server.php';
 
-$excessDir = str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__);
+$excessDir = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname($_SERVER['SCRIPT_FILENAME']));
 $resource  = str_replace($excessDir, '', $_SERVER['REDIRECT_URL']);
 
 try {
