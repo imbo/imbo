@@ -105,8 +105,9 @@ class Curl implements DriverInterface {
         }
 
         curl_setopt_array($this->curlHandle, array(
-            CURLOPT_POST       => true,
-            CURLOPT_POSTFIELDS => $postFields,
+            CURLOPT_POST          => true,
+            CURLOPT_POSTFIELDS    => $postFields,
+            CURLOPT_CUSTOMREQUEST => 'POST',
         ));
 
         return $this->request($url);
@@ -117,7 +118,8 @@ class Curl implements DriverInterface {
      */
     public function get($url) {
         curl_setopt_array($this->curlHandle, array(
-            CURLOPT_HTTPGET => true,
+            CURLOPT_HTTPGET       => true,
+            CURLOPT_CUSTOMREQUEST => 'GET',
         ));
 
         return $this->request($url);
@@ -128,7 +130,8 @@ class Curl implements DriverInterface {
      */
     public function head($url) {
         curl_setopt_array($this->curlHandle, array(
-            CURLOPT_NOBODY => true,
+            CURLOPT_NOBODY        => true,
+            CURLOPT_CUSTOMREQUEST => 'HEAD',
         ));
 
         return $this->request($url);
@@ -139,7 +142,7 @@ class Curl implements DriverInterface {
      */
     public function delete($url) {
         curl_setopt_array($this->curlHandle, array(
-            CURLOPT_CUSTOMREQUEST  => 'DELETE',
+            CURLOPT_CUSTOMREQUEST => 'DELETE',
         ));
 
         return $this->request($url);
@@ -167,7 +170,7 @@ class Curl implements DriverInterface {
         $connectTime  = (int) curl_getinfo($this->curlHandle, CURLINFO_CONNECT_TIME);
         $transferTime = (int) curl_getinfo($this->curlHandle, CURLINFO_TOTAL_TIME);
         $responseCode = (int) curl_getinfo($this->curlHandle, CURLINFO_HTTP_CODE);
-
+        
         if ($content === false) {
             if ($connectTime >= $this->params['connectTimeout']) {
                 throw new Exception('An error occured. Request timed out while connecting (limit: ' . $this->params['connectTimeout'] . 's).');
