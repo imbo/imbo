@@ -114,14 +114,12 @@ class Client {
     }
 
     /**
-     * Add a new image to the server
+     * Generate an MD5 image identifier for a given file
      *
      * @param string $path Path to the local image
-     * @param array $metadata Metadata to attach to the image
-     * @return PHPIMS\Client\Response
-     * @throws PHPIMS\Client\Exception
+     * @return string
      */
-    public function addImage($path, array $metadata = null) {
+    public function getImageIdentifier($path) {
         if (!is_file($path)) {
             throw new ClientException('File does not exist: ' . $path);
         }
@@ -131,7 +129,19 @@ class Client {
         $extension = image_type_to_extension($info[2], false);
 
         // Generate MD5 sum of the file
-        $imageIdentifier = md5_file($path) . '.' . $extension;
+        return md5_file($path) . '.' . $extension;
+    }
+
+    /**
+     * Add a new image to the server
+     *
+     * @param string $path Path to the local image
+     * @param array $metadata Metadata to attach to the image
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Exception
+     */
+    public function addImage($path, array $metadata = null) {
+        $imageIdentifier = $this->getImageIdentifier($path);
 
         $url = $this->getSignedResourceUrl('POST', $imageIdentifier);
 
