@@ -118,6 +118,7 @@ class Client {
      *
      * @param string $path Path to the local image
      * @return string
+     * @throws PHPIMS\Client\Exception
      */
     public function getImageIdentifier($path) {
         if (!is_file($path)) {
@@ -138,7 +139,6 @@ class Client {
      * @param string $path Path to the local image
      * @param array $metadata Metadata to attach to the image
      * @return PHPIMS\Client\Response
-     * @throws PHPIMS\Client\Exception
      */
     public function addImage($path, array $metadata = null) {
         $imageIdentifier = $this->getImageIdentifier($path);
