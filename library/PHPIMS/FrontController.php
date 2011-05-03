@@ -125,6 +125,12 @@ class FrontController {
             } else {
                 $operation = 'PHPIMS\\Operation\\DeleteImage';
             }
+        } else if ($method === self::HEAD && $imageIdentifier) {
+            if ($extra === 'meta') {
+                // Not yet implemented
+            } else {
+                $operation = 'PHPIMS\\Operation\\HeadImage';
+            }
         } else if ($method === self::BREW) {
             throw new Exception('I\'m a teapot!', 418);
         }
