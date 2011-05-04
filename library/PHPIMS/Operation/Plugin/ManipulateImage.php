@@ -114,11 +114,13 @@ class ManipulateImage implements PluginInterface {
      *
      * @var string
      */
-    const RESIZE    = 'resize';
-    const CROP      = 'crop';
-    const ROTATE    = 'rotate';
-    const BORDER    = 'border';
-    const THUMBNAIL = 'thumbnail';
+    const RESIZE           = 'resize';
+    const CROP             = 'crop';
+    const ROTATE           = 'rotate';
+    const BORDER           = 'border';
+    const THUMBNAIL        = 'thumbnail';
+    const FLIPHORIZONTALLY = 'flipHorizontally';
+    const FLIPVERTICALLY   = 'flipVertically';
     /**#@-*/
 
     /**
@@ -130,11 +132,13 @@ class ManipulateImage implements PluginInterface {
      * @var array
      */
     static public $transformationClasses = array(
-        self::RESIZE    => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Resize',
-        self::CROP      => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Crop',
-        self::ROTATE    => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Rotate',
-        self::BORDER    => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Border',
-        self::THUMBNAIL => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Thumbnail',
+        self::RESIZE           => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Resize',
+        self::CROP             => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Crop',
+        self::ROTATE           => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Rotate',
+        self::BORDER           => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Border',
+        self::THUMBNAIL        => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Thumbnail',
+        self::FLIPHORIZONTALLY => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\FlipHorizontally',
+        self::FLIPVERTICALLY   => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\FlipVertically',
     );
 
     /**

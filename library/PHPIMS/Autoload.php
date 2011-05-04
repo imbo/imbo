@@ -88,6 +88,8 @@ class Autoload {
         'phpims\\operation\\plugin\\manipulateimage\\transformation\\border' => '/Operation/Plugin/ManipulateImage/Transformation/Border.php',
         'phpims\\operation\\plugin\\manipulateimage\\transformation\\crop' => '/Operation/Plugin/ManipulateImage/Transformation/Crop.php',
         'phpims\\operation\\plugin\\manipulateimage\\transformation\\exception' => '/Operation/Plugin/ManipulateImage/Transformation/Exception.php',
+        'phpims\\operation\\plugin\\manipulateimage\\transformation\\fliphorizontally' => '/Operation/Plugin/ManipulateImage/Transformation/FlipHorizontally.php',
+        'phpims\\operation\\plugin\\manipulateimage\\transformation\\flipvertically' => '/Operation/Plugin/ManipulateImage/Transformation/FlipVertically.php',
         'phpims\\operation\\plugin\\manipulateimage\\transformation\\resize' => '/Operation/Plugin/ManipulateImage/Transformation/Resize.php',
         'phpims\\operation\\plugin\\manipulateimage\\transformation\\rotate' => '/Operation/Plugin/ManipulateImage/Transformation/Rotate.php',
         'phpims\\operation\\plugin\\manipulateimage\\transformation\\thumbnail' => '/Operation/Plugin/ManipulateImage/Transformation/Thumbnail.php',
