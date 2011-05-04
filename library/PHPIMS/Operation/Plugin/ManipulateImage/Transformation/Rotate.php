@@ -33,6 +33,7 @@
 namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
 use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
+use PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Color;
 
@@ -47,17 +48,20 @@ use \Imagine\Image\Color;
  * @link https://github.com/christeredvartsen/phpims
  * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Rotate implements TransformationInterface {
+class Rotate extends Transformation implements TransformationInterface {
+    /**
+     * @see PHPIMS\Operation\Plugin\ManipulateImage\Transformation::$defaultParams
+     */
+    static public $defaultParams = array(
+        'bg' => '000',
+    );
+
     /**
      * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
      */
-    public function apply(ImageInterface $image, array $params = array()) {
-        if (!isset($params['bg'])) {
-            $params['bg'] = '000';
-        }
+    public function apply(ImageInterface $image) {
+        $color = new Color($this->params['bg']);
 
-        $color = new Color($params['bg']);
-
-        $image->rotate($params['angle'], $color);
+        $image->rotate($this->params['angle'], $color);
     }
 }

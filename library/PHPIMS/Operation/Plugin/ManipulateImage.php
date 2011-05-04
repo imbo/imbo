@@ -36,6 +36,7 @@ use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 use PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception as TransformationException;
 use \Imagine\Imagick\Imagine;
+use \Imagine\ImageInterface;
 
 /**
  * Manipulate image plugin
@@ -113,10 +114,11 @@ class ManipulateImage implements PluginInterface {
      *
      * @var string
      */
-    const RESIZE = 'resize';
-    const CROP   = 'crop';
-    const ROTATE = 'rotate';
-    const BORDER = 'border';
+    const RESIZE    = 'resize';
+    const CROP      = 'crop';
+    const ROTATE    = 'rotate';
+    const BORDER    = 'border';
+    const THUMBNAIL = 'thumbnail';
     /**#@-*/
 
     /**
@@ -128,10 +130,11 @@ class ManipulateImage implements PluginInterface {
      * @var array
      */
     static public $transformationClasses = array(
-        self::RESIZE => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Resize',
-        self::CROP   => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Crop',
-        self::ROTATE => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Rotate',
-        self::BORDER => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Border',
+        self::RESIZE    => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Resize',
+        self::CROP      => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Crop',
+        self::ROTATE    => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Rotate',
+        self::BORDER    => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Border',
+        self::THUMBNAIL => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Thumbnail',
     );
 
     /**
@@ -192,10 +195,14 @@ class ManipulateImage implements PluginInterface {
                     }
                 }
 
-                $transformationInstance = new $className;
+                $transformationInstance = new $className($transformationParams);
 
                 try {
-                    $transformationInstance->apply($image, $transformationParams);
+                    $newImage = $transformationInstance->apply($image);
+
+                    if ($newImage instanceof ImageInterface) {
+                        $image = $newImage;
+                    }
                 } catch (\Imagine\Exception\Exception $e) {
                     trigger_error('Imagine failed with exception: ' . $e->getMessage(), E_USER_WARNING);
                 } catch (TransformationException $e) {

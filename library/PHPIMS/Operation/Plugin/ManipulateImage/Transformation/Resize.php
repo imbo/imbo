@@ -33,6 +33,7 @@
 namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
 use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
+use PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Box;
 
@@ -47,17 +48,17 @@ use \Imagine\Image\Box;
  * @link https://github.com/christeredvartsen/phpims
  * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Resize implements TransformationInterface {
+class Resize extends Transformation implements TransformationInterface {
     /**
      * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
      */
-    public function apply(ImageInterface $image, array $params = array()) {
-        if (!isset($params['width']) && !isset($params['height'])) {
+    public function apply(ImageInterface $image) {
+        if (!isset($this->params['width']) && !isset($this->params['height'])) {
             throw new Exception('Missing parameters width and/or height');
         }
 
-        $width  = (isset($params['width']) ? (int) $params['width'] : 0);
-        $height = (isset($params['height']) ? (int) $params['height'] : 0);
+        $width  = (isset($this->params['width']) ? (int) $this->params['width'] : 0);
+        $height = (isset($this->params['height']) ? (int) $this->params['height'] : 0);
 
         // Fetch the size of the original image
         $size = $image->getSize();

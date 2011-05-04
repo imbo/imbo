@@ -51,7 +51,7 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
      */
     public function testApplyWithNoParameters() {
         $image = m::mock('Imagine\\ImageInterface');
-        $transformation = new Resize;
+        $transformation = new Resize();
         $transformation->apply($image);
     }
 
@@ -64,8 +64,8 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
             return $box->getWidth() === 200 && $box->getHeight() === 100;
         }));
 
-        $transformation = new Resize;
-        $transformation->apply($image, array('width' => 200, 'height' => 100));
+        $transformation = new Resize(array('width' => 200, 'height' => 100));
+        $transformation->apply($image);
     }
 
     public function testApplyWithOnlyWidth() {
@@ -79,8 +79,8 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
             return $box->getWidth() === 200 && $box->getHeight() === 200;
         }));
 
-        $transformation = new Resize;
-        $transformation->apply($image, array('width' => 200));
+        $transformation = new Resize(array('width' => 200));
+        $transformation->apply($image);
     }
 
     public function testApplyWithOnlyHeight() {
@@ -94,7 +94,7 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
             return $box->getWidth() === 200 && $box->getHeight() === 200;
         }))->once();
 
-        $transformation = new Resize;
-        $transformation->apply($image, array('height' => 200));
+        $transformation = new Resize(array('height' => 200));
+        $transformation->apply($image);
     }
 }

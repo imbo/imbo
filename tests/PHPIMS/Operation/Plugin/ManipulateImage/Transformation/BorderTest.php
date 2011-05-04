@@ -65,7 +65,7 @@ class BorderTest extends \PHPUnit_Framework_TestCase {
                                         m::type('Imagine\\Image\\Color'))
                                     ->andReturn($draw);
 
-        $transformation = new Border;
-        $transformation->apply($image, array());
+        $transformation = new Border(array());
+        $transformation->apply($image);
     }
 }

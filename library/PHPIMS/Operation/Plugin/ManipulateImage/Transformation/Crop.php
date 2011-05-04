@@ -33,6 +33,7 @@
 namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
 use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
+use PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Point;
 use \Imagine\Image\Box;
@@ -48,19 +49,19 @@ use \Imagine\Image\Box;
  * @link https://github.com/christeredvartsen/phpims
  * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Crop implements TransformationInterface {
+class Crop extends Transformation implements TransformationInterface {
     /**
      * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
      */
-    public function apply(ImageInterface $image, array $params = array()) {
-        if (!isset($params['x']) || !isset($params['y']) || !isset($params['width']) || !isset($params['height'])) {
+    public function apply(ImageInterface $image) {
+        if (!isset($this->params['x']) || !isset($this->params['y']) || !isset($this->params['width']) || !isset($this->params['height'])) {
             throw new Exception('Missing parameter for crop transformation');
         }
 
         // Resize image and store in the image object
         $image->crop(
-            new Point((int) $params['x'], (int) $params['y']),
-            new Box((int) $params['width'], (int) $params['height'])
+            new Point((int) $this->params['x'], (int) $this->params['y']),
+            new Box((int) $this->params['width'], (int) $this->params['height'])
         );
     }
 }

@@ -33,6 +33,7 @@
 namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 
 use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
+use PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Color;
 use \Imagine\Image\Point;
@@ -48,37 +49,34 @@ use \Imagine\Image\Point;
  * @link https://github.com/christeredvartsen/phpims
  * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Border implements TransformationInterface {
+class Border extends Transformation implements TransformationInterface {
+    /**
+     * @see PHPIMS\Operation\Plugin\ManipulateImage\Transformation::$defaultParams
+     */
+    public static $defaultParams = array(
+        'color'  => '000',
+        'width'  => 1,
+        'height' => 1,
+    );
+
     /**
      * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
      */
-    public function apply(ImageInterface $image, array $params = array()) {
-        if (!isset($params['color'])) {
-            $params['color'] = '000';
-        }
-
-        if (!isset($params['width'])) {
-            $params['width'] = 1;
-        }
-
-        if (!isset($params['height'])) {
-            $params['height'] = 1;
-        }
-
-        $color  = new Color($params['color']);
+    public function apply(ImageInterface $image) {
+        $color  = new Color($this->params['color']);
         $size   = $image->getSize();
         $width  = $size->getWidth();
         $height = $size->getHeight();
         $draw   = $image->draw();
 
         // Draw top and bottom lines
-        for ($i = 0; $i < $params['height']; $i++) {
+        for ($i = 0; $i < $this->params['height']; $i++) {
             $draw->line(new Point(0, $i), new Point($width - 1, $i), $color)
                  ->line(new Point($width - 1, $height - ($i + 1)), new Point(0, $height - ($i + 1)), $color);
         }
 
         // Draw sides
-        for ($i = 0; $i < $params['width']; $i++) {
+        for ($i = 0; $i < $this->params['width']; $i++) {
             $draw->line(new Point($i, 0), new Point($i, $height - 1), $color)
                  ->line(new Point($width - ($i + 1), 0), new Point($width - ($i + 1), $height - 1), $color);
         }

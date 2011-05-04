@@ -50,7 +50,7 @@ class CropTest extends \PHPUnit_Framework_TestCase {
      */
     public function testApplyWithMissingParameters() {
         $image = m::mock('Imagine\\ImageInterface');
-        $transformation = new Crop;
+        $transformation = new Crop();
         $transformation->apply($image);
     }
 
@@ -66,7 +66,7 @@ class CropTest extends \PHPUnit_Framework_TestCase {
             'height' => 4,
         );
 
-        $transformation = new Crop;
-        $transformation->apply($image, $params);
+        $transformation = new Crop($params);
+        $transformation->apply($image);
     }
 }

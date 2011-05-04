@@ -48,7 +48,7 @@ class RotateTest extends \PHPUnit_Framework_TestCase {
         $image = m::mock('Imagine\\ImageInterface');
         $image->shouldReceive('rotate')->with(45, m::type('Imagine\\Image\\Color'))->once();
 
-        $transformation = new Rotate;
-        $transformation->apply($image, array('angle' => 45));
+        $transformation = new Rotate(array('angle' => 45));
+        $transformation->apply($image);
     }
 }

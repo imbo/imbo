@@ -49,9 +49,11 @@ interface TransformationInterface {
      * Method that will transform the image
      *
      * @param \Imagine\ImageInterface $image Image instance
-     * @param array $params Parameters for the transformation
-     * @return string Return the transformed binary image data
+     * @return \Imagine\ImageInterface|null If the Imagine transformation does not modify the image
+     *                                      itself, the transformation may return the new image
+     *                                      object. If Imagine modifies the image object itself,
+     *                                      nothing should be returned.
      * @throws PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
      */
-    public function apply(ImageInterface $image, array $params = array());
+    public function apply(ImageInterface $image);
 }
