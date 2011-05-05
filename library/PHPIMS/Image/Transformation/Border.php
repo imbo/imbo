@@ -50,6 +50,13 @@ use \Imagine\Image\Point;
  */
 class Border implements TransformationInterface {
     /**
+     * Color of the border
+     *
+     * @var string
+     */
+    private $color = '000';
+
+    /**
      * Width of the border
      *
      * @var int
@@ -62,13 +69,6 @@ class Border implements TransformationInterface {
      * @var int
      */
     private $height = 1;
-
-    /**
-     * Color of the border
-     *
-     * @var string
-     */
-    private $color = '000';
 
     /**
      * Class constructor
