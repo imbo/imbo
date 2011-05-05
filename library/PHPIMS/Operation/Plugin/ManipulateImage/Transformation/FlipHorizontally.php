@@ -30,10 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
-use PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+use PHPIMS\Image\TransformationInterface;
+use PHPIMS\Image\Transformation;
 use \Imagine\ImageInterface;
 
 /**
@@ -49,9 +49,16 @@ use \Imagine\ImageInterface;
  */
 class FlipHorizontally extends Transformation implements TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
+     * @see PHPIMS\Image\TransformationInterface::apply()
      */
     public function apply(ImageInterface $image) {
         $image->flipHorizontally();
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     */
+    public function getUrlTrigger() {
+        return 'flipHorizontally';
     }
 }

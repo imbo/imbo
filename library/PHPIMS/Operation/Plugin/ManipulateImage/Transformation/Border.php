@@ -30,10 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
-use PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+use PHPIMS\Image\TransformationInterface;
+use PHPIMS\Image\Transformation;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Color;
 use \Imagine\Image\Point;
@@ -51,34 +51,72 @@ use \Imagine\Image\Point;
  */
 class Border extends Transformation implements TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\Transformation::$defaultParams
+     * Width of the border
+     *
+     * @var int
      */
-    public static $defaultParams = array(
-        'color'  => '000',
-        'width'  => 1,
-        'height' => 1,
-    );
+    private $width;
 
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
+     * Height of the border
+     *
+     * @var int
+     */
+    private $height;
+
+    /**
+     * Color of the border
+     *
+     * @var string
+     */
+    private $color;
+
+    /**
+     * Class constructor
+     *
+     * @param string $color The color to set
+     * @param int $width Width of the border
+     * @param int $height Height of the border
+     */
+    public function __construct($color = '000', $width = 1, $height = 1) {
+        $this->color  = $color;
+        $this->width  = (int) $width;
+        $this->height = (int) $height;
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::apply()
      */
     public function apply(ImageInterface $image) {
-        $color  = new Color($this->params['color']);
+        $color  = new Color($this->color);
         $size   = $image->getSize();
         $width  = $size->getWidth();
         $height = $size->getHeight();
         $draw   = $image->draw();
 
         // Draw top and bottom lines
-        for ($i = 0; $i < $this->params['height']; $i++) {
+        for ($i = 0; $i < $this->height; $i++) {
             $draw->line(new Point(0, $i), new Point($width - 1, $i), $color)
                  ->line(new Point($width - 1, $height - ($i + 1)), new Point(0, $height - ($i + 1)), $color);
         }
 
         // Draw sides
-        for ($i = 0; $i < $this->params['width']; $i++) {
+        for ($i = 0; $i < $this->width; $i++) {
             $draw->line(new Point($i, 0), new Point($i, $height - 1), $color)
                  ->line(new Point($width - ($i + 1), 0), new Point($width - ($i + 1), $height - 1), $color);
         }
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     */
+    public function getUrlTrigger() {
+        $params = array(
+            'color=' . $this->color,
+            'width=' . $this->width,
+            'height=' . $this->height,
+        );
+
+        return 'border:' . implode(',', $params);
     }
 }

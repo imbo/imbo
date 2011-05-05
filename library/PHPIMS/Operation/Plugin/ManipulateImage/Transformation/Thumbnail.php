@@ -30,10 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
-use PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+use PHPIMS\Image\TransformationInterface;
+use PHPIMS\Image\Transformation;
 use \Imagine\ImageInterface;
 
 /**
@@ -49,22 +49,61 @@ use \Imagine\ImageInterface;
  */
 class Thumbnail extends Transformation implements TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\Transformation::$defaultParams
+     * Width of the thumbnail
+     *
+     * @var int
      */
-    static public $defaultParams = array(
-        'width'  => 50,
-        'height' => 50,
-        'fit'    => 'outbound',
-    );
+    private $width;
 
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
+     * Height of the thumbnail
+     *
+     * @var int
+     */
+    private $height;
+
+    /**
+     * Fit type
+     *
+     * The thumbnail fit style. 'inset' or 'outbound'
+     *
+     * @var string
+     */
+    private $fit;
+
+    /**
+     * Class constructor
+     *
+     * @param int $width Width of the thumbnail
+     * @param int $height Height of the thumbnail
+     * @param string $fit Fit type. 'outbound' or 'inset'
+     */
+    public function __construct($width = 50, $height = 50, $fit = 'outbound') {
+        $this->width = (int) $width;
+        $this->height = (int) $height;
+        $this->fit = $fit;
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::apply()
      */
     public function apply(ImageInterface $image) {
-        if ($this->params['fit'] !== 'inset' || $this->params['fit'] !== 'outbound') {
-            $this->params['fit'] = self::$defaultParams['fit'];
-        }
+        return $image->thumbnail(
+            new \Imagine\Image\Box($this->width, $this->height),
+            $this->fit
+        );
+    }
 
-        return $image->thumbnail(new \Imagine\Image\Box($this->params['width'], $this->params['height']), $this->params['fit']);
+    /**
+     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     */
+    public function getUrlTrigger() {
+        $params = array(
+            'width=' . $this->width,
+            'height=' . $this->height,
+            'fit=' . $this->fit,
+        );
+
+        return 'thumbnail:' . implode(',', $params);
     }
 }

@@ -30,10 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
-use PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+use PHPIMS\Image\TransformationInterface;
+use PHPIMS\Image\Transformation;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Point;
 use \Imagine\Image\Box;
@@ -51,17 +51,74 @@ use \Imagine\Image\Box;
  */
 class Crop extends Transformation implements TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
+     * X coordinate of the top left corner of the crop
+     *
+     * @var int
+     */
+    private $x;
+
+    /**
+     * Y coordinate of the top left corner of the crop
+     *
+     * @var int
+     */
+    private $y;
+
+    /**
+     * Width of the crop
+     *
+     * @var int
+     */
+    private $width;
+
+    /**
+     * Height of the crop
+     *
+     * @var int
+     */
+    private $height;
+
+    /**
+     * Class constructor
+     *
+     * @param int $x X coordinate of the top left corner of the crop
+     * @param int $y Y coordinate of the top left corner of the crop
+     * @param int $width Width of the crop
+     * @param int $height Height of the crop
+     */
+    public function __construct($x, $y, $width, $height) {
+        $this->x      = (int) $x;
+        $this->y      = (int) $y;
+        $this->width  = (int) $width;
+        $this->height = (int) $height;
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::apply()
      */
     public function apply(ImageInterface $image) {
-        if (!isset($this->params['x']) || !isset($this->params['y']) || !isset($this->params['width']) || !isset($this->params['height'])) {
-            throw new Exception('Missing parameter for crop transformation');
+        if (empty($this->width) || empty($this->height)) {
+            throw new Exception('Missing parameter(s) for crop transformation');
         }
 
         // Resize image and store in the image object
         $image->crop(
-            new Point((int) $this->params['x'], (int) $this->params['y']),
-            new Box((int) $this->params['width'], (int) $this->params['height'])
+            new Point($this->x, $this->y),
+            new Box($this->width, $this->height)
         );
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     */
+    public function getUrlTrigger() {
+        $params = array(
+            'x=' . $this->x,
+            'y=' . $this->y,
+            'width=' . $this->width,
+            'height=' . $this->height,
+        );
+
+        return 'crop:' . implode(',', $params);
     }
 }

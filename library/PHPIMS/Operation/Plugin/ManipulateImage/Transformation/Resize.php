@@ -30,10 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
-use PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+use PHPIMS\Image\TransformationInterface;
+use PHPIMS\Image\Transformation;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Box;
 
@@ -50,15 +50,45 @@ use \Imagine\Image\Box;
  */
 class Resize extends Transformation implements TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
+     * Width of the resize
+     *
+     * @var int
+     */
+    private $width = null;
+
+    /**
+     * Height of the resize
+     *
+     * @var int
+     */
+    private $height = null;
+
+    /**
+     * Class constructor
+     *
+     * @param int $width Width of the resize
+     * @param int $height Height of the resize
+     * @throws PHPIMS\Image\Transformation\Exception
+     */
+    public function __construct($width = null, $height = null) {
+        if ($width === null && $height === null) {
+            throw new FilterException('$width and/or $height must be set');
+        }
+
+        $this->width  = $width;
+        $this->height = $height;
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::apply()
      */
     public function apply(ImageInterface $image) {
-        if (!isset($this->params['width']) && !isset($this->params['height'])) {
+        if (empty($this->width) && empty($this->height)) {
             throw new Exception('Missing parameters width and/or height');
         }
 
-        $width  = (isset($this->params['width']) ? (int) $this->params['width'] : 0);
-        $height = (isset($this->params['height']) ? (int) $this->params['height'] : 0);
+        $width  = (empty($this->width) ? (int) $this->width : 0);
+        $height = (empty($this->height) ? (int) $this->height : 0);
 
         // Fetch the size of the original image
         $size = $image->getSize();
@@ -72,5 +102,22 @@ class Resize extends Transformation implements TransformationInterface {
 
         // Resize image and store in the image object
         $image->resize(new Box($width, $height));
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     */
+    public function getUrlTrigger() {
+        $params = array();
+
+        if ($this->width !== null) {
+            $params[] = 'width=' . $this->width;
+        }
+
+        if ($this->height !== null) {
+            $params[] = 'height=' . $this->height;
+        }
+
+        return 'resize:' . implode(',', $params);
     }
 }

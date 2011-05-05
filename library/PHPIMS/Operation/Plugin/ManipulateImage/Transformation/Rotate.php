@@ -30,10 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
-use PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+use PHPIMS\Image\TransformationInterface;
+use PHPIMS\Image\Transformation;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Color;
 
@@ -50,18 +50,46 @@ use \Imagine\Image\Color;
  */
 class Rotate extends Transformation implements TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\Transformation::$defaultParams
+     * Angle of the rotation
+     *
+     * @var int
      */
-    static public $defaultParams = array(
-        'bg' => '000',
-    );
+    private $angle;
 
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
+     * Background color of the image
+     *
+     * @var string
+     */
+    private $bg;
+
+    /**
+     * Class constructor
+     *
+     * @param int $angle Angle of the rotation
+     * @param string $bg Background color
+     */
+    public function __construct($angle, $bg = '000') {
+        $this->angle = (int) $angle;
+        $this->bg = $bg;
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::apply()
      */
     public function apply(ImageInterface $image) {
-        $color = new Color($this->params['bg']);
+        $image->rotate($this->angle, new Color($this->bg));
+    }
 
-        $image->rotate($this->params['angle'], $color);
+    /**
+     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     */
+    public function getUrlTrigger() {
+        $params = array(
+            'angle=' . $this->angle,
+            'bg=' . $this->bg,
+        );
+
+        return 'rotate:' . implode(',', $params);
     }
 }

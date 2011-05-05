@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage;
+namespace PHPIMS\Image;
 
 use \Imagine\ImageInterface;
 
@@ -53,7 +53,16 @@ interface TransformationInterface {
      *                                      itself, the transformation may return the new image
      *                                      object. If Imagine modifies the image object itself,
      *                                      nothing should be returned.
-     * @throws PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
+     * @throws PHPIMS\Image\Transformation\Exception
      */
     public function apply(ImageInterface $image);
+
+    /**
+     * Get url trigger
+     *
+     * Method that returns a part that can be added to an url to perform this operation
+     *
+     * @return string
+     */
+    public function getUrlTrigger();
 }
