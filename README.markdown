@@ -18,6 +18,20 @@ Fetch the image identified by &lt;image&gt;. Read more about applying image tran
 
 Get meta data related to the image identified by &lt;image&gt;. The meta data will be JSON encoded.
 
+### GET /images
+
+Get information about the images stored in PHPIMS. Supported query parameters are:
+
+* `(int) page` The page number. Defaults to 1.
+* `(int) num` Number of images pr. page. Defaults to 20.
+* `(boolean) metadata` Wether or not to include metadata in the output. Defaults to false ('0'). Set to '1' to enable.
+* `(int) from` Fetch images starting from this unix timestamp.
+* `(int) to` Fetch images up until this timestamp.
+
+Example:
+
+* `GET /images?page=1&num=30&metadata=1`
+
 ### POST /&lt;image&gt;
 
 Place a new image on the server along with meta data.
@@ -46,7 +60,7 @@ Fetches extra header information about the meta data attached to the image ident
 All write operations (POST and DELETE) requires authentication using an Hash-based Message Authentication Code (HMAC). The data PHPIMS uses when generating this code is:
 
 * HTTP method (POST or DELETE)
-* Resource identifier (for instance <image> if your PHPIMS installation answers directly in the document root)
+* Resource identifier (for instance &lt;image&gt; if your PHPIMS installation answers directly in the document root)
 * Public key (random MD5 hash that exists both on the server and the client)
 * GMT timestamp (YYYY-MM-DDTHH:MMZ, for instance: 2011-02-01T14:33Z)
 
