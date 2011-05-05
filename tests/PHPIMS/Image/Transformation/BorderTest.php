@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
 use \Imagine\ImageInterface;
@@ -43,30 +43,29 @@ use \Imagine\ImageInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class CropTest extends \PHPUnit_Framework_TestCase {
-    /**
-     * @expectedException PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
-     * @expectedExceptionMessage Missing parameter
-     */
-    public function testApplyWithMissingParameters() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $transformation = new Crop();
-        $transformation->apply($image);
-    }
-
+class BorderTest extends \PHPUnit_Framework_TestCase {
     public function testApply() {
+        $imageHeight = 100;
+        $imageWidth = 200;
+
+        $draw  = m::mock('Imagine\\Image\\Draw');
+        $size  = m::mock('Imagine\\Image\\Size');
         $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('crop')->once()
-                                     ->with(m::type('Imagine\\Image\\Point'), m::type('Imagine\\Image\\Box'));
 
-        $params = array(
-            'x'      => 1,
-            'y'      => 2,
-            'width'  => 3,
-            'height' => 4,
-        );
+        $image->shouldReceive('getSize')->once()->andReturn($size);
+        $image->shouldReceive('draw')->once()->andReturn($draw);
 
-        $transformation = new Crop($params);
-        $transformation->apply($image);
+        $size->shouldReceive('getHeight')->once()->andReturn($imageHeight);
+        $size->shouldReceive('getWidth')->once()->andReturn($imageWidth);
+
+        $draw->shouldReceive('line')->times(4)
+                                    ->with(
+                                        m::type('Imagine\\Image\\Point'),
+                                        m::type('Imagine\\Image\\Point'),
+                                        m::type('Imagine\\Image\\Color'))
+                                    ->andReturn($draw);
+
+        $transformation = new Border();
+        $transformation->applyToImage($image);
     }
 }

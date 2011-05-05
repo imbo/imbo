@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
 use \Imagine\ImageInterface;
@@ -43,29 +43,22 @@ use \Imagine\ImageInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class BorderTest extends \PHPUnit_Framework_TestCase {
+class ThumbnailTest extends \PHPUnit_Framework_TestCase {
     public function testApply() {
-        $imageHeight = 100;
-        $imageWidth = 200;
+        $width = 80;
+        $height = 90;
+        $fit = 'outbound';
 
-        $draw  = m::mock('Imagine\\Image\\Draw');
-        $size  = m::mock('Imagine\\Image\\Size');
+        $thumbnail = m::mock('Imagine\\ImageInterface');
+
         $image = m::mock('Imagine\\ImageInterface');
+        $image->shouldReceive('thumbnail')->once()->with(m::on(function (\Imagine\Image\Box $box) use($width, $height) {
+            return $width == $box->getWidth() && $height == $box->getHeight();
+        }), $fit)->andReturn($thumbnail);
 
-        $image->shouldReceive('getSize')->once()->andReturn($size);
-        $image->shouldReceive('draw')->once()->andReturn($draw);
+        $transformation = new Thumbnail($width, $height, $fit);
+        $result = $transformation->applyToImage($image);
 
-        $size->shouldReceive('getHeight')->once()->andReturn($imageHeight);
-        $size->shouldReceive('getWidth')->once()->andReturn($imageWidth);
-
-        $draw->shouldReceive('line')->times(4)
-                                    ->with(
-                                        m::type('Imagine\\Image\\Point'),
-                                        m::type('Imagine\\Image\\Point'),
-                                        m::type('Imagine\\Image\\Color'))
-                                    ->andReturn($draw);
-
-        $transformation = new Border(array());
-        $transformation->apply($image);
+        $this->assertInstanceOf('Imagine\\ImageInterface', $result);
     }
 }

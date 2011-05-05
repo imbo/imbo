@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
 use \Imagine\ImageInterface;
@@ -45,10 +45,12 @@ use \Imagine\ImageInterface;
  */
 class RotateTest extends \PHPUnit_Framework_TestCase {
     public function testApply() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('rotate')->with(45, m::type('Imagine\\Image\\Color'))->once();
+        $angle = 45;
 
-        $transformation = new Rotate(array('angle' => 45));
-        $transformation->apply($image);
+        $image = m::mock('Imagine\\ImageInterface');
+        $image->shouldReceive('rotate')->with($angle, m::type('Imagine\\Image\\Color'))->once();
+
+        $transformation = new Rotate($angle);
+        $transformation->applyToImage($image);
     }
 }

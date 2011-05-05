@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
 use \Imagine\ImageInterface;
@@ -43,24 +43,12 @@ use \Imagine\ImageInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class ThumbnailTest extends \PHPUnit_Framework_TestCase {
+class FlipVerticallyTest extends \PHPUnit_Framework_TestCase {
     public function testApply() {
-        $params = array(
-            'width' => 80,
-            'height' => 90,
-            'fit' => 'outbound',
-        );
-
-        $thumbnail = m::mock('Imagine\\ImageInterface');
-
         $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('thumbnail')->once()->with(m::on(function (\Imagine\Image\Box $box) use($params) {
-            return $params['width'] == $box->getWidth() && $params['height'] == $box->getHeight();
-        }), $params['fit'])->andReturn($thumbnail);
+        $image->shouldReceive('flipVertically')->once();
 
-        $transformation = new Thumbnail($params);
-        $result = $transformation->apply($image);
-
-        $this->assertInstanceOf('Imagine\\ImageInterface', $result);
+        $transformation = new FlipVertically();
+        $transformation->applyToImage($image);
     }
 }

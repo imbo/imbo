@@ -30,10 +30,11 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
 use \Imagine\ImageInterface;
+use \Imagine\Image\Box;
 
 /**
  * @package PHPIMS
@@ -43,12 +44,47 @@ use \Imagine\ImageInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class FlipHorizontallyTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
+class ResizeTest extends \PHPUnit_Framework_TestCase {
+    public function testApplyWithBothParams() {
+        $size  = m::mock('Imagine\\Image\\Size');
         $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('flipHorizontally')->once();
+        $image->shouldReceive('getSize')->once()->andReturn($size);
 
-        $transformation = new FlipHorizontally();
-        $transformation->apply($image);
+        $image->shouldReceive('resize')->once()->with(m::on(function(Box $box) {
+            return $box->getWidth() === 200 && $box->getHeight() === 100;
+        }));
+
+        $transformation = new Resize(200, 100);
+        $transformation->applyToImage($image);
+    }
+
+    public function testApplyWithOnlyWidth() {
+        $size = m::mock('Imagine\\Image\\Size');
+        $size->shouldReceive('getHeight')->once()->andReturn(1000);
+        $size->shouldReceive('getWidth')->once()->andReturn(1000);
+        $image = m::mock('Imagine\\ImageInterface');
+        $image->shouldReceive('getSize')->once()->andReturn($size);
+
+        $image->shouldReceive('resize')->once()->with(m::on(function(Box $box) {
+            return $box->getWidth() === 200 && $box->getHeight() === 200;
+        }));
+
+        $transformation = new Resize(200);
+        $transformation->applyToImage($image);
+    }
+
+    public function testApplyWithOnlyHeight() {
+        $size = m::mock('Imagine\\Image\\Size');
+        $size->shouldReceive('getHeight')->once()->andReturn(1000);
+        $size->shouldReceive('getWidth')->once()->andReturn(1000);
+        $image = m::mock('Imagine\\ImageInterface');
+        $image->shouldReceive('getSize')->once()->andReturn($size);
+
+        $image->shouldReceive('resize')->with(m::on(function(Box $box) {
+            return $box->getWidth() === 200 && $box->getHeight() === 200;
+        }))->once();
+
+        $transformation = new Resize(null, 200);
+        $transformation->applyToImage($image);
     }
 }
