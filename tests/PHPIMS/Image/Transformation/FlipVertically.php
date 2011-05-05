@@ -44,11 +44,16 @@ use \Imagine\ImageInterface;
  * @link https://github.com/christeredvartsen/phpims
  */
 class FlipVerticallyTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
+    public function testApplyToImage() {
         $image = m::mock('Imagine\\ImageInterface');
         $image->shouldReceive('flipVertically')->once();
 
         $transformation = new FlipVertically();
         $transformation->applyToImage($image);
+    }
+
+    public function testGetUrlTrigger() {
+        $flip = new FlipVertically();
+        $this->assertSame('flipVertically', $flip->getUrlTrigger());
     }
 }

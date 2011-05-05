@@ -46,7 +46,7 @@ use \Imagine\Image\Box;
  * @link https://github.com/christeredvartsen/phpims
  */
 class CropTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
+    public function testApplyToImage() {
         $x = 1;
         $y = 2;
         $width = 3;
@@ -62,5 +62,15 @@ class CropTest extends \PHPUnit_Framework_TestCase {
 
         $transformation = new Crop($x, $y, $width, $height);
         $transformation->applyToImage($image);
+    }
+
+    public function testGetUrlTrigger() {
+        $crop = new Crop(1, 2, 3, 4);
+        $trigger = $crop->getUrlTrigger();
+        $this->assertStringStartsWith('crop:', $trigger);
+        $this->assertContains('x=1', $trigger);
+        $this->assertContains('y=2', $trigger);
+        $this->assertContains('width=3', $trigger);
+        $this->assertContains('height=4', $trigger);
     }
 }

@@ -51,4 +51,9 @@ class FlipHorizontallyTest extends \PHPUnit_Framework_TestCase {
         $transformation = new FlipHorizontally();
         $transformation->applyToImage($image);
     }
+
+    public function testGetUrlTrigger() {
+        $flip = new FlipHorizontally();
+        $this->assertSame('flipHorizontally', $flip->getUrlTrigger());
+    }
 }

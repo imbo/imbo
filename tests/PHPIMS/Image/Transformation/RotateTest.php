@@ -53,4 +53,12 @@ class RotateTest extends \PHPUnit_Framework_TestCase {
         $transformation = new Rotate($angle);
         $transformation->applyToImage($image);
     }
+
+    public function testGetUrlTrigger() {
+        $rotate = new Rotate(33, 'fed');
+        $trigger = $rotate->getUrlTrigger();
+        $this->assertStringStartsWith('rotate:', $trigger);
+        $this->assertContains('angle=33', $trigger);
+        $this->assertContains('bg=fed', $trigger);
+    }
 }

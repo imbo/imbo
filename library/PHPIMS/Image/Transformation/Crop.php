@@ -96,10 +96,6 @@ class Crop implements TransformationInterface {
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
     public function applyToImage(ImageInterface $image) {
-        if (empty($this->width) || empty($this->height)) {
-            throw new Exception('Missing parameter(s) for crop transformation');
-        }
-
         // Resize image and store in the image object
         $image->crop(
             new Point($this->x, $this->y),

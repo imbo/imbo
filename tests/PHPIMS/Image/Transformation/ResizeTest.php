@@ -87,4 +87,12 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
         $transformation = new Resize(null, 200);
         $transformation->applyToImage($image);
     }
+
+    public function testGetUrlTrigger() {
+        $resize = new Resize(100, 200);
+        $trigger = $resize->getUrlTrigger();
+        $this->assertStringStartsWith('resize:', $trigger);
+        $this->assertContains('width=100', $trigger);
+        $this->assertContains('height=200', $trigger);
+    }
 }

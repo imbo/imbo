@@ -68,4 +68,13 @@ class BorderTest extends \PHPUnit_Framework_TestCase {
         $transformation = new Border();
         $transformation->applyToImage($image);
     }
+
+    public function testGetUrlTrigger() {
+        $border = new Border('fed', 1, 2);
+        $trigger = $border->getUrlTrigger();
+        $this->assertStringStartsWith('border:', $trigger);
+        $this->assertContains('color=fed', $trigger);
+        $this->assertContains('width=1', $trigger);
+        $this->assertContains('height=2', $trigger);
+    }
 }

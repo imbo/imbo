@@ -61,4 +61,13 @@ class ThumbnailTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertInstanceOf('Imagine\\ImageInterface', $result);
     }
+
+    public function testGetUrlTrigger() {
+        $thumb = new Thumbnail(100, 200, 'inset');
+        $trigger = $thumb->getUrlTrigger();
+        $this->assertStringStartsWith('thumbnail:', $trigger);
+        $this->assertContains('width=100', $trigger);
+        $this->assertContains('height=200', $trigger);
+        $this->assertContains('fit=inset', $trigger);
+    }
 }
