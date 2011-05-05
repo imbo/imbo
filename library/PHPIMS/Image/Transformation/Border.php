@@ -33,7 +33,6 @@
 namespace PHPIMS\Image\Transformation;
 
 use PHPIMS\Image\TransformationInterface;
-use PHPIMS\Image\Transformation;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Color;
 use \Imagine\Image\Point;
@@ -49,7 +48,7 @@ use \Imagine\Image\Point;
  * @link https://github.com/christeredvartsen/phpims
  * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Border extends Transformation implements TransformationInterface {
+class Border implements TransformationInterface {
     /**
      * Width of the border
      *

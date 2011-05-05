@@ -33,7 +33,6 @@
 namespace PHPIMS\Image\Transformation;
 
 use PHPIMS\Image\TransformationInterface;
-use PHPIMS\Image\Transformation;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Box;
 
@@ -48,7 +47,7 @@ use \Imagine\Image\Box;
  * @link https://github.com/christeredvartsen/phpims
  * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Resize extends Transformation implements TransformationInterface {
+class Resize implements TransformationInterface {
     /**
      * Width of the resize
      *

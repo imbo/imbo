@@ -33,7 +33,6 @@
 namespace PHPIMS\Image\Transformation;
 
 use PHPIMS\Image\TransformationInterface;
-use PHPIMS\Image\Transformation;
 use \Imagine\ImageInterface;
 
 /**
@@ -47,7 +46,7 @@ use \Imagine\ImageInterface;
  * @link https://github.com/christeredvartsen/phpims
  * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class FlipVertically extends Transformation implements TransformationInterface {
+class FlipVertically implements TransformationInterface {
     /**
      * @see PHPIMS\Image\TransformationInterface::apply()
      */

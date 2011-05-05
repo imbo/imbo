@@ -33,7 +33,6 @@
 namespace PHPIMS\Image\Transformation;
 
 use PHPIMS\Image\TransformationInterface;
-use PHPIMS\Image\Transformation;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Point;
 use \Imagine\Image\Box;
@@ -49,7 +48,7 @@ use \Imagine\Image\Box;
  * @link https://github.com/christeredvartsen/phpims
  * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Crop extends Transformation implements TransformationInterface {
+class Crop implements TransformationInterface {
     /**
      * X coordinate of the top left corner of the crop
      *
