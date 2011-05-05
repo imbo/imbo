@@ -394,14 +394,17 @@ Each plugin must also specify which operations it wants to hook into along with 
     
 This plugin will run after the `PHPIMS\Operation\GetImage::exec()` has finished executing. It will run with an index of 101 meaning that 100 plugins can be executed prior to this one for this specific hook. Internal plugins starts with an index of 100. The name of the operation specified in the array is the last part of the operation class name along with "PostExec" or "PreExec". Here are the different names for all operations:
 
-* `PHPIMS\Operation\AddImage` "addImagePreExec" and "addImagePostExec"
-* `PHPIMS\Operation\DeleteImage` "deleteImagePreExec" and "deleteImagePostExec"
-* `PHPIMS\Operation\DeleteImageMetadata` "deleteImageMetadataPreExec" and "deleteImageMetadataPostExec"
-* `PHPIMS\Operation\EditImageMetadata` "editImageMetadataPreExec" and "editImageMetadataPostExec"
-* `PHPIMS\Operation\GetImage` "getImagePreExec" and "getImagePostExec"
-* `PHPIMS\Operation\GetImages` "getImagesPreExec" and "getImagesPostExec"
-* `PHPIMS\Operation\GetImageMetadata` "getImageMetadataPreExec" and "getImageMetadataPostExec"
-* `PHPIMS\Operation\HeadImage` "headImagePreExec" and "headImagePostExec"
+<table>
+<tr><th>Operation class</th><th>Pre exec trigger</th><th>Post exec trigger</th></tr>
+<tr><td>`PHPIMS\Operation\AddImage`</td><td>addImagePreExec</td><td>addImagePostExec</td></tr>
+<tr><td>`PHPIMS\Operation\DeleteImage`</td><td>deleteImagePreExec</td><td>deleteImagePostExec</td></tr>
+<tr><td>`PHPIMS\Operation\DeleteImageMetadata`</td><td>deleteImageMetadataPreExec</td><td>deleteImageMetadataPostExec</td></tr>
+<tr><td>`PHPIMS\Operation\EditImageMetadata`</td><td>editImageMetadataPreExec</td><td>editImageMetadataPostExec</td></tr>
+<tr><td>`PHPIMS\Operation\GetImage`</td><td>getImagePreExec</td><td>getImagePostExec</td></tr>
+<tr><td>`PHPIMS\Operation\GetImages`</td><td>getImagesPreExec</td><td>getImagesPostExec</td></tr>
+<tr><td>`PHPIMS\Operation\GetImageMetadata`</td><td>getImageMetadataPreExec</td><td>getImageMetadataPostExec</td></tr>
+<tr><td>`PHPIMS\Operation\HeadImage`</td><td>headImagePreExec</td><td>headImagePostExec</td></tr>
+</table>
 
 It's important to notice that one request to PHPIMS triggers one operation. A single request can not trigger several operations.    
 
