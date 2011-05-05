@@ -35,7 +35,6 @@ namespace PHPIMS\Operation\Plugin;
 use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 
-use PHPIMS\Image\Transformation\Exception as TransformationException;
 use PHPIMS\Image\Transformation\Border;
 use PHPIMS\Image\Transformation\Crop;
 use PHPIMS\Image\Transformation\FlipHorizontally;
@@ -198,8 +197,6 @@ class ManipulateImage implements PluginInterface {
                     }
                 } catch (\Imagine\Exception\Exception $e) {
                     trigger_error('Imagine failed with exception: ' . $e->getMessage(), E_USER_WARNING);
-                } catch (TransformationException $e) {
-                    trigger_error('Transformation failed with exception: ' . $e->getMessage(), E_USER_WARNING);
                 }
             }
 

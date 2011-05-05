@@ -53,7 +53,6 @@ interface TransformationInterface {
      *                                      itself, the transformation may return the new image
      *                                      object. If Imagine modifies the image object itself,
      *                                      nothing should be returned.
-     * @throws PHPIMS\Image\Transformation\Exception
      */
     public function applyToImage(ImageInterface $image);
 
