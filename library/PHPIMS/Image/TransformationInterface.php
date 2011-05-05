@@ -23,32 +23,45 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image;
 
-use \Mockery as m;
 use \Imagine\ImageInterface;
 
 /**
+ * Image transformation interface
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class FlipHorizontallyTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('flipHorizontally')->once();
+interface TransformationInterface {
+    /**
+     * Apply a transformation to an image object
+     *
+     * @param \Imagine\ImageInterface $image Image instance
+     * @return \Imagine\ImageInterface|null If the Imagine transformation does not modify the image
+     *                                      itself, the transformation may return the new image
+     *                                      object. If Imagine modifies the image object itself,
+     *                                      nothing should be returned.
+     */
+    public function applyToImage(ImageInterface $image);
 
-        $transformation = new FlipHorizontally();
-        $transformation->apply($image);
-    }
+    /**
+     * Get url trigger
+     *
+     * Method that returns a part that can be added to an url to perform this operation
+     *
+     * @return string
+     */
+    public function getUrlTrigger();
 }

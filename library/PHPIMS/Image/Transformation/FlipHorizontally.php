@@ -23,49 +23,41 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use \Mockery as m;
+use PHPIMS\Image\TransformationInterface;
 use \Imagine\ImageInterface;
 
 /**
+ * Flip horizontally transformation
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class BorderTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
-        $imageHeight = 100;
-        $imageWidth = 200;
+class FlipHorizontally implements TransformationInterface {
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
+     */
+    public function applyToImage(ImageInterface $image) {
+        $image->flipHorizontally();
+    }
 
-        $draw  = m::mock('Imagine\\Image\\Draw');
-        $size  = m::mock('Imagine\\Image\\Size');
-        $image = m::mock('Imagine\\ImageInterface');
-
-        $image->shouldReceive('getSize')->once()->andReturn($size);
-        $image->shouldReceive('draw')->once()->andReturn($draw);
-
-        $size->shouldReceive('getHeight')->once()->andReturn($imageHeight);
-        $size->shouldReceive('getWidth')->once()->andReturn($imageWidth);
-
-        $draw->shouldReceive('line')->times(4)
-                                    ->with(
-                                        m::type('Imagine\\Image\\Point'),
-                                        m::type('Imagine\\Image\\Point'),
-                                        m::type('Imagine\\Image\\Color'))
-                                    ->andReturn($draw);
-
-        $transformation = new Border(array());
-        $transformation->apply($image);
+    /**
+     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     */
+    public function getUrlTrigger() {
+        return 'flipHorizontally';
     }
 }

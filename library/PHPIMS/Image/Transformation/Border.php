@@ -23,48 +23,52 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\ImageUrl\Filter;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Client\ImageUrl\FilterInterface;
+use PHPIMS\Image\TransformationInterface;
+use \Imagine\ImageInterface;
+use \Imagine\Image\Color;
+use \Imagine\Image\Point;
 
 /**
- * Border filter
+ * Border transformation
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Border implements FilterInterface {
+class Border implements TransformationInterface {
+    /**
+     * Color of the border
+     *
+     * @var string
+     */
+    private $color = '000';
+
     /**
      * Width of the border
      *
      * @var int
      */
-    private $width = null;
+    private $width = 1;
 
     /**
      * Height of the border
      *
      * @var int
      */
-    private $height = null;
-
-    /**
-     * Color of the border
-     *
-     * @var string
-     */
-    private $color = null;
+    private $height = 1;
 
     /**
      * Class constructor
@@ -74,33 +78,52 @@ class Border implements FilterInterface {
      * @param int $height Height of the border
      */
     public function __construct($color = null, $width = null, $height = null) {
-        $this->color  = $color;
-        $this->width  = $width;
-        $this->height = $height;
+        if ($color !== null) {
+            $this->color  = $color;
+        }
+
+        if ($width !== null) {
+            $this->width  = (int) $width;
+        }
+
+        if ($height !== null) {
+            $this->height = (int) $height;
+        }
     }
 
     /**
-     * @see PHPIMS\Client\ImageUrl\FilterInterface::getFilter()
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function getFilter() {
-        $params = array();
+    public function applyToImage(ImageInterface $image) {
+        $color  = new Color($this->color);
+        $size   = $image->getSize();
+        $width  = $size->getWidth();
+        $height = $size->getHeight();
+        $draw   = $image->draw();
 
-        if ($this->color !== null) {
-            $params[] = 'color=' . $this->color;
+        // Draw top and bottom lines
+        for ($i = 0; $i < $this->height; $i++) {
+            $draw->line(new Point(0, $i), new Point($width - 1, $i), $color)
+                 ->line(new Point($width - 1, $height - ($i + 1)), new Point(0, $height - ($i + 1)), $color);
         }
 
-        if ($this->width !== null) {
-            $params[] = 'width=' . $this->width;
+        // Draw sides
+        for ($i = 0; $i < $this->width; $i++) {
+            $draw->line(new Point($i, 0), new Point($i, $height - 1), $color)
+                 ->line(new Point($width - ($i + 1), 0), new Point($width - ($i + 1), $height - 1), $color);
         }
+    }
 
-        if ($this->color !== null) {
-            $params[] = 'height=' . $this->height;
-        }
+    /**
+     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     */
+    public function getUrlTrigger() {
+        $params = array(
+            'color=' . $this->color,
+            'width=' . $this->width,
+            'height=' . $this->height,
+        );
 
-        if (!empty($params)) {
-            return 'border:' . implode(',', $params);
-        }
-
-        return 'border';
+        return 'border:' . implode(',', $params);
     }
 }

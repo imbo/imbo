@@ -23,27 +23,41 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Exceptions
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\Exception as BaseException;
+use PHPIMS\Image\TransformationInterface;
+use \Imagine\ImageInterface;
 
 /**
- * Base exception class for operation plugins
+ * Flip vertically transformation
  *
  * @package PHPIMS
- * @subpackage Exceptions
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Exception extends BaseException {
+class FlipVertically implements TransformationInterface {
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
+     */
+    public function applyToImage(ImageInterface $image) {
+        $image->flipVertically();
+    }
 
+    /**
+     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     */
+    public function getUrlTrigger() {
+        return 'flipVertically';
+    }
 }

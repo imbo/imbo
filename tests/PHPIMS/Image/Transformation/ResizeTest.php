@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
 use \Imagine\ImageInterface;
@@ -45,16 +45,6 @@ use \Imagine\Image\Box;
  * @link https://github.com/christeredvartsen/phpims
  */
 class ResizeTest extends \PHPUnit_Framework_TestCase {
-    /**
-     * @expectedException PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
-     * @expectedExceptionMessage Missing parameters width and/or height
-     */
-    public function testApplyWithNoParameters() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $transformation = new Resize();
-        $transformation->apply($image);
-    }
-
     public function testApplyWithBothParams() {
         $size  = m::mock('Imagine\\Image\\Size');
         $image = m::mock('Imagine\\ImageInterface');
@@ -64,8 +54,8 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
             return $box->getWidth() === 200 && $box->getHeight() === 100;
         }));
 
-        $transformation = new Resize(array('width' => 200, 'height' => 100));
-        $transformation->apply($image);
+        $transformation = new Resize(200, 100);
+        $transformation->applyToImage($image);
     }
 
     public function testApplyWithOnlyWidth() {
@@ -79,8 +69,8 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
             return $box->getWidth() === 200 && $box->getHeight() === 200;
         }));
 
-        $transformation = new Resize(array('width' => 200));
-        $transformation->apply($image);
+        $transformation = new Resize(200);
+        $transformation->applyToImage($image);
     }
 
     public function testApplyWithOnlyHeight() {
@@ -94,7 +84,15 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
             return $box->getWidth() === 200 && $box->getHeight() === 200;
         }))->once();
 
-        $transformation = new Resize(array('height' => 200));
-        $transformation->apply($image);
+        $transformation = new Resize(null, 200);
+        $transformation->applyToImage($image);
+    }
+
+    public function testGetUrlTrigger() {
+        $resize = new Resize(100, 200);
+        $trigger = $resize->getUrlTrigger();
+        $this->assertStringStartsWith('resize:', $trigger);
+        $this->assertContains('width=100', $trigger);
+        $this->assertContains('height=200', $trigger);
     }
 }

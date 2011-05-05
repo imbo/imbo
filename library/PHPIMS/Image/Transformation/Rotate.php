@@ -23,30 +23,75 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\ImageUrl;
+namespace PHPIMS\Image\Transformation;
+
+use PHPIMS\Image\TransformationInterface;
+use \Imagine\ImageInterface;
+use \Imagine\Image\Color;
 
 /**
- * Filter interface
+ * Rotate transformation
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-interface FilterInterface {
+class Rotate implements TransformationInterface {
     /**
-     * Return the filter
+     * Angle of the rotation
      *
-     * @return string The filter to add to the url
+     * @var int
      */
-    public function getFilter();
+    private $angle;
+
+    /**
+     * Background color of the image
+     *
+     * @var string
+     */
+    private $bg = '000';
+
+    /**
+     * Class constructor
+     *
+     * @param int $angle Angle of the rotation
+     * @param string $bg Background color
+     */
+    public function __construct($angle, $bg = null) {
+        $this->angle = (int) $angle;
+
+        if ($bg !== null) {
+            $this->bg = $bg;
+        }
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
+     */
+    public function applyToImage(ImageInterface $image) {
+        $image->rotate($this->angle, new Color($this->bg));
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     */
+    public function getUrlTrigger() {
+        $params = array(
+            'angle=' . $this->angle,
+            'bg=' . $this->bg,
+        );
+
+        return 'rotate:' . implode(',', $params);
+    }
 }

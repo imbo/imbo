@@ -30,12 +30,13 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage;
+namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Image\TransformationInterface;
 use \Imagine\ImageInterface;
 
 /**
- * Image transformation interface
+ * Thumbnail transformation
  *
  * @package PHPIMS
  * @subpackage ImageTransformation
@@ -43,17 +44,73 @@ use \Imagine\ImageInterface;
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-interface TransformationInterface {
+class Thumbnail implements TransformationInterface {
     /**
-     * Method that will transform the image
+     * Width of the thumbnail
      *
-     * @param \Imagine\ImageInterface $image Image instance
-     * @return \Imagine\ImageInterface|null If the Imagine transformation does not modify the image
-     *                                      itself, the transformation may return the new image
-     *                                      object. If Imagine modifies the image object itself,
-     *                                      nothing should be returned.
-     * @throws PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
+     * @var int
      */
-    public function apply(ImageInterface $image);
+    private $width = 50;
+
+    /**
+     * Height of the thumbnail
+     *
+     * @var int
+     */
+    private $height = 50;
+
+    /**
+     * Fit type
+     *
+     * The thumbnail fit style. 'inset' or 'outbound'
+     *
+     * @var string
+     */
+    private $fit = 'outbound';
+
+    /**
+     * Class constructor
+     *
+     * @param int $width Width of the thumbnail
+     * @param int $height Height of the thumbnail
+     * @param string $fit Fit type. 'outbound' or 'inset'
+     */
+    public function __construct($width = null, $height = null, $fit = null) {
+        if ($width !== null) {
+            $this->width = (int) $width;
+        }
+
+        if ($height !== null) {
+            $this->height = (int) $height;
+        }
+
+        if ($fit !== null) {
+            $this->fit = $fit;
+        }
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
+     */
+    public function applyToImage(ImageInterface $image) {
+        return $image->thumbnail(
+            new \Imagine\Image\Box($this->width, $this->height),
+            $this->fit
+        );
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     */
+    public function getUrlTrigger() {
+        $params = array(
+            'width=' . $this->width,
+            'height=' . $this->height,
+            'fit=' . $this->fit,
+        );
+
+        return 'thumbnail:' . implode(',', $params);
+    }
 }

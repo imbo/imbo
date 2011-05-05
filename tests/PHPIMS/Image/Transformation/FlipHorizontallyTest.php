@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
 use \Imagine\ImageInterface;
@@ -43,30 +43,17 @@ use \Imagine\ImageInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class CropTest extends \PHPUnit_Framework_TestCase {
-    /**
-     * @expectedException PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
-     * @expectedExceptionMessage Missing parameter
-     */
-    public function testApplyWithMissingParameters() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $transformation = new Crop();
-        $transformation->apply($image);
-    }
-
+class FlipHorizontallyTest extends \PHPUnit_Framework_TestCase {
     public function testApply() {
         $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('crop')->once()
-                                     ->with(m::type('Imagine\\Image\\Point'), m::type('Imagine\\Image\\Box'));
+        $image->shouldReceive('flipHorizontally')->once();
 
-        $params = array(
-            'x'      => 1,
-            'y'      => 2,
-            'width'  => 3,
-            'height' => 4,
-        );
+        $transformation = new FlipHorizontally();
+        $transformation->applyToImage($image);
+    }
 
-        $transformation = new Crop($params);
-        $transformation->apply($image);
+    public function testGetUrlTrigger() {
+        $flip = new FlipHorizontally();
+        $this->assertSame('flipHorizontally', $flip->getUrlTrigger());
     }
 }

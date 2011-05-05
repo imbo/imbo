@@ -30,10 +30,12 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
 use \Imagine\ImageInterface;
+use \Imagine\Image\Point;
+use \Imagine\Image\Box;
 
 /**
  * @package PHPIMS
@@ -43,12 +45,32 @@ use \Imagine\ImageInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class FlipVerticallyTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('flipVertically')->once();
+class CropTest extends \PHPUnit_Framework_TestCase {
+    public function testApplyToImage() {
+        $x = 1;
+        $y = 2;
+        $width = 3;
+        $height = 4;
 
-        $transformation = new FlipVertically();
-        $transformation->apply($image);
+        $image = m::mock('Imagine\\ImageInterface');
+        $image->shouldReceive('crop')->once()->with(m::on(function(Point $point) use ($x, $y) {
+                                                        return $point->getX() == $x && $point->getY() == $y;
+                                                    }),
+                                                    m::on(function(Box $box) use ($width, $height) {
+                                                        return $box->getWidth() == $width && $box->getHeight() == $height;
+                                                    }));
+
+        $transformation = new Crop($x, $y, $width, $height);
+        $transformation->applyToImage($image);
+    }
+
+    public function testGetUrlTrigger() {
+        $crop = new Crop(1, 2, 3, 4);
+        $trigger = $crop->getUrlTrigger();
+        $this->assertStringStartsWith('crop:', $trigger);
+        $this->assertContains('x=1', $trigger);
+        $this->assertContains('y=2', $trigger);
+        $this->assertContains('width=3', $trigger);
+        $this->assertContains('height=4', $trigger);
     }
 }

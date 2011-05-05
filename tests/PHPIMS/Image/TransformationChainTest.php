@@ -30,9 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\ImageUrl;
+namespace PHPIMS\Image;
 
 use PHPIMS\Client\ImageUrl;
+use \Mockery as m;
 
 /**
  * @package PHPIMS
@@ -42,57 +43,83 @@ use PHPIMS\Client\ImageUrl;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class TransformationTest extends \PHPUnit_Framework_TestCase {
-    protected $transformation = null;
-    protected $url = null;
-    protected $baseUrl = 'http://host';
+class TransformationChainTest extends \PHPUnit_Framework_TestCase {
+    private $chain = null;
+    private $url = null;
+    private $baseUrl = 'http://host';
 
     public function setUp() {
-        $this->transformation = new Transformation;
+        $this->chain = new TransformationChain();
         $this->url = new ImageUrl($this->baseUrl . '/' . md5(microtime()) . '.png');
     }
 
     public function tearDown() {
-        $this->transformation = null;
+        $this->chain = null;
     }
 
     public function testBorder() {
         $url = (string) $this->url;
-        $this->transformation->border('444', 3, 3)->apply($this->url);
+        $this->assertInstanceOf('PHPIMS\\Image\\TransformationChain', $this->chain->border('444', 3, 3)->applyToImageUrl($this->url));
         $this->assertSame($url . '?t[]=border:color=444,width=3,height=3', (string) $this->url);
     }
 
     public function testCrop() {
         $url = (string) $this->url;
-        $this->transformation->crop(1, 2, 3, 4)->apply($this->url);
+        $this->assertInstanceOf('PHPIMS\\Image\\TransformationChain', $this->chain->crop(1, 2, 3, 4)->applyToImageUrl($this->url));
         $this->assertSame($url . '?t[]=crop:x=1,y=2,width=3,height=4', (string) $this->url);
     }
 
     public function testResize() {
         $url = (string) $this->url;
-        $this->transformation->resize(100, 200)->apply($this->url);
+        $this->assertInstanceOf('PHPIMS\\Image\\TransformationChain', $this->chain->resize(100, 200)->applyToImageUrl($this->url));
         $this->assertSame($url . '?t[]=resize:width=100,height=200', (string) $this->url);
     }
 
     public function testRotate() {
         $url = (string) $this->url;
-        $this->transformation->rotate(88, 'fff')->apply($this->url);
+        $this->assertInstanceOf('PHPIMS\\Image\\TransformationChain', $this->chain->rotate(88, 'fff')->applyToImageUrl($this->url));
         $this->assertSame($url . '?t[]=rotate:angle=88,bg=fff', (string) $this->url);
     }
 
-    public function testAll() {
+    public function testThumbnail() {
         $url = (string) $this->url;
-        $this->transformation->border('444', 3, 3)->crop(1, 2, 3, 4)->resize(100, 200)->rotate(88, 'fff')
-                             ->border('555', 2, 2)->crop(5, 6, 7, 8)->resize(200, 100)->rotate(45, '888')->apply($this->url);
-
-        $this->assertSame($url . '?' .
-            't[]=border:color=444,width=3,height=3&t[]=crop:x=1,y=2,width=3,height=4&t[]=resize:width=100,height=200&t[]=rotate:angle=88,bg=fff&' .
-            't[]=border:color=555,width=2,height=2&t[]=crop:x=5,y=6,width=7,height=8&t[]=resize:width=200,height=100&t[]=rotate:angle=45,bg=888', (string) $this->url);
+        $this->assertInstanceOf('PHPIMS\\Image\\TransformationChain', $this->chain->thumbnail(60, 60, 'inset')->applyToImageUrl($this->url));
+        $this->assertSame($url . '?t[]=thumbnail:width=60,height=60,fit=inset', (string) $this->url);
     }
 
-    public function testApplyWithNoFiltersAdded() {
+    public function testFlipHorizontally() {
         $url = (string) $this->url;
-        $this->transformation->apply($this->url);
+        $this->assertInstanceOf('PHPIMS\\Image\\TransformationChain', $this->chain->flipHorizontally()->applyToImageUrl($this->url));
+        $this->assertSame($url . '?t[]=flipHorizontally', (string) $this->url);
+    }
+
+    public function testFlipVertically() {
+        $url = (string) $this->url;
+        $this->assertInstanceOf('PHPIMS\\Image\\TransformationChain', $this->chain->flipVertically()->applyToImageUrl($this->url));
+        $this->assertSame($url . '?t[]=flipVertically', (string) $this->url);
+    }
+
+    public function testApplyToImageUrlWithNoFiltersAdded() {
+        $url = (string) $this->url;
+        $this->chain->applyToImageUrl($this->url);
         $this->assertSame($url, (string) $this->url);
+    }
+
+    public function testTransformImage() {
+        $image = m::mock('Imagine\\ImageInterface');
+        $transformation = m::mock('PHPIMS\\Image\\TransformationInterface');
+        $transformation->shouldReceive('applyToImage')->once()->with($image);
+
+        $this->chain->transformImage($image, $transformation);
+    }
+
+    public function testTransformImageUrl() {
+        $transformation = m::mock('PHPIMS\\Image\\TransformationInterface');
+        $transformation->shouldReceive('getUrlTrigger')->once()->andReturn('trigger');
+
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->once()->with('trigger');
+
+        $this->chain->transformImageUrl($url, $transformation);
     }
 }

@@ -34,9 +34,9 @@ namespace PHPIMS;
 
 use PHPIMS\Client\DriverInterface;
 use PHPIMS\Client\ImageUrl;
-use PHPIMS\Client\ImageUrl\Transformation;
 use PHPIMS\Client\Driver\Curl as DefaultDriver;
 use PHPIMS\Client\Exception as ClientException;
+use PHPIMS\Image\TransformationChain;
 
 /**
  * Client that interacts with the server part of PHPIMS
@@ -95,7 +95,7 @@ class Client {
 
         if ($driver === null) {
             // @codeCoverageIgnoreStart
-            $driver = new DefaultDriver;
+            $driver = new DefaultDriver();
         }
         // @codeCoverageIgnoreEnd
 
@@ -238,15 +238,16 @@ class Client {
      * Get url to an image
      *
      * @param string $imageIdentifier Image identifier
-     * @param Transformation $transformation An optional chain of transformations
+     * @param PHPIMS\Image\TransformationChain $transformationChain An optional chain of
+     *                                                              transformations
      * @return PHPIMS\Client\ImageUrl
      */
-    public function getImageUrl($imageIdentifier, Transformation $transformation = null) {
+    public function getImageUrl($imageIdentifier, TransformationChain $transformationChain = null) {
         $url = $this->getResourceUrl($imageIdentifier);
         $imageUrl = new ImageUrl($url);
 
-        if ($transformation !== null) {
-            $transformation->apply($imageUrl);
+        if ($transformationChain !== null) {
+            $transformationChain->applyToImageUrl($imageUrl);
         }
 
         return $imageUrl;

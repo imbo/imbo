@@ -30,7 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\ImageUrl\Filter;
+namespace PHPIMS\Image\Transformation;
+
+use \Mockery as m;
+use \Imagine\ImageInterface;
 
 /**
  * @package PHPIMS
@@ -40,9 +43,17 @@ namespace PHPIMS\Client\ImageUrl\Filter;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class CropTest extends \PHPUnit_Framework_TestCase {
-    public function testCrop() {
-        $filter = new Crop(1, 2, 3, 4);
-        $this->assertSame('crop:x=1,y=2,width=3,height=4', $filter->getFilter());
+class FlipVerticallyTest extends \PHPUnit_Framework_TestCase {
+    public function testApplyToImage() {
+        $image = m::mock('Imagine\\ImageInterface');
+        $image->shouldReceive('flipVertically')->once();
+
+        $transformation = new FlipVertically();
+        $transformation->applyToImage($image);
+    }
+
+    public function testGetUrlTrigger() {
+        $flip = new FlipVertically();
+        $this->assertSame('flipVertically', $flip->getUrlTrigger());
     }
 }

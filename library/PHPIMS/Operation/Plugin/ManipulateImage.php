@@ -34,9 +34,17 @@ namespace PHPIMS\Operation\Plugin;
 
 use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
-use PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception as TransformationException;
-use \Imagine\Imagick\Imagine;
-use \Imagine\ImageInterface;
+
+use PHPIMS\Image\Transformation\Border;
+use PHPIMS\Image\Transformation\Crop;
+use PHPIMS\Image\Transformation\FlipHorizontally;
+use PHPIMS\Image\Transformation\FlipVertically;
+use PHPIMS\Image\Transformation\Resize;
+use PHPIMS\Image\Transformation\Rotate;
+use PHPIMS\Image\Transformation\Thumbnail;
+
+use \Imagine\Imagick\Imagine as Imagine;
+use \Imagine\ImageInterface as ImagineImage;
 
 /**
  * Manipulate image plugin
@@ -109,48 +117,6 @@ class ManipulateImage implements PluginInterface {
         'getImagePostExec' => 101,
     );
 
-    /**#@+
-     * Valid operations
-     *
-     * @var string
-     */
-    const RESIZE           = 'resize';
-    const CROP             = 'crop';
-    const ROTATE           = 'rotate';
-    const BORDER           = 'border';
-    const THUMBNAIL        = 'thumbnail';
-    const FLIPHORIZONTALLY = 'flipHorizontally';
-    const FLIPVERTICALLY   = 'flipVertically';
-    /**#@-*/
-
-    /**
-     * Classes used to perform certain transformations
-     *
-     * The keys are the name of the transformations used in the query, and the value is the fully
-     * qualified class name of the class handling that transformation.
-     *
-     * @var array
-     */
-    static public $transformationClasses = array(
-        self::RESIZE           => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Resize',
-        self::CROP             => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Crop',
-        self::ROTATE           => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Rotate',
-        self::BORDER           => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Border',
-        self::THUMBNAIL        => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\Thumbnail',
-        self::FLIPHORIZONTALLY => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\FlipHorizontally',
-        self::FLIPVERTICALLY   => 'PHPIMS\\Operation\\Plugin\\ManipulateImage\\Transformation\\FlipVertically',
-    );
-
-    /**
-     * See if a transformation is valid
-     *
-     * @param string $transformation The transformation name
-     * @return boolean
-     */
-    static public function isValidTransformation($transformation) {
-        return isset(self::$transformationClasses[$transformation]);
-    }
-
     /**
      * @see PHPIMS\Operation\PluginInterface::exec()
      */
@@ -159,58 +125,78 @@ class ManipulateImage implements PluginInterface {
             $originalImage = $operation->getImage();
 
             // Load the image into imagine
-            $imagine = new Imagine;
+            $imagine = new Imagine();
             $image = $imagine->load($originalImage->getBlob());
 
             foreach ($_GET['t'] as $transformation) {
                 // See if the transformation has any parameters
                 $pos = strpos($transformation, ':');
-                $params = '';
+                $urlParams = '';
 
                 if ($pos === false) {
                     // No params exist
                     $name = $transformation;
                 } else {
-                    list($name, $params) = explode(':', $transformation, 2);
+                    list($name, $urlParams) = explode(':', $transformation, 2);
                 }
-
-                // See if this is a valid transformation. If not, skip this parameter
-                if (!self::isValidTransformation($name)) {
-                    continue;
-                }
-
-                $className = self::$transformationClasses[$name];
 
                 // Initialize params for the transformation
-                $transformationParams = array();
+                $params = array();
 
                 // See if we have more than one parameter
-                if (strpos($params, ',') !== false) {
-                    $params = explode(',', $params);
+                if (strpos($urlParams, ',') !== false) {
+                    $urlParams = explode(',', $urlParams);
                 } else {
-                    $params = array($params);
+                    $urlParams = array($urlParams);
                 }
 
-                foreach ($params as $param) {
+                foreach ($urlParams as $param) {
                     $pos = strpos($param, '=');
 
                     if ($pos !== false) {
-                        $transformationParams[substr($param, 0, $pos)] = substr($param, $pos + 1);
+                        $params[substr($param, 0, $pos)] = substr($param, $pos + 1);
                     }
                 }
 
-                $transformationInstance = new $className($transformationParams);
+                $p = function($key) use ($params) {
+                    return isset($params[$key]) ? $params[$key] : null;
+                };
+
+                switch ($name) {
+                    case 'border':
+                        $transformation = new Border($p('color'), $p('width'), $p('height'));
+                        break;
+                    case 'crop':
+                        $transformation = new Crop($p('x'), $p('y'), $p('width'), $p('height'));
+                        break;
+                    case 'flipHorizontally':
+                        $transformation = new FlipHorizontally();
+                        break;
+                    case 'flipVertically':
+                        $transformation = new FlipVertically();
+                        break;
+                    case 'resize':
+                        $transformation = new Resize($p('width'), $p('height'));
+                        break;
+                    case 'rotate':
+                        $transformation = new Rotate($p('angle'), $p('bg'));
+                        break;
+                    case 'thumbnail':
+                        $transformation = new Thumbnail($p('width'), $p('height'), $p('fit'));
+                        break;
+                    default:
+                        // Unsupported transformation
+                        continue;
+                }
 
                 try {
-                    $newImage = $transformationInstance->apply($image);
+                    $newImage = $transformation->applyToImage($image);
 
-                    if ($newImage instanceof ImageInterface) {
+                    if ($newImage instanceof ImagineImage) {
                         $image = $newImage;
                     }
                 } catch (\Imagine\Exception\Exception $e) {
                     trigger_error('Imagine failed with exception: ' . $e->getMessage(), E_USER_WARNING);
-                } catch (TransformationException $e) {
-                    trigger_error('Transformation failed with exception: ' . $e->getMessage(), E_USER_WARNING);
                 }
             }
 

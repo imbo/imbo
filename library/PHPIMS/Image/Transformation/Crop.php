@@ -30,14 +30,15 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
-use PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+use PHPIMS\Image\TransformationInterface;
 use \Imagine\ImageInterface;
+use \Imagine\Image\Point;
+use \Imagine\Image\Box;
 
 /**
- * Flip horizontally transformation
+ * Crop transformation
  *
  * @package PHPIMS
  * @subpackage ImageTransformation
@@ -47,11 +48,72 @@ use \Imagine\ImageInterface;
  * @link https://github.com/christeredvartsen/phpims
  * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class FlipHorizontally extends Transformation implements TransformationInterface {
+class Crop implements TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
+     * X coordinate of the top left corner of the crop
+     *
+     * @var int
      */
-    public function apply(ImageInterface $image) {
-        $image->flipHorizontally();
+    private $x;
+
+    /**
+     * Y coordinate of the top left corner of the crop
+     *
+     * @var int
+     */
+    private $y;
+
+    /**
+     * Width of the crop
+     *
+     * @var int
+     */
+    private $width;
+
+    /**
+     * Height of the crop
+     *
+     * @var int
+     */
+    private $height;
+
+    /**
+     * Class constructor
+     *
+     * @param int $x X coordinate of the top left corner of the crop
+     * @param int $y Y coordinate of the top left corner of the crop
+     * @param int $width Width of the crop
+     * @param int $height Height of the crop
+     */
+    public function __construct($x, $y, $width, $height) {
+        $this->x      = (int) $x;
+        $this->y      = (int) $y;
+        $this->width  = (int) $width;
+        $this->height = (int) $height;
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
+     */
+    public function applyToImage(ImageInterface $image) {
+        // Resize image and store in the image object
+        $image->crop(
+            new Point($this->x, $this->y),
+            new Box($this->width, $this->height)
+        );
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     */
+    public function getUrlTrigger() {
+        $params = array(
+            'x=' . $this->x,
+            'y=' . $this->y,
+            'width=' . $this->width,
+            'height=' . $this->height,
+        );
+
+        return 'crop:' . implode(',', $params);
     }
 }

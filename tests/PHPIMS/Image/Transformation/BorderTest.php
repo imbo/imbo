@@ -30,9 +30,10 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin;
+namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
+use \Imagine\ImageInterface;
 
 /**
  * @package PHPIMS
@@ -42,27 +43,38 @@ use \Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class ManipulateImageTest extends \PHPUnit_Framework_TestCase {
-    /**
-     * Plugin instance
-     *
-     * @var PHPIMS\Operation\Plugin\ManipulateImage
-     */
-    protected $plugin = null;
+class BorderTest extends \PHPUnit_Framework_TestCase {
+    public function testApply() {
+        $imageHeight = 100;
+        $imageWidth = 200;
 
-    public function setUp() {
-        $this->plugin = new ManipulateImage();
+        $draw  = m::mock('Imagine\\Image\\Draw');
+        $size  = m::mock('Imagine\\Image\\Size');
+        $image = m::mock('Imagine\\ImageInterface');
+
+        $image->shouldReceive('getSize')->once()->andReturn($size);
+        $image->shouldReceive('draw')->once()->andReturn($draw);
+
+        $size->shouldReceive('getHeight')->once()->andReturn($imageHeight);
+        $size->shouldReceive('getWidth')->once()->andReturn($imageWidth);
+
+        $draw->shouldReceive('line')->times(4)
+                                    ->with(
+                                        m::type('Imagine\\Image\\Point'),
+                                        m::type('Imagine\\Image\\Point'),
+                                        m::type('Imagine\\Image\\Color'))
+                                    ->andReturn($draw);
+
+        $transformation = new Border();
+        $transformation->applyToImage($image);
     }
 
-    public function tearDown() {
-        $this->plugin = null;
-    }
-
-    public function testIsValidTransformation() {
-        $this->assertTrue(ManipulateImage::isValidTransformation('resize'));
-        $this->assertTrue(ManipulateImage::isValidTransformation('crop'));
-        $this->assertTrue(ManipulateImage::isValidTransformation('rotate'));
-        $this->assertTrue(ManipulateImage::isValidTransformation('border'));
-        $this->assertFalse(ManipulateImage::isValidTransformation('foobar'));
+    public function testGetUrlTrigger() {
+        $border = new Border('fed', 1, 2);
+        $trigger = $border->getUrlTrigger();
+        $this->assertStringStartsWith('border:', $trigger);
+        $this->assertContains('color=fed', $trigger);
+        $this->assertContains('width=1', $trigger);
+        $this->assertContains('height=2', $trigger);
     }
 }

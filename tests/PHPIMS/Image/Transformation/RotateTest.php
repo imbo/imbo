@@ -23,27 +23,42 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Exceptions
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\ImageUrl\Filter;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Client\Exception as BaseException;
+use \Mockery as m;
+use \Imagine\ImageInterface;
 
 /**
- * Base exception class for imageurl filters
- *
  * @package PHPIMS
- * @subpackage Exceptions
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Exception extends BaseException {
+class RotateTest extends \PHPUnit_Framework_TestCase {
+    public function testApply() {
+        $angle = 45;
 
+        $image = m::mock('Imagine\\ImageInterface');
+        $image->shouldReceive('rotate')->with($angle, m::type('Imagine\\Image\\Color'))->once();
+
+        $transformation = new Rotate($angle);
+        $transformation->applyToImage($image);
+    }
+
+    public function testGetUrlTrigger() {
+        $rotate = new Rotate(33, 'fed');
+        $trigger = $rotate->getUrlTrigger();
+        $this->assertStringStartsWith('rotate:', $trigger);
+        $this->assertContains('angle=33', $trigger);
+        $this->assertContains('bg=fed', $trigger);
+    }
 }

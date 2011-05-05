@@ -23,35 +23,51 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
-use PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+use \Mockery as m;
 use \Imagine\ImageInterface;
 
 /**
- * Flip vertically transformation
- *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
- * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class FlipVertically extends Transformation implements TransformationInterface {
-    /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
-     */
-    public function apply(ImageInterface $image) {
-        $image->flipVertically();
+class ThumbnailTest extends \PHPUnit_Framework_TestCase {
+    public function testApply() {
+        $width = 80;
+        $height = 90;
+        $fit = 'outbound';
+
+        $thumbnail = m::mock('Imagine\\ImageInterface');
+
+        $image = m::mock('Imagine\\ImageInterface');
+        $image->shouldReceive('thumbnail')->once()->with(m::on(function (\Imagine\Image\Box $box) use($width, $height) {
+            return $width == $box->getWidth() && $height == $box->getHeight();
+        }), $fit)->andReturn($thumbnail);
+
+        $transformation = new Thumbnail($width, $height, $fit);
+        $result = $transformation->applyToImage($image);
+
+        $this->assertInstanceOf('Imagine\\ImageInterface', $result);
+    }
+
+    public function testGetUrlTrigger() {
+        $thumb = new Thumbnail(100, 200, 'inset');
+        $trigger = $thumb->getUrlTrigger();
+        $this->assertStringStartsWith('thumbnail:', $trigger);
+        $this->assertContains('width=100', $trigger);
+        $this->assertContains('height=200', $trigger);
+        $this->assertContains('fit=inset', $trigger);
     }
 }
