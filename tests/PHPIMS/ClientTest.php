@@ -186,10 +186,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
     public function testGetImageUrlWithTransformations() {
         $baseUrl = $this->serverUrl . '/' . $this->imageIdentifier;
         $completeUrl = $baseUrl;
-        $transformation = m::mock('PHPIMS\\Client\\ImageUrl\\Transformation');
-        $transformation->shouldReceive('apply')->once()->with(m::type('PHPIMS\\Client\\ImageUrl'));
+        $chain = m::mock('PHPIMS\\Image\\TransformationChain');
+        $chain->shouldReceive('applyToImageUrl')->once()->with(m::type('PHPIMS\\Client\\ImageUrl'));
 
-        $url = $this->client->getImageUrl($this->imageIdentifier, $transformation);
+        $url = $this->client->getImageUrl($this->imageIdentifier, $chain);
         $this->assertInstanceOf('PHPIMS\\Client\\ImageUrl', $url);
         $this->assertSame($completeUrl, (string) $url);
     }
