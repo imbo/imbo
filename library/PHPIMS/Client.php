@@ -247,7 +247,7 @@ class Client {
         $imageUrl = new ImageUrl($url);
 
         if ($transformationChain !== null) {
-            $transformationChain->transformImageUrl($imageUrl);
+            $transformationChain->applyToImageUrl($imageUrl);
         }
 
         return $imageUrl;

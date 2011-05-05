@@ -84,9 +84,9 @@ class Thumbnail implements TransformationInterface {
     }
 
     /**
-     * @see PHPIMS\Image\TransformationInterface::apply()
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function apply(ImageInterface $image) {
+    public function applyToImage(ImageInterface $image) {
         return $image->thumbnail(
             new \Imagine\Image\Box($this->width, $this->height),
             $this->fit

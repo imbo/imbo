@@ -79,9 +79,9 @@ class Resize implements TransformationInterface {
     }
 
     /**
-     * @see PHPIMS\Image\TransformationInterface::apply()
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function apply(ImageInterface $image) {
+    public function applyToImage(ImageInterface $image) {
         if (empty($this->width) && empty($this->height)) {
             throw new Exception('Missing parameters width and/or height');
         }

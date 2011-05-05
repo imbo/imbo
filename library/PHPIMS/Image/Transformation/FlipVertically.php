@@ -48,9 +48,9 @@ use \Imagine\ImageInterface;
  */
 class FlipVertically implements TransformationInterface {
     /**
-     * @see PHPIMS\Image\TransformationInterface::apply()
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function apply(ImageInterface $image) {
+    public function applyToImage(ImageInterface $image) {
         $image->flipVertically();
     }
 

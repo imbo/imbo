@@ -46,7 +46,7 @@ use \Imagine\ImageInterface;
  */
 interface TransformationInterface {
     /**
-     * Method that will transform the image
+     * Apply a transformation to an image object
      *
      * @param \Imagine\ImageInterface $image Image instance
      * @return \Imagine\ImageInterface|null If the Imagine transformation does not modify the image
@@ -55,7 +55,7 @@ interface TransformationInterface {
      *                                      nothing should be returned.
      * @throws PHPIMS\Image\Transformation\Exception
      */
-    public function apply(ImageInterface $image);
+    public function applyToImage(ImageInterface $image);
 
     /**
      * Get url trigger

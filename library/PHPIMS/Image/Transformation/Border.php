@@ -84,9 +84,9 @@ class Border implements TransformationInterface {
     }
 
     /**
-     * @see PHPIMS\Image\TransformationInterface::apply()
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function apply(ImageInterface $image) {
+    public function applyToImage(ImageInterface $image) {
         $color  = new Color($this->color);
         $size   = $image->getSize();
         $width  = $size->getWidth();
