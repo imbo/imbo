@@ -396,14 +396,14 @@ This plugin will run after the `PHPIMS\Operation\GetImage::exec()` has finished 
 
 <table>
 <tr><th>Operation class</th><th>Pre exec trigger</th><th>Post exec trigger</th></tr>
-<tr><td>`PHPIMS\Operation\AddImage`</td><td>addImagePreExec</td><td>addImagePostExec</td></tr>
-<tr><td>`PHPIMS\Operation\DeleteImage`</td><td>deleteImagePreExec</td><td>deleteImagePostExec</td></tr>
-<tr><td>`PHPIMS\Operation\DeleteImageMetadata`</td><td>deleteImageMetadataPreExec</td><td>deleteImageMetadataPostExec</td></tr>
-<tr><td>`PHPIMS\Operation\EditImageMetadata`</td><td>editImageMetadataPreExec</td><td>editImageMetadataPostExec</td></tr>
-<tr><td>`PHPIMS\Operation\GetImage`</td><td>getImagePreExec</td><td>getImagePostExec</td></tr>
-<tr><td>`PHPIMS\Operation\GetImages`</td><td>getImagesPreExec</td><td>getImagesPostExec</td></tr>
-<tr><td>`PHPIMS\Operation\GetImageMetadata`</td><td>getImageMetadataPreExec</td><td>getImageMetadataPostExec</td></tr>
-<tr><td>`PHPIMS\Operation\HeadImage`</td><td>headImagePreExec</td><td>headImagePostExec</td></tr>
+<tr><td>PHPIMS\Operation\AddImage</td><td>addImagePreExec</td><td>addImagePostExec</td></tr>
+<tr><td>PHPIMS\Operation\DeleteImage</td><td>deleteImagePreExec</td><td>deleteImagePostExec</td></tr>
+<tr><td>PHPIMS\Operation\DeleteImageMetadata</td><td>deleteImageMetadataPreExec</td><td>deleteImageMetadataPostExec</td></tr>
+<tr><td>PHPIMS\Operation\EditImageMetadata</td><td>editImageMetadataPreExec</td><td>editImageMetadataPostExec</td></tr>
+<tr><td>PHPIMS\Operation\GetImage</td><td>getImagePreExec</td><td>getImagePostExec</td></tr>
+<tr><td>PHPIMS\Operation\GetImages</td><td>getImagesPreExec</td><td>getImagesPostExec</td></tr>
+<tr><td>PHPIMS\Operation\GetImageMetadata</td><td>getImageMetadataPreExec</td><td>getImageMetadataPostExec</td></tr>
+<tr><td>PHPIMS\Operation\HeadImage</td><td>headImagePreExec</td><td>headImagePostExec</td></tr>
 </table>
 
 It's important to notice that one request to PHPIMS triggers one operation. A single request can not trigger several operations.    
