@@ -41,6 +41,9 @@ use PHPIMS\Image\Transformation\Border;
 use PHPIMS\Image\Transformation\Crop;
 use PHPIMS\Image\Transformation\Resize;
 use PHPIMS\Image\Transformation\Rotate;
+use PHPIMS\Image\Transformation\Thumbnail;
+use PHPIMS\Image\Transformation\FlipHorizontally;
+use PHPIMS\Image\Transformation\FlipVertically;
 
 /**
  * Transformation collection
