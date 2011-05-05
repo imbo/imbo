@@ -49,7 +49,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
     protected $query = null;
 
     public function setUp() {
-        $this->query = new Query;
+        $this->query = new Query();
     }
 
     public function tearDown() {

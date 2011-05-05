@@ -85,7 +85,7 @@ class MongoDB implements DriverInterface {
 
         if ($collection === null) {
             // @codeCoverageIgnoreStart
-            $mongo      = new \Mongo;
+            $mongo      = new \Mongo();
             $database   = $mongo->{$this->params['databaseName']};
             $collection = $database->{$this->params['collectionName']};
         }

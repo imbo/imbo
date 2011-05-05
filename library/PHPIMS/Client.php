@@ -95,7 +95,7 @@ class Client {
 
         if ($driver === null) {
             // @codeCoverageIgnoreStart
-            $driver = new DefaultDriver;
+            $driver = new DefaultDriver();
         }
         // @codeCoverageIgnoreEnd
 
