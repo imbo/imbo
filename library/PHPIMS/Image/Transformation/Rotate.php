@@ -60,7 +60,7 @@ class Rotate implements TransformationInterface {
      *
      * @var string
      */
-    private $bg;
+    private $bg = '000';
 
     /**
      * Class constructor
@@ -68,9 +68,12 @@ class Rotate implements TransformationInterface {
      * @param int $angle Angle of the rotation
      * @param string $bg Background color
      */
-    public function __construct($angle, $bg = '000') {
+    public function __construct($angle, $bg = null) {
         $this->angle = (int) $angle;
-        $this->bg = $bg;
+
+        if ($bg !== null) {
+            $this->bg = $bg;
+        }
     }
 
     /**

@@ -30,12 +30,12 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\Exception as BaseException;
+use PHPIMS\Exception as BaseException;
 
 /**
- * Base exception class for operation plugins
+ * Base exception class for image transformations
  *
  * @package PHPIMS
  * @subpackage Exceptions

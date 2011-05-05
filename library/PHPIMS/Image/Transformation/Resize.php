@@ -53,41 +53,32 @@ class Resize implements TransformationInterface {
      *
      * @var int
      */
-    private $width = null;
+    private $width;
 
     /**
      * Height of the resize
      *
      * @var int
      */
-    private $height = null;
+    private $height;
 
     /**
      * Class constructor
      *
      * @param int $width Width of the resize
      * @param int $height Height of the resize
-     * @throws PHPIMS\Image\Transformation\Exception
      */
     public function __construct($width = null, $height = null) {
-        if ($width === null && $height === null) {
-            throw new FilterException('$width and/or $height must be set');
-        }
-
-        $this->width  = $width;
-        $this->height = $height;
+        $this->width  = (int) $width;
+        $this->height = (int) $height;
     }
 
     /**
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
     public function applyToImage(ImageInterface $image) {
-        if (empty($this->width) && empty($this->height)) {
-            throw new Exception('Missing parameters width and/or height');
-        }
-
-        $width  = (empty($this->width) ? (int) $this->width : 0);
-        $height = (empty($this->height) ? (int) $this->height : 0);
+        $width  = $this->width ?: null;
+        $height = $this->height ?: null;
 
         // Fetch the size of the original image
         $size = $image->getSize();

@@ -54,21 +54,21 @@ class Border implements TransformationInterface {
      *
      * @var int
      */
-    private $width;
+    private $width = 1;
 
     /**
      * Height of the border
      *
      * @var int
      */
-    private $height;
+    private $height = 1;
 
     /**
      * Color of the border
      *
      * @var string
      */
-    private $color;
+    private $color = '000';
 
     /**
      * Class constructor
@@ -77,10 +77,18 @@ class Border implements TransformationInterface {
      * @param int $width Width of the border
      * @param int $height Height of the border
      */
-    public function __construct($color = '000', $width = 1, $height = 1) {
-        $this->color  = $color;
-        $this->width  = (int) $width;
-        $this->height = (int) $height;
+    public function __construct($color = null, $width = null, $height = null) {
+        if ($color !== null) {
+            $this->color  = $color;
+        }
+
+        if ($width !== null) {
+            $this->width  = (int) $width;
+        }
+
+        if ($height !== null) {
+            $this->height = (int) $height;
+        }
     }
 
     /**

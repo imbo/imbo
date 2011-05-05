@@ -52,14 +52,14 @@ class Thumbnail implements TransformationInterface {
      *
      * @var int
      */
-    private $width;
+    private $width = 50;
 
     /**
      * Height of the thumbnail
      *
      * @var int
      */
-    private $height;
+    private $height = 50;
 
     /**
      * Fit type
@@ -68,7 +68,7 @@ class Thumbnail implements TransformationInterface {
      *
      * @var string
      */
-    private $fit;
+    private $fit = 'outbound';
 
     /**
      * Class constructor
@@ -77,10 +77,18 @@ class Thumbnail implements TransformationInterface {
      * @param int $height Height of the thumbnail
      * @param string $fit Fit type. 'outbound' or 'inset'
      */
-    public function __construct($width = 50, $height = 50, $fit = 'outbound') {
-        $this->width = (int) $width;
-        $this->height = (int) $height;
-        $this->fit = $fit;
+    public function __construct($width = null, $height = null, $fit = null) {
+        if ($width !== null) {
+            $this->width = (int) $width;
+        }
+
+        if ($height !== null) {
+            $this->height = (int) $height;
+        }
+
+        if ($fit !== null) {
+            $this->fit = $fit;
+        }
     }
 
     /**
