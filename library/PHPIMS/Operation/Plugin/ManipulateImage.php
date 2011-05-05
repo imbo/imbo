@@ -137,8 +137,8 @@ class ManipulateImage implements PluginInterface {
                         $transformation = new Thumbnail($p('width'), $p('height'), $p('fit'));
                         break;
                     default:
-                        // Unsupported transformation
-                        continue;
+                        // Unsupported transformation. Continue to the next transformation
+                        continue 2;
                 }
 
                 try {
