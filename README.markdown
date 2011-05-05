@@ -86,9 +86,9 @@ This transformation will resize the image. Two parameters are supported and at l
 
 Examples:
 
-* `?t[]=resize:width=100`
-* `?t[]=resize:height=100`
-* `?t[]=resize:width=100,height=50`
+* `t[]=resize:width=100`
+* `t[]=resize:height=100`
+* `t[]=resize:width=100,height=50`
  
 ### crop
 This transformation will crop the image. All four arguments are required.
@@ -100,7 +100,7 @@ This transformation will crop the image. All four arguments are required.
 
 Examples:
 
-* `?t[]=crop:x=10,y=25,width=250,height=150`
+* `t[]=crop:x=10,y=25,width=250,height=150`
 
 ### rotate
 Use this transformation to rotate the image.
@@ -110,8 +110,8 @@ Use this transformation to rotate the image.
 
 Examples:
 
-* `?t[]=rotate:angle=90`
-* `?t[]=rotate:angle=45,bg=fff`
+* `t[]=rotate:angle=90`
+* `t[]=rotate:angle=45,bg=fff`
 
 ### border 
 If you want to add a border around the image, use this transformation.
@@ -122,9 +122,35 @@ If you want to add a border around the image, use this transformation.
 
 Examples:
 
-* `?t[]=border`
-* `?t[]=border:color=000`
-* `?t[]=border:color=f00,width=2,height=2` 
+* `t[]=border`
+* `t[]=border:color=000`
+* `t[]=border:color=f00,width=2,height=2`
+
+### thumbnail
+Transformation that creates a thumbnail of the image.
+
+* `(int) width` Width of the thumbnail. Defaults to 50.
+* `(int) height` Height of the thumbnail. Defaults to 50.
+* `(int) fit` Fit style. 'inset' or 'outbound'. Default to 'outbound'.
+
+Examples:
+
+* `t[]=thumbnail`
+* `t[]=thumbnail:width=20,height=20,fit=inset`
+
+### flipHorizontally
+Flip the image horizontally.
+
+Example:
+
+* `t[]=flipHorizontally`
+
+### flipVertically
+Flip the image vertically.
+
+Example:
+
+* `t[]=flipVertically`
 
 ## Extra response headers
 PHPIMS will usually inject extra response headers to the different requests. All response headers from PHPIMS will be prefixed with **X-PHPIMS-**.
@@ -200,61 +226,70 @@ The `getImageUrl` returns an instance of `PHPIMS\Client\ImageUrl` which, when us
     $client = new PHPIMS\Client('http://<hostname>');
     
     $hash = '<hash>';
-    $transformation = new PHPIMS\Client\ImageUrl\Transformation;
-    $transformation->border()
-                   ->resize(200)
-                   ->rotate(45);
+    $chain = new PHPIMS\Image\TransformationChain();
+    $chain->border()->resize(200)->rotate(45);
                    
-    $url = $client->getImageUrl($hash, $transformation);
+    $url = $client->getImageUrl($hash, $chain);
     
     // OR
     
     $hash = '<hash>';
     $url = $client->getImageUrl($hash);
     
-    $transformation = new PHPIMS\Client\ImageUrl\Transformation;
-    $transformation->border()
-                   ->resize(200)
-                   ->rotate(45)
-                   ->apply($url);
+    $chain = new PHPIMS\Image\TransformationChain();
+    $chain->border()->resize(200)->rotate(45)->applyToImageUrl($url);
     
     // OR
     
     $hash = '<hash>';
     $url = $client->getImageUrl($hash);
     
-    $transformation = new PHPIMS\Client\ImageUrl\Transformation;
-    $transformation->add(new PHPIMS\Client\ImageUrl\Filter\Border());
-                   ->add(new PHPIMS\Client\ImageUrl\Filter\Resize(200));
-                   ->add(new PHPIMS\Client\ImageUrl\Filter\Rotate(45))
-                   ->apply($url);
+    $chain = new PHPIMS\Image\TransformationChain();
+    $chain->add(new PHPIMS\Image\Transformation\Border());
+          ->add(new PHPIMS\Image\Transformation\Resize(200));
+          ->add(new PHPIMS\Image\Transformation\Rotate(45))
+          ->applyToImageUrl($url);
     
     // OR
     
     $hash = '<hash>';
     $url = $client->getImageUrl($hash);
-    $filter = new PHPIMS\Client\ImageUrl\Filter\Border();
-    $transformation = new PHPIMS\Client\ImageUrl\Transformation;
-    $transformation->applyFilter($url, $filter);
+    $transformation = new PHPIMS\Image\Transformation\Border();
+    $chain = new PHPIMS\Image\TransformationChain();
+    $chain->transformImageUrl($url, $$transformation);
+    
+    // OR
+    
+    $hash = '<hash>';
+    $url = $client->getImageUrl($hash);
+    $chain = new PHPIMS\Image\TransformationChain();
+    $chain->thumbnail()->border();
+    $url->transform($chain);
 
 #### Image transformations
-The `PHPIMS\Client\ImageUrl\Transformation` class can be used to manipulate the url. The following transformations can be added to an instance of the `PHPIMS\Client\ImageUrl\Transformation` class:
+The `PHPIMS\Image\TransformationChain` class can be used to stack image manipulations. The following transformations can be added to an instance of the `PHPIMS\Image\TransformationChain` class:
 
 * `border(string $color = null, int $width = null, int $height = null)` 
 * `crop(int $x, int $y, int $width, int $height)` 
 * `rotate(int $angle, string $bg = null)` 
 * `resize(int $width = null, int $height = null)` 
+* `thumbnail($width = null, $height = null, $fit = null)` 
+* `flipHorizontally()` 
+* `flipVertically()` 
 
 These methods can be chained. They can also be added using the following method:
 
-* `add(PHPIMS\Client\ImageUrl\FilterInterface $filter)`
+* `add(PHPIMS\Image\TransformationInterface $transformation)`
 
-The following filters are implemented using the same parameters as above in the constructors:
+The following transformations are implemented using the same parameters as above in the constructors:
 
-* `PHPIMS\Client\ImageUrl\Filter\Border`
-* `PHPIMS\Client\ImageUrl\Filter\Crop`
-* `PHPIMS\Client\ImageUrl\Filter\Resize`
-* `PHPIMS\Client\ImageUrl\Filter\Rotate`
+* `PHPIMS\Image\Transformation\Border`
+* `PHPIMS\Image\Transformation\Crop`
+* `PHPIMS\Image\Transformation\Resize`
+* `PHPIMS\Image\Transformation\Rotate`
+* `PHPIMS\Image\Transformation\Thumbnail`
+* `PHPIMS\Image\Transformation\FlipHorizontally`
+* `PHPIMS\Image\Transformation\FlipVertically`
 
 ### Client response object    
 All client methods returns an instance of `PHPIMS\Client\Response` (with the exception of `getImageUrl` which returns an instance of `PHPIMS\Client\ImageUrl`). In this instance you will find information on the request that was made. 
