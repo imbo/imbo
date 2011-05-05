@@ -23,122 +23,129 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage Image
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\ImageUrl;
+namespace PHPIMS\Image;
+
+use PHPIMS\Image\Transformation;
 
 use PHPIMS\Client;
 
-use PHPIMS\Client\ImageUrl;
-use PHPIMS\Client\ImageUrl\Filter\Border;
-use PHPIMS\Client\ImageUrl\Filter\Crop;
-use PHPIMS\Client\ImageUrl\Filter\Resize;
-use PHPIMS\Client\ImageUrl\Filter\Rotate;
+use PHPIMS\Image;
+use PHPIMS\Image\Transformation\Border;
+use PHPIMS\Image\Transformation\Crop;
+use PHPIMS\Image\Transformation\Resize;
+use PHPIMS\Image\Transformation\Rotate;
 
 /**
  * Transformation collection
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage Image
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Transformation {
+class TransformationChain {
     /**
-     * Filters added
+     * Transformations added
      *
      * @var array
      */
-    private $filters = array();
+    private $transformations = array();
 
     /**
-     * Add a filter to the chain
+     * Add a transformation to the chain
      *
-     * @param FilterInterface $filter The filter to add
-     * @return PHPIMS\Client\ImageUrl\Transformation
+     * @param TransformationInterface $transformation The transformation to add
+     * @return PHPIMS\Image\TransformationChain
      */
-    public function add(FilterInterface $filter) {
-        $this->filters[] = $filter;
+    public function add(TransformationInterface $transformation) {
+        $this->transformations[] = $transformation;
 
         return $this;
     }
 
     /**
-     * Apply a filter to an url
-     *
-     * @param PHPIMS\Client\ImageUrl ImageUrl $url
-     * @param PHPIMS\Client\ImageUrl\FilterInterface $filter
-     * @return PHPIMS\Client\ImageUrl
-     */
-    public function applyFilter(ImageUrl $url, FilterInterface $filter) {
-        return $url->append($filter->getFilter());
-    }
-
-    /**
-     * Apply the filter chain to an url
-     *
-     * @param PHPIMS\Client\ImageUrl $imageUrl The url to apply filters to
-     * @return PHPIMS\Client\ImageUrl
-     */
-    public function apply(ImageUrl $url) {
-        if (count($this->filters)) {
-            return array_reduce($this->filters, array($this, 'applyFilter'), $url);
-        }
-
-        return $url;
-    }
-
-    /**
-     * Border filter
+     * Border transformation
      *
      * @param string $color The color to use
      * @param int $width Width of the border
      * @param int $height Height of the border
-     * @return PHPIMS\Client\ImageUrl\Transformation
+     * @return PHPIMS\Image\TransformationChain
      */
     public function border($color = null, $width = null, $height = null) {
         return $this->add(new Border($color, $width, $height));
     }
 
     /**
-     * Crop filter
+     * Crop transformation
      *
      * @param int $x X coordinate of the top left corner of the crop
      * @param int $y Y coordinate of the top left corner of the crop
      * @param int $width Width of the crop
      * @param int $height Height of the crop
-     * @return PHPIMS\Client\ImageUrl\Transformation
+     * @return PHPIMS\Image\TransformationChain
      */
     public function crop($x, $y, $width, $height) {
         return $this->add(new Crop($x, $y, $width, $height));
     }
 
     /**
-     * Rotate filter
+     * Rotate transformation
      *
      * @param int $angle Angle of the rotation
      * @param string $bg Background color
-     * @return PHPIMS\Client\ImageUrl\Transformation
+     * @return PHPIMS\Image\TransformationChain
      */
     public function rotate($angle, $bg = null) {
         return $this->add(new Rotate($angle, $bg));
     }
 
     /**
-     * Resize filter
+     * Resize transformation
      *
      * @param int $width Width of the resize
      * @param int $height Height of the resize
-     * @return PHPIMS\Client\ImageUrl\Transformation
+     * @return PHPIMS\Image\TransformationChain
      */
     public function resize($width = null, $height = null) {
         return $this->add(new Resize($width, $height));
+    }
+
+    /**
+     * Thumbnail transformation
+     *
+     * @param int $width Width of the thumbnail
+     * @param int $height height of the thumbnail
+     * @param string $fit Fit style ('inset' or 'outbound')
+     * @return PHPIMS\Image\TransformationChain
+     */
+    public function thumbnail($width = null, $height = null, $fit = null) {
+        return $this->add(new Thumbnail($width, $height, $fit));
+    }
+
+    /**
+     * Flip horizontally transformation
+     *
+     * @return PHPIMS\Image\TransformationChain
+     */
+    public function flipHorizontally() {
+        return $this->add(new FlipHorizontally());
+    }
+
+    /**
+     * Flip vertically transformation
+     *
+     * @return PHPIMS\Image\TransformationChain
+     */
+    public function flipVertically() {
+        return $this->add(new FlipVertically());
     }
 }
