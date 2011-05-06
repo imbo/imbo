@@ -40,8 +40,8 @@ use PHPIMS\Image\Transformation\Thumbnail;
 use PHPIMS\Image\Transformation\FlipHorizontally;
 use PHPIMS\Image\Transformation\FlipVertically;
 
+use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
-use \Imagine\ImageInterface;
 
 /**
  * Transformation collection
@@ -91,10 +91,10 @@ class TransformationChain {
     /**
      * Apply all transformations to an image object
      *
-     * @param \Imagine\ImageInterface $image Image object
+     * @param PHPIMS\Image $image Image object
      * @return PHPIMS\Image\TransformationChain
      */
-    public function applyToImage(ImageInterface $image) {
+    public function applyToImage(Image $image) {
         foreach ($this->transformations as $transformation) {
             $this->transformImage($image, $transformation);
         }
@@ -105,11 +105,11 @@ class TransformationChain {
     /**
      * Transform an image
      *
-     * @param \Imagine\ImageInterface $image Image object
+     * @param PHPIMS\Image $image Image object
      * @param PHPIMS\Image\TransformationInterface $transformation Transformation object
      * @return PHPIMS\Image\TransformationChain
      */
-    public function transformImage(ImageInterface $image, TransformationInterface $transformation) {
+    public function transformImage(Image $image, TransformationInterface $transformation) {
         $transformation->applyToImage($image);
 
         return $this;

@@ -32,9 +32,10 @@
 
 namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
-use \Imagine\ImageInterface;
+
 use \Imagine\Image\Point;
 use \Imagine\Image\Box;
 
@@ -96,12 +97,13 @@ class Crop implements TransformationInterface {
     /**
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function applyToImage(ImageInterface $image) {
-        // Resize image and store in the image object
-        $image->crop(
+    public function applyToImage(Image $image) {
+        $imagineImage = $image->getImagineImage();
+        $imagineImage->crop(
             new Point($this->x, $this->y),
             new Box($this->width, $this->height)
         );
+        $image->refresh();
     }
 
     /**

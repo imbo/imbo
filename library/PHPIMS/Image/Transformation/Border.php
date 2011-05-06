@@ -32,9 +32,10 @@
 
 namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
-use \Imagine\ImageInterface;
+
 use \Imagine\Image\Color;
 use \Imagine\Image\Point;
 
@@ -95,12 +96,13 @@ class Border implements TransformationInterface {
     /**
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function applyToImage(ImageInterface $image) {
+    public function applyToImage(Image $image) {
+        $imagineImage = $image->getImagineImage();
         $color  = new Color($this->color);
-        $size   = $image->getSize();
+        $size   = $imagineImage->getSize();
         $width  = $size->getWidth();
         $height = $size->getHeight();
-        $draw   = $image->draw();
+        $draw   = $imagineImage->draw();
 
         // Draw top and bottom lines
         for ($i = 0; $i < $this->height; $i++) {
@@ -113,6 +115,8 @@ class Border implements TransformationInterface {
             $draw->line(new Point($i, 0), new Point($i, $height - 1), $color)
                  ->line(new Point($width - ($i + 1), 0), new Point($width - ($i + 1), $height - 1), $color);
         }
+
+        $image->refresh();
     }
 
     /**

@@ -32,8 +32,8 @@
 
 namespace PHPIMS\Image;
 
+use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
-use \Imagine\ImageInterface;
 
 /**
  * Image transformation interface
@@ -49,18 +49,14 @@ interface TransformationInterface {
     /**
      * Apply a transformation to an image object
      *
-     * @param \Imagine\ImageInterface $image Image instance
-     * @return \Imagine\ImageInterface|null If the Imagine transformation does not modify the image
-     *                                      itself, the transformation may return the new image
-     *                                      object. If Imagine modifies the image object itself,
-     *                                      nothing should be returned.
+     * @param PHPIMS\Image $image Image instance
      */
-    public function applyToImage(ImageInterface $image);
+    function applyToImage(Image $image);
 
     /**
      * Apply a transformation to an image url
      *
      * @param PHPIMS\Client\ImageUrl $url Image url
      */
-    public function applyToImageUrl(ImageUrl $url);
+    function applyToImageUrl(ImageUrl $url);
 }

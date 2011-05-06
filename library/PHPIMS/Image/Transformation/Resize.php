@@ -32,9 +32,10 @@
 
 namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
-use \Imagine\ImageInterface;
+
 use \Imagine\Image\Box;
 
 /**
@@ -77,12 +78,13 @@ class Resize implements TransformationInterface {
     /**
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function applyToImage(ImageInterface $image) {
+    public function applyToImage(Image $image) {
+        $imagineImage = $image->getImagineImage();
         $width  = $this->width ?: null;
         $height = $this->height ?: null;
 
         // Fetch the size of the original image
-        $size = $image->getSize();
+        $size = $imagineImage->getSize();
 
         // Calculate width or height if not both have been specified
         if (!$height) {
@@ -92,7 +94,8 @@ class Resize implements TransformationInterface {
         }
 
         // Resize image and store in the image object
-        $image->resize(new Box($width, $height));
+        $imagineImage->resize(new Box($width, $height));
+        $image->refresh();
     }
 
     /**

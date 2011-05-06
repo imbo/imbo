@@ -43,9 +43,6 @@ use PHPIMS\Image\Transformation\Resize;
 use PHPIMS\Image\Transformation\Rotate;
 use PHPIMS\Image\Transformation\Thumbnail;
 
-use \Imagine\Imagick\Imagine as Imagine;
-use \Imagine\ImageInterface as ImagineImage;
-
 /**
  * Manipulate image plugin
  *
@@ -74,11 +71,7 @@ class ManipulateImage implements PluginInterface {
      */
     public function exec(Operation $operation) {
         if (isset($_GET['t']) && is_array($_GET['t'])) {
-            $originalImage = $operation->getImage();
-
-            // Load the image into imagine
-            $imagine = new Imagine();
-            $image = $imagine->load($originalImage->getBlob());
+            $image = $operation->getImage();
 
             foreach ($_GET['t'] as $transformation) {
                 // See if the transformation has any parameters
@@ -142,17 +135,11 @@ class ManipulateImage implements PluginInterface {
                 }
 
                 try {
-                    $newImage = $transformation->applyToImage($image);
-
-                    if ($newImage instanceof ImagineImage) {
-                        $image = $newImage;
-                    }
+                    $transformation->applyToImage($image);
                 } catch (\Imagine\Exception\Exception $e) {
                     trigger_error('Imagine failed with exception: ' . $e->getMessage(), E_USER_WARNING);
                 }
             }
-
-            $originalImage->setBlob((string) $image);
         }
     }
 }

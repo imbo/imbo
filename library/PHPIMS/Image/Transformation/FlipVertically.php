@@ -32,9 +32,9 @@
 
 namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
-use \Imagine\ImageInterface;
 
 /**
  * Flip vertically transformation
@@ -51,8 +51,10 @@ class FlipVertically implements TransformationInterface {
     /**
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function applyToImage(ImageInterface $image) {
-        $image->flipVertically();
+    public function applyToImage(Image $image) {
+        $imagineImage = $image->getImagineImage();
+        $imagineImage->flipVertically();
+        $image->refresh();
     }
 
     /**

@@ -32,9 +32,11 @@
 
 namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
-use \Imagine\ImageInterface;
+
+use \Imagine\Image\Box;
 
 /**
  * Thumbnail transformation
@@ -95,11 +97,15 @@ class Thumbnail implements TransformationInterface {
     /**
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function applyToImage(ImageInterface $image) {
-        return $image->thumbnail(
-            new \Imagine\Image\Box($this->width, $this->height),
+    public function applyToImage(Image $image) {
+        $imagineImage = $image->getImagineImage();
+
+        $thumb = $imagineImage->thumbnail(
+            new Box($this->width, $this->height),
             $this->fit
         );
+
+        $image->setImagineImage($thumb);
     }
 
     /**

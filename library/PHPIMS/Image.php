@@ -31,6 +31,9 @@
 
 namespace PHPIMS;
 
+use \Imagine\Imagick\Imagine as Imagine;
+use \Imagine\ImageInterface as ImagineImage;
+
 /**
  * Class that represents a single image
  *
@@ -46,35 +49,35 @@ class Image {
      *
      * @var string
      */
-    private $filename = null;
+    private $filename;
 
     /**
      * Size of the file
      *
      * @var int
      */
-    private $filesize = null;
+    private $filesize;
 
     /**
      * Mime type of the image
      *
      * @var string
      */
-    private $mimeType = null;
+    private $mimeType;
 
     /**
      * Extension of the file without the dot
      *
      * @var string
      */
-    private $extension = null;
+    private $extension;
 
     /**
      * Blob containing the image itself
      *
      * @var string
      */
-    private $blob = null;
+    private $blob;
 
     /**
      * The metadata attached to this image
@@ -88,14 +91,21 @@ class Image {
      *
      * @var int
      */
-    private $width = null;
+    private $width;
 
     /**
      * Heigt of the image
      *
      * @var int
      */
-    private $height = null;
+    private $height;
+
+    /**
+     * Imagine image instance
+     *
+     * @var \Imagine\ImageInterface
+     */
+    private $imagineImage;
 
     /**
      * Get the filename
@@ -261,6 +271,48 @@ class Image {
      */
     public function setHeight($height) {
         $this->height = (int) $height;
+
+        return $this;
+    }
+
+    /**
+     * Get the imagine image
+     *
+     * @return \Imagine\ImageInterface
+     */
+    public function getImagineImage() {
+        if ($this->imagineImage === null) {
+            $imagine = new Imagine();
+            $this->imagineImage = $imagine->load($this->getBlob());
+        }
+
+        return $this->imagineImage;
+    }
+
+    /**
+     * Set the imagine image
+     *
+     * @param \Imagine\ImageInterface $image Image instance
+     * @return PHPIMS\Image
+     */
+    public function setImagineImage(ImagineImage $image) {
+        $this->imagineImage = $image;
+        $this->refresh();
+
+        return $this;
+    }
+
+    /**
+     * Refresh some properties based on the imagine image instance
+     *
+     * @return PHPIMS\Image
+     */
+    public function refresh() {
+        $size = $this->imagineImage->getSize();
+        $this->setWidth($size->getWidth())
+             ->setHeight($size->getHeight())
+             ->setFilesize(strlen($this->imagineImage))
+             ->setBlob((string) $this->imagineImage);
 
         return $this;
     }
