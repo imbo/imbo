@@ -309,10 +309,12 @@ class Image {
      */
     public function refresh() {
         $size = $this->imagineImage->getSize();
+        $blob = (string) $this->imagineImage;
+
         $this->setWidth($size->getWidth())
              ->setHeight($size->getHeight())
-             ->setFilesize(strlen($this->imagineImage))
-             ->setBlob((string) $this->imagineImage);
+             ->setFilesize(strlen($blob))
+             ->setBlob($blob);
 
         return $this;
     }
