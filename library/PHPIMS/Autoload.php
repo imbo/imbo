@@ -64,6 +64,7 @@ class Autoload {
         'phpims\\client\\imageurl\\transformation' => '/Client/ImageUrl/Transformation.php',
         'phpims\\client\\response' => '/Client/Response.php',
         'phpims\\database\\driver\\mongodb' => '/Database/Driver/MongoDB.php',
+        'phpims\\database\\driver\\mysql' => '/Database/Driver/MySQL.php',
         'phpims\\database\\driverinterface' => '/Database/DriverInterface.php',
         'phpims\\database\\exception' => '/Database/Exception.php',
         'phpims\\exception' => '/Exception.php',

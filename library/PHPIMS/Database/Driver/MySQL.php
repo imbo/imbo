@@ -92,12 +92,12 @@ class MySQL implements DriverInterface {
             // @codeCoverageIgnoreStart
             try
             {
-                $pdo        = new \PDO($this->params['dsn'], $this->params['username'], $this->params['password'], $this->params['driverOptions']);
+                $pdo = new \PDO($this->params['dsn'], $this->params['username'], $this->params['password'], $this->params['driverOptions']);
             }
             catch (PDOException $e)
             {
                 // We try to avoid leaking information about the database connection information into the exception
-                throw new DatabaseException('Failed setting up database connection: ' $e->getErrorCode(), 500);
+                throw new DatabaseException('Failed setting up database connection: ' . $e->getErrorCode(), 500);
             }
         }
         // @codeCoverageIgnoreEnd
@@ -111,11 +111,11 @@ class MySQL implements DriverInterface {
     public function insertImage($imageIdentifier, Image $image) {
         try {
             // See if the image already exists
-            if ($this->imageExists($imageIdentifier))
+            if ($this->imageExists($imageIdentifier)) {
                 throw new DatabaseException('Image already exists', 400);
             }
 
-            $imageStatement = $this->pdo->prepare("
+            $insertImageStatement = $this->pdo->prepare("
                 INSERT INTO
                     image
                     (name, size, imageIdentifier, mime, added, width, height)
@@ -140,6 +140,8 @@ class MySQL implements DriverInterface {
                 ':width'           => $image->getWidth(),
                 ':height'          => $image->getHeight(),
             ));
+            $insertImageStatement->closeCursor();
+            
         } catch (\PDOException $e) {
             $pdo->rollback();
             throw new DatabaseException('Unable to save image data', 500, $e);
@@ -163,6 +165,8 @@ class MySQL implements DriverInterface {
             $deleteImageStatement->execute(array(
                 ':imageIdentifier' => $imageIdentifier,
             ));
+            
+            $deleteImageStatement->closeCursor();
         } catch (\PDOException $e) {
             throw new DatabaseException('Unable to delete image data: ' . $e->getMessage(), 500, $e);
         }
@@ -184,10 +188,12 @@ class MySQL implements DriverInterface {
                     image_metadata
                     (imageIdentifier, field, value)
                 VALUES
-                
+                    
             ");
             
             $insertMetadataStatement->execute();
+            
+            $insertMetadataStatement->closeCursor();
         } catch (\PDOException $e) {
             throw new DatabaseException('Unable to edit image data: ' . $e->getMessage(), 500, $e);
         }
@@ -199,13 +205,35 @@ class MySQL implements DriverInterface {
      * @see PHPIMS\Database\DriverInterface::getMetadata()
      */
     public function getMetadata($imageIdentifier) {
+        $metadata = array();
+    
         try {
-            $data = $this->collection->findOne(array('imageIdentifier' => $imageIdentifier));
-        } catch (\MongoException $e) {
-            throw new DatabaseException('Unable to fetch image metadata', 500, $e);
+            $getMetadataStatement = $this->pdo->prepare("
+                SELECT
+                    m.field, m.value
+                FROM
+                    image_metadata m
+                WHERE
+                    m.imageIDentifier = :imageIdentifier
+            ");
+            
+            $getMetadataStatement->execute(array(
+                ':imageIdentifier' => $imageIdentifier,
+            ));
+            
+            $rows = $getMetadataStatement->fetchAll(PDO::FETCH_ASSOC);
+            
+            foreach($rows as $row)
+            {
+                $metadata[$row['field']] = $row['value'];            
+            }
+            
+            $getMetadataStatement->closeCursor();
+        } catch (\PDOException $e) {
+            throw new DatabaseException('Unable to fetch image metadata: ' . $e->getMessage(), 500, $e);
         }
-
-        return isset($data['metadata']) ? $data['metadata'] : array();
+        
+        return $metadata;
     }
 
     /**
@@ -223,6 +251,8 @@ class MySQL implements DriverInterface {
             $deleteImageMetadataStatement->execute(array(
                 ':imageIdentifier' => $imageIdentifier,
             ));
+            
+            $deleteImageMetadataStatement->closeCursor();
         } catch (DatabaseException $e) {
             throw new DatabaseException('Unable to remove metadata', 500, $e);
         }
@@ -234,59 +264,10 @@ class MySQL implements DriverInterface {
      * @see PHPIMS\Database\DriverInterface::getImages()
      */
     public function getImages(Query $query) {
-        // Initialize return value
-        $images = array();
-
-        // Query data
-        $queryData = array();
-
-        $from = $query->from();
-        $to = $query->to();
-
-        if ($from || $to) {
-            $tmp = array();
-
-            if ($from !== null) {
-                $tmp['$gt'] = $from;
-            }
-
-            if ($to !== null) {
-                $tmp['$lt'] = $to;
-            }
-
-            $queryData['added'] = $tmp;
-        }
-
-        $metadataQuery = $query->query();
-
-        if (!empty($metadataQuery)) {
-            $queryData['metadata'] = $metadataQuery;
-        }
-
-        // Fields to fetch
-        $fields = array('added', 'imageIdentifier', 'mime', 'name', 'size', 'width', 'height');
-
-        if ($query->returnMetadata()) {
-            $fields[] = 'metadata';
-        }
-
         try {
-            $cursor = $this->collection->find($queryData, $fields)
-                                       ->limit($query->num())
-                                       ->sort(array('added' => -1));
-
-            // Skip some images if a page has been set
-            if (($page = $query->page()) > 1) {
-                $skip = $query->num() * ($page - 1);
-                $cursor->skip($skip);
-            }
-
-            foreach ($cursor as $image) {
-                unset($image['_id']);
-                $images[] = $image;
-            }
-        } catch (\MongoException $e) {
-            throw new DatabaseException('Unable to search for images', 500, $e);
+        
+        } catch (\PDO $e) {
+            throw new DatabaseException('Unable to search for images: ' . $e->getMessage(), 500, $e);
         }
 
         return $images;
@@ -297,10 +278,23 @@ class MySQL implements DriverInterface {
      */
     public function load($imageIdentifier, Image $image) {
         try {
-            $fields = array('name', 'size', 'width', 'height');
-            $data = $this->collection->findOne(array('imageIdentifier' => $imageIdentifier), $fields);
-        } catch (\MongoException $e) {
-            throw new DatabaseException('Unable to fetch image data', 500, $e);
+            $loadImageStatement = $this->pdo->prepare("
+                SELECT
+                    i.name, i.size, i.width, i.height
+                FROM
+                    image
+                WHERE
+                    imageIdentifier = :imageIdentifier
+            ");
+            
+            $loadImageStatement->execute(array(
+                ':imageIdentifier' => $imageIdentifier,
+            ));
+            
+            $data = $loadImageStatement->fetch(PDO::FETCH_ASSOC);
+            $loadImageStatement->closeCursor();
+        } catch (\PDO $e) {
+            throw new DatabaseException('Unable to fetch image data: ' . $e->getMessage(), 500, $e);
         }
 
         $image->setFilename($data['name'])
@@ -309,5 +303,32 @@ class MySQL implements DriverInterface {
               ->setHeight($data['height']);
 
         return true;
+    }
+    
+    protected function imageExists($imageIdentifier)
+    {
+        try
+        {
+            $imageExistsStatement = $this->pdo->prepare("
+                SELECT
+                    1
+                FROM
+                    image
+                WHERE
+                    imageIdentifier = :imageIdentifier
+            ");
+            
+            $imageExistsStatement->execute(array(
+                ':imageIdentifier' => $imageIdentifier,
+            ));
+            
+            $rowTest = $imageExistsStatement->fetch();
+            
+            $imageExistsStatement->closeCursor();
+            
+            return !empty($rowTest);
+        } catch (\PDO $e) {
+            throw new DatabaseException('Unable to test for existance of image: ' . $e->getMessage(), 500, $e);
+        }
     }
 }
