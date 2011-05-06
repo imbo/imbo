@@ -32,6 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
 use \Imagine\ImageInterface;
 
@@ -102,15 +103,15 @@ class Thumbnail implements TransformationInterface {
     }
 
     /**
-     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
      */
-    public function getUrlTrigger() {
+    public function applyToImageUrl(ImageUrl $url) {
         $params = array(
             'width=' . $this->width,
             'height=' . $this->height,
             'fit=' . $this->fit,
         );
 
-        return 'thumbnail:' . implode(',', $params);
+        $url->append('thumbnail:' . implode(',', $params));
     }
 }

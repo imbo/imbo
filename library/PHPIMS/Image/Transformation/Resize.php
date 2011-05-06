@@ -32,6 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Box;
@@ -95,9 +96,9 @@ class Resize implements TransformationInterface {
     }
 
     /**
-     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
      */
-    public function getUrlTrigger() {
+    public function applyToImageUrl(ImageUrl $url) {
         $params = array();
 
         if ($this->width !== null) {
@@ -108,6 +109,6 @@ class Resize implements TransformationInterface {
             $params[] = 'height=' . $this->height;
         }
 
-        return 'resize:' . implode(',', $params);
+        $url->append('resize:' . implode(',', $params));
     }
 }

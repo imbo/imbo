@@ -32,6 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
 use \Imagine\ImageInterface;
 
@@ -55,9 +56,9 @@ class FlipVertically implements TransformationInterface {
     }
 
     /**
-     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
      */
-    public function getUrlTrigger() {
-        return 'flipVertically';
+    public function applyToImageUrl(ImageUrl $url) {
+        $url->append('flipVertically');
     }
 }

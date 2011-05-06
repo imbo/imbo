@@ -114,11 +114,9 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testTransformImageUrl() {
-        $transformation = m::mock('PHPIMS\\Image\\TransformationInterface');
-        $transformation->shouldReceive('getUrlTrigger')->once()->andReturn('trigger');
-
         $url = m::mock('PHPIMS\\Client\\ImageUrl');
-        $url->shouldReceive('append')->once()->with('trigger');
+        $transformation = m::mock('PHPIMS\\Image\\TransformationInterface');
+        $transformation->shouldReceive('applyToImageUrl')->once()->with($url);
 
         $this->chain->transformImageUrl($url, $transformation);
     }

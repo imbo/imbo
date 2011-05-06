@@ -45,7 +45,7 @@ use \Imagine\Image\Box;
  * @link https://github.com/christeredvartsen/phpims
  */
 class ResizeTest extends \PHPUnit_Framework_TestCase {
-    public function testApplyWithBothParams() {
+    public function testApplyToImageWithBothParams() {
         $size  = m::mock('Imagine\\Image\\Size');
         $image = m::mock('Imagine\\ImageInterface');
         $image->shouldReceive('getSize')->once()->andReturn($size);
@@ -58,7 +58,7 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
         $transformation->applyToImage($image);
     }
 
-    public function testApplyWithOnlyWidth() {
+    public function testApplyToImageWithOnlyWidth() {
         $size = m::mock('Imagine\\Image\\Size');
         $size->shouldReceive('getHeight')->once()->andReturn(1000);
         $size->shouldReceive('getWidth')->once()->andReturn(1000);
@@ -73,7 +73,7 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
         $transformation->applyToImage($image);
     }
 
-    public function testApplyWithOnlyHeight() {
+    public function testApplyToImageWithOnlyHeight() {
         $size = m::mock('Imagine\\Image\\Size');
         $size->shouldReceive('getHeight')->once()->andReturn(1000);
         $size->shouldReceive('getWidth')->once()->andReturn(1000);
@@ -88,11 +88,12 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
         $transformation->applyToImage($image);
     }
 
-    public function testGetUrlTrigger() {
-        $resize = new Resize(100, 200);
-        $trigger = $resize->getUrlTrigger();
-        $this->assertStringStartsWith('resize:', $trigger);
-        $this->assertContains('width=100', $trigger);
-        $this->assertContains('height=200', $trigger);
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return (preg_match('/^resize:/', $string) && strstr($string, 'width=100') && strstr($string, 'height=200'));
+        }))->once();
+        $transformation = new Resize(100, 200);
+        $transformation->applyToImageUrl($url);
     }
 }

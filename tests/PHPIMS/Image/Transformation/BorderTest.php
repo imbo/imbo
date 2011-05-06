@@ -44,7 +44,7 @@ use \Imagine\ImageInterface;
  * @link https://github.com/christeredvartsen/phpims
  */
 class BorderTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
+    public function testApplyToImage() {
         $imageHeight = 100;
         $imageWidth = 200;
 
@@ -69,12 +69,13 @@ class BorderTest extends \PHPUnit_Framework_TestCase {
         $transformation->applyToImage($image);
     }
 
-    public function testGetUrlTrigger() {
-        $border = new Border('fed', 1, 2);
-        $trigger = $border->getUrlTrigger();
-        $this->assertStringStartsWith('border:', $trigger);
-        $this->assertContains('color=fed', $trigger);
-        $this->assertContains('width=1', $trigger);
-        $this->assertContains('height=2', $trigger);
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return (preg_match('/^border:/', $string) && strstr($string, 'color=fed') &&
+                    strstr($string, 'width=1') && strstr($string, 'height=2'));
+        }))->once();
+        $transformation = new Border('fed', 1, 2);
+        $transformation->applyToImageUrl($url);
     }
 }

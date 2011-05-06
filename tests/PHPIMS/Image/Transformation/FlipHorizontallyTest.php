@@ -44,7 +44,7 @@ use \Imagine\ImageInterface;
  * @link https://github.com/christeredvartsen/phpims
  */
 class FlipHorizontallyTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
+    public function testApplyToImage() {
         $image = m::mock('Imagine\\ImageInterface');
         $image->shouldReceive('flipHorizontally')->once();
 
@@ -52,8 +52,12 @@ class FlipHorizontallyTest extends \PHPUnit_Framework_TestCase {
         $transformation->applyToImage($image);
     }
 
-    public function testGetUrlTrigger() {
-        $flip = new FlipHorizontally();
-        $this->assertSame('flipHorizontally', $flip->getUrlTrigger());
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return $string == 'flipHorizontally';
+        }))->once();
+        $transformation = new FlipHorizontally();
+        $transformation->applyToImageUrl($url);
     }
 }

@@ -44,7 +44,7 @@ use \Imagine\ImageInterface;
  * @link https://github.com/christeredvartsen/phpims
  */
 class ThumbnailTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
+    public function testApplyToImage() {
         $width = 80;
         $height = 90;
         $fit = 'outbound';
@@ -62,12 +62,13 @@ class ThumbnailTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('Imagine\\ImageInterface', $result);
     }
 
-    public function testGetUrlTrigger() {
-        $thumb = new Thumbnail(100, 200, 'inset');
-        $trigger = $thumb->getUrlTrigger();
-        $this->assertStringStartsWith('thumbnail:', $trigger);
-        $this->assertContains('width=100', $trigger);
-        $this->assertContains('height=200', $trigger);
-        $this->assertContains('fit=inset', $trigger);
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return (preg_match('/^thumbnail:/', $string) && strstr($string, 'width=100') &&
+                    strstr($string, 'height=200') && strstr($string, 'fit=inset'));
+        }))->once();
+        $transformation = new Thumbnail(100, 200, 'inset');
+        $transformation->applyToImageUrl($url);
     }
 }

@@ -52,8 +52,12 @@ class FlipVerticallyTest extends \PHPUnit_Framework_TestCase {
         $transformation->applyToImage($image);
     }
 
-    public function testGetUrlTrigger() {
-        $flip = new FlipVertically();
-        $this->assertSame('flipVertically', $flip->getUrlTrigger());
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return $string == 'flipVertically';
+        }))->once();
+        $transformation = new FlipVertically();
+        $transformation->applyToImageUrl($url);
     }
 }

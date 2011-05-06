@@ -64,13 +64,13 @@ class CropTest extends \PHPUnit_Framework_TestCase {
         $transformation->applyToImage($image);
     }
 
-    public function testGetUrlTrigger() {
-        $crop = new Crop(1, 2, 3, 4);
-        $trigger = $crop->getUrlTrigger();
-        $this->assertStringStartsWith('crop:', $trigger);
-        $this->assertContains('x=1', $trigger);
-        $this->assertContains('y=2', $trigger);
-        $this->assertContains('width=3', $trigger);
-        $this->assertContains('height=4', $trigger);
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return (preg_match('/^crop:/', $string) && strstr($string, 'x=1') && strstr($string, 'y=2') &&
+                    strstr($string, 'width=3') && strstr($string, 'height=4'));
+        }))->once();
+        $transformation = new Crop(1, 2, 3, 4);
+        $transformation->applyToImageUrl($url);
     }
 }

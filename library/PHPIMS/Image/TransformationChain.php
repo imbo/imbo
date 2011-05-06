@@ -83,7 +83,7 @@ class TransformationChain {
      * @return PHPIMS\Image\TransformationChain
      */
     public function transformImageUrl(ImageUrl $url, TransformationInterface $transformation) {
-        $url->append($transformation->getUrlTrigger());
+        $transformation->applyToImageUrl($url);
 
         return $this;
     }

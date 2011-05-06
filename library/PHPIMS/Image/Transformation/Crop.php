@@ -32,6 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Point;
@@ -104,9 +105,9 @@ class Crop implements TransformationInterface {
     }
 
     /**
-     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
      */
-    public function getUrlTrigger() {
+    public function applyToImageUrl(ImageUrl $url) {
         $params = array(
             'x=' . $this->x,
             'y=' . $this->y,
@@ -114,6 +115,6 @@ class Crop implements TransformationInterface {
             'height=' . $this->height,
         );
 
-        return 'crop:' . implode(',', $params);
+        $url->append('crop:' . implode(',', $params));
     }
 }

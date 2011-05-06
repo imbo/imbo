@@ -32,6 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Color;
@@ -115,15 +116,15 @@ class Border implements TransformationInterface {
     }
 
     /**
-     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
      */
-    public function getUrlTrigger() {
+    public function applyToImageUrl(ImageUrl $url) {
         $params = array(
             'color=' . $this->color,
             'width=' . $this->width,
             'height=' . $this->height,
         );
 
-        return 'border:' . implode(',', $params);
+        $url->append('border:' . implode(',', $params));
     }
 }

@@ -32,6 +32,7 @@
 
 namespace PHPIMS\Image;
 
+use PHPIMS\Client\ImageUrl;
 use \Imagine\ImageInterface;
 
 /**
@@ -57,11 +58,9 @@ interface TransformationInterface {
     public function applyToImage(ImageInterface $image);
 
     /**
-     * Get url trigger
+     * Apply a transformation to an image url
      *
-     * Method that returns a part that can be added to an url to perform this operation
-     *
-     * @return string
+     * @param PHPIMS\Client\ImageUrl $url Image url
      */
-    public function getUrlTrigger();
+    public function applyToImageUrl(ImageUrl $url);
 }

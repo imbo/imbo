@@ -44,7 +44,7 @@ use \Imagine\ImageInterface;
  * @link https://github.com/christeredvartsen/phpims
  */
 class RotateTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
+    public function testApplyToImage() {
         $angle = 45;
 
         $image = m::mock('Imagine\\ImageInterface');
@@ -54,11 +54,12 @@ class RotateTest extends \PHPUnit_Framework_TestCase {
         $transformation->applyToImage($image);
     }
 
-    public function testGetUrlTrigger() {
-        $rotate = new Rotate(33, 'fed');
-        $trigger = $rotate->getUrlTrigger();
-        $this->assertStringStartsWith('rotate:', $trigger);
-        $this->assertContains('angle=33', $trigger);
-        $this->assertContains('bg=fed', $trigger);
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return (preg_match('/^rotate:/', $string) && strstr($string, 'angle=33') && strstr($string, 'bg=fed'));
+        }))->once();
+        $transformation = new Rotate(33, 'fed');
+        $transformation->applyToImageUrl($url);
     }
 }

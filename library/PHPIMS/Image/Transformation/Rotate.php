@@ -32,6 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
 use \Imagine\ImageInterface;
 use \Imagine\Image\Color;
@@ -84,14 +85,14 @@ class Rotate implements TransformationInterface {
     }
 
     /**
-     * @see PHPIMS\Image\TransformationInterface::getUrlTrigger()
+     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
      */
-    public function getUrlTrigger() {
+    public function applyToImageUrl(ImageUrl $url) {
         $params = array(
             'angle=' . $this->angle,
             'bg=' . $this->bg,
         );
 
-        return 'rotate:' . implode(',', $params);
+        $url->append('rotate:' . implode(',', $params));
     }
 }
