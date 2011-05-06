@@ -106,7 +106,7 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testTransformImage() {
-        $image = m::mock('Imagine\\ImageInterface');
+        $image = m::mock('PHPIMS\\Image');
         $transformation = m::mock('PHPIMS\\Image\\TransformationInterface');
         $transformation->shouldReceive('applyToImage')->once()->with($image);
 

@@ -33,7 +33,6 @@
 namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
-use \Imagine\ImageInterface;
 
 /**
  * @package PHPIMS
@@ -47,8 +46,12 @@ class RotateTest extends \PHPUnit_Framework_TestCase {
     public function testApplyToImage() {
         $angle = 45;
 
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('rotate')->with($angle, m::type('Imagine\\Image\\Color'))->once();
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('rotate')->with($angle, m::type('Imagine\\Image\\Color'))->once();
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
 
         $transformation = new Rotate($angle);
         $transformation->applyToImage($image);

@@ -33,7 +33,6 @@
 namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
-use \Imagine\ImageInterface;
 
 /**
  * @package PHPIMS
@@ -51,15 +50,17 @@ class ThumbnailTest extends \PHPUnit_Framework_TestCase {
 
         $thumbnail = m::mock('Imagine\\ImageInterface');
 
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('thumbnail')->once()->with(m::on(function (\Imagine\Image\Box $box) use($width, $height) {
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('thumbnail')->once()->with(m::on(function (\Imagine\Image\Box $box) use($width, $height) {
             return $width == $box->getWidth() && $height == $box->getHeight();
         }), $fit)->andReturn($thumbnail);
 
-        $transformation = new Thumbnail($width, $height, $fit);
-        $result = $transformation->applyToImage($image);
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('setImagineImage')->once()->with($thumbnail);
 
-        $this->assertInstanceOf('Imagine\\ImageInterface', $result);
+        $transformation = new Thumbnail($width, $height, $fit);
+        $transformation->applyToImage($image);
     }
 
     public function testApplyToImageUrl() {

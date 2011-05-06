@@ -33,7 +33,6 @@
 namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
-use \Imagine\ImageInterface;
 
 /**
  * @package PHPIMS
@@ -45,8 +44,12 @@ use \Imagine\ImageInterface;
  */
 class FlipVerticallyTest extends \PHPUnit_Framework_TestCase {
     public function testApplyToImage() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('flipVertically')->once();
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('flipVertically')->once();
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
 
         $transformation = new FlipVertically();
         $transformation->applyToImage($image);

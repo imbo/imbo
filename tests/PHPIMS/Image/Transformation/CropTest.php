@@ -33,7 +33,6 @@
 namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
-use \Imagine\ImageInterface;
 use \Imagine\Image\Point;
 use \Imagine\Image\Box;
 
@@ -52,13 +51,17 @@ class CropTest extends \PHPUnit_Framework_TestCase {
         $width = 3;
         $height = 4;
 
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('crop')->once()->with(m::on(function(Point $point) use ($x, $y) {
-                                                        return $point->getX() == $x && $point->getY() == $y;
-                                                    }),
-                                                    m::on(function(Box $box) use ($width, $height) {
-                                                        return $box->getWidth() == $width && $box->getHeight() == $height;
-                                                    }));
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('crop')->once()->with(m::on(function(Point $point) use ($x, $y) {
+                                                               return $point->getX() == $x && $point->getY() == $y;
+                                                           }),
+                                                           m::on(function(Box $box) use ($width, $height) {
+                                                               return $box->getWidth() == $width && $box->getHeight() == $height;
+                                                           }));
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
 
         $transformation = new Crop($x, $y, $width, $height);
         $transformation->applyToImage($image);

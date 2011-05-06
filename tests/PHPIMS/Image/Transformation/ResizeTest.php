@@ -33,7 +33,6 @@
 namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
-use \Imagine\ImageInterface;
 use \Imagine\Image\Box;
 
 /**
@@ -47,12 +46,16 @@ use \Imagine\Image\Box;
 class ResizeTest extends \PHPUnit_Framework_TestCase {
     public function testApplyToImageWithBothParams() {
         $size  = m::mock('Imagine\\Image\\Size');
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('getSize')->once()->andReturn($size);
 
-        $image->shouldReceive('resize')->once()->with(m::on(function(Box $box) {
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('getSize')->once()->andReturn($size);
+        $imagineImage->shouldReceive('resize')->once()->with(m::on(function(Box $box) {
             return $box->getWidth() === 200 && $box->getHeight() === 100;
         }));
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
 
         $transformation = new Resize(200, 100);
         $transformation->applyToImage($image);
@@ -62,12 +65,16 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
         $size = m::mock('Imagine\\Image\\Size');
         $size->shouldReceive('getHeight')->once()->andReturn(1000);
         $size->shouldReceive('getWidth')->once()->andReturn(1000);
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('getSize')->once()->andReturn($size);
 
-        $image->shouldReceive('resize')->once()->with(m::on(function(Box $box) {
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('getSize')->once()->andReturn($size);
+        $imagineImage->shouldReceive('resize')->once()->with(m::on(function(Box $box) {
             return $box->getWidth() === 200 && $box->getHeight() === 200;
         }));
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
 
         $transformation = new Resize(200);
         $transformation->applyToImage($image);
@@ -77,12 +84,16 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
         $size = m::mock('Imagine\\Image\\Size');
         $size->shouldReceive('getHeight')->once()->andReturn(1000);
         $size->shouldReceive('getWidth')->once()->andReturn(1000);
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('getSize')->once()->andReturn($size);
 
-        $image->shouldReceive('resize')->with(m::on(function(Box $box) {
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('getSize')->once()->andReturn($size);
+        $imagineImage->shouldReceive('resize')->with(m::on(function(Box $box) {
             return $box->getWidth() === 200 && $box->getHeight() === 200;
         }))->once();
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
 
         $transformation = new Resize(null, 200);
         $transformation->applyToImage($image);
