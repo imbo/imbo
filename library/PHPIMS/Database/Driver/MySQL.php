@@ -253,7 +253,7 @@ class MySQL implements DriverInterface {
             ));
             
             $deleteImageMetadataStatement->closeCursor();
-        } catch (DatabaseException $e) {
+        } catch (\PDOException $e) {
             throw new DatabaseException('Unable to remove metadata', 500, $e);
         }
 
@@ -266,7 +266,7 @@ class MySQL implements DriverInterface {
     public function getImages(Query $query) {
         try {
         
-        } catch (\PDO $e) {
+        } catch (\PDOException $e) {
             throw new DatabaseException('Unable to search for images: ' . $e->getMessage(), 500, $e);
         }
 
@@ -293,7 +293,7 @@ class MySQL implements DriverInterface {
             
             $data = $loadImageStatement->fetch(PDO::FETCH_ASSOC);
             $loadImageStatement->closeCursor();
-        } catch (\PDO $e) {
+        } catch (\PDOException $e) {
             throw new DatabaseException('Unable to fetch image data: ' . $e->getMessage(), 500, $e);
         }
 
@@ -327,7 +327,7 @@ class MySQL implements DriverInterface {
             $imageExistsStatement->closeCursor();
             
             return !empty($rowTest);
-        } catch (\PDO $e) {
+        } catch (\PDOException $e) {
             throw new DatabaseException('Unable to test for existance of image: ' . $e->getMessage(), 500, $e);
         }
     }
