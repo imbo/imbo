@@ -182,18 +182,32 @@ class MySQL implements DriverInterface {
             $this->pdo->beginTransaction();
             
             $this->deleteMetadata($imageIdentifier);
-        
-            $insertMetadataStatement = $this->pdo->prepare("
-                INSERT INTO
-                    image_metadata
-                    (imageIdentifier, field, value)
-                VALUES
-                    
-            ");
             
-            $insertMetadataStatement->execute();
+            if ($metadata)
+            {
+                $insertValues = array();
+                
+                foreach ($metadata as $field => $value)
+                {
+                    $insertValues[] = $imageIdentifier;
+                    $insertValues[] = $field;
+                    $insertValues[] = $value;
+                }
             
-            $insertMetadataStatement->closeCursor();
+                $insertMetadataStatement = $this->pdo->prepare("
+                    INSERT INTO
+                        image_metadata
+                        (imageIdentifier, field, value)
+                    VALUES
+                        " . self::getInsertValuesString(3, count($metadata)) . "
+                ");
+                
+                $insertMetadataStatement->execute($insertValues);
+                
+                $insertMetadataStatement->closeCursor();
+            }
+            
+            $this->pdo->commit();
         } catch (\PDOException $e) {
             throw new DatabaseException('Unable to edit image data: ' . $e->getMessage(), 500, $e);
         }
@@ -221,7 +235,7 @@ class MySQL implements DriverInterface {
                 ':imageIdentifier' => $imageIdentifier,
             ));
             
-            $rows = $getMetadataStatement->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $getMetadataStatement->fetchAll(\PDO::FETCH_ASSOC);
             
             foreach($rows as $row)
             {
@@ -291,7 +305,7 @@ class MySQL implements DriverInterface {
                 ':imageIdentifier' => $imageIdentifier,
             ));
             
-            $data = $loadImageStatement->fetch(PDO::FETCH_ASSOC);
+            $data = $loadImageStatement->fetch(\PDO::FETCH_ASSOC);
             $loadImageStatement->closeCursor();
         } catch (\PDOException $e) {
             throw new DatabaseException('Unable to fetch image data: ' . $e->getMessage(), 500, $e);
@@ -304,7 +318,12 @@ class MySQL implements DriverInterface {
 
         return true;
     }
-    
+
+    /**
+     * Internal helper method to check if an image already exists in the database.
+     *
+     * @param string $imageIdentifier The identifier of the image we're checking if already exists
+     */
     protected function imageExists($imageIdentifier)
     {
         try
@@ -331,4 +350,33 @@ class MySQL implements DriverInterface {
             throw new DatabaseException('Unable to test for existance of image: ' . $e->getMessage(), 500, $e);
         }
     }
+    
+    /**
+     * Helper method to generate a placeholder string for multi-row inserts.
+     *
+     * @param int $columns Number of columns in each row
+     * @param int $rows Number of rows
+     */
+    static protected function getInsertValuesString($columns, $rows)
+    {
+        $eachValueStr = self::getPlaceholderExpression($columns);
+
+        // generate (?, ?), (?, ?), (?, ?)
+        $completeInsertStr = substr(str_repeat($eachValueStr . ', ', $rows), 0, -2);
+
+        return $completeInsertStr;
+    }
+
+    /**
+     * Helper method to generate a placeholder string for a single column row.
+     *
+     * @param int $columns Number of columns to generate placeholder expression with
+     */
+    static protected function getPlaceholderExpression($columns)
+    {
+        // generate (?, ?, ?, ...., ?)
+        $eachValueStr = '(' . substr(str_repeat('?, ', $columns), 0, -2) . ')';
+
+        return $eachValueStr;
+    }    
 }
