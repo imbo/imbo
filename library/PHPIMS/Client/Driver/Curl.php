@@ -159,7 +159,6 @@ class Curl implements DriverInterface {
      * @throws PHPIMS\Client\Driver\Exception
      */
     protected function request($url) {
-        var_dump("requestURL: " . $url);
         // Set the timeout options
         curl_setopt_array($this->curlHandle, array(
             CURLOPT_URL            => $url,
