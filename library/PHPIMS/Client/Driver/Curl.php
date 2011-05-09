@@ -107,6 +107,7 @@ class Curl implements DriverInterface {
         curl_setopt_array($this->curlHandle, array(
             CURLOPT_POST       => true,
             CURLOPT_POSTFIELDS => $postFields,
+            CURLOPT_CUSTOMREQUEST => 'POST',
         ));
 
         return $this->request($url);
@@ -118,6 +119,7 @@ class Curl implements DriverInterface {
     public function get($url) {
         curl_setopt_array($this->curlHandle, array(
             CURLOPT_HTTPGET => true,
+            CURLOPT_CUSTOMREQUEST => 'GET',
         ));
 
         return $this->request($url);
@@ -129,6 +131,7 @@ class Curl implements DriverInterface {
     public function head($url) {
         curl_setopt_array($this->curlHandle, array(
             CURLOPT_NOBODY => true,
+            CURLOPT_CUSTOMREQUEST => 'HEAD',
         ));
 
         return $this->request($url);
