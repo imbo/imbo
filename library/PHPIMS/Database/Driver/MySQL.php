@@ -214,7 +214,7 @@ class MySQL implements DriverInterface {
                 FROM
                     image_metadata m
                 WHERE
-                    m.imageIDentifier = :imageIdentifier
+                    m.imageIdentifier = :imageIdentifier
             ");
             
             $getMetadataStatement->execute(array(
