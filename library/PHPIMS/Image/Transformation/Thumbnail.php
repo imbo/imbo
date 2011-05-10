@@ -23,73 +23,101 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\ImageUrl\Filter;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Client\ImageUrl\FilterInterface;
-use PHPIMS\Client\ImageUrl\Filter\Exception as FilterException;
+use PHPIMS\Image;
+use PHPIMS\Client\ImageUrl;
+use PHPIMS\Image\TransformationInterface;
+
+use \Imagine\Image\Box;
 
 /**
- * Border filter
+ * Thumbnail transformation
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Resize implements FilterInterface {
+class Thumbnail implements TransformationInterface {
     /**
-     * Width of the resize
+     * Width of the thumbnail
      *
      * @var int
      */
-    private $width = null;
+    private $width = 50;
 
     /**
-     * Height of the resize
+     * Height of the thumbnail
      *
      * @var int
      */
-    private $height = null;
+    private $height = 50;
+
+    /**
+     * Fit type
+     *
+     * The thumbnail fit style. 'inset' or 'outbound'
+     *
+     * @var string
+     */
+    private $fit = 'outbound';
 
     /**
      * Class constructor
      *
-     * @param int $width Width of the resize
-     * @param int $height Height of the resize
-     * @throws PHPIMS\Client\ImageUrl\Filter\Exception
+     * @param int $width Width of the thumbnail
+     * @param int $height Height of the thumbnail
+     * @param string $fit Fit type. 'outbound' or 'inset'
      */
-    public function __construct($width = null, $height = null) {
-        if ($width === null && $height === null) {
-            throw new FilterException('$width and/or $height must be set');
+    public function __construct($width = null, $height = null, $fit = null) {
+        if ($width !== null) {
+            $this->width = (int) $width;
         }
 
-        $this->width  = $width;
-        $this->height = $height;
+        if ($height !== null) {
+            $this->height = (int) $height;
+        }
+
+        if ($fit !== null) {
+            $this->fit = $fit;
+        }
     }
 
     /**
-     * @see PHPIMS\Client\ImageUrl\FilterInterface::getFilter()
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function getFilter() {
-        $params = array();
+    public function applyToImage(Image $image) {
+        $imagineImage = $image->getImagineImage();
 
-        if ($this->width !== null) {
-            $params[] = 'width=' . $this->width;
-        }
+        $thumb = $imagineImage->thumbnail(
+            new Box($this->width, $this->height),
+            $this->fit
+        );
 
-        if ($this->height !== null) {
-            $params[] = 'height=' . $this->height;
-        }
+        $image->setImagineImage($thumb);
+    }
 
-        return 'resize:' . implode(',', $params);
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
+     */
+    public function applyToImageUrl(ImageUrl $url) {
+        $params = array(
+            'width=' . $this->width,
+            'height=' . $this->height,
+            'fit=' . $this->fit,
+        );
+
+        $url->append('thumbnail:' . implode(',', $params));
     }
 }

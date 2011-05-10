@@ -34,9 +34,9 @@ namespace PHPIMS;
 
 use PHPIMS\Client\DriverInterface;
 use PHPIMS\Client\ImageUrl;
-use PHPIMS\Client\ImageUrl\Transformation;
 use PHPIMS\Client\Driver\Curl as DefaultDriver;
 use PHPIMS\Client\Exception as ClientException;
+use PHPIMS\Image\TransformationChain;
 
 /**
  * Client that interacts with the server part of PHPIMS
@@ -95,7 +95,7 @@ class Client {
 
         if ($driver === null) {
             // @codeCoverageIgnoreStart
-            $driver = new DefaultDriver;
+            $driver = new DefaultDriver();
         }
         // @codeCoverageIgnoreEnd
 
@@ -114,14 +114,13 @@ class Client {
     }
 
     /**
-     * Add a new image to the server
+     * Generate an MD5 image identifier for a given file
      *
      * @param string $path Path to the local image
-     * @param array $metadata Metadata to attach to the image
-     * @return PHPIMS\Client\Response
+     * @return string
      * @throws PHPIMS\Client\Exception
      */
-    public function addImage($path, array $metadata = null) {
+    public function getImageIdentifier($path) {
         if (!is_file($path)) {
             throw new ClientException('File does not exist: ' . $path);
         }
@@ -131,7 +130,18 @@ class Client {
         $extension = image_type_to_extension($info[2], false);
 
         // Generate MD5 sum of the file
-        $imageIdentifier = md5_file($path) . '.' . $extension;
+        return md5_file($path) . '.' . $extension;
+    }
+
+    /**
+     * Add a new image to the server
+     *
+     * @param string $path Path to the local image
+     * @param array $metadata Metadata to attach to the image
+     * @return PHPIMS\Client\Response
+     */
+    public function addImage($path, array $metadata = null) {
+        $imageIdentifier = $this->getImageIdentifier($path);
 
         $url = $this->getSignedResourceUrl('POST', $imageIdentifier);
 
@@ -228,15 +238,16 @@ class Client {
      * Get url to an image
      *
      * @param string $imageIdentifier Image identifier
-     * @param Transformation $transformation An optional chain of transformations
+     * @param PHPIMS\Image\TransformationChain $transformationChain An optional chain of
+     *                                                              transformations
      * @return PHPIMS\Client\ImageUrl
      */
-    public function getImageUrl($imageIdentifier, Transformation $transformation = null) {
+    public function getImageUrl($imageIdentifier, TransformationChain $transformationChain = null) {
         $url = $this->getResourceUrl($imageIdentifier);
         $imageUrl = new ImageUrl($url);
 
-        if ($transformation !== null) {
-            $transformation->apply($imageUrl);
+        if ($transformationChain !== null) {
+            $transformationChain->applyToImageUrl($imageUrl);
         }
 
         return $imageUrl;

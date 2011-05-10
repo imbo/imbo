@@ -30,7 +30,9 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\ImageUrl\Filter;
+namespace PHPIMS\Operation;
+
+use \Mockery as m;
 
 /**
  * @package PHPIMS
@@ -40,12 +42,27 @@ namespace PHPIMS\Client\ImageUrl\Filter;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class RotateTest extends \PHPUnit_Framework_TestCase {
-    public function testRotate() {
-        $filter = new Rotate(45);
-        $this->assertSame('rotate:angle=45', $filter->getFilter());
+class HeadImageTest extends OperationTests {
+    protected function getNewOperation() {
+        return new HeadImage($this->database, $this->storage);
+    }
 
-        $filter = new Rotate(45, '222');
-        $this->assertSame('rotate:angle=45,bg=222', $filter->getFilter());
+    public function getExpectedOperationName() {
+        return 'headImage';
+    }
+
+    public function testSuccessfullExec() {
+        $this->database->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getMimeType')->once()->andReturn('image/png');
+        $image->shouldReceive('getWidth', 'getHeight', 'getFilename', 'getFilesize')->once()->andReturn('some value');
+
+        $response = m::mock('PHPIMS\\Server\\Response');
+        $response->shouldReceive('setContentType')->once()->with('image/png')->andReturn($response);
+        $response->shouldReceive('setCustomHeaders')->once()->with(m::type('array'))->andReturn($response);
+
+        $this->operation->setResponse($response)->setImage($image);
+        $this->operation->exec();
     }
 }

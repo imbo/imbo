@@ -23,35 +23,53 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage;
+namespace PHPIMS\Image\Transformation;
 
-use \Imagine\ImageInterface;
+use \Mockery as m;
 
 /**
- * Image transformation interface
- *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface TransformationInterface {
-    /**
-     * Method that will transform the image
-     *
-     * @param \Imagine\ImageInterface $image Image instance
-     * @param array $params Parameters for the transformation
-     * @return string Return the transformed binary image data
-     * @throws PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
-     */
-    public function apply(ImageInterface $image, array $params = array());
+class ThumbnailTest extends \PHPUnit_Framework_TestCase {
+    public function testApplyToImage() {
+        $width = 80;
+        $height = 90;
+        $fit = 'outbound';
+
+        $thumbnail = m::mock('Imagine\\ImageInterface');
+
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('thumbnail')->once()->with(m::on(function (\Imagine\Image\Box $box) use($width, $height) {
+            return $width == $box->getWidth() && $height == $box->getHeight();
+        }), $fit)->andReturn($thumbnail);
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('setImagineImage')->once()->with($thumbnail);
+
+        $transformation = new Thumbnail($width, $height, $fit);
+        $transformation->applyToImage($image);
+    }
+
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return (preg_match('/^thumbnail:/', $string) && strstr($string, 'width=100') &&
+                    strstr($string, 'height=200') && strstr($string, 'fit=inset'));
+        }))->once();
+        $transformation = new Thumbnail(100, 200, 'inset');
+        $transformation->applyToImageUrl($url);
+    }
 }

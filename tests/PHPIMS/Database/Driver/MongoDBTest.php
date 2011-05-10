@@ -313,7 +313,8 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             'name' => 'filename',
             'size' => 123,
             'width' => 234,
-            'height' => 345
+            'height' => 345,
+            'mime' => 'image/jpg',
         );
 
         $image = m::mock('PHPIMS\\Image');
@@ -321,6 +322,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $image->shouldReceive('setFilesize')->once()->with($data['size'])->andReturn($image);
         $image->shouldReceive('setWidth')->once()->with($data['width'])->andReturn($image);
         $image->shouldReceive('setHeight')->once()->with($data['height'])->andReturn($image);
+        $image->shouldReceive('setMimeType')->once()->with($data['mime'])->andReturn($image);
 
         $this->collection->shouldReceive('findOne')->once()->with(array('imageIdentifier' => $imageIdentifier), m::type('array'))->andReturn($data);
 

@@ -30,10 +30,9 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
-use \Imagine\ImageInterface;
 
 /**
  * @package PHPIMS
@@ -44,20 +43,11 @@ use \Imagine\ImageInterface;
  * @link https://github.com/christeredvartsen/phpims
  */
 class BorderTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
+    public function testApplyToImage() {
         $imageHeight = 100;
         $imageWidth = 200;
 
         $draw  = m::mock('Imagine\\Image\\Draw');
-        $size  = m::mock('Imagine\\Image\\Size');
-        $image = m::mock('Imagine\\ImageInterface');
-
-        $image->shouldReceive('getSize')->once()->andReturn($size);
-        $image->shouldReceive('draw')->once()->andReturn($draw);
-
-        $size->shouldReceive('getHeight')->once()->andReturn($imageHeight);
-        $size->shouldReceive('getWidth')->once()->andReturn($imageWidth);
-
         $draw->shouldReceive('line')->times(4)
                                     ->with(
                                         m::type('Imagine\\Image\\Point'),
@@ -65,7 +55,29 @@ class BorderTest extends \PHPUnit_Framework_TestCase {
                                         m::type('Imagine\\Image\\Color'))
                                     ->andReturn($draw);
 
-        $transformation = new Border;
-        $transformation->apply($image, array());
+        $size  = m::mock('Imagine\\Image\\Size');
+        $size->shouldReceive('getHeight')->once()->andReturn($imageHeight);
+        $size->shouldReceive('getWidth')->once()->andReturn($imageWidth);
+
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('getSize')->once()->andReturn($size);
+        $imagineImage->shouldReceive('draw')->once()->andReturn($draw);
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
+
+        $transformation = new Border();
+        $transformation->applyToImage($image);
+    }
+
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return (preg_match('/^border:/', $string) && strstr($string, 'color=fed') &&
+                    strstr($string, 'width=1') && strstr($string, 'height=2'));
+        }))->once();
+        $transformation = new Border('fed', 1, 2);
+        $transformation->applyToImageUrl($url);
     }
 }

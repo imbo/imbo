@@ -23,27 +23,44 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Exceptions
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\Exception as BaseException;
+use \Mockery as m;
 
 /**
- * Base exception class for operation plugins
- *
  * @package PHPIMS
- * @subpackage Exceptions
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Exception extends BaseException {
+class FlipVerticallyTest extends \PHPUnit_Framework_TestCase {
+    public function testApplyToImage() {
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('flipVertically')->once();
 
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
+
+        $transformation = new FlipVertically();
+        $transformation->applyToImage($image);
+    }
+
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return $string == 'flipVertically';
+        }))->once();
+        $transformation = new FlipVertically();
+        $transformation->applyToImageUrl($url);
+    }
 }

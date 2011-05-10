@@ -23,32 +23,79 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use \Mockery as m;
-use \Imagine\ImageInterface;
+use PHPIMS\Image;
+use PHPIMS\Client\ImageUrl;
+use PHPIMS\Image\TransformationInterface;
+
+use \Imagine\Image\Color;
 
 /**
+ * Rotate transformation
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class RotateTest extends \PHPUnit_Framework_TestCase {
-    public function testApply() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('rotate')->with(45, m::type('Imagine\\Image\\Color'))->once();
+class Rotate implements TransformationInterface {
+    /**
+     * Angle of the rotation
+     *
+     * @var int
+     */
+    private $angle;
 
-        $transformation = new Rotate;
-        $transformation->apply($image, array('angle' => 45));
+    /**
+     * Background color of the image
+     *
+     * @var string
+     */
+    private $bg = '000';
+
+    /**
+     * Class constructor
+     *
+     * @param int $angle Angle of the rotation
+     * @param string $bg Background color
+     */
+    public function __construct($angle, $bg = null) {
+        $this->angle = (int) $angle;
+
+        if ($bg !== null) {
+            $this->bg = $bg;
+        }
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
+     */
+    public function applyToImage(Image $image) {
+        $imagineImage = $image->getImagineImage();
+        $imagineImage->rotate($this->angle, new Color($this->bg));
+        $image->refresh();
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
+     */
+    public function applyToImageUrl(ImageUrl $url) {
+        $params = array(
+            'angle=' . $this->angle,
+            'bg=' . $this->bg,
+        );
+
+        $url->append('rotate:' . implode(',', $params));
     }
 }

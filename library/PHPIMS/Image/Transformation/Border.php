@@ -30,10 +30,12 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
-use \Imagine\ImageInterface;
+use PHPIMS\Image;
+use PHPIMS\Client\ImageUrl;
+use PHPIMS\Image\TransformationInterface;
+
 use \Imagine\Image\Color;
 use \Imagine\Image\Point;
 
@@ -50,37 +52,83 @@ use \Imagine\Image\Point;
  */
 class Border implements TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
+     * Color of the border
+     *
+     * @var string
      */
-    public function apply(ImageInterface $image, array $params = array()) {
-        if (!isset($params['color'])) {
-            $params['color'] = '000';
+    private $color = '000';
+
+    /**
+     * Width of the border
+     *
+     * @var int
+     */
+    private $width = 1;
+
+    /**
+     * Height of the border
+     *
+     * @var int
+     */
+    private $height = 1;
+
+    /**
+     * Class constructor
+     *
+     * @param string $color The color to set
+     * @param int $width Width of the border
+     * @param int $height Height of the border
+     */
+    public function __construct($color = null, $width = null, $height = null) {
+        if ($color !== null) {
+            $this->color  = $color;
         }
 
-        if (!isset($params['width'])) {
-            $params['width'] = 1;
+        if ($width !== null) {
+            $this->width  = (int) $width;
         }
 
-        if (!isset($params['height'])) {
-            $params['height'] = 1;
+        if ($height !== null) {
+            $this->height = (int) $height;
         }
+    }
 
-        $color  = new Color($params['color']);
-        $size   = $image->getSize();
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
+     */
+    public function applyToImage(Image $image) {
+        $imagineImage = $image->getImagineImage();
+        $color  = new Color($this->color);
+        $size   = $imagineImage->getSize();
         $width  = $size->getWidth();
         $height = $size->getHeight();
-        $draw   = $image->draw();
+        $draw   = $imagineImage->draw();
 
         // Draw top and bottom lines
-        for ($i = 0; $i < $params['height']; $i++) {
+        for ($i = 0; $i < $this->height; $i++) {
             $draw->line(new Point(0, $i), new Point($width - 1, $i), $color)
                  ->line(new Point($width - 1, $height - ($i + 1)), new Point(0, $height - ($i + 1)), $color);
         }
 
         // Draw sides
-        for ($i = 0; $i < $params['width']; $i++) {
+        for ($i = 0; $i < $this->width; $i++) {
             $draw->line(new Point($i, 0), new Point($i, $height - 1), $color)
                  ->line(new Point($width - ($i + 1), 0), new Point($width - ($i + 1), $height - 1), $color);
         }
+
+        $image->refresh();
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
+     */
+    public function applyToImageUrl(ImageUrl $url) {
+        $params = array(
+            'color=' . $this->color,
+            'width=' . $this->width,
+            'height=' . $this->height,
+        );
+
+        $url->append('border:' . implode(',', $params));
     }
 }

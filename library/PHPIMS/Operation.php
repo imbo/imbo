@@ -402,6 +402,7 @@ abstract class Operation {
             case 'PHPIMS\\Operation\\GetImage':
             case 'PHPIMS\\Operation\\GetImages':
             case 'PHPIMS\\Operation\\GetImageMetadata':
+            case 'PHPIMS\\Operation\\HeadImage':
                 $operation = new $className($database, $storage);
                 $operation->setConfig($config)
                           ->setResource($resource)

@@ -30,10 +30,9 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
-use \Imagine\ImageInterface;
 use \Imagine\Image\Box;
 
 /**
@@ -45,56 +44,67 @@ use \Imagine\Image\Box;
  * @link https://github.com/christeredvartsen/phpims
  */
 class ResizeTest extends \PHPUnit_Framework_TestCase {
-    /**
-     * @expectedException PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
-     * @expectedExceptionMessage Missing parameters width and/or height
-     */
-    public function testApplyWithNoParameters() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $transformation = new Resize;
-        $transformation->apply($image);
-    }
-
-    public function testApplyWithBothParams() {
+    public function testApplyToImageWithBothParams() {
         $size  = m::mock('Imagine\\Image\\Size');
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('getSize')->once()->andReturn($size);
 
-        $image->shouldReceive('resize')->once()->with(m::on(function(Box $box) {
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('getSize')->once()->andReturn($size);
+        $imagineImage->shouldReceive('resize')->once()->with(m::on(function(Box $box) {
             return $box->getWidth() === 200 && $box->getHeight() === 100;
         }));
 
-        $transformation = new Resize;
-        $transformation->apply($image, array('width' => 200, 'height' => 100));
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
+
+        $transformation = new Resize(200, 100);
+        $transformation->applyToImage($image);
     }
 
-    public function testApplyWithOnlyWidth() {
+    public function testApplyToImageWithOnlyWidth() {
         $size = m::mock('Imagine\\Image\\Size');
         $size->shouldReceive('getHeight')->once()->andReturn(1000);
         $size->shouldReceive('getWidth')->once()->andReturn(1000);
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('getSize')->once()->andReturn($size);
 
-        $image->shouldReceive('resize')->once()->with(m::on(function(Box $box) {
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('getSize')->once()->andReturn($size);
+        $imagineImage->shouldReceive('resize')->once()->with(m::on(function(Box $box) {
             return $box->getWidth() === 200 && $box->getHeight() === 200;
         }));
 
-        $transformation = new Resize;
-        $transformation->apply($image, array('width' => 200));
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
+
+        $transformation = new Resize(200);
+        $transformation->applyToImage($image);
     }
 
-    public function testApplyWithOnlyHeight() {
+    public function testApplyToImageWithOnlyHeight() {
         $size = m::mock('Imagine\\Image\\Size');
         $size->shouldReceive('getHeight')->once()->andReturn(1000);
         $size->shouldReceive('getWidth')->once()->andReturn(1000);
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('getSize')->once()->andReturn($size);
 
-        $image->shouldReceive('resize')->with(m::on(function(Box $box) {
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('getSize')->once()->andReturn($size);
+        $imagineImage->shouldReceive('resize')->with(m::on(function(Box $box) {
             return $box->getWidth() === 200 && $box->getHeight() === 200;
         }))->once();
 
-        $transformation = new Resize;
-        $transformation->apply($image, array('height' => 200));
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
+
+        $transformation = new Resize(null, 200);
+        $transformation->applyToImage($image);
+    }
+
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return (preg_match('/^resize:/', $string) && strstr($string, 'width=100') && strstr($string, 'height=200'));
+        }))->once();
+        $transformation = new Resize(100, 200);
+        $transformation->applyToImageUrl($url);
     }
 }

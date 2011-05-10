@@ -23,53 +23,44 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
-use \Imagine\ImageInterface;
-use \Imagine\Image\Box;
+use \Mockery as m;
 
 /**
- * Resize transformation
- *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
- * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Resize implements TransformationInterface {
-    /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
-     */
-    public function apply(ImageInterface $image, array $params = array()) {
-        if (!isset($params['width']) && !isset($params['height'])) {
-            throw new Exception('Missing parameters width and/or height');
-        }
+class FlipHorizontallyTest extends \PHPUnit_Framework_TestCase {
+    public function testApplyToImage() {
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('flipHorizontally')->once();
 
-        $width  = (isset($params['width']) ? (int) $params['width'] : 0);
-        $height = (isset($params['height']) ? (int) $params['height'] : 0);
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
 
-        // Fetch the size of the original image
-        $size = $image->getSize();
+        $transformation = new FlipHorizontally();
+        $transformation->applyToImage($image);
+    }
 
-        // Calculate width or height if not both have been specified
-        if (!$height) {
-            $height = ($size->getHeight() / $size->getWidth()) * $width;
-        } else if (!$width) {
-            $width = ($size->getWidth() / $size->getHeight()) * $height;
-        }
-
-        // Resize image and store in the image object
-        $image->resize(new Box($width, $height));
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return $string == 'flipHorizontally';
+        }))->once();
+        $transformation = new FlipHorizontally();
+        $transformation->applyToImageUrl($url);
     }
 }

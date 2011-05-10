@@ -23,84 +23,95 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\ImageUrl\Filter;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Client\ImageUrl\FilterInterface;
+use PHPIMS\Image;
+use PHPIMS\Client\ImageUrl;
+use PHPIMS\Image\TransformationInterface;
+
+use \Imagine\Image\Box;
 
 /**
- * Border filter
+ * Resize transformation
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Border implements FilterInterface {
+class Resize implements TransformationInterface {
     /**
-     * Width of the border
+     * Width of the resize
      *
      * @var int
      */
-    private $width = null;
+    private $width;
 
     /**
-     * Height of the border
+     * Height of the resize
      *
      * @var int
      */
-    private $height = null;
-
-    /**
-     * Color of the border
-     *
-     * @var string
-     */
-    private $color = null;
+    private $height;
 
     /**
      * Class constructor
      *
-     * @param string $color The color to set
-     * @param int $width Width of the border
-     * @param int $height Height of the border
+     * @param int $width Width of the resize
+     * @param int $height Height of the resize
      */
-    public function __construct($color = null, $width = null, $height = null) {
-        $this->color  = $color;
-        $this->width  = $width;
-        $this->height = $height;
+    public function __construct($width = null, $height = null) {
+        $this->width  = (int) $width;
+        $this->height = (int) $height;
     }
 
     /**
-     * @see PHPIMS\Client\ImageUrl\FilterInterface::getFilter()
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function getFilter() {
-        $params = array();
+    public function applyToImage(Image $image) {
+        $imagineImage = $image->getImagineImage();
+        $width  = $this->width ?: null;
+        $height = $this->height ?: null;
 
-        if ($this->color !== null) {
-            $params[] = 'color=' . $this->color;
+        // Fetch the size of the original image
+        $size = $imagineImage->getSize();
+
+        // Calculate width or height if not both have been specified
+        if (!$height) {
+            $height = ($size->getHeight() / $size->getWidth()) * $width;
+        } else if (!$width) {
+            $width = ($size->getWidth() / $size->getHeight()) * $height;
         }
+
+        // Resize image and store in the image object
+        $imagineImage->resize(new Box($width, $height));
+        $image->refresh();
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
+     */
+    public function applyToImageUrl(ImageUrl $url) {
+        $params = array();
 
         if ($this->width !== null) {
             $params[] = 'width=' . $this->width;
         }
 
-        if ($this->color !== null) {
+        if ($this->height !== null) {
             $params[] = 'height=' . $this->height;
         }
 
-        if (!empty($params)) {
-            return 'border:' . implode(',', $params);
-        }
-
-        return 'border';
+        $url->append('resize:' . implode(',', $params));
     }
 }

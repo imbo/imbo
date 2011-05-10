@@ -139,7 +139,10 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $database = m::mock('PHPIMS\\Database\\DriverInterface');
         $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
 
+        $this->assertInstanceOf('PHPIMS\\Operation\\GetImages', $method->invokeArgs($this->controller, array('images', 'GET')));
+
         $this->assertInstanceOf('PHPIMS\\Operation\\GetImage', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier)));
+        $this->assertInstanceOf('PHPIMS\\Operation\\HeadImage', $method->invokeArgs($this->controller, array($resource, 'HEAD', $imageIdentifier)));
         $this->assertInstanceOf('PHPIMS\\Operation\\AddImage', $method->invokeArgs($this->controller, array($resource, 'POST', $imageIdentifier)));
         $this->assertInstanceOf('PHPIMS\\Operation\\DeleteImage', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier)));
 

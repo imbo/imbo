@@ -61,7 +61,7 @@ class GetImages extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
-        $query = new Query;
+        $query = new Query();
 
         if (isset($_GET['page'])) {
             $query->page($_GET['page']);
