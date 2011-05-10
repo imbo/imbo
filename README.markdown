@@ -177,7 +177,7 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     <?php
     require 'PHPIMS/Autoload.php';
     
-    $client = new PHPIMS\Client('http://<hostname>');
+    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
 
     // Path to local image    
     $path = '/path/to/image.png';
@@ -195,7 +195,7 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     <?php
     require 'PHPIMS/Autoload.php';
 
-    $client = new PHPIMS\Client('http://<hostname>');
+    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
     
     $hash = '<hash>';
     $response = $client->getMetadata($hash);
@@ -205,7 +205,7 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     <?php
     require 'PHPIMS/Autoload.php';
 
-    $client = new PHPIMS\Client('http://<hostname>');
+    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
     
     $hash = '<hash>';
     $response = $client->deleteImage($hash);
@@ -215,7 +215,7 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     <?php
     require 'PHPIMS/Autoload.php';
 
-    $client = new PHPIMS\Client('http://<hostname>');
+    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
     
     $hash = '<hash>';
     $response = $client->deleteMetadata($hash);
@@ -225,7 +225,7 @@ A PHP client is included in PHPIMS that supports all the REST methods and includ
     <?php
     require 'PHPIMS/Autoload.php';
 
-    $client = new PHPIMS\Client('http://<hostname>');
+    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
     
     $hash = '<hash>';
     $url = $client->getImageUrl($hash);
@@ -237,7 +237,7 @@ The `getImageUrl` returns an instance of `PHPIMS\Client\ImageUrl` which, when us
     <?php
     require 'PHPIMS/Autoload.php';
 
-    $client = new PHPIMS\Client('http://<hostname>');
+    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
     
     $hash = '<hash>';
     $chain = new PHPIMS\Image\TransformationChain();
