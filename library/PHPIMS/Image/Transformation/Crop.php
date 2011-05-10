@@ -23,55 +23,61 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\ImageUrl\Filter;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Client\ImageUrl\FilterInterface;
+use PHPIMS\Image;
+use PHPIMS\Client\ImageUrl;
+use PHPIMS\Image\TransformationInterface;
+
+use \Imagine\Image\Point;
+use \Imagine\Image\Box;
 
 /**
- * Crop filter
+ * Crop transformation
  *
  * @package PHPIMS
- * @subpackage Client
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
+ * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Crop implements FilterInterface {
+class Crop implements TransformationInterface {
     /**
      * X coordinate of the top left corner of the crop
      *
      * @var int
      */
-    private $x = null;
+    private $x;
 
     /**
      * Y coordinate of the top left corner of the crop
      *
      * @var int
      */
-    private $y = null;
+    private $y;
 
     /**
      * Width of the crop
      *
      * @var int
      */
-    private $width = null;
+    private $width;
 
     /**
      * Height of the crop
      *
      * @var int
      */
-    private $height = null;
+    private $height;
 
     /**
      * Class constructor
@@ -89,9 +95,21 @@ class Crop implements FilterInterface {
     }
 
     /**
-     * @see PHPIMS\Client\ImageUrl\FilterInterface::getFilter()
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function getFilter() {
+    public function applyToImage(Image $image) {
+        $imagineImage = $image->getImagineImage();
+        $imagineImage->crop(
+            new Point($this->x, $this->y),
+            new Box($this->width, $this->height)
+        );
+        $image->refresh();
+    }
+
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
+     */
+    public function applyToImageUrl(ImageUrl $url) {
         $params = array(
             'x=' . $this->x,
             'y=' . $this->y,
@@ -99,6 +117,6 @@ class Crop implements FilterInterface {
             'height=' . $this->height,
         );
 
-        return 'crop:' . implode(',', $params);
+        $url->append('crop:' . implode(',', $params));
     }
 }

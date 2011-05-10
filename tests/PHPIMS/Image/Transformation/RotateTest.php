@@ -30,7 +30,9 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\ImageUrl\Filter;
+namespace PHPIMS\Image\Transformation;
+
+use \Mockery as m;
 
 /**
  * @package PHPIMS
@@ -40,9 +42,27 @@ namespace PHPIMS\Client\ImageUrl\Filter;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class CropTest extends \PHPUnit_Framework_TestCase {
-    public function testCrop() {
-        $filter = new Crop(1, 2, 3, 4);
-        $this->assertSame('crop:x=1,y=2,width=3,height=4', $filter->getFilter());
+class RotateTest extends \PHPUnit_Framework_TestCase {
+    public function testApplyToImage() {
+        $angle = 45;
+
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('rotate')->with($angle, m::type('Imagine\\Image\\Color'))->once();
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
+
+        $transformation = new Rotate($angle);
+        $transformation->applyToImage($image);
+    }
+
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return (preg_match('/^rotate:/', $string) && strstr($string, 'angle=33') && strstr($string, 'bg=fed'));
+        }))->once();
+        $transformation = new Rotate(33, 'fed');
+        $transformation->applyToImageUrl($url);
     }
 }

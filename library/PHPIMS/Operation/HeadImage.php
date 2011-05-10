@@ -23,27 +23,48 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Exceptions
+ * @subpackage Operations
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client\ImageUrl\Filter;
+namespace PHPIMS\Operation;
 
-use PHPIMS\Client\Exception as BaseException;
+use PHPIMS\Operation;
+use PHPIMS\OperationInterface;
+use PHPIMS\Operation\Plugin\IdentifyImage;
 
 /**
- * Base exception class for imageurl filters
+ * Head image operation
+ *
+ * This operation will populate response headers with information regarding a single image.
  *
  * @package PHPIMS
- * @subpackage Exceptions
+ * @subpackage Operations
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Exception extends BaseException {
+class HeadImage extends Operation implements OperationInterface {
+    /**
+     * @see PHPIMS\OperationInterface::exec()
+     */
+    public function exec() {
+        $image = $this->getImage();
+        $response = $this->getResponse();
 
+        // Fetch information from the database
+        $this->getDatabase()->load($this->getImageIdentifier(), $image);
+
+        $response->setContentType($image->getMimeType());
+        $response->setCustomHeaders(array(
+            'OrignalImageWidth'    => $image->getWidth(),
+            'OrignalImageHeight'   => $image->getHeight(),
+            'OrignalImageFilename' => $image->getFilename(),
+            'OrignalImageSize'     => $image->getFilesize(),
+        ));
+    }
 }

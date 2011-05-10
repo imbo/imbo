@@ -97,7 +97,7 @@ class Auth implements PluginInterface {
 
         $diff = time() - $timestamp;
 
-        if ($diff > 300 || $diff < 0) {
+        if ($diff > 150 || $diff < -150) {
             throw new Exception('Timestamp expired', 401);
         }
 

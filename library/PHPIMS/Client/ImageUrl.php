@@ -32,6 +32,8 @@
 
 namespace PHPIMS\Client;
 
+use PHPIMS\Image\TransformationChain;
+
 /**
  * URL to an image
  *
@@ -93,5 +95,17 @@ class ImageUrl {
         $query = rtrim($query, '&');
 
         return $this->baseUrl . '?' . $query;
+    }
+
+    /**
+     * Transform the current instance
+     *
+     * @param PHPIMS\Image\TransformationChain $chain A chain of transformations
+     * @return PHPIMS\Client\ImageUrl
+     */
+    public function transform(TransformationChain $chain) {
+        $chain->applyToImageUrl($this);
+
+        return $this;
     }
 }

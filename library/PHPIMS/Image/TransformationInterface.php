@@ -23,46 +23,40 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin;
+namespace PHPIMS\Image;
 
-use \Mockery as m;
+use PHPIMS\Image;
+use PHPIMS\Client\ImageUrl;
 
 /**
+ * Image transformation interface
+ *
  * @package PHPIMS
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class ManipulateImageTest extends \PHPUnit_Framework_TestCase {
+interface TransformationInterface {
     /**
-     * Plugin instance
+     * Apply a transformation to an image object
      *
-     * @var PHPIMS\Operation\Plugin\ManipulateImage
+     * @param PHPIMS\Image $image Image instance
      */
-    protected $plugin = null;
+    function applyToImage(Image $image);
 
-    public function setUp() {
-        $this->plugin = new ManipulateImage();
-    }
-
-    public function tearDown() {
-        $this->plugin = null;
-    }
-
-    public function testIsValidTransformation() {
-        $this->assertTrue(ManipulateImage::isValidTransformation('resize'));
-        $this->assertTrue(ManipulateImage::isValidTransformation('crop'));
-        $this->assertTrue(ManipulateImage::isValidTransformation('rotate'));
-        $this->assertTrue(ManipulateImage::isValidTransformation('border'));
-        $this->assertFalse(ManipulateImage::isValidTransformation('foobar'));
-    }
+    /**
+     * Apply a transformation to an image url
+     *
+     * @param PHPIMS\Client\ImageUrl $url Image url
+     */
+    function applyToImageUrl(ImageUrl $url);
 }

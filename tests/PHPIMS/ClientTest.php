@@ -115,8 +115,13 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
      * @expectedException PHPIMS\Client\Exception
      * @expectedExceptionMessage File does not exist: foobar
      */
-    public function testAddImageThatDoesNotExist() {
-        $this->client->addImage('foobar');
+    public function testGenerateImageIdentifierForFileThatDoesNotExist() {
+        $this->client->getImageIdentifier('foobar');
+    }
+
+    public function testGenerateImageIdentifier() {
+        $hash = $this->client->getImageIdentifier(__DIR__ . '/_files/image.png');
+        $this->assertSame('929db9c5fc3099f7576f5655207eba47.png', $hash);
     }
 
     public function testAddImage() {
@@ -181,10 +186,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
     public function testGetImageUrlWithTransformations() {
         $baseUrl = $this->serverUrl . '/' . $this->imageIdentifier;
         $completeUrl = $baseUrl;
-        $transformation = m::mock('PHPIMS\\Client\\ImageUrl\\Transformation');
-        $transformation->shouldReceive('apply')->once()->with(m::type('PHPIMS\\Client\\ImageUrl'));
+        $chain = m::mock('PHPIMS\\Image\\TransformationChain');
+        $chain->shouldReceive('applyToImageUrl')->once()->with(m::type('PHPIMS\\Client\\ImageUrl'));
 
-        $url = $this->client->getImageUrl($this->imageIdentifier, $transformation);
+        $url = $this->client->getImageUrl($this->imageIdentifier, $chain);
         $this->assertInstanceOf('PHPIMS\\Client\\ImageUrl', $url);
         $this->assertSame($completeUrl, (string) $url);
     }

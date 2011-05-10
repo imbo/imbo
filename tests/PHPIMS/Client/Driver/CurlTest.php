@@ -63,7 +63,7 @@ class CurlTest extends \PHPUnit_Framework_TestCase {
             $this->markTestSkipped('PHPIMS_ENABLE_CLIENT_TESTS must be set to true to run these tests');
         }
 
-        $this->driver  = new Curl;
+        $this->driver  = new Curl();
         $this->testUrl = PHPIMS_CLIENT_TESTS_URL;
     }
 

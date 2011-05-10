@@ -50,15 +50,6 @@ use PHPIMS\Operation\Plugin\IdentifyImage;
  */
 class GetImage extends Operation implements OperationInterface {
     /**
-     * Internal plugins
-     *
-     * @var array
-     */
-    protected $internalPluginsSpec = array(
-        'IdentifyImage' => array(),
-    );
-
-    /**
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {

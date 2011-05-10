@@ -30,14 +30,14 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface;
-use \Imagine\ImageInterface;
-use \Imagine\Image\Color;
+use PHPIMS\Image;
+use PHPIMS\Client\ImageUrl;
+use PHPIMS\Image\TransformationInterface;
 
 /**
- * Rotate transformation
+ * Flip horizontally transformation
  *
  * @package PHPIMS
  * @subpackage ImageTransformation
@@ -47,17 +47,20 @@ use \Imagine\Image\Color;
  * @link https://github.com/christeredvartsen/phpims
  * @see PHPIMS\Operation\Plugin\ManipulateImage
  */
-class Rotate implements TransformationInterface {
+class FlipHorizontally implements TransformationInterface {
     /**
-     * @see PHPIMS\Operation\Plugin\ManipulateImage\TransformationInterface::apply()
+     * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function apply(ImageInterface $image, array $params = array()) {
-        if (!isset($params['bg'])) {
-            $params['bg'] = '000';
-        }
+    public function applyToImage(Image $image) {
+        $imagineImage = $image->getImagineImage();
+        $imagineImage->flipHorizontally();
+        $image->refresh();
+    }
 
-        $color = new Color($params['bg']);
-
-        $image->rotate($params['angle'], $color);
+    /**
+     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
+     */
+    public function applyToImageUrl(ImageUrl $url) {
+        $url->append('flipHorizontally');
     }
 }

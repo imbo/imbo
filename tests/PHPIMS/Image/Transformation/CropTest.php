@@ -30,10 +30,11 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\Plugin\ManipulateImage\Transformation;
+namespace PHPIMS\Image\Transformation;
 
 use \Mockery as m;
-use \Imagine\ImageInterface;
+use \Imagine\Image\Point;
+use \Imagine\Image\Box;
 
 /**
  * @package PHPIMS
@@ -44,29 +45,35 @@ use \Imagine\ImageInterface;
  * @link https://github.com/christeredvartsen/phpims
  */
 class CropTest extends \PHPUnit_Framework_TestCase {
-    /**
-     * @expectedException PHPIMS\Operation\Plugin\ManipulateImage\Transformation\Exception
-     * @expectedExceptionMessage Missing parameter
-     */
-    public function testApplyWithMissingParameters() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $transformation = new Crop;
-        $transformation->apply($image);
+    public function testApplyToImage() {
+        $x = 1;
+        $y = 2;
+        $width = 3;
+        $height = 4;
+
+        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage->shouldReceive('crop')->once()->with(m::on(function(Point $point) use ($x, $y) {
+                                                               return $point->getX() == $x && $point->getY() == $y;
+                                                           }),
+                                                           m::on(function(Box $box) use ($width, $height) {
+                                                               return $box->getWidth() == $width && $box->getHeight() == $height;
+                                                           }));
+
+        $image = m::mock('PHPIMS\\Image');
+        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
+        $image->shouldReceive('refresh')->once();
+
+        $transformation = new Crop($x, $y, $width, $height);
+        $transformation->applyToImage($image);
     }
 
-    public function testApply() {
-        $image = m::mock('Imagine\\ImageInterface');
-        $image->shouldReceive('crop')->once()
-                                     ->with(m::type('Imagine\\Image\\Point'), m::type('Imagine\\Image\\Box'));
-
-        $params = array(
-            'x'      => 1,
-            'y'      => 2,
-            'width'  => 3,
-            'height' => 4,
-        );
-
-        $transformation = new Crop;
-        $transformation->apply($image, $params);
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return (preg_match('/^crop:/', $string) && strstr($string, 'x=1') && strstr($string, 'y=2') &&
+                    strstr($string, 'width=3') && strstr($string, 'height=4'));
+        }))->once();
+        $transformation = new Crop(1, 2, 3, 4);
+        $transformation->applyToImageUrl($url);
     }
 }

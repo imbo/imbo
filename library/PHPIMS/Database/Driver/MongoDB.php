@@ -85,7 +85,7 @@ class MongoDB implements DriverInterface {
 
         if ($collection === null) {
             // @codeCoverageIgnoreStart
-            $mongo      = new \Mongo;
+            $mongo      = new \Mongo();
             $database   = $mongo->{$this->params['databaseName']};
             $collection = $database->{$this->params['collectionName']};
         }
@@ -253,7 +253,7 @@ class MongoDB implements DriverInterface {
      */
     public function load($imageIdentifier, Image $image) {
         try {
-            $fields = array('name', 'size', 'width', 'height');
+            $fields = array('name', 'size', 'width', 'height', 'mime');
             $data = $this->collection->findOne(array('imageIdentifier' => $imageIdentifier), $fields);
         } catch (\MongoException $e) {
             throw new DatabaseException('Unable to fetch image data', 500, $e);
@@ -262,7 +262,8 @@ class MongoDB implements DriverInterface {
         $image->setFilename($data['name'])
               ->setFilesize($data['size'])
               ->setWidth($data['width'])
-              ->setHeight($data['height']);
+              ->setHeight($data['height'])
+              ->setMimeType($data['mime']);
 
         return true;
     }
