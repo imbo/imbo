@@ -393,7 +393,7 @@ abstract class Operation {
      * @return PHPIMS\OperationInterface
      * @throws PHPIMS\Operation\Exception
      */
-    static public function factory($className, $config, Database $database, Storage $storage, $resource, $method, $imageIdentifier = null) {
+    static public function factory($className, Database $database, Storage $storage, $resource, $method, $imageIdentifier = null) {
         switch ($className) {
             case 'PHPIMS\\Operation\\AddImage':
             case 'PHPIMS\\Operation\\DeleteImage':
@@ -404,8 +404,7 @@ abstract class Operation {
             case 'PHPIMS\\Operation\\GetImageMetadata':
             case 'PHPIMS\\Operation\\HeadImage':
                 $operation = new $className($database, $storage);
-                $operation->setConfig($config)
-                          ->setResource($resource)
+                $operation->setResource($resource)
                           ->setImageIdentifier($imageIdentifier)
                           ->setMethod($method)
                           ->setImage(new Image())
