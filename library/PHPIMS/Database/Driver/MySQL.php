@@ -219,35 +219,7 @@ class MySQL implements DriverInterface {
      * @see PHPIMS\Database\DriverInterface::getMetadata()
      */
     public function getMetadata($imageIdentifier) {
-        $metadata = array();
-    
-        try {
-            $getMetadataStatement = $this->pdo->prepare("
-                SELECT
-                    m.field, m.value
-                FROM
-                    image_metadata m
-                WHERE
-                    m.imageIdentifier = :imageIdentifier
-            ");
-            
-            $getMetadataStatement->execute(array(
-                ':imageIdentifier' => $imageIdentifier,
-            ));
-            
-            $rows = $getMetadataStatement->fetchAll(\PDO::FETCH_ASSOC);
-            
-            foreach($rows as $row)
-            {
-                $metadata[$row['field']] = $row['value'];            
-            }
-            
-            $getMetadataStatement->closeCursor();
-        } catch (\PDOException $e) {
-            throw new DatabaseException('Unable to fetch image metadata: ' . $e->getMessage(), 500, $e);
-        }
-        
-        return $metadata;
+        return $this->getMetadataForImages(array($imageIdentifier));
     }
 
     /**
@@ -278,8 +250,98 @@ class MySQL implements DriverInterface {
      * @see PHPIMS\Database\DriverInterface::getImages()
      */
     public function getImages(Query $query) {
-        try {
+        $images = array();
+
+        $additionalTables = array();
+        $whereStatements = array();
+        $whereValues = array();
         
+        if ($query->from())
+        {
+            $whereStatements[] = 'AND i.added > :timeFrom';
+            $whereValues[':timeFrom'] = $query->from();
+        }
+        
+        if ($query->to())
+        {
+            $whereStatements[] = 'AND i.added < :timeTo';
+            $whereValues[':timeTo'] = $query->to();
+        }
+        
+        if ($query->query()) {
+            // we should probably have a better solution than self-joining for each metadata query statement
+            $placeholderIndex = 0;
+            
+            foreach($query->query() as $field => $value)
+            {
+                $additionalTables[] = 'image_metadata im' . $placeholderIndex;
+                $whereStatements[] = 'AND i.imageIdentifier = im' . $placeholderIndex . '.imageIdentifier';
+            
+                $whereStatements[] = 'AND im' . $placeholderIndex . '.field = :metaField_' . $placeholderIndex . ' AND im' . $placeholderIndex . '.value = :metaValue_' . $placeholderIndex;
+                $whereValues[':metaField_' . $placeholderIndex] = $field;
+                $whereValues[':metaValue_' . $placeholderIndex] = $value;
+                
+                $placeholderIndex++;
+            }
+        }
+
+        try {
+            $start = $query->num() * ($query->page() - 1);
+            $generatedSQL = '';
+            
+            if ($additionalTables)
+            {
+                $generatedSQL .= ', ' . join(', ', $additionalTables);
+            }
+            
+            if ($whereStatements)
+            {
+                $generatedSQL .= 'WHERE ' . join(' ', $whereStatements);
+            }
+            
+            $imagesStatement = $this->pdo->prepare("
+                SELECT
+                    i.*
+                FROM
+                    image i
+                " . $generatedSQL . "
+                LIMIT
+                    :start, :num
+            ");
+            
+            // we have to bindValue each statement, as we can't provide PDO::PARAM_INT when using ->execute()
+            $imagesStatement->bindValue(':start', $start, \PDO::PARAM_INT);
+            $imagesStatement->bindValue(':num', (int) $query->num(), \PDO::PARAM_INT);
+            
+            foreach($whereValues as $placeholder => $value)
+            {
+                $imagesStatement->bindValue($placeholder, $value);
+            }
+            
+            $imagesStatement->execute();
+            
+            $images = $imagesStatement->fetchAll(\PDO::FETCH_ASSOC);
+            
+            if ($query->returnMetadata()) {
+                // build array with all images referenced by their imageidentifier
+                $imagesByIdentifier = array();
+                
+                foreach($images as $image)
+                {
+                    $imagesByIdentifier[$image['imageIdentifier']] = $image;
+                }
+                
+                // returns metadata by imageidentifier
+                $metadataByIdentifier = $this->getMetadataForImages(array_keys($imagesByIdentifier));
+                
+                foreach($metadataByIdentifier as $identifier => $metadata)
+                {
+                    $imagesByIdentifier[$identifier]['metadata'] = $metadata;
+                }
+                
+                // replace array with images array with added metadata
+                $images = array_values($imagesByIdentifier);
+            }
         } catch (\PDOException $e) {
             throw new DatabaseException('Unable to search for images: ' . $e->getMessage(), 500, $e);
         }
@@ -317,6 +379,47 @@ class MySQL implements DriverInterface {
               ->setHeight($data['height']);
 
         return true;
+    }
+    
+    /**
+     * Get metadata for an array of image identifiers.
+     * 
+     * @param array $imageIdentifiers A list of image identifiers to fetch data for.
+     */
+    protected function getMetadataForImages(array $imageIdentifiers)
+    {
+        $metadata = array();
+        
+        foreach($imageIdentifiers as $imageIdentifier)
+        {
+            $metadata[$imageIdentifier] = array();
+        }
+    
+        try {
+            $getMetadataStatement = $this->pdo->prepare("
+                SELECT
+                    m.imageIdentifier, m.field, m.value
+                FROM
+                    image_metadata m
+                WHERE
+                    m.imageIdentifier IN " . self::getPlaceholderExpression(count($imageIdentifiers)) . "
+            ");
+            
+            $getMetadataStatement->execute($imageIdentifiers);
+            
+            $rows = $getMetadataStatement->fetchAll(\PDO::FETCH_ASSOC);
+            
+            foreach($rows as $row)
+            {
+                $metadata[$row['imageIdentifier']][$row['field']] = $row['value'];
+            }
+            
+            $getMetadataStatement->closeCursor();
+        } catch (\PDOException $e) {
+            throw new DatabaseException('Unable to fetch image metadata: ' . $e->getMessage(), 500, $e);
+        }
+        
+        return $metadata;
     }
 
     /**
