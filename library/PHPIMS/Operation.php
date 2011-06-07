@@ -58,35 +58,35 @@ abstract class Operation {
      *
      * @var string
      */
-    private $resource = null;
+    private $resource;
 
     /**
      * The current image identifier
      *
      * @param string
      */
-    private $imageIdentifier = null;
+    private $imageIdentifier;
 
     /**
      * HTTP method
      *
      * @var string
      */
-    private $method = null;
+    private $method;
 
     /**
      * The database driver
      *
      * @var PHPIMS\Database\DriverInterface
      */
-    private $database = null;
+    private $database;
 
     /**
      * The storage driver
      *
      * @var PHPIMS\Storage\DriverInterface
      */
-    private $storage = null;
+    private $storage;
 
     /**
      * Image instance
@@ -96,7 +96,7 @@ abstract class Operation {
      *
      * @var PHPIMS\Image
      */
-    private $image = null;
+    private $image;
 
     /**
      * Response instance
@@ -106,7 +106,7 @@ abstract class Operation {
      *
      * @var PHPIMS\Image
      */
-    private $response = null;
+    private $response;
 
     /**
      * Array of plugins
@@ -121,6 +121,20 @@ abstract class Operation {
      * @var array
      */
     private $config = array();
+
+    /**
+     * Current public key if it exists
+     *
+     * @var string
+     */
+    private $publicKey;
+
+    /**
+     * Current private key if it exists
+     *
+     * @var string
+     */
+    private $privateKey;
 
     /**
      * Class constructor
@@ -334,6 +348,48 @@ abstract class Operation {
      */
     public function setConfig(array $config) {
         $this->config = $config;
+
+        return $this;
+    }
+
+    /**
+     * Get the public key
+     *
+     * @return string
+     */
+    public function getPublicKey() {
+        return $this->publicKey;
+    }
+
+    /**
+     * Set the public key
+     *
+     * @param string $key
+     * @return PHPIMS\Operation
+     */
+    public function setPublicKey($key) {
+        $this->publicKey = $key;
+
+        return $this;
+    }
+
+    /**
+     * Get the private key
+     *
+     * @return string
+     */
+    public function getPrivateKey() {
+        return $this->privateKey;
+    }
+
+    /**
+     * Set the private key
+     *
+     * @param string $key
+     * @return PHPIMS\Operation
+     */
+    public function setPrivateKey($key) {
+        $this->privateKey = $key;
 
         return $this;
     }
