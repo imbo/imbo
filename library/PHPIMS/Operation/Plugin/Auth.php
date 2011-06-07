@@ -101,14 +101,26 @@ class Auth implements PluginInterface {
             throw new Exception('Timestamp expired', 401);
         }
 
-        $config = $operation->getConfig('auth');
-        $data = $operation->getMethod() . $operation->getResource() . $_GET['publicKey'] . $_GET['timestamp'];
+        $keyPairs = $operation->getConfig('auth');
+        $publicKey = trim($_GET['publicKey']);
+
+        if (!isset($keyPairs[$publicKey])) {
+            throw new Exception('Unknown public key', 401);
+        }
+
+        $privateKey = $keyPairs[$publicKey];
+
+        $data = $operation->getMethod() . $operation->getResource() . $publicKey . $_GET['timestamp'];
 
         // Generate binary hash key
-        $actualSignature = hash_hmac('sha256', $data, $config['privateKey'], true);
+        $actualSignature = hash_hmac('sha256', $data, $privateKey, true);
 
         if ($actualSignature !== base64_decode($_GET['signature'])) {
             throw new Exception('Signature mismatch', 401);
         }
+
+        // Set the public and private key pair in the operation
+        $operation->setPublicKey($publicKey)
+                  ->setPrivateKey($privateKey);
     }
 }
