@@ -54,49 +54,54 @@ interface DriverInterface {
      * This method will insert a new image into the database. On errors throw exceptions that
      * extends PHPIMS\Database\Exception.
      *
+     * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @param PHPIMS\Image $image The image to insert
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    public function insertImage($imageIdentifier, Image $image);
+    public function insertImage($publicKey, $imageIdentifier, Image $image);
 
     /**
      * Delete an image from the database
      *
+     * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    public function deleteImage($imageIdentifier);
+    public function deleteImage($publicKey, $imageIdentifier);
 
     /**
      * Edit metadata
      *
+     * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @param array $metadata An array with metadata
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    public function updateMetadata($imageIdentifier, array $metadata);
+    public function updateMetadata($publicKey, $imageIdentifier, array $metadata);
 
     /**
      * Get all metadata associated with an image
      *
+     * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return array Returns the metadata as an array
      * @throws PHPIMS\Database\Exception
      */
-    public function getMetadata($imageIdentifier);
+    public function getMetadata($publicKey, $imageIdentifier);
 
     /**
      * Delete all metadata associated with an image
      *
+     * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    public function deleteMetadata($imageIdentifier);
+    public function deleteMetadata($publicKey, $imageIdentifier);
 
     /**
      * Get images based on some query parameters
@@ -110,10 +115,11 @@ interface DriverInterface {
     /**
      * Load information from database into the image object
      *
+     * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
      * @param Image $image The image object to populate
      * @return boolean
      * @throws PHPIMS\Database\Exception
      */
-    public function load($imageIdentifier, Image $image);
+    public function load($publicKey, $imageIdentifier, Image $image);
 }
