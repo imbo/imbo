@@ -1,5 +1,3 @@
-.buildpath
-.project
-.settings
 build
 phpunit.xml
+docblox.xml
