@@ -60,7 +60,7 @@ interface DriverInterface {
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Storage\Exception
      */
-    public function store($publicKey, $imageIdentifier, $path);
+    function store($publicKey, $imageIdentifier, $path);
 
     /**
      * Delete an image
@@ -72,7 +72,7 @@ interface DriverInterface {
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Storage\Exception
      */
-    public function delete($publicKey, $imageIdentifier);
+    function delete($publicKey, $imageIdentifier);
 
     /**
      * Load an image
@@ -90,5 +90,5 @@ interface DriverInterface {
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Storage\Exception
      */
-    public function load($publicKey, $imageIdentifier, Image $image);
+    function load($publicKey, $imageIdentifier, Image $image);
 }
