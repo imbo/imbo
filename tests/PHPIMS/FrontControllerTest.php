@@ -48,15 +48,34 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
      *
      * @var PHPIMS\FrontController
      */
-    protected $controller = null;
+    private $controller;
+
+    /**
+     * Public key
+     *
+     * @var string
+     */
+    private $publicKey;
+
+    /**
+     * Private key
+     *
+     * @var string
+     */
+    private $privateKey;
 
     /**
      * Set up method
      */
     public function setUp() {
+        $this->publicKey = md5(microtime());
+        $this->privateKey = md5(microtime());
         $config = array(
             'database' => m::mock('PHPIMS\\Database\\DriverInterface'),
             'storage' => m::mock('PHPIMS\\Storage\\DriverInterface'),
+            'auth' => array(
+                $this->publicKey => $this->privateKey,
+            ),
         );
         $this->controller = new FrontController($config);
     }
@@ -73,7 +92,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
      *
      * @param string $operationClass The class name of the operation to mock
      */
-    protected function getOperationMock($operationClass) {
+    private function getOperationMock($operationClass) {
         $operation = m::mock($operationClass);
         $operation->shouldReceive('init')->once()->andReturn($operation);
         $operation->shouldReceive('preExec')->once()->andReturn($operation);
@@ -117,7 +136,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unsupported operation
      */
     public function testHandleUnsupportedOperation() {
-        $this->controller->handle('images', 'DELETE');
+        $this->controller->handle($this->publicKey . '/images', 'DELETE');
     }
 
     /**
@@ -125,7 +144,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 418
      */
     public function testHandleBrew() {
-        $this->controller->handle(md5(microtime()) . '.png', 'BREW');
+        $this->controller->handle($this->publicKey . '/' . md5(microtime()) . '.png', 'BREW');
     }
 
     public function testResolveOperation() {
@@ -152,5 +171,17 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('PHPIMS\\Operation\\GetImageMetadata', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier, $extra)));
         $this->assertInstanceOf('PHPIMS\\Operation\\EditImageMetadata', $method->invokeArgs($this->controller, array($resource, 'POST', $imageIdentifier, $extra)));
         $this->assertInstanceOf('PHPIMS\\Operation\\DeleteImageMetadata', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier, $extra)));
+    }
+
+    /**
+     * @expectedException PHPIMS\Exception
+     * @expectedExceptionCode 400
+     * @expectedExceptionMessage Unknown public key
+     */
+    public function testHandleValidOperationWithValidButUnknownPublicKey() {
+        $resource = md5(microtime()) . '/' . md5(microtime()) . '.png';
+        $method = 'GET';
+
+        $this->controller->handle($resource, $method);
     }
 }

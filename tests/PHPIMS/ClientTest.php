@@ -48,56 +48,56 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
      *
      * @var PHPIMS\Client
      */
-    protected $client = null;
+    private $client;
 
     /**
      * Public key
      *
      * @var string
      */
-    protected $publicKey = null;
+    private $publicKey;
 
     /**
      * Private key
      *
      * @var string
      */
-    protected $privateKey = null;
+    private $privateKey;
 
     /**
      * The server url passed to the constructor
      *
      * @var string
      */
-    protected $serverUrl = 'http://host';
+    private $serverUrl = 'http://host';
 
     /**
      * Image identifier used for tests
      *
      * @var string
      */
-    protected $imageIdentifier = null;
+    private $imageIdentifier;
 
     /**
      * Pattern used in the Mockery matchers when url is signed
      *
      * @var string
      */
-    protected $signedUrlPattern = '|^http://host/[a-z0-9]{32}\.png(/meta)?\?signature=(.*?)&publicKey=[a-z0-9]{32}&timestamp=\d\d\d\d-\d\d-\d\dT\d\d%3A\d\dZ$|';
+    private $signedUrlPattern = '|^http://host/[a-f0-9]{32}/[a-f0-9]{32}\.png(/meta)?\?signature=(.*?)&timestamp=\d\d\d\d-\d\d-\d\dT\d\d%3A\d\dZ$|';
 
     /**
      * Pattern used in the Mockery matchers with regular urls
      *
      * @var string
      */
-    protected $urlPattern = '|^http://host/[a-z0-9]{32}\.png(/meta)?$|';
+    private $urlPattern = '|^http://host/[a-f0-9]{32}/[a-f0-9]{32}\.png(/meta)?$|';
 
     /**
      * Set up method
      */
     public function setUp() {
         $this->publicKey = md5(microtime());
-        $this->privateKey = md5($this->publicKey);
+        $this->privateKey = md5(microtime());
         $this->imageIdentifier = md5(microtime()) . '.png';
         $this->driver = m::mock('PHPIMS\\Client\\DriverInterface');
 
@@ -180,11 +180,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
     public function testGetImageUrl() {
         $url = $this->client->getImageUrl($this->imageIdentifier);
         $this->assertInstanceOf('PHPIMS\\Client\\ImageUrl', $url);
-        $this->assertSame($this->serverUrl . '/' . $this->imageIdentifier, (string) $url);
+        $this->assertSame($this->serverUrl . '/' . $this->publicKey . '/' . $this->imageIdentifier, (string) $url);
     }
 
     public function testGetImageUrlWithTransformations() {
-        $baseUrl = $this->serverUrl . '/' . $this->imageIdentifier;
+        $baseUrl = $this->serverUrl . '/' . $this->publicKey . '/' . $this->imageIdentifier;
         $completeUrl = $baseUrl;
         $chain = m::mock('PHPIMS\\Image\\TransformationChain');
         $chain->shouldReceive('applyToImageUrl')->once()->with(m::type('PHPIMS\\Client\\ImageUrl'));

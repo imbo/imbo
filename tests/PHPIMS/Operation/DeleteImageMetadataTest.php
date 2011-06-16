@@ -52,7 +52,7 @@ class DeleteImageMetadataTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $this->database->shouldReceive('deleteMetadata')->once()->with($this->imageIdentifier);
+        $this->database->shouldReceive('deleteMetadata')->once()->with($this->publicKey, $this->imageIdentifier);
 
         $this->operation->exec();
     }

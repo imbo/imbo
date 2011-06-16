@@ -65,7 +65,7 @@ class GetImagesTest extends OperationTests {
             'to'       => 234234234,
         );
 
-        $this->database->shouldReceive('getImages')->once()->with(m::on(function(Query $q) {
+        $this->database->shouldReceive('getImages')->once()->with($this->publicKey, m::on(function(Query $q) {
             return $q->page() === $_GET['page'] &&
                    $q->num() === $_GET['num'] &&
                    $q->returnMetadata() === true &&

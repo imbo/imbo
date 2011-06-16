@@ -55,7 +55,7 @@ class EditImageMetadataTest extends OperationTests {
         $metadata = array('foo' => 'bar', 'bar' => array('foo', 'bar'));
         $_POST['metadata'] = json_encode($metadata);
 
-        $this->database->shouldReceive('updateMetadata')->once()->with($this->imageIdentifier, $metadata);
+        $this->database->shouldReceive('updateMetadata')->once()->with($this->publicKey, $this->imageIdentifier, $metadata);
 
         $this->operation->exec();
     }

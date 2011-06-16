@@ -56,7 +56,7 @@ class GetImageMetadataTest extends OperationTests {
             'foo' => 'bar',
             'bar' => 'foo',
         );
-        $this->database->shouldReceive('getMetadata')->once()->with($this->imageIdentifier)->andReturn($data);
+        $this->database->shouldReceive('getMetadata')->once()->with($this->publicKey, $this->imageIdentifier)->andReturn($data);
 
         $response = m::mock('PHPIMS\\Server\\Response');
         $response->shouldReceive('setBody')->once()->with($data);
