@@ -60,7 +60,7 @@ interface DriverInterface {
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    public function insertImage($publicKey, $imageIdentifier, Image $image);
+    function insertImage($publicKey, $imageIdentifier, Image $image);
 
     /**
      * Delete an image from the database
@@ -70,7 +70,7 @@ interface DriverInterface {
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    public function deleteImage($publicKey, $imageIdentifier);
+    function deleteImage($publicKey, $imageIdentifier);
 
     /**
      * Edit metadata
@@ -81,7 +81,7 @@ interface DriverInterface {
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    public function updateMetadata($publicKey, $imageIdentifier, array $metadata);
+    function updateMetadata($publicKey, $imageIdentifier, array $metadata);
 
     /**
      * Get all metadata associated with an image
@@ -91,7 +91,7 @@ interface DriverInterface {
      * @return array Returns the metadata as an array
      * @throws PHPIMS\Database\Exception
      */
-    public function getMetadata($publicKey, $imageIdentifier);
+    function getMetadata($publicKey, $imageIdentifier);
 
     /**
      * Delete all metadata associated with an image
@@ -101,16 +101,17 @@ interface DriverInterface {
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    public function deleteMetadata($publicKey, $imageIdentifier);
+    function deleteMetadata($publicKey, $imageIdentifier);
 
     /**
      * Get images based on some query parameters
      *
+     * @param string $publicKey The public key of the user
      * @param PHPIMS\Operation\GetImages\Query
      * @return array
      * @throws PHPIMS\Database\Exception
      */
-    public function getImages(Query $query);
+    function getImages($publicKey, Query $query);
 
     /**
      * Load information from database into the image object
@@ -121,5 +122,5 @@ interface DriverInterface {
      * @return boolean
      * @throws PHPIMS\Database\Exception
      */
-    public function load($publicKey, $imageIdentifier, Image $image);
+    function load($publicKey, $imageIdentifier, Image $image);
 }
