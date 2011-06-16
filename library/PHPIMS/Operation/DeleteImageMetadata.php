@@ -52,7 +52,7 @@ class DeleteImageMetadata extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
-        $this->getDatabase()->deleteMetadata($this->getImageIdentifier());
+        $this->getDatabase()->deleteMetadata($this->getPublicKey(), $this->getImageIdentifier());
 
         return $this;
     }

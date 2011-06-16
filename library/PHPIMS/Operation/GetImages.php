@@ -91,7 +91,7 @@ class GetImages extends Operation implements OperationInterface {
             $query->to($_GET['to']);
         }
 
-        $images = $this->getDatabase()->getImages($query);
+        $images = $this->getDatabase()->getImages($this->getPublicKey(), $query);
 
         $this->getResponse()->setBody($images);
 

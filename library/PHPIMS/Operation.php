@@ -443,13 +443,10 @@ abstract class Operation {
      * @param string $className The name of the operation class to instantiate
      * @param PHPIMS\Database\DriverInterface $database Database driver
      * @param PHPIMS\Storage\DriverInterface $storage Storage driver
-     * @param string $resource The accessed resource
-     * @param string $method The HTTP method used
-     * @param string $imageIdentifier Optional Image identifier
      * @return PHPIMS\OperationInterface
      * @throws PHPIMS\Operation\Exception
      */
-    static public function factory($className, Database $database, Storage $storage, $resource, $method, $imageIdentifier = null) {
+    static public function factory($className, Database $database, Storage $storage) {
         switch ($className) {
             case 'PHPIMS\\Operation\\AddImage':
             case 'PHPIMS\\Operation\\DeleteImage':
@@ -459,14 +456,7 @@ abstract class Operation {
             case 'PHPIMS\\Operation\\GetImages':
             case 'PHPIMS\\Operation\\GetImageMetadata':
             case 'PHPIMS\\Operation\\HeadImage':
-                $operation = new $className($database, $storage);
-                $operation->setResource($resource)
-                          ->setImageIdentifier($imageIdentifier)
-                          ->setMethod($method)
-                          ->setImage(new Image())
-                          ->setResponse(new Response());
-
-                return $operation;
+                return new $className($database, $storage);
             default:
                 throw new OperationException('Invalid operation', 500);
         }

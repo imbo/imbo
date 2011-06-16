@@ -52,7 +52,7 @@ class EditImageMetadata extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
-        $this->getDatabase()->updateMetadata($this->getImageIdentifier(), json_decode($_POST['metadata'], true));
+        $this->getDatabase()->updateMetadata($this->getPublicKey(), $this->getImageIdentifier(), json_decode($_POST['metadata'], true));
 
         return $this;
     }

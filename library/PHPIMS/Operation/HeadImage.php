@@ -57,14 +57,14 @@ class HeadImage extends Operation implements OperationInterface {
         $response = $this->getResponse();
 
         // Fetch information from the database
-        $this->getDatabase()->load($this->getImageIdentifier(), $image);
+        $this->getDatabase()->load($this->getPublicKey(), $this->getImageIdentifier(), $image);
 
-        $response->setContentType($image->getMimeType());
-        $response->setCustomHeaders(array(
-            'OrignalImageWidth'    => $image->getWidth(),
-            'OrignalImageHeight'   => $image->getHeight(),
-            'OrignalImageFilename' => $image->getFilename(),
-            'OrignalImageSize'     => $image->getFilesize(),
-        ));
+        $response->setContentType($image->getMimeType())
+                 ->setCustomHeaders(array(
+                    'OrignalImageWidth'    => $image->getWidth(),
+                    'OrignalImageHeight'   => $image->getHeight(),
+                    'OrignalImageFilename' => $image->getFilename(),
+                    'OrignalImageSize'     => $image->getFilesize(),
+                ));
     }
 }

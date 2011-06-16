@@ -32,6 +32,8 @@
 
 namespace PHPIMS;
 
+use PHPIMS\Server\Response;
+
 /**
  * Client that interacts with the server part of PHPIMS
  *
@@ -62,14 +64,14 @@ class FrontController {
      *
      * @var array
      */
-    private $config = null;
+    private $config;
 
     /**
      * Class constructor
      *
      * @param array $config Configuration array
      */
-    public function __construct(array $config = null) {
+    public function __construct(array $config) {
         $this->config = $config;
     }
 
@@ -138,9 +140,16 @@ class FrontController {
         if ($operation === null) {
             throw new Exception('Unsupported operation', 400);
         }
-        
-        $operation = Operation::factory($operation, $this->config['database'], $this->config['storage'], $resource, $method, $imageIdentifier);
-        $operation->setConfig($this->config);
+
+        // Create the operation
+        $operation = Operation::factory($operation, $this->config['database'], $this->config['storage']);
+        $operation->setConfig($this->config)
+                  ->setResource($resource)
+                  ->setImageIdentifier($imageIdentifier)
+                  ->setMethod($method)
+                  ->setImage(new Image())
+                  ->setResponse(new Response());
+
         return $operation;
     }
 
@@ -161,14 +170,27 @@ class FrontController {
         $matches  = array();
 
         // See if
-        if (!preg_match('#^(images|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>meta))?)$#', $resource, $matches)) {
+        if (!preg_match('#^(?<publicKey>[a-f0-9]{32})/(images|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>meta))?)$#', $resource, $matches)) {
             throw new Exception('Unknown resource', 400);
         }
+
+        $publicKey = $matches['publicKey'];
+
+        // Make sure we have a valid public and private key pair
+        $keyPairs = $this->config['auth'];
+
+        if (!isset($keyPairs[$publicKey])) {
+            throw new Exception('Unknown public key', 400);
+        }
+
+        $privateKey = $keyPairs[$publicKey];
 
         $imageIdentifier = isset($matches['imageIdentifier']) ? $matches['imageIdentifier'] : null;
         $extra = isset($matches['extra']) ? $matches['extra'] : null;
 
+        // Create the operation
         $operation = $this->resolveOperation($resource, $method, $imageIdentifier, $extra);
+        $operation->setPublicKey($publicKey)->setPrivateKey($privateKey);
         $operation->run();
 
         return $operation->getResponse();
