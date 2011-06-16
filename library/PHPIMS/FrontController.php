@@ -156,7 +156,7 @@ class FrontController {
     /**
      * Handle a request
      *
-     * @param string $resource The resource accessed
+     * @param string $resource The resource accessed including the public key
      * @param string $method The HTTP method (one of the defined constants)
      * @throws PHPIMS\Exception
      */
@@ -170,7 +170,7 @@ class FrontController {
         $matches  = array();
 
         // See if
-        if (!preg_match('#^(?<publicKey>[a-f0-9]{32})/(images|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>meta))?)$#', $resource, $matches)) {
+        if (!preg_match('#^(?<publicKey>[a-f0-9]{32})/(?<resource>(images|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>meta))?))$#', $resource, $matches)) {
             throw new Exception('Unknown resource', 400);
         }
 
@@ -189,7 +189,7 @@ class FrontController {
         $extra = isset($matches['extra']) ? $matches['extra'] : null;
 
         // Create the operation
-        $operation = $this->resolveOperation($resource, $method, $imageIdentifier, $extra);
+        $operation = $this->resolveOperation($matches['resource'], $method, $imageIdentifier, $extra);
         $operation->setPublicKey($publicKey)->setPrivateKey($privateKey);
         $operation->run();
 
