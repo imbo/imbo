@@ -53,11 +53,13 @@ class GetImage extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
+        $publicKey = $this->getPublicKey();
+        $imageIdentifier = $this->getImageIdentifier();
         $image = $this->getImage();
         $response = $this->getResponse();
 
         // Fetch information from the database
-        $this->getDatabase()->load($this->getImageIdentifier(), $image);
+        $this->getDatabase()->load($publicKey, $imageIdentifier, $image);
 
         $response->setCustomHeaders(array(
             'OrignalImageWidth'    => $image->getWidth(),
@@ -67,7 +69,7 @@ class GetImage extends Operation implements OperationInterface {
         ));
 
         // Load the image
-        $this->getStorage()->load($this->getImageIdentifier(), $image);
+        $this->getStorage()->load($publicKey, $imageIdentifier, $image);
 
         // Attach the current image object to the response
         $response->setImage($image);

@@ -52,7 +52,7 @@ class GetImageMetadata extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
-        $data = $this->getDatabase()->getMetadata($this->getImageIdentifier());
+        $data = $this->getDatabase()->getMetadata($this->getPublicKey(), $this->getImageIdentifier());
         $this->getResponse()->setBody($data);
 
         return $this;

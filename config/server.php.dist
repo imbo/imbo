@@ -1,11 +1,8 @@
 <?php
 return array(
-    // Auth
-    'auth' => array(
-        'publicKey' => '',
-        'privateKey' => '',
-    ),
-    
+    // Auth (<public> => <private>)
+    'auth' => array(),
+
     // Database driver
     'database' => new PHPIMS\Database\Driver\MongoDB(array(
         'database'   => 'phpims',

@@ -52,8 +52,8 @@ class GetImageTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $this->database->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
-        $this->storage->shouldReceive('load')->once()->with($this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
+        $this->database->shouldReceive('load')->once()->with($this->publicKey, $this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
+        $this->storage->shouldReceive('load')->once()->with($this->publicKey, $this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
 
         $image = m::mock('PHPIMS\\Image');
         $image->shouldReceive('getWidth', 'getHeight', 'getFilename', 'getFilesize')->once()->andReturn('some value');

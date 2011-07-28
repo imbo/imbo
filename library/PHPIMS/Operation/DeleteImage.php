@@ -52,9 +52,11 @@ class DeleteImage extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
+        $publicKey = $this->getPublicKey();
         $imageIdentifier = $this->getImageIdentifier();
-        $this->getDatabase()->deleteImage($imageIdentifier);
-        $this->getStorage()->delete($imageIdentifier);
+
+        $this->getDatabase()->deleteImage($publicKey, $imageIdentifier);
+        $this->getStorage()->delete($publicKey, $imageIdentifier);
 
         return $this;
     }

@@ -48,7 +48,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
      *
      * @var PHPIMS\Operation
      */
-    protected $operation = null;
+    private $operation;
 
     /**
      * Set up method
@@ -77,37 +77,37 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
 
     public function testSetGetImageIdentifier() {
         $imageIdentifier = md5(time()) . '.png';
-        $this->operation->setImageIdentifier($imageIdentifier);
+        $this->assertInstanceOf('PHPIMS\\Operation', $this->operation->setImageIdentifier($imageIdentifier));
         $this->assertSame($imageIdentifier, $this->operation->getImageIdentifier());
     }
 
     public function testSetGetDatabase() {
         $driver = m::mock('PHPIMS\\Database\\DriverInterface');
-        $this->operation->setDatabase($driver);
+        $this->assertInstanceOf('PHPIMS\\Operation', $this->operation->setDatabase($driver));
         $this->assertSame($driver, $this->operation->getDatabase());
     }
 
     public function testSetGetStorage() {
         $driver = m::mock('PHPIMS\\Storage\\DriverInterface');
-        $this->operation->setStorage($driver);
+        $this->assertInstanceOf('PHPIMS\\Operation', $this->operation->setStorage($driver));
         $this->assertSame($driver, $this->operation->getStorage());
     }
 
     public function testSetGetImage() {
         $image = $this->getMock('PHPIMS\\Image');
-        $this->operation->setImage($image);
+        $this->assertInstanceOf('PHPIMS\\Operation', $this->operation->setImage($image));
         $this->assertSame($image, $this->operation->getImage());
     }
 
     public function testSetGetResponse() {
         $response = $this->getMock('PHPIMS\\Server\\Response');
-        $this->operation->setResponse($response);
+        $this->assertInstanceOf('PHPIMS\\Operation', $this->operation->setResponse($response));
         $this->assertSame($response, $this->operation->getResponse());
     }
 
     public function testSetGetMethod() {
         $method = 'DELETE';
-        $this->operation->setMethod($method);
+        $this->assertInstanceOf('PHPIMS\\Operation', $this->operation->setMethod($method));
         $this->assertSame($method, $this->operation->getMethod());
     }
 
@@ -140,7 +140,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
         $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
 
         foreach ($operations as $method => $className) {
-            $this->assertInstanceOf($className, Operation::factory($className, $database, $storage, $method, md5(microtime())));
+            $this->assertInstanceOf($className, Operation::factory($className, $database, $storage));
         }
     }
 
@@ -156,7 +156,19 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
 
     public function testSetGetResource() {
         $resource = md5(microtime()) . '.png';
-        $this->operation->setResource($resource);
+        $this->assertInstanceOf('PHPIMS\\Operation', $this->operation->setResource($resource));
         $this->assertSame($resource, $this->operation->getResource());
+    }
+
+    public function testSetGetPublicKey() {
+        $key = md5(microtime());
+        $this->assertInstanceOf('PHPIMS\\Operation', $this->operation->setPublicKey($key));
+        $this->assertSame($key, $this->operation->getPublicKey());
+    }
+
+    public function testSetGetPrivateKey() {
+        $key = md5(microtime());
+        $this->assertInstanceOf('PHPIMS\\Operation', $this->operation->setPrivateKey($key));
+        $this->assertSame($key, $this->operation->getPrivateKey());
     }
 }

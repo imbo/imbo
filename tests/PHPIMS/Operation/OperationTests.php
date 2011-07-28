@@ -50,28 +50,28 @@ abstract class OperationTests extends \PHPUnit_Framework_TestCase {
      *
      * @var PHPIMS\Datbase\DriverInterface
      */
-    protected $database = null;
+    protected $database;
 
     /**
      * Storage driver
      *
      * @var PHPIMS\Storage\DriverInterface
      */
-    protected $storage = null;
+    protected $storage;
 
     /**
      * Operation instance
      *
      * @var PHPIMS\Operation
      */
-    protected $operation = null;
+    protected $operation;
 
     /**
      * Image identifier used for the operation
      *
      * @var string
      */
-    protected $imageIdentifier = null;
+    protected $imageIdentifier;
 
     /**
      * Set up method
@@ -79,10 +79,11 @@ abstract class OperationTests extends \PHPUnit_Framework_TestCase {
     public function setUp() {
         $this->database = m::mock('PHPIMS\\Database\\DriverInterface');
         $this->storage = m::mock('PHPIMS\\Storage\\DriverInterface');
+        $this->publicKey = md5(microtime());
         $this->imageIdentifier = md5(microtime()) . '.png';
 
         $this->operation = $this->getNewOperation();
-        $this->operation->setImageIdentifier($this->imageIdentifier);
+        $this->operation->setImageIdentifier($this->imageIdentifier)->setPublicKey($this->publicKey);
     }
 
     /**

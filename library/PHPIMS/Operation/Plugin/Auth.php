@@ -38,17 +38,17 @@ use PHPIMS\Operation;
 /**
  * Auth plugin
  *
- * This plugin will kick in prior to any write operations and make sure that the signature in the
- * URL is correct. The signature is created client siden using a public and a private key. This is
- * done in the same manner here as well. A timestamp is used in the generating and PHPIMS allows a
- * margin of +-5 minutes.
+ * This plugin will kick in prior to any write operations and will make sure that the signature in
+ * the URL is correct. The signature is created client side using a public and a private key. This
+ * is done in the same manner here as well. A timestamp is used in the generating and PHPIMS allows
+ * a margin of +-2 minutes.
  *
- * The signature is generated using the following elements:
+ * The signature is generated using the following elements in the following order:
  *
  * - HTTP method in use (POST or DELETE)
  * - The image identifier
- * - A provided timestamp
  * - The public key (from the URL) and the private key (from the configuration file)
+ * - A provided timestamp
  *
  * @package PHPIMS
  * @subpackage OperationPlugin
@@ -74,7 +74,8 @@ class Auth implements PluginInterface {
      * @see PHPIMS\Operation\PluginInterface::exec()
      */
     public function exec(Operation $operation) {
-        $requiredParams = array('signature', 'publicKey', 'timestamp');
+        // Required parameters
+        $requiredParams = array('signature', 'timestamp');
 
         foreach ($requiredParams as $param) {
             if (empty($_GET[$param])) {
@@ -97,15 +98,15 @@ class Auth implements PluginInterface {
 
         $diff = time() - $timestamp;
 
-        if ($diff > 150 || $diff < -150) {
+        if ($diff > 120 || $diff < -120) {
             throw new Exception('Timestamp expired', 401);
         }
 
-        $config = $operation->getConfig('auth');
-        $data = $operation->getMethod() . $operation->getResource() . $_GET['publicKey'] . $_GET['timestamp'];
+        // Generate data for the HMAC
+        $data = $operation->getMethod() . $operation->getResource() . $operation->getPublicKey() . $_GET['timestamp'];
 
         // Generate binary hash key
-        $actualSignature = hash_hmac('sha256', $data, $config['privateKey'], true);
+        $actualSignature = hash_hmac('sha256', $data, $operation->getPrivateKey(), true);
 
         if ($actualSignature !== base64_decode($_GET['signature'])) {
             throw new Exception('Signature mismatch', 401);

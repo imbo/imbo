@@ -57,28 +57,28 @@ class Client {
      *
      * @var string
      */
-    private $serverUrl = null;
+    private $serverUrl;
 
     /**
      * Driver used by the client
      *
      * @var PHPIMS\Client\DriverInterface
      */
-    private $driver = null;
+    private $driver;
 
     /**
      * Public key used for signed requests
      *
      * @var string
      */
-    private $publicKey = null;
+    private $publicKey;
 
     /**
      * Private key used for signed requests
      *
      * @var string
      */
-    private $privateKey = null;
+    private $privateKey;
 
     /**
      * Class constructor
@@ -89,7 +89,7 @@ class Client {
      * @param PHPIMS\Client\DriverInterface $driver Optional driver to set
      */
     public function __construct($serverUrl, $publicKey, $privateKey, DriverInterface $driver = null) {
-        $this->serverUrl  = $serverUrl;
+        $this->serverUrl  = rtrim($serverUrl, '/');
         $this->publicKey  = $publicKey;
         $this->privateKey = $privateKey;
 
@@ -110,7 +110,7 @@ class Client {
      * @return string
      */
     public function getResourceUrl($resourceIdentifier) {
-        return $this->serverUrl . '/' . $resourceIdentifier;
+        return $this->serverUrl . '/' . $this->publicKey . '/' . $resourceIdentifier;
     }
 
     /**
@@ -229,7 +229,7 @@ class Client {
         $signature = $this->generateSignature($method, $resourceIdentifier, $timestamp);
 
         $url = $this->getResourceUrl($resourceIdentifier)
-             . sprintf('?signature=%s&publicKey=%s&timestamp=%s', rawurlencode($signature), $this->publicKey, rawurlencode($timestamp));
+             . sprintf('?signature=%s&timestamp=%s', rawurlencode($signature), rawurlencode($timestamp));
 
         return $url;
     }

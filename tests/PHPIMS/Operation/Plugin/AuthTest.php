@@ -48,7 +48,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
      *
      * @var PHPIMS\Operation\Plugin\Auth
      */
-    protected $plugin = null;
+    private $plugin;
 
     public function setUp() {
         $this->plugin = new Auth();
@@ -74,7 +74,6 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
      */
     public function testExecWithInvalidTimestampFormat() {
         $_GET['signature'] = 'some signature';
-        $_GET['publicKey'] = 'some key';
         $_GET['timestamp'] = 123123123;
 
         $operation = m::mock('PHPIMS\\Operation');
@@ -89,9 +88,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
      */
     public function testExecWithTimestampTooFarInTheFuture() {
         $_GET['signature'] = 'some signature';
-        $_GET['publicKey'] = 'some key';
-        // Set timestamp 5 minutes and 5 seconds in the future
-        $_GET['timestamp'] = gmdate('Y-m-d\TH:i\Z', time() + 305);
+        $_GET['timestamp'] = gmdate('Y-m-d\TH:i\Z', time() + 300);
 
         $operation = m::mock('PHPIMS\\Operation');
 
@@ -105,9 +102,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
      */
     public function testExecWithTimestampTooOld() {
         $_GET['signature'] = 'some signature';
-        $_GET['publicKey'] = 'some key';
-        // Set timestamp 5 minutes and 5 seconds in the past
-        $_GET['timestamp'] = gmdate('Y-m-d\TH:i\Z', time() - 305);
+        $_GET['timestamp'] = gmdate('Y-m-d\TH:i\Z', time() - 300);
 
         $operation = m::mock('PHPIMS\\Operation');
 
@@ -116,7 +111,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
 
     public function testExecWithCorrectSignature() {
         $publicKey = md5(microtime());
-        $privateKey = md5($publicKey);
+        $privateKey = md5(microtime());
 
         $this->signRequest($publicKey, $privateKey);
     }
@@ -128,7 +123,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
      */
     public function testExecWithIncorrectSignature() {
         $publicKey = md5(microtime());
-        $privateKey = md5($publicKey);
+        $privateKey = md5(microtime());
 
         $this->signRequest($publicKey, $privateKey, 'wrong signature');
     }
@@ -139,18 +134,14 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
         $resource = md5(microtime()) . '.png/meta';
         $timestamp = gmdate('Y-m-d\TH:i\Z');
 
-        $config = array(
-            'publicKey'  => $publicKey,
-            'privateKey' => $privateKey,
-        );
-
         // The data used to create the hash
         $data = $method . $resource . $publicKey . $timestamp;
 
         $operation = m::mock('PHPIMS\\Operation');
         $operation->shouldReceive('getMethod')->once()->andReturn($method);
-        $operation->shouldReceive('getConfig')->once()->andReturn($config);
         $operation->shouldReceive('getResource')->once()->andReturn($resource);
+        $operation->shouldReceive('getPublicKey')->once()->andReturn($publicKey);
+        $operation->shouldReceive('getPrivateKey')->once()->andReturn($privateKey);
 
         if ($signature === null) {
             // No signature given. Create the correct signature
@@ -158,7 +149,6 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
         }
 
         $_GET['signature'] = $signature;
-        $_GET['publicKey'] = $publicKey;
         $_GET['timestamp'] = $timestamp;
 
         $this->plugin->exec($operation);

@@ -58,7 +58,7 @@ class MongoDB implements DriverInterface {
     /**
      * The collection instance used by the driver
      *
-     * @var MongoCollection
+     * @var \MongoCollection
      */
     private $collection = null;
 
@@ -76,7 +76,7 @@ class MongoDB implements DriverInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param MongoCollection $collection MongoDB collection instance
+     * @param \MongoCollection $collection MongoDB collection instance
      */
     public function __construct(array $params = null, \MongoCollection $collection = null) {
         if ($params !== null) {
@@ -97,10 +97,11 @@ class MongoDB implements DriverInterface {
     /**
      * @see PHPIMS\Database\DriverInterface::insertImage()
      */
-    public function insertImage($imageIdentifier, Image $image) {
+    public function insertImage($publicKey, $imageIdentifier, Image $image) {
         $data = array(
             'name'            => $image->getFilename(),
             'size'            => $image->getFilesize(),
+            'publicKey'       => $publicKey,
             'imageIdentifier' => $imageIdentifier,
             'mime'            => $image->getMimeType(),
             'metadata'        => array(),
@@ -111,7 +112,7 @@ class MongoDB implements DriverInterface {
 
         try {
             // See if the image already exists
-            $row = $this->collection->findOne(array('imageIdentifier' => $data['imageIdentifier']));
+            $row = $this->collection->findOne(array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier));
 
             if ($row) {
                 throw new DatabaseException('Image already exists', 400);
@@ -128,9 +129,12 @@ class MongoDB implements DriverInterface {
     /**
      * @see PHPIMS\Database\DriverInterface::deleteImage()
      */
-    public function deleteImage($imageIdentifier) {
+    public function deleteImage($publicKey, $imageIdentifier) {
         try {
-            $this->collection->remove(array('imageIdentifier' => $imageIdentifier), array('justOne' => true, 'safe' => true));
+            $this->collection->remove(
+                array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
+                array('justOne' => true, 'safe' => true)
+            );
         } catch (\MongoException $e) {
             throw new DatabaseException('Unable to delete image data', 500, $e);
         }
@@ -141,17 +145,12 @@ class MongoDB implements DriverInterface {
     /**
      * @see PHPIMS\Database\DriverInterface::editMetadata()
      */
-    public function updateMetadata($imageIdentifier, array $metadata) {
+    public function updateMetadata($publicKey, $imageIdentifier, array $metadata) {
         try {
             $this->collection->update(
-                array('imageIdentifier' => $imageIdentifier),
-                array('$set' => array(
-                    'metadata' => $metadata,
-                )),
-                array(
-                    'safe' => true,
-                    'multiple' => false,
-                )
+                array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
+                array('$set' => array('metadata' => $metadata)),
+                array('safe' => true, 'multiple' => false)
             );
         } catch (\MongoException $e) {
             throw new DatabaseException('Unable to edit image data', 500, $e);
@@ -163,9 +162,9 @@ class MongoDB implements DriverInterface {
     /**
      * @see PHPIMS\Database\DriverInterface::getMetadata()
      */
-    public function getMetadata($imageIdentifier) {
+    public function getMetadata($publicKey, $imageIdentifier) {
         try {
-            $data = $this->collection->findOne(array('imageIdentifier' => $imageIdentifier));
+            $data = $this->collection->findOne(array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier));
         } catch (\MongoException $e) {
             throw new DatabaseException('Unable to fetch image metadata', 500, $e);
         }
@@ -176,9 +175,9 @@ class MongoDB implements DriverInterface {
     /**
      * @see PHPIMS\Database\DriverInterface::deleteMetadata()
      */
-    public function deleteMetadata($imageIdentifier) {
+    public function deleteMetadata($publicKey, $imageIdentifier) {
         try {
-            $this->updateMetadata($imageIdentifier, array());
+            $this->updateMetadata($publicKey, $imageIdentifier, array());
         } catch (DatabaseException $e) {
             throw new DatabaseException('Unable to remove metadata', 500, $e);
         }
@@ -189,12 +188,14 @@ class MongoDB implements DriverInterface {
     /**
      * @see PHPIMS\Database\DriverInterface::getImages()
      */
-    public function getImages(Query $query) {
+    public function getImages($publicKey, Query $query) {
         // Initialize return value
         $images = array();
 
         // Query data
-        $queryData = array();
+        $queryData = array(
+            'publicKey' => $publicKey,
+        );
 
         $from = $query->from();
         $to = $query->to();
@@ -220,7 +221,7 @@ class MongoDB implements DriverInterface {
         }
 
         // Fields to fetch
-        $fields = array('added', 'imageIdentifier', 'mime', 'name', 'size', 'width', 'height');
+        $fields = array('added', 'publicKey', 'imageIdentifier', 'mime', 'name', 'size', 'width', 'height');
 
         if ($query->returnMetadata()) {
             $fields[] = 'metadata';
@@ -251,10 +252,12 @@ class MongoDB implements DriverInterface {
     /**
      * @see PHPIMS\Database\DriverInterface::load()
      */
-    public function load($imageIdentifier, Image $image) {
+    public function load($publicKey, $imageIdentifier, Image $image) {
         try {
-            $fields = array('name', 'size', 'width', 'height', 'mime');
-            $data = $this->collection->findOne(array('imageIdentifier' => $imageIdentifier), $fields);
+            $data = $this->collection->findOne(
+                array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
+                array('name', 'size', 'width', 'height', 'mime')
+            );
         } catch (\MongoException $e) {
             throw new DatabaseException('Unable to fetch image data', 500, $e);
         }

@@ -58,35 +58,35 @@ abstract class Operation {
      *
      * @var string
      */
-    private $resource = null;
+    private $resource;
 
     /**
      * The current image identifier
      *
      * @param string
      */
-    private $imageIdentifier = null;
+    private $imageIdentifier;
 
     /**
      * HTTP method
      *
      * @var string
      */
-    private $method = null;
+    private $method;
 
     /**
      * The database driver
      *
      * @var PHPIMS\Database\DriverInterface
      */
-    private $database = null;
+    private $database;
 
     /**
      * The storage driver
      *
      * @var PHPIMS\Storage\DriverInterface
      */
-    private $storage = null;
+    private $storage;
 
     /**
      * Image instance
@@ -96,7 +96,7 @@ abstract class Operation {
      *
      * @var PHPIMS\Image
      */
-    private $image = null;
+    private $image;
 
     /**
      * Response instance
@@ -106,7 +106,7 @@ abstract class Operation {
      *
      * @var PHPIMS\Image
      */
-    private $response = null;
+    private $response;
 
     /**
      * Array of plugins
@@ -121,6 +121,20 @@ abstract class Operation {
      * @var array
      */
     private $config = array();
+
+    /**
+     * Current public key if it exists
+     *
+     * @var string
+     */
+    private $publicKey;
+
+    /**
+     * Current private key if it exists
+     *
+     * @var string
+     */
+    private $privateKey;
 
     /**
      * Class constructor
@@ -339,6 +353,48 @@ abstract class Operation {
     }
 
     /**
+     * Get the public key
+     *
+     * @return string
+     */
+    public function getPublicKey() {
+        return $this->publicKey;
+    }
+
+    /**
+     * Set the public key
+     *
+     * @param string $key
+     * @return PHPIMS\Operation
+     */
+    public function setPublicKey($key) {
+        $this->publicKey = $key;
+
+        return $this;
+    }
+
+    /**
+     * Get the private key
+     *
+     * @return string
+     */
+    public function getPrivateKey() {
+        return $this->privateKey;
+    }
+
+    /**
+     * Set the private key
+     *
+     * @param string $key
+     * @return PHPIMS\Operation
+     */
+    public function setPrivateKey($key) {
+        $this->privateKey = $key;
+
+        return $this;
+    }
+
+    /**
      * Run the operation
      *
      * This method will trigger registered plugins along with the main operation.
@@ -387,13 +443,10 @@ abstract class Operation {
      * @param string $className The name of the operation class to instantiate
      * @param PHPIMS\Database\DriverInterface $database Database driver
      * @param PHPIMS\Storage\DriverInterface $storage Storage driver
-     * @param string $resource The accessed resource
-     * @param string $method The HTTP method used
-     * @param string $imageIdentifier Optional Image identifier
      * @return PHPIMS\OperationInterface
      * @throws PHPIMS\Operation\Exception
      */
-    static public function factory($className, Database $database, Storage $storage, $resource, $method, $imageIdentifier = null) {
+    static public function factory($className, Database $database, Storage $storage) {
         switch ($className) {
             case 'PHPIMS\\Operation\\AddImage':
             case 'PHPIMS\\Operation\\DeleteImage':
@@ -403,14 +456,7 @@ abstract class Operation {
             case 'PHPIMS\\Operation\\GetImages':
             case 'PHPIMS\\Operation\\GetImageMetadata':
             case 'PHPIMS\\Operation\\HeadImage':
-                $operation = new $className($database, $storage);
-                $operation->setResource($resource)
-                          ->setImageIdentifier($imageIdentifier)
-                          ->setMethod($method)
-                          ->setImage(new Image())
-                          ->setResponse(new Response());
-
-                return $operation;
+                return new $className($database, $storage);
             default:
                 throw new OperationException('Invalid operation', 500);
         }

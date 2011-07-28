@@ -74,13 +74,13 @@ class Filesystem implements DriverInterface {
     /**
      * @see PHPIMS\Storage\DriverInterface::store()
      */
-    public function store($imageIdentifier, $path) {
+    public function store($publicKey, $imageIdentifier, $path) {
         if (!is_writable($this->params['dataDir'])) {
             throw new StorageException('Could not store image', 500);
         }
 
         // Create path for the image
-        $imageDir = $this->getImagePath($imageIdentifier, false);
+        $imageDir = $this->getImagePath($publicKey, $imageIdentifier, false);
         $oldUmask = umask(0);
 
         if (!is_dir($imageDir)) {
@@ -97,8 +97,8 @@ class Filesystem implements DriverInterface {
     /**
      * @see PHPIMS\Storage\DriverInterface::delete()
      */
-    public function delete($imageIdentifier) {
-        $path = $this->getImagePath($imageIdentifier);
+    public function delete($publicKey, $imageIdentifier) {
+        $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         if (!is_file($path)) {
             throw new StorageException('File not found', 404);
@@ -110,8 +110,8 @@ class Filesystem implements DriverInterface {
     /**
      * @see PHPIMS\Storage\DriverInterface::load()
      */
-    public function load($imageIdentifier, Image $image) {
-        $path = $this->getImagePath($imageIdentifier);
+    public function load($publicKey, $imageIdentifier, Image $image) {
+        $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         if (!is_file($path)) {
             throw new StorageException('File not found', 404);
@@ -125,19 +125,28 @@ class Filesystem implements DriverInterface {
     /**
      * Get the path to an image
      *
+     * @param string $publicKey The key
      * @param string $imageIdentifier Image identifier
      * @param boolean $includeFilename Wether or not to include the last part of the path (the
      *                                 filename itself)
      * @return string
      */
-    public function getImagePath($imageIdentifier, $includeFilename = true) {
-        $imagePath = $this->params['dataDir'] . '/' . $imageIdentifier[0] . '/'
-                   . $imageIdentifier[1] . '/' . $imageIdentifier[2];
+    public function getImagePath($publicKey, $imageIdentifier, $includeFilename = true) {
+        $parts = array(
+            $this->params['dataDir'],
+            $publicKey[0],
+            $publicKey[1],
+            $publicKey[2],
+            $publicKey,
+            $imageIdentifier[0],
+            $imageIdentifier[1],
+            $imageIdentifier[2],
+        );
 
         if ($includeFilename) {
-            $imagePath .= '/' . $imageIdentifier;
+            $parts[] = $imageIdentifier;
         }
 
-        return $imagePath;
+        return implode(DIRECTORY_SEPARATOR, $parts);
     }
 }

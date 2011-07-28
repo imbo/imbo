@@ -56,7 +56,6 @@ class AddImageTest extends OperationTests {
             'tmp_name' => '/tmp/foobar',
         );
 
-        $imageIdentifier = md5(microtime()) . '.png';
         $metadata = array(
             'foo' => 'bar',
             'bar' => array(
@@ -67,15 +66,14 @@ class AddImageTest extends OperationTests {
         $image->shouldReceive('getMetadata')->once()->andReturn($metadata);
         $response = m::mock('PHPIMS\\Server\\Response');
         $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
-        $response->shouldReceive('setBody')->once()->with(array('imageIdentifier' => $imageIdentifier))->andReturn($response);
+        $response->shouldReceive('setBody')->once()->with(array('imageIdentifier' => $this->imageIdentifier))->andReturn($response);
 
-        $this->database->shouldReceive('insertImage')->once()->with($imageIdentifier, $image);
-        $this->database->shouldReceive('updateMetadata')->once()->with($imageIdentifier, $metadata);
+        $this->database->shouldReceive('insertImage')->once()->with($this->publicKey, $this->imageIdentifier, $image);
+        $this->database->shouldReceive('updateMetadata')->once()->with($this->publicKey, $this->imageIdentifier, $metadata);
 
-        $this->storage->shouldReceive('store')->once()->with($imageIdentifier, $_FILES['file']['tmp_name']);
+        $this->storage->shouldReceive('store')->once()->with($this->publicKey, $this->imageIdentifier, $_FILES['file']['tmp_name']);
 
         $this->operation->setResponse($response)
-                        ->setImageIdentifier($imageIdentifier)
                         ->setImage($image)
                         ->exec();
     }

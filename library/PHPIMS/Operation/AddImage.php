@@ -52,13 +52,14 @@ class AddImage extends Operation implements OperationInterface {
      * @see PHPIMS\OperationInterface::exec()
      */
     public function exec() {
+        $publicKey = $this->getPublicKey();
         $imageIdentifier = $this->getImageIdentifier();
         $database = $this->getDatabase();
         $image = $this->getImage();
 
-        $database->insertImage($imageIdentifier, $image);
-        $database->updateMetadata($imageIdentifier, $image->getMetadata());
-        $this->getStorage()->store($imageIdentifier, $_FILES['file']['tmp_name']);
+        $database->insertImage($publicKey, $imageIdentifier, $image);
+        $database->updateMetadata($publicKey, $imageIdentifier, $image->getMetadata());
+        $this->getStorage()->store($publicKey, $imageIdentifier, $_FILES['file']['tmp_name']);
         $this->getResponse()->setCode(201)
                             ->setBody(array(
                                 'imageIdentifier' => $imageIdentifier,
