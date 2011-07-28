@@ -8,7 +8,7 @@
     <mkdir dir="${basedir}/build/logs" />
     <mkdir dir="${basedir}/build/docs" />
     <mkdir dir="${basedir}/build/code-browser" />
-    <copy file="${basedir}/tests/PHPIMS/Client/Driver/_files/driver.php" tofile="${client_tests_path}" />
+    <copy file="${basedir}/tests/PHPIMS/Client/Driver/_files/driver.php" tofile="${client_tests_path}" overwrite="true" />
   </target>
 
   <target name="phpab">
