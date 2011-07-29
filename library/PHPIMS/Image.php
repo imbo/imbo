@@ -31,8 +31,8 @@
 
 namespace PHPIMS;
 
-use \Imagine\Imagick\Imagine as Imagine;
-use \Imagine\ImageInterface as ImagineImage;
+use Imagine\Imagick\Imagine as Imagine;
+use Imagine\Image\ImageInterface as ImagineImage;
 
 /**
  * Class that represents a single image

@@ -48,9 +48,9 @@ class ThumbnailTest extends \PHPUnit_Framework_TestCase {
         $height = 90;
         $fit = 'outbound';
 
-        $thumbnail = m::mock('Imagine\\ImageInterface');
+        $thumbnail = m::mock('Imagine\Image\ImageInterface');
 
-        $imagineImage = m::mock('Imagine\\ImageInterface');
+        $imagineImage = m::mock('Imagine\ImageInterface');
         $imagineImage->shouldReceive('thumbnail')->once()->with(m::on(function (\Imagine\Image\Box $box) use($width, $height) {
             return $width == $box->getWidth() && $height == $box->getHeight();
         }), $fit)->andReturn($thumbnail);
@@ -64,7 +64,7 @@ class ThumbnailTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testApplyToImageUrl() {
-        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url = m::mock('PHPIMS\Client\ImageUrl');
         $url->shouldReceive('append')->with(m::on(function ($string) {
             return (preg_match('/^thumbnail:/', $string) && strstr($string, 'width=100') &&
                     strstr($string, 'height=200') && strstr($string, 'fit=inset'));
