@@ -52,6 +52,13 @@ class Image {
     private $filename;
 
     /**
+     * Local path
+     *
+     * @var string
+     */
+    private $path;
+
+    /**
      * Size of the file
      *
      * @var int
@@ -124,6 +131,27 @@ class Image {
      */
     public function setFilename($filename) {
         $this->filename = $filename;
+
+        return $this;
+    }
+
+    /**
+     * Get the path
+     *
+     * @return string
+     */
+    public function getPath() {
+        return $this->path;
+    }
+
+    /**
+     * Set the path
+     *
+     * @param string $path The path to set
+     * @return PHPIMS\Image
+     */
+    public function setPath($path) {
+        $this->path = $path;
 
         return $this;
     }
