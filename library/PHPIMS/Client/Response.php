@@ -48,21 +48,21 @@ class Response {
      *
      * @var array
      */
-    protected $headers = array();
+    private $headers = array();
 
     /**
      * Response body
      *
      * @var string
      */
-    protected $body = null;
+    private $body = null;
 
     /**
      * HTTP status code
      *
      * @var int
      */
-    protected $statusCode = null;
+    private $statusCode;
 
     /**
      * Get the headers
