@@ -64,7 +64,6 @@ class GetImage extends Operation implements OperationInterface {
         $response->setCustomHeaders(array(
             'OrignalImageWidth'    => $image->getWidth(),
             'OrignalImageHeight'   => $image->getHeight(),
-            'OrignalImageFilename' => $image->getFilename(),
             'OrignalImageSize'     => $image->getFilesize(),
         ));
 

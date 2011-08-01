@@ -63,7 +63,6 @@ class HeadImage extends Operation implements OperationInterface {
                  ->setCustomHeaders(array(
                     'OrignalImageWidth'    => $image->getWidth(),
                     'OrignalImageHeight'   => $image->getHeight(),
-                    'OrignalImageFilename' => $image->getFilename(),
                     'OrignalImageSize'     => $image->getFilesize(),
                 ));
     }

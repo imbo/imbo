@@ -99,7 +99,6 @@ class MongoDB implements DriverInterface {
      */
     public function insertImage($publicKey, $imageIdentifier, Image $image) {
         $data = array(
-            'name'            => $image->getFilename(),
             'size'            => $image->getFilesize(),
             'publicKey'       => $publicKey,
             'imageIdentifier' => $imageIdentifier,
@@ -262,8 +261,7 @@ class MongoDB implements DriverInterface {
             throw new DatabaseException('Unable to fetch image data', 500, $e);
         }
 
-        $image->setFilename($data['name'])
-              ->setWidth($data['width'])
+        $image->setWidth($data['width'])
               ->setHeight($data['height'])
               ->setMimeType($data['mime']);
 

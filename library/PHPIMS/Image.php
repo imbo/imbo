@@ -45,13 +45,6 @@ use Imagine\Image\ImageInterface as ImagineImage;
  */
 class Image {
     /**
-     * Original filename
-     *
-     * @var string
-     */
-    private $filename;
-
-    /**
      * Size of the file
      *
      * @var int
@@ -106,27 +99,6 @@ class Image {
      * @var \Imagine\ImageInterface
      */
     private $imagineImage;
-
-    /**
-     * Get the filename
-     *
-     * @return string
-     */
-    public function getFilename() {
-        return $this->filename;
-    }
-
-    /**
-     * Set the filename
-     *
-     * @param string $filename The original name of the image
-     * @return PHPIMS\Image
-     */
-    public function setFilename($filename) {
-        $this->filename = $filename;
-
-        return $this;
-    }
 
     /**
      * Get the size in bytes

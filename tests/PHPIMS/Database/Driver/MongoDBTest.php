@@ -354,7 +354,6 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         );
 
         $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('setFilename')->once()->with($data['name'])->andReturn($image);
         $image->shouldReceive('setFilesize')->once()->with($data['size'])->andReturn($image);
         $image->shouldReceive('setWidth')->once()->with($data['width'])->andReturn($image);
         $image->shouldReceive('setHeight')->once()->with($data['height'])->andReturn($image);
