@@ -8,7 +8,7 @@ PHPIMS requires [PHP-5.3](http://php.net/), the [Imagine](https://github.com/ava
 Since this is a work in progress there is no automatic installation. Simply clone the repository or make your own fork. Automatic installation using [PEAR](http://pear.php.net/) will be provided later.
 
 ## REST API
-PHPIMS uses a REST API to manage the images. Each image will be identified by a public key and an MD5 sum of the file itself and the original file extension, that will be referred to as &lt;image&gt; for the remainder of this document. Every request starts with the public key of a user.
+PHPIMS uses a REST API to manage the images. Each image will be identified by a public key and an MD5 sum of the file itself and the original file extension. The latter will be referred to as &lt;image&gt; for the remainder of this document.
 
 ### GET /&lt;publicKey&gt;/&lt;image&gt;
 
@@ -32,9 +32,9 @@ Example:
 
 * `GET /<publicKey>/images?page=1&num=30&metadata=1`
 
-### POST /&lt;publicKey&gt;/&lt;image&gt;
+### PUT /&lt;publicKey&gt;/&lt;image&gt;
 
-Place a new image on the server along with meta data.
+Place a new image on the server.
 
 ### POST /&lt;publicKey&gt;/&lt;image&gt;/meta
 
@@ -42,11 +42,11 @@ Edit the meta data attached to the image identified by &lt;image&gt;.
 
 ### DELETE /&lt;publicKey&gt;/&lt;image&gt;
 
-Delete the image identified by &lt;image&gt; along with all meta data. This action is not reversible.
+Delete the image identified by &lt;image&gt; along with all meta data.
 
 ### DELETE /&lt;publicKey&gt;/&lt;image&gt;/meta
 
-Delete the meta data attached to the image identified by &lt;image&gt;. The image is kept on the server. This action is not reversible.
+Delete the meta data attached to the image identified by &lt;image&gt;. The image is kept on the server.
 
 ### HEAD /&lt;publicKey&gt;/&lt;image&gt;
 
@@ -57,10 +57,10 @@ Fetch extra header information about a single image identified by &lt;image&gt;.
 Fetches extra header information about the meta data attached to the image identified by &lt;image&gt;.
 
 ## Authentication
-All write operations (POST and DELETE) requires authentication using an Hash-based Message Authentication Code (HMAC). The data PHPIMS uses when generating this code is:
+All write operations (PUT, POST and DELETE) requires authentication using an Hash-based Message Authentication Code (HMAC). The data PHPIMS uses when generating this code is:
 
-* HTTP method (POST or DELETE)
-* Resource identifier (for instance &lt;image&gt; if your PHPIMS installation answers directly in the document root)
+* HTTP method (PUT, POST or DELETE)
+* Resource identifier (for instance `<publicKey>/<image>` if your PHPIMS installation answers directly in the document root)
 * Public key (random MD5 hash that exists both on the server and the client)
 * GMT timestamp (YYYY-MM-DDTHH:MMZ, for instance: 2011-02-01T14:33Z)
 
