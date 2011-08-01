@@ -52,13 +52,6 @@ class Image {
     private $filename;
 
     /**
-     * Local path
-     *
-     * @var string
-     */
-    private $path;
-
-    /**
      * Size of the file
      *
      * @var int
@@ -136,27 +129,6 @@ class Image {
     }
 
     /**
-     * Get the path
-     *
-     * @return string
-     */
-    public function getPath() {
-        return $this->path;
-    }
-
-    /**
-     * Set the path
-     *
-     * @param string $path The path to set
-     * @return PHPIMS\Image
-     */
-    public function setPath($path) {
-        $this->path = $path;
-
-        return $this;
-    }
-
-    /**
      * Get the size in bytes
      *
      * @return int
@@ -171,7 +143,7 @@ class Image {
      * @param int $filesize The size to set
      * @return PHPIMS\Image
      */
-    public function setFilesize($filesize) {
+    private function setFilesize($filesize) {
         $this->filesize = $filesize;
 
         return $this;
@@ -236,6 +208,7 @@ class Image {
      */
     public function setBlob($blob) {
         $this->blob = $blob;
+        $this->setFilesize(strlen($blob));
 
         return $this;
     }
