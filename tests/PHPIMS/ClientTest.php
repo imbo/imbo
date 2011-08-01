@@ -99,7 +99,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         $this->publicKey = md5(microtime());
         $this->privateKey = md5(microtime());
         $this->imageIdentifier = md5(microtime()) . '.png';
-        $this->driver = m::mock('PHPIMS\\Client\\DriverInterface');
+        $this->driver = m::mock('PHPIMS\Client\DriverInterface');
 
         $this->client = new Client($this->serverUrl, $this->publicKey, $this->privateKey, $this->driver);
     }
@@ -111,36 +111,26 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         $this->client = null;
     }
 
-    /**
-     * @expectedException PHPIMS\Client\Exception
-     * @expectedExceptionMessage File does not exist: foobar
-     */
-    public function testGenerateImageIdentifierForFileThatDoesNotExist() {
-        $this->client->getImageIdentifier('foobar');
-    }
-
-    public function testGenerateImageIdentifier() {
-        $hash = $this->client->getImageIdentifier(__DIR__ . '/_files/image.png');
-        $this->assertSame('929db9c5fc3099f7576f5655207eba47.png', $hash);
-    }
-
     public function testAddImage() {
-        $image    = __DIR__ . '/_files/image.png';
+        $imagePath = __DIR__ . '/_files/image.png';
         $metadata = array(
             'foo' => 'bar',
             'bar' => 'foo',
         );
-        $md5 = md5_file($image);
 
-        $response = m::mock('PHPIMS\\Client\\Response');
-        $this->driver->shouldReceive('addImage')->once()->with($image, $this->signedUrlPattern, $metadata)->andReturn($response);
-        $result = $this->client->addImage($image, $metadata);
+        $response = m::mock('PHPIMS\Client\Response');
+        $response->shouldReceive('isSuccess')->once()->andReturn(true);
+
+        $this->driver->shouldReceive('put')->once()->with($this->signedUrlPattern, $imagePath)->andReturn($response);
+        $this->driver->shouldReceive('post')->once()->with($this->signedUrlPattern, $metadata)->andReturn($response);
+
+        $result = $this->client->addImage($imagePath, $metadata);
 
         $this->assertSame($result, $response);
     }
 
     public function testDeleteImage() {
-        $response = m::mock('PHPIMS\\Client\\Response');
+        $response = m::mock('PHPIMS\Client\Response');
         $this->driver->shouldReceive('delete')->once()->with($this->signedUrlPattern)->andReturn($response);
 
         $result = $this->client->deleteImage($this->imageIdentifier);
@@ -154,7 +144,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
             'bar' => 'foo',
         );
 
-        $response = m::mock('PHPIMS\\Client\\Response');
+        $response = m::mock('PHPIMS\Client\Response');
         $this->driver->shouldReceive('post')->once()->with($this->signedUrlPattern, $data)->andReturn($response);
         $result = $this->client->editMetaData($this->imageIdentifier, $data);
 
@@ -162,7 +152,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testDeleteMetaData() {
-        $response = m::mock('PHPIMS\\Client\\Response');
+        $response = m::mock('PHPIMS\Client\Response');
         $this->driver->shouldReceive('delete')->once()->with($this->signedUrlPattern)->andReturn($response);
         $result = $this->client->deleteMetaData($this->imageIdentifier);
 
@@ -170,27 +160,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetMetaData() {
-        $response = m::mock('PHPIMS\\Client\\Response');
+        $response = m::mock('PHPIMS\Client\Response');
         $this->driver->shouldReceive('get')->once()->with($this->urlPattern)->andReturn($response);
         $result = $this->client->getMetadata($this->imageIdentifier);
 
         $this->assertSame($result, $response);
-    }
-
-    public function testGetImageUrl() {
-        $url = $this->client->getImageUrl($this->imageIdentifier);
-        $this->assertInstanceOf('PHPIMS\\Client\\ImageUrl', $url);
-        $this->assertSame($this->serverUrl . '/' . $this->publicKey . '/' . $this->imageIdentifier, (string) $url);
-    }
-
-    public function testGetImageUrlWithTransformations() {
-        $baseUrl = $this->serverUrl . '/' . $this->publicKey . '/' . $this->imageIdentifier;
-        $completeUrl = $baseUrl;
-        $chain = m::mock('PHPIMS\\Image\\TransformationChain');
-        $chain->shouldReceive('applyToImageUrl')->once()->with(m::type('PHPIMS\\Client\\ImageUrl'));
-
-        $url = $this->client->getImageUrl($this->imageIdentifier, $chain);
-        $this->assertInstanceOf('PHPIMS\\Client\\ImageUrl', $url);
-        $this->assertSame($completeUrl, (string) $url);
     }
 }

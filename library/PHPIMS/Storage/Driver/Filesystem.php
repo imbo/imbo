@@ -74,7 +74,7 @@ class Filesystem implements DriverInterface {
     /**
      * @see PHPIMS\Storage\DriverInterface::store()
      */
-    public function store($publicKey, $imageIdentifier, $path) {
+    public function store($publicKey, $imageIdentifier, Image $image) {
         if (!is_writable($this->params['dataDir'])) {
             throw new StorageException('Could not store image', 500);
         }
@@ -91,7 +91,7 @@ class Filesystem implements DriverInterface {
 
         $imagePath = $imageDir . '/' . $imageIdentifier;
 
-        return move_uploaded_file($path, $imagePath);
+        return file_put_contents($imagePath, $image->getBlob());
     }
 
     /**

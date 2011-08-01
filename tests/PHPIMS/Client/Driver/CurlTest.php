@@ -109,18 +109,6 @@ class CurlTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame('DELETE', $result['method']);
     }
 
-    public function testAddImage() {
-        $data = array(
-            'foo' => 'bar',
-            'bar' => 'foo',
-        );
-        $response = $this->driver->addImage(__FILE__, $this->testUrl, $data);
-        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
-        $result = unserialize($response->getBody());
-        $this->assertSame('POST', $result['method']);
-        $this->assertArrayHasKey('files', $result);
-    }
-
     /**
      * @expectedException PHPIMS\Client\Driver\Exception
      */

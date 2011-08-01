@@ -54,6 +54,7 @@ class FrontController {
      */
     const GET    = 'GET';
     const POST   = 'POST';
+    const PUT    = 'PUT';
     const HEAD   = 'HEAD';
     const DELETE = 'DELETE';
     const BREW   = 'BREW';
@@ -85,6 +86,7 @@ class FrontController {
         switch ($method) {
             case self::GET:
             case self::POST:
+            case self::PUT:
             case self::HEAD:
             case self::DELETE:
             case self::BREW:
@@ -108,30 +110,28 @@ class FrontController {
         $operation = null;
 
         if ($resource === 'images' && $method === self::GET) {
-            $operation = 'PHPIMS\\Operation\\GetImages';
+            $operation = 'PHPIMS\Operation\GetImages';
         } else if ($method === self::GET && $imageIdentifier) {
             if ($extra === 'meta') {
-                $operation = 'PHPIMS\\Operation\\GetImageMetadata';
+                $operation = 'PHPIMS\Operation\GetImageMetadata';
             } else {
-                $operation = 'PHPIMS\\Operation\\GetImage';
+                $operation = 'PHPIMS\Operation\GetImage';
             }
-        } else if ($method === self::POST && $imageIdentifier) {
-            if ($extra === 'meta') {
-                $operation = 'PHPIMS\\Operation\\EditImageMetadata';
-            } else {
-                $operation = 'PHPIMS\\Operation\\AddImage';
-            }
+        } else if ($method === self::POST && $imageIdentifier && $extra === 'meta') {
+            $operation = 'PHPIMS\Operation\EditImageMetadata';
+        } else if ($method === self::PUT && $imageIdentifier) {
+            $operation = 'PHPIMS\Operation\AddImage';
         } else if ($method === self::DELETE && $imageIdentifier) {
             if ($extra === 'meta') {
-                $operation = 'PHPIMS\\Operation\\DeleteImageMetadata';
+                $operation = 'PHPIMS\Operation\DeleteImageMetadata';
             } else {
-                $operation = 'PHPIMS\\Operation\\DeleteImage';
+                $operation = 'PHPIMS\Operation\DeleteImage';
             }
         } else if ($method === self::HEAD && $imageIdentifier) {
             if ($extra === 'meta') {
                 // Not yet implemented
             } else {
-                $operation = 'PHPIMS\\Operation\\HeadImage';
+                $operation = 'PHPIMS\Operation\HeadImage';
             }
         } else if ($method === self::BREW) {
             throw new Exception('I\'m a teapot!', 418);

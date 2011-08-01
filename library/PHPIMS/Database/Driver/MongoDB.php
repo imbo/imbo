@@ -263,7 +263,6 @@ class MongoDB implements DriverInterface {
         }
 
         $image->setFilename($data['name'])
-              ->setFilesize($data['size'])
               ->setWidth($data['width'])
               ->setHeight($data['height'])
               ->setMimeType($data['mime']);

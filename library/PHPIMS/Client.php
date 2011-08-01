@@ -109,7 +109,7 @@ class Client {
      *                                   "<md5>.png/meta"
      * @return string
      */
-    public function getResourceUrl($resourceIdentifier) {
+    private function getResourceUrl($resourceIdentifier) {
         return $this->serverUrl . '/' . $this->publicKey . '/' . $resourceIdentifier;
     }
 
@@ -120,7 +120,7 @@ class Client {
      * @return string
      * @throws PHPIMS\Client\Exception
      */
-    public function getImageIdentifier($path) {
+    private function getImageIdentifier($path) {
         if (!is_file($path)) {
             throw new ClientException('File does not exist: ' . $path);
         }
@@ -136,6 +136,9 @@ class Client {
     /**
      * Add a new image to the server
      *
+     * This method will first PUT the image on the server, and then POST the metadata if the PUT
+     * was successful.
+     *
      * @param string $path Path to the local image
      * @param array $metadata Metadata to attach to the image
      * @return PHPIMS\Client\Response
@@ -143,9 +146,16 @@ class Client {
     public function addImage($path, array $metadata = null) {
         $imageIdentifier = $this->getImageIdentifier($path);
 
-        $url = $this->getSignedResourceUrl('POST', $imageIdentifier);
+        $url = $this->getSignedResourceUrl(DriverInterface::PUT, $imageIdentifier);
 
-        return $this->driver->addImage($path, $url, $metadata);
+        // Add the image, and then POST metadata
+        $response = $this->driver->put($url, $path);
+
+        if ($response->isSuccess() && $metadata !== null) {
+            return $this->editMetadata($imageIdentifier, $metadata);
+        }
+
+        return $response;
     }
 
     /**
@@ -155,7 +165,7 @@ class Client {
      * @return PHPIMS\Client\Response
      */
     public function deleteImage($imageIdentifier) {
-        $url = $this->getSignedResourceUrl('DELETE', $imageIdentifier);
+        $url = $this->getSignedResourceUrl(DriverInterface::DELETE, $imageIdentifier);
 
         return $this->driver->delete($url);
     }
@@ -168,7 +178,7 @@ class Client {
      * @return PHPIMS\Client\Response
      */
     public function editMetadata($imageIdentifier, array $metadata) {
-        $url = $this->getSignedResourceUrl('POST', $imageIdentifier . '/meta');
+        $url = $this->getSignedResourceUrl(DriverInterface::POST, $imageIdentifier . '/meta');
 
         return $this->driver->post($url, $metadata);
     }
@@ -180,7 +190,7 @@ class Client {
      * @return PHPIMS\Client\Response
      */
     public function deleteMetadata($imageIdentifier) {
-        $url = $this->getSignedResourceUrl('DELETE', $imageIdentifier . '/meta');
+        $url = $this->getSignedResourceUrl(DriverInterface::DELETE, $imageIdentifier . '/meta');
 
         return $this->driver->delete($url);
     }
@@ -205,7 +215,7 @@ class Client {
      * @param string $timestamp GMT timestamp
      * @return string
      */
-    public function generateSignature($method, $resourceIdentifier, $timestamp) {
+    private function generateSignature($method, $resourceIdentifier, $timestamp) {
         $data = $method . $resourceIdentifier . $this->publicKey . $timestamp;
 
         // Generate binary hash key
@@ -224,7 +234,7 @@ class Client {
      * @param string $resourceIdentifier The resource identifier (for instance "<image>/meta")
      * @return string Returns a string with the necessary parts for authenticating
      */
-    public function getSignedResourceUrl($method, $resourceIdentifier) {
+    private function getSignedResourceUrl($method, $resourceIdentifier) {
         $timestamp = gmdate('Y-m-d\TH:i\Z');
         $signature = $this->generateSignature($method, $resourceIdentifier, $timestamp);
 
@@ -232,24 +242,5 @@ class Client {
              . sprintf('?signature=%s&timestamp=%s', rawurlencode($signature), rawurlencode($timestamp));
 
         return $url;
-    }
-
-    /**
-     * Get url to an image
-     *
-     * @param string $imageIdentifier Image identifier
-     * @param PHPIMS\Image\TransformationChain $transformationChain An optional chain of
-     *                                                              transformations
-     * @return PHPIMS\Client\ImageUrl
-     */
-    public function getImageUrl($imageIdentifier, TransformationChain $transformationChain = null) {
-        $url = $this->getResourceUrl($imageIdentifier);
-        $imageUrl = new ImageUrl($url);
-
-        if ($transformationChain !== null) {
-            $transformationChain->applyToImageUrl($imageUrl);
-        }
-
-        return $imageUrl;
     }
 }

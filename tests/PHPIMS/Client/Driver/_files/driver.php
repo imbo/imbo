@@ -16,8 +16,4 @@ switch ($data['method']) {
         break;
 }
 
-if (isset($_FILES)) {
-    $data['files'] = $_FILES;
-}
-
 print(serialize($data));

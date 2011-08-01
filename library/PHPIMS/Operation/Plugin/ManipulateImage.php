@@ -35,13 +35,7 @@ namespace PHPIMS\Operation\Plugin;
 use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 
-use PHPIMS\Image\Transformation\Border;
-use PHPIMS\Image\Transformation\Crop;
-use PHPIMS\Image\Transformation\FlipHorizontally;
-use PHPIMS\Image\Transformation\FlipVertically;
-use PHPIMS\Image\Transformation\Resize;
-use PHPIMS\Image\Transformation\Rotate;
-use PHPIMS\Image\Transformation\Thumbnail;
+use PHPIMS\Image\Transformation;
 
 /**
  * Manipulate image plugin
@@ -109,25 +103,25 @@ class ManipulateImage implements PluginInterface {
 
                 switch ($name) {
                     case 'border':
-                        $transformation = new Border($p('color'), $p('width'), $p('height'));
+                        $transformation = new Transformation\Border($p('color'), $p('width'), $p('height'));
                         break;
                     case 'crop':
-                        $transformation = new Crop($p('x'), $p('y'), $p('width'), $p('height'));
+                        $transformation = new Transformation\Crop($p('x'), $p('y'), $p('width'), $p('height'));
                         break;
                     case 'flipHorizontally':
-                        $transformation = new FlipHorizontally();
+                        $transformation = new Transformation\FlipHorizontally();
                         break;
                     case 'flipVertically':
-                        $transformation = new FlipVertically();
+                        $transformation = new Tranformation\FlipVertically();
                         break;
                     case 'resize':
-                        $transformation = new Resize($p('width'), $p('height'));
+                        $transformation = new Transformation\Resize($p('width'), $p('height'));
                         break;
                     case 'rotate':
-                        $transformation = new Rotate($p('angle'), $p('bg'));
+                        $transformation = new Transformation\Rotate($p('angle'), $p('bg'));
                         break;
                     case 'thumbnail':
-                        $transformation = new Thumbnail($p('width'), $p('height'), $p('fit'));
+                        $transformation = new Transformation\Thumbnail($p('width'), $p('height'), $p('fit'));
                         break;
                     default:
                         // Unsupported transformation. Continue to the next transformation

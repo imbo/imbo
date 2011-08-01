@@ -162,7 +162,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertInstanceOf('PHPIMS\\Operation\\GetImage', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier)));
         $this->assertInstanceOf('PHPIMS\\Operation\\HeadImage', $method->invokeArgs($this->controller, array($resource, 'HEAD', $imageIdentifier)));
-        $this->assertInstanceOf('PHPIMS\\Operation\\AddImage', $method->invokeArgs($this->controller, array($resource, 'POST', $imageIdentifier)));
+        $this->assertInstanceOf('PHPIMS\\Operation\\AddImage', $method->invokeArgs($this->controller, array($resource, 'PUT', $imageIdentifier)));
         $this->assertInstanceOf('PHPIMS\\Operation\\DeleteImage', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier)));
 
         $extra = 'meta';

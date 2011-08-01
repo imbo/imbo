@@ -54,12 +54,15 @@ class AddImage extends Operation implements OperationInterface {
     public function exec() {
         $publicKey = $this->getPublicKey();
         $imageIdentifier = $this->getImageIdentifier();
-        $database = $this->getDatabase();
         $image = $this->getImage();
 
-        $database->insertImage($publicKey, $imageIdentifier, $image);
-        $database->updateMetadata($publicKey, $imageIdentifier, $image->getMetadata());
-        $this->getStorage()->store($publicKey, $imageIdentifier, $_FILES['file']['tmp_name']);
+        // Insert image to the database
+        $this->getDatabase()->insertImage($publicKey, $imageIdentifier, $image);
+
+        // Store the image
+        $this->getStorage()->store($publicKey, $imageIdentifier, $image);
+
+        // Populate the response object
         $this->getResponse()->setCode(201)
                             ->setBody(array(
                                 'imageIdentifier' => $imageIdentifier,

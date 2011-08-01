@@ -32,8 +32,6 @@
 
 namespace PHPIMS\Operation\Plugin;
 
-use PHPIMS;
-
 use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 
@@ -64,13 +62,15 @@ class PrepareImage implements PluginInterface {
      * @see PHPIMS\Operation\PluginInterface::exec()
      */
     public function exec(Operation $operation) {
-        // Make sure there is an image attached
-        if (empty($_FILES)) {
+        // Fetch image data from input
+        $imageBlob = file_get_contents('php://input');
+
+        if (empty($imageBlob)) {
             throw new Exception('No image attached', 400);
         }
 
-        $imagePath = $_FILES['file']['tmp_name'];
-        $actualHash = md5_file($imagePath);
+        // Calculate hash
+        $actualHash = md5($imageBlob);
 
         // Get image identifier from request
         $identifierFromRequest = $operation->getImageIdentifier();
@@ -79,22 +79,8 @@ class PrepareImage implements PluginInterface {
             throw new Exception('Hash mismatch', 400);
         }
 
+        // Fetch the image object and store the blob
         $image = $operation->getImage();
-        $image->setFilename($_FILES['file']['name'])
-              ->setFilesize($_FILES['file']['size'])
-              ->setBlob(file_get_contents($imagePath));
-
-        if (!empty($_POST['metadata'])) {
-            $data = json_decode($_POST['metadata'], true);
-
-            if (is_array($data)) {
-                $image->setMetadata($data);
-            }
-        }
-
-        // Fetch width and height of image
-        $size = getimagesize($_FILES['file']['tmp_name']);
-        $image->setWidth($size[0])
-              ->setHeight($size[1]);
+        $image->setBlob($imageBlob);
     }
 }

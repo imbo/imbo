@@ -45,17 +45,38 @@ namespace PHPIMS\Client;
  * @link https://github.com/christeredvartsen/phpims
  */
 interface DriverInterface {
+    /**#@+
+     * HTTP methods
+     *
+     * @var string
+     */
+    const GET    = 'GET';
+    const POST   = 'POST';
+    const PUT    = 'PUT';
+    const HEAD   = 'HEAD';
+    const DELETE = 'DELETE';
+    /**#@-*/
+
     /**
      * POST some data to an URL
      *
      * @param string $url The URL to POST to
      * @param array $metadata The metadata to POST. This array will be json_encoded and sent to the
      *                        server as $_POST['metadata']
-     * @param string $filePath Optional path to a file we want to add to the POST
      * @return PHPIMS\Client\Response
      * @throws PHPIMS\Client\Driver\Exception
      */
-    public function post($url, array $metadata = null, $filePath = null);
+    function post($url, array $metadata = null);
+
+    /**
+     * PUT a file to an URL
+     *
+     * @param string $url The URL to PUT to
+     * @param string $filePath Path to the local file
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Driver\Exception
+     */
+    function put($url, $filePath);
 
     /**
      * Perform a GET to $url
@@ -64,7 +85,7 @@ interface DriverInterface {
      * @return PHPIMS\Client\Response
      * @throws PHPIMS\Client\Driver\Exception
      */
-    public function get($url);
+    function get($url);
 
     /**
      * Perform a HEAD to $url
@@ -73,7 +94,7 @@ interface DriverInterface {
      * @return PHPIMS\Client\Response
      * @throws PHPIMS\Client\Driver\Exception
      */
-    public function head($url);
+    function head($url);
 
     /**
      * Perform a DELETE request to $url
@@ -82,16 +103,5 @@ interface DriverInterface {
      * @return PHPIMS\Client\Response
      * @throws PHPIMS\Client\Driver\Exception
      */
-    public function delete($url);
-
-    /**
-     * Add an image
-     *
-     * @param string $path The path to the image to add
-     * @param string $url The URL to push data to
-     * @param array $metadata Metadata to add along with the image
-     * @return PHPIMS\Client\Response
-     * @throws PHPIMS\Client\Driver\Exception
-     */
-    public function addImage($path, $url, array $metadata = null);
+    function delete($url);
 }

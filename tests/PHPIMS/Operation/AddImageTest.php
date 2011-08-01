@@ -52,26 +52,14 @@ class AddImageTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $_FILES['file'] = array(
-            'tmp_name' => '/tmp/foobar',
-        );
-
-        $metadata = array(
-            'foo' => 'bar',
-            'bar' => array(
-                'foo' => 'bar',
-            ),
-        );
         $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getMetadata')->once()->andReturn($metadata);
+
         $response = m::mock('PHPIMS\\Server\\Response');
         $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
         $response->shouldReceive('setBody')->once()->with(array('imageIdentifier' => $this->imageIdentifier))->andReturn($response);
 
         $this->database->shouldReceive('insertImage')->once()->with($this->publicKey, $this->imageIdentifier, $image);
-        $this->database->shouldReceive('updateMetadata')->once()->with($this->publicKey, $this->imageIdentifier, $metadata);
-
-        $this->storage->shouldReceive('store')->once()->with($this->publicKey, $this->imageIdentifier, $_FILES['file']['tmp_name']);
+        $this->storage->shouldReceive('store')->once()->with($this->publicKey, $this->imageIdentifier, $image);
 
         $this->operation->setResponse($response)
                         ->setImage($image)

@@ -50,17 +50,17 @@ interface DriverInterface {
     /**
      * Store an image
      *
-     * This method will take a temporary path (usually from the $_FILES array) and place it
-     * somewhere suited for the actual storage driver. If an error occurs the driver should throw
-     * an exception based on PHPIMS\Storage\Exception.
+     * This method will receive the binary data of the image place it somewhere suited for the
+     * actual storage driver. If an error occurs the driver should throw an exception based on
+     * PHPIMS\Storage\Exception.
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
-     * @param string $path Path to the temporary file
+     * @param PHPIMS\Image $image The image to store
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Storage\Exception
      */
-    function store($publicKey, $imageIdentifier, $path);
+    function store($publicKey, $imageIdentifier, Image $image);
 
     /**
      * Delete an image
