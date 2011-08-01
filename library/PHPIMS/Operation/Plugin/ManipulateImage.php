@@ -112,7 +112,7 @@ class ManipulateImage implements PluginInterface {
                         $transformation = new Transformation\FlipHorizontally();
                         break;
                     case 'flipVertically':
-                        $transformation = new Tranformation\FlipVertically();
+                        $transformation = new Transformation\FlipVertically();
                         break;
                     case 'resize':
                         $transformation = new Transformation\Resize($p('width'), $p('height'));
