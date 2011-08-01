@@ -68,12 +68,6 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($name, $this->image->getFilename());
     }
 
-    public function testSetGetFilesize() {
-        $size = 9854;
-        $this->image->setFilesize($size);
-        $this->assertSame($size, $this->image->getFilesize());
-    }
-
     public function testSetGetMetadata() {
         $data = array(
             'foo' => 'bar',
