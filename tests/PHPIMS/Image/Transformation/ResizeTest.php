@@ -59,7 +59,7 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
         $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
         $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
         $image->shouldReceive('setWidth')->once()->with(200)->andReturn($image);
-        $image->shouldReceive('setHeight')->once()->with(139)->andReturn($image);
+        $image->shouldReceive('setHeight')->once()->with(m::type('int'))->andReturn($image);
 
         $transformation = new Resize(200);
         $transformation->applyToImage($image);
@@ -69,7 +69,7 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
         $image = m::mock('PHPIMS\Image');
         $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
         $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
-        $image->shouldReceive('setWidth')->once()->with(287)->andReturn($image);
+        $image->shouldReceive('setWidth')->once()->with(m::type('int'))->andReturn($image);
         $image->shouldReceive('setHeight')->once()->with(200)->andReturn($image);
 
         $transformation = new Resize(null, 200);

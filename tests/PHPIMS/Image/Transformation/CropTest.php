@@ -44,16 +44,16 @@ use Mockery as m;
  */
 class CropTest extends \PHPUnit_Framework_TestCase {
     public function testApplyToImage() {
-        $image = m::mock('PHPIMS\Image');
-        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
-        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
-        $image->shouldReceive('setWidth')->once()->with(3)->andReturn($image);
-        $image->shouldReceive('setHeight')->once()->with(4)->andReturn($image);
-
         $x = 1;
         $y = 2;
         $width = 3;
         $height = 4;
+
+        $image = m::mock('PHPIMS\Image');
+        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
+        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
+        $image->shouldReceive('setWidth')->once()->with($width)->andReturn($image);
+        $image->shouldReceive('setHeight')->once()->with($height)->andReturn($image);
 
         $transformation = new Crop($x, $y, $width, $height);
         $transformation->applyToImage($image);
