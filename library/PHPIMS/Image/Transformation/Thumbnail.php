@@ -109,9 +109,9 @@ class Thumbnail implements TransformationInterface {
                 $this->fit
             );
 
-            $image->setBlob((string) $thumb)
-                ->setWidth($this->width)
-                ->setHeight($this->height);
+            $image->setBlob($thumb->get($image->getExtension()))
+                  ->setWidth($this->width)
+                  ->setHeight($this->height);
         } catch (ImagineException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }

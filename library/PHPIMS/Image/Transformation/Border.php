@@ -124,7 +124,7 @@ class Border implements TransformationInterface {
 
             $box = $imagineImage->getSize();
 
-            $image->setBlob((string) $imagineImage)
+            $image->setBlob($imagineImage->get($image->getExtension()))
                 ->setWidth($box->getWidth())
                 ->setHeight($box->getHeight());
         } catch (ImagineException $e) {

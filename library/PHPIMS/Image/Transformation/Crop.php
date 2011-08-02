@@ -109,7 +109,7 @@ class Crop implements TransformationInterface {
                 new Box($this->width, $this->height)
             );
 
-            $image->setBlob((string) $imagineImage)
+            $image->setBlob($imagineImage->get($image->getExtension()))
                   ->setWidth($this->width)
                   ->setHeight($this->height);
         } catch (ImagineException $e) {

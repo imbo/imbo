@@ -92,9 +92,9 @@ class Rotate implements TransformationInterface {
 
             $box = $imagineImage->getSize();
 
-            $image->setBlob((string) $imagineImage)
-                ->setWidth($box->getWidth())
-                ->setHeight($box->getHeight());
+            $image->setBlob($imagineImage->get($image->getExtension()))
+                  ->setWidth($box->getWidth())
+                  ->setHeight($box->getHeight());
         } catch (ImagineException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
