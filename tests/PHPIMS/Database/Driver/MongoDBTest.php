@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Database\Driver;
 
-use \Mockery as m;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -91,7 +91,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             );
         }
 
-        $this->collection = m::mock('\\MongoCollection');
+        $this->collection = m::mock('MongoCollection');
         $this->driver = new MongoDB($this->driverParams, $this->collection);
     }
 
@@ -113,11 +113,11 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             'imageIdentifier' => $this->imageIdentifier,
         );
 
-        $image = m::mock('PHPIMS\\Image');
+        $image = m::mock('PHPIMS\Image');
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
               ->once();
 
-        $response = m::mock('PHPIMS\\Server\\Response');
+        $response = m::mock('PHPIMS\Server\Response');
 
         $this->collection->shouldReceive('findOne')->once()->andReturn($data);
 
@@ -130,13 +130,13 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unable to save image data
      */
     public function testInsertImageWhenCollectionThrowsException() {
-        $image = m::mock('PHPIMS\\Image');
+        $image = m::mock('PHPIMS\Image');
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
               ->once();
 
-        $response = m::mock('PHPIMS\\Server\\Response');
+        $response = m::mock('PHPIMS\Server\Response');
 
-        $this->collection->shouldReceive('findOne')->once()->andThrow('\\MongoException');
+        $this->collection->shouldReceive('findOne')->once()->andThrow('MongoException');
 
         $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $image, $response);
     }
@@ -147,11 +147,11 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             'imageIdentifier' => $this->imageIdentifier,
         );
 
-        $image = m::mock('PHPIMS\\Image');
+        $image = m::mock('PHPIMS\Image');
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
               ->once();
 
-        $response = m::mock('PHPIMS\\Server\\Response');
+        $response = m::mock('PHPIMS\Server\Response');
 
         $this->collection->shouldReceive('findOne')->once()->with($data)->andReturn(array());
         $this->collection->shouldReceive('insert')->once()->with(m::type('array'), m::type('array'))->andReturn(true);
@@ -169,7 +169,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->collection->shouldReceive('remove')->once()->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             m::type('array')
-        )->andThrow('\\MongoException');
+        )->andThrow('MongoException');
 
         $this->driver->deleteImage($this->publicKey, $this->imageIdentifier);
     }
@@ -198,11 +198,12 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             ),
         );
 
+        $this->collection->shouldReceive('findOne')->once()->andReturn(array());
         $this->collection->shouldReceive('update')->once()->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             array('$set' => array('metadata' => $metadata)),
             m::type('array')
-        )->andThrow('\\MongoException');
+        )->andThrow('MongoException');
 
         $this->driver->updateMetadata($this->publicKey, $this->imageIdentifier, $metadata);
     }
@@ -215,6 +216,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             ),
         );
 
+        $this->collection->shouldReceive('findOne')->once()->andReturn(array());
         $this->collection->shouldReceive('update')->once()->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             array('$set' => array('metadata' => $metadata)),
@@ -234,7 +236,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     public function testGetMetadataWhenCollectionThrowsAnException() {
         $this->collection->shouldReceive('findOne')->once()->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier)
-        )->andThrow('\\MongoException');
+        )->andThrow('MongoException');
 
         $this->driver->getMetadata($this->publicKey, $this->imageIdentifier);
     }
@@ -267,7 +269,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             array('$set' => array('metadata' => array())),
             m::type('array')
-        )->andThrow('\\MongoException');
+        )->andThrow('MongoException');
 
         $this->driver->deleteMetadata($this->publicKey, $this->imageIdentifier);
     }
@@ -285,7 +287,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetImages() {
-        $query = m::mock('PHPIMS\\Operation\\GetImages\\Query');
+        $query = m::mock('PHPIMS\Operation\GetImages\Query');
         $query->shouldReceive('from')->once()->andReturn(123123123);
         $query->shouldReceive('to')->once()->andReturn(234234234);
         $query->shouldReceive('query')->once()->andReturn(array('category' => 'some category'));
@@ -319,13 +321,13 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unable to search for images
      */
     public function testGetImagesWhenCollectionThrowsException() {
-        $query = m::mock('PHPIMS\\Operation\\GetImages\\Query');
+        $query = m::mock('PHPIMS\Operation\GetImages\Query');
         $query->shouldReceive('from')->once();
         $query->shouldReceive('to')->once();
         $query->shouldReceive('query')->once();
         $query->shouldReceive('returnMetadata')->once();
 
-        $this->collection->shouldReceive('find')->once()->with(m::type('array'), m::type('array'))->andThrow('\\MongoException');
+        $this->collection->shouldReceive('find')->once()->with(m::type('array'), m::type('array'))->andThrow('MongoException');
 
         $this->driver->getImages($this->publicKey, $query);
     }
@@ -339,9 +341,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->collection->shouldReceive('findOne')->once()->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             m::type('array')
-        )->andThrow('\\MongoException');
+        )->andThrow('MongoException');
 
-        $this->driver->load($this->publicKey, $this->imageIdentifier, m::mock('PHPIMS\\Image'));
+        $this->driver->load($this->publicKey, $this->imageIdentifier, m::mock('PHPIMS\Image'));
     }
 
     public function testSucessfullLoad() {
@@ -353,7 +355,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             'mime' => 'image/jpg',
         );
 
-        $image = m::mock('PHPIMS\\Image');
+        $image = m::mock('PHPIMS\Image');
         $image->shouldReceive('setFilesize')->once()->with($data['size'])->andReturn($image);
         $image->shouldReceive('setWidth')->once()->with($data['width'])->andReturn($image);
         $image->shouldReceive('setHeight')->once()->with($data['height'])->andReturn($image);

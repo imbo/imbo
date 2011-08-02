@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Operation;
 
-use \Mockery as m;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -52,9 +52,9 @@ class AddImageTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $image = m::mock('PHPIMS\\Image');
+        $image = m::mock('PHPIMS\Image');
 
-        $response = m::mock('PHPIMS\\Server\\Response');
+        $response = m::mock('PHPIMS\Server\Response');
         $response->shouldReceive('setCode')->once()->with(201)->andReturn($response);
         $response->shouldReceive('setBody')->once()->with(array('imageIdentifier' => $this->imageIdentifier))->andReturn($response);
 

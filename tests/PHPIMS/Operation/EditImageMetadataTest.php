@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Operation;
 
-use \Mockery as m;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -55,8 +55,12 @@ class EditImageMetadataTest extends OperationTests {
         $metadata = array('foo' => 'bar', 'bar' => array('foo', 'bar'));
         $_POST['metadata'] = json_encode($metadata);
 
+        $response = m::mock('PHPIMS\Server\Response');
+        $response->shouldReceive('setCode')->once()->with(200)->andReturn($response);
+        $response->shouldReceive('setBody')->once()->with(array('imageIdentifier' => $this->imageIdentifier))->andReturn($response);
+
         $this->database->shouldReceive('updateMetadata')->once()->with($this->publicKey, $this->imageIdentifier, $metadata);
 
-        $this->operation->exec();
+        $this->operation->setResponse($response)->exec();
     }
 }

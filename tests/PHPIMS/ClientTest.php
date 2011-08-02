@@ -32,7 +32,7 @@
 
 namespace PHPIMS;
 
-use \Mockery as m;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -116,6 +116,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         $metadata = array(
             'foo' => 'bar',
             'bar' => 'foo',
+            'filename' => 'image.png',
         );
 
         $response = m::mock('PHPIMS\Client\Response');
