@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
-use \Mockery as m;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -44,35 +44,18 @@ use \Mockery as m;
  */
 class BorderTest extends \PHPUnit_Framework_TestCase {
     public function testApplyToImage() {
-        $imageHeight = 100;
-        $imageWidth = 200;
-
-        $draw  = m::mock('Imagine\\Image\\Draw');
-        $draw->shouldReceive('line')->times(4)
-                                    ->with(
-                                        m::type('Imagine\\Image\\Point'),
-                                        m::type('Imagine\\Image\\Point'),
-                                        m::type('Imagine\\Image\\Color'))
-                                    ->andReturn($draw);
-
-        $size  = m::mock('Imagine\\Image\\Size');
-        $size->shouldReceive('getHeight')->once()->andReturn($imageHeight);
-        $size->shouldReceive('getWidth')->once()->andReturn($imageWidth);
-
-        $imagineImage = m::mock('Imagine\\ImageInterface');
-        $imagineImage->shouldReceive('getSize')->once()->andReturn($size);
-        $imagineImage->shouldReceive('draw')->once()->andReturn($draw);
-
-        $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
-        $image->shouldReceive('refresh')->once();
+        $image = m::mock('PHPIMS\Image');
+        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
+        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
+        $image->shouldReceive('setWidth')->once()->with(665)->andReturn($image);
+        $image->shouldReceive('setHeight')->once()->with(463)->andReturn($image);
 
         $transformation = new Border();
         $transformation->applyToImage($image);
     }
 
     public function testApplyToImageUrl() {
-        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url = m::mock('PHPIMS\Client\ImageUrl');
         $url->shouldReceive('append')->with(m::on(function ($string) {
             return (preg_match('/^border:/', $string) && strstr($string, 'color=fed') &&
                     strstr($string, 'width=1') && strstr($string, 'height=2'));

@@ -31,9 +31,6 @@
 
 namespace PHPIMS;
 
-use Imagine\Imagick\Imagine as Imagine;
-use Imagine\Image\ImageInterface as ImagineImage;
-
 /**
  * Class that represents a single image
  *
@@ -92,13 +89,6 @@ class Image {
      * @var int
      */
     private $height;
-
-    /**
-     * Imagine image instance
-     *
-     * @var \Imagine\ImageInterface
-     */
-    private $imagineImage;
 
     /**
      * Get the size in bytes
@@ -244,50 +234,6 @@ class Image {
      */
     public function setHeight($height) {
         $this->height = (int) $height;
-
-        return $this;
-    }
-
-    /**
-     * Get the imagine image
-     *
-     * @return \Imagine\ImageInterface
-     */
-    public function getImagineImage() {
-        if ($this->imagineImage === null) {
-            $imagine = new Imagine();
-            $this->imagineImage = $imagine->load($this->getBlob());
-        }
-
-        return $this->imagineImage;
-    }
-
-    /**
-     * Set the imagine image
-     *
-     * @param \Imagine\ImageInterface $image Image instance
-     * @return PHPIMS\Image
-     */
-    public function setImagineImage(ImagineImage $image) {
-        $this->imagineImage = $image;
-        $this->refresh();
-
-        return $this;
-    }
-
-    /**
-     * Refresh some properties based on the imagine image instance
-     *
-     * @return PHPIMS\Image
-     */
-    public function refresh() {
-        $size = $this->imagineImage->getSize();
-        $blob = (string) $this->imagineImage;
-
-        $this->setWidth($size->getWidth())
-             ->setHeight($size->getHeight())
-             ->setFilesize(strlen($blob))
-             ->setBlob($blob);
 
         return $this;
     }

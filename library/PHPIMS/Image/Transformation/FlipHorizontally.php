@@ -36,6 +36,9 @@ use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
 
+use Imagine\Imagick\Imagine;
+use Imagine\Exception\Exception as ImagineException;
+
 /**
  * Flip horizontally transformation
  *
@@ -52,9 +55,16 @@ class FlipHorizontally implements TransformationInterface {
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
     public function applyToImage(Image $image) {
-        $imagineImage = $image->getImagineImage();
-        $imagineImage->flipHorizontally();
-        $image->refresh();
+        try {
+            $imagine = new Imagine();
+            $imagineImage = $imagine->load($image->getBlob());
+
+            $imagineImage->flipHorizontally();
+
+            $image->setBlob((string) $imagineImage);
+        } catch (ImagineException $e) {
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**

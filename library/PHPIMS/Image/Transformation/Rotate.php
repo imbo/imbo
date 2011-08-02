@@ -36,7 +36,9 @@ use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
 
-use \Imagine\Image\Color;
+use Imagine\Imagick\Imagine;
+use Imagine\Exception\Exception as ImagineException;
+use Imagine\Image\Color;
 
 /**
  * Rotate transformation
@@ -82,9 +84,20 @@ class Rotate implements TransformationInterface {
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
     public function applyToImage(Image $image) {
-        $imagineImage = $image->getImagineImage();
-        $imagineImage->rotate($this->angle, new Color($this->bg));
-        $image->refresh();
+        try {
+            $imagine = new Imagine();
+            $imagineImage = $imagine->load($image->getBlob());
+
+            $imagineImage->rotate($this->angle, new Color($this->bg));
+
+            $box = $imagineImage->getSize();
+
+            $image->setBlob((string) $imagineImage)
+                ->setWidth($box->getWidth())
+                ->setHeight($box->getHeight());
+        } catch (ImagineException $e) {
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**

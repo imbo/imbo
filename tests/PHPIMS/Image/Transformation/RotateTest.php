@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
-use \Mockery as m;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -44,21 +44,18 @@ use \Mockery as m;
  */
 class RotateTest extends \PHPUnit_Framework_TestCase {
     public function testApplyToImage() {
-        $angle = 45;
+        $image = m::mock('PHPIMS\Image');
+        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
+        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
+        $image->shouldReceive('setWidth')->once()->with(798)->andReturn($image);
+        $image->shouldReceive('setHeight')->once()->with(798)->andReturn($image);
 
-        $imagineImage = m::mock('Imagine\\ImageInterface');
-        $imagineImage->shouldReceive('rotate')->with($angle, m::type('Imagine\\Image\\Color'))->once();
-
-        $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
-        $image->shouldReceive('refresh')->once();
-
-        $transformation = new Rotate($angle);
+        $transformation = new Rotate(45);
         $transformation->applyToImage($image);
     }
 
     public function testApplyToImageUrl() {
-        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url = m::mock('PHPIMS\Client\ImageUrl');
         $url->shouldReceive('append')->with(m::on(function ($string) {
             return (preg_match('/^rotate:/', $string) && strstr($string, 'angle=33') && strstr($string, 'bg=fed'));
         }))->once();

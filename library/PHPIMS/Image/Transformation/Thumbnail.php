@@ -36,7 +36,9 @@ use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
 
-use \Imagine\Image\Box;
+use Imagine\Imagick\Imagine;
+use Imagine\Exception\Exception as ImagineException;
+use Imagine\Image\Box;
 
 /**
  * Thumbnail transformation
@@ -98,14 +100,21 @@ class Thumbnail implements TransformationInterface {
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
     public function applyToImage(Image $image) {
-        $imagineImage = $image->getImagineImage();
+        try {
+            $imagine = new Imagine();
+            $imagineImage = $imagine->load($image->getBlob());
 
-        $thumb = $imagineImage->thumbnail(
-            new Box($this->width, $this->height),
-            $this->fit
-        );
+            $thumb = $imagineImage->thumbnail(
+                new Box($this->width, $this->height),
+                $this->fit
+            );
 
-        $image->setImagineImage($thumb);
+            $image->setBlob((string) $thumb)
+                ->setWidth($this->width)
+                ->setHeight($this->height);
+        } catch (ImagineException $e) {
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**

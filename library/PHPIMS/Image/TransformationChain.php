@@ -32,14 +32,7 @@
 
 namespace PHPIMS\Image;
 
-use PHPIMS\Image\Transformation\Border;
-use PHPIMS\Image\Transformation\Crop;
-use PHPIMS\Image\Transformation\Resize;
-use PHPIMS\Image\Transformation\Rotate;
-use PHPIMS\Image\Transformation\Thumbnail;
-use PHPIMS\Image\Transformation\FlipHorizontally;
-use PHPIMS\Image\Transformation\FlipVertically;
-
+use PHPIMS\Image\Transformation;
 use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 
@@ -136,7 +129,7 @@ class TransformationChain {
      * @return PHPIMS\Image\TransformationChain
      */
     public function border($color = null, $width = null, $height = null) {
-        return $this->add(new Border($color, $width, $height));
+        return $this->add(new Transformation\Border($color, $width, $height));
     }
 
     /**
@@ -149,7 +142,7 @@ class TransformationChain {
      * @return PHPIMS\Image\TransformationChain
      */
     public function crop($x, $y, $width, $height) {
-        return $this->add(new Crop($x, $y, $width, $height));
+        return $this->add(new Transformation\Crop($x, $y, $width, $height));
     }
 
     /**
@@ -160,7 +153,7 @@ class TransformationChain {
      * @return PHPIMS\Image\TransformationChain
      */
     public function rotate($angle, $bg = null) {
-        return $this->add(new Rotate($angle, $bg));
+        return $this->add(new Transformation\Rotate($angle, $bg));
     }
 
     /**
@@ -171,7 +164,7 @@ class TransformationChain {
      * @return PHPIMS\Image\TransformationChain
      */
     public function resize($width = null, $height = null) {
-        return $this->add(new Resize($width, $height));
+        return $this->add(new Transformation\Resize($width, $height));
     }
 
     /**
@@ -183,7 +176,7 @@ class TransformationChain {
      * @return PHPIMS\Image\TransformationChain
      */
     public function thumbnail($width = null, $height = null, $fit = null) {
-        return $this->add(new Thumbnail($width, $height, $fit));
+        return $this->add(new Transformation\Thumbnail($width, $height, $fit));
     }
 
     /**
@@ -192,7 +185,7 @@ class TransformationChain {
      * @return PHPIMS\Image\TransformationChain
      */
     public function flipHorizontally() {
-        return $this->add(new FlipHorizontally());
+        return $this->add(new Transformation\FlipHorizontally());
     }
 
     /**
@@ -201,6 +194,6 @@ class TransformationChain {
      * @return PHPIMS\Image\TransformationChain
      */
     public function flipVertically() {
-        return $this->add(new FlipVertically());
+        return $this->add(new Transformation\FlipVertically());
     }
 }

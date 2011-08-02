@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
-use \Mockery as m;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -48,16 +48,11 @@ class ThumbnailTest extends \PHPUnit_Framework_TestCase {
         $height = 90;
         $fit = 'outbound';
 
-        $thumbnail = m::mock('Imagine\Image\ImageInterface');
-
-        $imagineImage = m::mock('Imagine\ImageInterface');
-        $imagineImage->shouldReceive('thumbnail')->once()->with(m::on(function (\Imagine\Image\Box $box) use($width, $height) {
-            return $width == $box->getWidth() && $height == $box->getHeight();
-        }), $fit)->andReturn($thumbnail);
-
-        $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
-        $image->shouldReceive('setImagineImage')->once()->with($thumbnail);
+        $image = m::mock('PHPIMS\Image');
+        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
+        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
+        $image->shouldReceive('setWidth')->once()->with($width)->andReturn($image);
+        $image->shouldReceive('setHeight')->once()->with($height)->andReturn($image);
 
         $transformation = new Thumbnail($width, $height, $fit);
         $transformation->applyToImage($image);

@@ -36,7 +36,9 @@ use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
 
-use \Imagine\Image\Box;
+use Imagine\Imagick\Imagine;
+use Imagine\Exception\Exception as ImagineException;
+use Imagine\Image\Box;
 
 /**
  * Resize transformation
@@ -79,23 +81,33 @@ class Resize implements TransformationInterface {
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
     public function applyToImage(Image $image) {
-        $imagineImage = $image->getImagineImage();
-        $width  = $this->width ?: null;
-        $height = $this->height ?: null;
+        try {
+            $imagine = new Imagine();
+            $imagineImage = $imagine->load($image->getBlob());
 
-        // Fetch the size of the original image
-        $size = $imagineImage->getSize();
+            $width  = $this->width ?: null;
+            $height = $this->height ?: null;
 
-        // Calculate width or height if not both have been specified
-        if (!$height) {
-            $height = ($size->getHeight() / $size->getWidth()) * $width;
-        } else if (!$width) {
-            $width = ($size->getWidth() / $size->getHeight()) * $height;
+            // Fetch the size of the original image
+            $size = $imagineImage->getSize();
+
+            // Calculate width or height if not both have been specified
+            if (!$height) {
+                $height = ($size->getHeight() / $size->getWidth()) * $width;
+            } else if (!$width) {
+                $width = ($size->getWidth() / $size->getHeight()) * $height;
+            }
+
+            $imagineImage->resize(new Box($width, $height));
+
+            $box = $imagineImage->getSize();
+
+            $image->setBlob((string) $imagineImage)
+                ->setWidth($box->getWidth())
+                ->setHeight($box->getHeight());
+        } catch (ImagineException $e) {
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
-
-        // Resize image and store in the image object
-        $imagineImage->resize(new Box($width, $height));
-        $image->refresh();
     }
 
     /**

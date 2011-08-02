@@ -34,7 +34,6 @@ namespace PHPIMS\Operation\Plugin;
 
 use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
-
 use PHPIMS\Image\Transformation;
 
 /**
@@ -130,8 +129,8 @@ class ManipulateImage implements PluginInterface {
 
                 try {
                     $transformation->applyToImage($image);
-                } catch (\Imagine\Exception\Exception $e) {
-                    trigger_error('Imagine failed with exception: ' . $e->getMessage(), E_USER_WARNING);
+                } catch (Transformation\Exception $e) {
+                    trigger_error('Transformation failed with exception: ' . $e->getMessage(), E_USER_WARNING);
                 }
             }
         }

@@ -32,9 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
-use \Mockery as m;
-use \Imagine\Image\Point;
-use \Imagine\Image\Box;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -46,29 +44,23 @@ use \Imagine\Image\Box;
  */
 class CropTest extends \PHPUnit_Framework_TestCase {
     public function testApplyToImage() {
+        $image = m::mock('PHPIMS\Image');
+        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
+        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
+        $image->shouldReceive('setWidth')->once()->with(3)->andReturn($image);
+        $image->shouldReceive('setHeight')->once()->with(4)->andReturn($image);
+
         $x = 1;
         $y = 2;
         $width = 3;
         $height = 4;
-
-        $imagineImage = m::mock('Imagine\\ImageInterface');
-        $imagineImage->shouldReceive('crop')->once()->with(m::on(function(Point $point) use ($x, $y) {
-                                                               return $point->getX() == $x && $point->getY() == $y;
-                                                           }),
-                                                           m::on(function(Box $box) use ($width, $height) {
-                                                               return $box->getWidth() == $width && $box->getHeight() == $height;
-                                                           }));
-
-        $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
-        $image->shouldReceive('refresh')->once();
 
         $transformation = new Crop($x, $y, $width, $height);
         $transformation->applyToImage($image);
     }
 
     public function testApplyToImageUrl() {
-        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url = m::mock('PHPIMS\Client\ImageUrl');
         $url->shouldReceive('append')->with(m::on(function ($string) {
             return (preg_match('/^crop:/', $string) && strstr($string, 'x=1') && strstr($string, 'y=2') &&
                     strstr($string, 'width=3') && strstr($string, 'height=4'));

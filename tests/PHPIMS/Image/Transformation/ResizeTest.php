@@ -32,8 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
-use \Mockery as m;
-use \Imagine\Image\Box;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -45,62 +44,40 @@ use \Imagine\Image\Box;
  */
 class ResizeTest extends \PHPUnit_Framework_TestCase {
     public function testApplyToImageWithBothParams() {
-        $size  = m::mock('Imagine\\Image\\Size');
-
-        $imagineImage = m::mock('Imagine\\ImageInterface');
-        $imagineImage->shouldReceive('getSize')->once()->andReturn($size);
-        $imagineImage->shouldReceive('resize')->once()->with(m::on(function(Box $box) {
-            return $box->getWidth() === 200 && $box->getHeight() === 100;
-        }));
-
-        $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
-        $image->shouldReceive('refresh')->once();
+        $image = m::mock('PHPIMS\Image');
+        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
+        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
+        $image->shouldReceive('setWidth')->once()->with(200)->andReturn($image);
+        $image->shouldReceive('setHeight')->once()->with(100)->andReturn($image);
 
         $transformation = new Resize(200, 100);
         $transformation->applyToImage($image);
     }
 
     public function testApplyToImageWithOnlyWidth() {
-        $size = m::mock('Imagine\\Image\\Size');
-        $size->shouldReceive('getHeight')->once()->andReturn(1000);
-        $size->shouldReceive('getWidth')->once()->andReturn(1000);
-
-        $imagineImage = m::mock('Imagine\\ImageInterface');
-        $imagineImage->shouldReceive('getSize')->once()->andReturn($size);
-        $imagineImage->shouldReceive('resize')->once()->with(m::on(function(Box $box) {
-            return $box->getWidth() === 200 && $box->getHeight() === 200;
-        }));
-
-        $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
-        $image->shouldReceive('refresh')->once();
+        $image = m::mock('PHPIMS\Image');
+        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
+        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
+        $image->shouldReceive('setWidth')->once()->with(200)->andReturn($image);
+        $image->shouldReceive('setHeight')->once()->with(139)->andReturn($image);
 
         $transformation = new Resize(200);
         $transformation->applyToImage($image);
     }
 
     public function testApplyToImageWithOnlyHeight() {
-        $size = m::mock('Imagine\\Image\\Size');
-        $size->shouldReceive('getHeight')->once()->andReturn(1000);
-        $size->shouldReceive('getWidth')->once()->andReturn(1000);
-
-        $imagineImage = m::mock('Imagine\\ImageInterface');
-        $imagineImage->shouldReceive('getSize')->once()->andReturn($size);
-        $imagineImage->shouldReceive('resize')->with(m::on(function(Box $box) {
-            return $box->getWidth() === 200 && $box->getHeight() === 200;
-        }))->once();
-
-        $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
-        $image->shouldReceive('refresh')->once();
+        $image = m::mock('PHPIMS\Image');
+        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
+        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
+        $image->shouldReceive('setWidth')->once()->with(287)->andReturn($image);
+        $image->shouldReceive('setHeight')->once()->with(200)->andReturn($image);
 
         $transformation = new Resize(null, 200);
         $transformation->applyToImage($image);
     }
 
     public function testApplyToImageUrl() {
-        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url = m::mock('PHPIMS\Client\ImageUrl');
         $url->shouldReceive('append')->with(m::on(function ($string) {
             return (preg_match('/^resize:/', $string) && strstr($string, 'width=100') && strstr($string, 'height=200'));
         }))->once();

@@ -36,8 +36,10 @@ use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
 
-use \Imagine\Image\Point;
-use \Imagine\Image\Box;
+use Imagine\Imagick\Imagine;
+use Imagine\Exception\Exception as ImagineException;
+use Imagine\Image\Point;
+use Imagine\Image\Box;
 
 /**
  * Crop transformation
@@ -98,12 +100,21 @@ class Crop implements TransformationInterface {
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
     public function applyToImage(Image $image) {
-        $imagineImage = $image->getImagineImage();
-        $imagineImage->crop(
-            new Point($this->x, $this->y),
-            new Box($this->width, $this->height)
-        );
-        $image->refresh();
+        try {
+            $imagine = new Imagine();
+            $imagineImage = $imagine->load($image->getBlob());
+
+            $imagineImage->crop(
+                new Point($this->x, $this->y),
+                new Box($this->width, $this->height)
+            );
+
+            $image->setBlob((string) $imagineImage)
+                  ->setWidth($this->width)
+                  ->setHeight($this->height);
+        } catch (ImagineException $e) {
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**

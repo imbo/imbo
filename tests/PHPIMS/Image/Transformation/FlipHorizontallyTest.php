@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
-use \Mockery as m;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -44,19 +44,16 @@ use \Mockery as m;
  */
 class FlipHorizontallyTest extends \PHPUnit_Framework_TestCase {
     public function testApplyToImage() {
-        $imagineImage = m::mock('Imagine\\ImageInterface');
-        $imagineImage->shouldReceive('flipHorizontally')->once();
-
-        $image = m::mock('PHPIMS\\Image');
-        $image->shouldReceive('getImagineImage')->once()->andReturn($imagineImage);
-        $image->shouldReceive('refresh')->once();
+        $image = m::mock('PHPIMS\Image');
+        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
+        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
 
         $transformation = new FlipHorizontally();
         $transformation->applyToImage($image);
     }
 
     public function testApplyToImageUrl() {
-        $url = m::mock('PHPIMS\\Client\\ImageUrl');
+        $url = m::mock('PHPIMS\Client\ImageUrl');
         $url->shouldReceive('append')->with(m::on(function ($string) {
             return $string == 'flipHorizontally';
         }))->once();

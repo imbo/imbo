@@ -49,7 +49,8 @@ interface TransformationInterface {
     /**
      * Apply a transformation to an image object
      *
-     * @param PHPIMS\Image $image Image instance
+     * @param PHPIMS\Image Image instance
+     * @throws PHPIMS\Image\Transformation\Exception
      */
     function applyToImage(Image $image);
 
