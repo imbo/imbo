@@ -86,6 +86,10 @@ class PrepareImage implements PluginInterface {
 
         // Fetch the image object and store the blob
         $image = $operation->getImage();
-        $image->setBlob($imageBlob)->setWidth($size[0])->setHeight($size[1]);
+        $image->setBlob($imageBlob)
+              ->setWidth($size[0])
+              ->setHeight($size[1]);
+
+        unlink($tmpFile);
     }
 }
