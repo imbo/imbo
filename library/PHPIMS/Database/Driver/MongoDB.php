@@ -146,9 +146,13 @@ class MongoDB implements DriverInterface {
      */
     public function updateMetadata($publicKey, $imageIdentifier, array $metadata) {
         try {
+            // Fetch existing metadata and merge with the incoming data
+            $existing = $this->getMetadata($publicKey, $imageIdentifier);
+            $updatedMetadata = array_merge($existing, $metadata);
+
             $this->collection->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('$set' => array('metadata' => $metadata)),
+                array('$set' => array('metadata' => $updatedMetadata)),
                 array('safe' => true, 'multiple' => false)
             );
         } catch (\MongoException $e) {
@@ -176,8 +180,12 @@ class MongoDB implements DriverInterface {
      */
     public function deleteMetadata($publicKey, $imageIdentifier) {
         try {
-            $this->updateMetadata($publicKey, $imageIdentifier, array());
-        } catch (DatabaseException $e) {
+            $this->collection->update(
+                array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
+                array('$set' => array('metadata' => array())),
+                array('safe' => true, 'multiple' => false)
+            );
+        } catch (\MongoException $e) {
             throw new DatabaseException('Unable to remove metadata', 500, $e);
         }
 
