@@ -63,6 +63,7 @@ class Autoload {
         'phpims\\frontcontroller' => '/FrontController.php',
         'phpims\\image' => '/Image.php',
         'phpims\\image\\transformation\\border' => '/Image/Transformation/Border.php',
+        'phpims\\image\\transformation\\compress' => '/Image/Transformation/Compress.php',
         'phpims\\image\\transformation\\crop' => '/Image/Transformation/Crop.php',
         'phpims\\image\\transformation\\exception' => '/Image/Transformation/Exception.php',
         'phpims\\image\\transformation\\fliphorizontally' => '/Image/Transformation/FlipHorizontally.php',

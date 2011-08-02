@@ -166,6 +166,15 @@ Example:
 
 * `t[]=flipVertically`
 
+### compress
+Compress the image on the fly.
+
+* `(int) quality` Quality of the resulting image. 100 is maximum quality (lowest compression rate)
+
+Example:
+
+* `t[]=compress:quality=40`
+
 ## Extra response headers
 PHPIMS will usually inject extra response headers to the different requests. All response headers from PHPIMS will be prefixed with **X-PHPIMS-**.
 

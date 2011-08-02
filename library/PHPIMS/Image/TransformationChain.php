@@ -133,6 +133,16 @@ class TransformationChain {
     }
 
     /**
+     * Compression transformation
+     *
+     * @param int $quality Quality of the resulting image
+     * @return PHPIMS\Image\TransformationChain
+     */
+    public function compress($quality) {
+        return $this->add(new Transformation\Compress($quality));
+    }
+
+    /**
      * Crop transformation
      *
      * @param int $x X coordinate of the top left corner of the crop

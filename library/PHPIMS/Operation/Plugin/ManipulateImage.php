@@ -104,6 +104,9 @@ class ManipulateImage implements PluginInterface {
                     case 'border':
                         $transformation = new Transformation\Border($p('color'), $p('width'), $p('height'));
                         break;
+                    case 'compress':
+                        $transformation = new Transformation\Compress($p('quality'));
+                        break;
                     case 'crop':
                         $transformation = new Transformation\Crop($p('x'), $p('y'), $p('width'), $p('height'));
                         break;

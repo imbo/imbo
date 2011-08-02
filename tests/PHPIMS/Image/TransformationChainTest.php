@@ -63,6 +63,12 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($url . '?t[]=border:color=444,width=3,height=3', (string) $this->url);
     }
 
+    public function testCompress() {
+        $url = (string) $this->url;
+        $this->assertInstanceOf('PHPIMS\Image\TransformationChain', $this->chain->compress(40)->applyToImageUrl($this->url));
+        $this->assertSame($url . '?t[]=compress:quality=40', (string) $this->url);
+    }
+
     public function testCrop() {
         $url = (string) $this->url;
         $this->assertInstanceOf('PHPIMS\Image\TransformationChain', $this->chain->crop(1, 2, 3, 4)->applyToImageUrl($this->url));
