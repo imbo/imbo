@@ -79,8 +79,13 @@ class PrepareImage implements PluginInterface {
             throw new Exception('Hash mismatch', 400);
         }
 
+        // Store file to disk and use getimagesize() to fetch width/height
+        $tmpFile = tempnam(sys_get_temp_dir(), 'PHPIMS_uploaded_Image');
+        file_put_contents($tmpFile, $imageBlob);
+        $size = getimagesize($tmpFile);
+
         // Fetch the image object and store the blob
         $image = $operation->getImage();
-        $image->setBlob($imageBlob);
+        $image->setBlob($imageBlob)->setWidth($size[0])->setHeight($size[1]);
     }
 }
