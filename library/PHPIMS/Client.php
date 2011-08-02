@@ -151,8 +151,15 @@ class Client {
         // Add the image, and then POST metadata
         $response = $this->driver->put($url, $path);
 
-        if ($response->isSuccess() && $metadata !== null) {
-            return $this->editMetadata($imageIdentifier, $metadata);
+        if ($response->isSuccess()) {
+            // Add metadata
+            if ($metadata === null) {
+                $metadata = array();
+            }
+
+            $metadata['filename'] = basename($path);
+
+            $response = $this->editMetadata($imageIdentifier, $metadata);
         }
 
         return $response;
