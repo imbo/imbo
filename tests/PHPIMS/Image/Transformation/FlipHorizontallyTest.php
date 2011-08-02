@@ -47,6 +47,7 @@ class FlipHorizontallyTest extends \PHPUnit_Framework_TestCase {
         $image = m::mock('PHPIMS\Image');
         $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
         $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
+        $image->shouldReceive('getExtension')->once()->andReturn('png');
 
         $transformation = new FlipHorizontally();
         $transformation->applyToImage($image);

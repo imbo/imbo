@@ -49,6 +49,7 @@ class RotateTest extends \PHPUnit_Framework_TestCase {
         $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
         $image->shouldReceive('setWidth')->once()->with(m::type('int'))->andReturn($image);
         $image->shouldReceive('setHeight')->once()->with(m::type('int'))->andReturn($image);
+        $image->shouldReceive('getExtension')->once()->andReturn('png');
 
         $transformation = new Rotate(45);
         $transformation->applyToImage($image);
