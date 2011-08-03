@@ -108,21 +108,21 @@ class Response {
      *
      * @var int
      */
-    protected $code = 200;
+    private $code = 200;
 
     /**
      * Response headers
      *
      * @var array
      */
-    protected $headers = array();
+    private $headers = array();
 
     /**
      * Content-Type of the response
      *
      * @var string
      */
-    protected $contentType = 'application/json; charset=utf-8';
+    private $contentType = 'application/json; charset=utf-8';
 
     /**
      * The body of the response
@@ -131,14 +131,14 @@ class Response {
      *
      * @var array
      */
-    protected $body = array();
+    private $body = array();
 
     /**
      * Optional image attached to the response
      *
      * @var PHPIMS\Image
      */
-    protected $image = null;
+    private $image = null;
 
     /**
      * Get the status code
