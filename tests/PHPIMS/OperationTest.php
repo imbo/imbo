@@ -127,33 +127,6 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($config['sub'], $this->operation->getConfig('sub'));
     }
 
-    public function testFactory() {
-        $operations = array(
-            'POST'   => 'PHPIMS\\Operation\\AddImage',
-            'POST'   => 'PHPIMS\\Operation\\EditImageMetadata',
-            'DELETE' => 'PHPIMS\\Operation\\DeleteImage',
-            'DELETE' => 'PHPIMS\\Operation\\DeleteImageMetadata',
-            'GET'    => 'PHPIMS\\Operation\\GetImage',
-            'GET'    => 'PHPIMS\\Operation\\GetImageMetadata',
-        );
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
-
-        foreach ($operations as $method => $className) {
-            $this->assertInstanceOf($className, Operation::factory($className, $database, $storage));
-        }
-    }
-
-    /**
-     * @expectedException PHPIMS\Operation\Exception
-     */
-    public function testFactoryWithUnSupportedOperation() {
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
-
-        Operation::factory('foobar', $database, $storage, 'GET', md5(microtime()));
-    }
-
     public function testSetGetResource() {
         $resource = md5(microtime()) . '.png';
         $this->assertInstanceOf('PHPIMS\\Operation', $this->operation->setResource($resource));

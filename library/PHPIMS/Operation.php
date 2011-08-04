@@ -142,9 +142,14 @@ abstract class Operation {
      * @param PHPIMS\Database\DriverInterface $database Database driver
      * @param PHPIMS\Storage\DriverInterface $storage Storage driver
      */
-    public function __construct(Database $database, Storage $storage) {
-        $this->database = $database;
-        $this->storage  = $storage;
+    public function __construct(Database $database = null, Storage $storage = null) {
+        if ($database !== null) {
+            $this->setDatabase($database);
+        }
+
+        if ($storage !== null) {
+            $this->setStorage($storage);
+        }
 
         // Register internal plugins
         $this->registerPlugin(new Auth())
@@ -434,31 +439,6 @@ abstract class Operation {
         // Trigger plugins who want to run after the operation
         foreach ($plugins['postExec'] as $plugin) {
             $plugin->exec($this);
-        }
-    }
-
-    /**
-     * Factory method
-     *
-     * @param string $className The name of the operation class to instantiate
-     * @param PHPIMS\Database\DriverInterface $database Database driver
-     * @param PHPIMS\Storage\DriverInterface $storage Storage driver
-     * @return PHPIMS\OperationInterface
-     * @throws PHPIMS\Operation\Exception
-     */
-    static public function factory($className, Database $database, Storage $storage) {
-        switch ($className) {
-            case 'PHPIMS\\Operation\\AddImage':
-            case 'PHPIMS\\Operation\\DeleteImage':
-            case 'PHPIMS\\Operation\\DeleteImageMetadata':
-            case 'PHPIMS\\Operation\\EditImageMetadata':
-            case 'PHPIMS\\Operation\\GetImage':
-            case 'PHPIMS\\Operation\\GetImages':
-            case 'PHPIMS\\Operation\\GetImageMetadata':
-            case 'PHPIMS\\Operation\\HeadImage':
-                return new $className($database, $storage);
-            default:
-                throw new OperationException('Invalid operation', 500);
         }
     }
 }

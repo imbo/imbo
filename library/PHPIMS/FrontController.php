@@ -33,6 +33,7 @@
 namespace PHPIMS;
 
 use PHPIMS\Server\Response;
+use PHPIMS\Operation;
 
 /**
  * Client that interacts with the server part of PHPIMS
@@ -61,6 +62,20 @@ class FrontController {
     /**#@-*/
 
     /**
+     * Valid HTTP methods
+     *
+     * @var array
+     */
+    private $validMethods = array(
+        self::GET    => true,
+        self::POST   => true,
+        self::PUT    => true,
+        self::HEAD   => true,
+        self::DELETE => true,
+        self::BREW   => true,
+    );
+
+    /**
      * Configuration
      *
      * @var array
@@ -82,18 +97,8 @@ class FrontController {
      * @param string $method The current method
      * @return boolean True if $method is valid, false otherwise
      */
-    static public function isValidMethod($method) {
-        switch ($method) {
-            case self::GET:
-            case self::POST:
-            case self::PUT:
-            case self::HEAD:
-            case self::DELETE:
-            case self::BREW:
-                return true;
-            default:
-                return false;
-        }
+    public function isValidMethod($method) {
+        return isset($this->validMethods[$method]);
     }
 
     /**
@@ -110,28 +115,28 @@ class FrontController {
         $operation = null;
 
         if ($resource === 'images' && $method === self::GET) {
-            $operation = 'PHPIMS\Operation\GetImages';
+            $operation = new Operation\GetImages();
         } else if ($method === self::GET && $imageIdentifier) {
             if ($extra === 'meta') {
-                $operation = 'PHPIMS\Operation\GetImageMetadata';
+                $operation = new Operation\GetImageMetadata();
             } else {
-                $operation = 'PHPIMS\Operation\GetImage';
+                $operation = new Operation\GetImage();
             }
         } else if ($method === self::POST && $imageIdentifier && $extra === 'meta') {
-            $operation = 'PHPIMS\Operation\EditImageMetadata';
+            $operation = new Operation\EditImageMetadata();
         } else if ($method === self::PUT && $imageIdentifier) {
-            $operation = 'PHPIMS\Operation\AddImage';
+            $operation = new Operation\AddImage();
         } else if ($method === self::DELETE && $imageIdentifier) {
             if ($extra === 'meta') {
-                $operation = 'PHPIMS\Operation\DeleteImageMetadata';
+                $operation = new Operation\DeleteImageMetadata();
             } else {
-                $operation = 'PHPIMS\Operation\DeleteImage';
+                $operation = new Operation\DeleteImage();
             }
         } else if ($method === self::HEAD && $imageIdentifier) {
             if ($extra === 'meta') {
                 // Not yet implemented
             } else {
-                $operation = 'PHPIMS\Operation\HeadImage';
+                $operation = new Operation\HeadImage();
             }
         } else if ($method === self::BREW) {
             throw new Exception('I\'m a teapot!', 418);
@@ -142,8 +147,9 @@ class FrontController {
         }
 
         // Create the operation
-        $operation = Operation::factory($operation, $this->config['database'], $this->config['storage']);
-        $operation->setConfig($this->config)
+        $operation->setDatabase($this->config['database'])
+                  ->setStorage($this->config['storage'])
+                  ->setConfig($this->config)
                   ->setResource($resource)
                   ->setImageIdentifier($imageIdentifier)
                   ->setMethod($method)
@@ -161,7 +167,7 @@ class FrontController {
      * @throws PHPIMS\Exception
      */
     public function handle($resource, $method) {
-        if (!self::isValidMethod($method)) {
+        if (!$this->isValidMethod($method)) {
             throw new Exception($method . ' not implemented', 501);
         }
 

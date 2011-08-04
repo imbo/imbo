@@ -103,14 +103,16 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testIsValidMethodWithSupportedMethods() {
-        $this->assertTrue(FrontController::isValidMethod('POST'));
-        $this->assertTrue(FrontController::isValidMethod('GET'));
-        $this->assertTrue(FrontController::isValidMethod('HEAD'));
-        $this->assertTrue(FrontController::isValidMethod('DELETE'));
+        $this->assertTrue($this->controller->isValidMethod('POST'));
+        $this->assertTrue($this->controller->isValidMethod('GET'));
+        $this->assertTrue($this->controller->isValidMethod('HEAD'));
+        $this->assertTrue($this->controller->isValidMethod('DELETE'));
+        $this->assertTrue($this->controller->isValidMethod('PUT'));
+        $this->assertTrue($this->controller->isValidMethod('BREW'));
     }
 
     public function testIsValidMethodWithInvalidMethod() {
-        $this->assertFalse(FrontController::isValidMethod('foobar'));
+        $this->assertFalse($this->controller->isValidMethod('foobar'));
     }
 
     /**
