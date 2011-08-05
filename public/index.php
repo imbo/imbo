@@ -45,11 +45,11 @@ try {
     $frontController = new PHPIMS\FrontController($config);
     $response = $frontController->handle($resource, $_SERVER['REQUEST_METHOD']);
 } catch (PHPIMS\Exception $e) {
-    $response = PHPIMS\Server\Response::fromException($e);
+    $response = PHPIMS\Response\Response::fromException($e);
 }
 
 $code = $response->getCode();
-$header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS\Server\Response::$codes[$code]);
+$header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS\Response\Response::$codes[$code]);
 
 header($header);
 
