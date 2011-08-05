@@ -82,13 +82,13 @@ class OperationTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetDatabase() {
-        $driver = m::mock('PHPIMS\Database\DriverInterface');
+        $driver = m::mock('PHPIMS\Database\Driver\DriverInterface');
         $this->assertInstanceOf('PHPIMS\Operation', $this->operation->setDatabase($driver));
         $this->assertSame($driver, $this->operation->getDatabase());
     }
 
     public function testSetGetStorage() {
-        $driver = m::mock('PHPIMS\Storage\DriverInterface');
+        $driver = m::mock('PHPIMS\Storage\Driver\DriverInterface');
         $this->assertInstanceOf('PHPIMS\Operation', $this->operation->setStorage($driver));
         $this->assertSame($driver, $this->operation->getStorage());
     }

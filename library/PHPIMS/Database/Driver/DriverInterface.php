@@ -30,14 +30,15 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Storage;
+namespace PHPIMS\Database\Driver;
 
 use PHPIMS\Image\ImageInterface;
+use PHPIMS\Operation\GetImages\Query;
 
 /**
- * Storage driver interface
+ * Database driver interface
  *
- * This is an interface for different storage drivers for PHPIMS.
+ * This is an interface for different database drivers.
  *
  * @package PHPIMS
  * @subpackage Interfaces
@@ -48,47 +49,78 @@ use PHPIMS\Image\ImageInterface;
  */
 interface DriverInterface {
     /**
-     * Store an image
+     * Insert a new image
      *
-     * This method will receive the binary data of the image place it somewhere suited for the
-     * actual storage driver. If an error occurs the driver should throw an exception based on
-     * PHPIMS\Storage\Exception.
+     * This method will insert a new image into the database. On errors throw exceptions that
+     * extends PHPIMS\Database\Exception.
+     *
+     * @param string $publicKey The public key of the user
+     * @param string $imageIdentifier Image identifier
+     * @param PHPIMS\Image\ImageInterface $image The image to insert
+     * @return boolean Returns true on success or false on failure
+     * @throws PHPIMS\Database\Exception
+     */
+    function insertImage($publicKey, $imageIdentifier, ImageInterface $image);
+
+    /**
+     * Delete an image from the database
+     *
+     * @param string $publicKey The public key of the user
+     * @param string $imageIdentifier Image identifier
+     * @return boolean Returns true on success or false on failure
+     * @throws PHPIMS\Database\Exception
+     */
+    function deleteImage($publicKey, $imageIdentifier);
+
+    /**
+     * Edit metadata
+     *
+     * @param string $publicKey The public key of the user
+     * @param string $imageIdentifier Image identifier
+     * @param array $metadata An array with metadata
+     * @return boolean Returns true on success or false on failure
+     * @throws PHPIMS\Database\Exception
+     */
+    function updateMetadata($publicKey, $imageIdentifier, array $metadata);
+
+    /**
+     * Get all metadata associated with an image
+     *
+     * @param string $publicKey The public key of the user
+     * @param string $imageIdentifier Image identifier
+     * @return array Returns the metadata as an array
+     * @throws PHPIMS\Database\Exception
+     */
+    function getMetadata($publicKey, $imageIdentifier);
+
+    /**
+     * Delete all metadata associated with an image
+     *
+     * @param string $publicKey The public key of the user
+     * @param string $imageIdentifier Image identifier
+     * @return boolean Returns true on success or false on failure
+     * @throws PHPIMS\Database\Exception
+     */
+    function deleteMetadata($publicKey, $imageIdentifier);
+
+    /**
+     * Get images based on some query parameters
+     *
+     * @param string $publicKey The public key of the user
+     * @param PHPIMS\Operation\GetImages\Query
+     * @return array
+     * @throws PHPIMS\Database\Exception
+     */
+    function getImages($publicKey, Query $query);
+
+    /**
+     * Load information from database into the image object
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
-     * @param PHPIMS\Image\ImageInterface $image The image to store
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS\Storage\Exception
-     */
-    function store($publicKey, $imageIdentifier, ImageInterface $image);
-
-    /**
-     * Delete an image
-     *
-     * This method will delete the file associated with $imageIdentifier from the storage medium
-     *
-     * @param string $publicKey The public key of the user
-     * @param string $imageIdentifier Image identifier
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS\Storage\Exception
-     */
-    function delete($publicKey, $imageIdentifier);
-
-    /**
-     * Load an image
-     *
-     * The implementation of this method must fetch the content of the file identified by
-     * $imageIdentifier and populate the blob property of $image:
-     *
-     * <code>
-     * $image->setBlob(<data>);
-     * </code>
-     *
-     * @param string $publicKey The public key of the user
-     * @param string $imageIdentifier Image identifier
-     * @param PHPIMS\Image\ImageInterface $image The image object
-     * @return boolean Returns true on success or false on failure
-     * @throws PHPIMS\Storage\Exception
+     * @param PHPIMS\Image\ImageInterface $image The image object to populate
+     * @return boolean
+     * @throws PHPIMS\Database\Exception
      */
     function load($publicKey, $imageIdentifier, ImageInterface $image);
 }

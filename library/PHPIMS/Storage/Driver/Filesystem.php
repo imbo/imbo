@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Storage\Driver;
 
-use PHPIMS\Storage\DriverInterface;
 use PHPIMS\Storage\Exception as StorageException;
 use PHPIMS\Image\ImageInterface;
 
@@ -72,7 +71,7 @@ class Filesystem implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Storage\DriverInterface::store()
+     * @see PHPIMS\Storage\Driver\DriverInterface::store()
      */
     public function store($publicKey, $imageIdentifier, ImageInterface $image) {
         if (!is_writable($this->params['dataDir'])) {
@@ -95,7 +94,7 @@ class Filesystem implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Storage\DriverInterface::delete()
+     * @see PHPIMS\Storage\Driver\DriverInterface::delete()
      */
     public function delete($publicKey, $imageIdentifier) {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
@@ -108,7 +107,7 @@ class Filesystem implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Storage\DriverInterface::load()
+     * @see PHPIMS\Storage\Driver\DriverInterface::load()
      */
     public function load($publicKey, $imageIdentifier, ImageInterface $image) {
         $path = $this->getImagePath($publicKey, $imageIdentifier);

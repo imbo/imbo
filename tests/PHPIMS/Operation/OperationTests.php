@@ -77,8 +77,8 @@ abstract class OperationTests extends \PHPUnit_Framework_TestCase {
      * Set up method
      */
     public function setUp() {
-        $this->database = m::mock('PHPIMS\Database\DriverInterface');
-        $this->storage = m::mock('PHPIMS\Storage\DriverInterface');
+        $this->database = m::mock('PHPIMS\Database\Driver\DriverInterface');
+        $this->storage = m::mock('PHPIMS\Storage\Driver\DriverInterface');
         $this->publicKey = md5(microtime());
         $this->imageIdentifier = md5(microtime()) . '.png';
 

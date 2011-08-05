@@ -56,8 +56,8 @@ class Autoload {
         'phpims\\client\\exception' => '/Client/Exception.php',
         'phpims\\client\\imageurl' => '/Client/ImageUrl.php',
         'phpims\\client\\response' => '/Client/Response.php',
+        'phpims\\database\\driver\\driverinterface' => '/Database/Driver/DriverInterface.php',
         'phpims\\database\\driver\\mongodb' => '/Database/Driver/MongoDB.php',
-        'phpims\\database\\driverinterface' => '/Database/DriverInterface.php',
         'phpims\\database\\exception' => '/Database/Exception.php',
         'phpims\\exception' => '/Exception.php',
         'phpims\\frontcontroller' => '/FrontController.php',
@@ -94,8 +94,8 @@ class Autoload {
         'phpims\\operation\\plugininterface' => '/Operation/PluginInterface.php',
         'phpims\\response\\response' => '/Response/Response.php',
         'phpims\\response\\responseinterface' => '/Response/ResponseInterface.php',
+        'phpims\\storage\\driver\\driverinterface' => '/Storage/Driver/DriverInterface.php',
         'phpims\\storage\\driver\\filesystem' => '/Storage/Driver/Filesystem.php',
-        'phpims\\storage\\driverinterface' => '/Storage/DriverInterface.php',
         'phpims\\storage\\exception' => '/Storage/Exception.php'
     );
 

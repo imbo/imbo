@@ -71,8 +71,8 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $this->publicKey = md5(microtime());
         $this->privateKey = md5(microtime());
         $config = array(
-            'database' => m::mock('PHPIMS\Database\DriverInterface'),
-            'storage' => m::mock('PHPIMS\Storage\DriverInterface'),
+            'database' => m::mock('PHPIMS\Database\Driver\DriverInterface'),
+            'storage' => m::mock('PHPIMS\Storage\Driver\DriverInterface'),
             'auth' => array(
                 $this->publicKey => $this->privateKey,
             ),
@@ -157,8 +157,8 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('resolveOperation');
         $method->setAccessible(true);
 
-        $database = m::mock('PHPIMS\Database\DriverInterface');
-        $storage = m::mock('PHPIMS\Storage\DriverInterface');
+        $database = m::mock('PHPIMS\Database\Driver\DriverInterface');
+        $storage = m::mock('PHPIMS\Storage\Driver\DriverInterface');
 
         $this->assertInstanceOf('PHPIMS\Operation\GetImages', $method->invokeArgs($this->controller, array('images', 'GET')));
 

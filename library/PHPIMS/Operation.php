@@ -33,8 +33,8 @@
 namespace PHPIMS;
 
 use PHPIMs\Image\ImageInterface;
-use PHPIMS\Database\DriverInterface as Database;
-use PHPIMS\Storage\DriverInterface as Storage;
+use PHPIMS\Database\Driver\DriverInterface as Database;
+use PHPIMS\Storage\Driver\DriverInterface as Storage;
 use PHPIMS\Response\ResponseInterface;
 use PHPIMS\Operation\Exception as OperationException;
 use PHPIMS\Operation\PluginInterface as Plugin;
@@ -78,14 +78,14 @@ abstract class Operation {
     /**
      * The database driver
      *
-     * @var PHPIMS\Database\DriverInterface
+     * @var PHPIMS\Database\Driver\DriverInterface
      */
     private $database;
 
     /**
      * The storage driver
      *
-     * @var PHPIMS\Storage\DriverInterface
+     * @var PHPIMS\Storage\Driver\DriverInterface
      */
     private $storage;
 
@@ -140,8 +140,8 @@ abstract class Operation {
     /**
      * Class constructor
      *
-     * @param PHPIMS\Database\DriverInterface $database Database driver
-     * @param PHPIMS\Storage\DriverInterface $storage Storage driver
+     * @param PHPIMS\Database\Driver\DriverInterface $database Database driver
+     * @param PHPIMS\Storage\Driver\DriverInterface $storage Storage driver
      */
     public function __construct(Database $database = null, Storage $storage = null) {
         if ($database !== null) {
@@ -251,7 +251,7 @@ abstract class Operation {
     /**
      * Get the database driver
      *
-     * @return PHPIMS\Database\DriverInterface
+     * @return PHPIMS\Database\Driver\DriverInterface
      */
     public function getDatabase() {
         return $this->database;
@@ -260,7 +260,7 @@ abstract class Operation {
     /**
      * Set the database driver
      *
-     * @param PHPIMS\Database\DriverInterface $database The driver instance
+     * @param PHPIMS\Database\Driver\DriverInterface $database The driver instance
      * @return PHPIMS\Operation
      */
     public function setDatabase(Database $database) {
@@ -272,7 +272,7 @@ abstract class Operation {
     /**
      * Get the storage driver
      *
-     * @return PHPIMS\Storage\DriverInterface
+     * @return PHPIMS\Storage\Driver\DriverInterface
      */
     public function getStorage() {
         return $this->storage;
@@ -281,7 +281,7 @@ abstract class Operation {
     /**
      * Set the storage driver
      *
-     * @param PHPIMS\Storage\DriverInterface $storage The driver instance
+     * @param PHPIMS\Storage\Driver\DriverInterface $storage The driver instance
      * @return PHPIMS\Operation
      */
     public function setStorage(Storage $storage) {

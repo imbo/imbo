@@ -33,7 +33,6 @@
 namespace PHPIMS\Database\Driver;
 
 use PHPIMS\Database\Exception as DatabaseException;
-use PHPIMS\Database\DriverInterface;
 use PHPIMS\Image\ImageInterface;
 use PHPIMS\Operation\GetImages\Query;
 
@@ -95,7 +94,7 @@ class MongoDB implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Database\DriverInterface::insertImage()
+     * @see PHPIMS\Database\Driver\DriverInterface::insertImage()
      */
     public function insertImage($publicKey, $imageIdentifier, ImageInterface $image) {
         $data = array(
@@ -126,7 +125,7 @@ class MongoDB implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Database\DriverInterface::deleteImage()
+     * @see PHPIMS\Database\Driver\DriverInterface::deleteImage()
      */
     public function deleteImage($publicKey, $imageIdentifier) {
         try {
@@ -142,7 +141,7 @@ class MongoDB implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Database\DriverInterface::editMetadata()
+     * @see PHPIMS\Database\Driver\DriverInterface::editMetadata()
      */
     public function updateMetadata($publicKey, $imageIdentifier, array $metadata) {
         try {
@@ -163,7 +162,7 @@ class MongoDB implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Database\DriverInterface::getMetadata()
+     * @see PHPIMS\Database\Driver\DriverInterface::getMetadata()
      */
     public function getMetadata($publicKey, $imageIdentifier) {
         try {
@@ -176,7 +175,7 @@ class MongoDB implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Database\DriverInterface::deleteMetadata()
+     * @see PHPIMS\Database\Driver\DriverInterface::deleteMetadata()
      */
     public function deleteMetadata($publicKey, $imageIdentifier) {
         try {
@@ -193,7 +192,7 @@ class MongoDB implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Database\DriverInterface::getImages()
+     * @see PHPIMS\Database\Driver\DriverInterface::getImages()
      */
     public function getImages($publicKey, Query $query) {
         // Initialize return value
@@ -257,7 +256,7 @@ class MongoDB implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Database\DriverInterface::load()
+     * @see PHPIMS\Database\Driver\DriverInterface::load()
      */
     public function load($publicKey, $imageIdentifier, ImageInterface $image) {
         try {
