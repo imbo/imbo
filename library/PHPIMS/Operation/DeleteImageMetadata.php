@@ -33,7 +33,6 @@
 namespace PHPIMS\Operation;
 
 use PHPIMS\Operation;
-use PHPIMS\OperationInterface;
 
 /**
  * Delete metadata operation
@@ -49,7 +48,7 @@ use PHPIMS\OperationInterface;
  */
 class DeleteImageMetadata extends Operation implements OperationInterface {
     /**
-     * @see PHPIMS\OperationInterface::exec()
+     * @see PHPIMS\Operation\OperationInterface::exec()
      */
     public function exec() {
         $this->getDatabase()->deleteMetadata($this->getPublicKey(), $this->getImageIdentifier());

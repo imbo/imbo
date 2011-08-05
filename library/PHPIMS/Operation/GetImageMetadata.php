@@ -33,7 +33,6 @@
 namespace PHPIMS\Operation;
 
 use PHPIMS\Operation;
-use PHPIMS\OperationInterface;
 
 /**
  * Get metadata operation
@@ -49,7 +48,7 @@ use PHPIMS\OperationInterface;
  */
 class GetImageMetadata extends Operation implements OperationInterface {
     /**
-     * @see PHPIMS\OperationInterface::exec()
+     * @see PHPIMS\Operation\OperationInterface::exec()
      */
     public function exec() {
         $data = $this->getDatabase()->getMetadata($this->getPublicKey(), $this->getImageIdentifier());

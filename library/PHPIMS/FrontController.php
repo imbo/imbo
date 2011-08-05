@@ -110,7 +110,7 @@ class FrontController {
      * @param string $imageIdentifier Optional Image identifier
      * @param string $extra Optional extra argument
      * @throws PHPIMS\Exception
-     * @return PHPIMS\OperationInterface
+     * @return PHPIMS\Operation\OperationInterface
      */
     private function resolveOperation($resource, $method, $imageIdentifier = null, $extra = null) {
         $operation = null;

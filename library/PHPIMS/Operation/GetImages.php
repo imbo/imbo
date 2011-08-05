@@ -33,7 +33,6 @@
 namespace PHPIMS\Operation;
 
 use PHPIMS\Operation;
-use PHPIMS\OperationInterface;
 use PHPIMS\Operation\GetImages\Query;
 
 /**
@@ -58,7 +57,7 @@ use PHPIMS\Operation\GetImages\Query;
  */
 class GetImages extends Operation implements OperationInterface {
     /**
-     * @see PHPIMS\OperationInterface::exec()
+     * @see PHPIMS\Operation\OperationInterface::exec()
      */
     public function exec() {
         $query = new Query();

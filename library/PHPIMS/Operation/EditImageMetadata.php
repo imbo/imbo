@@ -33,7 +33,6 @@
 namespace PHPIMS\Operation;
 
 use PHPIMS\Operation;
-use PHPIMS\OperationInterface;
 
 /**
  * Edit image operation
@@ -49,7 +48,7 @@ use PHPIMS\OperationInterface;
  */
 class EditImageMetadata extends Operation implements OperationInterface {
     /**
-     * @see PHPIMS\OperationInterface::exec()
+     * @see PHPIMS\Operation\OperationInterface::exec()
      */
     public function exec() {
         $imageIdentifier = $this->getImageIdentifier();

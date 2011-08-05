@@ -33,8 +33,6 @@
 namespace PHPIMS\Operation;
 
 use PHPIMS\Operation;
-use PHPIMS\OperationInterface;
-use PHPIMS\Operation\Plugin\IdentifyImage;
 
 /**
  * Head image operation
@@ -50,7 +48,7 @@ use PHPIMS\Operation\Plugin\IdentifyImage;
  */
 class HeadImage extends Operation implements OperationInterface {
     /**
-     * @see PHPIMS\OperationInterface::exec()
+     * @see PHPIMS\Operation\OperationInterface::exec()
      */
     public function exec() {
         $image = $this->getImage();

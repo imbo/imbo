@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS;
+namespace PHPIMS\Operation;
 
 /**
  * Operation interface
@@ -48,8 +48,8 @@ interface OperationInterface {
      *
      * The main exec method of the operation.
      *
-     * @return PHPIMS\Operation
+     * @return PHPIMS\Operation\OperationInterface
      * @throws PHPIMS\Operation\Exception
      */
-    public function exec();
+    function exec();
 }
