@@ -113,11 +113,11 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             'imageIdentifier' => $this->imageIdentifier,
         );
 
-        $image = m::mock('PHPIMS\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
               ->once();
 
-        $response = m::mock('PHPIMS\Server\Response');
+        $response = m::mock('PHPIMS\Response\ResponseInterface');
 
         $this->collection->shouldReceive('findOne')->once()->andReturn($data);
 
@@ -130,11 +130,11 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unable to save image data
      */
     public function testInsertImageWhenCollectionThrowsException() {
-        $image = m::mock('PHPIMS\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
               ->once();
 
-        $response = m::mock('PHPIMS\Server\Response');
+        $response = m::mock('PHPIMS\Response\ResponseInterface');
 
         $this->collection->shouldReceive('findOne')->once()->andThrow('MongoException');
 
@@ -147,11 +147,11 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             'imageIdentifier' => $this->imageIdentifier,
         );
 
-        $image = m::mock('PHPIMS\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
               ->once();
 
-        $response = m::mock('PHPIMS\Server\Response');
+        $response = m::mock('PHPIMS\Response\ResponseInterface');
 
         $this->collection->shouldReceive('findOne')->once()->with($data)->andReturn(array());
         $this->collection->shouldReceive('insert')->once()->with(m::type('array'), m::type('array'))->andReturn(true);
@@ -343,7 +343,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             m::type('array')
         )->andThrow('MongoException');
 
-        $this->driver->load($this->publicKey, $this->imageIdentifier, m::mock('PHPIMS\Image'));
+        $this->driver->load($this->publicKey, $this->imageIdentifier, m::mock('PHPIMS\Image\ImageInterface'));
     }
 
     public function testSucessfullLoad() {
@@ -355,7 +355,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             'mime' => 'image/jpg',
         );
 
-        $image = m::mock('PHPIMS\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('setFilesize')->once()->with($data['size'])->andReturn($image);
         $image->shouldReceive('setWidth')->once()->with($data['width'])->andReturn($image);
         $image->shouldReceive('setHeight')->once()->with($data['height'])->andReturn($image);

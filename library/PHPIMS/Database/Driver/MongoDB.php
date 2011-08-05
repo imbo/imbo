@@ -34,7 +34,7 @@ namespace PHPIMS\Database\Driver;
 
 use PHPIMS\Database\Exception as DatabaseException;
 use PHPIMS\Database\DriverInterface;
-use PHPIMS\Image;
+use PHPIMS\Image\ImageInterface;
 use PHPIMS\Operation\GetImages\Query;
 
 /**
@@ -97,7 +97,7 @@ class MongoDB implements DriverInterface {
     /**
      * @see PHPIMS\Database\DriverInterface::insertImage()
      */
-    public function insertImage($publicKey, $imageIdentifier, Image $image) {
+    public function insertImage($publicKey, $imageIdentifier, ImageInterface $image) {
         $data = array(
             'size'            => $image->getFilesize(),
             'publicKey'       => $publicKey,
@@ -259,7 +259,7 @@ class MongoDB implements DriverInterface {
     /**
      * @see PHPIMS\Database\DriverInterface::load()
      */
-    public function load($publicKey, $imageIdentifier, Image $image) {
+    public function load($publicKey, $imageIdentifier, ImageInterface $image) {
         try {
             $data = $this->collection->findOne(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),

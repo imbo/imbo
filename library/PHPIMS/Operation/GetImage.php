@@ -61,10 +61,10 @@ class GetImage extends Operation implements OperationInterface {
         // Fetch information from the database
         $this->getDatabase()->load($publicKey, $imageIdentifier, $image);
 
-        $response->setCustomHeaders(array(
-            'OrignalImageWidth'    => $image->getWidth(),
-            'OrignalImageHeight'   => $image->getHeight(),
-            'OrignalImageSize'     => $image->getFilesize(),
+        $response->setHeaders(array(
+            'X-PHPIMS-OrignalImageWidth'    => $image->getWidth(),
+            'X-PHPIMS-OrignalImageHeight'   => $image->getHeight(),
+            'X-PHPIMS-OrignalImageSize'     => $image->getFilesize(),
         ));
 
         // Load the image

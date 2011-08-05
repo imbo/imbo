@@ -33,7 +33,6 @@
 namespace PHPIMS\Image;
 
 use PHPIMS\Image\Transformation;
-use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 
 /**
@@ -84,10 +83,10 @@ class TransformationChain {
     /**
      * Apply all transformations to an image object
      *
-     * @param PHPIMS\Image $image Image object
+     * @param PHPIMS\Image\ImageInterface $image Image object
      * @return PHPIMS\Image\TransformationChain
      */
-    public function applyToImage(Image $image) {
+    public function applyToImage(ImageInterface $image) {
         foreach ($this->transformations as $transformation) {
             $this->transformImage($image, $transformation);
         }
@@ -98,11 +97,11 @@ class TransformationChain {
     /**
      * Transform an image
      *
-     * @param PHPIMS\Image $image Image object
+     * @param PHPIMS\Image\ImageInterface $image Image object
      * @param PHPIMS\Image\TransformationInterface $transformation Transformation object
      * @return PHPIMS\Image\TransformationChain
      */
-    public function transformImage(Image $image, TransformationInterface $transformation) {
+    public function transformImage(ImageInterface $image, TransformationInterface $transformation) {
         $transformation->applyToImage($image);
 
         return $this;

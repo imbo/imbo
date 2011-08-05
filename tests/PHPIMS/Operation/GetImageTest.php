@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Operation;
 
-use \Mockery as m;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -52,14 +52,14 @@ class GetImageTest extends OperationTests {
     }
 
     public function testSuccessfullExec() {
-        $this->database->shouldReceive('load')->once()->with($this->publicKey, $this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
-        $this->storage->shouldReceive('load')->once()->with($this->publicKey, $this->imageIdentifier, m::type('PHPIMS\\Image'))->andReturn(true);
+        $this->database->shouldReceive('load')->once()->with($this->publicKey, $this->imageIdentifier, m::type('PHPIMS\Image\ImageInterface'))->andReturn(true);
+        $this->storage->shouldReceive('load')->once()->with($this->publicKey, $this->imageIdentifier, m::type('PHPIMS\Image\ImageInterface'))->andReturn(true);
 
-        $image = m::mock('PHPIMS\\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getWidth', 'getHeight', 'getFilename', 'getFilesize')->once()->andReturn('some value');
-        $response = m::mock('PHPIMS\\Server\\Response');
+        $response = m::mock('PHPIMS\Response\ResponseInterface');
         $response->shouldReceive('setImage')->once()->with($image)->andReturn($response);
-        $response->shouldReceive('setCustomHeaders')->once()->with(m::type('array'))->andReturn($response);
+        $response->shouldReceive('setHeaders')->once()->with(m::type('array'))->andReturn($response);
 
         $this->operation->setResponse($response)->setImage($image);
 

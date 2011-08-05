@@ -55,7 +55,7 @@ class EditImageMetadataTest extends OperationTests {
         $metadata = array('foo' => 'bar', 'bar' => array('foo', 'bar'));
         $_POST['metadata'] = json_encode($metadata);
 
-        $response = m::mock('PHPIMS\Server\Response');
+        $response = m::mock('PHPIMS\Response\ResponseInterface');
         $response->shouldReceive('setCode')->once()->with(200)->andReturn($response);
         $response->shouldReceive('setBody')->once()->with(array('imageIdentifier' => $this->imageIdentifier))->andReturn($response);
 

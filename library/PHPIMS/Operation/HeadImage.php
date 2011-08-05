@@ -60,10 +60,10 @@ class HeadImage extends Operation implements OperationInterface {
         $this->getDatabase()->load($this->getPublicKey(), $this->getImageIdentifier(), $image);
 
         $response->setContentType($image->getMimeType())
-                 ->setCustomHeaders(array(
-                    'OrignalImageWidth'    => $image->getWidth(),
-                    'OrignalImageHeight'   => $image->getHeight(),
-                    'OrignalImageSize'     => $image->getFilesize(),
+                 ->setHeaders(array(
+                    'X-PHPIMS-OrignalImageWidth'    => $image->getWidth(),
+                    'X-PHPIMS-OrignalImageHeight'   => $image->getHeight(),
+                    'X-PHPIMS-OrignalImageSize'     => $image->getFilesize(),
                 ));
     }
 }

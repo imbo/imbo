@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Storage\Driver;
 
-use \Mockery as m;
+use Mockery as m;
 
 /** vfsStream */
 require_once 'vfsStream/vfsStream.php';
@@ -104,7 +104,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @expectedExpectionMessage Could not store image
      */
     public function testStoreToUnwritablePath() {
-        $image = m::mock('PHPIMS\\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $dir = 'unwritableDirectory';
 
         // Create the virtual directory with no permissions
@@ -131,7 +131,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 404
      */
     public function testLoadFileThatDoesNotExist() {
-        $image = m::mock('PHPIMS\\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $driver = new Filesystem(array('dataDir' => '/some/path'));
         $driver->load($this->publicKey, $this->imageIdentifier, $image);
     }
@@ -164,7 +164,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $file->setContent($content);
         $last->addChild($file);
 
-        $image = m::mock('PHPIMS\\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('setBlob')->once()->with($content);
 
         $this->assertTrue($driver->load($this->publicKey, $this->imageIdentifier, $image));

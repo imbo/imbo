@@ -32,9 +32,9 @@
 
 namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\TransformationInterface;
+use PHPIMS\Image\ImageInterface;
 
 use Imagine\Imagick\Imagine;
 use Imagine\Exception\Exception as ImagineException;
@@ -98,7 +98,7 @@ class Border implements TransformationInterface {
     /**
      * @see PHPIMS\Image\TransformationInterface::applyToImage()
      */
-    public function applyToImage(Image $image) {
+    public function applyToImage(ImageInterface $image) {
         try {
             $imagine = new Imagine();
             $imagineImage = $imagine->load($image->getBlob());

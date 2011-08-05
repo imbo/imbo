@@ -32,7 +32,7 @@
 
 namespace PHPIMS;
 
-use \Mockery as m;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -71,8 +71,8 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $this->publicKey = md5(microtime());
         $this->privateKey = md5(microtime());
         $config = array(
-            'database' => m::mock('PHPIMS\\Database\\DriverInterface'),
-            'storage' => m::mock('PHPIMS\\Storage\\DriverInterface'),
+            'database' => m::mock('PHPIMS\Database\DriverInterface'),
+            'storage' => m::mock('PHPIMS\Storage\DriverInterface'),
             'auth' => array(
                 $this->publicKey => $this->privateKey,
             ),
@@ -157,22 +157,22 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('resolveOperation');
         $method->setAccessible(true);
 
-        $database = m::mock('PHPIMS\\Database\\DriverInterface');
-        $storage = m::mock('PHPIMS\\Storage\\DriverInterface');
+        $database = m::mock('PHPIMS\Database\DriverInterface');
+        $storage = m::mock('PHPIMS\Storage\DriverInterface');
 
-        $this->assertInstanceOf('PHPIMS\\Operation\\GetImages', $method->invokeArgs($this->controller, array('images', 'GET')));
+        $this->assertInstanceOf('PHPIMS\Operation\GetImages', $method->invokeArgs($this->controller, array('images', 'GET')));
 
-        $this->assertInstanceOf('PHPIMS\\Operation\\GetImage', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier)));
-        $this->assertInstanceOf('PHPIMS\\Operation\\HeadImage', $method->invokeArgs($this->controller, array($resource, 'HEAD', $imageIdentifier)));
-        $this->assertInstanceOf('PHPIMS\\Operation\\AddImage', $method->invokeArgs($this->controller, array($resource, 'PUT', $imageIdentifier)));
-        $this->assertInstanceOf('PHPIMS\\Operation\\DeleteImage', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier)));
+        $this->assertInstanceOf('PHPIMS\Operation\GetImage', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier)));
+        $this->assertInstanceOf('PHPIMS\Operation\HeadImage', $method->invokeArgs($this->controller, array($resource, 'HEAD', $imageIdentifier)));
+        $this->assertInstanceOf('PHPIMS\Operation\AddImage', $method->invokeArgs($this->controller, array($resource, 'PUT', $imageIdentifier)));
+        $this->assertInstanceOf('PHPIMS\Operation\DeleteImage', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier)));
 
         $extra = 'meta';
         $resource .= '/meta';
 
-        $this->assertInstanceOf('PHPIMS\\Operation\\GetImageMetadata', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier, $extra)));
-        $this->assertInstanceOf('PHPIMS\\Operation\\EditImageMetadata', $method->invokeArgs($this->controller, array($resource, 'POST', $imageIdentifier, $extra)));
-        $this->assertInstanceOf('PHPIMS\\Operation\\DeleteImageMetadata', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier, $extra)));
+        $this->assertInstanceOf('PHPIMS\Operation\GetImageMetadata', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier, $extra)));
+        $this->assertInstanceOf('PHPIMS\Operation\EditImageMetadata', $method->invokeArgs($this->controller, array($resource, 'POST', $imageIdentifier, $extra)));
+        $this->assertInstanceOf('PHPIMS\Operation\DeleteImageMetadata', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier, $extra)));
     }
 
     /**

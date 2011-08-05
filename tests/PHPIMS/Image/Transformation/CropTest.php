@@ -49,7 +49,7 @@ class CropTest extends \PHPUnit_Framework_TestCase {
         $width = 3;
         $height = 4;
 
-        $image = m::mock('PHPIMS\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
         $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
         $image->shouldReceive('setWidth')->once()->with($width)->andReturn($image);

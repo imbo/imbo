@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Database;
 
-use PHPIMS\Image;
+use PHPIMS\Image\ImageInterface;
 use PHPIMS\Operation\GetImages\Query;
 
 /**
@@ -56,11 +56,11 @@ interface DriverInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
-     * @param PHPIMS\Image $image The image to insert
+     * @param PHPIMS\Image\ImageInterface $image The image to insert
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Database\Exception
      */
-    function insertImage($publicKey, $imageIdentifier, Image $image);
+    function insertImage($publicKey, $imageIdentifier, ImageInterface $image);
 
     /**
      * Delete an image from the database
@@ -118,9 +118,9 @@ interface DriverInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
-     * @param Image $image The image object to populate
+     * @param PHPIMS\Image\ImageInterface $image The image object to populate
      * @return boolean
      * @throws PHPIMS\Database\Exception
      */
-    function load($publicKey, $imageIdentifier, Image $image);
+    function load($publicKey, $imageIdentifier, ImageInterface $image);
 }

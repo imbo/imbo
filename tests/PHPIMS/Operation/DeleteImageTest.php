@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Operation;
 
-use \Mockery as m;
+use Mockery as m;
 
 /**
  * @package PHPIMS

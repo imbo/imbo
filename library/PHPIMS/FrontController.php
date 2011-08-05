@@ -32,8 +32,9 @@
 
 namespace PHPIMS;
 
-use PHPIMS\Server\Response;
+use PHPIMS\Response\Response;
 use PHPIMS\Operation;
+use PHPIMS\Image\Image;
 
 /**
  * Client that interacts with the server part of PHPIMS

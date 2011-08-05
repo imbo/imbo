@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Storage;
 
-use PHPIMS\Image;
+use PHPIMS\Image\ImageInterface;
 
 /**
  * Storage driver interface
@@ -56,11 +56,11 @@ interface DriverInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
-     * @param PHPIMS\Image $image The image to store
+     * @param PHPIMS\Image\ImageInterface $image The image to store
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Storage\Exception
      */
-    function store($publicKey, $imageIdentifier, Image $image);
+    function store($publicKey, $imageIdentifier, ImageInterface $image);
 
     /**
      * Delete an image
@@ -86,9 +86,9 @@ interface DriverInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
-     * @param PHPIMS\Image $image The image object
+     * @param PHPIMS\Image\ImageInterface $image The image object
      * @return boolean Returns true on success or false on failure
      * @throws PHPIMS\Storage\Exception
      */
-    function load($publicKey, $imageIdentifier, Image $image);
+    function load($publicKey, $imageIdentifier, ImageInterface $image);
 }

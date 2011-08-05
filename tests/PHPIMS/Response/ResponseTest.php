@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Server;
+namespace PHPIMS\Response;
 
 use PHPIMS\Exception;
 
@@ -46,9 +46,9 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
     /**
      * Response instance
      *
-     * @var PHPIMS\Server\Response
+     * @var PHPIMS\Response\Response
      */
-    protected $response = null;
+    private $response;
 
     /**
      * Set up method
@@ -79,18 +79,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($headers, $this->response->getHeaders());
     }
 
-    public function testSetGetCustomHeaders() {
-        $headers = array(
-            'Location' => 'http://foo/bar',
-            'x-Some' => 'Value',
-        );
-        $this->response->setCustomHeaders($headers);
-        $this->assertSame(array(
-            'X-PHPIMS-Location' => 'http://foo/bar',
-            'X-PHPIMS-x-Some' => 'Value',
-        ), $this->response->getHeaders());
-    }
-
     public function testSetGetHeader() {
         $headers = array(
             'Location' => 'http://foo/bar',
@@ -102,22 +90,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         }
 
         $this->assertSame($headers, $this->response->getHeaders());
-    }
-
-    public function testSetGetCustomHeader() {
-        $headers = array(
-            'foo' => 'foo',
-            'X-bar' => 'bar',
-        );
-
-        foreach ($headers as $name => $value) {
-            $this->response->setCustomHeader($name, $value);
-        }
-
-        $this->assertSame(array(
-            'X-PHPIMS-foo' => 'foo',
-            'X-PHPIMS-X-bar' => 'bar',
-        ), $this->response->getHeaders());
     }
 
     public function testSetGetBody() {
@@ -151,14 +123,14 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetImage() {
-        $image = $this->getMock('PHPIMS\\Image');
+        $image = $this->getMock('PHPIMS\Image\ImageInterface');
         $this->response->setImage($image);
         $this->assertSame($image, $this->response->getImage());
     }
 
     public function testHasImage() {
         $this->assertFalse($this->response->hasImage());
-        $image = $this->getMock('PHPIMS\\Image');
+        $image = $this->getMock('PHPIMS\Image\ImageInterface');
         $this->response->setImage($image);
         $this->assertTrue($this->response->hasImage());
     }

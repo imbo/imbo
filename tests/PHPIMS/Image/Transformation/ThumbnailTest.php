@@ -48,7 +48,7 @@ class ThumbnailTest extends \PHPUnit_Framework_TestCase {
         $height = 90;
         $fit = 'outbound';
 
-        $image = m::mock('PHPIMS\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
         $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
         $image->shouldReceive('setWidth')->once()->with($width)->andReturn($image);

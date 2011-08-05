@@ -32,9 +32,10 @@
 
 namespace PHPIMS;
 
+use PHPIMs\Image\ImageInterface;
 use PHPIMS\Database\DriverInterface as Database;
 use PHPIMS\Storage\DriverInterface as Storage;
-use PHPIMS\Server\Response;
+use PHPIMS\Response\ResponseInterface;
 use PHPIMS\Operation\Exception as OperationException;
 use PHPIMS\Operation\PluginInterface as Plugin;
 use PHPIMS\Operation\Plugin\Auth;
@@ -91,20 +92,20 @@ abstract class Operation {
     /**
      * Image instance
      *
-     * The image object is populated with en empty instance of PHPIMS\Image when the operation
-     * initializes.
+     * The image object is populated with en empty instance of PHPIMS\Image\ImageInterface when the
+     * operation initializes.
      *
-     * @var PHPIMS\Image
+     * @var PHPIMS\Image\ImageInterface
      */
     private $image;
 
     /**
      * Response instance
      *
-     * The response object is populated with en empty instance of PHPIMS\Server\Response when the
-     * operation initializes.
+     * The response object is populated with en empty instance of PHPIMS\Response\ResponseInterface
+     * when the operation initializes.
      *
-     * @var PHPIMS\Image
+     * @var PHPIMS\Response\ResponseInterface
      */
     private $response;
 
@@ -292,7 +293,7 @@ abstract class Operation {
     /**
      * Get the current image
      *
-     * @return PHPIMS\Image
+     * @return PHPIMS\Image\ImageInterface
      */
     public function getImage() {
         return $this->image;
@@ -301,10 +302,10 @@ abstract class Operation {
     /**
      * Set the image
      *
-     * @param PHPIMS\Image $image The image object to set
+     * @param PHPIMS\Image\ImageInterface $image The image object to set
      * @return PHPIMS\Operation
      */
-    public function setImage(Image $image) {
+    public function setImage(ImageInterface $image) {
         $this->image = $image;
 
         return $this;
@@ -313,7 +314,7 @@ abstract class Operation {
     /**
      * Get the response object
      *
-     * @return PHPIMS\Server\Response
+     * @return PHPIMS\Response\ResponseInterface
      */
     public function getResponse() {
         return $this->response;
@@ -322,10 +323,10 @@ abstract class Operation {
     /**
      * Set the response instance
      *
-     * @param PHPIMS\Server\Response $response A response object
+     * @param PHPIMS\Response\ResponseInterface $response A response object
      * @return PHPIMS\Operation
      */
-    public function setResponse(Response $response) {
+    public function setResponse(ResponseInterface $response) {
         $this->response = $response;
 
         return $this;

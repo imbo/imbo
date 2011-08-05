@@ -34,7 +34,7 @@ namespace PHPIMS\Storage\Driver;
 
 use PHPIMS\Storage\DriverInterface;
 use PHPIMS\Storage\Exception as StorageException;
-use PHPIMS\Image;
+use PHPIMS\Image\ImageInterface;
 
 /**
  * Filesystem storage driver
@@ -74,7 +74,7 @@ class Filesystem implements DriverInterface {
     /**
      * @see PHPIMS\Storage\DriverInterface::store()
      */
-    public function store($publicKey, $imageIdentifier, Image $image) {
+    public function store($publicKey, $imageIdentifier, ImageInterface $image) {
         if (!is_writable($this->params['dataDir'])) {
             throw new StorageException('Could not store image', 500);
         }
@@ -110,7 +110,7 @@ class Filesystem implements DriverInterface {
     /**
      * @see PHPIMS\Storage\DriverInterface::load()
      */
-    public function load($publicKey, $imageIdentifier, Image $image) {
+    public function load($publicKey, $imageIdentifier, ImageInterface $image) {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         if (!is_file($path)) {

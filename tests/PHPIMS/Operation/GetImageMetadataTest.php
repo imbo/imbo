@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Operation;
 
-use \Mockery as m;
+use Mockery as m;
 
 /**
  * @package PHPIMS
@@ -58,7 +58,7 @@ class GetImageMetadataTest extends OperationTests {
         );
         $this->database->shouldReceive('getMetadata')->once()->with($this->publicKey, $this->imageIdentifier)->andReturn($data);
 
-        $response = m::mock('PHPIMS\\Server\\Response');
+        $response = m::mock('PHPIMS\Response\ResponseInterface');
         $response->shouldReceive('setBody')->once()->with($data);
 
         $this->operation->setResponse($response);

@@ -44,7 +44,7 @@ use Mockery as m;
  */
 class RotateTest extends \PHPUnit_Framework_TestCase {
     public function testApplyToImage() {
-        $image = m::mock('PHPIMS\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
         $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
         $image->shouldReceive('setWidth')->once()->with(m::type('int'))->andReturn($image);

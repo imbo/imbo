@@ -32,7 +32,7 @@
 
 namespace PHPIMS\Operation;
 
-use \Mockery as m;
+use Mockery as m;
 use PHPIMS\Operation\GetImages\Query;
 
 /**
@@ -74,7 +74,7 @@ class GetImagesTest extends OperationTests {
                    $q->to() === $_GET['to'];
         }))->andReturn($images);
 
-        $response = m::mock('PHPIMS\\Server\\Response');
+        $response = m::mock('PHPIMS\Response\ResponseInterface');
         $response->shouldReceive('setBody')->once()->with($images);
 
         $this->operation->setResponse($response);

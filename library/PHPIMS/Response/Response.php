@@ -29,9 +29,9 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Server;
+namespace PHPIMS\Response;
 
-use PHPIMS\Image;
+use PHPIMS\Image\ImageInterface;
 use PHPIMS\Exception;
 
 /**
@@ -43,7 +43,7 @@ use PHPIMS\Exception;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Response {
+class Response implements ResponseInterface {
     /**
      * Different status codes
      *
@@ -136,24 +136,19 @@ class Response {
     /**
      * Optional image attached to the response
      *
-     * @var PHPIMS\Image
+     * @var PHPIMS\ImageInterface
      */
-    private $image = null;
+    private $image;
 
     /**
-     * Get the status code
-     *
-     * @return int
+     * @see PHPIMS\Response\ResponseInterface::getCode()
      */
     public function getCode() {
         return $this->code;
     }
 
     /**
-     * Set the code
-     *
-     * @param int $code The HTTP status code to use in the response
-     * @return PHPIMS\Server\Response
+     * @see PHPIMS\Response\ResponseInterface::setCode()
      */
     public function setCode($code) {
         $this->code = (int) $code;
@@ -162,19 +157,14 @@ class Response {
     }
 
     /**
-     * Get all headers
-     *
-     * @return array
+     * @see PHPIMS\Response\ResponseInterface::getHeaders()
      */
     public function getHeaders() {
         return $this->headers;
     }
 
     /**
-     * Set all headers
-     *
-     * @param array $headers An array of headers to set
-     * @return PHPIMS\Server\Response
+     * @see PHPIMS\Response\ResponseInterface::setHeaders()
      */
     public function setHeaders(array $headers) {
         foreach ($headers as $name => $value) {
@@ -185,11 +175,7 @@ class Response {
     }
 
     /**
-     * Add a single header
-     *
-     * @param string $name The header name
-     * @param mixed $value The header value
-     * @return PHPIMS\Server\Response
+     * @see PHPIMS\Response\ResponseInterface::setHeader()
      */
     public function setHeader($name, $value) {
         $this->headers[$name] = $value;
@@ -198,34 +184,7 @@ class Response {
     }
 
     /**
-     * Set custom headers (prefixed with "X-PHPIMS-")
-     *
-     * @param array $headers Headers to set
-     * @return \PHPIMS\Server\Response
-     */
-    public function setCustomHeaders(array $headers) {
-        foreach ($headers as $name => $value) {
-            $this->setCustomHeader($name, $value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Set a custom header (prefixed with "X-PHPIMS-")
-     *
-     * @param string $name The header name
-     * @param mixed $value The header value
-     */
-    public function setCustomHeader($name, $value) {
-        return $this->setHeader('X-PHPIMS-' . $name, $value);
-    }
-
-    /**
-     * Remove a single header element
-     *
-     * @param string $name The name of the header. For instance 'Location'
-     * @return PHPIMS\Server\Response
+     * @see PHPIMS\Response\ResponseInterface::removeHeader()
      */
     public function removeHeader($name) {
         unset($this->headers[$name]);
@@ -234,19 +193,14 @@ class Response {
     }
 
     /**
-     * Get the Content-Type
-     *
-     * @return string
+     * @see PHPIMS\Response\ResponseInterface::getContentType()
      */
     public function getContentType() {
         return $this->contentType;
     }
 
     /**
-     * Set the Content-Type
-     *
-     * @param string $type The type to set. For instance "application/json" or "image/png"
-     * @return PHPIMS\Server\Response
+     * @see PHPIMS\Response\ResponseInterface::setContentType()
      */
     public function setContentType($type) {
         $this->contentType = $type;
@@ -255,19 +209,14 @@ class Response {
     }
 
     /**
-     * Get the body
-     *
-     * @return array
+     * @see PHPIMS\Response\ResponseInterface::getBody()
      */
     public function getBody() {
         return $this->body;
     }
 
     /**
-     * Set the body
-     *
-     * @param array $body The body content
-     * @return PHPIMS\Server\Response
+     * @see PHPIMS\Response\ResponseInterface::setBody()
      */
     public function setBody(array $body) {
         $this->body = $body;
@@ -276,30 +225,23 @@ class Response {
     }
 
     /**
-     * Get the image
-     *
-     * @return PHPIMS\Image
+     * @see PHPIMS\Response\ResponseInterface::getImage()
      */
     public function getImage() {
         return $this->image;
     }
 
     /**
-     * Set the image
-     *
-     * @param PHPIMS\Image $image The image object
-     * @return PHPIMS\Server\Response
+     * @see PHPIMS\Response\ResponseInterface::setImage()
      */
-    public function setImage(Image $image) {
+    public function setImage(ImageInterface $image) {
         $this->image = $image;
 
         return $this;
     }
 
     /**
-     * See if the response has an image attached to it
-     *
-     * @return boolean
+     * @see PHPIMS\Response\ResponseInterface::hasImage()
      */
     public function hasImage() {
         return !($this->image === null);
@@ -309,7 +251,7 @@ class Response {
      * Create a response based on an exception object
      *
      * @param PHPIMS\Exception $e
-     * @return PHPIMS\Server\Response
+     * @return PHPIMS\Response\Response
      */
     static public function fromException(Exception $e) {
         $response = new static();

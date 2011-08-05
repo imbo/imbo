@@ -29,7 +29,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS;
+namespace PHPIMS\Image;
 
 /**
  * Class that represents a single image
@@ -40,7 +40,7 @@ namespace PHPIMS;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Image {
+class Image implements ImageInterface {
     /**
      * Size of the file
      *
@@ -91,40 +91,21 @@ class Image {
     private $height;
 
     /**
-     * Get the size in bytes
-     *
-     * @return int
+     * @use PHPIMS\Image\ImageInterface::getFilesize()
      */
     public function getFilesize() {
         return $this->filesize;
     }
 
     /**
-     * Set the size in bytes
-     *
-     * @param int $filesize The size to set
-     * @return PHPIMS\Image
-     */
-    private function setFilesize($filesize) {
-        $this->filesize = $filesize;
-
-        return $this;
-    }
-
-    /**
-     * Get the mime type
-     *
-     * @return string
+     * @use PHPIMS\Image\ImageInterface::getMimeType()
      */
     public function getMimeType() {
         return $this->mimeType;
     }
 
     /**
-     * Set the mime type
-     *
-     * @param string $mimeType The mime type, for instance "image/png"
-     * @return PHPIMS\Image
+     * @use PHPIMS\Image\ImageInterface::setMimeType()
      */
     public function setMimeType($mimeType) {
         $this->mimeType = $mimeType;
@@ -133,19 +114,14 @@ class Image {
     }
 
     /**
-     * Get the extension
-     *
-     * @return string
+     * @use PHPIMS\Image\ImageInterface::getExtension()
      */
     public function getExtension() {
         return $this->extension;
     }
 
     /**
-     * Set the extension
-     *
-     * @param string $extension The file extension
-     * @return PHPIMS\Image
+     * @use PHPIMS\Image\ImageInterface::setExtension()
      */
     public function setExtension($extension) {
         $this->extension = $extension;
@@ -154,41 +130,31 @@ class Image {
     }
 
     /**
-     * Get the blob
-     *
-     * @return string
+     * @use PHPIMS\Image\ImageInterface::getBlob()
      */
     public function getBlob() {
         return $this->blob;
     }
 
     /**
-     * Set the blob
-     *
-     * @param string $blob The binary data to set
-     * @return PHPIMS\Image
+     * @use PHPIMS\Image\ImageInterface::setBlob()
      */
     public function setBlob($blob) {
         $this->blob = $blob;
-        $this->setFilesize(strlen($blob));
+        $this->filesize = strlen($blob);
 
         return $this;
     }
 
     /**
-     * Get the metadata
-     *
-     * @return array
+     * @use PHPIMS\Image\ImageInterface::getMetadata()
      */
     public function getMetadata() {
         return $this->metadata;
     }
 
     /**
-     * Set the metadata
-     *
-     * @param array $metadata An array with metadata
-     * @return PHPIMS\Image
+     * @use PHPIMS\Image\ImageInterface::setMetadata()
      */
     public function setMetadata(array $metadata) {
         $this->metadata = $metadata;
@@ -197,19 +163,14 @@ class Image {
     }
 
     /**
-     * Get the width
-     *
-     * @return int
+     * @use PHPIMS\Image\ImageInterface::getWidth()
      */
     public function getWidth() {
         return $this->width;
     }
 
     /**
-     * Set the width
-     *
-     * @param int $width Width in pixels
-     * @return PHPIMS\Image
+     * @use PHPIMS\Image\ImageInterface::setWidth()
      */
     public function setWidth($width) {
         $this->width = (int) $width;
@@ -218,19 +179,14 @@ class Image {
     }
 
     /**
-     * Get the height
-     *
-     * @return int
+     * @use PHPIMS\Image\ImageInterface::getHeight()
      */
     public function getHeight() {
         return $this->height;
     }
 
     /**
-     * Set the height
-     *
-     * @param int $height Height in pixels
-     * @return PHPIMS\Image
+     * @use PHPIMS\Image\ImageInterface::setHeight()
      */
     public function setHeight($height) {
         $this->height = (int) $height;

@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS;
+namespace PHPIMS\Image;
 
 /**
  * @package PHPIMS
@@ -44,9 +44,9 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     /**
      * Image instance
      *
-     * @var PHPIMS\Image
+     * @var PHPIMS\Image\Image
      */
-    protected $image = null;
+    private $image;
 
     /**
      * Set up method

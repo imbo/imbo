@@ -44,7 +44,7 @@ use Mockery as m;
  */
 class ResizeTest extends \PHPUnit_Framework_TestCase {
     public function testApplyToImageWithBothParams() {
-        $image = m::mock('PHPIMS\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
         $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
         $image->shouldReceive('setWidth')->once()->with(200)->andReturn($image);
@@ -56,7 +56,7 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testApplyToImageWithOnlyWidth() {
-        $image = m::mock('PHPIMS\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
         $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
         $image->shouldReceive('setWidth')->once()->with(200)->andReturn($image);
@@ -68,7 +68,7 @@ class ResizeTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testApplyToImageWithOnlyHeight() {
-        $image = m::mock('PHPIMS\Image');
+        $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
         $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
         $image->shouldReceive('setWidth')->once()->with(m::type('int'))->andReturn($image);
