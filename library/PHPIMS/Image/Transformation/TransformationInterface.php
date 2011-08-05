@@ -30,8 +30,9 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Image;
+namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Image\ImageInterface;
 use PHPIMS\Client\ImageUrl;
 
 /**
@@ -49,7 +50,6 @@ interface TransformationInterface {
      * Apply a transformation to an image object
      *
      * @param PHPIMS\Image\ImageInterface Image instance
-     *
      * @throws PHPIMS\Image\Transformation\Exception
      */
     function applyToImage(ImageInterface $image);

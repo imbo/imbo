@@ -33,6 +33,7 @@
 namespace PHPIMS\Image;
 
 use PHPIMS\Image\Transformation;
+use PHPIMS\Image\Transformation\TransformationInterface;
 use PHPIMS\Client\ImageUrl;
 
 /**
@@ -71,7 +72,7 @@ class TransformationChain {
      * Transform an image url
      *
      * @param PHPIMS\Client\ImageUrl $url Image url object
-     * @param PHPIMS\Image\TransformationInterface $transformation Transformation object
+     * @param PHPIMS\Image\Transformation\TransformationInterface $transformation Transformation object
      * @return PHPIMS\Image\TransformationChain
      */
     public function transformImageUrl(ImageUrl $url, TransformationInterface $transformation) {
@@ -98,7 +99,7 @@ class TransformationChain {
      * Transform an image
      *
      * @param PHPIMS\Image\ImageInterface $image Image object
-     * @param PHPIMS\Image\TransformationInterface $transformation Transformation object
+     * @param PHPIMS\Image\Transformation\TransformationInterface $transformation Transformation object
      * @return PHPIMS\Image\TransformationChain
      */
     public function transformImage(ImageInterface $image, TransformationInterface $transformation) {
@@ -110,7 +111,7 @@ class TransformationChain {
     /**
      * Add a transformation to the chain
      *
-     * @param TransformationInterface $transformation The transformation to add
+     * @param PHPIMS\Image\Transformation\TransformationInterface $transformation The transformation to add
      * @return PHPIMS\Image\TransformationChain
      */
     public function add(TransformationInterface $transformation) {
