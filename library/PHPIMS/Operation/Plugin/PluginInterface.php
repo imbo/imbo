@@ -23,20 +23,22 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
+ * @subpackage Interfaces
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation;
+namespace PHPIMS\Operation\Plugin;
 
 use PHPIMS\Operation;
 
 /**
- * Abstract class for operation plugins
+ * Interface for plugins
  *
  * @package PHPIMS
+ * @subpackage Interfaces
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -49,5 +51,5 @@ interface PluginInterface {
      * @param PHPIMS\Opertaion $operation The operation the current plugin is working on
      * @throws PHPIMS\Operation\Plugin\Exception
      */
-    public function exec(Operation $operation);
+    function exec(Operation $operation);
 }

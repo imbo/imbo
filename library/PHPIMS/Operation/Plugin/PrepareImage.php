@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Operation\Plugin;
 
-use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 
 /**
@@ -59,7 +58,7 @@ class PrepareImage implements PluginInterface {
     );
 
     /**
-     * @see PHPIMS\Operation\PluginInterface::exec()
+     * @see PHPIMS\Operation\Plugin\PluginInterface::exec()
      */
     public function exec(Operation $operation) {
         // Fetch image data from input

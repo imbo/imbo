@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Operation\Plugin;
 
-use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 
 /**
@@ -71,7 +70,7 @@ class IdentifyImage implements PluginInterface {
     );
 
     /**
-     * @see PHPIMS\Operation\PluginInterface::exec()
+     * @see PHPIMS\Operation\Plugin\PluginInterface::exec()
      */
     public function exec(Operation $operation) {
         $image = $operation->getImage();

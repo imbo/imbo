@@ -37,7 +37,7 @@ use PHPIMS\Database\Driver\DriverInterface as Database;
 use PHPIMS\Storage\Driver\DriverInterface as Storage;
 use PHPIMS\Response\ResponseInterface;
 use PHPIMS\Operation\Exception as OperationException;
-use PHPIMS\Operation\PluginInterface as Plugin;
+use PHPIMS\Operation\Plugin\PluginInterface;
 use PHPIMS\Operation\Plugin\Auth;
 use PHPIMS\Operation\Plugin\IdentifyImage;
 use PHPIMS\Operation\Plugin\ManipulateImage;
@@ -162,10 +162,10 @@ abstract class Operation {
     /**
      * Register a plugin
      *
-     * @param PHPIMS\Operation\PluginInterface $plugin Plugin instance
+     * @param PHPIMS\Operation\Plugin\PluginInterface $plugin Plugin instance
      * @return PHPIMS\Operation
      */
-    public function registerPlugin(Plugin $plugin) {
+    public function registerPlugin(PluginInterface $plugin) {
         $this->plugins[] = $plugin;
 
         return $this;

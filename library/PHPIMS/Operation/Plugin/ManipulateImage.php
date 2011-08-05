@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Operation\Plugin;
 
-use PHPIMS\Operation\PluginInterface;
 use PHPIMS\Operation;
 use PHPIMS\Image\Transformation;
 
@@ -60,7 +59,7 @@ class ManipulateImage implements PluginInterface {
     );
 
     /**
-     * @see PHPIMS\Operation\PluginInterface::exec()
+     * @see PHPIMS\Operation\Plugin\PluginInterface::exec()
      */
     public function exec(Operation $operation) {
         if (isset($_GET['t']) && is_array($_GET['t'])) {
