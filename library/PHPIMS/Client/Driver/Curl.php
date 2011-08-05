@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Client\Driver;
 
-use PHPIMS\Client\DriverInterface;
 use PHPIMS\Client\Response;
 
 /**
@@ -95,7 +94,7 @@ class Curl implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Client\DriverInterface::post()
+     * @see PHPIMS\Client\Driver\DriverInterface::post()
      */
     public function post($url, array $metadata = null) {
         $postFields = array(
@@ -113,7 +112,7 @@ class Curl implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Client\DriverInterface::get()
+     * @see PHPIMS\Client\Driver\DriverInterface::get()
      */
     public function get($url) {
         $handle = curl_copy_handle($this->curlHandle);
@@ -126,7 +125,7 @@ class Curl implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Client\DriverInterface::head()
+     * @see PHPIMS\Client\Driver\DriverInterface::head()
      */
     public function head($url) {
         $handle = curl_copy_handle($this->curlHandle);
@@ -140,7 +139,7 @@ class Curl implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Client\DriverInterface::delete()
+     * @see PHPIMS\Client\Driver\DriverInterface::delete()
      */
     public function delete($url) {
         $handle = curl_copy_handle($this->curlHandle);
@@ -153,7 +152,7 @@ class Curl implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Client\DriverInterface::put()
+     * @see PHPIMS\Client\Driver\DriverInterface::put()
      */
     public function put($url, $filePath) {
         $fr = fopen($filePath, 'r');

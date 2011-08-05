@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Client;
+namespace PHPIMS\Client\Driver;
 
 /**
  * Client driver interface

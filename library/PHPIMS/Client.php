@@ -32,7 +32,7 @@
 
 namespace PHPIMS;
 
-use PHPIMS\Client\DriverInterface;
+use PHPIMS\Client\Driver\DriverInterface;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Client\Driver\Curl as DefaultDriver;
 use PHPIMS\Client\Exception as ClientException;
@@ -62,7 +62,7 @@ class Client {
     /**
      * Driver used by the client
      *
-     * @var PHPIMS\Client\DriverInterface
+     * @var PHPIMS\Client\Driver\DriverInterface
      */
     private $driver;
 
@@ -86,7 +86,7 @@ class Client {
      * @param string $serverUrl The URL to the PHPIMS server, including protocol
      * @param string $publicKey The public key to use
      * @param string $privateKey The private key to use
-     * @param PHPIMS\Client\DriverInterface $driver Optional driver to set
+     * @param PHPIMS\Client\Driver\DriverInterface $driver Optional driver to set
      */
     public function __construct($serverUrl, $publicKey, $privateKey, DriverInterface $driver = null) {
         $this->serverUrl  = rtrim($serverUrl, '/');

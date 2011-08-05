@@ -99,7 +99,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         $this->publicKey = md5(microtime());
         $this->privateKey = md5(microtime());
         $this->imageIdentifier = md5(microtime()) . '.png';
-        $this->driver = m::mock('PHPIMS\Client\DriverInterface');
+        $this->driver = m::mock('PHPIMS\Client\Driver\DriverInterface');
 
         $this->client = new Client($this->serverUrl, $this->publicKey, $this->privateKey, $this->driver);
     }
