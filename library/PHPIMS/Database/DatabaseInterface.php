@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Database\Driver;
+namespace PHPIMS\Database;
 
 use PHPIMS\Image\ImageInterface;
 use PHPIMS\Operation\GetImages\Query;
@@ -47,7 +47,7 @@ use PHPIMS\Operation\GetImages\Query;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface DriverInterface {
+interface DatabaseInterface {
     /**
      * Insert a new image
      *

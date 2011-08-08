@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Storage\Driver;
+namespace PHPIMS\Storage;
 
 use Mockery as m;
 

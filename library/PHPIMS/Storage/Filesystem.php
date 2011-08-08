@@ -30,9 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Storage\Driver;
+namespace PHPIMS\Storage;
 
-use PHPIMS\Storage\Exception as StorageException;
 use PHPIMS\Image\ImageInterface;
 
 /**
@@ -51,7 +50,7 @@ use PHPIMS\Image\ImageInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Filesystem implements DriverInterface {
+class Filesystem implements StorageInterface {
     /**
      * Parameters for the filesystem driver
      *
@@ -71,11 +70,11 @@ class Filesystem implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Storage\Driver\DriverInterface::store()
+     * @see PHPIMS\Storage\StorageInterface::store()
      */
     public function store($publicKey, $imageIdentifier, ImageInterface $image) {
         if (!is_writable($this->params['dataDir'])) {
-            throw new StorageException('Could not store image', 500);
+            throw new Exception('Could not store image', 500);
         }
 
         // Create path for the image
@@ -94,26 +93,26 @@ class Filesystem implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Storage\Driver\DriverInterface::delete()
+     * @see PHPIMS\Storage\StorageInterface::delete()
      */
     public function delete($publicKey, $imageIdentifier) {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         if (!is_file($path)) {
-            throw new StorageException('File not found', 404);
+            throw new Exception('File not found', 404);
         }
 
         return unlink($path);
     }
 
     /**
-     * @see PHPIMS\Storage\Driver\DriverInterface::load()
+     * @see PHPIMS\Storage\StorageInterface::load()
      */
     public function load($publicKey, $imageIdentifier, ImageInterface $image) {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         if (!is_file($path)) {
-            throw new StorageException('File not found', 404);
+            throw new Exception('File not found', 404);
         }
 
         $image->setBlob(file_get_contents($path));

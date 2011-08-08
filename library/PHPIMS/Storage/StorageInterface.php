@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Storage\Driver;
+namespace PHPIMS\Storage;
 
 use PHPIMS\Image\ImageInterface;
 
@@ -46,7 +46,7 @@ use PHPIMS\Image\ImageInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-interface DriverInterface {
+interface StorageInterface {
     /**
      * Store an image
      *

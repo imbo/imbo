@@ -30,9 +30,8 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Database\Driver;
+namespace PHPIMS\Database;
 
-use PHPIMS\Database\Exception as DatabaseException;
 use PHPIMS\Image\ImageInterface;
 use PHPIMS\Operation\GetImages\Query;
 
@@ -53,13 +52,13 @@ use PHPIMS\Operation\GetImages\Query;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class MongoDB implements DriverInterface {
+class MongoDB implements DatabaseInterface {
     /**
      * The collection instance used by the driver
      *
      * @var \MongoCollection
      */
-    private $collection = null;
+    private $collection;
 
     /**
      * Parameters for the driver
@@ -94,7 +93,7 @@ class MongoDB implements DriverInterface {
     }
 
     /**
-     * @see PHPIMS\Database\Driver\DriverInterface::insertImage()
+     * @see PHPIMS\Database\DatabaseInterface::insertImage()
      */
     public function insertImage($publicKey, $imageIdentifier, ImageInterface $image) {
         $data = array(
@@ -113,19 +112,19 @@ class MongoDB implements DriverInterface {
             $row = $this->collection->findOne(array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier));
 
             if ($row) {
-                throw new DatabaseException('Image already exists', 400);
+                throw new Exception('Image already exists', 400);
             }
 
             $this->collection->insert($data, array('safe' => true));
         } catch (\MongoException $e) {
-            throw new DatabaseException('Unable to save image data', 500, $e);
+            throw new Exception('Unable to save image data', 500, $e);
         }
 
         return true;
     }
 
     /**
-     * @see PHPIMS\Database\Driver\DriverInterface::deleteImage()
+     * @see PHPIMS\Database\DatabaseInterface::deleteImage()
      */
     public function deleteImage($publicKey, $imageIdentifier) {
         try {
@@ -134,14 +133,14 @@ class MongoDB implements DriverInterface {
                 array('justOne' => true, 'safe' => true)
             );
         } catch (\MongoException $e) {
-            throw new DatabaseException('Unable to delete image data', 500, $e);
+            throw new Exception('Unable to delete image data', 500, $e);
         }
 
         return true;
     }
 
     /**
-     * @see PHPIMS\Database\Driver\DriverInterface::editMetadata()
+     * @see PHPIMS\Database\DatabaseInterface::editMetadata()
      */
     public function updateMetadata($publicKey, $imageIdentifier, array $metadata) {
         try {
@@ -155,27 +154,27 @@ class MongoDB implements DriverInterface {
                 array('safe' => true, 'multiple' => false)
             );
         } catch (\MongoException $e) {
-            throw new DatabaseException('Unable to edit image data', 500, $e);
+            throw new Exception('Unable to edit image data', 500, $e);
         }
 
         return true;
     }
 
     /**
-     * @see PHPIMS\Database\Driver\DriverInterface::getMetadata()
+     * @see PHPIMS\Database\DatabaseInterface::getMetadata()
      */
     public function getMetadata($publicKey, $imageIdentifier) {
         try {
             $data = $this->collection->findOne(array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier));
         } catch (\MongoException $e) {
-            throw new DatabaseException('Unable to fetch image metadata', 500, $e);
+            throw new Exception('Unable to fetch image metadata', 500, $e);
         }
 
         return isset($data['metadata']) ? $data['metadata'] : array();
     }
 
     /**
-     * @see PHPIMS\Database\Driver\DriverInterface::deleteMetadata()
+     * @see PHPIMS\Database\DatabaseInterface::deleteMetadata()
      */
     public function deleteMetadata($publicKey, $imageIdentifier) {
         try {
@@ -185,14 +184,14 @@ class MongoDB implements DriverInterface {
                 array('safe' => true, 'multiple' => false)
             );
         } catch (\MongoException $e) {
-            throw new DatabaseException('Unable to remove metadata', 500, $e);
+            throw new Exception('Unable to remove metadata', 500, $e);
         }
 
         return true;
     }
 
     /**
-     * @see PHPIMS\Database\Driver\DriverInterface::getImages()
+     * @see PHPIMS\Database\DatabaseInterface::getImages()
      */
     public function getImages($publicKey, Query $query) {
         // Initialize return value
@@ -249,14 +248,14 @@ class MongoDB implements DriverInterface {
                 $images[] = $image;
             }
         } catch (\MongoException $e) {
-            throw new DatabaseException('Unable to search for images', 500, $e);
+            throw new Exception('Unable to search for images', 500, $e);
         }
 
         return $images;
     }
 
     /**
-     * @see PHPIMS\Database\Driver\DriverInterface::load()
+     * @see PHPIMS\Database\DatabaseInterface::load()
      */
     public function load($publicKey, $imageIdentifier, ImageInterface $image) {
         try {
@@ -265,7 +264,7 @@ class MongoDB implements DriverInterface {
                 array('name', 'size', 'width', 'height', 'mime')
             );
         } catch (\MongoException $e) {
-            throw new DatabaseException('Unable to fetch image data', 500, $e);
+            throw new Exception('Unable to fetch image data', 500, $e);
         }
 
         $image->setWidth($data['width'])

@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Database\Driver;
+namespace PHPIMS\Database;
 
 use Mockery as m;
 
@@ -46,7 +46,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     /**
      * Driver instance
      *
-     * @var PHPIMS\Database\Driver\MongoDB
+     * @var PHPIMS\Database\MongoDB
      */
     private $driver;
 
