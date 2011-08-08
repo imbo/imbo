@@ -29,7 +29,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
- 
+
 namespace PHPIMS;
 
 /**
@@ -92,6 +92,9 @@ class Autoload {
         'phpims\\operation\\plugin\\manipulateimage' => '/Operation/Plugin/ManipulateImage.php',
         'phpims\\operation\\plugin\\plugininterface' => '/Operation/Plugin/PluginInterface.php',
         'phpims\\operation\\plugin\\prepareimage' => '/Operation/Plugin/PrepareImage.php',
+        'phpims\\request\\exception' => '/Request/Exception.php',
+        'phpims\\request\\request' => '/Request/Request.php',
+        'phpims\\request\\requestinterface' => '/Request/RequestInterface.php',
         'phpims\\response\\response' => '/Response/Response.php',
         'phpims\\response\\responseinterface' => '/Response/ResponseInterface.php',
         'phpims\\storage\\driver\\driverinterface' => '/Storage/Driver/DriverInterface.php',
