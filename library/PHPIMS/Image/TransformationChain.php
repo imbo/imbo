@@ -46,13 +46,20 @@ use PHPIMS\Client\ImageUrl;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class TransformationChain {
+class TransformationChain implements \Countable {
     /**
      * Transformations added
      *
      * @var array
      */
     private $transformations = array();
+
+    /**
+     * @see Countable::count()
+     */
+    public function count() {
+        return count($this->transformations);
+    }
 
     /**
      * Apply all transformations to an image url object
