@@ -33,7 +33,7 @@
 namespace PHPIMS\Database;
 
 use PHPIMS\Image\ImageInterface;
-use PHPIMS\Operation\GetImages\Query;
+use PHPIMS\Resource\Images\Query;
 
 /**
  * Database driver interface
@@ -107,7 +107,7 @@ interface DatabaseInterface {
      * Get images based on some query parameters
      *
      * @param string $publicKey The public key of the user
-     * @param PHPIMS\Operation\GetImages\Query
+     * @param PHPIMS\Resource\Images\Query
      * @return array
      * @throws PHPIMS\Database\Exception
      */
