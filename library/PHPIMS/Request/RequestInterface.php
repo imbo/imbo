@@ -44,16 +44,27 @@ namespace PHPIMS\Request;
  */
 interface RequestInterface {
     /**#@+
+     * Supported resource types
+     *
+     * @var int
+     */
+    const RESOURCE_IMAGE    = 'IMAGE';
+    const RESOURCE_IMAGES   = 'IMAGES';
+    const RESOURCE_METADATA = 'METADATA';
+    /**#@-*/
+
+    /**#@+
      * Supported HTTP methods
      *
      * @var string
      */
-    const BREW   = 'BREW';
-    const DELETE = 'DELETE';
-    const GET    = 'GET';
-    const HEAD   = 'HEAD';
-    const POST   = 'POST';
-    const PUT    = 'PUT';
+    const METHOD_BREW    = 'BREW';
+    const METHOD_DELETE  = 'DELETE';
+    const METHOD_GET     = 'GET';
+    const METHOD_HEAD    = 'HEAD';
+    const METHOD_POST    = 'POST';
+    const METHOD_PUT     = 'PUT';
+    const METHOD_OPTIONS = 'OPTIONS';
     /**#@-*/
 
     /**
@@ -62,6 +73,13 @@ interface RequestInterface {
      * @return string
      */
     function getPublicKey();
+
+    /**
+     * Get the private key from the server configuration based on the public key from the request
+     *
+     * @return string
+     */
+    function getPrivateKey();
 
     /**
      * Get image transformations from the request
@@ -83,6 +101,14 @@ interface RequestInterface {
      * @return string|null
      */
     function getImageIdentifier();
+
+    /**
+     * Set the image identifier
+     *
+     * @param string $imageIdentifier The image identifier to set
+     * @return PHPIMS\Request\RequestInterface
+     */
+    function setImageIdentifier($imageIdentifier);
 
     /**
      * Get the current HTTP method
@@ -145,4 +171,25 @@ interface RequestInterface {
      * @return boolean
      */
     function has($key);
+
+    /**
+     * Wether or not the request is for the metadata resource
+     *
+     * @return boolean
+     */
+    function isMetadataRequest();
+
+    /**
+     * Wether or not the request is for an image resource
+     *
+     * @return boolean
+     */
+    function isImageRequest();
+
+    /**
+     * Wether or not the request is for the images resource
+     *
+     * @return boolean
+     */
+    function isImagesRequest();
 }
