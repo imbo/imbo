@@ -29,7 +29,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-
+ 
 namespace PHPIMS;
 
 /**
@@ -74,27 +74,20 @@ class Autoload {
         'phpims\\image\\transformation\\thumbnail' => '/Image/Transformation/Thumbnail.php',
         'phpims\\image\\transformation\\transformationinterface' => '/Image/Transformation/TransformationInterface.php',
         'phpims\\image\\transformationchain' => '/Image/TransformationChain.php',
-        'phpims\\operation' => '/Operation.php',
-        'phpims\\operation\\addimage' => '/Operation/AddImage.php',
-        'phpims\\operation\\deleteimage' => '/Operation/DeleteImage.php',
-        'phpims\\operation\\deleteimagemetadata' => '/Operation/DeleteImageMetadata.php',
-        'phpims\\operation\\editimagemetadata' => '/Operation/EditImageMetadata.php',
-        'phpims\\operation\\exception' => '/Operation/Exception.php',
-        'phpims\\operation\\getimage' => '/Operation/GetImage.php',
-        'phpims\\operation\\getimagemetadata' => '/Operation/GetImageMetadata.php',
-        'phpims\\operation\\getimages' => '/Operation/GetImages.php',
-        'phpims\\operation\\getimages\\query' => '/Operation/GetImages/Query.php',
-        'phpims\\operation\\headimage' => '/Operation/HeadImage.php',
-        'phpims\\operation\\operationinterface' => '/Operation/OperationInterface.php',
-        'phpims\\operation\\plugin\\auth' => '/Operation/Plugin/Auth.php',
-        'phpims\\operation\\plugin\\exception' => '/Operation/Plugin/Exception.php',
-        'phpims\\operation\\plugin\\identifyimage' => '/Operation/Plugin/IdentifyImage.php',
-        'phpims\\operation\\plugin\\manipulateimage' => '/Operation/Plugin/ManipulateImage.php',
-        'phpims\\operation\\plugin\\plugininterface' => '/Operation/Plugin/PluginInterface.php',
-        'phpims\\operation\\plugin\\prepareimage' => '/Operation/Plugin/PrepareImage.php',
         'phpims\\request\\exception' => '/Request/Exception.php',
         'phpims\\request\\request' => '/Request/Request.php',
         'phpims\\request\\requestinterface' => '/Request/RequestInterface.php',
+        'phpims\\resource\\image' => '/Resource/Image.php',
+        'phpims\\resource\\images' => '/Resource/Images.php',
+        'phpims\\resource\\images\\query' => '/Resource/Images/Query.php',
+        'phpims\\resource\\metadata' => '/Resource/Metadata.php',
+        'phpims\\resource\\plugin\\auth' => '/Resource/Plugin/Auth.php',
+        'phpims\\resource\\plugin\\exception' => '/Resource/Plugin/Exception.php',
+        'phpims\\resource\\plugin\\identifyimage' => '/Resource/Plugin/IdentifyImage.php',
+        'phpims\\resource\\plugin\\manipulateimage' => '/Resource/Plugin/ManipulateImage.php',
+        'phpims\\resource\\plugin\\plugininterface' => '/Resource/Plugin/PluginInterface.php',
+        'phpims\\resource\\resource' => '/Resource/Resource.php',
+        'phpims\\resource\\resourceinterface' => '/Resource/ResourceInterface.php',
         'phpims\\response\\response' => '/Response/Response.php',
         'phpims\\response\\responseinterface' => '/Response/ResponseInterface.php',
         'phpims\\storage\\exception' => '/Storage/Exception.php',
