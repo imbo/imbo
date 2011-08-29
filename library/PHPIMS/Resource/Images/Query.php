@@ -23,20 +23,20 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Operations
+ * @subpackage Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Operation\GetImages;
+namespace PHPIMS\Resource\Images;
 
 /**
- * Query object for the GetImages operation
+ * Query object for the images resource
  *
  * @package PHPIMS
- * @subpackage Operations
+ * @subpackage Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -89,7 +89,7 @@ class Query {
      * Set or get the page property
      *
      * @param int $page Give this a value to set the page property
-     * @return int|PHPIMS\Operation\GetImages\Query
+     * @return int|PHPIMS\Resource\Images\Query
      */
     public function page($page = null) {
         if ($page === null) {
@@ -105,7 +105,7 @@ class Query {
      * Set or get the num property
      *
      * @param int $num Give this a value to set the num property
-     * @return int|PHPIMS\Operation\GetImages\Query
+     * @return int|PHPIMS\Resource\Images\Query
      */
     public function num($num = null) {
         if ($num === null) {
@@ -121,7 +121,7 @@ class Query {
      * Set or get the returnMetadata flag
      *
      * @param boolean $returnMetadata Give this a value to set the returnMetadata flag
-     * @return boolean|PHPIMS\Operation\GetImages\Query
+     * @return boolean|PHPIMS\Resource\Images\Query
      */
     public function returnMetadata($returnMetadata = null) {
         if ($returnMetadata === null) {
@@ -137,7 +137,7 @@ class Query {
      * Set or get the query property
      *
      * @param array $query Give this a value to set the query property
-     * @return array|PHPIMS\Operation\GetImages\Query
+     * @return array|PHPIMS\Resource\Images\Query
      */
     public function query(array $query = null) {
         if ($query === null) {
@@ -153,7 +153,7 @@ class Query {
      * Set or get the from attribute
      *
      * @param int $from Give this a value to set the from property
-     * @return int|PHPIMS\Operation\GetImages\Query
+     * @return int|PHPIMS\Resource\Images\Query
      */
     public function from($from = null) {
         if ($from === null) {
@@ -169,7 +169,7 @@ class Query {
      * Set or get the to attribute
      *
      * @param int $from Give this a value to set the to property
-     * @return int|PHPIMS\Operation\GetImages\Query
+     * @return int|PHPIMS\Resource\Images\Query
      */
     public function to($to = null) {
         if ($to === null) {
