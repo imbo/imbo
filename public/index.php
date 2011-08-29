@@ -43,7 +43,8 @@ $resource  = str_replace($excessDir, '', $_SERVER['REDIRECT_URL']);
 
 try {
     $frontController = new PHPIMS\FrontController($config);
-    $response = $frontController->handle($resource, $_SERVER['REQUEST_METHOD']);
+    $request = new PHPIMS\Request\Request($_SERVER['REQUEST_METHOD'], $resource, $config['auth']);
+    $response = $frontController->handle($request);
 } catch (PHPIMS\Exception $e) {
     $response = PHPIMS\Response\Response::fromException($e);
 }
