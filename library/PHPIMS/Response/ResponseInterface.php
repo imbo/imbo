@@ -125,14 +125,14 @@ interface ResponseInterface {
     /**
      * Get the image
      *
-     * @return PHPIMS\ImageInterface
+     * @return PHPIMS\Image\ImageInterface
      */
     function getImage();
 
     /**
      * Set the image
      *
-     * @param PHPIMS\ImageInterface $image The image object
+     * @param PHPIMS\Image\ImageInterface $image The image object
      * @return PHPIMS\Response\ResponseInterface
      */
     function setImage(ImageInterface $image);

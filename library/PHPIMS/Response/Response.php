@@ -136,7 +136,7 @@ class Response implements ResponseInterface {
     /**
      * Optional image attached to the response
      *
-     * @var PHPIMS\ImageInterface
+     * @var PHPIMS\Image\ImageInterface
      */
     private $image;
 
