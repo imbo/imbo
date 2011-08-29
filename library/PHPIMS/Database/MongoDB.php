@@ -33,7 +33,7 @@
 namespace PHPIMS\Database;
 
 use PHPIMS\Image\ImageInterface;
-use PHPIMS\Operation\GetImages\Query;
+use PHPIMS\Resource\Images\Query;
 
 /**
  * MongoDB database driver
