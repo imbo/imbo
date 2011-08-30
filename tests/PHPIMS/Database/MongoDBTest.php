@@ -287,7 +287,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetImages() {
-        $query = m::mock('PHPIMS\Operation\GetImages\Query');
+        $query = m::mock('PHPIMS\Resource\Images\Query');
         $query->shouldReceive('from')->once()->andReturn(123123123);
         $query->shouldReceive('to')->once()->andReturn(234234234);
         $query->shouldReceive('query')->once()->andReturn(array('category' => 'some category'));
@@ -321,7 +321,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unable to search for images
      */
     public function testGetImagesWhenCollectionThrowsException() {
-        $query = m::mock('PHPIMS\Operation\GetImages\Query');
+        $query = m::mock('PHPIMS\Resource\Images\Query');
         $query->shouldReceive('from')->once();
         $query->shouldReceive('to')->once();
         $query->shouldReceive('query')->once();

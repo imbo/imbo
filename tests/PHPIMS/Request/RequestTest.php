@@ -41,88 +41,84 @@ namespace PHPIMS\Request;
  * @link https://github.com/christeredvartsen/phpims
  */
 class RequestTest extends \PHPUnit_Framework_TestCase {
-    public function testConstructorWithValidResource() {
-        $query = '/26a46b14849beb78e36883aabee0b5e0/b8533858299b04af3afc9a3713e69358.jpeg/meta';
-        $request = new Request(RequestInterface::GET, $query);
-
-        $this->assertSame('26a46b14849beb78e36883aabee0b5e0', $request->getPublicKey());
-        $this->assertSame('b8533858299b04af3afc9a3713e69358.jpeg', $request->getImageIdentifier());
-        $this->assertSame('b8533858299b04af3afc9a3713e69358.jpeg/meta', $request->getResource());
-        $this->assertSame(RequestInterface::GET, $request->getMethod());
-    }
-
-    /**
-     * @expectedException PHPIMS\Request\Exception
-     * @expectedExceptionMessage Unknown resource: foobar
-     */
-    public function testConstructorWithInvalidResource() {
-        $query = 'foobar';
-        $request = new Request(RequestInterface::GET, $query);
-    }
-
     /**
      * @expectedException PHPIMS\Request\Exception
      * @expectedExceptionMessage Unsupported HTTP method: TRACE
+     * @expectedExceptionCode 400
      */
-    public function testConstructorWithUnsupportedMethod() {
-        $query = '/26a46b14849beb78e36883aabee0b5e0/b8533858299b04af3afc9a3713e69358.jpeg';
-        $request = new Request('TRACE', $query);
+    public function testRequestWithInvalidMethod() {
+        $request = new Request('TRACE', '', array());
     }
 
-    public function testGetTimestamp() {
-        $timestamp = '2011-06-16T06:15Z';
-        $_GET['timestamp'] = $timestamp;
-
-        $query = '/26a46b14849beb78e36883aabee0b5e0/b8533858299b04af3afc9a3713e69358.jpeg';
-        $request = new Request(RequestInterface::GET, $query);
-        $this->assertSame($timestamp, $request->getTimestamp());
+    /**
+     * @expectedException PHPIMS\Request\Exception
+     * @expectedExceptionMessage Unknown resource: /some/resource
+     * @expectedExceptionCode 400
+     */
+    public function testRequestWithInvalidResource() {
+        $request = new Request('GET', '/some/resource', array());
     }
 
-    public function testGetMetadata() {
-        $metadata = array('some' => 'data');
-        $_POST['metadata'] = json_encode($metadata);
-        $query = '/26a46b14849beb78e36883aabee0b5e0/b8533858299b04af3afc9a3713e69358.jpeg/meta';
-        $request = new Request(RequestInterface::POST, $query);
+    /**
+     * @expectedException PHPIMS\Request\Exception
+     * @expectedExceptionMessage Unknown public key
+     * @expectedExceptionCode 400
+     */
+    public function testRequestWithUnknownPublicKey() {
+        $publicKey = md5(microtime());
+        $privateKey = md5(microtime());
 
-        $this->assertSame($metadata, $request->getMetadata());
-    }
-
-    public function testGetSignature() {
-        $signature = 'somesignature';
-        $_GET['signature'] = $signature;
-
-        $query = '/26a46b14849beb78e36883aabee0b5e0/b8533858299b04af3afc9a3713e69358.jpeg';
-        $request = new Request(RequestInterface::DELETE, $query);
-        $this->assertSame($signature, $request->getSignature());
-    }
-
-    public function testGetTransformations() {
-        $_GET['t'] = array(
-            'thumbnail', 'flipHorizontally', 'flipVertically', 'crop:x=0,y=10,width=100,height=200',
-            'border:color=fff,width=3,height=2', 'compress:quality=50', 'resize:width=100,height=200',
-            'rotate:angle=45,bg=fff',
+        $authConfig = array(
+            $publicKey => $privateKey,
         );
-        $query = '/26a46b14849beb78e36883aabee0b5e0/b8533858299b04af3afc9a3713e69358.jpeg';
-        $request = new Request(RequestInterface::GET, $query);
-        $chain = $request->getTransformations();
-
-        $this->assertInstanceOf('PHPIMS\Image\TransformationChain', $chain);
-        $this->assertSame(8, count($chain));
+        $request = new Request('GET', '/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/images', $authConfig);
     }
 
-    public function testGetTransformationsWithNoneSpecified() {
-        $query = '/26a46b14849beb78e36883aabee0b5e0/b8533858299b04af3afc9a3713e69358.jpeg';
-        $request = new Request(RequestInterface::GET, $query);
-        $chain = $request->getTransformations();
+    public function testImageRequest() {
+        $publicKey = md5(microtime());
+        $privateKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
 
-        $this->assertInstanceOf('PHPIMS\Image\TransformationChain', $chain);
-        $this->assertSame(0, count($chain));
+        $authConfig = array(
+            $publicKey => $privateKey,
+        );
+        $request = new Request('GET', '/' . $publicKey . '/' . $imageIdentifier, $authConfig);
+        $this->assertSame($imageIdentifier, $request->getImageIdentifier());
+        $this->assertTrue($request->isImageRequest());
+        $this->assertFalse($request->isImagesRequest());
+        $this->assertFalse($request->isMetadataRequest());
+        $this->assertSame($imageIdentifier, $request->getResource());
+        $this->assertSame('GET', $request->getMethod());
+
+        $this->assertSame($publicKey, $request->getPublicKey());
+        $this->assertSame($privateKey, $request->getPrivateKey());
     }
 
-    public function testGetMetadataWithNoneSpecified() {
-        $query = '/26a46b14849beb78e36883aabee0b5e0/b8533858299b04af3afc9a3713e69358.jpeg';
-        $request = new Request(RequestInterface::POST, $query);
+    public function testImagesRequest() {
+        $publicKey = md5(microtime());
+        $privateKey = md5(microtime());
 
-        $this->assertNull($request->getMetadata());
+        $authConfig = array(
+            $publicKey => $privateKey,
+        );
+        $request = new Request('GET', '/' . $publicKey . '/images', $authConfig);
+        $this->assertFalse($request->isImageRequest());
+        $this->assertTrue($request->isImagesRequest());
+        $this->assertFalse($request->isMetadataRequest());
+    }
+
+    public function testMetadataRequest() {
+        $publicKey = md5(microtime());
+        $privateKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+
+        $authConfig = array(
+            $publicKey => $privateKey,
+        );
+        $request = new Request('GET', '/' . $publicKey . '/' . $imageIdentifier . '/meta', $authConfig);
+        $this->assertSame($imageIdentifier, $request->getImageIdentifier());
+        $this->assertFalse($request->isImageRequest());
+        $this->assertFalse($request->isImagesRequest());
+        $this->assertTrue($request->isMetadataRequest());
     }
 }
