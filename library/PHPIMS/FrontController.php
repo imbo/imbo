@@ -70,14 +70,17 @@ class FrontController {
      *
      * @param PHPIMS\Request\RequestInterface $request A request instance
      * @return PHPIMS\Resource\ResourceInterface
+     * @throws PHPIMS\Exception
      */
     private function resolveResource(RequestInterface $request) {
         if ($request->isImageRequest()) {
             $resource = new Resource\Image();
         } else if ($request->isImagesRequest()) {
             $resource = new Resource\Images();
-        } else {
+        } else if ($request->isMetadataRequest()) {
             $resource = new Resource\Metadata();
+        } else {
+            throw new Exception('Invalid request', 400);
         }
 
         return $resource;
