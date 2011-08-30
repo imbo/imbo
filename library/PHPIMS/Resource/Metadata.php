@@ -54,7 +54,7 @@ class Metadata extends Resource implements ResourceInterface {
      * Class constructor
      */
     public function __construct() {
-        $authPlugin = new Plugin\Auth();
+        $auth = new Plugin\Auth();
 
         $this->registerPlugin(ResourceInterface::STATE_PRE, RequestInterface::METHOD_POST,   100, $auth)
              ->registerPlugin(ResourceInterface::STATE_PRE, RequestInterface::METHOD_DELETE, 100, $auth);
