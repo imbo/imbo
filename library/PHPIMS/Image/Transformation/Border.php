@@ -49,7 +49,7 @@ use Imagine\Image\Point;
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
- * @see PHPIMS\Operation\Plugin\ManipulateImage
+ * @see PHPIMS\Resource\Plugin\ManipulateImage
  */
 class Border implements TransformationInterface {
     /**
