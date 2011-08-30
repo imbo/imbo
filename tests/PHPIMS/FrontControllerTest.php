@@ -32,8 +32,6 @@
 
 namespace PHPIMS;
 
-use Mockery as m;
-
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -51,31 +49,12 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     private $controller;
 
     /**
-     * Public key
-     *
-     * @var string
-     */
-    private $publicKey;
-
-    /**
-     * Private key
-     *
-     * @var string
-     */
-    private $privateKey;
-
-    /**
      * Set up method
      */
     public function setUp() {
-        $this->publicKey = md5(microtime());
-        $this->privateKey = md5(microtime());
         $config = array(
-            'database' => m::mock('PHPIMS\Database\Driver\DriverInterface'),
-            'storage' => m::mock('PHPIMS\Storage\Driver\DriverInterface'),
-            'auth' => array(
-                $this->publicKey => $this->privateKey,
-            ),
+            'database' => $this->getMock('PHPIMS\Database\DatabaseInterface'),
+            'storage' => $this->getMock('PHPIMS\Storage\StorageInterface'),
         );
         $this->controller = new FrontController($config);
     }
@@ -87,103 +66,49 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $this->controller = null;
     }
 
-    /**
-     * Get a PHPIMS\Operation mock object
-     *
-     * @param string $operationClass The class name of the operation to mock
-     */
-    private function getOperationMock($operationClass) {
-        $operation = m::mock($operationClass);
-        $operation->shouldReceive('init')->once()->andReturn($operation);
-        $operation->shouldReceive('preExec')->once()->andReturn($operation);
-        $operation->shouldReceive('exec')->once()->andReturn($operation);
-        $operation->shouldReceive('postExec')->once()->andReturn($operation);
-
-        return $operation;
-    }
-
-    public function testIsValidMethodWithSupportedMethods() {
-        $this->assertTrue($this->controller->isValidMethod('POST'));
-        $this->assertTrue($this->controller->isValidMethod('GET'));
-        $this->assertTrue($this->controller->isValidMethod('HEAD'));
-        $this->assertTrue($this->controller->isValidMethod('DELETE'));
-        $this->assertTrue($this->controller->isValidMethod('PUT'));
-        $this->assertTrue($this->controller->isValidMethod('BREW'));
-    }
-
-    public function testIsValidMethodWithInvalidMethod() {
-        $this->assertFalse($this->controller->isValidMethod('foobar'));
-    }
-
-    /**
-     * @expectedException PHPIMS\Exception
-     * @expectedExceptionCode 501
-     */
-    public function testHandleInvalidMethod() {
-        $this->controller->handle('/some/path', 'foobar');
-    }
-
-    /**
-     * @expectedException PHPIMS\Exception
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Unknown resource
-     */
-    public function testHandleInvalidRequest() {
-        $this->controller->handle('/foobar', 'GET');
-    }
-
-    /**
-     * @expectedException PHPIMS\Exception
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Unsupported operation
-     */
-    public function testHandleUnsupportedOperation() {
-        $this->controller->handle($this->publicKey . '/images', 'DELETE');
-    }
-
-    /**
-     * @expectedException PHPIMS\Exception
-     * @expectedExceptionCode 418
-     */
-    public function testHandleBrew() {
-        $this->controller->handle($this->publicKey . '/' . md5(microtime()) . '.png', 'BREW');
-    }
-
-    public function testResolveOperation() {
-        $imageIdentifier = md5(microtime()) . '.png';
-        $resource = $imageIdentifier;
-
+    public function testResolveResourceWithImageRequest() {
         $reflection = new \ReflectionClass($this->controller);
-        $method = $reflection->getMethod('resolveOperation');
+        $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
+        $request = $this->getMock('PHPIMS\Request\RequestInterface');
+        $request->expects($this->once())->method('isImageRequest')->will($this->returnValue(true));
+        $this->assertInstanceOf('PHPIMS\Resource\Image', $method->invoke($this->controller, $request));
+    }
 
-        $database = m::mock('PHPIMS\Database\Driver\DriverInterface');
-        $storage = m::mock('PHPIMS\Storage\Driver\DriverInterface');
+    public function testResolveResourceWithImagesRequest() {
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('resolveResource');
+        $method->setAccessible(true);
+        $request = $this->getMock('PHPIMS\Request\RequestInterface');
+        $request->expects($this->once())->method('isImageRequest')->will($this->returnValue(false));
+        $request->expects($this->once())->method('isImagesRequest')->will($this->returnValue(true));
+        $this->assertInstanceOf('PHPIMS\Resource\Images', $method->invoke($this->controller, $request));
+    }
 
-        $this->assertInstanceOf('PHPIMS\Operation\GetImages', $method->invokeArgs($this->controller, array('images', 'GET')));
-
-        $this->assertInstanceOf('PHPIMS\Operation\GetImage', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier)));
-        $this->assertInstanceOf('PHPIMS\Operation\HeadImage', $method->invokeArgs($this->controller, array($resource, 'HEAD', $imageIdentifier)));
-        $this->assertInstanceOf('PHPIMS\Operation\AddImage', $method->invokeArgs($this->controller, array($resource, 'PUT', $imageIdentifier)));
-        $this->assertInstanceOf('PHPIMS\Operation\DeleteImage', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier)));
-
-        $extra = 'meta';
-        $resource .= '/meta';
-
-        $this->assertInstanceOf('PHPIMS\Operation\GetImageMetadata', $method->invokeArgs($this->controller, array($resource, 'GET', $imageIdentifier, $extra)));
-        $this->assertInstanceOf('PHPIMS\Operation\EditImageMetadata', $method->invokeArgs($this->controller, array($resource, 'POST', $imageIdentifier, $extra)));
-        $this->assertInstanceOf('PHPIMS\Operation\DeleteImageMetadata', $method->invokeArgs($this->controller, array($resource, 'DELETE', $imageIdentifier, $extra)));
+    public function testResolveResourceWithMetadataRequest() {
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('resolveResource');
+        $method->setAccessible(true);
+        $request = $this->getMock('PHPIMS\Request\RequestInterface');
+        $request->expects($this->once())->method('isImageRequest')->will($this->returnValue(false));
+        $request->expects($this->once())->method('isImagesRequest')->will($this->returnValue(false));
+        $request->expects($this->once())->method('isMetadataRequest')->will($this->returnValue(true));
+        $this->assertInstanceOf('PHPIMS\Resource\Metadata', $method->invoke($this->controller, $request));
     }
 
     /**
      * @expectedException PHPIMS\Exception
+     * @expectedExceptionMessage Invalid request
      * @expectedExceptionCode 400
-     * @expectedExceptionMessage Unknown public key
      */
-    public function testHandleValidOperationWithValidButUnknownPublicKey() {
-        $resource = md5(microtime()) . '/' . md5(microtime()) . '.png';
-        $method = 'GET';
-
-        $this->controller->handle($resource, $method);
+    public function testResolveResourceWithInvalidRequest() {
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('resolveResource');
+        $method->setAccessible(true);
+        $request = $this->getMock('PHPIMS\Request\RequestInterface');
+        $request->expects($this->once())->method('isImageRequest')->will($this->returnValue(false));
+        $request->expects($this->once())->method('isImagesRequest')->will($this->returnValue(false));
+        $request->expects($this->once())->method('isMetadataRequest')->will($this->returnValue(false));
+        $method->invoke($this->controller, $request);
     }
 }
