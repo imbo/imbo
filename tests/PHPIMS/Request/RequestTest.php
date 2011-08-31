@@ -32,6 +32,8 @@
 
 namespace PHPIMS\Request;
 
+use PHPIMS\Image\TransformationChain;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -120,5 +122,115 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($request->isImageRequest());
         $this->assertFalse($request->isImagesRequest());
         $this->assertTrue($request->isMetadataRequest());
+    }
+
+    private function getRequest() {
+        $publicKey = md5(microtime());
+        $privateKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $authConfig = array(
+            $publicKey => $privateKey,
+        );
+        return new Request('GET', '/' . $publicKey . '/' . $imageIdentifier, $authConfig);
+    }
+
+    public function testGetTimestamp() {
+        $request = $this->getRequest();
+
+        $this->assertNull($request->getTimestamp());
+        $_GET['timestamp'] = time();
+        $this->assertSame($_GET['timestamp'], $request->getTimestamp());
+    }
+
+    public function testGetSignature() {
+        $request = $this->getRequest();
+
+        $this->assertNull($request->getSignature());
+        $_GET['signature'] = time();
+        $this->assertSame($_GET['signature'], $request->getSignature());
+    }
+
+    public function testGetMetadata() {
+        $request = $this->getRequest();
+
+        $metadata = array(
+            'somekey' => 'value',
+            'someOtherKey' => 'someOtherValue',
+        );
+
+        $this->assertNull($request->getMetadata());
+        $_POST['metadata'] = json_encode($metadata);
+        $this->assertSame($metadata, $request->getMetadata());
+    }
+
+    public function testGetMetadataWhenDataIsNotValidJson() {
+        $request = $this->getRequest();
+
+        $_POST['metadata'] = 'some data';
+        $this->assertNull($request->getMetadata());
+    }
+
+    public function testGetPost() {
+        $request = $this->getRequest();
+        $this->assertNull($request->getPost('foo'));
+        $_POST['foo'] = 123;
+        $this->assertSame(123, $request->getPost('foo'));
+    }
+
+    public function testHasPost() {
+        $request = $this->getRequest();
+        $this->assertFalse($request->hasPost('foo'));
+        $_POST['foo'] = 'foobar';
+        $this->assertTrue($request->hasPost('foo'));
+    }
+
+    public function testGet() {
+        $request = $this->getRequest();
+        $this->assertNull($request->get('foo'));
+        $_GET['foo'] = 123;
+        $this->assertSame(123, $request->get('foo'));
+    }
+
+    public function testHas() {
+        $request = $this->getRequest();
+        $this->assertFalse($request->has('foo'));
+        $_GET['foo'] = 'foobar';
+        $this->assertTrue($request->has('foo'));
+    }
+
+    public function testGetTransformationsWithNoTransformationsPresent() {
+        $request = $this->getRequest();
+        $this->assertEquals(new TransformationChain(), $request->getTransformations());
+    }
+
+    public function testGetTransformations() {
+        $request = $this->getRequest();
+        $_GET['t'] = array(
+            // Valid transformations with all options
+            'border:color=fff,width=2,height=2',
+            'compress:quality=90',
+            'crop:x=1,y=2,width=3,height=4',
+            'resize:width=100,height=100',
+            'rotate:angle=45,bg=fff',
+            'thumbnail:width=100,height=100,fit=outbound',
+
+            // Transformations with no options
+            'flipHorizontally',
+            'flipVertically',
+
+            // Invalid transformations
+            'foo',
+            'bar:some=option',
+        );
+
+        $chain = $request->getTransformations();
+        $this->assertInstanceOf('PHPIMS\Image\TransformationChain', $chain);
+    }
+
+    public function testSetGetImageIdentifier() {
+        $request = $this->getRequest();
+        $identifier = md5(microtime()) . '.png';
+        $request->setImageIdentifier($identifier);
+        $this->assertSame($identifier, $request->getImageIdentifier());
     }
 }
