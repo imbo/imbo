@@ -89,6 +89,10 @@ class Filesystem implements StorageInterface {
 
         $imagePath = $imageDir . '/' . $imageIdentifier;
 
+        if (file_exists($imagePath)) {
+            throw new Exception('Image already exists', 400);
+        }
+
         return file_put_contents($imagePath, $image->getBlob());
     }
 
