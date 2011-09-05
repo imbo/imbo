@@ -57,12 +57,14 @@ class Image extends Resource implements ResourceInterface {
      */
     public function __construct() {
         $auth            = new Plugin\Auth();
+        $prepareImage    = new Plugin\PrepareImage();
         $identifyImage   = new Plugin\IdentifyImage();
         $manipulateImage = new Plugin\ManipulateImage();
 
         $this->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_DELETE, 100, $auth)
              ->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_PUT,    100, $auth)
-             ->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_PUT,    101, $identifyImage)
+             ->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_PUT,    101, $prepareImage)
+             ->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_PUT,    102, $identifyImage)
              ->registerPlugin(ResourceInterface::STATE_POST, RequestInterface::METHOD_GET,    100, $identifyImage)
              ->registerPlugin(ResourceInterface::STATE_POST, RequestInterface::METHOD_GET,    101, $manipulateImage);
     }
@@ -71,39 +73,9 @@ class Image extends Resource implements ResourceInterface {
      * @see PHPIMS\Resource\ResourceInterface::put()
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        // Fetch image data from input
-        $imageBlob = file_get_contents('php://input');
-
-        if (empty($imageBlob)) {
-            throw new Exception('No image attached', 400);
-        }
-
-        // Calculate hash
-        $actualHash = md5($imageBlob);
-
-        // Get image identifier from request
-        $identifierFromRequest = $operation->getImageIdentifier();
-
-        if ($actualHash !== substr($identifierFromRequest, 0, 32)) {
-            throw new Exception('Hash mismatch', 400);
-        }
-
-        // Store file to disk and use getimagesize() to fetch width/height
-        $tmpFile = tempnam(sys_get_temp_dir(), 'PHPIMS_uploaded_Image');
-        file_put_contents($tmpFile, $imageBlob);
-        $size = getimagesize($tmpFile);
-
-        // Fetch the image object and store the blob
-        $image = $operation->getImage();
-        $image->setBlob($imageBlob)
-              ->setWidth($size[0])
-              ->setHeight($size[1]);
-
-        unlink($tmpFile);
-
         $publicKey = $request->getPublicKey();
-        $imageIdentifier = $request->getImageIdentifier();
         $image = $response->getImage();
+        $imageIdentifier = $request->getImageIdentifier();
 
         // Insert image to the database
         $database->insertImage($publicKey, $imageIdentifier, $image);
