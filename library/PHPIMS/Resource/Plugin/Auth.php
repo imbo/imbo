@@ -95,7 +95,7 @@ class Auth implements PluginInterface {
         }
 
         // Generate data for the HMAC
-        $data = $request->getMethod() . $request->getResource() . $request->getPublicKey() . $timestamp;
+        $data = $request->getMethod() . $request->getResource() . $request->getPublicKey() . $request->getTimestamp();
 
         // Generate binary hash key
         $actualSignature = hash_hmac('sha256', $data, $request->getPrivateKey(), true);
