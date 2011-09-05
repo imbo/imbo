@@ -29,7 +29,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
- 
+
 namespace PHPIMS;
 
 /**
@@ -107,6 +107,12 @@ class Autoload {
             require __DIR__ . static::$classes[$className];
         }
     }
-}
 
-spl_autoload_register('PHPIMS\\Autoload::load');
+    /**
+     * Registers this instance as an autoloader
+     */
+    public function register() {
+        // Register the autoloader
+        spl_autoload_register(array($this, 'load'));
+    }
+}
