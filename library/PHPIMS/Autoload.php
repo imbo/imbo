@@ -86,6 +86,7 @@ class Autoload {
         'phpims\\resource\\plugin\\identifyimage' => '/Resource/Plugin/IdentifyImage.php',
         'phpims\\resource\\plugin\\manipulateimage' => '/Resource/Plugin/ManipulateImage.php',
         'phpims\\resource\\plugin\\plugininterface' => '/Resource/Plugin/PluginInterface.php',
+        'phpims\\resource\\plugin\\prepareimage' => '/Resource/Plugin/PrepareImage.php',
         'phpims\\resource\\resource' => '/Resource/Resource.php',
         'phpims\\resource\\resourceinterface' => '/Resource/ResourceInterface.php',
         'phpims\\response\\response' => '/Response/Response.php',
