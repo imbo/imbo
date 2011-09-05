@@ -35,6 +35,9 @@ set_include_path(__DIR__ . '/../library' . PATH_SEPARATOR . get_include_path());
 /** @see PHPIMS\Autoload */
 require_once 'PHPIMS/Autoload.php';
 
+$loader = new PHPIMS\Autoload();
+$loader->register();
+
 // Fetch configuration
 $config = require __DIR__ . '/../config/server.php';
 
