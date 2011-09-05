@@ -42,6 +42,9 @@
 /** @see PHPIMS\Autoload */
 require __DIR__ . '/../library/PHPIMS/Autoload.php';
 
+$loader = new PHPIMS\Autoload();
+$loader->register();
+
 set_include_path(
     get_include_path() . PATH_SEPARATOR .
     __DIR__
