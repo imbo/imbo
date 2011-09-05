@@ -70,19 +70,19 @@ class Images extends Resource implements ResourceInterface {
         }
 
         if ($request->has('num')) {
-            $query->page($request->get('num'));
+            $query->num($request->get('num'));
         }
 
         if ($request->has('returnMetadata')) {
-            $query->page($request->get('returnMetadata'));
+            $query->returnMetadata($request->get('returnMetadata'));
         }
 
         if ($request->has('from')) {
-            $query->page($request->get('from'));
+            $query->from($request->get('from'));
         }
 
         if ($request->has('to')) {
-            $query->page($request->get('to'));
+            $query->to($request->get('to'));
         }
 
         if ($request->has('query')) {
