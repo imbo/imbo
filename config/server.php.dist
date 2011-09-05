@@ -4,13 +4,13 @@ return array(
     'auth' => array(),
 
     // Database driver
-    'database' => new PHPIMS\Database\Driver\MongoDB(array(
+    'database' => new PHPIMS\Database\MongoDB(array(
         'database'   => 'phpims',
         'collection' => 'images',
     )),
 
     // Storage driver
-    'storage' => new PHPIMS\Storage\Driver\Filesystem(array(
+    'storage' => new PHPIMS\Storage\Filesystem(array(
         'dataDir' => realpath('/some/path'),
     )),
 );

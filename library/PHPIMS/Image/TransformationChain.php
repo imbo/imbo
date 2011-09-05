@@ -33,7 +33,7 @@
 namespace PHPIMS\Image;
 
 use PHPIMS\Image\Transformation;
-use PHPIMS\Image;
+use PHPIMS\Image\Transformation\TransformationInterface;
 use PHPIMS\Client\ImageUrl;
 
 /**
@@ -46,13 +46,20 @@ use PHPIMS\Client\ImageUrl;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class TransformationChain {
+class TransformationChain implements \Countable {
     /**
      * Transformations added
      *
      * @var array
      */
     private $transformations = array();
+
+    /**
+     * @see Countable::count()
+     */
+    public function count() {
+        return count($this->transformations);
+    }
 
     /**
      * Apply all transformations to an image url object
@@ -72,7 +79,7 @@ class TransformationChain {
      * Transform an image url
      *
      * @param PHPIMS\Client\ImageUrl $url Image url object
-     * @param PHPIMS\Image\TransformationInterface $transformation Transformation object
+     * @param PHPIMS\Image\Transformation\TransformationInterface $transformation Transformation object
      * @return PHPIMS\Image\TransformationChain
      */
     public function transformImageUrl(ImageUrl $url, TransformationInterface $transformation) {
@@ -84,10 +91,10 @@ class TransformationChain {
     /**
      * Apply all transformations to an image object
      *
-     * @param PHPIMS\Image $image Image object
+     * @param PHPIMS\Image\ImageInterface $image Image object
      * @return PHPIMS\Image\TransformationChain
      */
-    public function applyToImage(Image $image) {
+    public function applyToImage(ImageInterface $image) {
         foreach ($this->transformations as $transformation) {
             $this->transformImage($image, $transformation);
         }
@@ -98,11 +105,11 @@ class TransformationChain {
     /**
      * Transform an image
      *
-     * @param PHPIMS\Image $image Image object
-     * @param PHPIMS\Image\TransformationInterface $transformation Transformation object
+     * @param PHPIMS\Image\ImageInterface $image Image object
+     * @param PHPIMS\Image\Transformation\TransformationInterface $transformation Transformation object
      * @return PHPIMS\Image\TransformationChain
      */
-    public function transformImage(Image $image, TransformationInterface $transformation) {
+    public function transformImage(ImageInterface $image, TransformationInterface $transformation) {
         $transformation->applyToImage($image);
 
         return $this;
@@ -111,7 +118,7 @@ class TransformationChain {
     /**
      * Add a transformation to the chain
      *
-     * @param TransformationInterface $transformation The transformation to add
+     * @param PHPIMS\Image\Transformation\TransformationInterface $transformation The transformation to add
      * @return PHPIMS\Image\TransformationChain
      */
     public function add(TransformationInterface $transformation) {

@@ -32,9 +32,8 @@
 
 namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Image;
 use PHPIMS\Client\ImageUrl;
-use PHPIMS\Image\TransformationInterface;
+use PHPIMS\Image\ImageInterface;
 
 use Imagine\Imagick\Imagine;
 use Imagine\Exception\Exception as ImagineException;
@@ -48,13 +47,13 @@ use Imagine\Exception\Exception as ImagineException;
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
- * @see PHPIMS\Operation\Plugin\ManipulateImage
+ * @see PHPIMS\Resource\Plugin\ManipulateImage
  */
 class FlipHorizontally implements TransformationInterface {
     /**
-     * @see PHPIMS\Image\TransformationInterface::applyToImage()
+     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImage()
      */
-    public function applyToImage(Image $image) {
+    public function applyToImage(ImageInterface $image) {
         try {
             $imagine = new Imagine();
             $imagineImage = $imagine->load($image->getBlob());
@@ -68,7 +67,7 @@ class FlipHorizontally implements TransformationInterface {
     }
 
     /**
-     * @see PHPIMS\Image\TransformationInterface::applyToImageUrl()
+     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImageUrl()
      */
     public function applyToImageUrl(ImageUrl $url) {
         $url->append('flipHorizontally');

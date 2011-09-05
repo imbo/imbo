@@ -32,8 +32,9 @@
 
 namespace PHPIMS;
 
-use PHPIMS\Server\Response;
-use PHPIMS\Operation;
+use PHPIMS\Response\Response;
+use PHPIMS\Request\RequestInterface;
+use PHPIMS\Image\Image;
 
 /**
  * Client that interacts with the server part of PHPIMS
@@ -48,33 +49,6 @@ use PHPIMS\Operation;
  * @link https://github.com/christeredvartsen/phpims
  */
 class FrontController {
-    /**#@+
-     * Supported HTTP methods
-     *
-     * @var string
-     */
-    const GET    = 'GET';
-    const POST   = 'POST';
-    const PUT    = 'PUT';
-    const HEAD   = 'HEAD';
-    const DELETE = 'DELETE';
-    const BREW   = 'BREW';
-    /**#@-*/
-
-    /**
-     * Valid HTTP methods
-     *
-     * @var array
-     */
-    private $validMethods = array(
-        self::GET    => true,
-        self::POST   => true,
-        self::PUT    => true,
-        self::HEAD   => true,
-        self::DELETE => true,
-        self::BREW   => true,
-    );
-
     /**
      * Configuration
      *
@@ -92,113 +66,59 @@ class FrontController {
     }
 
     /**
-     * Wether or not the method is valid
+     * Create a resource object based on the request
      *
-     * @param string $method The current method
-     * @return boolean True if $method is valid, false otherwise
-     */
-    public function isValidMethod($method) {
-        return isset($this->validMethods[$method]);
-    }
-
-    /**
-     * Generate an operation object based on some parameters
-     *
-     * @param string $resource The accessed resource
-     * @param string $method The HTTP method
-     * @param string $imageIdentifier Optional Image identifier
-     * @param string $extra Optional extra argument
+     * @param PHPIMS\Request\RequestInterface $request A request instance
+     * @return PHPIMS\Resource\ResourceInterface
      * @throws PHPIMS\Exception
-     * @return PHPIMS\OperationInterface
      */
-    private function resolveOperation($resource, $method, $imageIdentifier = null, $extra = null) {
-        $operation = null;
-
-        if ($resource === 'images' && $method === self::GET) {
-            $operation = new Operation\GetImages();
-        } else if ($method === self::GET && $imageIdentifier) {
-            if ($extra === 'meta') {
-                $operation = new Operation\GetImageMetadata();
-            } else {
-                $operation = new Operation\GetImage();
-            }
-        } else if ($method === self::POST && $imageIdentifier && $extra === 'meta') {
-            $operation = new Operation\EditImageMetadata();
-        } else if ($method === self::PUT && $imageIdentifier) {
-            $operation = new Operation\AddImage();
-        } else if ($method === self::DELETE && $imageIdentifier) {
-            if ($extra === 'meta') {
-                $operation = new Operation\DeleteImageMetadata();
-            } else {
-                $operation = new Operation\DeleteImage();
-            }
-        } else if ($method === self::HEAD && $imageIdentifier) {
-            if ($extra === 'meta') {
-                // Not yet implemented
-            } else {
-                $operation = new Operation\HeadImage();
-            }
-        } else if ($method === self::BREW) {
-            throw new Exception('I\'m a teapot!', 418);
+    private function resolveResource(RequestInterface $request) {
+        if ($request->isImageRequest()) {
+            $resource = new Resource\Image();
+        } else if ($request->isImagesRequest()) {
+            $resource = new Resource\Images();
+        } else if ($request->isMetadataRequest()) {
+            $resource = new Resource\Metadata();
+        } else {
+            throw new Exception('Invalid request', 400);
         }
 
-        if ($operation === null) {
-            throw new Exception('Unsupported operation', 400);
-        }
-
-        // Create the operation
-        $operation->setDatabase($this->config['database'])
-                  ->setStorage($this->config['storage'])
-                  ->setConfig($this->config)
-                  ->setResource($resource)
-                  ->setImageIdentifier($imageIdentifier)
-                  ->setMethod($method)
-                  ->setImage(new Image())
-                  ->setResponse(new Response());
-
-        return $operation;
+        return $resource;
     }
 
     /**
      * Handle a request
      *
-     * @param string $resource The resource accessed including the public key
-     * @param string $method The HTTP method (one of the defined constants)
+     * @param PHPIMS\Request\RequestInterface $request The request object
+     * @return PHPIMS\Response\ResponseInterface
      * @throws PHPIMS\Exception
      */
-    public function handle($resource, $method) {
-        if (!$this->isValidMethod($method)) {
-            throw new Exception($method . ' not implemented', 501);
+    public function handle(RequestInterface $request) {
+        if ($request->getMethod() === RequestInterface::METHOD_BREW) {
+            throw new Exception('I\'m a teapot!', 418);
         }
 
-        // Trim away slashes
-        $resource = trim($resource, '/');
-        $matches  = array();
+        $response   = new Response();
+        $database   = $this->config['database'];
+        $storage    = $this->config['storage'];
+        $httpMethod = $request->getMethod();
+        $methodName = strtolower($httpMethod);
 
-        // See if
-        if (!preg_match('#^(?<publicKey>[a-f0-9]{32})/(?<resource>(images|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<extra>meta))?))$#', $resource, $matches)) {
-            throw new Exception('Unknown resource', 400);
+        // Fetch the resource instance
+        $resource = $this->resolveResource($request);
+
+        // Execute pre-exec plugins
+        foreach ($resource->getPreExecPlugins($httpMethod) as $plugin) {
+            $plugin->exec($request, $response, $database, $storage);
         }
 
-        $publicKey = $matches['publicKey'];
+        $resource->$methodName($request, $response, $database, $storage);
 
-        // Make sure we have a valid public and private key pair
-        $keyPairs = $this->config['auth'];
-
-        if (!isset($keyPairs[$publicKey])) {
-            throw new Exception('Unknown public key', 400);
+        // Execute post-exec plugins
+        foreach ($resource->getPostExecPlugins($httpMethod) as $plugin) {
+            $plugin->exec($request, $response, $database, $storage);
         }
 
-        $privateKey = $keyPairs[$publicKey];
-
-        $imageIdentifier = isset($matches['imageIdentifier']) ? $matches['imageIdentifier'] : null;
-        $extra = isset($matches['extra']) ? $matches['extra'] : null;
-
-        // Create the operation
-        $operation = $this->resolveOperation($matches['resource'], $method, $imageIdentifier, $extra);
-        $operation->setPublicKey($publicKey)->setPrivateKey($privateKey);
-        $operation->run();
-
-        return $operation->getResponse();
+        return $response;
     }
 }

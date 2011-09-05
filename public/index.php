@@ -35,6 +35,9 @@ set_include_path(__DIR__ . '/../library' . PATH_SEPARATOR . get_include_path());
 /** @see PHPIMS\Autoload */
 require_once 'PHPIMS/Autoload.php';
 
+$loader = new PHPIMS\Autoload();
+$loader->register();
+
 // Fetch configuration
 $config = require __DIR__ . '/../config/server.php';
 
@@ -43,13 +46,14 @@ $resource  = str_replace($excessDir, '', $_SERVER['REDIRECT_URL']);
 
 try {
     $frontController = new PHPIMS\FrontController($config);
-    $response = $frontController->handle($resource, $_SERVER['REQUEST_METHOD']);
+    $request = new PHPIMS\Request\Request($_SERVER['REQUEST_METHOD'], $resource, $config['auth']);
+    $response = $frontController->handle($request);
 } catch (PHPIMS\Exception $e) {
-    $response = PHPIMS\Server\Response::fromException($e);
+    $response = PHPIMS\Response\Response::fromException($e);
 }
 
 $code = $response->getCode();
-$header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS\Server\Response::$codes[$code]);
+$header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS\Response\Response::$codes[$code]);
 
 header($header);
 

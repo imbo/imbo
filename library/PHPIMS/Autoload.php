@@ -29,7 +29,7 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
- 
+
 namespace PHPIMS;
 
 /**
@@ -51,17 +51,18 @@ class Autoload {
         'phpims\\autoload' => '/Autoload.php',
         'phpims\\client' => '/Client.php',
         'phpims\\client\\driver\\curl' => '/Client/Driver/Curl.php',
+        'phpims\\client\\driver\\driverinterface' => '/Client/Driver/DriverInterface.php',
         'phpims\\client\\driver\\exception' => '/Client/Driver/Exception.php',
-        'phpims\\client\\driverinterface' => '/Client/DriverInterface.php',
         'phpims\\client\\exception' => '/Client/Exception.php',
         'phpims\\client\\imageurl' => '/Client/ImageUrl.php',
         'phpims\\client\\response' => '/Client/Response.php',
-        'phpims\\database\\driver\\mongodb' => '/Database/Driver/MongoDB.php',
-        'phpims\\database\\driverinterface' => '/Database/DriverInterface.php',
+        'phpims\\database\\databaseinterface' => '/Database/DatabaseInterface.php',
         'phpims\\database\\exception' => '/Database/Exception.php',
+        'phpims\\database\\mongodb' => '/Database/MongoDB.php',
         'phpims\\exception' => '/Exception.php',
         'phpims\\frontcontroller' => '/FrontController.php',
-        'phpims\\image' => '/Image.php',
+        'phpims\\image\\image' => '/Image/Image.php',
+        'phpims\\image\\imageinterface' => '/Image/ImageInterface.php',
         'phpims\\image\\transformation\\border' => '/Image/Transformation/Border.php',
         'phpims\\image\\transformation\\compress' => '/Image/Transformation/Compress.php',
         'phpims\\image\\transformation\\crop' => '/Image/Transformation/Crop.php',
@@ -71,30 +72,28 @@ class Autoload {
         'phpims\\image\\transformation\\resize' => '/Image/Transformation/Resize.php',
         'phpims\\image\\transformation\\rotate' => '/Image/Transformation/Rotate.php',
         'phpims\\image\\transformation\\thumbnail' => '/Image/Transformation/Thumbnail.php',
+        'phpims\\image\\transformation\\transformationinterface' => '/Image/Transformation/TransformationInterface.php',
         'phpims\\image\\transformationchain' => '/Image/TransformationChain.php',
-        'phpims\\image\\transformationinterface' => '/Image/TransformationInterface.php',
-        'phpims\\operation' => '/Operation.php',
-        'phpims\\operation\\addimage' => '/Operation/AddImage.php',
-        'phpims\\operation\\deleteimage' => '/Operation/DeleteImage.php',
-        'phpims\\operation\\deleteimagemetadata' => '/Operation/DeleteImageMetadata.php',
-        'phpims\\operation\\editimagemetadata' => '/Operation/EditImageMetadata.php',
-        'phpims\\operation\\exception' => '/Operation/Exception.php',
-        'phpims\\operation\\getimage' => '/Operation/GetImage.php',
-        'phpims\\operation\\getimagemetadata' => '/Operation/GetImageMetadata.php',
-        'phpims\\operation\\getimages' => '/Operation/GetImages.php',
-        'phpims\\operation\\getimages\\query' => '/Operation/GetImages/Query.php',
-        'phpims\\operation\\headimage' => '/Operation/HeadImage.php',
-        'phpims\\operation\\plugin\\auth' => '/Operation/Plugin/Auth.php',
-        'phpims\\operation\\plugin\\exception' => '/Operation/Plugin/Exception.php',
-        'phpims\\operation\\plugin\\identifyimage' => '/Operation/Plugin/IdentifyImage.php',
-        'phpims\\operation\\plugin\\manipulateimage' => '/Operation/Plugin/ManipulateImage.php',
-        'phpims\\operation\\plugin\\prepareimage' => '/Operation/Plugin/PrepareImage.php',
-        'phpims\\operation\\plugininterface' => '/Operation/PluginInterface.php',
-        'phpims\\operationinterface' => '/OperationInterface.php',
-        'phpims\\server\\response' => '/Server/Response.php',
-        'phpims\\storage\\driver\\filesystem' => '/Storage/Driver/Filesystem.php',
-        'phpims\\storage\\driverinterface' => '/Storage/DriverInterface.php',
-        'phpims\\storage\\exception' => '/Storage/Exception.php'
+        'phpims\\request\\exception' => '/Request/Exception.php',
+        'phpims\\request\\request' => '/Request/Request.php',
+        'phpims\\request\\requestinterface' => '/Request/RequestInterface.php',
+        'phpims\\resource\\image' => '/Resource/Image.php',
+        'phpims\\resource\\images' => '/Resource/Images.php',
+        'phpims\\resource\\images\\query' => '/Resource/Images/Query.php',
+        'phpims\\resource\\metadata' => '/Resource/Metadata.php',
+        'phpims\\resource\\plugin\\auth' => '/Resource/Plugin/Auth.php',
+        'phpims\\resource\\plugin\\exception' => '/Resource/Plugin/Exception.php',
+        'phpims\\resource\\plugin\\identifyimage' => '/Resource/Plugin/IdentifyImage.php',
+        'phpims\\resource\\plugin\\manipulateimage' => '/Resource/Plugin/ManipulateImage.php',
+        'phpims\\resource\\plugin\\plugininterface' => '/Resource/Plugin/PluginInterface.php',
+        'phpims\\resource\\plugin\\prepareimage' => '/Resource/Plugin/PrepareImage.php',
+        'phpims\\resource\\resource' => '/Resource/Resource.php',
+        'phpims\\resource\\resourceinterface' => '/Resource/ResourceInterface.php',
+        'phpims\\response\\response' => '/Response/Response.php',
+        'phpims\\response\\responseinterface' => '/Response/ResponseInterface.php',
+        'phpims\\storage\\exception' => '/Storage/Exception.php',
+        'phpims\\storage\\filesystem' => '/Storage/Filesystem.php',
+        'phpims\\storage\\storageinterface' => '/Storage/StorageInterface.php'
     );
 
     /**
@@ -109,6 +108,12 @@ class Autoload {
             require __DIR__ . static::$classes[$className];
         }
     }
-}
 
-spl_autoload_register('PHPIMS\\Autoload::load');
+    /**
+     * Registers this instance as an autoloader
+     */
+    public function register() {
+        // Register the autoloader
+        spl_autoload_register(array($this, 'load'));
+    }
+}
