@@ -73,8 +73,8 @@ class Images extends Resource implements ResourceInterface {
             $query->num($request->get('num'));
         }
 
-        if ($request->has('returnMetadata')) {
-            $query->returnMetadata($request->get('returnMetadata'));
+        if ($request->has('metadata')) {
+            $query->returnMetadata($request->get('metadata'));
         }
 
         if ($request->has('from')) {
