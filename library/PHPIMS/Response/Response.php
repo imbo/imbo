@@ -32,6 +32,7 @@
 namespace PHPIMS\Response;
 
 use PHPIMS\Image\ImageInterface;
+use PHPIMS\Image\Image;
 use PHPIMS\Exception;
 
 /**
@@ -228,6 +229,10 @@ class Response implements ResponseInterface {
      * @see PHPIMS\Response\ResponseInterface::getImage()
      */
     public function getImage() {
+        if ($this->image === null) {
+            $this->image = new Image();
+        }
+
         return $this->image;
     }
 
