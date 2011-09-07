@@ -111,7 +111,15 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         $this->client = null;
     }
 
-    public function testAddImage() {
+    /**
+     * @expectedException PHPIMS\Client\Exception
+     * @expectedExceptionMessage File does not exist: foobar
+     */
+    public function testAddImageWhenImageDoesNotExist() {
+        $this->client->addImage('foobar');
+    }
+
+    public function testAddImageWithMetadata() {
         $imagePath = __DIR__ . '/_files/image.png';
         $metadata = array(
             'foo' => 'bar',
@@ -126,6 +134,20 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         $this->driver->shouldReceive('post')->once()->with($this->signedUrlPattern, $metadata)->andReturn($response);
 
         $result = $this->client->addImage($imagePath, $metadata);
+
+        $this->assertSame($result, $response);
+    }
+
+    public function testAddImageWithNoMetadata() {
+        $imagePath = __DIR__ . '/_files/image.png';
+
+        $response = m::mock('PHPIMS\Client\Response');
+        $response->shouldReceive('isSuccess')->once()->andReturn(true);
+
+        $this->driver->shouldReceive('put')->once()->with($this->signedUrlPattern, $imagePath)->andReturn($response);
+        $this->driver->shouldReceive('post')->once()->with($this->signedUrlPattern, array('filename' => 'image.png'))->andReturn($response);
+
+        $result = $this->client->addImage($imagePath);
 
         $this->assertSame($result, $response);
     }

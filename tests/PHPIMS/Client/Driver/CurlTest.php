@@ -87,6 +87,20 @@ class CurlTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($metadata, json_decode($result['data']['metadata'], true));
     }
 
+    /**
+     * This method will PUT the current file (__FILE__) to the test script. The test script will
+     * then read this file and inject the md5 sum of the file into the output. This method will
+     * then compute the md5 sum and make sure it's the same as the one from the test script.
+     */
+    public function testPut() {
+        $url = $this->testUrl;
+        $response = $this->driver->put($url, __FILE__);
+        $this->assertInstanceOf('PHPIMS\\Client\\Response', $response);
+        $data = unserialize($response->getBody());
+
+        $this->assertSame($data['md5'], md5_file(__FILE__));
+    }
+
     public function testGet() {
         $url = $this->testUrl . '?foo=bar&bar=foo';
         $response = $this->driver->get($url);

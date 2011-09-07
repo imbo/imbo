@@ -111,6 +111,8 @@ class Autoload {
 
     /**
      * Registers this instance as an autoloader
+     *
+     * @codeCoverageIgnore
      */
     public function register() {
         // Register the autoloader
