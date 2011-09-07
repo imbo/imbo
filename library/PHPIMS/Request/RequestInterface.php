@@ -192,4 +192,11 @@ interface RequestInterface {
      * @return boolean
      */
     function isImagesRequest();
+
+    /**
+     * Return raw post data
+     *
+     * @return string
+     */
+    function getRawData();
 }

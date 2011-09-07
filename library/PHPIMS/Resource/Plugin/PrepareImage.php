@@ -55,7 +55,7 @@ class PrepareImage implements PluginInterface {
      */
     public function exec(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         // Fetch image data from input
-        $imageBlob = file_get_contents('php://input');
+        $imageBlob = $request->getRawData();
 
         if (empty($imageBlob)) {
             throw new Exception('No image attached', 400);

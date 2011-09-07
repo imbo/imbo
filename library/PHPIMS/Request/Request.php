@@ -339,4 +339,12 @@ class Request implements RequestInterface {
     public function isImagesRequest() {
         return $this->type === RequestInterface::RESOURCE_IMAGES;
     }
+
+    /**
+     * @see PHPIMS\Request\RequestInterface::getRawData()
+     * @codeCoverageIgnore
+     */
+    public function getRawData() {
+        return file_get_contents('php://input');
+    }
 }
