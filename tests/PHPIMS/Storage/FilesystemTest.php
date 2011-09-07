@@ -114,6 +114,38 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $driver->store($this->publicKey, $this->imageIdentifier, $image);
     }
 
+    /**
+     * @expectedException PHPIMS\Storage\Exception
+     * @expectedExceptionMessage Image already exists
+     * @expectedExceptionCode 400
+     */
+    public function testStoreFileTwice() {
+        $content = 'some content';
+        $image = m::mock('PHPIMS\Image\ImageInterface');
+        $image->shouldReceive('getBlob')->once()->andReturn($content);
+        $baseDir = 'someDir';
+
+        // Create the virtual directory
+        \vfsStream::setup($baseDir);
+
+        $driver = new Filesystem(array('dataDir' => \vfsStream::url($baseDir)));
+        $this->assertTrue($driver->store($this->publicKey, $this->imageIdentifier, $image));
+        $driver->store($this->publicKey, $this->imageIdentifier, $image);
+    }
+
+    public function testStore() {
+        $content = 'some content';
+        $image = m::mock('PHPIMS\Image\ImageInterface');
+        $image->shouldReceive('getBlob')->once()->andReturn($content);
+        $baseDir = 'someDir';
+
+        // Create the virtual directory
+        \vfsStream::setup($baseDir);
+
+        $driver = new Filesystem(array('dataDir' => \vfsStream::url($baseDir)));
+        $this->assertTrue($driver->store($this->publicKey, $this->imageIdentifier, $image));
+    }
+
     public function testGetImagePath() {
         $driver = new Filesystem(array('dataDir' => '/tmp'));
         $this->assertSame(
