@@ -93,7 +93,7 @@ class Filesystem implements StorageInterface {
             throw new Exception('Image already exists', 400);
         }
 
-        return file_put_contents($imagePath, $image->getBlob());
+        return (bool) file_put_contents($imagePath, $image->getBlob());
     }
 
     /**
