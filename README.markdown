@@ -281,14 +281,6 @@ The `getImageUrl` returns an instance of `PHPIMS\Client\ImageUrl` which, when us
     $chain = new PHPIMS\Image\TransformationChain();
     $chain->transformImageUrl($url, $$transformation);
 
-    // OR
-
-    $hash = '<hash>';
-    $url = $client->getImageUrl($hash);
-    $chain = new PHPIMS\Image\TransformationChain();
-    $chain->thumbnail()->border();
-    $url->transform($chain);
-
 #### Image transformations
 The `PHPIMS\Image\TransformationChain` class can be used to stack image manipulations. The following transformations can be added to an instance of the `PHPIMS\Image\TransformationChain` class:
 
