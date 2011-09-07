@@ -53,6 +53,7 @@ use PHPIMS\Storage\StorageInterface;
 class ManipulateImage implements PluginInterface {
     /**
      * @see PHPIMS\Resource\Plugin\PluginInterface::exec()
+     * @codeCoverageIgnore
      */
     public function exec(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $transformationChain = $request->getTransformations();
