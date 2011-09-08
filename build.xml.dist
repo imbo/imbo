@@ -1,70 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project name="phpims" default="build" basedir=".">
-  <!-- Override this value using the -Dclient_tests_url=/some/path when running ant -->
-  <property name="client_tests_path" value="/var/www/phpims/driver.php" />
+  <property name="source" value="${basedir}/library/PHPIMS"/>
+  <property name="build" value="${basedir}/build"/>
 
-  <target name="clean">
-    <delete dir="${basedir}/build"/>
-    <mkdir dir="${basedir}/build/coverage" />
-    <mkdir dir="${basedir}/build/logs" />
-    <mkdir dir="${basedir}/build/docs" />
-    <mkdir dir="${basedir}/build/code-browser" />
-    <copy file="${basedir}/tests/PHPIMS/Client/Driver/_files/driver.php" tofile="${client_tests_path}" overwrite="true" />
+  <!-- Override this value using the -Dclient_tests_url=/some/path when running ant -->
+  <property name="client_tests_path" value="/var/www/phpims/driver.php"/>
+
+  <target name="clean" description="Clean up and create artifact directories">
+    <delete dir="${build}"/>
+
+    <mkdir dir="${build}/coverage"/>
+    <mkdir dir="${build}/logs"/>
+    <mkdir dir="${build}/docs"/>
+    <mkdir dir="${build}/code-browser"/>
+    <mkdir dir="${build}/pdepend"/>
+
+    <copy file="${basedir}/tests/PHPIMS/Client/Driver/_files/driver.php" tofile="${client_tests_path}" overwrite="true"/>
   </target>
 
-  <target name="phpab">
+  <target name="phpab" description="Update autoloader using phpab">
     <exec executable="phpab">
-      <arg line="-o ${basedir}/library/PHPIMS/Autoload.php
-                 -t ${basedir}/library/PHPIMS/Autoload.php.in
-                 --indent '        '
-                 ${basedir}/library/PHPIMS" />
+      <arg line="-o ${source}/Autoload.php -t ${source}/Autoload.php.in --indent '        ' ${source}"/>
     </exec>
   </target>
 
-  <target name="phpunit">
-    <exec executable="phpunit" failonerror="true" />
+  <target name="phpunit" description="Run unit tests using PHPUnit and generates junit.xml and clover.xml (config in phpunit.xml)">
+    <exec executable="phpunit" failonerror="true"/>
   </target>
 
   <target name="docblox" description="Generate API documentation using DocBlox (config in docblox.xml)">
-    <exec executable="docblox" />
+    <exec executable="docblox"/>
   </target>
 
-  <target name="phploc">
+  <target name="phploc" description="Generate phploc data">
     <exec executable="phploc">
-      <arg line="--log-csv ${basedir}/build/logs/phploc.csv
-                 --log-xml ${basedir}/build/logs/phploc.xml
-                 ${basedir}/library/PHPIMS" />
+      <arg line="--log-csv ${build}/logs/phploc.csv --log-xml ${build}/logs/phploc.xml ${source}"/>
     </exec>
   </target>
 
-  <target name="phpcb">
+  <target name="phpcs" description="Generate checkstyle.xml using PHP_CodeSniffer">
+    <exec executable="phpcs" output="/dev/null">
+      <arg line="--report=checkstyle --report-file=${build}/logs/checkstyle.xml --standard=PHPIMS ${source}"/>
+    </exec>
+  </target>
+
+  <target name="phpcb" description="Aggregate tool output with PHP_CodeBrowser">
     <exec executable="phpcb">
-      <arg line="--log ${basedir}/build/logs
-                 --source ${basedir}/library/PHPIMS
-                 --output ${basedir}/build/code-browser" />
+      <arg line="--log ${build}/logs --source ${source} --output ${build}/code-browser"/>
     </exec>
   </target>
 
-  <target name="phpcpd">
+  <target name="phpcpd" description="Generate pmd-cpd.xml using PHPCPD">
     <exec executable="phpcpd">
-      <arg line="--log-pmd ${basedir}/build/logs/pmd-cpd.xml
-                 ${basedir}/library/PHPIMS" />
+      <arg line="--log-pmd ${build}/logs/pmd-cpd.xml ${source}"/>
     </exec>
   </target>
 
-  <target name="pdepend">
+  <target name="pdepend" description="Generate jdepend.xml and software metrics charts using PHP_Depend">
     <exec executable="pdepend">
-      <arg line="--jdepend-xml=${basedir}/build/logs/jdepend.xml
-                 ${basedir}/library/PHPIMS" />
+      <arg line="--jdepend-xml=${build}/logs/jdepend.xml --jdepend-chart=${build}/pdepend/dependencies.svg --overview-pyramid=${build}/pdepend/overview-pyramid.svg ${source}"/>
     </exec>
   </target>
 
-  <target name="phpmd">
+  <target name="phpmd" description="Generate pmd.xml using PHPMD (configuration in phpmd.xml)">
     <exec executable="phpmd">
-      <arg line="${basedir}/library/PHPIMS xml codesize,unusedcode
-                 --reportfile ${basedir}/build/logs/pmd.xml" />
-
+      <arg line="${source} xml ${basedir}/phpmd.xml --reportfile ${build}/logs/pmd.xml"/>
     </exec>
   </target>
 
-  <target name="build" depends="clean,phpab,phpunit,docblox,phploc,phpcb,phpcpd,pdepend,phpmd"/>
+  <target name="build" depends="clean,phpab,phpunit,docblox,phploc,phpcs,phpcb,phpcpd,pdepend,phpmd"/>
 </project>

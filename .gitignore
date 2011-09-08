@@ -2,3 +2,4 @@ build
 build.xml
 phpunit.xml
 docblox.xml
+phpmd.xml
