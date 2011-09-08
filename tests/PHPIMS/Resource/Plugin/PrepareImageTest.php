@@ -81,4 +81,21 @@ class PrepareImageTest extends \PHPUnit_Framework_TestCase {
 
         $this->plugin->exec($this->request, $this->response, $this->database, $this->storage);
     }
+
+    public function testSuccessfulExec() {
+        $imagePath = __DIR__ . '/../../_files/image.png';
+        $imageBlob = file_get_contents($imagePath);
+        $imageIdentifier = md5($imageBlob) . '.png';
+        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue($imageBlob));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+
+        $image = $this->getMock('PHPIMS\Image\ImageInterface');
+        $image->expects($this->once())->method('setBlob')->with($imageBlob)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with(665)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with(463)->will($this->returnValue($image));
+
+        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
+
+        $this->plugin->exec($this->request, $this->response, $this->database, $this->storage);
+    }
 }
