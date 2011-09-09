@@ -34,7 +34,8 @@ namespace PHPIMS;
 
 use PHPIMS\Response\Response;
 use PHPIMS\Request\RequestInterface;
-use PHPIMS\Image\Image;
+use PHPIMS\Resource\Exception as ResourceException;
+use PHPIMS\Resource\Plugin\Exception as PluginException;
 
 /**
  * Client that interacts with the server part of PHPIMS
@@ -110,16 +111,41 @@ class FrontController {
         // Add an Allow header to the response
         $response->setHeader('Allow', implode(', ', $resource->getAllowedMethods()));
 
-        // Execute pre-exec plugins
-        foreach ($resource->getPreExecPlugins($httpMethod) as $plugin) {
-            $plugin->exec($request, $response, $database, $storage);
+        // See if the HTTP method is supported at all
+        if (!method_exists($resource, $methodName)) {
+            $response->setError(405, 'Method not allowed');
+
+            return $response;
         }
 
-        $resource->$methodName($request, $response, $database, $storage);
+        // Execute pre-exec plugins
+        foreach ($resource->getPreExecPlugins($httpMethod) as $plugin) {
+            try {
+                $plugin->exec($request, $response, $database, $storage);
+            } catch (PluginException $e) {
+                $response->setErrorFromException($e);
+
+                return $response;
+            }
+        }
+
+        try {
+            $resource->$methodName($request, $response, $database, $storage);
+        } catch (ResourceException $e) {
+            $response->setErrorFromException($e);
+
+            return $response;
+        }
 
         // Execute post-exec plugins
         foreach ($resource->getPostExecPlugins($httpMethod) as $plugin) {
-            $plugin->exec($request, $response, $database, $storage);
+            try {
+                $plugin->exec($request, $response, $database, $storage);
+            } catch (PluginException $e) {
+                $response->setErrorFromException($e);
+
+                return $response;
+            }
         }
 
         return $response;
