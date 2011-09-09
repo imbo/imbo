@@ -36,6 +36,7 @@ use PHPIMS\Request\RequestInterface;
 use PHPIMS\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
+use PHPIMS\Image\Transformation\Exception as TransformationException;
 
 /**
  * Manipulate image plugin
@@ -59,6 +60,10 @@ class ManipulateImage implements PluginInterface {
         $transformationChain = $request->getTransformations();
         $image = $response->getImage();
 
-        $transformationChain->applyToImage($image);
+        try {
+            $transformationChain->applyToImage($image);
+        } catch (TransformationException $e) {
+            throw new Exception('Transformation failed with message: ' . $e->getMessage(), 401, $e);
+        }
     }
 }
