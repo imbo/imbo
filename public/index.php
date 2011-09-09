@@ -44,13 +44,9 @@ $config = require __DIR__ . '/../config/server.php';
 $excessDir = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname($_SERVER['SCRIPT_FILENAME']));
 $resource  = str_replace($excessDir, '', $_SERVER['REDIRECT_URL']);
 
-try {
-    $frontController = new PHPIMS\FrontController($config);
-    $request = new PHPIMS\Request\Request($_SERVER['REQUEST_METHOD'], $resource, $config['auth']);
-    $response = $frontController->handle($request);
-} catch (PHPIMS\Exception $e) {
-    $response = PHPIMS\Response\Response::fromException($e);
-}
+$frontController = new PHPIMS\FrontController($config);
+$request = new PHPIMS\Request\Request($_SERVER['REQUEST_METHOD'], $resource, $config['auth']);
+$response = $frontController->handle($request);
 
 $code = $response->getCode();
 $header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS\Response\Response::$codes[$code]);
