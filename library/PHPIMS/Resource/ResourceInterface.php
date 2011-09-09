@@ -105,6 +105,7 @@ interface ResourceInterface {
      * @param PHPIMS\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
+     * @throws PHPIMS\Resource\Exception
      */
     function post(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
@@ -115,6 +116,7 @@ interface ResourceInterface {
      * @param PHPIMS\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
+     * @throws PHPIMS\Resource\Exception
      */
     function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
@@ -125,6 +127,7 @@ interface ResourceInterface {
      * @param PHPIMS\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
+     * @throws PHPIMS\Resource\Exception
      */
     function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
@@ -135,6 +138,7 @@ interface ResourceInterface {
      * @param PHPIMS\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
+     * @throws PHPIMS\Resource\Exception
      */
     function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
@@ -145,6 +149,7 @@ interface ResourceInterface {
      * @param PHPIMS\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
+     * @throws PHPIMS\Resource\Exception
      */
     function options(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
@@ -155,6 +160,7 @@ interface ResourceInterface {
      * @param PHPIMS\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
+     * @throws PHPIMS\Resource\Exception
      */
     function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 }

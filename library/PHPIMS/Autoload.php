@@ -77,6 +77,7 @@ class Autoload {
         'phpims\\request\\exception' => '/Request/Exception.php',
         'phpims\\request\\request' => '/Request/Request.php',
         'phpims\\request\\requestinterface' => '/Request/RequestInterface.php',
+        'phpims\\resource\\exception' => '/Resource/Exception.php',
         'phpims\\resource\\image' => '/Resource/Image.php',
         'phpims\\resource\\images' => '/Resource/Images.php',
         'phpims\\resource\\images\\query' => '/Resource/Images/Query.php',
