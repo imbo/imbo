@@ -33,6 +33,7 @@
 namespace PHPIMS\Response;
 
 use PHPIMS\Image\ImageInterface;
+use PHPIMS\Exception;
 
 /**
  * Response interface
@@ -143,4 +144,24 @@ interface ResponseInterface {
      * @return boolean
      */
     function hasImage();
+
+    /**
+     * Set an error message
+     *
+     * This method should update the response code and store the error message in the body of the
+     * request.
+     *
+     * @param int $code The HTTP error code
+     * @param string $message Error message that will be sent to the client
+     * @return PHPIMS\Response\ResponseInterface
+     */
+    function setError($code, $message);
+
+    /**
+     * Set a response error based on an exception instance
+     *
+     * @param PHPIMS\Exception $e A thrown exception with a message and a status code
+     * @return PHPIMS\Response\ResponseInterface
+     */
+    function setErrorFromException(Exception $e);
 }

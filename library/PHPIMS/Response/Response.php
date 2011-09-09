@@ -253,19 +253,25 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * Create a response based on an exception object
-     *
-     * @param PHPIMS\Exception $e
-     * @return PHPIMS\Response\Response
+     * @see PHPIMS\Response\ResponseInterface::setError()
      */
-    static public function fromException(Exception $e) {
-        $response = new static();
-        $response->setCode($e->getCode())
-                 ->setBody(array('error' => array('code'      => $e->getCode(),
-                                                  'message'   => $e->getMessage(),
-                                                  'timestamp' => gmdate('Y-m-d\TH:i\Z')),
-        ));
+    public function setError($code, $message) {
+        // Remove a possible image instance
+        $this->image = null;
 
-        return $response;
+        // Set the HTTP status code and an array with an error element in the body
+        $this->setCode($code)
+             ->setBody(array('error' => array('code'      => $code,
+                                              'message'   => $message,
+                                              'timestamp' => gmdate('Y-m-d\TH:i\Z'))));
+
+        return $this;
+    }
+
+    /**
+     * @see PHPIMS\Response\ResponseInterface::setErrorFromException()
+     */
+    public function setErrorFromException(Exception $e) {
+        return $this->setError($e->getCode(), $e->getMessage());
     }
 }

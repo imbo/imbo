@@ -101,21 +101,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($body, $this->response->getBody());
     }
 
-    public function testStaticFromException() {
-        $code = 404;
-        $message = 'some message';
-        $e = new Exception($message, $code);
-
-        $response = Response::fromException($e);
-        $this->assertSame($code, $response->getCode());
-        $responseBody = $response->getBody();
-
-        $this->assertArrayHasKey('error', $responseBody);
-        $this->assertSame($code, $responseBody['error']['code']);
-        $this->assertSame($message, $responseBody['error']['message']);
-        $this->assertArrayHasKey('timestamp', $responseBody['error']);
-    }
-
     public function testSetGetContentType() {
         $type = 'application/json';
         $this->response->setContentType($type);
