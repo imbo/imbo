@@ -52,7 +52,9 @@ interface PluginInterface {
      * Plugin exec method
      *
      * The plugin will execute this method based on where it is inserted into the different
-     * resources.
+     * resources. If an error occurs the plugin should throw an instance of
+     * PHPIMS\Resource\Plugin\Exception with a descriptive message and a fitting HTTP response
+     * code.
      *
      * @param PHPIMS\Request\RequestInterface   $request  A request instance
      * @param PHPIMS\Response\ResponseInterface $response A response instance
