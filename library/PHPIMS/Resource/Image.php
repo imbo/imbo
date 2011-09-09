@@ -70,6 +70,18 @@ class Image extends Resource implements ResourceInterface {
     }
 
     /**
+     * @see PHPIMS\Resource\ResourceInterface::getAllowedMethods()
+     */
+    public function getAllowedMethods() {
+        return array(
+            RequestInterface::METHOD_GET,
+            RequestInterface::METHOD_HEAD,
+            RequestInterface::METHOD_DELETE,
+            RequestInterface::METHOD_PUT,
+        );
+    }
+
+    /**
      * @see PHPIMS\Resource\ResourceInterface::put()
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {

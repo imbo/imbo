@@ -60,6 +60,15 @@ use PHPIMS\Resource\Images\Query;
  */
 class Images extends Resource implements ResourceInterface {
     /**
+     * @see PHPIMS\Resource\ResourceInterface::getAllowedMethods()
+     */
+    public function getAllowedMethods() {
+        return array(
+            RequestInterface::METHOD_GET,
+        );
+    }
+
+    /**
      * @see PHPIMS\Resource\ResourceInterface::get()
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {

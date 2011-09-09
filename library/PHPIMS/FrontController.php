@@ -107,6 +107,9 @@ class FrontController {
         // Fetch the resource instance
         $resource = $this->resolveResource($request);
 
+        // Add an Allow header to the response
+        $response->setHeader('Allow', implode(', ', $resource->getAllowedMethods()));
+
         // Execute pre-exec plugins
         foreach ($resource->getPreExecPlugins($httpMethod) as $plugin) {
             $plugin->exec($request, $response, $database, $storage);

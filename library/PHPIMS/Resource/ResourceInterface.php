@@ -62,6 +62,13 @@ interface ResourceInterface {
     /**#@-*/
 
     /**
+     * Return an array with the allowed (implemented) HTTP methods for the current resource
+     *
+     * @return string[]
+     */
+    function getAllowedMethods();
+
+    /**
      * Register a plugin
      *
      * @param string $state One of the state constants in this interface

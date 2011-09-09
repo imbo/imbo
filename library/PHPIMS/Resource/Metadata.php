@@ -61,6 +61,17 @@ class Metadata extends Resource implements ResourceInterface {
     }
 
     /**
+     * @see PHPIMS\Resource\ResourceInterface::getAllowedMethods()
+     */
+    public function getAllowedMethods() {
+        return array(
+            RequestInterface::METHOD_GET,
+            RequestInterface::METHOD_POST,
+            RequestInterface::METHOD_DELETE,
+        );
+    }
+
+    /**
      * @see PHPIMS\Resource\ResourceInterface::delete()
      */
     public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
