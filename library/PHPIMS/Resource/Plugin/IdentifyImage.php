@@ -56,7 +56,7 @@ class IdentifyImage implements PluginInterface {
      *
      * @var array
      */
-    static public $mimeTypes = array(
+    private $mimeTypes = array(
         'image/png'  => 'png',
         'image/jpeg' => 'jpeg',
         'image/gif'  => 'gif',
@@ -71,11 +71,11 @@ class IdentifyImage implements PluginInterface {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mime = $finfo->buffer($image->getBlob());
 
-        if (!self::supportedMimeType($mime)) {
+        if (!$this->supportedMimeType($mime)) {
             throw new Exception('Unsupported image type: ' . $mime, 415);
         }
 
-        $extension = self::getFileExtension($mime);
+        $extension = $this->getFileExtension($mime);
 
         $image->setMimeType($mime)
               ->setExtension($extension);
@@ -92,8 +92,8 @@ class IdentifyImage implements PluginInterface {
      * @param string $mime The mime type to check. For instance "image/png"
      * @return boolean
      */
-    static public function supportedMimeType($mime) {
-        return isset(self::$mimeTypes[$mime]);
+    private function supportedMimeType($mime) {
+        return isset($this->mimeTypes[$mime]);
     }
 
     /**
@@ -103,7 +103,7 @@ class IdentifyImage implements PluginInterface {
      * @return boolean|string The extension (without the leading dot) on success or boolean false
      *                        if the mime type is not supported.
      */
-    static public function getFileExtension($mime) {
-        return isset(self::$mimeTypes[$mime]) ? self::$mimeTypes[$mime] : false;
+    private function getFileExtension($mime) {
+        return isset($this->mimeTypes[$mime]) ? $this->mimeTypes[$mime] : false;
     }
 }
