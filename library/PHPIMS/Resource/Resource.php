@@ -116,41 +116,41 @@ abstract class Resource {
      * @see PHPIMS\Resource\ResourceInterface::post()
      */
     public function post(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        throw new Exception('Not implemented');
+        throw new Exception('Method not allowed', 405);
     }
 
     /**
      * @see PHPIMS\Resource\ResourceInterface::get()
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        throw new Exception('Not implemented');
+        throw new Exception('Method not allowed', 405);
     }
 
     /**
      * @see PHPIMS\Resource\ResourceInterface::head()
      */
     public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        throw new Exception('Not implemented');
+        throw new Exception('Method not allowed', 405);
     }
 
     /**
      * @see PHPIMS\Resource\ResourceInterface::delete()
      */
     public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        throw new Exception('Not implemented');
+        throw new Exception('Method not allowed', 405);
     }
 
     /**
      * @see PHPIMS\Resource\ResourceInterface::options()
      */
     public function options(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        throw new Exception('Not implemented');
+        throw new Exception('Method not allowed', 405);
     }
 
     /**
      * @see PHPIMS\Resource\ResourceInterface::put()
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        throw new Exception('Not implemented');
+        throw new Exception('Method not allowed', 405);
     }
 }
