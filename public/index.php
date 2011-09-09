@@ -46,7 +46,9 @@ $resource  = str_replace($excessDir, '', $_SERVER['REDIRECT_URL']);
 
 $frontController = new PHPIMS\FrontController($config);
 $request = new PHPIMS\Request\Request($_SERVER['REQUEST_METHOD'], $resource, $config['auth']);
-$response = $frontController->handle($request);
+$response = new PHPIMS\Response\Response();
+
+$frontController->handle($request, $response);
 
 $code = $response->getCode();
 $header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS\Response\Response::$codes[$code]);

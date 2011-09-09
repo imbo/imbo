@@ -32,8 +32,8 @@
 
 namespace PHPIMS;
 
-use PHPIMS\Response\Response;
 use PHPIMS\Request\RequestInterface;
+use PHPIMS\Response\ResponseInterface;
 use PHPIMS\Resource\Exception as ResourceException;
 use PHPIMS\Resource\Plugin\Exception as PluginException;
 
@@ -91,15 +91,14 @@ class FrontController {
      * Handle a request
      *
      * @param PHPIMS\Request\RequestInterface $request The request object
-     * @return PHPIMS\Response\ResponseInterface
+     * @param PHPIMS\Response\ResponseInterface $response The response object
      * @throws PHPIMS\Exception
      */
-    public function handle(RequestInterface $request) {
+    public function handle(RequestInterface $request, ResponseInterface $response) {
         if ($request->getMethod() === RequestInterface::METHOD_BREW) {
             throw new Exception('I\'m a teapot!', 418);
         }
 
-        $response   = new Response();
         $database   = $this->config['database'];
         $storage    = $this->config['storage'];
         $httpMethod = $request->getMethod();
@@ -115,7 +114,7 @@ class FrontController {
         if (!method_exists($resource, $methodName)) {
             $response->setError(405, 'Method not allowed');
 
-            return $response;
+            return;
         }
 
         // Execute pre-exec plugins
@@ -125,7 +124,7 @@ class FrontController {
             } catch (PluginException $e) {
                 $response->setErrorFromException($e);
 
-                return $response;
+                return;
             }
         }
 
@@ -134,7 +133,7 @@ class FrontController {
         } catch (ResourceException $e) {
             $response->setErrorFromException($e);
 
-            return $response;
+            return;
         }
 
         // Execute post-exec plugins
@@ -144,10 +143,10 @@ class FrontController {
             } catch (PluginException $e) {
                 $response->setErrorFromException($e);
 
-                return $response;
+                return;
             }
         }
 
-        return $response;
+        return;
     }
 }
