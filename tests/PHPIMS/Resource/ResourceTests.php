@@ -41,6 +41,81 @@ namespace PHPIMS\Resource;
  * @link https://github.com/christeredvartsen/phpims
  */
 abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
+    /**
+     * @var PHPIMS\Resource\ResourceInterface
+     */
+    protected $resource;
+
+    /**
+     * @var PHPIMS\Request\RequestInterface
+     */
+    protected $request;
+
+    /**
+     * @var PHPIMS\Response\ResponseInterface
+     */
+    protected $response;
+
+    /**
+     * @var PHPIMS\Database\DatabaseInterface
+     */
+    protected $database;
+
+    /**
+     * @var PHPIMS\Storage\StorageInterface
+     */
+    protected $storage;
+
+    /**
+     * @var string
+     */
+    protected $publicKey;
+
+    /**
+     * @var string
+     */
+    protected $imageIdentifier;
+
+    /**
+     * @var PHPIMS\Image\ImageInterface
+     */
+    protected $image;
+
+    public function setUp() {
+        $this->resource = $this->getNewResource();
+
+        $this->publicKey = md5(microtime());
+        $this->imageIdentifier = md5(microtime()) . '.png';
+
+        $this->request = $this->getMock('PHPIMS\Request\RequestInterface');
+        $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
+
+        $this->image = $this->getMock('PHPIMS\Image\ImageInterface');
+        $this->response = $this->getMock('PHPIMS\Response\ResponseInterface');
+        $this->response->expects($this->any())->method('getImage')->will($this->returnValue($this->image));
+
+        $this->database = $this->getMock('PHPIMS\Database\DatabaseInterface');
+
+        $this->storage = $this->getMock('PHPIMS\Storage\StorageInterface');
+    }
+
+    public function tearDown() {
+        $this->resource = null;
+        $this->request = null;
+        $this->response = null;
+        $this->database = null;
+        $this->storage = null;
+        $this->publicKey = null;
+        $this->imageIdentifier = null;
+        $this->image = null;
+    }
+
+    /**
+     * Return a resource that can be tested
+     *
+     * @return PHPIMS\Resource\ResourceInterface
+     */
     abstract protected function getNewResource();
 
     /**
@@ -63,13 +138,5 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
         sort($expectedMethods);
 
         $this->assertSame($expectedMethods, $implementedMethods);
-    }
-
-    public function setUp() {
-        $this->resource = $this->getNewResource();
-    }
-
-    public function tearDown() {
-        $this->resource = null;
     }
 }

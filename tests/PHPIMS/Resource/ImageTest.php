@@ -32,6 +32,9 @@
 
 namespace PHPIMS\Resource;
 
+use PHPIMS\Database\Exception as DatabaseException;
+use PHPIMS\Storage\Exception as StorageException;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -43,5 +46,51 @@ namespace PHPIMS\Resource;
 class ImageTest extends ResourceTests {
     protected function getNewResource() {
         return new Image();
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedException Database error: Database message
+     * @expectedException 500
+     */
+    public function testPutWhenDatabaseThrowsAnException() {
+        $this->database->expects($this->once())
+                       ->method('insertImage')->with($this->publicKey, $this->imageIdentifier, $this->image)
+                       ->will($this->throwException(new DatabaseException('Database message', 500)));
+
+        $this->resource->put($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedException Storage error: Storage message
+     * @expectedException 500
+     */
+    public function testPutWhenStorageThrowsAnException() {
+        $this->database->expects($this->once())->method('insertImage');
+
+        $this->storage->expects($this->once())
+                      ->method('store')->with($this->publicKey, $this->imageIdentifier, $this->image)
+                      ->will($this->throwException(new StorageException('Storage message', 500)));
+
+        $this->resource->put($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    public function testSuccessfulPut() {
+        $this->database->expects($this->once())
+                       ->method('insertImage')->with($this->publicKey, $this->imageIdentifier, $this->image);
+
+        $this->storage->expects($this->once())
+                      ->method('store')->with($this->publicKey, $this->imageIdentifier, $this->image);
+
+        $this->response->expects($this->once())
+                       ->method('setCode')->with(201)
+                       ->will($this->returnValue($this->response));
+
+        $this->response->expects($this->once())
+                       ->method('setBody')->with(array('imageIdentifier' => $this->imageIdentifier))
+                       ->will($this->returnValue($this->response));
+
+        $this->resource->put($this->request, $this->response, $this->database, $this->storage);
     }
 }
