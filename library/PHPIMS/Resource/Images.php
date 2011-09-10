@@ -37,6 +37,7 @@ use PHPIMS\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
 use PHPIMS\Resource\Images\Query;
+use PHPIMS\Database\Exception as DatabaseException;
 
 /**
  * Images resource
@@ -102,7 +103,11 @@ class Images extends Resource implements ResourceInterface {
             }
         }
 
-        $images = $database->getImages($request->getPublicKey(), $query);
+        try {
+            $images = $database->getImages($request->getPublicKey(), $query);
+        } catch (DatabaseException $e) {
+            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
+        }
 
         $response->setBody($images);
     }

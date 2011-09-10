@@ -39,6 +39,8 @@ use PHPIMS\Storage\StorageInterface;
 use PHPIMS\Image\ImageInterface;
 use PHPIMS\Resource\ResourceInterface;
 use PHPIMS\Resource\Plugin;
+use PHPIMS\Database\Exception as DatabaseException;
+use PHPIMS\Storage\Exception as StorageException;
 
 /**
  * Image resource
@@ -89,10 +91,18 @@ class Image extends Resource implements ResourceInterface {
         $imageIdentifier = $request->getImageIdentifier();
 
         // Insert image to the database
-        $database->insertImage($publicKey, $imageIdentifier, $image);
+        try {
+            $database->insertImage($publicKey, $imageIdentifier, $image);
+        } catch (DatabaseException $e) {
+            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
+        }
 
         // Store the image
-        $storage->store($publicKey, $imageIdentifier, $image);
+        try {
+            $storage->store($publicKey, $imageIdentifier, $image);
+        } catch (StorageException $e) {
+            throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
+        }
 
         // Populate the response object
         $response->setCode(201)
@@ -106,8 +116,17 @@ class Image extends Resource implements ResourceInterface {
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
 
-        $database->deleteImage($publicKey, $imageIdentifier);
-        $storage->delete($publicKey, $imageIdentifier);
+        try {
+            $database->deleteImage($publicKey, $imageIdentifier);
+        } catch (DatabaseException $e) {
+            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
+        }
+
+        try {
+            $storage->delete($publicKey, $imageIdentifier);
+        } catch (StorageException $e) {
+            throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -119,12 +138,37 @@ class Image extends Resource implements ResourceInterface {
         $image = $response->getImage();
 
         // Fetch information from the database
-        $database->load($publicKey, $imageIdentifier, $image);
+        try {
+            $database->load($publicKey, $imageIdentifier, $image);
+        } catch (DatabaseError $e) {
+            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
+        }
 
         $this->addImageResponseHeaders($image, $response);
 
         // Load the image
-        $storage->load($publicKey, $imageIdentifier, $image);
+        try {
+            $storage->load($publicKey, $imageIdentifier, $image);
+        } catch (DatabaseException $e) {
+            throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * @see PHPIMS\Resource\ResourceInterface::head()
+     */
+    public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+        $image = $response->getImage();
+
+        // Fetch information from the database
+        try {
+            $database->load($request->getPublicKey(), $request->getImageIdentifier(), $image);
+        } catch (DatabaseError $e) {
+            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
+        }
+
+        $response->setContentType($image->getMimeType());
+        $this->addImageResponseHeaders($image, $response);
     }
 
     /**
@@ -139,18 +183,5 @@ class Image extends Resource implements ResourceInterface {
             'X-PHPIMS-OrignalImageHeight' => $image->getHeight(),
             'X-PHPIMS-OrignalImageSize'   => $image->getFilesize(),
         ));
-    }
-
-    /**
-     * @see PHPIMS\Resource\ResourceInterface::head()
-     */
-    public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $image = $response->getImage();
-
-        // Fetch information from the database
-        $database->load($request->getPublicKey(), $request->getImageIdentifier(), $image);
-
-        $response->setContentType($image->getMimeType());
-        $this->addImageResponseHeaders($image, $response);
     }
 }

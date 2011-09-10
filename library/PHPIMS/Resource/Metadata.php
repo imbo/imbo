@@ -36,8 +36,8 @@ use PHPIMS\Request\RequestInterface;
 use PHPIMS\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
-use PHPIMS\Resource\Plugin\PluginInterface;
 use PHPIMS\Resource\Plugin;
+use PHPIMS\Database\Exception as DatabaseException;
 
 /**
  * Metadata resource
@@ -75,7 +75,11 @@ class Metadata extends Resource implements ResourceInterface {
      * @see PHPIMS\Resource\ResourceInterface::delete()
      */
     public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $database->deleteMetadata($request->getPublicKey(), $request->getImageIdentifier());
+        try {
+            $database->deleteMetadata($request->getPublicKey(), $request->getImageIdentifier());
+        } catch (DatabaseException $e) {
+            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -83,7 +87,13 @@ class Metadata extends Resource implements ResourceInterface {
      */
     public function post(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $imageIdentifier = $request->getImageIdentifier();
-        $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $request->getMetadata());
+
+        try {
+            $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $request->getMetadata());
+        } catch (DatabaseException $e) {
+            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
+        }
+
         $response->setCode(200)
                  ->setBody(array('imageIdentifier' => $imageIdentifier));
     }
@@ -92,7 +102,12 @@ class Metadata extends Resource implements ResourceInterface {
      * @see PHPIMS\Resource\ResourceInterface::get()
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $data = $database->getMetadata($request->getPublicKey(), $request->getImageIdentifier());
+        try {
+            $data = $database->getMetadata($request->getPublicKey(), $request->getImageIdentifier());
+        } catch (DatabaseException $e) {
+            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
+        }
+
         $response->setBody($data);
     }
 }
