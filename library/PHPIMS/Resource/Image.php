@@ -39,7 +39,6 @@ use PHPIMS\Storage\StorageInterface;
 use PHPIMS\Image\ImageInterface;
 use PHPIMS\Resource\ResourceInterface;
 use PHPIMS\Resource\Plugin;
-use PHPIMS\Image\Image as ImageInstance;
 
 /**
  * Image resource
@@ -118,12 +117,6 @@ class Image extends Resource implements ResourceInterface {
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
         $image = $response->getImage();
-
-        // If no image exists, create a new instance and set the property in the response
-        if ($image === null) {
-            $image = new ImageInstance();
-            $response->setImage($image);
-        }
 
         // Fetch information from the database
         $database->load($publicKey, $imageIdentifier, $image);
