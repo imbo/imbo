@@ -46,7 +46,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException PHPIMS\Request\Exception
      * @expectedExceptionMessage Unsupported HTTP method: TRACE
-     * @expectedExceptionCode 400
+     * @expectedExceptionCode 501
      */
     public function testRequestWithInvalidMethod() {
         $request = new Request('TRACE', '', array());
