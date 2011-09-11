@@ -96,13 +96,16 @@ class MongoDB implements DatabaseInterface {
      * @see PHPIMS\Database\DatabaseInterface::insertImage()
      */
     public function insertImage($publicKey, $imageIdentifier, ImageInterface $image) {
+        $now = time();
+
         $data = array(
             'size'            => $image->getFilesize(),
             'publicKey'       => $publicKey,
             'imageIdentifier' => $imageIdentifier,
             'mime'            => $image->getMimeType(),
             'metadata'        => array(),
-            'added'           => time(),
+            'added'           => $now,
+            'updated'         => $now,
             'width'           => $image->getWidth(),
             'height'          => $image->getHeight(),
         );
@@ -150,7 +153,7 @@ class MongoDB implements DatabaseInterface {
 
             $this->collection->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('$set' => array('metadata' => $updatedMetadata)),
+                array('$set' => array('updated' => time(), 'metadata' => $updatedMetadata)),
                 array('safe' => true, 'multiple' => false)
             );
         } catch (\MongoException $e) {

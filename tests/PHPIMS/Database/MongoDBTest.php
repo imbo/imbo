@@ -201,7 +201,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->collection->shouldReceive('findOne')->once()->andReturn(array());
         $this->collection->shouldReceive('update')->once()->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
-            array('$set' => array('metadata' => $metadata)),
+            m::type('array'),
             m::type('array')
         )->andThrow('MongoException');
 
@@ -219,7 +219,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->collection->shouldReceive('findOne')->once()->andReturn(array());
         $this->collection->shouldReceive('update')->once()->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
-            array('$set' => array('metadata' => $metadata)),
+            m::type('array'),
             m::type('array')
         )->andReturn(true);
 
