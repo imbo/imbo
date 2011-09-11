@@ -59,7 +59,7 @@ try {
 }
 
 $code = $response->getCode();
-$header = sprintf("HTTP/1.0 %d %s", $code, PHPIMS\Response\Response::$codes[$code]);
+$header = sprintf("HTTP/1.1 %d %s", $code, PHPIMS\Response\Response::$codes[$code]);
 
 header($header);
 
