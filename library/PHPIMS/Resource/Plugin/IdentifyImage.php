@@ -80,6 +80,8 @@ class IdentifyImage implements PluginInterface {
         $image->setMimeType($mime)
               ->setExtension($extension);
 
+        $response->setContentType($mime);
+
         // Update image identifier in case it has a wrong extension
         $imageIdentifier = $request->getImageIdentifier();
         $imageIdentifier = substr($imageIdentifier, 0, 32) . '.' . $extension;
