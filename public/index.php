@@ -58,25 +58,32 @@ try {
     $response->setErrorFromException($e);
 }
 
+// Prepare the status line
 $code = $response->getCode();
 $header = sprintf("HTTP/1.1 %d %s", $code, PHPIMS\Response\Response::$codes[$code]);
 
+// Send status line
 header($header);
 
+// Send the content type of the response
+header('Content-Type: ' . $response->getContentType());
+
+// Send additional headers
 foreach ($response->getHeaders() as $name => $value) {
     header($name . ':' . $value);
 }
 
-if ($response->hasImage()) {
-    $image = $response->getImage();
-    $output = $image->getBlob();
-    $contentType = $image->getMimeType();
-} else {
-    $output = json_encode($response->getBody());
-    $contentType = $response->getContentType();
+// Make sure we don't send any message body for 204 and 304
+if ($code !== 204 && $code !== 304) {
+    if ($response->hasImage()) {
+        $output = $response->getImage()->getBlob();
+    } else {
+        $output = json_encode($response->getBody());
+    }
+
+    // Send a correct content-length header
+    header('Content-Length: ' . strlen($output));
+
+    // Send message body
+    print($output);
 }
-
-header('Content-Type: ' . $contentType);
-header('Content-Length: ' . strlen($output));
-
-print($output);
