@@ -308,10 +308,10 @@ class Response implements ResponseInterface {
 
         $statusCode = $this->getStatusCode();
         $statusLine = sprintf("HTTP/%s %d %s", $this->getProtocolVersion(), $statusCode, self::$statusCodes[$statusCode]);
-        header($header);
+        header($statusLine);
 
         // Send additional headers
-        foreach ($response->getHeaders() as $name => $value) {
+        foreach ($this->getHeaders() as $name => $value) {
             header($name . ':' . $value);
         }
     }
@@ -320,7 +320,7 @@ class Response implements ResponseInterface {
      * @see PHPIMS\Http\Response\ResponseInterface::sendContent()
      */
     public function sendContent() {
-        print($content);
+        print($this->getBody());
     }
 
     /**
