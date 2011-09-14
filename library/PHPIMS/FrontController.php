@@ -32,8 +32,8 @@
 
 namespace PHPIMS;
 
-use PHPIMS\Request\RequestInterface;
-use PHPIMS\Response\ResponseInterface;
+use PHPIMS\Http\Request\RequestInterface;
+use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Resource\Exception as ResourceException;
 use PHPIMS\Resource\Plugin\Exception as PluginException;
 
@@ -69,7 +69,7 @@ class FrontController {
     /**
      * Create a resource object based on the request
      *
-     * @param PHPIMS\Request\RequestInterface $request A request instance
+     * @param PHPIMS\Http\Request\RequestInterface $request A request instance
      * @return PHPIMS\Resource\ResourceInterface
      * @throws PHPIMS\Exception
      */
@@ -90,8 +90,8 @@ class FrontController {
     /**
      * Handle a request
      *
-     * @param PHPIMS\Request\RequestInterface $request The request object
-     * @param PHPIMS\Response\ResponseInterface $response The response object
+     * @param PHPIMS\Http\Request\RequestInterface $request The request object
+     * @param PHPIMS\Http\Response\ResponseInterface $response The response object
      * @throws PHPIMS\Exception
      */
     public function handle(RequestInterface $request, ResponseInterface $response) {

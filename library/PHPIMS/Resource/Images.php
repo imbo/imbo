@@ -32,8 +32,8 @@
 
 namespace PHPIMS\Resource;
 
-use PHPIMS\Request\RequestInterface;
-use PHPIMS\Response\ResponseInterface;
+use PHPIMS\Http\Request\RequestInterface;
+use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
 use PHPIMS\Resource\Images\Query;

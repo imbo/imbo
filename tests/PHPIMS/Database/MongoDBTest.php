@@ -117,7 +117,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
               ->once();
 
-        $response = m::mock('PHPIMS\Response\ResponseInterface');
+        $response = m::mock('PHPIMS\Http\Response\ResponseInterface');
 
         $this->collection->shouldReceive('findOne')->once()->andReturn($data);
 
@@ -134,7 +134,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
               ->once();
 
-        $response = m::mock('PHPIMS\Response\ResponseInterface');
+        $response = m::mock('PHPIMS\Http\Response\ResponseInterface');
 
         $this->collection->shouldReceive('findOne')->once()->andThrow('MongoException');
 
@@ -151,7 +151,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
               ->once();
 
-        $response = m::mock('PHPIMS\Response\ResponseInterface');
+        $response = m::mock('PHPIMS\Http\Response\ResponseInterface');
 
         $this->collection->shouldReceive('findOne')->once()->with($data)->andReturn(array());
         $this->collection->shouldReceive('insert')->once()->with(m::type('array'), m::type('array'))->andReturn(true);

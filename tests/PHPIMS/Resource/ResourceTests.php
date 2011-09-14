@@ -47,12 +47,12 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
     protected $resource;
 
     /**
-     * @var PHPIMS\Request\RequestInterface
+     * @var PHPIMS\Http\Request\RequestInterface
      */
     protected $request;
 
     /**
-     * @var PHPIMS\Response\ResponseInterface
+     * @var PHPIMS\Http\Response\ResponseInterface
      */
     protected $response;
 
@@ -87,12 +87,12 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
         $this->publicKey = md5(microtime());
         $this->imageIdentifier = md5(microtime()) . '.png';
 
-        $this->request = $this->getMock('PHPIMS\Request\RequestInterface');
+        $this->request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
         $this->image = $this->getMock('PHPIMS\Image\ImageInterface');
-        $this->response = $this->getMock('PHPIMS\Response\ResponseInterface');
+        $this->response = $this->getMock('PHPIMS\Http\Response\ResponseInterface');
         $this->response->expects($this->any())->method('getImage')->will($this->returnValue($this->image));
 
         $this->database = $this->getMock('PHPIMS\Database\DatabaseInterface');

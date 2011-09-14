@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Request;
+namespace PHPIMS\Http\Request;
 
 use PHPIMS\Exception as BaseException;
 

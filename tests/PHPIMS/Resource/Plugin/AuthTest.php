@@ -49,8 +49,8 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
 
     public function setUp() {
         $this->plugin   = new Auth();
-        $this->request  = $this->getMock('PHPIMS\Request\RequestInterface');
-        $this->response = $this->getMock('PHPIMS\Response\ResponseInterface');
+        $this->request  = $this->getMock('PHPIMS\Http\Request\RequestInterface');
+        $this->response = $this->getMock('PHPIMS\Http\Response\ResponseInterface');
         $this->database = $this->getMock('PHPIMS\Database\DatabaseInterface');
         $this->storage  = $this->getMock('PHPIMS\Storage\StorageInterface');
     }

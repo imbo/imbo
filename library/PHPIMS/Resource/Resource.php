@@ -32,8 +32,8 @@
 
 namespace PHPIMS\Resource;
 
-use PHPIMS\Request\RequestInterface;
-use PHPIMS\Response\ResponseInterface;
+use PHPIMS\Http\Request\RequestInterface;
+use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
 use PHPIMS\Resource\Plugin\PluginInterface;
@@ -105,7 +105,7 @@ abstract class Resource {
      *
      * @param int $state One of the state constants in PHPIMS\Resource\Plugin\PluginInterface
      * @param int $method The HTTP method to attach the plugin to. Should be one of the METHOD_*
-     *                    constants in PHPIMS\Request\RequestInterface
+     *                    constants in PHPIMS\Http\Request\RequestInterface
      * @return PHPIMS\Resource\Plugin\PluginInterface[]
      */
     private function getPlugins($state, $method) {

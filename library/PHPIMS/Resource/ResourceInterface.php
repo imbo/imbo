@@ -32,8 +32,8 @@
 
 namespace PHPIMS\Resource;
 
-use PHPIMS\Request\RequestInterface;
-use PHPIMS\Response\ResponseInterface;
+use PHPIMS\Http\Request\RequestInterface;
+use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
 use PHPIMS\Resource\Plugin\PluginInterface;
@@ -73,7 +73,7 @@ interface ResourceInterface {
      *
      * @param string $state One of the state constants in this interface
      * @param string $method The HTTP method to attach the plugin to. Should be one of the METHOD_*
-     *                       constants in PHPIMS\Request\RequestInterface
+     *                       constants in PHPIMS\Http\Request\RequestInterface
      * @param int $index The index of the plugin
      * @param PHPIMS\Resource\Plugin\PluginInterface $plugin The plugin itself
      * @return PHPIMS\Resource\ResourceInterface
@@ -84,7 +84,7 @@ interface ResourceInterface {
      * Get plugins that will execute *before* the resource executes its logic
      *
      * @param string $method The HTTP method to attach the plugin to. Should be one of the METHOD_*
-     *                       constants in PHPIMS\Request\RequestInterface
+     *                       constants in PHPIMS\Http\Request\RequestInterface
      * @return PHPIMS\Resource\Plugin\PluginInterface[]
      */
     function getPreExecPlugins($method);
@@ -93,7 +93,7 @@ interface ResourceInterface {
      * Get plugins that will execute *after* the resource executes its logic
      *
      * @param string $method The HTTP method to attach the plugin to. Should be one of the METHOD_*
-     *                       constants in PHPIMS\Request\RequestInterface
+     *                       constants in PHPIMS\Http\Request\RequestInterface
      * @return PHPIMS\Resource\Plugin\PluginInterface[]
      */
     function getPostExecPlugins($method);
@@ -101,8 +101,8 @@ interface ResourceInterface {
     /**
      * POST handler
      *
-     * @param PHPIMS\Request\RequestInterface   $request  A request instance
-     * @param PHPIMS\Response\ResponseInterface $response A response instance
+     * @param PHPIMS\Http\Request\RequestInterface   $request  A request instance
+     * @param PHPIMS\Http\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
      * @throws PHPIMS\Resource\Exception
@@ -112,8 +112,8 @@ interface ResourceInterface {
     /**
      * GET handler
      *
-     * @param PHPIMS\Request\RequestInterface   $request  A request instance
-     * @param PHPIMS\Response\ResponseInterface $response A response instance
+     * @param PHPIMS\Http\Request\RequestInterface   $request  A request instance
+     * @param PHPIMS\Http\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
      * @throws PHPIMS\Resource\Exception
@@ -123,8 +123,8 @@ interface ResourceInterface {
     /**
      * HEAD handler
      *
-     * @param PHPIMS\Request\RequestInterface   $request  A request instance
-     * @param PHPIMS\Response\ResponseInterface $response A response instance
+     * @param PHPIMS\Http\Request\RequestInterface   $request  A request instance
+     * @param PHPIMS\Http\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
      * @throws PHPIMS\Resource\Exception
@@ -134,8 +134,8 @@ interface ResourceInterface {
     /**
      * DELETE handler
      *
-     * @param PHPIMS\Request\RequestInterface   $request  A request instance
-     * @param PHPIMS\Response\ResponseInterface $response A response instance
+     * @param PHPIMS\Http\Request\RequestInterface   $request  A request instance
+     * @param PHPIMS\Http\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
      * @throws PHPIMS\Resource\Exception
@@ -145,8 +145,8 @@ interface ResourceInterface {
     /**
      * OPTIONS handler
      *
-     * @param PHPIMS\Request\RequestInterface   $request  A request instance
-     * @param PHPIMS\Response\ResponseInterface $response A response instance
+     * @param PHPIMS\Http\Request\RequestInterface   $request  A request instance
+     * @param PHPIMS\Http\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
      * @throws PHPIMS\Resource\Exception
@@ -156,8 +156,8 @@ interface ResourceInterface {
     /**
      * PUT handler
      *
-     * @param PHPIMS\Request\RequestInterface   $request  A request instance
-     * @param PHPIMS\Response\ResponseInterface $response A response instance
+     * @param PHPIMS\Http\Request\RequestInterface   $request  A request instance
+     * @param PHPIMS\Http\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
      * @throws PHPIMS\Resource\Exception

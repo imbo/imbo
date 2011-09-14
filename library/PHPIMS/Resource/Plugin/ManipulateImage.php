@@ -32,8 +32,8 @@
 
 namespace PHPIMS\Resource\Plugin;
 
-use PHPIMS\Request\RequestInterface;
-use PHPIMS\Response\ResponseInterface;
+use PHPIMS\Http\Request\RequestInterface;
+use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
 use PHPIMS\Image\Transformation\Exception as TransformationException;

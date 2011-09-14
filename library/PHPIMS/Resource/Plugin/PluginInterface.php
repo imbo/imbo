@@ -32,8 +32,8 @@
 
 namespace PHPIMS\Resource\Plugin;
 
-use PHPIMS\Request\RequestInterface;
-use PHPIMS\Response\ResponseInterface;
+use PHPIMS\Http\Request\RequestInterface;
+use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
 
@@ -56,8 +56,8 @@ interface PluginInterface {
      * PHPIMS\Resource\Plugin\Exception with a descriptive message and a fitting HTTP response
      * code.
      *
-     * @param PHPIMS\Request\RequestInterface   $request  A request instance
-     * @param PHPIMS\Response\ResponseInterface $response A response instance
+     * @param PHPIMS\Http\Request\RequestInterface   $request  A request instance
+     * @param PHPIMS\Http\Response\ResponseInterface $response A response instance
      * @param PHPIMS\Database\DatabaseInterface $database A database instance
      * @param PHPIMS\Storage\StorageInterface   $storage  A storage instance
      * @throws PHPIMS\Resource\Plugin\Exception

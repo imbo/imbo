@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Request;
+namespace PHPIMS\Http\Request;
 
 use PHPIMS\Image\Transformation;
 use PHPIMS\Image\TransformationChain;
@@ -92,7 +92,7 @@ class Request implements RequestInterface {
     /**
      * The HTTP method
      *
-     * Should be one of the defined constants in PHPIMS\Request\RequestInterface
+     * Should be one of the defined constants in PHPIMS\Http\Request\RequestInterface
      *
      * @var string
      */
@@ -111,7 +111,7 @@ class Request implements RequestInterface {
      * @param string $method The HTTP method used
      * @param string $query The current query
      * @param array $authConfig Authentication part of the PHPIMS server configuration array
-     * @throws PHPIMS\Request\Exception
+     * @throws PHPIMS\Http\Request\Exception
      */
     public function __construct($method, $query, array $authConfig) {
         $method = strtoupper($method);
@@ -153,21 +153,21 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::getPublicKey()
+     * @see PHPIMS\Http\Request\RequestInterface::getPublicKey()
      */
     public function getPublicKey() {
         return $this->publicKey;
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::getPrivateKey()
+     * @see PHPIMS\Http\Request\RequestInterface::getPrivateKey()
      */
     public function getPrivateKey() {
         return $this->privateKey;
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::getTransformations()
+     * @see PHPIMS\Http\Request\RequestInterface::getTransformations()
      */
     public function getTransformations() {
         $transformations = $this->get('t');
@@ -235,21 +235,21 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::getResource()
+     * @see PHPIMS\Http\Request\RequestInterface::getResource()
      */
     public function getResource() {
         return $this->resource;
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::getImageIdentifier()
+     * @see PHPIMS\Http\Request\RequestInterface::getImageIdentifier()
      */
     public function getImageIdentifier() {
         return $this->imageIdentifier;
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::setImageIdentifier()
+     * @see PHPIMS\Http\Request\RequestInterface::setImageIdentifier()
      */
     public function setImageIdentifier($imageIdentifier) {
         $this->imageIdentifier = $imageIdentifier;
@@ -258,28 +258,28 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::getMethod()
+     * @see PHPIMS\Http\Request\RequestInterface::getMethod()
      */
     public function getMethod() {
         return $this->method;
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::getTimestamp()
+     * @see PHPIMS\Http\Request\RequestInterface::getTimestamp()
      */
     public function getTimestamp() {
         return $this->get('timestamp');
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::getSignature()
+     * @see PHPIMS\Http\Request\RequestInterface::getSignature()
      */
     public function getSignature() {
         return $this->get('signature');
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::getMetadata()
+     * @see PHPIMS\Http\Request\RequestInterface::getMetadata()
      */
     public function getMetadata() {
         $metadata = $this->getPost('metadata');
@@ -292,56 +292,56 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::getPost()
+     * @see PHPIMS\Http\Request\RequestInterface::getPost()
      */
     public function getPost($key) {
         return $this->hasPost($key) ? $_POST[$key] : null;
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::hasPost()
+     * @see PHPIMS\Http\Request\RequestInterface::hasPost()
      */
     public function hasPost($key) {
         return isset($_POST[$key]);
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::get()
+     * @see PHPIMS\Http\Request\RequestInterface::get()
      */
     public function get($key) {
         return $this->has($key) ? $_GET[$key] : null;
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::has()
+     * @see PHPIMS\Http\Request\RequestInterface::has()
      */
     public function has($key) {
         return isset($_GET[$key]);
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::isMetadataRequest()
+     * @see PHPIMS\Http\Request\RequestInterface::isMetadataRequest()
      */
     public function isMetadataRequest() {
         return $this->type === RequestInterface::RESOURCE_METADATA;
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::isImageRequest()
+     * @see PHPIMS\Http\Request\RequestInterface::isImageRequest()
      */
     public function isImageRequest() {
         return $this->type === RequestInterface::RESOURCE_IMAGE;
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::isImagesRequest()
+     * @see PHPIMS\Http\Request\RequestInterface::isImagesRequest()
      */
     public function isImagesRequest() {
         return $this->type === RequestInterface::RESOURCE_IMAGES;
     }
 
     /**
-     * @see PHPIMS\Request\RequestInterface::getRawData()
+     * @see PHPIMS\Http\Request\RequestInterface::getRawData()
      * @codeCoverageIgnore
      */
     public function getRawData() {

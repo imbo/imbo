@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Request;
+namespace PHPIMS\Http\Request;
 
 /**
  * Request interface
@@ -106,7 +106,7 @@ interface RequestInterface {
      * Set the image identifier
      *
      * @param string $imageIdentifier The image identifier to set
-     * @return PHPIMS\Request\RequestInterface
+     * @return PHPIMS\Http\Request\RequestInterface
      */
     function setImageIdentifier($imageIdentifier);
 

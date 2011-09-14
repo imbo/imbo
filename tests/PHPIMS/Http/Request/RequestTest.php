@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Request;
+namespace PHPIMS\Http\Request;
 
 use PHPIMS\Image\TransformationChain;
 
@@ -44,7 +44,7 @@ use PHPIMS\Image\TransformationChain;
  */
 class RequestTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @expectedException PHPIMS\Request\Exception
+     * @expectedException PHPIMS\Http\Request\Exception
      * @expectedExceptionMessage Unsupported HTTP method: TRACE
      * @expectedExceptionCode 501
      */
@@ -53,7 +53,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException PHPIMS\Request\Exception
+     * @expectedException PHPIMS\Http\Request\Exception
      * @expectedExceptionMessage Unknown resource: /some/resource
      * @expectedExceptionCode 400
      */
@@ -62,7 +62,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException PHPIMS\Request\Exception
+     * @expectedException PHPIMS\Http\Request\Exception
      * @expectedExceptionMessage Unknown public key
      * @expectedExceptionCode 400
      */

@@ -32,8 +32,8 @@
 
 namespace PHPIMS\Resource;
 
-use PHPIMS\Request\RequestInterface;
-use PHPIMS\Response\ResponseInterface;
+use PHPIMS\Http\Request\RequestInterface;
+use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
 use PHPIMS\Image\ImageInterface;
@@ -175,7 +175,7 @@ class Image extends Resource implements ResourceInterface {
      * Add custom response headers with information about the image
      *
      * @param PHPIMS\Image\ImageInterface $image An image instance
-     * @param PHPIMS\Response\ResponseInterface $response A respones instance
+     * @param PHPIMS\Http\Response\ResponseInterface $response A respones instance
      */
     private function addImageResponseHeaders(ImageInterface $image, ResponseInterface $response) {
         $response->setHeaders(array(

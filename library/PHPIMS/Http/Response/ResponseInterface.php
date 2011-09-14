@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Response;
+namespace PHPIMS\Http\Response;
 
 use PHPIMS\Image\ImageInterface;
 use PHPIMS\Exception;
@@ -57,7 +57,7 @@ interface ResponseInterface {
      * Set the code
      *
      * @param int $code The HTTP status code to use in the response
-     * @return PHPIMS\Response\ResponseInterface
+     * @return PHPIMS\Http\Response\ResponseInterface
      */
     function setCode($code);
 
@@ -72,7 +72,7 @@ interface ResponseInterface {
      * Set all headers
      *
      * @param array $headers An array of headers to set
-     * @return PHPIMS\Response\ResponseInterface
+     * @return PHPIMS\Http\Response\ResponseInterface
      */
     function setHeaders(array $headers);
 
@@ -81,7 +81,7 @@ interface ResponseInterface {
      *
      * @param string $name The header name
      * @param mixed $value The header value
-     * @return PHPIMS\Response\ResponseInterface
+     * @return PHPIMS\Http\Response\ResponseInterface
      */
     function setHeader($name, $value);
 
@@ -89,7 +89,7 @@ interface ResponseInterface {
      * Remove a single header element
      *
      * @param string $name The name of the header. For instance 'Location'
-     * @return PHPIMS\Response\ResponseInterface
+     * @return PHPIMS\Http\Response\ResponseInterface
      */
     function removeHeader($name);
 
@@ -104,7 +104,7 @@ interface ResponseInterface {
      * Set the Content-Type
      *
      * @param string $type The type to set. For instance "application/json" or "image/png"
-     * @return PHPIMS\Response\ResponseInterface
+     * @return PHPIMS\Http\Response\ResponseInterface
      */
     function setContentType($type);
 
@@ -119,7 +119,7 @@ interface ResponseInterface {
      * Set the body
      *
      * @param array $body The body content
-     * @return PHPIMS\Response\ResponseInterface
+     * @return PHPIMS\Http\Response\ResponseInterface
      */
     function setBody(array $body);
 
@@ -134,7 +134,7 @@ interface ResponseInterface {
      * Set the image
      *
      * @param PHPIMS\Image\ImageInterface $image The image object
-     * @return PHPIMS\Response\ResponseInterface
+     * @return PHPIMS\Http\Response\ResponseInterface
      */
     function setImage(ImageInterface $image);
 
@@ -153,7 +153,7 @@ interface ResponseInterface {
      *
      * @param int $code The HTTP error code
      * @param string $message Error message that will be sent to the client
-     * @return PHPIMS\Response\ResponseInterface
+     * @return PHPIMS\Http\Response\ResponseInterface
      */
     function setError($code, $message);
 
@@ -161,7 +161,7 @@ interface ResponseInterface {
      * Set a response error based on an exception instance
      *
      * @param PHPIMS\Exception $e A thrown exception with a message and a status code
-     * @return PHPIMS\Response\ResponseInterface
+     * @return PHPIMS\Http\Response\ResponseInterface
      */
     function setErrorFromException(Exception $e);
 }

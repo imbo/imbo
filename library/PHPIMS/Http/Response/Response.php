@@ -29,7 +29,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Response;
+namespace PHPIMS\Http\Response;
 
 use PHPIMS\Image\ImageInterface;
 use PHPIMS\Image\Image;
@@ -142,14 +142,14 @@ class Response implements ResponseInterface {
     private $image;
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::getCode()
+     * @see PHPIMS\Http\Response\ResponseInterface::getCode()
      */
     public function getCode() {
         return $this->code;
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::setCode()
+     * @see PHPIMS\Http\Response\ResponseInterface::setCode()
      */
     public function setCode($code) {
         $this->code = (int) $code;
@@ -158,14 +158,14 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::getHeaders()
+     * @see PHPIMS\Http\Response\ResponseInterface::getHeaders()
      */
     public function getHeaders() {
         return $this->headers;
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::setHeaders()
+     * @see PHPIMS\Http\Response\ResponseInterface::setHeaders()
      */
     public function setHeaders(array $headers) {
         foreach ($headers as $name => $value) {
@@ -176,7 +176,7 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::setHeader()
+     * @see PHPIMS\Http\Response\ResponseInterface::setHeader()
      */
     public function setHeader($name, $value) {
         $this->headers[$name] = $value;
@@ -185,7 +185,7 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::removeHeader()
+     * @see PHPIMS\Http\Response\ResponseInterface::removeHeader()
      */
     public function removeHeader($name) {
         unset($this->headers[$name]);
@@ -194,14 +194,14 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::getContentType()
+     * @see PHPIMS\Http\Response\ResponseInterface::getContentType()
      */
     public function getContentType() {
         return $this->contentType;
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::setContentType()
+     * @see PHPIMS\Http\Response\ResponseInterface::setContentType()
      */
     public function setContentType($type) {
         $this->contentType = $type;
@@ -210,14 +210,14 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::getBody()
+     * @see PHPIMS\Http\Response\ResponseInterface::getBody()
      */
     public function getBody() {
         return $this->body;
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::setBody()
+     * @see PHPIMS\Http\Response\ResponseInterface::setBody()
      */
     public function setBody(array $body) {
         $this->body = $body;
@@ -226,7 +226,7 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::getImage()
+     * @see PHPIMS\Http\Response\ResponseInterface::getImage()
      */
     public function getImage() {
         if ($this->image === null) {
@@ -237,7 +237,7 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::setImage()
+     * @see PHPIMS\Http\Response\ResponseInterface::setImage()
      */
     public function setImage(ImageInterface $image) {
         $this->image = $image;
@@ -246,14 +246,14 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::hasImage()
+     * @see PHPIMS\Http\Response\ResponseInterface::hasImage()
      */
     public function hasImage() {
         return !($this->image === null);
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::setError()
+     * @see PHPIMS\Http\Response\ResponseInterface::setError()
      */
     public function setError($code, $message) {
         // Remove a possible image instance
@@ -269,7 +269,7 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Response\ResponseInterface::setErrorFromException()
+     * @see PHPIMS\Http\Response\ResponseInterface::setErrorFromException()
      */
     public function setErrorFromException(Exception $e) {
         return $this->setError($e->getCode(), $e->getMessage());

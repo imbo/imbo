@@ -30,7 +30,7 @@
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Response;
+namespace PHPIMS\Http\Response;
 
 use PHPIMS\Exception;
 
@@ -46,7 +46,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
     /**
      * Response instance
      *
-     * @var PHPIMS\Response\Response
+     * @var PHPIMS\Http\Response\Response
      */
     private $response;
 
