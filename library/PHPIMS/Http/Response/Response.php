@@ -46,6 +46,13 @@ use PHPIMS\Exception;
  */
 class Response implements ResponseInterface {
     /**
+     * HTTP protocol version
+     *
+     * @var string
+     */
+    private $protocolVersion = '1.1';
+
+    /**
      * Different status codes
      *
      * @var array
@@ -273,5 +280,54 @@ class Response implements ResponseInterface {
      */
     public function setErrorFromException(Exception $e) {
         return $this->setError($e->getCode(), $e->getMessage());
+    }
+
+    /**
+     * @see PHPIMS\Http\Response\ResponseInterface::getProtocolVersion()
+     */
+    public function getProtocolVersion() {
+        return $this->protocolVersion;
+    }
+
+    /**
+     * @see PHPIMS\Http\Response\ResponseInterface::setProtocolVersion()
+     */
+    public function setProtocolVersion($version) {
+        $this->protocolVersion = $version;
+
+        return $this;
+    }
+
+    /**
+     * @see PHPIMS\Http\Response\ResponseInterface::sendHeaders()
+     */
+    public function sendHeaders() {
+        if (headers_sent()) {
+            return;
+        }
+
+        $statusCode = $this->getStatusCode();
+        $statusLine = sprintf("HTTP/%s %d %s", $this->getProtocolVersion(), $statusCode, self::$statusCodes[$statusCode]);
+        header($header);
+
+        // Send additional headers
+        foreach ($response->getHeaders() as $name => $value) {
+            header($name . ':' . $value);
+        }
+    }
+
+    /**
+     * @see PHPIMS\Http\Response\ResponseInterface::sendContent()
+     */
+    public function sendContent() {
+        print($content);
+    }
+
+    /**
+     * @see PHPIMS\Http\Response\ResponseInterface::send()
+     */
+    public function send() {
+        $this->sendHeaders();
+        $this->sendContent();
     }
 }

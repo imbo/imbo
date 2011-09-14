@@ -159,4 +159,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($body['error']['code'], $code);
         $this->assertSame($body['error']['message'], $message);
     }
+
+    public function testSetGetProtocolVersion() {
+        // Assert default version
+        $this->assertSame('1.1', $this->response->getProtocolVersion());
+        $this->response->setProtocolVersion('1.0');
+        $this->assertSame('1.0', $this->response->getProtocolVersion());
+    }
 }

@@ -164,4 +164,34 @@ interface ResponseInterface {
      * @return PHPIMS\Http\Response\ResponseInterface
      */
     function setErrorFromException(Exception $e);
+
+    /**
+     * Get the HTTP protocol version
+     *
+     * @return string
+     */
+    function getProtocolVersion();
+
+    /**
+     * Set the protocol version header
+     *
+     * @param string $version The version to set
+     * @return PHPIMS\Http\Response\ResponseInterface
+     */
+    function setProtocolVersion($version);
+
+    /**
+     * Send all headers to the client (including the status line)
+     */
+    function sendHeaders();
+
+    /**
+     * Send the content to the client
+     */
+    function sendContent();
+
+    /**
+     * Send the headers and the content to the client
+     */
+    function send();
 }
