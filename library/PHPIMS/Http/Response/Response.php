@@ -253,13 +253,6 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Http\Response\ResponseInterface::hasImage()
-     */
-    public function hasImage() {
-        return !($this->image === null);
-    }
-
-    /**
      * @see PHPIMS\Http\Response\ResponseInterface::setError()
      */
     public function setError($code, $message) {

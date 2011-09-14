@@ -117,13 +117,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($image, $this->response->getImage());
     }
 
-    public function testHasImage() {
-        $this->assertFalse($this->response->hasImage());
-        $image = $this->getMock('PHPIMS\Image\ImageInterface');
-        $this->response->setImage($image);
-        $this->assertTrue($this->response->hasImage());
-    }
-
     public function testRemoveHeader() {
         $this->response->setHeader('Location', 'http://foobar');
         $this->assertArrayHasKey('Location', $this->response->getHeaders());

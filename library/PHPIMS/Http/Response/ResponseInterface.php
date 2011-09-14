@@ -139,13 +139,6 @@ interface ResponseInterface {
     function setImage(ImageInterface $image);
 
     /**
-     * See if the response has an image attached to it
-     *
-     * @return boolean
-     */
-    function hasImage();
-
-    /**
      * Set an error message
      *
      * This method should update the response code and store the error message in the body of the
