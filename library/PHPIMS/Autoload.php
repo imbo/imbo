@@ -64,6 +64,8 @@ class Autoload {
         'phpims\\http\\request\\exception' => '/Http/Request/Exception.php',
         'phpims\\http\\request\\request' => '/Http/Request/Request.php',
         'phpims\\http\\request\\requestinterface' => '/Http/Request/RequestInterface.php',
+        'phpims\\http\\response\\formatter\\formatterinterface' => '/Http/Response/Formatter/FormatterInterface.php',
+        'phpims\\http\\response\\formatter\\json' => '/Http/Response/Formatter/Json.php',
         'phpims\\http\\response\\response' => '/Http/Response/Response.php',
         'phpims\\http\\response\\responseinterface' => '/Http/Response/ResponseInterface.php',
         'phpims\\image\\image' => '/Image/Image.php',
