@@ -84,7 +84,7 @@ class ImageTest extends ResourceTests {
                       ->method('store')->with($this->publicKey, $this->imageIdentifier, $this->image);
 
         $this->response->expects($this->once())
-                       ->method('setCode')->with(201)
+                       ->method('setStatusCode')->with(201)
                        ->will($this->returnValue($this->response));
 
         $this->response->expects($this->once())

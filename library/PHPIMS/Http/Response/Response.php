@@ -50,7 +50,7 @@ class Response implements ResponseInterface {
      *
      * @var array
      */
-    static public $codes = array(
+    static public $statusCodes = array(
         // 1xx Informational
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -109,7 +109,7 @@ class Response implements ResponseInterface {
      *
      * @var int
      */
-    private $code = 200;
+    private $statusCode = 200;
 
     /**
      * Response headers
@@ -142,17 +142,17 @@ class Response implements ResponseInterface {
     private $image;
 
     /**
-     * @see PHPIMS\Http\Response\ResponseInterface::getCode()
+     * @see PHPIMS\Http\Response\ResponseInterface::getStatusCode()
      */
-    public function getCode() {
-        return $this->code;
+    public function getStatusCode() {
+        return $this->statusCode;
     }
 
     /**
-     * @see PHPIMS\Http\Response\ResponseInterface::setCode()
+     * @see PHPIMS\Http\Response\ResponseInterface::setStatusCode()
      */
-    public function setCode($code) {
-        $this->code = (int) $code;
+    public function setStatusCode($code) {
+        $this->statusCode = (int) $code;
 
         return $this;
     }
@@ -260,7 +260,7 @@ class Response implements ResponseInterface {
         $this->image = null;
 
         // Set the HTTP status code and an array with an error element in the body
-        $this->setCode($code)
+        $this->setStatusCode($code)
              ->setBody(array('error' => array('code'      => $code,
                                               'message'   => $message,
                                               'timestamp' => gmdate('Y-m-d\TH:i\Z'))));

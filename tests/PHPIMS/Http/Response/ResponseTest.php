@@ -64,10 +64,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->response = null;
     }
 
-    public function testSetGetCode() {
+    public function testSetGetStatusCode() {
         $code = 404;
-        $this->response->setCode($code);
-        $this->assertSame($code, $this->response->getCode());
+        $this->response->setStatusCode($code);
+        $this->assertSame($code, $this->response->getStatusCode());
     }
 
     public function testSetGetHeaders() {
@@ -136,7 +136,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $message = 'You can\'t do that';
 
         $this->response->setError($code, $message);
-        $this->assertSame($code, $this->response->getCode());
+        $this->assertSame($code, $this->response->getStatusCode());
 
         $body = $this->response->getBody();
 
@@ -152,7 +152,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
         $this->response->setErrorFromException($e);
 
-        $this->assertSame($code, $this->response->getCode());
+        $this->assertSame($code, $this->response->getStatusCode());
 
         $body = $this->response->getBody();
 

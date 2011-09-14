@@ -59,8 +59,8 @@ try {
 }
 
 // Prepare the status line
-$code = $response->getCode();
-$header = sprintf("HTTP/1.1 %d %s", $code, PHPIMS\Response\Response::$codes[$code]);
+$code = $response->getStatusCode();
+$header = sprintf("HTTP/1.1 %d %s", $code, PHPIMS\Response\Response::$statusCodes[$code]);
 
 // Send status line
 header($header);

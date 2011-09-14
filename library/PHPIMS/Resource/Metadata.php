@@ -94,8 +94,7 @@ class Metadata extends Resource implements ResourceInterface {
             throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
-        $response->setCode(200)
-                 ->setBody(array('imageIdentifier' => $imageIdentifier));
+        $response->setBody(array('imageIdentifier' => $imageIdentifier));
     }
 
     /**

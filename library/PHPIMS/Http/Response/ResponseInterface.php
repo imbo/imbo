@@ -51,15 +51,15 @@ interface ResponseInterface {
      *
      * @return int
      */
-    function getCode();
+    function getStatusCode();
 
     /**
-     * Set the code
+     * Set the status code
      *
      * @param int $code The HTTP status code to use in the response
      * @return PHPIMS\Http\Response\ResponseInterface
      */
-    function setCode($code);
+    function setStatusCode($code);
 
     /**
      * Get all headers as an associative array

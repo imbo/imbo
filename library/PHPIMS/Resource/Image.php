@@ -105,7 +105,7 @@ class Image extends Resource implements ResourceInterface {
         }
 
         // Populate the response object
-        $response->setCode(201)
+        $response->setStatusCode(201)
                  ->setBody(array('imageIdentifier' => $imageIdentifier));
     }
 
