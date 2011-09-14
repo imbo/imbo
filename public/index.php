@@ -45,22 +45,22 @@ $excessDir = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname($_SERVER['SCRIPT
 $resource  = str_replace($excessDir, '', $_SERVER['REDIRECT_URL']);
 
 // Create the response object
-$response = new PHPIMS\Response\Response();
+$response = new PHPIMS\Http\Response\Response();
 
 try {
     // The request initialization might throw an exception
-    $request = new PHPIMS\Request\Request($_SERVER['REQUEST_METHOD'], $resource, $config['auth']);
+    $request = new PHPIMS\Http\Request\Request($_SERVER['REQUEST_METHOD'], $resource, $config['auth']);
 
     // Create the front controller, and handle the current request
     $frontController = new PHPIMS\FrontController($config);
     $frontController->handle($request, $response);
-} catch (PHPIMS\Request\Exception $e) {
+} catch (PHPIMS\Http\Request\Exception $e) {
     $response->setErrorFromException($e);
 }
 
 // Prepare the status line
 $code = $response->getStatusCode();
-$header = sprintf("HTTP/1.1 %d %s", $code, PHPIMS\Response\Response::$statusCodes[$code]);
+$header = sprintf("HTTP/1.1 %d %s", $code, PHPIMS\Http\Response\Response::$statusCodes[$code]);
 
 // Send status line
 header($header);
