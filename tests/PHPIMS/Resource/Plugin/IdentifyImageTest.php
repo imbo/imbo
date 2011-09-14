@@ -41,6 +41,7 @@ namespace PHPIMS\Resource\Plugin;
  * @link https://github.com/christeredvartsen/phpims
  */
 class IdentifyImageTest extends \PHPUnit_Framework_TestCase {
+    private $image;
     private $plugin;
     private $request;
     private $response;
@@ -48,7 +49,8 @@ class IdentifyImageTest extends \PHPUnit_Framework_TestCase {
     private $storage;
 
     public function setUp() {
-        $this->plugin   = new IdentifyImage();
+        $this->image    = $this->getMock('PHPIMS\Image\ImageInterface');
+        $this->plugin   = new IdentifyImage($this->image);
         $this->request  = $this->getMock('PHPIMS\Http\Request\RequestInterface');
         $this->response = $this->getMock('PHPIMS\Http\Response\ResponseInterface');
         $this->database = $this->getMock('PHPIMS\Database\DatabaseInterface');
@@ -57,6 +59,11 @@ class IdentifyImageTest extends \PHPUnit_Framework_TestCase {
 
     public function tearDown() {
         $this->plugin = null;
+        $this->image = null;
+        $this->request = null;
+        $this->response = null;
+        $this->database = null;
+        $this->storage = null;
     }
 
     /**
@@ -65,10 +72,7 @@ class IdentifyImageTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 415
      */
     public function testExecWithUnsupportedImageType() {
-        $image = $this->getMock('PHPIMS\Image\ImageInterface');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__FILE__)));
-        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
-
+        $this->image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__FILE__)));
         $this->plugin->exec($this->request, $this->response, $this->database, $this->storage);
     }
 
@@ -80,16 +84,13 @@ class IdentifyImageTest extends \PHPUnit_Framework_TestCase {
         $imageIdentifier = md5_file($imagePath) . '.jpg';
         $correctImageIdentifier = md5_file($imagePath) . '.png';
 
-        $image = $this->getMock('PHPIMS\Image\ImageInterface');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents($imagePath)));
-        $image->expects($this->once())->method('setMimeType')->with('image/png')->will($this->returnValue($image));
-        $image->expects($this->once())->method('setExtension')->with('png')->will($this->returnValue($image));
+        $this->image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents($imagePath)));
+        $this->image->expects($this->once())->method('setMimeType')->with('image/png')->will($this->returnValue($this->image));
+        $this->image->expects($this->once())->method('setExtension')->with('png')->will($this->returnValue($this->image));
 
         // Intentionally set a wrong extension to make sure the plugin will fix it for us
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
         $this->request->expects($this->once())->method('setImageIdentifier')->with($correctImageIdentifier);
-
-        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
 
         $this->plugin->exec($this->request, $this->response, $this->database, $this->storage);
     }

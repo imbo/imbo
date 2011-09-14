@@ -36,6 +36,7 @@ use PHPIMS\Http\Request\RequestInterface;
 use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
+use PHPIMS\Image\ImageInterface;
 
 /**
  * Identify image plugin
@@ -63,13 +64,27 @@ class IdentifyImage implements PluginInterface {
     );
 
     /**
+     * Image property
+     *
+     * @var PHPIMS\Image\ImageInterface
+     */
+    private $image;
+
+    /**
+     * Class constructor
+     *
+     * @param PHPIMS\Image\ImageInterface $image Image instance
+     */
+    public function __construct(ImageInterface $image) {
+        $this->image = $image;
+    }
+
+    /**
      * @see PHPIMS\Resource\Plugin\PluginInterface::exec()
      */
     public function exec(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $image = $response->getImage();
-
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->buffer($image->getBlob());
+        $mime = $finfo->buffer($this->image->getBlob());
 
         if (!$this->supportedMimeType($mime)) {
             throw new Exception('Unsupported image type: ' . $mime, 415);
@@ -77,10 +92,10 @@ class IdentifyImage implements PluginInterface {
 
         $extension = $this->getFileExtension($mime);
 
-        $image->setMimeType($mime)
-              ->setExtension($extension);
+        $this->image->setMimeType($mime)
+                    ->setExtension($extension);
 
-        $response->setContentType($mime);
+        $response->setHeader('Content-Type', $mime);
 
         // Update image identifier in case it has a wrong extension
         $imageIdentifier = $request->getImageIdentifier();

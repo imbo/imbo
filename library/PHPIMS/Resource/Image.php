@@ -54,13 +54,25 @@ use PHPIMS\Storage\Exception as StorageException;
  */
 class Image extends Resource implements ResourceInterface {
     /**
-     * Class constructor
+     * Image for the client
+     *
+     * @var PHPIMS\Image\ImageInterface
      */
-    public function __construct() {
+    private $image;
+
+    /**
+     * Class constructor
+     *
+     * @param PHPIMS\Image\ImageInterface $image Image instance used by this resource and its
+     *                                           plugins
+     */
+    public function __construct(ImageInterface $image) {
+        $this->image = $image;
+
         $auth            = new Plugin\Auth();
-        $prepareImage    = new Plugin\PrepareImage();
-        $identifyImage   = new Plugin\IdentifyImage();
-        $manipulateImage = new Plugin\ManipulateImage();
+        $prepareImage    = new Plugin\PrepareImage($this->image);
+        $identifyImage   = new Plugin\IdentifyImage($this->image);
+        $manipulateImage = new Plugin\ManipulateImage($this->image);
 
         $this->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_DELETE, 100, $auth)
              ->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_PUT,    100, $auth)
@@ -87,19 +99,18 @@ class Image extends Resource implements ResourceInterface {
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $publicKey = $request->getPublicKey();
-        $image = $response->getImage();
         $imageIdentifier = $request->getImageIdentifier();
 
         // Insert image to the database
         try {
-            $database->insertImage($publicKey, $imageIdentifier, $image);
+            $database->insertImage($publicKey, $imageIdentifier, $this->image);
         } catch (DatabaseException $e) {
             throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
         // Store the image
         try {
-            $storage->store($publicKey, $imageIdentifier, $image);
+            $storage->store($publicKey, $imageIdentifier, $this->image);
         } catch (StorageException $e) {
             throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
         }
@@ -135,53 +146,36 @@ class Image extends Resource implements ResourceInterface {
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
-        $image = $response->getImage();
 
         // Fetch information from the database
         try {
-            $database->load($publicKey, $imageIdentifier, $image);
+            $database->load($publicKey, $imageIdentifier, $this->image);
         } catch (DatabaseError $e) {
             throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
-        $this->addImageResponseHeaders($image, $response);
-
         // Load the image
         try {
-            $storage->load($publicKey, $imageIdentifier, $image);
+            $storage->load($publicKey, $imageIdentifier, $this->image);
         } catch (DatabaseException $e) {
             throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
         }
+
+        $response->setBody($this->image->getBlob())
+                 ->setHeader('Content-Type', $this->image->getMimeType());
     }
 
     /**
      * @see PHPIMS\Resource\ResourceInterface::head()
      */
     public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $image = $response->getImage();
-
         // Fetch information from the database
         try {
-            $database->load($request->getPublicKey(), $request->getImageIdentifier(), $image);
+            $database->load($request->getPublicKey(), $request->getImageIdentifier(), $this->image);
         } catch (DatabaseError $e) {
             throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
-        $response->setContentType($image->getMimeType());
-        $this->addImageResponseHeaders($image, $response);
-    }
-
-    /**
-     * Add custom response headers with information about the image
-     *
-     * @param PHPIMS\Image\ImageInterface $image An image instance
-     * @param PHPIMS\Http\Response\ResponseInterface $response A respones instance
-     */
-    private function addImageResponseHeaders(ImageInterface $image, ResponseInterface $response) {
-        $response->setHeaders(array(
-            'X-PHPIMS-OrignalImageWidth'  => $image->getWidth(),
-            'X-PHPIMS-OrignalImageHeight' => $image->getHeight(),
-            'X-PHPIMS-OrignalImageSize'   => $image->getFilesize(),
-        ));
+        $response->setContentType($this->image->getMimeType());
     }
 }

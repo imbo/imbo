@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Http\Response;
 
-use PHPIMS\Image\ImageInterface;
 use PHPIMS\Exception;
 
 /**
@@ -94,69 +93,31 @@ interface ResponseInterface {
     function removeHeader($name);
 
     /**
-     * Get the Content-Type
-     *
-     * @return string
-     */
-    function getContentType();
-
-    /**
-     * Set the Content-Type
-     *
-     * @param string $type The type to set. For instance "application/json" or "image/png"
-     * @return PHPIMS\Http\Response\ResponseInterface
-     */
-    function setContentType($type);
-
-    /**
      * Get the body
      *
-     * @return array
+     * @return string
      */
     function getBody();
 
     /**
      * Set the body
      *
-     * @param array $body The body content
+     * @param string $body The body content
      * @return PHPIMS\Http\Response\ResponseInterface
      */
-    function setBody(array $body);
-
-    /**
-     * Get the image
-     *
-     * @return PHPIMS\Image\ImageInterface
-     */
-    function getImage();
-
-    /**
-     * Set the image
-     *
-     * @param PHPIMS\Image\ImageInterface $image The image object
-     * @return PHPIMS\Http\Response\ResponseInterface
-     */
-    function setImage(ImageInterface $image);
+    function setBody($body);
 
     /**
      * Set an error message
      *
-     * This method should update the response code and store the error message in the body of the
-     * request.
+     * This method should update the status code and store the error message in the body of the
+     * response.
      *
-     * @param int $code The HTTP error code
+     * @param int $code The HTTP status code
      * @param string $message Error message that will be sent to the client
      * @return PHPIMS\Http\Response\ResponseInterface
      */
     function setError($code, $message);
-
-    /**
-     * Set a response error based on an exception instance
-     *
-     * @param PHPIMS\Exception $e A thrown exception with a message and a status code
-     * @return PHPIMS\Http\Response\ResponseInterface
-     */
-    function setErrorFromException(Exception $e);
 
     /**
      * Get the HTTP protocol version

@@ -45,7 +45,9 @@ use PHPIMS\Storage\Exception as StorageException;
  */
 class ImageTest extends ResourceTests {
     protected function getNewResource() {
-        return new Image();
+        $image = $this->getMock('PHPIMS\Image\ImageInterface');
+
+        return new Image($image);
     }
 
     /**

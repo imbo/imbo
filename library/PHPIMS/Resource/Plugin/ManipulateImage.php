@@ -37,6 +37,7 @@ use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
 use PHPIMS\Image\Transformation\Exception as TransformationException;
+use PHPIMS\Image\ImageInterface;
 
 /**
  * Manipulate image plugin
@@ -53,17 +54,33 @@ use PHPIMS\Image\Transformation\Exception as TransformationException;
  */
 class ManipulateImage implements PluginInterface {
     /**
+     * Image property
+     *
+     * @var PHPIMS\Image\ImageInterface
+     */
+    private $image;
+
+    /**
+     * Class constructor
+     *
+     * @param PHPIMS\Image\ImageInterface $image Image instance
+     */
+    public function __construct(ImageInterface $image) {
+        $this->image = $image;
+    }
+
+    /**
      * @see PHPIMS\Resource\Plugin\PluginInterface::exec()
-     * @codeCoverageIgnore
      */
     public function exec(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $transformationChain = $request->getTransformations();
-        $image = $response->getImage();
 
         try {
-            $transformationChain->applyToImage($image);
+            $transformationChain->applyToImage($this->image);
         } catch (TransformationException $e) {
             throw new Exception('Transformation failed with message: ' . $e->getMessage(), 401, $e);
         }
+
+        $response->setBody($this->image->getBlob());
     }
 }

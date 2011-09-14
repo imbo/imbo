@@ -31,8 +31,6 @@
 
 namespace PHPIMS\Http\Response;
 
-use PHPIMS\Image\ImageInterface;
-use PHPIMS\Image\Image;
 use PHPIMS\Exception;
 
 /**
@@ -126,27 +124,11 @@ class Response implements ResponseInterface {
     private $headers = array();
 
     /**
-     * Content-Type of the response
+     * The body of the response
      *
      * @var string
      */
-    private $contentType = 'application/json; charset=utf-8';
-
-    /**
-     * The body of the response
-     *
-     * The data to send back to the client. Will be sent as a json encoded array
-     *
-     * @var array
-     */
-    private $body = array();
-
-    /**
-     * Optional image attached to the response
-     *
-     * @var PHPIMS\Image\ImageInterface
-     */
-    private $image;
+    private $body;
 
     /**
      * @see PHPIMS\Http\Response\ResponseInterface::getStatusCode()
@@ -201,22 +183,6 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Http\Response\ResponseInterface::getContentType()
-     */
-    public function getContentType() {
-        return $this->contentType;
-    }
-
-    /**
-     * @see PHPIMS\Http\Response\ResponseInterface::setContentType()
-     */
-    public function setContentType($type) {
-        $this->contentType = $type;
-
-        return $this;
-    }
-
-    /**
      * @see PHPIMS\Http\Response\ResponseInterface::getBody()
      */
     public function getBody() {
@@ -226,28 +192,13 @@ class Response implements ResponseInterface {
     /**
      * @see PHPIMS\Http\Response\ResponseInterface::setBody()
      */
-    public function setBody(array $body) {
-        $this->body = $body;
-
-        return $this;
-    }
-
-    /**
-     * @see PHPIMS\Http\Response\ResponseInterface::getImage()
-     */
-    public function getImage() {
-        if ($this->image === null) {
-            $this->image = new Image();
+    public function setBody($body) {
+        if (is_array($body)) {
+            $body = json_encode($body);
         }
 
-        return $this->image;
-    }
-
-    /**
-     * @see PHPIMS\Http\Response\ResponseInterface::setImage()
-     */
-    public function setImage(ImageInterface $image) {
-        $this->image = $image;
+        $this->body = $body;
+        $this->setHeader('Content-Length', strlen($body));
 
         return $this;
     }
@@ -256,23 +207,13 @@ class Response implements ResponseInterface {
      * @see PHPIMS\Http\Response\ResponseInterface::setError()
      */
     public function setError($code, $message) {
-        // Remove a possible image instance
-        $this->image = null;
-
-        // Set the HTTP status code and an array with an error element in the body
         $this->setStatusCode($code)
-             ->setBody(array('error' => array('code'      => $code,
-                                              'message'   => $message,
-                                              'timestamp' => gmdate('Y-m-d\TH:i\Z'))));
+             ->setBody(array('error' => array(
+                'code'      => $code,
+                'message'   => $message,
+                'timestamp' => gmdate('Y-m-d\TH:i\Z'))));
 
         return $this;
-    }
-
-    /**
-     * @see PHPIMS\Http\Response\ResponseInterface::setErrorFromException()
-     */
-    public function setErrorFromException(Exception $e) {
-        return $this->setError($e->getCode(), $e->getMessage());
     }
 
     /**

@@ -34,6 +34,7 @@ namespace PHPIMS;
 
 use PHPIMS\Http\Request\RequestInterface;
 use PHPIMS\Http\Response\ResponseInterface;
+use PHPIMS\Image\Image;
 use PHPIMS\Resource\Exception as ResourceException;
 use PHPIMS\Resource\Plugin\Exception as PluginException;
 
@@ -75,7 +76,9 @@ class FrontController {
      */
     private function resolveResource(RequestInterface $request) {
         if ($request->isImageRequest()) {
-            $resource = new Resource\Image();
+            $image = new Image();
+
+            $resource = new Resource\Image($image);
         } else if ($request->isImagesRequest()) {
             $resource = new Resource\Images();
         } else if ($request->isMetadataRequest()) {
@@ -122,7 +125,7 @@ class FrontController {
             try {
                 $plugin->exec($request, $response, $database, $storage);
             } catch (PluginException $e) {
-                $response->setErrorFromException($e);
+                $response->setError($e->getCode(), $e->getMessage());
 
                 return;
             }
@@ -131,7 +134,7 @@ class FrontController {
         try {
             $resource->$methodName($request, $response, $database, $storage);
         } catch (ResourceException $e) {
-            $response->setErrorFromException($e);
+            $response->setError($e->getCode(), $e->getMessage());
 
             return;
         }
@@ -141,7 +144,7 @@ class FrontController {
             try {
                 $plugin->exec($request, $response, $database, $storage);
             } catch (PluginException $e) {
-                $response->setErrorFromException($e);
+                $response->setError($e->getCode(), $e->getMessage());
 
                 return;
             }

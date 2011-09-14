@@ -36,6 +36,7 @@ use PHPIMS\Http\Request\RequestInterface;
 use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
+use PHPIMS\Image\ImageInterface;
 
 /**
  * Prepare image plugin
@@ -50,6 +51,22 @@ use PHPIMS\Storage\StorageInterface;
  * @link https://github.com/christeredvartsen/phpims
  */
 class PrepareImage implements PluginInterface {
+    /**
+     * Image property
+     *
+     * @var PHPIMS\Image\ImageInterface
+     */
+    private $image;
+
+    /**
+     * Class constructor
+     *
+     * @param PHPIMS\Image\ImageInterface $image Image instance
+     */
+    public function __construct(ImageInterface $image) {
+        $this->image = $image;
+    }
+
     /**
      * @see PHPIMS\Resource\Plugin\PluginInterface::exec()
      */
@@ -77,10 +94,9 @@ class PrepareImage implements PluginInterface {
         $size = getimagesize($tmpFile);
 
         // Fetch the image object and store the blob
-        $image = $response->getImage();
-        $image->setBlob($imageBlob)
-              ->setWidth($size[0])
-              ->setHeight($size[1]);
+        $this->image->setBlob($imageBlob)
+                    ->setWidth($size[0])
+                    ->setHeight($size[1]);
 
         unlink($tmpFile);
     }

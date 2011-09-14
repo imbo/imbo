@@ -55,7 +55,7 @@ try {
     $frontController = new PHPIMS\FrontController($config);
     $frontController->handle($request, $response);
 } catch (PHPIMS\Http\Request\Exception $e) {
-    $response->setErrorFromException($e);
+    $response->setError($e->getCode(), $e->getMessage());
 }
 
 $response->send();

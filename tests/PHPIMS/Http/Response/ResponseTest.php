@@ -93,28 +93,9 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSetGetBody() {
-        $body = array(
-            'foo' => 'bar',
-            'bar' => 'foo',
-        );
+        $body = 'some content';
         $this->response->setBody($body);
         $this->assertSame($body, $this->response->getBody());
-    }
-
-    public function testSetGetContentType() {
-        $type = 'application/json';
-        $this->response->setContentType($type);
-        $this->assertSame($type, $this->response->getContentType());
-    }
-
-    public function testGetImageWithoutSettingOneFirst() {
-        $this->assertInstanceOf('PHPIMS\Image\ImageInterface', $this->response->getImage());
-    }
-
-    public function testSetGetImage() {
-        $image = $this->getMock('PHPIMS\Image\ImageInterface');
-        $this->response->setImage($image);
-        $this->assertSame($image, $this->response->getImage());
     }
 
     public function testRemoveHeader() {
@@ -122,35 +103,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertArrayHasKey('Location', $this->response->getHeaders());
         $this->response->removeHeader('Location');
         $this->assertArrayNotHasKey('Location', $this->response->getHeaders());
-    }
-
-    public function testSetError() {
-        $code = 401;
-        $message = 'You can\'t do that';
-
-        $this->response->setError($code, $message);
-        $this->assertSame($code, $this->response->getStatusCode());
-
-        $body = $this->response->getBody();
-
-        $this->assertSame($body['error']['code'], $code);
-        $this->assertSame($body['error']['message'], $message);
-    }
-
-    public function testSetErrorFromException() {
-        $code = 401;
-        $message = 'You can\'t do that';
-
-        $e = new Exception($message, $code);
-
-        $this->response->setErrorFromException($e);
-
-        $this->assertSame($code, $this->response->getStatusCode());
-
-        $body = $this->response->getBody();
-
-        $this->assertSame($body['error']['code'], $code);
-        $this->assertSame($body['error']['message'], $message);
     }
 
     public function testSetGetProtocolVersion() {

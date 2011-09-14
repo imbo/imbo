@@ -41,6 +41,7 @@ namespace PHPIMS\Resource\Plugin;
  * @link https://github.com/christeredvartsen/phpims
  */
 class PrepareImageTest extends \PHPUnit_Framework_TestCase {
+    private $image;
     private $plugin;
     private $request;
     private $response;
@@ -48,7 +49,8 @@ class PrepareImageTest extends \PHPUnit_Framework_TestCase {
     private $storage;
 
     public function setUp() {
-        $this->plugin   = new PrepareImage();
+        $this->image    = $this->getMock('PHPIMS\Image\ImageInterface');
+        $this->plugin   = new PrepareImage($this->image);
         $this->request  = $this->getMock('PHPIMS\Http\Request\RequestInterface');
         $this->response = $this->getMock('PHPIMS\Http\Response\ResponseInterface');
         $this->database = $this->getMock('PHPIMS\Database\DatabaseInterface');
@@ -56,7 +58,12 @@ class PrepareImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function tearDown() {
-        $this->plugin = null;
+        $this->image    = null;
+        $this->plugin   = null;
+        $this->request  = null;
+        $this->response = null;
+        $this->database = null;
+        $this->storage  = null;
     }
 
     /**
@@ -89,12 +96,9 @@ class PrepareImageTest extends \PHPUnit_Framework_TestCase {
         $this->request->expects($this->once())->method('getRawData')->will($this->returnValue($imageBlob));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
 
-        $image = $this->getMock('PHPIMS\Image\ImageInterface');
-        $image->expects($this->once())->method('setBlob')->with($imageBlob)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with(665)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with(463)->will($this->returnValue($image));
-
-        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $this->image->expects($this->once())->method('setBlob')->with($imageBlob)->will($this->returnValue($this->image));
+        $this->image->expects($this->once())->method('setWidth')->with(665)->will($this->returnValue($this->image));
+        $this->image->expects($this->once())->method('setHeight')->with(463)->will($this->returnValue($this->image));
 
         $this->plugin->exec($this->request, $this->response, $this->database, $this->storage);
     }
