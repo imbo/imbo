@@ -43,194 +43,55 @@ use PHPIMS\Image\TransformationChain;
  * @link https://github.com/christeredvartsen/phpims
  */
 class RequestTest extends \PHPUnit_Framework_TestCase {
-    /**
-     * @expectedException PHPIMS\Http\Request\Exception
-     * @expectedExceptionMessage Unsupported HTTP method: TRACE
-     * @expectedExceptionCode 501
-     */
-    public function testRequestWithInvalidMethod() {
-        $request = new Request('TRACE', '', array());
-    }
-
-    /**
-     * @expectedException PHPIMS\Http\Request\Exception
-     * @expectedExceptionMessage Unknown resource: /some/resource
-     * @expectedExceptionCode 400
-     */
-    public function testRequestWithInvalidResource() {
-        $request = new Request('GET', '/some/resource', array());
-    }
-
-    /**
-     * @expectedException PHPIMS\Http\Request\Exception
-     * @expectedExceptionMessage Unknown public key
-     * @expectedExceptionCode 400
-     */
-    public function testRequestWithUnknownPublicKey() {
-        $publicKey = md5(microtime());
-        $privateKey = md5(microtime());
-
-        $authConfig = array(
-            $publicKey => $privateKey,
-        );
-        $request = new Request('GET', '/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/images', $authConfig);
-    }
-
-    public function testImageRequest() {
-        $publicKey = md5(microtime());
-        $privateKey = md5(microtime());
-        $imageIdentifier = md5(microtime()) . '.png';
-
-        $authConfig = array(
-            $publicKey => $privateKey,
-        );
-        $request = new Request('GET', '/' . $publicKey . '/' . $imageIdentifier, $authConfig);
-        $this->assertSame($imageIdentifier, $request->getImageIdentifier());
-        $this->assertTrue($request->isImageRequest());
-        $this->assertFalse($request->isImagesRequest());
-        $this->assertFalse($request->isMetadataRequest());
-        $this->assertSame($imageIdentifier, $request->getResource());
-        $this->assertSame('GET', $request->getMethod());
-
-        $this->assertSame($publicKey, $request->getPublicKey());
-        $this->assertSame($privateKey, $request->getPrivateKey());
-    }
-
-    public function testImagesRequest() {
-        $publicKey = md5(microtime());
-        $privateKey = md5(microtime());
-
-        $authConfig = array(
-            $publicKey => $privateKey,
-        );
-        $request = new Request('GET', '/' . $publicKey . '/images', $authConfig);
-        $this->assertFalse($request->isImageRequest());
-        $this->assertTrue($request->isImagesRequest());
-        $this->assertFalse($request->isMetadataRequest());
-    }
-
-    public function testMetadataRequest() {
-        $publicKey = md5(microtime());
-        $privateKey = md5(microtime());
-        $imageIdentifier = md5(microtime()) . '.png';
-
-        $authConfig = array(
-            $publicKey => $privateKey,
-        );
-        $request = new Request('GET', '/' . $publicKey . '/' . $imageIdentifier . '/meta', $authConfig);
-        $this->assertSame($imageIdentifier, $request->getImageIdentifier());
-        $this->assertFalse($request->isImageRequest());
-        $this->assertFalse($request->isImagesRequest());
-        $this->assertTrue($request->isMetadataRequest());
-    }
-
-    private function getRequest() {
-        $publicKey = md5(microtime());
-        $privateKey = md5(microtime());
-        $imageIdentifier = md5(microtime()) . '.png';
-        $authConfig = array(
-            $publicKey => $privateKey,
-        );
-        return new Request('GET', '/' . $publicKey . '/' . $imageIdentifier, $authConfig);
-    }
-
-    public function testGetTimestamp() {
-        $request = $this->getRequest();
-
-        $this->assertNull($request->getTimestamp());
-        $_GET['timestamp'] = time();
-        $this->assertSame($_GET['timestamp'], $request->getTimestamp());
-    }
-
-    public function testGetSignature() {
-        $request = $this->getRequest();
-
-        $this->assertNull($request->getSignature());
-        $_GET['signature'] = time();
-        $this->assertSame($_GET['signature'], $request->getSignature());
-    }
-
-    public function testGetMetadata() {
-        $request = $this->getRequest();
-
-        $metadata = array(
-            'somekey' => 'value',
-            'someOtherKey' => 'someOtherValue',
-        );
-
-        $this->assertNull($request->getMetadata());
-        $_POST['metadata'] = json_encode($metadata);
-        $this->assertSame($metadata, $request->getMetadata());
-    }
-
-    public function testGetMetadataWhenDataIsNotValidJson() {
-        $request = $this->getRequest();
-
-        $_POST['metadata'] = 'some data';
-        $this->assertNull($request->getMetadata());
-    }
-
-    public function testGetPost() {
-        $request = $this->getRequest();
-        $this->assertNull($request->getPost('foo'));
-        $_POST['foo'] = 123;
-        $this->assertSame(123, $request->getPost('foo'));
-    }
-
-    public function testHasPost() {
-        $request = $this->getRequest();
-        $this->assertFalse($request->hasPost('foo'));
-        $_POST['foo'] = 'foobar';
-        $this->assertTrue($request->hasPost('foo'));
-    }
-
-    public function testGet() {
-        $request = $this->getRequest();
-        $this->assertNull($request->get('foo'));
-        $_GET['foo'] = 123;
-        $this->assertSame(123, $request->get('foo'));
-    }
-
-    public function testHas() {
-        $request = $this->getRequest();
-        $this->assertFalse($request->has('foo'));
-        $_GET['foo'] = 'foobar';
-        $this->assertTrue($request->has('foo'));
-    }
-
     public function testGetTransformationsWithNoTransformationsPresent() {
-        $request = $this->getRequest();
+        $request = new Request();
         $this->assertEquals(new TransformationChain(), $request->getTransformations());
     }
 
     public function testGetTransformations() {
-        $request = $this->getRequest();
-        $_GET['t'] = array(
-            // Valid transformations with all options
-            'border:color=fff,width=2,height=2',
-            'compress:quality=90',
-            'crop:x=1,y=2,width=3,height=4',
-            'resize:width=100,height=100',
-            'rotate:angle=45,bg=fff',
-            'thumbnail:width=100,height=100,fit=outbound',
+        $query = array(
+            't' => array(
+                // Valid transformations with all options
+                'border:color=fff,width=2,height=2',
+                'compress:quality=90',
+                'crop:x=1,y=2,width=3,height=4',
+                'resize:width=100,height=100',
+                'rotate:angle=45,bg=fff',
+                'thumbnail:width=100,height=100,fit=outbound',
 
-            // Transformations with no options
-            'flipHorizontally',
-            'flipVertically',
+                // Transformations with no options
+                'flipHorizontally',
+                'flipVertically',
 
-            // Invalid transformations
-            'foo',
-            'bar:some=option',
+                // Invalid transformations
+                'foo',
+                'bar:some=option',
+            ),
         );
 
+        $request = new Request($query);
         $chain = $request->getTransformations();
         $this->assertInstanceOf('PHPIMS\Image\TransformationChain', $chain);
     }
 
-    public function testSetGetImageIdentifier() {
-        $request = $this->getRequest();
-        $identifier = md5(microtime()) . '.png';
-        $request->setImageIdentifier($identifier);
-        $this->assertSame($identifier, $request->getImageIdentifier());
+    public function testRequestCorrectResource() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $method = 'GET';
+        $resource = $imageIdentifier . '/meta';
+
+        $server = array(
+            'DOCUMENT_ROOT' => '/path/to/document/root',
+            'SCRIPT_FILENAME' => '/path/to/document/root/index.php',
+            'REDIRECT_URL' => '/' . $publicKey . '/' . $resource,
+            'REQUEST_METHOD' => $method,
+        );
+
+        $request = new Request(array(), array(), $server);
+        $this->assertSame($publicKey, $request->getPublicKey());
+        $this->assertSame($resource, $request->getResource());
+        $this->assertSame($imageIdentifier, $request->getImageIdentifier());
+        $this->assertSame($method, $request->getMethod());
+        $this->assertSame(RequestInterface::RESOURCE_METADATA, $request->getType());
     }
 }
