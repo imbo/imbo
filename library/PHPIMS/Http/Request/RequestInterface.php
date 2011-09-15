@@ -51,6 +51,7 @@ interface RequestInterface {
     const RESOURCE_IMAGE    = 'IMAGE';
     const RESOURCE_IMAGES   = 'IMAGES';
     const RESOURCE_METADATA = 'METADATA';
+    const RESOURCE_UNKNOWN  = 'UNKNOWN';
     /**#@-*/
 
     /**#@+
@@ -73,13 +74,6 @@ interface RequestInterface {
      * @return string
      */
     function getPublicKey();
-
-    /**
-     * Get the private key from the server configuration based on the public key from the request
-     *
-     * @return string
-     */
-    function getPrivateKey();
 
     /**
      * Get image transformations from the request
@@ -120,83 +114,30 @@ interface RequestInterface {
     function getMethod();
 
     /**
-     * Get the timestamp used to generate the signature
-     *
-     * @return string
-     */
-    function getTimestamp();
-
-    /**
-     * Get the signature used to authenticate write operations (PUT, POST and DELETE)
-     *
-     * @return string
-     */
-    function getSignature();
-
-    /**
-     * Get the POSTed metadata
-     *
-     * @return array
-     */
-    function getMetadata();
-
-    /**
-     * Get a POST parameter
-     *
-     * @param string $key The POST parameter to fetch
-     * @return mixed
-     */
-    function getPost($key);
-
-    /**
-     * Check if the request has a specific POST parameter
-     *
-     * @param string $key The key to check for
-     * @return boolean
-     */
-    function hasPost($key);
-
-    /**
-     * Get a GET parameter
-     *
-     * @param string $key The parameter to fetch
-     * @return mixed
-     */
-    function get($key);
-
-    /**
-     * Check if the request has a specific GET parameter
-     *
-     * @param string $key The key to check for
-     * @return boolean
-     */
-    function has($key);
-
-    /**
-     * Wether or not the request is for the metadata resource
-     *
-     * @return boolean
-     */
-    function isMetadataRequest();
-
-    /**
-     * Wether or not the request is for an image resource
-     *
-     * @return boolean
-     */
-    function isImageRequest();
-
-    /**
-     * Wether or not the request is for the images resource
-     *
-     * @return boolean
-     */
-    function isImagesRequest();
-
-    /**
      * Return raw post data
      *
      * @return string
      */
     function getRawData();
+
+    /**
+     * Get the request type
+     *
+     * @return string
+     */
+    function getType();
+
+    /**
+     * Get the query container
+     *
+     * @return PHPIMS\Http\ParameterContainerInterface
+     */
+    function getQuery();
+
+    /**
+     * Wether or not the request is POST, PUT or DELETE
+     *
+     * @return boolean
+     */
+    function isUnsafe();
 }

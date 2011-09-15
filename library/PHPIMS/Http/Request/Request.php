@@ -32,6 +32,9 @@
 
 namespace PHPIMS\Http\Request;
 
+use PHPIMS\Http\ParameterContainer;
+use PHPIMS\Http\ServerContainer;
+use PHPIMS\Http\HeaderContainer;
 use PHPIMS\Image\Transformation;
 use PHPIMS\Image\TransformationChain;
 
@@ -47,108 +50,102 @@ use PHPIMS\Image\TransformationChain;
  */
 class Request implements RequestInterface {
     /**
-     * Valid HTTP methods
+     * Query data
      *
-     * @var array
+     * @var PHPIMS\Http\ParameterContainerInterface
      */
-    private $validMethods = array(
-        RequestInterface::METHOD_GET     => true,
-        RequestInterface::METHOD_POST    => true,
-        RequestInterface::METHOD_PUT     => true,
-        RequestInterface::METHOD_HEAD    => true,
-        RequestInterface::METHOD_DELETE  => true,
-        RequestInterface::METHOD_BREW    => true,
-        RequestInterface::METHOD_OPTIONS => true,
-    );
+    private $query;
 
     /**
-     * Public key from the url
+     * Request data
+     *
+     * @var PHPIMS\Http\ParameterContainerInterface
+     */
+    private $request;
+
+    /**
+     * Server data
+     *
+     * @var PHPIMS\Http\ServerContainerInterface
+     */
+    private $server;
+
+    /**
+     * HTTP headers
+     *
+     * @var PHPIMS\Http\HeaderContainer
+     */
+    private $headers;
+
+    /**
+     * The public key from the request
      *
      * @var string
      */
     private $publicKey;
 
     /**
-     * Private key from the server configuration
+     * The current resource (excluding the public key)
+     *
+     * Examples:
+     * * images
+     * * <image identifier>
+     * * <image identifier>/meta
      *
      * @var string
      */
-    private $privateKey;
+    private $resource;
 
     /**
-     * Resource name from the url
-     *
-     * @var string
-     */
-    private $resouce;
-
-    /**
-     * Image identifier from the url
+     * The current image identifier
      *
      * @var string
      */
     private $imageIdentifier;
 
     /**
-     * The HTTP method
-     *
-     * Should be one of the defined constants in PHPIMS\Http\Request\RequestInterface
+     * Type of the request
      *
      * @var string
      */
-    private $method;
-
-    /**
-     * Type of the request (one of the TYPE constants defined in this class)
-     *
-     * @var int
-     */
-    private $type;
+    private $type = RequestInterface::RESOURCE_UNKNOWN;
 
     /**
      * Class constructor
      *
-     * @param string $method The HTTP method used
-     * @param string $query The current query
-     * @param array $authConfig Authentication part of the PHPIMS server configuration array
-     * @throws PHPIMS\Http\Request\Exception
+     * @param array $query Query data ($_GET)
+     * @param array $request Request data ($_POST)
+     * @param array $server Server data ($_SERVER)
      */
-    public function __construct($method, $query, array $authConfig) {
-        $method = strtoupper($method);
+    public function __construct(array $query, array $request, array $server) {
+        $this->query   = new ParameterContainer($query);
+        $this->request = new ParameterContainer($request);
+        $this->server  = new ServerContainer($server);
+        $this->headers = new HeaderContainer($this->server->getHeaders());
 
-        if (!isset($this->validMethods[$method])) {
-            throw new Exception('Unsupported HTTP method: ' . $method, 501);
-        }
+        // Remove a possible prefix in the URL
+        $excessDir = str_replace($this->server->get('DOCUMENT_ROOT'), '', dirname($this->server->get('SCRIPT_FILENAME')));
+        $resource  = str_replace($excessDir, '', $this->server->get('REDIRECT_URL'));
 
-        $this->method = $method;
-
-        $parts = parse_url($query);
+        $parts = parse_url($resource);
         $path = trim($parts['path'], '/');
 
-        $matches  = array();
+        $matches = array();
 
-        if (!preg_match('#^(?<publicKey>[a-f0-9]{32})/(?<resource>(images|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<metadata>meta))?))$#', $path, $matches)) {
-            throw new Exception('Unknown resource: ' . $query, 400);
-        }
+        // Set some properties if the resource requested is known
+        if (preg_match('#^(?<publicKey>[a-f0-9]{32})/(?<resource>(images|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<metadata>meta))?))$#', $path, $matches)) {
+            $this->resource = $matches['resource'];
+            $this->publicKey = $matches['publicKey'];
+            $this->imageIdentifier = isset($matches['imageIdentifier']) ? $matches['imageIdentifier'] : null;
 
-        $this->resource = $matches['resource'];
-        $this->publicKey = $matches['publicKey'];
-        $this->imageIdentifier = isset($matches['imageIdentifier']) ? $matches['imageIdentifier'] : null;
-
-        // Make sure we have a valid public and private key pair
-        if (!isset($authConfig[$this->publicKey])) {
-            throw new Exception('Unknown public key', 400);
-        }
-
-        $this->privateKey = $authConfig[$this->publicKey];
-
-        // Decide the type of the request
-        if (isset($matches['imageIdentifier']) && isset($matches['metadata'])) {
-            $this->type = RequestInterface::RESOURCE_METADATA;
-        } else if (isset($matches['imageIdentifier'])) {
-            $this->type = RequestInterface::RESOURCE_IMAGE;
-        } else {
-            $this->type = RequestInterface::RESOURCE_IMAGES;
+            // Decide the type of the request
+            if (isset($matches['imageIdentifier']) && isset($matches['metadata'])) {
+                $this->type = RequestInterface::RESOURCE_METADATA;
+            } else if (isset($matches['imageIdentifier'])) {
+                $this->type = RequestInterface::RESOURCE_IMAGE;
+            } else {
+                $this->type = RequestInterface::RESOURCE_IMAGES;
+            }
         }
     }
 
@@ -160,22 +157,11 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see PHPIMS\Http\Request\RequestInterface::getPrivateKey()
-     */
-    public function getPrivateKey() {
-        return $this->privateKey;
-    }
-
-    /**
      * @see PHPIMS\Http\Request\RequestInterface::getTransformations()
      */
     public function getTransformations() {
-        $transformations = $this->get('t');
+        $transformations = $this->query->get('t', array());
         $chain = new TransformationChain();
-
-        if (!is_array($transformations)) {
-            return $chain;
-        }
 
         foreach ($transformations as $transformation) {
             // See if the transformation has any parameters
@@ -261,83 +247,7 @@ class Request implements RequestInterface {
      * @see PHPIMS\Http\Request\RequestInterface::getMethod()
      */
     public function getMethod() {
-        return $this->method;
-    }
-
-    /**
-     * @see PHPIMS\Http\Request\RequestInterface::getTimestamp()
-     */
-    public function getTimestamp() {
-        return $this->get('timestamp');
-    }
-
-    /**
-     * @see PHPIMS\Http\Request\RequestInterface::getSignature()
-     */
-    public function getSignature() {
-        return $this->get('signature');
-    }
-
-    /**
-     * @see PHPIMS\Http\Request\RequestInterface::getMetadata()
-     */
-    public function getMetadata() {
-        $metadata = $this->getPost('metadata');
-
-        if (!$metadata) {
-            return null;
-        }
-
-        return json_decode($metadata, true);
-    }
-
-    /**
-     * @see PHPIMS\Http\Request\RequestInterface::getPost()
-     */
-    public function getPost($key) {
-        return $this->hasPost($key) ? $_POST[$key] : null;
-    }
-
-    /**
-     * @see PHPIMS\Http\Request\RequestInterface::hasPost()
-     */
-    public function hasPost($key) {
-        return isset($_POST[$key]);
-    }
-
-    /**
-     * @see PHPIMS\Http\Request\RequestInterface::get()
-     */
-    public function get($key) {
-        return $this->has($key) ? $_GET[$key] : null;
-    }
-
-    /**
-     * @see PHPIMS\Http\Request\RequestInterface::has()
-     */
-    public function has($key) {
-        return isset($_GET[$key]);
-    }
-
-    /**
-     * @see PHPIMS\Http\Request\RequestInterface::isMetadataRequest()
-     */
-    public function isMetadataRequest() {
-        return $this->type === RequestInterface::RESOURCE_METADATA;
-    }
-
-    /**
-     * @see PHPIMS\Http\Request\RequestInterface::isImageRequest()
-     */
-    public function isImageRequest() {
-        return $this->type === RequestInterface::RESOURCE_IMAGE;
-    }
-
-    /**
-     * @see PHPIMS\Http\Request\RequestInterface::isImagesRequest()
-     */
-    public function isImagesRequest() {
-        return $this->type === RequestInterface::RESOURCE_IMAGES;
+        return $this->server->get('REQUEST_METHOD');
     }
 
     /**
@@ -346,5 +256,30 @@ class Request implements RequestInterface {
      */
     public function getRawData() {
         return file_get_contents('php://input');
+    }
+
+    /**
+     * @see PHPIMS\Http\Request\RequestInterface::getType()
+     */
+    public function getType() {
+        return $this->type;
+    }
+
+    /**
+     * @see PHPIMS\Http\Request\RequestInterface::getType()
+     */
+    public function getQuery() {
+        return $this->query;
+    }
+
+    /**
+     * @see PHPIMS\Http\Request\RequestInterface::isUnsafe()
+     */
+    public function isUnsafe() {
+        $method = $this->getMethod();
+
+        return $method === RequestInterface::METHOD_POST ||
+               $method === RequestInterface::METHOD_PUT ||
+               $method === RequestInterface::METHOD_DELETE;
     }
 }
