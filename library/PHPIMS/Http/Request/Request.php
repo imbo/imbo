@@ -117,7 +117,7 @@ class Request implements RequestInterface {
      * @param array $request Request data ($_POST)
      * @param array $server Server data ($_SERVER)
      */
-    public function __construct(array $query, array $request, array $server) {
+    public function __construct(array $query = array(), array $request = array(), array $server = array()) {
         $this->query   = new ParameterContainer($query);
         $this->request = new ParameterContainer($request);
         $this->server  = new ServerContainer($server);
