@@ -59,6 +59,21 @@ class FrontController {
     private $config;
 
     /**
+     * HTTP methods supported one way or another in PHPIMS
+     *
+     * @var array
+     */
+    static private $supportedHttpMethods = array(
+        RequestInterface::METHOD_GET     => true,
+        RequestInterface::METHOD_POST    => true,
+        RequestInterface::METHOD_PUT     => true,
+        RequestInterface::METHOD_HEAD    => true,
+        RequestInterface::METHOD_DELETE  => true,
+        RequestInterface::METHOD_BREW    => true,
+        RequestInterface::METHOD_OPTIONS => true,
+    );
+
+    /**
      * Class constructor
      *
      * @param array $config Configuration array
@@ -75,19 +90,78 @@ class FrontController {
      * @throws PHPIMS\Exception
      */
     private function resolveResource(RequestInterface $request) {
-        if ($request->isImageRequest()) {
-            $image = new Image();
+        // Fetch request type
+        $type = $request->getType();
 
+        if ($type === RequestInterface::RESOURCE_IMAGE) {
+            $image = new Image();
             $resource = new Resource\Image($image);
-        } else if ($request->isImagesRequest()) {
+        } else if ($type === RequestInterface::RESOURCE_IMAGES) {
             $resource = new Resource\Images();
-        } else if ($request->isMetadataRequest()) {
+        } else if ($type === RequestInterface::RESOURCE_METADATA) {
             $resource = new Resource\Metadata();
         } else {
             throw new Exception('Invalid request', 400);
         }
 
         return $resource;
+    }
+
+    /**
+     * Authenticate the current request
+     *
+     * @param PHPIMS\Http\Request\RequestInterface $request The current request
+     * @throws PHPIMS\Exception
+     */
+    private function auth(RequestInterface $request) {
+        $authConfig = $this->config['auth'];
+        $publicKey = $request->getPublicKey();
+
+        // See if the public key exists
+        if (!isset($authConfig[$publicKey])) {
+            throw new Exception('Unknown public key', 400);
+        }
+
+        $privateKey = $authConfig[$publicKey];
+
+        $query = $request->getQuery();
+
+        foreach (array('signature', 'timestamp') as $param) {
+            if (!$query->has($param)) {
+                throw new Exception('Missing required authentication parameter: ' . $param, 400);
+            }
+        }
+
+        $timestamp = $query->get('timestamp');
+
+        // Make sure the timestamp is in the correct format
+        if (!preg_match('/[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}Z/', $timestamp)) {
+            throw new Exception('Invalid authentication timestamp format: ' . $timestamp, 400);
+        }
+
+        $year   = substr($timestamp, 0, 4);
+        $month  = substr($timestamp, 5, 2);
+        $day    = substr($timestamp, 8, 2);
+        $hour   = substr($timestamp, 11, 2);
+        $minute = substr($timestamp, 14, 2);
+
+        $timestamp = gmmktime($hour, $minute, null, $month, $day, $year);
+
+        $diff = time() - $timestamp;
+
+        if ($diff > 120 || $diff < -120) {
+            throw new Exception('Authentication timestamp has expired', 401);
+        }
+
+        // Generate data for the HMAC
+        $data = $request->getMethod() . $request->getResource() . $publicKey . $query->get('timestamp');
+
+        // Generate binary hash key
+        $actualSignature = hash_hmac('sha256', $data, $privateKey, true);
+
+        if ($actualSignature !== base64_decode($query->get('signature'))) {
+            throw new Exception('Signature mismatch', 401);
+        }
     }
 
     /**
@@ -98,20 +172,32 @@ class FrontController {
      * @throws PHPIMS\Exception
      */
     public function handle(RequestInterface $request, ResponseInterface $response) {
-        if ($request->getMethod() === RequestInterface::METHOD_BREW) {
+        $httpMethod = $request->getMethod();
+
+        if ($httpMethod === RequestInterface::METHOD_BREW) {
             throw new Exception('I\'m a teapot!', 418);
         }
 
-        $database   = $this->config['database'];
-        $storage    = $this->config['storage'];
-        $httpMethod = $request->getMethod();
+        if (!isset(self::$supportedHttpMethods[$httpMethod])) {
+            throw new Exception('Unsupported HTTP method: ' . $httpMethod, 501);
+        }
+
+        // If we have an unsafe request, we need to make sure that the request is valid
+        if ($request->isUnsafe()) {
+            $this->auth($request);
+        }
+
+        $database = $this->config['database'];
+        $storage  = $this->config['storage'];
+
+        // Lowercase the HTTP method to get the class method to execute
         $methodName = strtolower($httpMethod);
 
         // Fetch the resource instance
         $resource = $this->resolveResource($request);
 
         // Add an Allow header to the response
-        $response->setHeader('Allow', implode(', ', $resource->getAllowedMethods()));
+        $response->getHeaders()->set('Allow', implode(', ', $resource->getAllowedMethods()));
 
         // See if the HTTP method is supported at all
         if (!method_exists($resource, $methodName)) {
