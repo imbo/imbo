@@ -38,24 +38,23 @@ require_once 'PHPIMS/Autoload.php';
 $loader = new PHPIMS\Autoload();
 $loader->register();
 
-// Fetch configuration
-$config = require __DIR__ . '/../config/server.php';
-
-$excessDir = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname($_SERVER['SCRIPT_FILENAME']));
-$resource  = str_replace($excessDir, '', $_SERVER['REDIRECT_URL']);
-
-// Create the response object
-$response = new PHPIMS\Http\Response\Response();
+// Initialize request and response
+$request = new PHPIMS\Http\Request\Request($_GET, $_POST, $_SERVER);
+$responseWriter = new PHPIMS\Http\Response\ResponseWriter($request);
+$response = new PHPIMS\Http\Response\Response($responseWriter);
 
 try {
-    // The request initialization might throw an exception
-    $request = new PHPIMS\Http\Request\Request($_SERVER['REQUEST_METHOD'], $resource, $config['auth']);
+    // Load configuration
+    $config = require __DIR__ . '/../config/server.php';
 
-    // Create the front controller, and handle the current request
+    // Create the front controller
     $frontController = new PHPIMS\FrontController($config);
+
+    // Handle the current request
     $frontController->handle($request, $response);
-} catch (PHPIMS\Http\Request\Exception $e) {
+} catch (PHPIMS\Exception $e) {
     $response->setError($e->getCode(), $e->getMessage());
 }
 
-$response->send();
+// Send the response to the client
+$response->send($request);
