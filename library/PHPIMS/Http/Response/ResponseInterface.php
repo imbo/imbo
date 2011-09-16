@@ -61,36 +61,11 @@ interface ResponseInterface {
     function setStatusCode($code);
 
     /**
-     * Get all headers as an associative array
+     * Get the header container
      *
-     * @return array
+     * @return PHPIMS\Http\HeaderContainer
      */
     function getHeaders();
-
-    /**
-     * Set all headers
-     *
-     * @param array $headers An array of headers to set
-     * @return PHPIMS\Http\Response\ResponseInterface
-     */
-    function setHeaders(array $headers);
-
-    /**
-     * Set a single header
-     *
-     * @param string $name The header name
-     * @param mixed $value The header value
-     * @return PHPIMS\Http\Response\ResponseInterface
-     */
-    function setHeader($name, $value);
-
-    /**
-     * Remove a single header element
-     *
-     * @param string $name The name of the header. For instance 'Location'
-     * @return PHPIMS\Http\Response\ResponseInterface
-     */
-    function removeHeader($name);
 
     /**
      * Get the body
@@ -102,10 +77,10 @@ interface ResponseInterface {
     /**
      * Set the body
      *
-     * @param string $body The body content
+     * @param PHPIMS\Image\ImageInterface|array $content Either an image instance, or an array
      * @return PHPIMS\Http\Response\ResponseInterface
      */
-    function setBody($body);
+    function setBody($content);
 
     /**
      * Set an error message
@@ -135,17 +110,7 @@ interface ResponseInterface {
     function setProtocolVersion($version);
 
     /**
-     * Send all headers to the client (including the status line)
-     */
-    function sendHeaders();
-
-    /**
-     * Send the content to the client
-     */
-    function sendContent();
-
-    /**
-     * Send the headers and the content to the client
+     * Send the response to the client (headers and content)
      */
     function send();
 }

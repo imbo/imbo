@@ -31,6 +31,9 @@
 
 namespace PHPIMS\Http\Response;
 
+use PHPIMS\Http\Response\Formatter\FormatterInterface;
+use PHPIMS\Http\HeaderContainer;
+use PHPIMS\Image\ImageInterface;
 use PHPIMS\Exception;
 
 /**
@@ -43,6 +46,13 @@ use PHPIMS\Exception;
  * @link https://github.com/christeredvartsen/phpims
  */
 class Response implements ResponseInterface {
+    /**
+     * Response writer used to format messages to the client (other than images)
+     *
+     * @var PHPIMS\Http\Response\ResponseWriterInterface
+     */
+    private $writer;
+
     /**
      * HTTP protocol version
      *
@@ -119,9 +129,9 @@ class Response implements ResponseInterface {
     /**
      * Response headers
      *
-     * @var array
+     * @var PHPIMS\Http\HeaderContainer
      */
-    private $headers = array();
+    private $headers;
 
     /**
      * The body of the response
@@ -129,6 +139,16 @@ class Response implements ResponseInterface {
      * @var string
      */
     private $body;
+
+    /**
+     * Class constructor
+     *
+     * @param PHPIMS\Http\Response\ResponseWriterInterface $writer
+     */
+    public function __construct(ResponseWriterInterface $writer) {
+        $this->writer = $writer;
+        $this->headers = new HeaderContainer();
+    }
 
     /**
      * @see PHPIMS\Http\Response\ResponseInterface::getStatusCode()
@@ -154,35 +174,6 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Http\Response\ResponseInterface::setHeaders()
-     */
-    public function setHeaders(array $headers) {
-        foreach ($headers as $name => $value) {
-            $this->setHeader($name, $value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @see PHPIMS\Http\Response\ResponseInterface::setHeader()
-     */
-    public function setHeader($name, $value) {
-        $this->headers[$name] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @see PHPIMS\Http\Response\ResponseInterface::removeHeader()
-     */
-    public function removeHeader($name) {
-        unset($this->headers[$name]);
-
-        return $this;
-    }
-
-    /**
      * @see PHPIMS\Http\Response\ResponseInterface::getBody()
      */
     public function getBody() {
@@ -192,13 +183,21 @@ class Response implements ResponseInterface {
     /**
      * @see PHPIMS\Http\Response\ResponseInterface::setBody()
      */
-    public function setBody($body) {
-        if (is_array($body)) {
-            $body = json_encode($body);
+    public function setBody($content) {
+        if ($content instanceof ImageInterface) {
+            $contentType = $content->getMimeType();
+            $content = $content->getBlob();
+        } else {
+            $contentType = $this->writer->getContentType();
+            $content = $this->writer->write($content);
         }
 
-        $this->body = $body;
-        $this->setHeader('Content-Length', strlen($body));
+        // Store the content in the body
+        $this->body = $content;
+
+        // Set some content specific headers
+        $this->headers->set('Content-Length', strlen($content));
+        $this->headers->set('Content-Type', $contentType);
 
         return $this;
     }
@@ -233,9 +232,17 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see PHPIMS\Http\Response\ResponseInterface::sendHeaders()
+     * @see PHPIMS\Http\Response\ResponseInterface::send()
      */
-    public function sendHeaders() {
+    public function send() {
+        $this->sendHeaders();
+        $this->sendContent();
+    }
+
+    /**
+     * Send all headers to the client
+     */
+    private function sendHeaders() {
         if (headers_sent()) {
             return;
         }
@@ -244,24 +251,27 @@ class Response implements ResponseInterface {
         $statusLine = sprintf("HTTP/%s %d %s", $this->getProtocolVersion(), $statusCode, self::$statusCodes[$statusCode]);
         header($statusLine);
 
-        // Send additional headers
-        foreach ($this->getHeaders() as $name => $value) {
-            header($name . ':' . $value);
+        // Fetch all headers
+        $headers = $this->headers->getAll();
+
+        // Closure that will translate the normalized header names to a prettier format (HTTP
+        // header names are case insensitive anyways (RFC2616, section 4.2)
+        $transform = function($name) {
+            return preg_replace_callback('/^[a-z]|-[a-z]/', function($match) {
+                return strtoupper($match[0]);
+            }, $name);
+        };
+
+        // Send all headers to the client
+        foreach ($headers as $name => $value) {
+            header($transform($name) . ': ' . $value);
         }
     }
 
     /**
-     * @see PHPIMS\Http\Response\ResponseInterface::sendContent()
+     * Send the content to the client
      */
-    public function sendContent() {
+    private function sendContent() {
         print($this->getBody());
-    }
-
-    /**
-     * @see PHPIMS\Http\Response\ResponseInterface::send()
-     */
-    public function send() {
-        $this->sendHeaders();
-        $this->sendContent();
     }
 }
