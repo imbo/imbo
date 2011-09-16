@@ -135,6 +135,13 @@ interface RequestInterface {
     function getQuery();
 
     /**
+     * Get the requerst container
+     *
+     * @return PHPIMS\Http\ParameterContainer
+     */
+    function getRequest();
+
+    /**
      * Wether or not the request is POST, PUT or DELETE
      *
      * @return boolean

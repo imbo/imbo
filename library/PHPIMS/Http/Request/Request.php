@@ -266,10 +266,17 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see PHPIMS\Http\Request\RequestInterface::getType()
+     * @see PHPIMS\Http\Request\RequestInterface::getQuery()
      */
     public function getQuery() {
         return $this->query;
+    }
+
+    /**
+     * @see PHPIMS\Http\Request\RequestInterface::getRequest()
+     */
+    public function getRequest() {
+        return $this->request;
     }
 
     /**
