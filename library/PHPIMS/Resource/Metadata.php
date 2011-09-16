@@ -36,7 +36,6 @@ use PHPIMS\Http\Request\RequestInterface;
 use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
-use PHPIMS\Resource\Plugin;
 use PHPIMS\Database\Exception as DatabaseException;
 
 /**
@@ -50,16 +49,6 @@ use PHPIMS\Database\Exception as DatabaseException;
  * @link https://github.com/christeredvartsen/phpims
  */
 class Metadata extends Resource implements ResourceInterface {
-    /**
-     * Class constructor
-     */
-    public function __construct() {
-        $auth = new Plugin\Auth();
-
-        $this->registerPlugin(ResourceInterface::STATE_PRE, RequestInterface::METHOD_POST,   100, $auth)
-             ->registerPlugin(ResourceInterface::STATE_PRE, RequestInterface::METHOD_DELETE, 100, $auth);
-    }
-
     /**
      * @see PHPIMS\Resource\ResourceInterface::getAllowedMethods()
      */
