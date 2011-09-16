@@ -61,6 +61,13 @@ class ParameterContainer implements ParameterContainerInterface {
     }
 
     /**
+     * @see PHPIMS\Http\ParameterContainerInterface::getAll()
+     */
+    public function getAll() {
+        return $this->parameters;
+    }
+
+    /**
      * @see PHPIMS\Http\ParameterContainerInterface::set()
      */
     public function set($key, $value) {

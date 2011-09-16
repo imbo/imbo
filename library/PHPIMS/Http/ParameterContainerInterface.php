@@ -44,6 +44,13 @@ namespace PHPIMS\Http;
  */
 interface ParameterContainerInterface {
     /**
+     * Get all parameters as an associative array
+     *
+     * @return array
+     */
+    function getAll();
+
+    /**
      * Set a parameter value
      *
      * @param string $key The key to store the value to
