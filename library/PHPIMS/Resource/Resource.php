@@ -36,7 +36,6 @@ use PHPIMS\Http\Request\RequestInterface;
 use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
-use PHPIMS\Resource\Plugin\PluginInterface;
 use PHPIMS\Resource\ResourceInterface;
 use PHPIMS\Exception;
 
@@ -53,65 +52,6 @@ use PHPIMS\Exception;
  * @link https://github.com/christeredvartsen/phpims
  */
 abstract class Resource {
-    /**
-     * Plugins for the current resource
-     *
-     * @var array
-     */
-    private $plugins = array(
-        ResourceInterface::STATE_PRE => array(
-            RequestInterface::METHOD_POST    => array(),
-            RequestInterface::METHOD_GET     => array(),
-            RequestInterface::METHOD_HEAD    => array(),
-            RequestInterface::METHOD_DELETE  => array(),
-            RequestInterface::METHOD_OPTIONS => array(),
-            RequestInterface::METHOD_PUT     => array(),
-        ),
-        ResourceInterface::STATE_POST => array(
-            RequestInterface::METHOD_POST    => array(),
-            RequestInterface::METHOD_GET     => array(),
-            RequestInterface::METHOD_HEAD    => array(),
-            RequestInterface::METHOD_DELETE  => array(),
-            RequestInterface::METHOD_OPTIONS => array(),
-            RequestInterface::METHOD_PUT     => array(),
-        ),
-    );
-
-    /**
-     * @see PHPIMS\Resource\ResourceInterface::registerPlugin()
-     */
-    public function registerPlugin($state, $method, $index, PluginInterface $plugin) {
-        $this->plugins[$state][$method][$index] = $plugin;
-
-        return $this;
-    }
-
-    /**
-     * @see PHPIMS\Resource\ResourceInterface::getPreExecPlugins()
-     */
-    public function getPreExecPlugins($method) {
-        return $this->getPlugins(ResourceInterface::STATE_PRE, $method);
-    }
-
-    /**
-     * @see PHPIMS\Resource\ResourceInterface::getPostExecPlugins()
-     */
-    public function getPostExecPlugins($method) {
-        return $this->getPlugins(ResourceInterface::STATE_POST, $method);
-    }
-
-    /**
-     * Fetch plugins for a given method in a given state
-     *
-     * @param int $state One of the state constants in PHPIMS\Resource\Plugin\PluginInterface
-     * @param int $method The HTTP method to attach the plugin to. Should be one of the METHOD_*
-     *                    constants in PHPIMS\Http\Request\RequestInterface
-     * @return PHPIMS\Resource\Plugin\PluginInterface[]
-     */
-    private function getPlugins($state, $method) {
-        return $this->plugins[$state][$method];
-    }
-
     /**
      * @see PHPIMS\Resource\ResourceInterface::post()
      */

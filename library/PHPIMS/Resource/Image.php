@@ -36,9 +36,7 @@ use PHPIMS\Http\Request\RequestInterface;
 use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
-use PHPIMS\Image\ImageInterface;
-use PHPIMS\Resource\ResourceInterface;
-use PHPIMS\Resource\Plugin;
+use PHPIMS\Image\Image as ImageObject;
 use PHPIMS\Database\Exception as DatabaseException;
 use PHPIMS\Storage\Exception as StorageException;
 
@@ -54,6 +52,17 @@ use PHPIMS\Storage\Exception as StorageException;
  */
 class Image extends Resource implements ResourceInterface {
     /**
+     * Supported mime types and the correct file extension
+     *
+     * @var array
+     */
+    static public $mimeTypes = array(
+        'image/png'  => 'png',
+        'image/jpeg' => 'jpeg',
+        'image/gif'  => 'gif',
+    );
+
+    /**
      * Image for the client
      *
      * @var PHPIMS\Image\ImageInterface
@@ -62,19 +71,9 @@ class Image extends Resource implements ResourceInterface {
 
     /**
      * Class constructor
-     *
-     * @param PHPIMS\Image\ImageInterface $image Image instance used by this resource and its
-     *                                           plugins
      */
-    public function __construct(ImageInterface $image) {
-        $this->image = $image;
-
-        $prepareImage    = new Plugin\PrepareImage($this->image);
-        $identifyImage   = new Plugin\IdentifyImage($this->image);
-
-        $this->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_PUT,    101, $prepareImage)
-             ->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_PUT,    102, $identifyImage)
-             ->registerPlugin(ResourceInterface::STATE_POST, RequestInterface::METHOD_GET,    100, $identifyImage);
+    public function __construct() {
+        $this->image = new ImageObject();
     }
 
     /**
@@ -93,6 +92,8 @@ class Image extends Resource implements ResourceInterface {
      * @see PHPIMS\Resource\ResourceInterface::put()
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+        $this->prepareImage($request, $response);
+
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
 
@@ -156,6 +157,11 @@ class Image extends Resource implements ResourceInterface {
             throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
+        // Identify the image to inject the content type header to the response, and to set the
+        // correct mime type and extension in the image instance
+        $this->identifyImage($request, $response);
+
+        // Apply transformations
         $transformationChain = $request->getTransformations();
 
         try {
@@ -165,6 +171,7 @@ class Image extends Resource implements ResourceInterface {
         }
 
         $response->setBody($this->image);
+
     }
 
     /**
@@ -179,5 +186,97 @@ class Image extends Resource implements ResourceInterface {
         }
 
         $response->setContentType($this->image->getMimeType());
+    }
+
+    /**
+     * Prepare the local image property when someone PUT's a new image to the server
+     *
+     * @param PHPIMS\Http\Request\RequestInterface $request The current request
+     * @param PHPIMS\Http\Response\ResponseInterface $response The current response
+     * @throws PHPIMS\Resource\Exception
+     */
+    private function prepareImage(RequestInterface $request, ResponseInterface $response) {
+        // Fetch image data from input
+        $imageBlob = $request->getRawData();
+
+        if (empty($imageBlob)) {
+            throw new Exception('No image attached', 400);
+        }
+
+        // Calculate hash
+        $actualHash = md5($imageBlob);
+
+        // Get image identifier from request
+        $imageIdentifier = $request->getImageIdentifier();
+
+        if ($actualHash !== substr($imageIdentifier, 0, 32)) {
+            throw new Exception('Hash mismatch', 400);
+        }
+
+        // Store file to disk and use getimagesize() to fetch width/height
+        $tmpFile = tempnam(sys_get_temp_dir(), 'PHPIMS_uploaded_image');
+        file_put_contents($tmpFile, $imageBlob);
+        $size = getimagesize($tmpFile);
+
+        // Fetch the image object and store the blob
+        $this->image->setBlob($imageBlob)
+                    ->setWidth($size[0])
+                    ->setHeight($size[1]);
+
+        unlink($tmpFile);
+
+        $this->identifyImage($request, $response);
+    }
+
+    /**
+     * Identify the local image property
+     *
+     * This method will identify the current image using the finfo extension and inject the mime
+     * type of the image into the response headers.
+     *
+     * @param PHPIMS\Http\Request\RequestInterface $request The current request
+     * @param PHPIMS\Http\Response\ResponseInterface $response The current response
+     * @throws PHPIMS\Resource\Exception
+     */
+    private function identifyImage(RequestInterface $request, ResponseInterface $response) {
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->buffer($this->image->getBlob());
+
+        if (!$this->supportedMimeType($mime)) {
+            throw new Exception('Unsupported image type: ' . $mime, 415);
+        }
+
+        $extension = $this->getFileExtension($mime);
+
+        $this->image->setMimeType($mime)
+                    ->setExtension($extension);
+
+        $response->getHeaders()->set('Content-Type', $mime);
+
+        // Update image identifier in case it has a wrong extension
+        $imageIdentifier = $request->getImageIdentifier();
+        $imageIdentifier = substr($imageIdentifier, 0, 32) . '.' . $extension;
+        $request->setImageIdentifier($imageIdentifier);
+    }
+
+    /**
+     * Check if a mime type is supported by PHPIMS
+     *
+     * @param string $mime The mime type to check. For instance "image/png"
+     * @return boolean
+     */
+    private function supportedMimeType($mime) {
+        return isset(self::$mimeTypes[$mime]);
+    }
+
+    /**
+     * Get the file extension mapped to a mime type
+     *
+     * @param string $mime The mime type. For instance "image/png"
+     * @return boolean|string The extension (without the leading dot) on success or boolean false
+     *                        if the mime type is not supported.
+     */
+    private function getFileExtension($mime) {
+        return isset(self::$mimeTypes[$mime]) ? self::$mimeTypes[$mime] : false;
     }
 }

@@ -36,7 +36,6 @@ use PHPIMS\Http\Request\RequestInterface;
 use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Database\DatabaseInterface;
 use PHPIMS\Storage\StorageInterface;
-use PHPIMS\Resource\Plugin\PluginInterface;
 
 /**
  * Resource interface
@@ -67,36 +66,6 @@ interface ResourceInterface {
      * @return string[]
      */
     function getAllowedMethods();
-
-    /**
-     * Register a plugin
-     *
-     * @param string $state One of the state constants in this interface
-     * @param string $method The HTTP method to attach the plugin to. Should be one of the METHOD_*
-     *                       constants in PHPIMS\Http\Request\RequestInterface
-     * @param int $index The index of the plugin
-     * @param PHPIMS\Resource\Plugin\PluginInterface $plugin The plugin itself
-     * @return PHPIMS\Resource\ResourceInterface
-     */
-    function registerPlugin($state, $method, $index, PluginInterface $plugin);
-
-    /**
-     * Get plugins that will execute *before* the resource executes its logic
-     *
-     * @param string $method The HTTP method to attach the plugin to. Should be one of the METHOD_*
-     *                       constants in PHPIMS\Http\Request\RequestInterface
-     * @return PHPIMS\Resource\Plugin\PluginInterface[]
-     */
-    function getPreExecPlugins($method);
-
-    /**
-     * Get plugins that will execute *after* the resource executes its logic
-     *
-     * @param string $method The HTTP method to attach the plugin to. Should be one of the METHOD_*
-     *                       constants in PHPIMS\Http\Request\RequestInterface
-     * @return PHPIMS\Resource\Plugin\PluginInterface[]
-     */
-    function getPostExecPlugins($method);
 
     /**
      * POST handler

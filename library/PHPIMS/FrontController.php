@@ -36,7 +36,6 @@ use PHPIMS\Http\Request\RequestInterface;
 use PHPIMS\Http\Response\ResponseInterface;
 use PHPIMS\Image\Image;
 use PHPIMS\Resource\Exception as ResourceException;
-use PHPIMS\Resource\Plugin\Exception as PluginException;
 
 /**
  * Client that interacts with the server part of PHPIMS
@@ -206,17 +205,6 @@ class FrontController {
             return;
         }
 
-        // Execute pre-exec plugins
-        foreach ($resource->getPreExecPlugins($httpMethod) as $plugin) {
-            try {
-                $plugin->exec($request, $response, $database, $storage);
-            } catch (PluginException $e) {
-                $response->setError($e->getCode(), $e->getMessage());
-
-                return;
-            }
-        }
-
         try {
             $resource->$methodName($request, $response, $database, $storage);
         } catch (ResourceException $e) {
@@ -224,18 +212,5 @@ class FrontController {
 
             return;
         }
-
-        // Execute post-exec plugins
-        foreach ($resource->getPostExecPlugins($httpMethod) as $plugin) {
-            try {
-                $plugin->exec($request, $response, $database, $storage);
-            } catch (PluginException $e) {
-                $response->setError($e->getCode(), $e->getMessage());
-
-                return;
-            }
-        }
-
-        return;
     }
 }
