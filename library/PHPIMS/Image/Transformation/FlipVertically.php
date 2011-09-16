@@ -47,7 +47,6 @@ use Imagine\Exception\Exception as ImagineException;
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
- * @see PHPIMS\Resource\Plugin\ManipulateImage
  */
 class FlipVertically implements TransformationInterface {
     /**

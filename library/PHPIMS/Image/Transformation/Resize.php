@@ -48,7 +48,6 @@ use Imagine\Image\Box;
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
- * @see PHPIMS\Resource\Plugin\ManipulateImage
  */
 class Resize implements TransformationInterface {
     /**

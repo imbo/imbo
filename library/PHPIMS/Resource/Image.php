@@ -69,17 +69,12 @@ class Image extends Resource implements ResourceInterface {
     public function __construct(ImageInterface $image) {
         $this->image = $image;
 
-        $auth            = new Plugin\Auth();
         $prepareImage    = new Plugin\PrepareImage($this->image);
         $identifyImage   = new Plugin\IdentifyImage($this->image);
-        $manipulateImage = new Plugin\ManipulateImage($this->image);
 
-        $this->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_DELETE, 100, $auth)
-             ->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_PUT,    100, $auth)
-             ->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_PUT,    101, $prepareImage)
+        $this->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_PUT,    101, $prepareImage)
              ->registerPlugin(ResourceInterface::STATE_PRE,  RequestInterface::METHOD_PUT,    102, $identifyImage)
-             ->registerPlugin(ResourceInterface::STATE_POST, RequestInterface::METHOD_GET,    100, $identifyImage)
-             ->registerPlugin(ResourceInterface::STATE_POST, RequestInterface::METHOD_GET,    101, $manipulateImage);
+             ->registerPlugin(ResourceInterface::STATE_POST, RequestInterface::METHOD_GET,    100, $identifyImage);
     }
 
     /**
@@ -161,8 +156,15 @@ class Image extends Resource implements ResourceInterface {
             throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
-        $response->setBody($this->image->getBlob())
-                 ->setHeader('Content-Type', $this->image->getMimeType());
+        $transformationChain = $request->getTransformations();
+
+        try {
+            $transformationChain->applyToImage($this->image);
+        } catch (TransformationException $e) {
+            throw new Exception('Transformation failed with message: ' . $e->getMessage(), 401, $e);
+        }
+
+        $response->setBody($this->image);
     }
 
     /**
