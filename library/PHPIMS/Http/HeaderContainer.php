@@ -48,47 +48,47 @@ class HeaderContainer extends ParameterContainer {
      *
      * @param array $parameters Parameters to store in the container
      */
-    public function __construct(array $parameters) {
+    public function __construct(array $parameters = array()) {
         foreach ($parameters as $key => $value) {
             $this->set($key, $value);
         }
     }
 
     /**
-     * Normalize the keys
+     * Normalize the header name
      *
-     * @param string $key The key to normalize, for instance "IF_MODIFIED_SINCE"
-     * @return string The normalized key, for instance "if-modified-since"
+     * @param string $name The name to normalize, for instance "IF_MODIFIED_SINCE"
+     * @return string The normalized name, for instance "if-modified-since"
      */
-    private function getKey($key) {
-        return strtolower(str_replace('_', '-', $key));
+    private function getName($name) {
+        return strtolower(str_replace('_', '-', $name));
     }
 
     /**
      * @see PHPIMS\Http\ParameterContainerInterface::set()
      */
     public function set($key, $value) {
-        return parent::set($this->getKey($key), $value);
+        return parent::set($this->getName($key), $value);
     }
 
     /**
      * @see PHPIMS\Http\ParameterContainerInterface::get()
      */
     public function get($key, $default = null) {
-        return parent::get($this->getKey($key), $default);
+        return parent::get($this->getName($key), $default);
     }
 
     /**
      * @see PHPIMS\Http\ParameterContainerInterface::remove()
      */
     public function remove($key) {
-        return parent::remove($this->getKey($key));
+        return parent::remove($this->getName($key));
     }
 
     /**
      * @see PHPIMS\Http\ParameterContainerInterface::has()
      */
     public function has($key) {
-        return parent::has($this->getKey($key));
+        return parent::has($this->getName($key));
     }
 }
