@@ -74,29 +74,30 @@ class Images extends Resource implements ResourceInterface {
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $query = new Query();
+        $params = $request->getQuery();
 
-        if ($request->has('page')) {
-            $query->page($request->get('page'));
+        if ($params->has('page')) {
+            $query->page($params->get('page'));
         }
 
-        if ($request->has('num')) {
-            $query->num($request->get('num'));
+        if ($params->has('num')) {
+            $query->num($params->get('num'));
         }
 
-        if ($request->has('metadata')) {
-            $query->returnMetadata($request->get('metadata'));
+        if ($params->has('metadata')) {
+            $query->returnMetadata($params->get('metadata'));
         }
 
-        if ($request->has('from')) {
-            $query->from($request->get('from'));
+        if ($params->has('from')) {
+            $query->from($params->get('from'));
         }
 
-        if ($request->has('to')) {
-            $query->to($request->get('to'));
+        if ($params->has('to')) {
+            $query->to($params->get('to'));
         }
 
-        if ($request->has('query')) {
-            $data = json_decode($request->get('query'), true);
+        if ($params->has('query')) {
+            $data = json_decode($params->get('query'), true);
 
             if (is_array($data)) {
                 $query->query($data);
