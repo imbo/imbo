@@ -77,8 +77,17 @@ class Metadata extends Resource implements ResourceInterface {
     public function post(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $imageIdentifier = $request->getImageIdentifier();
 
+        // Fetch metadata from the request
+        $metadata = $request->getRequest()->get('metadata');
+
+        if (!$metadata) {
+            $metadata = array();
+        } else {
+            $metadata = json_decode($metadata, true);
+        }
+
         try {
-            $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $request->getMetadata());
+            $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $metadata);
         } catch (DatabaseException $e) {
             throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
         }
