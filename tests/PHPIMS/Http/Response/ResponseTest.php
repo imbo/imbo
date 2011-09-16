@@ -51,16 +51,25 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
     private $response;
 
     /**
+     * Writer instance
+     *
+     * @var PHPIMS\Http\Response\ResponseWriterInterface
+     */
+    private $writer;
+
+    /**
      * Set up method
      */
     public function setUp() {
-        $this->response = new Response();
+        $this->writer = $this->getMock('PHPIMS\Http\Response\ResponseWriterInterface');
+        $this->response = new Response($this->writer);
     }
 
     /**
      * Tear down method
      */
     public function tearDown() {
+        $this->writer = null;
         $this->response = null;
     }
 
@@ -68,41 +77,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $code = 404;
         $this->response->setStatusCode($code);
         $this->assertSame($code, $this->response->getStatusCode());
-    }
-
-    public function testSetGetHeaders() {
-        $headers = array(
-            'Location' => 'http://foo/bar',
-            'x-Some' => 'Value',
-        );
-        $this->response->setHeaders($headers);
-        $this->assertSame($headers, $this->response->getHeaders());
-    }
-
-    public function testSetGetHeader() {
-        $headers = array(
-            'Location' => 'http://foo/bar',
-            'X-Some'   => 'Value',
-        );
-
-        foreach ($headers as $name => $value) {
-            $this->response->setHeader($name, $value);
-        }
-
-        $this->assertSame($headers, $this->response->getHeaders());
-    }
-
-    public function testSetGetBody() {
-        $body = 'some content';
-        $this->response->setBody($body);
-        $this->assertSame($body, $this->response->getBody());
-    }
-
-    public function testRemoveHeader() {
-        $this->response->setHeader('Location', 'http://foobar');
-        $this->assertArrayHasKey('Location', $this->response->getHeaders());
-        $this->response->removeHeader('Location');
-        $this->assertArrayNotHasKey('Location', $this->response->getHeaders());
     }
 
     public function testSetGetProtocolVersion() {

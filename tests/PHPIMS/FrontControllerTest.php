@@ -32,6 +32,8 @@
 
 namespace PHPIMS;
 
+use PHPIMS\Http\Request\RequestInterface;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -71,7 +73,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
         $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('isImageRequest')->will($this->returnValue(true));
+        $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_IMAGE));
         $this->assertInstanceOf('PHPIMS\Resource\Image', $method->invoke($this->controller, $request));
     }
 
@@ -80,8 +82,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
         $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('isImageRequest')->will($this->returnValue(false));
-        $request->expects($this->once())->method('isImagesRequest')->will($this->returnValue(true));
+        $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_IMAGES));
         $this->assertInstanceOf('PHPIMS\Resource\Images', $method->invoke($this->controller, $request));
     }
 
@@ -90,9 +91,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
         $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('isImageRequest')->will($this->returnValue(false));
-        $request->expects($this->once())->method('isImagesRequest')->will($this->returnValue(false));
-        $request->expects($this->once())->method('isMetadataRequest')->will($this->returnValue(true));
+        $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_METADATA));
         $this->assertInstanceOf('PHPIMS\Resource\Metadata', $method->invoke($this->controller, $request));
     }
 
@@ -106,9 +105,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
         $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('isImageRequest')->will($this->returnValue(false));
-        $request->expects($this->once())->method('isImagesRequest')->will($this->returnValue(false));
-        $request->expects($this->once())->method('isMetadataRequest')->will($this->returnValue(false));
+        $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_UNKNOWN));
         $method->invoke($this->controller, $request);
     }
 }

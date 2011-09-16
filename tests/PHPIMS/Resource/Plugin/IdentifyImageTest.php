@@ -92,6 +92,10 @@ class IdentifyImageTest extends \PHPUnit_Framework_TestCase {
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
         $this->request->expects($this->once())->method('setImageIdentifier')->with($correctImageIdentifier);
 
+        $headers = $this->getMock('PHPIMS\Http\HeaderContainer');
+        $headers->expects($this->once())->method('set')->with('Content-Type', 'image/png');
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
+
         $this->plugin->exec($this->request, $this->response, $this->database, $this->storage);
     }
 }
