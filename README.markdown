@@ -420,14 +420,6 @@ This resource can be used to query PHPIMS for stored images.
 #### PHPIMS\Resource\Metadata
 This resource delivers the metadata associated with an image.
 
-### Resource plugins
-Plugins contain extra features for the different resources. Plugins can hook in before and/or after the current resource executes its `exec()` method. All plugins must implement the `PHPIMS\Resource\Plugin\PluginInterface` interface. This interface has a single method:
-
-`exec(PHPIMS\Request\RequestInterface $request, PHPIMS\Response\ResponseInterface $response,
-      PHPIMS\Datbase\DatabaseInterface $database, PHPIMS\Storage\StorageInterface $storage)`
-
-It's important to notice that one request to PHPIMS triggers one resource. A single request can not trigger several resources.
-
 ### Storage drivers
 PHPIMS supports plugable storage drivers. All storage drivers must implement the `PHPIMS\Storage\StorageInterface` interface.
 
