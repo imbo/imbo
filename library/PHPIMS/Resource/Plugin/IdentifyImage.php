@@ -95,7 +95,7 @@ class IdentifyImage implements PluginInterface {
         $this->image->setMimeType($mime)
                     ->setExtension($extension);
 
-        $response->setHeader('Content-Type', $mime);
+        $response->getHeaders()->set('Content-Type', $mime);
 
         // Update image identifier in case it has a wrong extension
         $imageIdentifier = $request->getImageIdentifier();
