@@ -181,6 +181,13 @@ class FrontController {
             throw new Exception('Unsupported HTTP method: ' . $httpMethod, 501);
         }
 
+        // Fetch the resource instance
+        $resource = $this->resolveResource($request);
+
+        // Add an Allow header to the response that contains the methods the resource has
+        // implemented
+        $response->getHeaders()->set('Allow', implode(', ', $resource->getAllowedMethods()));
+
         // If we have an unsafe request, we need to make sure that the request is valid
         if ($request->isUnsafe()) {
             $this->auth($request);
@@ -191,12 +198,6 @@ class FrontController {
 
         // Lowercase the HTTP method to get the class method to execute
         $methodName = strtolower($httpMethod);
-
-        // Fetch the resource instance
-        $resource = $this->resolveResource($request);
-
-        // Add an Allow header to the response
-        $response->getHeaders()->set('Allow', implode(', ', $resource->getAllowedMethods()));
 
         // See if the HTTP method is supported at all
         if (!method_exists($resource, $methodName)) {
