@@ -127,6 +127,11 @@ class Client {
 
         // Get file extension
         $info = getimagesize($path);
+
+        if (!$info) {
+            throw new ClientException('Unknown image format of file: ' . $path);
+        }
+
         $extension = image_type_to_extension($info[2], false);
 
         // Generate MD5 sum of the file
