@@ -33,6 +33,7 @@
 namespace PHPIMS\Http\Response;
 
 use PHPIMS\Exception;
+use PHPIMS\Http\HeaderContainer;
 
 /**
  * Response interface
@@ -66,6 +67,14 @@ interface ResponseInterface {
      * @return PHPIMS\Http\HeaderContainer
      */
     function getHeaders();
+
+    /**
+     * Set the header container
+     *
+     * @param PHPIMS\Http\HeaderContainer
+     * @return PHPIMS\Http\Response\ResponesInterface
+     */
+    function setHeaders(HeaderContainer $headers);
 
     /**
      * Get the body

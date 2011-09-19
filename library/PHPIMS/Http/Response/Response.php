@@ -143,11 +143,19 @@ class Response implements ResponseInterface {
     /**
      * Class constructor
      *
-     * @param PHPIMS\Http\Response\ResponseWriterInterface $writer
+     * @param PHPIMS\Http\Response\ResponseWriterInterface $writer Response writer instance
+     * @param PHPIMS\Http\HeaderContainer $headerContainer An optional instance of a header
+     *                                                     container. An empty one will be created
+     *                                                     if not specified.
      */
-    public function __construct(ResponseWriterInterface $writer) {
+    public function __construct(ResponseWriterInterface $writer, HeaderContainer $headerContainer = null) {
         $this->writer = $writer;
-        $this->headers = new HeaderContainer();
+
+        if ($headerContainer === null) {
+            $headerContainer = new HeaderContainer();
+        }
+
+        $this->headers = $headerContainer;
     }
 
     /**
@@ -171,6 +179,15 @@ class Response implements ResponseInterface {
      */
     public function getHeaders() {
         return $this->headers;
+    }
+
+    /**
+     * @see PHPIMS\Http\Response\ResponseInterface::setHeaders()
+     */
+    public function setHeaders(HeaderContainer $headers) {
+        $this->headers = $headers;
+
+        return $this;
     }
 
     /**
