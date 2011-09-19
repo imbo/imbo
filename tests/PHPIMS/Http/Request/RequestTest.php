@@ -94,4 +94,36 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($method, $request->getMethod());
         $this->assertSame(RequestInterface::RESOURCE_METADATA, $request->getType());
     }
+
+    public function testSetGetImageIdentifier() {
+        $request = new Request();
+        $identifier = md5(microtime()) . '.png';
+        $request->setImageIdentifier($identifier);
+        $this->assertSame($identifier, $request->getImageIdentifier());
+    }
+
+    public function testGetQuery() {
+        $request = new Request(array('key' => 'value'));
+        $queryContainer = $request->getQuery();
+        $this->assertInstanceOf('PHPIMS\Http\ParameterContainer', $queryContainer);
+    }
+
+    public function testGetRequest() {
+        $request = new Request(array(), array('key' => 'value'));
+        $requestContainer = $request->getRequest();
+        $this->assertInstanceOf('PHPIMS\Http\ParameterContainer', $requestContainer);
+    }
+
+    public function testIsUnsafe() {
+        $request = new Request(array(), array(), array('REQUEST_METHOD' => 'GET'));
+        $this->assertFalse($request->isUnsafe());
+        $request = new Request(array(), array(), array('REQUEST_METHOD' => 'HEAD'));
+        $this->assertFalse($request->isUnsafe());
+        $request = new Request(array(), array(), array('REQUEST_METHOD' => 'PUT'));
+        $this->assertTrue($request->isUnsafe());
+        $request = new Request(array(), array(), array('REQUEST_METHOD' => 'POST'));
+        $this->assertTrue($request->isUnsafe());
+        $request = new Request(array(), array(), array('REQUEST_METHOD' => 'DELETE'));
+        $this->assertTrue($request->isUnsafe());
+    }
 }
