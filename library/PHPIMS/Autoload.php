@@ -64,7 +64,6 @@ class Autoload {
         'phpims\\http\\headercontainer' => '/Http/HeaderContainer.php',
         'phpims\\http\\parametercontainer' => '/Http/ParameterContainer.php',
         'phpims\\http\\parametercontainerinterface' => '/Http/ParameterContainerInterface.php',
-        'phpims\\http\\request\\exception' => '/Http/Request/Exception.php',
         'phpims\\http\\request\\request' => '/Http/Request/Request.php',
         'phpims\\http\\request\\requestinterface' => '/Http/Request/RequestInterface.php',
         'phpims\\http\\response\\formatter\\formatterinterface' => '/Http/Response/Formatter/FormatterInterface.php',
