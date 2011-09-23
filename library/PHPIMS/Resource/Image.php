@@ -104,14 +104,21 @@ class Image extends Resource implements ResourceInterface {
      * @see PHPIMS\Resource\ResourceInterface::put()
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $this->prepareImage($request, $response);
+        // Prepare the image instance
+        $this->prepareImage($request);
 
-        //$imageIdentifier = $request->getImageIdentifier();
-        //$imageIdentifier = substr($imageIdentifier, 0, 32) . '.' . $extension;
-        //$request->setImageIdentifier($imageIdentifier);
+        // Identify the image to set the correct mime type and extension in the image instance
+        try {
+            $this->imageIdentification->identifyImage($this->image);
+        } catch (ImageException $e) {
+            throw new Exception('Could not identify the image', 500);
+        }
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
+
+        // Make sure that the extension of the file along with the PUT is correct
+        $imageIdentifier = substr($imageIdentifier, 0, 32) . '.' . $this->image->getExtension();
 
         // Insert image to the database
         try {
@@ -213,11 +220,11 @@ class Image extends Resource implements ResourceInterface {
     /**
      * Prepare the local image property when someone PUT's a new image to the server
      *
-     * @param PHPIMS\Http\Request\RequestInterface $request The current request
-     * @param PHPIMS\Http\Response\ResponseInterface $response The current response
+     * @param PHPIMS\Http\Request\RequestInterface $request The current request where the raw image
+     *                                                      data is accessible
      * @throws PHPIMS\Resource\Exception
      */
-    private function prepareImage(RequestInterface $request, ResponseInterface $response) {
+    private function prepareImage(RequestInterface $request) {
         // Fetch image data from input
         $imageBlob = $request->getRawData();
 
@@ -246,7 +253,5 @@ class Image extends Resource implements ResourceInterface {
                     ->setHeight($size[1]);
 
         unlink($tmpFile);
-
-        $this->identifyImage($request, $response);
     }
 }
