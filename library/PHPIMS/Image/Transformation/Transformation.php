@@ -32,13 +32,11 @@
 
 namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Client\ImageUrl;
-use PHPIMS\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
+use Imagine\Image\ImagineInterface;
+use Imagine\Imagick\Imagine;
 
 /**
- * Flip horizontally transformation
+ * Abstract transformation
  *
  * @package PHPIMS
  * @subpackage ImageTransformation
@@ -47,27 +45,31 @@ use Imagine\Exception\Exception as ImagineException;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class FlipHorizontally extends Transformation implements TransformationInterface {
+abstract class Transformation implements TransformationInterface {
     /**
-     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImage()
+     * Imagine instance
+     *
+     * @var Imagine\Image\ImagineInterface
      */
-    public function applyToImage(ImageInterface $image) {
-        try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
+    private $imagine;
 
-            $imagineImage->flipHorizontally();
-
-            $image->setBlob($imagineImage->get($image->getExtension()));
-        } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
+    /**
+     * @see PHPIMS\Image\Transformation\TransformationInterface::getImagine()
+     */
+    public function getImagine() {
+        if ($this->imagine === null) {
+            $this->imagine = new Imagine();
         }
+
+        return $this->imagine;
     }
 
     /**
-     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImageUrl()
+     * @see PHPIMS\Image\Transformation\TransformationInterface::getImagine()
      */
-    public function applyToImageUrl(ImageUrl $url) {
-        $url->append('flipHorizontally');
+    public function setImagine(ImagineInterface $imagine) {
+        $this->imagine = $imagine;
+
+        return $this;
     }
 }

@@ -35,7 +35,6 @@ namespace PHPIMS\Image\Transformation;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\ImageInterface;
 
-use Imagine\Imagick\Imagine;
 use Imagine\Exception\Exception as ImagineException;
 use Imagine\Image\Color;
 
@@ -49,7 +48,7 @@ use Imagine\Image\Color;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Rotate implements TransformationInterface {
+class Rotate extends Transformation implements TransformationInterface {
     /**
      * Angle of the rotation
      *
@@ -83,7 +82,7 @@ class Rotate implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $imagine = new Imagine();
+            $imagine = $this->getImagine();
             $imagineImage = $imagine->load($image->getBlob());
 
             $imagineImage->rotate($this->angle, new Color($this->bg));

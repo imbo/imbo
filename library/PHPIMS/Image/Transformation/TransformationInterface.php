@@ -34,6 +34,7 @@ namespace PHPIMS\Image\Transformation;
 
 use PHPIMS\Image\ImageInterface;
 use PHPIMS\Client\ImageUrl;
+use Imagine\Image\ImagineInterface;
 
 /**
  * Image transformation interface
@@ -46,6 +47,21 @@ use PHPIMS\Client\ImageUrl;
  * @link https://github.com/christeredvartsen/phpims
  */
 interface TransformationInterface {
+    /**
+     * Get the imagine instance
+     *
+     * @return Imagine\Image\ImagineInterface
+     */
+    function getImagine();
+
+    /**
+     * Set the imagine instance
+     *
+     * @param Imagine\Image\ImagineInterface $imagine
+     * @return PHPIMS\Image\Transformation\TransformationInterface
+     */
+    function setImagine(ImagineInterface $imagine);
+
     /**
      * Apply a transformation to an image object
      *

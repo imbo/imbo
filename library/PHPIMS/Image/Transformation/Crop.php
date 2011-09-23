@@ -35,7 +35,6 @@ namespace PHPIMS\Image\Transformation;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\ImageInterface;
 
-use Imagine\Imagick\Imagine;
 use Imagine\Exception\Exception as ImagineException;
 use Imagine\Image\Point;
 use Imagine\Image\Box;
@@ -50,7 +49,7 @@ use Imagine\Image\Box;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Crop implements TransformationInterface {
+class Crop extends Transformation implements TransformationInterface {
     /**
      * X coordinate of the top left corner of the crop
      *
@@ -99,7 +98,7 @@ class Crop implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $imagine = new Imagine();
+            $imagine = $this->getImagine();
             $imagineImage = $imagine->load($image->getBlob());
 
             $imagineImage->crop(

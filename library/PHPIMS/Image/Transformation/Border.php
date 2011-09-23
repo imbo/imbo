@@ -35,7 +35,6 @@ namespace PHPIMS\Image\Transformation;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\ImageInterface;
 
-use Imagine\Imagick\Imagine;
 use Imagine\Exception\Exception as ImagineException;
 use Imagine\Image\Color;
 use Imagine\Image\Point;
@@ -50,7 +49,7 @@ use Imagine\Image\Point;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Border implements TransformationInterface {
+class Border extends Transformation implements TransformationInterface {
     /**
      * Color of the border
      *
@@ -98,7 +97,7 @@ class Border implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $imagine = new Imagine();
+            $imagine = $this->getImagine();
             $imagineImage = $imagine->load($image->getBlob());
 
             $color  = new Color($this->color);

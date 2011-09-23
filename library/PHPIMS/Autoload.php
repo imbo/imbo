@@ -88,6 +88,7 @@ class Autoload {
         'phpims\\image\\transformation\\resize' => '/Image/Transformation/Resize.php',
         'phpims\\image\\transformation\\rotate' => '/Image/Transformation/Rotate.php',
         'phpims\\image\\transformation\\thumbnail' => '/Image/Transformation/Thumbnail.php',
+        'phpims\\image\\transformation\\transformation' => '/Image/Transformation/Transformation.php',
         'phpims\\image\\transformation\\transformationinterface' => '/Image/Transformation/TransformationInterface.php',
         'phpims\\image\\transformationchain' => '/Image/TransformationChain.php',
         'phpims\\resource\\exception' => '/Resource/Exception.php',

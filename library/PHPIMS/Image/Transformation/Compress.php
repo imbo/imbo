@@ -35,7 +35,7 @@ namespace PHPIMS\Image\Transformation;
 use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\ImageInterface;
 
-use Imagine\Imagick\Imagine;
+use Imagine\Exception\Exception as ImagineException;
 
 /**
  * Compression transformation
@@ -47,7 +47,7 @@ use Imagine\Imagick\Imagine;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class Compress implements TransformationInterface {
+class Compress extends Transformation implements TransformationInterface {
     /**
      * Quality of the resulting image
      *
@@ -69,7 +69,7 @@ class Compress implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $imagine = new Imagine();
+            $imagine = $this->getImagine();
             $imagineImage = $imagine->load($image->getBlob());
 
             $image->setBlob($imagineImage->get($image->getExtension(), array(
