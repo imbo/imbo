@@ -258,6 +258,8 @@ class Response implements ResponseInterface {
 
     /**
      * Send all headers to the client
+     *
+     * @codeCoverageIgnore
      */
     private function sendHeaders() {
         if (headers_sent()) {
