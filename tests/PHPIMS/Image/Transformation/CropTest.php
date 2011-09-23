@@ -42,7 +42,11 @@ use Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class CropTest extends \PHPUnit_Framework_TestCase {
+class CropTest extends TransformationTests {
+    protected function getTransformation() {
+        return new Crop(1, 2, 3, 4);
+    }
+
     public function testApplyToImage() {
         $x = 1;
         $y = 2;

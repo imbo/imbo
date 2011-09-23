@@ -81,6 +81,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
         $blob = 'some string';
         $this->image->setBlob($blob);
         $this->assertSame($blob, $this->image->getBlob());
+        $this->assertSame(11, $this->image->getFilesize());
     }
 
     public function testSetGetExtension() {

@@ -42,7 +42,11 @@ use Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class ThumbnailTest extends \PHPUnit_Framework_TestCase {
+class ThumbnailTest extends TransformationTests {
+    protected function getTransformation() {
+        return new Thumbnail();
+    }
+
     public function testApplyToImage() {
         $width = 80;
         $height = 90;

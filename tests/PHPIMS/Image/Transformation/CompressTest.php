@@ -42,7 +42,11 @@ use Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class CompressTest extends \PHPUnit_Framework_TestCase {
+class CompressTest extends TransformationTests {
+    protected function getTransformation() {
+        return new Compress(90);
+    }
+
     public function testApplyToImage() {
         $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));

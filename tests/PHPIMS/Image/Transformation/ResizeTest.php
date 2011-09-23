@@ -42,7 +42,11 @@ use Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class ResizeTest extends \PHPUnit_Framework_TestCase {
+class ResizeTest extends TransformationTests {
+    protected function getTransformation() {
+        return new Resize(1, 2);
+    }
+
     public function testApplyToImageWithBothParams() {
         $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));

@@ -42,7 +42,11 @@ use Mockery as m;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class RotateTest extends \PHPUnit_Framework_TestCase {
+class RotateTest extends TransformationTests {
+    protected function getTransformation() {
+        return new Rotate(45);
+    }
+
     public function testApplyToImage() {
         $image = m::mock('PHPIMS\Image\ImageInterface');
         $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));

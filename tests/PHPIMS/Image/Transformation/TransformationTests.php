@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Image\Transformation;
 
-use Mockery as m;
 use Imagine\Exception\RuntimeException as ImagineException;
 
 /**
@@ -43,30 +42,22 @@ use Imagine\Exception\RuntimeException as ImagineException;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class BorderTest extends TransformationTests {
-    protected function getTransformation() {
-        return new Border();
-    }
+abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
+    abstract protected function getTransformation();
 
-    public function testApplyToImage() {
-        $image = m::mock('PHPIMS\Image\ImageInterface');
-        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
-        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
-        $image->shouldReceive('setWidth')->once()->with(665)->andReturn($image);
-        $image->shouldReceive('setHeight')->once()->with(463)->andReturn($image);
-        $image->shouldReceive('getExtension')->once()->andReturn('png');
+    /**
+     * @expectedException PHPIMS\Image\Transformation\Exception
+     * @expectedExceptionMessage some message
+     * @expectedExceptionCode 123
+     */
+    public function testApplyToImageWhenImagineThrowsAnException() {
+        $image = $this->getMock('PHPIMS\Image\ImageInterface');
 
-        $transformation = new Border();
+        $imagine = $this->getMock('Imagine\Image\ImagineInterface');
+        $imagine->expects($this->once())->method('load')->will($this->throwException(new ImagineException('some message', 123)));
+
+        $transformation = $this->getTransformation();
+        $transformation->setImagine($imagine);
         $transformation->applyToImage($image);
-    }
-
-    public function testApplyToImageUrl() {
-        $url = m::mock('PHPIMS\Client\ImageUrl');
-        $url->shouldReceive('append')->with(m::on(function ($string) {
-            return (preg_match('/^border:/', $string) && strstr($string, 'color=fed') &&
-                    strstr($string, 'width=1') && strstr($string, 'height=2'));
-        }))->once();
-        $transformation = new Border('fed', 1, 2);
-        $transformation->applyToImageUrl($url);
     }
 }

@@ -57,10 +57,20 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
         $this->chain = null;
     }
 
-    public function testBorder() {
+    public function testBorderWithImageUrl() {
         $url = (string) $this->url;
-        $this->assertInstanceOf('PHPIMS\Image\TransformationChain', $this->chain->border('444', 3, 3)->applyToImageUrl($this->url));
+        $this->assertSame($this->chain, $this->chain->border('444', 3, 3)->applyToImageUrl($this->url));
         $this->assertSame($url . '?t[]=border:color=444,width=3,height=3', (string) $this->url);
+    }
+
+    public function testApplyTrasformationsToImage() {
+        $image = $this->getMock('PHPIMS\Image\ImageInterface');
+
+        $transformation = $this->getMock('PHPIMS\Image\Transformation\TransformationInterface');
+        $transformation->expects($this->once())->method('applyToImage')->with($image);
+
+        $this->assertSame($this->chain, $this->chain->add($transformation));
+        $this->assertSame($this->chain, $this->chain->applyToImage($image));
     }
 
     public function testCompress() {
