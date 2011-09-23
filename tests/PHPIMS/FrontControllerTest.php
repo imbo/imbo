@@ -50,13 +50,22 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
      */
     private $controller;
 
+    private $publicKey;
+    private $privateKey;
+
     /**
      * Set up method
      */
     public function setUp() {
+        $this->publicKey = md5(microtime());
+        $this->privateKey = md5(microtime());
+
         $config = array(
             'database' => $this->getMock('PHPIMS\Database\DatabaseInterface'),
             'storage' => $this->getMock('PHPIMS\Storage\StorageInterface'),
+            'auth' => array(
+                $this->publicKey => $this->privateKey,
+            ),
         );
         $this->controller = new FrontController($config);
     }
@@ -107,5 +116,194 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_UNKNOWN));
         $method->invoke($this->controller, $request);
+    }
+
+    /**
+     * @expectedException PHPIMS\Exception
+     * @expectedExceptionMessage Unknown public key
+     * @expectedExceptionCode 400
+     */
+    public function testAuthWithUnknownPublicKey() {
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('auth');
+        $method->setAccessible(true);
+
+        $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue('some unknown key'));
+
+        $method->invoke($this->controller, $request);
+    }
+
+    /**
+     * @expectedException PHPIMS\Exception
+     * @expectedExceptionMessage Missing required authentication parameter: signature
+     * @expectedExceptionCode 400
+     */
+    public function testAuthWithMissingSignature() {
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('auth');
+        $method->setAccessible(true);
+
+        $query = $this->getMock('PHPIMS\Http\ParameterContainerInterface');
+        $query->expects($this->any())->method('has')->with('signature')->will($this->returnValue(false));
+
+        $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+
+        $method->invoke($this->controller, $request);
+    }
+
+    /**
+     * @expectedException PHPIMS\Exception
+     * @expectedExceptionMessage Missing required authentication parameter: timestamp
+     * @expectedExceptionCode 400
+     */
+    public function testAuthWithMissingTimestamp() {
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('auth');
+        $method->setAccessible(true);
+
+        $query = $this->getMock('PHPIMS\Http\ParameterContainerInterface');
+        $query->expects($this->at(0))->method('has')->with('signature')->will($this->returnValue(true));
+        $query->expects($this->at(1))->method('has')->with('timestamp')->will($this->returnValue(false));
+
+        $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+
+        $method->invoke($this->controller, $request);
+    }
+
+    /**
+     * @expectedException PHPIMS\Exception
+     * @expectedExceptionMessage Invalid authentication timestamp format
+     * @expectedExceptionCode 400
+     */
+    public function testAuthWithInvalidTimestampFormat() {
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('auth');
+        $method->setAccessible(true);
+
+        $query = $this->getMock('PHPIMS\Http\ParameterContainerInterface');
+        $query->expects($this->any())->method('has')->will($this->returnValue(true));
+        $query->expects($this->once())->method('get')->with('timestamp')->will($this->returnValue('some string'));
+
+        $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+
+        $method->invoke($this->controller, $request);
+    }
+
+    /**
+     * @expectedException PHPIMS\Exception
+     * @expectedExceptionMessage Authentication timestamp has expired
+     * @expectedExceptionCode 401
+     */
+    public function testAuthWithExpiredTimestamp() {
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('auth');
+        $method->setAccessible(true);
+
+        $query = $this->getMock('PHPIMS\Http\ParameterContainerInterface');
+        $query->expects($this->any())->method('has')->will($this->returnValue(true));
+        $query->expects($this->once())->method('get')->with('timestamp')->will($this->returnValue('2011-01-01T01:00Z'));
+
+        $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+
+        $method->invoke($this->controller, $request);
+    }
+
+    /**
+     * @expectedException PHPIMS\Exception
+     * @expectedExceptionMessage Signature mismatch
+     * @expectedExceptionCode 401
+     */
+    public function testAuthWithSignatureMismatch() {
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('auth');
+        $method->setAccessible(true);
+
+        $timestamp = gmdate('Y-m-d\TH:i\Z');
+        $signature = 'some signature';
+
+        $query = $this->getMock('PHPIMS\Http\ParameterContainerInterface');
+        $query->expects($this->any())->method('has')->will($this->returnValue(true));
+        $query->expects($this->any())->method('get')->will($this->returnCallback(function($arg) use($timestamp, $signature) {
+            if ($arg === 'timestamp') {
+                return $timestamp;
+            } else if ($arg === 'signature') {
+                return $signature;
+            }
+        }));
+
+        $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+
+        $method->invoke($this->controller, $request);
+    }
+
+    public function testSuccessfulAuth() {
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('auth');
+        $method->setAccessible(true);
+
+        $timestamp = gmdate('Y-m-d\TH:i\Z');
+        $httpMethod = 'POST';
+        $resource = md5(microtime()) . '.png/meta';
+        $data = $httpMethod . $resource . $this->publicKey . $timestamp;
+
+        // Generate the correct signature
+        $signature = hash_hmac('sha256', $data, $this->privateKey, true);
+
+        $query = $this->getMock('PHPIMS\Http\ParameterContainerInterface');
+        $query->expects($this->any())->method('has')->will($this->returnValue(true));
+        $query->expects($this->any())->method('get')->will($this->returnCallback(function($arg) use($timestamp, $signature) {
+            if ($arg === 'timestamp') {
+                return $timestamp;
+            } else if ($arg === 'signature') {
+                return base64_encode($signature);
+            }
+        }));
+
+        $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+        $request->expects($this->once())->method('getMethod')->will($this->returnValue($httpMethod));
+        $request->expects($this->once())->method('getResource')->will($this->returnValue($resource));
+
+        $method->invoke($this->controller, $request);
+    }
+
+    /**
+     * @expectedException PHPIMS\Exception
+     * @expectedExceptionMessage I'm a teapot!
+     * @expectedExceptionCode 418
+     */
+    public function testHandleBrew() {
+        $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getMethod')->will($this->returnValue('BREW'));
+
+        $response = $this->getMock('PHPIMS\Http\Response\ResponseInterface');
+
+        $this->controller->handle($request, $response);
+    }
+
+    /**
+     * @expectedException PHPIMS\Exception
+     * @expectedExceptionMessage Unsupported HTTP method
+     * @expectedExceptionCode 501
+     */
+    public function testHandleUnsupportedHttpMethod() {
+        $request = $this->getMock('PHPIMS\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getMethod')->will($this->returnValue('TRACE'));
+
+        $response = $this->getMock('PHPIMS\Http\Response\ResponseInterface');
+
+        $this->controller->handle($request, $response);
     }
 }
