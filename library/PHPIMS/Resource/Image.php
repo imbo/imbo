@@ -41,6 +41,8 @@ use PHPIMS\Image\Exception as ImageException;
 use PHPIMS\Image\ImageInterface;
 use PHPIMS\Image\ImageIdentification;
 use PHPIMS\Image\ImageIdentificationInterface;
+use PHPIMS\Image\ImagePreparation;
+use PHPIMS\Image\ImagePreparationInterface;
 use PHPIMS\Database\Exception as DatabaseException;
 use PHPIMS\Storage\Exception as StorageException;
 
@@ -70,12 +72,20 @@ class Image extends Resource implements ResourceInterface {
     private $imageIdentification;
 
     /**
+     * Image prepation instance
+     *
+     * @var PHPIMS\Image\ImagePreparation
+     */
+    private $imagePreparation;
+
+    /**
      * Class constructor
      *
      * @param PHPIMS\Image\ImageInterface $image An image instance
-     * @param PHPIMS\Image\ImageIdentification $imageIdentification An image identification instance
+     * @param PHPIMS\Image\ImageIdentificationInterface $imageIdentification An image identification instance
+     * @param PHPIMS\Image\ImagePreparationInterface $imagePreparation An image preparation instance
      */
-    public function __construct(ImageInterface $image = null, ImageIdentificationInterface $imageIdentification = null) {
+    public function __construct(ImageInterface $image = null, ImageIdentificationInterface $imageIdentification = null, ImagePreparationInterface $imagePreparation = null) {
         if ($image === null) {
             $image = new ImageObject();
         }
@@ -84,8 +94,13 @@ class Image extends Resource implements ResourceInterface {
             $imageIdentification = new ImageIdentification();
         }
 
+        if ($imagePreparation === null) {
+            $imagePreparation = new ImagePreparation();
+        }
+
         $this->image = $image;
         $this->imageIdentification = $imageIdentification;
+        $this->imagePreparation = $imagePreparation;
     }
 
     /**
@@ -104,14 +119,14 @@ class Image extends Resource implements ResourceInterface {
      * @see PHPIMS\Resource\ResourceInterface::put()
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        // Prepare the image instance
-        $this->prepareImage($request);
-
-        // Identify the image to set the correct mime type and extension in the image instance
         try {
+            // Prepare the image based on the input stream in the request
+            $this->imagePreparation->prepareImage($request, $this->image);
+
+            // Identify the image to set the correct mime type and extension in the image instance
             $this->imageIdentification->identifyImage($this->image);
         } catch (ImageException $e) {
-            throw new Exception('Could not identify the image', 500);
+            throw new Exception($e->getMessage(), $e->getCode());
         }
 
         $publicKey = $request->getPublicKey();
@@ -120,16 +135,14 @@ class Image extends Resource implements ResourceInterface {
         // Make sure that the extension of the file along with the PUT is correct
         $imageIdentifier = substr($imageIdentifier, 0, 32) . '.' . $this->image->getExtension();
 
-        // Insert image to the database
         try {
+            // Insert the image to the database
             $database->insertImage($publicKey, $imageIdentifier, $this->image);
+
+            // Store the image
+            $storage->store($publicKey, $imageIdentifier, $this->image);
         } catch (DatabaseException $e) {
             throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
-        }
-
-        // Store the image
-        try {
-            $storage->store($publicKey, $imageIdentifier, $this->image);
         } catch (StorageException $e) {
             throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
         }
@@ -215,43 +228,5 @@ class Image extends Resource implements ResourceInterface {
         }
 
         $response->setContentType($this->image->getMimeType());
-    }
-
-    /**
-     * Prepare the local image property when someone PUT's a new image to the server
-     *
-     * @param PHPIMS\Http\Request\RequestInterface $request The current request where the raw image
-     *                                                      data is accessible
-     * @throws PHPIMS\Resource\Exception
-     */
-    private function prepareImage(RequestInterface $request) {
-        // Fetch image data from input
-        $imageBlob = $request->getRawData();
-
-        if (empty($imageBlob)) {
-            throw new Exception('No image attached', 400);
-        }
-
-        // Calculate hash
-        $actualHash = md5($imageBlob);
-
-        // Get image identifier from request
-        $imageIdentifier = $request->getImageIdentifier();
-
-        if ($actualHash !== substr($imageIdentifier, 0, 32)) {
-            throw new Exception('Hash mismatch', 400);
-        }
-
-        // Store file to disk and use getimagesize() to fetch width/height
-        $tmpFile = tempnam(sys_get_temp_dir(), 'PHPIMS_uploaded_image');
-        file_put_contents($tmpFile, $imageBlob);
-        $size = getimagesize($tmpFile);
-
-        // Fetch the image object and store the blob
-        $this->image->setBlob($imageBlob)
-                    ->setWidth($size[0])
-                    ->setHeight($size[1]);
-
-        unlink($tmpFile);
     }
 }

@@ -79,6 +79,8 @@ class Autoload {
         'phpims\\image\\imageidentification' => '/Image/ImageIdentification.php',
         'phpims\\image\\imageidentificationinterface' => '/Image/ImageIdentificationInterface.php',
         'phpims\\image\\imageinterface' => '/Image/ImageInterface.php',
+        'phpims\\image\\imagepreparation' => '/Image/ImagePreparation.php',
+        'phpims\\image\\imagepreparationinterface' => '/Image/ImagePreparationInterface.php',
         'phpims\\image\\transformation\\border' => '/Image/Transformation/Border.php',
         'phpims\\image\\transformation\\compress' => '/Image/Transformation/Compress.php',
         'phpims\\image\\transformation\\crop' => '/Image/Transformation/Crop.php',
