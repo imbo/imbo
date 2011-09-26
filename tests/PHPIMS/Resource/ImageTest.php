@@ -32,6 +32,7 @@
 
 namespace PHPIMS\Resource;
 
+use PHPIMS\Image\Exception as ImageException;
 use PHPIMS\Database\Exception as DatabaseException;
 use PHPIMS\Storage\Exception as StorageException;
 
@@ -44,9 +45,150 @@ use PHPIMS\Storage\Exception as StorageException;
  * @link https://github.com/christeredvartsen/phpims
  */
 class ImageTest extends ResourceTests {
-    protected function getNewResource() {
-        $image = $this->getMock('PHPIMS\Image\ImageInterface');
+    private $imageIdentification;
+    private $imagePreparation;
+    private $image;
 
-        return new Image($image);
+    protected function getNewResource() {
+        $this->image = $this->getMock('PHPIMS\Image\ImageInterface');
+        $this->imageIdentification = $this->getMock('PHPIMS\Image\ImageIdentificationInterface');
+        $this->imagePreparation = $this->getMock('PHPIMS\Image\ImagePreparationInterface');
+
+        return new Image($this->image, $this->imageIdentification, $this->imagePreparation);
+    }
+
+    public function tearDown() {
+        parent::tearDown();
+
+        $this->image = null;
+        $this->imageIdentification = null;
+        $this->imagePreparation = null;
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedExceptionMessage message
+     * @expectedExceptionCode 400
+     */
+    public function testPutWhenImagePreparationThrowsException() {
+        $resource = $this->getNewResource();
+
+        $this->imagePreparation->expects($this->once())
+                               ->method('prepareImage')
+                               ->with($this->request, $this->image)
+                               ->will($this->throwException(new ImageException('message', 400)));
+
+        $resource->put($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedExceptionMessage message
+     * @expectedExceptionCode 400
+     */
+    public function testPutWhenImageIdentificationThrowsException() {
+        $resource = $this->getNewResource();
+
+        $this->imagePreparation->expects($this->once())
+                               ->method('prepareImage')
+                               ->with($this->request, $this->image);
+
+        $this->imageIdentification->expects($this->once())
+                                  ->method('identifyImage')
+                                  ->with($this->image)
+                                  ->will($this->throwException(new ImageException('message', 400)));
+
+        $resource->put($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedExceptionMessage Database error: message
+     * @expectedExceptionCode 500
+     */
+    public function testPutWhenDatabaseThrowsException() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())
+                      ->method('getPublicKey')
+                      ->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())
+                      ->method('getImageIdentifier')
+                      ->will($this->returnValue($imageIdentifier));
+
+        $this->image->expects($this->once())
+                    ->method('getExtension')
+                    ->will($this->returnValue('png'));
+
+        $this->database->expects($this->once())
+                       ->method('insertImage')
+                       ->with($publicKey, $imageIdentifier, $this->image)
+                       ->will($this->throwException(new DatabaseException('message', 500)));
+
+        $resource->put($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedExceptionMessage Storage error: message
+     * @expectedExceptionCode 500
+     */
+    public function testPutWhenStorageThrowsException() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())
+                      ->method('getPublicKey')
+                      ->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())
+                      ->method('getImageIdentifier')
+                      ->will($this->returnValue($imageIdentifier));
+
+        $this->image->expects($this->once())
+                    ->method('getExtension')
+                    ->will($this->returnValue('png'));
+
+        $this->database->expects($this->once())
+                       ->method('insertImage')
+                       ->with($publicKey, $imageIdentifier, $this->image);
+
+        $this->storage->expects($this->once())
+                      ->method('store')
+                      ->with($publicKey, $imageIdentifier, $this->image)
+                      ->will($this->throwException(new StorageException('message', 500)));
+
+        $resource->put($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    public function testSuccessfulPut() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())
+                      ->method('getPublicKey')
+                      ->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())
+                      ->method('getImageIdentifier')
+                      ->will($this->returnValue($imageIdentifier));
+
+        $this->image->expects($this->once())
+                    ->method('getExtension')
+                    ->will($this->returnValue('png'));
+
+        $this->database->expects($this->once())
+                       ->method('insertImage')
+                       ->with($publicKey, $imageIdentifier, $this->image);
+
+        $this->storage->expects($this->once())
+                      ->method('store')
+                      ->with($publicKey, $imageIdentifier, $this->image);
+
+        $this->response->expects($this->once())->method('setStatusCode')->with(201)->will($this->returnValue($this->response));
+
+        $resource->put($this->request, $this->response, $this->database, $this->storage);
     }
 }

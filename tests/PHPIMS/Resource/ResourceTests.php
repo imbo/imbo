@@ -46,12 +46,25 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
      */
     protected $resource;
 
+    protected $request;
+    protected $response;
+    protected $database;
+    protected $storage;
+
     public function setUp() {
         $this->resource = $this->getNewResource();
+        $this->request  = $this->getMock('PHPIMS\Http\Request\RequestInterface');
+        $this->response = $this->getMock('PHPIMS\Http\Response\ResponseInterface');
+        $this->database = $this->getMock('PHPIMS\Database\DatabaseInterface');
+        $this->storage  = $this->getMock('PHPIMS\Storage\StorageInterface');
     }
 
     public function tearDown() {
         $this->resource = null;
+        $this->request = null;
+        $this->response = null;
+        $this->database = null;
+        $this->storage = null;
     }
 
     /**
