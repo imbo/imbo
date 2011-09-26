@@ -45,6 +45,7 @@ use PHPIMS\Image\ImagePreparation;
 use PHPIMS\Image\ImagePreparationInterface;
 use PHPIMS\Database\Exception as DatabaseException;
 use PHPIMS\Storage\Exception as StorageException;
+use PHPIMS\Image\Transformation\Exception as TransformationException;
 
 /**
  * Image resource
@@ -161,12 +162,9 @@ class Image extends Resource implements ResourceInterface {
 
         try {
             $database->deleteImage($publicKey, $imageIdentifier);
+            $storage->delete($publicKey, $imageIdentifier);
         } catch (DatabaseException $e) {
             throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
-        }
-
-        try {
-            $storage->delete($publicKey, $imageIdentifier);
         } catch (StorageException $e) {
             throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
         }
@@ -179,35 +177,28 @@ class Image extends Resource implements ResourceInterface {
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
 
-        // Fetch information from the database
         try {
+            // Fetch information from the database
             $database->load($publicKey, $imageIdentifier, $this->image);
-        } catch (DatabaseError $e) {
-            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
-        }
 
-        // Load the image
-        try {
+            // Load the image
             $storage->load($publicKey, $imageIdentifier, $this->image);
-        } catch (DatabaseException $e) {
-            throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
-        }
 
-        // Identify the image to set the correct mime type and extension in the image instance
-        try {
+            // Identify the image to set the correct mime type and extension in the image instance
             $this->imageIdentification->identifyImage($this->image);
+
+            // Add the content type of the image to the response headers
+            $response->getHeaders()->set('Content-Type', $this->image->getMimeType());
+
+            // Apply transformations
+            $transformationChain = $request->getTransformations();
+            $transformationChain->applyToImage($this->image);
+        } catch (DatabaseException $e) {
+            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
+        } catch (StorageException $e) {
+            throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
         } catch (ImageException $e) {
             throw new Exception('Could not identify the image', 500);
-        }
-
-        // Add the content type of the image to the response headers
-        $response->getHeaders()->set('Content-Type', $this->image->getMimeType());
-
-        // Apply transformations
-        $transformationChain = $request->getTransformations();
-
-        try {
-            $transformationChain->applyToImage($this->image);
         } catch (TransformationException $e) {
             throw new Exception('Transformation failed with message: ' . $e->getMessage(), 401, $e);
         }
@@ -223,7 +214,7 @@ class Image extends Resource implements ResourceInterface {
         // Fetch information from the database
         try {
             $database->load($request->getPublicKey(), $request->getImageIdentifier(), $this->image);
-        } catch (DatabaseError $e) {
+        } catch (DatabaseException $e) {
             throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
