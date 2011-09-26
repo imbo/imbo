@@ -218,6 +218,6 @@ class Image extends Resource implements ResourceInterface {
             throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
-        $response->setContentType($this->image->getMimeType());
+        $response->getHeaders()->set('Content-Type', $this->image->getMimeType());
     }
 }
