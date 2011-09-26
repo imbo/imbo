@@ -406,4 +406,47 @@ class ImageTest extends ResourceTests {
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedExceptionMessage Database error: message
+     * @expectedExceptionCode 500
+     */
+    public function testHeadWhenDatabaseThrowsException() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+
+        $this->database->expects($this->once())
+                       ->method('load')
+                       ->with($publicKey, $imageIdentifier, $this->image)
+                       ->will($this->throwException(new DatabaseException('message', 500)));
+
+        $resource->head($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    public function testSuccessfulHead() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+
+        $this->database->expects($this->once())
+                       ->method('load')
+                       ->with($publicKey, $imageIdentifier, $this->image);
+
+        $headerContainer = $this->getMock('PHPIMS\Http\HeaderContainer');
+        $headerContainer->expects($this->once())->method('set')->with('Content-Type', 'image/png');
+
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headerContainer));
+
+        $this->image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/png'));
+
+        $resource->head($this->request, $this->response, $this->database, $this->storage);
+    }
 }
