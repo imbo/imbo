@@ -35,6 +35,7 @@ namespace PHPIMS\Resource;
 use PHPIMS\Image\Exception as ImageException;
 use PHPIMS\Database\Exception as DatabaseException;
 use PHPIMS\Storage\Exception as StorageException;
+use PHPIMS\Image\Transformation\Exception as TransformationException;
 
 /**
  * @package PHPIMS
@@ -190,5 +191,219 @@ class ImageTest extends ResourceTests {
         $this->response->expects($this->once())->method('setStatusCode')->with(201)->will($this->returnValue($this->response));
 
         $resource->put($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedExceptionMessage Database error: message
+     * @expectedExceptionCode 500
+     */
+    public function testDeleteWhenDatabaseThrowsAnException() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+
+        $this->database->expects($this->once())
+                       ->method('deleteImage')
+                       ->with($publicKey, $imageIdentifier)
+                       ->will($this->throwException(new DatabaseException('message', 500)));
+
+        $resource->delete($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedExceptionMessage Storage error: message
+     * @expectedExceptionCode 500
+     */
+    public function testDeleteWhenStorageThrowsAnException() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+
+        $this->database->expects($this->once())
+                       ->method('deleteImage')
+                       ->with($publicKey, $imageIdentifier);
+
+        $this->storage->expects($this->once())
+                      ->method('delete')
+                      ->with($publicKey, $imageIdentifier)
+                      ->will($this->throwException(new StorageException('message', 500)));
+
+        $resource->delete($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    public function testSuccessfulDelete() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+
+        $this->database->expects($this->once())
+                       ->method('deleteImage')
+                       ->with($publicKey, $imageIdentifier);
+
+        $this->storage->expects($this->once())
+                      ->method('delete')
+                      ->with($publicKey, $imageIdentifier);
+
+        $resource->delete($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedExceptionMessage Database error: message
+     * @expectedExceptionCode 500
+     */
+    public function testGetWhenDatabaseThrowsAnException() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+
+        $this->database->expects($this->once())
+                       ->method('load')
+                       ->with($publicKey, $imageIdentifier, $this->image)
+                       ->will($this->throwException(new DatabaseException('message', 500)));
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedExceptionMessage Storage error: message
+     * @expectedExceptionCode 500
+     */
+    public function testGetWhenStorageThrowsAnException() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+
+        $this->database->expects($this->once())
+                       ->method('load')
+                       ->with($publicKey, $imageIdentifier, $this->image);
+
+        $this->storage->expects($this->once())
+                      ->method('load')
+                      ->with($publicKey, $imageIdentifier, $this->image)
+                      ->will($this->throwException(new StorageException('message', 500)));
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedExceptionMessage Could not identify the image
+     * @expectedExceptionCode 500
+     */
+    public function testGetWhenImageIdentificationThrowsAnException() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+
+        $this->database->expects($this->once())
+                       ->method('load')
+                       ->with($publicKey, $imageIdentifier, $this->image);
+
+        $this->storage->expects($this->once())
+                      ->method('load')
+                      ->with($publicKey, $imageIdentifier, $this->image);
+
+        $this->imageIdentification->expects($this->once())
+                                  ->method('identifyImage')
+                                  ->with($this->image)
+                                  ->will($this->throwException(new ImageException('message')));
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedExceptionMessage Transformation failed with message: message
+     * @expectedExceptionCode 401
+     */
+    public function testGetWhenTransformationThrowsAnException() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/png'));
+
+        $headerContainer = $this->getMock('PHPIMS\Http\HeaderContainer');
+        $headerContainer->expects($this->once())->method('set')->with('Content-Type', 'image/png');
+
+        $transformationChain = $this->getMock('PHPIMS\Image\TransformationChain');
+        $transformationChain->expects($this->once())->method('applyToImage')->with($this->image)->will($this->throwException(new TransformationException('message', 401)));
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue($transformationChain));
+
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headerContainer));
+
+        $this->database->expects($this->once())
+                       ->method('load')
+                       ->with($publicKey, $imageIdentifier, $this->image);
+
+        $this->storage->expects($this->once())
+                      ->method('load')
+                      ->with($publicKey, $imageIdentifier, $this->image);
+
+        $this->imageIdentification->expects($this->once())
+                                  ->method('identifyImage')
+                                  ->with($this->image);
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    public function testSuccessfulGet() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime()) . '.png';
+        $resource = $this->getNewResource();
+
+        $this->image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/png'));
+
+        $headerContainer = $this->getMock('PHPIMS\Http\HeaderContainer');
+        $headerContainer->expects($this->once())->method('set')->with('Content-Type', 'image/png');
+
+        $transformationChain = $this->getMock('PHPIMS\Image\TransformationChain');
+        $transformationChain->expects($this->once())->method('applyToImage')->with($this->image);
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue($transformationChain));
+
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headerContainer));
+        $this->response->expects($this->once())->method('setBody')->with($this->image);
+
+        $this->database->expects($this->once())
+                       ->method('load')
+                       ->with($publicKey, $imageIdentifier, $this->image);
+
+        $this->storage->expects($this->once())
+                      ->method('load')
+                      ->with($publicKey, $imageIdentifier, $this->image);
+
+        $this->imageIdentification->expects($this->once())
+                                  ->method('identifyImage')
+                                  ->with($this->image);
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
 }
