@@ -32,6 +32,8 @@
 
 namespace PHPIMS\Resource;
 
+use PHPIMS\Database\Exception as DatabaseException;
+
 /**
  * @package PHPIMS
  * @subpackage Unittests
@@ -43,5 +45,51 @@ namespace PHPIMS\Resource;
 class ImagesTest extends ResourceTests {
     protected function getNewResource() {
         return new Images();
+    }
+
+    /**
+     * @expectedException PHPIMS\Resource\Exception
+     * @expectedExceptionMessage Database error: message
+     * @expectedExceptionCode 500
+     */
+    public function testGetWhenDatabaseThrowsAnException() {
+        $resource = $this->getNewResource();
+        $parameterContainer = $this->getMock('PHPIMS\Http\ParameterContainerInterface');
+        $parameterContainer->expects($this->any())->method('has')->will($this->returnValue(false));
+
+        $this->database->expects($this->once())->method('getImages')->will($this->throwException(new DatabaseException('message', 500)));
+        $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($parameterContainer));
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    public function testSuccessfulGetWithNoQueryParams() {
+        $publicKey = md5(microtime());
+        $resource = $this->getNewResource();
+        $images = array();
+        $parameterContainer = $this->getMock('PHPIMS\Http\ParameterContainerInterface');
+        $parameterContainer->expects($this->any())->method('has')->will($this->returnValue(false));
+
+        $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($parameterContainer));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->database->expects($this->once())->method('getImages')->with($publicKey, $this->isInstanceOf('PHPIMS\Resource\Images\Query'))->will($this->returnValue($images));
+        $this->response->expects($this->once())->method('setBody')->with($images);
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    public function ttestSuccessfulGetWithAllQueryParams() {
+        $publicKey = md5(microtime());
+        $resource = $this->getNewResource();
+        $images = array();
+        $parameterContainer = $this->getMock('PHPIMS\Http\ParameterContainerInterface');
+        $parameterContainer->expects($this->any())->method('has')->will($this->returnValue(false));
+
+        $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($parameterContainer));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->database->expects($this->once())->method('getImages')->with($publicKey, $this->isInstanceOf('PHPIMS\Resource\Images\Query'))->will($this->returnValue($images));
+        $this->response->expects($this->once())->method('setBody')->with($images);
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
 }
