@@ -174,21 +174,47 @@ class Image extends Resource implements ResourceInterface {
      * @see Imbo\Resource\ResourceInterface::get()
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $publicKey = $request->getPublicKey();
+        // Fetch some entries from the request and the respones
+        $publicKey       = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
+        $serverContainer = $request->getServer();
+        $requestHeaders  = $request->getHeaders();
+        $responseHeaders = $response->getHeaders();
+
+        // Generate ETag using public key, image identifier and the query string from the
+        // request
+        $etag = md5($publicKey . $imageIdentifier . $serverContainer->get('REDIRECT_QUERY_STRING'));
 
         try {
-            // Fetch information from the database
+            // Fetch information from the database (injects mime type, width and height to the
+            // image instance)
             $database->load($publicKey, $imageIdentifier, $this->image);
+            $mimeType = $this->image->getMimeType();
 
-            // Load the image
+            // Set the image extension based on the mime type
+            $this->image->setExtension(ImageIdentification::$mimeTypes[$mimeType]);
+
+            // Fetch last modified timestamp from the storage driver
+            $lastModified = date('r', $storage->getLastModified($publicKey, $imageIdentifier));
+
+            if (
+                $lastModified === $requestHeaders->get('if-modified-since') &&
+                $etag === $requestHeaders->get('if-none-match')
+            ) {
+                $response->setStatusCode(304);
+                return;
+            }
+
+            // Load the image data (injects the blob into the image instance)
             $storage->load($publicKey, $imageIdentifier, $this->image);
 
-            // Identify the image to set the correct mime type and extension in the image instance
-            $this->imageIdentification->identifyImage($this->image);
-
-            // Add the content type of the image to the response headers
-            $response->getHeaders()->set('Content-Type', $this->image->getMimeType());
+            // Set some response headers
+            $responseHeaders->set('Last-Modified', $lastModified)
+                            ->set('ETag', $etag)
+                            ->set('Content-Type', $mimeType)
+                            ->set('X-Imbo-OriginalWidth', $this->image->getWidth())
+                            ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
+                            ->set('X-Imbo-OriginalFileSize', $this->image->getFileSize());
 
             // Apply transformations
             $transformationChain = $request->getTransformations();
@@ -197,8 +223,6 @@ class Image extends Resource implements ResourceInterface {
             throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
         } catch (StorageException $e) {
             throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
-        } catch (ImageException $e) {
-            throw new Exception('Could not identify the image', 500);
         } catch (TransformationException $e) {
             throw new Exception('Transformation failed with message: ' . $e->getMessage(), 401, $e);
         }
