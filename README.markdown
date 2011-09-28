@@ -1,14 +1,14 @@
-# PHP Image Server
-PHP Image Server (**PHPIMS**) is an image "server" that can be used to add/get/delete images using a REST interface. There is also support for adding meta data to an image. The main idea behind PHPIMS is to have a place to store high quality original images and to use the REST interface to fetch variations of those images. PHPIMS will resize, rotate, crop (amongst other features) on the fly so you won't have to store all the different variations. PHPIMS comes with an administration dashboard that can be used to locate images. The dashboard will also support editing of meta data.
+# Imbo - Image box
+Imbo is an image "server" that can be used to add/get/delete images using a REST interface. There is also support for adding meta data to an image. The main idea behind Imbo is to have a place to store high quality original images and to use the REST interface to fetch variations of those images. Imbo will resize, rotate, crop (amongst other features) on the fly so you won't have to store all the different variations. Imbo comes with an administration dashboard that can be used to locate images. The dashboard will also support editing of meta data.
 
 ## Requirements
-PHPIMS requires [PHP-5.3](http://php.net/), the [Imagine](https://github.com/avalanche123/imagine) image manipulation library, a running [MongoDB](http://www.mongodb.org/) and the [Mongo extension for PHP](http://pecl.php.net/package/mongo).
+Imbo requires [PHP-5.3](http://php.net/), the [Imagine](https://github.com/avalanche123/imagine) image manipulation library, a running [MongoDB](http://www.mongodb.org/) and the [Mongo extension for PHP](http://pecl.php.net/package/mongo).
 
 ## Installation
 Since this is a work in progress there is no automatic installation. Simply clone the repository or make your own fork. Automatic installation using [PEAR](http://pear.php.net/) will be provided later.
 
 ## REST API
-PHPIMS uses a REST API to manage the images. Each image will be identified by a public key and an MD5 sum of the file itself and the original file extension. The latter will be referred to as &lt;image&gt; for the remainder of this document.
+Imbo uses a REST API to manage the images. Each image will be identified by a public key and an MD5 sum of the file itself and the original file extension. The latter will be referred to as &lt;image&gt; for the remainder of this document.
 
 ### GET /&lt;publicKey&gt;/&lt;image&gt;
 
@@ -20,7 +20,7 @@ Get meta data related to the image identified by &lt;image&gt;. The meta data wi
 
 ### GET /&lt;publicKey&gt;/images
 
-Get information about the images stored in PHPIMS for the user with the public key &lt;publicKey&gt;. Supported query parameters are:
+Get information about the images stored in Imbo for the user with the public key &lt;publicKey&gt;. Supported query parameters are:
 
 * `(int) page` The page number. Defaults to 1.
 * `(int) num` Number of images pr. page. Defaults to 20.
@@ -57,10 +57,10 @@ Fetch extra header information about a single image identified by &lt;image&gt;.
 Fetches extra header information about the meta data attached to the image identified by &lt;image&gt;.
 
 ## Authentication
-All write operations (PUT, POST and DELETE) requires authentication using an Hash-based Message Authentication Code (HMAC). The data PHPIMS uses when generating this code is:
+All write operations (PUT, POST and DELETE) requires authentication using an Hash-based Message Authentication Code (HMAC). The data Imbo uses when generating this code is:
 
 * HTTP method (PUT, POST or DELETE)
-* Resource identifier (for instance `<publicKey>/<image>` if your PHPIMS installation answers directly in the document root)
+* Resource identifier (for instance `<publicKey>/<image>` if your Imbo installation answers directly in the document root)
 * Public key (random MD5 hash that exists both on the server and the client)
 * GMT timestamp (YYYY-MM-DDTHH:MMZ, for instance: 2011-02-01T14:33Z)
 
@@ -88,7 +88,7 @@ The above code will generate a signature that must be sent along the request usi
 The public and private key pair used by clients must be specified in the server configuration. More information on the configuration file can be found later in this document.
 
 ## Image transformations
-PHPIMS supports some image transformations out of the box using the [Imagine](https://github.com/avalanche123/Imagine/) image manipulation library.
+Imbo supports some image transformations out of the box using the [Imagine](https://github.com/avalanche123/Imagine/) image manipulation library.
 
 Transformations are made using the `t[]` query parameter. This GET parameter should be used as an array so that multiple transformations can be made. The transformations are made in the order they are specified in the url.
 
@@ -176,17 +176,17 @@ Example:
 * `t[]=compress:quality=40`
 
 ## Extra response headers
-PHPIMS will usually inject extra response headers to the different requests. All response headers from PHPIMS will be prefixed with **X-PHPIMS-**.
+Imbo will usually inject extra response headers to the different requests. All response headers from Imbo will be prefixed with **X-Imbo-**.
 
 ## PHP client
-A PHP client is included with PHPIMS that supports all the REST methods and includes some convenience methods. The client constructor requires the PHPIMS hostname, the public key and the private key.
+A PHP client is included with Imbo that supports all the REST methods and includes some convenience methods. The client constructor requires the Imbo hostname, the public key and the private key.
 
 ### Add an image
 
     <?php
-    require 'PHPIMS/Autoload.php';
+    require 'Imbo/Autoload.php';
 
-    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
+    $client = new Imbo\Client('http://<hostname>', '<publickey>', '<privatekey>');
 
     // Path to local image
     $path = '/path/to/image.png';
@@ -202,9 +202,9 @@ A PHP client is included with PHPIMS that supports all the REST methods and incl
 ### Get meta data
 
     <?php
-    require 'PHPIMS/Autoload.php';
+    require 'Imbo/Autoload.php';
 
-    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
+    $client = new Imbo\Client('http://<hostname>', '<publickey>', '<privatekey>');
 
     $hash = '<hash>';
     $response = $client->getMetadata($hash);
@@ -212,9 +212,9 @@ A PHP client is included with PHPIMS that supports all the REST methods and incl
 ### Delete an image
 
     <?php
-    require 'PHPIMS/Autoload.php';
+    require 'Imbo/Autoload.php';
 
-    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
+    $client = new Imbo\Client('http://<hostname>', '<publickey>', '<privatekey>');
 
     $hash = '<hash>';
     $response = $client->deleteImage($hash);
@@ -222,9 +222,9 @@ A PHP client is included with PHPIMS that supports all the REST methods and incl
 ### Delete all meta data attached to an image
 
     <?php
-    require 'PHPIMS/Autoload.php';
+    require 'Imbo/Autoload.php';
 
-    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
+    $client = new Imbo\Client('http://<hostname>', '<publickey>', '<privatekey>');
 
     $hash = '<hash>';
     $response = $client->deleteMetadata($hash);
@@ -232,24 +232,24 @@ A PHP client is included with PHPIMS that supports all the REST methods and incl
 ### Get image url
 
     <?php
-    require 'PHPIMS/Autoload.php';
+    require 'Imbo/Autoload.php';
 
-    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
+    $client = new Imbo\Client('http://<hostname>', '<publickey>', '<privatekey>');
 
     $hash = '<hash>';
     $url = $client->getImageUrl($hash);
 
-The `getImageUrl` returns an instance of `PHPIMS\Client\ImageUrl` which, when used in string context, represents an url to an image.
+The `getImageUrl` returns an instance of `Imbo\Client\ImageUrl` which, when used in string context, represents an url to an image.
 
 ### Get image url with transformations
 
     <?php
-    require 'PHPIMS/Autoload.php';
+    require 'Imbo/Autoload.php';
 
-    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
+    $client = new Imbo\Client('http://<hostname>', '<publickey>', '<privatekey>');
 
     $hash = '<hash>';
-    $chain = new PHPIMS\Image\TransformationChain();
+    $chain = new Imbo\Image\TransformationChain();
     $chain->border()->resize(200)->rotate(45);
 
     $url = $client->getImageUrl($hash, $chain);
@@ -259,7 +259,7 @@ The `getImageUrl` returns an instance of `PHPIMS\Client\ImageUrl` which, when us
     $hash = '<hash>';
     $url = $client->getImageUrl($hash);
 
-    $chain = new PHPIMS\Image\TransformationChain();
+    $chain = new Imbo\Image\TransformationChain();
     $chain->border()->resize(200)->rotate(45)->applyToImageUrl($url);
 
     // OR
@@ -267,22 +267,22 @@ The `getImageUrl` returns an instance of `PHPIMS\Client\ImageUrl` which, when us
     $hash = '<hash>';
     $url = $client->getImageUrl($hash);
 
-    $chain = new PHPIMS\Image\TransformationChain();
-    $chain->add(new PHPIMS\Image\Transformation\Border());
-          ->add(new PHPIMS\Image\Transformation\Resize(200));
-          ->add(new PHPIMS\Image\Transformation\Rotate(45))
+    $chain = new Imbo\Image\TransformationChain();
+    $chain->add(new Imbo\Image\Transformation\Border());
+          ->add(new Imbo\Image\Transformation\Resize(200));
+          ->add(new Imbo\Image\Transformation\Rotate(45))
           ->applyToImageUrl($url);
 
     // OR
 
     $hash = '<hash>';
     $url = $client->getImageUrl($hash);
-    $transformation = new PHPIMS\Image\Transformation\Border();
-    $chain = new PHPIMS\Image\TransformationChain();
+    $transformation = new Imbo\Image\Transformation\Border();
+    $chain = new Imbo\Image\TransformationChain();
     $chain->transformImageUrl($url, $$transformation);
 
 #### Image transformations
-The `PHPIMS\Image\TransformationChain` class can be used to stack image manipulations. The following transformations can be added to an instance of the `PHPIMS\Image\TransformationChain` class:
+The `Imbo\Image\TransformationChain` class can be used to stack image manipulations. The following transformations can be added to an instance of the `Imbo\Image\TransformationChain` class:
 
 * `border(string $color = null, int $width = null, int $height = null)`
 * `crop(int $x, int $y, int $width, int $height)`
@@ -294,21 +294,21 @@ The `PHPIMS\Image\TransformationChain` class can be used to stack image manipula
 
 These methods can be chained. They can also be added using the following method:
 
-* `add(PHPIMS\Image\Transformation\TransformationInterface $transformation)`
+* `add(Imbo\Image\Transformation\TransformationInterface $transformation)`
 
 The following transformations are implemented using the same parameters as above in the constructors:
 
-* `PHPIMS\Image\Transformation\Border`
-* `PHPIMS\Image\Transformation\Compress`
-* `PHPIMS\Image\Transformation\Crop`
-* `PHPIMS\Image\Transformation\FlipHorizontally`
-* `PHPIMS\Image\Transformation\FlipVertically`
-* `PHPIMS\Image\Transformation\Resize`
-* `PHPIMS\Image\Transformation\Rotate`
-* `PHPIMS\Image\Transformation\Thumbnail`
+* `Imbo\Image\Transformation\Border`
+* `Imbo\Image\Transformation\Compress`
+* `Imbo\Image\Transformation\Crop`
+* `Imbo\Image\Transformation\FlipHorizontally`
+* `Imbo\Image\Transformation\FlipVertically`
+* `Imbo\Image\Transformation\Resize`
+* `Imbo\Image\Transformation\Rotate`
+* `Imbo\Image\Transformation\Thumbnail`
 
 ### Client response object
-All client methods returns an instance of `PHPIMS\Client\Response` (with the exception of `getImageUrl` which returns an instance of `PHPIMS\Client\ImageUrl`). In this instance you will find information on the request that was made.
+All client methods returns an instance of `Imbo\Client\Response` (with the exception of `getImageUrl` which returns an instance of `Imbo\Client\ImageUrl`). In this instance you will find information on the request that was made.
 
 The response instance includes all response headers and the body, and has the following methods:
 
@@ -319,10 +319,10 @@ The response instance includes all response headers and the body, and has the fo
 * `int getStatusCode(void)` Get the status code
 
 ## Configuration
-When installing PHPIMS you need to copy the config/server.php.dist file to config/server.php and change the values to suit your needs.
+When installing Imbo you need to copy the config/server.php.dist file to config/server.php and change the values to suit your needs.
 
 ### Authentication key pairs
-PHPIMS supports several key pairs so several users can store images on your installation of PHPIMS. To achieve this simply specify several key pairs in the 'auth' element:
+Imbo supports several key pairs so several users can store images on your installation of Imbo. To achieve this simply specify several key pairs in the 'auth' element:
 
     'auth' => array(
         '<publicKey1> => <privateKey1>,
@@ -335,35 +335,35 @@ PHPIMS supports several key pairs so several users can store images on your inst
 The database and storage drivers use the 'database' and 'storage' elements in the configuration array respectively. The default looks like this:
 
     // Database driver
-    'database' => new PHPIMS\Database\MongoDB(array(
-        'database'   => 'phpims',
+    'database' => new Imbo\Database\MongoDB(array(
+        'database'   => 'imbo',
         'collection' => 'images',
     )),
 
     // Storage driver
-    'storage' => new PHPIMS\Storage\Filesystem(array(
+    'storage' => new Imbo\Storage\Filesystem(array(
         'dataDir' => realpath('/some/path'),
     )),
 
-which makes PHPIMS use MongoDB as database and the local filesystem for storage. You can implement your own drivers and use them here. Remember to implement `PHPIMS\Database\DatabaseInterface` and `PHPIMS\Storage\StorageInterface` for database drivers and storage drivers respectively.
+which makes Imbo use MongoDB as database and the local filesystem for storage. You can implement your own drivers and use them here. Remember to implement `Imbo\Database\DatabaseInterface` and `Imbo\Storage\StorageInterface` for database drivers and storage drivers respectively.
 
 ## Developer/Contributer notes
-Here you will find some notes about how PHPIMS works internally along with information on what is needed to develop PHPIMS.
+Here you will find some notes about how Imbo works internally along with information on what is needed to develop Imbo.
 
-* [Jenkins job](http://ci.starzinger.net/job/PHPIMS/)
-* [API Documentation](http://ci.starzinger.net/job/PHPIMS/API_Documentation/)
-* [Code Coverage](http://ci.starzinger.net/job/PHPIMS/Code_Coverage/)
-* [Code Browser](http://ci.starzinger.net/job/PHPIMS/Code_Browser/)
+* [Jenkins job](http://ci.starzinger.net/job/Imbo/)
+* [API Documentation](http://ci.starzinger.net/job/Imbo/API_Documentation/)
+* [Code Coverage](http://ci.starzinger.net/job/Imbo/Code_Coverage/)
+* [Code Browser](http://ci.starzinger.net/job/Imbo/Code_Browser/)
 
 Developers who want to contribute will need to do one or more of the following steps:
 
-### Fork PHPIMS and checkout your fork
+### Fork Imbo and checkout your fork
 Click on the fork button on github and clone your fork:
 
-    git clone git@github.com:<username>/phpims.git
+    git clone git@github.com:<username>/imbo.git
 
 ### Software needed
-To fully develop PHPIMS (as in run the complete build process, which most likely you will never do) you will need to have the following software installed:
+To fully develop Imbo (as in run the complete build process, which most likely you will never do) you will need to have the following software installed:
 
 * [PHPUnit](http://phpunit.de/)
 * [Autoload (phpab)](https://github.com/theseer/Autoload)
@@ -406,22 +406,22 @@ It's worth noting that you don't need all of the above software to just do a qui
 If you send me a pull request I would appreciate it if you include tests for all new code as well and make sure that the test suite passes.
 
 ### Front controller
-The `PHPIMS\FrontController` class is responsible for validating the request, and picking the correct resource class for the request. It will create an instance of the resource, execute plugins and the resource logic and then return the response.
+The `Imbo\FrontController` class is responsible for validating the request, and picking the correct resource class for the request. It will create an instance of the resource, execute plugins and the resource logic and then return the response.
 
 ### Resources
-There are three available resources in PHPIMS. `PHPIMS\Resource\Image`, `PHPIMS\Resource\Images` and `PHPIMS\Resource\Metadata`.
+There are three available resources in Imbo. `Imbo\Resource\Image`, `Imbo\Resource\Images` and `Imbo\Resource\Metadata`.
 
-#### PHPIMS\Resource\Image
+#### Imbo\Resource\Image
 This resource delivers the image data.
 
-#### PHPIMS\Resource\Images
-This resource can be used to query PHPIMS for stored images.
+#### Imbo\Resource\Images
+This resource can be used to query Imbo for stored images.
 
-#### PHPIMS\Resource\Metadata
+#### Imbo\Resource\Metadata
 This resource delivers the metadata associated with an image.
 
 ### Storage drivers
-PHPIMS supports plugable storage drivers. All storage drivers must implement the `PHPIMS\Storage\StorageInterface` interface.
+Imbo supports plugable storage drivers. All storage drivers must implement the `Imbo\Storage\StorageInterface` interface.
 
 ### Database drivers
-PHPIMS supports plugable database drivers. All database drivers must implement the `PHPIMS\Database\DatabaseInterface` interface.
+Imbo supports plugable database drivers. All database drivers must implement the `Imbo\Database\DatabaseInterface` interface.

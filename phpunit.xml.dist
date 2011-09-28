@@ -2,8 +2,8 @@
 <phpunit colors="true"
   bootstrap="tests/bootstrap.php">
   <testsuites>
-    <testsuite name="PHPIMS test suite">
-      <directory>tests/PHPIMS</directory>
+    <testsuite name="Imbo test suite">
+      <directory>tests/Imbo</directory>
     </testsuite>
   </testsuites>
 
@@ -12,12 +12,12 @@
   </listeners>
 
   <php>
-    <const name="PHPIMS_ENABLE_CLIENT_TESTS" value="false" />
-    <const name="PHPIMS_CLIENT_TESTS_URL" value="" />
+    <const name="IMBO_ENABLE_CLIENT_TESTS" value="false" />
+    <const name="IMBO_CLIENT_TESTS_URL" value="" />
   </php>
 
   <logging>
-    <log type="coverage-html" target="build/coverage" title="Code coverage for PHPIMS"
+    <log type="coverage-html" target="build/coverage" title="Code coverage for Imbo"
       charset="UTF-8" yui="true" highlight="true" />
     <log type="coverage-clover" target="build/logs/clover.xml" />
     <log type="junit" target="build/logs/junit.xml" logIncompleteSkipped="false" />
@@ -25,7 +25,7 @@
 
   <filter>
     <whitelist addUncoveredFilesFromWhitelist="true">
-      <directory suffix=".php">library/PHPIMS</directory>
+      <directory suffix=".php">library/Imbo</directory>
     </whitelist>
   </filter>
 </phpunit>

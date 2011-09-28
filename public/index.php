@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPIMS
+ * Imbo
  *
  * Copyright (c) 2011 Christer Edvartsen <cogo@starzinger.net>
  *
@@ -22,37 +22,37 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package PHPIMS
+ * @package Imbo
  * @subpackage Server
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/phpims
+ * @link https://github.com/christeredvartsen/imbo
  */
 
 set_include_path(__DIR__ . '/../library' . PATH_SEPARATOR . get_include_path());
 
-/** @see PHPIMS\Autoload */
-require_once 'PHPIMS/Autoload.php';
+/** @see Imbo\Autoload */
+require_once 'Imbo/Autoload.php';
 
-$loader = new PHPIMS\Autoload();
+$loader = new Imbo\Autoload();
 $loader->register();
 
 // Initialize request and response
-$request = new PHPIMS\Http\Request\Request($_GET, $_POST, $_SERVER);
-$responseWriter = new PHPIMS\Http\Response\ResponseWriter($request);
-$response = new PHPIMS\Http\Response\Response($responseWriter);
+$request = new Imbo\Http\Request\Request($_GET, $_POST, $_SERVER);
+$responseWriter = new Imbo\Http\Response\ResponseWriter($request);
+$response = new Imbo\Http\Response\Response($responseWriter);
 
 try {
     // Load configuration
     $config = require __DIR__ . '/../config/server.php';
 
     // Create the front controller
-    $frontController = new PHPIMS\FrontController($config);
+    $frontController = new Imbo\FrontController($config);
 
     // Handle the current request
     $frontController->handle($request, $response);
-} catch (PHPIMS\Exception $e) {
+} catch (Imbo\Exception $e) {
     $response->setError($e->getCode(), $e->getMessage());
 }
 

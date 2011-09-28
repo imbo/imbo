@@ -1,7 +1,0 @@
-<VirtualHost *:80>
-    ServerName hostname
-    DocumentRoot /path/to/document/root
-    
-    CustomLog /path/to/logs/phpims.access_log combined
-    ErrorLog /path/to/logs/phpims.error_log
-</VirtualHost>

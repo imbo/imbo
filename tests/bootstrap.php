@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPIMS
+ * Imbo
  *
  * Copyright (c) 2011 Christer Edvartsen <cogo@starzinger.net>
  *
@@ -22,27 +22,27 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package PHPIMS
+ * @package Imbo
  * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/phpims
+ * @link https://github.com/christeredvartsen/imbo
  */
 
 /**
- * @package PHPIMS
+ * @package Imbo
  * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/phpims
+ * @link https://github.com/christeredvartsen/imbo
  */
 
-/** @see PHPIMS\Autoload */
-require __DIR__ . '/../library/PHPIMS/Autoload.php';
+/** @see Imbo\Autoload */
+require __DIR__ . '/../library/Imbo/Autoload.php';
 
-$loader = new PHPIMS\Autoload();
+$loader = new Imbo\Autoload();
 $loader->register();
 
 set_include_path(

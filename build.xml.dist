@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="phpims" default="build" basedir=".">
-  <property name="source" value="${basedir}/library/PHPIMS"/>
+<project name="Imbo" default="build" basedir=".">
+  <property name="source" value="${basedir}/library/Imbo"/>
   <property name="build" value="${basedir}/build"/>
 
   <!-- Override this value using the -Dclient_tests_url=/some/path when running ant -->
-  <property name="client_tests_path" value="/var/www/phpims/driver.php"/>
+  <property name="client_tests_path" value="/var/www/imbo/driver.php"/>
 
   <target name="clean" description="Clean up and create artifact directories">
     <delete dir="${build}"/>
@@ -15,7 +15,7 @@
     <mkdir dir="${build}/code-browser"/>
     <mkdir dir="${build}/pdepend"/>
 
-    <copy file="${basedir}/tests/PHPIMS/Client/Driver/_files/driver.php" tofile="${client_tests_path}" overwrite="true"/>
+    <copy file="${basedir}/tests/Imbo/Client/Driver/_files/driver.php" tofile="${client_tests_path}" overwrite="true"/>
   </target>
 
   <target name="phpab" description="Update autoloader using phpab">
@@ -40,7 +40,7 @@
 
   <target name="phpcs" description="Generate checkstyle.xml using PHP_CodeSniffer">
     <exec executable="phpcs" output="/dev/null">
-      <arg line="--report=checkstyle --report-file=${build}/logs/checkstyle.xml --standard=PHPIMS ${source}"/>
+      <arg line="--report=checkstyle --report-file=${build}/logs/checkstyle.xml --standard=Imbo ${source}"/>
     </exec>
   </target>
 
