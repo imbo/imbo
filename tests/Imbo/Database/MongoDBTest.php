@@ -32,8 +32,6 @@
 
 namespace Imbo\Database;
 
-use Mockery as m;
-
 /**
  * @package Imbo
  * @subpackage Unittests
@@ -91,7 +89,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             );
         }
 
-        $this->collection = m::mock('MongoCollection');
+        $this->collection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
         $this->driver = new MongoDB($this->driverParams, $this->collection);
     }
 
@@ -113,13 +111,10 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             'imageIdentifier' => $this->imageIdentifier,
         );
 
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
-              ->once();
+        $this->collection->expects($this->once())->method('findOne')->will($this->returnValue($data));
 
-        $response = m::mock('Imbo\Http\Response\ResponseInterface');
-
-        $this->collection->shouldReceive('findOne')->once()->andReturn($data);
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
 
         $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $image, $response);
     }
@@ -130,13 +125,10 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unable to save image data
      */
     public function testInsertImageWhenCollectionThrowsException() {
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
-              ->once();
+        $this->collection->expects($this->once())->method('findOne')->will($this->throwException(new \MongoException()));
 
-        $response = m::mock('Imbo\Http\Response\ResponseInterface');
-
-        $this->collection->shouldReceive('findOne')->once()->andThrow('MongoException');
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
 
         $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $image, $response);
     }
@@ -147,14 +139,11 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             'imageIdentifier' => $this->imageIdentifier,
         );
 
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $image->shouldReceive('getFilename', 'getFilesize', 'getMimeType', 'getWidth', 'getHeight')
-              ->once();
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
 
-        $response = m::mock('Imbo\Http\Response\ResponseInterface');
-
-        $this->collection->shouldReceive('findOne')->once()->with($data)->andReturn(array());
-        $this->collection->shouldReceive('insert')->once()->with(m::type('array'), m::type('array'))->andReturn(true);
+        $this->collection->expects($this->once())->method('findOne')->with($data)->will($this->returnValue(array()));
+        $this->collection->expects($this->once())->method('insert')->with($this->isType('array'), $this->isType('array'))->will($this->returnValue(true));
 
         $result = $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $image, $response);
         $this->assertTrue($result);
@@ -166,19 +155,23 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unable to delete image data
      */
     public function testDeleteImageWhenCollectionThrowsAnException() {
-        $this->collection->shouldReceive('remove')->once()->with(
-            array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
-            m::type('array')
-        )->andThrow('MongoException');
+        $this->collection->expects($this->once())
+                         ->method('remove')
+                         ->with(
+                             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
+                             $this->isType('array'))
+                         ->will($this->throwException(new \MongoException()));
 
         $this->driver->deleteImage($this->publicKey, $this->imageIdentifier);
     }
 
     public function testSucessfullDeleteImage() {
-        $this->collection->shouldReceive('remove')->once()->with(
-            array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
-            m::type('array')
-        )->andReturn(true);
+        $this->collection->expects($this->once())
+                         ->method('remove')
+                         ->with(
+                             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
+                             $this->isType('array'))
+                         ->will($this->returnValue(true));
 
         $result = $this->driver->deleteImage($this->publicKey, $this->imageIdentifier);
 
@@ -198,12 +191,14 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             ),
         );
 
-        $this->collection->shouldReceive('findOne')->once()->andReturn(array());
-        $this->collection->shouldReceive('update')->once()->with(
-            array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
-            m::type('array'),
-            m::type('array')
-        )->andThrow('MongoException');
+        $this->collection->expects($this->once())->method('findOne')->will($this->returnValue(array()));
+        $this->collection->expects($this->once())
+                         ->method('update')
+                         ->with(
+                             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
+                             $this->isType('array'),
+                             $this->isType('array'))
+                         ->will($this->throwException(new \MongoException()));
 
         $this->driver->updateMetadata($this->publicKey, $this->imageIdentifier, $metadata);
     }
@@ -216,12 +211,14 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             ),
         );
 
-        $this->collection->shouldReceive('findOne')->once()->andReturn(array());
-        $this->collection->shouldReceive('update')->once()->with(
-            array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
-            m::type('array'),
-            m::type('array')
-        )->andReturn(true);
+        $this->collection->expects($this->once())->method('findOne')->will($this->returnValue(array()));
+        $this->collection->expects($this->once())
+                         ->method('update')
+                         ->with(
+                             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
+                             $this->isType('array'),
+                             $this->isType('array'))
+                         ->will($this->returnValue(true));
 
         $result = $this->driver->updateMetadata($this->publicKey, $this->imageIdentifier, $metadata);
 
@@ -234,9 +231,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unable to fetch image metadata
      */
     public function testGetMetadataWhenCollectionThrowsAnException() {
-        $this->collection->shouldReceive('findOne')->once()->with(
+        $this->collection->expects($this->once())->method('findOne')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier)
-        )->andThrow('MongoException');
+        )->will($this->throwException(new \MongoException()));
 
         $this->driver->getMetadata($this->publicKey, $this->imageIdentifier);
     }
@@ -250,9 +247,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         );
         $data = array('metadata' => $metadata);
 
-        $this->collection->shouldReceive('findOne')->once()->with(
+        $this->collection->expects($this->once())->method('findOne')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier)
-        )->andReturn($data);
+        )->will($this->returnValue($data));
 
         $result = $this->driver->getMetadata($this->publicKey, $this->imageIdentifier);
 
@@ -265,20 +262,20 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unable to remove metadata
      */
     public function testDeleteMetadataWhenCollectionThrowsAnException() {
-        $this->collection->shouldReceive('update')->once()->with(
+        $this->collection->expects($this->once())->method('update')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             array('$set' => array('metadata' => array())),
-            m::type('array')
-        )->andThrow('MongoException');
+            $this->isType('array')
+        )->will($this->throwException(new \MongoException()));
 
         $this->driver->deleteMetadata($this->publicKey, $this->imageIdentifier);
     }
 
     public function testSucessfullDeleteMetadata() {
-        $this->collection->shouldReceive('update')->once()->with(
+        $this->collection->expects($this->once())->method('update')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             array('$set' => array('metadata' => array())),
-            m::type('array')
+            $this->isType('array')
         );
 
         $result = $this->driver->deleteMetadata($this->publicKey, $this->imageIdentifier);
@@ -287,27 +284,27 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetImages() {
-        $query = m::mock('Imbo\Resource\Images\Query');
-        $query->shouldReceive('from')->once()->andReturn(123123123);
-        $query->shouldReceive('to')->once()->andReturn(234234234);
-        $query->shouldReceive('query')->once()->andReturn(array('category' => 'some category'));
-        $query->shouldReceive('returnMetadata')->once()->andReturn(true);
-        $query->shouldReceive('num')->times(2)->andReturn(30);
-        $query->shouldReceive('page')->once()->andReturn(2);
+        $query = $this->getMock('Imbo\Resource\Images\Query');
+        $query->expects($this->once())->method('from')->will($this->returnValue(123123123));
+        $query->expects($this->once())->method('to')->will($this->returnValue(234234234));
+        $query->expects($this->once())->method('query')->will($this->returnValue(array('category' => 'some category')));
+        $query->expects($this->once())->method('returnMetadata')->will($this->returnValue(true));
+        $query->expects($this->exactly(2))->method('num')->will($this->returnValue(30));
+        $query->expects($this->once())->method('page')->will($this->returnValue(2));
 
-        $cursor = m::mock('MongoCursor');
-        $cursor->shouldReceive('limit')->once()->with(30)->andReturn($cursor);
-        $cursor->shouldReceive('sort')->once()->with(m::type('array'))->andReturn($cursor);
-        $cursor->shouldReceive('skip')->once()->with(30)->andReturn($cursor);
-        $cursor->shouldReceive('rewind')->once();
-        $cursor->shouldReceive('valid')->times(2)->andReturn(true, false);
+        $cursor = $this->getMockBuilder('MongoCursor')->disableOriginalConstructor()->getMock();
+        $cursor->expects($this->once())->method('limit')->with(30)->will($this->returnValue($cursor));
+        $cursor->expects($this->once())->method('sort')->with($this->isType('array'))->will($this->returnValue($cursor));
+        $cursor->expects($this->once())->method('skip')->with(30)->will($this->returnValue($cursor));
+        $cursor->expects($this->once())->method('rewind');
+        $cursor->expects($this->exactly(2))->method('valid')->will($this->onConsecutiveCalls(true, false));
 
         $image = array('foo' => 'bar');
 
-        $cursor->shouldReceive('current')->once()->andReturn($image);
-        $cursor->shouldReceive('next')->once();
+        $cursor->expects($this->once())->method('current')->will($this->returnValue($image));
+        $cursor->expects($this->once())->methoD('next');
 
-        $this->collection->shouldReceive('find')->once()->with(m::type('array'), m::type('array'))->andReturn($cursor);
+        $this->collection->expects($this->once())->method('find')->with($this->isType('array'), $this->isType('array'))->will($this->returnValue($cursor));
 
         $result = $this->driver->getImages($this->publicKey, $query);
 
@@ -321,13 +318,13 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unable to search for images
      */
     public function testGetImagesWhenCollectionThrowsException() {
-        $query = m::mock('Imbo\Resource\Images\Query');
-        $query->shouldReceive('from')->once();
-        $query->shouldReceive('to')->once();
-        $query->shouldReceive('query')->once();
-        $query->shouldReceive('returnMetadata')->once();
+        $query = $this->getMock('Imbo\Resource\Images\Query');
 
-        $this->collection->shouldReceive('find')->once()->with(m::type('array'), m::type('array'))->andThrow('MongoException');
+        foreach (array('from', 'to', 'query', 'returnMetadata') as $method) {
+            $query->expects($this->once())->method($method);
+        }
+
+        $this->collection->expects($this->once())->method('find')->with($this->isType('array'), $this->isType('array'))->will($this->throwException(new \MongoException()));
 
         $this->driver->getImages($this->publicKey, $query);
     }
@@ -338,12 +335,12 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unable to fetch image data
      */
     public function testLoadWhenCollectionThrowsException() {
-        $this->collection->shouldReceive('findOne')->once()->with(
+        $this->collection->expects($this->once())->method('findOne')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
-            m::type('array')
-        )->andThrow('MongoException');
+            $this->isType('array')
+        )->will($this->throwException(new \MongoException()));
 
-        $this->driver->load($this->publicKey, $this->imageIdentifier, m::mock('Imbo\Image\ImageInterface'));
+        $this->driver->load($this->publicKey, $this->imageIdentifier, $this->getMock('Imbo\Image\ImageInterface'));
     }
 
     public function testSucessfullLoad() {
@@ -355,16 +352,15 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             'mime' => 'image/jpg',
         );
 
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $image->shouldReceive('setFilesize')->once()->with($data['size'])->andReturn($image);
-        $image->shouldReceive('setWidth')->once()->with($data['width'])->andReturn($image);
-        $image->shouldReceive('setHeight')->once()->with($data['height'])->andReturn($image);
-        $image->shouldReceive('setMimeType')->once()->with($data['mime'])->andReturn($image);
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('setWidth')->with($data['width'])  ->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with($data['height'])->will($this->returnValue($image));
+        $image->expects($this->once())->method('setMimeType')->with($data['mime'])->will($this->returnValue($image));
 
-        $this->collection->shouldReceive('findOne')->once()->with(
+        $this->collection->expects($this->once())->method('findOne')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
-            m::type('array')
-        )->andReturn($data);
+            $this->isType('array')
+        )->will($this->returnValue($data));
 
         $this->assertTrue($this->driver->load($this->publicKey, $this->imageIdentifier, $image));
     }
