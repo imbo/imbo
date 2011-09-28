@@ -108,6 +108,7 @@ class MongoDB implements DatabaseInterface {
             'updated'         => $now,
             'width'           => $image->getWidth(),
             'height'          => $image->getHeight(),
+            'checksum'        => md5($image->getBlob()),
         );
 
         try {
@@ -229,7 +230,7 @@ class MongoDB implements DatabaseInterface {
         }
 
         // Fields to fetch
-        $fields = array('added', 'publicKey', 'imageIdentifier', 'mime', 'name', 'size', 'width', 'height');
+        $fields = array('added', 'checksum', 'updated', 'publicKey', 'imageIdentifier', 'mime', 'name', 'size', 'width', 'height');
 
         if ($query->returnMetadata()) {
             $fields[] = 'metadata';
