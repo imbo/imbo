@@ -94,7 +94,8 @@ class Autoload {
         'imbo\\resource\\resourceinterface' => '/Resource/ResourceInterface.php',
         'imbo\\storage\\exception' => '/Storage/Exception.php',
         'imbo\\storage\\filesystem' => '/Storage/Filesystem.php',
-        'imbo\\storage\\storageinterface' => '/Storage/StorageInterface.php'
+        'imbo\\storage\\storageinterface' => '/Storage/StorageInterface.php',
+        'imbo\\version' => '/Version.php'
     );
 
     /**

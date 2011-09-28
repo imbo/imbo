@@ -23,39 +23,41 @@
  * IN THE SOFTWARE.
  *
  * @package Imbo
- * @subpackage Server
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
 
-set_include_path(__DIR__ . '/../library' . PATH_SEPARATOR . get_include_path());
+namespace Imbo;
 
-/** @see Imbo\Autoload */
-require_once 'Imbo/Autoload.php';
+/**
+ * Version class
+ *
+ * @package Imbo
+ * @author Christer Edvartsen <cogo@starzinger.net>
+ * @copyright Copyright (c) 2011, Christer Edvartsen
+ * @license http://www.opensource.org/licenses/mit-license MIT License
+ * @link https://github.com/christeredvartsen/imbo
+ */
+class Version {
+    /**
+     * The current version
+     *
+     * @var string
+     */
+    static private $id = '@package_version@';
 
-$loader = new Imbo\Autoload();
-$loader->register();
+    /**
+     * Get the version number only
+     *
+     * @return string
+     */
+    static public function getVersionNumber() {
+        if (strpos(self::$id, '@package_version') === 0) {
+            return 'dev';
+        }
 
-// Initialize request and response
-$request = new Imbo\Http\Request\Request($_GET, $_POST, $_SERVER);
-$responseWriter = new Imbo\Http\Response\ResponseWriter($request);
-$response = new Imbo\Http\Response\Response($responseWriter);
-$response->getHeaders()->set('X-Imbo-Version', Imbo\Version::getVersionNumber());
-
-try {
-    // Load configuration
-    $config = require __DIR__ . '/../config/server.php';
-
-    // Create the front controller
-    $frontController = new Imbo\FrontController($config);
-
-    // Handle the current request
-    $frontController->handle($request, $response);
-} catch (Imbo\Exception $e) {
-    $response->setError($e->getCode(), $e->getMessage());
+        return self::$id;
+    }
 }
-
-// Send the response to the client
-$response->send($request);
