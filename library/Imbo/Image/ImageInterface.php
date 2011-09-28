@@ -91,7 +91,7 @@ interface ImageInterface {
     /**
      * Set the blob
      *
-     * This method should update the size property of the image (returned by getSize()).
+     * This method should update the size property of the image (returned by getFileSize()).
      *
      * @param string $blob The binary data to set
      * @return Imbo\Image\ImageInterface
