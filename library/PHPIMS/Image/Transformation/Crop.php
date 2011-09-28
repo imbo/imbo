@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\ImageInterface;
 
 use Imagine\Exception\Exception as ImagineException;
@@ -112,19 +111,5 @@ class Crop extends Transformation implements TransformationInterface {
         } catch (ImagineException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
-    }
-
-    /**
-     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImageUrl()
-     */
-    public function applyToImageUrl(ImageUrl $url) {
-        $params = array(
-            'x=' . $this->x,
-            'y=' . $this->y,
-            'width=' . $this->width,
-            'height=' . $this->height,
-        );
-
-        $url->append('crop:' . implode(',', $params));
     }
 }

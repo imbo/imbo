@@ -59,14 +59,4 @@ class BorderTest extends TransformationTests {
         $transformation = new Border();
         $transformation->applyToImage($image);
     }
-
-    public function testApplyToImageUrl() {
-        $url = m::mock('PHPIMS\Client\ImageUrl');
-        $url->shouldReceive('append')->with(m::on(function ($string) {
-            return (preg_match('/^border:/', $string) && strstr($string, 'color=fed') &&
-                    strstr($string, 'width=1') && strstr($string, 'height=2'));
-        }))->once();
-        $transformation = new Border('fed', 1, 2);
-        $transformation->applyToImageUrl($url);
-    }
 }

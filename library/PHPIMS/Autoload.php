@@ -23,7 +23,6 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage Client
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -49,13 +48,6 @@ class Autoload {
      */
     static public $classes = array(
         'phpims\\autoload' => '/Autoload.php',
-        'phpims\\client' => '/Client.php',
-        'phpims\\client\\driver\\curl' => '/Client/Driver/Curl.php',
-        'phpims\\client\\driver\\driverinterface' => '/Client/Driver/DriverInterface.php',
-        'phpims\\client\\driver\\exception' => '/Client/Driver/Exception.php',
-        'phpims\\client\\exception' => '/Client/Exception.php',
-        'phpims\\client\\imageurl' => '/Client/ImageUrl.php',
-        'phpims\\client\\response' => '/Client/Response.php',
         'phpims\\database\\databaseinterface' => '/Database/DatabaseInterface.php',
         'phpims\\database\\exception' => '/Database/Exception.php',
         'phpims\\database\\mongodb' => '/Database/MongoDB.php',

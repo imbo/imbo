@@ -32,7 +32,6 @@
 
 namespace PHPIMS\Image\Transformation;
 
-use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\ImageInterface;
 
 use Imagine\Exception\Exception as ImagineException;
@@ -105,22 +104,5 @@ class Resize extends Transformation implements TransformationInterface {
         } catch (ImagineException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
-    }
-
-    /**
-     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImageUrl()
-     */
-    public function applyToImageUrl(ImageUrl $url) {
-        $params = array();
-
-        if ($this->width !== null) {
-            $params[] = 'width=' . $this->width;
-        }
-
-        if ($this->height !== null) {
-            $params[] = 'height=' . $this->height;
-        }
-
-        $url->append('resize:' . implode(',', $params));
     }
 }

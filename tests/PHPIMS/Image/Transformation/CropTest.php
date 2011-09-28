@@ -63,14 +63,4 @@ class CropTest extends TransformationTests {
         $transformation = new Crop($x, $y, $width, $height);
         $transformation->applyToImage($image);
     }
-
-    public function testApplyToImageUrl() {
-        $url = m::mock('PHPIMS\Client\ImageUrl');
-        $url->shouldReceive('append')->with(m::on(function ($string) {
-            return (preg_match('/^crop:/', $string) && strstr($string, 'x=1') && strstr($string, 'y=2') &&
-                    strstr($string, 'width=3') && strstr($string, 'height=4'));
-        }))->once();
-        $transformation = new Crop(1, 2, 3, 4);
-        $transformation->applyToImageUrl($url);
-    }
 }
