@@ -34,6 +34,7 @@ namespace PHPIMS\Image;
 
 use PHPIMS\Image\Transformation;
 use PHPIMS\Image\Transformation\TransformationInterface;
+use PHPIMS\Client\ImageUrl;
 
 /**
  * Transformation collection
@@ -52,6 +53,33 @@ class TransformationChain {
      * @var array
      */
     private $transformations = array();
+
+    /**
+     * Apply all transformations to an image url object
+     *
+     * @param PHPIMS\Client\ImageUrl $url Instance of the image url
+     * @return PHPIMS\Image\TransformationChain
+     */
+    public function applyToImageUrl(ImageUrl $url) {
+        foreach ($this->transformations as $transformation) {
+            $this->transformImageUrl($url, $transformation);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Transform an image url
+     *
+     * @param PHPIMS\Client\ImageUrl $url Image url object
+     * @param PHPIMS\Image\Transformation\TransformationInterface $transformation Transformation object
+     * @return PHPIMS\Image\TransformationChain
+     */
+    public function transformImageUrl(ImageUrl $url, TransformationInterface $transformation) {
+        $transformation->applyToImageUrl($url);
+
+        return $this;
+    }
 
     /**
      * Apply all transformations to an image object

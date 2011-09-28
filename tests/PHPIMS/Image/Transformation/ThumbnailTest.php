@@ -62,4 +62,14 @@ class ThumbnailTest extends TransformationTests {
         $transformation = new Thumbnail($width, $height, $fit);
         $transformation->applyToImage($image);
     }
+
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\Client\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return (preg_match('/^thumbnail:/', $string) && strstr($string, 'width=100') &&
+                    strstr($string, 'height=200') && strstr($string, 'fit=inset'));
+        }))->once();
+        $transformation = new Thumbnail(100, 200, 'inset');
+        $transformation->applyToImageUrl($url);
+    }
 }

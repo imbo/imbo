@@ -175,6 +175,149 @@ Example:
 
 * `t[]=compress:quality=40`
 
+## Extra response headers
+PHPIMS will usually inject extra response headers to the different requests. All response headers from PHPIMS will be prefixed with **X-PHPIMS-**.
+
+## PHP client
+A PHP client is included with PHPIMS that supports all the REST methods and includes some convenience methods. The client constructor requires the PHPIMS hostname, the public key and the private key.
+
+### Add an image
+
+    <?php
+    require 'PHPIMS/Autoload.php';
+
+    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
+
+    // Path to local image
+    $path = '/path/to/image.png';
+
+    // Add some meta data to the image
+    $metadata = array(
+        'foo' => 'bar',
+        'bar' => 'foo',
+    );
+
+    $response = $client->addImage($path, $metadata);
+
+### Get meta data
+
+    <?php
+    require 'PHPIMS/Autoload.php';
+
+    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
+
+    $hash = '<hash>';
+    $response = $client->getMetadata($hash);
+
+### Delete an image
+
+    <?php
+    require 'PHPIMS/Autoload.php';
+
+    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
+
+    $hash = '<hash>';
+    $response = $client->deleteImage($hash);
+
+### Delete all meta data attached to an image
+
+    <?php
+    require 'PHPIMS/Autoload.php';
+
+    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
+
+    $hash = '<hash>';
+    $response = $client->deleteMetadata($hash);
+
+### Get image url
+
+    <?php
+    require 'PHPIMS/Autoload.php';
+
+    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
+
+    $hash = '<hash>';
+    $url = $client->getImageUrl($hash);
+
+The `getImageUrl` returns an instance of `PHPIMS\Client\ImageUrl` which, when used in string context, represents an url to an image.
+
+### Get image url with transformations
+
+    <?php
+    require 'PHPIMS/Autoload.php';
+
+    $client = new PHPIMS\Client('http://<hostname>', '<publickey>', '<privatekey>');
+
+    $hash = '<hash>';
+    $chain = new PHPIMS\Image\TransformationChain();
+    $chain->border()->resize(200)->rotate(45);
+
+    $url = $client->getImageUrl($hash, $chain);
+
+    // OR
+
+    $hash = '<hash>';
+    $url = $client->getImageUrl($hash);
+
+    $chain = new PHPIMS\Image\TransformationChain();
+    $chain->border()->resize(200)->rotate(45)->applyToImageUrl($url);
+
+    // OR
+
+    $hash = '<hash>';
+    $url = $client->getImageUrl($hash);
+
+    $chain = new PHPIMS\Image\TransformationChain();
+    $chain->add(new PHPIMS\Image\Transformation\Border());
+          ->add(new PHPIMS\Image\Transformation\Resize(200));
+          ->add(new PHPIMS\Image\Transformation\Rotate(45))
+          ->applyToImageUrl($url);
+
+    // OR
+
+    $hash = '<hash>';
+    $url = $client->getImageUrl($hash);
+    $transformation = new PHPIMS\Image\Transformation\Border();
+    $chain = new PHPIMS\Image\TransformationChain();
+    $chain->transformImageUrl($url, $$transformation);
+
+#### Image transformations
+The `PHPIMS\Image\TransformationChain` class can be used to stack image manipulations. The following transformations can be added to an instance of the `PHPIMS\Image\TransformationChain` class:
+
+* `border(string $color = null, int $width = null, int $height = null)`
+* `crop(int $x, int $y, int $width, int $height)`
+* `rotate(int $angle, string $bg = null)`
+* `resize(int $width = null, int $height = null)`
+* `thumbnail($width = null, $height = null, $fit = null)`
+* `flipHorizontally()`
+* `flipVertically()`
+
+These methods can be chained. They can also be added using the following method:
+
+* `add(PHPIMS\Image\Transformation\TransformationInterface $transformation)`
+
+The following transformations are implemented using the same parameters as above in the constructors:
+
+* `PHPIMS\Image\Transformation\Border`
+* `PHPIMS\Image\Transformation\Compress`
+* `PHPIMS\Image\Transformation\Crop`
+* `PHPIMS\Image\Transformation\FlipHorizontally`
+* `PHPIMS\Image\Transformation\FlipVertically`
+* `PHPIMS\Image\Transformation\Resize`
+* `PHPIMS\Image\Transformation\Rotate`
+* `PHPIMS\Image\Transformation\Thumbnail`
+
+### Client response object
+All client methods returns an instance of `PHPIMS\Client\Response` (with the exception of `getImageUrl` which returns an instance of `PHPIMS\Client\ImageUrl`). In this instance you will find information on the request that was made.
+
+The response instance includes all response headers and the body, and has the following methods:
+
+* `array getHeaders(void)` Get all response headers
+* `array asArray(void)` Get the body as a native PHP array instead of a JSON-encoded string
+* `stdClass asObject(void)` Get the body as an instance of stdClass instead of a JSON-encoded string
+* `boolean isSuccess(void)` Wether or not the response was a success (true if the HTTP status code is in the 2xx range)
+* `int getStatusCode(void)` Get the status code
+
 ## Configuration
 When installing PHPIMS you need to copy the config/server.php.dist file to config/server.php and change the values to suit your needs.
 

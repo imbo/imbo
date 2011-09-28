@@ -23,51 +23,77 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Client
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Image\Transformation;
+namespace PHPIMS\Client;
 
-use PHPIMS\Client\ImageUrl;
-use PHPIMS\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
+use PHPIMS\Image\TransformationChain;
 
 /**
- * Flip horizontally transformation
+ * URL to an image
  *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Client
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class FlipHorizontally extends Transformation implements TransformationInterface {
+class ImageUrl {
     /**
-     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImage()
+     * Baseurl to the PHPIMS service
+     *
+     * @var string
      */
-    public function applyToImage(ImageInterface $image) {
-        try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
+    private $baseUrl;
 
-            $imagineImage->flipHorizontally();
+    /**
+     * Query data
+     *
+     * @var array
+     */
+    private $data;
 
-            $image->setBlob($imagineImage->get($image->getExtension()));
-        } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
-        }
+    /**
+     * Class constructor
+     *
+     * @param string $baseUrl The url to an image (including public key)
+     */
+    public function __construct($baseUrl) {
+        $this->baseUrl = rtrim($baseUrl, '/');
     }
 
     /**
-     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImageUrl()
+     * Append something to the url
+     *
+     * @param string $part The part to append
+     * @return PHPIMS\Client\ImageUrl
      */
-    public function applyToImageUrl(ImageUrl $url) {
-        $url->append('flipHorizontally');
+    public function append($part) {
+        $this->data[] = $part;
+
+        return $this;
+    }
+
+    /**
+     * To string method
+     *
+     * @return string
+     */
+    public function __toString() {
+        if (empty($this->data)) {
+            return $this->baseUrl;
+        }
+
+        $query = null;
+        $query = array_reduce($this->data, function($query, $element) { return $query . 't[]=' . $element . '&'; }, $query);
+        $query = rtrim($query, '&');
+
+        return $this->baseUrl . '?' . $query;
     }
 }

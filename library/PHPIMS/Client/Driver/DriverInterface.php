@@ -23,51 +23,85 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Client
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Image\Transformation;
-
-use PHPIMS\Client\ImageUrl;
-use PHPIMS\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
+namespace PHPIMS\Client\Driver;
 
 /**
- * Flip horizontally transformation
+ * Client driver interface
+ *
+ * This is an interface for different client drivers.
  *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Client
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class FlipHorizontally extends Transformation implements TransformationInterface {
-    /**
-     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImage()
+interface DriverInterface {
+    /**#@+
+     * HTTP methods
+     *
+     * @var string
      */
-    public function applyToImage(ImageInterface $image) {
-        try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
-
-            $imagineImage->flipHorizontally();
-
-            $image->setBlob($imagineImage->get($image->getExtension()));
-        } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
-        }
-    }
+    const GET    = 'GET';
+    const POST   = 'POST';
+    const PUT    = 'PUT';
+    const HEAD   = 'HEAD';
+    const DELETE = 'DELETE';
+    /**#@-*/
 
     /**
-     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImageUrl()
+     * POST some data to an URL
+     *
+     * @param string $url The URL to POST to
+     * @param array $metadata The metadata to POST. This array will be json_encoded and sent to the
+     *                        server as $_POST['metadata']
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Driver\Exception
      */
-    public function applyToImageUrl(ImageUrl $url) {
-        $url->append('flipHorizontally');
-    }
+    function post($url, array $metadata = null);
+
+    /**
+     * PUT a file to an URL
+     *
+     * @param string $url The URL to PUT to
+     * @param string $filePath Path to the local file
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Driver\Exception
+     */
+    function put($url, $filePath);
+
+    /**
+     * Perform a GET to $url
+     *
+     * @param string $url The URL to GET
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Driver\Exception
+     */
+    function get($url);
+
+    /**
+     * Perform a HEAD to $url
+     *
+     * @param string $url The URL to HEAD
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Driver\Exception
+     */
+    function head($url);
+
+    /**
+     * Perform a DELETE request to $url
+     *
+     * @param string $url The URL to DELETE
+     * @return PHPIMS\Client\Response
+     * @throws PHPIMS\Client\Driver\Exception
+     */
+    function delete($url);
 }

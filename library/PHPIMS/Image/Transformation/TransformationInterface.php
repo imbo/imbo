@@ -33,6 +33,7 @@
 namespace PHPIMS\Image\Transformation;
 
 use PHPIMS\Image\ImageInterface;
+use PHPIMS\Client\ImageUrl;
 use Imagine\Image\ImagineInterface;
 
 /**
@@ -68,4 +69,11 @@ interface TransformationInterface {
      * @throws PHPIMS\Image\Transformation\Exception
      */
     function applyToImage(ImageInterface $image);
+
+    /**
+     * Apply a transformation to an image url
+     *
+     * @param PHPIMS\Client\ImageUrl $url Image url
+     */
+    function applyToImageUrl(ImageUrl $url);
 }

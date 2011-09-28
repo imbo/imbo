@@ -58,4 +58,13 @@ class RotateTest extends TransformationTests {
         $transformation = new Rotate(45);
         $transformation->applyToImage($image);
     }
+
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\Client\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return (preg_match('/^rotate:/', $string) && strstr($string, 'angle=33') && strstr($string, 'bg=fed'));
+        }))->once();
+        $transformation = new Rotate(33, 'fed');
+        $transformation->applyToImageUrl($url);
+    }
 }

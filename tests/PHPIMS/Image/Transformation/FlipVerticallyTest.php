@@ -56,4 +56,13 @@ class FlipVerticallyTest extends TransformationTests {
         $transformation = new FlipVertically();
         $transformation->applyToImage($image);
     }
+
+    public function testApplyToImageUrl() {
+        $url = m::mock('PHPIMS\Client\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) {
+            return $string == 'flipVertically';
+        }))->once();
+        $transformation = new FlipVertically();
+        $transformation->applyToImageUrl($url);
+    }
 }

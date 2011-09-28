@@ -56,4 +56,14 @@ class CompressTest extends TransformationTests {
         $transformation = new Compress(50);
         $transformation->applyToImage($image);
     }
+
+    public function testApplyToImageUrl() {
+        $quality = 50;
+        $url = m::mock('PHPIMS\Client\ImageUrl');
+        $url->shouldReceive('append')->with(m::on(function ($string) use($quality) {
+            return $string === 'compress:quality=' . $quality;
+        }))->once();
+        $transformation = new Compress($quality);
+        $transformation->applyToImageUrl($url);
+    }
 }

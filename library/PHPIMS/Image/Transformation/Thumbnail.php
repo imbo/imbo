@@ -32,6 +32,7 @@
 
 namespace PHPIMS\Image\Transformation;
 
+use PHPIMS\Client\ImageUrl;
 use PHPIMS\Image\ImageInterface;
 
 use Imagine\Exception\Exception as ImagineException;
@@ -111,5 +112,18 @@ class Thumbnail extends Transformation implements TransformationInterface {
         } catch (ImagineException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    /**
+     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImageUrl()
+     */
+    public function applyToImageUrl(ImageUrl $url) {
+        $params = array(
+            'width=' . $this->width,
+            'height=' . $this->height,
+            'fit=' . $this->fit,
+        );
+
+        $url->append('thumbnail:' . implode(',', $params));
     }
 }

@@ -23,51 +23,39 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-
-namespace PHPIMS\Image\Transformation;
-
-use PHPIMS\Client\ImageUrl;
-use PHPIMS\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
 
 /**
- * Flip horizontally transformation
- *
- * @package PHPIMS
- * @subpackage ImageTransformation
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @copyright Copyright (c) 2011, Christer Edvartsen
- * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/phpims
+ * This script is a part of PHPIMS' test suite. The client drivers use this script when doing
+ * actual HTTP requests.
  */
-class FlipHorizontally extends Transformation implements TransformationInterface {
-    /**
-     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImage()
-     */
-    public function applyToImage(ImageInterface $image) {
-        try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
 
-            $imagineImage->flipHorizontally();
-
-            $image->setBlob($imagineImage->get($image->getExtension()));
-        } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImageUrl()
-     */
-    public function applyToImageUrl(ImageUrl $url) {
-        $url->append('flipHorizontally');
-    }
+// Sleep some some seconds if specified (to test timeouts)
+if (isset($_REQUEST['sleep'])) {
+    sleep($_REQUEST['sleep']);
 }
+
+// Initialize return data
+$data = array(
+    'method' => $_SERVER['REQUEST_METHOD'],
+);
+
+switch ($data['method']) {
+    case 'PUT':
+        // Fetch image data from input
+        $imageBlob = file_get_contents('php://input');
+        $data['md5'] = md5($imageBlob);
+    case 'POST':
+        $data['data'] = $_POST;
+        break;
+    case 'GET':
+        $data['data'] = $_GET;
+        break;
+}
+
+print(serialize($data));

@@ -23,51 +23,38 @@
  * IN THE SOFTWARE.
  *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
 
-namespace PHPIMS\Image\Transformation;
-
-use PHPIMS\Client\ImageUrl;
-use PHPIMS\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
+namespace PHPIMS\Client;
 
 /**
- * Flip horizontally transformation
- *
  * @package PHPIMS
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/phpims
  */
-class FlipHorizontally extends Transformation implements TransformationInterface {
-    /**
-     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImage()
-     */
-    public function applyToImage(ImageInterface $image) {
-        try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
-
-            $imagineImage->flipHorizontally();
-
-            $image->setBlob($imagineImage->get($image->getExtension()));
-        } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
-        }
+class ImageUrlTest extends \PHPUnit_Framework_TestCase {
+    public function testToStringWithoutData() {
+        $baseUrl = 'http://baseurl/' . md5(microtime()) . '.png';
+        $imageUrl = new ImageUrl($baseUrl);
+        $this->assertSame($baseUrl, (string) $imageUrl);
     }
 
-    /**
-     * @see PHPIMS\Image\Transformation\TransformationInterface::applyToImageUrl()
-     */
-    public function applyToImageUrl(ImageUrl $url) {
-        $url->append('flipHorizontally');
+    public function testToStringWithData() {
+        $baseUrl = 'http://baseurl/' . md5(microtime()) . '.png';
+        $imageUrl = new ImageUrl($baseUrl);
+        $imageUrl->append('border')
+                 ->append('rotate:angle=45')
+                 ->append('resize:width=100')
+                 ->append('crop:x=2,y=3,width=10,height=5');
+
+        $this->assertSame($baseUrl . '?t[]=border&t[]=rotate:angle=45&t[]=resize:width=100&t[]=crop:x=2,y=3,width=10,height=5', (string) $imageUrl);
     }
 }
