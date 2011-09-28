@@ -280,6 +280,20 @@ class Request implements RequestInterface {
     }
 
     /**
+     * @see Imbo\Http\Request\RequestInterface::getServer()
+     */
+    public function getServer() {
+        return $this->server;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::getHeaders()
+     */
+    public function getHeaders() {
+        return $this->headers;
+    }
+
+    /**
      * @see Imbo\Http\Request\RequestInterface::isUnsafe()
      */
     public function isUnsafe() {

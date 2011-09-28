@@ -142,6 +142,20 @@ interface RequestInterface {
     function getRequest();
 
     /**
+     * Get the server container
+     *
+     * @return Imbo\Http\ServerContainerInterface
+     */
+    function getServer();
+
+    /**
+     * Get the HTTP headers
+     *
+     * @return Imbo\Http\HeaderContainer
+     */
+    function getHeaders();
+
+    /**
      * Wether or not the request is POST, PUT or DELETE
      *
      * @return boolean
