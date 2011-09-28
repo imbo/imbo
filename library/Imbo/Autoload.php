@@ -48,13 +48,6 @@ class Autoload {
      */
     static public $classes = array(
         'imbo\\autoload' => '/Autoload.php',
-        'imbo\\client' => '/Client.php',
-        'imbo\\client\\driver\\curl' => '/Client/Driver/Curl.php',
-        'imbo\\client\\driver\\driverinterface' => '/Client/Driver/DriverInterface.php',
-        'imbo\\client\\driver\\exception' => '/Client/Driver/Exception.php',
-        'imbo\\client\\exception' => '/Client/Exception.php',
-        'imbo\\client\\imageurl' => '/Client/ImageUrl.php',
-        'imbo\\client\\response' => '/Client/Response.php',
         'imbo\\database\\databaseinterface' => '/Database/DatabaseInterface.php',
         'imbo\\database\\exception' => '/Database/Exception.php',
         'imbo\\database\\mongodb' => '/Database/MongoDB.php',

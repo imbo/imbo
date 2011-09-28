@@ -82,13 +82,4 @@ class ResizeTest extends TransformationTests {
         $transformation = new Resize(null, 200);
         $transformation->applyToImage($image);
     }
-
-    public function testApplyToImageUrl() {
-        $url = m::mock('Imbo\Client\ImageUrl');
-        $url->shouldReceive('append')->with(m::on(function ($string) {
-            return (preg_match('/^resize:/', $string) && strstr($string, 'width=100') && strstr($string, 'height=200'));
-        }))->once();
-        $transformation = new Resize(100, 200);
-        $transformation->applyToImageUrl($url);
-    }
 }

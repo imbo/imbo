@@ -33,7 +33,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface;
-use Imbo\Client\ImageUrl;
 use Imagine\Image\ImagineInterface;
 
 /**
@@ -69,11 +68,4 @@ interface TransformationInterface {
      * @throws Imbo\Image\Transformation\Exception
      */
     function applyToImage(ImageInterface $image);
-
-    /**
-     * Apply a transformation to an image url
-     *
-     * @param Imbo\Client\ImageUrl $url Image url
-     */
-    function applyToImageUrl(ImageUrl $url);
 }

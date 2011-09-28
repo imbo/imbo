@@ -34,7 +34,6 @@ namespace Imbo\Image;
 
 use Imbo\Image\Transformation;
 use Imbo\Image\Transformation\TransformationInterface;
-use Imbo\Client\ImageUrl;
 
 /**
  * Transformation collection
@@ -53,33 +52,6 @@ class TransformationChain {
      * @var array
      */
     private $transformations = array();
-
-    /**
-     * Apply all transformations to an image url object
-     *
-     * @param Imbo\Client\ImageUrl $url Instance of the image url
-     * @return Imbo\Image\TransformationChain
-     */
-    public function applyToImageUrl(ImageUrl $url) {
-        foreach ($this->transformations as $transformation) {
-            $this->transformImageUrl($url, $transformation);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Transform an image url
-     *
-     * @param Imbo\Client\ImageUrl $url Image url object
-     * @param Imbo\Image\Transformation\TransformationInterface $transformation Transformation object
-     * @return Imbo\Image\TransformationChain
-     */
-    public function transformImageUrl(ImageUrl $url, TransformationInterface $transformation) {
-        $transformation->applyToImageUrl($url);
-
-        return $this;
-    }
 
     /**
      * Apply all transformations to an image object

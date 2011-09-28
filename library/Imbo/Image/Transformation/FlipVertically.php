@@ -32,7 +32,6 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Client\ImageUrl;
 use Imbo\Image\ImageInterface;
 
 use Imagine\Exception\Exception as ImagineException;
@@ -62,12 +61,5 @@ class FlipVertically extends Transformation implements TransformationInterface {
         } catch (ImagineException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
-    }
-
-    /**
-     * @see Imbo\Image\Transformation\TransformationInterface::applyToImageUrl()
-     */
-    public function applyToImageUrl(ImageUrl $url) {
-        $url->append('flipVertically');
     }
 }

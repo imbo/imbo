@@ -56,13 +56,4 @@ class FlipHorizontallyTest extends TransformationTests {
         $transformation = new FlipHorizontally();
         $transformation->applyToImage($image);
     }
-
-    public function testApplyToImageUrl() {
-        $url = m::mock('Imbo\Client\ImageUrl');
-        $url->shouldReceive('append')->with(m::on(function ($string) {
-            return $string == 'flipHorizontally';
-        }))->once();
-        $transformation = new FlipHorizontally();
-        $transformation->applyToImageUrl($url);
-    }
 }

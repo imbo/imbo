@@ -32,7 +32,6 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Client\ImageUrl;
 use Imbo\Image\ImageInterface;
 
 use Imagine\Exception\Exception as ImagineException;
@@ -78,16 +77,5 @@ class Compress extends Transformation implements TransformationInterface {
         } catch (ImagineException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
-    }
-
-    /**
-     * @see Imbo\Image\Transformation\TransformationInterface::applyToImageUrl()
-     */
-    public function applyToImageUrl(ImageUrl $url) {
-        $params = array(
-            'quality=' . $this->quality,
-        );
-
-        $url->append('compress:' . implode(',', $params));
     }
 }

@@ -32,7 +32,6 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Client\ImageUrl;
 use Imbo\Image\ImageInterface;
 
 use Imagine\Exception\Exception as ImagineException;
@@ -127,18 +126,5 @@ class Border extends Transformation implements TransformationInterface {
         } catch (ImagineException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
-    }
-
-    /**
-     * @see Imbo\Image\Transformation\TransformationInterface::applyToImageUrl()
-     */
-    public function applyToImageUrl(ImageUrl $url) {
-        $params = array(
-            'color=' . $this->color,
-            'width=' . $this->width,
-            'height=' . $this->height,
-        );
-
-        $url->append('border:' . implode(',', $params));
     }
 }

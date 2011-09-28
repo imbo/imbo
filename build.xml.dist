@@ -3,9 +3,6 @@
   <property name="source" value="${basedir}/library/Imbo"/>
   <property name="build" value="${basedir}/build"/>
 
-  <!-- Override this value using the -Dclient_tests_url=/some/path when running ant -->
-  <property name="client_tests_path" value="/var/www/imbo/driver.php"/>
-
   <target name="clean" description="Clean up and create artifact directories">
     <delete dir="${build}"/>
 
@@ -14,8 +11,6 @@
     <mkdir dir="${build}/docs"/>
     <mkdir dir="${build}/code-browser"/>
     <mkdir dir="${build}/pdepend"/>
-
-    <copy file="${basedir}/tests/Imbo/Client/Driver/_files/driver.php" tofile="${client_tests_path}" overwrite="true"/>
   </target>
 
   <target name="phpab" description="Update autoloader using phpab">

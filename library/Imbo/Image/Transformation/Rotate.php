@@ -32,7 +32,6 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Client\ImageUrl;
 use Imbo\Image\ImageInterface;
 
 use Imagine\Exception\Exception as ImagineException;
@@ -95,17 +94,5 @@ class Rotate extends Transformation implements TransformationInterface {
         } catch (ImagineException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
-    }
-
-    /**
-     * @see Imbo\Image\Transformation\TransformationInterface::applyToImageUrl()
-     */
-    public function applyToImageUrl(ImageUrl $url) {
-        $params = array(
-            'angle=' . $this->angle,
-            'bg=' . $this->bg,
-        );
-
-        $url->append('rotate:' . implode(',', $params));
     }
 }
