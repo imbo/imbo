@@ -37,7 +37,6 @@ use Imbo\Http\Response\ResponseInterface;
 use Imbo\Database\DatabaseInterface;
 use Imbo\Storage\StorageInterface;
 use Imbo\Resource\ResourceInterface;
-use Imbo\Exception;
 
 /**
  * Abstract resource class
