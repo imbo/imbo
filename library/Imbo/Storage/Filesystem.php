@@ -125,6 +125,19 @@ class Filesystem implements StorageInterface {
     }
 
     /**
+     * @see Imbo\Storage\StorageInterface::getLastModified()
+     */
+    public function getLastModified($publicKey, $imageIdentifier) {
+        $path = $this->getImagePath($publicKey, $imageIdentifier);
+
+        if (!is_file($path)) {
+            throw new Exception('File not found', 404);
+        }
+
+        return filemtime($path);
+    }
+
+    /**
      * Get the path to an image
      *
      * @param string $publicKey The key

@@ -32,8 +32,6 @@
 
 namespace Imbo\Storage;
 
-use Mockery as m;
-
 /** vfsStream */
 require_once 'vfsStream/vfsStream.php';
 
@@ -104,7 +102,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @expectedExpectionMessage Could not store image
      */
     public function testStoreToUnwritablePath() {
-        $image = m::mock('Imbo\Image\ImageInterface');
+        $image = $this->getMock('Imbo\Image\ImageInterface');
         $dir = 'unwritableDirectory';
 
         // Create the virtual directory with no permissions
@@ -121,8 +119,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      */
     public function testStoreFileTwice() {
         $content = 'some content';
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $image->shouldReceive('getBlob')->once()->andReturn($content);
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue($content));
         $baseDir = 'someDir';
 
         // Create the virtual directory
@@ -135,8 +133,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
 
     public function testStore() {
         $content = 'some content';
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $image->shouldReceive('getBlob')->once()->andReturn($content);
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue($content));
         $baseDir = 'someDir';
 
         // Create the virtual directory
@@ -163,7 +161,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 404
      */
     public function testLoadFileThatDoesNotExist() {
-        $image = m::mock('Imbo\Image\ImageInterface');
+        $image = $this->getMock('Imbo\Image\ImageInterface');
         $driver = new Filesystem(array('dataDir' => '/some/path'));
         $driver->load($this->publicKey, $this->imageIdentifier, $image);
     }
@@ -196,9 +194,53 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $file->setContent($content);
         $last->addChild($file);
 
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $image->shouldReceive('setBlob')->once()->with($content);
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('setBlob')->with($content);
 
         $this->assertTrue($driver->load($this->publicKey, $this->imageIdentifier, $image));
+    }
+
+    /**
+     * @expectedException Imbo\Storage\Exception
+     * @expectedExceptionMessage File not found
+     * @expectedExceptionCode 404
+     */
+    public function testGetLastModifiedWithFileThatDoesNotExist() {
+        $driver = new Filesystem(array('dataDir' => '/some/path'));
+        $driver->getLastModified($this->publicKey, $this->imageIdentifier);
+    }
+
+    public function testGetLastModified() {
+        \vfsStream::setup('basedir');
+        $driver = new Filesystem(array('dataDir' => \vfsStream::url('basedir')));
+
+        $root = \vfsStreamWrapper::getRoot();
+        $last = $root;
+
+        $parts = array(
+            $this->publicKey[0],
+            $this->publicKey[1],
+            $this->publicKey[2],
+            $this->publicKey,
+            $this->imageIdentifier[0],
+            $this->imageIdentifier[1],
+            $this->imageIdentifier[2],
+        );
+
+        foreach ($parts as $part) {
+            $d = \vfsStream::newDirectory($part);
+            $last->addChild($d);
+            $last = $d;
+        }
+
+        $now = time();
+
+        $content = 'some binary content';
+        $file = \vfsStream::newFile($this->imageIdentifier);
+        $file->setContent($content);
+        $file->lastModified($now);
+        $last->addChild($file);
+
+        $this->assertSame($now, $driver->getLastModified($this->publicKey, $this->imageIdentifier));
     }
 }

@@ -91,4 +91,14 @@ interface StorageInterface {
      * @throws Imbo\Storage\Exception
      */
     function load($publicKey, $imageIdentifier, ImageInterface $image);
+
+    /**
+     * Get the last modified timestamp
+     *
+     * @param string $publicKey The public key of the user
+     * @param string $imageIdentifier Image identifier
+     * @return int Unix timestamp
+     * @throws Imbo\Storage\Exception
+     */
+    function getLastModified($publicKey, $imageIdentifier);
 }
