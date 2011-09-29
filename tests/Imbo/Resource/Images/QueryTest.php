@@ -76,11 +76,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->query->returnMetadata());
     }
 
-    public function testQuery() {
+    public function testMetadataQuery() {
         $value = array('category' => 'some category');
-        $this->assertSame(array(), $this->query->query());
-        $this->query->query($value);
-        $this->assertSame($value, $this->query->query());
+        $this->assertSame(array(), $this->query->metadataQuery());
+        $this->query->metadataQuery($value);
+        $this->assertSame($value, $this->query->metadataQuery());
     }
 
     public function testFrom() {

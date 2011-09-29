@@ -69,7 +69,7 @@ class Query {
      *
      * @var array
      */
-    private $query = array();
+    private $metadataQuery = array();
 
     /**
      * Timestamp to start fetching from
@@ -134,17 +134,17 @@ class Query {
     }
 
     /**
-     * Set or get the query property
+     * Set or get the metadataQuery property
      *
-     * @param array $query Give this a value to set the query property
+     * @param array $metadataQuery Give this a value to set the property
      * @return array|Imbo\Resource\Images\Query
      */
-    public function query(array $query = null) {
-        if ($query === null) {
-            return $this->query;
+    public function metadataQuery(array $metadataQuery = null) {
+        if ($metadataQuery === null) {
+            return $this->metadataQuery;
         }
 
-        $this->query = $query;
+        $this->metadataQuery = $metadataQuery;
 
         return $this;
     }
