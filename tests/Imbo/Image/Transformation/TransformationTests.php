@@ -48,13 +48,13 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException Imbo\Image\Transformation\Exception
      * @expectedExceptionMessage some message
-     * @expectedExceptionCode 123
+     * @expectedExceptionCode 401
      */
     public function testApplyToImageWhenImagineThrowsAnException() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
 
         $imagine = $this->getMock('Imagine\Image\ImagineInterface');
-        $imagine->expects($this->once())->method('load')->will($this->throwException(new ImagineException('some message', 123)));
+        $imagine->expects($this->once())->method('load')->will($this->throwException(new ImagineException('some message')));
 
         $transformation = $this->getTransformation();
         $transformation->setImagine($imagine);
