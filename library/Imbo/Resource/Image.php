@@ -32,6 +32,7 @@
 
 namespace Imbo\Resource;
 
+use Imbo\Exception as ImboException;
 use Imbo\Http\Request\RequestInterface;
 use Imbo\Http\Response\ResponseInterface;
 use Imbo\Database\DatabaseInterface;
@@ -44,8 +45,6 @@ use Imbo\Image\ImageIdentificationInterface;
 use Imbo\Image\ImagePreparation;
 use Imbo\Image\ImagePreparationInterface;
 use Imbo\Database\Exception as DatabaseException;
-use Imbo\Storage\Exception as StorageException;
-use Imbo\Image\Transformation\Exception as TransformationException;
 
 /**
  * Image resource
@@ -127,7 +126,7 @@ class Image extends Resource implements ResourceInterface {
             // Identify the image to set the correct mime type and extension in the image instance
             $this->imageIdentification->identifyImage($this->image);
         } catch (ImageException $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
 
         $publicKey = $request->getPublicKey();
@@ -142,10 +141,8 @@ class Image extends Resource implements ResourceInterface {
 
             // Store the image
             $storage->store($publicKey, $imageIdentifier, $this->image);
-        } catch (DatabaseException $e) {
-            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
-        } catch (StorageException $e) {
-            throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
+        } catch (ImboException $e) {
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
 
         // Populate the response object
@@ -163,10 +160,8 @@ class Image extends Resource implements ResourceInterface {
         try {
             $database->deleteImage($publicKey, $imageIdentifier);
             $storage->delete($publicKey, $imageIdentifier);
-        } catch (DatabaseException $e) {
-            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
-        } catch (StorageException $e) {
-            throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
+        } catch (ImboException $e) {
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -219,12 +214,8 @@ class Image extends Resource implements ResourceInterface {
             // Apply transformations
             $transformationChain = $request->getTransformations();
             $transformationChain->applyToImage($this->image);
-        } catch (DatabaseException $e) {
-            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
-        } catch (StorageException $e) {
-            throw new Exception('Storage error: ' . $e->getMessage(), $e->getCode(), $e);
-        } catch (TransformationException $e) {
-            throw new Exception('Transformation failed with message: ' . $e->getMessage(), 401, $e);
+        } catch (ImboException $e) {
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
 
         // Store the image in the response
@@ -235,13 +226,6 @@ class Image extends Resource implements ResourceInterface {
      * @see Imbo\Resource\ResourceInterface::head()
      */
     public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        // Fetch information from the database
-        try {
-            $database->load($request->getPublicKey(), $request->getImageIdentifier(), $this->image);
-        } catch (DatabaseException $e) {
-            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
-        }
-
-        $response->getHeaders()->set('Content-Type', $this->image->getMimeType());
+        return $this->get($request, $response, $database, $storage);
     }
 }
