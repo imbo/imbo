@@ -109,22 +109,22 @@ class Border extends Transformation implements TransformationInterface {
             // Draw top and bottom lines
             for ($i = 0; $i < $this->height; $i++) {
                 $draw->line(new Point(0, $i), new Point($width - 1, $i), $color)
-                    ->line(new Point($width - 1, $height - ($i + 1)), new Point(0, $height - ($i + 1)), $color);
+                     ->line(new Point($width - 1, $height - ($i + 1)), new Point(0, $height - ($i + 1)), $color);
             }
 
             // Draw sides
             for ($i = 0; $i < $this->width; $i++) {
                 $draw->line(new Point($i, 0), new Point($i, $height - 1), $color)
-                    ->line(new Point($width - ($i + 1), 0), new Point($width - ($i + 1), $height - 1), $color);
+                     ->line(new Point($width - ($i + 1), 0), new Point($width - ($i + 1), $height - 1), $color);
             }
 
             $box = $imagineImage->getSize();
 
             $image->setBlob($imagineImage->get($image->getExtension()))
-                ->setWidth($box->getWidth())
-                ->setHeight($box->getHeight());
+                  ->setWidth($box->getWidth())
+                  ->setHeight($box->getHeight());
         } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
+            throw new Exception($e->getMessage(), 401, $e);
         }
     }
 }

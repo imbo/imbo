@@ -109,7 +109,7 @@ class Thumbnail extends Transformation implements TransformationInterface {
                   ->setWidth($this->width)
                   ->setHeight($this->height);
         } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
+            throw new Exception($e->getMessage(), 401, $e);
         }
     }
 }

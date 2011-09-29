@@ -59,7 +59,7 @@ class FlipHorizontally extends Transformation implements TransformationInterface
 
             $image->setBlob($imagineImage->get($image->getExtension()));
         } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
+            throw new Exception($e->getMessage(), 401, $e);
         }
     }
 }

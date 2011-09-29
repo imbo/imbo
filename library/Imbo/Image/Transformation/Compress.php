@@ -75,7 +75,7 @@ class Compress extends Transformation implements TransformationInterface {
                 'quality' => $this->quality,
             )));
         } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
+            throw new Exception($e->getMessage(), 401, $e);
         }
     }
 }
