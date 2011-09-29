@@ -133,7 +133,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $image, $response);
     }
 
-    public function testSucessfullInsert() {
+    public function testSuccessfulInsert() {
         $data = array(
             'publicKey' => $this->publicKey,
             'imageIdentifier' => $this->imageIdentifier,
@@ -165,7 +165,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->deleteImage($this->publicKey, $this->imageIdentifier);
     }
 
-    public function testSucessfullDeleteImage() {
+    public function testSuccessfulDeleteImage() {
         $this->collection->expects($this->once())
                          ->method('remove')
                          ->with(
@@ -203,7 +203,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->updateMetadata($this->publicKey, $this->imageIdentifier, $metadata);
     }
 
-    public function testSucessfullUpdateMetadata() {
+    public function testSuccessfulUpdateMetadata() {
         $metadata = array(
             'foo' => 'bar',
             'bar' => array(
@@ -238,7 +238,20 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->getMetadata($this->publicKey, $this->imageIdentifier);
     }
 
-    public function testSucessfullGetMetadata() {
+    /**
+     * @expectedException Imbo\Database\Exception
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessage Image not found
+     */
+    public function testGetMetadataWhenEntryDoesNotExist() {
+        $this->collection->expects($this->once())->method('findOne')->with(
+            array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier)
+        )->will($this->returnValue(null));
+
+        $this->driver->getMetadata($this->publicKey, $this->imageIdentifier);
+    }
+
+    public function testSuccessfulGetMetadata() {
         $metadata = array(
             'foo' => 'bar',
             'bar' => array(
@@ -271,7 +284,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->deleteMetadata($this->publicKey, $this->imageIdentifier);
     }
 
-    public function testSucessfullDeleteMetadata() {
+    public function testSuccessfulDeleteMetadata() {
         $this->collection->expects($this->once())->method('update')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             array('$set' => array('metadata' => array())),
@@ -287,7 +300,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $query = $this->getMock('Imbo\Resource\Images\Query');
         $query->expects($this->once())->method('from')->will($this->returnValue(123123123));
         $query->expects($this->once())->method('to')->will($this->returnValue(234234234));
-        $query->expects($this->once())->method('query')->will($this->returnValue(array('category' => 'some category')));
+        $query->expects($this->once())->method('metadataQuery')->will($this->returnValue(array('category' => 'some category')));
         $query->expects($this->once())->method('returnMetadata')->will($this->returnValue(true));
         $query->expects($this->exactly(2))->method('num')->will($this->returnValue(30));
         $query->expects($this->once())->method('page')->will($this->returnValue(2));
@@ -320,7 +333,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     public function testGetImagesWhenCollectionThrowsException() {
         $query = $this->getMock('Imbo\Resource\Images\Query');
 
-        foreach (array('from', 'to', 'query', 'returnMetadata') as $method) {
+        foreach (array('from', 'to', 'metadataQuery', 'returnMetadata') as $method) {
             $query->expects($this->once())->method($method);
         }
 
@@ -343,7 +356,21 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->load($this->publicKey, $this->imageIdentifier, $this->getMock('Imbo\Image\ImageInterface'));
     }
 
-    public function testSucessfullLoad() {
+    /**
+     * @expectedException Imbo\Database\Exception
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessage Image not found
+     */
+    public function testLoadWhenImageDoesNotExist() {
+        $this->collection->expects($this->once())->method('findOne')->with(
+            array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
+            $this->isType('array')
+        )->will($this->returnValue(null));
+
+        $this->driver->load($this->publicKey, $this->imageIdentifier, $this->getMock('Imbo\Image\ImageInterface'));
+    }
+
+    public function testSuccessfulLoad() {
         $data = array(
             'name' => 'filename',
             'size' => 123,
@@ -363,5 +390,48 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         )->will($this->returnValue($data));
 
         $this->assertTrue($this->driver->load($this->publicKey, $this->imageIdentifier, $image));
+    }
+
+    /**
+     * @expectedException Imbo\Database\Exception
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Unable to fetch image data
+     */
+    public function testGetLastModifiedWhenCollectionThrowsException() {
+        $this->collection->expects($this->once())->method('findOne')->with(
+            array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
+            array('updated')
+        )->will($this->throwException(new \MongoException()));
+
+        $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+    }
+
+    /**
+     * @expectedException Imbo\Database\Exception
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessage Image not found
+     */
+    public function testGetLastModifiedWhenImageDoesNotExist() {
+        $this->collection->expects($this->once())->method('findOne')->with(
+            array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
+            array('updated')
+        )->will($this->returnValue(null));
+
+        $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+    }
+
+    public function testSuccessfulGetLastModified() {
+        $now = time();
+
+        $data = array(
+            'updated' => $now,
+        );
+
+        $this->collection->expects($this->once())->method('findOne')->with(
+            array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
+            array('updated')
+        )->will($this->returnValue($data));
+
+        $this->assertSame($now, $this->driver->getLastModified($this->publicKey, $this->imageIdentifier));
     }
 }
