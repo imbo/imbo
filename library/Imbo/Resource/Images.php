@@ -100,7 +100,7 @@ class Images extends Resource implements ResourceInterface {
             $data = json_decode($params->get('query'), true);
 
             if (is_array($data)) {
-                $query->query($data);
+                $query->metadataQuery($data);
             }
         }
 
