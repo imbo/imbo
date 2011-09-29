@@ -174,6 +174,10 @@ class MongoDB implements DatabaseInterface {
             throw new Exception('Unable to fetch image metadata', 500, $e);
         }
 
+        if ($data === null) {
+            throw new Exception('Image not found', 404);
+        }
+
         return isset($data['metadata']) ? $data['metadata'] : array();
     }
 
@@ -223,7 +227,7 @@ class MongoDB implements DatabaseInterface {
             $queryData['added'] = $tmp;
         }
 
-        $metadataQuery = $query->query();
+        $metadataQuery = $query->metadataQuery();
 
         if (!empty($metadataQuery)) {
             $queryData['metadata'] = $metadataQuery;
@@ -271,10 +275,34 @@ class MongoDB implements DatabaseInterface {
             throw new Exception('Unable to fetch image data', 500, $e);
         }
 
+        if ($data === null) {
+            throw new Exception('Image not found', 404);
+        }
+
         $image->setWidth($data['width'])
               ->setHeight($data['height'])
               ->setMimeType($data['mime']);
 
         return true;
+    }
+
+    /**
+     * @see Imbo\Database\DatabaseInterface::load()
+     */
+    public function getLastModified($publicKey, $imageIdentifier) {
+        try {
+            $data = $this->collection->findOne(
+                array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
+                array('updated')
+            );
+        } catch (\MongoException $e) {
+            throw new Exception('Unable to fetch image data', 500, $e);
+        }
+
+        if ($data === null) {
+            throw new Exception('Image not found', 404);
+        }
+
+        return $data['updated'];
     }
 }

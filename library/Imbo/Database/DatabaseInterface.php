@@ -123,4 +123,14 @@ interface DatabaseInterface {
      * @throws Imbo\Database\Exception
      */
     function load($publicKey, $imageIdentifier, ImageInterface $image);
+
+    /**
+     * Get the last modified timestamp
+     *
+     * @param string $publicKey The public key of the user
+     * @param string $imageIdentifier The image identifier
+     * @return int Returns the timestamp as a unix timestamp
+     * @throws Imbo\Database\Exception
+     */
+    function getLastModified($publicKey, $imageIdentifier);
 }
