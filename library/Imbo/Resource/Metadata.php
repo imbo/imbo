@@ -67,7 +67,7 @@ class Metadata extends Resource implements ResourceInterface {
         try {
             $database->deleteMetadata($request->getPublicKey(), $request->getImageIdentifier());
         } catch (DatabaseException $e) {
-            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -89,7 +89,7 @@ class Metadata extends Resource implements ResourceInterface {
         try {
             $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $metadata);
         } catch (DatabaseException $e) {
-            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
 
         $response->setBody(array('imageIdentifier' => $imageIdentifier));
@@ -99,10 +99,35 @@ class Metadata extends Resource implements ResourceInterface {
      * @see Imbo\Resource\ResourceInterface::get()
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+        $publicKey = $request->getPublicKey();
+        $imageIdentifier = $request->getImageIdentifier();
+        $requestHeaders = $request->getHeaders();
+
         try {
-            $data = $database->getMetadata($request->getPublicKey(), $request->getImageIdentifier());
+            // See when this particular image was last updated
+            $lastModified = date('r', $database->getLastModified($publicKey, $imageIdentifier));
+
+            // Generate an etag for the content
+            $etag = md5($publicKey . $imageIdentifier . $lastModified);
+
+            if (
+                $lastModified === $requestHeaders->get('if-modified-since') &&
+                $etag === $requestHeaders->get('if-none-match'))
+            {
+                // The client already has this object
+                $response->setStatusCode(304);
+                return;
+            }
+
+            $responseHeaders = $response->getHeaders();
+
+            // The client did not have this particular version in its cache
+            $responseHeaders->set('Last-Modified', $lastModified)
+                            ->set('ETag', $etag);
+
+            $data = $database->getMetadata($publicKey, $imageIdentifier);
         } catch (DatabaseException $e) {
-            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
 
         $response->setBody($data);
