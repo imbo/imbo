@@ -35,7 +35,6 @@ namespace Imbo;
 use Imbo\Http\Request\RequestInterface;
 use Imbo\Http\Response\ResponseInterface;
 use Imbo\Image\Image;
-use Imbo\Resource\Exception as ResourceException;
 
 /**
  * Client that interacts with the server part of Imbo
@@ -206,12 +205,6 @@ class FrontController {
             return;
         }
 
-        try {
-            $resource->$methodName($request, $response, $database, $storage);
-        } catch (ResourceException $e) {
-            $response->setError($e->getCode(), $e->getMessage());
-
-            return;
-        }
+        $resource->$methodName($request, $response, $database, $storage);
     }
 }
