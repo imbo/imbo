@@ -48,7 +48,7 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException Imbo\Image\Transformation\Exception
      * @expectedExceptionMessage some message
-     * @expectedExceptionCode 401
+     * @expectedExceptionCode 400
      */
     public function testApplyToImageWhenImagineThrowsAnException() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
