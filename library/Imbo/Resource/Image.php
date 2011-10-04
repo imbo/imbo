@@ -40,11 +40,10 @@ use Imbo\Storage\StorageInterface;
 use Imbo\Image\Image as ImageObject;
 use Imbo\Image\Exception as ImageException;
 use Imbo\Image\ImageInterface;
-use Imbo\Image\ImageIdentification;
-use Imbo\Image\ImageIdentificationInterface;
 use Imbo\Image\ImagePreparation;
 use Imbo\Image\ImagePreparationInterface;
 use Imbo\Database\Exception as DatabaseException;
+use Imbo\Image\Transformation\Convert;
 
 /**
  * Image resource
@@ -65,13 +64,6 @@ class Image extends Resource implements ResourceInterface {
     private $image;
 
     /**
-     * Image identification instance
-     *
-     * @var Imbo\Image\ImageIdentification
-     */
-    private $imageIdentification;
-
-    /**
      * Image prepation instance
      *
      * @var Imbo\Image\ImagePreparation
@@ -82,16 +74,11 @@ class Image extends Resource implements ResourceInterface {
      * Class constructor
      *
      * @param Imbo\Image\ImageInterface $image An image instance
-     * @param Imbo\Image\ImageIdentificationInterface $imageIdentification An image identification instance
      * @param Imbo\Image\ImagePreparationInterface $imagePreparation An image preparation instance
      */
-    public function __construct(ImageInterface $image = null, ImageIdentificationInterface $imageIdentification = null, ImagePreparationInterface $imagePreparation = null) {
+    public function __construct(ImageInterface $image = null, ImagePreparationInterface $imagePreparation = null) {
         if ($image === null) {
             $image = new ImageObject();
-        }
-
-        if ($imageIdentification === null) {
-            $imageIdentification = new ImageIdentification();
         }
 
         if ($imagePreparation === null) {
@@ -99,7 +86,6 @@ class Image extends Resource implements ResourceInterface {
         }
 
         $this->image = $image;
-        $this->imageIdentification = $imageIdentification;
         $this->imagePreparation = $imagePreparation;
     }
 
@@ -122,18 +108,12 @@ class Image extends Resource implements ResourceInterface {
         try {
             // Prepare the image based on the input stream in the request
             $this->imagePreparation->prepareImage($request, $this->image);
-
-            // Identify the image to set the correct mime type and extension in the image instance
-            $this->imageIdentification->identifyImage($this->image);
         } catch (ImageException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
-
-        // Make sure that the extension of the file along with the PUT is correct
-        $imageIdentifier = substr($imageIdentifier, 0, 32) . '.' . $this->image->getExtension();
 
         try {
             // Insert the image to the database
@@ -169,25 +149,19 @@ class Image extends Resource implements ResourceInterface {
      * @see Imbo\Resource\ResourceInterface::get()
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        // Fetch some entries from the request and the respones
         $publicKey       = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
         $serverContainer = $request->getServer();
         $requestHeaders  = $request->getHeaders();
         $responseHeaders = $response->getHeaders();
 
-        // Generate ETag using public key, image identifier and the query string from the
-        // request
-        $etag = md5($publicKey . $imageIdentifier . $serverContainer->get('REDIRECT_QUERY_STRING'));
-
         try {
             // Fetch information from the database (injects mime type, width and height to the
             // image instance)
             $database->load($publicKey, $imageIdentifier, $this->image);
-            $mimeType = $this->image->getMimeType();
 
-            // Set the image extension based on the mime type
-            $this->image->setExtension(ImageIdentification::$mimeTypes[$mimeType]);
+            // Generate ETag using public key, image identifier, and the redirect url
+            $etag = md5($publicKey . $imageIdentifier . $serverContainer->get('REQUEST_URI'));
 
             // Fetch last modified timestamp from the storage driver
             $lastModified = date('r', $storage->getLastModified($publicKey, $imageIdentifier));
@@ -203,10 +177,23 @@ class Image extends Resource implements ResourceInterface {
             // Load the image data (injects the blob into the image instance)
             $storage->load($publicKey, $imageIdentifier, $this->image);
 
+            // Fetch the requested resource to see if we have to convert the image
+            $resource = $request->getResource();
+            $originalMimeType = $this->image->getMimeType();
+
+            if (isset($resource[32])) {
+                // We have a requested image type
+                $extension = substr($resource, 33);
+
+                $convert = new Convert($extension);
+                $convert->applyToImage($this->image);
+            }
+
             // Set some response headers
             $responseHeaders->set('Last-Modified', $lastModified)
                             ->set('ETag', $etag)
-                            ->set('Content-Type', $mimeType)
+                            ->set('Content-Type', $this->image->getMimeType())
+                            ->set('X-Imbo-OriginalMimeType', $originalMimeType)
                             ->set('X-Imbo-OriginalWidth', $this->image->getWidth())
                             ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
                             ->set('X-Imbo-OriginalFileSize', $this->image->getFileSize());
