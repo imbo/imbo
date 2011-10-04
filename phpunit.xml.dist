@@ -7,10 +7,6 @@
     </testsuite>
   </testsuites>
 
-  <listeners>
-    <listener class="\Mockery\Adapter\Phpunit\TestListener" file="Mockery/Adapter/Phpunit/TestListener.php" />
-  </listeners>
-
   <logging>
     <log type="coverage-html" target="build/coverage" title="Code coverage for Imbo"
       charset="UTF-8" yui="true" highlight="true" />

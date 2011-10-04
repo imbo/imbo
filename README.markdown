@@ -227,7 +227,6 @@ To fully develop Imbo (as in run the complete build process, which most likely y
 
 * [PHPUnit](http://phpunit.de/)
 * [Autoload (phpab)](https://github.com/theseer/Autoload)
-* [Mockery](https://github.com/padraic/mockery)
 * [vfsStream](http://code.google.com/p/bovigo/wiki/vfsStream)
 * [Imagine](https://github.com/avalanche123/Imagine/)
 * [MongoDB](http://www.mongodb.org/)
@@ -238,8 +237,6 @@ Run the following commands as root to install the software (on Ubuntu):
     pear channel-discover pear.phpunit.de
     pear channel-discover components.ez.no
     pear channel-discover pear.symfony-project.com
-    pear channel-discover pear.survivethedeepend.com
-    pear channel-discover hamcrest.googlecode.com/svn/pear
     pear channel-discover pear.php-tools.net
     pear channel-discover pear.netpirates.net
     pear channel-discover pear.pdepend.org
@@ -247,8 +244,6 @@ Run the following commands as root to install the software (on Ubuntu):
 
     pear install --alldeps phpunit/PHPUnit
     pear install --alldeps phpunit/PHP_CodeBrowser
-    pear install --alldeps deepend/Mockery
-    pear install --alldeps hamcrest/Hamcrest
     pear install pat/vfsStream-beta
     pear install theseer/Autoload
     pear install pecl/mongo
