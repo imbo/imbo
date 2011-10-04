@@ -32,8 +32,6 @@
 
 namespace Imbo\Image\Transformation;
 
-use Mockery as m;
-
 /**
  * @package Imbo
  * @subpackage Unittests
@@ -48,36 +46,36 @@ class ResizeTest extends TransformationTests {
     }
 
     public function testApplyToImageWithBothParams() {
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
-        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
-        $image->shouldReceive('setWidth')->once()->with(200)->andReturn($image);
-        $image->shouldReceive('setHeight')->once()->with(100)->andReturn($image);
-        $image->shouldReceive('getExtension')->once()->andReturn('png');
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
+        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with(100)->will($this->returnValue($image));
+        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
         $transformation = new Resize(200, 100);
         $transformation->applyToImage($image);
     }
 
     public function testApplyToImageWithOnlyWidth() {
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
-        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
-        $image->shouldReceive('setWidth')->once()->with(200)->andReturn($image);
-        $image->shouldReceive('setHeight')->once()->with(m::type('int'))->andReturn($image);
-        $image->shouldReceive('getExtension')->once()->andReturn('png');
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
+        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with($this->isType('int'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
         $transformation = new Resize(200);
         $transformation->applyToImage($image);
     }
 
     public function testApplyToImageWithOnlyHeight() {
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
-        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
-        $image->shouldReceive('setWidth')->once()->with(m::type('int'))->andReturn($image);
-        $image->shouldReceive('setHeight')->once()->with(200)->andReturn($image);
-        $image->shouldReceive('getExtension')->once()->andReturn('png');
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
+        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with($this->isType('int'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with(200)->will($this->returnValue($image));
+        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
         $transformation = new Resize(null, 200);
         $transformation->applyToImage($image);

@@ -32,8 +32,6 @@
 
 namespace Imbo\Image\Transformation;
 
-use Mockery as m;
-
 /**
  * @package Imbo
  * @subpackage Unittests
@@ -48,10 +46,10 @@ class FlipVerticallyTest extends TransformationTests {
     }
 
     public function testApplyToImage() {
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
-        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
-        $image->shouldReceive('getExtension')->once()->andReturn('png');
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
+        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
         $transformation = new FlipVertically();
         $transformation->applyToImage($image);

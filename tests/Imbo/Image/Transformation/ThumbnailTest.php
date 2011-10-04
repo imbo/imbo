@@ -32,8 +32,6 @@
 
 namespace Imbo\Image\Transformation;
 
-use Mockery as m;
-
 /**
  * @package Imbo
  * @subpackage Unittests
@@ -52,12 +50,12 @@ class ThumbnailTest extends TransformationTests {
         $height = 90;
         $fit = 'outbound';
 
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $image->shouldReceive('getBlob')->once()->andReturn(file_get_contents(__DIR__ . '/../../_files/image.png'));
-        $image->shouldReceive('setBlob')->once()->with(m::type('string'))->andReturn($image);
-        $image->shouldReceive('setWidth')->once()->with($width)->andReturn($image);
-        $image->shouldReceive('setHeight')->once()->with($height)->andReturn($image);
-        $image->shouldReceive('getExtension')->once()->andReturn('png');
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
+        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
+        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
         $transformation = new Thumbnail($width, $height, $fit);
         $transformation->applyToImage($image);

@@ -102,6 +102,7 @@ class MongoDB implements DatabaseInterface {
             'size'            => $image->getFilesize(),
             'publicKey'       => $publicKey,
             'imageIdentifier' => $imageIdentifier,
+            'extension'       => $image->getExtension(),
             'mime'            => $image->getMimeType(),
             'metadata'        => array(),
             'added'           => $now,
@@ -234,7 +235,7 @@ class MongoDB implements DatabaseInterface {
         }
 
         // Fields to fetch
-        $fields = array('added', 'checksum', 'updated', 'publicKey', 'imageIdentifier', 'mime', 'name', 'size', 'width', 'height');
+        $fields = array('extension', 'added', 'checksum', 'updated', 'publicKey', 'imageIdentifier', 'mime', 'name', 'size', 'width', 'height');
 
         if ($query->returnMetadata()) {
             $fields[] = 'metadata';
@@ -269,7 +270,7 @@ class MongoDB implements DatabaseInterface {
         try {
             $data = $this->collection->findOne(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('name', 'size', 'width', 'height', 'mime')
+                array('name', 'size', 'width', 'height', 'mime', 'extension')
             );
         } catch (\MongoException $e) {
             throw new Exception('Unable to fetch image data', 500, $e);
@@ -281,7 +282,8 @@ class MongoDB implements DatabaseInterface {
 
         $image->setWidth($data['width'])
               ->setHeight($data['height'])
-              ->setMimeType($data['mime']);
+              ->setMimeType($data['mime'])
+              ->setExtension($data['extension']);
 
         return true;
     }

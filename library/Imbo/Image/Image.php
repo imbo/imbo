@@ -42,6 +42,17 @@ namespace Imbo\Image;
  */
 class Image implements ImageInterface {
     /**
+     * Supported mime types and the correct file extensions
+     *
+     * @var array
+     */
+    static public $mimeTypes = array(
+        'image/png'  => 'png',
+        'image/jpeg' => 'jpg',
+        'image/gif'  => 'gif',
+    );
+
+    /**
      * Size of the file
      *
      * @var int
@@ -192,5 +203,19 @@ class Image implements ImageInterface {
         $this->height = (int) $height;
 
         return $this;
+    }
+
+    /**
+     * @use Imbo\Image\ImageInterface::supportedMimeType()
+     */
+    static public function supportedMimeType($mime) {
+        return isset(self::$mimeTypes[$mime]);
+    }
+
+    /**
+     * @use Imbo\Image\ImageInterface::getFileExtension()
+     */
+    static public function getFileExtension($mime) {
+        return isset(self::$mimeTypes[$mime]) ? self::$mimeTypes[$mime] : false;
     }
 }

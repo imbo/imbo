@@ -80,14 +80,28 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
         $this->prepare->prepareImage($this->request, $this->image);
     }
 
+    /**
+     * @expectedException Imbo\Image\Exception
+     * @expectedExceptionMessage Unsupported image type
+     * @expectedExceptionCode 415
+     */
+    public function testPrepareImageWithUnsupportedImageType() {
+        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue(file_get_contents(__FILE__)));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(md5_file(__FILE__)));
+
+        $this->prepare->prepareImage($this->request, $this->image);
+    }
+
     public function testSuccessfulPrepareImage() {
         $imagePath = __DIR__ . '/../_files/image.png';
         $imageData = file_get_contents($imagePath);
-        $imageIdentifier = md5($imageData) . '.png';
+        $imageIdentifier = md5($imageData);
 
         $this->request->expects($this->once())->method('getRawData')->will($this->returnValue($imageData));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
 
+        $this->image->expects($this->once())->method('setMimeType')->with('image/png')->will($this->returnValue($this->image));
+        $this->image->expects($this->once())->method('setExtension')->with('png')->will($this->returnValue($this->image));
         $this->image->expects($this->once())->method('setBlob')->with($imageData)->will($this->returnValue($this->image));
         $this->image->expects($this->once())->method('setWidth')->with(665)->will($this->returnValue($this->image));
         $this->image->expects($this->once())->method('setHeight')->with(463)->will($this->returnValue($this->image));

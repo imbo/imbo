@@ -377,6 +377,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             'width' => 234,
             'height' => 345,
             'mime' => 'image/jpg',
+            'extension' => 'jpg',
         );
 
         $image = $this->getMock('Imbo\Image\ImageInterface');

@@ -133,7 +133,7 @@ class Request implements RequestInterface {
         $matches = array();
 
         // Set some properties if the resource requested is known
-        if (preg_match('#^(?<publicKey>[a-f0-9]{32})/(?<resource>(images|(?<imageIdentifier>[a-f0-9]{32}\.[a-zA-Z]{3,4})(?:/(?<metadata>meta))?))$#', $path, $matches)) {
+        if (preg_match('#^(?<publicKey>[a-f0-9]{32})/(?<resource>(images|(?<imageIdentifier>[a-f0-9]{32})(?:\.(jpg|gif|png))?(?:/(?<metadata>meta))?))$#', $path, $matches)) {
             $this->resource = $matches['resource'];
             $this->publicKey = $matches['publicKey'];
             $this->imageIdentifier = isset($matches['imageIdentifier']) ? $matches['imageIdentifier'] : null;

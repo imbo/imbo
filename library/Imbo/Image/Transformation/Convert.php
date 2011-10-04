@@ -23,44 +23,70 @@
  * IN THE SOFTWARE.
  *
  * @package Imbo
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
 
-namespace Imbo\Image;
+namespace Imbo\Image\Transformation;
+
+use Imbo\Image\ImageInterface;
+use Imbo\Image\Image;
+
+use Imagine\Exception\Exception as ImagineException;
 
 /**
+ * Convert transformation
+ *
+ * This transformation can be used to convert the image from one type to another.
+ *
  * @package Imbo
- * @subpackage Unittests
+ * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class ImageIdentificationTest extends \PHPUnit_Framework_TestCase {
+class Convert extends Transformation implements TransformationInterface {
     /**
-     * @expectedException Imbo\Image\Exception
-     * @expectedExceptionMessage Unsupported image type
-     * @expectedExceptionCode 415
+     * Type we want to convert to
+     *
+     * @var string
      */
-    public function testIdentifyImageWithUnsupportedMimeType() {
-        $id = new ImageIdentification();
-        $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue('some data'));
+    private $type;
 
-        $id->identifyImage($image);
+    /**
+     * Class constructor
+     *
+     * @param string $type The type we want to convert to
+     */
+    public function __construct($type) {
+        $this->type = $type;
     }
 
-    public function testSuccessfulIdentifyImage() {
-        $id = new ImageIdentification();
-        $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../_files/image.png')));
-        $image->expects($this->once())->method('setMimeType')->with('image/png')->will($this->returnValue($image));
-        $image->expects($this->once())->method('setExtension')->with('png')->will($this->returnValue($image));
+    /**
+     * @see Imbo\Image\Transformation\TransformationInterface::applyToImage()
+     */
+    public function applyToImage(ImageInterface $image) {
+        if ($image->getExtension() === $this->type) {
+            // The requested extension is the same as the image, no conversion is needed
+            return;
+        }
 
-        $this->assertSame($id, $id->identifyImage($image));
+        try {
+            $imagine = $this->getImagine();
+            $imagineImage = $imagine->load($image->getBlob());
+
+            $imageBlob = $imagineImage->get($this->type);
+            $mimeType = array_search($this->type, Image::$mimeTypes);
+
+            $image->setBlob($imageBlob)
+                  ->setMimeType($mimeType)
+                  ->setExtension($this->type);
+        } catch (ImagineException $e) {
+            throw new Exception($e->getMessage(), 400, $e);
+        }
     }
 }

@@ -142,4 +142,21 @@ interface ImageInterface {
      * @return Imbo\Image\ImageInterface
      */
     function setHeight($height);
+
+    /**
+     * Check if a mime type is supported by Imbo
+     *
+     * @param string $mime The mime type to check. For instance "image/png"
+     * @return boolean
+     */
+    static function supportedMimeType($mime);
+
+    /**
+     * Get the file extension mapped to a mime type
+     *
+     * @param string $mime The mime type. For instance "image/png"
+     * @return boolean|string The extension (without the leading dot) on success or boolean false
+     *                        if the mime type is not supported.
+     */
+    static function getFileExtension($mime);
 }
