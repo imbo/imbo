@@ -32,6 +32,7 @@
 namespace Imbo\Image;
 
 use Imbo\Http\Request\RequestInterface;
+use Imbo\Image\Image;
 
 /**
  * Image preparation
@@ -60,20 +61,33 @@ class ImagePreparation implements ImagePreparationInterface {
         // Get image identifier from request
         $imageIdentifier = $request->getImageIdentifier();
 
-        if ($actualHash !== substr($imageIdentifier, 0, 32)) {
+        if ($actualHash !== $imageIdentifier) {
             throw new Exception('Hash mismatch', 400);
         }
+
+        // Use the file info extension to fetch the mime type
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->buffer($imageBlob);
+
+        if (!Image::supportedMimeType($mime)) {
+            throw new Exception('Unsupported image type: ' . $mime, 415);
+        }
+
+        $extension = Image::getFileExtension($mime);
 
         // Store file to disk and use getimagesize() to fetch width/height
         $tmpFile = tempnam(sys_get_temp_dir(), 'Imbo_uploaded_image');
         file_put_contents($tmpFile, $imageBlob);
         $size = getimagesize($tmpFile);
+        unlink($tmpFile);
 
-        // Fetch the image object and store the blob
-        $image->setBlob($imageBlob)
+        // Store relevant information in the image instance
+        $image->setMimeType($mime)
+              ->setExtension($extension)
+              ->setBlob($imageBlob)
               ->setWidth($size[0])
               ->setHeight($size[1]);
 
-        unlink($tmpFile);
+        return $this;
     }
 }

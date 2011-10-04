@@ -49,7 +49,7 @@ interface ImagePreparationInterface {
      * Prepare an image
      *
      * This method should prepare an image object from php://input. The method must also figure out
-     * the width and height of the image.
+     * the width, height, mime type  and extension of the image.
      *
      * @param Imbo\Http\Request\RequestInterface $request A request instance
      * @param Imbo\Image\ImageInterface $image An image instance
