@@ -32,8 +32,6 @@
 
 namespace Imbo\Image;
 
-use Mockery as m;
-
 /**
  * @package Imbo
  * @subpackage Unittests
@@ -43,7 +41,7 @@ use Mockery as m;
  * @link https://github.com/christeredvartsen/imbo
  */
 class TransformationChainTest extends \PHPUnit_Framework_TestCase {
-    private $chain = null;
+    private $chain;
 
     public function setUp() {
         $this->chain = new TransformationChain();
@@ -64,9 +62,9 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testTransformImage() {
-        $image = m::mock('Imbo\Image\ImageInterface');
-        $transformation = m::mock('Imbo\Image\Transformation\TransformationInterface');
-        $transformation->shouldReceive('applyToImage')->once()->with($image);
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $transformation = $this->getMock('Imbo\Image\Transformation\TransformationInterface');
+        $transformation->expects($this->once())->method('applyToImage')->with($image);
 
         $this->chain->transformImage($image, $transformation);
     }
