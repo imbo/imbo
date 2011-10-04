@@ -76,7 +76,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
     public function testRequestWithImageResource() {
         $publicKey = md5(microtime());
-        $imageIdentifier = md5(microtime()) . '.png';
+        $imageIdentifier = md5(microtime());
         $method = 'GET';
         $resource = $imageIdentifier;
 
@@ -116,7 +116,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
     public function testRequestWithMetadataResource() {
         $publicKey = md5(microtime());
-        $imageIdentifier = md5(microtime()) . '.png';
+        $imageIdentifier = md5(microtime());
         $method = 'GET';
         $resource = $imageIdentifier . '/meta';
 
@@ -137,7 +137,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
     public function testSetGetImageIdentifier() {
         $request = new Request();
-        $identifier = md5(microtime()) . '.png';
+        $identifier = md5(microtime());
         $request->setImageIdentifier($identifier);
         $this->assertSame($identifier, $request->getImageIdentifier());
     }
