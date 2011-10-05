@@ -187,6 +187,10 @@ class FrontController {
         // implemented
         $response->getHeaders()->set('Allow', implode(', ', $resource->getAllowedMethods()));
 
+        if ($request->getType() === RequestInterface::RESOURCE_IMAGE) {
+            $response->getHeaders()->set('X-Imbo-ImageIdentifier', $request->getImageIdentifier());
+        }
+
         // If we have an unsafe request, we need to make sure that the request is valid
         if ($request->isUnsafe()) {
             $this->auth($request);
