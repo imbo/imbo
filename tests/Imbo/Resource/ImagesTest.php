@@ -47,6 +47,13 @@ class ImagesTest extends ResourceTests {
         return new Images();
     }
 
+    public function testSetGetQuery() {
+        $resource = $this->getNewResource();
+        $query = $this->getMock('Imbo\Resource\Images\QueryInterface');
+        $this->assertSame($resource, $resource->setQuery($query));
+        $this->assertSame($query, $resource->getQuery());
+    }
+
     /**
      * @expectedException Imbo\Resource\Exception
      * @expectedExceptionMessage Database error: message
@@ -55,7 +62,6 @@ class ImagesTest extends ResourceTests {
     public function testGetWhenDatabaseThrowsAnException() {
         $resource = $this->getNewResource();
         $parameterContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
-        $parameterContainer->expects($this->any())->method('has')->will($this->returnValue(false));
 
         $this->database->expects($this->once())->method('getImages')->will($this->throwException(new DatabaseException('message', 500)));
         $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($parameterContainer));
@@ -65,30 +71,60 @@ class ImagesTest extends ResourceTests {
 
     public function testSuccessfulGetWithNoQueryParams() {
         $publicKey = md5(microtime());
-        $resource = $this->getNewResource();
         $images = array();
+
         $parameterContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
-        $parameterContainer->expects($this->any())->method('has')->will($this->returnValue(false));
+        $query = $this->getMock('Imbo\Resource\Images\QueryInterface');
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
+        $writer->expects($this->once())->method('write')->with($images, $this->request, $this->response);
+
+        $resource = $this->getNewResource();
+        $resource->setQuery($query);
+        $resource->setResponseWriter($writer);
 
         $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($parameterContainer));
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->database->expects($this->once())->method('getImages')->with($publicKey, $this->isInstanceOf('Imbo\Resource\Images\Query'))->will($this->returnValue($images));
-        $this->response->expects($this->once())->method('setBody')->with($images);
+        $this->database->expects($this->once())->method('getImages')->with($publicKey, $query)->will($this->returnValue($images));
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
 
-    public function ttestSuccessfulGetWithAllQueryParams() {
+    public function testSuccessfulGetWithAllQueryParams() {
         $publicKey = md5(microtime());
-        $resource = $this->getNewResource();
         $images = array();
-        $parameterContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
-        $parameterContainer->expects($this->any())->method('has')->will($this->returnValue(false));
 
-        $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($parameterContainer));
+        $params = $this->getMock('Imbo\Http\ParameterContainerInterface');
+        $query = $this->getMock('Imbo\Resource\Images\QueryInterface');
+
+        $params->expects($this->any())->method('has')->will($this->returnValue(true));
+        $params->expects($this->any())->method('get')->will($this->returnCallback(function($param) {
+            switch ($param) {
+                case 'page': return 1;
+                case 'num': return 2;
+                case 'metadata': return '1';
+                case 'from': return 3;
+                case 'to': return 4;
+                case 'query': return json_encode(array('foo', 'bar'));
+            }
+        }));
+
+        $query->expects($this->once())->method('page')->with(1);
+        $query->expects($this->once())->method('num')->with(2);
+        $query->expects($this->once())->method('returnMetadata')->with('1');
+        $query->expects($this->once())->method('from')->with(3);
+        $query->expects($this->once())->method('to')->with(4);
+        $query->expects($this->once())->method('metadataQuery')->with(array('foo', 'bar'));
+
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
+        $writer->expects($this->once())->method('write')->with($images, $this->request, $this->response);
+
+        $resource = $this->getNewResource();
+        $resource->setQuery($query);
+        $resource->setResponseWriter($writer);
+
+        $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($params));
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->database->expects($this->once())->method('getImages')->with($publicKey, $this->isInstanceOf('Imbo\Resource\Images\Query'))->will($this->returnValue($images));
-        $this->response->expects($this->once())->method('setBody')->with($images);
+        $this->database->expects($this->once())->method('getImages')->with($publicKey, $query)->will($this->returnValue($images));
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }

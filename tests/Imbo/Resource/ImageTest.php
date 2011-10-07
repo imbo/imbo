@@ -92,6 +92,7 @@ class ImageTest extends ResourceTests {
         $this->request->expects($this->once())
                       ->method('getPublicKey')
                       ->will($this->returnValue($publicKey));
+
         $this->request->expects($this->once())
                       ->method('getImageIdentifier')
                       ->will($this->returnValue($imageIdentifier));
@@ -136,11 +137,16 @@ class ImageTest extends ResourceTests {
     public function testSuccessfulPut() {
         $publicKey = md5(microtime());
         $imageIdentifier = md5(microtime());
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
+        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+
         $resource = $this->getNewResource();
+        $resource->setResponseWriter($writer);
 
         $this->request->expects($this->once())
                       ->method('getPublicKey')
                       ->will($this->returnValue($publicKey));
+
         $this->request->expects($this->once())
                       ->method('getImageIdentifier')
                       ->will($this->returnValue($imageIdentifier));
@@ -207,7 +213,12 @@ class ImageTest extends ResourceTests {
     public function testSuccessfulDelete() {
         $publicKey = md5(microtime());
         $imageIdentifier = md5(microtime());
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
+        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+
         $resource = $this->getNewResource();
+        $resource->setResponseWriter($writer);
+
 
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
@@ -221,5 +232,41 @@ class ImageTest extends ResourceTests {
                       ->with($publicKey, $imageIdentifier);
 
         $resource->delete($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @expectedException Imbo\Resource\Exception
+     * @expectedExceptionMessage message
+     * @expectedExceptionCode 500
+     */
+    public function testGetWhenDatabaseThrowsException() {
+        $resource = $this->getNewResource();
+
+        $this->database->expects($this->once())
+                       ->method('load')
+                       ->will($this->throwException(new DatabaseException('message', 500)));
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @expectedException Imbo\Resource\Exception
+     * @expectedExceptionMessage message
+     * @expectedExceptionCode 500
+     */
+    public function testGetWhenStorageThrowsException() {
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())->method('getServer')->will($this->returnValue($this->getMock('Imbo\Http\ServerContainerInterface')));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
+
+        $this->database->expects($this->once())
+                       ->method('load');
+
+        $this->storage->expects($this->once())
+                      ->method('load')
+                      ->will($this->throwException(new DatabaseException('message', 500)));
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
 }

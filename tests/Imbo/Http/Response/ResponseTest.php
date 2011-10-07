@@ -51,25 +51,16 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
     private $response;
 
     /**
-     * Writer instance
-     *
-     * @var Imbo\Http\Response\ResponseWriterInterface
-     */
-    private $writer;
-
-    /**
      * Set up method
      */
     public function setUp() {
-        $this->writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
-        $this->response = new Response($this->writer);
+        $this->response = new Response();
     }
 
     /**
      * Tear down method
      */
     public function tearDown() {
-        $this->writer = null;
         $this->response = null;
     }
 
@@ -92,47 +83,15 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($headers, $this->response->getHeaders());
     }
 
-    public function testSetBodyWithArray() {
-        $body = array('some' => 'data');
-        $this->writer->expects($this->once())->method('write')->with($body)->will($this->returnValue('formatted data'));
-        $this->writer->expects($this->once())->method('getContentType')->will($this->returnValue('text/plain'));
-        $this->response->setBody($body);
-        $this->assertSame('formatted data', $this->response->getBody());
-        $this->assertSame(strlen('formatted data'), $this->response->getHeaders()->get('content-length'));
-        $this->assertSame('text/plain', $this->response->getHeaders()->get('content-type'));
-    }
-
-    public function testSetBodyWithImageInstance() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue('some binary data'));
-        $image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/png'));
-
-        $this->response->setBody($image);
-
-        $this->assertSame('some binary data', $this->response->getBody());
-        $this->assertSame(strlen('some binary data'), $this->response->getHeaders()->get('content-length'));
-        $this->assertSame('image/png', $this->response->getHeaders()->get('content-type'));
-    }
-
-    public function testSetError() {
-        $code = 404;
-        $message  = 'Image not found';
-        $this->writer->expects($this->once())->method('write')->will($this->returnValue('Encoded error message'));
-
-        $this->response->setError($code, $message);
-
-        $this->assertSame(404, $this->response->getStatusCode());
-
-        $this->assertSame('Encoded error message', $this->response->getBody());
+    public function testSetGetBody() {
+        $body = 'some content';
+        $this->assertSame($this->response, $this->response->setBody($body));
+        $this->assertSame($body, $this->response->getBody());
     }
 
     public function testSendContent() {
         $content = 'some content';
-
-        $this->writer->expects($this->once())->method('write')->will($this->returnValue('some content'));
-        $this->writer->expects($this->once())->method('getContentType');
-
-        $this->response->setBody(array('some data'));
+        $this->response->setBody($content);
 
         ob_start();
         $this->response->send();
