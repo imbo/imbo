@@ -169,6 +169,7 @@ class Image extends Resource implements ResourceInterface {
         // Fetch the requested resource to see if we have to convert the image
         $resource = $request->getResource();
         $originalMimeType = $this->image->getMimeType();
+        $originalFilesize = $this->image->getFilesize();
 
         if (isset($resource[32])) {
             // We have a requested image type
@@ -185,7 +186,7 @@ class Image extends Resource implements ResourceInterface {
                         ->set('X-Imbo-OriginalMimeType', $originalMimeType)
                         ->set('X-Imbo-OriginalWidth', $this->image->getWidth())
                         ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
-                        ->set('X-Imbo-OriginalFileSize', $this->image->getFileSize());
+                        ->set('X-Imbo-OriginalFileSize', $originalFilesize);
 
         // Apply transformations
         $transformationChain = $request->getTransformations();
