@@ -38,24 +38,41 @@ require_once 'Imbo/Autoload.php';
 $loader = new Imbo\Autoload();
 $loader->register();
 
+// Load configuration
+$config = require __DIR__ . '/../config/server.php';
+
 // Initialize request and response
 $request = new Imbo\Http\Request\Request($_GET, $_POST, $_SERVER);
-$responseWriter = new Imbo\Http\Response\ResponseWriter($request);
-$response = new Imbo\Http\Response\Response($responseWriter);
+$response = new Imbo\Http\Response\Response();
 $response->getHeaders()->set('X-Imbo-Version', Imbo\Version::getVersionNumber());
 
-try {
-    // Load configuration
-    $config = require __DIR__ . '/../config/server.php';
+set_exception_handler(function (Imbo\Exception $exception) use ($request, $response) {
+    $response->setStatusCode($exception->getCode());
 
-    // Create the front controller
-    $frontController = new Imbo\FrontController($config);
+    $data = array(
+        'error' => array(
+            'code'      => $exception->getCode(),
+            'message'   => $exception->getMessage(),
+            'timestamp' => gmdate('Y-m-d\TH:i\Z'),
+        ),
+    );
 
-    // Handle the current request
-    $frontController->handle($request, $response);
-} catch (Imbo\Exception $e) {
-    $response->setError($e->getCode(), $e->getMessage());
-}
+    $imageIdentifier = $request->getImageIdentifier();
+
+    if ($imageIdentifier) {
+        $data['imageIdentifier'] = $imageIdentifier;
+    }
+
+    $responseWriter = new Imbo\Http\Response\ResponseWriter();
+    $responseWriter->write($data, $request, $response);
+
+    // Send the formatted response
+    $response->send();
+});
+
+// Create the front controller and handle the request
+$frontController = new Imbo\FrontController($config);
+$frontController->handle($request, $response);
 
 // Send the response to the client
-$response->send($request);
+$response->send();
