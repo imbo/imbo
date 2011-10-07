@@ -64,11 +64,15 @@ class Metadata extends Resource implements ResourceInterface {
      * @see Imbo\Resource\ResourceInterface::delete()
      */
     public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+        $imageIdentifier = $request->getImageIdentifier();
+
         try {
-            $database->deleteMetadata($request->getPublicKey(), $request->getImageIdentifier());
+            $database->deleteMetadata($request->getPublicKey(), $imageIdentifier);
         } catch (DatabaseException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
+
+        $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
     }
 
     /**
@@ -92,7 +96,7 @@ class Metadata extends Resource implements ResourceInterface {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
 
-        $response->setBody(array('imageIdentifier' => $imageIdentifier));
+        $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
     }
 
     /**
@@ -115,7 +119,7 @@ class Metadata extends Resource implements ResourceInterface {
                 $etag === $requestHeaders->get('if-none-match'))
             {
                 // The client already has this object
-                $response->setStatusCode(304);
+                $response->setNotModified();
                 return;
             }
 
@@ -125,11 +129,21 @@ class Metadata extends Resource implements ResourceInterface {
             $responseHeaders->set('Last-Modified', $lastModified)
                             ->set('ETag', $etag);
 
-            $data = $database->getMetadata($publicKey, $imageIdentifier);
+            $metadata = $database->getMetadata($publicKey, $imageIdentifier);
         } catch (DatabaseException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
 
-        $response->setBody($data);
+        return $this->getResponseWriter()->write($metadata, $request, $response);
+    }
+
+    /**
+     * @see Imbo\Resource\ResourceInterface::head()
+     */
+    public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+        $this->get($request, $response, $database, $storage);
+
+        // Remove body from the response, but keep everything else
+        $response->setBody(null);
     }
 }

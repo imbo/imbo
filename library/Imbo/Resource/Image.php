@@ -125,9 +125,9 @@ class Image extends Resource implements ResourceInterface {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
 
-        // Populate the response object
-        $response->setStatusCode(201)
-                 ->setBody(array('imageIdentifier' => $imageIdentifier));
+        $response->setStatusCode(201);
+
+        $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
     }
 
     /**
@@ -143,6 +143,8 @@ class Image extends Resource implements ResourceInterface {
         } catch (ImboException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
+
+        $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
     }
 
     /**
@@ -170,7 +172,7 @@ class Image extends Resource implements ResourceInterface {
                 $lastModified === $requestHeaders->get('if-modified-since') &&
                 $etag === $requestHeaders->get('if-none-match')
             ) {
-                $response->setStatusCode(304);
+                $response->setNotModified();
                 return;
             }
 
@@ -189,7 +191,7 @@ class Image extends Resource implements ResourceInterface {
                 $convert->applyToImage($this->image);
             }
 
-            // Set some response headers
+            // Set some response headers before we apply optional transformations
             $responseHeaders->set('Last-Modified', $lastModified)
                             ->set('ETag', $etag)
                             ->set('Content-Type', $this->image->getMimeType())
@@ -205,14 +207,20 @@ class Image extends Resource implements ResourceInterface {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
 
-        // Store the image in the response
-        $response->setBody($this->image);
+        // Set the content length after transformations have been applied
+        $imageData = $this->image->getBlob();
+        $responseHeaders->set('Content-Length', strlen($imageData));
+
+        $response->setBody($imageData);
     }
 
     /**
      * @see Imbo\Resource\ResourceInterface::head()
      */
     public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        return $this->get($request, $response, $database, $storage);
+        $this->get($request, $response, $database, $storage);
+
+        // Remove body from the response, but keep everything else
+        $response->setBody(null);
     }
 }
