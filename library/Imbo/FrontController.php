@@ -204,9 +204,7 @@ class FrontController {
 
         // See if the HTTP method is supported at all
         if (!method_exists($resource, $methodName)) {
-            $response->setError(405, 'Method not allowed');
-
-            return;
+            throw new Exception('Method not allowed', 405);
         }
 
         $resource->$methodName($request, $response, $database, $storage);
