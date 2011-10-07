@@ -46,7 +46,12 @@ $request = new Imbo\Http\Request\Request($_GET, $_POST, $_SERVER);
 $response = new Imbo\Http\Response\Response();
 $response->getHeaders()->set('X-Imbo-Version', Imbo\Version::getVersionNumber());
 
-set_exception_handler(function (Imbo\Exception $exception) use ($request, $response) {
+// Create the front controller and handle the request
+$frontController = new Imbo\FrontController($config);
+
+try {
+    $frontController->handle($request, $response);
+} catch (Imbo\Exception $exception) {
     $response->setStatusCode($exception->getCode());
 
     $data = array(
@@ -65,14 +70,7 @@ set_exception_handler(function (Imbo\Exception $exception) use ($request, $respo
 
     $responseWriter = new Imbo\Http\Response\ResponseWriter();
     $responseWriter->write($data, $request, $response);
-
-    // Send the formatted response
-    $response->send();
-});
-
-// Create the front controller and handle the request
-$frontController = new Imbo\FrontController($config);
-$frontController->handle($request, $response);
+}
 
 // Send the response to the client
 $response->send();
