@@ -110,6 +110,16 @@ class Images extends Resource implements ResourceInterface {
             throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
-        $response->setBody($images);
+        $this->getResponseWriter()->write($images, $request, $response);
+    }
+
+    /**
+     * @see Imbo\Resource\ResourceInterface::head()
+     */
+    public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+        $this->get($request, $response, $database, $storage);
+
+        // Remove body from the response, but keep everything else
+        $response->setBody(null);
     }
 }
