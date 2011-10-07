@@ -32,6 +32,8 @@
 
 namespace Imbo\Http\Response;
 
+use Imbo\Http\Request\RequestInterface;
+
 /**
  * Response writer interface
  *
@@ -47,14 +49,8 @@ interface ResponseWriterInterface {
      * Return a formatted message using a chosen formatter based on the request
      *
      * @param array $data Data to write in another format
-     * @return string
+     * @param Imbo\Http\Request\RequestInterface $request A request instance
+     * @param Imbo\Http\Response\ResponseInterface $response A response instance
      */
-    function write(array $data);
-
-    /**
-     * Get the content type of the message the writer will write based on the request
-     *
-     * @return string
-     */
-    function getContentType();
+    function write(array $data, RequestInterface $request, ResponseInterface $response);
 }

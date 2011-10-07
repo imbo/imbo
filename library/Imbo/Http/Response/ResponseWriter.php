@@ -45,41 +45,16 @@ use Imbo\Http\Response\Formatter;
  */
 class ResponseWriter implements ResponseWriterInterface {
     /**
-     * Request instance
-     *
-     * The request instance is used to dynamically select a formatter to write the response to the
-     * client.
-     *
-     * @var Imbo\Http\Request\RequestInterface
-     */
-    private $request;
-
-    /**
-     * Class constructor
-     *
-     * @param Imbo\Http\Request\RequestInterface $request The request instance
-     */
-    public function __construct(RequestInterface $request) {
-        $this->request = $request;
-    }
-
-    /**
      * @see Imbo\Http\Response\ResponseWriterInterface::write()
-     * @TODO Check the Accept headers to make sure we have a valid formatter. Also check
-     *       Accept-Charset to possibly convert.
+     * @todo Pick the formatter based on the request
      */
-    public function write(array $data) {
+    public function write(array $data, RequestInterface $request, ResponseInterface $response) {
         $formatter = new Formatter\Json();
-        return $formatter->format($data);
-    }
+        $formattedData = $formatter->format($data);
 
-    /**
-     * @see Imbo\Http\Response\ResponseWriterInterface::getContentType()
-     * @TODO Use the Accept-Charset header to inject the used charset in the content-type returned
-     *       from the formatter.
-     */
-    public function getContentType() {
-        $formatter = new Formatter\Json();
-        return $formatter->getContentType();
+        $response->getHeaders()->set('Content-Type', $formatter->getContentType())
+                               ->set('Content-Length', strlen($formattedData));
+
+        $response->setBody($formattedData);
     }
 }
