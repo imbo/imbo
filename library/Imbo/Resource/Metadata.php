@@ -67,11 +67,7 @@ class Metadata extends Resource implements ResourceInterface {
     public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $imageIdentifier = $request->getImageIdentifier();
 
-        try {
-            $database->deleteMetadata($request->getPublicKey(), $imageIdentifier);
-        } catch (DatabaseException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
-        }
+        $database->deleteMetadata($request->getPublicKey(), $imageIdentifier);
 
         $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
     }
@@ -91,11 +87,7 @@ class Metadata extends Resource implements ResourceInterface {
             $metadata = json_decode($metadata, true);
         }
 
-        try {
-            $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $metadata);
-        } catch (DatabaseException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
-        }
+        $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $metadata);
 
         $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
     }
@@ -108,32 +100,28 @@ class Metadata extends Resource implements ResourceInterface {
         $imageIdentifier = $request->getImageIdentifier();
         $requestHeaders = $request->getHeaders();
 
-        try {
-            // See when this particular image was last updated
-            $lastModified = date('r', $database->getLastModified($publicKey, $imageIdentifier));
+        // See when this particular image was last updated
+        $lastModified = date('r', $database->getLastModified($publicKey, $imageIdentifier));
 
-            // Generate an etag for the content
-            $etag = md5($publicKey . $imageIdentifier . $lastModified);
+        // Generate an etag for the content
+        $etag = md5($publicKey . $imageIdentifier . $lastModified);
 
-            if (
-                $lastModified === $requestHeaders->get('if-modified-since') &&
-                $etag === $requestHeaders->get('if-none-match'))
-            {
-                // The client already has this object
-                $response->setNotModified();
-                return;
-            }
-
-            $responseHeaders = $response->getHeaders();
-
-            // The client did not have this particular version in its cache
-            $responseHeaders->set('Last-Modified', $lastModified)
-                            ->set('ETag', $etag);
-
-            $metadata = $database->getMetadata($publicKey, $imageIdentifier);
-        } catch (DatabaseException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
+        if (
+            $lastModified === $requestHeaders->get('if-modified-since') &&
+            $etag === $requestHeaders->get('if-none-match'))
+        {
+            // The client already has this object
+            $response->setNotModified();
+            return;
         }
+
+        $responseHeaders = $response->getHeaders();
+
+        // The client did not have this particular version in its cache
+        $responseHeaders->set('Last-Modified', $lastModified)
+                        ->set('ETag', $etag);
+
+        $metadata = $database->getMetadata($publicKey, $imageIdentifier);
 
         return $this->getResponseWriter()->write($metadata, $request, $response);
     }

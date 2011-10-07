@@ -105,25 +105,17 @@ class Image extends Resource implements ResourceInterface {
      * @see Imbo\Resource\ResourceInterface::put()
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        try {
-            // Prepare the image based on the input stream in the request
-            $this->imagePreparation->prepareImage($request, $this->image);
-        } catch (ImageException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
-        }
+        // Prepare the image based on the input stream in the request
+        $this->imagePreparation->prepareImage($request, $this->image);
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
 
-        try {
-            // Insert the image to the database
-            $database->insertImage($publicKey, $imageIdentifier, $this->image);
+        // Insert the image to the database
+        $database->insertImage($publicKey, $imageIdentifier, $this->image);
 
-            // Store the image
-            $storage->store($publicKey, $imageIdentifier, $this->image);
-        } catch (ImboException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
-        }
+        // Store the image
+        $storage->store($publicKey, $imageIdentifier, $this->image);
 
         $response->setStatusCode(201);
 
@@ -137,12 +129,8 @@ class Image extends Resource implements ResourceInterface {
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
 
-        try {
-            $database->deleteImage($publicKey, $imageIdentifier);
-            $storage->delete($publicKey, $imageIdentifier);
-        } catch (ImboException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
-        }
+        $database->deleteImage($publicKey, $imageIdentifier);
+        $storage->delete($publicKey, $imageIdentifier);
 
         $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
     }
@@ -157,55 +145,51 @@ class Image extends Resource implements ResourceInterface {
         $requestHeaders  = $request->getHeaders();
         $responseHeaders = $response->getHeaders();
 
-        try {
-            // Fetch information from the database (injects mime type, width and height to the
-            // image instance)
-            $database->load($publicKey, $imageIdentifier, $this->image);
+        // Fetch information from the database (injects mime type, width and height to the
+        // image instance)
+        $database->load($publicKey, $imageIdentifier, $this->image);
 
-            // Generate ETag using public key, image identifier, and the redirect url
-            $etag = md5($publicKey . $imageIdentifier . $serverContainer->get('REQUEST_URI'));
+        // Generate ETag using public key, image identifier, and the redirect url
+        $etag = md5($publicKey . $imageIdentifier . $serverContainer->get('REQUEST_URI'));
 
-            // Fetch last modified timestamp from the storage driver
-            $lastModified = date('r', $storage->getLastModified($publicKey, $imageIdentifier));
+        // Fetch last modified timestamp from the storage driver
+        $lastModified = date('r', $storage->getLastModified($publicKey, $imageIdentifier));
 
-            if (
-                $lastModified === $requestHeaders->get('if-modified-since') &&
-                $etag === $requestHeaders->get('if-none-match')
-            ) {
-                $response->setNotModified();
-                return;
-            }
-
-            // Load the image data (injects the blob into the image instance)
-            $storage->load($publicKey, $imageIdentifier, $this->image);
-
-            // Fetch the requested resource to see if we have to convert the image
-            $resource = $request->getResource();
-            $originalMimeType = $this->image->getMimeType();
-
-            if (isset($resource[32])) {
-                // We have a requested image type
-                $extension = substr($resource, 33);
-
-                $convert = new Convert($extension);
-                $convert->applyToImage($this->image);
-            }
-
-            // Set some response headers before we apply optional transformations
-            $responseHeaders->set('Last-Modified', $lastModified)
-                            ->set('ETag', $etag)
-                            ->set('Content-Type', $this->image->getMimeType())
-                            ->set('X-Imbo-OriginalMimeType', $originalMimeType)
-                            ->set('X-Imbo-OriginalWidth', $this->image->getWidth())
-                            ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
-                            ->set('X-Imbo-OriginalFileSize', $this->image->getFileSize());
-
-            // Apply transformations
-            $transformationChain = $request->getTransformations();
-            $transformationChain->applyToImage($this->image);
-        } catch (ImboException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
+        if (
+            $lastModified === $requestHeaders->get('if-modified-since') &&
+            $etag === $requestHeaders->get('if-none-match')
+        ) {
+            $response->setNotModified();
+            return;
         }
+
+        // Load the image data (injects the blob into the image instance)
+        $storage->load($publicKey, $imageIdentifier, $this->image);
+
+        // Fetch the requested resource to see if we have to convert the image
+        $resource = $request->getResource();
+        $originalMimeType = $this->image->getMimeType();
+
+        if (isset($resource[32])) {
+            // We have a requested image type
+            $extension = substr($resource, 33);
+
+            $convert = new Convert($extension);
+            $convert->applyToImage($this->image);
+        }
+
+        // Set some response headers before we apply optional transformations
+        $responseHeaders->set('Last-Modified', $lastModified)
+                        ->set('ETag', $etag)
+                        ->set('Content-Type', $this->image->getMimeType())
+                        ->set('X-Imbo-OriginalMimeType', $originalMimeType)
+                        ->set('X-Imbo-OriginalWidth', $this->image->getWidth())
+                        ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
+                        ->set('X-Imbo-OriginalFileSize', $this->image->getFileSize());
+
+        // Apply transformations
+        $transformationChain = $request->getTransformations();
+        $transformationChain->applyToImage($this->image);
 
         // Set the content length after transformations have been applied
         $imageData = $this->image->getBlob();
