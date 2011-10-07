@@ -57,6 +57,7 @@ class Metadata extends Resource implements ResourceInterface {
             RequestInterface::METHOD_GET,
             RequestInterface::METHOD_POST,
             RequestInterface::METHOD_DELETE,
+            RequestInterface::METHOD_HEAD,
         );
     }
 
