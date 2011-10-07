@@ -33,7 +33,7 @@
 namespace Imbo\Database;
 
 use Imbo\Image\ImageInterface;
-use Imbo\Resource\Images\Query;
+use Imbo\Resource\Images\QueryInterface;
 
 /**
  * Database driver interface
@@ -111,7 +111,7 @@ interface DatabaseInterface {
      * @return array
      * @throws Imbo\Database\Exception
      */
-    function getImages($publicKey, Query $query);
+    function getImages($publicKey, QueryInterface $query);
 
     /**
      * Load information from database into the image object

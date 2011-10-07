@@ -33,7 +33,7 @@
 namespace Imbo\Database;
 
 use Imbo\Image\ImageInterface;
-use Imbo\Resource\Images\Query;
+use Imbo\Resource\Images\QueryInterface;
 
 /**
  * MongoDB database driver
@@ -202,7 +202,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * @see Imbo\Database\DatabaseInterface::getImages()
      */
-    public function getImages($publicKey, Query $query) {
+    public function getImages($publicKey, QueryInterface $query) {
         // Initialize return value
         $images = array();
 
