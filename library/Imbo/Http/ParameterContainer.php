@@ -68,6 +68,15 @@ class ParameterContainer implements ParameterContainerInterface {
     }
 
     /**
+     * @see Imbo\Http\ParameterContainerInterface::removeAll()
+     */
+    public function removeAll() {
+        $this->parameters = array();
+
+        return $this;
+    }
+
+    /**
      * @see Imbo\Http\ParameterContainerInterface::set()
      */
     public function set($key, $value) {
