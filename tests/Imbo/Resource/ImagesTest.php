@@ -55,8 +55,8 @@ class ImagesTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Resource\Exception
-     * @expectedExceptionMessage Database error: message
+     * @expectedException Imbo\Database\Exception
+     * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
     public function testGetWhenDatabaseThrowsAnException() {

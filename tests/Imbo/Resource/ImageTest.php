@@ -64,7 +64,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Resource\Exception
+     * @expectedException Imbo\Image\Exception
      * @expectedExceptionMessage message
      * @expectedExceptionCode 400
      */
@@ -80,7 +80,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Resource\Exception
+     * @expectedException Imbo\Database\Exception
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
@@ -106,7 +106,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Resource\Exception
+     * @expectedException Imbo\Storage\Exception
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
@@ -165,7 +165,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Resource\Exception
+     * @expectedException Imbo\Database\Exception
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
@@ -186,7 +186,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Resource\Exception
+     * @expectedException Imbo\Storage\Exception
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
@@ -235,7 +235,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Resource\Exception
+     * @expectedException Imbo\Database\Exception
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
@@ -250,7 +250,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Resource\Exception
+     * @expectedException Imbo\Storage\Exception
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
@@ -265,7 +265,7 @@ class ImageTest extends ResourceTests {
 
         $this->storage->expects($this->once())
                       ->method('load')
-                      ->will($this->throwException(new DatabaseException('message', 500)));
+                      ->will($this->throwException(new StorageException('message', 500)));
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }

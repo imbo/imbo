@@ -133,11 +133,7 @@ class Images extends Resource implements ImagesInterface {
             }
         }
 
-        try {
-            $images = $database->getImages($request->getPublicKey(), $query);
-        } catch (DatabaseException $e) {
-            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
-        }
+        $images = $database->getImages($request->getPublicKey(), $query);
 
         $this->getResponseWriter()->write($images, $request, $response);
     }
