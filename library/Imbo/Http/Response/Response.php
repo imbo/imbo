@@ -31,7 +31,6 @@
 
 namespace Imbo\Http\Response;
 
-use Imbo\Http\Response\Formatter\FormatterInterface;
 use Imbo\Http\HeaderContainer;
 use Imbo\Image\ImageInterface;
 use Imbo\Exception;
@@ -46,13 +45,6 @@ use Imbo\Exception;
  * @link https://github.com/christeredvartsen/imbo
  */
 class Response implements ResponseInterface {
-    /**
-     * Response writer used to format messages to the client (other than images)
-     *
-     * @var Imbo\Http\Response\ResponseWriterInterface
-     */
-    private $writer;
-
     /**
      * HTTP protocol version
      *
@@ -143,14 +135,11 @@ class Response implements ResponseInterface {
     /**
      * Class constructor
      *
-     * @param Imbo\Http\Response\ResponseWriterInterface $writer Response writer instance
      * @param Imbo\Http\HeaderContainer $headerContainer An optional instance of a header
      *                                                     container. An empty one will be created
      *                                                     if not specified.
      */
-    public function __construct(ResponseWriterInterface $writer, HeaderContainer $headerContainer = null) {
-        $this->writer = $writer;
-
+    public function __construct(HeaderContainer $headerContainer = null) {
         if ($headerContainer === null) {
             $headerContainer = new HeaderContainer();
         }
@@ -201,33 +190,7 @@ class Response implements ResponseInterface {
      * @see Imbo\Http\Response\ResponseInterface::setBody()
      */
     public function setBody($content) {
-        if ($content instanceof ImageInterface) {
-            $contentType = $content->getMimeType();
-            $content = $content->getBlob();
-        } else {
-            $contentType = $this->writer->getContentType();
-            $content = $this->writer->write($content);
-        }
-
-        // Store the content in the body
         $this->body = $content;
-
-        // Set some content specific headers
-        $this->headers->set('Content-Length', strlen($content));
-        $this->headers->set('Content-Type', $contentType);
-
-        return $this;
-    }
-
-    /**
-     * @see Imbo\Http\Response\ResponseInterface::setError()
-     */
-    public function setError($code, $message) {
-        $this->setStatusCode($code)
-             ->setBody(array('error' => array(
-                'code'      => $code,
-                'message'   => $message,
-                'timestamp' => gmdate('Y-m-d\TH:i\Z'))));
 
         return $this;
     }
@@ -254,6 +217,15 @@ class Response implements ResponseInterface {
     public function send() {
         $this->sendHeaders();
         $this->sendContent();
+    }
+
+    /**
+     * @see Imbo\Http\Response\ResponseInterface::setNotModified()
+     */
+    public function setNotModified() {
+        $this->setStatusCode(304);
+        $this->setBody(null);
+        $this->getHeaders()->removeAll();
     }
 
     /**
