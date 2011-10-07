@@ -44,4 +44,21 @@ class MetadataTest extends ResourceTests {
     protected function getNewResource() {
         return new Metadata();
     }
+
+    public function testDelete() {
+        $imageIdentifier = md5(microtime());
+        $publicKey = md5(microtime());
+
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
+        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+
+        $resource = $this->getNewResource();
+        $resource->setResponseWriter($writer);
+
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->database->expects($this->once())->method('deleteMetadata')->with($publicKey, $imageIdentifier);
+
+        $resource->delete($this->request, $this->response, $this->database, $this->storage);
+    }
 }
