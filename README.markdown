@@ -179,31 +179,41 @@ Example:
 Imbo will usually inject extra response headers to the different requests. All response headers from Imbo will be prefixed with **X-Imbo-**.
 
 ## Configuration
-When installing Imbo you need to copy the config/server.php.dist file to config/server.php and change the values to suit your needs.
+When installing Imbo you need to copy the boostrap/bootstrap.php.dist file to bootstrap/bootstrap.php and change the values to suit your needs.
 
 ### Authentication key pairs
-Imbo supports several key pairs so several users can store images on your installation of Imbo. To achieve this simply specify several key pairs in the 'auth' element:
+Imbo supports several key pairs so several users can store images on your installation of Imbo. To achieve this simply specify several key pairs in the 'auth' value in the container:
 
-    'auth' => array(
+    $container->auth = array(
         '<publicKey1> => <privateKey1>,
         '<publicKey2> => <privateKey2>,
         ...
         '<publicKeyN> => <privateKeyN>,
-    ),
+    );
 
 ### Specify database and storage drivers
-The database and storage drivers use the 'database' and 'storage' elements in the configuration array respectively. The default looks like this:
+The database and storage drivers use the 'database' and 'storage' values in the container respectively. The default looks like this:
 
-    // Database driver
-    'database' => new Imbo\Database\MongoDB(array(
-        'database'   => 'imbo',
+    // Parameters for the database driver
+    $dbParams = array(
+        'database' => 'imbo',
         'collection' => 'images',
-    )),
+    );
 
-    // Storage driver
-    'storage' => new Imbo\Storage\Filesystem(array(
-        'dataDir' => realpath('/some/path'),
-    )),
+    // Create the database entry
+    $container->database = $container->shared(function (Imbo\Container $container) use ($dbParams) {
+        return new Imbo\Database\MongoDb($dbParams);
+    });
+
+    // Parameters for the storage driver
+    $storageParams = array(
+        'dataDir' => '/some/path',
+    );
+
+    // Create the storage entry
+    $container->storage = $container->shared(function (Imbo\Container $container) use ($storageParams) {
+        return new Imbo\Storage\Filesystem($storageParams);
+    });
 
 which makes Imbo use MongoDB as database and the local filesystem for storage. You can implement your own drivers and use them here. Remember to implement `Imbo\Database\DatabaseInterface` and `Imbo\Storage\StorageInterface` for database drivers and storage drivers respectively.
 
