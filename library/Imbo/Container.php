@@ -58,17 +58,17 @@ namespace Imbo;
  *     namespace Imbo;
  *
  *     $container = new Container();
- *     $container->imageResource = $container->asShared(function (Container $container) {
+ *     $container->imageResource = $container->shared(function (Container $container) {
  *         return new Resource\Image();
  *     });
  *
  *     $dbParams = array('some' => 'params');
- *     $container->database = $container->asShared(function (Container $container) use ($dbParams) {
+ *     $container->database = $container->shared(function (Container $container) use ($dbParams) {
  *         return new Database\MongoDb($dbParams);
  *     });
  *
  *     $storageParams = array('some' => 'params');
- *     $container->storage = $container->asShared(function (Container $container) use ($storageParams) {
+ *     $container->storage = $container->shared(function (Container $container) use ($storageParams) {
  *         return new Storage\Filesystem($storageParams);
  *     });
  *
