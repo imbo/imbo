@@ -48,6 +48,7 @@ class Autoload {
      */
     static public $classes = array(
         'imbo\\autoload' => '/Autoload.php',
+        'imbo\\container' => '/Container.php',
         'imbo\\database\\databaseinterface' => '/Database/DatabaseInterface.php',
         'imbo\\database\\exception' => '/Database/Exception.php',
         'imbo\\database\\mongodb' => '/Database/MongoDB.php',

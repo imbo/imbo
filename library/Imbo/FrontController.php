@@ -50,11 +50,11 @@ use Imbo\Image\Image;
  */
 class FrontController {
     /**
-     * Configuration
+     * Dependency injection container
      *
-     * @var array
+     * @var Imbo\Container
      */
-    private $config;
+    private $container;
 
     /**
      * HTTP methods supported one way or another in Imbo
@@ -74,10 +74,10 @@ class FrontController {
     /**
      * Class constructor
      *
-     * @param array $config Configuration array
+     * @param Imbo\Container $container A container instance
      */
-    public function __construct(array $config) {
-        $this->config = $config;
+    public function __construct(Container $container) {
+        $this->container = $container;
     }
 
     /**
@@ -112,7 +112,7 @@ class FrontController {
      * @throws Imbo\Exception
      */
     private function auth(RequestInterface $request) {
-        $authConfig = $this->config['auth'];
+        $authConfig = $this->container->auth;
         $publicKey = $request->getPublicKey();
 
         // See if the public key exists
@@ -196,9 +196,6 @@ class FrontController {
             $this->auth($request);
         }
 
-        $database = $this->config['database'];
-        $storage  = $this->config['storage'];
-
         // Lowercase the HTTP method to get the class method to execute
         $methodName = strtolower($httpMethod);
 
@@ -207,6 +204,6 @@ class FrontController {
             throw new Exception('Method not allowed', 405);
         }
 
-        $resource->$methodName($request, $response, $database, $storage);
+        $resource->$methodName($request, $response, $this->container->database, $this->container->storage);
     }
 }

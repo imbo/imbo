@@ -60,14 +60,14 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $this->publicKey = md5(microtime());
         $this->privateKey = md5(microtime());
 
-        $config = array(
-            'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
-            'storage' => $this->getMock('Imbo\Storage\StorageInterface'),
-            'auth' => array(
-                $this->publicKey => $this->privateKey,
-            ),
+        $container = new Container();
+        $container->auth = array(
+            $this->publicKey => $this->privateKey,
         );
-        $this->controller = new FrontController($config);
+        $container->database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $container->storage  = $this->getMock('Imbo\Storage\StorageInterface');
+
+        $this->controller = new FrontController($container);
     }
 
     /**
