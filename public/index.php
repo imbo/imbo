@@ -38,8 +38,8 @@ require_once 'Imbo/Autoload.php';
 $loader = new Imbo\Autoload();
 $loader->register();
 
-// Load configuration
-$config = require __DIR__ . '/../config/server.php';
+// Fetch the container
+$container = require __DIR__ . '/../bootstrap/bootstrap.php';
 
 // Initialize request and response
 $request = new Imbo\Http\Request\Request($_GET, $_POST, $_SERVER);
@@ -47,7 +47,7 @@ $response = new Imbo\Http\Response\Response();
 $response->getHeaders()->set('X-Imbo-Version', Imbo\Version::getVersionNumber());
 
 // Create the front controller and handle the request
-$frontController = new Imbo\FrontController($config);
+$frontController = new Imbo\FrontController($container);
 
 try {
     $frontController->handle($request, $response);
