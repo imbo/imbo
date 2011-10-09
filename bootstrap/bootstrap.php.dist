@@ -1,16 +1,29 @@
 <?php
-return array(
-    // Auth (<public> => <private>)
-    'auth' => array(),
+$container = new Imbo\Container();
 
-    // Database driver
-    'database' => new Imbo\Database\MongoDB(array(
-        'database'   => 'imbo',
-        'collection' => 'images',
-    )),
+// Authentication key pairs (publicKey => privateKey)
+$container->auth = array();
 
-    // Storage driver
-    'storage' => new Imbo\Storage\Filesystem(array(
-        'dataDir' => realpath('/some/path'),
-    )),
+// Parameters for the database driver
+$dbParams = array(
+    'database' => 'imbo',
+    'collection' => 'images',
 );
+
+// Create the database entry
+$container->database = $container->shared(function (Imbo\Container $container) use ($dbParams) {
+    return new Imbo\Database\MongoDb($dbParams);
+});
+
+// Parameters for the storage driver
+$storageParams = array(
+    'dataDir' => '/some/path',
+);
+
+// Create the storage entry
+$container->storage = $container->shared(function (Imbo\Container $container) use ($storageParams) {
+    return new Imbo\Storage\Filesystem($storageParams);
+});
+
+// Return the container instance
+return $container;
