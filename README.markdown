@@ -120,7 +120,7 @@ Examples:
 Use this transformation to rotate the image.
 
 * `(int) angle` The number of degrees to rotate the image.
-* `(string) bg` Background color in hexadecimal. Defaults to "000000" (also supports short values like "f00" ("ff0000")).
+* `(string) bg` Background color in hexadecimal. Defaults to '000000' (also supports short values like 'f00' ('ff0000')).
 
 Examples:
 
@@ -130,7 +130,7 @@ Examples:
 ### border
 If you want to add a border around the image, use this transformation.
 
-* `(string) color` Color in hexadecimal. Defaults to "000000" (also supports short values like "f00" ("ff0000")).
+* `(string) color` Color in hexadecimal. Defaults to '000000' (also supports short values like 'f00' ('ff0000')).
 * `(int) width` Width of the border on the left and right sides of the image. Defaults to 1.
 * `(int) height` Height of the border on the top and bottoms sides of the image. Defaults to 1.
 
@@ -145,7 +145,7 @@ Transformation that creates a thumbnail of the image.
 
 * `(int) width` Width of the thumbnail. Defaults to 50.
 * `(int) height` Height of the thumbnail. Defaults to 50.
-* `(int) fit` Fit style. 'inset' or 'outbound'. Default to 'outbound'.
+* `(string) fit` Fit style. 'inset' or 'outbound'. Default to 'outbound'.
 
 Examples:
 
