@@ -180,9 +180,9 @@ class FrontController {
         $data = $request->getMethod() . '|' . $request->getResource() . '|' . $publicKey . '|' . $query->get('timestamp');
 
         // Generate binary hash key
-        $actualSignature = hash_hmac('sha256', $data, $privateKey, true);
+        $actualSignature = hash_hmac('sha256', $data, $privateKey);
 
-        if ($actualSignature !== base64_decode($query->get('signature'))) {
+        if ($actualSignature !== $query->get('signature')) {
             throw new Exception('Signature mismatch', 403);
         }
     }

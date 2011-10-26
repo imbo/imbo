@@ -269,7 +269,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $data = $httpMethod . '|' . $resource . '|' . $this->publicKey . '|' . $timestamp;
 
         // Generate the correct signature
-        $signature = hash_hmac('sha256', $data, $this->privateKey, true);
+        $signature = hash_hmac('sha256', $data, $this->privateKey);
 
         $query = $this->getMock('Imbo\Http\ParameterContainerInterface');
         $query->expects($this->any())->method('has')->will($this->returnValue(true));
@@ -277,7 +277,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
             if ($arg === 'timestamp') {
                 return $timestamp;
             } else if ($arg === 'signature') {
-                return base64_encode($signature);
+                return $signature;
             }
         }));
 
