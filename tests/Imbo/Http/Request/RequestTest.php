@@ -112,4 +112,37 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $request = new Request(array(), array(), array('REQUEST_METHOD' => 'DELETE'));
         $this->assertTrue($request->isUnsafe());
     }
+
+    public function testSetGetPublicKey() {
+        $request = new Request();
+        $publicKey = md5(microtime());
+        $this->assertSame($request, $request->setPublicKey($publicKey));
+        $this->assertSame($publicKey, $request->getPublicKey());
+    }
+
+    public function testGetPath() {
+        $request = new Request();
+        $this->assertEmpty($request->getPath());
+
+    }
+
+    /**
+     * If public/index.php is not placed directly in the document root there is logic in the
+     * request class the removes a possible prefix from the path. This method will test that
+     * functionality.
+     */
+    public function testGetPathWithPrefixUsedForImboInstallation() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime());
+
+        $server = array(
+            'DOCUMENT_ROOT' => '/var/www/imbo',
+            'SCRIPT_FILENAME' => '/var/www/imbo/public/index.php',
+            'REDIRECT_URL' => '/public/users/' . $publicKey . '/images/' . $imageIdentifier,
+        );
+
+        $request = new Request(array(), array(), $server);
+
+        $this->assertSame('/users/' . $publicKey . '/images/' . $imageIdentifier, $request->getPath());
+    }
 }
