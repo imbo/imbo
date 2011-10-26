@@ -58,7 +58,7 @@ try {
         'error' => array(
             'code'      => $exception->getCode(),
             'message'   => $exception->getMessage(),
-            'timestamp' => gmdate('Y-m-d\TH:i\Z'),
+            'timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
         ),
     );
 
