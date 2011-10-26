@@ -88,19 +88,43 @@ class FrontController {
      * @throws Imbo\Exception
      */
     private function resolveResource(RequestInterface $request) {
-        // Fetch request type
-        $type = $request->getType();
+        // Fetch current path
+        $path = $request->getPath();
 
-        if ($type === RequestInterface::RESOURCE_IMAGE) {
-            $image = new Image();
-            $resource = new Resource\Image($image);
-        } else if ($type === RequestInterface::RESOURCE_IMAGES) {
-            $resource = new Resource\Images();
-        } else if ($type === RequestInterface::RESOURCE_METADATA) {
-            $resource = new Resource\Metadata();
-        } else {
+        // Possible patterns to match where the most accessed patch is placed first
+        $routes = array(
+            'image'    => '#^/users/(?<publicKey>[a-f0-9]{32})/images/(?<resource>(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png))?)$#',
+            'metadata' => '#^/users/(?<publicKey>[a-f0-9]{32})/images/(?<resource>(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png)/)meta/?)$#',
+            'images'   => '#^/users/(?<publicKey>[a-f0-9]{32})/(?<resource>images)/?$#',
+        );
+
+        // Initialize matches
+        $matches = array();
+
+        foreach ($routes as $resourceName => $route) {
+            if (preg_match($route, $path, $matches)) {
+                break;
+            }
+        }
+
+        // Path matched no route
+        if (!$matches) {
             throw new Exception('Invalid request', 400);
         }
+
+        // Extract some information from the path and store in the request instance
+        $request->setPublicKey($matches['publicKey']);
+        $request->setResource(rtrim($matches['resource'], '/'));
+
+        if (isset($matches['imageIdentifier'])) {
+            $request->setImageIdentifier($matches['imageIdentifier']);
+        }
+
+        // Append "Resource" to the resource name to match the entry in the container
+        $resourceName .= 'Resource';
+
+        // Fetch the resource instance from the container
+        $resource = $this->container->$resourceName;
 
         return $resource;
     }
@@ -180,15 +204,15 @@ class FrontController {
             throw new Exception('Unsupported HTTP method: ' . $httpMethod, 501);
         }
 
-        // Fetch the resource instance
+        // Fetch a resource instance based on the request path
         $resource = $this->resolveResource($request);
 
         // Add an Allow header to the response that contains the methods the resource has
         // implemented
         $response->getHeaders()->set('Allow', implode(', ', $resource->getAllowedMethods()));
 
-        if ($request->getType() === RequestInterface::RESOURCE_IMAGE) {
-            $response->getHeaders()->set('X-Imbo-ImageIdentifier', $request->getImageIdentifier());
+        if ($identifier = $request->getImageIdentifier()) {
+            $response->getHeaders()->set('X-Imbo-ImageIdentifier', $identifier);
         }
 
         // If we have an unsafe request, we need to make sure that the request is valid
