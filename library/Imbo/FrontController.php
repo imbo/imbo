@@ -157,7 +157,7 @@ class FrontController {
         $timestamp = $query->get('timestamp');
 
         // Make sure the timestamp is in the correct format
-        if (!preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}Z$/', $timestamp)) {
+        if (!preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/', $timestamp)) {
             throw new Exception('Invalid authentication timestamp format: ' . $timestamp, 400);
         }
 
@@ -166,8 +166,9 @@ class FrontController {
         $day    = substr($timestamp, 8, 2);
         $hour   = substr($timestamp, 11, 2);
         $minute = substr($timestamp, 14, 2);
+        $second = substr($timestamp, 17, 2);
 
-        $timestamp = gmmktime($hour, $minute, null, $month, $day, $year);
+        $timestamp = gmmktime($hour, $minute, $second, $month, $day, $year);
 
         $diff = time() - $timestamp;
 

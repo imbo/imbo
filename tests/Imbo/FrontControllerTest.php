@@ -219,7 +219,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
 
         $query = $this->getMock('Imbo\Http\ParameterContainerInterface');
         $query->expects($this->any())->method('has')->will($this->returnValue(true));
-        $query->expects($this->once())->method('get')->with('timestamp')->will($this->returnValue('2011-01-01T01:00Z'));
+        $query->expects($this->once())->method('get')->with('timestamp')->will($this->returnValue('2011-01-01T01:00:00Z'));
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
@@ -238,7 +238,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('auth');
         $method->setAccessible(true);
 
-        $timestamp = gmdate('Y-m-d\TH:i\Z');
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         $signature = 'some signature';
 
         $query = $this->getMock('Imbo\Http\ParameterContainerInterface');
@@ -263,7 +263,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('auth');
         $method->setAccessible(true);
 
-        $timestamp = gmdate('Y-m-d\TH:i\Z');
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         $httpMethod = 'POST';
         $resource = md5(microtime()) . '.png/meta';
         $data = $httpMethod . '|' . $resource . '|' . $this->publicKey . '|' . $timestamp;
