@@ -10,8 +10,24 @@ $dbParams = array(
     'collection' => 'images',
 );
 
+// Image object that can be used by the image resource
+$container->image = $container->shared(function(Imbo\Container $container) {
+    return new Imbo\Image\Image();
+});
+
+// Resources
+$container->metadataResource = $container->shared(function(Imbo\Container $container) {
+    return new Imbo\Resource\Metadata();
+});
+$container->imagesResource = $container->shared(function(Imbo\Container $container) {
+    return new Imbo\Resource\Images();
+});
+$container->imageResource = $container->shared(function(Imbo\Container $container) {
+    return new Imbo\Resource\Image($container->image);
+});
+
 // Create the database entry
-$container->database = $container->shared(function (Imbo\Container $container) use ($dbParams) {
+$container->database = $container->shared(function(Imbo\Container $container) use ($dbParams) {
     return new Imbo\Database\MongoDb($dbParams);
 });
 
@@ -21,7 +37,7 @@ $storageParams = array(
 );
 
 // Create the storage entry
-$container->storage = $container->shared(function (Imbo\Container $container) use ($storageParams) {
+$container->storage = $container->shared(function(Imbo\Container $container) use ($storageParams) {
     return new Imbo\Storage\Filesystem($storageParams);
 });
 

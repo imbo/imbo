@@ -50,6 +50,13 @@ use Imbo\Image\TransformationChain;
  */
 class Request implements RequestInterface {
     /**
+     * The current accessed path
+     *
+     * @var string
+     */
+    private $path;
+
+    /**
      * Query data
      *
      * @var Imbo\Http\ParameterContainerInterface
@@ -104,13 +111,6 @@ class Request implements RequestInterface {
     private $imageIdentifier;
 
     /**
-     * Type of the request
-     *
-     * @var string
-     */
-    private $type = RequestInterface::RESOURCE_UNKNOWN;
-
-    /**
      * Class constructor
      *
      * @param array $query Query data ($_GET)
@@ -128,25 +128,7 @@ class Request implements RequestInterface {
         $resource  = str_replace($excessDir, '', $this->server->get('REDIRECT_URL'));
 
         $parts = parse_url($resource);
-        $path = trim($parts['path'], '/');
-
-        $matches = array();
-
-        // Set some properties if the resource requested is known
-        if (preg_match('#^(?<publicKey>[a-f0-9]{32})/(?<resource>(images|(?<imageIdentifier>[a-f0-9]{32})(?:\.(jpg|gif|png))?(?:/(?<metadata>meta))?))$#', $path, $matches)) {
-            $this->resource = $matches['resource'];
-            $this->publicKey = $matches['publicKey'];
-            $this->imageIdentifier = isset($matches['imageIdentifier']) ? $matches['imageIdentifier'] : null;
-
-            // Decide the type of the request
-            if (isset($matches['imageIdentifier']) && isset($matches['metadata'])) {
-                $this->type = RequestInterface::RESOURCE_METADATA;
-            } else if (isset($matches['imageIdentifier'])) {
-                $this->type = RequestInterface::RESOURCE_IMAGE;
-            } else {
-                $this->type = RequestInterface::RESOURCE_IMAGES;
-            }
-        }
+        $this->path = $parts['path'];
     }
 
     /**
@@ -154,6 +136,15 @@ class Request implements RequestInterface {
      */
     public function getPublicKey() {
         return $this->publicKey;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::setPublicKey()
+     */
+    public function setPublicKey($key) {
+        $this->publicKey = $key;
+
+        return $this;
     }
 
     /**
@@ -221,10 +212,26 @@ class Request implements RequestInterface {
     }
 
     /**
+     * @see Imbo\Http\Request\RequestInterface::getPath()
+     */
+    public function getPath() {
+        return $this->path;
+    }
+
+    /**
      * @see Imbo\Http\Request\RequestInterface::getResource()
      */
     public function getResource() {
         return $this->resource;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::setResource()
+     */
+    public function setResource($resource) {
+        $this->resource = $resource;
+
+        return $this;
     }
 
     /**
@@ -256,13 +263,6 @@ class Request implements RequestInterface {
      */
     public function getRawData() {
         return file_get_contents('php://input');
-    }
-
-    /**
-     * @see Imbo\Http\Request\RequestInterface::getType()
-     */
-    public function getType() {
-        return $this->type;
     }
 
     /**

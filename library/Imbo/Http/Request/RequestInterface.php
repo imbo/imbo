@@ -44,17 +44,6 @@ namespace Imbo\Http\Request;
  */
 interface RequestInterface {
     /**#@+
-     * Supported resource types
-     *
-     * @var int
-     */
-    const RESOURCE_IMAGE    = 'IMAGE';
-    const RESOURCE_IMAGES   = 'IMAGES';
-    const RESOURCE_METADATA = 'METADATA';
-    const RESOURCE_UNKNOWN  = 'UNKNOWN';
-    /**#@-*/
-
-    /**#@+
      * Supported HTTP methods
      *
      * @var string
@@ -76,6 +65,14 @@ interface RequestInterface {
     function getPublicKey();
 
     /**
+     * Set the public key
+     *
+     * @param string $key The key to set
+     * @return Imbo\Http\Request\RequestInterface
+     */
+    function setPublicKey($key);
+
+    /**
      * Get image transformations from the request
      *
      * @return Imbo\Image\TransformationChain
@@ -83,11 +80,26 @@ interface RequestInterface {
     function getTransformations();
 
     /**
+     * Get the current accessed path without possible application prefixes
+     *
+     * @return string
+     */
+    function getPath();
+
+    /**
      * Get the current resource
      *
      * @return string
      */
     function getResource();
+
+    /**
+     * Set the current resource
+     *
+     * @param string $resource The resource name
+     * @return Imbo\Http\Request\RequestInterface
+     */
+    function setResource($resource);
 
     /**
      * Get the current image identifier
@@ -119,13 +131,6 @@ interface RequestInterface {
      * @return string
      */
     function getRawData();
-
-    /**
-     * Get the request type
-     *
-     * @return string
-     */
-    function getType();
 
     /**
      * Get the query container
