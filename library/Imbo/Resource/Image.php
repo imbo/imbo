@@ -181,7 +181,7 @@ class Image extends Resource implements ResourceInterface {
 
         // Set some response headers before we apply optional transformations
         $responseHeaders->set('Last-Modified', $lastModified)
-                        ->set('ETag', $etag)
+                        ->set('ETag', '"' . $etag . '"')
                         ->set('Content-Type', $this->image->getMimeType())
                         ->set('X-Imbo-OriginalMimeType', $originalMimeType)
                         ->set('X-Imbo-OriginalWidth', $this->image->getWidth())

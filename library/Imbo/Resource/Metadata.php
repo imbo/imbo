@@ -119,7 +119,7 @@ class Metadata extends Resource implements ResourceInterface {
 
         // The client did not have this particular version in its cache
         $responseHeaders->set('Last-Modified', $lastModified)
-                        ->set('ETag', $etag);
+                        ->set('ETag', '"' . $etag . '"');
 
         $metadata = $database->getMetadata($publicKey, $imageIdentifier);
 
