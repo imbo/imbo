@@ -66,6 +66,9 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         );
         $container->database = $this->getMock('Imbo\Database\DatabaseInterface');
         $container->storage  = $this->getMock('Imbo\Storage\StorageInterface');
+        $container->imageResource = $this->getMock('Imbo\Resource\Image');
+        $container->imagesResource = $this->getMock('Imbo\Resource\Images');
+        $container->metadataResource = $this->getMock('Imbo\Resource\Metadata');
 
         $this->controller = new FrontController($container);
     }
@@ -82,7 +85,10 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_IMAGE));
+        $imageIdentifier = md5(microtime());
+        $request->expects($this->once())->method('getPath')->will($this->returnValue('/users/' . $this->publicKey . '/images/' . $imageIdentifier));
+        $request->expects($this->once())->method('setPublicKey')->with($this->publicKey);
+        $request->expects($this->once())->method('setResource')->with($imageIdentifier);
         $this->assertInstanceOf('Imbo\Resource\Image', $method->invoke($this->controller, $request));
     }
 
@@ -91,7 +97,9 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_IMAGES));
+        $request->expects($this->once())->method('getPath')->will($this->returnValue('/users/' . $this->publicKey . '/images'));
+        $request->expects($this->once())->method('setPublicKey')->with($this->publicKey);
+        $request->expects($this->once())->method('setResource')->with('images');
         $this->assertInstanceOf('Imbo\Resource\Images', $method->invoke($this->controller, $request));
     }
 
@@ -99,8 +107,11 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $reflection = new \ReflectionClass($this->controller);
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
+        $imageIdentifier = md5(microtime());
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_METADATA));
+        $request->expects($this->once())->method('getPath')->will($this->returnValue('/users/' . $this->publicKey . '/images/' . $imageIdentifier . '/meta'));
+        $request->expects($this->once())->method('setPublicKey')->with($this->publicKey);
+        $request->expects($this->once())->method('setResource')->with($imageIdentifier . '/meta');
         $this->assertInstanceOf('Imbo\Resource\Metadata', $method->invoke($this->controller, $request));
     }
 
@@ -114,7 +125,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_UNKNOWN));
+        $request->expects($this->once())->method('getPath')->will($this->returnValue('foobar'));
         $method->invoke($this->controller, $request);
     }
 

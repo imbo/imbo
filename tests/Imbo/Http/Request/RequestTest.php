@@ -74,72 +74,18 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('Imbo\Image\TransformationChain', $chain);
     }
 
-    public function testRequestWithImageResource() {
-        $publicKey = md5(microtime());
-        $imageIdentifier = md5(microtime());
-        $method = 'GET';
-        $resource = $imageIdentifier;
-
-        $server = array(
-            'DOCUMENT_ROOT' => '/path/to/document/root',
-            'SCRIPT_FILENAME' => '/path/to/document/root/index.php',
-            'REDIRECT_URL' => '/' . $publicKey . '/' . $resource,
-            'REQUEST_METHOD' => $method,
-        );
-
-        $request = new Request(array(), array(), $server);
-        $this->assertSame($publicKey, $request->getPublicKey());
-        $this->assertSame($resource, $request->getResource());
-        $this->assertSame($imageIdentifier, $request->getImageIdentifier());
-        $this->assertSame($method, $request->getMethod());
-        $this->assertSame(RequestInterface::RESOURCE_IMAGE, $request->getType());
-    }
-
-    public function testRequestWithImagesResource() {
-        $publicKey = md5(microtime());
-        $method = 'GET';
-        $resource = 'images';
-
-        $server = array(
-            'DOCUMENT_ROOT' => '/path/to/document/root',
-            'SCRIPT_FILENAME' => '/path/to/document/root/index.php',
-            'REDIRECT_URL' => '/' . $publicKey . '/' . $resource,
-            'REQUEST_METHOD' => $method,
-        );
-
-        $request = new Request(array(), array(), $server);
-        $this->assertSame($publicKey, $request->getPublicKey());
-        $this->assertSame($resource, $request->getResource());
-        $this->assertSame($method, $request->getMethod());
-        $this->assertSame(RequestInterface::RESOURCE_IMAGES, $request->getType());
-    }
-
-    public function testRequestWithMetadataResource() {
-        $publicKey = md5(microtime());
-        $imageIdentifier = md5(microtime());
-        $method = 'GET';
-        $resource = $imageIdentifier . '/meta';
-
-        $server = array(
-            'DOCUMENT_ROOT' => '/path/to/document/root',
-            'SCRIPT_FILENAME' => '/path/to/document/root/index.php',
-            'REDIRECT_URL' => '/' . $publicKey . '/' . $resource,
-            'REQUEST_METHOD' => $method,
-        );
-
-        $request = new Request(array(), array(), $server);
-        $this->assertSame($publicKey, $request->getPublicKey());
-        $this->assertSame($resource, $request->getResource());
-        $this->assertSame($imageIdentifier, $request->getImageIdentifier());
-        $this->assertSame($method, $request->getMethod());
-        $this->assertSame(RequestInterface::RESOURCE_METADATA, $request->getType());
-    }
-
     public function testSetGetImageIdentifier() {
         $request = new Request();
         $identifier = md5(microtime());
         $request->setImageIdentifier($identifier);
         $this->assertSame($identifier, $request->getImageIdentifier());
+    }
+
+    public function testSetGetResource() {
+        $resource = 'images';
+        $request = new Request();
+        $this->assertSame($request, $request->setResource($resource));
+        $this->assertSame($resource, $request->getResource());
     }
 
     public function testGetQuery() {
