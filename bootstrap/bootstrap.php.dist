@@ -4,12 +4,6 @@ $container = new Imbo\Container();
 // Authentication key pairs (publicKey => privateKey)
 $container->auth = array();
 
-// Parameters for the database driver
-$dbParams = array(
-    'database' => 'imbo',
-    'collection' => 'images',
-);
-
 // Image object that can be used by the image resource
 $container->image = $container->shared(function(Imbo\Container $container) {
     return new Imbo\Image\Image();
@@ -25,6 +19,12 @@ $container->imagesResource = $container->shared(function(Imbo\Container $contain
 $container->imageResource = $container->shared(function(Imbo\Container $container) {
     return new Imbo\Resource\Image($container->image);
 });
+
+// Parameters for the database driver
+$dbParams = array(
+    'database' => 'imbo',
+    'collection' => 'images',
+);
 
 // Create the database entry
 $container->database = $container->shared(function(Imbo\Container $container) use ($dbParams) {
