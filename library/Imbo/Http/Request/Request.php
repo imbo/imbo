@@ -124,7 +124,7 @@ class Request implements RequestInterface {
         $this->headers = new HeaderContainer($this->server->getHeaders());
 
         // Remove a possible prefix in the URL
-        $excessDir = str_replace($this->server->get('DOCUMENT_ROOT'), '', dirname($this->server->get('SCRIPT_FILENAME')));
+        $excessDir = str_replace(rtrim($this->server->get('DOCUMENT_ROOT'), '/'), '', dirname($this->server->get('SCRIPT_FILENAME')));
         $resource  = str_replace($excessDir, '', $this->server->get('REDIRECT_URL'));
 
         $parts = parse_url($resource);
