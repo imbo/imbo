@@ -157,7 +157,7 @@ class FrontController {
         $timestamp = $query->get('timestamp');
 
         // Make sure the timestamp is in the correct format
-        if (!preg_match('/[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}Z/', $timestamp)) {
+        if (!preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}Z$/', $timestamp)) {
             throw new Exception('Invalid authentication timestamp format: ' . $timestamp, 400);
         }
 
@@ -172,17 +172,17 @@ class FrontController {
         $diff = time() - $timestamp;
 
         if ($diff > 120 || $diff < -120) {
-            throw new Exception('Authentication timestamp has expired', 401);
+            throw new Exception('Authentication timestamp has expired', 403);
         }
 
         // Generate data for the HMAC
-        $data = $request->getMethod() . $request->getResource() . $publicKey . $query->get('timestamp');
+        $data = $request->getMethod() . '|' . $request->getResource() . '|' . $publicKey . '|' . $query->get('timestamp');
 
         // Generate binary hash key
         $actualSignature = hash_hmac('sha256', $data, $privateKey, true);
 
         if ($actualSignature !== base64_decode($query->get('signature'))) {
-            throw new Exception('Signature mismatch', 401);
+            throw new Exception('Signature mismatch', 403);
         }
     }
 

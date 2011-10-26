@@ -210,7 +210,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Authentication timestamp has expired
-     * @expectedExceptionCode 401
+     * @expectedExceptionCode 403
      */
     public function testAuthWithExpiredTimestamp() {
         $reflection = new \ReflectionClass($this->controller);
@@ -231,7 +231,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Signature mismatch
-     * @expectedExceptionCode 401
+     * @expectedExceptionCode 403
      */
     public function testAuthWithSignatureMismatch() {
         $reflection = new \ReflectionClass($this->controller);
@@ -266,7 +266,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $timestamp = gmdate('Y-m-d\TH:i\Z');
         $httpMethod = 'POST';
         $resource = md5(microtime()) . '.png/meta';
-        $data = $httpMethod . $resource . $this->publicKey . $timestamp;
+        $data = $httpMethod . '|' . $resource . '|' . $this->publicKey . '|' . $timestamp;
 
         // Generate the correct signature
         $signature = hash_hmac('sha256', $data, $this->privateKey, true);

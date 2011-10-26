@@ -64,7 +64,7 @@ All write operations (PUT, POST and DELETE) requires authentication using an Has
 * Public key (random MD5 hash that exists both on the server and the client)
 * GMT timestamp (YYYY-MM-DDTHH:MMZ, for instance: 2011-02-01T14:33Z)
 
-These elements are concatenated in the above order and a hash is generated using a private key and the sha256 algorithm. The following snippet shows how this can be done using PHP:
+These elements are concatenated in the above order with | as a delimiter character and a hash is generated using a private key and the sha256 algorithm. The following snippet shows how this can be done using PHP:
 
     <?php
     $publicKey  = '<some random MD5 hash>';
@@ -73,7 +73,7 @@ These elements are concatenated in the above order and a hash is generated using
     $resource   = 'b8533858299b04af3afc9a3713e69358.jpeg/meta'
     $timestamp  = gmdate('Y-m-d\TH:i\Z');
 
-    $data       = $method . $resource . $publicKey . $timestamp;
+    $data       = $method . '|' . $resource . '|' . $publicKey . '|' . $timestamp;
 
     $hash       = hash_hmac('sha256', $data, $privateKey, true);
     $signature  = base64_encode($hash);
