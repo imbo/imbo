@@ -10,15 +10,15 @@ Since this is a work in progress there is no automatic installation. Simply clon
 ## REST API
 Imbo uses a REST API to manage the images. Each image will be identified by a public key and an MD5 sum of the file itself and the original file extension. The latter will be referred to as &lt;image&gt; for the remainder of this document.
 
-### GET /&lt;publicKey&gt;/&lt;image&gt;
+### GET /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
 Fetch the image identified by &lt;image&gt;. Read more about applying image transformations later on.
 
-### GET /&lt;publicKey&gt;/&lt;image&gt;/meta
+### GET /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
 
 Get meta data related to the image identified by &lt;image&gt;. The meta data will be JSON encoded.
 
-### GET /&lt;publicKey&gt;/images
+### GET /users/&lt;publicKey&gt;/images
 
 Get information about the images stored in Imbo for the user with the public key &lt;publicKey&gt;. Supported query parameters are:
 
@@ -30,29 +30,29 @@ Get information about the images stored in Imbo for the user with the public key
 
 Example:
 
-* `GET /<publicKey>/images?page=1&num=30&metadata=1`
+* `GET /users/<publicKey>/images?page=1&num=30&metadata=1`
 
-### PUT /&lt;publicKey&gt;/&lt;image&gt;
+### PUT /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
 Place a new image on the server.
 
-### POST /&lt;publicKey&gt;/&lt;image&gt;/meta
+### POST /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
 
 Edit the meta data attached to the image identified by &lt;image&gt;.
 
-### DELETE /&lt;publicKey&gt;/&lt;image&gt;
+### DELETE /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
 Delete the image identified by &lt;image&gt; along with all meta data.
 
-### DELETE /&lt;publicKey&gt;/&lt;image&gt;/meta
+### DELETE /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
 
 Delete the meta data attached to the image identified by &lt;image&gt;. The image is kept on the server.
 
-### HEAD /&lt;publicKey&gt;/&lt;image&gt;
+### HEAD /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
 Fetch extra header information about a single image identified by &lt;image&gt;.
 
-### HEAD /&lt;publicKey&gt;/&lt;image&gt;/meta
+### HEAD /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
 
 Fetches extra header information about the meta data attached to the image identified by &lt;image&gt;.
 
@@ -77,7 +77,7 @@ These elements are concatenated in the above order and a hash is generated using
 
     $hash       = hash_hmac('sha256', $data, $privateKey, true);
     $signature  = base64_encode($hash);
-    $url        = sprintf('http://example.com/%s/%s?signature=%s&timestamp=%s',
+    $url        = sprintf('http://example.com/users/%s/images/%s?signature=%s&timestamp=%s',
                           $publicKey,
                           $resource,
                           rawurlencode($signature),
