@@ -79,7 +79,11 @@ class Metadata extends Resource implements ResourceInterface {
         $imageIdentifier = $request->getImageIdentifier();
 
         // Fetch metadata from the request
-        $metadata = $request->getRequest()->get('metadata');
+        if ($request->getRequest()->has('metadata')) {
+            $metadata = $request->getRequest()->get('metadata');
+        } else {
+            $metadata = $request->getRawData();
+        }
 
         if (!$metadata) {
             $metadata = array();
