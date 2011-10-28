@@ -52,8 +52,6 @@ class Autoload {
         'imbo\\database\\databaseinterface' => '/Database/DatabaseInterface.php',
         'imbo\\database\\exception' => '/Database/Exception.php',
         'imbo\\database\\mongodb' => '/Database/MongoDB.php',
-        'imbo\\eventmanager\\event' => '/EventManager/Event.php',
-        'imbo\\eventmanager\\eventinterface' => '/EventManager/EventInterface.php',
         'imbo\\eventmanager\\eventmanager' => '/EventManager/EventManager.php',
         'imbo\\eventmanager\\eventmanagerinterface' => '/EventManager/EventManagerInterface.php',
         'imbo\\exception' => '/Exception.php',
