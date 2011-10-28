@@ -31,6 +31,9 @@
 
 namespace Imbo\EventManager;
 
+use InvalidArgumentException;
+use SplPriorityQueue;
+
 /**
  * Event manager
  *
@@ -41,5 +44,40 @@ namespace Imbo\EventManager;
  * @link https://github.com/christeredvartsen/imbo
  */
 class EventManager implements EventManagerInterface {
+    /**
+     * Different events that can be triggerd
+     *
+     * @var array
+     */
+    private $events;
 
+    /**
+     * @see Imbo\EveneManager\EventManagerInterface::attach()
+     */
+    public function attach($eventName, $callback, $priority = 1) {
+        if (!is_callable($callback)) {
+            throw new InvalidArgumentException('Callback is not callable');
+        }
+
+        if (empty($this->events[$eventName])) {
+            $this->events[$eventName] = new SplPriorityQueue();
+        }
+
+        $this->events[$eventName]->insert($callback, $priority);
+
+        return $this;
+    }
+
+    /**
+     * @see Imbo\EveneManager\EventManagerInterface::trigger()
+     */
+    public function trigger($eventName) {
+        if (!empty($this->events[$eventName])) {
+            foreach ($this->events[$eventName] as $callback) {
+                $callback();
+            }
+        }
+
+        return $this;
+    }
 }
