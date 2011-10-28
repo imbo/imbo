@@ -22,44 +22,41 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Interfaces
- * @subpackage Http\Response\Formatters
+ * @package Http
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/imbo/imbo
+ * @link https://github.com/christeredvartsen/imbo
  */
 
-namespace Imbo\Http\Response\Formatter;
+namespace Imbo\Http;
 
 /**
- * Interface for formatters
+ * Content negotiation
  *
- * @package Interfaces
- * @subpackage Http\Response\Formatters
+ * @package Http
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/imbo/imbo
+ * @link https://github.com/christeredvartsen/imbo
  */
-interface FormatterInterface {
+class ContentNegotiation {
     /**
-     * Format data
+     * See if a mime type is accepted
      *
-     * @param array $data The data to format
-     * @param string $resource The resource name
-     * @param boolean $error Whether or not the response is an error
-     * @return string Formatted data ready to be sent to the client
+     * @param string $mimeType The mime type to check, for instance "image/png"
+     * @param array $acceptable An array of acceptable content types
+     * @return boolean Returns true if $mimeType is accepted, false otherwise
      */
-    function format(array $data, $resource, $error);
+    public function isAcceptable($mimeType, array $acceptable) {
+        foreach ($acceptable as $type) {
+            $pattern = '#^' . str_replace('*', '.*', $type) . '#';
 
-    /**
-     * Get the content type for the current formatter
-     *
-     * Return the content type for the current formatter, excluding the character set, for instance
-     * 'application/json'.
-     *
-     * @return string
-     */
-    function getContentType();
+            if (preg_match($pattern, $mimeType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

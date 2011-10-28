@@ -36,7 +36,8 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface,
     Imbo\Resource\Images\Query,
-    Imbo\Resource\Images\QueryInterface;
+    Imbo\Resource\Images\QueryInterface,
+    DateTime;
 
 /**
  * Images resource
@@ -154,7 +155,14 @@ class Images extends Resource implements ImagesInterface {
             }
         }
 
-        $response->setBody($database->getImages($publicKey, $query));
+        $images = $database->getImages($publicKey, $query);
+
+        foreach ($images as &$image) {
+            $image['added']   = $this->formatDate(new DateTime('@' . $image['added']));
+            $image['updated'] = $this->formatDate(new DateTime('@' . $image['updated']));
+        }
+
+        $response->setBody($images);
     }
 
     /**

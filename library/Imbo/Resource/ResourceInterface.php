@@ -52,6 +52,21 @@ use Imbo\Http\Request\RequestInterface,
  * @link https://github.com/imbo/imbo
  */
 interface ResourceInterface {
+    /**#@+
+     * Resource types
+     *
+     * The values of the constants maps to the names (appended with Resource) used in
+     * Imbo\Container for the resource entries.
+     *
+     * @var string
+     */
+    const STATUS   = 'status';
+    const USER     = 'user';
+    const IMAGES   = 'images';
+    const IMAGE    = 'image';
+    const METADATA = 'metadata';
+    /**#@-*/
+
     /**
      * Return an array with the allowed (implemented) HTTP methods for the current resource
      *

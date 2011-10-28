@@ -245,6 +245,13 @@ class Response implements ResponseInterface {
     }
 
     /**
+     * @see Imbo\Http\Response\ResponseInterface::isError()
+     */
+    public function isError() {
+        return $this->getStatusCode() >= 400;
+    }
+
+    /**
      * Send all headers to the client
      *
      * @codeCoverageIgnore

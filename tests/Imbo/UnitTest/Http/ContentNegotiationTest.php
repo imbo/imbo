@@ -22,44 +22,63 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Interfaces
- * @subpackage Http\Response\Formatters
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\Http\Response\Formatter;
+namespace Imbo\UnitTest\Http;
+
+use Imbo\Http\ContentNegotiation;
 
 /**
- * Interface for formatters
- *
- * @package Interfaces
- * @subpackage Http\Response\Formatters
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Http\ContentNegotiation
  */
-interface FormatterInterface {
+class ContentNegotiationTest extends \PHPUnit_Framework_TestCase {
     /**
-     * Format data
-     *
-     * @param array $data The data to format
-     * @param string $resource The resource name
-     * @param boolean $error Whether or not the response is an error
-     * @return string Formatted data ready to be sent to the client
+     * @var Imbo\Http\ContentNegotiation
      */
-    function format(array $data, $resource, $error);
+    private $cn;
 
     /**
-     * Get the content type for the current formatter
-     *
-     * Return the content type for the current formatter, excluding the character set, for instance
-     * 'application/json'.
-     *
-     * @return string
+     * Set up
      */
-    function getContentType();
+    public function setUp() {
+        $this->cn = new ContentNegotiation();
+    }
+
+    /**
+     * Tear down
+     */
+    public function tearDown() {
+        $this->cn = null;
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getIsAcceptableData() {
+        return array(
+            array('image/png', array('image/png', 'image/*'), true),
+            array('image/png', array('text/html', '*/*'), true),
+            array('image/png', array('text/html'), false),
+            array('image/jpeg', array('application/json', 'text/*'), false),
+            array('application/json', array('text/html;level=1', 'text/html', '*/*', 'text/html;level=2', 'text/*'), true),
+        );
+    }
+
+    /**
+     * @dataProvider getIsAcceptableData
+     * @covers Imbo\Http\ContentNegotiation::isAcceptable
+     */
+    public function testIsAcceptable($mimeType, $acceptable, $result) {
+        $this->assertSame($result, $this->cn->isAcceptable($mimeType, $acceptable));
+    }
 }

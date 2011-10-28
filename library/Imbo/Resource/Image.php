@@ -40,7 +40,9 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Image\ImagePreparation,
     Imbo\Image\ImagePreparationInterface,
     Imbo\Exception\StorageException,
-    Imbo\Image\Transformation\Convert;
+    Imbo\Exception\ResourceException,
+    Imbo\Image\Transformation\Convert,
+    Imbo\Http\ContentNegotiation;
 
 /**
  * Image resource
@@ -67,12 +69,20 @@ class Image extends Resource implements ResourceInterface {
     private $imagePreparation;
 
     /**
+     * Content negotiation instance
+     *
+     * @var Imbo\Http\ContentNegotiation
+     */
+    private $contentNegotiation;
+
+    /**
      * Class constructor
      *
      * @param Imbo\Image\ImageInterface $image An image instance
      * @param Imbo\Image\ImagePreparationInterface $imagePreparation An image preparation instance
+     * @param Imbo\Http\ContentNegotiation $contentNegotiation Content negotiation instance
      */
-    public function __construct(ImageInterface $image = null, ImagePreparationInterface $imagePreparation = null) {
+    public function __construct(ImageInterface $image = null, ImagePreparationInterface $imagePreparation = null, ContentNegotiation $contentNegotiation = null) {
         if ($image === null) {
             $image = new ImageObject();
         }
@@ -81,8 +91,13 @@ class Image extends Resource implements ResourceInterface {
             $imagePreparation = new ImagePreparation();
         }
 
+        if ($contentNegotiation === null) {
+            $contentNegotiation = new ContentNegotiation();
+        }
+
         $this->image = $image;
         $this->imagePreparation = $imagePreparation;
+        $this->contentNegotiation = $contentNegotiation;
     }
 
     /**
@@ -203,6 +218,11 @@ class Image extends Resource implements ResourceInterface {
 
             $convert = new Convert($extension);
             $convert->applyToImage($this->image);
+        }
+
+        // If the image type is not accepted by the client generate an error
+        if (!$this->contentNegotiation->isAcceptable($this->image->getMimetype(), array_keys($request->getAcceptableContentTypes()))) {
+            throw new ResourceException('Not Acceptable', 406);
         }
 
         // Set the content length and content-type after transformations have been applied
