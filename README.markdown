@@ -65,6 +65,7 @@ All write operations (PUT, POST and DELETE) requires authentication using an Has
 * GMT timestamp (YYYY-MM-DDTHH:MMZ, for instance: 2011-02-01T14:33Z)
 
 These elements are concatenated in the above order with | as a delimiter character and a hash is generated using a private key and the sha256 algorithm. The following snippet shows how this can be done using PHP:
+
 ```php
 <?php
 $publicKey  = '<some random MD5 hash>';
@@ -83,6 +84,7 @@ $url        = sprintf('http://example.com/users/%s/images/%s?signature=%s&timest
                       rawurlencode($signature),
                       rawurlencode($timestamp));
 ```
+
 The above code will generate a signature that must be sent along the request using the `signature` query parameter. The timestamp used must also be provided using the `timestamp` query parameter so that the signature can be regenerated server-side. A generated signature is only valid for 5 minutes. Both the signature and the timestamp must be url encoded (by using for instance PHPs [rawurlencode](http://php.net/rawurlencode).
 
 The public and private key pair used by clients must be specified in the server configuration. More information on the configuration file can be found later in this document.
