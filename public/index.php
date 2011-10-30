@@ -38,24 +38,39 @@ require_once 'Imbo/Autoload.php';
 $loader = new Imbo\Autoload();
 $loader->register();
 
+// Fetch the container
+$container = require __DIR__ . '/../bootstrap/bootstrap.php';
+
 // Initialize request and response
 $request = new Imbo\Http\Request\Request($_GET, $_POST, $_SERVER);
-$responseWriter = new Imbo\Http\Response\ResponseWriter($request);
-$response = new Imbo\Http\Response\Response($responseWriter);
+$response = new Imbo\Http\Response\Response();
 $response->getHeaders()->set('X-Imbo-Version', Imbo\Version::getVersionNumber());
 
+// Create the front controller and handle the request
+$frontController = new Imbo\FrontController($container);
+
 try {
-    // Load configuration
-    $config = require __DIR__ . '/../config/server.php';
-
-    // Create the front controller
-    $frontController = new Imbo\FrontController($config);
-
-    // Handle the current request
     $frontController->handle($request, $response);
-} catch (Imbo\Exception $e) {
-    $response->setError($e->getCode(), $e->getMessage());
+} catch (Imbo\Exception $exception) {
+    $response->setStatusCode($exception->getCode());
+
+    $data = array(
+        'error' => array(
+            'code'      => $exception->getCode(),
+            'message'   => $exception->getMessage(),
+            'timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
+        ),
+    );
+
+    $imageIdentifier = $request->getImageIdentifier();
+
+    if ($imageIdentifier) {
+        $data['imageIdentifier'] = $imageIdentifier;
+    }
+
+    $responseWriter = new Imbo\Http\Response\ResponseWriter();
+    $responseWriter->write($data, $request, $response);
 }
 
 // Send the response to the client
-$response->send($request);
+$response->send();

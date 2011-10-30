@@ -42,7 +42,7 @@ namespace Imbo\Resource\Images;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class Query {
+class Query implements QueryInterface {
     /**
      * The page to get
      *
@@ -86,10 +86,7 @@ class Query {
     private $to;
 
     /**
-     * Set or get the page property
-     *
-     * @param int $page Give this a value to set the page property
-     * @return int|Imbo\Resource\Images\Query
+     * @see Imbo\Resource\Images\QueryInterface::page()
      */
     public function page($page = null) {
         if ($page === null) {
@@ -102,10 +99,7 @@ class Query {
     }
 
     /**
-     * Set or get the num property
-     *
-     * @param int $num Give this a value to set the num property
-     * @return int|Imbo\Resource\Images\Query
+     * @see Imbo\Resource\Images\QueryInterface::num()
      */
     public function num($num = null) {
         if ($num === null) {
@@ -118,10 +112,7 @@ class Query {
     }
 
     /**
-     * Set or get the returnMetadata flag
-     *
-     * @param boolean $returnMetadata Give this a value to set the returnMetadata flag
-     * @return boolean|Imbo\Resource\Images\Query
+     * @see Imbo\Resource\Images\QueryInterface::returnMetadata()
      */
     public function returnMetadata($returnMetadata = null) {
         if ($returnMetadata === null) {
@@ -134,10 +125,7 @@ class Query {
     }
 
     /**
-     * Set or get the metadataQuery property
-     *
-     * @param array $metadataQuery Give this a value to set the property
-     * @return array|Imbo\Resource\Images\Query
+     * @see Imbo\Resource\Images\QueryInterface::metadataQuery()
      */
     public function metadataQuery(array $metadataQuery = null) {
         if ($metadataQuery === null) {
@@ -150,10 +138,7 @@ class Query {
     }
 
     /**
-     * Set or get the from attribute
-     *
-     * @param int $from Give this a value to set the from property
-     * @return int|Imbo\Resource\Images\Query
+     * @see Imbo\Resource\Images\QueryInterface::from()
      */
     public function from($from = null) {
         if ($from === null) {
@@ -166,10 +151,7 @@ class Query {
     }
 
     /**
-     * Set or get the to attribute
-     *
-     * @param int $from Give this a value to set the to property
-     * @return int|Imbo\Resource\Images\Query
+     * @see Imbo\Resource\Images\QueryInterface::to()
      */
     public function to($to = null) {
         if ($to === null) {

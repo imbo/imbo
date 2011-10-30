@@ -44,4 +44,73 @@ class MetadataTest extends ResourceTests {
     protected function getNewResource() {
         return new Metadata();
     }
+
+    public function testDelete() {
+        $imageIdentifier = md5(microtime());
+        $publicKey = md5(microtime());
+
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
+        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+
+        $resource = $this->getNewResource();
+        $resource->setResponseWriter($writer);
+
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->database->expects($this->once())->method('deleteMetadata')->with($publicKey, $imageIdentifier);
+
+        $resource->delete($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    public function testPost() {
+        $imageIdentifier = md5(microtime());
+        $publicKey = md5(microtime());
+
+        $rawMetadata = array('some' => 'data');
+        $metadata = json_encode($rawMetadata);
+
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
+        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+
+        $resource = $this->getNewResource();
+        $resource->setResponseWriter($writer);
+
+        $paramContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
+        $paramContainer->expects($this->once())->method('has')->with('metadata')->will($this->returnValue(true));
+        $paramContainer->expects($this->once())->method('get')->with('metadata')->will($this->returnValue($metadata));
+
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->any())->method('getRequest')->will($this->returnValue($paramContainer));
+
+        $this->database->expects($this->once())->method('updateMetadata')->with($publicKey, $imageIdentifier, $rawMetadata);
+
+        $resource->post($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    public function testPostWithDataInRawBody() {
+        $imageIdentifier = md5(microtime());
+        $publicKey = md5(microtime());
+
+        $rawMetadata = array('some' => 'data');
+        $metadata = json_encode($rawMetadata);
+
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
+        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+
+        $resource = $this->getNewResource();
+        $resource->setResponseWriter($writer);
+
+        $paramContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
+        $paramContainer->expects($this->once())->method('has')->with('metadata')->will($this->returnValue(false));
+
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getRequest')->will($this->returnValue($paramContainer));
+        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue($metadata));
+
+        $this->database->expects($this->once())->method('updateMetadata')->with($publicKey, $imageIdentifier, $rawMetadata);
+
+        $resource->post($this->request, $this->response, $this->database, $this->storage);
+    }
 }

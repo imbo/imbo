@@ -57,6 +57,7 @@ class Metadata extends Resource implements ResourceInterface {
             RequestInterface::METHOD_GET,
             RequestInterface::METHOD_POST,
             RequestInterface::METHOD_DELETE,
+            RequestInterface::METHOD_HEAD,
         );
     }
 
@@ -64,11 +65,11 @@ class Metadata extends Resource implements ResourceInterface {
      * @see Imbo\Resource\ResourceInterface::delete()
      */
     public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        try {
-            $database->deleteMetadata($request->getPublicKey(), $request->getImageIdentifier());
-        } catch (DatabaseException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
-        }
+        $imageIdentifier = $request->getImageIdentifier();
+
+        $database->deleteMetadata($request->getPublicKey(), $imageIdentifier);
+
+        $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
     }
 
     /**
@@ -78,7 +79,11 @@ class Metadata extends Resource implements ResourceInterface {
         $imageIdentifier = $request->getImageIdentifier();
 
         // Fetch metadata from the request
-        $metadata = $request->getRequest()->get('metadata');
+        if ($request->getRequest()->has('metadata')) {
+            $metadata = $request->getRequest()->get('metadata');
+        } else {
+            $metadata = $request->getRawData();
+        }
 
         if (!$metadata) {
             $metadata = array();
@@ -86,13 +91,9 @@ class Metadata extends Resource implements ResourceInterface {
             $metadata = json_decode($metadata, true);
         }
 
-        try {
-            $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $metadata);
-        } catch (DatabaseException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
-        }
+        $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $metadata);
 
-        $response->setBody(array('imageIdentifier' => $imageIdentifier));
+        $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
     }
 
     /**
@@ -103,33 +104,39 @@ class Metadata extends Resource implements ResourceInterface {
         $imageIdentifier = $request->getImageIdentifier();
         $requestHeaders = $request->getHeaders();
 
-        try {
-            // See when this particular image was last updated
-            $lastModified = date('r', $database->getLastModified($publicKey, $imageIdentifier));
+        // See when this particular image was last updated
+        $lastModified = date('r', $database->getLastModified($publicKey, $imageIdentifier));
 
-            // Generate an etag for the content
-            $etag = md5($publicKey . $imageIdentifier . $lastModified);
+        // Generate an etag for the content
+        $etag = md5($publicKey . $imageIdentifier . $lastModified);
 
-            if (
-                $lastModified === $requestHeaders->get('if-modified-since') &&
-                $etag === $requestHeaders->get('if-none-match'))
-            {
-                // The client already has this object
-                $response->setStatusCode(304);
-                return;
-            }
-
-            $responseHeaders = $response->getHeaders();
-
-            // The client did not have this particular version in its cache
-            $responseHeaders->set('Last-Modified', $lastModified)
-                            ->set('ETag', $etag);
-
-            $data = $database->getMetadata($publicKey, $imageIdentifier);
-        } catch (DatabaseException $e) {
-            throw new Exception($e->getMessage(), $e->getCode(), $e);
+        if (
+            $lastModified === $requestHeaders->get('if-modified-since') &&
+            $etag === $requestHeaders->get('if-none-match'))
+        {
+            // The client already has this object
+            $response->setNotModified();
+            return;
         }
 
-        $response->setBody($data);
+        $responseHeaders = $response->getHeaders();
+
+        // The client did not have this particular version in its cache
+        $responseHeaders->set('Last-Modified', $lastModified)
+                        ->set('ETag', '"' . $etag . '"');
+
+        $metadata = $database->getMetadata($publicKey, $imageIdentifier);
+
+        return $this->getResponseWriter()->write($metadata, $request, $response);
+    }
+
+    /**
+     * @see Imbo\Resource\ResourceInterface::head()
+     */
+    public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+        $this->get($request, $response, $database, $storage);
+
+        // Remove body from the response, but keep everything else
+        $response->setBody(null);
     }
 }

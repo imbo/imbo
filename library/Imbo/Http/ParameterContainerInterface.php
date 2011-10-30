@@ -51,6 +51,13 @@ interface ParameterContainerInterface {
     function getAll();
 
     /**
+     * Remove all parameters
+     *
+     * @return Imbo\Http\ParameterContainerInterface
+     */
+    function removeAll();
+
+    /**
      * Set a parameter value
      *
      * @param string $key The key to store the value to

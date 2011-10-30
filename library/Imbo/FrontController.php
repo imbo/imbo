@@ -50,11 +50,11 @@ use Imbo\Image\Image;
  */
 class FrontController {
     /**
-     * Configuration
+     * Dependency injection container
      *
-     * @var array
+     * @var Imbo\Container
      */
-    private $config;
+    private $container;
 
     /**
      * HTTP methods supported one way or another in Imbo
@@ -74,10 +74,10 @@ class FrontController {
     /**
      * Class constructor
      *
-     * @param array $config Configuration array
+     * @param Imbo\Container $container A container instance
      */
-    public function __construct(array $config) {
-        $this->config = $config;
+    public function __construct(Container $container) {
+        $this->container = $container;
     }
 
     /**
@@ -88,19 +88,43 @@ class FrontController {
      * @throws Imbo\Exception
      */
     private function resolveResource(RequestInterface $request) {
-        // Fetch request type
-        $type = $request->getType();
+        // Fetch current path
+        $path = $request->getPath();
 
-        if ($type === RequestInterface::RESOURCE_IMAGE) {
-            $image = new Image();
-            $resource = new Resource\Image($image);
-        } else if ($type === RequestInterface::RESOURCE_IMAGES) {
-            $resource = new Resource\Images();
-        } else if ($type === RequestInterface::RESOURCE_METADATA) {
-            $resource = new Resource\Metadata();
-        } else {
+        // Possible patterns to match where the most accessed patch is placed first
+        $routes = array(
+            'image'    => '#^/users/(?<publicKey>[a-f0-9]{32})/images/(?<resource>(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png))?)$#',
+            'metadata' => '#^/users/(?<publicKey>[a-f0-9]{32})/images/(?<resource>(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png)/)meta/?)$#',
+            'images'   => '#^/users/(?<publicKey>[a-f0-9]{32})/(?<resource>images)/?$#',
+        );
+
+        // Initialize matches
+        $matches = array();
+
+        foreach ($routes as $resourceName => $route) {
+            if (preg_match($route, $path, $matches)) {
+                break;
+            }
+        }
+
+        // Path matched no route
+        if (!$matches) {
             throw new Exception('Invalid request', 400);
         }
+
+        // Extract some information from the path and store in the request instance
+        $request->setPublicKey($matches['publicKey']);
+        $request->setResource(rtrim($matches['resource'], '/'));
+
+        if (isset($matches['imageIdentifier'])) {
+            $request->setImageIdentifier($matches['imageIdentifier']);
+        }
+
+        // Append "Resource" to the resource name to match the entry in the container
+        $resourceName .= 'Resource';
+
+        // Fetch the resource instance from the container
+        $resource = $this->container->$resourceName;
 
         return $resource;
     }
@@ -112,7 +136,7 @@ class FrontController {
      * @throws Imbo\Exception
      */
     private function auth(RequestInterface $request) {
-        $authConfig = $this->config['auth'];
+        $authConfig = $this->container->auth;
         $publicKey = $request->getPublicKey();
 
         // See if the public key exists
@@ -142,23 +166,24 @@ class FrontController {
         $day    = substr($timestamp, 8, 2);
         $hour   = substr($timestamp, 11, 2);
         $minute = substr($timestamp, 14, 2);
+        $second = substr($timestamp, 17, 2);
 
-        $timestamp = gmmktime($hour, $minute, null, $month, $day, $year);
+        $timestamp = gmmktime($hour, $minute, $second, $month, $day, $year);
 
         $diff = time() - $timestamp;
 
         if ($diff > 120 || $diff < -120) {
-            throw new Exception('Authentication timestamp has expired', 401);
+            throw new Exception('Authentication timestamp has expired', 403);
         }
 
         // Generate data for the HMAC
-        $data = $request->getMethod() . $request->getResource() . $publicKey . $query->get('timestamp');
+        $data = $request->getMethod() . '|' . $request->getResource() . '|' . $publicKey . '|' . $query->get('timestamp');
 
         // Generate binary hash key
-        $actualSignature = hash_hmac('sha256', $data, $privateKey, true);
+        $actualSignature = hash_hmac('sha256', $data, $privateKey);
 
-        if ($actualSignature !== base64_decode($query->get('signature'))) {
-            throw new Exception('Signature mismatch', 401);
+        if ($actualSignature !== $query->get('signature')) {
+            throw new Exception('Signature mismatch', 403);
         }
     }
 
@@ -180,15 +205,15 @@ class FrontController {
             throw new Exception('Unsupported HTTP method: ' . $httpMethod, 501);
         }
 
-        // Fetch the resource instance
+        // Fetch a resource instance based on the request path
         $resource = $this->resolveResource($request);
 
         // Add an Allow header to the response that contains the methods the resource has
         // implemented
         $response->getHeaders()->set('Allow', implode(', ', $resource->getAllowedMethods()));
 
-        if ($request->getType() === RequestInterface::RESOURCE_IMAGE) {
-            $response->getHeaders()->set('X-Imbo-ImageIdentifier', $request->getImageIdentifier());
+        if ($identifier = $request->getImageIdentifier()) {
+            $response->getHeaders()->set('X-Imbo-ImageIdentifier', $identifier);
         }
 
         // If we have an unsafe request, we need to make sure that the request is valid
@@ -196,19 +221,14 @@ class FrontController {
             $this->auth($request);
         }
 
-        $database = $this->config['database'];
-        $storage  = $this->config['storage'];
-
         // Lowercase the HTTP method to get the class method to execute
         $methodName = strtolower($httpMethod);
 
         // See if the HTTP method is supported at all
         if (!method_exists($resource, $methodName)) {
-            $response->setError(405, 'Method not allowed');
-
-            return;
+            throw new Exception('Method not allowed', 405);
         }
 
-        $resource->$methodName($request, $response, $database, $storage);
+        $resource->$methodName($request, $response, $this->container->database, $this->container->storage);
     }
 }

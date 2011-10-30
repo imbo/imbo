@@ -60,14 +60,17 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $this->publicKey = md5(microtime());
         $this->privateKey = md5(microtime());
 
-        $config = array(
-            'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
-            'storage' => $this->getMock('Imbo\Storage\StorageInterface'),
-            'auth' => array(
-                $this->publicKey => $this->privateKey,
-            ),
+        $container = new Container();
+        $container->auth = array(
+            $this->publicKey => $this->privateKey,
         );
-        $this->controller = new FrontController($config);
+        $container->database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $container->storage  = $this->getMock('Imbo\Storage\StorageInterface');
+        $container->imageResource = $this->getMock('Imbo\Resource\Image');
+        $container->imagesResource = $this->getMock('Imbo\Resource\Images');
+        $container->metadataResource = $this->getMock('Imbo\Resource\Metadata');
+
+        $this->controller = new FrontController($container);
     }
 
     /**
@@ -82,7 +85,10 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_IMAGE));
+        $imageIdentifier = md5(microtime());
+        $request->expects($this->once())->method('getPath')->will($this->returnValue('/users/' . $this->publicKey . '/images/' . $imageIdentifier));
+        $request->expects($this->once())->method('setPublicKey')->with($this->publicKey);
+        $request->expects($this->once())->method('setResource')->with($imageIdentifier);
         $this->assertInstanceOf('Imbo\Resource\Image', $method->invoke($this->controller, $request));
     }
 
@@ -91,7 +97,9 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_IMAGES));
+        $request->expects($this->once())->method('getPath')->will($this->returnValue('/users/' . $this->publicKey . '/images'));
+        $request->expects($this->once())->method('setPublicKey')->with($this->publicKey);
+        $request->expects($this->once())->method('setResource')->with('images');
         $this->assertInstanceOf('Imbo\Resource\Images', $method->invoke($this->controller, $request));
     }
 
@@ -99,8 +107,11 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $reflection = new \ReflectionClass($this->controller);
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
+        $imageIdentifier = md5(microtime());
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_METADATA));
+        $request->expects($this->once())->method('getPath')->will($this->returnValue('/users/' . $this->publicKey . '/images/' . $imageIdentifier . '/meta'));
+        $request->expects($this->once())->method('setPublicKey')->with($this->publicKey);
+        $request->expects($this->once())->method('setResource')->with($imageIdentifier . '/meta');
         $this->assertInstanceOf('Imbo\Resource\Metadata', $method->invoke($this->controller, $request));
     }
 
@@ -114,7 +125,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getType')->will($this->returnValue(RequestInterface::RESOURCE_UNKNOWN));
+        $request->expects($this->once())->method('getPath')->will($this->returnValue('foobar'));
         $method->invoke($this->controller, $request);
     }
 
@@ -199,7 +210,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Authentication timestamp has expired
-     * @expectedExceptionCode 401
+     * @expectedExceptionCode 403
      */
     public function testAuthWithExpiredTimestamp() {
         $reflection = new \ReflectionClass($this->controller);
@@ -208,7 +219,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
 
         $query = $this->getMock('Imbo\Http\ParameterContainerInterface');
         $query->expects($this->any())->method('has')->will($this->returnValue(true));
-        $query->expects($this->once())->method('get')->with('timestamp')->will($this->returnValue('2011-01-01T01:00Z'));
+        $query->expects($this->once())->method('get')->with('timestamp')->will($this->returnValue('2011-01-01T01:00:00Z'));
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
@@ -220,14 +231,14 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Signature mismatch
-     * @expectedExceptionCode 401
+     * @expectedExceptionCode 403
      */
     public function testAuthWithSignatureMismatch() {
         $reflection = new \ReflectionClass($this->controller);
         $method = $reflection->getMethod('auth');
         $method->setAccessible(true);
 
-        $timestamp = gmdate('Y-m-d\TH:i\Z');
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         $signature = 'some signature';
 
         $query = $this->getMock('Imbo\Http\ParameterContainerInterface');
@@ -252,13 +263,13 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('auth');
         $method->setAccessible(true);
 
-        $timestamp = gmdate('Y-m-d\TH:i\Z');
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         $httpMethod = 'POST';
         $resource = md5(microtime()) . '.png/meta';
-        $data = $httpMethod . $resource . $this->publicKey . $timestamp;
+        $data = $httpMethod . '|' . $resource . '|' . $this->publicKey . '|' . $timestamp;
 
         // Generate the correct signature
-        $signature = hash_hmac('sha256', $data, $this->privateKey, true);
+        $signature = hash_hmac('sha256', $data, $this->privateKey);
 
         $query = $this->getMock('Imbo\Http\ParameterContainerInterface');
         $query->expects($this->any())->method('has')->will($this->returnValue(true));
@@ -266,7 +277,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
             if ($arg === 'timestamp') {
                 return $timestamp;
             } else if ($arg === 'signature') {
-                return base64_encode($signature);
+                return $signature;
             }
         }));
 

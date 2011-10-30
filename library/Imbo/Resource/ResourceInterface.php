@@ -68,68 +68,77 @@ interface ResourceInterface {
     function getAllowedMethods();
 
     /**
+     * Get the response writer instance
+     *
+     * @return Imbo\Http\Response\ResponseWriterInterface
+     */
+    function getResponseWriter();
+
+    /**
+     * Set the response writer instance
+     *
+     * @param Imbo\Http\Response\ResponseWriterInterface $writer An instance of the response writer
+     * @return Imbo\Resource\ResourceInterface
+     */
+    function setResponseWriter($writer);
+
+    /**
      * POST handler
      *
-     * @param Imbo\Http\Request\RequestInterface   $request  A request instance
+     * @param Imbo\Http\Request\RequestInterface $request A request instance
      * @param Imbo\Http\Response\ResponseInterface $response A response instance
      * @param Imbo\Database\DatabaseInterface $database A database instance
-     * @param Imbo\Storage\StorageInterface   $storage  A storage instance
-     * @throws Imbo\Resource\Exception
+     * @param Imbo\Storage\StorageInterface $storage A storage instance
      */
     function post(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
     /**
      * GET handler
      *
-     * @param Imbo\Http\Request\RequestInterface   $request  A request instance
+     * @param Imbo\Http\Request\RequestInterface $request A request instance
      * @param Imbo\Http\Response\ResponseInterface $response A response instance
      * @param Imbo\Database\DatabaseInterface $database A database instance
-     * @param Imbo\Storage\StorageInterface   $storage  A storage instance
-     * @throws Imbo\Resource\Exception
+     * @param Imbo\Storage\StorageInterface $storage A storage instance
      */
     function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
     /**
      * HEAD handler
      *
-     * @param Imbo\Http\Request\RequestInterface   $request  A request instance
+     * @param Imbo\Http\Request\RequestInterface $request A request instance
      * @param Imbo\Http\Response\ResponseInterface $response A response instance
      * @param Imbo\Database\DatabaseInterface $database A database instance
-     * @param Imbo\Storage\StorageInterface   $storage  A storage instance
-     * @throws Imbo\Resource\Exception
+     * @param Imbo\Storage\StorageInterface $storage A storage instance
      */
     function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
     /**
      * DELETE handler
      *
-     * @param Imbo\Http\Request\RequestInterface   $request  A request instance
+     * @param Imbo\Http\Request\RequestInterface $request A request instance
      * @param Imbo\Http\Response\ResponseInterface $response A response instance
      * @param Imbo\Database\DatabaseInterface $database A database instance
-     * @param Imbo\Storage\StorageInterface   $storage  A storage instance
-     * @throws Imbo\Resource\Exception
+     * @param Imbo\Storage\StorageInterface $storage A storage instance
      */
     function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
     /**
      * OPTIONS handler
      *
-     * @param Imbo\Http\Request\RequestInterface   $request  A request instance
+     * @param Imbo\Http\Request\RequestInterface $request A request instance
      * @param Imbo\Http\Response\ResponseInterface $response A response instance
      * @param Imbo\Database\DatabaseInterface $database A database instance
-     * @param Imbo\Storage\StorageInterface   $storage  A storage instance
-     * @throws Imbo\Resource\Exception
+     * @param Imbo\Storage\StorageInterface $storage A storage instance
      */
     function options(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
     /**
      * PUT handler
      *
-     * @param Imbo\Http\Request\RequestInterface   $request  A request instance
+     * @param Imbo\Http\Request\RequestInterface $request A request instance
      * @param Imbo\Http\Response\ResponseInterface $response A response instance
      * @param Imbo\Database\DatabaseInterface $database A database instance
-     * @param Imbo\Storage\StorageInterface   $storage  A storage instance
-     * @throws Imbo\Resource\Exception
+     * @param Imbo\Storage\StorageInterface $storage A storage instance
      */
     function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 }

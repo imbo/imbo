@@ -23,38 +23,43 @@
  * IN THE SOFTWARE.
  *
  * @package Imbo
+ * @subpackage Interfaces
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
 
-namespace Imbo\Http\Response;
+namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface;
-use Imbo\Http\Response\Formatter;
+use Imbo\Resource\Images\QueryInterface;
 
 /**
- * Response writer
+ * Images resource interface
+ *
+ * This interface extends the resource interface with two methods for setting and getting a query
+ * instance.
  *
  * @package Imbo
+ * @subpackage Interfaces
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class ResponseWriter implements ResponseWriterInterface {
+interface ImagesInterface extends ResourceInterface {
     /**
-     * @see Imbo\Http\Response\ResponseWriterInterface::write()
-     * @todo Pick the formatter based on the request
+     * Fetch a query instance
+     *
+     * @return Imbo\Resource\Images\QueryInterface
      */
-    public function write(array $data, RequestInterface $request, ResponseInterface $response) {
-        $formatter = new Formatter\Json();
-        $formattedData = $formatter->format($data);
+    function getQuery();
 
-        $response->getHeaders()->set('Content-Type', $formatter->getContentType())
-                               ->set('Content-Length', strlen($formattedData));
-
-        $response->setBody($formattedData);
-    }
+    /**
+     * Set a query instance
+     *
+     * @param Imbo\Resource\Images\QueryInterface $query A query instance
+     * @return Imbo\Resource\ImagesInterface
+     */
+    function setQuery(QueryInterface $query);
 }

@@ -37,6 +37,7 @@ use Imbo\Http\Response\ResponseInterface;
 use Imbo\Database\DatabaseInterface;
 use Imbo\Storage\StorageInterface;
 use Imbo\Resource\Images\Query;
+use Imbo\Resource\Images\QueryInterface;
 use Imbo\Database\Exception as DatabaseException;
 
 /**
@@ -59,13 +60,41 @@ use Imbo\Database\Exception as DatabaseException;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class Images extends Resource implements ResourceInterface {
+class Images extends Resource implements ImagesInterface {
+    /**
+     * Query instance
+     *
+     * @var Imbo\Resource\Images\QueryInterface
+     */
+    private $query;
+
+    /**
+     * @see Imbo\Resource\ImagesInterface::getQuery()
+     */
+    public function getQuery() {
+        if ($this->query === null) {
+            $this->query = new Query();
+        }
+
+        return $this->query;
+    }
+
+    /**
+     * @see Imbo\Resource\ImagesInterface::setQuery()
+     */
+    public function setQuery(QueryInterface $query) {
+        $this->query = $query;
+
+        return $this;
+    }
+
     /**
      * @see Imbo\Resource\ResourceInterface::getAllowedMethods()
      */
     public function getAllowedMethods() {
         return array(
             RequestInterface::METHOD_GET,
+            RequestInterface::METHOD_HEAD,
         );
     }
 
@@ -73,7 +102,7 @@ class Images extends Resource implements ResourceInterface {
      * @see Imbo\Resource\ResourceInterface::get()
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $query = new Query();
+        $query = $this->getQuery();
         $params = $request->getQuery();
 
         if ($params->has('page')) {
@@ -104,12 +133,18 @@ class Images extends Resource implements ResourceInterface {
             }
         }
 
-        try {
-            $images = $database->getImages($request->getPublicKey(), $query);
-        } catch (DatabaseException $e) {
-            throw new Exception('Database error: ' . $e->getMessage(), $e->getCode(), $e);
-        }
+        $images = $database->getImages($request->getPublicKey(), $query);
 
-        $response->setBody($images);
+        $this->getResponseWriter()->write($images, $request, $response);
+    }
+
+    /**
+     * @see Imbo\Resource\ResourceInterface::head()
+     */
+    public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+        $this->get($request, $response, $database, $storage);
+
+        // Remove body from the response, but keep everything else
+        $response->setBody(null);
     }
 }

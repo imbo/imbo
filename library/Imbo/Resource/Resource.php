@@ -34,6 +34,7 @@ namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface;
 use Imbo\Http\Response\ResponseInterface;
+use Imbo\Http\Response\ResponseWriter;
 use Imbo\Database\DatabaseInterface;
 use Imbo\Storage\StorageInterface;
 use Imbo\Resource\ResourceInterface;
@@ -51,6 +52,33 @@ use Imbo\Resource\ResourceInterface;
  * @link https://github.com/christeredvartsen/imbo
  */
 abstract class Resource {
+    /**
+     * A response writer
+     *
+     * @var Imbo\Http\Response\ResponseWriterInterface
+     */
+    private $writer;
+
+    /**
+     * @see Imbo\Resource\ResourceInterface::getResponseWriter()
+     */
+    public function getResponseWriter() {
+        if ($this->writer === null) {
+            $this->writer = new ResponseWriter();
+        }
+
+        return $this->writer;
+    }
+
+    /**
+     * @see Imbo\Resource\ResourceInterface::setResponseWriter()
+     */
+    public function setResponseWriter($writer) {
+        $this->writer = $writer;
+
+        return $this;
+    }
+
     /**
      * @see Imbo\Resource\ResourceInterface::post()
      */

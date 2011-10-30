@@ -92,18 +92,6 @@ interface ResponseInterface {
     function setBody($content);
 
     /**
-     * Set an error message
-     *
-     * This method should update the status code and store the error message in the body of the
-     * response.
-     *
-     * @param int $code The HTTP status code
-     * @param string $message Error message that will be sent to the client
-     * @return Imbo\Http\Response\ResponseInterface
-     */
-    function setError($code, $message);
-
-    /**
      * Get the HTTP protocol version
      *
      * @return string
@@ -122,4 +110,9 @@ interface ResponseInterface {
      * Send the response to the client (headers and content)
      */
     function send();
+
+    /**
+     * Prepare the response to send 304 Not Modified to the client
+     */
+    function setNotModified();
 }

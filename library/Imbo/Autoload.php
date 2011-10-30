@@ -48,6 +48,7 @@ class Autoload {
      */
     static public $classes = array(
         'imbo\\autoload' => '/Autoload.php',
+        'imbo\\container' => '/Container.php',
         'imbo\\database\\databaseinterface' => '/Database/DatabaseInterface.php',
         'imbo\\database\\exception' => '/Database/Exception.php',
         'imbo\\database\\mongodb' => '/Database/MongoDB.php',
@@ -88,6 +89,8 @@ class Autoload {
         'imbo\\resource\\image' => '/Resource/Image.php',
         'imbo\\resource\\images' => '/Resource/Images.php',
         'imbo\\resource\\images\\query' => '/Resource/Images/Query.php',
+        'imbo\\resource\\images\\queryinterface' => '/Resource/Images/QueryInterface.php',
+        'imbo\\resource\\imagesinterface' => '/Resource/ImagesInterface.php',
         'imbo\\resource\\metadata' => '/Resource/Metadata.php',
         'imbo\\resource\\resource' => '/Resource/Resource.php',
         'imbo\\resource\\resourceinterface' => '/Resource/ResourceInterface.php',

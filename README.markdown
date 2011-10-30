@@ -10,15 +10,15 @@ Since this is a work in progress there is no automatic installation. Simply clon
 ## REST API
 Imbo uses a REST API to manage the images. Each image will be identified by a public key and an MD5 sum of the file itself and the original file extension. The latter will be referred to as &lt;image&gt; for the remainder of this document.
 
-### GET /&lt;publicKey&gt;/&lt;image&gt;
+### GET /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
 Fetch the image identified by &lt;image&gt;. Read more about applying image transformations later on.
 
-### GET /&lt;publicKey&gt;/&lt;image&gt;/meta
+### GET /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
 
 Get meta data related to the image identified by &lt;image&gt;. The meta data will be JSON encoded.
 
-### GET /&lt;publicKey&gt;/images
+### GET /users/&lt;publicKey&gt;/images
 
 Get information about the images stored in Imbo for the user with the public key &lt;publicKey&gt;. Supported query parameters are:
 
@@ -30,29 +30,29 @@ Get information about the images stored in Imbo for the user with the public key
 
 Example:
 
-* `GET /<publicKey>/images?page=1&num=30&metadata=1`
+* `GET /users/<publicKey>/images?page=1&num=30&metadata=1`
 
-### PUT /&lt;publicKey&gt;/&lt;image&gt;
+### PUT /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
 Place a new image on the server.
 
-### POST /&lt;publicKey&gt;/&lt;image&gt;/meta
+### POST /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
 
 Edit the meta data attached to the image identified by &lt;image&gt;.
 
-### DELETE /&lt;publicKey&gt;/&lt;image&gt;
+### DELETE /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
 Delete the image identified by &lt;image&gt; along with all meta data.
 
-### DELETE /&lt;publicKey&gt;/&lt;image&gt;/meta
+### DELETE /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
 
 Delete the meta data attached to the image identified by &lt;image&gt;. The image is kept on the server.
 
-### HEAD /&lt;publicKey&gt;/&lt;image&gt;
+### HEAD /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
 Fetch extra header information about a single image identified by &lt;image&gt;.
 
-### HEAD /&lt;publicKey&gt;/&lt;image&gt;/meta
+### HEAD /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
 
 Fetches extra header information about the meta data attached to the image identified by &lt;image&gt;.
 
@@ -64,24 +64,26 @@ All write operations (PUT, POST and DELETE) requires authentication using an Has
 * Public key (random MD5 hash that exists both on the server and the client)
 * GMT timestamp (YYYY-MM-DDTHH:MMZ, for instance: 2011-02-01T14:33Z)
 
-These elements are concatenated in the above order and a hash is generated using a private key and the sha256 algorithm. The following snippet shows how this can be done using PHP:
+These elements are concatenated in the above order with | as a delimiter character and a hash is generated using a private key and the sha256 algorithm. The following snippet shows how this can be done using PHP:
 
-    <?php
-    $publicKey  = '<some random MD5 hash>';
-    $privateKey = '<some other random MD5 hash>';
-    $method     = 'DELETE';
-    $resource   = 'b8533858299b04af3afc9a3713e69358.jpeg/meta'
-    $timestamp  = gmdate('Y-m-d\TH:i\Z');
+```php
+<?php
+$publicKey  = '<some random MD5 hash>';
+$privateKey = '<some other random MD5 hash>';
+$method     = 'DELETE';
+$resource   = 'b8533858299b04af3afc9a3713e69358.jpeg/meta'
+$timestamp  = gmdate('Y-m-d\TH:i\Z');
 
-    $data       = $method . $resource . $publicKey . $timestamp;
+$data       = $method . '|' . $resource . '|' . $publicKey . '|' . $timestamp;
 
-    $hash       = hash_hmac('sha256', $data, $privateKey, true);
-    $signature  = base64_encode($hash);
-    $url        = sprintf('http://example.com/%s/%s?signature=%s&timestamp=%s',
-                          $publicKey,
-                          $resource,
-                          rawurlencode($signature),
-                          rawurlencode($timestamp));
+$hash       = hash_hmac('sha256', $data, $privateKey, true);
+$signature  = base64_encode($hash);
+$url        = sprintf('http://example.com/users/%s/images/%s?signature=%s&timestamp=%s',
+                      $publicKey,
+                      $resource,
+                      rawurlencode($signature),
+                      rawurlencode($timestamp));
+```
 
 The above code will generate a signature that must be sent along the request using the `signature` query parameter. The timestamp used must also be provided using the `timestamp` query parameter so that the signature can be regenerated server-side. A generated signature is only valid for 5 minutes. Both the signature and the timestamp must be url encoded (by using for instance PHPs [rawurlencode](http://php.net/rawurlencode).
 
@@ -120,7 +122,7 @@ Examples:
 Use this transformation to rotate the image.
 
 * `(int) angle` The number of degrees to rotate the image.
-* `(string) bg` Background color in hexadecimal. Defaults to "000000" (also supports short values like "f00" ("ff0000")).
+* `(string) bg` Background color in hexadecimal. Defaults to '000000' (also supports short values like 'f00' ('ff0000')).
 
 Examples:
 
@@ -130,7 +132,7 @@ Examples:
 ### border
 If you want to add a border around the image, use this transformation.
 
-* `(string) color` Color in hexadecimal. Defaults to "000000" (also supports short values like "f00" ("ff0000")).
+* `(string) color` Color in hexadecimal. Defaults to '000000' (also supports short values like 'f00' ('ff0000')).
 * `(int) width` Width of the border on the left and right sides of the image. Defaults to 1.
 * `(int) height` Height of the border on the top and bottoms sides of the image. Defaults to 1.
 
@@ -145,7 +147,7 @@ Transformation that creates a thumbnail of the image.
 
 * `(int) width` Width of the thumbnail. Defaults to 50.
 * `(int) height` Height of the thumbnail. Defaults to 50.
-* `(int) fit` Fit style. 'inset' or 'outbound'. Default to 'outbound'.
+* `(string) fit` Fit style. 'inset' or 'outbound'. Default to 'outbound'.
 
 Examples:
 
@@ -179,31 +181,47 @@ Example:
 Imbo will usually inject extra response headers to the different requests. All response headers from Imbo will be prefixed with **X-Imbo-**.
 
 ## Configuration
-When installing Imbo you need to copy the config/server.php.dist file to config/server.php and change the values to suit your needs.
+When installing Imbo you need to copy the boostrap/bootstrap.php.dist file to bootstrap/bootstrap.php and change the values to suit your needs.
 
 ### Authentication key pairs
-Imbo supports several key pairs so several users can store images on your installation of Imbo. To achieve this simply specify several key pairs in the 'auth' element:
+Imbo supports several key pairs so several users can store images on your installation of Imbo. To achieve this simply specify several key pairs in the 'auth' value in the container:
 
-    'auth' => array(
-        '<publicKey1> => <privateKey1>,
-        '<publicKey2> => <privateKey2>,
-        ...
-        '<publicKeyN> => <privateKeyN>,
-    ),
+```php
+<?php
+$container->auth = array(
+    '<publicKey1>' => '<privateKey1>',
+    '<publicKey2>' => '<privateKey2>',
+    ...
+    '<publicKeyN>' => '<privateKeyN>',
+);
+```
 
 ### Specify database and storage drivers
-The database and storage drivers use the 'database' and 'storage' elements in the configuration array respectively. The default looks like this:
+The database and storage drivers use the 'database' and 'storage' values in the container respectively. The default looks like this:
 
-    // Database driver
-    'database' => new Imbo\Database\MongoDB(array(
-        'database'   => 'imbo',
-        'collection' => 'images',
-    )),
+```php
+<?php
+// Parameters for the database driver
+$dbParams = array(
+    'database' => 'imbo',
+    'collection' => 'images',
+);
 
-    // Storage driver
-    'storage' => new Imbo\Storage\Filesystem(array(
-        'dataDir' => realpath('/some/path'),
-    )),
+// Create the database entry
+$container->database = $container->shared(function (Imbo\Container $container) use ($dbParams) {
+    return new Imbo\Database\MongoDb($dbParams);
+});
+
+// Parameters for the storage driver
+$storageParams = array(
+    'dataDir' => '/some/path',
+);
+
+// Create the storage entry
+$container->storage = $container->shared(function (Imbo\Container $container) use ($storageParams) {
+    return new Imbo\Storage\Filesystem($storageParams);
+});
+```
 
 which makes Imbo use MongoDB as database and the local filesystem for storage. You can implement your own drivers and use them here. Remember to implement `Imbo\Database\DatabaseInterface` and `Imbo\Storage\StorageInterface` for database drivers and storage drivers respectively.
 
