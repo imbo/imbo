@@ -32,17 +32,15 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Exception as ImboException;
 use Imbo\Http\Request\RequestInterface;
 use Imbo\Http\Response\ResponseInterface;
 use Imbo\Database\DatabaseInterface;
 use Imbo\Storage\StorageInterface;
 use Imbo\Image\Image as ImageObject;
-use Imbo\Image\Exception as ImageException;
 use Imbo\Image\ImageInterface;
 use Imbo\Image\ImagePreparation;
 use Imbo\Image\ImagePreparationInterface;
-use Imbo\Database\Exception as DatabaseException;
+use Imbo\Storage\Exception as StorageException;
 use Imbo\Image\Transformation\Convert;
 
 /**
@@ -115,7 +113,14 @@ class Image extends Resource implements ResourceInterface {
         $database->insertImage($publicKey, $imageIdentifier, $this->image);
 
         // Store the image
-        $storage->store($publicKey, $imageIdentifier, $this->image);
+        try {
+            $storage->store($publicKey, $imageIdentifier, $this->image);
+        } catch (StorageException $e) {
+            // Remove image from the database
+            $database->deleteImage($publicKey, $imageIdentifier);
+
+            throw $e;
+        }
 
         $response->setStatusCode(201);
 
