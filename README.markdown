@@ -185,6 +185,7 @@ When installing Imbo you need to copy the boostrap/bootstrap.php.dist file to bo
 
 ### Authentication key pairs
 Imbo supports several key pairs so several users can store images on your installation of Imbo. To achieve this simply specify several key pairs in the 'auth' value in the container:
+
 ```php
 <?php
 $container->auth = array(
@@ -194,8 +195,10 @@ $container->auth = array(
     '<publicKeyN> => <privateKeyN>,
 );
 ```
+
 ### Specify database and storage drivers
 The database and storage drivers use the 'database' and 'storage' values in the container respectively. The default looks like this:
+
 ```php
 <?php
 // Parameters for the database driver
@@ -219,6 +222,7 @@ $container->storage = $container->shared(function (Imbo\Container $container) us
     return new Imbo\Storage\Filesystem($storageParams);
 });
 ```
+
 which makes Imbo use MongoDB as database and the local filesystem for storage. You can implement your own drivers and use them here. Remember to implement `Imbo\Database\DatabaseInterface` and `Imbo\Storage\StorageInterface` for database drivers and storage drivers respectively.
 
 ## Developer/Contributer notes
