@@ -189,10 +189,10 @@ Imbo supports several key pairs so several users can store images on your instal
 ```php
 <?php
 $container->auth = array(
-    '<publicKey1> => <privateKey1>,
-    '<publicKey2> => <privateKey2>,
+    '<publicKey1>' => '<privateKey1>',
+    '<publicKey2>' => '<privateKey2>',
     ...
-    '<publicKeyN> => <privateKeyN>,
+    '<publicKeyN>' => '<privateKeyN>',
 );
 ```
 
