@@ -126,6 +126,10 @@ class ImageTest extends ResourceTests {
                        ->method('insertImage')
                        ->with($publicKey, $imageIdentifier, $this->image);
 
+        $this->database->expects($this->once())
+                       ->method('deleteImage')
+                       ->with($publicKey, $imageIdentifier);
+
         $this->storage->expects($this->once())
                       ->method('store')
                       ->with($publicKey, $imageIdentifier, $this->image)
