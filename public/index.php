@@ -42,8 +42,8 @@ $loader->register();
 $container = require __DIR__ . '/../bootstrap/bootstrap.php';
 
 // Initialize request and response
-$request = new Imbo\Http\Request\Request($_GET, $_POST, $_SERVER);
-$response = new Imbo\Http\Response\Response();
+$request = $container->request;
+$response = $container->response;
 $response->getHeaders()->set('X-Imbo-Version', Imbo\Version::getVersionNumber());
 
 // Create the front controller and handle the request
