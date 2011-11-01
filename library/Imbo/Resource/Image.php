@@ -162,7 +162,7 @@ class Image extends Resource implements ResourceInterface {
 
         if (
             $lastModified === $requestHeaders->get('if-modified-since') &&
-            $etag === $requestHeaders->get('if-none-match')
+            $etag === trim($requestHeaders->get('if-none-match'), '"')
         ) {
             $response->setNotModified();
             return;

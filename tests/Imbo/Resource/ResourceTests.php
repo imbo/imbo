@@ -46,10 +46,39 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
      */
     protected $resource;
 
+    /**
+     * @var Imbo\Http\Request\RequestInterface
+     */
     protected $request;
+
+    /**
+     * @var Imbo\Http\Response\ResponseInterface
+     */
     protected $response;
+
+    /**
+     * @var Imbo\Database\DatabaseInterface
+     */
     protected $database;
+
+    /**
+     * @var Imbo\Storage\StorageInterface
+     */
     protected $storage;
+
+    /**
+     * Public key
+     *
+     * @var string
+     */
+    protected $publicKey = '84ddfea4384c0d2093540fbe6d8b13cb';
+
+    /**
+     * Image identifier
+     *
+     * @var string
+     */
+    protected $imageIdentifier = '34205548e02b8bd0865287a4b0b3fe5e';
 
     public function setUp() {
         $this->resource = $this->getNewResource();

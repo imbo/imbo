@@ -46,14 +46,25 @@ use Imbo\Image\Transformation\Exception as TransformationException;
  * @link https://github.com/christeredvartsen/imbo
  */
 class ImageTest extends ResourceTests {
+    /**
+     * @var Imbo\Image\ImagePreparationInterface
+     */
     private $imagePreparation;
+
+    /**
+     * @var Imbo\Image\ImageInterface
+     */
     private $image;
 
     protected function getNewResource() {
+        return new Image($this->image, $this->imagePreparation);
+    }
+
+    public function setUp() {
         $this->image = $this->getMock('Imbo\Image\ImageInterface');
         $this->imagePreparation = $this->getMock('Imbo\Image\ImagePreparationInterface');
 
-        return new Image($this->image, $this->imagePreparation);
+        parent::setUp();
     }
 
     public function tearDown() {
@@ -85,21 +96,19 @@ class ImageTest extends ResourceTests {
      * @expectedExceptionCode 500
      */
     public function testPutWhenDatabaseThrowsException() {
-        $publicKey = md5(microtime());
-        $imageIdentifier = md5(microtime());
         $resource = $this->getNewResource();
 
         $this->request->expects($this->once())
                       ->method('getPublicKey')
-                      ->will($this->returnValue($publicKey));
+                      ->will($this->returnValue($this->publicKey));
 
         $this->request->expects($this->once())
                       ->method('getImageIdentifier')
-                      ->will($this->returnValue($imageIdentifier));
+                      ->will($this->returnValue($this->imageIdentifier));
 
         $this->database->expects($this->once())
                        ->method('insertImage')
-                       ->with($publicKey, $imageIdentifier, $this->image)
+                       ->with($this->publicKey, $this->imageIdentifier, $this->image)
                        ->will($this->throwException(new DatabaseException('message', 500)));
 
         $resource->put($this->request, $this->response, $this->database, $this->storage);
@@ -111,36 +120,32 @@ class ImageTest extends ResourceTests {
      * @expectedExceptionCode 500
      */
     public function testPutWhenStorageThrowsException() {
-        $publicKey = md5(microtime());
-        $imageIdentifier = md5(microtime());
         $resource = $this->getNewResource();
 
         $this->request->expects($this->once())
                       ->method('getPublicKey')
-                      ->will($this->returnValue($publicKey));
+                      ->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())
                       ->method('getImageIdentifier')
-                      ->will($this->returnValue($imageIdentifier));
+                      ->will($this->returnValue($this->imageIdentifier));
 
         $this->database->expects($this->once())
                        ->method('insertImage')
-                       ->with($publicKey, $imageIdentifier, $this->image);
+                       ->with($this->publicKey, $this->imageIdentifier, $this->image);
 
         $this->database->expects($this->once())
                        ->method('deleteImage')
-                       ->with($publicKey, $imageIdentifier);
+                       ->with($this->publicKey, $this->imageIdentifier);
 
         $this->storage->expects($this->once())
                       ->method('store')
-                      ->with($publicKey, $imageIdentifier, $this->image)
+                      ->with($this->publicKey, $this->imageIdentifier, $this->image)
                       ->will($this->throwException(new StorageException('message', 500)));
 
         $resource->put($this->request, $this->response, $this->database, $this->storage);
     }
 
     public function testSuccessfulPut() {
-        $publicKey = md5(microtime());
-        $imageIdentifier = md5(microtime());
         $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
         $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
 
@@ -149,19 +154,19 @@ class ImageTest extends ResourceTests {
 
         $this->request->expects($this->once())
                       ->method('getPublicKey')
-                      ->will($this->returnValue($publicKey));
+                      ->will($this->returnValue($this->publicKey));
 
         $this->request->expects($this->once())
                       ->method('getImageIdentifier')
-                      ->will($this->returnValue($imageIdentifier));
+                      ->will($this->returnValue($this->imageIdentifier));
 
         $this->database->expects($this->once())
                        ->method('insertImage')
-                       ->with($publicKey, $imageIdentifier, $this->image);
+                       ->with($this->publicKey, $this->imageIdentifier, $this->image);
 
         $this->storage->expects($this->once())
                       ->method('store')
-                      ->with($publicKey, $imageIdentifier, $this->image);
+                      ->with($this->publicKey, $this->imageIdentifier, $this->image);
 
         $this->response->expects($this->once())->method('setStatusCode')->with(201)->will($this->returnValue($this->response));
 
@@ -174,16 +179,14 @@ class ImageTest extends ResourceTests {
      * @expectedExceptionCode 500
      */
     public function testDeleteWhenDatabaseThrowsAnException() {
-        $publicKey = md5(microtime());
-        $imageIdentifier = md5(microtime());
         $resource = $this->getNewResource();
 
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
         $this->database->expects($this->once())
                        ->method('deleteImage')
-                       ->with($publicKey, $imageIdentifier)
+                       ->with($this->publicKey, $this->imageIdentifier)
                        ->will($this->throwException(new DatabaseException('message', 500)));
 
         $resource->delete($this->request, $this->response, $this->database, $this->storage);
@@ -195,45 +198,40 @@ class ImageTest extends ResourceTests {
      * @expectedExceptionCode 500
      */
     public function testDeleteWhenStorageThrowsAnException() {
-        $publicKey = md5(microtime());
-        $imageIdentifier = md5(microtime());
         $resource = $this->getNewResource();
 
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
         $this->database->expects($this->once())
                        ->method('deleteImage')
-                       ->with($publicKey, $imageIdentifier);
+                       ->with($this->publicKey, $this->imageIdentifier);
 
         $this->storage->expects($this->once())
                       ->method('delete')
-                      ->with($publicKey, $imageIdentifier)
+                      ->with($this->publicKey, $this->imageIdentifier)
                       ->will($this->throwException(new StorageException('message', 500)));
 
         $resource->delete($this->request, $this->response, $this->database, $this->storage);
     }
 
     public function testSuccessfulDelete() {
-        $publicKey = md5(microtime());
-        $imageIdentifier = md5(microtime());
         $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
         $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
 
         $resource = $this->getNewResource();
         $resource->setResponseWriter($writer);
 
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
         $this->database->expects($this->once())
                        ->method('deleteImage')
-                       ->with($publicKey, $imageIdentifier);
+                       ->with($this->publicKey, $this->imageIdentifier);
 
         $this->storage->expects($this->once())
                       ->method('delete')
-                      ->with($publicKey, $imageIdentifier);
+                      ->with($this->publicKey, $this->imageIdentifier);
 
         $resource->delete($this->request, $this->response, $this->database, $this->storage);
     }
@@ -270,6 +268,45 @@ class ImageTest extends ResourceTests {
         $this->storage->expects($this->once())
                       ->method('load')
                       ->will($this->throwException(new StorageException('message', 500)));
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    public function testGetWhenResponseIsNotModified() {
+        // Get the image resource
+        $resource = $this->getNewResource();
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
+
+        // The request URI for some image
+        $requestUri = '/users/' . $this->publicKey . '/images/' . $this->imageIdentifier . '.png';
+
+        // Timestamp used for the Last-Modified header
+        $timestamp = time();
+
+        // Generate ETag as it appears in the headers
+        $etag = '"' . md5($this->publicKey . $this->imageIdentifier . $requestUri) . '"';
+        $lastModified = date('r', $timestamp);
+
+        $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($timestamp));
+
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
+        $serverContainer->expects($this->once())->method('get')->with('REQUEST_URI')->will($this->returnValue($requestUri));
+
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
+        $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
+
+        $requestHeaders->expects($this->any())->method('get')->will($this->returnCallback(function($arg) use($etag, $lastModified) {
+            if ($arg == 'if-modified-since') {
+                return $lastModified;
+            }
+
+            return $etag;
+        }));
+
+        $this->response->expects($this->once())->method('setNotModified');
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
