@@ -33,6 +33,8 @@ namespace Imbo\EventManager;
 
 use InvalidArgumentException;
 use SplPriorityQueue;
+use Imbo\Http\Request\RequestInterface;
+use Imbo\Http\Response\ResponseInterface;
 
 /**
  * Event manager
@@ -50,6 +52,31 @@ class EventManager implements EventManagerInterface {
      * @var array
      */
     private $events;
+
+    /**
+     * Request instance
+     *
+     * @var Imbo\Http\Request\RequestInterface
+     */
+    private $request;
+
+    /**
+     * Response instance
+     *
+     * @var Imbo\Http\Response\ResponseInterface
+     */
+    private $response;
+
+    /**
+     * Class constructor
+     *
+     * @param Imbo\Http\Request\RequestInterface $request
+     * @param Imbo\Http\Response\ResponseInterface $response
+     */
+    public function __construct(RequestInterface $request, ResponseInterface $response) {
+        $this->request = $request;
+        $this->response = $response;
+    }
 
     /**
      * @see Imbo\EveneManager\EventManagerInterface::attach()
@@ -74,7 +101,7 @@ class EventManager implements EventManagerInterface {
     public function trigger($eventName) {
         if (!empty($this->events[$eventName])) {
             foreach ($this->events[$eventName] as $callback) {
-                $callback();
+                $callback($this->request, $this->response);
             }
         }
 
