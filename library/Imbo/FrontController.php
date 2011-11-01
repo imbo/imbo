@@ -157,7 +157,7 @@ class FrontController {
         $timestamp = $query->get('timestamp');
 
         // Make sure the timestamp is in the correct format
-        if (!preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/', $timestamp)) {
+        if (!preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}(?:\.\d+)?Z$/', $timestamp)) {
             throw new Exception('Invalid authentication timestamp format: ' . $timestamp, 400);
         }
 

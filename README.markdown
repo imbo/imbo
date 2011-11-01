@@ -66,22 +66,24 @@ All write operations (PUT, POST and DELETE) requires authentication using an Has
 
 These elements are concatenated in the above order with | as a delimiter character and a hash is generated using a private key and the sha256 algorithm. The following snippet shows how this can be done using PHP:
 
-    <?php
-    $publicKey  = '<some random MD5 hash>';
-    $privateKey = '<some other random MD5 hash>';
-    $method     = 'DELETE';
-    $resource   = 'b8533858299b04af3afc9a3713e69358.jpeg/meta'
-    $timestamp  = gmdate('Y-m-d\TH:i\Z');
+```php
+<?php
+$publicKey  = '<some random MD5 hash>';
+$privateKey = '<some other random MD5 hash>';
+$method     = 'DELETE';
+$resource   = 'b8533858299b04af3afc9a3713e69358.jpeg/meta'
+$timestamp  = gmdate('Y-m-d\TH:i\Z');
 
-    $data       = $method . '|' . $resource . '|' . $publicKey . '|' . $timestamp;
+$data       = $method . '|' . $resource . '|' . $publicKey . '|' . $timestamp;
 
-    $hash       = hash_hmac('sha256', $data, $privateKey, true);
-    $signature  = base64_encode($hash);
-    $url        = sprintf('http://example.com/users/%s/images/%s?signature=%s&timestamp=%s',
-                          $publicKey,
-                          $resource,
-                          rawurlencode($signature),
-                          rawurlencode($timestamp));
+$hash       = hash_hmac('sha256', $data, $privateKey, true);
+$signature  = base64_encode($hash);
+$url        = sprintf('http://example.com/users/%s/images/%s?signature=%s&timestamp=%s',
+                      $publicKey,
+                      $resource,
+                      rawurlencode($signature),
+                      rawurlencode($timestamp));
+```
 
 The above code will generate a signature that must be sent along the request using the `signature` query parameter. The timestamp used must also be provided using the `timestamp` query parameter so that the signature can be regenerated server-side. A generated signature is only valid for 5 minutes. Both the signature and the timestamp must be url encoded (by using for instance PHPs [rawurlencode](http://php.net/rawurlencode).
 
@@ -184,36 +186,42 @@ When installing Imbo you need to copy the boostrap/bootstrap.php.dist file to bo
 ### Authentication key pairs
 Imbo supports several key pairs so several users can store images on your installation of Imbo. To achieve this simply specify several key pairs in the 'auth' value in the container:
 
-    $container->auth = array(
-        '<publicKey1> => <privateKey1>,
-        '<publicKey2> => <privateKey2>,
-        ...
-        '<publicKeyN> => <privateKeyN>,
-    );
+```php
+<?php
+$container->auth = array(
+    '<publicKey1>' => '<privateKey1>',
+    '<publicKey2>' => '<privateKey2>',
+    ...
+    '<publicKeyN>' => '<privateKeyN>',
+);
+```
 
 ### Specify database and storage drivers
 The database and storage drivers use the 'database' and 'storage' values in the container respectively. The default looks like this:
 
-    // Parameters for the database driver
-    $dbParams = array(
-        'database' => 'imbo',
-        'collection' => 'images',
-    );
+```php
+<?php
+// Parameters for the database driver
+$dbParams = array(
+    'database' => 'imbo',
+    'collection' => 'images',
+);
 
-    // Create the database entry
-    $container->database = $container->shared(function (Imbo\Container $container) use ($dbParams) {
-        return new Imbo\Database\MongoDb($dbParams);
-    });
+// Create the database entry
+$container->database = $container->shared(function (Imbo\Container $container) use ($dbParams) {
+    return new Imbo\Database\MongoDb($dbParams);
+});
 
-    // Parameters for the storage driver
-    $storageParams = array(
-        'dataDir' => '/some/path',
-    );
+// Parameters for the storage driver
+$storageParams = array(
+    'dataDir' => '/some/path',
+);
 
-    // Create the storage entry
-    $container->storage = $container->shared(function (Imbo\Container $container) use ($storageParams) {
-        return new Imbo\Storage\Filesystem($storageParams);
-    });
+// Create the storage entry
+$container->storage = $container->shared(function (Imbo\Container $container) use ($storageParams) {
+    return new Imbo\Storage\Filesystem($storageParams);
+});
+```
 
 which makes Imbo use MongoDB as database and the local filesystem for storage. You can implement your own drivers and use them here. Remember to implement `Imbo\Database\DatabaseInterface` and `Imbo\Storage\StorageInterface` for database drivers and storage drivers respectively.
 
