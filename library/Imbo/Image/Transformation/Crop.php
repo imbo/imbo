@@ -54,28 +54,28 @@ class Crop extends Transformation implements TransformationInterface {
      *
      * @var int
      */
-    private $x;
+    public $x;
 
     /**
      * Y coordinate of the top left corner of the crop
      *
      * @var int
      */
-    private $y;
+    public $y;
 
     /**
      * Width of the crop
      *
      * @var int
      */
-    private $width;
+    public $width;
 
     /**
      * Height of the crop
      *
      * @var int
      */
-    private $height;
+    public $height;
 
     /**
      * Class constructor

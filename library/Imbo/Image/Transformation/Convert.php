@@ -55,7 +55,7 @@ class Convert extends Transformation implements TransformationInterface {
      *
      * @var string
      */
-    private $type;
+    public $type;
 
     /**
      * Class constructor

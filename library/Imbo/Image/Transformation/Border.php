@@ -54,21 +54,21 @@ class Border extends Transformation implements TransformationInterface {
      *
      * @var string
      */
-    private $color = '000';
+    public $color = '000';
 
     /**
      * Width of the border
      *
      * @var int
      */
-    private $width = 1;
+    public $width = 1;
 
     /**
      * Height of the border
      *
      * @var int
      */
-    private $height = 1;
+    public $height = 1;
 
     /**
      * Class constructor
