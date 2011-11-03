@@ -100,6 +100,18 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('Imbo\Http\ParameterContainer', $requestContainer);
     }
 
+    public function testGetServer() {
+        $request = new Request(array(), array(), array('key' => 'value'));
+        $container = $request->getServer();
+        $this->assertInstanceOf('Imbo\Http\ServerContainer', $container);
+    }
+
+    public function testGetHeaders() {
+        $request = new Request(array(), array(), array('key' => 'value'));
+        $container = $request->getHeaders();
+        $this->assertInstanceOf('Imbo\Http\HeaderContainer', $container);
+    }
+
     public function testIsUnsafe() {
         $request = new Request(array(), array(), array('REQUEST_METHOD' => 'GET'));
         $this->assertFalse($request->isUnsafe());

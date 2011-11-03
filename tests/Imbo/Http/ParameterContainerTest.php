@@ -73,4 +73,12 @@ class ParameterContainerTest extends \PHPUnit_Framework_TestCase {
         $this->container->set('key', 'value');
         $this->assertSame('value', $this->container->get('key'));
     }
+
+    /**
+     * @depends testSetAndGet
+     */
+    public function testRemoveAll() {
+        $this->container->removeAll();
+        $this->assertEmpty($this->container->getAll());
+    }
 }
