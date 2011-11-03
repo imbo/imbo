@@ -226,7 +226,7 @@ $container->storage = $container->shared(function (Imbo\Container $container) us
 which makes Imbo use MongoDB as database and the local filesystem for storage. You can implement your own drivers and use them here. Remember to implement `Imbo\Database\DatabaseInterface` and `Imbo\Storage\StorageInterface` for database drivers and storage drivers respectively.
 
 ### Event manager
-Imbo comes with an event manager that can be used to inject custom code in different parts of the application. Attaching code to a given event can be done in the following way:
+Imbo comes with an event manager that can be used to inject custom code in different parts of the application. Attaching code to a given event can be done in the following way in `bootstrap/bootstrap.php`:
 
 ```php
 <?php
