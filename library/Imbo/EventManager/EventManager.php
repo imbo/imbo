@@ -23,93 +23,98 @@
  * IN THE SOFTWARE.
  *
  * @package Imbo
- * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
 
-namespace Imbo\Image\Transformation;
+namespace Imbo\EventManager;
 
-use Imbo\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
-use Imagine\Image\Box;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    InvalidArgumentException,
+    SplPriorityQueue;
 
 /**
- * Thumbnail transformation
+ * Event manager
  *
  * @package Imbo
- * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class Thumbnail extends Transformation implements TransformationInterface {
+class EventManager implements EventManagerInterface {
     /**
-     * Width of the thumbnail
+     * Different events that can be triggerd
      *
-     * @var int
+     * @var array
      */
-    public $width = 50;
+    private $events;
 
     /**
-     * Height of the thumbnail
+     * Request instance
      *
-     * @var int
+     * @var Imbo\Http\Request\RequestInterface
      */
-    public $height = 50;
+    private $request;
 
     /**
-     * Fit type
+     * Response instance
      *
-     * The thumbnail fit style. 'inset' or 'outbound'
-     *
-     * @var string
+     * @var Imbo\Http\Response\ResponseInterface
      */
-    public $fit = 'outbound';
+    private $response;
 
     /**
      * Class constructor
      *
-     * @param int $width Width of the thumbnail
-     * @param int $height Height of the thumbnail
-     * @param string $fit Fit type. 'outbound' or 'inset'
+     * @param Imbo\Http\Request\RequestInterface $request
+     * @param Imbo\Http\Response\ResponseInterface $response
      */
-    public function __construct($width = null, $height = null, $fit = null) {
-        if ($width !== null) {
-            $this->width = (int) $width;
-        }
-
-        if ($height !== null) {
-            $this->height = (int) $height;
-        }
-
-        if ($fit !== null) {
-            $this->fit = $fit;
-        }
+    public function __construct(RequestInterface $request, ResponseInterface $response) {
+        $this->request = $request;
+        $this->response = $response;
     }
 
     /**
-     * @see Imbo\Image\Transformation\TransformationInterface::applyToImage()
+     * @see Imbo\EveneManager\EventManagerInterface::attach()
      */
-    public function applyToImage(ImageInterface $image) {
-        try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
-
-            $thumb = $imagineImage->thumbnail(
-                new Box($this->width, $this->height),
-                $this->fit
-            );
-
-            $image->setBlob($thumb->get($image->getExtension()))
-                  ->setWidth($this->width)
-                  ->setHeight($this->height);
-        } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), 400, $e);
+    public function attach($events, $callback, $priority = 1) {
+        if (!is_array($events)) {
+            $events = array($events);
         }
+
+        if (!is_callable($callback)) {
+            throw new InvalidArgumentException('Callback is not callable');
+        }
+
+        foreach ($events as $event) {
+            if (empty($this->events[$event])) {
+                $this->events[$event] = new SplPriorityQueue();
+            }
+
+            $this->events[$event]->insert($callback, $priority);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @see Imbo\EveneManager\EventManagerInterface::trigger()
+     */
+    public function trigger($event) {
+        if (!empty($this->events[$event])) {
+            // Create an event instance
+            $e = new Event($event, $this->request, $this->response);
+
+            // Trigger all listeners for this event and pass in the event instance
+            foreach ($this->events[$event] as $callback) {
+                $callback($e);
+            }
+        }
+
+        return $this;
     }
 }

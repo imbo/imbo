@@ -23,59 +23,44 @@
  * IN THE SOFTWARE.
  *
  * @package Imbo
- * @subpackage ImageTransformation
+ * @subpackage Interfaces
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
 
-namespace Imbo\Image\Transformation;
-
-use Imbo\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
+namespace Imbo\EventManager;
 
 /**
- * Compression transformation
+ * Event interface
  *
  * @package Imbo
- * @subpackage ImageTransformation
+ * @subpackage Interfaces
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class Compress extends Transformation implements TransformationInterface {
+interface EventInterface {
     /**
-     * Quality of the resulting image
+     * Get the name of the event
      *
-     * @var int
+     * @return string
      */
-    public $quality;
+    function getName();
 
     /**
-     * Class constructor
+     * Get the request instance
      *
-     * @param int $quality Quality of the resulting image
+     * @return Imbo\Http\Request\RequestInterface
      */
-    public function __construct($quality) {
-        $this->quality = (int) $quality;
-    }
+    function getRequest();
 
     /**
-     * @see Imbo\Image\Transformation\TransformationInterface::applyToImage()
+     * Get the response instance
+     *
+     * @return Imbo\Http\Response\ResponseInterface
      */
-    public function applyToImage(ImageInterface $image) {
-        try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
-
-            $image->setBlob($imagineImage->get($image->getExtension(), array(
-                'quality' => $this->quality,
-            )));
-        } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), 400, $e);
-        }
-    }
+    function getResponse();
 }

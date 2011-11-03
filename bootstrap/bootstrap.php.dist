@@ -1,4 +1,5 @@
 <?php
+// Create a new DIC
 $container = new Imbo\Container();
 
 // Authentication key pairs (publicKey => privateKey)
@@ -39,6 +40,15 @@ $storageParams = array(
 // Create the storage entry
 $container->storage = $container->shared(function(Imbo\Container $container) use ($storageParams) {
     return new Imbo\Storage\Filesystem($storageParams);
+});
+
+// Create request and response objects
+$container->request = new Imbo\Http\Request\Request($_GET, $_POST, $_SERVER);
+$container->response = new Imbo\Http\Response\Response();
+
+// Event manager
+$container->eventManager = $container->shared(function(Imbo\Container $container) {
+    return new Imbo\EventManager\EventManager($container->request, $container->response);
 });
 
 // Return the container instance

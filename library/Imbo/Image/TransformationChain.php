@@ -34,6 +34,7 @@ namespace Imbo\Image;
 
 use Imbo\Image\Transformation;
 use Imbo\Image\Transformation\TransformationInterface;
+use Iterator, Countable;
 
 /**
  * Transformation collection
@@ -45,13 +46,62 @@ use Imbo\Image\Transformation\TransformationInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class TransformationChain {
+class TransformationChain implements Iterator, Countable {
     /**
      * Transformations added
      *
      * @var array
      */
     private $transformations = array();
+
+    /**
+     * Position in the transformations array
+     *
+     * @var int
+     */
+    private $position = 0;
+
+    /**
+     * @see Iterator::rewind()
+     */
+    public function rewind() {
+        $this->position = 0;
+    }
+
+    /**
+     * @see Iterator::current()
+     */
+    public function current() {
+        return $this->transformations[$this->position];
+    }
+
+    /**
+     * @see Iterator::key()
+     */
+    public function key() {
+        return $this->position;
+    }
+
+    /**
+     * @see Iterator::next()
+     */
+    public function next() {
+        $this->position++;
+    }
+
+    /**
+     * @see Countable::count()
+     */
+    public function count() {
+        return count($this->transformations);
+    }
+
+    /**
+     * @see Iterator::valid()
+     */
+    public function valid() {
+        return isset($this->transformations[$this->position]);
+    }
 
     /**
      * Apply all transformations to an image object

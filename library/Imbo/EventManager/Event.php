@@ -23,59 +23,79 @@
  * IN THE SOFTWARE.
  *
  * @package Imbo
- * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
 
-namespace Imbo\Image\Transformation;
+namespace Imbo\EventManager;
 
-use Imbo\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
+use Imbo\Http\Request\RequestInterface;
+use Imbo\Http\Response\ResponseInterface;
 
 /**
- * Compression transformation
+ * Event class
  *
  * @package Imbo
- * @subpackage ImageTransformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class Compress extends Transformation implements TransformationInterface {
+class Event implements EventInterface {
     /**
-     * Quality of the resulting image
+     * Name of the current event
      *
-     * @var int
+     * @var string
      */
-    public $quality;
+    private $name;
 
     /**
-     * Class constructor
+     * Request instance
      *
-     * @param int $quality Quality of the resulting image
+     * @var Imbo\Http\Request\RequestInterface
      */
-    public function __construct($quality) {
-        $this->quality = (int) $quality;
+    private $request;
+
+    /**
+     * Response instance
+     *
+     * @var Imbo\Http\Response\ResponseInterface
+     */
+    private $response;
+
+    /**
+     * Class contsructor
+     *
+     * @param string $name The name of the current event
+     * @param Imbo\Http\Request\RequestInterface $request Request instance
+     * @param Imbo\Http\Response\ResponseInterface $response Response instance
+     */
+    public function __construct($name, RequestInterface $request, ResponseInterface $response) {
+        $this->name = $name;
+        $this->request = $request;
+        $this->response = $response;
     }
 
     /**
-     * @see Imbo\Image\Transformation\TransformationInterface::applyToImage()
+     * @see Imbo\EventManager\EventInterface::getName()
      */
-    public function applyToImage(ImageInterface $image) {
-        try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
+    public function getName() {
+        return $this->name;
+    }
 
-            $image->setBlob($imagineImage->get($image->getExtension(), array(
-                'quality' => $this->quality,
-            )));
-        } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), 400, $e);
-        }
+    /**
+     * @see Imbo\EventManager\EventInterface::getRequest()
+     */
+    public function getRequest() {
+        return $this->request;
+    }
+
+    /**
+     * @see Imbo\EventManager\EventInterface::getResponse()
+     */
+    public function getResponse() {
+        return $this->response;
     }
 }

@@ -225,6 +225,102 @@ $container->storage = $container->shared(function (Imbo\Container $container) us
 
 which makes Imbo use MongoDB as database and the local filesystem for storage. You can implement your own drivers and use them here. Remember to implement `Imbo\Database\DatabaseInterface` and `Imbo\Storage\StorageInterface` for database drivers and storage drivers respectively.
 
+### Event manager
+Imbo comes with an event manager that can be used to inject custom code in different parts of the application. Attaching code to a given event can be done in the following way:
+
+```php
+<?php
+$container->eventManager = $container->shared(function(Imbo\Container $container) {
+    $manager = new Imbo\EventManager\EventManager($container->request, $container->response);
+
+    $manager->attach('image.get.pre', function(Imbo\EventManager\EventInterface $event) {
+        $event->getResponse()->getHeaders()->set('X-Custom-Header', 'some value');
+    });
+
+    return $manager;
+});
+```
+
+The above code will get triggered before all `GET` requests for specific images. Each resource triggers `pre` and `post` events for all supported HTTP methods. The following events are defined for the `image` resource:
+
+* `image.get.pre`
+* `image.get.post`
+* `image.head.pre`
+* `image.head.post`
+* `image.delete.pre`
+* `image.delete.post`
+* `image.put.pre`
+* `image.put.post`
+
+Imbo defines three resources:
+
+* `image`
+* `images`
+* `metadata`
+
+The executable code you attach to an event will receive a single parameter, an instance of `Imbo\EventManager\EventInterface`. This interface defines the following methods:
+
+* `getRequest()`: Returns the current request instance.
+* `getResponse()`: Returns the current response instance.
+* `getName()`: Returns the full name of the event that triggered your code (for instance `metadata.get.post`).
+
+If you want to attach code to several events, you can supply an array of event names to the `attach()` method:
+
+```php
+<?php
+$container->eventManager = $container->shared(function(Imbo\Container $container) {
+    $manager = new Imbo\EventManager\EventManager($container->request, $container->response);
+    $manager->attach(array('image.get.pre', 'image.head.pre'), function(Imbo\EventManager\EventInterface $event) {
+        // some code
+    });
+
+    return $manager;
+});
+```
+
+#### Example
+You can use the event manager to enforce specific transformation parameters. If you for instance only want to support the thumbnail transformation, this can be done with the following code:
+
+```php
+<?php
+$container->eventManager = $container->shared(function(Imbo\Container $container) {
+    $manager = new Imbo\EventManager\EventManager($container->request, $container->response);
+    $manager->attach('image.get.pre', function(Imbo\EventManager\EventInterface $event) {
+        $transformations = $event->getRequest()->getTransformations();
+
+        foreach ($transformations as $t) {
+            if (!($t instanceof Imbo\Image\Transformation\Thumbnail)) {
+                throw new Imbo\Exception('Unsupported transformation', 400);
+            }
+        }
+    });
+
+    return $manager;
+});
+```
+
+You might also want to make sure images can't be resized above some specific value. This can be solved with something like:
+
+```php
+<?php
+$container->eventManager = $container->shared(function(Imbo\Container $container) {
+    $manager = new Imbo\EventManager\EventManager($container->request, $container->response);
+    $manager->attach('image.get.pre', function(Imbo\EventManager\EventInterface $event) {
+        $transformations = $event->getRequest()->getTransformations();
+
+        foreach ($transformations as $t) {
+            if ($t instanceof Imbo\Image\Transformation\Resize) {
+                if ($t->width > 1000 || $t->height > 1000) {
+                    throw new Imbo\Exception('Unsupported resize parameters', 400);
+                }
+            }
+        }
+    });
+
+    return $manager;
+});
+```
+
 ## Developer/Contributer notes
 Here you will find some notes about how Imbo works internally along with information on what is needed to develop Imbo.
 

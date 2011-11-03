@@ -23,59 +23,42 @@
  * IN THE SOFTWARE.
  *
  * @package Imbo
- * @subpackage ImageTransformation
+ * @subpackage Interfaces
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
 
-namespace Imbo\Image\Transformation;
-
-use Imbo\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
+namespace Imbo\EventManager;
 
 /**
- * Compression transformation
+ * Event manager interface
  *
  * @package Imbo
- * @subpackage ImageTransformation
+ * @subpackage Interfaces
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class Compress extends Transformation implements TransformationInterface {
+interface EventManagerInterface {
     /**
-     * Quality of the resulting image
+     * Attach a callable to an event
      *
-     * @var int
+     * @param array|string $events The event(s) to attach to
+     * @param callback $callback Code that will be called when the event is triggered
+     * @param int $priority Priority of the callback
+     * @throws InvalidArgumentException
+     * @return Imbo\EventManager\EventManagerInterface
      */
-    public $quality;
+    function attach($events, $callback, $priority = 1);
 
     /**
-     * Class constructor
+     * Trigger a given event
      *
-     * @param int $quality Quality of the resulting image
+     * @param string $event The event to trigger
+     * @return Imbo\EventManager\EventManagerInterface
      */
-    public function __construct($quality) {
-        $this->quality = (int) $quality;
-    }
-
-    /**
-     * @see Imbo\Image\Transformation\TransformationInterface::applyToImage()
-     */
-    public function applyToImage(ImageInterface $image) {
-        try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
-
-            $image->setBlob($imagineImage->get($image->getExtension(), array(
-                'quality' => $this->quality,
-            )));
-        } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), 400, $e);
-        }
-    }
+    function trigger($event);
 }

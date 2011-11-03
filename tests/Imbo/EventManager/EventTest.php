@@ -23,59 +23,33 @@
  * IN THE SOFTWARE.
  *
  * @package Imbo
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
 
-namespace Imbo\Image\Transformation;
-
-use Imbo\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
+namespace Imbo\EventManager;
 
 /**
- * Compression transformation
- *
  * @package Imbo
- * @subpackage ImageTransformation
+ * @subpackage Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class Compress extends Transformation implements TransformationInterface {
-    /**
-     * Quality of the resulting image
-     *
-     * @var int
-     */
-    public $quality;
+class EventTest extends \PHPUnit_Framework_TestCase {
+    public function testEvent() {
+        $name = 'some.event.name';
+        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
 
-    /**
-     * Class constructor
-     *
-     * @param int $quality Quality of the resulting image
-     */
-    public function __construct($quality) {
-        $this->quality = (int) $quality;
-    }
+        $event = new Event($name, $request, $response);
 
-    /**
-     * @see Imbo\Image\Transformation\TransformationInterface::applyToImage()
-     */
-    public function applyToImage(ImageInterface $image) {
-        try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
-
-            $image->setBlob($imagineImage->get($image->getExtension(), array(
-                'quality' => $this->quality,
-            )));
-        } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), 400, $e);
-        }
+        $this->assertSame($name, $event->getName());
+        $this->assertSame($request, $event->getRequest());
+        $this->assertSame($response, $event->getResponse());
     }
 }
