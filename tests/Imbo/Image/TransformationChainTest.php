@@ -68,4 +68,41 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
 
         $this->chain->transformImage($image, $transformation);
     }
+
+    /**
+     * Test that transformation methods are chainable
+     */
+    public function testChain() {
+        $this->chain->border('fff', 1, 1)
+                    ->compress(75)
+                    ->crop(1, 2, 3, 4)
+                    ->rotate(45, 'fff')
+                    ->resize(100, 200)
+                    ->thumbnail(10, 10, '000')
+                    ->flipHorizontally()
+                    ->flipVertically()
+                    ->border('000', 2, 2);
+    }
+
+    public function testCountable() {
+        $this->chain->border('fff', 1, 1);
+        $this->assertSame(1, count($this->chain));
+
+        $this->chain->compress(10);
+        $this->assertSame(2, count($this->chain));
+    }
+
+    public function testIterator() {
+        $this->chain->border('fff', 1, 2)->resize(1, 2)->thumbnail();
+
+        $expectedClasses = array(
+            'Imbo\Image\Transformation\Border',
+            'Imbo\Image\Transformation\Resize',
+            'Imbo\Image\Transformation\Thumbnail',
+        );
+
+        foreach ($this->chain as $key => $transformation) {
+            $this->assertInstanceOf($expectedClasses[$key], $transformation);
+        }
+    }
 }
