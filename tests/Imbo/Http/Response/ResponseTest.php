@@ -99,4 +99,16 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame($output, $content);
     }
+
+    public function testSetNotModified() {
+        $this->response->setBody('some content');
+        $this->response->setStatusCode(200);
+        $this->response->getHeaders()->set('key', 'value');
+
+        $this->response->setNotModified();
+
+        $this->assertSame(304, $this->response->getStatusCode());
+        $this->assertEmpty($this->response->getBody());
+        $this->assertEmpty($this->response->getHeaders()->getAll());
+    }
 }
