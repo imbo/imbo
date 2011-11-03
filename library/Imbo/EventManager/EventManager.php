@@ -31,10 +31,10 @@
 
 namespace Imbo\EventManager;
 
-use InvalidArgumentException;
-use SplPriorityQueue;
-use Imbo\Http\Request\RequestInterface;
-use Imbo\Http\Response\ResponseInterface;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    InvalidArgumentException,
+    SplPriorityQueue;
 
 /**
  * Event manager
@@ -81,16 +81,22 @@ class EventManager implements EventManagerInterface {
     /**
      * @see Imbo\EveneManager\EventManagerInterface::attach()
      */
-    public function attach($eventName, $callback, $priority = 1) {
+    public function attach($events, $callback, $priority = 1) {
+        if (!is_array($events)) {
+            $events = array($events);
+        }
+
         if (!is_callable($callback)) {
             throw new InvalidArgumentException('Callback is not callable');
         }
 
-        if (empty($this->events[$eventName])) {
-            $this->events[$eventName] = new SplPriorityQueue();
-        }
+        foreach ($events as $event) {
+            if (empty($this->events[$event])) {
+                $this->events[$event] = new SplPriorityQueue();
+            }
 
-        $this->events[$eventName]->insert($callback, $priority);
+            $this->events[$event]->insert($callback, $priority);
+        }
 
         return $this;
     }
@@ -98,10 +104,14 @@ class EventManager implements EventManagerInterface {
     /**
      * @see Imbo\EveneManager\EventManagerInterface::trigger()
      */
-    public function trigger($eventName) {
-        if (!empty($this->events[$eventName])) {
-            foreach ($this->events[$eventName] as $callback) {
-                $callback($this->request, $this->response);
+    public function trigger($event) {
+        if (!empty($this->events[$event])) {
+            // Create an event instance
+            $e = new Event($event, $this->request, $this->response);
+
+            // Trigger all listeners for this event and pass in the event instance
+            foreach ($this->events[$event] as $callback) {
+                $callback($e);
             }
         }
 

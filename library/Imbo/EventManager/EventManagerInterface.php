@@ -46,19 +46,19 @@ interface EventManagerInterface {
     /**
      * Attach a callable to an event
      *
-     * @param string $event The event to attach to
+     * @param array|string $events The event(s) to attach to
      * @param callback $callback Code that will be called when the event is triggered
      * @param int $priority Priority of the callback
      * @throws InvalidArgumentException
      * @return Imbo\EventManager\EventManagerInterface
      */
-    function attach($eventName, $callback, $priority = 1);
+    function attach($events, $callback, $priority = 1);
 
     /**
      * Trigger a given event
      *
-     * @param string $eventName The event to trigger
+     * @param string $event The event to trigger
      * @return Imbo\EventManager\EventManagerInterface
      */
-    function trigger($eventName);
+    function trigger($event);
 }
