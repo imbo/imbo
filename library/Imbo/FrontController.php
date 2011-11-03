@@ -229,6 +229,12 @@ class FrontController {
             throw new Exception('Method not allowed', 405);
         }
 
+        $className = get_class($resource);
+        $resourceName = strtolower(substr($className, strrpos($className, '\\') + 1));
+        $eventName = $resourceName . '.' . $methodName;
+
+        $this->container->eventManager->trigger($eventName . '.pre');
         $resource->$methodName($request, $response, $this->container->database, $this->container->storage);
+        $this->container->eventManager->trigger($eventName . '.post');
     }
 }
