@@ -56,6 +56,7 @@ class Autoload {
         'imbo\\eventmanager\\eventinterface' => '/EventManager/EventInterface.php',
         'imbo\\eventmanager\\eventmanager' => '/EventManager/EventManager.php',
         'imbo\\eventmanager\\eventmanagerinterface' => '/EventManager/EventManagerInterface.php',
+        'imbo\\eventmanager\\listener\\listenerinterface' => '/EventManager/Listener/ListenerInterface.php',
         'imbo\\exception' => '/Exception.php',
         'imbo\\frontcontroller' => '/FrontController.php',
         'imbo\\http\\headercontainer' => '/Http/HeaderContainer.php',
