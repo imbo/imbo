@@ -310,4 +310,31 @@ class ImageTest extends ResourceTests {
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
+
+    public function testGetWithImageConversion() {
+        $resource = $this->getNewResource();
+        $resourcePart = $this->imageIdentifier . '.jpg';
+        $requestUri = '/users/' . $this->publicKey . '/images/' . $resourcePart;
+
+        $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
+        $serverContainer->expects($this->once())->method('get')->with('REQUEST_URI')->will($this->returnValue($requestUri));
+
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $responseHeaders->expects($this->any())->method('set')->will($this->returnValue($responseHeaders));
+
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
+
+        $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
+        $this->request->expects($this->once())->method('getResource')->will($this->returnValue($resourcePart));
+        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue($this->getMock('Imbo\Image\TransformationChain')));
+
+        $this->image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../_files/image.png')));
+
+        $this->response->expects($this->once())->method('setBody')->with($this->isType('string'));
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
+    }
 }
