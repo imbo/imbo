@@ -22,8 +22,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Imbo
- * @subpackage Exceptions
+ * @package Exceptions
+ * @subpackage Database
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -37,8 +37,8 @@ use Imbo\Exception as BaseException;
 /**
  * Database exception class for Imbo
  *
- * @package Imbo
- * @subpackage Exceptions
+ * @package Exceptions
+ * @subpackage Database
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License

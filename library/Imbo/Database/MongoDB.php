@@ -22,8 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Imbo
- * @subpackage DatabaseDriver
+ * @package Database
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -45,8 +44,7 @@ use Imbo\Resource\Images\QueryInterface;
  * - <pre>(string) database</pre> Name of the database. Defaults to 'imbo'
  * - <pre>(string) collection</pre> Name of the collection to store data in. Defaults to 'images'
  *
- * @package Imbo
- * @subpackage DatabaseDriver
+ * @package Database
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License

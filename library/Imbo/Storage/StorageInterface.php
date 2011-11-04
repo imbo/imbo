@@ -22,8 +22,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Imbo
- * @subpackage Interfaces
+ * @package Interfaces
+ * @subpackage Storage
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -39,8 +39,8 @@ use Imbo\Image\ImageInterface;
  *
  * This is an interface for different storage drivers for Imbo.
  *
- * @package Imbo
- * @subpackage Interfaces
+ * @package Interfaces
+ * @subpackage Storage
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License

@@ -22,7 +22,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Imbo
+ * @package Http
+ * @subpackage Containers
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -37,7 +38,8 @@ namespace Imbo\Http;
  * Instances of this container will usually hold paramters found in for instance the $_GET or
  * $_POST superglobals.
  *
- * @package Imbo
+ * @package Http
+ * @subpackage Containers
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License

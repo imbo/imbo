@@ -22,7 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Imbo
+ * @package Http\Response
  * @subpackage Formatters
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
@@ -35,7 +35,7 @@ namespace Imbo\Http\Response\Formatter;
 /**
  * JSON formatter
  *
- * @package Imbo
+ * @package Http\Response
  * @subpackage Formatters
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen

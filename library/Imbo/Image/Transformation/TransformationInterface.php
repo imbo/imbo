@@ -22,8 +22,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Imbo
- * @subpackage ImageTransformation
+ * @package Interfaces
+ * @subpackage Transformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -38,8 +38,8 @@ use Imagine\Image\ImagineInterface;
 /**
  * Image transformation interface
  *
- * @package Imbo
- * @subpackage ImageTransformation
+ * @package Interfaces
+ * @subpackage Transformation
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License

@@ -22,8 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Imbo
- * @subpackage StorageDriver
+ * @package Storage
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -43,8 +42,7 @@ use Imbo\Image\ImageInterface;
  *
  * - <pre>(string) dataDir</pre> Absolute path to the base directory the images should be stored in
  *
- * @package Imbo
- * @subpackage StorageDriver
+ * @package Storage
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License

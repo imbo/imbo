@@ -22,8 +22,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Imbo
- * @subpackage Interfaces
+ * @package Interfaces
+ * @subpackage Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -40,8 +40,8 @@ use Imbo\Resource\Images\QueryInterface;
  * This interface extends the resource interface with two methods for setting and getting a query
  * instance.
  *
- * @package Imbo
- * @subpackage Interfaces
+ * @package Interfaces
+ * @subpackage Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License

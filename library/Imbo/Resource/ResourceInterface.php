@@ -22,8 +22,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Imbo
- * @subpackage Interfaces
+ * @package Interfaces
+ * @subpackage Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -43,8 +43,8 @@ use Imbo\Storage\StorageInterface;
  * Available resources must implement this interface. They can also extend the abstract resource
  * class (Imbo\Resource\Resource) for convenience.
  *
- * @package Imbo
- * @subpackage Interfaces
+ * @package Interfaces
+ * @subpackage Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
