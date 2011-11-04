@@ -62,9 +62,8 @@ class ConvertTest extends TransformationTests {
         $convert = $this->getTransformation();
 
         $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->once())->method('setBlob')->will($this->returnValue($image));
-        $image->expects($this->once())->method('setMimeType')->with('image/png')->will($this->returnValue($image));
-        $image->expects($this->once())->method('setExtension')->with('png')->will($this->returnValue($image));
+        $image->expects($this->once())->method('setMimeType')->with('image/png');
+        $image->expects($this->once())->method('setExtension')->with('png');
 
         $imagineImage = $this->getMock('Imagine\Image\ImageInterface');
 

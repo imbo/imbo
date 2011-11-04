@@ -82,9 +82,9 @@ class Convert extends Transformation implements TransformationInterface {
             $imageBlob = $imagineImage->get($this->type);
             $mimeType = array_search($this->type, Image::$mimeTypes);
 
-            $image->setBlob($imageBlob)
-                  ->setMimeType($mimeType)
-                  ->setExtension($this->type);
+            $image->setBlob($imageBlob);
+            $image->setMimeType($mimeType);
+            $image->setExtension($this->type);
         } catch (ImagineException $e) {
             throw new Exception($e->getMessage(), 400, $e);
         }
