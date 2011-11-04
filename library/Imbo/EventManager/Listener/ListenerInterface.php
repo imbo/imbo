@@ -46,9 +46,14 @@ use Imbo\EventManager\EventInterface;
  */
 interface ListenerInterface {
     /**
-     * Magic invoke method
+     * Return the events this listener wants to listen for
      *
-     * This is the only method required for implementations of this interface
+     * @return array
+     */
+    function getEvents();
+
+    /**
+     * Magic invoke method
      *
      * @param Imbo\EventManager\EventInterface $event The triggered event
      */
