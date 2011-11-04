@@ -32,6 +32,8 @@
 
 namespace Imbo\EventManager;
 
+use Imbo\EventManager\Listener\ListenerInterface;
+
 /**
  * Event manager interface
  *
@@ -53,6 +55,15 @@ interface EventManagerInterface {
      * @return Imbo\EventManager\EventManagerInterface
      */
     function attach($events, $callback, $priority = 1);
+
+    /**
+     * Attach a listener to the event manager
+     *
+     * @param Imbo\EventManager\Listener\ListenerInterface $listener The listener to attach
+     * @param int $priority Priority of the callback
+     * @return Imbo\EventManager\EventManagerInterface
+     */
+    function attachListener(ListenerInterface $listener, $priority = 1);
 
     /**
      * Trigger a given event

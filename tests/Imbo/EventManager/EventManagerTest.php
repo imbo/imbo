@@ -88,4 +88,13 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
                       ->trigger('event2')
                       ->trigger('event4');
     }
+
+    public function testAttachListener() {
+        $listener = $this->getMock('Imbo\EventManager\Listener\ListenerInterface');
+        $listener->expects($this->once())->method('getEvents')->will($this->returnValue(array('event')));
+        $listener->expects($this->once())->method('__invoke')->with($this->isInstanceOf('Imbo\EventManager\EventInterface'));
+
+        $this->manager->attachListener($listener);
+        $this->manager->trigger('event');
+    }
 }
