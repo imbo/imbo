@@ -67,7 +67,7 @@ class ResizeConstraintTest extends ListenerTests {
         $event = $this->getMock('Imbo\EventManager\EventInterface');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
 
-        $listener($event);
+        $listener->invoke($event);
     }
 
     public function testInvoke() {
@@ -83,6 +83,6 @@ class ResizeConstraintTest extends ListenerTests {
         $event = $this->getMock('Imbo\EventManager\EventInterface');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
 
-        $listener($event);
+        $listener->invoke($event);
     }
 }

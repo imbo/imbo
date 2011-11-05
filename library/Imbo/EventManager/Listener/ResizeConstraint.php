@@ -83,9 +83,9 @@ class ResizeConstraint implements ListenerInterface {
     }
 
     /**
-     * @see Imbo\EventManager\Listener\ListenerInterface::__invoke()
+     * @see Imbo\EventManager\Listener\ListenerInterface::invoke()
      */
-    public function __invoke(EventInterface $event) {
+    public function invoke(EventInterface $event) {
         $request = $event->getRequest();
         $transformations = $request->getTransformations();
 

@@ -105,8 +105,10 @@ class EventManager implements EventManagerInterface {
     /**
      * @see Imbo\EventManager\EventManagagerInterface::attachListener()
      */
-    public function attachListener(ListenerInterface $listener, $priority = 1) {
-        return $this->attach($listener->getEvents(), $listener, $priority);
+    public function attachListener(Listener\ListenerInterface $listener, $priority = 1) {
+        return $this->attach($listener->getEvents(), function(EventInterface $event) use($listener) {
+            $listener->invoke($event);
+        }, $priority);
     }
 
     /**

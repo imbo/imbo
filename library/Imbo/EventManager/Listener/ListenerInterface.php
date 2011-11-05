@@ -53,9 +53,11 @@ interface ListenerInterface {
     function getEvents();
 
     /**
-     * Magic invoke method
+     * Invoke method
+     *
+     * This method will get triggered by the event manager
      *
      * @param Imbo\EventManager\EventInterface $event The triggered event
      */
-    function __invoke(EventInterface $event);
+    function invoke(EventInterface $event);
 }
