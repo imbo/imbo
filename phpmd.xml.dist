@@ -10,5 +10,7 @@
   <rule ref="rulesets/naming.xml">
     <exclude name="ShortVariable" />
   </rule>
-  <rule ref="rulesets/unusedcode.xml" />
+  <rule ref="rulesets/unusedcode.xml">
+    <exclude name="UnusedFormalParameter" />
+  </rule>
 </ruleset>
