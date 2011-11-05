@@ -305,4 +305,19 @@ class MongoDB implements DatabaseInterface {
 
         return $data['updated'];
     }
+
+    /**
+     * @see Imbo\Database\DatabaseInterface::getNumImages()
+     */
+    public function getNumImages($publicKey) {
+        try {
+            $query = array(
+                'publicKey' => $publicKey,
+            );
+
+            return (int) $this->collection->find($query)->count();
+        } catch (\MongoException $e) {
+            throw new Exception('Unable to fetch information from the database', 500, $e);
+        }
+    }
 }
