@@ -89,6 +89,16 @@ class Container {
     private $values = array();
 
     /**
+     * See if the container has a given value
+     *
+     * @param string $key The key to check for
+     * @return boolean
+     */
+    public function has($key) {
+        return isset($this->values[$key]);
+    }
+
+    /**
      * Set a value
      *
      * @param string $id The accessed property
