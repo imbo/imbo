@@ -20,6 +20,9 @@ $container->imagesResource = $container->shared(function(Imbo\Container $contain
 $container->imageResource = $container->shared(function(Imbo\Container $container) {
     return new Imbo\Resource\Image($container->image);
 });
+$container->userResource = $container->shared(function(Imbo\Container $container) {
+    return new Imbo\Resource\User();
+});
 
 // Parameters for the database driver
 $dbParams = array(
