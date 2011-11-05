@@ -70,6 +70,20 @@ class FrontController {
     );
 
     /**
+     * Default class names for the supported resources
+     *
+     * This is the fallback map if the resource is not located in the DIC.
+     *
+     * @var array
+     */
+    static private $resourceClasses = array(
+        'image'    => 'Imbo\Resource\Image',
+        'metadata' => 'Imbo\Resource\Metadata',
+        'images'   => 'Imbo\Resource\Images',
+        'user'     => 'Imbo\Resource\User',
+    );
+
+    /**
      * Class constructor
      *
      * @param Imbo\Container $container A container instance
@@ -94,6 +108,7 @@ class FrontController {
             'image'    => '#^/users/(?<publicKey>[a-f0-9]{32})/images/(?<resource>(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png))?)$#',
             'metadata' => '#^/users/(?<publicKey>[a-f0-9]{32})/images/(?<resource>(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png)/)meta/?)$#',
             'images'   => '#^/users/(?<publicKey>[a-f0-9]{32})/(?<resource>images)/?$#',
+            'user'     => '#^/users/(?<resource>(?<publicKey>[a-f0-9]{32}))/?$#',
         );
 
         // Initialize matches
@@ -119,10 +134,15 @@ class FrontController {
         }
 
         // Append "Resource" to the resource name to match the entry in the container
-        $resourceName .= 'Resource';
+        $dicEntry = $resourceName . 'Resource';
 
-        // Fetch the resource instance from the container
-        $resource = $this->container->$resourceName;
+        if ($this->container->has($dicEntry)) {
+            // Fetch the resource instance from the container
+            $resource = $this->container->$dicEntry;
+        } else {
+            $className = self::$resourceClasses[$resourceName];
+            $resource = new $className();
+        }
 
         return $resource;
     }
@@ -140,6 +160,10 @@ class FrontController {
         // See if the public key exists
         if (!isset($authConfig[$publicKey])) {
             throw new Exception('Unknown public key', 400);
+        }
+
+        if (!$request->isUnsafe()) {
+            return;
         }
 
         $privateKey = $authConfig[$publicKey];
@@ -214,10 +238,8 @@ class FrontController {
             $response->getHeaders()->set('X-Imbo-ImageIdentifier', $identifier);
         }
 
-        // If we have an unsafe request, we need to make sure that the request is valid
-        if ($request->isUnsafe()) {
-            $this->auth($request);
-        }
+        // Authenticate the request
+        $this->auth($request);
 
         // Lowercase the HTTP method to get the class method to execute
         $methodName = strtolower($httpMethod);

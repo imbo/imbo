@@ -133,4 +133,13 @@ interface DatabaseInterface {
      * @throws Imbo\Database\Exception
      */
     function getLastModified($publicKey, $imageIdentifier);
+
+    /**
+     * Fetch the number of images owned by a given user
+     *
+     * @param string $publicKey The public key of the user
+     * @return int Returns the number of images
+     * @throws Imbo\Database\Exception
+     */
+    function getNumImages($publicKey);
 }

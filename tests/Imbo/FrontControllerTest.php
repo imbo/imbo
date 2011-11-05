@@ -161,6 +161,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+        $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
 
         $method->invoke($this->controller, $request);
     }
@@ -182,6 +183,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+        $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
 
         $method->invoke($this->controller, $request);
     }
@@ -203,6 +205,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+        $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
 
         $method->invoke($this->controller, $request);
     }
@@ -224,6 +227,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+        $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
 
         $method->invoke($this->controller, $request);
     }
@@ -254,6 +258,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+        $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
 
         $method->invoke($this->controller, $request);
     }
@@ -286,6 +291,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
         $request->expects($this->once())->method('getMethod')->will($this->returnValue($httpMethod));
         $request->expects($this->once())->method('getResource')->will($this->returnValue($resource));
+        $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
 
         $method->invoke($this->controller, $request);
     }
