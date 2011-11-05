@@ -33,7 +33,6 @@ namespace Imbo\EventManager;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
-    Imbo\EventManager\Listener\ListenerInterface,
     InvalidArgumentException,
     SplPriorityQueue;
 
@@ -105,7 +104,7 @@ class EventManager implements EventManagerInterface {
     /**
      * @see Imbo\EventManager\EventManagagerInterface::attachListener()
      */
-    public function attachListener(Listener\ListenerInterface $listener, $priority = 1) {
+    public function attachListener(ListenerInterface $listener, $priority = 1) {
         return $this->attach($listener->getEvents(), function(EventInterface $event) use($listener) {
             $listener->invoke($event);
         }, $priority);
