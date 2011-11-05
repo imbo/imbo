@@ -10,6 +10,8 @@ Since this is a work in progress there is no automatic installation. Simply clon
 ## REST API
 Imbo uses a REST API to manage the images. Each image will be identified by a public key and an MD5 sum of the file itself and the original file extension. The latter will be referred to as &lt;image&gt; for the remainder of this document.
 
+The resources supporting `GET` also supports `HEAD` which will return only the headers.
+
 ### GET /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
 Fetch the image identified by &lt;image&gt;. Read more about applying image transformations later on.
@@ -32,6 +34,10 @@ Example:
 
 * `GET /users/<publicKey>/images?page=1&num=30&metadata=1`
 
+### GET /users/&lt;publicKey&gt;
+
+Fetch information about a specific user.
+
 ### PUT /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
 Place a new image on the server.
@@ -47,14 +53,6 @@ Delete the image identified by &lt;image&gt; along with all meta data.
 ### DELETE /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
 
 Delete the meta data attached to the image identified by &lt;image&gt;. The image is kept on the server.
-
-### HEAD /users/&lt;publicKey&gt;/images/&lt;image&gt;
-
-Fetch extra header information about a single image identified by &lt;image&gt;.
-
-### HEAD /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
-
-Fetches extra header information about the meta data attached to the image identified by &lt;image&gt;.
 
 ## Authentication
 All write operations (PUT, POST and DELETE) requires authentication using an Hash-based Message Authentication Code (HMAC). The data Imbo uses when generating this code is:
@@ -257,6 +255,7 @@ Imbo defines three resources:
 * `image`
 * `images`
 * `metadata`
+* `user`
 
 The executable code you attach to an event will receive a single parameter, an instance of `Imbo\EventManager\EventInterface`. This interface defines the following methods:
 
@@ -378,7 +377,7 @@ If you send me a pull request I would appreciate it if you include tests for all
 The `Imbo\FrontController` class is responsible for validating the request, and picking the correct resource class for the request. It will create an instance of the resource, execute plugins and the resource logic and then return the response.
 
 ### Resources
-There are three available resources in Imbo. `Imbo\Resource\Image`, `Imbo\Resource\Images` and `Imbo\Resource\Metadata`.
+The following resources are defined in Imbo:
 
 #### Imbo\Resource\Image
 This resource delivers the image data.
@@ -388,6 +387,9 @@ This resource can be used to query Imbo for stored images.
 
 #### Imbo\Resource\Metadata
 This resource delivers the metadata associated with an image.
+
+#### Imbo\Resource\User
+This resource handles information about a single user.
 
 ### Storage drivers
 Imbo supports plugable storage drivers. All storage drivers must implement the `Imbo\Storage\StorageInterface` interface.
