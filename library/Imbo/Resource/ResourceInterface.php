@@ -51,15 +51,6 @@ use Imbo\Storage\StorageInterface;
  * @link https://github.com/christeredvartsen/imbo
  */
 interface ResourceInterface {
-    /**#@+
-     * State constants
-     *
-     * @var string
-     */
-    const STATE_PRE  = 'pre';
-    const STATE_POST = 'post';
-    /**#@-*/
-
     /**
      * Return an array with the allowed (implemented) HTTP methods for the current resource
      *
