@@ -105,10 +105,10 @@ class FrontController {
 
         // Possible patterns to match where the most accessed patch is placed first
         $routes = array(
-            'image'    => '#^/users/(?<publicKey>[a-f0-9]{32})/images/(?<resource>(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png))?)$#',
-            'metadata' => '#^/users/(?<publicKey>[a-f0-9]{32})/images/(?<resource>(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png)/)meta/?)$#',
-            'images'   => '#^/users/(?<publicKey>[a-f0-9]{32})/(?<resource>images)/?$#',
-            'user'     => '#^/users/(?<resource>(?<publicKey>[a-f0-9]{32}))/?$#',
+            'image'    => '#^/users/(?<publicKey>[a-f0-9]{32})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png))?$#',
+            'images'   => '#^/users/(?<publicKey>[a-f0-9]{32})/images/?$#',
+            'metadata' => '#^/users/(?<publicKey>[a-f0-9]{32})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png)/)meta/?$#',
+            'user'     => '#^/users/(?<publicKey>[a-f0-9]{32})/?$#',
         );
 
         // Initialize matches
@@ -127,7 +127,6 @@ class FrontController {
 
         // Extract some information from the path and store in the request instance
         $request->setPublicKey($matches['publicKey']);
-        $request->setResource(rtrim($matches['resource'], '/'));
 
         if (isset($matches['imageIdentifier'])) {
             $request->setImageIdentifier($matches['imageIdentifier']);
@@ -199,7 +198,7 @@ class FrontController {
         }
 
         // Generate data for the HMAC
-        $data = $request->getMethod() . '|' . $request->getResource() . '|' . $publicKey . '|' . $query->get('timestamp');
+        $data = $request->getMethod() . '|' . $request->getUrl() . '|' . $publicKey . '|' . $query->get('timestamp');
 
         // Generate binary hash key
         $actualSignature = hash_hmac('sha256', $data, $privateKey);

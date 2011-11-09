@@ -88,7 +88,6 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $imageIdentifier = md5(microtime());
         $request->expects($this->once())->method('getPath')->will($this->returnValue('/users/' . $this->publicKey . '/images/' . $imageIdentifier));
         $request->expects($this->once())->method('setPublicKey')->with($this->publicKey);
-        $request->expects($this->once())->method('setResource')->with($imageIdentifier);
         $this->assertInstanceOf('Imbo\Resource\Image', $method->invoke($this->controller, $request));
     }
 
@@ -99,7 +98,6 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPath')->will($this->returnValue('/users/' . $this->publicKey . '/images'));
         $request->expects($this->once())->method('setPublicKey')->with($this->publicKey);
-        $request->expects($this->once())->method('setResource')->with('images');
         $this->assertInstanceOf('Imbo\Resource\Images', $method->invoke($this->controller, $request));
     }
 
@@ -111,7 +109,6 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPath')->will($this->returnValue('/users/' . $this->publicKey . '/images/' . $imageIdentifier . '/meta'));
         $request->expects($this->once())->method('setPublicKey')->with($this->publicKey);
-        $request->expects($this->once())->method('setResource')->with($imageIdentifier . '/meta');
         $this->assertInstanceOf('Imbo\Resource\Metadata', $method->invoke($this->controller, $request));
     }
 
@@ -269,9 +266,10 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method->setAccessible(true);
 
         $timestamp = gmdate('Y-m-d\TH:i:s\Z');
+        $imageIdentifier = md5(microtime());
         $httpMethod = 'POST';
-        $resource = md5(microtime()) . '.png/meta';
-        $data = $httpMethod . '|' . $resource . '|' . $this->publicKey . '|' . $timestamp;
+        $url = 'http://host/user/' . $this->publicKey . '/images/' . $imageIdentifier . '/meta';
+        $data = $httpMethod . '|' . $url . '|' . $this->publicKey . '|' . $timestamp;
 
         // Generate the correct signature
         $signature = hash_hmac('sha256', $data, $this->privateKey);
@@ -290,7 +288,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
         $request->expects($this->once())->method('getMethod')->will($this->returnValue($httpMethod));
-        $request->expects($this->once())->method('getResource')->will($this->returnValue($resource));
+        $request->expects($this->once())->method('getUrl')->will($this->returnValue($url));
         $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
 
         $method->invoke($this->controller, $request);
