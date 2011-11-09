@@ -170,7 +170,9 @@ class Image extends Resource implements ResourceInterface {
         $storage->load($publicKey, $imageIdentifier, $this->image);
 
         // Fetch the requested resource to see if we have to convert the image
-        $resource = $request->getResource();
+        $path = $request->getPath();
+        $resource = substr($path, strrpos($path, '/') + 1);
+
         $originalMimeType = $this->image->getMimeType();
         $originalFilesize = $this->image->getFilesize();
 

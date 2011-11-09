@@ -328,7 +328,7 @@ class ImageTest extends ResourceTests {
 
         $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-        $this->request->expects($this->once())->method('getResource')->will($this->returnValue($resourcePart));
+        $this->request->expects($this->once())->method('getPath')->will($this->returnValue($requestUri));
         $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue($this->getMock('Imbo\Image\TransformationChain')));
 
         $this->image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../_files/image.png')));
