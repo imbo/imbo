@@ -315,7 +315,9 @@ class MongoDB implements DatabaseInterface {
                 'publicKey' => $publicKey,
             );
 
-            return (int) $this->collection->find($query)->count();
+            $result = (int) $this->collection->find($query)->count();
+
+            return $result;
         } catch (\MongoException $e) {
             throw new Exception('Unable to fetch information from the database', 500, $e);
         }

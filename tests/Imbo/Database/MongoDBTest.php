@@ -435,4 +435,20 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame($now, $this->driver->getLastModified($this->publicKey, $this->imageIdentifier));
     }
+
+    /**
+     * @expectedException Imbo\Database\Exception
+     * @expectedExceptionCode 500
+     */
+    public function testGetNumImagesWhenMongoThrowsAnException() {
+        $this->collection->expects($this->once())->method('find')->will($this->throwException(new \MongoException()));
+        $this->driver->getNumImages($this->publicKey);
+    }
+
+    public function testGetNumImages() {
+        $result = $this->getMock('stdClass', array('count'));
+        $result->expects($this->once())->method('count')->will($this->returnValue(2));
+        $this->collection->expects($this->once())->method('find')->with(array('publicKey' => $this->publicKey))->will($this->returnValue($result));
+        $this->assertSame(2, $this->driver->getNumImages($this->publicKey));
+    }
 }
