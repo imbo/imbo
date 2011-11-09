@@ -80,6 +80,20 @@ interface RequestInterface {
     function getTransformations();
 
     /**
+     * Get the current scheme (http or https)
+     *
+     * @return string
+     */
+    function getScheme();
+
+    /**
+     * Get the host
+     *
+     * @return string
+     */
+    function getHost();
+
+    /**
      * Get the current accessed path without possible application prefixes
      *
      * @return string
@@ -87,19 +101,11 @@ interface RequestInterface {
     function getPath();
 
     /**
-     * Get the current resource
+     * Get the current url
      *
      * @return string
      */
-    function getResource();
-
-    /**
-     * Set the current resource
-     *
-     * @param string $resource The resource name
-     * @return Imbo\Http\Request\RequestInterface
-     */
-    function setResource($resource);
+    function getUrl();
 
     /**
      * Get the current image identifier

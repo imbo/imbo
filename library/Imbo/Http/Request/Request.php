@@ -210,6 +210,22 @@ class Request implements RequestInterface {
     }
 
     /**
+     * @see Imbo\Http\Request\RequestInterface::getScheme()
+     */
+    public function getScheme() {
+        $https = strtolower($this->server->get('HTTPS'));
+
+        return ($https === 'on' || $https == 1) ? 'https' : 'http';
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::getHost()
+     */
+    public function getHost() {
+        return $this->server->get('SERVER_NAME');
+    }
+
+    /**
      * @see Imbo\Http\Request\RequestInterface::getPath()
      */
     public function getPath() {
@@ -217,19 +233,10 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getResource()
+     * @see Imbo\Http\Request\RequestInterface::getUrl()
      */
-    public function getResource() {
-        return $this->resource;
-    }
-
-    /**
-     * @see Imbo\Http\Request\RequestInterface::setResource()
-     */
-    public function setResource($resource) {
-        $this->resource = $resource;
-
-        return $this;
+    public function getUrl() {
+        return sprintf('%s://%s%s', $this->getScheme(), $this->getHost(), $this->getPath());
     }
 
     /**

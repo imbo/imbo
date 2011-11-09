@@ -81,13 +81,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($identifier, $request->getImageIdentifier());
     }
 
-    public function testSetGetResource() {
-        $resource = 'images';
-        $request = new Request();
-        $this->assertSame($request, $request->setResource($resource));
-        $this->assertSame($resource, $request->getResource());
-    }
-
     public function testGetQuery() {
         $request = new Request(array('key' => 'value'));
         $queryContainer = $request->getQuery();
@@ -156,5 +149,34 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $request = new Request(array(), array(), $server);
 
         $this->assertSame('/users/' . $publicKey . '/images/' . $imageIdentifier, $request->getPath());
+    }
+
+    public function testGetSchemeWithHttps() {
+        $request = new Request(array(), array(), array('HTTPS' => 1));
+        $this->assertSame('https', $request->getScheme());
+    }
+
+    public function testGetSchemeWithHttp() {
+        $request = new Request();
+        $this->assertSame('http', $request->getScheme());
+    }
+
+    public function testGetHost() {
+        $request = new Request(array(), array(), array('SERVER_NAME' => 'localhost'));
+        $this->assertSame('localhost', $request->getHost());
+    }
+
+    public function testGetUrl() {
+        $publicKey = md5(microtime());
+        $image = md5(microtime());
+
+        $request = new Request(array(), array(), array(
+            'SERVER_NAME' => 'localhost',
+            'HTTPS' => 1,
+            'SCRIPT_FILENAME' => '/var/www/index.php',
+            'REDIRECT_URL' => '/users/' . $publicKey . '/' . $image,
+        ));
+
+        $this->assertSame('https://localhost/users/' . $publicKey . '/' . $image, $request->getUrl());
     }
 }
