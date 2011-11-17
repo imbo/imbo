@@ -94,7 +94,14 @@ interface RequestInterface {
     function getHost();
 
     /**
-     * Get the current accessed path without possible application prefixes
+     * Get the baseurl
+     *
+     * @return string
+     */
+    function getBaseUrl();
+
+    /**
+     * Get the current accessed path (the part after the base url)
      *
      * @return string
      */

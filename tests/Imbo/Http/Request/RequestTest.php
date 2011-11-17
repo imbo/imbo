@@ -166,17 +166,33 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame('localhost', $request->getHost());
     }
 
-    public function testGetUrl() {
+    public function testGetUrlWithImboInDocumentRoot() {
         $publicKey = md5(microtime());
         $image = md5(microtime());
 
         $request = new Request(array(), array(), array(
             'SERVER_NAME' => 'localhost',
             'HTTPS' => 1,
+            'DOCUMENT_ROOT' => '/var/www',
             'SCRIPT_FILENAME' => '/var/www/index.php',
             'REDIRECT_URL' => '/users/' . $publicKey . '/' . $image,
         ));
 
         $this->assertSame('https://localhost/users/' . $publicKey . '/' . $image, $request->getUrl());
+    }
+
+    public function testGetUrlWithImboInDirectory() {
+        $publicKey = md5(microtime());
+        $image = md5(microtime());
+
+        $request = new Request(array(), array(), array(
+            'SERVER_NAME' => 'localhost',
+            'HTTPS' => 1,
+            'DOCUMENT_ROOT' => '/var/www',
+            'SCRIPT_FILENAME' => '/var/www/imbo/index.php',
+            'REDIRECT_URL' => '/users/' . $publicKey . '/' . $image,
+        ));
+
+        $this->assertSame('https://localhost/imbo/users/' . $publicKey . '/' . $image, $request->getUrl());
     }
 }

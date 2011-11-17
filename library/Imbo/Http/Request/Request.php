@@ -121,12 +121,8 @@ class Request implements RequestInterface {
         $this->server  = new ServerContainer($server);
         $this->headers = new HeaderContainer($this->server->getHeaders());
 
-        // Remove a possible prefix in the URL
-        $excessDir = str_replace(rtrim($this->server->get('DOCUMENT_ROOT'), '/'), '', dirname($this->server->get('SCRIPT_FILENAME')));
-        $resource  = str_replace($excessDir, '', $this->server->get('REDIRECT_URL'));
-
-        $parts = parse_url($resource);
-        $this->path = $parts['path'];
+        $this->baseUrl = str_replace(rtrim($this->server->get('DOCUMENT_ROOT'), '/'), '', dirname($this->server->get('SCRIPT_FILENAME')));
+        $this->path = str_replace($this->baseUrl, '', $this->server->get('REDIRECT_URL'));
     }
 
     /**
@@ -226,6 +222,13 @@ class Request implements RequestInterface {
     }
 
     /**
+     * @see Imbo\Http\Request\RequestInterface::getBaseUrl()
+     */
+    public function getBaseUrl() {
+        return $this->baseUrl;
+    }
+
+    /**
      * @see Imbo\Http\Request\RequestInterface::getPath()
      */
     public function getPath() {
@@ -236,7 +239,7 @@ class Request implements RequestInterface {
      * @see Imbo\Http\Request\RequestInterface::getUrl()
      */
     public function getUrl() {
-        return sprintf('%s://%s%s', $this->getScheme(), $this->getHost(), $this->getPath());
+        return sprintf('%s://%s%s%s', $this->getScheme(), $this->getHost(), $this->getBaseUrl(), $this->getPath());
     }
 
     /**
