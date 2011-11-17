@@ -45,6 +45,12 @@ use Imagine\Exception\RuntimeException as ImagineException;
 abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     abstract protected function getTransformation();
 
+    public function setUp() {
+        if (!class_exists('Imagine\Imagick\Imagine', false)) {
+            $this->markTestSkipped('Imagine must be available to run this test');
+        }
+    }
+
     /**
      * @expectedException Imbo\Image\Transformation\Exception
      * @expectedExceptionMessage some message
