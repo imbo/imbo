@@ -32,8 +32,8 @@
 
 namespace Imbo\Storage;
 
-/** vfsStream */
-require_once 'vfsStream/vfsStream.php';
+use vfsStream,
+    vfsStreamWrapper;
 
 /**
  * @package Imbo
@@ -59,6 +59,15 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     private $imageIdentifier = '96d08a5943ebf1c5635a2995c9408cdd.png';
 
     /**
+     * Setup method
+     */
+    public function setUp() {
+        if (!class_exists('vfsStream', true)) {
+            $this->markTestSkipped('This testcase requires vfsStream to run');
+        }
+    }
+
+    /**
      * @expectedException Imbo\Storage\Exception
      * @expectedExceptionMessage File not found
      */
@@ -68,10 +77,10 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testDelete() {
-        \vfsStream::setup('basedir');
-        $driver = new Filesystem(array('dataDir' => \vfsStream::url('basedir')));
+        vfsStream::setup('basedir');
+        $driver = new Filesystem(array('dataDir' => vfsStream::url('basedir')));
 
-        $root = \vfsStreamWrapper::getRoot();
+        $root = vfsStreamWrapper::getRoot();
         $last = $root;
 
         $parts = array(
@@ -85,12 +94,12 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         );
 
         foreach ($parts as $part) {
-            $d = \vfsStream::newDirectory($part);
+            $d = vfsStream::newDirectory($part);
             $last->addChild($d);
             $last = $d;
         }
 
-        $last->addChild(\vfsStream::newFile($this->imageIdentifier));
+        $last->addChild(vfsStream::newFile($this->imageIdentifier));
 
         $this->assertTrue($last->hasChild($this->imageIdentifier));
         $driver->delete($this->publicKey, $this->imageIdentifier);
@@ -106,9 +115,9 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $dir = 'unwritableDirectory';
 
         // Create the virtual directory with no permissions
-        \vfsStream::setup($dir, 0);
+        vfsStream::setup($dir, 0);
 
-        $driver = new Filesystem(array('dataDir' => \vfsStream::url($dir)));
+        $driver = new Filesystem(array('dataDir' => vfsStream::url($dir)));
         $driver->store($this->publicKey, $this->imageIdentifier, $image);
     }
 
@@ -124,9 +133,9 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $baseDir = 'someDir';
 
         // Create the virtual directory
-        \vfsStream::setup($baseDir);
+        vfsStream::setup($baseDir);
 
-        $driver = new Filesystem(array('dataDir' => \vfsStream::url($baseDir)));
+        $driver = new Filesystem(array('dataDir' => vfsStream::url($baseDir)));
         $this->assertTrue($driver->store($this->publicKey, $this->imageIdentifier, $image));
         $driver->store($this->publicKey, $this->imageIdentifier, $image);
     }
@@ -138,9 +147,9 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $baseDir = 'someDir';
 
         // Create the virtual directory
-        \vfsStream::setup($baseDir);
+        vfsStream::setup($baseDir);
 
-        $driver = new Filesystem(array('dataDir' => \vfsStream::url($baseDir)));
+        $driver = new Filesystem(array('dataDir' => vfsStream::url($baseDir)));
         $this->assertTrue($driver->store($this->publicKey, $this->imageIdentifier, $image));
     }
 
@@ -167,10 +176,10 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testLoad() {
-        \vfsStream::setup('basedir');
-        $driver = new Filesystem(array('dataDir' => \vfsStream::url('basedir')));
+        vfsStream::setup('basedir');
+        $driver = new Filesystem(array('dataDir' => vfsStream::url('basedir')));
 
-        $root = \vfsStreamWrapper::getRoot();
+        $root = vfsStreamWrapper::getRoot();
         $last = $root;
 
         $parts = array(
@@ -184,13 +193,13 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         );
 
         foreach ($parts as $part) {
-            $d = \vfsStream::newDirectory($part);
+            $d = vfsStream::newDirectory($part);
             $last->addChild($d);
             $last = $d;
         }
 
         $content = 'some binary content';
-        $file = \vfsStream::newFile($this->imageIdentifier);
+        $file = vfsStream::newFile($this->imageIdentifier);
         $file->setContent($content);
         $last->addChild($file);
 
@@ -211,10 +220,10 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetLastModified() {
-        \vfsStream::setup('basedir');
-        $driver = new Filesystem(array('dataDir' => \vfsStream::url('basedir')));
+        vfsStream::setup('basedir');
+        $driver = new Filesystem(array('dataDir' => vfsStream::url('basedir')));
 
-        $root = \vfsStreamWrapper::getRoot();
+        $root = vfsStreamWrapper::getRoot();
         $last = $root;
 
         $parts = array(
@@ -228,7 +237,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         );
 
         foreach ($parts as $part) {
-            $d = \vfsStream::newDirectory($part);
+            $d = vfsStream::newDirectory($part);
             $last->addChild($d);
             $last = $d;
         }
@@ -236,7 +245,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $now = time();
 
         $content = 'some binary content';
-        $file = \vfsStream::newFile($this->imageIdentifier);
+        $file = vfsStream::newFile($this->imageIdentifier);
         $file->setContent($content);
         $file->lastModified($now);
         $last->addChild($file);
