@@ -312,7 +312,7 @@ class ImageTest extends ResourceTests {
     }
 
     public function testGetWithImageConversion() {
-        if (!class_exists('Imagine\Imagick\Imagine', false)) {
+        if (!class_exists('Imagine\Imagick\Imagine')) {
             $this->markTestSkipped('Imagine must be available to run this test');
         }
 
