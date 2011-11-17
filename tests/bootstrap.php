@@ -54,6 +54,10 @@ set_include_path(
 spl_autoload_register(function($className) {
     $filename = str_replace('\\', '/', $className) . '.php';
 
+    if ($className === 'vfsStream') {
+        $filename = 'vfsStream/' . $filename;
+    }
+
     foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
         $absPath = rtrim($path, '/') . '/' . $filename;
 
