@@ -44,6 +44,10 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
     private $chain;
 
     public function setUp() {
+        if (!class_exists('Imagine\Imagick\Imagine')) {
+            $this->markTestSkipped('Imagine must be available to run this test');
+        }
+
         $this->chain = new TransformationChain();
     }
 

@@ -312,6 +312,10 @@ class ImageTest extends ResourceTests {
     }
 
     public function testGetWithImageConversion() {
+        if (!class_exists('Imagine\Imagick\Imagine')) {
+            $this->markTestSkipped('Imagine must be available to run this test');
+        }
+
         $resource = $this->getNewResource();
         $resourcePart = $this->imageIdentifier . '.jpg';
         $requestUri = '/users/' . $this->publicKey . '/images/' . $resourcePart;
