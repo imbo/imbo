@@ -225,7 +225,11 @@ class Response implements ResponseInterface {
     public function setNotModified() {
         $this->setStatusCode(304);
         $this->setBody(null);
-        $this->getHeaders()->removeAll();
+        $headers = $this->getHeaders();
+
+        foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Content-Type', 'Last-Modified') as $header) {
+            $headers->remove($header);
+        }
     }
 
     /**
