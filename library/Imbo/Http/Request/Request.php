@@ -218,7 +218,21 @@ class Request implements RequestInterface {
      * @see Imbo\Http\Request\RequestInterface::getHost()
      */
     public function getHost() {
-        return $this->server->get('SERVER_NAME');
+        $host = $this->server->get('HTTP_HOST');
+
+        // Remove optional port
+        if (($pos = strpos($host, ':')) !== false) {
+            $host = substr($host, 0, $pos);
+        }
+
+        return $host;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::getPort()
+     */
+    public function getPort() {
+        return $this->server->get('SERVER_PORT');
     }
 
     /**
@@ -239,7 +253,15 @@ class Request implements RequestInterface {
      * @see Imbo\Http\Request\RequestInterface::getUrl()
      */
     public function getUrl() {
-        return sprintf('%s://%s%s%s', $this->getScheme(), $this->getHost(), $this->getBaseUrl(), $this->getPath());
+        $port = (int) $this->getPort();
+
+        if (!$port || $port === 80) {
+            $port = '';
+        } else if ($port) {
+            $port = ':' . $port;
+        }
+
+        return sprintf('%s://%s%s%s%s', $this->getScheme(), $this->getHost(), $port, $this->getBaseUrl(), $this->getPath());
     }
 
     /**

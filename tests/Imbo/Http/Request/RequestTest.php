@@ -161,38 +161,46 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame('http', $request->getScheme());
     }
 
-    public function testGetHost() {
-        $request = new Request(array(), array(), array('SERVER_NAME' => 'localhost'));
-        $this->assertSame('localhost', $request->getHost());
+    public function getHosts() {
+        return array(
+            array('localhost', 'localhost'),
+            array('localhost:81', 'localhost'),
+        );
     }
 
-    public function testGetUrlWithImboInDocumentRoot() {
-        $publicKey = md5(microtime());
-        $image = md5(microtime());
-
-        $request = new Request(array(), array(), array(
-            'SERVER_NAME' => 'localhost',
-            'HTTPS' => 1,
-            'DOCUMENT_ROOT' => '/var/www',
-            'SCRIPT_FILENAME' => '/var/www/index.php',
-            'REDIRECT_URL' => '/users/' . $publicKey . '/' . $image,
-        ));
-
-        $this->assertSame('https://localhost/users/' . $publicKey . '/' . $image, $request->getUrl());
+    /**
+     * @dataProvider getHosts()
+     */
+    public function testGetHost($host, $expected) {
+        $request = new Request(array(), array(), array('HTTP_HOST' => $host));
+        $this->assertSame($expected, $request->getHost());
     }
 
-    public function testGetUrlWithImboInDirectory() {
+    public function getUrls() {
         $publicKey = md5(microtime());
-        $image = md5(microtime());
 
+        return array(
+            array('localhost', 80, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'http://localhost/users/' . $publicKey),
+            array('localhost', 80, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'http://localhost/prefix/users/' . $publicKey),
+            array('localhost:81', 81, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'http://localhost:81/users/' . $publicKey),
+            array('localhost:81', 81, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'http://localhost:81/prefix/users/' . $publicKey),
+            array('localhost:80', 80, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'http://localhost/users/' . $publicKey),
+            array('localhost:80', 80, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'http://localhost/prefix/users/' . $publicKey),
+        );
+    }
+
+    /**
+     * @dataProvider getUrls()
+     */
+    public function testGetUrlWithImboInDocumentRoot($host, $port, $documentRoot, $scriptFilename, $redirectUrl, $expected) {
         $request = new Request(array(), array(), array(
-            'SERVER_NAME' => 'localhost',
-            'HTTPS' => 1,
-            'DOCUMENT_ROOT' => '/var/www',
-            'SCRIPT_FILENAME' => '/var/www/imbo/index.php',
-            'REDIRECT_URL' => '/users/' . $publicKey . '/' . $image,
+            'HTTP_HOST' => $host,
+            'DOCUMENT_ROOT' => $documentRoot,
+            'SCRIPT_FILENAME' => $scriptFilename,
+            'REDIRECT_URL' => $redirectUrl,
+            'SERVER_PORT' => $port,
         ));
 
-        $this->assertSame('https://localhost/imbo/users/' . $publicKey . '/' . $image, $request->getUrl());
+        $this->assertSame($expected, $request->getUrl());
     }
 }

@@ -87,11 +87,18 @@ interface RequestInterface {
     function getScheme();
 
     /**
-     * Get the host
+     * Get the host, without port number
      *
      * @return string
      */
     function getHost();
+
+    /**
+     * Get the port
+     *
+     * @return int
+     */
+    function getPort();
 
     /**
      * Get the baseurl
@@ -109,6 +116,8 @@ interface RequestInterface {
 
     /**
      * Get the current url
+     *
+     * If the accessed port equals 80, this must be stripped from the URL returned from this method
      *
      * @return string
      */
