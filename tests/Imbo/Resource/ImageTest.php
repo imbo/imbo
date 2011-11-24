@@ -261,6 +261,7 @@ class ImageTest extends ResourceTests {
 
         $this->request->expects($this->once())->method('getServer')->will($this->returnValue($this->getMock('Imbo\Http\ServerContainerInterface')));
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
 
         $this->database->expects($this->once())
                        ->method('load');
@@ -278,6 +279,7 @@ class ImageTest extends ResourceTests {
 
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
 
         // The request URI for some image
         $requestUri = '/users/' . $this->publicKey . '/images/' . $this->imageIdentifier . '.png';

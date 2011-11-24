@@ -153,14 +153,17 @@ class Image extends Resource implements ResourceInterface {
         $database->load($publicKey, $imageIdentifier, $this->image);
 
         // Generate ETag using public key, image identifier, and the redirect url
-        $etag = md5($publicKey . $imageIdentifier . $serverContainer->get('REQUEST_URI'));
+        $etag = '"' . md5($publicKey . $imageIdentifier . $serverContainer->get('REQUEST_URI')) . '"';
 
         // Fetch last modified timestamp from the storage driver
         $lastModified = date('r', $storage->getLastModified($publicKey, $imageIdentifier));
 
+        // Add the ETag to the response headers
+        $responseHeaders->set('ETag', $etag);
+
         if (
             $lastModified === $requestHeaders->get('if-modified-since') &&
-            $etag === trim($requestHeaders->get('if-none-match'), '"')
+            $etag === $requestHeaders->get('if-none-match')
         ) {
             $response->setNotModified();
             return;
@@ -185,13 +188,12 @@ class Image extends Resource implements ResourceInterface {
         }
 
         // Set some response headers before we apply optional transformations
-        $responseHeaders->set('Last-Modified', $lastModified)
-                        ->set('ETag', '"' . $etag . '"')
-                        ->set('Content-Type', $this->image->getMimeType())
+        $responseHeaders->set('Content-Type', $this->image->getMimeType())
                         ->set('X-Imbo-OriginalMimeType', $originalMimeType)
                         ->set('X-Imbo-OriginalWidth', $this->image->getWidth())
                         ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
-                        ->set('X-Imbo-OriginalFileSize', $originalFilesize);
+                        ->set('X-Imbo-OriginalFileSize', $originalFilesize)
+                        ->set('Last-Modified', $lastModified);
 
         // Apply transformations
         $transformationChain = $request->getTransformations();
