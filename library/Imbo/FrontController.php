@@ -36,9 +36,7 @@ use Imbo\Http\Response\ResponseInterface;
 use Imbo\Image\Image;
 
 /**
- * Client that interacts with the server part of Imbo
- *
- * This client includes methods that can be used to easily interact with a Imbo server
+ * Front controller
  *
  * @package Core
  * @author Christer Edvartsen <cogo@starzinger.net>
