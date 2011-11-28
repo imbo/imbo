@@ -3,3 +3,4 @@ build.xml
 phpunit.xml
 docblox.xml
 phpmd.xml
+cache.properties

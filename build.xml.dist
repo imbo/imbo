@@ -13,6 +13,22 @@
     <mkdir dir="${build}/pdepend"/>
   </target>
 
+  <target name="lint">
+    <apply executable="php" failonerror="true">
+      <arg value="-l" />
+
+      <fileset dir="${source}">
+        <include name="**/*.php" />
+        <modified />
+      </fileset>
+
+      <fileset dir="${basedir}/tests">
+        <include name="**/*.php" />
+        <modified />
+      </fileset>
+    </apply>
+  </target>
+
   <target name="phpab" description="Update autoloader using phpab">
     <exec executable="phpab">
       <arg line="-o ${source}/Autoload.php -t ${source}/Autoload.php.in --indent '        ' ${source}"/>
@@ -63,5 +79,5 @@
     </exec>
   </target>
 
-  <target name="build" depends="clean,phpab,phpunit,docblox,phploc,phpcs,phpcb,phpcpd,pdepend,phpmd"/>
+  <target name="build" depends="clean,lint,phpab,phpunit,docblox,phploc,phpcs,phpcb,phpcpd,pdepend,phpmd"/>
 </project>
