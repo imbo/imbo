@@ -110,7 +110,7 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
         $reflection = new \ReflectionClass($this->resource);
         $className = get_class($this->resource);
         $allHttpMethods = array(
-            'get', 'post', 'put', 'delete', 'options', 'head',
+            'get', 'post', 'put', 'delete', 'head',
         );
 
         $implementedMethods = array_filter($reflection->getMethods(\ReflectionMethod::IS_PUBLIC), function($method) use($className, $allHttpMethods) {

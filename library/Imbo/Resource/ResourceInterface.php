@@ -114,16 +114,6 @@ interface ResourceInterface {
     function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
     /**
-     * OPTIONS handler
-     *
-     * @param Imbo\Http\Request\RequestInterface $request A request instance
-     * @param Imbo\Http\Response\ResponseInterface $response A response instance
-     * @param Imbo\Database\DatabaseInterface $database A database instance
-     * @param Imbo\Storage\StorageInterface $storage A storage instance
-     */
-    function options(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
-
-    /**
      * PUT handler
      *
      * @param Imbo\Http\Request\RequestInterface $request A request instance

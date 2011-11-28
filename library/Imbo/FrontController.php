@@ -64,7 +64,6 @@ class FrontController {
         RequestInterface::METHOD_HEAD    => true,
         RequestInterface::METHOD_DELETE  => true,
         RequestInterface::METHOD_BREW    => true,
-        RequestInterface::METHOD_OPTIONS => true,
     );
 
     /**

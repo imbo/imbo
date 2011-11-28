@@ -106,13 +106,6 @@ abstract class Resource {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::options()
-     */
-    public function options(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        throw new Exception('Method not allowed', 405);
-    }
-
-    /**
      * @see Imbo\Resource\ResourceInterface::put()
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {

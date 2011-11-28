@@ -101,15 +101,6 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
     public function testHead() {
         $this->resource->head($this->request, $this->response, $this->database, $this->storage);
     }
-
-    /**
-     * @expectedException Imbo\Exception
-     * @expectedExceptionMessage Method not allowed
-     * @expectedExceptionCode 405
-     */
-    public function testOptions() {
-        $this->resource->options($this->request, $this->response, $this->database, $this->storage);
-    }
 }
 
 class ResourceImplementation extends Resource {}
