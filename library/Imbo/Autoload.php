@@ -103,6 +103,10 @@ class Autoload {
         'imbo\\storage\\exception' => '/Storage/Exception.php',
         'imbo\\storage\\filesystem' => '/Storage/Filesystem.php',
         'imbo\\storage\\storageinterface' => '/Storage/StorageInterface.php',
+        'imbo\\validate\\signature' => '/Validate/Signature.php',
+        'imbo\\validate\\signatureinterface' => '/Validate/SignatureInterface.php',
+        'imbo\\validate\\timestamp' => '/Validate/Timestamp.php',
+        'imbo\\validate\\validateinterface' => '/Validate/ValidateInterface.php',
         'imbo\\version' => '/Version.php'
     );
 
