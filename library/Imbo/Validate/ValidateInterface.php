@@ -22,7 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Core
+ * @package Validators
  * @subpackage Interfaces
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
@@ -35,7 +35,7 @@ namespace Imbo\Validate;
 /**
  * Validator interface
  *
- * @package Core
+ * @package Validators
  * @subpackage Interfaces
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
@@ -46,7 +46,7 @@ interface ValidateInterface {
     /**
      * See if a value is valid
      *
-     * @return boolean
+     * @return bool
      */
     function isValid($value);
 }
