@@ -22,8 +22,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Validators
- * @subpackage Interfaces
+ * @package Interfaces
+ * @subpackage Validators
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -35,8 +35,8 @@ namespace Imbo\Validate;
 /**
  * Signature validator interface
  *
- * @package Validators
- * @subpackage Interfaces
+ * @package Interfaces
+ * @subpackage Validators
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011, Christer Edvartsen
  * @license http://www.opensource.org/licenses/mit-license MIT License
