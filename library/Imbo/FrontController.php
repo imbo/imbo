@@ -31,9 +31,10 @@
 
 namespace Imbo;
 
-use Imbo\Http\Request\RequestInterface;
-use Imbo\Http\Response\ResponseInterface;
-use Imbo\Image\Image;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    Imbo\Image\Image,
+    Imbo\Validate;
 
 /**
  * Front controller
@@ -51,6 +52,20 @@ class FrontController {
      * @var Imbo\Container
      */
     private $container;
+
+    /**
+     * Timestamp validator
+     *
+     * @var Imbo\Validate\ValidateInterface
+     */
+    private $timestampValidator;
+
+    /**
+     * Signature validator
+     *
+     * @var Imbo\Validate\SignatureInterface
+     */
+    private $signatureValidator;
 
     /**
      * HTTP methods supported one way or another in Imbo
@@ -84,9 +99,24 @@ class FrontController {
      * Class constructor
      *
      * @param Imbo\Container $container A container instance
+     * @param Imbo\Validate\ValidateInterface $timestampValidator A timestamp validator
+     * @param Imbo\Validate\SignatureInterface $signatureValidator A signature validator
      */
-    public function __construct(Container $container) {
+    public function __construct(Container $container,
+                                Validate\ValidateInterface $timestampValidator = null,
+                                Validate\SignatureInterface $signatureValidator = null) {
         $this->container = $container;
+
+        if ($timestampValidator === null) {
+            $timestampValidator = new Validate\Timestamp();
+        }
+
+        if ($signatureValidator === null) {
+            $signatureValidator = new Validate\Signature();
+        }
+
+        $this->timestampValidator = $timestampValidator;
+        $this->signatureValidator = $signatureValidator;
     }
 
     /**
@@ -147,9 +177,11 @@ class FrontController {
      * Authenticate the current request
      *
      * @param Imbo\Http\Request\RequestInterface $request The current request
+     * @param Imbo\Http\Response\ResponseInterface $response The response instance
      * @throws Imbo\Exception
+     * @return mixed Returns true on success
      */
-    private function auth(RequestInterface $request) {
+    private function auth(RequestInterface $request, ResponseInterface $response) {
         $authConfig = $this->container->auth;
         $publicKey = $request->getPublicKey();
 
@@ -174,35 +206,25 @@ class FrontController {
 
         $timestamp = $query->get('timestamp');
 
-        // Make sure the timestamp is in the correct format
-        if (!preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}(?:\.\d+)?Z$/', $timestamp)) {
-            throw new Exception('Invalid authentication timestamp format: ' . $timestamp, 400);
+        if (!$this->timestampValidator->isValid($timestamp)) {
+            throw new Exception('Invalid timestamp: ' . $timestamp, 400);
         }
 
-        $year   = substr($timestamp, 0, 4);
-        $month  = substr($timestamp, 5, 2);
-        $day    = substr($timestamp, 8, 2);
-        $hour   = substr($timestamp, 11, 2);
-        $minute = substr($timestamp, 14, 2);
-        $second = substr($timestamp, 17, 2);
+        // Add the URL used for auth to the response headers
+        $response->getHeaders()->set('X-Imbo-AuthUrl', $request->getUrl());
 
-        $timestamp = gmmktime($hour, $minute, $second, $month, $day, $year);
+        $signature = $query->get('signature');
+        $this->signatureValidator->setHttpMethod($request->getMethod())
+                                 ->setUrl($request->getUrl())
+                                 ->setTimestamp($timestamp)
+                                 ->setPublicKey($publicKey)
+                                 ->setPrivateKey($privateKey);
 
-        $diff = time() - $timestamp;
-
-        if ($diff > 120 || $diff < -120) {
-            throw new Exception('Authentication timestamp has expired', 403);
-        }
-
-        // Generate data for the HMAC
-        $data = $request->getMethod() . '|' . $request->getUrl() . '|' . $publicKey . '|' . $query->get('timestamp');
-
-        // Generate binary hash key
-        $actualSignature = hash_hmac('sha256', $data, $privateKey);
-
-        if ($actualSignature !== $query->get('signature')) {
+        if (!$this->signatureValidator->isValid($signature)) {
             throw new Exception('Signature mismatch', 403);
         }
+
+        return true;
     }
 
     /**
@@ -235,7 +257,7 @@ class FrontController {
         }
 
         // Authenticate the request
-        $this->auth($request);
+        $this->auth($request, $response);
 
         // Lowercase the HTTP method to get the class method to execute
         $methodName = strtolower($httpMethod);

@@ -52,6 +52,8 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
 
     private $publicKey;
     private $privateKey;
+    private $timestampValidator;
+    private $signatureValidator;
 
     /**
      * Set up method
@@ -59,6 +61,8 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     public function setUp() {
         $this->publicKey = md5(microtime());
         $this->privateKey = md5(microtime());
+        $this->timestampValidator = $this->getMock('Imbo\Validate\ValidateInterface');
+        $this->signatureValidator = $this->getMock('Imbo\Validate\SignatureInterface');
 
         $container = new Container();
         $container->auth = array(
@@ -70,7 +74,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $container->imagesResource = $this->getMock('Imbo\Resource\Images');
         $container->metadataResource = $this->getMock('Imbo\Resource\Metadata');
 
-        $this->controller = new FrontController($container);
+        $this->controller = new FrontController($container, $this->timestampValidator, $this->signatureValidator);
     }
 
     /**
@@ -80,36 +84,30 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $this->controller = null;
     }
 
-    public function testResolveResourceWithImageRequest() {
-        $reflection = new \ReflectionClass($this->controller);
-        $method = $reflection->getMethod('resolveResource');
-        $method->setAccessible(true);
-        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+    public function getResolveData() {
         $imageIdentifier = md5(microtime());
-        $request->expects($this->once())->method('getPath')->will($this->returnValue('/users/' . $this->publicKey . '/images/' . $imageIdentifier));
-        $request->expects($this->once())->method('setPublicKey')->with($this->publicKey);
-        $this->assertInstanceOf('Imbo\Resource\Image', $method->invoke($this->controller, $request));
+        $publicKey = md5(microtime());
+
+        return array(
+            array('/users/' . $publicKey . '/images/' . $imageIdentifier . '/meta', 'Imbo\Resource\Metadata'),
+            array('/users/' . $publicKey . '/images/' . $imageIdentifier, 'Imbo\Resource\Image'),
+            array('/users/' . $publicKey . '/images', 'Imbo\Resource\Images'),
+            array('/users/' . $publicKey, 'Imbo\Resource\User'), // Not located in the DIC, should work nonetheless
+        );
     }
 
-    public function testResolveResourceWithImagesRequest() {
+    /**
+     * @dataProvider getResolveData()
+     */
+    public function testResolveResourceWithMetadataRequest($path, $resourceClass) {
         $reflection = new \ReflectionClass($this->controller);
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
-        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getPath')->will($this->returnValue('/users/' . $this->publicKey . '/images'));
-        $request->expects($this->once())->method('setPublicKey')->with($this->publicKey);
-        $this->assertInstanceOf('Imbo\Resource\Images', $method->invoke($this->controller, $request));
-    }
 
-    public function testResolveResourceWithMetadataRequest() {
-        $reflection = new \ReflectionClass($this->controller);
-        $method = $reflection->getMethod('resolveResource');
-        $method->setAccessible(true);
-        $imageIdentifier = md5(microtime());
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getPath')->will($this->returnValue('/users/' . $this->publicKey . '/images/' . $imageIdentifier . '/meta'));
-        $request->expects($this->once())->method('setPublicKey')->with($this->publicKey);
-        $this->assertInstanceOf('Imbo\Resource\Metadata', $method->invoke($this->controller, $request));
+        $request->expects($this->once())->method('getPath')->will($this->returnValue($path));
+        $request->expects($this->once())->method('setPublicKey');
+        $this->assertInstanceOf($resourceClass, $method->invoke($this->controller, $request));
     }
 
     /**
@@ -139,7 +137,23 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue('some unknown key'));
 
-        $method->invoke($this->controller, $request);
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+
+        $method->invoke($this->controller, $request, $response);
+    }
+
+    public function testAuthWithSafeHttpMethod() {
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('auth');
+        $method->setAccessible(true);
+
+        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(false));
+
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+
+        $this->assertNull($method->invoke($this->controller, $request, $response));
     }
 
     /**
@@ -160,7 +174,9 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
         $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
 
-        $method->invoke($this->controller, $request);
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+
+        $method->invoke($this->controller, $request, $response);
     }
 
     /**
@@ -182,15 +198,17 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
         $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
 
-        $method->invoke($this->controller, $request);
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+
+        $method->invoke($this->controller, $request, $response);
     }
 
     /**
      * @expectedException Imbo\Exception
-     * @expectedExceptionMessage Invalid authentication timestamp format
+     * @expectedExceptionMessage Invalid timestamp:
      * @expectedExceptionCode 400
      */
-    public function testAuthWithInvalidTimestampFormat() {
+    public function testAuthWithInvalidTimestamp() {
         $reflection = new \ReflectionClass($this->controller);
         $method = $reflection->getMethod('auth');
         $method->setAccessible(true);
@@ -204,29 +222,11 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
         $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
 
-        $method->invoke($this->controller, $request);
-    }
+        $this->timestampValidator->expects($this->once())->method('isValid')->with('some string')->will($this->returnValue(false));
 
-    /**
-     * @expectedException Imbo\Exception
-     * @expectedExceptionMessage Authentication timestamp has expired
-     * @expectedExceptionCode 403
-     */
-    public function testAuthWithExpiredTimestamp() {
-        $reflection = new \ReflectionClass($this->controller);
-        $method = $reflection->getMethod('auth');
-        $method->setAccessible(true);
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
 
-        $query = $this->getMock('Imbo\Http\ParameterContainerInterface');
-        $query->expects($this->any())->method('has')->will($this->returnValue(true));
-        $query->expects($this->once())->method('get')->with('timestamp')->will($this->returnValue('2011-01-01T01:00:00Z'));
-
-        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
-        $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
-
-        $method->invoke($this->controller, $request);
+        $method->invoke($this->controller, $request, $response);
     }
 
     /**
@@ -239,25 +239,30 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('auth');
         $method->setAccessible(true);
 
-        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
-        $signature = 'some signature';
-
         $query = $this->getMock('Imbo\Http\ParameterContainerInterface');
         $query->expects($this->any())->method('has')->will($this->returnValue(true));
-        $query->expects($this->any())->method('get')->will($this->returnCallback(function($arg) use($timestamp, $signature) {
-            if ($arg === 'timestamp') {
-                return $timestamp;
-            } else if ($arg === 'signature') {
-                return $signature;
-            }
-        }));
+        $query->expects($this->any())->method('get');
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
         $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
 
-        $method->invoke($this->controller, $request);
+        $this->timestampValidator->expects($this->once())->method('isValid')->will($this->returnValue(true));
+        $this->signatureValidator->expects($this->once())->method('isValid')->will($this->returnValue(false));
+
+        $this->signatureValidator->expects($this->once())->method('setHttpMethod')->will($this->returnSelf());
+        $this->signatureValidator->expects($this->once())->method('setUrl')->will($this->returnSelf());
+        $this->signatureValidator->expects($this->once())->method('setTimestamp')->will($this->returnSelf());
+        $this->signatureValidator->expects($this->once())->method('setPublicKey')->will($this->returnSelf());
+        $this->signatureValidator->expects($this->once())->method('setPrivateKey')->will($this->returnSelf());
+
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
+
+        $method->invoke($this->controller, $request, $response);
     }
 
     public function testSuccessfulAuth() {
@@ -265,33 +270,30 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method = $reflection->getMethod('auth');
         $method->setAccessible(true);
 
-        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
-        $imageIdentifier = md5(microtime());
-        $httpMethod = 'POST';
-        $url = 'http://host/user/' . $this->publicKey . '/images/' . $imageIdentifier . '/meta';
-        $data = $httpMethod . '|' . $url . '|' . $this->publicKey . '|' . $timestamp;
-
-        // Generate the correct signature
-        $signature = hash_hmac('sha256', $data, $this->privateKey);
-
         $query = $this->getMock('Imbo\Http\ParameterContainerInterface');
         $query->expects($this->any())->method('has')->will($this->returnValue(true));
-        $query->expects($this->any())->method('get')->will($this->returnCallback(function($arg) use($timestamp, $signature) {
-            if ($arg === 'timestamp') {
-                return $timestamp;
-            } else if ($arg === 'signature') {
-                return $signature;
-            }
-        }));
+        $query->expects($this->any())->method('get');
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
-        $request->expects($this->once())->method('getMethod')->will($this->returnValue($httpMethod));
-        $request->expects($this->once())->method('getUrl')->will($this->returnValue($url));
         $request->expects($this->once())->method('isUnsafe')->will($this->returnValue(true));
 
-        $method->invoke($this->controller, $request);
+        $this->timestampValidator->expects($this->once())->method('isValid')->will($this->returnValue(true));
+        $this->signatureValidator->expects($this->once())->method('isValid')->will($this->returnValue(true));
+
+        $this->signatureValidator->expects($this->once())->method('setHttpMethod')->will($this->returnSelf());
+        $this->signatureValidator->expects($this->once())->method('setUrl')->will($this->returnSelf());
+        $this->signatureValidator->expects($this->once())->method('setTimestamp')->will($this->returnSelf());
+        $this->signatureValidator->expects($this->once())->method('setPublicKey')->will($this->returnSelf());
+        $this->signatureValidator->expects($this->once())->method('setPrivateKey')->will($this->returnSelf());
+
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
+
+        $this->assertTrue($method->invoke($this->controller, $request, $response));
     }
 
     /**
