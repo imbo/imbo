@@ -188,12 +188,19 @@ class Image extends Resource implements ResourceInterface {
         }
 
         // Set some response headers before we apply optional transformations
-        $responseHeaders->set('Content-Type', $this->image->getMimeType())
-                        ->set('X-Imbo-OriginalMimeType', $originalMimeType)
-                        ->set('X-Imbo-OriginalWidth', $this->image->getWidth())
-                        ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
-                        ->set('X-Imbo-OriginalFileSize', $originalFilesize)
-                        ->set('Last-Modified', $lastModified);
+        $responseHeaders
+            // Set the content-type of the image and the last modification date
+            ->set('Content-Type', $this->image->getMimeType())
+            ->set('Last-Modified', $lastModified)
+
+            // Set the max-age to a year since the image never changes
+            ->set('Cache-Control', 'max-age=31536000')
+
+            // Custom Imbo headers
+            ->set('X-Imbo-OriginalMimeType', $originalMimeType)
+            ->set('X-Imbo-OriginalWidth', $this->image->getWidth())
+            ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
+            ->set('X-Imbo-OriginalFileSize', $originalFilesize);
 
         // Apply transformations
         $transformationChain = $request->getTransformations();
