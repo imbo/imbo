@@ -146,7 +146,7 @@ class MongoDB implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::editMetadata()
+     * @see Imbo\Database\DatabaseInterface::updateMetadata()
      */
     public function updateMetadata($publicKey, $imageIdentifier, array $metadata) {
         try {
@@ -290,7 +290,7 @@ class MongoDB implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::load()
+     * @see Imbo\Database\DatabaseInterface::getLastModified()
      */
     public function getLastModified($publicKey, $imageIdentifier = null) {
         try {
