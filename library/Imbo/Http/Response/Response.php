@@ -227,7 +227,7 @@ class Response implements ResponseInterface {
         $this->setBody(null);
         $headers = $this->getHeaders();
 
-        foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Content-Type', 'Last-Modified') as $header) {
+        foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Last-Modified') as $header) {
             $headers->remove($header);
         }
     }
