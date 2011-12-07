@@ -32,8 +32,8 @@
 
 namespace Imbo\Database;
 
-use Imbo\Image\ImageInterface;
-use Imbo\Resource\Images\QueryInterface;
+use Imbo\Image\ImageInterface,
+    Imbo\Resource\Images\QueryInterface;
 
 /**
  * Database driver interface
@@ -125,14 +125,17 @@ interface DatabaseInterface {
     function load($publicKey, $imageIdentifier, ImageInterface $image);
 
     /**
-     * Get the last modified timestamp
+     * Get the last modified timestamp of a user
+     *
+     * If the $imageIdentifier parameter is set, return when that image was last updated. If not
+     * set, return when the user last updated any image.
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
      * @return int Returns the timestamp as a unix timestamp
      * @throws Imbo\Database\Exception
      */
-    function getLastModified($publicKey, $imageIdentifier);
+    function getLastModified($publicKey, $imageIdentifier = null);
 
     /**
      * Fetch the number of images owned by a given user

@@ -32,6 +32,8 @@
 
 namespace Imbo\Database;
 
+use MongoException;
+
 /**
  * @package Imbo
  * @subpackage Unittests
@@ -51,7 +53,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     /**
      * The collection to use
      *
-     * @var \MongoCollection
+     * @var MongoCollection
      */
     private $collection;
 
@@ -125,7 +127,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unable to save image data
      */
     public function testInsertImageWhenCollectionThrowsException() {
-        $this->collection->expects($this->once())->method('findOne')->will($this->throwException(new \MongoException()));
+        $this->collection->expects($this->once())->method('findOne')->will($this->throwException(new MongoException()));
 
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
@@ -160,7 +162,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                          ->with(
                              array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
                              $this->isType('array'))
-                         ->will($this->throwException(new \MongoException()));
+                         ->will($this->throwException(new MongoException()));
 
         $this->driver->deleteImage($this->publicKey, $this->imageIdentifier);
     }
@@ -198,7 +200,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                              array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
                              $this->isType('array'),
                              $this->isType('array'))
-                         ->will($this->throwException(new \MongoException()));
+                         ->will($this->throwException(new MongoException()));
 
         $this->driver->updateMetadata($this->publicKey, $this->imageIdentifier, $metadata);
     }
@@ -233,7 +235,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     public function testGetMetadataWhenCollectionThrowsAnException() {
         $this->collection->expects($this->once())->method('findOne')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier)
-        )->will($this->throwException(new \MongoException()));
+        )->will($this->throwException(new MongoException()));
 
         $this->driver->getMetadata($this->publicKey, $this->imageIdentifier);
     }
@@ -279,7 +281,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             array('$set' => array('metadata' => array())),
             $this->isType('array')
-        )->will($this->throwException(new \MongoException()));
+        )->will($this->throwException(new MongoException()));
 
         $this->driver->deleteMetadata($this->publicKey, $this->imageIdentifier);
     }
@@ -337,7 +339,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             $query->expects($this->once())->method($method);
         }
 
-        $this->collection->expects($this->once())->method('find')->with($this->isType('array'), $this->isType('array'))->will($this->throwException(new \MongoException()));
+        $this->collection->expects($this->once())->method('find')->with($this->isType('array'), $this->isType('array'))->will($this->throwException(new MongoException()));
 
         $this->driver->getImages($this->publicKey, $query);
     }
@@ -351,7 +353,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->collection->expects($this->once())->method('findOne')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             $this->isType('array')
-        )->will($this->throwException(new \MongoException()));
+        )->will($this->throwException(new MongoException()));
 
         $this->driver->load($this->publicKey, $this->imageIdentifier, $this->getMock('Imbo\Image\ImageInterface'));
     }
@@ -399,12 +401,12 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unable to fetch image data
      */
     public function testGetLastModifiedWhenCollectionThrowsException() {
-        $this->collection->expects($this->once())->method('findOne')->with(
-            array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
+        $this->collection->expects($this->once())->method('find')->with(
+            array('publicKey' => $this->publicKey),
             array('updated')
-        )->will($this->throwException(new \MongoException()));
+        )->will($this->throwException(new MongoException()));
 
-        $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+        $this->driver->getLastModified($this->publicKey);
     }
 
     /**
@@ -413,25 +415,74 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Image not found
      */
     public function testGetLastModifiedWhenImageDoesNotExist() {
-        $this->collection->expects($this->once())->method('findOne')->with(
+        $cursor = $this->getMockBuilder('MongoCursor')->disableOriginalConstructor()->setMethods(array('limit', 'sort', 'getNext'))->getMock();
+        $cursor->expects($this->any())->method('limit')->will($this->returnValue($cursor));
+        $cursor->expects($this->any())->method('sort')->will($this->returnValue($cursor));
+        $cursor->expects($this->any())->method('getNext')->will($this->returnValue(null));
+
+        $this->collection->expects($this->once())->method('find')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             array('updated')
-        )->will($this->returnValue(null));
+        )->will($this->returnValue($cursor));
 
         $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
     }
 
-    public function testSuccessfulGetLastModified() {
+    /**
+     * @expectedException Imbo\Database\Exception
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage User not found
+     */
+    public function testGetLastModifiedWhenUserDoesNotExist() {
+        $cursor = $this->getMockBuilder('MongoCursor')->disableOriginalConstructor()->setMethods(array('limit', 'sort', 'getNext'))->getMock();
+        $cursor->expects($this->any())->method('limit')->will($this->returnValue($cursor));
+        $cursor->expects($this->any())->method('sort')->will($this->returnValue($cursor));
+        $cursor->expects($this->any())->method('getNext')->will($this->returnValue(null));
+
+        $this->collection->expects($this->once())->method('find')->with(
+            array('publicKey' => $this->publicKey),
+            array('updated')
+        )->will($this->returnValue($cursor));
+
+        $this->driver->getLastModified($this->publicKey);
+    }
+
+    public function testGetLastModifiedWithoutImageIdentifier() {
         $now = time();
 
         $data = array(
             'updated' => $now,
         );
 
-        $this->collection->expects($this->once())->method('findOne')->with(
+        $cursor = $this->getMockBuilder('MongoCursor')->disableOriginalConstructor()->setMethods(array('limit', 'sort', 'getNext'))->getMock();
+        $cursor->expects($this->any())->method('limit')->will($this->returnValue($cursor));
+        $cursor->expects($this->any())->method('sort')->will($this->returnValue($cursor));
+        $cursor->expects($this->any())->method('getNext')->will($this->returnValue($data));
+
+        $this->collection->expects($this->once())->method('find')->with(
+            array('publicKey' => $this->publicKey),
+            array('updated')
+        )->will($this->returnValue($cursor));
+
+        $this->assertSame($now, $this->driver->getLastModified($this->publicKey));
+    }
+
+    public function testGetLastModifiedWithImageIdentifier() {
+        $now = time();
+
+        $data = array(
+            'updated' => $now,
+        );
+
+        $cursor = $this->getMockBuilder('MongoCursor')->disableOriginalConstructor()->setMethods(array('limit', 'sort', 'getNext'))->getMock();
+        $cursor->expects($this->any())->method('limit')->will($this->returnValue($cursor));
+        $cursor->expects($this->any())->method('sort')->will($this->returnValue($cursor));
+        $cursor->expects($this->any())->method('getNext')->will($this->returnValue($data));
+
+        $this->collection->expects($this->once())->method('find')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             array('updated')
-        )->will($this->returnValue($data));
+        )->will($this->returnValue($cursor));
 
         $this->assertSame($now, $this->driver->getLastModified($this->publicKey, $this->imageIdentifier));
     }
@@ -441,7 +492,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testGetNumImagesWhenMongoThrowsAnException() {
-        $this->collection->expects($this->once())->method('find')->will($this->throwException(new \MongoException()));
+        $this->collection->expects($this->once())->method('find')->will($this->throwException(new MongoException()));
         $this->driver->getNumImages($this->publicKey);
     }
 

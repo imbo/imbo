@@ -31,8 +31,11 @@
 
 namespace Imbo\Database;
 
-use Imbo\Image\ImageInterface;
-use Imbo\Resource\Images\QueryInterface;
+use Imbo\Image\ImageInterface,
+    Imbo\Resource\Images\QueryInterface,
+    Mongo,
+    MongoException,
+    MongoCollection;
 
 /**
  * MongoDB database driver
@@ -54,7 +57,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * The collection instance used by the driver
      *
-     * @var \MongoCollection
+     * @var MongoCollection
      */
     private $collection;
 
@@ -72,16 +75,16 @@ class MongoDB implements DatabaseInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param \MongoCollection $collection MongoDB collection instance
+     * @param MongoCollection $collection MongoDB collection instance
      */
-    public function __construct(array $params = null, \MongoCollection $collection = null) {
+    public function __construct(array $params = null, MongoCollection $collection = null) {
         if ($params !== null) {
             $this->params = array_merge($this->params, $params);
         }
 
         if ($collection === null) {
             // @codeCoverageIgnoreStart
-            $mongo      = new \Mongo();
+            $mongo      = new Mongo();
             $database   = $mongo->{$this->params['databaseName']};
             $collection = $database->{$this->params['collectionName']};
         }
@@ -119,7 +122,7 @@ class MongoDB implements DatabaseInterface {
             }
 
             $this->collection->insert($data, array('safe' => true));
-        } catch (\MongoException $e) {
+        } catch (MongoException $e) {
             throw new Exception('Unable to save image data', 500, $e);
         }
 
@@ -135,7 +138,7 @@ class MongoDB implements DatabaseInterface {
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('justOne' => true, 'safe' => true)
             );
-        } catch (\MongoException $e) {
+        } catch (MongoException $e) {
             throw new Exception('Unable to delete image data', 500, $e);
         }
 
@@ -156,7 +159,7 @@ class MongoDB implements DatabaseInterface {
                 array('$set' => array('updated' => time(), 'metadata' => $updatedMetadata)),
                 array('safe' => true, 'multiple' => false)
             );
-        } catch (\MongoException $e) {
+        } catch (MongoException $e) {
             throw new Exception('Unable to edit image data', 500, $e);
         }
 
@@ -169,7 +172,7 @@ class MongoDB implements DatabaseInterface {
     public function getMetadata($publicKey, $imageIdentifier) {
         try {
             $data = $this->collection->findOne(array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier));
-        } catch (\MongoException $e) {
+        } catch (MongoException $e) {
             throw new Exception('Unable to fetch image metadata', 500, $e);
         }
 
@@ -190,7 +193,7 @@ class MongoDB implements DatabaseInterface {
                 array('$set' => array('metadata' => array())),
                 array('safe' => true, 'multiple' => false)
             );
-        } catch (\MongoException $e) {
+        } catch (MongoException $e) {
             throw new Exception('Unable to remove metadata', 500, $e);
         }
 
@@ -254,7 +257,7 @@ class MongoDB implements DatabaseInterface {
                 unset($image['_id']);
                 $images[] = $image;
             }
-        } catch (\MongoException $e) {
+        } catch (MongoException $e) {
             throw new Exception('Unable to search for images', 500, $e);
         }
 
@@ -270,7 +273,7 @@ class MongoDB implements DatabaseInterface {
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('name', 'size', 'width', 'height', 'mime', 'extension')
             );
-        } catch (\MongoException $e) {
+        } catch (MongoException $e) {
             throw new Exception('Unable to fetch image data', 500, $e);
         }
 
@@ -289,18 +292,33 @@ class MongoDB implements DatabaseInterface {
     /**
      * @see Imbo\Database\DatabaseInterface::load()
      */
-    public function getLastModified($publicKey, $imageIdentifier) {
+    public function getLastModified($publicKey, $imageIdentifier = null) {
         try {
-            $data = $this->collection->findOne(
-                array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('updated')
-            );
-        } catch (\MongoException $e) {
+            // Query on the public key
+            $query = array('publicKey' => $publicKey);
+
+            if ($imageIdentifier) {
+                // We want information about a single image. Add the identifier to the query
+                $query['imageIdentifier'] = $imageIdentifier;
+            }
+
+            // Create the cursor
+            $cursor = $this->collection->find($query, array('updated'))
+                                       ->limit(1)
+                                       ->sort(array(
+                                           'updated' => MongoCollection::DESCENDING,
+                                       ));
+
+            // Fetch the next row
+            $data = $cursor->getNext();
+        } catch (MongoException $e) {
             throw new Exception('Unable to fetch image data', 500, $e);
         }
 
-        if ($data === null) {
+        if ($data === null && $imageIdentifier) {
             throw new Exception('Image not found', 404);
+        } else if ($data === null) {
+            throw new Exception('User not found', 500);
         }
 
         return $data['updated'];
@@ -318,7 +336,7 @@ class MongoDB implements DatabaseInterface {
             $result = (int) $this->collection->find($query)->count();
 
             return $result;
-        } catch (\MongoException $e) {
+        } catch (MongoException $e) {
             throw new Exception('Unable to fetch information from the database', 500, $e);
         }
     }
