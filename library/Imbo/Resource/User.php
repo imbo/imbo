@@ -31,10 +31,10 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface;
-use Imbo\Http\Response\ResponseInterface;
-use Imbo\Database\DatabaseInterface;
-use Imbo\Storage\StorageInterface;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface;
 
 /**
  * User resource
@@ -62,10 +62,35 @@ class User extends Resource implements ResourceInterface {
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $publicKey = $request->getPublicKey();
 
+        // Fetch header containers
+        $requestHeaders = $request->getHeaders();
+        $responseHeaders = $response->getHeaders();
+
+        // Fetch the number of images this user has in the database
+        $numImages = $database->getNumImages($publicKey);
+
+        // Fetch the last modfified timestamp for the current user
+        $lastModified = date('r', $database->getLastModified($publicKey));
+
+        // Generate ETag and add to the response headers
+        $etag = '"' . md5($publicKey . $numImages) . '"';
+        $responseHeaders->set('ETag', $etag);
+
+        if (
+            $lastModified === $requestHeaders->get('if-modified-since') &&
+            $etag === $requestHeaders->get('if-none-match')
+        ) {
+            $response->setNotModified();
+            return;
+        }
+
         $data = array(
             'publicKey' => $publicKey,
-            'numImages' => $database->getNumImages($publicKey),
+            'numImages' => $numImages,
+            'lastModified' => $lastModified,
         );
+
+        $responseHeaders->set('Last-Modified', $lastModified);
 
         return $this->getResponseWriter()->write($data, $request, $response);
     }
