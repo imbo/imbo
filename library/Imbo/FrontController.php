@@ -248,9 +248,9 @@ class FrontController {
         // Fetch a resource instance based on the request path
         $resource = $this->resolveResource($request);
 
-        // Add an Allow header to the response that contains the methods the resource has
-        // implemented
-        $response->getHeaders()->set('Allow', implode(', ', $resource->getAllowedMethods()));
+        // Add Allow and Vary to all responses
+        $response->getHeaders()->set('Allow', implode(', ', $resource->getAllowedMethods()))
+                               ->set('Vary', 'Accept, Accept-Encoding');
 
         if ($identifier = $request->getImageIdentifier()) {
             $response->getHeaders()->set('X-Imbo-ImageIdentifier', $identifier);
