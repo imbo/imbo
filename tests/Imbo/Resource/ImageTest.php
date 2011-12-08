@@ -285,13 +285,12 @@ class ImageTest extends ResourceTests {
         $requestUri = '/users/' . $this->publicKey . '/images/' . $this->imageIdentifier . '.png';
 
         // Timestamp used for the Last-Modified header
-        $timestamp = time();
+        $lastModified = date('D, d M Y H:i:s') . ' GMT';
 
         // Generate ETag as it appears in the headers
         $etag = '"' . md5($this->publicKey . $this->imageIdentifier . $requestUri) . '"';
-        $lastModified = date('r', $timestamp);
 
-        $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($timestamp));
+        $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($lastModified));
 
         $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');

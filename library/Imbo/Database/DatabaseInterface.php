@@ -132,10 +132,12 @@ interface DatabaseInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
-     * @return int Returns the timestamp as a unix timestamp
+     * @param boolean $formatted Wether or not to format the date as an HTTP date
+     * @return DateTime|string If $formatted is true this method should return the timestamp as a
+     *                         valid HTTP date. If not, return the DateTime instance
      * @throws Imbo\Database\Exception
      */
-    function getLastModified($publicKey, $imageIdentifier = null);
+    function getLastModified($publicKey, $imageIdentifier = null, $formatted = false);
 
     /**
      * Fetch the number of images owned by a given user

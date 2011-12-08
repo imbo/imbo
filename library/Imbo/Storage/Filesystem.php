@@ -31,7 +31,8 @@
 
 namespace Imbo\Storage;
 
-use Imbo\Image\ImageInterface;
+use Imbo\Image\ImageInterface,
+    DateTime;
 
 /**
  * Filesystem storage driver
@@ -125,14 +126,24 @@ class Filesystem implements StorageInterface {
     /**
      * @see Imbo\Storage\StorageInterface::getLastModified()
      */
-    public function getLastModified($publicKey, $imageIdentifier) {
+    public function getLastModified($publicKey, $imageIdentifier, $formatted = false) {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         if (!is_file($path)) {
             throw new Exception('File not found', 404);
         }
 
-        return filemtime($path);
+        // Get the unix timestamp
+        $timestamp = filemtime($path);
+
+        // Create a new datetime instance
+        $date = new DateTime('@' . $timestamp);
+
+        if ($formatted) {
+            return $date->format('D, d M Y H:i:s') . ' GMT';
+        }
+
+        return $date;
     }
 
     /**

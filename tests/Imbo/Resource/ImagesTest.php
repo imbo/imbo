@@ -63,8 +63,19 @@ class ImagesTest extends ResourceTests {
         $resource = $this->getNewResource();
         $parameterContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
 
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $responseHeaders->expects($this->any())->method('set');
+
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $requestHeaders->expects($this->any())->method('get');
+
+        $this->database->expects($this->once())->method('getLastModified');
         $this->database->expects($this->once())->method('getImages')->will($this->throwException(new DatabaseException('message', 500)));
         $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($parameterContainer));
+        $this->request->expects($this->once())->method('getPublicKey');
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
+
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
@@ -82,9 +93,17 @@ class ImagesTest extends ResourceTests {
         $resource->setQuery($query);
         $resource->setResponseWriter($writer);
 
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $responseHeaders->expects($this->any())->method('set');
+
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $requestHeaders->expects($this->any())->method('get');
+
         $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($parameterContainer));
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
         $this->database->expects($this->once())->method('getImages')->with($publicKey, $query)->will($this->returnValue($images));
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
@@ -122,9 +141,17 @@ class ImagesTest extends ResourceTests {
         $resource->setQuery($query);
         $resource->setResponseWriter($writer);
 
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $responseHeaders->expects($this->any())->method('set');
+
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $requestHeaders->expects($this->any())->method('get');
+
         $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($params));
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
         $this->database->expects($this->once())->method('getImages')->with($publicKey, $query)->will($this->returnValue($images));
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }

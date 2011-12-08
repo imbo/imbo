@@ -250,6 +250,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $file->lastModified($now);
         $last->addChild($file);
 
-        $this->assertSame($now, $driver->getLastModified($this->publicKey, $this->imageIdentifier));
+        $this->assertInstanceOf('DateTime', $driver->getLastModified($this->publicKey, $this->imageIdentifier));
+        $formatted = $driver->getLastModified($this->publicKey, $this->imageIdentifier, true);
+        $this->assertSame($now, strtotime($formatted));
     }
 }

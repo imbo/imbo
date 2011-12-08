@@ -155,8 +155,8 @@ class Image extends Resource implements ResourceInterface {
         // Generate ETag using public key, image identifier, and the redirect url
         $etag = '"' . md5($publicKey . $imageIdentifier . $serverContainer->get('REQUEST_URI')) . '"';
 
-        // Fetch last modified timestamp from the storage driver
-        $lastModified = date('r', $storage->getLastModified($publicKey, $imageIdentifier));
+        // Fetch formatted last modified timestamp from the storage driver
+        $lastModified = $storage->getLastModified($publicKey, $imageIdentifier, true);
 
         // Add the ETag to the response headers
         $responseHeaders->set('ETag', $etag);

@@ -35,7 +35,8 @@ use Imbo\Image\ImageInterface,
     Imbo\Resource\Images\QueryInterface,
     Mongo,
     MongoException,
-    MongoCollection;
+    MongoCollection,
+    DateTime;
 
 /**
  * MongoDB database driver
@@ -292,7 +293,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * @see Imbo\Database\DatabaseInterface::getLastModified()
      */
-    public function getLastModified($publicKey, $imageIdentifier = null) {
+    public function getLastModified($publicKey, $imageIdentifier = null, $formatted = false) {
         try {
             // Query on the public key
             $query = array('publicKey' => $publicKey);
@@ -321,7 +322,14 @@ class MongoDB implements DatabaseInterface {
             throw new Exception('User not found', 500);
         }
 
-        return $data['updated'];
+        // Create a new datetime instance
+        $date = new DateTime('@' . $data['updated']);
+
+        if ($formatted) {
+            return $date->format('D, d M Y H:i:s') . ' GMT';
+        }
+
+        return $date;
     }
 
     /**

@@ -459,12 +459,15 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $cursor->expects($this->any())->method('sort')->will($this->returnValue($cursor));
         $cursor->expects($this->any())->method('getNext')->will($this->returnValue($data));
 
-        $this->collection->expects($this->once())->method('find')->with(
+        $this->collection->expects($this->any())->method('find')->with(
             array('publicKey' => $this->publicKey),
             array('updated')
         )->will($this->returnValue($cursor));
 
-        $this->assertSame($now, $this->driver->getLastModified($this->publicKey));
+        $this->assertInstanceOf('DateTime', $this->driver->getLastModified($this->publicKey));
+        $formatted = $this->driver->getLastModified($this->publicKey, null, true);
+
+        $this->assertSame($now, strtotime($formatted));
     }
 
     public function testGetLastModifiedWithImageIdentifier() {
@@ -479,12 +482,15 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $cursor->expects($this->any())->method('sort')->will($this->returnValue($cursor));
         $cursor->expects($this->any())->method('getNext')->will($this->returnValue($data));
 
-        $this->collection->expects($this->once())->method('find')->with(
+        $this->collection->expects($this->any())->method('find')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
             array('updated')
         )->will($this->returnValue($cursor));
 
-        $this->assertSame($now, $this->driver->getLastModified($this->publicKey, $this->imageIdentifier));
+        $this->assertInstanceOf('DateTime', $this->driver->getLastModified($this->publicKey, $this->imageIdentifier));
+        $formatted = $this->driver->getLastModified($this->publicKey, $this->imageIdentifier, true);
+
+        $this->assertSame($now, strtotime($formatted));
     }
 
     /**

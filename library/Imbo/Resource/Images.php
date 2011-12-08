@@ -31,13 +31,13 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface;
-use Imbo\Http\Response\ResponseInterface;
-use Imbo\Database\DatabaseInterface;
-use Imbo\Storage\StorageInterface;
-use Imbo\Resource\Images\Query;
-use Imbo\Resource\Images\QueryInterface;
-use Imbo\Database\Exception as DatabaseException;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface,
+    Imbo\Resource\Images\Query,
+    Imbo\Resource\Images\QueryInterface,
+    Imbo\Database\Exception as DatabaseException;
 
 /**
  * Images resource
@@ -100,6 +100,30 @@ class Images extends Resource implements ImagesInterface {
      * @see Imbo\Resource\ResourceInterface::get()
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+        $publicKey = $request->getPublicKey();
+
+        // Fetch header containers
+        $requestHeaders = $request->getHeaders();
+        $responseHeaders = $response->getHeaders();
+
+        // Fetch the last modification date of the current user
+        $lastModified = $database->getLastModified($publicKey, null, true);
+
+        // Generate ETag based on the last modification date and add to the response headers
+        $etag = '"' . md5($lastModified) . '"';
+        $responseHeaders->set('ETag', $etag);
+
+        if (
+            $lastModified === $requestHeaders->get('if-modified-since') &&
+            $etag === $requestHeaders->get('if-none-match')
+        ) {
+            $response->setNotModified();
+            return;
+        }
+
+        // Add the last modification date
+        $responseHeaders->set('Last-Modified', $lastModified);
+
         $query = $this->getQuery();
         $params = $request->getQuery();
 
@@ -131,7 +155,7 @@ class Images extends Resource implements ImagesInterface {
             }
         }
 
-        $images = $database->getImages($request->getPublicKey(), $query);
+        $images = $database->getImages($publicKey, $query);
 
         $this->getResponseWriter()->write($images, $request, $response);
     }

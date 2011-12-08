@@ -97,8 +97,10 @@ interface StorageInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
-     * @return int Unix timestamp
+     * @param boolean $formatted Wether or not to format the date as an HTTP date
+     * @return DateTime|string If $formatted is true this method should return the timestamp as a
+     *                         valid HTTP date. If not, return the DateTime instance
      * @throws Imbo\Storage\Exception
      */
-    function getLastModified($publicKey, $imageIdentifier);
+    function getLastModified($publicKey, $imageIdentifier, $formatted = false);
 }
