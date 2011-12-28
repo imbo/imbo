@@ -61,15 +61,15 @@ All write operations (PUT, POST and DELETE) requires authentication using an Has
 
 * HTTP method (PUT, POST or DELETE)
 * Resource identifier (for instance `<publicKey>/<image>` if your Imbo installation answers directly in the document root)
-* Public key (random MD5 hash that exists both on the server and the client)
+* Public key (random value that exists both on the server and the client)
 * GMT timestamp (YYYY-MM-DDTHH:MMZ, for instance: 2011-02-01T14:33Z)
 
 These elements are concatenated in the above order with | as a delimiter character and a hash is generated using a private key and the sha256 algorithm. The following snippet shows how this can be done using PHP:
 
 ```php
 <?php
-$publicKey  = '<some random MD5 hash>';
-$privateKey = '<some other random MD5 hash>';
+$publicKey  = '<some random value>';
+$privateKey = '<secret value>';
 $method     = 'DELETE';
 $resource   = 'b8533858299b04af3afc9a3713e69358.jpeg/meta'
 $timestamp  = gmdate('Y-m-d\TH:i\Z');

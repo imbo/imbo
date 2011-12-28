@@ -130,12 +130,12 @@ class FrontController {
         // Fetch current path
         $path = $request->getPath();
 
-        // Possible patterns to match where the most accessed patch is placed first
+        // Possible patterns to match where the most accessed match is placed first
         $routes = array(
-            'image'    => '#^/users/(?<publicKey>[a-f0-9]{32})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png))?$#',
-            'images'   => '#^/users/(?<publicKey>[a-f0-9]{32})/images/?$#',
-            'metadata' => '#^/users/(?<publicKey>[a-f0-9]{32})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png)/)meta/?$#',
-            'user'     => '#^/users/(?<publicKey>[a-f0-9]{32})/?$#',
+            'image'    => '#^/users/(?<publicKey>[^/]+)/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png))?$#',
+            'images'   => '#^/users/(?<publicKey>[^/]+)/images/?$#',
+            'metadata' => '#^/users/(?<publicKey>[^/]+)/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png)/)meta/?$#',
+            'user'     => '#^/users/(?<publicKey>[^/]+)/?$#',
         );
 
         // Initialize matches
