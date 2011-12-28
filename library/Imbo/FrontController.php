@@ -132,10 +132,10 @@ class FrontController {
 
         // Possible patterns to match where the most accessed match is placed first
         $routes = array(
-            'image'    => '#^/users/(?<publicKey>[^/]+)/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png))?$#',
-            'images'   => '#^/users/(?<publicKey>[^/]+)/images/?$#',
-            'metadata' => '#^/users/(?<publicKey>[^/]+)/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png)/)meta/?$#',
-            'user'     => '#^/users/(?<publicKey>[^/]+)/?$#',
+            'image'    => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png))?$#',
+            'images'   => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/?$#',
+            'metadata' => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png)/)meta/?$#',
+            'user'     => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/?$#',
         );
 
         // Initialize matches
