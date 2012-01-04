@@ -2,7 +2,7 @@
 /**
  * Imbo
  *
- * Copyright (c) 2011 Christer Edvartsen <cogo@starzinger.net>
+ * Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -25,7 +25,7 @@
  * @package Interfaces
  * @subpackage Http\Containers
  * @author Christer Edvartsen <cogo@starzinger.net>
- * @copyright Copyright (c) 2011, Christer Edvartsen
+ * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
@@ -38,7 +38,7 @@ namespace Imbo\Http;
  * @package Interfaces
  * @subpackage Http\Containers
  * @author Christer Edvartsen <cogo@starzinger.net>
- * @copyright Copyright (c) 2011, Christer Edvartsen
+ * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
