@@ -58,6 +58,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
                 'resize:width=100,height=100',
                 'rotate:angle=45,bg=fff',
                 'thumbnail:width=100,height=100,fit=outbound',
+                'canvas:width=100,height=100,x=10,y=10,bg=000',
 
                 // Transformations with no options
                 'flipHorizontally',
