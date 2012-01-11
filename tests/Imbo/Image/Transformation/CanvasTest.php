@@ -32,8 +32,6 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imagine\Exception\RuntimeException as ImagineException;
-
 /**
  * @package Imbo
  * @subpackage Unittests
@@ -42,29 +40,37 @@ use Imagine\Exception\RuntimeException as ImagineException;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
-    abstract protected function getTransformation();
-
-    public function setUp() {
-        if (!class_exists('Imagine\Imagick\Imagine')) {
-            $this->markTestSkipped('Imagine must be available to run this test');
-        }
+class CanvasTest extends TransformationTests {
+    protected function getTransformation() {
+        return new Canvas(100, 100, 10, 10, '000');
     }
 
-    /**
-     * @expectedException Imbo\Image\Transformation\Exception
-     * @expectedExceptionMessage some message
-     * @expectedExceptionCode 400
-     */
-    public function testApplyToImageWhenImagineThrowsAnException() {
+    public function testApplyToImage() {
+        $width = 100;
+        $height = 200;
+        $x = 10;
+        $y = 20;
+        $bg = '000';
+        $blob = file_get_contents(__DIR__ . '/../../_files/image.png');
+
         $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue($blob));
+        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
+        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
+
+        $imagineImage = $this->getMock('Imagine\Image\ImageInterface');
+
+        $canvas = $this->getMock('Imagine\Image\ImageInterface');
+        $canvas->expects($this->once())->method('paste')->with($imagineImage);
+        $canvas->expects($this->once())->method('get')->with('png')->will($this->returnValue($blob));
 
         $imagine = $this->getMock('Imagine\Image\ImagineInterface');
-        $imagine->expects($this->any())->method('load')->will($this->throwException(new ImagineException('some message')));
-        $imagine->expects($this->any())->method('create')->will($this->throwException(new ImagineException('some message')));
-        $imagine->expects($this->any())->method('paste')->will($this->throwException(new ImagineException('some message')));
+        $imagine->expects($this->once())->method('create')->will($this->returnValue($canvas));
+        $imagine->expects($this->once())->method('load')->with($blob)->will($this->returnValue($imagineImage));
 
-        $transformation = $this->getTransformation();
+        $transformation = new Canvas($width, $height, $x, $y, $bg);
         $transformation->setImagine($imagine);
         $transformation->applyToImage($image);
     }

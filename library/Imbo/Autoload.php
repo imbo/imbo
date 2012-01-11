@@ -78,6 +78,7 @@ class Autoload {
         'imbo\\image\\imagepreparation' => '/Image/ImagePreparation.php',
         'imbo\\image\\imagepreparationinterface' => '/Image/ImagePreparationInterface.php',
         'imbo\\image\\transformation\\border' => '/Image/Transformation/Border.php',
+        'imbo\\image\\transformation\\canvas' => '/Image/Transformation/Canvas.php',
         'imbo\\image\\transformation\\compress' => '/Image/Transformation/Compress.php',
         'imbo\\image\\transformation\\convert' => '/Image/Transformation/Convert.php',
         'imbo\\image\\transformation\\crop' => '/Image/Transformation/Crop.php',

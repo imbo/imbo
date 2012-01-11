@@ -77,7 +77,7 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
      * Test that transformation methods are chainable
      */
     public function testChain() {
-        $this->chain->border('fff', 1, 1)
+        $this->assertSame($this->chain, $this->chain->border('fff', 1, 1)
                     ->compress(75)
                     ->crop(1, 2, 3, 4)
                     ->rotate(45, 'fff')
@@ -85,7 +85,8 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
                     ->thumbnail(10, 10, '000')
                     ->flipHorizontally()
                     ->flipVertically()
-                    ->border('000', 2, 2);
+                    ->border('000', 2, 2)
+                    ->canvas(100, 100, 10, 10, '000'));
     }
 
     public function testCountable() {
