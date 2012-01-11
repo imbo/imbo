@@ -53,14 +53,14 @@ class Rotate extends Transformation implements TransformationInterface {
      *
      * @var int
      */
-    public $angle;
+    private $angle;
 
     /**
      * Background color of the image
      *
      * @var string
      */
-    public $bg = '000';
+    private $bg = '000';
 
     /**
      * Class constructor

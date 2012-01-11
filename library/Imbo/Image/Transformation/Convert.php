@@ -55,7 +55,7 @@ class Convert extends Transformation implements TransformationInterface {
      *
      * @var string
      */
-    public $type;
+    private $type;
 
     /**
      * Class constructor
@@ -77,6 +77,7 @@ class Convert extends Transformation implements TransformationInterface {
 
         try {
             $imagine = $this->getImagine();
+            $blob = $image->getBlob();
             $imagineImage = $imagine->load($image->getBlob());
 
             $imageBlob = $imagineImage->get($this->type);

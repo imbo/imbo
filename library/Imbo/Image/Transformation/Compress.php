@@ -52,7 +52,7 @@ class Compress extends Transformation implements TransformationInterface {
      *
      * @var int
      */
-    public $quality;
+    private $quality;
 
     /**
      * Class constructor

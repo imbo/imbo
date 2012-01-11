@@ -53,14 +53,14 @@ class Thumbnail extends Transformation implements TransformationInterface {
      *
      * @var int
      */
-    public $width = 50;
+    private $width = 50;
 
     /**
      * Height of the thumbnail
      *
      * @var int
      */
-    public $height = 50;
+    private $height = 50;
 
     /**
      * Fit type
@@ -69,7 +69,7 @@ class Thumbnail extends Transformation implements TransformationInterface {
      *
      * @var string
      */
-    public $fit = 'outbound';
+    private $fit = 'outbound';
 
     /**
      * Class constructor

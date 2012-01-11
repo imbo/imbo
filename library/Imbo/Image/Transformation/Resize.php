@@ -53,14 +53,14 @@ class Resize extends Transformation implements TransformationInterface {
      *
      * @var int
      */
-    public $width;
+    private $width;
 
     /**
      * Height of the resize
      *
      * @var int
      */
-    public $height;
+    private $height;
 
     /**
      * Class constructor
