@@ -184,21 +184,23 @@ class Request implements RequestInterface {
             };
 
             if ($name === 'border') {
-                $chain->add(new Transformation\Border($p('color'), $p('width'), $p('height')));
+                $chain->border($p('color'), $p('width'), $p('height'));
             } else if ($name === 'compress') {
-                $chain->add(new Transformation\Compress($p('quality')));
+                $chain->compress($p('quality'));
             } else if ($name === 'crop') {
-                $chain->add(new Transformation\Crop($p('x'), $p('y'), $p('width'), $p('height')));
+                $chain->crop($p('x'), $p('y'), $p('width'), $p('height'));
             } else if ($name === 'flipHorizontally') {
-                $chain->add(new Transformation\FlipHorizontally());
+                $chain->flipHorizontally();
             } else if ($name === 'flipVertically') {
-                $chain->add(new Transformation\FlipVertically());
+                $chain->flipVertically();
             } else if ($name === 'resize') {
-                $chain->add(new Transformation\Resize($p('width'), $p('height')));
+                $chain->resize($p('width'), $p('height'));
             } else if ($name === 'rotate') {
-                $chain->add(new Transformation\Rotate($p('angle'), $p('bg')));
+                $chain->rotate($p('angle'), $p('bg'));
             } else if ($name === 'thumbnail') {
-                $chain->add(new Transformation\Thumbnail($p('width'), $p('height'), $p('fit')));
+                $chain->thumbnail($p('width'), $p('height'), $p('fit'));
+            } else if ($name === 'canvas') {
+                $chain->canvas($p('width'), $p('height'), $p('x'), $p('y'), $p('bg'));
             }
         }
 
