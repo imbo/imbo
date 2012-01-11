@@ -226,4 +226,13 @@ class TransformationChain implements Iterator, Countable {
     public function flipVertically() {
         return $this->add(new Transformation\FlipVertically());
     }
+
+    /**
+     * Canvas transformation
+     *
+     * @return Imbo\Image\TransformationChain
+     */
+    public function canvas($width, $height, $x = null, $y = null, $bg = null) {
+        return $this->add(new Transformation\Canvas($width, $height, $x, $y, $bg));
+    }
 }
