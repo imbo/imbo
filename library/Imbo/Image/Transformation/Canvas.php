@@ -66,18 +66,34 @@ class Canvas extends Transformation implements TransformationInterface {
     private $height;
 
     /**
-     * X coordinate of the placement of the upper left corner of the existing image
+     * Canvas mode
      *
-     * @var int
+     * Supported modes:
+     *
+     * - "free" (default): Uses both x and y properties for placement
+     * - "center": Places the existing image in the center of the x and y axis
+     * - "center-x": Places the existing image in the center of the x-axis and uses y for vertical
+     *               placement
+     * - "center-y": Places the existing image in the center of the y-axis and uses x for vertical
+     *               placement
+     *
+     * @var string
      */
-    private $x;
+    private $mode = 'free';
 
     /**
      * X coordinate of the placement of the upper left corner of the existing image
      *
      * @var int
      */
-    private $y;
+    private $x = 0;
+
+    /**
+     * X coordinate of the placement of the upper left corner of the existing image
+     *
+     * @var int
+     */
+    private $y = 0;
 
     /**
      * Background color of the canvas
@@ -91,17 +107,31 @@ class Canvas extends Transformation implements TransformationInterface {
      *
      * @param int $width Width of the new canvas
      * @param int $height Height of the new canvas
+     * @param string $mode The placement mode
      * @param int $x X coordinate of the placement of the upper left corner of the existing image
      * @param int $y Y coordinate of the placement of the upper left corner of the existing image
      * @param string $bg Background color of the canvas
      * @throws InvalidArgumentException
      */
-    public function __construct($width, $height, $x = 0, $y = 0, $bg = null) {
+    public function __construct($width, $height, $mode = 'free', $x = 0, $y = 0, $bg = null) {
         $this->width  = (int) $width;
         $this->height = (int) $height;
-        $this->x = (int) $x;
-        $this->y = (int) $y;
-        $this->bg = $bg;
+
+        if ($mode) {
+            $this->mode = $mode;
+        }
+
+        if ($x) {
+            $this->x = (int) $x;
+        }
+
+        if ($y) {
+            $this->y = (int) $y;
+        }
+
+        if ($bg) {
+            $this->bg = $bg;
+        }
     }
 
     /**
@@ -119,11 +149,24 @@ class Canvas extends Transformation implements TransformationInterface {
                 $background
             );
 
+            // Default placement
+            $x = $this->x;
+            $y = $this->y;
+
+            if ($this->mode === 'center') {
+                $x = ($this->width - $image->getWidth()) / 2;
+                $y = ($this->height - $image->getHeight()) / 2;
+            } else if ($this->mode === 'center-x') {
+                $x = ($this->height - $image->getHeight()) / 2;
+            } else if ($this->mode === 'center-y') {
+                $y = ($this->width - $image->getWidth()) / 2;
+            }
+
+            // Placement of the existing image inside of the new canvas
+            $placement = new ImaginePoint((int) $x, (int) $y);
+
             // Paste existing image into the new canvas at the given position
-            $canvas->paste(
-                $imagine->load($image->getBlob()),
-                new ImaginePoint($this->x, $this->y)
-            );
+            $canvas->paste($imagine->load($image->getBlob()), $placement);
 
             // Store the new image
             $image->setBlob($canvas->get($image->getExtension()))

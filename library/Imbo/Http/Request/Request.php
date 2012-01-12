@@ -200,7 +200,7 @@ class Request implements RequestInterface {
             } else if ($name === 'thumbnail') {
                 $chain->thumbnail($p('width'), $p('height'), $p('fit'));
             } else if ($name === 'canvas') {
-                $chain->canvas($p('width'), $p('height'), $p('x'), $p('y'), $p('bg'));
+                $chain->canvas($p('width'), $p('height'), $p('mode'), $p('x'), $p('y'), $p('bg'));
             }
         }
 
