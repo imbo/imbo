@@ -7,7 +7,7 @@
     <target>build/docs</target>
   </transformer>
   <transformations>
-    <template name="old_ocean" />
+    <template name="new_black" />
   </transformations>
   <files>
     <directory>library</directory>
