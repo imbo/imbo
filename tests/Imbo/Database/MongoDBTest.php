@@ -428,12 +428,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
     }
 
-    /**
-     * @expectedException Imbo\Database\Exception
-     * @expectedExceptionCode 500
-     * @expectedExceptionMessage User not found
-     */
-    public function testGetLastModifiedWhenUserDoesNotExist() {
+    public function testGetLastModifiedWhenUserDoesNotHaveAnyImages() {
         $cursor = $this->getMockBuilder('MongoCursor')->disableOriginalConstructor()->setMethods(array('limit', 'sort', 'getNext'))->getMock();
         $cursor->expects($this->any())->method('limit')->will($this->returnValue($cursor));
         $cursor->expects($this->any())->method('sort')->will($this->returnValue($cursor));
@@ -444,7 +439,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             array('updated')
         )->will($this->returnValue($cursor));
 
-        $this->driver->getLastModified($this->publicKey);
+        $this->assertInstanceOf('DateTime', $this->driver->getLastModified($this->publicKey));
     }
 
     public function testGetLastModifiedWithoutImageIdentifier() {
