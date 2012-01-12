@@ -319,7 +319,7 @@ class MongoDB implements DatabaseInterface {
         if ($data === null && $imageIdentifier) {
             throw new Exception('Image not found', 404);
         } else if ($data === null) {
-            throw new Exception('User not found', 500);
+            $data = array('updated' => time());
         }
 
         // Create a new datetime instance
