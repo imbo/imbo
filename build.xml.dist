@@ -29,12 +29,6 @@
     </apply>
   </target>
 
-  <target name="phpab" description="Update autoloader using phpab">
-    <exec executable="phpab">
-      <arg line="-o ${source}/Autoload.php -t ${source}/Autoload.php.in --indent '        ' ${source}"/>
-    </exec>
-  </target>
-
   <target name="phpunit" description="Run unit tests using PHPUnit and generates junit.xml and clover.xml (config in phpunit.xml)">
     <exec executable="phpunit" failonerror="true"/>
   </target>
@@ -79,5 +73,5 @@
     </exec>
   </target>
 
-  <target name="build" depends="clean,lint,phpab,phpunit,docblox,phploc,phpcs,phpcb,phpcpd,pdepend,phpmd"/>
+  <target name="build" depends="clean,lint,phpunit,docblox,phploc,phpcs,phpcb,phpcpd,pdepend,phpmd"/>
 </project>
