@@ -101,12 +101,15 @@ class Metadata extends Resource implements ResourceInterface {
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
         $requestHeaders = $request->getHeaders();
+        $responseHeaders = $response->getHeaders();
 
         // See when this particular image was last updated
         $lastModified = $database->getLastModified($publicKey, $imageIdentifier, true);
 
         // Generate an etag for the content
-        $etag = md5($publicKey . $imageIdentifier . $lastModified);
+        $etag = '"' . md5($publicKey . $imageIdentifier . $lastModified) . '"';
+
+        $responseHeaders->set('ETag', $etag);
 
         if (
             $lastModified === $requestHeaders->get('if-modified-since') &&
@@ -117,11 +120,8 @@ class Metadata extends Resource implements ResourceInterface {
             return;
         }
 
-        $responseHeaders = $response->getHeaders();
-
         // The client did not have this particular version in its cache
-        $responseHeaders->set('Last-Modified', $lastModified)
-                        ->set('ETag', '"' . $etag . '"');
+        $responseHeaders->set('Last-Modified', $lastModified);
 
         $metadata = $database->getMetadata($publicKey, $imageIdentifier);
 

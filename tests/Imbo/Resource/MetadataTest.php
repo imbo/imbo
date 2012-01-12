@@ -113,4 +113,73 @@ class MetadataTest extends ResourceTests {
 
         $resource->post($this->request, $this->response, $this->database, $this->storage);
     }
+
+    public function testGetWhenResponseIsNotModified() {
+        $publicKey = 'some key';
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358';
+        $lastModified = 'Mon, 10 Jan 2011 13:37:00 GMT';
+        $etag = '"b0ef1f0bef5ac57b8d1365a51f3fc1ca"';
+
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $requestHeaders->expects($this->any())->method('get')->will($this->returnCallback(function($param) use ($lastModified, $etag) {
+            if ($param === 'if-modified-since') {
+                return $lastModified;
+            } else if ($param === 'if-none-match') {
+                return $etag;
+            }
+        }));
+
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $responseHeaders->expects($this->once())->method('set')->with('ETag', $etag);
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
+
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
+        $this->response->expects($this->once())->method('setNotModified');
+
+        $this->database->expects($this->once())->method('getLastModified')->with($publicKey, $imageIdentifier)->will($this->returnValue($lastModified));
+
+        $resource = $this->getNewResource();
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    public function testGetWhenResponseIsModified() {
+        $publicKey = 'some key';
+        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358';
+        $lastModified = 'Mon, 10 Jan 2011 13:37:00 GMT';
+        $etag = '"b0ef1f0bef5ac57b8d1365a51f3fc1ca"';
+        $metadata = array('foo' => 'bar');
+
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $responseHeaders->expects($this->any())->method('set')->will($this->returnCallback(function ($key, $value) use ($lastModified, $etag) {
+            if (
+                ($key === 'Etag' && $value === $etag) ||
+                ($key === 'Last-Modified' && $value === $lastModified)
+            ) {
+                return true;
+            }
+
+            return false;
+        }));
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
+
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
+
+        $this->database->expects($this->once())->method('getLastModified')->with($publicKey, $imageIdentifier)->will($this->returnValue($lastModified));
+        $this->database->expects($this->once())->method('getMetadata')->with($publicKey, $imageIdentifier)->will($this->returnValue($metadata));
+
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
+        $writer->expects($this->once())->method('write')->with($metadata, $this->request, $this->response);
+
+        $resource = $this->getNewResource();
+        $resource->setResponseWriter($writer);
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
+    }
 }
