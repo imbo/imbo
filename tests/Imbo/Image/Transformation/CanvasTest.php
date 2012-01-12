@@ -42,10 +42,11 @@ namespace Imbo\Image\Transformation;
  */
 class CanvasTest extends TransformationTests {
     protected function getTransformation() {
-        return new Canvas(100, 100, 10, 10, '000');
+        return new Canvas(100, 100, 'free', 10, 10, '000');
     }
 
     public function testApplyToImage() {
+        $mode = 'free';
         $width = 100;
         $height = 200;
         $x = 10;
@@ -70,7 +71,7 @@ class CanvasTest extends TransformationTests {
         $imagine->expects($this->once())->method('create')->will($this->returnValue($canvas));
         $imagine->expects($this->once())->method('load')->with($blob)->will($this->returnValue($imagineImage));
 
-        $transformation = new Canvas($width, $height, $x, $y, $bg);
+        $transformation = new Canvas($width, $height, $mode, $x, $y, $bg);
         $transformation->setImagine($imagine);
         $transformation->applyToImage($image);
     }

@@ -147,6 +147,7 @@ class TransformationChain implements Iterator, Countable {
      * @param int $width Width of the border
      * @param int $height Height of the border
      * @return Imbo\Image\TransformationChain
+     * @see Imbo\Image\Transformation\Border
      */
     public function border($color = null, $width = null, $height = null) {
         return $this->add(new Transformation\Border($color, $width, $height));
@@ -157,6 +158,7 @@ class TransformationChain implements Iterator, Countable {
      *
      * @param int $quality Quality of the resulting image
      * @return Imbo\Image\TransformationChain
+     * @see Imbo\Image\Transformation\Compress
      */
     public function compress($quality) {
         return $this->add(new Transformation\Compress($quality));
@@ -170,6 +172,7 @@ class TransformationChain implements Iterator, Countable {
      * @param int $width Width of the crop
      * @param int $height Height of the crop
      * @return Imbo\Image\TransformationChain
+     * @see Imbo\Image\Transformation\Crop
      */
     public function crop($x, $y, $width, $height) {
         return $this->add(new Transformation\Crop($x, $y, $width, $height));
@@ -181,6 +184,7 @@ class TransformationChain implements Iterator, Countable {
      * @param int $angle Angle of the rotation
      * @param string $bg Background color
      * @return Imbo\Image\TransformationChain
+     * @see Imbo\Image\Transformation\Rotate
      */
     public function rotate($angle, $bg = null) {
         return $this->add(new Transformation\Rotate($angle, $bg));
@@ -192,6 +196,7 @@ class TransformationChain implements Iterator, Countable {
      * @param int $width Width of the resize
      * @param int $height Height of the resize
      * @return Imbo\Image\TransformationChain
+     * @see Imbo\Image\Transformation\Resize
      */
     public function resize($width = null, $height = null) {
         return $this->add(new Transformation\Resize($width, $height));
@@ -204,6 +209,7 @@ class TransformationChain implements Iterator, Countable {
      * @param int $height height of the thumbnail
      * @param string $fit Fit style ('inset' or 'outbound')
      * @return Imbo\Image\TransformationChain
+     * @see Imbo\Image\Transformation\Thumbnail
      */
     public function thumbnail($width = null, $height = null, $fit = null) {
         return $this->add(new Transformation\Thumbnail($width, $height, $fit));
@@ -213,6 +219,7 @@ class TransformationChain implements Iterator, Countable {
      * Flip horizontally transformation
      *
      * @return Imbo\Image\TransformationChain
+     * @see Imbo\Image\Transformation\FlipHorizontally
      */
     public function flipHorizontally() {
         return $this->add(new Transformation\FlipHorizontally());
@@ -222,6 +229,7 @@ class TransformationChain implements Iterator, Countable {
      * Flip vertically transformation
      *
      * @return Imbo\Image\TransformationChain
+     * @see Imbo\Image\Transformation\FlipVertically
      */
     public function flipVertically() {
         return $this->add(new Transformation\FlipVertically());
@@ -230,9 +238,16 @@ class TransformationChain implements Iterator, Countable {
     /**
      * Canvas transformation
      *
+     * @param int $width Width of the new canvas
+     * @param int $height Height of the new canvas
+     * @param string $mode The placement mode
+     * @param int $x X coordinate of the placement of the upper left corner of the existing image
+     * @param int $y Y coordinate of the placement of the upper left corner of the existing image
+     * @param string $bg Background color of the canvas
      * @return Imbo\Image\TransformationChain
+     * @see Imbo\Image\Transformation\Canvas
      */
-    public function canvas($width, $height, $x = null, $y = null, $bg = null) {
-        return $this->add(new Transformation\Canvas($width, $height, $x, $y, $bg));
+    public function canvas($width, $height, $mode = null, $x = null, $y = null, $bg = null) {
+        return $this->add(new Transformation\Canvas($width, $height, $mode, $x, $y, $bg));
     }
 }
