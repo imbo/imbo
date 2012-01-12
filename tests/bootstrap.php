@@ -39,14 +39,9 @@
  * @link https://github.com/christeredvartsen/imbo
  */
 
-/** @see Imbo\Autoload */
-require __DIR__ . '/../library/Imbo/Autoload.php';
-
-$loader = new Imbo\Autoload();
-$loader->register();
-
 set_include_path(
     get_include_path() . PATH_SEPARATOR .
+    __DIR__ . '/../library' . PATH_SEPARATOR .
     __DIR__
 );
 
