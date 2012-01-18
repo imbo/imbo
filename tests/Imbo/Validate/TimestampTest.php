@@ -53,19 +53,23 @@ class TimestampTest extends \PHPUnit_Framework_TestCase {
 
     public function getValidationData() {
         return array(
-            array(time(), false),
-            array(gmdate('Y-m-d\TH:i:s\Z'), true),
-            array(gmdate('Y-m-d\TH:i:s\Z', time() + 100), true),
-            array(gmdate('Y-m-d\TH:i:s\Z', time() - 100), true),
-            array(gmdate('Y-m-d\TH:i:s\Z', time() + 130), false),
-            array(gmdate('Y-m-d\TH:i:s\Z', time() - 130), false),
+            array(0, true),
+            array(100, true),
+            array(-100, true),
+            array(130, false),
+            array(-130, false),
         );
     }
 
     /**
      * @dataProvider getValidationData()
      */
-    public function testIsValid($timestamp, $result) {
-        $this->assertSame($result, $this->validate->isValid($timestamp));
+    public function testIsValid($offset, $result) {
+        $date = gmdate('Y-m-d\TH:i:s\Z', time() + $offset);
+        $this->assertSame($result, $this->validate->isValid($date));
+    }
+
+    public function testIsValidWithInvalidFormat() {
+        $this->assertFalse($this->validate->isValid(time()));
     }
 }
