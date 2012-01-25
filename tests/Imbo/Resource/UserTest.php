@@ -32,6 +32,8 @@
 
 namespace Imbo\Resource;
 
+use DateTime;
+
 /**
  * @package Imbo
  * @subpackage Unittests
@@ -43,5 +45,82 @@ namespace Imbo\Resource;
 class UserTest extends ResourceTests {
     protected function getNewResource() {
         return new User();
+    }
+
+    public function testGetWhenDataIsNotModified() {
+        $publicKey = 'mykey';
+        $numImages = 42;
+        $lastModified = 'Thu, 12 Jan 2012 16:13:35 GMT';
+        $etag = '"' . md5($lastModified) . '"';
+
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $requestHeaders->expects($this->any())->method('get')->will($this->returnCallback(function ($key) use ($etag, $lastModified) {
+            if ($key === 'if-modified-since') {
+                return $lastModified;
+            } else if ($key === 'if-none-match') {
+                return $etag;
+            }
+        }));
+
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $responseHeaders->expects($this->once())->method('set')->with('ETag', $etag);
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
+
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
+        $this->response->expects($this->once())->method('setNotModified');
+
+        $this->database->expects($this->once())->method('getNumImages')->with($publicKey)->will($this->returnValue($numImages));
+        $this->database->expects($this->once())->method('getLastModified')->with($publicKey)->will($this->returnValue($lastModified));
+
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    public function testGetWhenDataIsModified() {
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $requestHeaders->expects($this->any())->method('get')->will($this->returnCallback(function ($key) {
+            $lastModified = 'Thu, 12 Jan 2012 16:13:35 GMT';
+
+            if ($key === 'if-modified-since') {
+                return $lastModified;
+            } else if ($key === 'if-none-match') {
+                return '"' . md5($lastModified) . '"';
+            }
+        }));
+
+        $publicKey = 'mykey';
+        $numImages = 42;
+        $date = new DateTime('@' . time());
+        $lastModified = $date->format('D, d M Y H:i:s') . ' GMT';
+        $etag = '"' . md5($lastModified) . '"';
+
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $responseHeaders->expects($this->any())->method('set')->will($this->returnCallback(function($key, $value) use ($lastModified, $etag) {
+            if (
+                ($key === 'ETag' && $value === $etag) ||
+                ($key === 'Last-Modified' && $value === $lastModified)
+            ) {
+                return true;
+            }
+
+            return false;
+        }));
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
+
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
+
+        $this->database->expects($this->once())->method('getNumImages')->with($publicKey)->will($this->returnValue($numImages));
+        $this->database->expects($this->once())->method('getLastModified')->with($publicKey)->will($this->returnValue($lastModified));
+
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
+        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+
+        $resource = $this->getNewResource();
+        $resource->setResponseWriter($writer);
+
+        $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
 }
