@@ -85,9 +85,13 @@ class MongoDB implements DatabaseInterface {
 
         if ($collection === null) {
             // @codeCoverageIgnoreStart
-            $mongo      = new Mongo();
-            $database   = $mongo->{$this->params['databaseName']};
-            $collection = $database->{$this->params['collectionName']};
+            try {
+                $mongo      = new Mongo();
+                $database   = $mongo->{$this->params['databaseName']};
+                $collection = $database->{$this->params['collectionName']};
+            } catch (MongoException $e) {
+                throw new Exception('Could not connect to database', 500);
+            }
         }
         // @codeCoverageIgnoreEnd
 
