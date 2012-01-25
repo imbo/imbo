@@ -149,24 +149,59 @@ class Canvas extends Transformation implements TransformationInterface {
                 $background
             );
 
+            // Load existing image
+            $existingImage = $imagine->load($image->getBlob());
+            $existingWidth = $image->getWidth();
+            $existingHeight = $image->getHeight();
+
+            if ($existingWidth > $this->width || $existingHeight > $this->height) {
+                // The existing image is bigger than the canvas and needs to be cropped
+                $cropX = 0;
+                $cropY = 0;
+                $cropWidth = $this->width;
+                $cropHeight = $this->height;
+
+                if ($existingWidth > $this->width) {
+                    if ($this->mode === 'center' || $this->mode === 'center-x') {
+                        $cropX = (int) ($existingWidth - $this->width) / 2;
+                    }
+                } else {
+                    $cropWidth = $existingWidth;
+                }
+
+                if ($existingHeight > $this->height) {
+                    if ($this->mode === 'center' || $this->mode === 'center-y') {
+                        $cropY = (int) ($existingHeight - $this->height) / 2;
+                    }
+                } else {
+                    $cropHeight = $existingHeight;
+                }
+
+                $existingImage->crop(new ImaginePoint($cropX, $cropY),
+                                     new ImagineBox($cropWidth, $cropHeight));
+            }
+
             // Default placement
             $x = $this->x;
             $y = $this->y;
 
+            // Figure out the correct placement of the image based on the placement mode. Use the
+            // size from the imagine image when calculating since the image may have been cropped
+            // above.
             if ($this->mode === 'center') {
-                $x = ($this->width - $image->getWidth()) / 2;
-                $y = ($this->height - $image->getHeight()) / 2;
+                $x = ($this->width - $existingImage->getSize()->getWidth()) / 2;
+                $y = ($this->height - $existingImage->getSize()->getHeight()) / 2;
             } else if ($this->mode === 'center-x') {
-                $x = ($this->height - $image->getHeight()) / 2;
+                $x = ($this->width - $existingImage->getSize()->getWidth()) / 2;
             } else if ($this->mode === 'center-y') {
-                $y = ($this->width - $image->getWidth()) / 2;
+                $y = ($this->height - $existingImage->getSize()->getHeight()) / 2;
             }
 
             // Placement of the existing image inside of the new canvas
             $placement = new ImaginePoint((int) $x, (int) $y);
 
             // Paste existing image into the new canvas at the given position
-            $canvas->paste($imagine->load($image->getBlob()), $placement);
+            $canvas->paste($existingImage, $placement);
 
             // Store the new image
             $image->setBlob($canvas->get($image->getExtension()))
