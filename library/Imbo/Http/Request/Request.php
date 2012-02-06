@@ -90,18 +90,6 @@ class Request implements RequestInterface {
     private $publicKey;
 
     /**
-     * The current resource (excluding the public key)
-     *
-     * Examples:
-     * * images
-     * * <image identifier>
-     * * <image identifier>/meta
-     *
-     * @var string
-     */
-    private $resource;
-
-    /**
      * The current image identifier
      *
      * @var string
