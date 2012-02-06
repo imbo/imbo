@@ -359,7 +359,6 @@ Run the following commands as root to install the software (on Ubuntu):
     pear install --alldeps phpunit/PHPUnit
     pear install --alldeps phpunit/PHP_CodeBrowser
     pear install pat/vfsStream-beta
-    pear install theseer/Autoload
     pear install pecl/mongo
     pear install phpDocumentor
     pear install phpunit/phploc
