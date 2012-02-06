@@ -190,11 +190,13 @@ class FrontController {
             throw new Exception('Unknown public key', 400);
         }
 
+        // Fetch the private key from the config and store it in the request
+        $privateKey = $authConfig[$publicKey];
+        $request->setPrivateKey($privateKey);
+
         if (!$request->isUnsafe()) {
             return;
         }
-
-        $privateKey = $authConfig[$publicKey];
 
         $query = $request->getQuery();
 
