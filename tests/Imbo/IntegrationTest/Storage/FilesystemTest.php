@@ -22,35 +22,72 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
+
+namespace Imbo\IntegrationTest\Storage;
+
+use Imbo\Storage\Filesystem;
 
 /**
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Storage\Filesystem
  */
+class FilesystemTest extends StorageTests {
+    /**
+     * @var string
+     */
+    private $path = '/tmp/imboFilesystemIntegrationTest';
 
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+    /**
+     * @see Imbo\IntegrationTest\Storage\StorageTests::getDriver()
+     */
+    protected function getDriver() {
+        return new Filesystem(array(
+            'dataDir' => $this->path,
+        ));
     }
 
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
+    public function setUp() {
+        if (is_dir($this->path)) {
+            $this->rmdir($this->path);
         }
+
+        mkdir($this->path);
+
+        parent::setUp();
     }
-});
+
+    public function tearDown() {
+        if (is_dir($this->path)) {
+            $this->rmdir($this->path);
+        }
+
+        parent::tearDown();
+    }
+
+    /**
+     * Recursively delete the test directory
+     *
+     * @param string $path Path to a file or a directory
+     */
+    private function rmdir($path) {
+        foreach (glob($path . '/*') as $file) {
+            if (is_dir($file)) {
+                $this->rmdir($file);
+            } else {
+                unlink($file);
+            }
+        }
+
+        rmdir($path);
+    }
+}

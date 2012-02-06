@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit colors="true"
-  bootstrap="tests/bootstrap.php">
+<phpunit colors="true" bootstrap="tests/bootstrap.php">
   <testsuites>
-    <testsuite name="Imbo test suite">
-      <directory>tests/Imbo</directory>
+    <testsuite name="imbo">
+      <directory>tests/Imbo/UnitTest</directory>
+    </testsuite>
+    <testsuite name="imbo-integration">
+      <directory>tests/Imbo/IntegrationTest</directory>
     </testsuite>
   </testsuites>
 
   <php>
-    <const name="MEMCACHED_TEST_HOST" value="" />
-    <const name="MEMCACHED_TEST_PORT" value="" />
+    <!-- Directory to find fixtures (images, SQL statements, ... ) -->
+    <const name="FIXTURES_DIR" value="tests/Imbo/Fixtures" />
+
+    <!-- Memcached cache driver integration tests -->
+    <var name="MEMCACHED_HOST" value="" />
+    <var name="MEMCACHED_PORT" value="" />
+
+    <!-- Include paths -->
+    <includePath>./tests</includePath>
+    <includePath>./library</includePath>
   </php>
 
   <logging>
-    <log type="coverage-html" target="build/coverage" title="Code coverage for Imbo"
-      charset="UTF-8" yui="true" highlight="true" />
+    <log type="coverage-html" target="build/coverage" title="Code coverage for Imbo" charset="UTF-8" yui="true" highlight="true" />
     <log type="coverage-clover" target="build/logs/clover.xml" />
     <log type="junit" target="build/logs/junit.xml" logIncompleteSkipped="false" />
   </logging>

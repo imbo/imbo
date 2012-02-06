@@ -29,28 +29,52 @@
  * @link https://github.com/imbo/imbo
  */
 
+namespace Imbo\UnitTest\Validate;
+
+use Imbo\Validate\Timestamp;
+
 /**
  * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Validate\Timestamp
  */
+class TimestampTest extends \PHPUnit_Framework_TestCase {
+    private $validate;
 
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+    public function setUp() {
+        $this->validate = new Timestamp();
     }
 
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
-        }
+    public function tearDown() {
+        $this->timestamp = null;
     }
-});
+
+    public function getValidationData() {
+        return array(
+            array(0, true),
+            array(100, true),
+            array(-100, true),
+            array(130, false),
+            array(-130, false),
+        );
+    }
+
+    /**
+     * @dataProvider getValidationData()
+     * @covers Imbo\Validate\Timestamp::isValid
+     */
+    public function testIsValid($offset, $result) {
+        $date = gmdate('Y-m-d\TH:i:s\Z', time() + $offset);
+        $this->assertSame($result, $this->validate->isValid($date));
+    }
+
+    /**
+     * @covers Imbo\Validate\Timestamp::isValid
+     */
+    public function testIsValidWithInvalidFormat() {
+        $this->assertFalse($this->validate->isValid(time()));
+    }
+}

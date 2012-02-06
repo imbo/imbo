@@ -29,28 +29,36 @@
  * @link https://github.com/imbo/imbo
  */
 
+namespace Imbo\UnitTest\Exception;
+
+use Imbo\Exception\InvalidArgumentException;
+
 /**
  * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Exception\InvalidArgumentException
  */
-
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+class InvalidArgumentExceptionTest extends \PHPUnit_Framework_TestCase {
+    public function getErrorCodes() {
+        return array(
+            array(123, 123),
+            array('123', 123),
+            array(0, 0),
+        );
     }
 
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
-        }
+    /**
+     * @covers Imbo\Exception\InvalidArgumentException::setImboErrorCode
+     * @covers Imbo\Exception\InvalidArgumentException::getImboErrorCode
+     * @dataProvider getErrorCodes
+     */
+    public function testSetAndGetImboErrorCode($actual, $expected) {
+        $exception = new InvalidArgumentException();
+        $this->assertSame($exception, $exception->setImboErrorCode($actual));
+        $this->assertSame($expected, $exception->getImboErrorCode());
     }
-});
+
+}

@@ -136,7 +136,7 @@ class Metadata extends Resource implements ResourceInterface {
         $responseHeaders = $response->getHeaders();
 
         // See when this particular image was last updated
-        $lastModified = $database->getLastModified($publicKey, $imageIdentifier, true);
+        $lastModified = $this->formatDate($database->getLastModified($publicKey, $imageIdentifier));
 
         // Generate an etag for the content
         $etag = '"' . md5($publicKey . $imageIdentifier . $lastModified) . '"';
