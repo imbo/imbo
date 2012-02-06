@@ -72,6 +72,24 @@ interface RequestInterface {
     function setPublicKey($key);
 
     /**
+     * Get the private key
+     *
+     * The private key property is populated by the server based on the public key from the
+     * request. The client itself does not place the private key in the request.
+     *
+     * @return string
+     */
+    function getPrivateKey();
+
+    /**
+     * Set the private key
+     *
+     * @param string $key The key to set
+     * @return Imbo\Http\Request\RequestInterface
+     */
+    function setPrivateKey($key);
+
+    /**
      * Get image transformations from the request
      *
      * @return Imbo\Image\TransformationChain

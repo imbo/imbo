@@ -90,6 +90,13 @@ class Request implements RequestInterface {
     private $publicKey;
 
     /**
+     * The private key
+     *
+     * @var string
+     */
+    private $privateKey;
+
+    /**
      * The current image identifier
      *
      * @var string
@@ -125,6 +132,22 @@ class Request implements RequestInterface {
      */
     public function setPublicKey($key) {
         $this->publicKey = $key;
+
+        return $this;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::getPrivateKey()
+     */
+    public function getPrivateKey() {
+        return $this->privateKey;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::setPrivateKey()
+     */
+    public function setPrivateKey($key) {
+        $this->privateKey = $key;
 
         return $this;
     }

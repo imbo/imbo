@@ -121,9 +121,16 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
     public function testSetGetPublicKey() {
         $request = new Request();
-        $publicKey = md5(microtime());
+        $publicKey = 'publicKey';
         $this->assertSame($request, $request->setPublicKey($publicKey));
         $this->assertSame($publicKey, $request->getPublicKey());
+    }
+
+    public function testSetGetPrivateKey() {
+        $request = new Request();
+        $privateKey = '55b90a334854ac17b91f5c5690944f31';
+        $this->assertSame($request, $request->setPrivateKey($privateKey));
+        $this->assertSame($privateKey, $request->getPrivateKey());
     }
 
     public function testGetPath() {
