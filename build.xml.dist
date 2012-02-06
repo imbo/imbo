@@ -73,5 +73,11 @@
     </exec>
   </target>
 
-  <target name="build" depends="clean,lint,phpunit,docblox,phploc,phpcs,phpcb,phpcpd,pdepend,phpmd"/>
+  <target name="phpmd-html" description="Generate pmd.html using PHPMD (configuration in phpmd.xml)">
+    <exec executable="phpmd">
+      <arg line="${source} html ${basedir}/phpmd.xml --reportfile ${build}/logs/pmd.html"/>
+    </exec>
+  </target>
+
+  <target name="build" depends="clean,lint,phpunit,docblox,phploc,phpcs,phpcb,phpcpd,pdepend,phpmd,phpmd-html"/>
 </project>
