@@ -209,7 +209,7 @@ $dbParams = array(
 
 // Create the database entry
 $container->database = $container->shared(function (Imbo\Container $container) use ($dbParams) {
-    return new Imbo\Database\MongoDb($dbParams);
+    return new Imbo\Database\MongoDB($dbParams);
 });
 
 // Parameters for the storage driver

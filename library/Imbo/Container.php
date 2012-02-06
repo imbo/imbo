@@ -48,7 +48,7 @@ namespace Imbo;
  *     $container->imageResource = new Resource\Image();
  *
  *     $dbParams = array('some' => 'params');
- *     $container->database = new Database\MongoDb($dbParams);
+ *     $container->database = new Database\MongoDB($dbParams);
  *
  *     $storageParams = array('some' => 'params');
  *     $container->storage = new Storage\Filesystem($storageParams);
@@ -64,7 +64,7 @@ namespace Imbo;
  *
  *     $dbParams = array('some' => 'params');
  *     $container->database = $container->shared(function (Container $container) use ($dbParams) {
- *         return new Database\MongoDb($dbParams);
+ *         return new Database\MongoDB($dbParams);
  *     });
  *
  *     $storageParams = array('some' => 'params');
