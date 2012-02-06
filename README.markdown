@@ -341,7 +341,6 @@ Click on the fork button on github and clone your fork:
 To fully develop Imbo (as in run the complete build process, which most likely you will never do) you will need to have the following software installed:
 
 * [PHPUnit](http://phpunit.de/)
-* [Autoload (phpab)](https://github.com/theseer/Autoload)
 * [vfsStream](http://code.google.com/p/bovigo/wiki/vfsStream)
 * [Imagine](https://github.com/avalanche123/Imagine/)
 * [MongoDB](http://www.mongodb.org/)

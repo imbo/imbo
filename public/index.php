@@ -30,14 +30,6 @@
  * @link https://github.com/christeredvartsen/imbo
  */
 
-set_include_path(__DIR__ . '/../library' . PATH_SEPARATOR . get_include_path());
-
-/** @see Imbo\Autoload */
-require_once 'Imbo/Autoload.php';
-
-$loader = new Imbo\Autoload();
-$loader->register();
-
 // Fetch the container
 $container = require __DIR__ . '/../bootstrap/bootstrap.php';
 
