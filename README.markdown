@@ -94,41 +94,6 @@ Imbo supports some image transformations out of the box using the [Imagine](http
 
 Transformations are made using the `t[]` query parameter. This GET parameter should be used as an array so that multiple transformations can be made. The transformations are made in the order they are specified in the url.
 
-### resize
-This transformation will resize the image. Two parameters are supported and at least one of them must be supplied to apply this transformation.
-
-* `(int) width` The width of the resulting image in pixels. If not specified the width will be calculated using the same ratio as the original image.
-* `(int) height` The height of the resulting image in pixels. If not specified the height will be calculated using the same ratio as the original image.
-
-Examples:
-
-* `t[]=resize:width=100`
-* `t[]=resize:height=100`
-* `t[]=resize:width=100,height=50`
-
-### crop
-This transformation will crop the image. All four arguments are required.
-
-* `(int) x` The X coordinate of the cropped region's top left corner.
-* `(int) y` The Y coordinate of the cropped region's top left corner.
-* `(int) width` The width of the crop.
-* `(int) height` The height of the crop.
-
-Examples:
-
-* `t[]=crop:x=10,y=25,width=250,height=150`
-
-### rotate
-Use this transformation to rotate the image.
-
-* `(int) angle` The number of degrees to rotate the image.
-* `(string) bg` Background color in hexadecimal. Defaults to '000000' (also supports short values like 'f00' ('ff0000')).
-
-Examples:
-
-* `t[]=rotate:angle=90`
-* `t[]=rotate:angle=45,bg=fff`
-
 ### border
 If you want to add a border around the image, use this transformation.
 
@@ -142,17 +107,52 @@ Examples:
 * `t[]=border:color=000`
 * `t[]=border:color=f00,width=2,height=2`
 
-### thumbnail
-Transformation that creates a thumbnail of the image.
+### canvas
+Adds a canvas around the image,
 
-* `(int) width` Width of the thumbnail. Defaults to 50.
-* `(int) height` Height of the thumbnail. Defaults to 50.
-* `(string) fit` Fit style. 'inset' or 'outbound'. Default to 'outbound'.
+* `(int) width` Width of the surrounding canvas.
+* `(int) height` Height of the surrounding canvas.
+* `(string) mode` The placement mode of the original image. "free", "center", "center-x" and "center-y" are available values. Defaults to "free".
+* `(int) x` X coordinate of the placement of the upper left corner of the existing image.
+* `(int) y` Y coordinate of the placement of the upper left corner of the existing image.
+* `(string) $bg` Background color of the canvas. Defaults to `null` which uses the background color of the original image.
 
 Examples:
 
-* `t[]=thumbnail`
-* `t[]=thumbnail:width=20,height=20,fit=inset`
+* `t[]=canvas:width=200,height=200,mode=center`
+* `t[]=canvas:width=200,height=200,x=10,y=10,bg=000`
+* `t[]=canvas:width=200,height=200,x=10,mode=center-y`
+* `t[]=canvas:width=200,height=200,y=10,mode=center-x`
+
+### compress
+Compress the image on the fly.
+
+* `(int) quality` Quality of the resulting image. 100 is maximum quality (lowest compression rate)
+
+Example:
+
+* `t[]=compress:quality=40`
+
+### convert
+This transformation is not applied like the rest of the transformations. It is triggered when specifying a custom extension to the `<image>`.
+
+Example:
+
+* `GET /users/<publicKey>/images/<image>.gif`
+* `GET /users/<publicKey>/images/<image>.jpg`
+* `GET /users/<publicKey>/images/<image>.png`
+
+### crop
+This transformation will crop the image. All four arguments are required.
+
+* `(int) x` The X coordinate of the cropped region's top left corner.
+* `(int) y` The Y coordinate of the cropped region's top left corner.
+* `(int) width` The width of the crop.
+* `(int) height` The height of the crop.
+
+Examples:
+
+* `t[]=crop:x=10,y=25,width=250,height=150`
 
 ### flipHorizontally
 Flip the image horizontally.
@@ -168,14 +168,71 @@ Example:
 
 * `t[]=flipVertically`
 
-### compress
-Compress the image on the fly.
+### resize
+This transformation will resize the image. Two parameters are supported and at least one of them must be supplied to apply this transformation.
 
-* `(int) quality` Quality of the resulting image. 100 is maximum quality (lowest compression rate)
+* `(int) width` The width of the resulting image in pixels. If not specified the width will be calculated using the same ratio as the original image.
+* `(int) height` The height of the resulting image in pixels. If not specified the height will be calculated using the same ratio as the original image.
 
-Example:
+Examples:
 
-* `t[]=compress:quality=40`
+* `t[]=resize:width=100`
+* `t[]=resize:height=100`
+* `t[]=resize:width=100,height=50`
+
+### rotate
+Use this transformation to rotate the image.
+
+* `(int) angle` The number of degrees to rotate the image.
+* `(string) bg` Background color in hexadecimal. Defaults to '000000' (also supports short values like 'f00' ('ff0000')).
+
+Examples:
+
+* `t[]=rotate:angle=90`
+* `t[]=rotate:angle=45,bg=fff`
+
+
+### thumbnail
+Transformation that creates a thumbnail of the image.
+
+* `(int) width` Width of the thumbnail. Defaults to 50.
+* `(int) height` Height of the thumbnail. Defaults to 50.
+* `(string) fit` Fit style. 'inset' or 'outbound'. Default to 'outbound'.
+
+Examples:
+
+* `t[]=thumbnail`
+* `t[]=thumbnail:width=20,height=20,fit=inset`
+
+## Transformation key
+When Imbo is supposed to apply one or more transformations to an image it will pr. default require a valid transformation key (enforced by an event listener that can be removed if wanted). This key must be supplied in the URL using the `tk` query parameter. The value of this parameter is generated by the client in the following fashion:
+
+```php
+<?php
+$publicKey  = '<some random value>';
+$privateKey = '<secret value>';
+$image      = '<image>';
+
+// Create the URL to an image
+$url = sprintf('http://example.com/users/%s/images/%s', $publicKey, $imageIdentifier);
+
+// The transformations to apply
+$transformations = array('t[]=thumbnail:width=40,height=40,fit=outbound',
+                         't[]=border:width=3,height=3,color=red',
+                         't[]=canvas:width=100,height=100,mode=center');
+$query = implode('&', $transformations);
+
+// Initialize data for the transformation key HMAC
+$data = $publicKey . '|' . $image . '|' . $query;
+
+// Prepare data for the hash
+$transformationKey = hash_hmac('md5', $data, $privateKey);
+
+// Output the URL with the transformation key
+echo $url . '?' . $query . '&tk=' . $transformationKey;
+```
+
+Whenever a transformation is requested and the `tk` parameter is missing or invalid, Imbo will respond with `400 Bad Request`. If the event listener is removed, Imbo will no longer require the `tk` query parameter.
 
 ## Extra response headers
 Imbo will usually inject extra response headers to the different requests. All response headers from Imbo will be prefixed with **X-Imbo-**.
@@ -321,6 +378,9 @@ $container->eventManager = $container->shared(function(Imbo\Container $container
     return $manager;
 });
 ```
+
+### The EventListener interface
+The event manager also has a method called `attachListener()` that takes an implementation of the `Imbo\EventListener\ListenerInterface` interface as argument. Imbo ships with some implementations of this interface.
 
 ## Developer/Contributer notes
 Here you will find some notes about how Imbo works internally along with information on what is needed to develop Imbo.
