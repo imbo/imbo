@@ -98,11 +98,10 @@ class TransformationKey implements ListenerInterface {
         }
 
         if ($transformations) {
-            // We have transformations. Build the query string (in the same was as the client does
-            // it)
+            // We have transformations. Build the query string in the same fashion as the client
             $query = null;
             $query = array_reduce($transformations, function($query, $element) {
-                return $query . 't%5B%5D=' . urlencode($element) . '&';
+                return $query . 't[]=' . $element . '&';
             }, $query);
 
             $data .= '|' . rtrim($query, '&');
