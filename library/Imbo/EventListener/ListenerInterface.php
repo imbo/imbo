@@ -58,6 +58,7 @@ interface ListenerInterface {
      * This method will get triggered by the event manager
      *
      * @param Imbo\EventManager\EventInterface $event The triggered event
+     * @throws Imbo\Exception
      */
     function invoke(EventInterface $event);
 }
