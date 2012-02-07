@@ -132,9 +132,9 @@ class FrontController {
 
         // Possible patterns to match where the most accessed match is placed first
         $routes = array(
-            'image'    => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png))?$#',
+            'image'    => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png))?$#',
             'images'   => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/?$#',
-            'metadata' => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(gif|jpg|png)/)meta/?$#',
+            'metadata' => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png)/)meta/?$#',
             'user'     => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/?$#',
         );
 
@@ -157,6 +157,10 @@ class FrontController {
 
         if (isset($matches['imageIdentifier'])) {
             $request->setImageIdentifier($matches['imageIdentifier']);
+        }
+
+        if (isset($matches['extension'])) {
+            $request->setImageExtension($matches['extension']);
         }
 
         // Append "Resource" to the resource name to match the entry in the container

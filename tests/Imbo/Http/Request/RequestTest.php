@@ -43,11 +43,19 @@ use Imbo\Image\TransformationChain;
  * @link https://github.com/christeredvartsen/imbo
  */
 class RequestTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getTransformations
+     */
     public function testGetTransformationsWithNoTransformationsPresent() {
         $request = new Request();
         $this->assertEquals(new TransformationChain(), $request->getTransformations());
     }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getTransformations
+     */
     public function testGetTransformations() {
         $query = array(
             't' => array(
@@ -75,37 +83,77 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('Imbo\Image\TransformationChain', $chain);
     }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getImageIdentifier
+     * @covers Imbo\Http\Request\Request::setImageIdentifier
+     */
     public function testSetGetImageIdentifier() {
         $request = new Request();
         $identifier = md5(microtime());
-        $request->setImageIdentifier($identifier);
+        $this->assertNull($request->getImageIdentifier());
+        $this->assertSame($request, $request->setImageIdentifier($identifier));
         $this->assertSame($identifier, $request->getImageIdentifier());
     }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getImageExtension
+     * @covers Imbo\Http\Request\Request::setImageExtension
+     */
+    public function testSetGetImageExtension() {
+        $request = new Request();
+        $extension = 'gif';
+        $this->assertNull($request->getImageExtension());
+        $this->assertSame($request, $request->setImageExtension($extension));
+        $this->assertSame($extension, $request->getImageExtension());
+    }
+
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getQuery
+     */
     public function testGetQuery() {
         $request = new Request(array('key' => 'value'));
         $queryContainer = $request->getQuery();
         $this->assertInstanceOf('Imbo\Http\ParameterContainer', $queryContainer);
     }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getRequest
+     */
     public function testGetRequest() {
         $request = new Request(array(), array('key' => 'value'));
         $requestContainer = $request->getRequest();
         $this->assertInstanceOf('Imbo\Http\ParameterContainer', $requestContainer);
     }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getServer
+     */
     public function testGetServer() {
         $request = new Request(array(), array(), array('key' => 'value'));
         $container = $request->getServer();
         $this->assertInstanceOf('Imbo\Http\ServerContainer', $container);
     }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getHeaders
+     */
     public function testGetHeaders() {
         $request = new Request(array(), array(), array('key' => 'value'));
         $container = $request->getHeaders();
         $this->assertInstanceOf('Imbo\Http\HeaderContainer', $container);
     }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::isUnsafe
+     * @covers Imbo\Http\Request\Request::getMethod
+     */
     public function testIsUnsafe() {
         $request = new Request(array(), array(), array('REQUEST_METHOD' => 'GET'));
         $this->assertFalse($request->isUnsafe());
@@ -119,6 +167,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($request->isUnsafe());
     }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::setPublicKey
+     * @covers Imbo\Http\Request\Request::getPublicKey
+     */
     public function testSetGetPublicKey() {
         $request = new Request();
         $publicKey = 'publicKey';
@@ -126,6 +179,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($publicKey, $request->getPublicKey());
     }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::setPrivateKey
+     * @covers Imbo\Http\Request\Request::getPrivateKey
+     */
     public function testSetGetPrivateKey() {
         $request = new Request();
         $privateKey = '55b90a334854ac17b91f5c5690944f31';
@@ -133,6 +191,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($privateKey, $request->getPrivateKey());
     }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getPath
+     */
     public function testGetPath() {
         $request = new Request();
         $this->assertEmpty($request->getPath());
@@ -143,6 +205,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * If public/index.php is not placed directly in the document root there is logic in the
      * request class the removes a possible prefix from the path. This method will test that
      * functionality.
+     *
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getPath
      */
     public function testGetPathWithPrefixUsedForImboInstallation() {
         $publicKey = md5(microtime());
@@ -159,11 +224,19 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame('/users/' . $publicKey . '/images/' . $imageIdentifier, $request->getPath());
     }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getScheme
+     */
     public function testGetSchemeWithHttps() {
         $request = new Request(array(), array(), array('HTTPS' => 1));
         $this->assertSame('https', $request->getScheme());
     }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getScheme
+     */
     public function testGetSchemeWithHttp() {
         $request = new Request();
         $this->assertSame('http', $request->getScheme());
@@ -178,6 +251,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @dataProvider getHosts()
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getHost
      */
     public function testGetHost($host, $expected) {
         $request = new Request(array(), array(), array('HTTP_HOST' => $host));
@@ -199,6 +274,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @dataProvider getUrls()
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getUrl
      */
     public function testGetUrlWithImboInDocumentRoot($host, $port, $documentRoot, $scriptFilename, $redirectUrl, $expected) {
         $request = new Request(array(), array(), array(
@@ -210,5 +287,39 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         ));
 
         $this->assertSame($expected, $request->getUrl());
+    }
+
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getPort
+     */
+    public function testGetPort() {
+        $port = 80;
+        $request = new Request(array(), array(), array(
+            'SERVER_PORT' => $port,
+        ));
+        $this->assertSame($port, $request->getPort());
+    }
+
+    public function getBaseUrlData() {
+        return array(
+            array('/doc/root', '/doc/root/index.php', ''),
+            array('/doc/root/', '/doc/root/index.php', ''),
+            array('/doc/root', '/doc/root/dir/index.php', '/dir'),
+            array('/doc/root/', '/doc/root/dir/index.php', '/dir'),
+        );
+    }
+
+    /**
+     * @dataProvider getBaseUrlData
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getBaseUrl
+     */
+    public function testGetBaseUrl($documentRoot, $script, $baseUrl) {
+        $request = new Request(array(), array(), array(
+            'DOCUMENT_ROOT' => $documentRoot,
+            'SCRIPT_FILENAME' => $script,
+        ));
+        $this->assertSame($baseUrl, $request->getBaseUrl());
     }
 }

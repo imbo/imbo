@@ -156,6 +156,21 @@ interface RequestInterface {
     function setImageIdentifier($imageIdentifier);
 
     /**
+     * Get the current image extension (if any)
+     *
+     * @return string|null
+     */
+    function getImageExtension();
+
+    /**
+     * Set the image extension
+     *
+     * @param string $extension The image extension to set
+     * @return Imbo\Http\Request\RequestInterface
+     */
+    function setImageExtension($extension);
+
+    /**
      * Get the current HTTP method
      *
      * Returns one of the constants defined in this interface.

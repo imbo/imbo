@@ -97,11 +97,18 @@ class Request implements RequestInterface {
     private $privateKey;
 
     /**
-     * The current image identifier
+     * The current image identifier (if any)
      *
      * @var string
      */
     private $imageIdentifier;
+
+    /**
+     * The current image extension (if any)
+     *
+     * @var string
+     */
+    private $imageExtension;
 
     /**
      * Class constructor
@@ -289,6 +296,22 @@ class Request implements RequestInterface {
      */
     public function setImageIdentifier($imageIdentifier) {
         $this->imageIdentifier = $imageIdentifier;
+
+        return $this;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::getImageExtension()
+     */
+    public function getImageExtension() {
+        return $this->imageExtension;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::setImageExtension()
+     */
+    public function setImageExtension($extension) {
+        $this->imageExtension = $extension;
 
         return $this;
     }
