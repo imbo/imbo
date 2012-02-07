@@ -78,7 +78,10 @@ $container->response = new Imbo\Http\Response\Response();
 
 // Event manager
 $container->eventManager = $container->shared(function(Imbo\Container $container) {
-    return new Imbo\EventManager\EventManager($container->request, $container->response);
+    $manager = new Imbo\EventManager\EventManager($container->request, $container->response);
+    $manager->attachListener(new Imbo\EventListener\TransformationKey());
+
+    return $manager;
 });
 
 // Return the container instance
