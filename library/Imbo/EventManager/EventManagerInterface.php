@@ -32,6 +32,8 @@
 
 namespace Imbo\EventManager;
 
+use Imbo\EventListener\ListenerInterface;
+
 /**
  * Event manager interface
  *
@@ -57,7 +59,7 @@ interface EventManagerInterface {
     /**
      * Attach a listener to the event manager
      *
-     * @param Imbo\EventManager\ListenerInterface $listener The listener to attach
+     * @param Imbo\EventListener\ListenerInterface $listener The listener to attach
      * @param int $priority Priority of the callback
      * @return Imbo\EventManager\EventManagerInterface
      */
