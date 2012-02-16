@@ -45,7 +45,7 @@
 
   <target name="phpcs" description="Generate checkstyle.xml using PHP_CodeSniffer">
     <exec executable="phpcs" output="/dev/null">
-      <arg line="--report=checkstyle --report-file=${build}/logs/checkstyle.xml --standard=CE ${source}"/>
+      <arg line="--report=checkstyle --report-file=${build}/logs/checkstyle.xml --standard=Imbo ${source}"/>
     </exec>
   </target>
 
