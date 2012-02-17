@@ -23,27 +23,23 @@
  * IN THE SOFTWARE.
  *
  * @package Exceptions
- * @subpackage Database
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
 
-namespace Imbo\Database;
-
-use Imbo\Exception as BaseException;
+namespace Imbo\Exception;
 
 /**
- * Database exception class for Imbo
+ * Storage exception
  *
  * @package Exceptions
- * @subpackage Database
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class Exception extends BaseException {
+class StorageException extends RuntimeException {
 
 }
