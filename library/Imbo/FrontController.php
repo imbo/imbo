@@ -34,6 +34,7 @@ namespace Imbo;
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
     Imbo\Exception\RuntimeException,
+    Imbo\Exception,
     Imbo\Image\Image,
     Imbo\Validate;
 
@@ -150,7 +151,7 @@ class FrontController {
 
         // Path matched no route
         if (!$matches) {
-            throw new RuntimeException('Invalid request', 400);
+            throw new RuntimeException('Not found', 404);
         }
 
         // Extract some information from the path and store in the request instance
@@ -192,7 +193,10 @@ class FrontController {
 
         // See if the public key exists
         if (!isset($authConfig[$publicKey])) {
-            throw new RuntimeException('Unknown public key', 400);
+            $e = new RuntimeException('Unknown public key', 400);
+            $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
+
+            throw $e;
         }
 
         // Fetch the private key from the config and store it in the request
@@ -207,14 +211,20 @@ class FrontController {
 
         foreach (array('signature', 'timestamp') as $param) {
             if (!$query->has($param)) {
-                throw new RuntimeException('Missing required authentication parameter: ' . $param, 400);
+                $e = new RuntimeException('Missing required authentication parameter: ' . $param, 400);
+                $e->setImboErrorCode(Exception::AUTH_MISSING_PARAM);
+
+                throw $e;
             }
         }
 
         $timestamp = $query->get('timestamp');
 
         if (!$this->timestampValidator->isValid($timestamp)) {
-            throw new RuntimeException('Invalid timestamp: ' . $timestamp, 400);
+            $e = new RuntimeException('Invalid timestamp: ' . $timestamp, 400);
+            $e->setImboErrorCode(Exception::AUTH_INVALID_TIMESTAMP);
+
+            throw $e;
         }
 
         // Add the URL used for auth to the response headers
@@ -228,7 +238,10 @@ class FrontController {
                                  ->setPrivateKey($privateKey);
 
         if (!$this->signatureValidator->isValid($signature)) {
-            throw new RuntimeException('Signature mismatch', 403);
+            $e = new RuntimeException('Signature mismatch', 403);
+            $e->setImboErrorCode(Exception::AUTH_SIGNATURE_MISMATCH);
+
+            throw $e;
         }
 
         return true;
