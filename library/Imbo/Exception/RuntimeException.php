@@ -44,5 +44,26 @@ use Imbo\Exception,
  * @link https://github.com/christeredvartsen/imbo
  */
 class RuntimeException extends BaseRuntimeException implements Exception {
+    /**
+     * Internal Imbo error code injected into the error output
+     *
+     * @var int
+     */
+    private $imboCode;
 
+    /**
+     * @see Imbo\Exception::setImboErrorCode()
+     */
+    public function setImboErrorCode($code) {
+        $this->imboCode = (int) $code;
+
+        return $this;
+    }
+
+    /**
+     * @see Imbo\Exception::getImboErrorCode()
+     */
+    public function getImboErrorCode() {
+        return $this->imboCode;
+    }
 }

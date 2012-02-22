@@ -43,5 +43,31 @@ namespace Imbo;
  * @link https://github.com/christeredvartsen/imbo
  */
 interface Exception {
+    /**#@+
+     * Internal error codes
+     *
+     * @var int
+     */
+    const ERR_UNSPECIFIED = 0;
 
+    const AUTH_UNKNOWN_PUBLIC_KEY = 100;
+    const AUTH_MISSING_PARAM      = 101;
+    const AUTH_INVALID_TIMESTAMP  = 102;
+    const AUTH_SIGNATURE_MISMATCH = 103;
+    /**#@-*/
+
+    /**
+     * Set an internal Imbo error code
+     *
+     * @param int $code One of the constants defined in this class
+     * @return Imbo\Exception
+     */
+    function setImboErrorCode($code);
+
+    /**
+     * Get the internal Imbo error code
+     *
+     * @return int
+     */
+    function getImboErrorCode();
 }
