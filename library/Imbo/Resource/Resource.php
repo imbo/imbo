@@ -31,12 +31,13 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface;
-use Imbo\Http\Response\ResponseInterface;
-use Imbo\Http\Response\ResponseWriter;
-use Imbo\Database\DatabaseInterface;
-use Imbo\Storage\StorageInterface;
-use Imbo\Resource\ResourceInterface;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    Imbo\Http\Response\ResponseWriter,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface,
+    Imbo\Resource\ResourceInterface,
+    Imbo\Exception\ResourceException;
 
 /**
  * Abstract resource class
@@ -81,34 +82,34 @@ abstract class Resource {
      * @see Imbo\Resource\ResourceInterface::post()
      */
     public function post(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        throw new Exception('Method not allowed', 405);
+        throw new ResourceException('Method not allowed', 405);
     }
 
     /**
      * @see Imbo\Resource\ResourceInterface::get()
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        throw new Exception('Method not allowed', 405);
+        throw new ResourceException('Method not allowed', 405);
     }
 
     /**
      * @see Imbo\Resource\ResourceInterface::head()
      */
     public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        throw new Exception('Method not allowed', 405);
+        throw new ResourceException('Method not allowed', 405);
     }
 
     /**
      * @see Imbo\Resource\ResourceInterface::delete()
      */
     public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        throw new Exception('Method not allowed', 405);
+        throw new ResourceException('Method not allowed', 405);
     }
 
     /**
      * @see Imbo\Resource\ResourceInterface::put()
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        throw new Exception('Method not allowed', 405);
+        throw new ResourceException('Method not allowed', 405);
     }
 }

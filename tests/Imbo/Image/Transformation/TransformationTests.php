@@ -52,7 +52,7 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Image\Transformation\Exception
+     * @expectedException Imbo\Exception\TransformationException
      * @expectedExceptionMessage some message
      * @expectedExceptionCode 400
      */

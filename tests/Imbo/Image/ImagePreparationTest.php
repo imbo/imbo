@@ -58,7 +58,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Image\Exception
+     * @expectedException Imbo\Exception\ImageException
      * @expectedExceptionMessage No image attached
      * @expectedExceptionCode 400
      */
@@ -69,7 +69,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Image\Exception
+     * @expectedException Imbo\Exception\ImageException
      * @expectedExceptionMessage Hash mismatch
      * @expectedExceptionCode 400
      */
@@ -81,7 +81,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Image\Exception
+     * @expectedException Imbo\Exception\ImageException
      * @expectedExceptionMessage Unsupported image type
      * @expectedExceptionCode 415
      */

@@ -32,6 +32,8 @@
 namespace Imbo\Storage;
 
 use Imbo\Image\ImageInterface,
+    Imbo\Exception\StorageException,
+    Imbo\Exception,
     DateTime;
 
 /**
@@ -73,7 +75,7 @@ class Filesystem implements StorageInterface {
      */
     public function store($publicKey, $imageIdentifier, ImageInterface $image) {
         if (!is_writable($this->params['dataDir'])) {
-            throw new Exception('Could not store image', 500);
+            throw new StorageException('Could not store image', 500);
         }
 
         // Create path for the image
@@ -89,7 +91,10 @@ class Filesystem implements StorageInterface {
         $imagePath = $imageDir . '/' . $imageIdentifier;
 
         if (file_exists($imagePath)) {
-            throw new Exception('Image already exists', 400);
+            $e = new StorageException('Image already exists', 400);
+            $e->setImboErrorCode(Exception::IMAGE_ALREADY_EXISTS);
+
+            throw $e;
         }
 
         return (bool) file_put_contents($imagePath, $image->getBlob());
@@ -102,7 +107,7 @@ class Filesystem implements StorageInterface {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         if (!is_file($path)) {
-            throw new Exception('File not found', 404);
+            throw new StorageException('File not found', 404);
         }
 
         return unlink($path);
@@ -115,7 +120,7 @@ class Filesystem implements StorageInterface {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         if (!is_file($path)) {
-            throw new Exception('File not found', 404);
+            throw new StorageException('File not found', 404);
         }
 
         $image->setBlob(file_get_contents($path));
@@ -130,7 +135,7 @@ class Filesystem implements StorageInterface {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         if (!is_file($path)) {
-            throw new Exception('File not found', 404);
+            throw new StorageException('File not found', 404);
         }
 
         // Get the unix timestamp

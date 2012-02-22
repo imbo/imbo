@@ -34,7 +34,7 @@ namespace Imbo\EventManager;
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
     Imbo\EventListener\ListenerInterface,
-    InvalidArgumentException,
+    Imbo\Exception\InvalidArgumentException,
     SplPriorityQueue;
 
 /**

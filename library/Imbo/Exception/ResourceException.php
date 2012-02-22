@@ -22,54 +22,24 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Interfaces
- * @subpackage EventManager
+ * @package Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
 
-namespace Imbo\EventManager;
-
-use Imbo\EventListener\ListenerInterface;
+namespace Imbo\Exception;
 
 /**
- * Event manager interface
+ * Resource exception
  *
- * @package Interfaces
- * @subpackage EventManager
+ * @package Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-interface EventManagerInterface {
-    /**
-     * Attach a callable to an event
-     *
-     * @param array|string $events The event(s) to attach to
-     * @param callback $callback Code that will be called when the event is triggered
-     * @param int $priority Priority of the callback
-     * @throws Imbo\Exception\InvalidArgumentException
-     * @return Imbo\EventManager\EventManagerInterface
-     */
-    function attach($events, $callback, $priority = 1);
+class ResourceException extends RuntimeException {
 
-    /**
-     * Attach a listener to the event manager
-     *
-     * @param Imbo\EventListener\ListenerInterface $listener The listener to attach
-     * @param int $priority Priority of the callback
-     * @return Imbo\EventManager\EventManagerInterface
-     */
-    function attachListener(ListenerInterface $listener, $priority = 1);
-
-    /**
-     * Trigger a given event
-     *
-     * @param string $event The event to trigger
-     * @return Imbo\EventManager\EventManagerInterface
-     */
-    function trigger($event);
 }

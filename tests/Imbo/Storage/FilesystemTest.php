@@ -68,7 +68,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Storage\Exception
+     * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionMessage File not found
      */
     public function testDeleteFileThatDoesNotExist() {
@@ -107,7 +107,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Storage\Exception
+     * @expectedException Imbo\Exception\StorageException
      * @expectedExpectionMessage Could not store image
      */
     public function testStoreToUnwritablePath() {
@@ -122,7 +122,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Storage\Exception
+     * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionMessage Image already exists
      * @expectedExceptionCode 400
      */
@@ -166,7 +166,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Storage\Exception
+     * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionCode 404
      */
     public function testLoadFileThatDoesNotExist() {
@@ -210,7 +210,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Storage\Exception
+     * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionMessage File not found
      * @expectedExceptionCode 404
      */

@@ -31,6 +31,8 @@
 
 namespace Imbo;
 
+use Imbo\Exception\InvalidArgumentException;
+
 /**
  * Dependency Injection Container
  *
@@ -113,12 +115,12 @@ class Container {
      *
      * @param string $id The accessed property
      * @return mixed
-     * @throws InvalidArgumentException If someone tries to access a value that is not yet defined
-     *                                  an exception will be thrown.
+     * @throws Imbo\Exception\InvalidArgumentException If someone tries to access a value that is
+     *                                                 not yet defined an exception will be thrown.
      */
     public function __get($id) {
         if (!isset($this->values[$id])) {
-            throw new \InvalidArgumentException(sprintf('Value %s is not defined.', $id));
+            throw new InvalidArgumentException(sprintf('Value %s is not defined.', $id));
         }
 
         // If the property is callable, execute it with the closure as a parameter

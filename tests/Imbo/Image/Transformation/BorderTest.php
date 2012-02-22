@@ -32,8 +32,6 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imagine\Exception\RuntimeException as ImagineException;
-
 /**
  * @package Imbo
  * @subpackage Unittests
