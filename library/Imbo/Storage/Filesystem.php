@@ -33,6 +33,7 @@ namespace Imbo\Storage;
 
 use Imbo\Image\ImageInterface,
     Imbo\Exception\StorageException,
+    Imbo\Exception,
     DateTime;
 
 /**
@@ -90,7 +91,10 @@ class Filesystem implements StorageInterface {
         $imagePath = $imageDir . '/' . $imageIdentifier;
 
         if (file_exists($imagePath)) {
-            throw new StorageException('Image already exists', 400);
+            $e = new StorageException('Image already exists', 400);
+            $e->setImboErrorCode(Exception::IMAGE_ALREADY_EXISTS);
+
+            throw $e;
         }
 
         return (bool) file_put_contents($imagePath, $image->getBlob());

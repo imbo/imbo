@@ -34,6 +34,7 @@ namespace Imbo\Database;
 use Imbo\Image\ImageInterface,
     Imbo\Resource\Images\QueryInterface,
     Imbo\Exception\DatabaseException,
+    Imbo\Exception,
     Mongo,
     MongoException,
     MongoCollection,
@@ -124,7 +125,10 @@ class MongoDB implements DatabaseInterface {
             $row = $this->collection->findOne(array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier));
 
             if ($row) {
-                throw new DatabaseException('Image already exists', 400);
+                $e = new DatabaseException('Image already exists', 400);
+                $e->setImboErrorCode(Exception::IMAGE_ALREADY_EXISTS);
+
+                throw $e;
             }
 
             $this->collection->insert($data, array('safe' => true));
