@@ -32,13 +32,12 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException,
+use Imbo\Image\ImageInterface,
+    Imbo\Exception\TransformationException,
+    Imagine\Exception\Exception as ImagineException,
     Imagine\Image\Box as ImagineBox,
     Imagine\Image\Point as ImaginePoint,
-    Imagine\Image\Color as ImagineColor,
-    InvalidArgumentException;
+    Imagine\Image\Color as ImagineColor;
 
 /**
  * Canvas transformation
@@ -111,7 +110,6 @@ class Canvas extends Transformation implements TransformationInterface {
      * @param int $x X coordinate of the placement of the upper left corner of the existing image
      * @param int $y Y coordinate of the placement of the upper left corner of the existing image
      * @param string $bg Background color of the canvas
-     * @throws InvalidArgumentException
      */
     public function __construct($width, $height, $mode = 'free', $x = 0, $y = 0, $bg = null) {
         $this->width  = (int) $width;
@@ -208,7 +206,7 @@ class Canvas extends Transformation implements TransformationInterface {
                   ->setWidth($this->width)
                   ->setHeight($this->height);
         } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), 400, $e);
         }
     }
 }

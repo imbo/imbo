@@ -33,6 +33,7 @@ namespace Imbo;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
+    Imbo\Exception\RuntimeException,
     Imbo\Image\Image,
     Imbo\Validate;
 
@@ -124,7 +125,7 @@ class FrontController {
      *
      * @param Imbo\Http\Request\RequestInterface $request A request instance
      * @return Imbo\Resource\ResourceInterface
-     * @throws Imbo\Exception
+     * @throws Imbo\Exception\RuntimeException
      */
     private function resolveResource(RequestInterface $request) {
         // Fetch current path
@@ -149,7 +150,7 @@ class FrontController {
 
         // Path matched no route
         if (!$matches) {
-            throw new Exception('Invalid request', 400);
+            throw new RuntimeException('Invalid request', 400);
         }
 
         // Extract some information from the path and store in the request instance
@@ -182,7 +183,7 @@ class FrontController {
      *
      * @param Imbo\Http\Request\RequestInterface $request The current request
      * @param Imbo\Http\Response\ResponseInterface $response The response instance
-     * @throws Imbo\Exception
+     * @throws Imbo\Exception\RuntimeException
      * @return mixed Returns true on success
      */
     private function auth(RequestInterface $request, ResponseInterface $response) {
@@ -191,7 +192,7 @@ class FrontController {
 
         // See if the public key exists
         if (!isset($authConfig[$publicKey])) {
-            throw new Exception('Unknown public key', 400);
+            throw new RuntimeException('Unknown public key', 400);
         }
 
         // Fetch the private key from the config and store it in the request
@@ -206,14 +207,14 @@ class FrontController {
 
         foreach (array('signature', 'timestamp') as $param) {
             if (!$query->has($param)) {
-                throw new Exception('Missing required authentication parameter: ' . $param, 400);
+                throw new RuntimeException('Missing required authentication parameter: ' . $param, 400);
             }
         }
 
         $timestamp = $query->get('timestamp');
 
         if (!$this->timestampValidator->isValid($timestamp)) {
-            throw new Exception('Invalid timestamp: ' . $timestamp, 400);
+            throw new RuntimeException('Invalid timestamp: ' . $timestamp, 400);
         }
 
         // Add the URL used for auth to the response headers
@@ -227,7 +228,7 @@ class FrontController {
                                  ->setPrivateKey($privateKey);
 
         if (!$this->signatureValidator->isValid($signature)) {
-            throw new Exception('Signature mismatch', 403);
+            throw new RuntimeException('Signature mismatch', 403);
         }
 
         return true;
@@ -238,17 +239,17 @@ class FrontController {
      *
      * @param Imbo\Http\Request\RequestInterface $request The request object
      * @param Imbo\Http\Response\ResponseInterface $response The response object
-     * @throws Imbo\Exception
+     * @throws Imbo\Exception\RuntimeException
      */
     public function handle(RequestInterface $request, ResponseInterface $response) {
         $httpMethod = $request->getMethod();
 
         if ($httpMethod === RequestInterface::METHOD_BREW) {
-            throw new Exception('I\'m a teapot!', 418);
+            throw new RuntimeException('I\'m a teapot!', 418);
         }
 
         if (!isset(self::$supportedHttpMethods[$httpMethod])) {
-            throw new Exception('Unsupported HTTP method: ' . $httpMethod, 501);
+            throw new RuntimeException('Unsupported HTTP method: ' . $httpMethod, 501);
         }
 
         // Fetch a resource instance based on the request path
@@ -270,7 +271,7 @@ class FrontController {
 
         // See if the HTTP method is supported at all
         if (!method_exists($resource, $methodName)) {
-            throw new Exception('Method not allowed', 405);
+            throw new RuntimeException('Method not allowed', 405);
         }
 
         $className = get_class($resource);

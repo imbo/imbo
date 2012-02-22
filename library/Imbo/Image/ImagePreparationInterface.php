@@ -53,7 +53,7 @@ interface ImagePreparationInterface {
      *
      * @param Imbo\Http\Request\RequestInterface $request A request instance
      * @param Imbo\Image\ImageInterface $image An image instance
-     * @throws Imbo\Image\Exception
+     * @throws Imbo\Exception\ImageException
      * @return Imbo\Image\ImagePreparationInterface
      */
     function prepareImage(RequestInterface $request, ImageInterface $image);

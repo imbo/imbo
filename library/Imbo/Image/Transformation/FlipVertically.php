@@ -32,9 +32,9 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
+use Imbo\Image\ImageInterface,
+    Imbo\Exception\TransformationException,
+    Imagine\Exception\Exception as ImagineException;
 
 /**
  * Flip vertically transformation
@@ -59,7 +59,7 @@ class FlipVertically extends Transformation implements TransformationInterface {
 
             $image->setBlob($imagineImage->get($image->getExtension()));
         } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), 400, $e);
         }
     }
 }

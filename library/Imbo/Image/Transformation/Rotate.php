@@ -32,10 +32,10 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
-use Imagine\Image\Color;
+use Imbo\Image\ImageInterface,
+    Imbo\Exception\TransformationException,
+    Imagine\Exception\Exception as ImagineException,
+    Imagine\Image\Color;
 
 /**
  * Rotate transformation
@@ -92,7 +92,7 @@ class Rotate extends Transformation implements TransformationInterface {
                   ->setWidth($box->getWidth())
                   ->setHeight($box->getHeight());
         } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), 400, $e);
         }
     }
 }

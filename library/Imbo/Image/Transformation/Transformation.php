@@ -31,8 +31,8 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imagine\Image\ImagineInterface;
-use Imagine\Imagick\Imagine;
+use Imagine\Image\ImagineInterface,
+    Imagine\Imagick\Imagine;
 
 /**
  * Abstract transformation

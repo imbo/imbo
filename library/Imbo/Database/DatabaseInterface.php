@@ -51,14 +51,13 @@ interface DatabaseInterface {
     /**
      * Insert a new image
      *
-     * This method will insert a new image into the database. On errors throw exceptions that
-     * extends Imbo\Database\Exception.
+     * This method will insert a new image into the database
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @param Imbo\Image\ImageInterface $image The image to insert
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Database\Exception
+     * @throws Imbo\Exception\DatabaseException
      */
     function insertImage($publicKey, $imageIdentifier, ImageInterface $image);
 
@@ -68,7 +67,7 @@ interface DatabaseInterface {
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Database\Exception
+     * @throws Imbo\Exception\DatabaseException
      */
     function deleteImage($publicKey, $imageIdentifier);
 
@@ -79,7 +78,7 @@ interface DatabaseInterface {
      * @param string $imageIdentifier Image identifier
      * @param array $metadata An array with metadata
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Database\Exception
+     * @throws Imbo\Exception\DatabaseException
      */
     function updateMetadata($publicKey, $imageIdentifier, array $metadata);
 
@@ -89,7 +88,7 @@ interface DatabaseInterface {
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return array Returns the metadata as an array
-     * @throws Imbo\Database\Exception
+     * @throws Imbo\Exception\DatabaseException
      */
     function getMetadata($publicKey, $imageIdentifier);
 
@@ -99,7 +98,7 @@ interface DatabaseInterface {
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Database\Exception
+     * @throws Imbo\Exception\DatabaseException
      */
     function deleteMetadata($publicKey, $imageIdentifier);
 
@@ -109,7 +108,7 @@ interface DatabaseInterface {
      * @param string $publicKey The public key of the user
      * @param Imbo\Resource\Images\Query
      * @return array
-     * @throws Imbo\Database\Exception
+     * @throws Imbo\Exception\DatabaseException
      */
     function getImages($publicKey, QueryInterface $query);
 
@@ -120,7 +119,7 @@ interface DatabaseInterface {
      * @param string $imageIdentifier The image identifier
      * @param Imbo\Image\ImageInterface $image The image object to populate
      * @return boolean
-     * @throws Imbo\Database\Exception
+     * @throws Imbo\Exception\DatabaseException
      */
     function load($publicKey, $imageIdentifier, ImageInterface $image);
 
@@ -136,7 +135,7 @@ interface DatabaseInterface {
      * @param boolean $formatted Wether or not to format the date as an HTTP date
      * @return DateTime|string If $formatted is true this method should return the timestamp as a
      *                         valid HTTP date. If not, return the DateTime instance
-     * @throws Imbo\Database\Exception
+     * @throws Imbo\Exception\DatabaseException
      */
     function getLastModified($publicKey, $imageIdentifier = null, $formatted = false);
 
@@ -145,7 +144,7 @@ interface DatabaseInterface {
      *
      * @param string $publicKey The public key of the user
      * @return int Returns the number of images
-     * @throws Imbo\Database\Exception
+     * @throws Imbo\Exception\DatabaseException
      */
     function getNumImages($publicKey);
 }
