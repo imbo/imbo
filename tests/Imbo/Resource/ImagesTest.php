@@ -32,7 +32,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Database\Exception as DatabaseException;
+use Imbo\Exception\DatabaseException;
 
 /**
  * @package Imbo
@@ -55,7 +55,7 @@ class ImagesTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */

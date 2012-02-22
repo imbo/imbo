@@ -65,7 +65,7 @@ interface TransformationInterface {
      * Apply a transformation to an image object
      *
      * @param Imbo\Image\ImageInterface Image instance
-     * @throws Imbo\Image\Transformation\Exception
+     * @throws Imbo\Exception\TransformationException
      */
     function applyToImage(ImageInterface $image);
 }

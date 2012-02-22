@@ -103,7 +103,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Image already exists
      */
@@ -122,7 +122,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to save image data
      */
@@ -152,7 +152,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to delete image data
      */
@@ -181,7 +181,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to edit image data
      */
@@ -228,7 +228,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to fetch image metadata
      */
@@ -241,7 +241,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 404
      * @expectedExceptionMessage Image not found
      */
@@ -272,7 +272,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to remove metadata
      */
@@ -328,7 +328,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to search for images
      */
@@ -345,7 +345,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to fetch image data
      */
@@ -359,7 +359,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 404
      * @expectedExceptionMessage Image not found
      */
@@ -396,7 +396,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to fetch image data
      */
@@ -410,7 +410,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 404
      * @expectedExceptionMessage Image not found
      */
@@ -489,7 +489,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      */
     public function testGetNumImagesWhenMongoThrowsAnException() {

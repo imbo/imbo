@@ -32,10 +32,10 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Image\Exception as ImageException;
-use Imbo\Database\Exception as DatabaseException;
-use Imbo\Storage\Exception as StorageException;
-use Imbo\Image\Transformation\Exception as TransformationException;
+use Imbo\Exception\ImageException,
+    Imbo\Exception\DatabaseException,
+    Imbo\Exception\StorageException,
+    Imbo\Exception\TransformationException;
 
 /**
  * @package Imbo
@@ -75,7 +75,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Image\Exception
+     * @expectedException Imbo\Exception\ImageException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 400
      */
@@ -91,7 +91,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
@@ -115,7 +115,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Storage\Exception
+     * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
@@ -174,7 +174,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
@@ -193,7 +193,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Storage\Exception
+     * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
@@ -237,7 +237,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Database\Exception
+     * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
@@ -252,7 +252,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Storage\Exception
+     * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */

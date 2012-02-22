@@ -31,16 +31,16 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface;
-use Imbo\Http\Response\ResponseInterface;
-use Imbo\Database\DatabaseInterface;
-use Imbo\Storage\StorageInterface;
-use Imbo\Image\Image as ImageObject;
-use Imbo\Image\ImageInterface;
-use Imbo\Image\ImagePreparation;
-use Imbo\Image\ImagePreparationInterface;
-use Imbo\Storage\Exception as StorageException;
-use Imbo\Image\Transformation\Convert;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface,
+    Imbo\Image\Image as ImageObject,
+    Imbo\Image\ImageInterface,
+    Imbo\Image\ImagePreparation,
+    Imbo\Image\ImagePreparationInterface,
+    Imbo\Exception\StorageException,
+    Imbo\Image\Transformation\Convert;
 
 /**
  * Image resource

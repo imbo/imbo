@@ -31,8 +31,10 @@
 
 namespace Imbo\Image;
 
-use Imbo\Http\Request\RequestInterface;
-use Imbo\Image\Image;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Exception\ImageException,
+    Imbo\Exception,
+    Imbo\Image\Image;
 
 /**
  * Image preparation
@@ -52,7 +54,10 @@ class ImagePreparation implements ImagePreparationInterface {
         $imageBlob = $request->getRawData();
 
         if (empty($imageBlob)) {
-            throw new Exception('No image attached', 400);
+            $e = new ImageException('No image attached', 400);
+            $e->setImboErrorCode(Exception::IMAGE_NO_IMAGE_ATTACHED);
+
+            throw $e;
         }
 
         // Calculate hash
@@ -62,7 +67,10 @@ class ImagePreparation implements ImagePreparationInterface {
         $imageIdentifier = $request->getImageIdentifier();
 
         if ($actualHash !== $imageIdentifier) {
-            throw new Exception('Hash mismatch', 400);
+            $e = new ImageException('Hash mismatch', 400);
+            $e->setImboErrorCode(Exception::IMAGE_HASH_MISMATCH);
+
+            throw $e;
         }
 
         // Use the file info extension to fetch the mime type
@@ -70,7 +78,10 @@ class ImagePreparation implements ImagePreparationInterface {
         $mime = $finfo->buffer($imageBlob);
 
         if (!Image::supportedMimeType($mime)) {
-            throw new Exception('Unsupported image type: ' . $mime, 415);
+            $e = new ImageException('Unsupported image type: ' . $mime, 415);
+            $e->setImboErrorCode(Exception::IMAGE_UNSUPPORTED_MIMETYPE);
+
+            throw $e;
         }
 
         $extension = Image::getFileExtension($mime);

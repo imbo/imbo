@@ -32,11 +32,11 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
-use Imagine\Image\Point;
-use Imagine\Image\Box;
+use Imbo\Image\ImageInterface,
+    Imbo\Exception\TransformationException,
+    Imagine\Exception\Exception as ImagineException,
+    Imagine\Image\Point,
+    Imagine\Image\Box;
 
 /**
  * Crop transformation
@@ -109,7 +109,7 @@ class Crop extends Transformation implements TransformationInterface {
                   ->setWidth($this->width)
                   ->setHeight($this->height);
         } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), 400, $e);
         }
     }
 }

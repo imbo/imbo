@@ -32,10 +32,10 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface;
-use Imbo\Image\Image;
-
-use Imagine\Exception\Exception as ImagineException;
+use Imbo\Image\ImageInterface,
+    Imbo\Image\Image,
+    Imbo\Exception\TransformationException,
+    Imagine\Exception\Exception as ImagineException;
 
 /**
  * Convert transformation
@@ -86,7 +86,7 @@ class Convert extends Transformation implements TransformationInterface {
             $image->setMimeType($mimeType);
             $image->setExtension($this->type);
         } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), 400, $e);
         }
     }
 }

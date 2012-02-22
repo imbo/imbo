@@ -23,27 +23,47 @@
  * IN THE SOFTWARE.
  *
  * @package Exceptions
- * @subpackage Image
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
 
-namespace Imbo\Image;
+namespace Imbo\Exception;
 
-use Imbo\Exception as BaseException;
+use Imbo\Exception,
+    InvalidArgumentException as BaseInvalidArgumentException;
 
 /**
- * Image exception
+ * Invalid argument exception
  *
  * @package Exceptions
- * @subpackage Image
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class Exception extends BaseException {
+class InvalidArgumentException extends BaseInvalidArgumentException implements Exception {
+    /**
+     * Internal Imbo error code injected into the error output
+     *
+     * @var int
+     */
+    private $imboCode;
 
+    /**
+     * @see Imbo\Exception::setImboErrorCode()
+     */
+    public function setImboErrorCode($code) {
+        $this->imboCode = (int) $code;
+
+        return $this;
+    }
+
+    /**
+     * @see Imbo\Exception::getImboErrorCode()
+     */
+    public function getImboErrorCode() {
+        return $this->imboCode;
+    }
 }

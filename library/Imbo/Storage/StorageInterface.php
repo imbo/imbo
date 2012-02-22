@@ -51,14 +51,14 @@ interface StorageInterface {
      * Store an image
      *
      * This method will receive the binary data of the image place it somewhere suited for the
-     * actual storage driver. If an error occurs the driver should throw an exception based on
-     * Imbo\Storage\Exception.
+     * actual storage driver. If an error occurs the driver should throw an
+     * Imbo\Exception\StorageException exception.
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
      * @param Imbo\Image\ImageInterface $image The image to store
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Storage\Exception
+     * @throws Imbo\Exception\StorageException
      */
     function store($publicKey, $imageIdentifier, ImageInterface $image);
 
@@ -70,7 +70,7 @@ interface StorageInterface {
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Storage\Exception
+     * @throws Imbo\Exception\StorageException
      */
     function delete($publicKey, $imageIdentifier);
 
@@ -88,7 +88,7 @@ interface StorageInterface {
      * @param string $imageIdentifier Image identifier
      * @param Imbo\Image\ImageInterface $image The image object
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Storage\Exception
+     * @throws Imbo\Exception\StorageException
      */
     function load($publicKey, $imageIdentifier, ImageInterface $image);
 
@@ -100,7 +100,7 @@ interface StorageInterface {
      * @param boolean $formatted Wether or not to format the date as an HTTP date
      * @return DateTime|string If $formatted is true this method should return the timestamp as a
      *                         valid HTTP date. If not, return the DateTime instance
-     * @throws Imbo\Storage\Exception
+     * @throws Imbo\Exception\StorageException
      */
     function getLastModified($publicKey, $imageIdentifier, $formatted = false);
 }

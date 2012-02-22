@@ -112,8 +112,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException Imbo\Exception
-     * @expectedExceptionMessage Invalid request
-     * @expectedExceptionCode 400
+     * @expectedExceptionCode 404
      */
     public function testResolveResourceWithInvalidRequest() {
         $reflection = new \ReflectionClass($this->controller);

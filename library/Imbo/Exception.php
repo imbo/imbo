@@ -22,7 +22,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Exceptions
+ * @package Interfaces
+ * @subpackage Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -32,14 +33,48 @@
 namespace Imbo;
 
 /**
- * Base exception class for Imbo
+ * Base exception interface
  *
- * @package Exceptions
+ * @package Interfaces
+ * @subpackage Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class Exception extends \RuntimeException {
+interface Exception {
+    /**#@+
+     * Internal error codes
+     *
+     * @var int
+     */
+    const ERR_UNSPECIFIED = 0;
 
+    // Auth errors
+    const AUTH_UNKNOWN_PUBLIC_KEY = 100;
+    const AUTH_MISSING_PARAM      = 101;
+    const AUTH_INVALID_TIMESTAMP  = 102;
+    const AUTH_SIGNATURE_MISMATCH = 103;
+
+    // Image resource errors
+    const IMAGE_ALREADY_EXISTS       = 200;
+    const IMAGE_NO_IMAGE_ATTACHED    = 201;
+    const IMAGE_HASH_MISMATCH        = 202;
+    const IMAGE_UNSUPPORTED_MIMETYPE = 203;
+    /**#@-*/
+
+    /**
+     * Set an internal Imbo error code
+     *
+     * @param int $code One of the constants defined in this class
+     * @return Imbo\Exception
+     */
+    function setImboErrorCode($code);
+
+    /**
+     * Get the internal Imbo error code
+     *
+     * @return int
+     */
+    function getImboErrorCode();
 }

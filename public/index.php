@@ -47,12 +47,18 @@ try {
     $frontController->handle($request, $response);
 } catch (Imbo\Exception $exception) {
     $response->setStatusCode($exception->getCode());
+    $internalCode = $exception->getImboErrorCode();
+
+    if ($internalCode === null) {
+        $internalCode = Imbo\Exception::ERR_UNSPECIFIED;
+    }
 
     $data = array(
         'error' => array(
-            'code'      => $exception->getCode(),
-            'message'   => $exception->getMessage(),
-            'timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
+            'code'          => $exception->getCode(),
+            'message'       => $exception->getMessage(),
+            'timestamp'     => gmdate('Y-m-d\TH:i:s\Z'),
+            'imboErrorCode' => $internalCode,
         ),
     );
 

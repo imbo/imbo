@@ -32,9 +32,9 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface;
-
-use Imagine\Exception\Exception as ImagineException;
+use Imbo\Image\ImageInterface,
+    Imbo\Exception\TransformationException,
+    Imagine\Exception\Exception as ImagineException;
 
 /**
  * Compression transformation
@@ -75,7 +75,7 @@ class Compress extends Transformation implements TransformationInterface {
                 'quality' => $this->quality,
             )));
         } catch (ImagineException $e) {
-            throw new Exception($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), 400, $e);
         }
     }
 }
