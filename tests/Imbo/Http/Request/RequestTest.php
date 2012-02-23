@@ -267,6 +267,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
             array('localhost:81', 81, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'http://localhost:81/prefix/users/' . $publicKey),
             array('localhost:80', 80, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'http://localhost/users/' . $publicKey),
             array('localhost:80', 80, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'http://localhost/prefix/users/' . $publicKey),
+
+            array('localhost', 443, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'https://localhost/users/' . $publicKey, true),
+            array('localhost', 443, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'https://localhost/prefix/users/' . $publicKey, true),
+            array('localhost:444', 444, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'https://localhost:444/users/' . $publicKey, true),
+            array('localhost:444', 444, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'https://localhost:444/prefix/users/' . $publicKey, true),
+            array('localhost:443', 443, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'https://localhost/users/' . $publicKey, true),
+            array('localhost:443', 443, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'https://localhost/prefix/users/' . $publicKey, true),
         );
     }
 
@@ -275,13 +282,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Request\Request::__construct
      * @covers Imbo\Http\Request\Request::getUrl
      */
-    public function testGetUrlWithImboInDocumentRoot($host, $port, $documentRoot, $scriptFilename, $redirectUrl, $expected) {
+    public function testGetUrlWithImboInDocumentRoot($host, $port, $documentRoot, $scriptFilename, $redirectUrl, $expected, $ssl = false) {
         $request = new Request(array(), array(), array(
             'HTTP_HOST' => $host,
             'DOCUMENT_ROOT' => $documentRoot,
             'SCRIPT_FILENAME' => $scriptFilename,
             'REDIRECT_URL' => $redirectUrl,
             'SERVER_PORT' => $port,
+            'HTTPS' => (int) $ssl,
         ));
 
         $this->assertSame($expected, $request->getUrl());

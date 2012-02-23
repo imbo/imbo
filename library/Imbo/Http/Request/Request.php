@@ -274,14 +274,19 @@ class Request implements RequestInterface {
      */
     public function getUrl() {
         $port = (int) $this->getPort();
+        $scheme = $this->getScheme();
 
-        if (!$port || $port === 80) {
+        if (
+            !$port ||
+            ($scheme === 'http' && $port === 80) ||
+            ($scheme === 'https' && $port === 443)
+        ) {
             $port = '';
         } else if ($port) {
             $port = ':' . $port;
         }
 
-        return sprintf('%s://%s%s%s%s', $this->getScheme(), $this->getHost(), $port, $this->getBaseUrl(), $this->getPath());
+        return sprintf('%s://%s%s%s%s', $scheme, $this->getHost(), $port, $this->getBaseUrl(), $this->getPath());
     }
 
     /**
