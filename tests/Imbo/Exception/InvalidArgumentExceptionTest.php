@@ -29,7 +29,7 @@
  * @link https://github.com/christeredvartsen/imbo
  */
 
-namespace Imbo\Image\Transformation;
+namespace Imbo\Exception;
 
 /**
  * @package Unittests
@@ -38,18 +38,22 @@ namespace Imbo\Image\Transformation;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/christeredvartsen/imbo
  */
-class FlipHorizontallyTest extends TransformationTests {
-    protected function getTransformation() {
-        return new FlipHorizontally();
+class InvalidArgumentExceptionTest extends \PHPUnit_Framework_TestCase {
+    public function getErrorCodes() {
+        return array(
+            array(123, 123),
+            array('123', 123),
+            array(0, 0),
+        );
     }
 
-    public function testApplyToImage() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
-
-        $transformation = new FlipHorizontally();
-        $transformation->applyToImage($image);
+    /**
+     * @dataProvider getErrorCodes
+     */
+    public function testSetAndGetImboErrorCode($actual, $expected) {
+        $exception = new InvalidArgumentException();
+        $this->assertSame($exception, $exception->setImboErrorCode($actual));
+        $this->assertSame($expected, $exception->getImboErrorCode());
     }
+
 }

@@ -11,5 +11,6 @@
   </transformations>
   <files>
     <directory>library</directory>
+    <directory>tests</directory>
   </files>
 </docblox>

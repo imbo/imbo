@@ -33,7 +33,7 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Http\Response\ResponseInterface,
-    Imbo\Exception;
+    Imbo\Exception\TransformationException;
 
 /**
  * Transformation key
@@ -80,7 +80,7 @@ class TransformationKey implements ListenerInterface {
 
         if (!$params->has('tk')) {
             // We have a custom extension and/or one or more transformations, but no key
-            throw new Exception('Missing transformation key', 400);
+            throw new TransformationException('Missing transformation key', 400);
         }
 
         // We have a key. Lets see if it's correct
@@ -112,7 +112,7 @@ class TransformationKey implements ListenerInterface {
 
         if ($key !== $actualKey) {
             // Key from the request is not correct
-            throw new Exception('Invalid transformation key', 400);
+            throw new TransformationException('Invalid transformation key', 400);
         }
     }
 }
