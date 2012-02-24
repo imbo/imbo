@@ -26,7 +26,7 @@
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/imbo
+ * @link https://github.com/imbo/imbo
  */
 
 namespace Imbo\Image\Transformation;
@@ -38,7 +38,7 @@ use Imagine\Exception\RuntimeException as ImagineException;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/imbo
+ * @link https://github.com/imbo/imbo
  */
 abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     abstract protected function getTransformation();

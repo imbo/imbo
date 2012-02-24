@@ -1,7 +1,7 @@
 # Imbo - Image box
 Imbo is an image "server" that can be used to add/get/delete images using a REST interface. There is also support for adding meta data to an image. The main idea behind Imbo is to have a place to store high quality original images and to use the REST interface to fetch variations of those images. Imbo will resize, rotate, crop (amongst other features) on the fly so you won't have to store all the different variations. Imbo comes with an administration dashboard that can be used to locate images. The dashboard will also support editing of meta data.
 
-[![Current build Status](https://secure.travis-ci.org/christeredvartsen/imbo.png)](http://travis-ci.org/christeredvartsen/imbo)
+[![Current build Status](https://secure.travis-ci.org/imbo/imbo.png)](http://travis-ci.org/imbo/imbo)
 
 ## Requirements
 Imbo requires [PHP-5.3](http://php.net/), the [Imagine](https://github.com/avalanche123/imagine) image manipulation library, a running [MongoDB](http://www.mongodb.org/) and the [Mongo extension for PHP](http://pecl.php.net/package/mongo).

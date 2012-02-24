@@ -26,7 +26,7 @@
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/imbo
+ * @link https://github.com/imbo/imbo
  */
 
 namespace Imbo\EventListener;
@@ -40,7 +40,7 @@ use Imbo\EventManager\EventInterface,
  *
  * This event listener will listen to all GET requests for images and make sure that requests that
  * will end up doing a transformation to an image includes a correct transformation key. The
- * official PHP-based imbo client (https://github.com/christeredvartsen/imboclient-php) does this
+ * official PHP-based imbo client (https://github.com/imbo/imboclient-php) does this
  * by default.
  *
  * This event listener listens for GET and HEAD requests for image resources.
@@ -49,7 +49,7 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/imbo
+ * @link https://github.com/imbo/imbo
  */
 class TransformationKey implements ListenerInterface {
     /**
