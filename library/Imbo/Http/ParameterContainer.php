@@ -27,7 +27,7 @@
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/imbo
+ * @link https://github.com/imbo/imbo
  */
 
 namespace Imbo\Http;
@@ -43,7 +43,7 @@ namespace Imbo\Http;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/imbo
+ * @link https://github.com/imbo/imbo
  */
 class ParameterContainer implements ParameterContainerInterface {
     /**

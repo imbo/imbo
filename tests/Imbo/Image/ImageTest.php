@@ -26,7 +26,7 @@
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/imbo
+ * @link https://github.com/imbo/imbo
  */
 
 namespace Imbo\Image;
@@ -36,7 +36,7 @@ namespace Imbo\Image;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/imbo
+ * @link https://github.com/imbo/imbo
  */
 class ImageTest extends \PHPUnit_Framework_TestCase {
     /**
