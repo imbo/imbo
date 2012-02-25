@@ -32,7 +32,8 @@
 namespace Imbo\EventManager;
 
 use Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface;
+    Imbo\Http\Response\ResponseInterface,
+    Imbo\Image\ImageInterface;
 
 /**
  * Event class
@@ -66,16 +67,25 @@ class Event implements EventInterface {
     private $response;
 
     /**
+     * Image instance
+     *
+     * @var Imbo\Image\ImageInterface
+     */
+    private $image;
+
+    /**
      * Class contsructor
      *
      * @param string $name The name of the current event
      * @param Imbo\Http\Request\RequestInterface $request Request instance
      * @param Imbo\Http\Response\ResponseInterface $response Response instance
+     * @param Imbo\Image\ImageInterface $image Image instance
      */
-    public function __construct($name, RequestInterface $request, ResponseInterface $response) {
+    public function __construct($name, RequestInterface $request, ResponseInterface $response, ImageInterface $image = null) {
         $this->name = $name;
         $this->request = $request;
         $this->response = $response;
+        $this->image = $image;
     }
 
     /**
@@ -97,5 +107,12 @@ class Event implements EventInterface {
      */
     public function getResponse() {
         return $this->response;
+    }
+
+    /**
+     * @see Imbo\EventManager\EventInterface::getImage()
+     */
+    public function getImage() {
+        return $this->image;
     }
 }

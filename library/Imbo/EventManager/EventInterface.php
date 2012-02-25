@@ -63,4 +63,11 @@ interface EventInterface {
      * @return Imbo\Http\Response\ResponseInterface
      */
     function getResponse();
+
+    /**
+     * Get the image instance
+     *
+     * @return null|Imbo\Image\ImageInterface
+     */
+    function getImage();
 }
