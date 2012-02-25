@@ -37,7 +37,8 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface,
     Imbo\Resource\ResourceInterface,
-    Imbo\Exception\ResourceException;
+    Imbo\Exception\ResourceException,
+    Imbo\EventManager\EventManagerInterface;
 
 /**
  * Abstract resource class
@@ -51,6 +52,13 @@ use Imbo\Http\Request\RequestInterface,
  * @link https://github.com/imbo/imbo
  */
 abstract class Resource {
+    /**
+     * Event manager
+     *
+     * @var Imbo\EventManager\EventManagerInterface
+     */
+    protected $eventManager;
+
     /**
      * A response writer
      *
@@ -111,5 +119,14 @@ abstract class Resource {
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         throw new ResourceException('Method not allowed', 405);
+    }
+
+    /**
+     * @see Imbo\Resource\ResourceInterface::setEventManager()
+     */
+    public function setEventManager(EventManagerInterface $eventManager) {
+        $this->eventManager = $eventManager;
+
+        return $this;
     }
 }

@@ -42,7 +42,7 @@ Fetch information about a specific user.
 
 ### PUT /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
-Place a new image on the server.
+Place a new image on the server. The output from the server is important as the image identifier of the result image might differ from the one on the URL. This is because event listeners such as `Imbo\EventListener\MaxImageSize` changes images before they are added to the database/storage.
 
 ### POST /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
 
@@ -60,29 +60,35 @@ Delete the meta data attached to the image identified by &lt;image&gt;. The imag
 All write operations (PUT, POST and DELETE) requires authentication using an Hash-based Message Authentication Code (HMAC). The data Imbo uses when generating this code is:
 
 * HTTP method (PUT, POST or DELETE)
-* Resource identifier (for instance `<publicKey>/<image>` if your Imbo installation answers directly in the document root)
+* The URL to request
 * Public key (A-Z, a-z, 0-9, minimum 3 characters)
-* GMT timestamp (YYYY-MM-DDTHH:MMZ, for instance: 2011-02-01T14:33Z)
+* GMT timestamp (YYYY-MM-DDTHH:MM:SSZ, for instance: 2011-02-01T14:33:03Z)
 
 These elements are concatenated in the above order with | as a delimiter character and a hash is generated using a private key and the sha256 algorithm. The following snippet shows how this can be done using PHP:
 
 ```php
 <?php
+// Auth info
 $publicKey  = '<some random value>';
 $privateKey = '<secret value>';
-$method     = 'DELETE';
-$resource   = 'b8533858299b04af3afc9a3713e69358.jpeg/meta'
-$timestamp  = gmdate('Y-m-d\TH:i\Z');
+$timestamp  = gmdate('Y-m-d\TH:i:s\Z');
 
-$data       = $method . '|' . $resource . '|' . $publicKey . '|' . $timestamp;
+// The identifier of the image (MD5 sum of the image file)
+$imageIdentifier = '7cf1ec1233fd72896f71094548afb67a';
 
-$hash       = hash_hmac('sha256', $data, $privateKey, true);
-$signature  = base64_encode($hash);
-$url        = sprintf('http://example.com/users/%s/images/%s?signature=%s&timestamp=%s',
-                      $publicKey,
-                      $resource,
-                      rawurlencode($signature),
-                      rawurlencode($timestamp));
+// The URL to the image
+$url = sprintf('http://imbo.example.com/users/%s/images/%s', $publicKey, $imageIdentifier);
+
+// The method to request with
+$method = 'DELETE';
+
+// Generate the hash
+$data = $method . '|' . $url . '|' . $publicKey . '|' . $timestamp;
+$signature = hash_hmac('sha256', $data, $privateKey);
+$url = sprintf('%s?signature=%s&timestamp=%s',
+               $url,
+               rawurlencode($signature),
+               rawurlencode($timestamp));
 ```
 
 The above code will generate a signature that must be sent along the request using the `signature` query parameter. The timestamp used must also be provided using the `timestamp` query parameter so that the signature can be regenerated server-side. A generated signature is only valid for 5 minutes. Both the signature and the timestamp must be url encoded (by using for instance PHPs [rawurlencode](http://php.net/rawurlencode).
@@ -309,7 +315,7 @@ The above code will get triggered before all `GET` requests for specific images.
 * `image.put.pre`
 * `image.put.post`
 
-Imbo defines three resources:
+Imbo uses the following resources:
 
 * `image`
 * `images`
@@ -348,7 +354,7 @@ $container->eventManager = $container->shared(function(Imbo\Container $container
 
         foreach ($transformations as $t) {
             if (!($t instanceof Imbo\Image\Transformation\Thumbnail)) {
-                throw new Imbo\Exception('Unsupported transformation', 400);
+                throw new Imbo\Exception\TransformationException('Unsupported transformation', 400);
             }
         }
     });
@@ -369,7 +375,7 @@ $container->eventManager = $container->shared(function(Imbo\Container $container
         foreach ($transformations as $t) {
             if ($t instanceof Imbo\Image\Transformation\Resize) {
                 if ($t->width > 1000 || $t->height > 1000) {
-                    throw new Imbo\Exception('Unsupported resize parameters', 400);
+                    throw new Imbo\Exception\TransformationException('Unsupported resize parameters', 400);
                 }
             }
         }

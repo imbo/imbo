@@ -103,9 +103,10 @@ class Image extends Resource implements ResourceInterface {
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         // Prepare the image based on the input stream in the request
         $this->imagePreparation->prepareImage($request, $this->image);
+        $this->eventManager->trigger('image.put.imagepreparation.post');
 
         $publicKey = $request->getPublicKey();
-        $imageIdentifier = $request->getImageIdentifier();
+        $imageIdentifier = $request->getRealImageIdentifier();
 
         // Insert the image to the database
         $database->insertImage($publicKey, $imageIdentifier, $this->image);

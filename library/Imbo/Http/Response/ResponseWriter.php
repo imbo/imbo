@@ -32,8 +32,8 @@
 
 namespace Imbo\Http\Response;
 
-use Imbo\Http\Request\RequestInterface;
-use Imbo\Http\Response\Formatter;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\Formatter;
 
 /**
  * Response writer

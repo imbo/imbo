@@ -32,7 +32,6 @@
 
 namespace Imbo\Http\Response;
 
-use Imbo\Exception;
 use Imbo\Http\HeaderContainer;
 
 /**

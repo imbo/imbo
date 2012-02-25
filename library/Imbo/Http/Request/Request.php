@@ -31,11 +31,11 @@
 
 namespace Imbo\Http\Request;
 
-use Imbo\Http\ParameterContainer;
-use Imbo\Http\ServerContainer;
-use Imbo\Http\HeaderContainer;
-use Imbo\Image\Transformation;
-use Imbo\Image\TransformationChain;
+use Imbo\Http\ParameterContainer,
+    Imbo\Http\ServerContainer,
+    Imbo\Http\HeaderContainer,
+    Imbo\Image\Transformation,
+    Imbo\Image\TransformationChain;
 
 /**
  * Request class
@@ -102,6 +102,13 @@ class Request implements RequestInterface {
      * @var string
      */
     private $imageIdentifier;
+
+    /**
+     * Raw image data
+     *
+     * @var string
+     */
+    private $rawData;
 
     /**
      * The current image extension (if any)
@@ -306,6 +313,17 @@ class Request implements RequestInterface {
     }
 
     /**
+     * @see Imbo\Http\Request\RequestInterface::getRealImageIdentifier()
+     */
+    public function getRealImageIdentifier() {
+        if ($this->rawData === null) {
+            return null;
+        }
+
+        return md5($this->rawData);
+    }
+
+    /**
      * @see Imbo\Http\Request\RequestInterface::getImageExtension()
      */
     public function getImageExtension() {
@@ -330,10 +348,22 @@ class Request implements RequestInterface {
 
     /**
      * @see Imbo\Http\Request\RequestInterface::getRawData()
-     * @codeCoverageIgnore
      */
     public function getRawData() {
-        return file_get_contents('php://input');
+        if ($this->rawData === null) {
+            $this->rawData = file_get_contents('php://input');
+        }
+
+        return $this->rawData;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::setRawData()
+     */
+    public function setRawData($data) {
+        $this->rawData = $data;
+
+        return $this;
     }
 
     /**
