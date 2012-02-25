@@ -43,11 +43,21 @@ class EventTest extends \PHPUnit_Framework_TestCase {
         $name = 'some.event.name';
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $image = $this->getMock('Imbo\Image\ImageInterface');
 
-        $event = new Event($name, $request, $response);
+        $event = new Event($name, $request, $response, $image);
 
         $this->assertSame($name, $event->getName());
         $this->assertSame($request, $event->getRequest());
         $this->assertSame($response, $event->getResponse());
+        $this->assertSame($image, $event->getImage());
+    }
+
+    public function testEventWithNoImageInstance() {
+        $event = new Event('some name',
+                           $this->getMock('Imbo\Http\Request\RequestInterface'),
+                           $this->getMock('Imbo\Http\Response\ResponseInterface'));
+
+        $this->assertNull($event->getImage());
     }
 }
