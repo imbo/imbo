@@ -80,6 +80,7 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
                     ->crop(1, 2, 3, 4)
                     ->rotate(45, 'fff')
                     ->resize(100, 200)
+                    ->maxSize(100, 200)
                     ->thumbnail(10, 10, '000')
                     ->flipHorizontally()
                     ->flipVertically()
