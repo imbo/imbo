@@ -7,6 +7,11 @@
     </testsuite>
   </testsuites>
 
+  <php>
+    <const name="MEMCACHED_TEST_HOST" value="" />
+    <const name="MEMCACHED_TEST_PORT" value="" />
+  </php>
+
   <logging>
     <log type="coverage-html" target="build/coverage" title="Code coverage for Imbo"
       charset="UTF-8" yui="true" highlight="true" />
