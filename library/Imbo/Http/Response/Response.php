@@ -32,8 +32,6 @@
 namespace Imbo\Http\Response;
 
 use Imbo\Http\HeaderContainer;
-use Imbo\Image\ImageInterface;
-use Imbo\Exception;
 
 /**
  * Response object from the server to the client

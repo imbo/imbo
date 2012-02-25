@@ -31,9 +31,10 @@
 
 namespace Imbo\Image;
 
-use Imbo\Image\Transformation;
-use Imbo\Image\Transformation\TransformationInterface;
-use Iterator, Countable;
+use Imbo\Image\Transformation,
+    Imbo\Image\Transformation\TransformationInterface,
+    Iterator,
+    Countable;
 
 /**
  * Transformation collection

@@ -31,11 +31,11 @@
 
 namespace Imbo\Http\Request;
 
-use Imbo\Http\ParameterContainer;
-use Imbo\Http\ServerContainer;
-use Imbo\Http\HeaderContainer;
-use Imbo\Image\Transformation;
-use Imbo\Image\TransformationChain;
+use Imbo\Http\ParameterContainer,
+    Imbo\Http\ServerContainer,
+    Imbo\Http\HeaderContainer,
+    Imbo\Image\Transformation,
+    Imbo\Image\TransformationChain;
 
 /**
  * Request class

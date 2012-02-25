@@ -31,11 +31,11 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface;
-use Imbo\Http\Response\ResponseInterface;
-use Imbo\Database\DatabaseInterface;
-use Imbo\Storage\StorageInterface;
-use Imbo\Database\Exception as DatabaseException;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface,
+    Imbo\Database\Exception as DatabaseException;
 
 /**
  * Metadata resource

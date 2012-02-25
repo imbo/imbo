@@ -31,8 +31,8 @@
 
 namespace Imbo\EventManager;
 
-use Imbo\Http\Request\RequestInterface;
-use Imbo\Http\Response\ResponseInterface;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface;
 
 /**
  * Event class

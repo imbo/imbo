@@ -32,8 +32,8 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface;
-use Imagine\Image\ImagineInterface;
+use Imbo\Image\ImageInterface,
+    Imagine\Image\ImagineInterface;
 
 /**
  * Image transformation interface
