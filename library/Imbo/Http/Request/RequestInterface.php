@@ -141,7 +141,12 @@ interface RequestInterface {
     function getUrl();
 
     /**
-     * Get the current image identifier
+     * Get the image identifier from the URL
+     *
+     * Note that this might not be valid for the current image data since event listeners have the
+     * possibility to change the image data before the imbo application handles it. The method
+     * called getRealImageIdentifier() returns the identifier of the image data currently stored in
+     * the request instance.
      *
      * @return string|null
      */
@@ -154,6 +159,15 @@ interface RequestInterface {
      * @return Imbo\Http\Request\RequestInterface
      */
     function setImageIdentifier($imageIdentifier);
+
+    /**
+     * Get the image identifier from the image data stored in the request instance
+     *
+     * This method returns null if there is no stored raw data.
+     *
+     * @return string|null
+     */
+    function getRealImageIdentifier();
 
     /**
      * Get the current image extension (if any)
@@ -185,6 +199,16 @@ interface RequestInterface {
      * @return string
      */
     function getRawData();
+
+    /**
+     * Set the raw data
+     *
+     * This method must also update the current imageIdentifier
+     *
+     * @param string $data The data to set
+     * @return Imbo\Http\Request\RequestInterface
+     */
+    function setRawData($data);
 
     /**
      * Get the query container
