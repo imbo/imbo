@@ -35,6 +35,7 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
+    Imbo\Image\ImageInterface,
     SplPriorityQueue;
 
 /**
@@ -69,14 +70,23 @@ class EventManager implements EventManagerInterface {
     private $response;
 
     /**
+     * Image instance
+     *
+     * @var Imbo\Image\ImageInterface
+     */
+    private $image;
+
+    /**
      * Class constructor
      *
      * @param Imbo\Http\Request\RequestInterface $request
      * @param Imbo\Http\Response\ResponseInterface $response
+     * @param Imbo\Image\ImageInterface $response
      */
-    public function __construct(RequestInterface $request, ResponseInterface $response) {
+    public function __construct(RequestInterface $request, ResponseInterface $response, ImageInterface $image = null) {
         $this->request = $request;
         $this->response = $response;
+        $this->image = $image;
     }
 
     /**
@@ -117,7 +127,7 @@ class EventManager implements EventManagerInterface {
     public function trigger($event) {
         if (!empty($this->events[$event])) {
             // Create an event instance
-            $e = new Event($event, $this->request, $this->response);
+            $e = new Event($event, $this->request, $this->response, $this->image);
 
             // Trigger all listeners for this event and pass in the event instance
             foreach ($this->events[$event] as $callback) {

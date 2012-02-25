@@ -35,7 +35,8 @@ namespace Imbo\Resource;
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
     Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface;
+    Imbo\Storage\StorageInterface,
+    Imbo\EventManager\EventManagerInterface;
 
 /**
  * Resource interface
@@ -122,4 +123,12 @@ interface ResourceInterface {
      * @param Imbo\Storage\StorageInterface $storage A storage instance
      */
     function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
+
+    /**
+     * Set the event manager
+     *
+     * @param Imbo\EventManager\EventManagerInterface $eventManager An instance of an event manager
+     * @return Imbo\Resource\ResourceInterface
+     */
+    function setEventManager(EventManagerInterface $eventManager);
 }

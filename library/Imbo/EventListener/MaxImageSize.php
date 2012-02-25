@@ -22,97 +22,85 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package EventManager
+ * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\EventManager;
+namespace Imbo\EventListener;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface,
-    Imbo\Image\ImageInterface;
+use Imbo\EventManager\EventInterface,
+    Imbo\Image\Transformation\Resize;
 
 /**
- * Event class
+ * Max image size event listener
  *
- * @package EventManager
+ * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Event implements EventInterface {
+class MaxImageSize implements ListenerInterface {
     /**
-     * Name of the current event
+     * Max width
      *
-     * @var string
+     * @var int
      */
-    private $name;
+    private $width;
 
     /**
-     * Request instance
+     * Max height
      *
-     * @var Imbo\Http\Request\RequestInterface
+     * @var int
      */
-    private $request;
+    private $height;
 
     /**
-     * Response instance
+     * Class constructor
      *
-     * @var Imbo\Http\Response\ResponseInterface
+     * @param int $width Max width
+     * @param int $height Max height
      */
-    private $response;
-
-    /**
-     * Image instance
-     *
-     * @var Imbo\Image\ImageInterface
-     */
-    private $image;
-
-    /**
-     * Class contsructor
-     *
-     * @param string $name The name of the current event
-     * @param Imbo\Http\Request\RequestInterface $request Request instance
-     * @param Imbo\Http\Response\ResponseInterface $response Response instance
-     * @param Imbo\Image\ImageInterface $image Image instance
-     */
-    public function __construct($name, RequestInterface $request, ResponseInterface $response, ImageInterface $image = null) {
-        $this->name = $name;
-        $this->request = $request;
-        $this->response = $response;
-        $this->image = $image;
+    public function __construct($width = null, $height = null) {
+        $this->width  = (int) $width;
+        $this->height = (int) $height;
     }
 
     /**
-     * @see Imbo\EventManager\EventInterface::getName()
+     * @see Imbo\EventListener\ListenerInterface::getEvents()
      */
-    public function getName() {
-        return $this->name;
+    public function getEvents() {
+        return array(
+            'image.put.imagepreparation.post',
+        );
     }
 
     /**
-     * @see Imbo\EventManager\EventInterface::getRequest()
+     * @see Imbo\EventListener\ListenerInterface::invoke()
      */
-    public function getRequest() {
-        return $this->request;
-    }
+    public function invoke(EventInterface $event) {
+        $image = $event->getImage();
 
-    /**
-     * @see Imbo\EventManager\EventInterface::getResponse()
-     */
-    public function getResponse() {
-        return $this->response;
-    }
+        $width = $image->getWidth();
+        $height = $image->getHeight();
 
-    /**
-     * @see Imbo\EventManager\EventInterface::getImage()
-     */
-    public function getImage() {
-        return $this->image;
+        if (($this->width && ($width > $this->width)) || ($this->height && ($height > $this->height))) {
+            if ($this->width && ($width > $this->width)) {
+                $transformation = new Resize($this->width);
+                $transformation->applyToImage($image);
+                $height = $image->getHeight();
+            }
+
+            if ($this->height && ($height > $this->height)) {
+                $transformation = new Resize(null, $this->height);
+                $transformation->applyToImage($image);
+            }
+
+            // Update raw data in request to reflect the new image
+            $event->getRequest()->setRawData($image->getBlob());
+        }
     }
 }

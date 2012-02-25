@@ -71,6 +71,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $container->imageResource = $this->getMock('Imbo\Resource\Image');
         $container->imagesResource = $this->getMock('Imbo\Resource\Images');
         $container->metadataResource = $this->getMock('Imbo\Resource\Metadata');
+        $container->eventManager = $this->getMock('Imbo\EventManager\EventManagerInterface');
 
         $this->controller = new FrontController($container, $this->timestampValidator, $this->signatureValidator);
     }

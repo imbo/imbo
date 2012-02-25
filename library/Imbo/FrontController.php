@@ -176,6 +176,9 @@ class FrontController {
             $resource = new $className();
         }
 
+        // Attach the event manager to the resource
+        $resource->setEventManager($this->container->eventManager);
+
         return $resource;
     }
 
