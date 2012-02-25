@@ -50,12 +50,21 @@ class ImageTest extends ResourceTests {
     private $imagePreparation;
 
     /**
+     * @var Imbo\EventManager\EventManagerInterface
+     */
+    private $eventManager;
+
+    /**
      * @var Imbo\Image\ImageInterface
      */
     private $image;
 
     protected function getNewResource() {
-        return new Image($this->image, $this->imagePreparation);
+        $this->eventManager = $this->getMock('Imbo\EventManager\EventManagerInterface');
+        $image = new Image($this->image, $this->imagePreparation);
+        $image->setEventManager($this->eventManager);
+
+        return $image;
     }
 
     public function setUp() {
@@ -101,7 +110,7 @@ class ImageTest extends ResourceTests {
                       ->will($this->returnValue($this->publicKey));
 
         $this->request->expects($this->once())
-                      ->method('getImageIdentifier')
+                      ->method('getRealImageIdentifier')
                       ->will($this->returnValue($this->imageIdentifier));
 
         $this->database->expects($this->once())
@@ -124,7 +133,7 @@ class ImageTest extends ResourceTests {
                       ->method('getPublicKey')
                       ->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())
-                      ->method('getImageIdentifier')
+                      ->method('getRealImageIdentifier')
                       ->will($this->returnValue($this->imageIdentifier));
 
         $this->database->expects($this->once())
@@ -155,7 +164,7 @@ class ImageTest extends ResourceTests {
                       ->will($this->returnValue($this->publicKey));
 
         $this->request->expects($this->once())
-                      ->method('getImageIdentifier')
+                      ->method('getRealImageIdentifier')
                       ->will($this->returnValue($this->imageIdentifier));
 
         $this->database->expects($this->once())
