@@ -315,7 +315,7 @@ The above code will get triggered before all `GET` requests for specific images.
 * `image.put.pre`
 * `image.put.post`
 
-Imbo defines three resources:
+Imbo uses the following resources:
 
 * `image`
 * `images`
@@ -354,7 +354,7 @@ $container->eventManager = $container->shared(function(Imbo\Container $container
 
         foreach ($transformations as $t) {
             if (!($t instanceof Imbo\Image\Transformation\Thumbnail)) {
-                throw new Imbo\Exception('Unsupported transformation', 400);
+                throw new Imbo\Exception\TransformationException('Unsupported transformation', 400);
             }
         }
     });
@@ -375,7 +375,7 @@ $container->eventManager = $container->shared(function(Imbo\Container $container
         foreach ($transformations as $t) {
             if ($t instanceof Imbo\Image\Transformation\Resize) {
                 if ($t->width > 1000 || $t->height > 1000) {
-                    throw new Imbo\Exception('Unsupported resize parameters', 400);
+                    throw new Imbo\Exception\TransformationException('Unsupported resize parameters', 400);
                 }
             }
         }
