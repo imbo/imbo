@@ -328,4 +328,27 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         ));
         $this->assertSame($baseUrl, $request->getBaseUrl());
     }
+
+    /**
+     * @covers Imbo\Http\Request\Request::getRawData
+     * @covers Imbo\Http\Request\Request::setRawData
+     */
+    public function testSetGetRawImageData() {
+        $image = file_get_contents(__DIR__ . '/../../_files/image.png');
+        $request = new Request();
+        $request->setRawData($image);
+        $this->assertSame($image, $request->getRawData());
+    }
+
+    /**
+     * @covers Imbo\Http\Request\Request::getRealImageIdentifier
+     */
+    public function testGetRealImageIdentifier() {
+        $request = new Request();
+        $this->assertNull($request->getRealImageIdentifier());
+
+        $image = file_get_contents(__DIR__ . '/../../_files/image.png');
+        $request->setRawData($image);
+        $this->assertSame('929db9c5fc3099f7576f5655207eba47', $request->getRealImageIdentifier());
+    }
 }
