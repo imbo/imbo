@@ -218,6 +218,8 @@ class Request implements RequestInterface {
                 $chain->flipHorizontally();
             } else if ($name === 'flipVertically') {
                 $chain->flipVertically();
+            } else if ($name === 'maxSize') {
+                $chain->maxSize($p('width'), $p('height'));
             } else if ($name === 'resize') {
                 $chain->resize($p('width'), $p('height'));
             } else if ($name === 'rotate') {

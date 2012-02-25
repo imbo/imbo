@@ -155,6 +155,18 @@ class TransformationChain implements Iterator, Countable {
     }
 
     /**
+     * MaxSize transformation
+     *
+     * @param int $maxWidth Max width of the image
+     * @param int $maxHeight Max height of the image
+     * @return Imbo\Image\TransformationChain
+     * @see Imbo\Image\Transformation\MaxSize
+     */
+    public function maxSize($maxWidth = null, $maxHeight = null) {
+        return $this->add(new Transformation\MaxSize($maxWidth, $maxHeight));
+    }
+
+    /**
      * Compression transformation
      *
      * @param int $quality Quality of the resulting image
