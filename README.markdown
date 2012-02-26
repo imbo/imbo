@@ -186,6 +186,19 @@ Examples:
 * `t[]=resize:height=100`
 * `t[]=resize:width=100,height=50`
 
+### maxSize
+This transformation will resize the image using the original aspect ratio. Two parameters are supported and at least one of them must be supplied to apply this transformation.
+Note the difference from the resize transformation: given both height and width, the resulting image will not be the same width and height as specified unless the aspect ratio is the same.
+
+* `(int) width` The max width of the resulting image in pixels. If not specified the width will be calculated using the same ratio as the original image.
+* `(int) height` The max height of the resulting image in pixels. If not specified the height will be calculated using the same ratio as the original image.
+
+Examples:
+
+* `t[]=maxSize:width=100`
+* `t[]=maxSize:height=100`
+* `t[]=maxSize:width=100,height=50`
+
 ### rotate
 Use this transformation to rotate the image.
 
