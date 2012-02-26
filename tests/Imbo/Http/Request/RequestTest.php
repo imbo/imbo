@@ -62,6 +62,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
                 'compress:quality=90',
                 'crop:x=1,y=2,width=3,height=4',
                 'resize:width=100,height=100',
+                'maxSize:width=100,height=100',
                 'rotate:angle=45,bg=fff',
                 'thumbnail:width=100,height=100,fit=outbound',
                 'canvas:width=100,height=100,x=10,y=10,bg=000',
