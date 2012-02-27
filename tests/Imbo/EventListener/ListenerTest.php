@@ -22,8 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Interfaces
- * @subpackage EventListener
+ * @package Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -35,48 +34,34 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface;
 
 /**
- * Listener interface
- *
- * @package Interfaces
- * @subpackage EventListener
+ * @package Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-interface ListenerInterface {
-    /**
-     * Return the events this listener wants to listen for
-     *
-     * @return array
-     */
-    function getEvents();
+class ListenerTest extends \PHPUnit_Framework_TestCase {
+    public function setUp() {
+        $this->listener = new SomeListener();
+    }
+
+    public function tearDown() {
+        $this->listener = null;
+    }
 
     /**
-     * Returns a list of public keys this event listener should be triggered for
-     *
-     * If an empty array is returned the listener is triggered for all users
-     *
-     * @return array
+     * @covers Imbo\EventListener\Listener::getPublicKeys
+     * @covers Imbo\EventListener\Listener::setPublicKeys
      */
-    function getPublicKeys();
+    public function testSetAndGetPublicKeys() {
+        $this->assertSame(array(), $this->listener->getPublicKeys());
+        $keys = array('key1', 'key2');
+        $this->assertSame($this->listener, $this->listener->setPublicKeys($keys));
+        $this->assertSame($keys, $this->listener->getPublicKeys());
+    }
+}
 
-    /**
-     * Set the list of public keys the listener should be triggered for
-     *
-     * @param array $keys An array of public keys
-     * @return Imbo\EventListener\ListenerInterface
-     */
-    function setPublicKeys(array $keys);
-
-    /**
-     * Invoke method
-     *
-     * This method will get triggered by the event manager
-     *
-     * @param Imbo\EventManager\EventInterface $event The triggered event
-     * @throws Imbo\Exception This method can throw exceptions implementing the base Imbo exception
-     *                        interface.
-     */
-    function invoke(EventInterface $event);
+class SomeListener extends Listener {
+    public function getEvents() {}
+    public function invoke(EventInterface $event) {}
 }

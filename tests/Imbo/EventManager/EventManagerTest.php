@@ -95,4 +95,28 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $this->manager->attachListener($listener);
         $this->manager->trigger('event');
     }
+
+    public function testAttachListenerWithSpecificPublicKey() {
+        $listener = $this->getMock('Imbo\EventListener\ListenerInterface');
+        $listener->expects($this->once())->method('getEvents')->will($this->returnValue(array('event')));
+        $listener->expects($this->once())->method('invoke')->with($this->isInstanceOf('Imbo\EventManager\EventInterface'));
+        $listener->expects($this->once())->method('getPublicKeys')->will($this->returnValue(array('key')));
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+
+        $this->manager->attachListener($listener);
+        $this->manager->trigger('event');
+    }
+
+    public function testAttachListenerWithSpecificPublicKeyThatDoesNotEqualCurrent() {
+        $listener = $this->getMock('Imbo\EventListener\ListenerInterface');
+        $listener->expects($this->never())->method('getEvents');
+        $listener->expects($this->never())->method('invoke');
+        $listener->expects($this->once())->method('getPublicKeys')->will($this->returnValue(array('key')));
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('otherkey'));
+
+        $this->manager->attachListener($listener);
+        $this->manager->trigger('event');
+    }
 }
