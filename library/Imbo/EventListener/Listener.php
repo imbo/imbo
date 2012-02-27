@@ -22,8 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Interfaces
- * @subpackage EventListener
+ * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -32,51 +31,36 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface;
-
 /**
- * Listener interface
+ * Abstract event listener
  *
- * @package Interfaces
- * @subpackage EventListener
+ * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-interface ListenerInterface {
+abstract class Listener implements ListenerInterface {
     /**
-     * Return the events this listener wants to listen for
+     * Public keys this listener should trigger for
      *
-     * @return array
+     * @var array
      */
-    function getEvents();
+    private $publicKeys = array();
 
     /**
-     * Returns a list of public keys this event listener should be triggered for
-     *
-     * If an empty array is returned the listener is triggered for all users
-     *
-     * @return array
+     * @see Imbo\EventListener\ListenerInterface::getPublicKeys()
      */
-    function getPublicKeys();
+    public function getPublicKeys() {
+        return $this->publicKeys;
+    }
 
     /**
-     * Set the list of public keys the listener should be triggered for
-     *
-     * @param array $keys An array of public keys
-     * @return Imbo\EventListener\ListenerInterface
+     * @see Imbo\EventListener\ListenerInterface::setPublicKeys()
      */
-    function setPublicKeys(array $keys);
+    public function setPublicKeys(array $keys) {
+        $this->publicKeys = $keys;
 
-    /**
-     * Invoke method
-     *
-     * This method will get triggered by the event manager
-     *
-     * @param Imbo\EventManager\EventInterface $event The triggered event
-     * @throws Imbo\Exception This method can throw exceptions implementing the base Imbo exception
-     *                        interface.
-     */
-    function invoke(EventInterface $event);
+        return $this;
+    }
 }
