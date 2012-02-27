@@ -116,9 +116,21 @@ class EventManager implements EventManagerInterface {
      * @see Imbo\EventManager\EventManagagerInterface::attachListener()
      */
     public function attachListener(ListenerInterface $listener, $priority = 1) {
-        return $this->attach($listener->getEvents(), function(EventInterface $event) use($listener) {
-            $listener->invoke($event);
-        }, $priority);
+        // Fetch current public key
+        $publicKey = $this->request->getPublicKey();
+
+        // Fetch the keys the listener is to be triggered for
+        $keys = $listener->getPublicKeys();
+
+        if (empty($keys) || in_array($publicKey, $keys)) {
+            // Either no keys have been specicied, or the listener wants to trigger for the current
+            // key
+            return $this->attach($listener->getEvents(), function(EventInterface $event) use($listener) {
+                $listener->invoke($event);
+            }, $priority);
+        }
+
+        return $this;
     }
 
     /**

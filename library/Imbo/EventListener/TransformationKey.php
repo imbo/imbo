@@ -51,7 +51,7 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class TransformationKey implements ListenerInterface {
+class TransformationKey extends Listener implements ListenerInterface {
     /**
      * @see Imbo\EventListener\ListenerInterface::getEvents()
      */

@@ -275,7 +275,8 @@ class FrontController {
         $response->getHeaders()->set('Allow', implode(', ', $resource->getAllowedMethods()))
                                ->set('Vary', 'Accept, Accept-Encoding');
 
-        if ($identifier = $request->getImageIdentifier()) {
+        // Fetch the real image identifier (PUT only) or the one from the URL (if present)
+        if (($identifier = $request->getRealImageIdentifier()) || ($identifier = $request->getImageIdentifier())) {
             $response->getHeaders()->set('X-Imbo-ImageIdentifier', $identifier);
         }
 
