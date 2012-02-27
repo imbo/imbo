@@ -70,10 +70,30 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
                 // Transformations with no options
                 'flipHorizontally',
                 'flipVertically',
+            ),
+        );
 
-                // Invalid transformations
-                'foo',
-                'bar:some=option',
+        $request = new Request($query);
+        $chain = $request->getTransformations();
+        $this->assertInstanceOf('Imbo\Image\TransformationChain', $chain);
+    }
+
+    /**
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionCode 400
+     * @expectedExceptionMessage Invalid transformation: foo
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getTransformations
+     */
+    public function testGetTransformationsWithInvalidTransformation() {
+        $query = array(
+            't' => array(
+                // Valid transformations
+                'thumbnail:width=100,height=100,fit=outbound',
+                'canvas:width=100,height=100,x=10,y=10,bg=000',
+
+                // Invalid
+                'foo:param=1',
             ),
         );
 
