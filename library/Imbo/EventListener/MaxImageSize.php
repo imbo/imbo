@@ -43,7 +43,7 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class MaxImageSize implements ListenerInterface {
+class MaxImageSize extends Listener implements ListenerInterface {
     /**
      * Max width
      *
