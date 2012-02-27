@@ -35,7 +35,8 @@ use Imbo\Http\ParameterContainer,
     Imbo\Http\ServerContainer,
     Imbo\Http\HeaderContainer,
     Imbo\Image\Transformation,
-    Imbo\Image\TransformationChain;
+    Imbo\Image\TransformationChain,
+    Imbo\Exception\InvalidArgumentException;
 
 /**
  * Request class
@@ -228,6 +229,8 @@ class Request implements RequestInterface {
                 $chain->thumbnail($p('width'), $p('height'), $p('fit'));
             } else if ($name === 'canvas') {
                 $chain->canvas($p('width'), $p('height'), $p('mode'), $p('x'), $p('y'), $p('bg'));
+            } else {
+                throw new InvalidArgumentException('Invalid transformation: ' . $name, 400);
             }
         }
 

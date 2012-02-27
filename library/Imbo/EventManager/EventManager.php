@@ -123,7 +123,7 @@ class EventManager implements EventManagerInterface {
         $keys = $listener->getPublicKeys();
 
         if (empty($keys) || in_array($publicKey, $keys)) {
-            // Either no keys have been specicied, or the listener wants to trigger for the current
+            // Either no keys have been specified, or the listener wants to trigger for the current
             // key
             return $this->attach($listener->getEvents(), function(EventInterface $event) use($listener) {
                 $listener->invoke($event);
