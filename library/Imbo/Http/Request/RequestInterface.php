@@ -92,6 +92,10 @@ interface RequestInterface {
     /**
      * Get image transformations from the request
      *
+     * If someone specified a transformation that does not exist, an
+     * Imbo\Exception\InvalidArgumentException exception must be thrown.
+     *
+     * @throws Imbo\Exception\InvalidArgumentException
      * @return Imbo\Image\TransformationChain
      */
     function getTransformations();
