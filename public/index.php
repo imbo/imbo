@@ -62,10 +62,9 @@ try {
         ),
     );
 
-    $imageIdentifier = $request->getImageIdentifier();
-
-    if ($imageIdentifier) {
-        $data['imageIdentifier'] = $imageIdentifier;
+    // Fetch the real image identifier (PUT only) or the one from the URL (if present)
+    if (($identifier = $request->getRealImageIdentifier()) || ($identifier = $request->getImageIdentifier())) {
+        $data['imageIdentifier'] = $identifier;
     }
 
     $responseWriter = new Imbo\Http\Response\ResponseWriter();
