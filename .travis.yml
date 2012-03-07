@@ -3,7 +3,10 @@ php:
   - 5.3
   - 5.4
 notifications:
-  irc: "irc.freenode.org#imbo"
+  irc:
+    use_notice: true
+    skip_join: true
+    channels: ["irc.freenode.org#imbo"]
 branches:
   only:
     - develop

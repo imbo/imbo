@@ -82,29 +82,27 @@ class ImageTest extends ResourceTests {
     }
 
     /**
+     * @covers Imbo\Resource\Image::put
      * @expectedException Imbo\Exception\ImageException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 400
      */
     public function testPutWhenImagePreparationThrowsException() {
-        $resource = $this->getNewResource();
-
         $this->imagePreparation->expects($this->once())
                                ->method('prepareImage')
                                ->with($this->request, $this->image)
                                ->will($this->throwException(new ImageException('message', 400)));
 
-        $resource->put($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->put($this->request, $this->response, $this->database, $this->storage);
     }
 
     /**
+     * @covers Imbo\Resource\Image::put
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
     public function testPutWhenDatabaseThrowsException() {
-        $resource = $this->getNewResource();
-
         $this->request->expects($this->once())
                       ->method('getPublicKey')
                       ->will($this->returnValue($this->publicKey));
@@ -118,17 +116,16 @@ class ImageTest extends ResourceTests {
                        ->with($this->publicKey, $this->imageIdentifier, $this->image)
                        ->will($this->throwException(new DatabaseException('message', 500)));
 
-        $resource->put($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->put($this->request, $this->response, $this->database, $this->storage);
     }
 
     /**
+     * @covers Imbo\Resource\Image::put
      * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
     public function testPutWhenStorageThrowsException() {
-        $resource = $this->getNewResource();
-
         $this->request->expects($this->once())
                       ->method('getPublicKey')
                       ->will($this->returnValue($this->publicKey));
@@ -149,9 +146,12 @@ class ImageTest extends ResourceTests {
                       ->with($this->publicKey, $this->imageIdentifier, $this->image)
                       ->will($this->throwException(new StorageException('message', 500)));
 
-        $resource->put($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->put($this->request, $this->response, $this->database, $this->storage);
     }
 
+    /**
+     * @covers Imbo\Resource\Image::put
+     */
     public function testSuccessfulPut() {
         $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
         $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
@@ -181,13 +181,12 @@ class ImageTest extends ResourceTests {
     }
 
     /**
+     * @covers Imbo\Resource\Image::delete
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
     public function testDeleteWhenDatabaseThrowsAnException() {
-        $resource = $this->getNewResource();
-
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
@@ -196,17 +195,16 @@ class ImageTest extends ResourceTests {
                        ->with($this->publicKey, $this->imageIdentifier)
                        ->will($this->throwException(new DatabaseException('message', 500)));
 
-        $resource->delete($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->delete($this->request, $this->response, $this->database, $this->storage);
     }
 
     /**
+     * @covers Imbo\Resource\Image::delete
      * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
     public function testDeleteWhenStorageThrowsAnException() {
-        $resource = $this->getNewResource();
-
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
@@ -219,9 +217,12 @@ class ImageTest extends ResourceTests {
                       ->with($this->publicKey, $this->imageIdentifier)
                       ->will($this->throwException(new StorageException('message', 500)));
 
-        $resource->delete($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->delete($this->request, $this->response, $this->database, $this->storage);
     }
 
+    /**
+     * @covers Imbo\Resource\Image::delete
+     */
     public function testSuccessfulDelete() {
         $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
         $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
@@ -244,28 +245,26 @@ class ImageTest extends ResourceTests {
     }
 
     /**
+     * @covers Imbo\Resource\Image::get
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
     public function testGetWhenDatabaseThrowsException() {
-        $resource = $this->getNewResource();
-
         $this->database->expects($this->once())
                        ->method('load')
                        ->will($this->throwException(new DatabaseException('message', 500)));
 
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
 
     /**
+     * @covers Imbo\Resource\Image::get
      * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionMessage message
      * @expectedExceptionCode 500
      */
     public function testGetWhenStorageThrowsException() {
-        $resource = $this->getNewResource();
-
         $this->request->expects($this->once())->method('getServer')->will($this->returnValue($this->getMock('Imbo\Http\ServerContainerInterface')));
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
@@ -277,13 +276,13 @@ class ImageTest extends ResourceTests {
                       ->method('load')
                       ->will($this->throwException(new StorageException('message', 500)));
 
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
 
+    /**
+     * @covers Imbo\Resource\Image::get
+     */
     public function testGetWhenResponseIsNotModified() {
-        // Get the image resource
-        $resource = $this->getNewResource();
-
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
@@ -316,15 +315,17 @@ class ImageTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setNotModified');
 
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
 
+    /**
+     * @covers Imbo\Resource\Image::get
+     */
     public function testGetWithImageConversion() {
         if (!class_exists('Imagine\Imagick\Imagine')) {
             $this->markTestSkipped('Imagine must be available to run this test');
         }
 
-        $resource = $this->getNewResource();
         $resourcePart = $this->imageIdentifier . '.jpg';
         $requestUri = '/users/' . $this->publicKey . '/images/' . $resourcePart;
 
@@ -347,6 +348,6 @@ class ImageTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setBody')->with($this->isType('string'));
 
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
 }

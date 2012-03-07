@@ -61,11 +61,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($value, $this->query->page());
     }
 
-    public function testNum() {
+    public function testLimit() {
         $value = 30;
-        $this->assertSame(20, $this->query->num());
-        $this->query->num($value);
-        $this->assertSame($value, $this->query->num());
+        $this->assertSame(20, $this->query->limit());
+        $this->query->limit($value);
+        $this->assertSame($value, $this->query->limit());
     }
 
     public function testReturnMetadata() {
