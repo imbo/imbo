@@ -53,8 +53,8 @@ $container->userResource = $container->shared(function(Imbo\Container $container
 
 // Parameters for the database driver
 $dbParams = array(
-    'database' => 'imbo',
-    'collection' => 'images',
+    'databaseName'   => 'imbo',
+    'collectionName' => 'images',
 );
 
 // Create the database entry
