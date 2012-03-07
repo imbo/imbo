@@ -35,7 +35,7 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface,
-    Imbo\Database\Exception as DatabaseException;
+    Imbo\Exception\InvalidArgumentException;
 
 /**
  * Metadata resource
@@ -83,10 +83,14 @@ class Metadata extends Resource implements ResourceInterface {
             $metadata = $request->getRawData();
         }
 
-        if (!$metadata) {
-            $metadata = array();
+        if (empty($metadata)) {
+            throw new InvalidArgumentException('Missing JSON data', 400);
         } else {
             $metadata = json_decode($metadata, true);
+
+            if ($metadata === null) {
+                throw new InvalidArgumentException('Invalid JSON data', 400);
+            }
         }
 
         $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $metadata);
@@ -125,7 +129,7 @@ class Metadata extends Resource implements ResourceInterface {
 
         $metadata = $database->getMetadata($publicKey, $imageIdentifier);
 
-        return $this->getResponseWriter()->write($metadata, $request, $response);
+        $this->getResponseWriter()->write($metadata, $request, $response);
     }
 
     /**
