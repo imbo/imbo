@@ -45,6 +45,10 @@ class ImagesTest extends ResourceTests {
         return new Images();
     }
 
+    /**
+     * @covers Imbo\Resource\Images::getQuery
+     * @covers Imbo\Resource\Images::setQuery
+     */
     public function testSetGetQuery() {
         $resource = $this->getNewResource();
         $query = $this->getMock('Imbo\Resource\Images\QueryInterface');
@@ -53,33 +57,41 @@ class ImagesTest extends ResourceTests {
     }
 
     /**
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionMessage message
-     * @expectedExceptionCode 500
+     * @covers Imbo\Resource\Images::get
      */
-    public function testGetWhenDatabaseThrowsAnException() {
-        $resource = $this->getNewResource();
-        $parameterContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
+    public function testGetWhenResourceIsNotModified() {
+        $lastModified = 'Mon, 10 Jan 2011 13:37:00 GMT';
+        $etag = '"' . md5($lastModified) . '"';
 
-        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders->expects($this->any())->method('set');
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
 
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $requestHeaders->expects($this->any())->method('get');
+        $requestHeaders = $this->getMock('Imbo\Http\ParameterContainerInterface');
+        $requestHeaders->expects($this->any())->method('get')->will($this->returnCallback(function($key, $value) use ($lastModified, $etag) {
+            if ($key === 'if-modified-since') {
+                return $lastModified;
+            } else if ($key === 'if-none-match') {
+                return $etag;
+            }
 
-        $this->database->expects($this->once())->method('getLastModified');
-        $this->database->expects($this->once())->method('getImages')->will($this->throwException(new DatabaseException('message', 500)));
-        $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($parameterContainer));
-        $this->request->expects($this->once())->method('getPublicKey');
+            return null;
+        }));
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
 
+        $responseHeaders = $this->getMock('Imbo\Http\ParameterContainerInterface');
+        $responseHeaders->expects($this->once())->method('set')->with('ETag', $etag);
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $this->database->expects($this->once())->method('getLastModified')->will($this->returnValue($lastModified));
+
+        $this->response->expects($this->once())->method('setNotModified');
+
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
 
+    /**
+     * @covers Imbo\Resource\Images::get
+     */
     public function testSuccessfulGetWithNoQueryParams() {
-        $publicKey = md5(microtime());
         $images = array();
 
         $parameterContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
@@ -98,16 +110,18 @@ class ImagesTest extends ResourceTests {
         $requestHeaders->expects($this->any())->method('get');
 
         $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($parameterContainer));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-        $this->database->expects($this->once())->method('getImages')->with($publicKey, $query)->will($this->returnValue($images));
+        $this->database->expects($this->once())->method('getImages')->with($this->publicKey, $query)->will($this->returnValue($images));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
 
+    /**
+     * @covers Imbo\Resource\Images::get
+     */
     public function testSuccessfulGetWithAllQueryParams() {
-        $publicKey = md5(microtime());
         $images = array();
 
         $params = $this->getMock('Imbo\Http\ParameterContainerInterface');
@@ -117,7 +131,8 @@ class ImagesTest extends ResourceTests {
         $params->expects($this->any())->method('get')->will($this->returnCallback(function($param) {
             switch ($param) {
                 case 'page': return 1;
-                case 'num': return 2;
+                case 'num': // fall through
+                case 'limit': return 2;
                 case 'metadata': return '1';
                 case 'from': return 3;
                 case 'to': return 4;
@@ -126,7 +141,7 @@ class ImagesTest extends ResourceTests {
         }));
 
         $query->expects($this->once())->method('page')->with(1);
-        $query->expects($this->once())->method('num')->with(2);
+        $query->expects($this->exactly(2))->method('limit')->with(2); // exactly 2 because of "num" and "limit"
         $query->expects($this->once())->method('returnMetadata')->with('1');
         $query->expects($this->once())->method('from')->with(3);
         $query->expects($this->once())->method('to')->with(4);
@@ -146,9 +161,9 @@ class ImagesTest extends ResourceTests {
         $requestHeaders->expects($this->any())->method('get');
 
         $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($params));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-        $this->database->expects($this->once())->method('getImages')->with($publicKey, $query)->will($this->returnValue($images));
+        $this->database->expects($this->once())->method('getImages')->with($this->publicKey, $query)->will($this->returnValue($images));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);

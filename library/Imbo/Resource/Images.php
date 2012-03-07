@@ -36,8 +36,7 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface,
     Imbo\Resource\Images\Query,
-    Imbo\Resource\Images\QueryInterface,
-    Imbo\Database\Exception as DatabaseException;
+    Imbo\Resource\Images\QueryInterface;
 
 /**
  * Images resource
@@ -131,8 +130,13 @@ class Images extends Resource implements ImagesInterface {
             $query->page($params->get('page'));
         }
 
+        // Keep supporting "num"
         if ($params->has('num')) {
-            $query->num($params->get('num'));
+            $query->limit($params->get('num'));
+        }
+
+        if ($params->has('limit')) {
+            $query->limit($params->get('limit'));
         }
 
         if ($params->has('metadata')) {

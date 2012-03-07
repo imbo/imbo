@@ -43,29 +43,70 @@ class MetadataTest extends ResourceTests {
         return new Metadata();
     }
 
+    /**
+     * @covers Imbo\Resource\Metadata::delete
+     */
     public function testDelete() {
-        $imageIdentifier = md5(microtime());
-        $publicKey = md5(microtime());
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->database->expects($this->once())->method('deleteMetadata')->with($this->publicKey, $this->imageIdentifier);
 
         $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
         $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
 
         $resource = $this->getNewResource();
         $resource->setResponseWriter($writer);
-
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->database->expects($this->once())->method('deleteMetadata')->with($publicKey, $imageIdentifier);
 
         $resource->delete($this->request, $this->response, $this->database, $this->storage);
     }
 
-    public function testPost() {
-        $imageIdentifier = md5(microtime());
-        $publicKey = md5(microtime());
+    /**
+     * @covers Imbo\Resource\Metadata::post
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Missing JSON data
+     * @expectedExceptionCode 400
+     */
+    public function testPostWithNoMetadata() {
+        $paramContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
+        $paramContainer->expects($this->once())->method('has')->with('metadata')->will($this->returnValue(false));
 
-        $rawMetadata = array('some' => 'data');
-        $metadata = json_encode($rawMetadata);
+        $this->request->expects($this->any())->method('getRequest')->will($this->returnValue($paramContainer));
+        $this->request->expects($this->any())->method('getRawData')->will($this->returnValue(null));
+
+        $resource = $this->getNewResource();
+        $resource->post($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @covers Imbo\Resource\Metadata::post
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid JSON data
+     * @expectedExceptionCode 400
+     */
+    public function testPostWithInvalidMetadata() {
+        $paramContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
+        $paramContainer->expects($this->once())->method('has')->with('metadata')->will($this->returnValue(false));
+
+        $this->request->expects($this->any())->method('getRequest')->will($this->returnValue($paramContainer));
+        $this->request->expects($this->any())->method('getRawData')->will($this->returnValue('some string'));
+
+        $resource = $this->getNewResource();
+        $resource->post($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @covers Imbo\Resource\Metadata::post
+     */
+    public function testPostWithDataInPostParams() {
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
+
+        $paramContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
+        $paramContainer->expects($this->once())->method('has')->with('metadata')->will($this->returnValue(true));
+        $paramContainer->expects($this->once())->method('get')->with('metadata')->will($this->returnValue('{"foo":"bar"}'));
+
+        $this->request->expects($this->any())->method('getRequest')->will($this->returnValue($paramContainer));
+        $this->database->expects($this->once())->method('updateMetadata')->with($this->publicKey, $this->imageIdentifier, array('foo' => 'bar'));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
 
         $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
         $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
@@ -73,50 +114,43 @@ class MetadataTest extends ResourceTests {
         $resource = $this->getNewResource();
         $resource->setResponseWriter($writer);
 
-        $paramContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
-        $paramContainer->expects($this->once())->method('has')->with('metadata')->will($this->returnValue(true));
-        $paramContainer->expects($this->once())->method('get')->with('metadata')->will($this->returnValue($metadata));
-
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->request->expects($this->any())->method('getRequest')->will($this->returnValue($paramContainer));
-
-        $this->database->expects($this->once())->method('updateMetadata')->with($publicKey, $imageIdentifier, $rawMetadata);
 
         $resource->post($this->request, $this->response, $this->database, $this->storage);
     }
 
+    /**
+     * @covers Imbo\Resource\Metadata::post
+     */
     public function testPostWithDataInRawBody() {
-        $imageIdentifier = md5(microtime());
-        $publicKey = md5(microtime());
-
-        $rawMetadata = array('some' => 'data');
-        $metadata = json_encode($rawMetadata);
-
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
-        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
-
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
         $paramContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
         $paramContainer->expects($this->once())->method('has')->with('metadata')->will($this->returnValue(false));
 
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
         $this->request->expects($this->once())->method('getRequest')->will($this->returnValue($paramContainer));
-        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue($metadata));
+        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue('{"some":"value"}'));
 
-        $this->database->expects($this->once())->method('updateMetadata')->with($publicKey, $imageIdentifier, $rawMetadata);
+        $this->database->expects($this->once())->method('updateMetadata')->with($this->publicKey, $this->imageIdentifier, array('some' => 'value'));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
+        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+
+        $resource = $this->getNewResource();
+        $resource->setResponseWriter($writer);
 
         $resource->post($this->request, $this->response, $this->database, $this->storage);
     }
 
+    /**
+     * @covers Imbo\Resource\Metadata::get
+     */
     public function testGetWhenResponseIsNotModified() {
-        $publicKey = 'some key';
-        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358';
         $lastModified = 'Mon, 10 Jan 2011 13:37:00 GMT';
-        $etag = '"b0ef1f0bef5ac57b8d1365a51f3fc1ca"';
+        $etag = '"' . md5($this->publicKey . $this->imageIdentifier . $lastModified) . '"';
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
         $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $requestHeaders->expects($this->any())->method('get')->will($this->returnCallback(function($param) use ($lastModified, $etag) {
@@ -127,57 +161,49 @@ class MetadataTest extends ResourceTests {
             }
         }));
 
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
+
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->once())->method('set')->with('ETag', $etag);
 
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-        $this->response->expects($this->once())->method('setNotModified');
+        $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($lastModified));
 
-        $this->database->expects($this->once())->method('getLastModified')->with($publicKey, $imageIdentifier)->will($this->returnValue($lastModified));
+        $this->response->expects($this->once())->method('setNotModified');
 
         $resource = $this->getNewResource();
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
 
+    /**
+     * @covers Imbo\Resource\Metadata::get
+     */
     public function testGetWhenResponseIsModified() {
-        $publicKey = 'some key';
-        $imageIdentifier = 'b8533858299b04af3afc9a3713e69358';
         $lastModified = 'Mon, 10 Jan 2011 13:37:00 GMT';
-        $etag = '"b0ef1f0bef5ac57b8d1365a51f3fc1ca"';
-        $metadata = array('foo' => 'bar');
+        $etag = '"' . md5($this->publicKey . $this->imageIdentifier . $lastModified) . '"';
+        $metadataInDatabase = array('foo' => 'bar');
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
         $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-
-        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders->expects($this->any())->method('set')->will($this->returnCallback(function ($key, $value) use ($lastModified, $etag) {
-            if (
-                ($key === 'Etag' && $value === $etag) ||
-                ($key === 'Last-Modified' && $value === $lastModified)
-            ) {
-                return true;
-            }
-
-            return false;
-        }));
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
 
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $responseHeaders->expects($this->at(0))->method('set')->with('ETag', $etag);
+        $responseHeaders->expects($this->at(1))->method('set')->with('Last-Modified', $lastModified);
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
-        $this->database->expects($this->once())->method('getLastModified')->with($publicKey, $imageIdentifier)->will($this->returnValue($lastModified));
-        $this->database->expects($this->once())->method('getMetadata')->with($publicKey, $imageIdentifier)->will($this->returnValue($metadata));
+        $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($lastModified));
+
+        $this->database->expects($this->once())->method('getMetadata')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($metadataInDatabase));
 
         $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
-        $writer->expects($this->once())->method('write')->with($metadata, $this->request, $this->response);
+        $writer->expects($this->once())->method('write')->with($metadataInDatabase, $this->request, $this->response);
 
         $resource = $this->getNewResource();
         $resource->setResponseWriter($writer);
+
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
 }

@@ -302,7 +302,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $query->expects($this->once())->method('to')->will($this->returnValue(234234234));
         $query->expects($this->once())->method('metadataQuery')->will($this->returnValue(array('category' => 'some category')));
         $query->expects($this->once())->method('returnMetadata')->will($this->returnValue(true));
-        $query->expects($this->exactly(2))->method('num')->will($this->returnValue(30));
+        $query->expects($this->exactly(2))->method('limit')->will($this->returnValue(30));
         $query->expects($this->once())->method('page')->will($this->returnValue(2));
 
         $cursor = $this->getMockBuilder('MongoCursor')->disableOriginalConstructor()->getMock();
