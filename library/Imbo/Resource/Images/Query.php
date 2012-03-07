@@ -55,7 +55,7 @@ class Query implements QueryInterface {
      *
      * @var int
      */
-    private $num = 20;
+    private $limit = 20;
 
     /**
      * Return metadata or not
@@ -99,14 +99,14 @@ class Query implements QueryInterface {
     }
 
     /**
-     * @see Imbo\Resource\Images\QueryInterface::num()
+     * @see Imbo\Resource\Images\QueryInterface::limit()
      */
-    public function num($num = null) {
-        if ($num === null) {
-            return $this->num;
+    public function limit($limit = null) {
+        if ($limit === null) {
+            return $this->limit;
         }
 
-        $this->num = (int) $num;
+        $this->limit = (int) $limit;
 
         return $this;
     }

@@ -254,12 +254,12 @@ class MongoDB implements DatabaseInterface {
 
         try {
             $cursor = $this->collection->find($queryData, $fields)
-                                       ->limit($query->num())
+                                       ->limit($query->limit())
                                        ->sort(array('added' => -1));
 
             // Skip some images if a page has been set
             if (($page = $query->page()) > 1) {
-                $skip = $query->num() * ($page - 1);
+                $skip = $query->limit() * ($page - 1);
                 $cursor->skip($skip);
             }
 

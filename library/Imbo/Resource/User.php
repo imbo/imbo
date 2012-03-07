@@ -92,7 +92,7 @@ class User extends Resource implements ResourceInterface {
 
         $responseHeaders->set('Last-Modified', $lastModified);
 
-        return $this->getResponseWriter()->write($data, $request, $response);
+        $this->getResponseWriter()->write($data, $request, $response);
     }
 
     /**
