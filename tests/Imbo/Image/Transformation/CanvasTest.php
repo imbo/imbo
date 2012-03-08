@@ -37,12 +37,16 @@ namespace Imbo\Image\Transformation;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\Transformation\Canvas
  */
 class CanvasTest extends TransformationTests {
     protected function getTransformation() {
         return new Canvas(100, 100, 'free', 10, 10, '000');
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\Canvas::applyToImage
+     */
     public function testApplyToImage() {
         $mode = 'free';
         $width = 100;

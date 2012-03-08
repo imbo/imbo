@@ -39,6 +39,7 @@ use Imbo\Http\Request\RequestInterface;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\FrontController
  */
 class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -48,9 +49,24 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
      */
     private $controller;
 
+    /**
+     * @var string
+     */
     private $publicKey;
+
+    /**
+     * @var string
+     */
     private $privateKey;
+
+    /**
+     * @var Imbo\Validate\ValidateInterface
+     */
     private $timestampValidator;
+
+    /**
+     * @var Imbo\Validate\ValidateInterface
+     */
     private $signatureValidator;
 
     /**
@@ -90,15 +106,17 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         return array(
             array('/users/' . $publicKey . '/images/' . $imageIdentifier . '/meta', 'Imbo\Resource\Metadata'),
             array('/users/' . $publicKey . '/images/' . $imageIdentifier, 'Imbo\Resource\Image'),
+            array('/users/' . $publicKey . '/images/' . $imageIdentifier . '.jpg', 'Imbo\Resource\Image'),
             array('/users/' . $publicKey . '/images', 'Imbo\Resource\Images'),
             array('/users/' . $publicKey, 'Imbo\Resource\User'), // Not located in the DIC, should work nonetheless
         );
     }
 
     /**
+     * @covers Imbo\FrontController::resolveResource
      * @dataProvider getResolveData()
      */
-    public function testResolveResourceWithMetadataRequest($path, $resourceClass) {
+    public function testResolveResource($path, $resourceClass) {
         $reflection = new \ReflectionClass($this->controller);
         $method = $reflection->getMethod('resolveResource');
         $method->setAccessible(true);
@@ -110,6 +128,28 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\FrontController::resolveResource
+     */
+    public function testReolveResourceWhenGivenImageUrlWithExtension() {
+        $reflection = new \ReflectionClass($this->controller);
+        $method = $reflection->getMethod('resolveResource');
+        $method->setAccessible(true);
+
+        $imageIdentifier = md5(microtime());
+        $publicKey = 'key';
+        $path = '/users/' . $publicKey . '/images/' . $imageIdentifier . '.jpg';
+
+        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getPath')->will($this->returnValue($path));
+        $request->expects($this->once())->method('setPublicKey')->with($publicKey);
+        $request->expects($this->once())->method('setImageIdentifier')->with($imageIdentifier);
+        $request->expects($this->once())->method('setImageExtension')->with('jpg');
+
+        $this->assertInstanceOf('Imbo\Resource\Image', $method->invoke($this->controller, $request));
+    }
+
+    /**
+     * @covers Imbo\FrontController::resolveResource
      * @expectedException Imbo\Exception
      * @expectedExceptionCode 404
      */
@@ -123,6 +163,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\FrontController::auth
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Unknown public key
      * @expectedExceptionCode 400
@@ -140,6 +181,9 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method->invoke($this->controller, $request, $response);
     }
 
+    /**
+     * @covers Imbo\FrontController::auth
+     */
     public function testAuthWithSafeHttpMethod() {
         $reflection = new \ReflectionClass($this->controller);
         $method = $reflection->getMethod('auth');
@@ -155,6 +199,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\FrontController::auth
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Missing required authentication parameter: signature
      * @expectedExceptionCode 400
@@ -178,6 +223,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\FrontController::auth
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Missing required authentication parameter: timestamp
      * @expectedExceptionCode 400
@@ -202,6 +248,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\FrontController::auth
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Invalid timestamp:
      * @expectedExceptionCode 400
@@ -228,6 +275,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\FrontController::auth
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Signature mismatch
      * @expectedExceptionCode 403
@@ -263,6 +311,9 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $method->invoke($this->controller, $request, $response);
     }
 
+    /**
+     * @covers Imbo\FrontController::auth
+     */
     public function testSuccessfulAuth() {
         $reflection = new \ReflectionClass($this->controller);
         $method = $reflection->getMethod('auth');
@@ -295,6 +346,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\FrontController::handle
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage I'm a teapot!
      * @expectedExceptionCode 418
@@ -309,6 +361,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\FrontController::handle
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Unsupported HTTP method
      * @expectedExceptionCode 501

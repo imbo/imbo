@@ -39,6 +39,7 @@ use Imbo\Exception;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Http\Response\Response
  */
 class ResponseTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -62,34 +63,54 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->response = null;
     }
 
+    /**
+     * @covers Imbo\Http\Response\Response::setStatusCode
+     * @covers Imbo\Http\Response\Response::getStatusCode
+     */
     public function testSetGetStatusCode() {
         $code = 404;
-        $this->response->setStatusCode($code);
+        $this->assertSame($this->response, $this->response->setStatusCode($code));
         $this->assertSame($code, $this->response->getStatusCode());
     }
 
+    /**
+     * @covers Imbo\Http\Response\Response::getProtocolVersion
+     * @covers Imbo\Http\Response\Response::setProtocolVersion
+     */
     public function testSetGetProtocolVersion() {
         // Assert default version
         $this->assertSame('1.1', $this->response->getProtocolVersion());
-        $this->response->setProtocolVersion('1.0');
+        $this->assertSame($this->response, $this->response->setProtocolVersion('1.0'));
         $this->assertSame('1.0', $this->response->getProtocolVersion());
     }
 
+    /**
+     * @covers Imbo\Http\Response\Response::getHeaders
+     * @covers Imbo\Http\Response\Response::setHeaders
+     */
     public function testSetGetHeaders() {
         $headers = $this->getMock('Imbo\Http\HeaderContainer');
-        $this->response->setHeaders($headers);
+        $this->assertSame($this->response, $this->response->setHeaders($headers));
         $this->assertSame($headers, $this->response->getHeaders());
     }
 
+    /**
+     * @covers Imbo\Http\Response\Response::setBody
+     * @covers Imbo\Http\Response\Response::getBody
+     */
     public function testSetGetBody() {
         $body = 'some content';
         $this->assertSame($this->response, $this->response->setBody($body));
         $this->assertSame($body, $this->response->getBody());
     }
 
+    /**
+     * @covers Imbo\Http\Response\Response::setBody
+     * @covers Imbo\Http\Response\Response::send
+     */
     public function testSendContent() {
         $content = 'some content';
-        $this->response->setBody($content);
+        $this->assertSame($this->response, $this->response->setBody($content));
 
         ob_start();
         $this->response->send();
@@ -98,11 +119,18 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($output, $content);
     }
 
+    /**
+     * @covers Imbo\Http\Response\Response::setBody
+     * @covers Imbo\Http\Response\Response::setStatusCode
+     * @covers Imbo\Http\Response\Response::setNotModified
+     * @covers Imbo\Http\Response\Response::getStatusCode
+     * @covers Imbo\Http\Response\Response::getBody
+     */
     public function testSetNotModified() {
-        $this->response->setBody('some content');
-        $this->response->setStatusCode(200);
+        $this->assertSame($this->response, $this->response->setBody('some content'));
+        $this->assertSame($this->response, $this->response->setStatusCode(200));
 
-        $this->response->setNotModified();
+        $this->assertSame($this->response, $this->response->setNotModified());
 
         $this->assertSame(304, $this->response->getStatusCode());
         $this->assertEmpty($this->response->getBody());

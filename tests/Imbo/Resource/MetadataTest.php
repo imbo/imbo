@@ -37,6 +37,7 @@ namespace Imbo\Resource;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Resource\Metadata
  */
 class MetadataTest extends ResourceTests {
     protected function getNewResource() {
