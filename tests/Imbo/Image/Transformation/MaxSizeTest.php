@@ -23,7 +23,6 @@
  * IN THE SOFTWARE.
  *
  * @package Unittests
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -39,12 +38,16 @@ namespace Imbo\Image\Transformation;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\Transformation\MaxSize
  */
 class MaxSizeTest extends TransformationTests {
     protected function getTransformation() {
         return new MaxSize(200, 100);
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\MaxSize::applyToImage
+     */
     public function testApplyToImageWithBothParams() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
@@ -57,6 +60,9 @@ class MaxSizeTest extends TransformationTests {
         $transformation->applyToImage($image);
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\MaxSize::applyToImage
+     */
     public function testApplyToImageWithOnlyWidth() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
@@ -69,6 +75,9 @@ class MaxSizeTest extends TransformationTests {
         $transformation->applyToImage($image);
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\MaxSize::applyToImage
+     */
     public function testApplyToImageWithOnlyHeight() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
@@ -81,6 +90,9 @@ class MaxSizeTest extends TransformationTests {
         $transformation->applyToImage($image);
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\MaxSize::applyToImage
+     */
     public function testApplyToTallImage() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/tall-image.png')));
@@ -93,6 +105,9 @@ class MaxSizeTest extends TransformationTests {
         $transformation->applyToImage($image);
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\MaxSize::applyToImage
+     */
     public function testApplyToImageSmallerThanParams() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/tall-image.png')));
@@ -104,5 +119,4 @@ class MaxSizeTest extends TransformationTests {
         $transformation = new MaxSize(1000, 1000);
         $transformation->applyToImage($image);
     }
-
 }

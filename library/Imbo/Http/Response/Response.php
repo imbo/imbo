@@ -229,6 +229,8 @@ class Response implements ResponseInterface {
         foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Last-Modified') as $header) {
             $headers->remove($header);
         }
+
+        return $this;
     }
 
     /**

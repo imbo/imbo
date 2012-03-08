@@ -37,6 +37,7 @@ namespace Imbo\Validate;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Validate\Signature
  */
 class SignatureTest extends \PHPUnit_Framework_TestCase {
     private $validate;
@@ -49,29 +50,47 @@ class SignatureTest extends \PHPUnit_Framework_TestCase {
         $this->validate = null;
     }
 
+    /**
+     * @covers Imbo\Validate\Signature::setHttpMethod
+     */
     public function testSetHttpMethod() {
         $this->assertSame($this->validate, $this->validate->setHttpMethod('POST'));
     }
 
+    /**
+     * @covers Imbo\Validate\Signature::setUrl
+     */
     public function testSetUrl() {
         $this->assertSame($this->validate, $this->validate->setUrl('http://imbo/users/'));
     }
 
+    /**
+     * @covers Imbo\Validate\Signature::setTimestamp
+     */
     public function testSetTimestamp() {
         $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         $this->assertSame($this->validate, $this->validate->setTimestamp($timestamp));
     }
 
+    /**
+     * @covers Imbo\Validate\Signature::setPublicKey
+     */
     public function testSetPublicKey() {
         $key = 'e047e85fbfc6e212beb4b9bbc025b019';
         $this->assertSame($this->validate, $this->validate->setPublicKey($key));
     }
 
+    /**
+     * @covers Imbo\Validate\Signature::setPrivateKey
+     */
     public function testSetPrivateKey() {
         $key = 'e047e85fbfc6e212beb4b9bbc025b019';
         $this->assertSame($this->validate, $this->validate->setPrivateKey($key));
     }
 
+    /**
+     * @covers Imbo\Validate\Signature::isValid
+     */
     public function testIsValid() {
         $method     = 'POST';
         $publicKey  = 'e047e85fbfc6e212beb4b9bbc025b019';
