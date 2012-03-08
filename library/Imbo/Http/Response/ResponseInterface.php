@@ -112,6 +112,8 @@ interface ResponseInterface {
 
     /**
      * Prepare the response to send 304 Not Modified to the client
+     *
+     * @return Imbo\Http\Response\ResponseInterface
      */
     function setNotModified();
 }
