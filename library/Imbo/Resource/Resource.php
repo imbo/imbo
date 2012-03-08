@@ -34,6 +34,7 @@ namespace Imbo\Resource;
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
     Imbo\Http\Response\ResponseWriter,
+    Imbo\Http\Response\ResponseWriterInterface,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface,
     Imbo\Resource\ResourceInterface,
@@ -51,7 +52,7 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-abstract class Resource {
+abstract class Resource implements ResourceInterface {
     /**
      * Event manager
      *
@@ -80,7 +81,7 @@ abstract class Resource {
     /**
      * @see Imbo\Resource\ResourceInterface::setResponseWriter()
      */
-    public function setResponseWriter($writer) {
+    public function setResponseWriter(ResponseWriterInterface $writer) {
         $this->writer = $writer;
 
         return $this;
