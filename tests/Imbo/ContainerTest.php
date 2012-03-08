@@ -37,6 +37,7 @@ namespace Imbo;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Container
  */
 class ContainerTest extends \PHPUnit_Framework_TestCase {
     private $container;
@@ -58,6 +59,8 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Container::__set
+     * @covers Imbo\Container::__get
      * @dataProvider getContainerValues()
      */
     public function testSetGet($key, $value, $expected) {
@@ -65,6 +68,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $this->container->$key);
     }
 
+    /**
+     * @covers Imbo\Container::has
+     */
     public function testHas() {
         $this->assertFalse($this->container->has('key'));
         $this->container->key = 'value';
@@ -78,6 +84,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
         $this->container->foobar;
     }
 
+    /**
+     * @covers Imbo\Container::__get
+     */
     public function testCallback() {
         $this->container->key = function($container) { return new \stdClass(); };
 
@@ -85,6 +94,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
         $this->assertNotSame($this->container->key, $this->container->key);
     }
 
+    /**
+     * @covers Imbo\Container::shared
+     */
     public function testShared() {
         $callback = function($container) { return new \stdClass(); };
 

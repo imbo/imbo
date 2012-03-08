@@ -37,6 +37,7 @@ namespace Imbo\Resource;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Resource\Resource
  */
 class ResourceTest extends \PHPUnit_Framework_TestCase {
     public function setUp() {
@@ -56,6 +57,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Resource\Resource::get
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Method not allowed
      * @expectedExceptionCode 405
@@ -65,6 +67,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Resource\Resource::put
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Method not allowed
      * @expectedExceptionCode 405
@@ -74,6 +77,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Resource\Resource::post
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Method not allowed
      * @expectedExceptionCode 405
@@ -83,6 +87,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Resource\Resource::delete
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Method not allowed
      * @expectedExceptionCode 405
@@ -92,6 +97,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Resource\Resource::head
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Method not allowed
      * @expectedExceptionCode 405
@@ -99,6 +105,25 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
     public function testHead() {
         $this->resource->head($this->request, $this->response, $this->database, $this->storage);
     }
+
+    /**
+     * @covers Imbo\Resource\Resource::setResponseWriter
+     * @covers Imbo\Resource\Resource::getResponseWriter
+     */
+    public function testSetGetResponseWriter() {
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
+        $this->assertSame($this->resource, $this->resource->setResponseWriter($writer));
+        $this->assertSame($writer, $this->resource->getResponseWriter());
+    }
+
+    /**
+     * @covers Imbo\Resource\Resource::getResponseWriter
+     */
+    public function testGetResponseWriterWithoutSet() {
+        $this->assertInstanceOf('Imbo\Http\Response\ResponseWriterInterface', $this->resource->getResponseWriter());
+    }
 }
 
-class ResourceImplementation extends Resource {}
+class ResourceImplementation extends Resource {
+    public function getAllowedMethods() {}
+}

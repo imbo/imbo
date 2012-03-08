@@ -37,12 +37,16 @@ namespace Imbo\Image\Transformation;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\Transformation\Crop
  */
 class CropTest extends TransformationTests {
     protected function getTransformation() {
         return new Crop(1, 2, 3, 4);
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\Crop::applyToImage
+     */
     public function testApplyToImage() {
         $x = 1;
         $y = 2;

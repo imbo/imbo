@@ -37,6 +37,7 @@ namespace Imbo\EventManager;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\EventManager\EventManager
  */
 class EventManagerTest extends \PHPUnit_Framework_TestCase {
     private $request;
@@ -57,6 +58,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\EventManager\EventManager::attach
      * @expectedException InvalidArgumentException
      */
     public function testAttachNonCallableParameter() {
@@ -65,6 +67,10 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $this->manager->attach('event', $callback);
     }
 
+    /**
+     * @covers Imbo\EventManager\EventManager::attach
+     * @covers Imbo\EventManager\EventManager::trigger
+     */
     public function testAttachAndTriggerEvents() {
         $callback1 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
         $callback1->expects($this->exactly(2))->method('__invoke');
@@ -87,6 +93,10 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
                       ->trigger('event4');
     }
 
+    /**
+     * @covers Imbo\EventManager\EventManager::attachListener
+     * @covers Imbo\EventManager\EventManager::trigger
+     */
     public function testAttachListener() {
         $listener = $this->getMock('Imbo\EventListener\ListenerInterface');
         $listener->expects($this->once())->method('getEvents')->will($this->returnValue(array('event')));
@@ -96,18 +106,30 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $this->manager->trigger('event');
     }
 
+    /**
+     * @covers Imbo\EventManager\EventManager::attachListener
+     * @covers Imbo\EventManager\EventManager::trigger
+     */
     public function testAttachListenerWithSpecificPublicKey() {
-        $listener = $this->getMock('Imbo\EventListener\ListenerInterface');
-        $listener->expects($this->once())->method('getEvents')->will($this->returnValue(array('event')));
-        $listener->expects($this->once())->method('invoke')->with($this->isInstanceOf('Imbo\EventManager\EventInterface'));
-        $listener->expects($this->once())->method('getPublicKeys')->will($this->returnValue(array('key')));
+        $listener1 = $this->getMock('Imbo\EventListener\ListenerInterface');
+        $listener1->expects($this->once())->method('getEvents')->will($this->returnValue(array('event')));
+        $listener1->expects($this->once())->method('invoke')->with($this->isInstanceOf('Imbo\EventManager\EventInterface'));
+        $listener1->expects($this->once())->method('getPublicKeys')->will($this->returnValue(array('key')));
 
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $listener2 = $this->getMock('Imbo\EventListener\ListenerInterface');
+        $listener2->expects($this->never())->method('invoke');
+        $listener2->expects($this->once())->method('getPublicKeys')->will($this->returnValue(array('key2')));
 
-        $this->manager->attachListener($listener);
+        $this->request->expects($this->exactly(2))->method('getPublicKey')->will($this->returnValue('key'));
+
+        $this->manager->attachListener($listener1)->attachListener($listener2);
         $this->manager->trigger('event');
     }
 
+    /**
+     * @covers Imbo\EventManager\EventManager::attachListener
+     * @covers Imbo\EventManager\EventManager::trigger
+     */
     public function testAttachListenerWithSpecificPublicKeyThatDoesNotEqualCurrent() {
         $listener = $this->getMock('Imbo\EventListener\ListenerInterface');
         $listener->expects($this->never())->method('getEvents');

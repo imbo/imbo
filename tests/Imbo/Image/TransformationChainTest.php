@@ -37,6 +37,7 @@ namespace Imbo\Image;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\TransformationChain
  */
 class TransformationChainTest extends \PHPUnit_Framework_TestCase {
     private $chain;
@@ -53,6 +54,9 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
         $this->chain = null;
     }
 
+    /**
+     * @covers Imbo\Image\TransformationChain::applyToImage
+     */
     public function testApplyTrasformationsToImage() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
 
@@ -63,6 +67,9 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->chain, $this->chain->applyToImage($image));
     }
 
+    /**
+     * @covers Imbo\Image\TransformationChain::transformImage
+     */
     public function testTransformImage() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $transformation = $this->getMock('Imbo\Image\Transformation\TransformationInterface');
@@ -73,21 +80,36 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * Test that transformation methods are chainable
+     *
+     * @covers Imbo\Image\TransformationChain::border
+     * @covers Imbo\Image\TransformationChain::canvas
+     * @covers Imbo\Image\TransformationChain::compress
+     * @covers Imbo\Image\TransformationChain::crop
+     * @covers Imbo\Image\TransformationChain::flipHorizontally
+     * @covers Imbo\Image\TransformationChain::flipVertically
+     * @covers Imbo\Image\TransformationChain::maxSize
+     * @covers Imbo\Image\TransformationChain::resize
+     * @covers Imbo\Image\TransformationChain::rotate
+     * @covers Imbo\Image\TransformationChain::thumbnail
      */
     public function testChain() {
-        $this->assertSame($this->chain, $this->chain->border('fff', 1, 1)
-                    ->compress(75)
-                    ->crop(1, 2, 3, 4)
-                    ->rotate(45, 'fff')
-                    ->resize(100, 200)
-                    ->maxSize(100, 200)
-                    ->thumbnail(10, 10, '000')
-                    ->flipHorizontally()
-                    ->flipVertically()
-                    ->border('000', 2, 2)
-                    ->canvas(100, 100, 10, 10, '000'));
+        $this->assertSame($this->chain,
+            $this->chain->border('fff', 1, 1)
+                        ->canvas(100, 100, 10, 10, '000')
+                        ->compress(75)
+                        ->crop(1, 2, 3, 4)
+                        ->flipHorizontally()
+                        ->flipVertically()
+                        ->maxSize(100, 200)
+                        ->resize(100, 200)
+                        ->rotate(45, 'fff')
+                        ->thumbnail(10, 10, '000')
+        );
     }
 
+    /**
+     * @covers Imbo\Image\TransformationChain::count
+     */
     public function testCountable() {
         $this->chain->border('fff', 1, 1);
         $this->assertSame(1, count($this->chain));
@@ -96,8 +118,18 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(2, count($this->chain));
     }
 
+    /**
+     * @covers Imbo\Image\TransformationChain::add
+     * @covers Imbo\Image\TransformationChain::rewind
+     * @covers Imbo\Image\TransformationChain::current
+     * @covers Imbo\Image\TransformationChain::key
+     * @covers Imbo\Image\TransformationChain::next
+     * @covers Imbo\Image\TransformationChain::valid
+     */
     public function testIterator() {
-        $this->chain->border('fff', 1, 2)->resize(1, 2)->thumbnail();
+        $this->chain->add($this->getMock('Imbo\Image\Transformation\Border'))
+                    ->add($this->getMock('Imbo\Image\Transformation\Resize'))
+                    ->add($this->getMock('Imbo\Image\Transformation\Thumbnail'));
 
         $expectedClasses = array(
             'Imbo\Image\Transformation\Border',

@@ -37,6 +37,7 @@ namespace Imbo\EventListener;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\EventListener\TransformationKey
  */
 class TransformationKeyTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -87,12 +88,18 @@ class TransformationKeyTest extends \PHPUnit_Framework_TestCase {
         $this->listener = null;
     }
 
+    /**
+     * @covers Imbo\EventListener\TransformationKey::getEvents
+     */
     public function testGetEvents() {
         $events = $this->listener->getEvents();
         $this->assertContains('image.get.pre', $events);
         $this->assertContains('image.head.pre', $events);
     }
 
+    /**
+     * @covers Imbo\EventListener\TransformationKey::invoke
+     */
     public function testInvokeWithNoImageExtensionOrTransformations() {
         $this->request->expects($this->once())->method('getImageExtension')->will($this->returnValue(null));
         $this->assertNull($this->listener->invoke($this->event));
@@ -102,6 +109,7 @@ class TransformationKeyTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\TransformationException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Missing
+     * @covers Imbo\EventListener\TransformationKey::invoke
      */
     public function testInvokeWithImageExtensionAndNoTransformations() {
         $this->request->expects($this->once())->method('getImageExtension')->will($this->returnValue('png'));
@@ -112,6 +120,7 @@ class TransformationKeyTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\TransformationException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Missing
+     * @covers Imbo\EventListener\TransformationKey::invoke
      */
     public function testInvokeWithTransformationsAndNoImageExtension() {
         $this->request->expects($this->once())->method('getImageExtension')->will($this->returnValue(null));
@@ -129,6 +138,7 @@ class TransformationKeyTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\TransformationException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Invalid
+     * @covers Imbo\EventListener\TransformationKey::invoke
      */
     public function testInvokeWithInvalidTransformationKey() {
         $this->request->expects($this->once())->method('getImageExtension')->will($this->returnValue(null));
@@ -148,6 +158,9 @@ class TransformationKeyTest extends \PHPUnit_Framework_TestCase {
         $this->listener->invoke($this->event);
     }
 
+    /**
+     * @covers Imbo\EventListener\TransformationKey::invoke
+     */
     public function testInvokeWithValidTransformationKeyWhenUsingAnExtensionAndTransformations() {
         $publicKey = 'publicKey';
         $privateKey = md5(microtime());

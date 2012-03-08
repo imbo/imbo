@@ -39,6 +39,7 @@ use MongoException;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Database\MongoDB
  */
 class MongoDBTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -104,6 +105,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Image already exists
+     * @covers Imbo\Database\MongoDB::insertImage
      */
     public function testInsertImageThatAlreadyExists() {
         $data = array(
@@ -123,6 +125,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to save image data
+     * @covers Imbo\Database\MongoDB::insertImage
      */
     public function testInsertImageWhenCollectionThrowsException() {
         $this->collection->expects($this->once())->method('findOne')->will($this->throwException(new MongoException()));
@@ -133,6 +136,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $image, $response);
     }
 
+    /**
+     * @covers Imbo\Database\MongoDB::insertImage
+     */
     public function testSuccessfulInsert() {
         $data = array(
             'publicKey' => $this->publicKey,
@@ -153,6 +159,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to delete image data
+     * @covers Imbo\Database\MongoDB::deleteImage
      */
     public function testDeleteImageWhenCollectionThrowsAnException() {
         $this->collection->expects($this->once())
@@ -165,6 +172,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->deleteImage($this->publicKey, $this->imageIdentifier);
     }
 
+    /**
+     * @covers Imbo\Database\MongoDB::deleteImage
+     */
     public function testSuccessfulDeleteImage() {
         $this->collection->expects($this->once())
                          ->method('remove')
@@ -182,6 +192,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to edit image data
+     * @covers Imbo\Database\MongoDB::updateMetadata
      */
     public function testUpdateMetadataWhenCollectionThrowsAnException() {
         $metadata = array(
@@ -203,6 +214,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->updateMetadata($this->publicKey, $this->imageIdentifier, $metadata);
     }
 
+    /**
+     * @covers Imbo\Database\MongoDB::updateMetadata
+     */
     public function testSuccessfulUpdateMetadata() {
         $metadata = array(
             'foo' => 'bar',
@@ -229,6 +243,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to fetch image metadata
+     * @covers Imbo\Database\MongoDB::getMetadata
      */
     public function testGetMetadataWhenCollectionThrowsAnException() {
         $this->collection->expects($this->once())->method('findOne')->with(
@@ -242,6 +257,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 404
      * @expectedExceptionMessage Image not found
+     * @covers Imbo\Database\MongoDB::getMetadata
      */
     public function testGetMetadataWhenEntryDoesNotExist() {
         $this->collection->expects($this->once())->method('findOne')->with(
@@ -251,6 +267,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->getMetadata($this->publicKey, $this->imageIdentifier);
     }
 
+    /**
+     * @covers Imbo\Database\MongoDB::getMetadata
+     */
     public function testSuccessfulGetMetadata() {
         $metadata = array(
             'foo' => 'bar',
@@ -273,6 +292,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to remove metadata
+     * @covers Imbo\Database\MongoDB::deleteMetadata
      */
     public function testDeleteMetadataWhenCollectionThrowsAnException() {
         $this->collection->expects($this->once())->method('update')->with(
@@ -284,6 +304,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->deleteMetadata($this->publicKey, $this->imageIdentifier);
     }
 
+    /**
+     * @covers Imbo\Database\MongoDB::deleteMetadata
+     */
     public function testSuccessfulDeleteMetadata() {
         $this->collection->expects($this->once())->method('update')->with(
             array('publicKey' => $this->publicKey, 'imageIdentifier' => $this->imageIdentifier),
@@ -296,6 +319,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($result);
     }
 
+    /**
+     * @covers Imbo\Database\MongoDB::getImages
+     */
     public function testGetImages() {
         $query = $this->getMock('Imbo\Resource\Images\Query');
         $query->expects($this->once())->method('from')->will($this->returnValue(123123123));
@@ -329,6 +355,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to search for images
+     * @covers Imbo\Database\MongoDB::getImages
      */
     public function testGetImagesWhenCollectionThrowsException() {
         $query = $this->getMock('Imbo\Resource\Images\Query');
@@ -346,6 +373,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to fetch image data
+     * @covers Imbo\Database\MongoDB::load
      */
     public function testLoadWhenCollectionThrowsException() {
         $this->collection->expects($this->once())->method('findOne')->with(
@@ -360,6 +388,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 404
      * @expectedExceptionMessage Image not found
+     * @covers Imbo\Database\MongoDB::load
      */
     public function testLoadWhenImageDoesNotExist() {
         $this->collection->expects($this->once())->method('findOne')->with(
@@ -370,6 +399,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->load($this->publicKey, $this->imageIdentifier, $this->getMock('Imbo\Image\ImageInterface'));
     }
 
+    /**
+     * @covers Imbo\Database\MongoDB::load
+     */
     public function testSuccessfulLoad() {
         $data = array(
             'name' => 'filename',
@@ -397,6 +429,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Unable to fetch image data
+     * @covers Imbo\Database\MongoDB::getLastModified
      */
     public function testGetLastModifiedWhenCollectionThrowsException() {
         $this->collection->expects($this->once())->method('find')->with(
@@ -411,6 +444,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 404
      * @expectedExceptionMessage Image not found
+     * @covers Imbo\Database\MongoDB::getLastModified
      */
     public function testGetLastModifiedWhenImageDoesNotExist() {
         $cursor = $this->getMockBuilder('MongoCursor')->disableOriginalConstructor()->setMethods(array('limit', 'sort', 'getNext'))->getMock();
@@ -426,6 +460,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
     }
 
+    /**
+     * @covers Imbo\Database\MongoDB::getLastModified
+     */
     public function testGetLastModifiedWhenUserDoesNotHaveAnyImages() {
         $cursor = $this->getMockBuilder('MongoCursor')->disableOriginalConstructor()->setMethods(array('limit', 'sort', 'getNext'))->getMock();
         $cursor->expects($this->any())->method('limit')->will($this->returnValue($cursor));
@@ -440,6 +477,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('DateTime', $this->driver->getLastModified($this->publicKey));
     }
 
+    /**
+     * @covers Imbo\Database\MongoDB::getLastModified
+     */
     public function testGetLastModifiedWithoutImageIdentifier() {
         $now = time();
 
@@ -463,6 +503,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($now, strtotime($formatted));
     }
 
+    /**
+     * @covers Imbo\Database\MongoDB::getLastModified
+     */
     public function testGetLastModifiedWithImageIdentifier() {
         $now = time();
 
@@ -489,12 +532,16 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 500
+     * @covers Imbo\Database\MongoDB::getNumImages
      */
     public function testGetNumImagesWhenMongoThrowsAnException() {
         $this->collection->expects($this->once())->method('find')->will($this->throwException(new MongoException()));
         $this->driver->getNumImages($this->publicKey);
     }
 
+    /**
+     * @covers Imbo\Database\MongoDB::getNumImages
+     */
     public function testGetNumImages() {
         $result = $this->getMock('stdClass', array('count'));
         $result->expects($this->once())->method('count')->will($this->returnValue(2));

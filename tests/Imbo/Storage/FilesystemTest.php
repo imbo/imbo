@@ -40,6 +40,7 @@ use vfsStream,
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Storage\Filesystem
  */
 class FilesystemTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -68,12 +69,16 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionMessage File not found
+     * @covers Imbo\Storage\Filesystem::delete
      */
     public function testDeleteFileThatDoesNotExist() {
         $driver = new Filesystem(array('dataDir' => 'foobar'));
         $driver->delete($this->publicKey, $this->imageIdentifier);
     }
 
+    /**
+     * @covers Imbo\Storage\Filesystem::delete
+     */
     public function testDelete() {
         vfsStream::setup('basedir');
         $driver = new Filesystem(array('dataDir' => vfsStream::url('basedir')));
@@ -107,6 +112,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException Imbo\Exception\StorageException
      * @expectedExpectionMessage Could not store image
+     * @covers Imbo\Storage\Filesystem::store
      */
     public function testStoreToUnwritablePath() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
@@ -123,6 +129,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionMessage Image already exists
      * @expectedExceptionCode 400
+     * @covers Imbo\Storage\Filesystem::store
      */
     public function testStoreFileTwice() {
         $content = 'some content';
@@ -138,6 +145,9 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $driver->store($this->publicKey, $this->imageIdentifier, $image);
     }
 
+    /**
+     * @covers Imbo\Storage\Filesystem::store
+     */
     public function testStore() {
         $content = 'some content';
         $image = $this->getMock('Imbo\Image\ImageInterface');
@@ -151,6 +161,9 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($driver->store($this->publicKey, $this->imageIdentifier, $image));
     }
 
+    /**
+     * @covers Imbo\Storage\Filesystem::getImagePath
+     */
     public function testGetImagePath() {
         $driver = new Filesystem(array('dataDir' => '/tmp'));
         $this->assertSame(
@@ -166,6 +179,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionCode 404
+     * @covers Imbo\Storage\Filesystem::load
      */
     public function testLoadFileThatDoesNotExist() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
@@ -173,6 +187,9 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $driver->load($this->publicKey, $this->imageIdentifier, $image);
     }
 
+    /**
+     * @covers Imbo\Storage\Filesystem::load
+     */
     public function testLoad() {
         vfsStream::setup('basedir');
         $driver = new Filesystem(array('dataDir' => vfsStream::url('basedir')));
@@ -211,12 +228,16 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\StorageException
      * @expectedExceptionMessage File not found
      * @expectedExceptionCode 404
+     * @covers Imbo\Storage\Filesystem::getLastModified
      */
     public function testGetLastModifiedWithFileThatDoesNotExist() {
         $driver = new Filesystem(array('dataDir' => '/some/path'));
         $driver->getLastModified($this->publicKey, $this->imageIdentifier);
     }
 
+    /**
+     * @covers Imbo\Storage\Filesystem::getLastModified
+     */
     public function testGetLastModified() {
         vfsStream::setup('basedir');
         $driver = new Filesystem(array('dataDir' => vfsStream::url('basedir')));

@@ -39,10 +39,10 @@ use Imbo\Image\TransformationChain;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Http\Request\Request
  */
 class RequestTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @covers Imbo\Http\Request\Request::__construct
      * @covers Imbo\Http\Request\Request::getTransformations
      */
     public function testGetTransformationsWithNoTransformationsPresent() {
@@ -357,7 +357,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     public function testSetGetRawImageData() {
         $image = file_get_contents(__DIR__ . '/../../_files/image.png');
         $request = new Request();
-        $request->setRawData($image);
+        $this->assertSame($request, $request->setRawData($image));
         $this->assertSame($image, $request->getRawData());
     }
 
@@ -369,7 +369,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($request->getRealImageIdentifier());
 
         $image = file_get_contents(__DIR__ . '/../../_files/image.png');
-        $request->setRawData($image);
+        $this->assertSame($request, $request->setRawData($image));
         $this->assertSame('929db9c5fc3099f7576f5655207eba47', $request->getRealImageIdentifier());
     }
 }

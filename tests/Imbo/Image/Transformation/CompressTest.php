@@ -37,12 +37,16 @@ namespace Imbo\Image\Transformation;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\Transformation\Compress
  */
 class CompressTest extends TransformationTests {
     protected function getTransformation() {
         return new Compress(90);
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\Compress::applyToImage
+     */
     public function testApplyToImage() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));

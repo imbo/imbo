@@ -37,6 +37,7 @@ namespace Imbo\Http;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Http\ParameterContainer
  */
 class ParameterContainerTest extends \PHPUnit_Framework_TestCase {
     private $container;
@@ -57,26 +58,39 @@ class ParameterContainerTest extends \PHPUnit_Framework_TestCase {
         $this->parameters = null;
     }
 
+    /**
+     * @covers Imbo\Http\ServerContainer::getAll
+     */
     public function testContainer() {
         $this->assertSame($this->parameters, $this->container->getAll());
     }
 
+    /**
+     * @covers Imbo\Http\ServerContainer::has
+     * @covers Imbo\Http\ServerContainer::remove
+     */
     public function testRemoveKey() {
         $this->assertTrue($this->container->has('key1'));
-        $this->container->remove('key1');
+        $this->assertSame($this->container, $this->container->remove('key1'));
         $this->assertFalse($this->container->has('key1'));
     }
 
+    /**
+     * @covers Imbo\Http\ServerContainer::set
+     * @covers Imbo\Http\ServerContainer::get
+     */
     public function testSetAndGet() {
-        $this->container->set('key', 'value');
+        $this->assertSame($this->container, $this->container->set('key', 'value'));
         $this->assertSame('value', $this->container->get('key'));
     }
 
     /**
      * @depends testSetAndGet
+     * @covers Imbo\Http\ServerContainer::removeAll
+     * @covers Imbo\Http\ServerContainer::getAll
      */
     public function testRemoveAll() {
-        $this->container->removeAll();
+        $this->assertSame($this->container, $this->container->removeAll());
         $this->assertEmpty($this->container->getAll());
     }
 }
