@@ -13,7 +13,9 @@
     ErrorLog /path/to/logs/imbo.error_log
 
     # Rewrite rules that rewrite all requests to the index.php script
-    RewriteEngine on
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule .* index.php
+    <Directory /path/to/document/root>
+        RewriteEngine on
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule .* index.php
+    </Directory>
 </VirtualHost>
