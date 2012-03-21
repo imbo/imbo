@@ -90,4 +90,11 @@ interface ParameterContainerInterface {
      * @return boolean
      */
     function has($key);
+
+    /**
+     * Return the query as a string
+     *
+     * @return string
+     */
+    function asString();
 }

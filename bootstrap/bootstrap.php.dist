@@ -79,7 +79,7 @@ $container->response = new Imbo\Http\Response\Response();
 // Event manager
 $container->eventManager = $container->shared(function(Imbo\Container $container) {
     $manager = new Imbo\EventManager\EventManager($container->request, $container->response, $container->image);
-    $manager->attachListener(new Imbo\EventListener\TransformationKey());
+    $manager->attachListener(new Imbo\EventListener\AccessToken());
 
     return $manager;
 });

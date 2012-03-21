@@ -109,4 +109,11 @@ class ParameterContainer implements ParameterContainerInterface {
     public function has($key) {
         return isset($this->parameters[$key]);
     }
+
+    /**
+     * @see Imbo\Http\ParameterContainerInterface::asString()
+     */
+    public function asString() {
+        return preg_replace('/\[\d+\]/', '[]', urldecode(http_build_query($this->parameters)));
+    }
 }
