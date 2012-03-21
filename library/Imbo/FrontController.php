@@ -234,6 +234,11 @@ class FrontController {
         $response->getHeaders()->set('X-Imbo-AuthUrl', $request->getUrl());
 
         $signature = $query->get('signature');
+
+        // Remove signature and timestamp from the query params
+        $query->remove('signature')
+              ->remove('timestamp');
+
         $this->signatureValidator->setHttpMethod($request->getMethod())
                                  ->setUrl($request->getUrl())
                                  ->setTimestamp($timestamp)

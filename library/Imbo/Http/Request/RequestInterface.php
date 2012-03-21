@@ -122,23 +122,24 @@ interface RequestInterface {
     function getPort();
 
     /**
-     * Get the baseurl
+     * Get the base URL
      *
      * @return string
      */
     function getBaseUrl();
 
     /**
-     * Get the current accessed path (the part after the base url)
+     * Get the current accessed path (the part after the base URL)
      *
      * @return string
      */
     function getPath();
 
     /**
-     * Get the current url
+     * Get the current URL including query parameters
      *
-     * If the accessed port equals 80, this must be stripped from the URL returned from this method
+     * If the accessed port equals 80 and the scheme is HTTP or if the accessed port is 443 and the
+     * scheme is https, the port must be stripped from the URL returned from this method.
      *
      * @return string
      */
