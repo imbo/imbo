@@ -298,7 +298,16 @@ class Request implements RequestInterface {
             $port = ':' . $port;
         }
 
-        return sprintf('%s://%s%s%s%s', $scheme, $this->getHost(), $port, $this->getBaseUrl(), $this->getPath());
+        // Fetch query string
+        $queryString = $this->getQuery()->asString();
+
+        if (!empty($queryString)) {
+            $queryString = '?' . $queryString;
+        }
+
+        $url = sprintf('%s://%s%s%s%s%s', $scheme, $this->getHost(), $port, $this->getBaseUrl(), $this->getPath(), $queryString);
+
+        return $url;
     }
 
     /**
