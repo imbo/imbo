@@ -37,6 +37,7 @@ namespace Imbo\Image;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\Image
  */
 class ImageTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -60,43 +61,112 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
         $this->image = null;
     }
 
+    /**
+     * @covers Imbo\Image\Image::setMetadata
+     * @covers Imbo\Image\Image::getMetadata
+     */
     public function testSetGetMetadata() {
         $data = array(
             'foo' => 'bar',
             'bar' => 'foo',
         );
-        $this->image->setMetadata($data);
+        $this->assertSame($this->image, $this->image->setMetadata($data));
         $this->assertSame($data, $this->image->getMetadata());
     }
 
+    /**
+     * @covers Imbo\Image\Image::setMimeType
+     * @covers Imbo\Image\Image::getMimeType
+     */
     public function testSetGetMimeType() {
         $mimeType = 'image/png';
-        $this->image->setMimeType($mimeType);
+        $this->assertSame($this->image, $this->image->setMimeType($mimeType));
         $this->assertSame($mimeType, $this->image->getMimeType());
     }
 
+    /**
+     * @covers Imbo\Image\Image::setBlob
+     * @covers Imbo\Image\Image::getBlob
+     * @covers Imbo\Image\Image::getFilesize
+     */
     public function testSetGetBlob() {
         $blob = 'some string';
-        $this->image->setBlob($blob);
+        $this->assertSame($this->image, $this->image->setBlob($blob));
         $this->assertSame($blob, $this->image->getBlob());
         $this->assertSame(11, $this->image->getFilesize());
     }
 
+    /**
+     * @covers Imbo\Image\Image::setExtension
+     * @covers Imbo\Image\Image::getExtension
+     */
     public function testSetGetExtension() {
         $extension = 'png';
-        $this->image->setExtension($extension);
+        $this->assertSame($this->image, $this->image->setExtension($extension));
         $this->assertSame($extension, $this->image->getExtension());
     }
 
+    /**
+     * @covers Imbo\Image\Image::setWidth
+     * @covers Imbo\Image\Image::getWidth
+     */
     public function testSetGetWidth() {
         $width = 123;
-        $this->image->setWidth($width);
+        $this->assertSame($this->image, $this->image->setWidth($width));
         $this->assertSame($width, $this->image->getWidth());
     }
 
+    /**
+     * @covers Imbo\Image\Image::setHeight
+     * @covers Imbo\Image\Image::getHeight
+     */
     public function testSetGetHeight() {
         $height = 234;
-        $this->image->setHeight($height);
+        $this->assertSame($this->image, $this->image->setHeight($height));
         $this->assertSame($height, $this->image->getHeight());
+    }
+
+    /**
+     * Get mime types and whether or not they are supported
+     *
+     * @return array
+     */
+    public function getMimeTypes() {
+        return array(
+            array('image/png', true),
+            array('image/jpeg', true),
+            array('image/gif', true),
+            array('image/jpg', false),
+        );
+    }
+
+    /**
+     * @covers Imbo\Image\Image::supportedMimeType
+     * @dataProvider getMimeTypes
+     */
+    public function testSupportedMimeType($type, $result) {
+        $this->assertSame($result, Image::supportedMimeType($type));
+    }
+
+    /**
+     * Get mime types and file extensions
+     *
+     * @return array
+     */
+    public function getFileExtensions() {
+        return array(
+            array('image/png', 'png'),
+            array('image/jpeg', 'jpg'),
+            array('image/gif', 'gif'),
+            array('image/jpg', false),
+        );
+    }
+
+    /**
+     * @covers Imbo\Image\Image::getFileExtension
+     * @dataProvider getFileExtensions
+     */
+    public function testGetFileExtension($type, $extension) {
+        $this->assertSame($extension, Image::getFileExtension($type));
     }
 }

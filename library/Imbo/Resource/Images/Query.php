@@ -60,7 +60,7 @@ class Query implements QueryInterface {
     /**
      * Return metadata or not
      *
-     * @var string
+     * @var boolean
      */
     private $returnMetadata = false;
 

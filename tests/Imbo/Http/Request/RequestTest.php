@@ -39,10 +39,10 @@ use Imbo\Image\TransformationChain;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Http\Request\Request
  */
 class RequestTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @covers Imbo\Http\Request\Request::__construct
      * @covers Imbo\Http\Request\Request::getTransformations
      */
     public function testGetTransformationsWithNoTransformationsPresent() {
@@ -282,19 +282,120 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $publicKey = md5(microtime());
 
         return array(
-            array('localhost', 80, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'http://localhost/users/' . $publicKey),
-            array('localhost', 80, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'http://localhost/prefix/users/' . $publicKey),
-            array('localhost:81', 81, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'http://localhost:81/users/' . $publicKey),
-            array('localhost:81', 81, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'http://localhost:81/prefix/users/' . $publicKey),
-            array('localhost:80', 80, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'http://localhost/users/' . $publicKey),
-            array('localhost:80', 80, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'http://localhost/prefix/users/' . $publicKey),
+            array(
+                'localhost', 80,
+                array('accessToken' => 'token'),
+                '/var/www', '/var/www/index.php',
+                '/users/' . $publicKey,
+                'http://localhost/users/' . $publicKey . '?accessToken=token'
+            ),
 
-            array('localhost', 443, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'https://localhost/users/' . $publicKey, true),
-            array('localhost', 443, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'https://localhost/prefix/users/' . $publicKey, true),
-            array('localhost:444', 444, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'https://localhost:444/users/' . $publicKey, true),
-            array('localhost:444', 444, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'https://localhost:444/prefix/users/' . $publicKey, true),
-            array('localhost:443', 443, '/var/www', '/var/www/index.php', '/users/' . $publicKey, 'https://localhost/users/' . $publicKey, true),
-            array('localhost:443', 443, '/var/www', '/var/www/prefix/index.php', '/users/' . $publicKey, 'https://localhost/prefix/users/' . $publicKey, true),
+            array(
+                'localhost', 80,
+                array(
+                    'accessToken' => 'token',
+                    't' => array(
+                        'border',
+                        'thumbnail',
+                        'flipVertically'
+                    ),
+                ),
+                '/var/www', '/var/www/prefix/index.php',
+                '/users/' . $publicKey,
+                'http://localhost/prefix/users/' . $publicKey . '?accessToken=token&t[]=border&t[]=thumbnail&t[]=flipVertically'
+            ),
+
+            array(
+                'localhost:81', 81,
+                array(),
+                '/var/www', '/var/www/index.php',
+                '/users/' . $publicKey,
+                'http://localhost:81/users/' . $publicKey
+            ),
+
+            array(
+                'localhost:81', 81,
+                array(),
+                '/var/www', '/var/www/prefix/index.php',
+                '/users/' . $publicKey,
+                'http://localhost:81/prefix/users/' . $publicKey
+            ),
+
+            array(
+                'localhost:80', 80,
+                array(),
+                '/var/www', '/var/www/index.php',
+                '/users/' . $publicKey,
+                'http://localhost/users/' . $publicKey
+            ),
+
+            array(
+                'localhost:80', 80,
+                array(),
+                '/var/www', '/var/www/prefix/index.php',
+                '/users/' . $publicKey,
+                'http://localhost/prefix/users/' . $publicKey
+            ),
+
+            array(
+                'localhost', 443,
+                array(),
+                '/var/www', '/var/www/index.php',
+                '/users/' . $publicKey,
+                'https://localhost/users/' . $publicKey,
+                true
+            ),
+
+            array(
+                'localhost', 443,
+                array(),
+                '/var/www', '/var/www/prefix/index.php',
+                '/users/' . $publicKey,
+                'https://localhost/prefix/users/' . $publicKey,
+                true
+            ),
+
+            array(
+                'localhost:444', 444,
+                array(),
+                '/var/www', '/var/www/index.php',
+                '/users/' . $publicKey,
+                'https://localhost:444/users/' . $publicKey,
+                true
+            ),
+
+            array(
+                'localhost:444', 444,
+                array(),
+                '/var/www', '/var/www/prefix/index.php',
+                '/users/' . $publicKey,
+                'https://localhost:444/prefix/users/' . $publicKey,
+                true
+            ),
+
+            array(
+                'localhost:443', 443,
+                array(),
+                '/var/www', '/var/www/index.php',
+                '/users/' . $publicKey,
+                'https://localhost/users/' . $publicKey,
+                true
+            ),
+
+            array(
+                'localhost:443', 443,
+                array(
+                    't' => array(
+                        'flipHorizontally',
+                        'border',
+                    ),
+                    'accessToken' => 'token',
+                ),
+                '/var/www', '/var/www/prefix/index.php',
+                '/users/' . $publicKey,
+                'https://localhost/prefix/users/' . $publicKey . '?t[]=flipHorizontally&t[]=border&accessToken=token',
+                true
+            ),
         );
     }
 
@@ -303,15 +404,19 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Request\Request::__construct
      * @covers Imbo\Http\Request\Request::getUrl
      */
-    public function testGetUrlWithImboInDocumentRoot($host, $port, $documentRoot, $scriptFilename, $redirectUrl, $expected, $ssl = false) {
-        $request = new Request(array(), array(), array(
-            'HTTP_HOST' => $host,
-            'DOCUMENT_ROOT' => $documentRoot,
-            'SCRIPT_FILENAME' => $scriptFilename,
-            'REDIRECT_URL' => $redirectUrl,
-            'SERVER_PORT' => $port,
-            'HTTPS' => (int) $ssl,
-        ));
+    public function testGetUrlWithImboInDocumentRoot($host, $port, array $queryParams, $documentRoot, $scriptFilename, $redirectUrl, $expected, $ssl = false) {
+        $request = new Request(
+            $queryParams,
+            array(),
+            array(
+                'HTTP_HOST' => $host,
+                'DOCUMENT_ROOT' => $documentRoot,
+                'SCRIPT_FILENAME' => $scriptFilename,
+                'REDIRECT_URL' => $redirectUrl,
+                'SERVER_PORT' => $port,
+                'HTTPS' => (int) $ssl,
+            )
+        );
 
         $this->assertSame($expected, $request->getUrl());
     }
@@ -357,7 +462,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     public function testSetGetRawImageData() {
         $image = file_get_contents(__DIR__ . '/../../_files/image.png');
         $request = new Request();
-        $request->setRawData($image);
+        $this->assertSame($request, $request->setRawData($image));
         $this->assertSame($image, $request->getRawData());
     }
 
@@ -369,7 +474,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($request->getRealImageIdentifier());
 
         $image = file_get_contents(__DIR__ . '/../../_files/image.png');
-        $request->setRawData($image);
+        $this->assertSame($request, $request->setRawData($image));
         $this->assertSame('929db9c5fc3099f7576f5655207eba47', $request->getRealImageIdentifier());
     }
 }

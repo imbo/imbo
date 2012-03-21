@@ -37,8 +37,15 @@ namespace Imbo\Http;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Http\HeaderContainer
  */
 class HeaderContainerTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @covers Imbo\Http\HeaderContainer::__construct
+     * @covers Imbo\Http\HeaderContainer::get
+     * @covers Imbo\Http\HeaderContainer::remove
+     * @covers Imbo\Http\HeaderContainer::has
+     */
     public function testHeaderContainer() {
         $parameters = array(
             'key' => 'value',
@@ -55,9 +62,9 @@ class HeaderContainerTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(234, $container->get('CONTENT_LENGTH'));
         $this->assertSame(234, $container->get('content-length'));
         $this->assertSame('asdf', $container->get('if-none-match'));
-        $container->remove('if-none-match');
+        $this->assertSame($container, $container->remove('if-none-match'));
         $this->assertFalse($container->has('if-none-match'));
-        $container->set('IF_NONE_MATCH', 'asd');
+        $this->assertSame($container, $container->set('IF_NONE_MATCH', 'asd'));
         $this->assertSame('asd', $container->get('if-none-match'));
     }
 }

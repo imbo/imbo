@@ -37,8 +37,16 @@ namespace Imbo\EventManager;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\EventManager\Event
  */
 class EventTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @covers Imbo\EventManager\Event::__construct
+     * @covers Imbo\EventManager\Event::getName
+     * @covers Imbo\EventManager\Event::getRequest
+     * @covers Imbo\EventManager\Event::getResponse
+     * @covers Imbo\EventManager\Event::getImage
+     */
     public function testEvent() {
         $name = 'some.event.name';
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
@@ -53,6 +61,10 @@ class EventTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($image, $event->getImage());
     }
 
+    /**
+     * @covers Imbo\EventManager\Event::__construct
+     * @covers Imbo\EventManager\Event::getImage
+     */
     public function testEventWithNoImageInstance() {
         $event = new Event('some name',
                            $this->getMock('Imbo\Http\Request\RequestInterface'),

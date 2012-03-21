@@ -92,6 +92,13 @@ class ImagePreparation implements ImagePreparationInterface {
         $size = getimagesize($tmpFile);
         unlink($tmpFile);
 
+        if (!$size) {
+            $e = new ImageException('Broken image', 415);
+            $e->setImboErrorCode(Exception::IMAGE_BROKEN_IMAGE);
+
+            throw $e;
+        }
+
         // Store relevant information in the image instance
         $image->setMimeType($mime)
               ->setExtension($extension)

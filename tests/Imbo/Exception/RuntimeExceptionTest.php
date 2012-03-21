@@ -37,6 +37,7 @@ namespace Imbo\Exception;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Exception\RuntimeException
  */
 class RuntimeExceptionTest extends \PHPUnit_Framework_TestCase {
     public function getErrorCodes() {
@@ -48,6 +49,8 @@ class RuntimeExceptionTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Exception\RuntimeException::setImboErrorCode
+     * @covers Imbo\Exception\RuntimeException::getImboErrorCode
      * @dataProvider getErrorCodes
      */
     public function testSetAndGetImboErrorCode($actual, $expected) {

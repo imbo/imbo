@@ -37,12 +37,16 @@ namespace Imbo\Image\Transformation;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\Transformation\Border
  */
 class BorderTest extends TransformationTests {
     protected function getTransformation() {
         return new Border();
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\Border::applyToImage
+     */
     public function testApplyToImage() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));

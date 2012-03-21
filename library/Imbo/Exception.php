@@ -61,6 +61,7 @@ interface Exception {
     const IMAGE_NO_IMAGE_ATTACHED    = 201;
     const IMAGE_HASH_MISMATCH        = 202;
     const IMAGE_UNSUPPORTED_MIMETYPE = 203;
+    const IMAGE_BROKEN_IMAGE         = 204;
     /**#@-*/
 
     /**

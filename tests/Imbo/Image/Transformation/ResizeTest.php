@@ -37,12 +37,16 @@ namespace Imbo\Image\Transformation;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\Transformation\Resize
  */
 class ResizeTest extends TransformationTests {
     protected function getTransformation() {
         return new Resize(1, 2);
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\Resize::applyToImage
+     */
     public function testApplyToImageWithBothParams() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
@@ -55,6 +59,9 @@ class ResizeTest extends TransformationTests {
         $transformation->applyToImage($image);
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\Resize::applyToImage
+     */
     public function testApplyToImageWithOnlyWidth() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
@@ -67,6 +74,9 @@ class ResizeTest extends TransformationTests {
         $transformation->applyToImage($image);
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\Resize::applyToImage
+     */
     public function testApplyToImageWithOnlyHeight() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));

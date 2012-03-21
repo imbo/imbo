@@ -37,12 +37,16 @@ namespace Imbo\Image\Transformation;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\Transformation\Convert
  */
 class ConvertTest extends TransformationTests {
     protected function getTransformation() {
         return new Convert('png');
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\Convert::applyToImage
+     */
     public function testConvertToSameTypeAsImage() {
         $convert = $this->getTransformation();
         $image = $this->getMock('Imbo\Image\ImageInterface');
@@ -56,6 +60,9 @@ class ConvertTest extends TransformationTests {
         $convert->applyToImage($image);
     }
 
+    /**
+     * @covers Imbo\Image\Transformation\Convert::applyToImage
+     */
     public function testApplyToImage() {
         $convert = $this->getTransformation();
 

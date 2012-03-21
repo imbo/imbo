@@ -37,6 +37,7 @@ namespace Imbo\Resource\Images;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Resource\Images\Query
  */
 class QueryTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -54,44 +55,62 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
         $this->query = null;
     }
 
+    /**
+     * @covers Imbo\Resource\Images\Query::page
+     */
     public function testPage() {
         $value = 2;
         $this->assertSame(1, $this->query->page());
-        $this->query->page($value);
+        $this->assertSame($this->query, $this->query->page($value));
         $this->assertSame($value, $this->query->page());
     }
 
+    /**
+     * @covers Imbo\Resource\Images\Query::limit
+     */
     public function testLimit() {
         $value = 30;
         $this->assertSame(20, $this->query->limit());
-        $this->query->limit($value);
+        $this->assertSame($this->query, $this->query->limit($value));
         $this->assertSame($value, $this->query->limit());
     }
 
+    /**
+     * @covers Imbo\Resource\Images\Query::returnMetadata
+     */
     public function testReturnMetadata() {
         $this->assertFalse($this->query->returnMetadata());
-        $this->query->returnMetadata(true);
+        $this->assertSame($this->query, $this->query->returnMetadata(true));
         $this->assertTrue($this->query->returnMetadata());
     }
 
+    /**
+     * @covers Imbo\Resource\Images\Query::metadataQuery
+     */
     public function testMetadataQuery() {
         $value = array('category' => 'some category');
         $this->assertSame(array(), $this->query->metadataQuery());
-        $this->query->metadataQuery($value);
+        $this->assertSame($this->query, $this->query->metadataQuery($value));
         $this->assertSame($value, $this->query->metadataQuery());
     }
 
+    /**
+     * @covers Imbo\Resource\Images\Query::from
+     */
     public function testFrom() {
         $value = 123123123;
         $this->assertNull($this->query->from());
-        $this->query->from($value);
+        $this->assertSame($this->query, $this->query->from($value));
         $this->assertSame($value, $this->query->from());
     }
 
+    /**
+     * @covers Imbo\Resource\Images\Query::to
+     */
     public function testTo() {
         $value = 123123123;
         $this->assertNull($this->query->to());
-        $this->query->to($value);
+        $this->assertSame($this->query, $this->query->to($value));
         $this->assertSame($value, $this->query->to());
     }
 }

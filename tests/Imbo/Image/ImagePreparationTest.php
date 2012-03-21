@@ -37,6 +37,7 @@ namespace Imbo\Image;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\ImagePreparation
  */
 class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     private $preparation;
@@ -56,6 +57,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Image\ImagePreparation::prepareImage
      * @expectedException Imbo\Exception\ImageException
      * @expectedExceptionMessage No image attached
      * @expectedExceptionCode 400
@@ -67,6 +69,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Image\ImagePreparation::prepareImage
      * @expectedException Imbo\Exception\ImageException
      * @expectedExceptionMessage Hash mismatch
      * @expectedExceptionCode 400
@@ -79,6 +82,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Image\ImagePreparation::prepareImage
      * @expectedException Imbo\Exception\ImageException
      * @expectedExceptionMessage Unsupported image type
      * @expectedExceptionCode 415
@@ -90,6 +94,24 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
         $this->prepare->prepareImage($this->request, $this->image);
     }
 
+    /**
+     * @covers Imbo\Image\ImagePreparation::prepareImage
+     * @expectedException Imbo\Exception\ImageException
+     * @expectedExceptionMessage Broken image
+     * @expectedExceptionCode 415
+     */
+    public function testPrepareImageWithBrokenImage() {
+        $filePath = __DIR__ . '/../_files/broken-image.jpg';
+
+        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue(file_get_contents($filePath)));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(md5_file($filePath)));
+
+        $this->prepare->prepareImage($this->request, $this->image);
+    }
+
+    /**
+     * @covers Imbo\Image\ImagePreparation::prepareImage
+     */
     public function testSuccessfulPrepareImage() {
         $imagePath = __DIR__ . '/../_files/image.png';
         $imageData = file_get_contents($imagePath);
