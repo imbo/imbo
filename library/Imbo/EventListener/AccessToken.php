@@ -33,17 +33,15 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Http\Response\ResponseInterface,
-    Imbo\Exception\TransformationException;
+    Imbo\Exception\RuntimeException;
 
 /**
- * Transformation key
+ * Access token event listener
  *
- * This event listener will listen to all GET requests for images and make sure that requests that
- * will end up doing a transformation to an image includes a correct transformation key. The
- * official PHP-based imbo client (https://github.com/imbo/imboclient-php) does this
- * by default.
- *
- * This event listener listens for GET and HEAD requests for image resources.
+ * This event listener will listen to all GET and HEAD requests and make sure that they include a
+ * valid access token. The official PHP-based imbo client (https://github.com/imbo/imboclient-php)
+ * appends this token to all such requests by default. If the access token is missing or invalid
+ * the event listener will throw an exception resulting in a HTTP response with 400 Bad Request.
  *
  * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -51,14 +49,21 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class TransformationKey extends Listener implements ListenerInterface {
+class AccessToken extends Listener implements ListenerInterface {
     /**
      * @see Imbo\EventListener\ListenerInterface::getEvents()
      */
     public function getEvents() {
         return array(
+            'user.get.pre',
+            'images.get.pre',
             'image.get.pre',
+            'metadata.get.pre',
+
+            'user.head.pre',
+            'images.head.pre',
             'image.head.pre',
+            'metadata.head.pre',
         );
     }
 
@@ -67,52 +72,22 @@ class TransformationKey extends Listener implements ListenerInterface {
      */
     public function invoke(EventInterface $event) {
         $request = $event->getRequest();
-        $params = $request->getQuery();
+        $query = $request->getQuery();
 
-        // Fetch a possible extension
-        $extension = $request->getImageExtension();
-
-        if (!$extension && !$params->has('t')) {
-            // No custom extension and no transformations. Simply return as we don't have to verify
-            // any transformation key
-            return;
+        if (!$query->has('accessToken')) {
+            throw new RuntimeException('Missing access token', 400);
         }
 
-        if (!$params->has('tk')) {
-            // We have a custom extension and/or one or more transformations, but no key
-            throw new TransformationException('Missing transformation key', 400);
-        }
+        $token = $query->get('accessToken');
+        $url = $request->getUrl();
 
-        // We have a key. Lets see if it's correct
-        $key = $params->get('tk');
+        // Remove the access token from the query string as it's not used to generate the HMAC
+        $url = trim(preg_replace('/(\?|&)accessToken=' . $token . '&?/', '\\1', $url), '&?');
 
-        // Fetch transformations
-        $transformations = $params->get('t');
+        $correctToken = hash_hmac('sha256', $url, $request->getPrivateKey());
 
-        // Initialize data used for the HMAC
-        $data = $request->getPublicKey() . '|' . $request->getImageIdentifier();
-
-        if ($extension) {
-            // Append custom extension
-            $data .= '.' . $extension;
-        }
-
-        if ($transformations) {
-            // We have transformations. Build the query string in the same fashion as the client
-            $query = null;
-            $query = array_reduce($transformations, function($query, $element) {
-                return $query . 't[]=' . $element . '&';
-            }, $query);
-
-            $data .= '|' . rtrim($query, '&');
-        }
-
-        // Compute the key using the private key of the current user
-        $actualKey = hash_hmac('md5', $data, $request->getPrivateKey());
-
-        if ($key !== $actualKey) {
-            // Key from the request is not correct
-            throw new TransformationException('Invalid transformation key', 400);
+        if ($correctToken !== $token) {
+            throw new RuntimeException('Incorrect access token', 400);
         }
     }
 }

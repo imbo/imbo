@@ -93,4 +93,20 @@ class ParameterContainerTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->container, $this->container->removeAll());
         $this->assertEmpty($this->container->getAll());
     }
+
+    public function getParameters() {
+        return array(
+            array(array('foo' => 'bar', 'bar' => 'foo'), 'foo=bar&bar=foo'),
+            array(array('key' => 'value', 'keys' => array(1, 2, 3, 'four'), 'foo' => 'bar'), 'key=value&keys[]=1&keys[]=2&keys[]=3&keys[]=four&foo=bar'),
+        );
+    }
+
+    /**
+     * @dataProvider getParameters
+     * @covers Imbo\Http\ParameterContainer::asString
+     */
+    public function testAsString(array $params, $expected) {
+        $container = new ParameterContainer($params);
+        $this->assertSame($expected, $container->asString());
+    }
 }

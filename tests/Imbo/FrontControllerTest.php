@@ -288,6 +288,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $query = $this->getMock('Imbo\Http\ParameterContainerInterface');
         $query->expects($this->any())->method('has')->will($this->returnValue(true));
         $query->expects($this->any())->method('get');
+        $query->expects($this->any())->method('remove')->with($this->isType('string'))->will($this->returnSelf());
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
@@ -322,6 +323,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $query = $this->getMock('Imbo\Http\ParameterContainerInterface');
         $query->expects($this->any())->method('has')->will($this->returnValue(true));
         $query->expects($this->any())->method('get');
+        $query->expects($this->any())->method('remove')->with($this->isType('string'))->will($this->returnSelf());
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
