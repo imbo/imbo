@@ -96,6 +96,7 @@ class ParameterContainerTest extends \PHPUnit_Framework_TestCase {
 
     public function getParameters() {
         return array(
+            array(array('foo' => '', 'bar' => 'foo'), 'foo=&bar=foo'),
             array(array('foo' => 'bar', 'bar' => 'foo'), 'foo=bar&bar=foo'),
             array(array('key' => 'value', 'keys' => array(1, 2, 3, 'four'), 'foo' => 'bar'), 'key=value&keys[]=1&keys[]=2&keys[]=3&keys[]=four&foo=bar'),
         );
