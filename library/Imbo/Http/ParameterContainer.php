@@ -114,6 +114,7 @@ class ParameterContainer implements ParameterContainerInterface {
      * @see Imbo\Http\ParameterContainerInterface::asString()
      */
     public function asString() {
-        return preg_replace('/\[\d+\]/', '[]', urldecode(http_build_query($this->parameters)));
+        // Translate %5B and %5D back to [] as the client uses [] when generating the access token
+        return preg_replace('/%5B\d+%5D/', '[]', http_build_query($this->parameters));
     }
 }
