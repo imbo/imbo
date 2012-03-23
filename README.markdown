@@ -27,14 +27,14 @@ Get meta data related to the image identified by &lt;image&gt;. The meta data wi
 Get information about the images stored in Imbo for the user with the public key &lt;publicKey&gt;. Supported query parameters are:
 
 * `(int) page` The page number. Defaults to 1.
-* `(int) num` Number of images pr. page. Defaults to 20.
+* `(int) limit` Number of images pr. page. Defaults to 20.
 * `(boolean) metadata` Wether or not to include metadata in the output. Defaults to false ('0'). Set to '1' to enable.
 * `(int) from` Fetch images starting from this unix timestamp.
 * `(int) to` Fetch images up until this timestamp.
 
 Example:
 
-* `GET /users/<publicKey>/images?page=1&num=30&metadata=1`
+* `GET /users/<publicKey>/images?page=1&limit=30&metadata=1`
 
 ### GET /users/&lt;publicKey&gt;
 
