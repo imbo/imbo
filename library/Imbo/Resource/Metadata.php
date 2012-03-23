@@ -54,6 +54,7 @@ class Metadata extends Resource implements ResourceInterface {
         return array(
             RequestInterface::METHOD_GET,
             RequestInterface::METHOD_POST,
+            RequestInterface::METHOD_PUT,
             RequestInterface::METHOD_DELETE,
             RequestInterface::METHOD_HEAD,
         );
@@ -66,6 +67,33 @@ class Metadata extends Resource implements ResourceInterface {
         $imageIdentifier = $request->getImageIdentifier();
 
         $database->deleteMetadata($request->getPublicKey(), $imageIdentifier);
+
+        $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
+    }
+
+    /**
+     * @see Imbo\Resource\ResourceInterface::put()
+     */
+    public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+        $publicKey = $request->getPublicKey();
+        $imageIdentifier = $request->getImageIdentifier();
+        $metadata = $request->getRawData();
+
+        if (empty($metadata)) {
+            throw new InvalidArgumentException('Missing JSON data', 400);
+        } else {
+            $metadata = json_decode($metadata, true);
+
+            if ($metadata === null) {
+                throw new InvalidArgumentException('Invalid JSON data', 400);
+            }
+        }
+
+        // Remove existing metadata
+        $database->deleteMetadata($publicKey, $imageIdentifier);
+
+        // Insert new metadata
+        $database->updateMetadata($publicKey, $imageIdentifier, $metadata);
 
         $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
     }

@@ -144,6 +144,52 @@ class MetadataTest extends ResourceTests {
     }
 
     /**
+     * @covers Imbo\Resource\Metadata::put
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Missing JSON data
+     * @expectedExceptionCode 400
+     */
+    public function testPutWithNoMetadata() {
+        $this->request->expects($this->any())->method('getRawData')->will($this->returnValue(null));
+
+        $resource = $this->getNewResource();
+        $resource->put($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @covers Imbo\Resource\Metadata::put
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid JSON data
+     * @expectedExceptionCode 400
+     */
+    public function testPutWithInvalidMetadata() {
+        $this->request->expects($this->any())->method('getRawData')->will($this->returnValue('some string'));
+
+        $resource = $this->getNewResource();
+        $resource->put($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @covers Imbo\Resource\Metadata::put
+     */
+    public function testSuccessfulPut() {
+        $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
+        $this->request->expects($this->any())->method('getRawData')->will($this->returnValue('{"key":"value"}'));
+
+        $this->database->expects($this->once())->method('deleteMetadata')->with($this->publicKey, $this->imageIdentifier);
+        $this->database->expects($this->once())->method('updateMetadata')->with($this->publicKey, $this->imageIdentifier, array('key' => 'value'));
+
+        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
+        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+
+        $resource = $this->getNewResource();
+        $resource->setResponseWriter($writer);
+
+        $resource->put($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
      * @covers Imbo\Resource\Metadata::get
      */
     public function testGetWhenResponseIsNotModified() {
