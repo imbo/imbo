@@ -48,6 +48,10 @@ Place a new image on the server. The output from the server is important as the 
 
 Edit the meta data attached to the image identified by &lt;image&gt;.
 
+### PUT /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
+
+Replaces the meta data attached to the image identified by &lt;image&gt;.
+
 ### DELETE /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
 Delete the image identified by &lt;image&gt; along with all meta data.
