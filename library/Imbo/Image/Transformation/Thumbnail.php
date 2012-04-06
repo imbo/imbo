@@ -95,19 +95,19 @@ class Thumbnail extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $thumb = $this->getImagick();
-            $thumb->setOption('jpeg:size', $this->width . 'x' . $this->height);
-            $thumb->readImageBlob($image->getBlob());
+            $imagick = $this->getImagick();
+            $imagick->setOption('jpeg:size', $this->width . 'x' . $this->height);
+            $imagick->readImageBlob($image->getBlob());
 
             if ($this->fit == 'inset') {
-                $thumb->thumbnailimage($this->width, $this->height, true);
+                $imagick->thumbnailimage($this->width, $this->height, true);
             } else {
-                $thumb->cropThumbnailImage($this->width, $this->height);
+                $imagick->cropThumbnailImage($this->width, $this->height);
             }
 
-            $size = $thumb->getImageGeometry();
+            $size = $imagick->getImageGeometry();
 
-            $image->setBlob($thumb->getImageBlob())
+            $image->setBlob($imagick->getImageBlob())
                   ->setWidth($size['width'])
                   ->setHeight($size['height']);
         } catch (\ImagickException $e) {
