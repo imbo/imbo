@@ -33,9 +33,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
-    Imbo\Exception\TransformationException,
-    Imagine\Exception\Exception as ImagineException,
-    Imagine\Image\Box;
+    Imbo\Exception\TransformationException;
 
 /**
  * Thumbnail transformation
@@ -97,18 +95,22 @@ class Thumbnail extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
+            $thumb = $this->getImagick();
+            $thumb->setOption('jpeg:size', $this->width . 'x' . $this->height);
+            $thumb->readImageBlob($image->getBlob());
 
-            $thumb = $imagineImage->thumbnail(
-                new Box($this->width, $this->height),
-                $this->fit
-            );
+            if ($this->fit == 'inset') {
+                $thumb->thumbnailimage($this->width, $this->height, true);
+            } else {
+                $thumb->cropThumbnailImage($this->width, $this->height);
+            }
 
-            $image->setBlob($thumb->get($image->getExtension()))
-                  ->setWidth($this->width)
-                  ->setHeight($this->height);
-        } catch (ImagineException $e) {
+            $size = $thumb->getImageGeometry();
+
+            $image->setBlob($thumb->getImageBlob())
+                  ->setWidth($size['width'])
+                  ->setHeight($size['height']);
+        } catch (\ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }
