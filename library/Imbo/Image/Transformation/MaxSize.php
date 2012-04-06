@@ -34,9 +34,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
-    Imbo\Exception\TransformationException,
-    Imagine\Exception\Exception as ImagineException,
-    Imagine\Image\Box;
+    Imbo\Exception\TransformationException;
 
 /**
  * MaxSize transformation
@@ -80,20 +78,14 @@ class MaxSize extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
-
-            // Fetch the size of the original image
-            $size = $imagineImage->getSize();
-
-            $width  = $this->maxWidth  ?: $size->getWidth();
-            $height = $this->maxHeight ?: $size->getHeight();
+            $width  = $this->maxWidth  ?: $image->getWidth();
+            $height = $this->maxHeight ?: $image->getHeight();
 
             // Figure out original ratio
-            $ratio = $size->getWidth() / $size->getHeight();
+            $ratio = $image->getWidth() / $image->getHeight();
 
             // Is the original image larger than the max-parameters?
-            if (($size->getWidth() > $width) || ($size->getHeight() > $height)) {
+            if (($image->getWidth() > $width) || ($image->getHeight() > $height)) {
                 if (($width / $height) > $ratio) {
                     $width  = round($height * $ratio);
                 } else {
@@ -104,14 +96,17 @@ class MaxSize extends Transformation implements TransformationInterface {
                 return;
             }
 
-            $imagineImage->resize(new Box($width, $height));
+            $imagick = $this->getImagick();
+            $imagick->setOption('jpeg:size', $width . 'x' . $height);
+            $imagick->readImageBlob($image->getBlob());
+            $imagick->thumbnailImage($width, $height);
 
-            $box = $imagineImage->getSize();
+            $size = $imagick->getImageGeometry();
 
-            $image->setBlob($imagineImage->get($image->getExtension()))
-                  ->setWidth($box->getWidth())
-                  ->setHeight($box->getHeight());
-        } catch (ImagineException $e) {
+            $image->setBlob($imagick->getImageBlob())
+                  ->setWidth($size['width'])
+                  ->setHeight($size['height']);
+        } catch (\ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }
