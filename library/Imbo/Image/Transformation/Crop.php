@@ -33,10 +33,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
-    Imbo\Exception\TransformationException,
-    Imagine\Exception\Exception as ImagineException,
-    Imagine\Image\Point,
-    Imagine\Image\Box;
+    Imbo\Exception\TransformationException;
 
 /**
  * Crop transformation
@@ -97,18 +94,16 @@ class Crop extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
+            $imagick = $this->getImagick();
+            $imagick->readImageBlob($image->getBlob());
+            $imagick->cropImage($this->width, $this->height, $this->x, $this->y);
 
-            $imagineImage->crop(
-                new Point($this->x, $this->y),
-                new Box($this->width, $this->height)
-            );
+            $size = $imagick->getImageGeometry();
 
-            $image->setBlob($imagineImage->get($image->getExtension()))
-                  ->setWidth($this->width)
-                  ->setHeight($this->height);
-        } catch (ImagineException $e) {
+            $image->setBlob($imagick->getImageBlob())
+                  ->setWidth($size['width'])
+                  ->setHeight($size['height']);
+        } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }
