@@ -97,4 +97,18 @@ abstract class Transformation implements TransformationInterface {
 
         return $this;
     }
+
+    /**
+     * Attempt to format a color-string into a string Imagick can understand
+     *
+     * @param string $color
+     * @return string
+     */
+    private function formatColor($color) {
+        if (preg_match('/^[A-F0-9]{3,6}$/i', $color)) {
+            return '#' . $color;
+        }
+
+        return $color;
+    }
 }

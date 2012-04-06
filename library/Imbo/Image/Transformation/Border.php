@@ -51,7 +51,7 @@ class Border extends Transformation implements TransformationInterface {
      *
      * @var string
      */
-    private $color = '000';
+    private $color = '#000';
 
     /**
      * Width of the border
@@ -107,19 +107,5 @@ class Border extends Transformation implements TransformationInterface {
         } catch (\ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
-    }
-
-    /**
-     * Attempt to format a color-string into a string Imagick can understand
-     *
-     * @param string $color
-     * @return string
-     */
-    private function formatColor($color) {
-        if (preg_match('/^[A-F0-9]{3,6}$/i', $color)) {
-            return '#' . $color;
-        }
-
-        return $color;
     }
 }
