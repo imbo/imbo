@@ -52,6 +52,33 @@ abstract class Transformation implements TransformationInterface {
     private $imagine;
 
     /**
+     * Imagick instance
+     *
+     * @var Imagick
+     */
+    private $imagick;
+
+    /**
+     * @see Imbo\Image\Transformation\TransformationInterface::getImagick()
+     */
+    public function getImagick() {
+        if ($this->imagick === null) {
+            $this->imagick = new \Imagick();
+        }
+
+        return $this->imagick;
+    }
+
+    /**
+     * @see Imbo\Image\Transformation\TransformationInterface::getImagick()
+     */
+    public function setImagick(Imagick $imagick) {
+        $this->imagick = $imagick;
+
+        return $this;
+    }
+
+    /**
      * @see Imbo\Image\Transformation\TransformationInterface::getImagine()
      */
     public function getImagine() {

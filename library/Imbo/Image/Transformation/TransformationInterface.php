@@ -47,6 +47,21 @@ use Imbo\Image\ImageInterface,
  */
 interface TransformationInterface {
     /**
+     * Get the imagick instance
+     *
+     * @return Imagick
+     */
+    function getImagick();
+
+    /**
+     * Set the imagick instance
+     *
+     * @param Imagick $imagick
+     * @return Imbo\Image\Transformation\TransformationInterface
+     */
+    function setImagick(Imagick $imagick);
+
+    /**
      * Get the imagine instance
      *
      * @return Imagine\Image\ImagineInterface
