@@ -32,8 +32,7 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface,
-    Imagine\Image\ImagineInterface;
+use Imbo\Image\ImageInterface;
 
 /**
  * Image transformation interface
@@ -60,21 +59,6 @@ interface TransformationInterface {
      * @return Imbo\Image\Transformation\TransformationInterface
      */
     function setImagick(Imagick $imagick);
-
-    /**
-     * Get the imagine instance
-     *
-     * @return Imagine\Image\ImagineInterface
-     */
-    function getImagine();
-
-    /**
-     * Set the imagine instance
-     *
-     * @param Imagine\Image\ImagineInterface $imagine
-     * @return Imbo\Image\Transformation\TransformationInterface
-     */
-    function setImagine(ImagineInterface $imagine);
 
     /**
      * Apply a transformation to an image object

@@ -31,9 +31,6 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imagine\Image\ImagineInterface,
-    Imagine\Imagick\Imagine;
-
 /**
  * Abstract transformation
  *
@@ -44,12 +41,6 @@ use Imagine\Image\ImagineInterface,
  * @link https://github.com/imbo/imbo
  */
 abstract class Transformation implements TransformationInterface {
-    /**
-     * Imagine instance
-     *
-     * @var Imagine\Image\ImagineInterface
-     */
-    private $imagine;
 
     /**
      * Imagick instance
@@ -74,26 +65,6 @@ abstract class Transformation implements TransformationInterface {
      */
     public function setImagick(Imagick $imagick) {
         $this->imagick = $imagick;
-
-        return $this;
-    }
-
-    /**
-     * @see Imbo\Image\Transformation\TransformationInterface::getImagine()
-     */
-    public function getImagine() {
-        if ($this->imagine === null) {
-            $this->imagine = new Imagine();
-        }
-
-        return $this->imagine;
-    }
-
-    /**
-     * @see Imbo\Image\Transformation\TransformationInterface::getImagine()
-     */
-    public function setImagine(ImagineInterface $imagine) {
-        $this->imagine = $imagine;
 
         return $this;
     }
