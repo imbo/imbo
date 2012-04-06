@@ -103,7 +103,7 @@ class Crop extends Transformation implements TransformationInterface {
             $image->setBlob($imagick->getImageBlob())
                   ->setWidth($size['width'])
                   ->setHeight($size['height']);
-        } catch (ImagickException $e) {
+        } catch (\ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }

@@ -57,7 +57,7 @@ class FlipVertically extends Transformation implements TransformationInterface {
             $imagick->flipImage();
 
             $image->setBlob($imagick->getImageBlob());
-        } catch (ImagickException $e) {
+        } catch (\ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }
