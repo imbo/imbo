@@ -104,7 +104,7 @@ abstract class Transformation implements TransformationInterface {
      * @param string $color
      * @return string
      */
-    private function formatColor($color) {
+    protected function formatColor($color) {
         if (preg_match('/^[A-F0-9]{3,6}$/i', $color)) {
             return '#' . $color;
         }
