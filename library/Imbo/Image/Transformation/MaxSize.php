@@ -79,14 +79,17 @@ class MaxSize extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $width  = $this->maxWidth  ?: $image->getWidth();
-            $height = $this->maxHeight ?: $image->getHeight();
+            $sourceWidth  = $image->getWidth();
+            $sourceHeight = $image->getHeight();
+
+            $width  = $this->maxWidth  ?: $sourceWidth;
+            $height = $this->maxHeight ?: $sourceHeight;
 
             // Figure out original ratio
-            $ratio = $image->getWidth() / $image->getHeight();
+            $ratio = $sourceWidth / $sourceHeight;
 
             // Is the original image larger than the max-parameters?
-            if (($image->getWidth() > $width) || ($image->getHeight() > $height)) {
+            if (($sourceWidth > $width) || ($sourceHeight > $height)) {
                 if (($width / $height) > $ratio) {
                     $width  = round($height * $ratio);
                 } else {
