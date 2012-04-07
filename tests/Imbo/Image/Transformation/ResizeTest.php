@@ -53,7 +53,6 @@ class ResizeTest extends TransformationTests {
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(100)->will($this->returnValue($image));
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
         $transformation = new Resize(200, 100);
         $transformation->applyToImage($image);
@@ -65,10 +64,11 @@ class ResizeTest extends TransformationTests {
     public function testApplyToImageWithOnlyWidth() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
+        $image->expects($this->once())->method('getHeight')->will($this->returnValue(665));
+        $image->expects($this->once())->method('getWidth')->will($this->returnValue(463));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($this->isType('int'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
         $transformation = new Resize(200);
         $transformation->applyToImage($image);
@@ -80,10 +80,11 @@ class ResizeTest extends TransformationTests {
     public function testApplyToImageWithOnlyHeight() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
+        $image->expects($this->once())->method('getHeight')->will($this->returnValue(665));
+        $image->expects($this->once())->method('getWidth')->will($this->returnValue(463));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setWidth')->with($this->isType('int'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(200)->will($this->returnValue($image));
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
         $transformation = new Resize(null, 200);
         $transformation->applyToImage($image);

@@ -323,8 +323,8 @@ class ImageTest extends ResourceTests {
      * @covers Imbo\Resource\Image::get
      */
     public function testGetWithImageConversion() {
-        if (!class_exists('Imagine\Imagick\Imagine')) {
-            $this->markTestSkipped('Imagine must be available to run this test');
+        if (!class_exists('Imagick')) {
+            $this->markTestSkipped('Imagick must be available to run this test');
         }
 
         $resourcePart = $this->imageIdentifier . '.jpg';
