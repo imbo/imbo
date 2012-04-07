@@ -53,7 +53,6 @@ class RotateTest extends TransformationTests {
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setWidth')->with($this->isType('int'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($this->isType('int'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
         $transformation = new Rotate(45);
         $transformation->applyToImage($image);

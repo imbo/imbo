@@ -31,8 +31,6 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imagine\Exception\RuntimeException as ImagineException;
-
 /**
  * @package Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -44,26 +42,8 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     abstract protected function getTransformation();
 
     public function setUp() {
-        if (!class_exists('Imagine\Imagick\Imagine')) {
-            $this->markTestSkipped('Imagine must be available to run this test');
+        if (!class_exists('Imagick')) {
+            $this->markTestSkipped('Imagick must be available to run this test');
         }
-    }
-
-    /**
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionMessage some message
-     * @expectedExceptionCode 400
-     */
-    public function testApplyToImageWhenImagineThrowsAnException() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
-
-        $imagine = $this->getMock('Imagine\Image\ImagineInterface');
-        $imagine->expects($this->any())->method('load')->will($this->throwException(new ImagineException('some message')));
-        $imagine->expects($this->any())->method('create')->will($this->throwException(new ImagineException('some message')));
-        $imagine->expects($this->any())->method('paste')->will($this->throwException(new ImagineException('some message')));
-
-        $transformation = $this->getTransformation();
-        $transformation->setImagine($imagine);
-        $transformation->applyToImage($image);
     }
 }

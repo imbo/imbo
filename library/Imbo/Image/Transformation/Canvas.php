@@ -34,10 +34,9 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
     Imbo\Exception\TransformationException,
-    Imagine\Exception\Exception as ImagineException,
-    Imagine\Image\Box as ImagineBox,
-    Imagine\Image\Point as ImaginePoint,
-    Imagine\Image\Color as ImagineColor;
+    Imagick,
+    ImagickException,
+    ImagickPixelException;
 
 /**
  * Canvas transformation
@@ -128,7 +127,7 @@ class Canvas extends Transformation implements TransformationInterface {
         }
 
         if ($bg) {
-            $this->bg = $bg;
+            $this->bg = $this->formatColor($bg);
         }
     }
 
@@ -137,26 +136,24 @@ class Canvas extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $imagine = $this->getImagine();
-
-            $background = $this->bg ? new ImagineColor($this->bg) : null;
+            $background = $this->bg ?: null;
 
             // Create a new canvas
-            $canvas = $imagine->create(
-                new ImagineBox($this->width, $this->height),
-                $background
-            );
+            $canvas = new Imagick();
+            $canvas->newImage($this->width, $this->height, $this->bg);
+            $canvas->setImageFormat($image->getExtension());
 
             // Load existing image
-            $existingImage = $imagine->load($image->getBlob());
-            $existingWidth = $image->getWidth();
+            $existingImage  = $this->getImagick();
+            $existingImage->readImageBlob($image->getBlob());
+            $existingWidth  = $image->getWidth();
             $existingHeight = $image->getHeight();
 
             if ($existingWidth > $this->width || $existingHeight > $this->height) {
                 // The existing image is bigger than the canvas and needs to be cropped
                 $cropX = 0;
                 $cropY = 0;
-                $cropWidth = $this->width;
+                $cropWidth  = $this->width;
                 $cropHeight = $this->height;
 
                 if ($existingWidth > $this->width) {
@@ -175,8 +172,7 @@ class Canvas extends Transformation implements TransformationInterface {
                     $cropHeight = $existingHeight;
                 }
 
-                $existingImage->crop(new ImaginePoint($cropX, $cropY),
-                                     new ImagineBox($cropWidth, $cropHeight));
+                $existingImage->cropImage($cropWidth, $cropHeight, $cropX, $cropY);
             }
 
             // Default placement
@@ -184,28 +180,34 @@ class Canvas extends Transformation implements TransformationInterface {
             $y = $this->y;
 
             // Figure out the correct placement of the image based on the placement mode. Use the
-            // size from the imagine image when calculating since the image may have been cropped
+            // size from the imagick image when calculating since the image may have been cropped
             // above.
+            $existingSize = $existingImage->getImageGeometry();
             if ($this->mode === 'center') {
-                $x = ($this->width - $existingImage->getSize()->getWidth()) / 2;
-                $y = ($this->height - $existingImage->getSize()->getHeight()) / 2;
+                $x = ($this->width - $existingSize['width']) / 2;
+                $y = ($this->height - $existingSize['height']) / 2;
             } else if ($this->mode === 'center-x') {
-                $x = ($this->width - $existingImage->getSize()->getWidth()) / 2;
+                $x = ($this->width - $existingSize['width']) / 2;
             } else if ($this->mode === 'center-y') {
-                $y = ($this->height - $existingImage->getSize()->getHeight()) / 2;
+                $y = ($this->height - $existingSize['height']) / 2;
             }
 
-            // Placement of the existing image inside of the new canvas
-            $placement = new ImaginePoint((int) $x, (int) $y);
-
             // Paste existing image into the new canvas at the given position
-            $canvas->paste($existingImage, $placement);
+            $canvas->compositeImage(
+                $existingImage,
+                Imagick::COMPOSITE_DEFAULT,
+                $x,
+                $y
+            );
 
             // Store the new image
-            $image->setBlob($canvas->get($image->getExtension()))
-                  ->setWidth($this->width)
-                  ->setHeight($this->height);
-        } catch (ImagineException $e) {
+            $size = $canvas->getImageGeometry();
+            $image->setBlob($canvas->getImageBlob())
+                  ->setWidth($size['width'])
+                  ->setHeight($size['height']);
+        } catch (ImagickException $e) {
+            throw new TransformationException($e->getMessage(), 400, $e);
+        } catch (ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }
