@@ -4,7 +4,7 @@ Imbo is an image "server" that can be used to add/get/delete images using a REST
 [![Current build Status](https://secure.travis-ci.org/imbo/imbo.png)](http://travis-ci.org/imbo/imbo)
 
 ## Requirements
-Imbo requires [PHP-5.3](http://php.net/), the [Imagine](https://github.com/avalanche123/imagine) image manipulation library, a running [MongoDB](http://www.mongodb.org/) and the [Mongo extension for PHP](http://pecl.php.net/package/mongo).
+Imbo requires [PHP-5.3](http://php.net/), the [Imagick extension for PHP](http://pecl.php.net/package/imagick), a running [MongoDB](http://www.mongodb.org/) and the [Mongo extension for PHP](http://pecl.php.net/package/mongo).
 
 ## Installation
 Since this is a work in progress there is no automatic installation. Simply clone the repository or make your own fork. Automatic installation using [PEAR](http://pear.php.net/) will be provided later.
@@ -100,7 +100,7 @@ The above code will generate a signature that must be sent along the request usi
 The public and private key pair used by clients must be specified in the server configuration. More information on the configuration file can be found later in this document.
 
 ## Image transformations
-Imbo supports some image transformations out of the box using the [Imagine](https://github.com/avalanche123/Imagine/) image manipulation library.
+Imbo supports some image transformations out of the box using the [Imagick](http://pecl.php.net/package/imagick) PHP extension.
 
 Transformations are made using the `t[]` query parameter. This GET parameter should be used as an array so that multiple transformations can be made. The transformations are made in the order they are specified in the url.
 
@@ -382,7 +382,7 @@ To fully develop Imbo (as in run the complete build process, which most likely y
 
 * [PHPUnit](http://phpunit.de/)
 * [vfsStream](http://code.google.com/p/bovigo/wiki/vfsStream)
-* [Imagine](https://github.com/avalanche123/Imagine/)
+* [Imagick extension for PHP](http://pecl.php.net/package/imagick)
 * [MongoDB](http://www.mongodb.org/)
 * [Mongo extension for PHP](http://pecl.php.net/package/mongo)
 
