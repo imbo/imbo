@@ -34,7 +34,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
     Imbo\Image\Image,
-    Imbo\Exception\TransformationException;
+    Imbo\Exception\TransformationException,
+    ImagickException;
 
 /**
  * Convert transformation
@@ -84,7 +85,7 @@ class Convert extends Transformation implements TransformationInterface {
             $image->setBlob($imagick->getImageBlob());
             $image->setMimeType($mimeType);
             $image->setExtension($this->type);
-        } catch (\ImagickException $e) {
+        } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }

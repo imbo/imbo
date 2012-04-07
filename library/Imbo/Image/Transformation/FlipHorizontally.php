@@ -33,7 +33,8 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
-    Imbo\Exception\TransformationException;
+    Imbo\Exception\TransformationException,
+    ImagickException;
 
 /**
  * Flip horizontally transformation
@@ -57,7 +58,7 @@ class FlipHorizontally extends Transformation implements TransformationInterface
             $imagick->flopImage();
 
             $image->setBlob($imagick->getImageBlob());
-        } catch (\ImagickException $e) {
+        } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }

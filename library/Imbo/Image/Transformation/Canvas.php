@@ -33,7 +33,10 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
-    Imbo\Exception\TransformationException;
+    Imbo\Exception\TransformationException,
+    Imagick,
+    ImagickException,
+    ImagickPixelException;
 
 /**
  * Canvas transformation
@@ -136,7 +139,7 @@ class Canvas extends Transformation implements TransformationInterface {
             $background = $this->bg ?: null;
 
             // Create a new canvas
-            $canvas = new \Imagick();
+            $canvas = new Imagick();
             $canvas->newImage($this->width, $this->height, $this->bg);
             $canvas->setImageFormat($image->getExtension());
 
@@ -192,7 +195,7 @@ class Canvas extends Transformation implements TransformationInterface {
             // Paste existing image into the new canvas at the given position
             $canvas->compositeImage(
                 $existingImage,
-                \Imagick::COMPOSITE_DEFAULT,
+                Imagick::COMPOSITE_DEFAULT,
                 $x,
                 $y
             );
@@ -202,7 +205,9 @@ class Canvas extends Transformation implements TransformationInterface {
             $image->setBlob($canvas->getImageBlob())
                   ->setWidth($size['width'])
                   ->setHeight($size['height']);
-        } catch (\ImagickException $e) {
+        } catch (ImagickException $e) {
+            throw new TransformationException($e->getMessage(), 400, $e);
+        } catch (ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }

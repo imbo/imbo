@@ -31,6 +31,8 @@
 
 namespace Imbo\Image\Transformation;
 
+use Imagick;
+
 /**
  * Abstract transformation
  *
@@ -54,7 +56,7 @@ abstract class Transformation implements TransformationInterface {
      */
     public function getImagick() {
         if ($this->imagick === null) {
-            $this->imagick = new \Imagick();
+            $this->imagick = new Imagick();
         }
 
         return $this->imagick;

@@ -33,7 +33,8 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
-    Imbo\Exception\TransformationException;
+    Imbo\Exception\TransformationException,
+    ImagickException;
 
 /**
  * Thumbnail transformation
@@ -110,7 +111,7 @@ class Thumbnail extends Transformation implements TransformationInterface {
             $image->setBlob($imagick->getImageBlob())
                   ->setWidth($size['width'])
                   ->setHeight($size['height']);
-        } catch (\ImagickException $e) {
+        } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }

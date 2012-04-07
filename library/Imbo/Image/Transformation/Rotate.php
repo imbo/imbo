@@ -33,7 +33,9 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
-    Imbo\Exception\TransformationException;
+    Imbo\Exception\TransformationException,
+    ImagickException,
+    ImagickPixelException;
 
 /**
  * Rotate transformation
@@ -89,7 +91,9 @@ class Rotate extends Transformation implements TransformationInterface {
             $image->setBlob($imagick->getImageBlob())
                   ->setWidth($size['width'])
                   ->setHeight($size['height']);
-        } catch (\ImagickException $e) {
+        } catch (ImagickException $e) {
+            throw new TransformationException($e->getMessage(), 400, $e);
+        } catch (ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }

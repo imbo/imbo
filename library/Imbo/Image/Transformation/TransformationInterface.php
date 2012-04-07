@@ -32,7 +32,8 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface;
+use Imbo\Image\ImageInterface,
+    Imagick;
 
 /**
  * Image transformation interface
