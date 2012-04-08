@@ -34,9 +34,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
     Imbo\Exception\TransformationException,
-    Imagine\Exception\Exception as ImagineException,
-    Imagine\Image\Color,
-    Imagine\Image\Point;
+    ImagickException,
+    ImagickPixelException;
 
 /**
  * Border transformation
@@ -54,7 +53,7 @@ class Border extends Transformation implements TransformationInterface {
      *
      * @var string
      */
-    private $color = '000';
+    private $color = '#000';
 
     /**
      * Width of the border
@@ -79,7 +78,7 @@ class Border extends Transformation implements TransformationInterface {
      */
     public function __construct($color = null, $width = null, $height = null) {
         if ($color !== null) {
-            $this->color  = $color;
+            $this->color  = $this->formatColor($color);
         }
 
         if ($width !== null) {
@@ -96,34 +95,18 @@ class Border extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
+            $imagick = $this->getImagick();
+            $imagick->readImageBlob($image->getBlob());
+            $imagick->borderImage($this->color, $this->width, $this->height);
 
-            $color  = new Color($this->color);
+            $size = $imagick->getImageGeometry();
 
-            $size   = $imagineImage->getSize();
-            $width  = $size->getWidth();
-            $height = $size->getHeight();
-            $draw   = $imagineImage->draw();
-
-            // Draw top and bottom lines
-            for ($i = 0; $i < $this->height; $i++) {
-                $draw->line(new Point(0, $i), new Point($width - 1, $i), $color)
-                     ->line(new Point($width - 1, $height - ($i + 1)), new Point(0, $height - ($i + 1)), $color);
-            }
-
-            // Draw sides
-            for ($i = 0; $i < $this->width; $i++) {
-                $draw->line(new Point($i, 0), new Point($i, $height - 1), $color)
-                     ->line(new Point($width - ($i + 1), 0), new Point($width - ($i + 1), $height - 1), $color);
-            }
-
-            $box = $imagineImage->getSize();
-
-            $image->setBlob($imagineImage->get($image->getExtension()))
-                  ->setWidth($box->getWidth())
-                  ->setHeight($box->getHeight());
-        } catch (ImagineException $e) {
+            $image->setBlob($imagick->getImageBlob())
+                  ->setWidth($size['width'])
+                  ->setHeight($size['height']);
+        } catch (ImagickException $e) {
+            throw new TransformationException($e->getMessage(), 400, $e);
+        } catch (ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }

@@ -57,7 +57,6 @@ class ThumbnailTest extends TransformationTests {
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
         $transformation = new Thumbnail($width, $height, $fit);
         $transformation->applyToImage($image);

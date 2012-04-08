@@ -31,6 +31,8 @@
 
 namespace Imbo\Image\Transformation;
 
+use Imagick;
+
 /**
  * @package Unittests
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -49,32 +51,31 @@ class CanvasTest extends TransformationTests {
      */
     public function testApplyToImage() {
         $mode = 'free';
-        $width = 100;
-        $height = 200;
+        $width = 700;
+        $height = 500;
         $x = 10;
         $y = 20;
-        $bg = '000';
+        $bg = 'bf1942';
         $blob = file_get_contents(__DIR__ . '/../../_files/image.png');
 
         $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue($blob));
+        $image->expects($this->any())->method('getBlob')->will($this->returnValue($blob));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
+        $image->expects($this->once())->method('getHeight')->will($this->returnValue(463));
         $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
         $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
-        $imagineImage = $this->getMock('Imagine\Image\ImageInterface');
-
-        $canvas = $this->getMock('Imagine\Image\ImageInterface');
-        $canvas->expects($this->once())->method('paste')->with($imagineImage);
-        $canvas->expects($this->once())->method('get')->with('png')->will($this->returnValue($blob));
-
-        $imagine = $this->getMock('Imagine\Image\ImagineInterface');
-        $imagine->expects($this->once())->method('create')->will($this->returnValue($canvas));
-        $imagine->expects($this->once())->method('load')->with($blob)->will($this->returnValue($imagineImage));
-
         $transformation = new Canvas($width, $height, $mode, $x, $y, $bg);
-        $transformation->setImagine($imagine);
         $transformation->applyToImage($image);
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob($image->getBlob());
+
+        $canvasColor = $imagick->getImagePixelColor(695, 495);
+        $windowColor = $imagick->getImagePixelColor(14, 69);
+        $this->assertSame('rgb(109,106,104)', $canvasColor->getColorAsString());
+        $this->assertSame('rgb(0,0,0)',       $windowColor->getColorAsString());
     }
 }

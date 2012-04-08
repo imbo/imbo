@@ -35,7 +35,7 @@ namespace Imbo\Image\Transformation;
 use Imbo\Image\ImageInterface,
     Imbo\Image\Image,
     Imbo\Exception\TransformationException,
-    Imagine\Exception\Exception as ImagineException;
+    ImagickException;
 
 /**
  * Convert transformation
@@ -76,16 +76,16 @@ class Convert extends Transformation implements TransformationInterface {
         }
 
         try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
+            $imagick = $this->getImagick();
+            $imagick->readImageBlob($image->getBlob());
 
-            $imageBlob = $imagineImage->get($this->type);
+            $imagick->setImageFormat($this->type);
             $mimeType = array_search($this->type, Image::$mimeTypes);
 
-            $image->setBlob($imageBlob);
+            $image->setBlob($imagick->getImageBlob());
             $image->setMimeType($mimeType);
             $image->setExtension($this->type);
-        } catch (ImagineException $e) {
+        } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }

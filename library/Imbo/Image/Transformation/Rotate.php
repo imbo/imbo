@@ -34,8 +34,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
     Imbo\Exception\TransformationException,
-    Imagine\Exception\Exception as ImagineException,
-    Imagine\Image\Color;
+    ImagickException,
+    ImagickPixelException;
 
 /**
  * Rotate transformation
@@ -60,7 +60,7 @@ class Rotate extends Transformation implements TransformationInterface {
      *
      * @var string
      */
-    private $bg = '000';
+    private $bg = '#000';
 
     /**
      * Class constructor
@@ -72,7 +72,7 @@ class Rotate extends Transformation implements TransformationInterface {
         $this->angle = (int) $angle;
 
         if ($bg !== null) {
-            $this->bg = $bg;
+            $this->bg = $this->formatColor($bg);
         }
     }
 
@@ -81,17 +81,19 @@ class Rotate extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
+            $imagick = $this->getImagick();
+            $imagick->readImageBlob($image->getBlob());
 
-            $imagineImage->rotate($this->angle, new Color($this->bg));
+            $imagick->rotateImage($this->bg, $this->angle);
 
-            $box = $imagineImage->getSize();
+            $size = $imagick->getImageGeometry();
 
-            $image->setBlob($imagineImage->get($image->getExtension()))
-                  ->setWidth($box->getWidth())
-                  ->setHeight($box->getHeight());
-        } catch (ImagineException $e) {
+            $image->setBlob($imagick->getImageBlob())
+                  ->setWidth($size['width'])
+                  ->setHeight($size['height']);
+        } catch (ImagickException $e) {
+            throw new TransformationException($e->getMessage(), 400, $e);
+        } catch (ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }

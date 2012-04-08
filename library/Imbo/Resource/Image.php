@@ -173,12 +173,27 @@ class Image extends Resource implements ResourceInterface {
         // Load the image data (injects the blob into the image instance)
         $storage->load($publicKey, $imageIdentifier, $this->image);
 
+        // Set some response headers before we apply optional transformations
+        $responseHeaders
+            // Set the last modification date
+            ->set('Last-Modified', $lastModified)
+
+            // Set the max-age to a year since the image never changes
+            ->set('Cache-Control', 'max-age=31536000')
+
+            // Custom Imbo headers
+            ->set('X-Imbo-OriginalMimeType', $this->image->getMimeType())
+            ->set('X-Imbo-OriginalWidth', $this->image->getWidth())
+            ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
+            ->set('X-Imbo-OriginalFileSize', $this->image->getFilesize());
+
+        // Apply transformations
+        $transformationChain = $request->getTransformations();
+        $transformationChain->applyToImage($this->image);
+
         // Fetch the requested resource to see if we have to convert the image
         $path = $request->getPath();
         $resource = substr($path, strrpos($path, '/') + 1);
-
-        $originalMimeType = $this->image->getMimeType();
-        $originalFilesize = $this->image->getFilesize();
 
         if (isset($resource[32])) {
             // We have a requested image type
@@ -188,28 +203,10 @@ class Image extends Resource implements ResourceInterface {
             $convert->applyToImage($this->image);
         }
 
-        // Set some response headers before we apply optional transformations
-        $responseHeaders
-            // Set the content-type of the image and the last modification date
-            ->set('Content-Type', $this->image->getMimeType())
-            ->set('Last-Modified', $lastModified)
-
-            // Set the max-age to a year since the image never changes
-            ->set('Cache-Control', 'max-age=31536000')
-
-            // Custom Imbo headers
-            ->set('X-Imbo-OriginalMimeType', $originalMimeType)
-            ->set('X-Imbo-OriginalWidth', $this->image->getWidth())
-            ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
-            ->set('X-Imbo-OriginalFileSize', $originalFilesize);
-
-        // Apply transformations
-        $transformationChain = $request->getTransformations();
-        $transformationChain->applyToImage($this->image);
-
-        // Set the content length after transformations have been applied
+        // Set the content length and content-type after transformations have been applied
         $imageData = $this->image->getBlob();
-        $responseHeaders->set('Content-Length', strlen($imageData));
+        $responseHeaders->set('Content-Length', strlen($imageData))
+                        ->set('Content-Type', $this->image->getMimeType());
 
         $response->setBody($imageData);
     }

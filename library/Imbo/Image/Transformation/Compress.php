@@ -34,7 +34,7 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
     Imbo\Exception\TransformationException,
-    Imagine\Exception\Exception as ImagineException;
+    ImagickException;
 
 /**
  * Compression transformation
@@ -68,13 +68,12 @@ class Compress extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
+            $imagick = $this->getImagick();
+            $imagick->readImageBlob($image->getBlob());
+            $imagick->setImageCompressionQuality($this->quality);
 
-            $image->setBlob($imagineImage->get($image->getExtension(), array(
-                'quality' => $this->quality,
-            )));
-        } catch (ImagineException $e) {
+            $image->setBlob($imagick->getImageBlob());
+        } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }

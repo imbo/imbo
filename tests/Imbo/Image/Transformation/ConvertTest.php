@@ -52,11 +52,6 @@ class ConvertTest extends TransformationTests {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
-        $imagine = $this->getMock('Imagine\Image\ImagineInterface');
-        $imagine->expects($this->exactly(0))->method('load');
-
-        $convert->setImagine($imagine);
-
         $convert->applyToImage($image);
     }
 
@@ -69,12 +64,7 @@ class ConvertTest extends TransformationTests {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('setMimeType')->with('image/png');
         $image->expects($this->once())->method('setExtension')->with('png');
-
-        $imagineImage = $this->getMock('Imagine\Image\ImageInterface');
-
-        $imagine = $this->getMock('Imagine\Image\ImagineInterface');
-        $imagine->expects($this->once())->method('load')->will($this->returnValue($imagineImage));
-        $convert->setImagine($imagine);
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(__DIR__ . '/../../_files/image.png')));
 
         $convert->applyToImage($image);
     }
