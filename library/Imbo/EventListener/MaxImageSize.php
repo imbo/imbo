@@ -24,6 +24,7 @@
  *
  * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
@@ -32,13 +33,14 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Image\Transformation\Resize;
+    Imbo\Image\Transformation\MaxSize;
 
 /**
  * Max image size event listener
  *
  * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
@@ -82,22 +84,14 @@ class MaxImageSize extends Listener implements ListenerInterface {
      * @see Imbo\EventListener\ListenerInterface::invoke()
      */
     public function invoke(EventInterface $event) {
-        $image = $event->getImage();
+        $image  = $event->getImage();
 
-        $width = $image->getWidth();
+        $width  = $image->getWidth();
         $height = $image->getHeight();
 
         if (($this->width && ($width > $this->width)) || ($this->height && ($height > $this->height))) {
-            if ($this->width && ($width > $this->width)) {
-                $transformation = new Resize($this->width);
-                $transformation->applyToImage($image);
-                $height = $image->getHeight();
-            }
-
-            if ($this->height && ($height > $this->height)) {
-                $transformation = new Resize(null, $this->height);
-                $transformation->applyToImage($image);
-            }
+            $transformation = new MaxSize($this->width, $this->height);
+            $transformation->applyToImage($image);
 
             // Update raw data in request to reflect the new image
             $event->getRequest()->setRawData($image->getBlob());
