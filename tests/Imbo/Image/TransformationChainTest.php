@@ -91,6 +91,8 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\TransformationChain::resize
      * @covers Imbo\Image\TransformationChain::rotate
      * @covers Imbo\Image\TransformationChain::thumbnail
+     * @covers Imbo\Image\TransformationChain::transpose
+     * @covers Imbo\Image\TransformationChain::transverse
      */
     public function testChain() {
         $this->assertSame($this->chain,
@@ -104,6 +106,8 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
                         ->resize(100, 200)
                         ->rotate(45, 'fff')
                         ->thumbnail(10, 10, '000')
+                        ->transpose()
+                        ->transverse()
         );
     }
 
