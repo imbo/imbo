@@ -228,7 +228,7 @@ Examples:
 * `t[]=thumbnail:width=20,height=20,fit=inset`
 
 ### transpose
-Creates a horizontal mirror image by reflecting the pixels around the central y-axis while rotating them 90-degrees.
+Creates a vertical mirror image by reflecting the pixels around the central x-axis while rotating them 90-degrees.
 
 Example:
 
