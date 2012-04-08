@@ -194,6 +194,7 @@ class Image extends Resource implements ResourceInterface {
         // Fetch the requested resource to see if we have to convert the image
         $path = $request->getPath();
         $resource = substr($path, strrpos($path, '/') + 1);
+
         if (isset($resource[32])) {
             // We have a requested image type
             $extension = substr($resource, 33);
