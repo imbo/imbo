@@ -227,6 +227,20 @@ Examples:
 * `t[]=thumbnail`
 * `t[]=thumbnail:width=20,height=20,fit=inset`
 
+### transpose
+Creates a vertical mirror image by reflecting the pixels around the central x-axis while rotating them 90-degrees.
+
+Example:
+
+* `t[]=transpose`
+
+### transverse
+Creates a horizontal mirror image by reflecting the pixels around the central y-axis while rotating them 270-degrees.
+
+Example:
+
+* `t[]=transverse`
+
 ## Access token
 All GET and HEAD requests will need to include an access token in the URL. This is enforced by an event listener (`Imbo\EventListener\AccessToken`). This token must be supplied in the URL using the `accessToken` query parameter. The value of this token is a SHA256 hash using the URL with query parameters as data and must be signed with the private key of the user. Below is an example on how to generate the hash:
 
