@@ -79,8 +79,10 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $this->signatureValidator = $this->getMock('Imbo\Validate\SignatureInterface');
 
         $container = new Container();
-        $container->auth = array(
-            $this->publicKey => $this->privateKey,
+        $container->config = array(
+            'auth' => array(
+                $this->publicKey => $this->privateKey,
+            ),
         );
         $container->database = $this->getMock('Imbo\Database\DatabaseInterface');
         $container->storage  = $this->getMock('Imbo\Storage\StorageInterface');
