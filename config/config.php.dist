@@ -1,0 +1,142 @@
+<?php
+/**
+ * Imbo
+ *
+ * Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * * The above copyright notice and this permission notice shall be included in
+ *   all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * @package Imbo
+ * @subpackage Server
+ * @author Christer Edvartsen <cogo@starzinger.net>
+ * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
+ * @license http://www.opensource.org/licenses/mit-license MIT License
+ * @link https://github.com/imbo/imbo
+ */
+
+namespace Imbo;
+
+/**
+ * Require PSR-0 compatible autoloader
+ */
+require 'autoloader.php';
+
+return array(
+    /**
+     * Authentication
+     *
+     * This value must be set to an array with key => value pairs mapping to public and private keys
+     * of the users of this installation.
+     *
+     * @var array
+     */
+    'auth' => array(),
+
+    /**
+     * Database configuration
+     *
+     * The 'driver' value must be set to one of the following:
+     *
+     * - A fully qualified class name of a driver that implements Imbo\Database\DatabaseInterface.
+     *   Example: 'Imbo\Database\MongoDB'
+     * - An instance of a class implementing Imbo\Database\DatabaseInterface
+     *
+     * The 'params' value will only be used if 'driver' is a string, and will be passed to the
+     * contructor of the class specified in 'driver'.
+     *
+     * @var array
+     */
+    'database' => array(
+        'driver' => 'Imbo\Database\MongoDB',
+        'params' => array(
+            'databaseName'   => 'imbo',
+            'collectionName' => 'images',
+        ),
+    ),
+
+    /**
+     * Storage configuration
+     *
+     * The 'driver' value must be set to one of the following:
+     *
+     * - A fully qualified class name of a driver that implements Imbo\Storage\StorageInterface.
+     *   Example: 'Imbo\Storage\Filesystem'
+     * - An instance of a class implementing Imbo\Storage\StorageInterface
+     *
+     * The 'params' value will only be used if 'driver' is a string, and will be passed to the
+     * contructor of the class specified in 'driver'.
+     *
+     * @var array
+     */
+    'storage' => array(
+        'driver' => 'Imbo\Storage\Filesystem',
+        'params' => array(
+            'dataDir' => '/path/to/images',
+        ),
+    ),
+
+    /**
+     * Event listeners
+     *
+     * Each element in this array is another array with the following keys:
+     *
+     * - listener
+     * - events
+     * - publicKeys
+     *
+     * 'listener' is required and can be one of the following:
+     *
+     * - An instance of a class implementing Imbo\EventListener\ListenerInterface
+     * - Any callable unit of code that will receive one argument: $event
+     *
+     * 'events' is an array of events the current listener will listen for. This only needs to be
+     * set if 'listener' is not an instance of Imbo\EventListener\ListenerInterface.
+     *
+     * 'publicKeys' is an array that contains which public keys the listener will trigger for. It
+     * omitted or left empty the listener will trigger for all users.
+     *
+     * Example of how to add different listeners:
+     *
+     * 'eventListener' => array(
+     *   array(
+     *     'listener' => new Imbo\EventListener\AccessToken(),
+     *   ),
+     *   array(
+     *     'listener' => new Imbo\EventListener\ImageTransformationStorage('/tmp/imbocache'),
+     *   ),
+     *   array(
+     *     'listener' => function($event) {
+     *       // Some code
+     *     },
+     *     'events' => array(
+     *       'image.get.pre', 'image.head.pre'
+     *     ),
+     *   ),
+     * ),
+     *
+     * The listeners are triggered in the order they are added.
+     *
+     * @var array
+     */
+    'eventListeners' => array(
+        array(
+            'listener' => new EventListener\AccessToken(),
+        ),
+    ),
+);
