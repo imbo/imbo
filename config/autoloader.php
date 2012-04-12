@@ -32,6 +32,11 @@
 
 namespace Imbo;
 
+// Explode include_path and remove all trailing slashes
+$paths = array_map(function($path) {
+    return rtrim($path, DIRECTORY_SEPARATOR);
+}, explode(PATH_SEPARATOR, get_include_path()));
+
 // Register autoloader
 spl_autoload_register(function($className) use ($paths) {
     $filename = str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
