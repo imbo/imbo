@@ -35,8 +35,7 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
-    Imbo\Image\ImageInterface,
-    SplPriorityQueue;
+    Imbo\Image\ImageInterface;
 
 /**
  * Event manager
@@ -92,7 +91,7 @@ class EventManager implements EventManagerInterface {
     /**
      * @see Imbo\EveneManager\EventManagerInterface::attach()
      */
-    public function attach($events, $callback, $priority = 1) {
+    public function attach($events, $callback) {
         if (!is_array($events)) {
             $events = array($events);
         }
@@ -103,10 +102,10 @@ class EventManager implements EventManagerInterface {
 
         foreach ($events as $event) {
             if (empty($this->events[$event])) {
-                $this->events[$event] = new SplPriorityQueue();
+                $this->events[$event] = array();
             }
 
-            $this->events[$event]->insert($callback, $priority);
+            $this->events[$event][] = $callback;
         }
 
         return $this;
@@ -115,7 +114,7 @@ class EventManager implements EventManagerInterface {
     /**
      * @see Imbo\EventManager\EventManagagerInterface::attachListener()
      */
-    public function attachListener(ListenerInterface $listener, $priority = 1) {
+    public function attachListener(ListenerInterface $listener) {
         // Fetch current public key
         $publicKey = $this->request->getPublicKey();
 
@@ -127,7 +126,7 @@ class EventManager implements EventManagerInterface {
             // key
             return $this->attach($listener->getEvents(), function(EventInterface $event) use($listener) {
                 $listener->invoke($event);
-            }, $priority);
+            });
         }
 
         return $this;
