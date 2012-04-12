@@ -191,7 +191,7 @@ class FrontController {
      * @return mixed Returns true on success
      */
     private function auth(RequestInterface $request, ResponseInterface $response) {
-        $authConfig = $this->container->auth;
+        $authConfig = $this->container->config['auth'];
         $publicKey = $request->getPublicKey();
 
         // See if the public key exists
