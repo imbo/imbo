@@ -196,7 +196,7 @@ class FrontController {
 
         // See if the public key exists
         if (!isset($authConfig[$publicKey])) {
-            $e = new RuntimeException('Unknown public key', 400);
+            $e = new RuntimeException('Unknown public key', 404);
             $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
 
             throw $e;

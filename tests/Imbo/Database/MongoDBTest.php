@@ -50,6 +50,13 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     private $driver;
 
     /**
+     * Mongo instance
+     *
+     * @var Mongo
+     */
+    private $mongo;
+
+    /**
      * The collection to use
      *
      * @var MongoCollection
@@ -90,8 +97,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             );
         }
 
+        $this->mongo = $this->getMockBuilder('Mongo')->disableOriginalConstructor()->getMock();
         $this->collection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
-        $this->driver = new MongoDB($this->driverParams, $this->collection);
+        $this->driver = new MongoDB($this->driverParams, $this->mongo, $this->collection);
     }
 
     /**

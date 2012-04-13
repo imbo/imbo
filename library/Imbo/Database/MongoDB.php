@@ -36,8 +36,9 @@ use Imbo\Image\ImageInterface,
     Imbo\Exception\DatabaseException,
     Imbo\Exception,
     Mongo,
-    MongoException,
     MongoCollection,
+    MongoException,
+    InvalidArgumentException,
     DateTime;
 
 /**
@@ -49,6 +50,12 @@ use Imbo\Image\ImageInterface,
  *
  * - <pre>(string) database</pre> Name of the database. Defaults to 'imbo'
  * - <pre>(string) collection</pre> Name of the collection to store data in. Defaults to 'images'
+ * - <pre>(string) server</pre> The server string to use when connecting to MongoDB. Defaults to
+ *                              'mongodb://localhost:27017'
+ * - <pre>(array) options</pre> Options to use when creating the Mongo instance. Defaults to
+ *                              array('connect' => true, 'timeout' => 1000).
+ * - <pre>(string) slaveOk</pre> If reads should be sent to secondary members of a replica set for
+ *                               all possible queries. Defaults to false.
  *
  * @package Database
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -57,6 +64,13 @@ use Imbo\Image\ImageInterface,
  * @link https://github.com/imbo/imbo
  */
 class MongoDB implements DatabaseInterface {
+    /**
+     * Mongo instance
+     *
+     * @var Mongo
+     */
+    private $mongo;
+
     /**
      * The collection instance used by the driver
      *
@@ -70,34 +84,37 @@ class MongoDB implements DatabaseInterface {
      * @var array
      */
     private $params = array(
+        // Database and collection names
         'databaseName'   => 'imbo',
         'collectionName' => 'images',
+
+        // Server string and ctor options
+        'server'  => 'mongodb://localhost:27017',
+        'options' => array('connect' => true, 'timeout' => 1000),
+
+        // Other options
+        'slaveOk' => true,
     );
 
     /**
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param MongoCollection $collection MongoDB collection instance
+     * @param Mongo $mongo Mongo instance
+     * @param MongoCollection $collection MongoCollection instance
      */
-    public function __construct(array $params = null, MongoCollection $collection = null) {
+    public function __construct(array $params = null, Mongo $mongo = null, MongoCollection $collection = null) {
         if ($params !== null) {
-            $this->params = array_merge($this->params, $params);
+            $this->params = array_replace_recursive($this->params, $params);
         }
 
-        if ($collection === null) {
-            // @codeCoverageIgnoreStart
-            try {
-                $mongo      = new Mongo();
-                $database   = $mongo->{$this->params['databaseName']};
-                $collection = $database->{$this->params['collectionName']};
-            } catch (MongoException $e) {
-                throw new DatabaseException('Could not connect to database', 500);
-            }
+        if ($mongo !== null) {
+            $this->mongo = $mongo;
         }
-        // @codeCoverageIgnoreEnd
 
-        $this->collection = $collection;
+        if ($collection !== null) {
+            $this->collection = $collection;
+        }
     }
 
     /**
@@ -122,7 +139,10 @@ class MongoDB implements DatabaseInterface {
 
         try {
             // See if the image already exists
-            $row = $this->collection->findOne(array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier));
+            $row = $this->getCollection()->findOne(array(
+                'publicKey' => $publicKey,
+                'imageIdentifier' => $imageIdentifier,
+            ));
 
             if ($row) {
                 $e = new DatabaseException('Image already exists', 400);
@@ -131,7 +151,7 @@ class MongoDB implements DatabaseInterface {
                 throw $e;
             }
 
-            $this->collection->insert($data, array('safe' => true));
+            $this->getCollection()->insert($data, array('safe' => true));
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to save image data', 500, $e);
         }
@@ -144,7 +164,7 @@ class MongoDB implements DatabaseInterface {
      */
     public function deleteImage($publicKey, $imageIdentifier) {
         try {
-            $this->collection->remove(
+            $this->getCollection()->remove(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('justOne' => true, 'safe' => true)
             );
@@ -164,7 +184,7 @@ class MongoDB implements DatabaseInterface {
             $existing = $this->getMetadata($publicKey, $imageIdentifier);
             $updatedMetadata = array_merge($existing, $metadata);
 
-            $this->collection->update(
+            $this->getCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('$set' => array('updated' => time(), 'metadata' => $updatedMetadata)),
                 array('safe' => true, 'multiple' => false)
@@ -181,7 +201,10 @@ class MongoDB implements DatabaseInterface {
      */
     public function getMetadata($publicKey, $imageIdentifier) {
         try {
-            $data = $this->collection->findOne(array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier));
+            $data = $this->getCollection()->findOne(array(
+                'publicKey' => $publicKey,
+                'imageIdentifier' => $imageIdentifier,
+            ));
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch image metadata', 500, $e);
         }
@@ -198,7 +221,7 @@ class MongoDB implements DatabaseInterface {
      */
     public function deleteMetadata($publicKey, $imageIdentifier) {
         try {
-            $this->collection->update(
+            $this->getCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('$set' => array('metadata' => array())),
                 array('safe' => true, 'multiple' => false)
@@ -253,9 +276,9 @@ class MongoDB implements DatabaseInterface {
         }
 
         try {
-            $cursor = $this->collection->find($queryData, $fields)
-                                       ->limit($query->limit())
-                                       ->sort(array('added' => -1));
+            $cursor = $this->getCollection()->find($queryData, $fields)
+                                            ->limit($query->limit())
+                                            ->sort(array('added' => -1));
 
             // Skip some images if a page has been set
             if (($page = $query->page()) > 1) {
@@ -279,7 +302,7 @@ class MongoDB implements DatabaseInterface {
      */
     public function load($publicKey, $imageIdentifier, ImageInterface $image) {
         try {
-            $data = $this->collection->findOne(
+            $data = $this->getCollection()->findOne(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('name', 'size', 'width', 'height', 'mime', 'extension')
             );
@@ -313,11 +336,11 @@ class MongoDB implements DatabaseInterface {
             }
 
             // Create the cursor
-            $cursor = $this->collection->find($query, array('updated'))
-                                       ->limit(1)
-                                       ->sort(array(
-                                           'updated' => MongoCollection::DESCENDING,
-                                       ));
+            $cursor = $this->getCollection()->find($query, array('updated'))
+                                            ->limit(1)
+                                            ->sort(array(
+                                                'updated' => MongoCollection::DESCENDING,
+                                            ));
 
             // Fetch the next row
             $data = $cursor->getNext();
@@ -350,11 +373,52 @@ class MongoDB implements DatabaseInterface {
                 'publicKey' => $publicKey,
             );
 
-            $result = (int) $this->collection->find($query)->count();
+            $result = (int) $this->getCollection()->find($query)->count();
 
             return $result;
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch information from the database', 500, $e);
         }
+    }
+
+    /**
+     * Get the mongo collection instance
+     *
+     * @return MongoCollection
+     */
+    protected function getCollection() {
+        if ($this->collection === null) {
+            try {
+                $this->collection = $this->getMongo()->selectCollection(
+                    $this->params['databaseName'],
+                    $this->params['collectionName']
+                );
+            } catch (InvalidArgumentException $d) {
+                throw new DatabaseException('Could not select collection', 500);
+            }
+        }
+
+        return $this->collection;
+    }
+
+    /**
+     * Get the mongo instance
+     *
+     * @return Mongo
+     */
+    protected function getMongo() {
+        if ($this->mongo === null) {
+            try {
+                $this->mongo = new Mongo($this->params['server'], $this->params['options']);
+
+                if ($this->params['slaveOk'] === true) {
+                    $this->mongo->setSlaveOkay(true);
+                }
+            } catch (MongoException $e) {
+                throw new DatabaseException('Could not connect to database', 500);
+            }
+        }
+
+        return $this->mongo;
     }
 }
