@@ -94,11 +94,11 @@ class Canvas extends Transformation implements TransformationInterface {
     private $y = 0;
 
     /**
-     * Background color of the canvas
+     * Background color of the canvas. Defaults to white.
      *
      * @var string
      */
-    private $bg;
+    private $bg = '#fff';
 
     /**
      * Class constructor
@@ -136,8 +136,6 @@ class Canvas extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $background = $this->bg ?: null;
-
             // Create a new canvas
             $canvas = new Imagick();
             $canvas->newImage($this->width, $this->height, $this->bg);
