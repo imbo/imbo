@@ -118,7 +118,7 @@ return array(
      *     'listener' => new Imbo\EventListener\AccessToken(),
      *   ),
      *   array(
-     *     'listener' => new Imbo\EventListener\ImageTransformationStorage('/tmp/imbocache'),
+     *     'listener' => new Imbo\EventListener\ImageTransformationCache('/tmp/imbocache'),
      *   ),
      *   array(
      *     'listener' => function($event) {

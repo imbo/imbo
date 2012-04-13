@@ -35,7 +35,7 @@ use Imbo\Exception\RuntimeException,
     Imbo\EventManager\EventInterface;
 
 /**
- * Image transformation storage
+ * Image transformation cache
  *
  * Event listener that stores (transformed) images to disk. By using this listener Imbo will only
  * have to generate each transformation once.
@@ -46,7 +46,7 @@ use Imbo\Exception\RuntimeException,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class ImageTransformationStorage extends Listener implements ListenerInterface {
+class ImageTransformationCache extends Listener implements ListenerInterface {
     /**
      * Root path where the temp. images can be stored
      *
