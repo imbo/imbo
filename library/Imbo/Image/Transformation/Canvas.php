@@ -136,11 +136,11 @@ class Canvas extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $background = $this->bg ?: null;
+            $background = $this->bg ?: '#fff';
 
             // Create a new canvas
             $canvas = new Imagick();
-            $canvas->newImage($this->width, $this->height, $this->bg);
+            $canvas->newImage($this->width, $this->height, $background);
             $canvas->setImageFormat($image->getExtension());
 
             // Load existing image
