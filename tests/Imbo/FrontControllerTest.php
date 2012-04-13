@@ -168,7 +168,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\FrontController::auth
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Unknown public key
-     * @expectedExceptionCode 400
+     * @expectedExceptionCode 404
      */
     public function testAuthWithUnknownPublicKey() {
         $reflection = new \ReflectionClass($this->controller);
