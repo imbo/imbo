@@ -125,7 +125,7 @@ Adds a canvas around the image,
 * `(string) mode` The placement mode of the original image. "free", "center", "center-x" and "center-y" are available values. Defaults to "free".
 * `(int) x` X coordinate of the placement of the upper left corner of the existing image.
 * `(int) y` Y coordinate of the placement of the upper left corner of the existing image.
-* `(string) $bg` Background color of the canvas. Defaults to `null` which uses the background color of the original image.
+* `(string) $bg` Background color of the canvas. Defaults to `#fff`.
 
 Examples:
 
