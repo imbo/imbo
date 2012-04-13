@@ -58,15 +58,9 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
      * Class constructor
      *
      * @param string $path Path to store the temp. images
-     * @throws Imbo\Exception\RuntimeException
      */
     public function __construct($path) {
         $this->path = rtrim($path, '/');
-
-        // Try to create the path if it does not exist
-        if ((!is_dir($path) && !@mkdir($path, 0775, true)) || !is_writable($path)) {
-            throw new RuntimeException('Invalid path: ' . $path, 500);
-        }
     }
 
     /**
@@ -81,12 +75,11 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
 
     /**
      * @see Imbo\EventListener\ListenerInterface::invoke
-     * @throws Imbo\Exception\RuntimeException
      */
     public function invoke(EventInterface $event) {
         $eventName = $event->getName();
         $request = $event->getRequest();
-        $hash = md5($request->getUrl());
+        $hash = hash('sha256', $request->getUrl());
         $fullPath = $this->getFullPath($hash);
 
         if ($eventName === 'image.get.pre') {
@@ -120,11 +113,11 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
 
             $dir = dirname($fullPath);
 
-            if (!is_dir($dir) && !mkdir($dir, 0775, true)) {
-                throw new RuntimeException('Could not create directory: ' . $dir, 500);
+            if (is_dir($dir) || mkdir($dir, 0775, true)) {
+                if (file_put_contents($fullPath . '.tmp', serialize($response))) {
+                    rename($fullPath . '.tmp', $fullPath);
+                }
             }
-
-            file_put_contents($fullPath, serialize($response));
         }
     }
 
