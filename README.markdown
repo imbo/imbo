@@ -275,66 +275,12 @@ If you requestn an URL from Imbo without an access token or if the access token 
 Imbo will usually inject extra response headers to the different requests. All response headers from Imbo will be prefixed with **X-Imbo-**.
 
 ## Configuration
-When installing Imbo you need to copy the boostrap/bootstrap.php.dist file to bootstrap/bootstrap.php and change the values to suit your needs.
+When installing Imbo you need to copy the `config/config.php.dist` file to `config/config.php` and change the values to suit your needs. Documentation on the different configuration settings are located in the `config.php.dist` file.
 
-### Authentication key pairs
-Imbo supports several key pairs so several users can store images on your installation of Imbo. To achieve this simply specify several key pairs in the 'auth' value in the container:
+## Event manager
+Imbo comes with an event manager that can be used to inject custom code in different parts of the application. Which event listeners to use is specified in the configuration file.
 
-```php
-<?php
-$container->auth = array(
-    '<publicKey1>' => '<privateKey1>',
-    '<publicKey2>' => '<privateKey2>',
-    ...
-    '<publicKeyN>' => '<privateKeyN>',
-);
-```
-
-### Specify database and storage drivers
-The database and storage drivers use the 'database' and 'storage' values in the container respectively. The default looks like this:
-
-```php
-<?php
-// Parameters for the database driver
-$dbParams = array(
-    'database' => 'imbo',
-    'collection' => 'images',
-);
-
-// Create the database entry
-$container->database = $container->shared(function (Imbo\Container $container) use ($dbParams) {
-    return new Imbo\Database\MongoDB($dbParams);
-});
-
-// Parameters for the storage driver
-$storageParams = array(
-    'dataDir' => '/some/path',
-);
-
-// Create the storage entry
-$container->storage = $container->shared(function (Imbo\Container $container) use ($storageParams) {
-    return new Imbo\Storage\Filesystem($storageParams);
-});
-```
-
-which makes Imbo use MongoDB as database and the local filesystem for storage. You can implement your own drivers and use them here. Remember to implement `Imbo\Database\DatabaseInterface` and `Imbo\Storage\StorageInterface` for database drivers and storage drivers respectively.
-
-### Event manager
-Imbo comes with an event manager that can be used to inject custom code in different parts of the application. Attaching code to a given event can be done in the following way in `bootstrap/bootstrap.php`:
-
-```php
-<?php
-$container->eventManager = $container->shared(function(Imbo\Container $container) {
-    $manager = new Imbo\EventManager\EventManager($container->request, $container->response, $container->image);
-    $manager->attach('image.get.pre', function(Imbo\EventManager\EventInterface $event) {
-        $event->getResponse()->getHeaders()->set('X-Custom-Header', 'some value');
-    });
-
-    return $manager;
-});
-```
-
-The above code will get triggered before all `GET` requests for specific images. Each resource triggers `pre` and `post` events for all supported HTTP methods. The following events are defined for the `image` resource:
+Event listeners will listen for specific events that Imbo triggers. Each resource in Imbo triggers `pre` and `post` events for all supported HTTP methods. The following events are defined for the `image` resource:
 
 * `image.get.pre`
 * `image.get.post`
@@ -356,25 +302,62 @@ The executable code you attach to an event will receive a single parameter, an i
 
 * `getRequest()`: Returns the current request instance.
 * `getResponse()`: Returns the current response instance.
-* `getImage()`: Returns the current internal image instance.
+* `getImage()`: Returns the current internal image instance. This method will return `null` for all resources except `image`.
 * `getName()`: Returns the full name of the event that triggered your code (for instance `metadata.get.post`).
 
-If you want to attach code to several events, you can supply an array of event names to the `attach()` method:
+## Bundled event listeners
+Imbo ships with some event listener implementations. One of them is also enabled pr. default in the default configuration file.
+
+### AccessToken
+The access token listener enforces a valid access token to be present for all URLs. This event listener does not have any constructor parameters and is enabled in the default configuration file.
 
 ```php
-<?php
-$container->eventManager = $container->shared(function(Imbo\Container $container) {
-    $manager = new Imbo\EventManager\EventManager($container->request, $container->response, $container->image);
-    $manager->attach(array('image.get.pre', 'image.head.pre'), function(Imbo\EventManager\EventInterface $event) {
-        // some code
-    });
+'eventListeners' => array(
+    array(
+        'listener' => new Imbo\EventListener\AccessToken(),
+    )
 
-    return $manager;
-});
+    // ...
+),
 ```
 
-### The EventListener interface
-The event manager also has a method called `attachListener()` that takes an implementation of the `Imbo\EventListener\ListenerInterface` interface as argument. Imbo ships with some implementations of this interface.
+It is advised to keep this event listener first.
+
+### ImageTransformationCache
+Transforming images again and again on the server can be avoided by enabling this event listener. The listener takes one argument, which is a path to where to store the cached images:
+
+```php
+'eventListeners' => array(
+    // ...
+
+    array(
+        'listener' => new Imbo\EventListener\ImageTransformationCache('/var/cache/imbo'),
+    )
+
+    // ...
+),
+```
+
+Imbo will automatically create subdirectories inside the cache dir passed to the constructor of the event listener. If the listener is unable to write to the specified directory it will generate warnings, but will still be able to deliver the image to the client. If you want to clean up the cache dir you can for instance have a crontab run once a day that deletes old files:
+
+`find /var/cache/imbo -ctime +7 -type f -delete`
+
+The above example will delete all files in `/var/cache/imbo` older than 7 days.
+
+### MaxImageSize
+If you want your Imbo installation to only store images below a certain size you can use the MaxImageSize listener. The constructor of this class takes two arguments: `$width` and `$height`. If an image exceeds these sizes it will be resized when initially `PUT`.
+
+```php
+'eventListeners' => array(
+    // ...
+
+    array(
+        'listener' => new Imbo\EventListener\MaxImageSize(2000, 2000),
+    )
+
+    // ...
+),
+```
 
 ## Developer/Contributer notes
 Here you will find some notes about how Imbo works internally along with information on what is needed to develop Imbo.
