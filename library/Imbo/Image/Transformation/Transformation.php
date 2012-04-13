@@ -31,8 +31,7 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imagine\Image\ImagineInterface,
-    Imagine\Imagick\Imagine;
+use Imagick;
 
 /**
  * Abstract transformation
@@ -44,30 +43,45 @@ use Imagine\Image\ImagineInterface,
  * @link https://github.com/imbo/imbo
  */
 abstract class Transformation implements TransformationInterface {
-    /**
-     * Imagine instance
-     *
-     * @var Imagine\Image\ImagineInterface
-     */
-    private $imagine;
 
     /**
-     * @see Imbo\Image\Transformation\TransformationInterface::getImagine()
+     * Imagick instance
+     *
+     * @var Imagick
      */
-    public function getImagine() {
-        if ($this->imagine === null) {
-            $this->imagine = new Imagine();
+    private $imagick;
+
+    /**
+     * @see Imbo\Image\Transformation\TransformationInterface::getImagick()
+     */
+    public function getImagick() {
+        if ($this->imagick === null) {
+            $this->imagick = new Imagick();
         }
 
-        return $this->imagine;
+        return $this->imagick;
     }
 
     /**
-     * @see Imbo\Image\Transformation\TransformationInterface::getImagine()
+     * @see Imbo\Image\Transformation\TransformationInterface::getImagick()
      */
-    public function setImagine(ImagineInterface $imagine) {
-        $this->imagine = $imagine;
+    public function setImagick(Imagick $imagick) {
+        $this->imagick = $imagick;
 
         return $this;
+    }
+
+    /**
+     * Attempt to format a color-string into a string Imagick can understand
+     *
+     * @param string $color
+     * @return string
+     */
+    protected function formatColor($color) {
+        if (preg_match('/^[A-F0-9]{3,6}$/i', $color)) {
+            return '#' . $color;
+        }
+
+        return $color;
     }
 }

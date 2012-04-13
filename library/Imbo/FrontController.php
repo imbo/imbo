@@ -191,12 +191,12 @@ class FrontController {
      * @return mixed Returns true on success
      */
     private function auth(RequestInterface $request, ResponseInterface $response) {
-        $authConfig = $this->container->auth;
+        $authConfig = $this->container->config['auth'];
         $publicKey = $request->getPublicKey();
 
         // See if the public key exists
         if (!isset($authConfig[$publicKey])) {
-            $e = new RuntimeException('Unknown public key', 400);
+            $e = new RuntimeException('Unknown public key', 404);
             $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
 
             throw $e;
@@ -276,9 +276,8 @@ class FrontController {
         // Fetch a resource instance based on the request path
         $resource = $this->resolveResource($request);
 
-        // Add Allow and Vary to all responses
-        $response->getHeaders()->set('Allow', implode(', ', $resource->getAllowedMethods()))
-                               ->set('Vary', 'Accept, Accept-Encoding');
+        // Add Allow to all responses
+        $response->getHeaders()->set('Allow', implode(', ', $resource->getAllowedMethods()));
 
         // Fetch the real image identifier (PUT only) or the one from the URL (if present)
         if (($identifier = $request->getRealImageIdentifier()) || ($identifier = $request->getImageIdentifier())) {

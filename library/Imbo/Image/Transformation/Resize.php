@@ -34,8 +34,7 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Image\ImageInterface,
     Imbo\Exception\TransformationException,
-    Imagine\Exception\Exception as ImagineException,
-    Imagine\Image\Box;
+    ImagickException;
 
 /**
  * Resize transformation
@@ -78,30 +77,27 @@ class Resize extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
-            $imagine = $this->getImagine();
-            $imagineImage = $imagine->load($image->getBlob());
-
-            $width  = $this->width ?: null;
+            $width  = $this->width  ?: null;
             $height = $this->height ?: null;
-
-            // Fetch the size of the original image
-            $size = $imagineImage->getSize();
 
             // Calculate width or height if not both have been specified
             if (!$height) {
-                $height = ($size->getHeight() / $size->getWidth()) * $width;
+                $height = ($image->getHeight() / $image->getWidth()) * $width;
             } else if (!$width) {
-                $width = ($size->getWidth() / $size->getHeight()) * $height;
+                $width = ($image->getWidth() / $image->getHeight()) * $height;
             }
 
-            $imagineImage->resize(new Box($width, $height));
+            $imagick = $this->getImagick();
+            $imagick->setOption('jpeg:size', $width . 'x' . $height);
+            $imagick->readImageBlob($image->getBlob());
+            $imagick->cropThumbnailImage($width, $height);
 
-            $box = $imagineImage->getSize();
+            $size = $imagick->getImageGeometry();
 
-            $image->setBlob($imagineImage->get($image->getExtension()))
-                  ->setWidth($box->getWidth())
-                  ->setHeight($box->getHeight());
-        } catch (ImagineException $e) {
+            $image->setBlob($imagick->getImageBlob())
+                  ->setWidth($size['width'])
+                  ->setHeight($size['height']);
+        } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
     }

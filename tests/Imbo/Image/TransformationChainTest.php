@@ -43,8 +43,8 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
     private $chain;
 
     public function setUp() {
-        if (!class_exists('Imagine\Imagick\Imagine')) {
-            $this->markTestSkipped('Imagine must be available to run this test');
+        if (!class_exists('Imagick')) {
+            $this->markTestSkipped('Imagick must be available to run this test');
         }
 
         $this->chain = new TransformationChain();
@@ -91,6 +91,8 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\TransformationChain::resize
      * @covers Imbo\Image\TransformationChain::rotate
      * @covers Imbo\Image\TransformationChain::thumbnail
+     * @covers Imbo\Image\TransformationChain::transpose
+     * @covers Imbo\Image\TransformationChain::transverse
      */
     public function testChain() {
         $this->assertSame($this->chain,
@@ -104,6 +106,8 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
                         ->resize(100, 200)
                         ->rotate(45, 'fff')
                         ->thumbnail(10, 10, '000')
+                        ->transpose()
+                        ->transverse()
         );
     }
 

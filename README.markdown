@@ -4,7 +4,7 @@ Imbo is an image "server" that can be used to add/get/delete images using a REST
 [![Current build Status](https://secure.travis-ci.org/imbo/imbo.png)](http://travis-ci.org/imbo/imbo)
 
 ## Requirements
-Imbo requires [PHP-5.3](http://php.net/), the [Imagine](https://github.com/avalanche123/imagine) image manipulation library, a running [MongoDB](http://www.mongodb.org/) and the [Mongo extension for PHP](http://pecl.php.net/package/mongo).
+Imbo requires [PHP-5.3](http://php.net/), the [Imagick extension for PHP](http://pecl.php.net/package/imagick), a running [MongoDB](http://www.mongodb.org/) and the [Mongo extension for PHP](http://pecl.php.net/package/mongo).
 
 ## Installation
 Since this is a work in progress there is no automatic installation. Simply clone the repository or make your own fork. Automatic installation using [PEAR](http://pear.php.net/) will be provided later.
@@ -27,14 +27,14 @@ Get meta data related to the image identified by &lt;image&gt;. The meta data wi
 Get information about the images stored in Imbo for the user with the public key &lt;publicKey&gt;. Supported query parameters are:
 
 * `(int) page` The page number. Defaults to 1.
-* `(int) num` Number of images pr. page. Defaults to 20.
+* `(int) limit` Number of images pr. page. Defaults to 20.
 * `(boolean) metadata` Wether or not to include metadata in the output. Defaults to false ('0'). Set to '1' to enable.
 * `(int) from` Fetch images starting from this unix timestamp.
 * `(int) to` Fetch images up until this timestamp.
 
 Example:
 
-* `GET /users/<publicKey>/images?page=1&num=30&metadata=1`
+* `GET /users/<publicKey>/images?page=1&limit=30&metadata=1`
 
 ### GET /users/&lt;publicKey&gt;
 
@@ -47,6 +47,10 @@ Place a new image on the server. The output from the server is important as the 
 ### POST /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
 
 Edit the meta data attached to the image identified by &lt;image&gt;.
+
+### PUT /users/&lt;publicKey&gt;/images/&lt;image&gt;/meta
+
+Replaces the meta data attached to the image identified by &lt;image&gt;.
 
 ### DELETE /users/&lt;publicKey&gt;/images/&lt;image&gt;
 
@@ -96,7 +100,7 @@ The above code will generate a signature that must be sent along the request usi
 The public and private key pair used by clients must be specified in the server configuration. More information on the configuration file can be found later in this document.
 
 ## Image transformations
-Imbo supports some image transformations out of the box using the [Imagine](https://github.com/avalanche123/Imagine/) image manipulation library.
+Imbo supports some image transformations out of the box using the [Imagick](http://pecl.php.net/package/imagick) PHP extension.
 
 Transformations are made using the `t[]` query parameter. This GET parameter should be used as an array so that multiple transformations can be made. The transformations are made in the order they are specified in the url.
 
@@ -222,6 +226,20 @@ Examples:
 
 * `t[]=thumbnail`
 * `t[]=thumbnail:width=20,height=20,fit=inset`
+
+### transpose
+Creates a vertical mirror image by reflecting the pixels around the central x-axis while rotating them 90-degrees.
+
+Example:
+
+* `t[]=transpose`
+
+### transverse
+Creates a horizontal mirror image by reflecting the pixels around the central y-axis while rotating them 270-degrees.
+
+Example:
+
+* `t[]=transverse`
 
 ## Access token
 All GET and HEAD requests will need to include an access token in the URL. This is enforced by an event listener (`Imbo\EventListener\AccessToken`). This token must be supplied in the URL using the `accessToken` query parameter. The value of this token is a SHA256 hash using the URL with query parameters as data and must be signed with the private key of the user. Below is an example on how to generate the hash:
@@ -378,7 +396,7 @@ To fully develop Imbo (as in run the complete build process, which most likely y
 
 * [PHPUnit](http://phpunit.de/)
 * [vfsStream](http://code.google.com/p/bovigo/wiki/vfsStream)
-* [Imagine](https://github.com/avalanche123/Imagine/)
+* [Imagick extension for PHP](http://pecl.php.net/package/imagick)
 * [MongoDB](http://www.mongodb.org/)
 * [Mongo extension for PHP](http://pecl.php.net/package/mongo)
 

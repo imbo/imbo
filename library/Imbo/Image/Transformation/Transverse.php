@@ -22,52 +22,46 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Interfaces
- * @subpackage EventManager
+ * @package Image
+ * @subpackage Transformation
+ * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\EventManager;
+namespace Imbo\Image\Transformation;
 
-use Imbo\EventListener\ListenerInterface;
+use Imbo\Image\ImageInterface,
+    Imbo\Exception\TransformationException,
+    ImagickException;
 
 /**
- * Event manager interface
+ * Transverse transformation
  *
- * @package Interfaces
- * @subpackage EventManager
+ * @package Image
+ * @subpackage Transformation
+ * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-interface EventManagerInterface {
+class Transverse extends Transformation implements TransformationInterface {
     /**
-     * Attach a callable to an event
-     *
-     * @param array|string $events The event(s) to attach to
-     * @param callback $callback Code that will be called when the event is triggered
-     * @throws Imbo\Exception\InvalidArgumentException
-     * @return Imbo\EventManager\EventManagerInterface
+     * @see Imbo\Image\Transformation\TransformationInterface::applyToImage()
      */
-    function attach($events, $callback);
+    public function applyToImage(ImageInterface $image) {
+        try {
+            $imagick = $this->getImagick();
+            $imagick->readImageBlob($image->getBlob());
 
-    /**
-     * Attach a listener to the event manager
-     *
-     * @param Imbo\EventListener\ListenerInterface $listener The listener to attach
-     * @return Imbo\EventManager\EventManagerInterface
-     */
-    function attachListener(ListenerInterface $listener);
+            $imagick->transverseImage();
 
-    /**
-     * Trigger a given event
-     *
-     * @param string $event The event to trigger
-     * @return Imbo\EventManager\EventManagerInterface
-     */
-    function trigger($event);
+            $image->setBlob($imagick->getImageBlob());
+        } catch (ImagickException $e) {
+            throw new TransformationException($e->getMessage(), 400, $e);
+        }
+    }
 }
