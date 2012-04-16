@@ -70,6 +70,7 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
         return array(
             'image.get.pre',
             'image.get.post',
+            'image.delete.post',
         );
     }
 
@@ -117,6 +118,10 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
                 if (file_put_contents($fullPath . '.tmp', serialize($response))) {
                     rename($fullPath . '.tmp', $fullPath);
                 }
+            }
+        } else if ($eventName === 'image.delete.post') {
+            if (is_file($fullPath)) {
+                unlink($fullPath);
             }
         }
     }
