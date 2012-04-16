@@ -48,14 +48,14 @@ use Imbo\Image\ImageInterface,
  *
  * Valid parameters for this driver:
  *
- * - <pre>(string) database</pre> Name of the database. Defaults to 'imbo'
- * - <pre>(string) collection</pre> Name of the collection to store data in. Defaults to 'images'
- * - <pre>(string) server</pre> The server string to use when connecting to MongoDB. Defaults to
+ * - (string) databaseName Name of the database. Defaults to 'imbo'
+ * - (string) collectionName Name of the collection to store data in. Defaults to 'images'
+ * - (string) server The server string to use when connecting to MongoDB. Defaults to
  *                              'mongodb://localhost:27017'
- * - <pre>(array) options</pre> Options to use when creating the Mongo instance. Defaults to
+ * - (array) options Options to use when creating the Mongo instance. Defaults to
  *                              array('connect' => true, 'timeout' => 1000).
- * - <pre>(string) slaveOk</pre> If reads should be sent to secondary members of a replica set for
- *                               all possible queries. Defaults to false.
+ * - (string) slaveOk If reads should be sent to secondary members of a replica set for all
+ *                    possible queries. Defaults to false.
  *
  * @package Database
  * @author Christer Edvartsen <cogo@starzinger.net>
