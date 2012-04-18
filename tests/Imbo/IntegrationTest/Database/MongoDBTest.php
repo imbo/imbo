@@ -22,35 +22,62 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
+
+namespace Imbo\IntegrationTest\Database;
+
+use Imbo\Database\MongoDB,
+    Mongo;
 
 /**
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Database\MongoDB
  */
+class MongoDBTest extends DatabaseTests {
+    /**
+     * @var string
+     */
+    private $testDbName = 'imboMongoDBIntegrationTestDB';
 
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
+    /**
+     * @var string
+     */
+    private $testCollectionName = 'imboMongoDBIntegrationTestCollection';
 
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+    /**
+     * @see Imbo\IntegrationTest\Database\DatabaseTests::getDriver()
+     */
+    protected function getDriver() {
+        return new MongoDB(array(
+            'databaseName' => $this->testDbName,
+            'collectionName' => $this->testCollectionName
+        ));
     }
 
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
+    public function setUp() {
+        if (!extension_loaded('mongo')) {
+            $this->markTestSkipped('pecl/mongo is required to run this test');
         }
+
+        $mongo = new Mongo();
+        $mongo->selectDB($this->testDbName)->drop();
+
+        parent::setUp();
     }
-});
+
+    public function tearDown() {
+        $mongo = new Mongo();
+        $mongo->selectDB($this->testDbName)->drop();
+
+        parent::tearDown();
+    }
+}

@@ -29,28 +29,34 @@
  * @link https://github.com/imbo/imbo
  */
 
+namespace Imbo\UnitTest\Image\Transformation;
+
+use Imbo\Image\Transformation\Border;
+
 /**
  * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\Transformation\Border
  */
-
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+class BorderTest extends TransformationTests {
+    protected function getTransformation() {
+        return new Border();
     }
 
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
+    /**
+     * @covers Imbo\Image\Transformation\Border::applyToImage
+     */
+    public function testApplyToImage() {
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
+        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with(667)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with(465)->will($this->returnValue($image));
 
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
-        }
+        $transformation = new Border();
+        $transformation->applyToImage($image);
     }
-});
+}

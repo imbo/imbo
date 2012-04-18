@@ -29,28 +29,44 @@
  * @link https://github.com/imbo/imbo
  */
 
+namespace Imbo\UnitTest\Http;
+
+use Imbo\Http\HeaderContainer;
+
 /**
  * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Http\HeaderContainer
  */
+class HeaderContainerTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @covers Imbo\Http\HeaderContainer::__construct
+     * @covers Imbo\Http\HeaderContainer::get
+     * @covers Imbo\Http\HeaderContainer::remove
+     * @covers Imbo\Http\HeaderContainer::has
+     */
+    public function testHeaderContainer() {
+        $parameters = array(
+            'key' => 'value',
+            'otherKey' => 'otherValue',
+            'content-length' => 123,
+            'CONTENT_LENGTH' => 234,
+            'content-type' => 'text/html',
+            'CONTENT_TYPE' => 'image/png',
+            'IF_NONE_MATCH' => 'asdf',
+        );
 
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+        $container = new HeaderContainer($parameters);
+        $this->assertSame('value', $container->get('key'));
+        $this->assertSame(234, $container->get('CONTENT_LENGTH'));
+        $this->assertSame(234, $container->get('content-length'));
+        $this->assertSame('asdf', $container->get('if-none-match'));
+        $this->assertSame($container, $container->remove('if-none-match'));
+        $this->assertFalse($container->has('if-none-match'));
+        $this->assertSame($container, $container->set('IF_NONE_MATCH', 'asd'));
+        $this->assertSame('asd', $container->get('if-none-match'));
     }
-
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
-        }
-    }
-});
+}

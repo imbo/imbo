@@ -29,6 +29,8 @@
  * @link https://github.com/imbo/imbo
  */
 
+namespace Imbo\UnitTest\Image\Transformation;
+
 /**
  * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -36,21 +38,12 @@
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
+abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
+    abstract protected function getTransformation();
 
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
-    }
-
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
+    public function setUp() {
+        if (!class_exists('Imagick')) {
+            $this->markTestSkipped('Imagick must be available to run this test');
         }
     }
-});
+}

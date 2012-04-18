@@ -106,7 +106,7 @@ class Images extends Resource implements ImagesInterface {
         $responseHeaders = $response->getHeaders();
 
         // Fetch the last modification date of the current user
-        $lastModified = $database->getLastModified($publicKey, null, true);
+        $lastModified = $this->formatDate($database->getLastModified($publicKey));
 
         // Generate ETag based on the last modification date and add to the response headers
         $etag = '"' . md5($lastModified) . '"';
@@ -128,11 +128,6 @@ class Images extends Resource implements ImagesInterface {
 
         if ($params->has('page')) {
             $query->page($params->get('page'));
-        }
-
-        // Keep supporting "num"
-        if ($params->has('num')) {
-            $query->limit($params->get('num'));
         }
 
         if ($params->has('limit')) {

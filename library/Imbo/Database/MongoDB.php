@@ -164,6 +164,15 @@ class MongoDB implements DatabaseInterface {
      */
     public function deleteImage($publicKey, $imageIdentifier) {
         try {
+            $data = $this->getCollection()->findOne(array(
+                'publicKey' => $publicKey,
+                'imageIdentifier' => $imageIdentifier,
+            ));
+
+            if ($data === null) {
+                throw new DatabaseException('Image not found', 404);
+            }
+
             $this->getCollection()->remove(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('justOne' => true, 'safe' => true)
@@ -221,6 +230,15 @@ class MongoDB implements DatabaseInterface {
      */
     public function deleteMetadata($publicKey, $imageIdentifier) {
         try {
+            $data = $this->getCollection()->findOne(array(
+                'publicKey' => $publicKey,
+                'imageIdentifier' => $imageIdentifier,
+            ));
+
+            if ($data === null) {
+                throw new DatabaseException('Image not found', 404);
+            }
+
             $this->getCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('$set' => array('metadata' => array())),
@@ -252,11 +270,11 @@ class MongoDB implements DatabaseInterface {
             $tmp = array();
 
             if ($from !== null) {
-                $tmp['$gt'] = $from;
+                $tmp['$gte'] = $from;
             }
 
             if ($to !== null) {
-                $tmp['$lt'] = $to;
+                $tmp['$lte'] = $to;
             }
 
             $queryData['added'] = $tmp;
@@ -269,7 +287,7 @@ class MongoDB implements DatabaseInterface {
         }
 
         // Fields to fetch
-        $fields = array('extension', 'added', 'checksum', 'updated', 'publicKey', 'imageIdentifier', 'mime', 'name', 'size', 'width', 'height');
+        $fields = array('extension', 'added', 'checksum', 'updated', 'publicKey', 'imageIdentifier', 'mime', 'size', 'width', 'height');
 
         if ($query->returnMetadata()) {
             $fields[] = 'metadata';
@@ -304,7 +322,7 @@ class MongoDB implements DatabaseInterface {
         try {
             $data = $this->getCollection()->findOne(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('name', 'size', 'width', 'height', 'mime', 'extension')
+                array('size', 'width', 'height', 'mime', 'extension')
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch image data', 500, $e);
@@ -325,7 +343,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * @see Imbo\Database\DatabaseInterface::getLastModified()
      */
-    public function getLastModified($publicKey, $imageIdentifier = null, $formatted = false) {
+    public function getLastModified($publicKey, $imageIdentifier = null) {
         try {
             // Query on the public key
             $query = array('publicKey' => $publicKey);
@@ -354,14 +372,7 @@ class MongoDB implements DatabaseInterface {
             $data = array('updated' => time());
         }
 
-        // Create a new datetime instance
-        $date = new DateTime('@' . $data['updated']);
-
-        if ($formatted) {
-            return $date->format('D, d M Y H:i:s') . ' GMT';
-        }
-
-        return $date;
+        return new DateTime('@' . $data['updated']);
     }
 
     /**

@@ -39,7 +39,8 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Storage\StorageInterface,
     Imbo\Resource\ResourceInterface,
     Imbo\Exception\ResourceException,
-    Imbo\EventManager\EventManagerInterface;
+    Imbo\EventManager\EventManagerInterface,
+    DateTime;
 
 /**
  * Abstract resource class
@@ -129,5 +130,15 @@ abstract class Resource implements ResourceInterface {
         $this->eventManager = $eventManager;
 
         return $this;
+    }
+
+    /**
+     * Get a formatted date
+     *
+     * @param DateTime $date An instance of DateTime
+     * @return string Returns a formatted date string
+     */
+    protected function formatDate(DateTime $date) {
+        return $date->format('D, d M Y H:i:s') . ' GMT';
     }
 }

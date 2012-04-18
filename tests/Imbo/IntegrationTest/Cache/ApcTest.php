@@ -22,35 +22,35 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
+
+namespace Imbo\IntegrationTest\Cache;
+
+use Imbo\Cache\Apc;
 
 /**
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Cache\Apc
  */
-
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
-    }
-
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
+class ApcTest extends CacheTests {
+    protected function getDriver() {
+        if (!extension_loaded('apc')) {
+            $this->markTestSkipped('APC is not installed');
         }
+
+        if (!ini_get('apc.enable_cli')) {
+            $this->markTestSkipped('apc.enable_cli must be set to On to run this test case');
+        }
+
+        return new Apc('ImboTestSuite');
     }
-});
+}

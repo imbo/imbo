@@ -29,28 +29,39 @@
  * @link https://github.com/imbo/imbo
  */
 
+namespace Imbo\UnitTest\Image\Transformation;
+
+use Imbo\Image\Transformation\Crop;
+
 /**
  * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\Transformation\Crop
  */
-
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+class CropTest extends TransformationTests {
+    protected function getTransformation() {
+        return new Crop(1, 2, 3, 4);
     }
 
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
+    /**
+     * @covers Imbo\Image\Transformation\Crop::applyToImage
+     */
+    public function testApplyToImage() {
+        $x = 1;
+        $y = 2;
+        $width = 3;
+        $height = 4;
 
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
-        }
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
+        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
+
+        $transformation = new Crop($x, $y, $width, $height);
+        $transformation->applyToImage($image);
     }
-});
+}

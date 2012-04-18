@@ -50,17 +50,17 @@ interface StorageInterface {
     /**
      * Store an image
      *
-     * This method will receive the binary data of the image place it somewhere suited for the
+     * This method will receive the binary data of the image and store it somewhere suited for the
      * actual storage driver. If an error occurs the driver should throw an
      * Imbo\Exception\StorageException exception.
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
-     * @param Imbo\Image\ImageInterface $image The image to store
+     * @param string $imageData The image data to store
      * @return boolean Returns true on success or false on failure
      * @throws Imbo\Exception\StorageException
      */
-    function store($publicKey, $imageIdentifier, ImageInterface $image);
+    function store($publicKey, $imageIdentifier, $imageData);
 
     /**
      * Delete an image
@@ -75,32 +75,22 @@ interface StorageInterface {
     function delete($publicKey, $imageIdentifier);
 
     /**
-     * Load an image
-     *
-     * The implementation of this method must fetch the content of the file identified by
-     * $imageIdentifier and populate the blob property of $image:
-     *
-     * <code>
-     * $image->setBlob(<data>);
-     * </code>
+     * Get image content
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
-     * @param Imbo\Image\ImageInterface $image The image object
-     * @return boolean Returns true on success or false on failure
+     * @return string The binary content of the image
      * @throws Imbo\Exception\StorageException
      */
-    function load($publicKey, $imageIdentifier, ImageInterface $image);
+    function getImage($publicKey, $imageIdentifier);
 
     /**
      * Get the last modified timestamp
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
-     * @param boolean $formatted Wether or not to format the date as an HTTP date
-     * @return DateTime|string If $formatted is true this method should return the timestamp as a
-     *                         valid HTTP date. If not, return the DateTime instance
+     * @return DateTime Returns an instance of DateTime
      * @throws Imbo\Exception\StorageException
      */
-    function getLastModified($publicKey, $imageIdentifier, $formatted = false);
+    function getLastModified($publicKey, $imageIdentifier);
 }

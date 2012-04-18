@@ -22,35 +22,64 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
+
+namespace Imbo\IntegrationTest\Storage;
+
+use Imbo\Storage\Doctrine,
+    PDO;
 
 /**
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Storage\Doctrine
  */
+class DoctrineTest extends StorageTests {
+    /**
+     * @var PDO
+     */
+    private $pdo;
 
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+    /**
+     * @see Imbo\IntegrationTest\Storage\StorageTests::getDriver()
+     */
+    protected function getDriver() {
+        return new Doctrine(array(
+            'pdo' => $this->pdo,
+        ));
     }
 
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
+    public function setUp() {
+        if (!extension_loaded('PDO')) {
+            $this->markTestSkipped('PDO is required to run this test');
         }
+
+        // Create tmp tables
+        $this->pdo = new PDO('sqlite::memory:');
+        $this->pdo->query("
+            CREATE TABLE storage_images (
+                publicKey TEXT NOT NULL,
+                imageIdentifier TEXT NOT NULL,
+                data BLOB NOT NULL,
+                created INTEGER NOT NULL,
+                PRIMARY KEY (publicKey,imageIdentifier)
+            )
+        ");
+
+        parent::setUp();
     }
-});
+
+    public function tearDown() {
+        $this->pdo = null;
+
+        parent::tearDown();
+    }
+}

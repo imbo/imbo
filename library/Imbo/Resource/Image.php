@@ -113,7 +113,7 @@ class Image extends Resource implements ResourceInterface {
 
         // Store the image
         try {
-            $storage->store($publicKey, $imageIdentifier, $this->image);
+            $storage->store($publicKey, $imageIdentifier, $this->image->getBlob());
         } catch (StorageException $e) {
             // Remove image from the database
             $database->deleteImage($publicKey, $imageIdentifier);
@@ -157,7 +157,7 @@ class Image extends Resource implements ResourceInterface {
         $etag = '"' . md5($publicKey . $imageIdentifier . $serverContainer->get('REQUEST_URI')) . '"';
 
         // Fetch formatted last modified timestamp from the storage driver
-        $lastModified = $storage->getLastModified($publicKey, $imageIdentifier, true);
+        $lastModified = $this->formatDate($storage->getLastModified($publicKey, $imageIdentifier));
 
         // Add the ETag to the response headers
         $responseHeaders->set('ETag', $etag);
@@ -170,8 +170,9 @@ class Image extends Resource implements ResourceInterface {
             return;
         }
 
-        // Load the image data (injects the blob into the image instance)
-        $storage->load($publicKey, $imageIdentifier, $this->image);
+        // Fetch the image data and store the data in the image instance
+        $imageData = $storage->getImage($publicKey, $imageIdentifier);
+        $this->image->setBlob($imageData);
 
         // Set some response headers before we apply optional transformations
         $responseHeaders

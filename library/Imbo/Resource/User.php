@@ -70,7 +70,7 @@ class User extends Resource implements ResourceInterface {
         $numImages = $database->getNumImages($publicKey);
 
         // Fetch the last modfified timestamp for the current user
-        $lastModified = $database->getLastModified($publicKey, null, true);
+        $lastModified = $this->formatDate($database->getLastModified($publicKey));
 
         // Generate ETag based on the last modification date and add to the response headers
         $etag = '"' . md5($lastModified) . '"';
