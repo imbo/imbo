@@ -22,35 +22,58 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
+
+namespace Imbo\IntegrationTest\Storage;
+
+use Imbo\Storage\GridFS,
+    Mongo;
 
 /**
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Storage\GridFS
  */
+class GridFSTest extends StorageTests {
+    /**
+     * Name of the test db
+     *
+     * @var string
+     */
+    private $testDbName = 'imboGridFSIntegrationTest';
 
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+    /**
+     * @see Imbo\IntegrationTest\Storage\StorageTests::getDriver()
+     */
+    protected function getDriver() {
+        return new GridFS(array(
+            'databaseName' => $this->testDbName,
+        ));
     }
 
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
+    public function setUp() {
+        if (!extension_loaded('mongo')) {
+            $this->markTestSkipped('pecl/mongo is required to run this test');
         }
+
+        $mongo = new Mongo();
+        $mongo->selectDB($this->testDbName)->drop();
+
+        parent::setUp();
     }
-});
+
+    public function tearDown() {
+        $mongo = new Mongo();
+        $mongo->selectDB($this->testDbName)->drop();
+
+        parent::tearDown();
+    }
+}

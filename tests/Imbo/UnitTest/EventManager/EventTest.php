@@ -29,28 +29,49 @@
  * @link https://github.com/imbo/imbo
  */
 
+namespace Imbo\UnitTest\EventManager;
+
+use Imbo\EventManager\Event;
+
 /**
  * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\EventManager\Event
  */
+class EventTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @covers Imbo\EventManager\Event::__construct
+     * @covers Imbo\EventManager\Event::getName
+     * @covers Imbo\EventManager\Event::getRequest
+     * @covers Imbo\EventManager\Event::getResponse
+     * @covers Imbo\EventManager\Event::getImage
+     */
+    public function testEvent() {
+        $name = 'some.event.name';
+        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $image = $this->getMock('Imbo\Image\ImageInterface');
 
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
+        $event = new Event($name, $request, $response, $image);
 
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+        $this->assertSame($name, $event->getName());
+        $this->assertSame($request, $event->getRequest());
+        $this->assertSame($response, $event->getResponse());
+        $this->assertSame($image, $event->getImage());
     }
 
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
+    /**
+     * @covers Imbo\EventManager\Event::__construct
+     * @covers Imbo\EventManager\Event::getImage
+     */
+    public function testEventWithNoImageInstance() {
+        $event = new Event('some name',
+                           $this->getMock('Imbo\Http\Request\RequestInterface'),
+                           $this->getMock('Imbo\Http\Response\ResponseInterface'));
 
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
-        }
+        $this->assertNull($event->getImage());
     }
-});
+}

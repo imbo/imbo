@@ -127,17 +127,15 @@ interface DatabaseInterface {
      * Get the last modified timestamp of a user
      *
      * If the $imageIdentifier parameter is set, return when that image was last updated. If not
-     * set, return when the user last updated any image. If the use does not any images return the
-     * current date.
+     * set, return when the user last updated any image. If the user does not have any images
+     * stored, return current the timestamp.
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
-     * @param boolean $formatted Wether or not to format the date as an HTTP date
-     * @return DateTime|string If $formatted is true this method should return the timestamp as a
-     *                         valid HTTP date. If not, return the DateTime instance
+     * @return DateTime Returns an instance of DateTime
      * @throws Imbo\Exception\DatabaseException
      */
-    function getLastModified($publicKey, $imageIdentifier = null, $formatted = false);
+    function getLastModified($publicKey, $imageIdentifier = null);
 
     /**
      * Fetch the number of images owned by a given user

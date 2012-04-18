@@ -29,28 +29,41 @@
  * @link https://github.com/imbo/imbo
  */
 
+namespace Imbo\UnitTest\EventListener;
+
+use Imbo\EventManager\EventInterface,
+    Imbo\EventListener\Listener;
+
 /**
  * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\EventListener\Listener
  */
-
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+class ListenerTest extends \PHPUnit_Framework_TestCase {
+    public function setUp() {
+        $this->listener = new SomeListener();
     }
 
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
-        }
+    public function tearDown() {
+        $this->listener = null;
     }
-});
+
+    /**
+     * @covers Imbo\EventListener\Listener::getPublicKeys
+     * @covers Imbo\EventListener\Listener::setPublicKeys
+     */
+    public function testSetAndGetPublicKeys() {
+        $this->assertSame(array(), $this->listener->getPublicKeys());
+        $keys = array('key1', 'key2');
+        $this->assertSame($this->listener, $this->listener->setPublicKeys($keys));
+        $this->assertSame($keys, $this->listener->getPublicKeys());
+    }
+}
+
+class SomeListener extends Listener {
+    public function getEvents() {}
+    public function invoke(EventInterface $event) {}
+}

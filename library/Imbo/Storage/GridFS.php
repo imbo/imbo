@@ -116,7 +116,7 @@ class GridFS implements StorageInterface {
     /**
      * @see Imbo\Storage\StorageInterface::store()
      */
-    public function store($publicKey, $imageIdentifier, ImageInterface $image) {
+    public function store($publicKey, $imageIdentifier, $imageData) {
         if ($this->imageExists($publicKey, $imageIdentifier, true) !== false) {
             $e = new StorageException('Image already exists', 400);
             $e->setImboErrorCode(Exception::IMAGE_ALREADY_EXISTS);
@@ -133,7 +133,7 @@ class GridFS implements StorageInterface {
         $options = array('safe' => true);
 
         try {
-            $result = $this->getGrid()->storeBytes($image->getBlob(), $extra, $options);
+            $result = $this->getGrid()->storeBytes($imageData, $extra, $options);
         } catch (MongoCursorException $e) {
             throw new StorageException('Could not store file', 500, $e);
         }
@@ -153,34 +153,27 @@ class GridFS implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::load()
+     * @see Imbo\Storage\StorageInterface::getImage()
      */
-    public function load($publicKey, $imageIdentifier, ImageInterface $image) {
+    public function getImage($publicKey, $imageIdentifier) {
         if (($file = $this->imageExists($publicKey, $imageIdentifier)) === false) {
             throw new StorageException('File not found', 404);
         }
 
-        $image->setBlob($file->getBytes());
-
-        return true;
+        return $file->getBytes();
     }
 
     /**
      * @see Imbo\Storage\StorageInterface::getLastModified()
      */
-    public function getLastModified($publicKey, $imageIdentifier, $formatted = false) {
+    public function getLastModified($publicKey, $imageIdentifier) {
         if (($file = $this->imageExists($publicKey, $imageIdentifier)) === false) {
             throw new StorageException('File not found', 404);
         }
 
         $timestamp = $file->file['created'];
-        $date = new DateTime('@' . $timestamp);
 
-        if ($formatted) {
-            return $date->format('D, d M Y H:i:s') . ' GMT';
-        }
-
-        return $date;
+        return new DateTime('@' . $timestamp);
     }
 
     /**

@@ -29,28 +29,36 @@
  * @link https://github.com/imbo/imbo
  */
 
+namespace Imbo\UnitTest\Exception;
+
+use Imbo\Exception\RuntimeException;
+
 /**
  * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Exception\RuntimeException
  */
-
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+class RuntimeExceptionTest extends \PHPUnit_Framework_TestCase {
+    public function getErrorCodes() {
+        return array(
+            array(123, 123),
+            array('123', 123),
+            array(0, 0),
+        );
     }
 
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
-        }
+    /**
+     * @covers Imbo\Exception\RuntimeException::setImboErrorCode
+     * @covers Imbo\Exception\RuntimeException::getImboErrorCode
+     * @dataProvider getErrorCodes
+     */
+    public function testSetAndGetImboErrorCode($actual, $expected) {
+        $exception = new RuntimeException();
+        $this->assertSame($exception, $exception->setImboErrorCode($actual));
+        $this->assertSame($expected, $exception->getImboErrorCode());
     }
-});
+
+}

@@ -73,7 +73,7 @@ class Filesystem implements StorageInterface {
     /**
      * @see Imbo\Storage\StorageInterface::store()
      */
-    public function store($publicKey, $imageIdentifier, ImageInterface $image) {
+    public function store($publicKey, $imageIdentifier, $imageData) {
         if (!is_writable($this->params['dataDir'])) {
             throw new StorageException('Could not store image', 500);
         }
@@ -97,7 +97,7 @@ class Filesystem implements StorageInterface {
             throw $e;
         }
 
-        return (bool) file_put_contents($imagePath, $image->getBlob());
+        return (bool) file_put_contents($imagePath, $imageData);
     }
 
     /**
@@ -114,24 +114,22 @@ class Filesystem implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::load()
+     * @see Imbo\Storage\StorageInterface::getImage()
      */
-    public function load($publicKey, $imageIdentifier, ImageInterface $image) {
+    public function getImage($publicKey, $imageIdentifier) {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         if (!is_file($path)) {
             throw new StorageException('File not found', 404);
         }
 
-        $image->setBlob(file_get_contents($path));
-
-        return true;
+        return file_get_contents($path);
     }
 
     /**
      * @see Imbo\Storage\StorageInterface::getLastModified()
      */
-    public function getLastModified($publicKey, $imageIdentifier, $formatted = false) {
+    public function getLastModified($publicKey, $imageIdentifier) {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         if (!is_file($path)) {
@@ -142,13 +140,7 @@ class Filesystem implements StorageInterface {
         $timestamp = filemtime($path);
 
         // Create a new datetime instance
-        $date = new DateTime('@' . $timestamp);
-
-        if ($formatted) {
-            return $date->format('D, d M Y H:i:s') . ' GMT';
-        }
-
-        return $date;
+        return new DateTime('@' . $timestamp);
     }
 
     /**
@@ -160,7 +152,7 @@ class Filesystem implements StorageInterface {
      *                                 filename itself)
      * @return string
      */
-    public function getImagePath($publicKey, $imageIdentifier, $includeFilename = true) {
+    private function getImagePath($publicKey, $imageIdentifier, $includeFilename = true) {
         $parts = array(
             $this->params['dataDir'],
             $publicKey[0],

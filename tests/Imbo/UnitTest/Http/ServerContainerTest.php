@@ -29,28 +29,39 @@
  * @link https://github.com/imbo/imbo
  */
 
+namespace Imbo\UnitTest\Http;
+
+use Imbo\Http\ServerContainer;
+
 /**
  * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Http\ServerContainer
  */
+class ServerContainerTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @covers Imbo\Http\ServerContainer::__construct
+     * @covers Imbo\Http\ServerContainer::getHeaders
+     */
+    public function testGetHeaders() {
+        $parameters = array(
+            'key' => 'value',
+            'otherKey' => 'otherValue',
+            'content-length' => 123,
+            'CONTENT_LENGTH' => 234,
+            'content-type' => 'text/html',
+            'CONTENT_TYPE' => 'image/png',
+            'HTTP_IF_NONE_MATCH' => 'asdf',
+        );
 
-// Autoloader for namespaced classes in the include_path
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', '/', $className) . '.php';
-
-    if ($className === 'vfsStream') {
-        $filename = 'vfsStream/' . $filename;
+        $container = new ServerContainer($parameters);
+        $headers = $container->getHeaders();
+        $this->assertSame(3, count($headers));
+        $this->assertSame(234, $headers['CONTENT_LENGTH']);
+        $this->assertSame('image/png', $headers['CONTENT_TYPE']);
+        $this->assertSame('asdf', $headers['IF_NONE_MATCH']);
     }
-
-    foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
-        $absPath = rtrim($path, '/') . '/' . $filename;
-
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
-        }
-    }
-});
+}
