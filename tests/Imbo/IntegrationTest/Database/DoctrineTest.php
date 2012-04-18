@@ -66,6 +66,10 @@ class DoctrineTest extends DatabaseTests {
             $this->markTestSkipped('sqlite is required to run this test');
         }
 
+        if (!class_exists('Doctrine\DBAL\DriverManager')) {
+            $this->markTestSkipped('Doctrine is required to run this test');
+        }
+
         // Create tmp tables
         $this->pdo = new PDO('sqlite::memory:');
         $this->pdo->query("
