@@ -62,8 +62,8 @@ class DoctrineTest extends DatabaseTests {
             $this->markTestSkipped('PDO is required to run this test');
         }
 
-        if (!extension_loaded('sqlite')) {
-            $this->markTestSkipped('sqlite is required to run this test');
+        if (!extension_loaded('pdo_sqlite')) {
+            $this->markTestSkipped('pdo_sqlite is required to run this test');
         }
 
         if (!class_exists('Doctrine\DBAL\DriverManager')) {
