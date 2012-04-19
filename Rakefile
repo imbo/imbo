@@ -62,6 +62,12 @@ task :pear, :version do |t, args|
           xml.email "cogo@starzinger.net"
           xml.active "yes"
         }
+        xml.developer {
+          xml.name "Espen Hovlandsdal"
+          xml.user "rexxars"
+          xml.email "espen@hovlandsdal.com"
+          xml.active "yes"
+        }
         xml.date now.strftime('%Y-%m-%d')
         xml.time now.strftime('%H:%M:%S')
         xml.version {
@@ -77,7 +83,7 @@ task :pear, :version do |t, args|
         xml.contents {
           xml.dir(:name => "/", :baseinstalldir => "Imbo") {
             # Library files
-            `git ls-files library public bootstrap|grep -v Version.php`.split("\n").each { |f|
+            `git ls-files library public config|grep -v Version.php`.split("\n").each { |f|
               xml.file(:md5sum => hash.hexdigest(File.read(f)), :role => "php", :name => f)
             }
 
@@ -100,19 +106,27 @@ task :pear, :version do |t, args|
             xml.pearinstaller {
               xml.min "1.9.0"
             }
-            xml.package {
-              xml.name "Imagine"
-              xml.channel "pear.avalanche123.com"
-            }
-            xml.package {
-              xml.name "Yaml"
-              xml.channel "pear.symfony.com"
-            }
             xml.extension {
               xml.name "spl"
             }
             xml.extension {
               xml.name "imagick"
+            }
+            xml.extension {
+              xml.name "mongo"
+            }
+          }
+          xml.optional {
+            xml.package {
+              xml.name "DoctrineDBAL"
+              xml.channel "http://pear.doctrine-project.org"
+              xml.min "2.2.2"
+            }
+            xml.extension {
+              xml.name "memcached"
+            }
+            xml.extension {
+              xml.name "apc"
             }
           }
         }
