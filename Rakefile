@@ -159,7 +159,7 @@ task :publish, :version do |t, args|
 
     if File.exists?(package)
       wd = Dir.getwd
-      system "pirum add /home/christer/dev/christeredvartsen.github.com library/#{package}"
+      system "pirum add /home/christer/dev/christeredvartsen.github.com #{package}"
       Dir.chdir("/home/christer/dev/christeredvartsen.github.com")
       system "git add --all"
       system "git commit -a -m 'Added #{package[0..-5]}'"
