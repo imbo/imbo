@@ -72,6 +72,10 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      * Setup method
      */
     public function setUp() {
+        if (!extension_loaded('mongo')) {
+            $this->markTestSkipped('pecl/mongo is required to run this test');
+        }
+
         $this->grid = $this->getMockBuilder('MongoGridFS')->disableOriginalConstructor()->getMock();
         $this->driver = new GridFS(array(), null, $this->grid);
     }
@@ -228,10 +232,12 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     }
 }
 
-class TestFile extends MongoGridFSFile {
-    public $file = array(
-        'created' => 1334579830,
-    );
+if (class_exists('MongoGridFSFile')) {
+    class TestFile extends MongoGridFSFile {
+        public $file = array(
+            'created' => 1334579830,
+        );
 
-    public function __construct() {}
+        public function __construct() {}
+    }
 }

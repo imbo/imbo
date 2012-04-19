@@ -75,8 +75,10 @@ class MongoDBTest extends DatabaseTests {
     }
 
     public function tearDown() {
-        $mongo = new Mongo();
-        $mongo->selectDB($this->testDbName)->drop();
+        if (extension_loaded('mongo')) {
+            $mongo = new Mongo();
+            $mongo->selectDB($this->testDbName)->drop();
+        }
 
         parent::tearDown();
     }
