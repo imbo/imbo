@@ -16,6 +16,25 @@ end
 
 desc "Run PHPUnit tests (config in phpunit.xml)"
 task :test do
+  if ENV["TRAVIS"] == 'true'
+    system "sudo apt-get install -y php-pear mongodb memcached libmemcached-dev php-apc imagemagick libmagickcore-dev libmagickwand-dev"
+
+    ["imagick", "mongo", "memcached"].each { |e|
+      system "wget http://pecl.php.net/get/#{e}"
+      system "tar -xzf #{e}"
+      system "sh -c \"cd #{e}-* && phpize && ./configure && make && sudo make install\""
+      system "sudo sh -c \"echo 'extension=#{e}.so' > /etc/php5/conf.d/#{e}.ini\""
+    }
+
+    system "sudo pear config-set auto_discover 1"
+    system "sudo pear install pear.doctrine-project.org/DoctrineDBAL"
+    system "sudo pear install pear.bovigo.org/vfsStream-beta"
+
+    system "sudo sh -c \"echo 'apc.enable_cli=on' >> /etc/php5/conf.d/apc.ini\""
+
+    system "sed -i 's/name=\"MEMCACHED_HOST\" value=\"\"/name=\"MEMCACHED_HOST\" value=\"127.0.0.1\"/' phpunit.xml.dist"
+    system "sed -i 's/name=\"MEMCACHED_PORT\" value=\"\"/name=\"MEMCACHED_PORT\" value=\"11211\"/' phpunit.xml.dist"
+  end
   begin
     sh %{phpunit}
   rescue Exception
