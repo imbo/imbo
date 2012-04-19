@@ -194,7 +194,7 @@ end
 desc "Publish API docs"
 task :docs do
     system "git checkout master"
-    system "docblox"
+    system "phpdoc"
     wd = Dir.getwd
     Dir.chdir("/home/christer/dev/imbo-ghpages")
     system "git pull origin gh-pages"
