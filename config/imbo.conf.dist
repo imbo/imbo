@@ -1,7 +1,21 @@
 <VirtualHost *:80>
-    ServerName hostname
+    # Servername of the virtual host
+    ServerName imbo
+
+    # Define aliases to use multiple hosts
+    # ServerAlias imbo1 imbo2 imbo3
+
+    # Document root
     DocumentRoot /path/to/document/root
 
+    # Logging
     CustomLog /path/to/logs/imbo.access_log combined
     ErrorLog /path/to/logs/imbo.error_log
+
+    # Rewrite rules that rewrite all requests to the index.php script
+    <Directory /path/to/document/root>
+        RewriteEngine on
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule .* index.php
+    </Directory>
 </VirtualHost>

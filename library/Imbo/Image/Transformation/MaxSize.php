@@ -61,7 +61,7 @@ class MaxSize extends Transformation implements TransformationInterface {
      *
      * @var int
      */
-    private $height;
+    private $maxHeight;
 
     /**
      * Class constructor
