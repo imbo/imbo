@@ -3,6 +3,69 @@ require 'digest/md5'
 require 'fileutils'
 require 'nokogiri'
 
+basedir = "."
+build   = "#{basedir}/build"
+source  = "#{basedir}/library"
+
+desc "Task used by Jenkins-CI"
+task :jenkins => [:prepare, :lint, :test, :apidocs, :phploc, :phpcs, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
+
+desc "Task used by Travis-CI"
+task :travis => [:test]
+
+desc "Default task"
+task :default => [:lint, :test]
+
+desc "Clean up and create artifact directories"
+task :prepare do
+  FileUtils.rm_rf build
+  FileUtils.mkdir build
+
+  ["coverage", "logs", "docs", "code-browser", "pdepend"].each do |d|
+    FileUtils.mkdir "#{build}/#{d}"
+  end
+end
+
+desc "Generate checkstyle.xml using PHP_CodeSniffer"
+task :phpcs do
+  system "phpcs --report=checkstyle --report-file=#{build}/logs/checkstyle.xml --standard=Imbo #{source}"
+end
+
+desc "Aggregate tool output with PHP_CodeBrowser"
+task :phpcb do
+  system "phpcb --log #{build}/logs --source #{source} --output #{build}/code-browser"
+end
+
+desc "Generate pmd-cpd.xml using PHPCPD"
+task :phpcpd do
+  system "phpcpd --log-pmd #{build}/logs/pmd-cpd.xml #{source}"
+end
+
+desc "Generate jdepend.xml and software metrics charts using PHP_Depend"
+task :pdepend do
+  system "pdepend --jdepend-xml=#{build}/logs/jdepend.xml --jdepend-chart=#{build}/pdepend/dependencies.svg --overview-pyramid=#{build}/pdepend/overview-pyramid.svg #{source}"
+end
+
+desc "Generate pmd.xml using PHPMD (configuration in phpmd.xml)"
+task :phpmd do
+  system "phpmd #{source} xml #{basedir}/phpmd.xml --reportfile #{build}/logs/pmd.xml"
+end
+
+desc "Generate pmd.html using PHPMD (configuration in phpmd.xml)"
+task :phpmd_html do
+  system "phpmd #{source} html #{basedir}/phpmd.xml --reportfile #{build}/logs/pmd.html"
+end
+
+desc "Generate phploc data"
+task :phploc do
+  system "phploc --log-csv #{build}/logs/phploc.csv --log-xml #{build}/logs/phploc.xml #{source}"
+end
+
+desc "Generate API documentation using phpdoc (config in phpdoc.xml)"
+task :apidocs do
+  system "phpdoc"
+end
+
 desc "Check syntax on all php files in the project"
 task :lint do
   `git ls-files "*.php"`.split("\n").each do |f|
@@ -16,7 +79,7 @@ end
 
 desc "Run PHPUnit tests (config in phpunit.xml)"
 task :test do
-  if ENV["TRAVIS"] == 'true'
+  if ENV["TRAVIS"] == "true"
     system "sudo apt-get install -y php-pear mongodb memcached libmemcached-dev php-apc imagemagick libmagickcore-dev libmagickwand-dev"
 
     ["imagick", "mongo", "memcached"].each { |e|
@@ -32,8 +95,12 @@ task :test do
 
     system "sudo sh -c \"echo 'apc.enable_cli=on' >> /etc/php5/conf.d/apc.ini\""
 
-    system "sed -i 's/name=\"MEMCACHED_HOST\" value=\"\"/name=\"MEMCACHED_HOST\" value=\"127.0.0.1\"/' phpunit.xml.dist"
-    system "sed -i 's/name=\"MEMCACHED_PORT\" value=\"\"/name=\"MEMCACHED_PORT\" value=\"11211\"/' phpunit.xml.dist"
+    f = File.open('phpunit.xml.dist')
+    document = Nokogiri::XML(f)
+    document.xpath("//phpunit/php/var[@name='MEMCACHED_HOST']").first["value"] = "127.0.0.1"
+    document.xpath("//phpunit/php/var[@name='MEMCACHED_PORT']").first["value"] = "11211"
+    document.xpath("//phpunit/logging").remove
+    f.write(document.to_xml)
   end
   begin
     sh %{phpunit}
