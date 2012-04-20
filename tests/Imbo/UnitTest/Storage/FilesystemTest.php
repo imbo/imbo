@@ -32,8 +32,8 @@
 namespace Imbo\UnitTest\Storage;
 
 use Imbo\Storage\Filesystem,
-    vfsStream,
-    vfsStreamWrapper;
+    org\bovigo\vfs\vfsStream,
+    org\bovigo\vfs\vfsStreamWrapper;
 
 /**
  * @package TestSuite\UnitTests
@@ -62,7 +62,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * Setup method
      */
     public function setUp() {
-        if (!class_exists('vfsStream', true)) {
+        if (!class_exists('org\bovigo\vfs\vfsStream')) {
             $this->markTestSkipped('This testcase requires vfsStream to run');
         }
     }

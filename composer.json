@@ -1,0 +1,6 @@
+{
+  "require": {
+    "mikey179/vfsStream": "*",
+    "doctrine/dbal": "2.2.2"
+  }
+}

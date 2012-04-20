@@ -82,7 +82,7 @@ task :test do
   if ENV["TRAVIS"] == "true"
     # system "sudo apt-get update"
     # system "sudo apt-get -y upgrade"
-    system "sudo apt-get install -y php-pear php-apc php5-sqlite libmagickcore-dev libjpeg-dev libdjvulibre-dev libmagickwand-dev"
+    system "sudo apt-get install -y php-apc php5-sqlite libmagickcore-dev libjpeg-dev libdjvulibre-dev libmagickwand-dev"
 
     ini_file = Hash[`php --ini`.split("\n").map {|l| l.split(/:\s+/)}]["Loaded Configuration File"]
 
@@ -93,9 +93,8 @@ task :test do
       system "sudo sh -c \"echo 'extension=#{e}.so' >> #{ini_file}\""
     }
 
-    system "sudo pear config-set auto_discover 1"
-    system "sudo pear install pear.doctrine-project.org/DoctrineDBAL"
-    system "sudo pear install pear.bovigo.org/vfsStream-beta"
+    system "curl -s http://getcomposer.org/installer | php"
+    system "php composer.phar install"
 
     system "sudo sh -c \"echo 'apc.enable_cli=on' >> #{ini_file}\""
 
