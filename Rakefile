@@ -94,11 +94,11 @@ task :test do
     }
 
     system "curl -s http://getcomposer.org/installer | php"
-    system "php composer.phar install"
+    system "php composer.phar --no-ansi install"
 
     system "sudo sh -c \"echo 'apc.enable_cli=on' >> #{ini_file}\""
 
-    f = File.open('phpunit.xml.dist')
+    f = File.open('phpunit.xml.dist', 'rw')
     document = Nokogiri::XML(f)
     document.xpath("//phpunit/php/var[@name='MEMCACHED_HOST']").first["value"] = "127.0.0.1"
     document.xpath("//phpunit/php/var[@name='MEMCACHED_PORT']").first["value"] = "11211"
