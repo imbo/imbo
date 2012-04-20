@@ -80,9 +80,9 @@ end
 desc "Run PHPUnit tests (config in phpunit.xml)"
 task :test do
   if ENV["TRAVIS"] == "true"
-    system "sudo apt-get update"
-    system "sudo apt-get -y upgrade"
-    system "sudo apt-get install -y php-pear mongodb memcached libmemcached-dev php-apc php5-sqlite imagemagick libmagickcore-dev libmagickwand-dev"
+    # system "sudo apt-get update"
+    # system "sudo apt-get -y upgrade"
+    system "sudo apt-get install -y php-pear libmemcached-dev php-apc php5-sqlite libmagickcore-dev libmagickwand-dev"
 
     ini_file = Hash[`php --ini`.split("\n").map {|l| l.split(/:\s+/)}]["Loaded Configuration File"]
 
