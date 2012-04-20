@@ -80,20 +80,24 @@ end
 desc "Run PHPUnit tests (config in phpunit.xml)"
 task :test do
   if ENV["TRAVIS"] == "true"
-    system "sudo apt-get install -y php-pear mongodb memcached libmemcached-dev php-apc imagemagick libmagickcore-dev libmagickwand-dev"
+    system "sudo apt-get update"
+    system "sudo apt-get -y upgrade"
+    system "sudo apt-get install -y php-pear mongodb memcached libmemcached-dev php-apc php5-sqlite imagemagick libmagickcore-dev libmagickwand-dev"
+
+    ini_file = Hash[`php --ini`.split("\n").map {|l| l.split(/:\s+/)}]["Loaded Configuration File"]
 
     ["imagick", "mongo", "memcached"].each { |e|
       system "wget http://pecl.php.net/get/#{e}"
       system "tar -xzf #{e}"
       system "sh -c \"cd #{e}-* && phpize && ./configure && make && sudo make install\""
-      system "sudo sh -c \"echo 'extension=#{e}.so' > /etc/php5/conf.d/#{e}.ini\""
+      system "sudo sh -c \"echo 'extension=#{e}.so' >> #{ini_file}\""
     }
 
     system "sudo pear config-set auto_discover 1"
     system "sudo pear install pear.doctrine-project.org/DoctrineDBAL"
     system "sudo pear install pear.bovigo.org/vfsStream-beta"
 
-    system "sudo sh -c \"echo 'apc.enable_cli=on' >> /etc/php5/conf.d/apc.ini\""
+    system "sudo sh -c \"echo 'apc.enable_cli=on' >> #{ini_file}\""
 
     f = File.open('phpunit.xml.dist')
     document = Nokogiri::XML(f)
