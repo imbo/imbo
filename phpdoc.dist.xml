@@ -8,6 +8,5 @@
   </transformer>
   <files>
     <directory>library</directory>
-    <directory>tests</directory>
   </files>
 </phpdoc>
