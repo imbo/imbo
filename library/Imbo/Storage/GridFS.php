@@ -133,7 +133,7 @@ class GridFS implements StorageInterface {
         $options = array('safe' => true);
 
         try {
-            $result = $this->getGrid()->storeBytes($imageData, $extra, $options);
+            $this->getGrid()->storeBytes($imageData, $extra, $options);
         } catch (MongoCursorException $e) {
             throw new StorageException('Could not store file', 500, $e);
         }

@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<docblox>
+<phpdoc>
   <parser>
     <target>build/docs</target>
   </parser>
   <transformer>
     <target>build/docs</target>
   </transformer>
-  <transformations>
-    <template name="new_black" />
-  </transformations>
   <files>
     <directory>library</directory>
-    <directory>tests</directory>
   </files>
-</docblox>
+</phpdoc>

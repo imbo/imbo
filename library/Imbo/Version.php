@@ -45,9 +45,11 @@ class Version {
     /**
      * The current version
      *
+     * This string will be replaced by pear when the package is installed
+     *
      * @var string
      */
-    static private $id = '@package_version@';
+    static private $version = '@package_version@';
 
     /**
      * Get the version number only
@@ -55,10 +57,10 @@ class Version {
      * @return string
      */
     static public function getVersionNumber() {
-        if (strpos(self::$id, '@package_version') === 0) {
+        if (strpos(self::$version, '@package_version') === 0) {
             return 'dev';
         }
 
-        return self::$id;
+        return self::$version;
     }
 }

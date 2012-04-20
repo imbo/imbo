@@ -188,7 +188,6 @@ class Doctrine implements DatabaseInterface {
     public function updateMetadata($publicKey, $imageIdentifier, array $metadata) {
         // Fetch the current connection
         $connection = $this->getConnection();
-        $tableName = $this->getTableName('imageinfo', $publicKey, $imageIdentifier);
         $imageId = $this->getImageId($publicKey, $imageIdentifier);
 
         // Fetch existing metadata so we can merge it with the data passed to this method

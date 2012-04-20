@@ -1,6 +1,4 @@
 build
-build.xml
 phpunit.xml
-docblox.xml
+phpdoc.xml
 phpmd.xml
-cache.properties
