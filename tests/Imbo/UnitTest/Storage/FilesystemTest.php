@@ -270,4 +270,24 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertInstanceOf('DateTime', $driver->getLastModified($this->publicKey, $this->imageIdentifier));
     }
+
+    /**
+     * @covers Imbo\Storage\Filesystem::getStatus
+     */
+    public function testGetStatusWhenBaseDirIsNotWritable() {
+        vfsStream::setup('dir', 0);
+
+        $driver = new Filesystem(array('dataDir' => vfsStream::url('dir')));
+        $this->assertFalse($driver->getStatus());
+    }
+
+    /**
+     * @covers Imbo\Storage\Filesystem::getStatus
+     */
+    public function testGetStatusWhenBaseDirIsWritable() {
+        vfsStream::setup('dir');
+
+        $driver = new Filesystem(array('dataDir' => vfsStream::url('dir')));
+        $this->assertTrue($driver->getStatus());
+    }
 }

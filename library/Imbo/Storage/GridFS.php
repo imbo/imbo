@@ -177,6 +177,13 @@ class GridFS implements StorageInterface {
     }
 
     /**
+     * @see Imbo\Storage\StorageInterface::getStatus()
+     */
+    public function getStatus() {
+        return $this->getMongo()->connect();
+    }
+
+    /**
      * Get the grid instance
      *
      * @return MongoGridFS
