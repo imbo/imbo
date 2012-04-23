@@ -145,4 +145,13 @@ interface DatabaseInterface {
      * @throws Imbo\Exception\DatabaseException
      */
     function getNumImages($publicKey);
+
+    /**
+     * Get the current status of the database connection
+     *
+     * This method is used with the status resource.
+     *
+     * @return boolean
+     */
+    function getStatus();
 }

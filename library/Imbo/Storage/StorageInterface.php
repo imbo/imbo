@@ -93,4 +93,13 @@ interface StorageInterface {
      * @throws Imbo\Exception\StorageException
      */
     function getLastModified($publicKey, $imageIdentifier);
+
+    /**
+     * Get the current status of the storage
+     *
+     * This method is used with the status resource.
+     *
+     * @return boolean
+     */
+    function getStatus();
 }

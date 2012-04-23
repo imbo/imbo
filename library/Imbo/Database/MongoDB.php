@@ -393,6 +393,13 @@ class MongoDB implements DatabaseInterface {
     }
 
     /**
+     * @see Imbo\Database\DatabaseInterface::getStatus()
+     */
+    public function getStatus() {
+        return $this->getMongo()->connect();
+    }
+
+    /**
      * Get the mongo collection instance
      *
      * @return MongoCollection
