@@ -108,7 +108,7 @@ return array(
      * 'events' is an array of events the current listener will listen for. This only needs to be
      * set if 'listener' is not an instance of Imbo\EventListener\ListenerInterface.
      *
-     * 'publicKeys' is an array that contains which public keys the listener will trigger for. It
+     * 'publicKeys' is an array that contains which public keys the listener will trigger for. If
      * omitted or left empty the listener will trigger for all users.
      *
      * Example of how to add different listeners:
@@ -135,6 +135,9 @@ return array(
      * @var array
      */
     'eventListeners' => array(
+        array(
+            'listener' => new EventListener\Authenticate(),
+        ),
         array(
             'listener' => new EventListener\AccessToken(),
         ),

@@ -35,8 +35,7 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
     Imbo\Exception\RuntimeException,
     Imbo\Exception,
-    Imbo\Image\Image,
-    Imbo\Validate;
+    Imbo\Image\Image;
 
 /**
  * Front controller
@@ -54,20 +53,6 @@ class FrontController {
      * @var Imbo\Container
      */
     private $container;
-
-    /**
-     * Timestamp validator
-     *
-     * @var Imbo\Validate\ValidateInterface
-     */
-    private $timestampValidator;
-
-    /**
-     * Signature validator
-     *
-     * @var Imbo\Validate\SignatureInterface
-     */
-    private $signatureValidator;
 
     /**
      * HTTP methods supported one way or another in Imbo
@@ -102,24 +87,9 @@ class FrontController {
      * Class constructor
      *
      * @param Imbo\Container $container A container instance
-     * @param Imbo\Validate\ValidateInterface $timestampValidator A timestamp validator
-     * @param Imbo\Validate\SignatureInterface $signatureValidator A signature validator
      */
-    public function __construct(Container $container,
-                                Validate\ValidateInterface $timestampValidator = null,
-                                Validate\SignatureInterface $signatureValidator = null) {
+    public function __construct(Container $container) {
         $this->container = $container;
-
-        if ($timestampValidator === null) {
-            $timestampValidator = new Validate\Timestamp();
-        }
-
-        if ($signatureValidator === null) {
-            $signatureValidator = new Validate\Signature();
-        }
-
-        $this->timestampValidator = $timestampValidator;
-        $this->signatureValidator = $signatureValidator;
     }
 
     /**
@@ -187,81 +157,6 @@ class FrontController {
     }
 
     /**
-     * Authenticate the current request
-     *
-     * @param Imbo\Http\Request\RequestInterface $request The current request
-     * @param Imbo\Http\Response\ResponseInterface $response The response instance
-     * @throws Imbo\Exception\RuntimeException
-     * @return mixed Returns true on success
-     */
-    private function auth(RequestInterface $request, ResponseInterface $response) {
-        $authConfig = $this->container->config['auth'];
-        $publicKey = $request->getPublicKey();
-
-        // See if the public key exists
-        if ($publicKey) {
-            if (!isset($authConfig[$publicKey])) {
-                $e = new RuntimeException('Unknown public key', 404);
-                $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
-
-                throw $e;
-            }
-
-            // Fetch the private key from the config and store it in the request
-            $privateKey = $authConfig[$publicKey];
-            $request->setPrivateKey($privateKey);
-        }
-
-        if (!$request->isUnsafe()) {
-            return;
-        }
-
-        $query = $request->getQuery();
-
-        foreach (array('signature', 'timestamp') as $param) {
-            if (!$query->has($param)) {
-                $e = new RuntimeException('Missing required authentication parameter: ' . $param, 400);
-                $e->setImboErrorCode(Exception::AUTH_MISSING_PARAM);
-
-                throw $e;
-            }
-        }
-
-        $timestamp = $query->get('timestamp');
-
-        if (!$this->timestampValidator->isValid($timestamp)) {
-            $e = new RuntimeException('Invalid timestamp: ' . $timestamp, 400);
-            $e->setImboErrorCode(Exception::AUTH_INVALID_TIMESTAMP);
-
-            throw $e;
-        }
-
-        // Add the URL used for auth to the response headers
-        $response->getHeaders()->set('X-Imbo-AuthUrl', $request->getUrl());
-
-        $signature = $query->get('signature');
-
-        // Remove signature and timestamp from the query params
-        $query->remove('signature')
-              ->remove('timestamp');
-
-        $this->signatureValidator->setHttpMethod($request->getMethod())
-                                 ->setUrl($request->getUrl())
-                                 ->setTimestamp($timestamp)
-                                 ->setPublicKey($publicKey)
-                                 ->setPrivateKey($privateKey);
-
-        if (!$this->signatureValidator->isValid($signature)) {
-            $e = new RuntimeException('Signature mismatch', 403);
-            $e->setImboErrorCode(Exception::AUTH_SIGNATURE_MISMATCH);
-
-            throw $e;
-        }
-
-        return true;
-    }
-
-    /**
      * Handle a request
      *
      * @param Imbo\Http\Request\RequestInterface $request The request object
@@ -290,8 +185,23 @@ class FrontController {
             $response->getHeaders()->set('X-Imbo-ImageIdentifier', $identifier);
         }
 
-        // Authenticate the request
-        $this->auth($request, $response);
+        // Fetch auth config
+        $authConfig = $this->container->config['auth'];
+        $publicKey = $request->getPublicKey();
+
+        // See if the public key exists
+        if ($publicKey) {
+            if (!isset($authConfig[$publicKey])) {
+                $e = new RuntimeException('Unknown public key', 404);
+                $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
+
+                throw $e;
+            }
+
+            // Fetch the private key from the config and store it in the request
+            $privateKey = $authConfig[$publicKey];
+            $request->setPrivateKey($privateKey);
+        }
 
         // Lowercase the HTTP method to get the class method to execute
         $methodName = strtolower($httpMethod);
