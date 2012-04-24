@@ -215,6 +215,15 @@ class Doctrine implements StorageInterface {
     }
 
     /**
+     * @see Imbo\Storage\StorageInterface::getStatus()
+     */
+    public function getStatus() {
+        $connection = $this->getConnection();
+
+        return $connection->isConnected() || $connection->connect();
+    }
+
+    /**
      * Set the connection instance
      *
      * @param Doctrine\DBAL\Connection $connection The connection instance

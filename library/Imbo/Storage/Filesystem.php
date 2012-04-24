@@ -144,6 +144,13 @@ class Filesystem implements StorageInterface {
     }
 
     /**
+     * @see Imbo\Storage\StorageInterface::getStatus()
+     */
+    public function getStatus() {
+        return is_writable($this->params['dataDir']);
+    }
+
+    /**
      * Get the path to an image
      *
      * @param string $publicKey The key

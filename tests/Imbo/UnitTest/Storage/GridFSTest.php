@@ -55,6 +55,11 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     private $grid;
 
     /**
+     * @var Mongo
+     */
+    private $mongo;
+
+    /**
      * Public key that can be used in tests
      *
      * @var string
@@ -77,7 +82,17 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
         }
 
         $this->grid = $this->getMockBuilder('MongoGridFS')->disableOriginalConstructor()->getMock();
-        $this->driver = new GridFS(array(), null, $this->grid);
+        $this->mongo = $this->getMockBuilder('Mongo')->disableOriginalConstructor()->getMock();
+        $this->driver = new GridFS(array(), $this->mongo, $this->grid);
+    }
+
+    /**
+     * Teardown method
+     */
+    public function tearDown() {
+        $this->grid = null;
+        $this->mongo = null;
+        $this->driver = null;
     }
 
     /**
@@ -229,6 +244,22 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('DateTime', ($date = $this->driver->getLastModified($this->publicKey, $this->imageIdentifier)));
         $this->assertSame(1334579830, $date->getTimestamp());
 
+    }
+
+    /**
+     * @covers Imbo\Storage\GridFS::getStatus
+     */
+    public function testGetStatusWhenMongoIsNotConnectable() {
+        $this->mongo->expects($this->once())->method('connect')->will($this->returnValue(false));
+        $this->assertFalse($this->driver->getStatus());
+    }
+
+    /**
+     * @covers Imbo\Storage\GridFS::getStatus
+     */
+    public function testGetStatusWhenMongoIsConnectable() {
+        $this->mongo->expects($this->once())->method('connect')->will($this->returnValue(true));
+        $this->assertTrue($this->driver->getStatus());
     }
 }
 

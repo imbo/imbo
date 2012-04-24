@@ -95,6 +95,7 @@ class FrontController {
         'metadata' => 'Imbo\Resource\Metadata',
         'images'   => 'Imbo\Resource\Images',
         'user'     => 'Imbo\Resource\User',
+        'status'   => 'Imbo\Resource\Status',
     );
 
     /**
@@ -138,6 +139,7 @@ class FrontController {
             'images'   => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/?$#',
             'metadata' => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png)/)meta/?$#',
             'user'     => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/?$#',
+            'status'   => '#^/status/?#',
         );
 
         // Initialize matches
@@ -155,7 +157,9 @@ class FrontController {
         }
 
         // Extract some information from the path and store in the request instance
-        $request->setPublicKey($matches['publicKey']);
+        if (!empty($matches['publicKey'])) {
+            $request->setPublicKey($matches['publicKey']);
+        }
 
         if (isset($matches['imageIdentifier'])) {
             $request->setImageIdentifier($matches['imageIdentifier']);
@@ -195,16 +199,18 @@ class FrontController {
         $publicKey = $request->getPublicKey();
 
         // See if the public key exists
-        if (!isset($authConfig[$publicKey])) {
-            $e = new RuntimeException('Unknown public key', 404);
-            $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
+        if ($publicKey) {
+            if (!isset($authConfig[$publicKey])) {
+                $e = new RuntimeException('Unknown public key', 404);
+                $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
 
-            throw $e;
+                throw $e;
+            }
+
+            // Fetch the private key from the config and store it in the request
+            $privateKey = $authConfig[$publicKey];
+            $request->setPrivateKey($privateKey);
         }
-
-        // Fetch the private key from the config and store it in the request
-        $privateKey = $authConfig[$publicKey];
-        $request->setPrivateKey($privateKey);
 
         if (!$request->isUnsafe()) {
             return;

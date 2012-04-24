@@ -68,6 +68,9 @@ $container->imageResource = $container->shared(function(Container $container) {
 $container->userResource = $container->shared(function(Container $container) {
     return new Resource\User();
 });
+$container->statusResource = $container->shared(function(Container $container) {
+    return new Resource\Status();
+});
 
 // Create the database entry
 $container->database = $container->shared(function(Container $container) {
