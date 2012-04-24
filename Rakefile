@@ -105,11 +105,12 @@ task :test do
     document.xpath("//phpunit/php/var[@name='MEMCACHED_PORT']").first["value"] = "11211"
     document.xpath("//phpunit/logging").remove
 
-
     puts "Writing edited version of phpunit.xml"
     puts document.to_xml
-    f = File.open("phpunit.xml", "w+")
-    f.write(document.to_xml)
+
+    File.open("phpunit.xml", "w+") do |f|
+        f.write(document.to_xml)
+    end
   end
 
   if File.exists?("phpunit.xml")
