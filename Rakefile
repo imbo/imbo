@@ -80,23 +80,20 @@ end
 desc "Run PHPUnit tests (config in phpunit.xml)"
 task :test do
   if ENV["TRAVIS"] == "true"
-    # system "sudo apt-get update"
-    # system "sudo apt-get -y upgrade"
-    system "sudo apt-get install -y php-apc php5-sqlite libmagickcore-dev libjpeg-dev libdjvulibre-dev libmagickwand-dev"
+    system "sudo apt-get install -y php5-sqlite libmagickcore-dev libjpeg-dev libdjvulibre-dev libmagickwand-dev"
 
     ini_file = Hash[`php --ini`.split("\n").map {|l| l.split(/:\s+/)}]["Loaded Configuration File"]
 
-    ["imagick", "mongo", "memcached"].each { |e|
+    ["imagick", "mongo", "memcached", "APC"].each { |e|
       system "wget http://pecl.php.net/get/#{e}"
       system "tar -xzf #{e}"
       system "sh -c \"cd #{e}-* && phpize && ./configure && make && sudo make install\""
-      system "sudo sh -c \"echo 'extension=#{e}.so' >> #{ini_file}\""
+      system "sudo sh -c \"echo 'extension=#{e.downcase}.so' >> #{ini_file}\""
     }
 
     system "curl -s http://getcomposer.org/installer | php"
     system "php composer.phar --no-ansi install"
 
-    system "sudo sh -c \"echo 'extension=apc.so' >> #{ini_file}\""
     system "sudo sh -c \"echo 'apc.enable_cli=on' >> #{ini_file}\""
 
     puts "Opening phpunit.xml.dist"
