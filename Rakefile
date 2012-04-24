@@ -107,11 +107,8 @@ task :test do
     puts "Writing edited version of phpunit.xml.dist"
     File.open('phpunit.xml', 'w').write(document.to_xml)
   end
-  begin
-    sh %{phpunit -c phpunit.xml}
-  rescue Exception
-    exit 1
-  end
+
+  exit system("phpunit -c phpunit.xml")
 end
 
 desc "Create a PEAR package"
