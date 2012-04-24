@@ -109,6 +109,10 @@ task :test do
   end
 
   if File.exists?("phpunit.xml")
+    puts "Dumping contents of phpunit.xml"
+    system "cat phpunit.xml"
+    puts "File dumped. Running PHPUnit..."
+
     exit system("phpunit -c phpunit.xml")
   else
     puts "phpunit.xml does not exist"
