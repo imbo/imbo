@@ -46,7 +46,7 @@ class Timestamp implements ValidateInterface {
      *
      * @var int
      */
-    protected $maxDiff = 120;
+    private $maxDiff = 120;
 
     /**
      * @see Imbo\Validate\ValidateInterface::isValid()
