@@ -105,10 +105,10 @@ task :test do
     document.xpath("//phpunit/logging").remove
 
     puts "Writing edited version of phpunit.xml.dist"
-    File.open('phpunit.xml.dist', 'w').write(document.to_xml)
+    File.open('phpunit.xml', 'w').write(document.to_xml)
   end
   begin
-    sh %{phpunit}
+    sh %{phpunit -c phpunit.xml}
   rescue Exception
     exit 1
   end
