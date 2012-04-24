@@ -99,26 +99,19 @@ task :test do
     system "sudo sh -c \"echo 'apc.enable_cli=on' >> #{ini_file}\""
 
     puts "Opening phpunit.xml.dist"
-    puts File.open("phpunit.xml.dist")
     document = Nokogiri::XML(File.open("phpunit.xml.dist"))
     document.xpath("//phpunit/php/var[@name='MEMCACHED_HOST']").first["value"] = "127.0.0.1"
     document.xpath("//phpunit/php/var[@name='MEMCACHED_PORT']").first["value"] = "11211"
     document.xpath("//phpunit/logging").remove
 
     puts "Writing edited version of phpunit.xml"
-    puts document.to_xml
-
     File.open("phpunit.xml", "w+") do |f|
         f.write(document.to_xml)
     end
   end
 
   if File.exists?("phpunit.xml")
-    puts "Dumping contents of phpunit.xml"
-    puts File.open("phpunit.xml")
-    puts "File dumped. Running PHPUnit..."
-
-    exit system("phpunit -c phpunit.xml")
+    exit system("phpunit --verbose -c phpunit.xml")
   else
     puts "phpunit.xml does not exist"
     exit 1
