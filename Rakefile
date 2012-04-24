@@ -108,7 +108,8 @@ task :test do
 
     puts "Writing edited version of phpunit.xml"
     puts document.to_xml
-    File.open("phpunit.xml", "w+").write(document.to_xml)
+    f = File.open("phpunit.xml", "w+")
+    f.write(document.to_xml)
   end
 
   if File.exists?("phpunit.xml")
