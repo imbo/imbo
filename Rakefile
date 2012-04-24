@@ -105,7 +105,7 @@ task :test do
     document.xpath("//phpunit/logging").remove
 
     puts "Writing edited version of phpunit.xml"
-    File.open("phpunit.xml", "w").write(document.to_xml)
+    File.open("phpunit.xml", "w+").write(document.to_xml)
   end
 
   if File.exists?("phpunit.xml")
