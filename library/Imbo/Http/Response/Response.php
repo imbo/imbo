@@ -118,6 +118,13 @@ class Response implements ResponseInterface {
     private $statusCode = 200;
 
     /**
+     * Custom HTTP status message
+     *
+     * @var string
+     */
+    private $statusMessage;
+
+    /**
      * Response headers
      *
      * @var Imbo\Http\HeaderContainer
@@ -156,8 +163,12 @@ class Response implements ResponseInterface {
     /**
      * @see Imbo\Http\Response\ResponseInterface::setStatusCode()
      */
-    public function setStatusCode($code) {
+    public function setStatusCode($code, $message = null) {
         $this->statusCode = (int) $code;
+
+        if ($message !== null) {
+            $this->statusMessage = $message;
+        }
 
         return $this;
     }
@@ -244,7 +255,8 @@ class Response implements ResponseInterface {
         }
 
         $statusCode = $this->getStatusCode();
-        $statusLine = sprintf("HTTP/%s %d %s", $this->getProtocolVersion(), $statusCode, self::$statusCodes[$statusCode]);
+
+        $statusLine = sprintf("HTTP/%s %d %s", $this->getProtocolVersion(), $statusCode, $this->statusMessage ?: self::$statusCodes[$statusCode]);
         header($statusLine);
 
         // Fetch all headers
