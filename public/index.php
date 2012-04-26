@@ -119,7 +119,7 @@ $container->response = new Response();
 // Event manager
 $container->eventManager = $container->shared(function(Container $container) {
     $listeners = $container->config['eventListeners'];
-    $manager = new EventManager($container->request, $container->response, $container->image);
+    $manager = new EventManager($container->request, $container->response, $container->database, $container->storage, $container->image);
 
     foreach ($listeners as $def) {
         if (empty($def['listener'])) {

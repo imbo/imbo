@@ -33,6 +33,8 @@ namespace Imbo\EventManager;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Image\ImageInterface;
@@ -69,6 +71,20 @@ class EventManager implements EventManagerInterface {
     private $response;
 
     /**
+     * Database driver
+     *
+     * @var Imbo\Database\DatabaseInterface
+     */
+    private $database;
+
+    /**
+     * Storage driver
+     *
+     * @var Imbo\Storage\StorageInterface
+     */
+    private $storage;
+
+    /**
      * Image instance
      *
      * @var Imbo\Image\ImageInterface
@@ -80,12 +96,18 @@ class EventManager implements EventManagerInterface {
      *
      * @param Imbo\Http\Request\RequestInterface $request
      * @param Imbo\Http\Response\ResponseInterface $response
+     * @param Imbo\Http\Database\DatabaseInterface $database Database driver
+     * @param Imbo\Http\Storage\StorageInterface $storage Storage driver
      * @param Imbo\Image\ImageInterface $response
      */
-    public function __construct(RequestInterface $request, ResponseInterface $response, ImageInterface $image = null) {
-        $this->request = $request;
+    public function __construct(RequestInterface $request, ResponseInterface $response,
+                                DatabaseInterface $database, StorageInterface $storage,
+                                ImageInterface $image = null) {
+        $this->request  = $request;
         $this->response = $response;
-        $this->image = $image;
+        $this->database = $database;
+        $this->storage  = $storage;
+        $this->image    = $image;
     }
 
     /**
@@ -138,7 +160,7 @@ class EventManager implements EventManagerInterface {
     public function trigger($event) {
         if (!empty($this->events[$event])) {
             // Create an event instance
-            $e = new Event($event, $this->request, $this->response, $this->image);
+            $e = new Event($event, $this->request, $this->response, $this->database, $this->storage, $this->image);
 
             // Trigger all listeners for this event and pass in the event instance
             foreach ($this->events[$event] as $callback) {

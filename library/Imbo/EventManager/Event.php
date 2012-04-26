@@ -33,6 +33,8 @@ namespace Imbo\EventManager;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface,
     Imbo\Image\ImageInterface;
 
 /**
@@ -67,6 +69,20 @@ class Event implements EventInterface {
     private $response;
 
     /**
+     * Database driver
+     *
+     * @var Imbo\Database\DatabaseInterface
+     */
+    private $database;
+
+    /**
+     * Storage driver
+     *
+     * @var Imbo\Storage\StorageInterface
+     */
+    private $storage;
+
+    /**
      * Image instance
      *
      * @var Imbo\Image\ImageInterface
@@ -79,13 +95,19 @@ class Event implements EventInterface {
      * @param string $name The name of the current event
      * @param Imbo\Http\Request\RequestInterface $request Request instance
      * @param Imbo\Http\Response\ResponseInterface $response Response instance
+     * @param Imbo\Database\DatabaseInterface $database Database driver
+     * @param Imbo\Storage\StorageInterface $storage Storage driver
      * @param Imbo\Image\ImageInterface $image Image instance
      */
-    public function __construct($name, RequestInterface $request, ResponseInterface $response, ImageInterface $image = null) {
-        $this->name = $name;
-        $this->request = $request;
+    public function __construct($name, RequestInterface $request, ResponseInterface $response,
+                                DatabaseInterface $database, StorageInterface $storage,
+                                ImageInterface $image = null) {
+        $this->name     = $name;
+        $this->request  = $request;
         $this->response = $response;
-        $this->image = $image;
+        $this->database = $database;
+        $this->storage  = $storage;
+        $this->image    = $image;
     }
 
     /**
@@ -107,6 +129,20 @@ class Event implements EventInterface {
      */
     public function getResponse() {
         return $this->response;
+    }
+
+    /**
+     * @see Imbo\EventManager\EventInterface::getDatabase()
+     */
+    public function getDatabase() {
+        return $this->database;
+    }
+
+    /**
+     * @see Imbo\EventManager\EventInterface::getStorage()
+     */
+    public function getStorage() {
+        return $this->storage;
     }
 
     /**
