@@ -70,7 +70,15 @@ class Status extends Resource implements ResourceInterface {
         $storageStatus = $storage->getStatus();
 
         if (!$databaseStatus || !$storageStatus) {
-            $response->setStatusCode(500);
+            if (!$databaseStatus && !$storageStatus) {
+                $message = 'Database and storage error';
+            } else if (!$storageStatus) {
+                $message = 'Storage error';
+            } else {
+                $message = 'Database error';
+            }
+
+            $response->setStatusCode(500, $message);
         }
 
         $response->setBody(array(

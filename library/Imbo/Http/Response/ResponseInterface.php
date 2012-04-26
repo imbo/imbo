@@ -56,9 +56,11 @@ interface ResponseInterface {
      * Set the status code
      *
      * @param int $code The HTTP status code to use in the response
+     * @param string $message A custom message to send in the status line instead of the default
+     *                        status messages defined in Imbo\Http\Response\Response.php.
      * @return Imbo\Http\Response\ResponseInterface
      */
-    function setStatusCode($code);
+    function setStatusCode($code, $message = null);
 
     /**
      * Get the header container
