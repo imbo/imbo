@@ -47,19 +47,25 @@ class EventTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\Event::getName
      * @covers Imbo\EventManager\Event::getRequest
      * @covers Imbo\EventManager\Event::getResponse
+     * @covers Imbo\EventManager\Event::getDatabase
+     * @covers Imbo\EventManager\Event::getStorage
      * @covers Imbo\EventManager\Event::getImage
      */
     public function testEvent() {
         $name = 'some.event.name';
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $storage = $this->getMock('Imbo\Storage\StorageInterface');
         $image = $this->getMock('Imbo\Image\ImageInterface');
 
-        $event = new Event($name, $request, $response, $image);
+        $event = new Event($name, $request, $response, $database, $storage, $image);
 
         $this->assertSame($name, $event->getName());
         $this->assertSame($request, $event->getRequest());
         $this->assertSame($response, $event->getResponse());
+        $this->assertSame($database, $event->getDatabase());
+        $this->assertSame($storage, $event->getStorage());
         $this->assertSame($image, $event->getImage());
     }
 
@@ -70,7 +76,9 @@ class EventTest extends \PHPUnit_Framework_TestCase {
     public function testEventWithNoImageInstance() {
         $event = new Event('some name',
                            $this->getMock('Imbo\Http\Request\RequestInterface'),
-                           $this->getMock('Imbo\Http\Response\ResponseInterface'));
+                           $this->getMock('Imbo\Http\Response\ResponseInterface'),
+                           $this->getMock('Imbo\Database\DatabaseInterface'),
+                           $this->getMock('Imbo\Storage\StorageInterface'));
 
         $this->assertNull($event->getImage());
     }

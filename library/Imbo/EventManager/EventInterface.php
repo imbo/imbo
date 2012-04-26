@@ -65,6 +65,20 @@ interface EventInterface {
     function getResponse();
 
     /**
+     * Get the database driver
+     *
+     * @return Imbo\Database\DatabaseInterface
+     */
+    function getDatabase();
+
+    /**
+     * Get the storage driver
+     *
+     * @return Imbo\Storage\StorageInterface
+     */
+    function getStorage();
+
+    /**
      * Get the image instance
      *
      * @return null|Imbo\Image\ImageInterface
