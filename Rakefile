@@ -109,7 +109,11 @@ task :test do
   end
 
   if File.exists?("phpunit.xml")
-    exit system("phpunit --verbose -c phpunit.xml")
+    begin
+      sh %{phpunit --verbose -c phpunit.xml}
+    rescue Exception
+      exit 1
+    end
   else
     puts "phpunit.xml does not exist"
     exit 1
