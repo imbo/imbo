@@ -189,7 +189,7 @@ $body = $response->getBody();
 
 if (is_array($body)) {
     // Write the correct response body
-    $responseWriter->write($data, $request, $response);
+    $responseWriter->write($body, $request, $response);
 }
 
 // Send the response to the client

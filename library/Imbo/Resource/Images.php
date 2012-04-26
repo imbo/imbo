@@ -154,9 +154,7 @@ class Images extends Resource implements ImagesInterface {
             }
         }
 
-        $images = $database->getImages($publicKey, $query);
-
-        $this->getResponseWriter()->write($images, $request, $response);
+        $response->setBody($database->getImages($publicKey, $query));
     }
 
     /**

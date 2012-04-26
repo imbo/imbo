@@ -54,13 +54,9 @@ class MetadataTest extends ResourceTests {
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->database->expects($this->once())->method('deleteMetadata')->with($this->publicKey, $this->imageIdentifier);
 
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
-        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
-
-        $resource->delete($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->delete($this->request, $this->response, $this->database, $this->storage);
     }
 
     /**
@@ -111,14 +107,9 @@ class MetadataTest extends ResourceTests {
         $this->database->expects($this->once())->method('updateMetadata')->with($this->publicKey, $this->imageIdentifier, array('foo' => 'bar'));
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
 
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
-        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
-
-
-        $resource->post($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->post($this->request, $this->response, $this->database, $this->storage);
     }
 
     /**
@@ -136,13 +127,9 @@ class MetadataTest extends ResourceTests {
         $this->database->expects($this->once())->method('updateMetadata')->with($this->publicKey, $this->imageIdentifier, array('some' => 'value'));
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
 
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
-        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
-
-        $resource->post($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->post($this->request, $this->response, $this->database, $this->storage);
     }
 
     /**
@@ -182,13 +169,9 @@ class MetadataTest extends ResourceTests {
         $this->database->expects($this->once())->method('deleteMetadata')->with($this->publicKey, $this->imageIdentifier);
         $this->database->expects($this->once())->method('updateMetadata')->with($this->publicKey, $this->imageIdentifier, array('key' => 'value'));
 
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
-        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
-
-        $resource->put($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->put($this->request, $this->response, $this->database, $this->storage);
     }
 
     /**
@@ -254,12 +237,8 @@ class MetadataTest extends ResourceTests {
 
         $this->database->expects($this->once())->method('getMetadata')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($metadataInDatabase));
 
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
-        $writer->expects($this->once())->method('write')->with($metadataInDatabase, $this->request, $this->response);
+        $this->response->expects($this->once())->method('setBody')->with($metadataInDatabase);
 
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
-
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
 }

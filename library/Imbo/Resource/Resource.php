@@ -33,8 +33,6 @@ namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
-    Imbo\Http\Response\ResponseWriter,
-    Imbo\Http\Response\ResponseWriterInterface,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface,
     Imbo\Resource\ResourceInterface,

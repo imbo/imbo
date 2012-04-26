@@ -161,37 +161,21 @@ class ImageTest extends ResourceTests {
      * @covers Imbo\Resource\Image::put
      */
     public function testSuccessfulPut() {
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
-        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
-
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
-
         $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
 
-        $this->image->expects($this->once())
-                    ->method('getBlob')
-                    ->will($this->returnValue($imageData));
+        $this->image->expects($this->once())->method('getBlob')->will($this->returnValue($imageData));
 
-        $this->request->expects($this->once())
-                      ->method('getPublicKey')
-                      ->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->once())->method('getRealImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
-        $this->request->expects($this->once())
-                      ->method('getRealImageIdentifier')
-                      ->will($this->returnValue($this->imageIdentifier));
+        $this->database->expects($this->once())->method('insertImage')->with($this->publicKey, $this->imageIdentifier, $this->image);
 
-        $this->database->expects($this->once())
-                       ->method('insertImage')
-                       ->with($this->publicKey, $this->imageIdentifier, $this->image);
-
-        $this->storage->expects($this->once())
-                      ->method('store')
-                      ->with($this->publicKey, $this->imageIdentifier, $imageData);
+        $this->storage->expects($this->once())->method('store')->with($this->publicKey, $this->imageIdentifier, $imageData);
 
         $this->response->expects($this->once())->method('setStatusCode')->with(201)->will($this->returnValue($this->response));
+        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $resource->put($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->put($this->request, $this->response, $this->database, $this->storage);
     }
 
     /**
@@ -238,24 +222,16 @@ class ImageTest extends ResourceTests {
      * @covers Imbo\Resource\Image::delete
      */
     public function testSuccessfulDelete() {
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
-        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
-
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
-
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
-        $this->database->expects($this->once())
-                       ->method('deleteImage')
-                       ->with($this->publicKey, $this->imageIdentifier);
+        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $this->storage->expects($this->once())
-                      ->method('delete')
-                      ->with($this->publicKey, $this->imageIdentifier);
+        $this->database->expects($this->once())->method('deleteImage')->with($this->publicKey, $this->imageIdentifier);
 
-        $resource->delete($this->request, $this->response, $this->database, $this->storage);
+        $this->storage->expects($this->once())->method('delete')->with($this->publicKey, $this->imageIdentifier);
+
+        $this->getNewResource()->delete($this->request, $this->response, $this->database, $this->storage);
     }
 
     /**

@@ -68,7 +68,9 @@ class Metadata extends Resource implements ResourceInterface {
 
         $database->deleteMetadata($request->getPublicKey(), $imageIdentifier);
 
-        $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
+        $response->setBody(array(
+            'imageIdentifier' => $imageIdentifier,
+        ));
     }
 
     /**
@@ -95,7 +97,9 @@ class Metadata extends Resource implements ResourceInterface {
         // Insert new metadata
         $database->updateMetadata($publicKey, $imageIdentifier, $metadata);
 
-        $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
+        $response->setBody(array(
+            'imageIdentifier' => $imageIdentifier,
+        ));
     }
 
     /**
@@ -123,7 +127,9 @@ class Metadata extends Resource implements ResourceInterface {
 
         $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $metadata);
 
-        $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
+        $response->setBody(array(
+            'imageIdentifier' => $imageIdentifier,
+        ));
     }
 
     /**
@@ -155,9 +161,7 @@ class Metadata extends Resource implements ResourceInterface {
         // The client did not have this particular version in its cache
         $responseHeaders->set('Last-Modified', $lastModified);
 
-        $metadata = $database->getMetadata($publicKey, $imageIdentifier);
-
-        $this->getResponseWriter()->write($metadata, $request, $response);
+        $response->setBody($database->getMetadata($publicKey, $imageIdentifier));
     }
 
     /**
