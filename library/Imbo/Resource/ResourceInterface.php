@@ -34,7 +34,6 @@ namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
-    Imbo\Http\Response\ResponseWriterInterface,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface,
     Imbo\EventManager\EventManagerInterface;
@@ -59,21 +58,6 @@ interface ResourceInterface {
      * @return string[]
      */
     function getAllowedMethods();
-
-    /**
-     * Get the response writer instance
-     *
-     * @return Imbo\Http\Response\ResponseWriterInterface
-     */
-    function getResponseWriter();
-
-    /**
-     * Set the response writer instance
-     *
-     * @param Imbo\Http\Response\ResponseWriterInterface $writer An instance of the response writer
-     * @return Imbo\Resource\ResourceInterface
-     */
-    function setResponseWriter(ResponseWriterInterface $writer);
 
     /**
      * POST handler

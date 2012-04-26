@@ -107,23 +107,6 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
     public function testHead() {
         $this->resource->head($this->request, $this->response, $this->database, $this->storage);
     }
-
-    /**
-     * @covers Imbo\Resource\Resource::setResponseWriter
-     * @covers Imbo\Resource\Resource::getResponseWriter
-     */
-    public function testSetGetResponseWriter() {
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
-        $this->assertSame($this->resource, $this->resource->setResponseWriter($writer));
-        $this->assertSame($writer, $this->resource->getResponseWriter());
-    }
-
-    /**
-     * @covers Imbo\Resource\Resource::getResponseWriter
-     */
-    public function testGetResponseWriterWithoutSet() {
-        $this->assertInstanceOf('Imbo\Http\Response\ResponseWriterInterface', $this->resource->getResponseWriter());
-    }
 }
 
 class ResourceImplementation extends Resource {
