@@ -55,13 +55,9 @@ class StatusTest extends ResourceTests {
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->once())->method('setStatusCode')->with(500);
 
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
-        $writer->expects($this->once())->method('write')->with($this->isType('array', $this->request, $this->response));
+        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
-
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
 
     public function testStatusWhenStorageDriverFails() {
@@ -73,13 +69,9 @@ class StatusTest extends ResourceTests {
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->once())->method('setStatusCode')->with(500);
 
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
-        $writer->expects($this->once())->method('write')->with($this->isType('array', $this->request, $this->response));
+        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
-
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
 
     public function testStatusWhenBothDriversFails() {
@@ -91,13 +83,9 @@ class StatusTest extends ResourceTests {
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->once())->method('setStatusCode')->with(500);
 
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
-        $writer->expects($this->once())->method('write')->with($this->isType('array', $this->request, $this->response));
+        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
-
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
 
     public function testStatusWhenNoDriverFails() {
@@ -109,12 +97,8 @@ class StatusTest extends ResourceTests {
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->never())->method('setStatusCode');
 
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
-        $writer->expects($this->once())->method('write')->with($this->isType('array', $this->request, $this->response));
+        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
-
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
 }

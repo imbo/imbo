@@ -84,15 +84,13 @@ class User extends Resource implements ResourceInterface {
             return;
         }
 
-        $data = array(
-            'publicKey' => $publicKey,
-            'numImages' => $numImages,
-            'lastModified' => $lastModified,
-        );
-
         $responseHeaders->set('Last-Modified', $lastModified);
 
-        $this->getResponseWriter()->write($data, $request, $response);
+        $response->setBody(array(
+            'publicKey'    => $publicKey,
+            'numImages'    => $numImages,
+            'lastModified' => $lastModified,
+        ));
     }
 
     /**
