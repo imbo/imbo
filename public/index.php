@@ -154,6 +154,9 @@ $response->getHeaders()->set('X-Imbo-Version', Version::getVersionNumber());
 // Create the front controller and handle the request
 $frontController = new FrontController($container);
 
+// Create a response writer
+$responseWriter = new ResponseWriter();
+
 try {
     $frontController->handle($request, $response);
 } catch (Exception $exception) {
@@ -178,8 +181,15 @@ try {
         $data['imageIdentifier'] = $identifier;
     }
 
-    $responseWriter = new ResponseWriter();
-    $responseWriter->write($data, $request, $response);
+    $response->setBody($data);
+}
+
+// Fetch the response body
+$body = $response->getBody();
+
+if (is_array($body)) {
+    // Write the correct response body
+    $responseWriter->write($body, $request, $response);
 }
 
 // Send the response to the client

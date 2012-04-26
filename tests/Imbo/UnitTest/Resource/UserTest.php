@@ -116,12 +116,8 @@ class UserTest extends ResourceTests {
         $this->database->expects($this->once())->method('getNumImages')->with($this->publicKey)->will($this->returnValue($numImages));
         $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey)->will($this->returnValue($lastModified));
 
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriter');
-        $writer->expects($this->once())->method('write')->with($this->isType('array'), $this->request, $this->response);
+        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $resource = $this->getNewResource();
-        $resource->setResponseWriter($writer);
-
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
 }

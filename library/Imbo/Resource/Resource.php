@@ -33,8 +33,6 @@ namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
-    Imbo\Http\Response\ResponseWriter,
-    Imbo\Http\Response\ResponseWriterInterface,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface,
     Imbo\Resource\ResourceInterface,
@@ -60,33 +58,6 @@ abstract class Resource implements ResourceInterface {
      * @var Imbo\EventManager\EventManagerInterface
      */
     protected $eventManager;
-
-    /**
-     * A response writer
-     *
-     * @var Imbo\Http\Response\ResponseWriterInterface
-     */
-    private $writer;
-
-    /**
-     * @see Imbo\Resource\ResourceInterface::getResponseWriter()
-     */
-    public function getResponseWriter() {
-        if ($this->writer === null) {
-            $this->writer = new ResponseWriter();
-        }
-
-        return $this->writer;
-    }
-
-    /**
-     * @see Imbo\Resource\ResourceInterface::setResponseWriter()
-     */
-    public function setResponseWriter(ResponseWriterInterface $writer) {
-        $this->writer = $writer;
-
-        return $this;
-    }
 
     /**
      * @see Imbo\Resource\ResourceInterface::post()

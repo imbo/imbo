@@ -101,12 +101,9 @@ class ImagesTest extends ResourceTests {
 
         $parameterContainer = $this->getMock('Imbo\Http\ParameterContainerInterface');
         $query = $this->getMock('Imbo\Resource\Images\QueryInterface');
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
-        $writer->expects($this->once())->method('write')->with($images, $this->request, $this->response);
 
         $resource = $this->getNewResource();
         $resource->setQuery($query);
-        $resource->setResponseWriter($writer);
 
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->any())->method('set');
@@ -120,6 +117,7 @@ class ImagesTest extends ResourceTests {
         $this->database->expects($this->once())->method('getImages')->with($this->publicKey, $query)->will($this->returnValue($images));
         $this->database->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
+        $this->response->expects($this->once())->method('setBody')->with($images);
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }
@@ -152,12 +150,8 @@ class ImagesTest extends ResourceTests {
         $query->expects($this->once())->method('to')->with(4);
         $query->expects($this->once())->method('metadataQuery')->with(array('foo', 'bar'));
 
-        $writer = $this->getMock('Imbo\Http\Response\ResponseWriterInterface');
-        $writer->expects($this->once())->method('write')->with($images, $this->request, $this->response);
-
         $resource = $this->getNewResource();
         $resource->setQuery($query);
-        $resource->setResponseWriter($writer);
 
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->any())->method('set');
@@ -171,6 +165,7 @@ class ImagesTest extends ResourceTests {
         $this->database->expects($this->once())->method('getImages')->with($this->publicKey, $query)->will($this->returnValue($images));
         $this->database->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
+        $this->response->expects($this->once())->method('setBody')->with($images);
 
         $resource->get($this->request, $this->response, $this->database, $this->storage);
     }

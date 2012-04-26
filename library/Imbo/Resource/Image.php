@@ -121,9 +121,8 @@ class Image extends Resource implements ResourceInterface {
             throw $e;
         }
 
-        $response->setStatusCode(201);
-
-        $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
+        $response->setStatusCode(201)
+                 ->setBody(array('imageIdentifier' => $imageIdentifier));
     }
 
     /**
@@ -136,7 +135,9 @@ class Image extends Resource implements ResourceInterface {
         $database->deleteImage($publicKey, $imageIdentifier);
         $storage->delete($publicKey, $imageIdentifier);
 
-        $this->getResponseWriter()->write(array('imageIdentifier' => $imageIdentifier), $request, $response);
+        $response->setBody(array(
+            'imageIdentifier' => $imageIdentifier,
+        ));
     }
 
     /**

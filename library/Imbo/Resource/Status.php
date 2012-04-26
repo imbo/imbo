@@ -73,11 +73,11 @@ class Status extends Resource implements ResourceInterface {
             $response->setStatusCode(500);
         }
 
-        $this->getResponseWriter()->write(array(
+        $response->setBody(array(
             'timestamp' => $this->formatDate(new DateTime()),
-            'database' => $databaseStatus,
-            'storage' => $storageStatus,
-        ), $request, $response);
+            'database'  => $databaseStatus,
+            'storage'   => $storageStatus,
+        ));
     }
 
     /**
