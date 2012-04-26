@@ -64,9 +64,7 @@ class Status extends Resource implements ResourceInterface {
      * @see Imbo\Resource\ResourceInterface::get()
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $response->getHeaders()
-            ->set('Cache-Control', 'no-cache')
-            ->set('Expires', 'Fri, 16 Mar 2012 13:05:00 GMT');
+        $response->getHeaders()->set('Cache-Control', 'max-age=0');
 
         $databaseStatus = $database->getStatus();
         $storageStatus = $storage->getStatus();
