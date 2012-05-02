@@ -168,6 +168,7 @@ class Image extends Resource implements ResourceInterface {
         // Fetch information from the database (injects mime type, width and height to the
         // image instance)
         $database->load($publicKey, $imageIdentifier, $this->image);
+        $this->eventManager->trigger('image.get.database.load.post');
 
         // Generate ETag using public key, image identifier, and the redirect url
         $etag = '"' . md5($publicKey . $imageIdentifier . $serverContainer->get('REQUEST_URI')) . '"';
