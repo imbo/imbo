@@ -118,4 +118,11 @@ interface ResponseInterface {
      * @return Imbo\Http\Response\ResponseInterface
      */
     function setNotModified();
+
+    /**
+     * Whether or not the response is an error response
+     *
+     * @return boolean
+     */
+    function isError();
 }

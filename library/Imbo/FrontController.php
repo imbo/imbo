@@ -33,6 +33,7 @@ namespace Imbo;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
+    Imbo\Resource\ResourceInterface,
     Imbo\Exception\RuntimeException,
     Imbo\Exception,
     Imbo\Image\Image;
@@ -76,11 +77,11 @@ class FrontController {
      * @var array
      */
     static private $resourceClasses = array(
-        'image'    => 'Imbo\Resource\Image',
-        'metadata' => 'Imbo\Resource\Metadata',
-        'images'   => 'Imbo\Resource\Images',
-        'user'     => 'Imbo\Resource\User',
-        'status'   => 'Imbo\Resource\Status',
+        ResourceInterface::STATUS   => 'Imbo\Resource\Status',
+        ResourceInterface::USER     => 'Imbo\Resource\User',
+        ResourceInterface::IMAGES   => 'Imbo\Resource\Images',
+        ResourceInterface::IMAGE    => 'Imbo\Resource\Image',
+        ResourceInterface::METADATA => 'Imbo\Resource\Metadata',
     );
 
     /**
@@ -105,11 +106,11 @@ class FrontController {
 
         // Possible patterns to match where the most accessed match is placed first
         $routes = array(
-            'image'    => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png))?$#',
-            'images'   => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/?$#',
-            'metadata' => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png)/)meta/?$#',
-            'user'     => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/?$#',
-            'status'   => '#^/status/?#',
+            ResourceInterface::IMAGE    => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png))?$#',
+            ResourceInterface::STATUS   => '#^/status/?$#',
+            ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/?$#',
+            ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png)/)meta/?$#',
+            ResourceInterface::USER     => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/?$#',
         );
 
         // Initialize matches
@@ -125,6 +126,9 @@ class FrontController {
         if (!$matches) {
             throw new RuntimeException('Not found', 404);
         }
+
+        // Set the resource name
+        $request->setResource($resourceName);
 
         // Extract some information from the path and store in the request instance
         if (!empty($matches['publicKey'])) {
@@ -177,8 +181,13 @@ class FrontController {
         // Fetch a resource instance based on the request path
         $resource = $this->resolveResource($request);
 
-        // Add Allow to all responses
-        $response->getHeaders()->set('Allow', implode(', ', $resource->getAllowedMethods()));
+        // Add some response headers
+        $response->getHeaders()
+            // Inform the user agent of which methods are allowed against this resource
+            ->set('Allow', implode(', ', $resource->getAllowedMethods()))
+
+            // Vary on the Accept header as Imbo supports several content types
+            ->set('Vary', 'Accept');
 
         // Fetch the real image identifier (PUT only) or the one from the URL (if present)
         if (($identifier = $request->getRealImageIdentifier()) || ($identifier = $request->getImageIdentifier())) {

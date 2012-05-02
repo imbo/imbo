@@ -136,4 +136,23 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(304, $this->response->getStatusCode());
         $this->assertEmpty($this->response->getBody());
     }
+
+    public function isErrorData() {
+        return array(
+            array(100, false),
+            array(200, false),
+            array(300, false),
+            array(400, true),
+            array(500, true),
+        );
+    }
+
+    /**
+     * @dataProvider isErrorData
+     * @covers Imbo\Http\Response\Response::isError
+     */
+    public function testIsError($code, $error) {
+        $this->response->setStatusCode($code);
+        $this->assertSame($error, $this->response->isError());
+    }
 }

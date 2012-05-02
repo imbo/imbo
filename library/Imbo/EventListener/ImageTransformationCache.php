@@ -32,7 +32,9 @@
 namespace Imbo\EventListener;
 
 use Imbo\Exception\RuntimeException,
-    Imbo\EventManager\EventInterface;
+    Imbo\EventManager\EventInterface,
+    Imbo\Http\ContentNegotiation,
+    Imbo\Image\Image;
 
 /**
  * Image transformation cache
@@ -55,12 +57,26 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
     private $path;
 
     /**
+     * Content negotiation instance
+     *
+     * @var Imbo\Http\ContentNegotiation
+     */
+    private $contentNegotiation;
+
+    /**
      * Class constructor
      *
      * @param string $path Path to store the temp. images
+     * @param Imbo\Http\ContentNegotiation $contentNegotiation Content negotiation instance
      */
-    public function __construct($path) {
+    public function __construct($path, ContentNegotiation $contentNegotiation = null) {
         $this->path = rtrim($path, '/');
+
+        if ($contentNegotiation === null) {
+            $contentNegotiation = new ContentNegotiation();
+        }
+
+        $this->contentNegotiation = $contentNegotiation;
     }
 
     /**
@@ -68,8 +84,13 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
      */
     public function getEvents() {
         return array(
-            'image.get.pre',
+            // Look for images in the cache
+            'image.get.database.load.post',
+
+            // Store images in the cache
             'image.get.post',
+
+            // Remove from the cache when an image is deleted from Imbo
             'image.delete.post',
         );
     }
@@ -79,11 +100,38 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
      */
     public function invoke(EventInterface $event) {
         $eventName = $event->getName();
-        $request = $event->getRequest();
-        $hash = hash('sha256', $request->getUrl());
+        $request   = $event->getRequest();
+        $response  = $event->getResponse();
+        $image     = $event->getImage();
+
+        $publicKey       = $request->getPublicKey();
+        $imageIdentifier = $request->getImageIdentifier();
+        $imageExtension  = $request->getImageExtension();
+        $url             = $request->getUrl();
+
+        // Fetch the mime type of the original image
+        $mimeType = $image->getMimeType();
+
+        if ($imageExtension !== null) {
+            // The user has requested a specific type (convert transformation). Use that mime type
+            // instead
+            $types = array_flip(Image::$mimeTypes);
+            $mimeType = $types[$imageExtension];
+        }
+
+        // Generate cache key and fetch the full path of the cached response
+        $hash = $this->getCacheKey($url, $mimeType);
         $fullPath = $this->getFullPath($hash);
 
-        if ($eventName === 'image.get.pre') {
+        if ($eventName === 'image.get.database.load.post') {
+            // Fetch the acceptable types from the user agent
+            $acceptableTypes = array_keys($request->getAcceptableContentTypes());
+
+            if (!$this->contentNegotiation->isAcceptable($mimeType, $acceptableTypes)) {
+                // The user agent does not accept this type of image. Don't look in the cache.
+                return;
+            }
+
             if (is_file($fullPath)) {
                 $response = unserialize(file_get_contents($fullPath));
 
@@ -101,14 +149,16 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
                     $response->setNotModified();
                 }
 
+                $response->getHeaders()->set('X-Imbo-TransformationCache', 'Hit');
+
                 $response->send();
                 exit;
             }
-        } else if ($eventName === 'image.get.post') {
-            $response = $event->getResponse();
 
-            if ($response->getStatusCode() === 304) {
-                // We don't want to put a 304 response in the cache
+            $response->getHeaders()->set('X-Imbo-TransformationCache', 'Miss');
+        } else if ($eventName === 'image.get.post') {
+            if ($response->getStatusCode() !== 200) {
+                // We only want to put 200 OK responses in the cache
                 return;
             }
 
@@ -129,10 +179,21 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
     /**
      * Get the full path based on the hash
      *
-     * @param string $hash An MD5 hash (image identifier)
+     * @param string $hash The hash used as cache key
      * @return string Returns a full path
      */
     private function getFullPath($hash) {
         return sprintf('%s/%s/%s/%s/%s', $this->path, $hash[0], $hash[1], $hash[2], $hash);
+    }
+
+    /**
+     * Generate a cache key
+     *
+     * @param string $url The requested URL
+     * @param string $mime The mime type of the image
+     * @return string Returns a string that can be used as a cache key for the current image
+     */
+    private function getCacheKey($url, $mime) {
+        return hash('sha256', $url . '|' . $mime);
     }
 }

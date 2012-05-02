@@ -46,7 +46,8 @@ class Json implements FormatterInterface {
     /**
      * @see Imbo\Http\Response\Formatter\FormatterInterface::format()
      */
-    public function format(array $data) {
+    public function format(array $data, $resource, $error) {
+        // Simply encode the data to JSON, no matter what resource we are dealing with
         return json_encode($data);
     }
 
