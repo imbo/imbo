@@ -119,6 +119,14 @@ class Request implements RequestInterface {
     private $imageExtension;
 
     /**
+     * The currently requested resorce name (as defined by the constants in
+     * Imbo\Resource\ResourceInterface).
+     *
+     * @var string
+     */
+    private $resource;
+
+    /**
      * Class constructor
      *
      * @param array $query Query data ($_GET)
@@ -421,5 +429,82 @@ class Request implements RequestInterface {
         return $method === RequestInterface::METHOD_POST ||
                $method === RequestInterface::METHOD_PUT ||
                $method === RequestInterface::METHOD_DELETE;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::splitAcceptHeader()
+     */
+    public function splitAcceptHeader($header) {
+        if (!$header) {
+            return array();
+        }
+
+        $values = array();
+
+        // Explode on , to get all media types
+        $mediaTypes = array_map('trim', explode(',', $header));
+
+        // Remove possible empty values due to poorly formatted headers
+        $mediaTypes = array_filter($mediaTypes);
+
+        foreach ($mediaTypes as $type) {
+            $quality = 1;
+
+            if (preg_match('/;\s*q=(\d\.?\d?)/', $type, $match)) {
+                $quality = (float) $match[1];
+
+                // Remove the matched string from the type
+                $type = substr($type, 0, -strlen($match[0]));
+            }
+
+            if ($quality) {
+                $values[$type] = $quality;
+            }
+        }
+
+        // Increase all quality values to be able to get a correct sort
+        $f = .00001;
+        $i = 0;
+
+        $values = array_reverse($values);
+        $factor = array();
+
+        foreach ($values as $type => $q) {
+            $values[$type] += ($f * ++$i);
+            $factor[$type] = $i;
+        }
+
+        // Sort the values and maintain key association
+        arsort($values);
+
+        // Decrease the values back to the original values
+        foreach ($values as $type => $q) {
+            $values[$type] -= $f * $factor[$type];
+        }
+
+        return $values;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::getAcceptableContentTypes()
+     */
+    public function getAcceptableContentTypes() {
+        return $this->splitAcceptHeader($this->headers->get('Accept'));
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::setResource()
+     */
+    public function setResource($resource) {
+        $this->resource = $resource;
+
+        return $this;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::getResource()
+     */
+    public function getResource() {
+        return $this->resource;
     }
 }

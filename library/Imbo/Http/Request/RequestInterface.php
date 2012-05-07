@@ -249,4 +249,37 @@ interface RequestInterface {
      * @return boolean
      */
     function isUnsafe();
+
+    /**
+     * Split Accept-* headers
+     *
+     * @param string $header The header string to split, for instance "audio/*; q=0.2, audio/basic"
+     * @return array Returns an array with the media type as keys and the quality as values
+     */
+    function splitAcceptHeader($header);
+
+    /**
+     * Get the acceptable content types for the current request
+     *
+     * This method will return an array where the keys are the acceptable mime types, and the
+     * values are the quality associated with the mime types
+     *
+     * @return array
+     */
+    function getAcceptableContentTypes();
+
+    /**
+     * Set the resource name (one of the constants defined in Imbo\Resource\ResourceInterface)
+     *
+     * @param string $resource The name of the resource
+     * @return Imbo\Http\Request\RequestInterface
+     */
+    function setResource($resource);
+
+    /**
+     * Get the resource name
+     *
+     * @return string
+     */
+    function getResource();
 }

@@ -82,9 +82,9 @@ class Status extends Resource implements ResourceInterface {
         }
 
         $response->setBody(array(
-            'timestamp' => $this->formatDate(new DateTime()),
-            'database'  => $databaseStatus,
-            'storage'   => $storageStatus,
+            'date'     => $this->formatDate(new DateTime()),
+            'database' => $databaseStatus,
+            'storage'  => $storageStatus,
         ));
     }
 

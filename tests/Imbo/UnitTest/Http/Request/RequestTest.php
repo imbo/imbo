@@ -478,4 +478,58 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($request, $request->setRawData($image));
         $this->assertSame('929db9c5fc3099f7576f5655207eba47', $request->getRealImageIdentifier());
     }
+
+    /**
+     * @dataProvider splitAcceptHeaderData
+     */
+    public function testSplitAcceptHeader($header, $expected) {
+        $request = new Request();
+        $this->assertEquals($expected, $request->splitAcceptHeader($header));
+    }
+
+    /**
+     * Test values are from RFC2616, section 14.1
+     */
+    public function splitAcceptHeaderData() {
+        return array(
+            array(null, array()),
+
+            array('audio/*; q=0.2, audio/basic', array(
+                'audio/basic' => 1,
+                'audio/*' => 0.2,
+            )),
+
+            array('text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c', array(
+                'text/html' => 1,
+                'text/x-c' => 1,
+                'text/x-dvi' => 0.8,
+                'text/plain' => 0.5,
+            )),
+
+            array('text/*, text/html, text/html;level=1, */*', array(
+                'text/html;level=1' => 1,
+                'text/html' => 1,
+                'text/*' => 1,
+                '*/*' => 1,
+            )),
+
+            array('text/*;q=0.3, text/html;q=0.7, text/html;level=1, text/html;level=2;q=0.4, */*;q=0.5', array(
+                'text/html;level=1' => 1,
+                'text/html' => 0.7,
+                '*/*' => 0.5,
+                'text/html;level=2' => 0.4,
+                'text/*' => 0.3,
+            )),
+        );
+    }
+
+    /**
+     * @covers Imbo\Http\Request\Request::getResource
+     * @covers Imbo\Http\Request\Request::setResource
+     */
+    public function testSetGetResource() {
+        $request = new Request();
+        $this->assertSame($request, $request->setResource('metadata'));
+        $this->assertSame('metadata', $request->getResource());
+    }
 }

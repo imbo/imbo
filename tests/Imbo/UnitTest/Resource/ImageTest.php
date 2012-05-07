@@ -52,6 +52,11 @@ class ImageTest extends ResourceTests {
     private $imagePreparation;
 
     /**
+     * @var Imbo\Http\ContentNegotiation
+     */
+    private $contentNegotiation;
+
+    /**
      * @var Imbo\EventManager\EventManagerInterface
      */
     private $eventManager;
@@ -63,7 +68,7 @@ class ImageTest extends ResourceTests {
 
     protected function getNewResource() {
         $this->eventManager = $this->getMock('Imbo\EventManager\EventManagerInterface');
-        $image = new Image($this->image, $this->imagePreparation);
+        $image = new Image($this->image, $this->imagePreparation, $this->contentNegotiation);
         $image->setEventManager($this->eventManager);
 
         return $image;
@@ -72,6 +77,7 @@ class ImageTest extends ResourceTests {
     public function setUp() {
         $this->image = $this->getMock('Imbo\Image\ImageInterface');
         $this->imagePreparation = $this->getMock('Imbo\Image\ImagePreparationInterface');
+        $this->contentNegotiation = $this->getMock('Imbo\Http\ContentNegotiation');
 
         parent::setUp();
     }
@@ -81,6 +87,7 @@ class ImageTest extends ResourceTests {
 
         $this->image = null;
         $this->imagePreparation = null;
+        $this->contentNegotiation = null;
     }
 
     /**
@@ -336,12 +343,15 @@ class ImageTest extends ResourceTests {
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
         $this->request->expects($this->once())->method('getPath')->will($this->returnValue($requestUri));
         $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue($this->getMock('Imbo\Image\TransformationChain')));
+        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('*/*' => 1)));
 
         $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
 
         $this->image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
 
         $this->response->expects($this->once())->method('setBody')->with($this->isType('string'));
+
+        $this->contentNegotiation->expects($this->once())->method('isAcceptable')->will($this->returnValue(true));
 
         $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
@@ -364,6 +374,7 @@ class ImageTest extends ResourceTests {
         $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
         $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue($this->getMock('Imbo\Image\TransformationChain')));
+        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('*/*' => 1)));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->once())->method('setBody')->with($imageData);
 
@@ -372,6 +383,38 @@ class ImageTest extends ResourceTests {
         $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
         $this->image->expects($this->once())->method('setBlob')->with($imageData);
         $this->image->expects($this->once())->method('getBlob')->will($this->returnValue($imageData));
+        $this->contentNegotiation->expects($this->once())->method('isAcceptable')->will($this->returnValue(true));
+
+        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+    }
+
+    /**
+     * @covers Imbo\Resource\Image::get
+     * @expectedException Imbo\Exception\ResourceException
+     * @expectedExceptionCode 406
+     */
+    public function testGetWhenUserAgentDoesNotAcceptImage() {
+        $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
+        $requestUri = '/users/' . $this->publicKey . '/images/' . $this->imageIdentifier;
+
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
+        $serverContainer->expects($this->once())->method('get')->with('REQUEST_URI')->will($this->returnValue($requestUri));
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $responseHeaders->expects($this->any())->method('set')->will($this->returnValue($responseHeaders));
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
+        $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
+        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue($this->getMock('Imbo\Image\TransformationChain')));
+        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('image/jpg' => 1)));
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
+
+        $this->request->expects($this->once())->method('getPath')->will($this->returnValue($requestUri));
+        $this->storage->expects($this->once())->method('getImage')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($imageData));
+        $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
+        $this->contentNegotiation->expects($this->once())->method('isAcceptable')->will($this->returnValue(false));
 
         $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
     }
