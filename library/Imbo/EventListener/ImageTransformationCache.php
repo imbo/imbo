@@ -145,7 +145,7 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
 
         if ($eventName === 'image.get.pre') {
             // Fetch the acceptable types from the user agent
-            $acceptableTypes = array_keys($request->getAcceptableContentTypes());
+            $acceptableTypes = $request->getAcceptableContentTypes();
 
             if (!$this->contentNegotiation->isAcceptable($mimeType, $acceptableTypes)) {
                 // The user agent does not accept this type of image. Don't look in the cache.

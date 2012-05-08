@@ -66,11 +66,11 @@ class ContentNegotiationTest extends \PHPUnit_Framework_TestCase {
      */
     public function getIsAcceptableData() {
         return array(
-            array('image/png', array('image/png', 'image/*'), true),
-            array('image/png', array('text/html', '*/*'), true),
-            array('image/png', array('text/html'), false),
-            array('image/jpeg', array('application/json', 'text/*'), false),
-            array('application/json', array('text/html;level=1', 'text/html', '*/*', 'text/html;level=2', 'text/*'), true),
+            array('image/png', array('image/png' => 1, 'image/*' => 0.9), 1),
+            array('image/png', array('text/html' => 1, '*/*' => 0.9), 0.9),
+            array('image/png', array('text/html' => 1), false),
+            array('image/jpeg', array('application/json' => 1, 'text/*' => 0.9), false),
+            array('application/json', array('text/html;level=1' => 1, 'text/html' => 0.9, '*/*' => 0.8, 'text/html;level=2' => 0.7, 'text/*' => 0.9), 0.8),
         );
     }
 

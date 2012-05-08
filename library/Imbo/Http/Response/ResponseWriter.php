@@ -61,7 +61,9 @@ class ResponseWriter implements ResponseWriterInterface {
      * @var array
      */
     private $supportedTypes = array(
-        'application/json' => 'Imbo\Http\Response\Formatter\Json',
+        'application/json' => 'Imbo\Http\Response\Formatter\JSON',
+        'application/xml'  => 'Imbo\Http\Response\Formatter\XML',
+        'text/html'        => 'Imbo\Http\Response\Formatter\HTML',
     );
 
     /**
@@ -87,28 +89,32 @@ class ResponseWriter implements ResponseWriterInterface {
     /**
      * @see Imbo\Http\Response\ResponseWriterInterface::write()
      */
-    public function write(array $data, RequestInterface $request, ResponseInterface $response) {
-        $acceptableTypes = array_keys($request->getAcceptableContentTypes());
+    public function write(array $data, RequestInterface $request, ResponseInterface $response, $strict = true) {
+        $acceptableTypes = $request->getAcceptableContentTypes();
+        $formatter = null;
         $match = false;
+        $maxQ = 0;
 
         foreach ($this->supportedTypes as $mime => $formatterClass) {
-            if ($this->cn->isAcceptable($mime, $acceptableTypes)) {
+            if (($q = $this->cn->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
+                $maxQ = $q;
                 $match = true;
-                break;
+                $formatter = $formatterClass;
             }
         }
 
-        if (!$match && $response->isError()) {
-            // There was no match but this time it's an error message that is supposed to be
-            // formatted. Send a response anyway (allowed according to RFC2616, section 10.4.7)
-            $formatterClass = $this->supportedTypes[$this->defaultMimeType];
-        } else if (!$match) {
-            // No types matched. The client does not want any of Imbo's supported types
+        if (!$match && $strict) {
+            // No types matched with strict mode enabled. The client does not want any of Imbo's
+            // supported types
             throw new RuntimeException('Not acceptable', 406);
+        } else if (!$match) {
+            // There was no match but we don't want to be an ass about it. Send a response anyway
+            // (allowed according to RFC2616, section 10.4.7)
+            $formatter = $this->supportedTypes[$this->defaultMimeType];
         }
 
         // Create an instance of the formatter
-        $formatter = new $formatterClass();
+        $formatter = new $formatter();
         $formattedData = $formatter->format($data, $request->getResource(), $response->isError());
 
         $response->getHeaders()->set('Content-Type', $formatter->getContentType())
