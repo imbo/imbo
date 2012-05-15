@@ -55,6 +55,7 @@ interface Exception {
     const AUTH_MISSING_PARAM      = 101;
     const AUTH_INVALID_TIMESTAMP  = 102;
     const AUTH_SIGNATURE_MISMATCH = 103;
+    const AUTH_TIMESTAMP_EXPIRED  = 104;
 
     // Image resource errors
     const IMAGE_ALREADY_EXISTS       = 200;
