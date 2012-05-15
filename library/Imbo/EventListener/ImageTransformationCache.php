@@ -34,13 +34,17 @@ namespace Imbo\EventListener;
 use Imbo\Exception\RuntimeException,
     Imbo\EventManager\EventInterface,
     Imbo\Http\ContentNegotiation,
-    Imbo\Image\Image;
+    Imbo\Image\Image,
+    RecursiveDirectoryIterator,
+    RecursiveIteratorIterator;
 
 /**
  * Image transformation cache
  *
- * Event listener that stores (transformed) images to disk. By using this listener Imbo will only
- * have to generate each transformation once.
+ * Event listener that stores transformed images to disk. By using this listener Imbo will only
+ * have to generate each transformation once. Requests for original images (no t[] in the URI)
+ * will not be cached. The listener will also delete images from the cache when they are deleted
+ * from Imbo.
  *
  * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -85,13 +89,15 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
     public function getEvents() {
         return array(
             // Look for images in the cache
-            'image.get.database.load.post',
+            'image.get.pre',
 
             // Store images in the cache
             'image.get.post',
 
-            // Remove from the cache when an image is deleted from Imbo
-            'image.delete.post',
+            // Remove from the cache when an image is deleted from Imbo. The cached image must be
+            // removed first since we need to fetch info from the database about the mime type
+            // before it can be deleted.
+            'image.delete.pre',
         );
     }
 
@@ -99,18 +105,32 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
      * @see Imbo\EventListener\ListenerInterface::invoke
      */
     public function invoke(EventInterface $event) {
-        $eventName = $event->getName();
-        $request   = $event->getRequest();
-        $response  = $event->getResponse();
-        $image     = $event->getImage();
+        $eventName          = $event->getName();
+        $request            = $event->getRequest();
+        $response           = $event->getResponse();
 
-        $publicKey       = $request->getPublicKey();
-        $imageIdentifier = $request->getImageIdentifier();
-        $imageExtension  = $request->getImageExtension();
-        $url             = $request->getUrl();
+        $publicKey          = $request->getPublicKey();
+        $imageIdentifier    = $request->getImageIdentifier();
+        $imageExtension     = $request->getImageExtension();
+        $hasTransformations = $request->getQuery()->has('t') || $imageExtension;
+        $url                = $request->getUrl();
+
+        if (($eventName === 'image.get.pre' || $eventName === 'image.get.post') && !$hasTransformations) {
+            // Nothing for the listener to do since we do not want to store/fetch from the cache if
+            // no transformations are applied. We still want to remove
+            return;
+        }
 
         // Fetch the mime type of the original image
-        $mimeType = $image->getMimeType();
+        if ($eventName === 'image.get.pre' || $eventName === 'image.delete.pre') {
+            // We have yet populated the internal image instance so we need to fetch the mime type
+            // from the database
+            $database = $event->getDatabase();
+            $mimeType = $database->getImageMimeType($publicKey, $imageIdentifier);
+        } else {
+            // Fetch the mime type form the internal image instance
+            $mimeType = $event->getImage()->getMimeType();
+        }
 
         if ($imageExtension !== null) {
             // The user has requested a specific type (convert transformation). Use that mime type
@@ -121,9 +141,9 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
 
         // Generate cache key and fetch the full path of the cached response
         $hash = $this->getCacheKey($url, $mimeType);
-        $fullPath = $this->getFullPath($hash);
+        $fullPath = $this->getCacheFilePath($imageIdentifier, $hash);
 
-        if ($eventName === 'image.get.database.load.post') {
+        if ($eventName === 'image.get.pre') {
             // Fetch the acceptable types from the user agent
             $acceptableTypes = array_keys($request->getAcceptableContentTypes());
 
@@ -169,21 +189,35 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
                     rename($fullPath . '.tmp', $fullPath);
                 }
             }
-        } else if ($eventName === 'image.delete.post') {
-            if (is_file($fullPath)) {
-                unlink($fullPath);
+        } else if ($eventName === 'image.delete.pre') {
+            // Delete all cached versions of this image
+            $cacheDir = $this->getCacheDir($imageIdentifier);
+
+            if (is_dir($cacheDir)) {
+                $this->rmdir($cacheDir);
             }
         }
     }
 
     /**
-     * Get the full path based on the hash
+     * Get the path to the current image cache dir
      *
-     * @param string $hash The hash used as cache key
-     * @return string Returns a full path
+     * @param string $imageIdentifier The image identifier
+     * @return string Returns the absolute path to the image cache dir
      */
-    private function getFullPath($hash) {
-        return sprintf('%s/%s/%s/%s/%s', $this->path, $hash[0], $hash[1], $hash[2], $hash);
+    private function getCacheDir($imageIdentifier) {
+        return sprintf('%s/%s/%s/%s/%s', $this->path, $imageIdentifier[0], $imageIdentifier[1], $imageIdentifier[2], $imageIdentifier);
+    }
+
+    /**
+     * Get the absolute path to cache file
+     *
+     * @param string $imageIdentifier The image identifier
+     * @param string $hash The hash used as cache key
+     * @return string Returns the absolute path to the cache file
+     */
+    private function getCacheFilePath($imageIdentifier, $hash) {
+        return sprintf('%s/%s/%s/%s/%s', $this->getCacheDir($imageIdentifier), $hash[0], $hash[1], $hash[2], $hash);
     }
 
     /**
@@ -195,5 +229,36 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
      */
     private function getCacheKey($url, $mime) {
         return hash('sha256', $url . '|' . $mime);
+    }
+
+    /**
+     * Completely remove a directory (with contents)
+     *
+     * @param string $dir Name of a directory
+     */
+    private function rmdir($dir) {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($iterator as $file) {
+            $name = $file->getPathname();
+
+            if (substr($name, -1) === '.') {
+                continue;
+            }
+
+            if ($file->isDir()) {
+                // Remove dir
+                rmdir($name);
+            } else {
+                // Remove file
+                unlink($name);
+            }
+        }
+
+        // Remove the directory itself
+        rmdir($dir);
     }
 }

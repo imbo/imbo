@@ -420,6 +420,30 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
+     * @see Imbo\Database\DatabaseInterface::getImageMimeType()
+     */
+    public function getImageMimeType($publicKey, $imageIdentifier) {
+        $query = $this->getConnection()->createQueryBuilder();
+        $query->select('mime')
+              ->from($this->getTableName('imageinfo', $publicKey, $imageIdentifier), 'i')
+              ->where('i.publicKey = :publicKey')
+              ->andWhere('i.imageIdentifier = :imageIdentifier')
+              ->setParameters(array(
+                  ':publicKey'       => $publicKey,
+                  ':imageIdentifier' => $imageIdentifier,
+              ));
+
+        $stmt = $query->execute();
+        $mime = $stmt->fetchColumn();
+
+        if (!$mime) {
+            throw new DatabaseException('Image not found', 404);
+        }
+
+        return $mime;
+    }
+
+    /**
      * Set the connection instance
      *
      * @param Doctrine\DBAL\Connection $connection The connection instance

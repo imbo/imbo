@@ -400,6 +400,26 @@ class MongoDB implements DatabaseInterface {
     }
 
     /**
+     * @see Imbo\Database\DatabaseInterface::getImageMimeType()
+     */
+    public function getImageMimeType($publicKey, $imageIdentifier) {
+        try {
+            $data = $this->getCollection()->findOne(array(
+                'publicKey' => $publicKey,
+                'imageIdentifier' => $imageIdentifier,
+            ));
+        } catch (MongoException $e) {
+            throw new DatabaseException('Unable to fetch image metadata', 500, $e);
+        }
+
+        if ($data === null) {
+            throw new DatabaseException('Image not found', 404);
+        }
+
+        return $data['mime'];
+    }
+
+    /**
      * Get the mongo collection instance
      *
      * @return MongoCollection
