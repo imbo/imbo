@@ -220,7 +220,6 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $images[0] = new Image();
         $images[0]->setMimeType('image/png')->setExtension('png')->setWidth(665)->setHeight(463)->setBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
-
         $images[1] = new Image();
         $images[1]->setMimeType('image/png')->setExtension('png')->setWidth(599)->setHeight(417)->setBlob(file_get_contents(FIXTURES_DIR . '/image1.png'));
 
@@ -337,5 +336,33 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $query->limit(2)->page(4);
         $images = $this->driver->getImages($this->publicKey, $query);
         $this->assertSame(array(), $images);
+    }
+
+    public function testGetImageMimeType() {
+        $images = array();
+
+        $images[0] = new Image();
+        $images[0]->setMimeType('image/png')->setExtension('png')->setWidth(665)->setHeight(463)->setBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+
+        $images[1] = new Image();
+        $images[1]->setMimeType('image/jpeg')->setExtension('jpg')->setWidth(665)->setHeight(463)->setBlob(file_get_contents(FIXTURES_DIR . '/image.jpg'));
+
+        foreach ($images as $image) {
+            $imageIdentifier = md5($image->getBlob());
+
+            $this->driver->insertImage($this->publicKey, $imageIdentifier, $image);
+        }
+
+        $this->assertSame('image/png', $this->driver->getImageMimeType($this->publicKey, md5($images[0]->getBlob())));
+        $this->assertSame('image/jpeg', $this->driver->getImageMimeType($this->publicKey, md5($images[1]->getBlob())));
+    }
+
+    /**
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessage Image not found
+     */
+    public function testGetMimeTypeWhenImageDoesNotExist() {
+        $this->driver->getImageMimeType($this->publicKey, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     }
 }
