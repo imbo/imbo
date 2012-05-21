@@ -42,7 +42,7 @@ namespace Imbo\Http\Response\Formatter;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Json implements FormatterInterface {
+class JSON implements FormatterInterface {
     /**
      * @see Imbo\Http\Response\Formatter\FormatterInterface::format()
      */
