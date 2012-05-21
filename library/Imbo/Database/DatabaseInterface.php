@@ -154,4 +154,14 @@ interface DatabaseInterface {
      * @return boolean
      */
     function getStatus();
+
+    /**
+     * Get the mime type of an image
+     *
+     * @param string $publicKey The public key of the user who owns the image
+     * @param string $imageIdentifier The image identifier
+     * @return string Returns the mime type of the image
+     * @throws Imbo\Exception\DatabaseException
+     */
+    function getImageMimeType($publicKey, $imageIdentifier);
 }
