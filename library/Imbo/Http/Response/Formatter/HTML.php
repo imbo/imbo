@@ -76,20 +76,20 @@ class HTML implements FormatterInterface {
      */
     private function getDocument() {
         return <<<DOCUMENT
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-              <meta charset="utf-8">
-              <title>%TITLE%</title>
-              <style type="text/css">
-                dt { font-weight: bold; }
-              </style>
-            </head>
-            <body>
-              <h1>%TITLE%</h1>
-              %BODY%
-            </body>
-            </html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>%TITLE%</title>
+    <style type="text/css">
+      dt { font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <h1>%TITLE%</h1>
+    %BODY%
+  </body>
+</html>
 DOCUMENT;
     }
 
@@ -102,16 +102,16 @@ DOCUMENT;
     private function formatError(array $data) {
         $title = 'Error';
         $body = <<<ERROR
-            <dl>
-              <dt>Code</dt>
-              <dd>{$data['error']['code']}</dd>
-              <dt>Message</dt>
-              <dd>{$data['error']['message']}</dd>
-              <dt>Date</dt>
-              <dd>{$data['error']['date']}</dd>
-              <dt>Imbo error code</dt>
-              <dd>{$data['error']['imboErrorCode']}</dd>
-            </dl>
+<dl>
+  <dt>Code</dt>
+  <dd>{$data['error']['code']}</dd>
+  <dt>Message</dt>
+  <dd>{$data['error']['message']}</dd>
+  <dt>Date</dt>
+  <dd>{$data['error']['date']}</dd>
+  <dt>Imbo error code</dt>
+  <dd>{$data['error']['imboErrorCode']}</dd>
+</dl>
 ERROR;
 
         return str_replace(array('%TITLE%', '%BODY%'), array($title, $body), $this->getDocument());
@@ -126,14 +126,14 @@ ERROR;
     private function formatStatus(array $data) {
         $title = 'Status';
         $body = <<<STATUS
-            <dl>
-              <dt>Date</dt>
-              <dd>{$data['date']}</dd>
-              <dt>Database</dt>
-              <dd>{$data['database']}</dd>
-              <dt>Storage</dt>
-              <dd>{$data['storage']}</dd>
-            </dl>
+<dl>
+  <dt>Date</dt>
+  <dd>{$data['date']}</dd>
+  <dt>Database</dt>
+  <dd>{$data['database']}</dd>
+  <dt>Storage</dt>
+  <dd>{$data['storage']}</dd>
+</dl>
 STATUS;
 
         return str_replace(array('%TITLE%', '%BODY%'), array($title, $body), $this->getDocument());
@@ -148,14 +148,14 @@ STATUS;
     private function formatUser(array $data) {
         $title = 'User';
         $body = <<<USER
-            <dl>
-              <dt>Public key</dt>
-              <dd>{$data['publicKey']}</dd>
-              <dt>Num. images</dt>
-              <dd>{$data['numImages']}</dd>
-              <dt>Last modified</dt>
-              <dd>{$data['lastModified']}</dd>
-            </dl>
+<dl>
+  <dt>Public key</dt>
+  <dd>{$data['publicKey']}</dd>
+  <dt>Num. images</dt>
+  <dd>{$data['numImages']}</dd>
+  <dt>Last modified</dt>
+  <dd>{$data['lastModified']}</dd>
+</dl>
 USER;
 
         return str_replace(array('%TITLE%', '%BODY%'), array($title, $body), $this->getDocument());
@@ -185,29 +185,29 @@ USER;
             }
 
             $entry = <<<IMAGE
-                <li>
-                  <dl>
-                    <dt>Public key</dt>
-                    <dd>{$image['publicKey']}</dd>
-                    <dt>Image identifier</dt>
-                    <dd>{$image['imageIdentifier']}</dd>
-                    <dt>Extension</dt>
-                    <dd>{$image['extension']}</dd>
-                    <dt>Mime type</dt>
-                    <dd>{$image['mime']}</dd>
-                    <dt>Added</dt>
-                    <dd>{$image['added']}</dd>
-                    <dt>Updated</dt>
-                    <dd>{$image['updated']}</dd>
-                    <dt>Size</dt>
-                    <dd>{$image['size']}</dd>
-                    <dt>Width</dt>
-                    <dd>{$image['width']}</dd>
-                    <dt>Height</dt>
-                    <dd>{$image['height']}</dd>
-                    $metadata
-                  </dl>
-                </li>
+<li>
+  <dl>
+    <dt>Public key</dt>
+    <dd>{$image['publicKey']}</dd>
+    <dt>Image identifier</dt>
+    <dd>{$image['imageIdentifier']}</dd>
+    <dt>Extension</dt>
+    <dd>{$image['extension']}</dd>
+    <dt>Mime type</dt>
+    <dd>{$image['mime']}</dd>
+    <dt>Added</dt>
+    <dd>{$image['added']}</dd>
+    <dt>Updated</dt>
+    <dd>{$image['updated']}</dd>
+    <dt>Size</dt>
+    <dd>{$image['size']}</dd>
+    <dt>Width</dt>
+    <dd>{$image['width']}</dd>
+    <dt>Height</dt>
+    <dd>{$image['height']}</dd>
+    $metadata
+  </dl>
+</li>
 IMAGE;
             $images[] = $entry;
         }
