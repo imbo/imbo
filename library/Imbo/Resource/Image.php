@@ -221,7 +221,7 @@ class Image extends Resource implements ResourceInterface {
         }
 
         // If the image type is not accepted by the client generate an error
-        if (!$this->contentNegotiation->isAcceptable($this->image->getMimetype(), array_keys($request->getAcceptableContentTypes()))) {
+        if (!$this->contentNegotiation->isAcceptable($this->image->getMimetype(), $request->getAcceptableContentTypes())) {
             throw new ResourceException('Not Acceptable', 406);
         }
 

@@ -159,6 +159,9 @@ $frontController = new FrontController($container);
 // Create a response writer
 $responseWriter = new ResponseWriter();
 
+// Default mode for the response writer
+$strict = true;
+
 try {
     $frontController->handle($request, $response);
 
@@ -169,9 +172,15 @@ try {
 
     if (is_array($body)) {
         // Write the correct response body. This will throw an exception if the client does not
-        // accept any of the supported content types. It will not throw an exception the other time
-        // around (after the code in the catch block below have been executed).
-        $responseWriter->write($body, $request, $response);
+        // accept any of the supported content types and the $strict flag has been set to true.
+        try {
+            $responseWriter->write($body, $request, $response, $strict);
+        } catch (Exception $exception) {
+            // The response writer could not produce acceptable content. Flip flag and re-throw
+            $strict = false;
+
+            throw $exception;
+        }
     }
 } catch (Exception $exception) {
     $date = new DateTime();
@@ -191,7 +200,7 @@ try {
     $responseHeaders = $response->getHeaders();
     $responseHeaders->set('X-Imbo-Error-Message', $message)
                     ->set('X-Imbo-Error-InternalCode', $internalCode)
-                    ->set('X-Imbo-Error-Timestamp', $timestamp)
+                    ->set('X-Imbo-Error-Date', $timestamp)
                     ->remove('ETag')
                     ->remove('Last-Modified');
 
@@ -201,7 +210,7 @@ try {
             'error' => array(
                 'code'          => $code,
                 'message'       => $message,
-                'timestamp'     => $timestamp,
+                'date'          => $timestamp,
                 'imboErrorCode' => $internalCode,
             ),
         );

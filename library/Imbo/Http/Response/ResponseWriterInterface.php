@@ -51,6 +51,10 @@ interface ResponseWriterInterface {
      * @param array $data Data to write in another format
      * @param Imbo\Http\Request\RequestInterface $request A request instance
      * @param Imbo\Http\Response\ResponseInterface $response A response instance
+     * @param boolean $strict Whether or not the response writer will throw a RuntimeException with
+     *                        status code 406 (Not Acceptable) if it can not produce acceptable
+     *                        content for the user agent.
+     * @throws Imbo\Exception\RuntimeException
      */
-    function write(array $data, RequestInterface $request, ResponseInterface $response);
+    function write(array $data, RequestInterface $request, ResponseInterface $response, $strict = true);
 }

@@ -26,7 +26,7 @@
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/imbo
+ * @link https://github.com/imbo/imbo
  */
 
 namespace Imbo\Http;
@@ -38,22 +38,24 @@ namespace Imbo\Http;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
- * @link https://github.com/christeredvartsen/imbo
+ * @link https://github.com/imbo/imbo
  */
 class ContentNegotiation {
     /**
      * See if a mime type is accepted
      *
      * @param string $mimeType The mime type to check, for instance "image/png"
-     * @param array $acceptable An array of acceptable content types
-     * @return boolean Returns true if $mimeType is accepted, false otherwise
+     * @param array $acceptable An array of acceptable content types as keys and the quality as
+     *                          value
+     * @return boolean|double Returns the quality of the mime type if it is accepted, or false
+     *                        otherwise
      */
     public function isAcceptable($mimeType, array $acceptable) {
-        foreach ($acceptable as $type) {
+        foreach ($acceptable as $type => $q) {
             $pattern = '#^' . str_replace('*', '.*', $type) . '#';
 
             if (preg_match($pattern, $mimeType)) {
-                return true;
+                return $q;
             }
         }
 
