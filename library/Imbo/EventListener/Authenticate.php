@@ -32,7 +32,6 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Validate,
     Imbo\Exception\RuntimeException,
     Imbo\Exception;
 
@@ -50,18 +49,18 @@ use Imbo\EventManager\EventInterface,
  */
 class Authenticate extends Listener implements ListenerInterface {
     /**
-     * Timestamp validator
+     * Max. diff to tolerate in the timestamp in seconds
      *
-     * @var Imbo\Validate\ValidateInterface
+     * @var int
      */
-    private $timestampValidator;
+    private $maxDiff = 120;
 
     /**
-     * Signature validator
+     * The algorithm to use when generating the HMAC
      *
-     * @var Imbo\Validate\SignatureInterface
+     * @var string
      */
-    private $signatureValidator;
+    private $algorithm = 'sha256';
 
     /**
      * @see Imbo\EventListener\ListenerInterface::getEvents()
@@ -76,26 +75,6 @@ class Authenticate extends Listener implements ListenerInterface {
             'metadata.post.pre',
             'metadata.delete.pre',
         );
-    }
-
-    /**
-     * Class constructor
-     *
-     * @param Imbo\Validate\ValidateInterface $timestampValidator A timestamp validator
-     * @param Imbo\Validate\SignatureInterface $signatureValidator A signature validator
-     */
-    public function __construct(Validate\ValidateInterface $timestampValidator = null,
-                                Validate\SignatureInterface $signatureValidator = null) {
-        if ($timestampValidator === null) {
-            $timestampValidator = new Validate\Timestamp();
-        }
-
-        if ($signatureValidator === null) {
-            $signatureValidator = new Validate\Signature();
-        }
-
-        $this->timestampValidator = $timestampValidator;
-        $this->signatureValidator = $signatureValidator;
     }
 
     /**
@@ -123,28 +102,88 @@ class Authenticate extends Listener implements ListenerInterface {
         $query->remove('signature')
               ->remove('timestamp');
 
-        if (!$this->timestampValidator->isValid($timestamp)) {
+        if (!$this->timestampIsValid($timestamp)) {
             $e = new RuntimeException('Invalid timestamp: ' . $timestamp, 400);
             $e->setImboErrorCode(Exception::AUTH_INVALID_TIMESTAMP);
 
             throw $e;
         }
 
+        if ($this->timestampHasExpired($timestamp)) {
+            $e = new RuntimeException('Timestamp has expired: ' . $timestamp, 400);
+            $e->setImboErrorCode(Exception::AUTH_TIMESTAMP_EXPIRED);
+
+            throw $e;
+        }
+
+        $url = $request->getUrl();
+
         // Add the URL used for auth to the response headers
-        $response->getHeaders()->set('X-Imbo-AuthUrl', $request->getUrl());
+        $response->getHeaders()->set('X-Imbo-AuthUrl', $url);
 
-        // Prepare the signature validation
-        $this->signatureValidator->setHttpMethod($request->getMethod())
-                                 ->setUrl($request->getUrl())
-                                 ->setTimestamp($timestamp)
-                                 ->setPublicKey($request->getPublicKey())
-                                 ->setPrivateKey($request->getPrivateKey());
-
-        if (!$this->signatureValidator->isValid($signature)) {
+        if (!$this->signatureIsValid($request->getMethod(), $url, $request->getPublicKey(), $request->getPrivateKey(), $timestamp, $signature)) {
             $e = new RuntimeException('Signature mismatch', 400);
             $e->setImboErrorCode(Exception::AUTH_SIGNATURE_MISMATCH);
 
             throw $e;
         }
+    }
+
+    /**
+     * Check if the signature is valid
+     *
+     * @param string $httpMethod The current HTTP method
+     * @param string $url The accessed URL
+     * @param string $publicKey The current public key
+     * @param string $privateKey The private key to sign the hash with
+     * @param string $timestamp A valid timestamp
+     * @param string $signature The signature to compare with
+     * @return boolean
+     */
+    private function signatureIsValid($httpMethod, $url, $publicKey, $privateKey, $timestamp, $signature) {
+        // Generate data for the HMAC
+        $data = $httpMethod . '|' . $url . '|' . $publicKey . '|' . $timestamp;
+
+        // Compare
+        return ($signature === hash_hmac($this->algorithm, $data, $privateKey));
+    }
+
+    /**
+     * Check if the format of the timestamp is valid
+     *
+     * @param string $timestamp A string with a timestamp
+     * @return boolean
+     */
+    private function timestampIsValid($timestamp) {
+        if (!preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}(?:\.\d+)?Z$/', $timestamp)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the timestamp has expired
+     *
+     * @param string $timestamp A valid timestamp
+     * @return boolean
+     */
+    private function timestampHasExpired($timestamp) {
+        $year   = substr($timestamp, 0, 4);
+        $month  = substr($timestamp, 5, 2);
+        $day    = substr($timestamp, 8, 2);
+        $hour   = substr($timestamp, 11, 2);
+        $minute = substr($timestamp, 14, 2);
+        $second = substr($timestamp, 17, 2);
+
+        $timestamp = gmmktime($hour, $minute, $second, $month, $day, $year);
+
+        $diff = time() - $timestamp;
+
+        if ($diff > $this->maxDiff || $diff < -$this->maxDiff) {
+            return true;
+        }
+
+        return false;
     }
 }
