@@ -62,23 +62,11 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     private $privateKey;
 
     /**
-     * @var Imbo\Validate\ValidateInterface
-     */
-    private $timestampValidator;
-
-    /**
-     * @var Imbo\Validate\ValidateInterface
-     */
-    private $signatureValidator;
-
-    /**
      * Set up method
      */
     public function setUp() {
         $this->publicKey = md5(microtime());
         $this->privateKey = md5(microtime());
-        $this->timestampValidator = $this->getMock('Imbo\Validate\ValidateInterface');
-        $this->signatureValidator = $this->getMock('Imbo\Validate\SignatureInterface');
 
         $container = new Container();
         $container->config = array(
@@ -93,7 +81,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $container->metadataResource = $this->getMock('Imbo\Resource\Metadata');
         $container->eventManager = $this->getMock('Imbo\EventManager\EventManagerInterface');
 
-        $this->controller = new FrontController($container, $this->timestampValidator, $this->signatureValidator);
+        $this->controller = new FrontController($container);
     }
 
     /**

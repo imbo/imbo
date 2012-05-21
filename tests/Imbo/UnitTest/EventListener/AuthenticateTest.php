@@ -48,16 +48,6 @@ class AuthenticateTest extends \PHPUnit_Framework_TestCase {
     private $listener;
 
     /**
-     * @var Imbo\Validate\ValidateInterface
-     */
-    private $timestampValidator;
-
-    /**
-     * @var Imbo\Validate\SignatureInterface
-     */
-    private $signatureValidator;
-
-    /**
      * @var Imbo\EventManager\EventInterface
      */
     private $event;
@@ -79,13 +69,8 @@ class AuthenticateTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * Set up method
-     *
-     * @covers Imbo\EventListener\Authenticate::__construct
      */
     public function setUp() {
-        $this->timestampValidator = $this->getMock('Imbo\Validate\ValidateInterface');
-        $this->signatureValidator = $this->getMock('Imbo\Validate\SignatureInterface');
-
         $this->query = $this->getMock('Imbo\Http\ParameterContainerInterface');
 
         $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
@@ -96,15 +81,13 @@ class AuthenticateTest extends \PHPUnit_Framework_TestCase {
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
-        $this->listener = new Authenticate($this->timestampValidator, $this->signatureValidator);
+        $this->listener = new Authenticate();
     }
 
     /**
      * Tear down method
      */
     public function tearDown() {
-        $this->timestampValidator = null;
-        $this->signatureValidator = null;
         $this->request = null;
         $this->response = null;
         $this->event = null;
@@ -158,7 +141,27 @@ class AuthenticateTest extends \PHPUnit_Framework_TestCase {
         }));
 
         $this->query->expects($this->any())->method('remove')->will($this->returnSelf());
-        $this->timestampValidator->expects($this->once())->method('isValid')->with('some string')->will($this->returnValue(false));
+
+        $this->listener->invoke($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\Authenticate::invoke
+     * @expectedException Imbo\Exception\RuntimeException
+     * @expectedExceptionMessage Timestamp has expired: 2010-10-10T20:10:10Z
+     * @expectedExceptionCode 400
+     */
+    public function testAuthWithExpiredTimestamp() {
+        $this->query->expects($this->any())->method('has')->will($this->returnValue(true));
+        $this->query->expects($this->any())->method('get')->will($this->returnCallback(function($arg) {
+            if ($arg === 'timestamp') {
+                return '2010-10-10T20:10:10Z';
+            }
+
+            return 'signature';
+        }));
+
+        $this->query->expects($this->any())->method('remove')->will($this->returnSelf());
 
         $this->listener->invoke($this->event);
     }
@@ -171,42 +174,17 @@ class AuthenticateTest extends \PHPUnit_Framework_TestCase {
      */
     public function testAuthWithSignatureMismatch() {
         $this->query->expects($this->any())->method('has')->will($this->returnValue(true));
-        $this->query->expects($this->any())->method('get');
         $this->query->expects($this->any())->method('remove')->will($this->returnSelf());
+        $this->query->expects($this->any())->method('get')->will($this->returnCallback(function($arg) {
+            if ($arg === 'timestamp') {
+                return gmdate('Y-m-d\TH:i:s\Z');
+            }
 
-        $this->timestampValidator->expects($this->once())->method('isValid')->will($this->returnValue(true));
-        $this->signatureValidator->expects($this->once())->method('isValid')->will($this->returnValue(false));
-
-        $this->signatureValidator->expects($this->once())->method('setHttpMethod')->will($this->returnSelf());
-        $this->signatureValidator->expects($this->once())->method('setUrl')->will($this->returnSelf());
-        $this->signatureValidator->expects($this->once())->method('setTimestamp')->will($this->returnSelf());
-        $this->signatureValidator->expects($this->once())->method('setPublicKey')->will($this->returnSelf());
-        $this->signatureValidator->expects($this->once())->method('setPrivateKey')->will($this->returnSelf());
+            return 'signature';
+        }));
 
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
 
         $this->listener->invoke($this->event);
-    }
-
-    /**
-     * @covers Imbo\EventListener\Authenticate::invoke
-     */
-    public function testSuccessfulAuth() {
-        $this->query->expects($this->any())->method('has')->will($this->returnValue(true));
-        $this->query->expects($this->any())->method('get');
-        $this->query->expects($this->any())->method('remove')->will($this->returnSelf());
-
-        $this->timestampValidator->expects($this->once())->method('isValid')->will($this->returnValue(true));
-        $this->signatureValidator->expects($this->once())->method('isValid')->will($this->returnValue(true));
-
-        $this->signatureValidator->expects($this->once())->method('setHttpMethod')->will($this->returnSelf());
-        $this->signatureValidator->expects($this->once())->method('setUrl')->will($this->returnSelf());
-        $this->signatureValidator->expects($this->once())->method('setTimestamp')->will($this->returnSelf());
-        $this->signatureValidator->expects($this->once())->method('setPublicKey')->will($this->returnSelf());
-        $this->signatureValidator->expects($this->once())->method('setPrivateKey')->will($this->returnSelf());
-
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
-
-        $this->assertNull($this->listener->invoke($this->event));
     }
 }
