@@ -112,11 +112,11 @@ class Request implements RequestInterface {
     private $rawData;
 
     /**
-     * The current image extension (if any)
+     * The current extension (if any)
      *
      * @var string
      */
-    private $imageExtension;
+    private $extension;
 
     /**
      * The currently requested resorce name (as defined by the constants in
@@ -350,17 +350,17 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getImageExtension()
+     * @see Imbo\Http\Request\RequestInterface::getExtension()
      */
-    public function getImageExtension() {
-        return $this->imageExtension;
+    public function getExtension() {
+        return $this->extension;
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::setImageExtension()
+     * @see Imbo\Http\Request\RequestInterface::setExtension()
      */
-    public function setImageExtension($extension) {
-        $this->imageExtension = $extension;
+    public function setExtension($extension) {
+        $this->extension = $extension;
 
         return $this;
     }

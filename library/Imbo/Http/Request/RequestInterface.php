@@ -175,19 +175,19 @@ interface RequestInterface {
     function getRealImageIdentifier();
 
     /**
-     * Get the current image extension (if any)
+     * Get the current requested extension (if any)
      *
      * @return string|null
      */
-    function getImageExtension();
+    function getExtension();
 
     /**
-     * Set the image extension
+     * Set the extension requested
      *
-     * @param string $extension The image extension to set
+     * @param string $extension The extension to set
      * @return Imbo\Http\Request\RequestInterface
      */
-    function setImageExtension($extension);
+    function setExtension($extension);
 
     /**
      * Get the current HTTP method
