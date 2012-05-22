@@ -135,7 +135,7 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $request->expects($this->once())->method('getPath')->will($this->returnValue($path));
         $request->expects($this->once())->method('setPublicKey')->with($publicKey);
         $request->expects($this->once())->method('setImageIdentifier')->with($imageIdentifier);
-        $request->expects($this->once())->method('setImageExtension')->with('jpg');
+        $request->expects($this->once())->method('setExtension')->with('jpg');
 
         $this->assertInstanceOf('Imbo\Resource\Image', $method->invoke($this->controller, $request));
     }

@@ -67,6 +67,17 @@ class ResponseWriter implements ResponseWriterInterface {
     );
 
     /**
+     * Mapping from extensions to mime types
+     *
+     * @var array
+     */
+    private $extensionsToMimeType = array(
+        'json' => 'application/json',
+        'xml'  => 'application/xml',
+        'html' => 'text/html',
+    );
+
+    /**
      * The default mime type to use when formatting a response
      *
      * @var string
@@ -91,11 +102,21 @@ class ResponseWriter implements ResponseWriterInterface {
      */
     public function write(array $data, RequestInterface $request, ResponseInterface $response, $strict = true) {
         $acceptableTypes = $request->getAcceptableContentTypes();
+        $available = $this->supportedTypes;
+        $extension = $request->getExtension();
+
+        if ($extension) {
+            // The user agent wants a specific type. Set this as the only available type instead of
+            // trying to find the best match of the available types
+            $mime = $this->extensionsToMimeType[$extension];
+            $available = array($mime => $this->supportedTypes[$mime]);
+        }
+
         $formatter = null;
         $match = false;
         $maxQ = 0;
 
-        foreach ($this->supportedTypes as $mime => $formatterClass) {
+        foreach ($available as $mime => $formatterClass) {
             if (($q = $this->cn->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
                 $maxQ = $q;
                 $match = true;

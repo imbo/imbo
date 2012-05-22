@@ -111,7 +111,7 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
 
         $publicKey          = $request->getPublicKey();
         $imageIdentifier    = $request->getImageIdentifier();
-        $imageExtension     = $request->getImageExtension();
+        $imageExtension     = $request->getExtension();
         $hasTransformations = $request->getQuery()->has('t') || $imageExtension;
         $url                = $request->getUrl();
 

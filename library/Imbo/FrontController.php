@@ -107,10 +107,10 @@ class FrontController {
         // Possible patterns to match where the most accessed match is placed first
         $routes = array(
             ResourceInterface::IMAGE    => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png))?$#',
-            ResourceInterface::STATUS   => '#^/status/?$#',
-            ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/?$#',
-            ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png)/)meta/?$#',
-            ResourceInterface::USER     => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/?$#',
+            ResourceInterface::STATUS   => '#^/status(/|(\.(?<extension>json|html|xml)))?$#',
+            ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images(/|(\.(?<extension>json|html|xml)))?$#',
+            ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(/|\.(?<extension>json|html|xml))?$#',
+            ResourceInterface::USER     => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})(/|\.(?<extension>json|html|xml))?$#',
         );
 
         // Initialize matches
@@ -140,7 +140,7 @@ class FrontController {
         }
 
         if (isset($matches['extension'])) {
-            $request->setImageExtension($matches['extension']);
+            $request->setExtension($matches['extension']);
         }
 
         // Append "Resource" to the resource name to match the entry in the container
