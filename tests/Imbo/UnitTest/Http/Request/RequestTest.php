@@ -118,15 +118,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\Http\Request\Request::__construct
-     * @covers Imbo\Http\Request\Request::getImageExtension
-     * @covers Imbo\Http\Request\Request::setImageExtension
+     * @covers Imbo\Http\Request\Request::getExtension
+     * @covers Imbo\Http\Request\Request::setExtension
      */
-    public function testSetGetImageExtension() {
+    public function testSetGetExtension() {
         $request = new Request();
         $extension = 'gif';
-        $this->assertNull($request->getImageExtension());
-        $this->assertSame($request, $request->setImageExtension($extension));
-        $this->assertSame($extension, $request->getImageExtension());
+        $this->assertNull($request->getExtension());
+        $this->assertSame($request, $request->setExtension($extension));
+        $this->assertSame($extension, $request->getExtension());
     }
 
     /**
