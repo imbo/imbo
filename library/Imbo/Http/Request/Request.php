@@ -140,7 +140,11 @@ class Request implements RequestInterface {
         $this->headers = new HeaderContainer($this->server->getHeaders());
 
         $this->baseUrl = str_replace(rtrim($this->server->get('DOCUMENT_ROOT'), '/'), '', dirname($this->server->get('SCRIPT_FILENAME')));
-        $this->path = str_replace($this->baseUrl, '', $this->server->get('REDIRECT_URL'));
+        $this->path = str_replace($this->baseUrl, '', $this->server->get('REQUEST_URI'));
+
+        if (strpos($this->path, '?') !== false) {
+            $this->path = substr($this->path, 0, strpos($this->path, '?'));
+        }
     }
 
     /**
