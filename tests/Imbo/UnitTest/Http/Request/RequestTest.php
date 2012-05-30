@@ -218,7 +218,25 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     public function testGetPath() {
         $request = new Request();
         $this->assertEmpty($request->getPath());
+    }
 
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getPath
+     */
+    public function testGetPathWithQueryParameters() {
+        $publicKey = md5(microtime());
+        $imageIdentifier = md5(microtime());
+        $path = '/users/' . $publicKey . '/images/' . $imageIdentifier;
+
+        $server = array(
+            'DOCUMENT_ROOT' => '/var/www/imbo',
+            'SCRIPT_FILENAME' => '/var/www/imbo/public/index.php',
+            'REQUEST_URI' => '/public' . $path . '?foo=bar',
+        );
+
+        $request = new Request(array(), array(), $server);
+        $this->assertSame($path, $request->getPath());
     }
 
     /**
@@ -236,7 +254,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $server = array(
             'DOCUMENT_ROOT' => '/var/www/imbo',
             'SCRIPT_FILENAME' => '/var/www/imbo/public/index.php',
-            'REDIRECT_URL' => '/public/users/' . $publicKey . '/images/' . $imageIdentifier,
+            'REQUEST_URI' => '/public/users/' . $publicKey . '/images/' . $imageIdentifier,
         );
 
         $request = new Request(array(), array(), $server);
@@ -413,7 +431,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
                 'HTTP_HOST' => $host,
                 'DOCUMENT_ROOT' => $documentRoot,
                 'SCRIPT_FILENAME' => $scriptFilename,
-                'REDIRECT_URL' => $redirectUrl,
+                'REQUEST_URI' => $redirectUrl,
                 'SERVER_PORT' => $port,
                 'HTTPS' => (int) $ssl,
             )
