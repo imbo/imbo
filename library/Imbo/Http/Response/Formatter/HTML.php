@@ -32,7 +32,9 @@
 
 namespace Imbo\Http\Response\Formatter;
 
-use Imbo\Resource\ResourceInterface;
+use Imbo\Resource\ResourceInterface,
+    Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface;
 
 /**
  * HTML5 formatter
@@ -48,8 +50,11 @@ class HTML implements FormatterInterface {
     /**
      * @see Imbo\Http\Response\Formatter\FormatterInterface::format()
      */
-    public function format(array $data, $resource, $error) {
-        if ($error) {
+    public function format(array $data, RequestInterface $request, ResponseInterface $response) {
+        // Fetch the name of the resource
+        $resource = $request->getResource();
+
+        if ($response->isError()) {
             return $this->formatError($data);
         } else if ($resource === ResourceInterface::STATUS) {
             return $this->formatStatus($data);
