@@ -136,7 +136,7 @@ class ResponseWriter implements ResponseWriterInterface {
 
         // Create an instance of the formatter
         $formatter = new $formatter();
-        $formattedData = $formatter->format($data, $request->getResource(), $response->isError());
+        $formattedData = $formatter->format($data, $request, $response);
 
         $response->getHeaders()->set('Content-Type', $formatter->getContentType())
                                ->set('Content-Length', strlen($formattedData));
