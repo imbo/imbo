@@ -32,6 +32,9 @@
 
 namespace Imbo\Http\Response\Formatter;
 
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface;
+
 /**
  * JSON formatter
  *
@@ -46,9 +49,19 @@ class JSON implements FormatterInterface {
     /**
      * @see Imbo\Http\Response\Formatter\FormatterInterface::format()
      */
-    public function format(array $data, $resource, $error) {
+    public function format(array $data, RequestInterface $request, ResponseInterface $response) {
         // Simply encode the data to JSON, no matter what resource we are dealing with
-        return json_encode($data);
+        $jsonEncoded = json_encode($data);
+        $query = $request->getQuery();
+
+        foreach (array('callback', 'jsonp', 'json') as $param) {
+            if ($query->has($param)) {
+                $jsonEncoded = sprintf("%s(%s)", $query->get($param), $jsonEncoded);
+                break;
+            }
+        }
+
+        return $jsonEncoded;
     }
 
     /**
