@@ -191,8 +191,14 @@ class Image extends Resource implements ImageResourceInterface {
         // image instance)
         $database->load($publicKey, $imageIdentifier, $this->image);
 
-        // Generate ETag using public key, image identifier, and the redirect url
-        $etag = '"' . md5($publicKey . $imageIdentifier . $serverContainer->get('REQUEST_URI')) . '"';
+        // Generate ETag using public key, image identifier, Accept headers of the user agent and
+        // the requested URI
+        $etag = '"' . md5(
+            $publicKey .
+            $imageIdentifier .
+            $requestHeaders->get('Accept') .
+            $serverContainer->get('REQUEST_URI')
+        ) . '"';
 
         // Fetch formatted last modified timestamp from the storage driver
         $lastModified = $this->formatDate($storage->getLastModified($publicKey, $imageIdentifier));
@@ -244,21 +250,33 @@ class Image extends Resource implements ImageResourceInterface {
             }
         }
 
-        // Fetch the requested resource to see if we have to convert the image
-        $path = $request->getPath();
-        $resource = substr($path, strrpos($path, '/') + 1);
+        // See if we want to trigger a conversion. This happens if the user agent has specified an
+        // image type in the URI, or if the user agent does not accept the original content type of
+        // the requested image.
+        $extension = $request->getExtension();
+        $imageType = $this->image->getMimeType();
+        $acceptableTypes = $request->getAcceptableContentTypes();
 
-        if (isset($resource[32])) {
-            // We have a requested image type
-            $extension = substr($resource, 33);
+        if (!$extension && !$this->contentNegotiation->isAcceptable($imageType, $acceptableTypes)) {
+            // No extension specified, and the user agent does not want the original image type
+            $typesToCheck = ImageObject::$mimeTypes;
+            unset($typesToCheck[$imageType]);
 
-            $convert = new Convert(array('type' => $extension));
-            $convert->applyToImage($this->image);
+            $match = $this->contentNegotiation->bestMatch(array_keys($typesToCheck), $acceptableTypes);
+
+            if (!$match) {
+                throw new ResourceException('Not Acceptable', 406);
+            }
+
+            $extension = $typesToCheck[$match];
         }
 
-        // If the image type is not accepted by the client generate an error
-        if (!$this->contentNegotiation->isAcceptable($this->image->getMimetype(), $request->getAcceptableContentTypes())) {
-            throw new ResourceException('Not Acceptable', 406);
+        if ($extension) {
+            // Trigger a conversion
+            $callback = $container->config['transformations']['convert'];
+
+            $convert = $callback(array('type' => $extension));
+            $convert->applyToImage($this->image);
         }
 
         // Set the content length and content-type after transformations have been applied
