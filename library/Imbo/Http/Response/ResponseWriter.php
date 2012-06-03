@@ -101,37 +101,36 @@ class ResponseWriter implements ResponseWriterInterface {
      * @see Imbo\Http\Response\ResponseWriterInterface::write()
      */
     public function write(array $data, RequestInterface $request, ResponseInterface $response, $strict = true) {
-        $acceptableTypes = $request->getAcceptableContentTypes();
-        $available = $this->supportedTypes;
-        $extension = $request->getExtension();
-
-        if ($extension) {
-            // The user agent wants a specific type. Set this as the only available type instead of
-            // trying to find the best match of the available types
-            $mime = $this->extensionsToMimeType[$extension];
-            $available = array($mime => $this->supportedTypes[$mime]);
-        }
-
+        // The formatter to use
         $formatter = null;
-        $match = false;
-        $maxQ = 0;
 
-        foreach ($available as $mime => $formatterClass) {
-            if (($q = $this->cn->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
-                $maxQ = $q;
-                $match = true;
-                $formatter = $formatterClass;
+        if ($extension = $request->getExtension()) {
+            // The user agent wants a specific type. Skip content negotiation completely
+            $mime = $this->extensionsToMimeType[$extension];
+            $formatter = $this->supportedTypes[$mime];
+        } else {
+            // Try to find the best match
+            $acceptableTypes = $request->getAcceptableContentTypes();
+            $match = false;
+            $maxQ = 0;
+
+            foreach ($this->supportedTypes as $mime => $formatterClass) {
+                if (($q = $this->cn->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
+                    $maxQ = $q;
+                    $match = true;
+                    $formatter = $formatterClass;
+                }
             }
-        }
 
-        if (!$match && $strict) {
-            // No types matched with strict mode enabled. The client does not want any of Imbo's
-            // supported types
-            throw new RuntimeException('Not acceptable', 406);
-        } else if (!$match) {
-            // There was no match but we don't want to be an ass about it. Send a response anyway
-            // (allowed according to RFC2616, section 10.4.7)
-            $formatter = $this->supportedTypes[$this->defaultMimeType];
+            if (!$match && $strict) {
+                // No types matched with strict mode enabled. The client does not want any of Imbo's
+                // supported types. Y U NO ACCEPT MY TYPES?! FFFFUUUUUUU!
+                throw new RuntimeException('Not acceptable', 406);
+            } else if (!$match) {
+                // There was no match but we don't want to be an ass about it. Send a response
+                // anyway (allowed according to RFC2616, section 10.4.7)
+                $formatter = $this->supportedTypes[$this->defaultMimeType];
+            }
         }
 
         // Create an instance of the formatter
