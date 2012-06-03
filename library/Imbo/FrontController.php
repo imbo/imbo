@@ -61,12 +61,12 @@ class FrontController {
      * @var array
      */
     static private $supportedHttpMethods = array(
-        RequestInterface::METHOD_GET     => true,
-        RequestInterface::METHOD_POST    => true,
-        RequestInterface::METHOD_PUT     => true,
-        RequestInterface::METHOD_HEAD    => true,
-        RequestInterface::METHOD_DELETE  => true,
-        RequestInterface::METHOD_BREW    => true,
+        RequestInterface::METHOD_GET    => true,
+        RequestInterface::METHOD_POST   => true,
+        RequestInterface::METHOD_PUT    => true,
+        RequestInterface::METHOD_HEAD   => true,
+        RequestInterface::METHOD_DELETE => true,
+        RequestInterface::METHOD_BREW   => true,
     );
 
     /**
@@ -182,12 +182,16 @@ class FrontController {
         $resource = $this->resolveResource($request);
 
         // Add some response headers
-        $response->getHeaders()
-            // Inform the user agent of which methods are allowed against this resource
-            ->set('Allow', implode(', ', $resource->getAllowedMethods()))
+        $responseHeaders = $response->getHeaders();
 
-            // Vary on the Accept header as Imbo supports several content types
-            ->set('Vary', 'Accept');
+        // Inform the user agent of which methods are allowed against this resource
+        $responseHeaders->set('Allow', implode(', ', $resource->getAllowedMethods()));
+
+        // Add Accept to Vary if the client has not specified a specific extension, in which we
+        // won't do any content negotiation at all.
+        if (!$request->getExtension()) {
+            $responseHeaders->set('Vary', 'Accept');
+        }
 
         // Fetch the real image identifier (PUT only) or the one from the URL (if present)
         if (($identifier = $request->getRealImageIdentifier()) || ($identifier = $request->getImageIdentifier())) {
