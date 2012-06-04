@@ -135,7 +135,8 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
         if ($imageExtension !== null) {
             // The user has requested a specific type (convert transformation). Use that mime type
             // instead
-            $types = array_flip(Image::$mimeTypes);
+            $tables = Image::$mimeTypes;
+            $types = array_flip($tables); // ╯°□°）╯︵ ┻━┻
             $mimeType = $types[$imageExtension];
         }
 
