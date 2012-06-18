@@ -92,7 +92,7 @@ task :test do
     }
 
     system "curl -s http://getcomposer.org/installer | php"
-    system "php composer.phar --no-ansi install"
+    system "php composer.phar --no-ansi install --dev"
 
     system "sudo sh -c \"echo 'apc.enable_cli=on' >> #{ini_file}\""
 

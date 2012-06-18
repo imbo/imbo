@@ -1,5 +1,30 @@
 {
+  "name": "imbo/imbo",
+  "type": "library",
+  "description": "RESTful image server that handles image storage/transformations and metadata",
+  "keywords": [ "image storage", "image transformation", "image metadata" ],
+  "homepage": "http://www.imbo-project.org/",
+  "license": "MIT",
+  "authors": [{
+      "name": "Christer Edvartsen",
+      "email": "cogo@starzinger.net",
+      "role": "Project lead",
+      "homepage": "http://cogo.wordpress.com"
+    }
+  ],
   "require": {
+    "php": ">=5.3.2"
+  },
+  "support": {
+    "issues": "https://github.com/imbo/imbo/issues",
+    "irc": "irc://irc.freenode.net/imbo"
+  },
+  "autoload": {
+    "psr-0": {
+      "Imbo": "library"
+    }
+  },
+  "require-dev": {
     "mikey179/vfsStream": "*",
     "doctrine/dbal": "2.2.2"
   }
