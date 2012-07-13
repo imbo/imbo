@@ -84,7 +84,9 @@ class MaxImageSize extends Listener implements ListenerInterface {
      * @see Imbo\EventListener\ListenerInterface::invoke()
      */
     public function invoke(EventInterface $event) {
-        $image  = $event->getImage();
+        $container = $event->getContainer();
+
+        $image  = $container->get('image');
 
         $width  = $image->getWidth();
         $height = $image->getHeight();
@@ -94,7 +96,7 @@ class MaxImageSize extends Listener implements ListenerInterface {
             $transformation->applyToImage($image);
 
             // Update raw data in request to reflect the new image
-            $event->getRequest()->setRawData($image->getBlob());
+            $container->get('request')->setRawData($image->getBlob());
         }
     }
 }

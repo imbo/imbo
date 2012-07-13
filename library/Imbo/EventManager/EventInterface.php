@@ -51,37 +51,9 @@ interface EventInterface {
     function getName();
 
     /**
-     * Get the request instance
+     * Get the container instance
      *
-     * @return Imbo\Http\Request\RequestInterface
+     * @return Imbo\Container
      */
-    function getRequest();
-
-    /**
-     * Get the response instance
-     *
-     * @return Imbo\Http\Response\ResponseInterface
-     */
-    function getResponse();
-
-    /**
-     * Get the database driver
-     *
-     * @return Imbo\Database\DatabaseInterface
-     */
-    function getDatabase();
-
-    /**
-     * Get the storage driver
-     *
-     * @return Imbo\Storage\StorageInterface
-     */
-    function getStorage();
-
-    /**
-     * Get the image instance
-     *
-     * @return null|Imbo\Image\ImageInterface
-     */
-    function getImage();
+    function getContainer();
 }
