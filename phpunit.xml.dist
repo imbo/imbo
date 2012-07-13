@@ -20,9 +20,6 @@
     <!-- Include paths -->
     <includePath>./tests</includePath>
     <includePath>./library</includePath>
-    <includePath>./vendor/mikey179/vfsStream/src/main/php</includePath>
-    <includePath>./vendor/doctrine/dbal/lib</includePath>
-    <includePath>./vendor/doctrine/common/lib</includePath>
   </php>
 
   <logging>
