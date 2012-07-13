@@ -111,6 +111,19 @@ class Container {
     }
 
     /**
+     * Alias of __set
+     *
+     * @param string $id The accessed property
+     * @param mixed $value The value to set
+     * @return Imbo\Container
+     */
+    public function set($id, $value) {
+        $this->$id = $value;
+
+        return $this;
+    }
+
+    /**
      * Get a property
      *
      * @param string $id The accessed property
@@ -129,6 +142,16 @@ class Container {
         }
 
         return $this->values[$id];
+    }
+
+    /**
+     * Alias of __get
+     *
+     * @param string $id The accessed property
+     * @return mixed
+     */
+    public function get($id) {
+        return $this->$id;
     }
 
     /**

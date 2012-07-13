@@ -61,17 +61,21 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Container::set
      * @covers Imbo\Container::__set
+     * @covers Imbo\Container::get
      * @covers Imbo\Container::__get
      * @dataProvider getContainerValues()
      */
     public function testSetGet($key, $value, $expected) {
-        $this->container->$key = $value;
+        $this->container->set($key, $value);
         $this->assertSame($expected, $this->container->$key);
+        $this->assertSame($expected, $this->container->get($key));
     }
 
     /**
      * @covers Imbo\Container::has
+     * @covers Imbo\Container::__set
      */
     public function testHas() {
         $this->assertFalse($this->container->has('key'));
@@ -81,6 +85,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException InvalidArgumentException
+     * @covers Imbo\Container::__get
      */
     public function testGetUndefinedValues() {
         $this->container->foobar;
