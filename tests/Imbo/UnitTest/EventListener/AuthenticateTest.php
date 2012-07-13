@@ -68,18 +68,32 @@ class AuthenticateTest extends \PHPUnit_Framework_TestCase {
     private $query;
 
     /**
+     * @var Imbo\Container
+     */
+    private $container;
+
+    /**
      * Set up method
      */
     public function setUp() {
         $this->query = $this->getMock('Imbo\Http\ParameterContainerInterface');
 
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->request->expects($this->any())->method('getQuery')->will($this->returnValue($this->query));
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $request->expects($this->any())->method('getQuery')->will($this->returnValue($this->query));
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+
+        $config = array('auth' => array('publicKey' => 'privateKey'));
+
+        $this->container = $this->getMock('Imbo\Container');
+        $this->container->expects($this->any())->method('get')->will($this->returnCallback(function($key) use($request, $response, $config) {
+            return $$key;
+        }));
+
+        $this->request = $request;
+        $this->response = $response;
 
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->event->expects($this->any())->method('getContainer')->will($this->returnValue($this->container));
 
         $this->listener = new Authenticate();
     }
@@ -93,6 +107,7 @@ class AuthenticateTest extends \PHPUnit_Framework_TestCase {
         $this->event = null;
         $this->query = null;
         $this->listener = null;
+        $this->container = null;
     }
 
     /**
