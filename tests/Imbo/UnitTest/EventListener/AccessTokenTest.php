@@ -63,6 +63,11 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
     private $response;
 
     /**
+     * @var Imbo\Container
+     */
+    private $container;
+
+    /**
      * @var Imbo\Http\ParameterContainerInterface
      */
     private $params;
@@ -70,14 +75,21 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
     public function setUp() {
         $this->params = $this->getMock('Imbo\Http\ParameterContainerInterface');
 
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->request->expects($this->any())->method('getQuery')->will($this->returnValue($this->params));
+        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $request->expects($this->any())->method('getQuery')->will($this->returnValue($this->params));
 
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+
+        $this->container = $this->getMock('Imbo\Container');
+        $this->container->expects($this->any())->method('get')->will($this->returnCallback(function($key) use($request, $response) {
+            return $$key;
+        }));
+
+        $this->request = $request;
+        $this->response = $response;
 
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->event->expects($this->any())->method('getContainer')->will($this->returnValue($this->container));
 
         $this->listener = new AccessToken();
     }
@@ -88,6 +100,7 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
         $this->response = null;
         $this->event = null;
         $this->listener = null;
+        $this->container = null;
     }
 
     /**

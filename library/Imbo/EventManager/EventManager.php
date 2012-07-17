@@ -31,13 +31,9 @@
 
 namespace Imbo\EventManager;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface,
-    Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface,
+use Imbo\Container,
     Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Image\ImageInterface;
+    Imbo\Exception\InvalidArgumentException;
 
 /**
  * Event manager
@@ -57,57 +53,19 @@ class EventManager implements EventManagerInterface {
     private $events;
 
     /**
-     * Request instance
+     * Container instance
      *
-     * @var Imbo\Http\Request\RequestInterface
+     * @var Imbo\Container
      */
-    private $request;
-
-    /**
-     * Response instance
-     *
-     * @var Imbo\Http\Response\ResponseInterface
-     */
-    private $response;
-
-    /**
-     * Database driver
-     *
-     * @var Imbo\Database\DatabaseInterface
-     */
-    private $database;
-
-    /**
-     * Storage driver
-     *
-     * @var Imbo\Storage\StorageInterface
-     */
-    private $storage;
-
-    /**
-     * Image instance
-     *
-     * @var Imbo\Image\ImageInterface
-     */
-    private $image;
+    private $container;
 
     /**
      * Class constructor
      *
-     * @param Imbo\Http\Request\RequestInterface $request
-     * @param Imbo\Http\Response\ResponseInterface $response
-     * @param Imbo\Http\Database\DatabaseInterface $database Database driver
-     * @param Imbo\Http\Storage\StorageInterface $storage Storage driver
-     * @param Imbo\Image\ImageInterface $response
+     * @param Imbo\Container $container Instance of a container
      */
-    public function __construct(RequestInterface $request, ResponseInterface $response,
-                                DatabaseInterface $database, StorageInterface $storage,
-                                ImageInterface $image = null) {
-        $this->request  = $request;
-        $this->response = $response;
-        $this->database = $database;
-        $this->storage  = $storage;
-        $this->image    = $image;
+    public function __construct(Container $container) {
+        $this->container = $container;
     }
 
     /**
@@ -138,7 +96,7 @@ class EventManager implements EventManagerInterface {
      */
     public function attachListener(ListenerInterface $listener) {
         // Fetch current public key
-        $publicKey = $this->request->getPublicKey();
+        $publicKey = $this->container->get('request')->getPublicKey();
 
         // Fetch the keys the listener is to be triggered for
         $keys = $listener->getPublicKeys();
@@ -160,7 +118,7 @@ class EventManager implements EventManagerInterface {
     public function trigger($event) {
         if (!empty($this->events[$event])) {
             // Create an event instance
-            $e = new Event($event, $this->request, $this->response, $this->database, $this->storage, $this->image);
+            $e = new Event($event, $this->container);
 
             // Trigger all listeners for this event and pass in the event instance
             foreach ($this->events[$event] as $callback) {

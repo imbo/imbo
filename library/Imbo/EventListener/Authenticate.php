@@ -67,6 +67,8 @@ class Authenticate extends Listener implements ListenerInterface {
      */
     public function getEvents() {
         return array(
+            'status.get.pre',
+
             'image.put.pre',
             'image.post.pre',
             'image.delete.pre',
@@ -81,13 +83,34 @@ class Authenticate extends Listener implements ListenerInterface {
      * @see Imbo\EventListener\ListenerInterface::invoke()
      */
     public function invoke(EventInterface $event) {
-        $response = $event->getResponse();
-        $request  = $event->getRequest();
+        $container = $event->getContainer();
+
+        $config = $container->get('config');
+        $auth = $config['auth'];
+
+        $response = $container->get('response');
+        $request  = $container->get('request');
         $query    = $request->getQuery();
 
+        // Whether or not this is a status check
+        $statusCheck = ($event->getName() === 'status.get.pre');
+
+        // Required query parameters
+        $requiredParams = array('signature', 'timestamp');
+
+        if ($statusCheck) {
+            // We have a status check. The public key is provided as a query parameter
+            $requiredParams[] = 'publicKey';
+        }
+
         // Check for signature and timestamp
-        foreach (array('signature', 'timestamp') as $param) {
+        foreach ($requiredParams as $param) {
             if (!$query->has($param)) {
+                if ($statusCheck) {
+                    // This is a status check, let's bail.
+                    return;
+                }
+
                 $e = new RuntimeException('Missing required authentication parameter: ' . $param, 400);
                 $e->setImboErrorCode(Exception::AUTH_MISSING_PARAM);
 
@@ -96,8 +119,18 @@ class Authenticate extends Listener implements ListenerInterface {
         }
 
         // Fetch values we want to validate and remove them from the request
-        $timestamp = $query->get('timestamp');
-        $signature = $query->get('signature');
+        $timestamp  = $query->get('timestamp');
+        $signature  = $query->get('signature');
+        $publicKey  = $statusCheck ? $query->get('publicKey') : $request->getPublicKey();
+
+        if ($statusCheck && !isset($auth[$publicKey])) {
+            $e = new RuntimeException('Unknown public key', 404);
+            $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
+
+            throw $e;
+        }
+
+        $privateKey = $statusCheck ? $auth[$publicKey] : $request->getPrivateKey();
 
         $query->remove('signature')
               ->remove('timestamp');
@@ -121,7 +154,7 @@ class Authenticate extends Listener implements ListenerInterface {
         // Add the URL used for auth to the response headers
         $response->getHeaders()->set('X-Imbo-AuthUrl', $url);
 
-        if (!$this->signatureIsValid($request->getMethod(), $url, $request->getPublicKey(), $request->getPrivateKey(), $timestamp, $signature)) {
+        if (!$this->signatureIsValid($request->getMethod(), $url, $publicKey, $privateKey, $timestamp, $signature)) {
             $e = new RuntimeException('Signature mismatch', 400);
             $e->setImboErrorCode(Exception::AUTH_SIGNATURE_MISMATCH);
 

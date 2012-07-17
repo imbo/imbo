@@ -105,9 +105,11 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
      * @see Imbo\EventListener\ListenerInterface::invoke
      */
     public function invoke(EventInterface $event) {
+        $container = $event->getContainer();
+
         $eventName          = $event->getName();
-        $request            = $event->getRequest();
-        $response           = $event->getResponse();
+        $request            = $container->get('request');
+        $response           = $container->get('response');
 
         $publicKey          = $request->getPublicKey();
         $imageIdentifier    = $request->getImageIdentifier();
@@ -125,11 +127,11 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
         if ($eventName === 'image.get.pre' || $eventName === 'image.delete.pre') {
             // We have yet populated the internal image instance so we need to fetch the mime type
             // from the database
-            $database = $event->getDatabase();
+            $database = $container->get('database');
             $mimeType = $database->getImageMimeType($publicKey, $imageIdentifier);
         } else {
             // Fetch the mime type form the internal image instance
-            $mimeType = $event->getImage()->getMimeType();
+            $mimeType = $container->get('image')->getMimeType();
         }
 
         if ($imageExtension !== null) {

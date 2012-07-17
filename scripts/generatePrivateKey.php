@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /**
  * Imbo
@@ -23,7 +24,6 @@
  * IN THE SOFTWARE.
  *
  * @package Imbo
- * @subpackage Server
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -32,20 +32,17 @@
 
 namespace Imbo;
 
-$path = realpath(__DIR__ . '/../library');
+$strong = false;
+$maxTries = 10;
+$i = 0;
 
-// Register autoloader
-spl_autoload_register(function($className) use ($path) {
-    $filename = str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
+while (!$strong && $maxTries > $i++) {
+    $data = openssl_random_pseudo_bytes(64, $strong);
+}
 
-    $absPath = $path . DIRECTORY_SEPARATOR . $filename;
+if (!$strong) {
+    echo "Could not generate private key." . PHP_EOL;
+    exit;
+}
 
-    if (is_file($absPath)) {
-        require $absPath;
-        return true;
-    }
-
-    return false;
-});
-
-unset($path);
+echo "Private key: " . hash('sha256', $data) . PHP_EOL;
