@@ -60,6 +60,11 @@ class ImageTransformationCacheTest extends \PHPUnit_Framework_TestCase {
     private $event;
 
     /**
+     * @var Imbo\Container
+     */
+    private $container;
+
+    /**
      * @var Imbo\Http\Request\RequestInterface
      */
     private $request;
@@ -68,11 +73,6 @@ class ImageTransformationCacheTest extends \PHPUnit_Framework_TestCase {
      * @var Imbo\Http\Response\ResponseInterface
      */
     private $response;
-
-    /**
-     * @var Imbo\Database\DatabaseInterface
-     */
-    private $database;
 
     /**
      * @var Imbo\Http\ParameterContainerInterface
@@ -104,12 +104,22 @@ class ImageTransformationCacheTest extends \PHPUnit_Framework_TestCase {
             $this->markTestSkipped('This testcase requires vfsStream to run');
         }
 
-        $this->query = $this->getMock('Imbo\Http\ParameterContainerInterface');
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
-        $this->cn = $this->getMock('Imbo\Http\ContentNegotiation');
-        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $query = $this->getMock('Imbo\Http\ParameterContainerInterface');
+        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $cn = $this->getMock('Imbo\Http\ContentNegotiation');
+
+        $this->container = $this->getMock('Imbo\Container');
+        $this->container->expects($this->any())->method('get')->will($this->returnCallback(function($key) use ($request, $response) {
+            return $$key;
+        }));
+
+        $this->query = $query;
+        $this->request = $request;
+        $this->response = $response;
+        $this->event = $event;
+        $this->cn = $cn;
 
         $this->publicKey = 'publicKey';
         $this->imageIdentifier = '7bf2e67f09de203da740a86cd37bbe8d';
@@ -118,9 +128,7 @@ class ImageTransformationCacheTest extends \PHPUnit_Framework_TestCase {
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
+        $this->event->expects($this->any())->method('getContainer')->will($this->returnValue($this->container));
 
         $this->path = 'cacheDir';
 
@@ -138,6 +146,7 @@ class ImageTransformationCacheTest extends \PHPUnit_Framework_TestCase {
         $this->event = null;
         $this->cn = null;
         $this->listener = null;
+        $this->container = null;
     }
 
     /**

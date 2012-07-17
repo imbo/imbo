@@ -33,7 +33,7 @@
 namespace Imbo;
 
 /**
- * Require PSR-0 compatible autoloader
+ * Require Imbo autoloader
  */
 require 'autoloader.php';
 

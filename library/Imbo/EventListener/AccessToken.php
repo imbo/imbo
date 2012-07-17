@@ -32,7 +32,6 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Http\Response\ResponseInterface,
     Imbo\Exception\RuntimeException;
 
 /**
@@ -71,7 +70,7 @@ class AccessToken extends Listener implements ListenerInterface {
      * @see Imbo\EventListener\ListenerInterface::invoke()
      */
     public function invoke(EventInterface $event) {
-        $request = $event->getRequest();
+        $request = $event->getContainer()->get('request');
         $query = $request->getQuery();
 
         if (!$query->has('accessToken')) {

@@ -42,25 +42,18 @@ use Imbo\EventManager\EventManager;
  * @covers Imbo\EventManager\EventManager
  */
 class EventManagerTest extends \PHPUnit_Framework_TestCase {
+    private $container;
     private $request;
-    private $response;
-    private $database;
-    private $storage;
-    private $manager;
 
     public function setUp() {
         $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
-        $this->manager = new EventManager($this->request, $this->response, $this->database, $this->storage);
+        $this->container = $this->getMock('Imbo\Container');
+        $this->container->expects($this->any())->method('get')->with('request')->will($this->returnValue($this->request));
+        $this->manager = new EventManager($this->container);
     }
 
     public function tearDown() {
-        $this->request = null;
-        $this->response = null;
-        $this->database = null;
-        $this->storage = null;
+        $this->container = null;
         $this->manager = null;
     }
 
