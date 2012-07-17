@@ -29,12 +29,12 @@ end
 desc "Fetch or update composer.phar and update the dependencies"
 task :composer do
   if File.exists?("composer.phar")
-    system "php composer.phar self-update"
+    system "php -d \"apc.enable_cli=0\" composer.phar self-update"
   else
-    system "curl -s http://getcomposer.org/installer | php"
+    system "curl -s http://getcomposer.org/installer | php -d \"apc.enable_cli=0\""
   end
 
-  system "php composer.phar --no-ansi update --dev"
+  system "php -d \"apc.enable_cli=0\" composer.phar --no-ansi update --dev"
 end
 
 desc "Generate checkstyle.xml using PHP_CodeSniffer"
