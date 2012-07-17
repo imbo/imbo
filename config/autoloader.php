@@ -32,23 +32,20 @@
 
 namespace Imbo;
 
-// Explode include_path and remove all trailing slashes
-$paths = array_map(function($path) {
-    return rtrim($path, DIRECTORY_SEPARATOR);
-}, explode(PATH_SEPARATOR, get_include_path()));
+$path = realpath(__DIR__ . '/../library');
 
 // Register autoloader
-spl_autoload_register(function($className) use ($paths) {
+spl_autoload_register(function($className) use ($path) {
     $filename = str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
 
-    foreach ($paths as $path) {
-        $absPath = $path . DIRECTORY_SEPARATOR . $filename;
+    $absPath = $path . DIRECTORY_SEPARATOR . $filename;
 
-        if (is_file($absPath)) {
-            require $absPath;
-            return true;
-        }
+    if (is_file($absPath)) {
+        require $absPath;
+        return true;
     }
 
     return false;
 });
+
+unset($path);
