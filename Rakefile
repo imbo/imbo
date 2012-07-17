@@ -8,13 +8,13 @@ build   = "#{basedir}/build"
 source  = "#{basedir}/library"
 
 desc "Task used by Jenkins-CI"
-task :jenkins => [:prepare, :lint, :test, :apidocs, :phploc, :phpcs, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
+task :jenkins => [:prepare, :lint, :composer, :test, :apidocs, :phploc, :phpcs, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
 
 desc "Task used by Travis-CI"
-task :travis => [:test]
+task :travis => [:composer, :test]
 
 desc "Default task"
-task :default => [:lint, :test]
+task :default => [:lint, :composer, :test]
 
 desc "Clean up and create artifact directories"
 task :prepare do
@@ -24,6 +24,17 @@ task :prepare do
   ["coverage", "logs", "docs", "code-browser", "pdepend"].each do |d|
     FileUtils.mkdir "#{build}/#{d}"
   end
+end
+
+desc "Fetch or update composer.phar and update the dependencies"
+task :composer do
+  if File.exists?("composer.phar")
+    system "php composer.phar self-update"
+  else
+    system "curl -s http://getcomposer.org/installer | php"
+  end
+
+  system "php composer.phar --no-ansi update --dev"
 end
 
 desc "Generate checkstyle.xml using PHP_CodeSniffer"
@@ -90,9 +101,6 @@ task :test do
       system "sh -c \"cd #{e}-* && phpize && ./configure && make && sudo make install\""
       system "sudo sh -c \"echo 'extension=#{e.downcase}.so' >> #{ini_file}\""
     }
-
-    system "curl -s http://getcomposer.org/installer | php"
-    system "php composer.phar --no-ansi install --dev"
 
     system "sudo sh -c \"echo 'apc.enable_cli=on' >> #{ini_file}\""
 
