@@ -50,6 +50,51 @@ use Imbo\EventManager\EventInterface,
  */
 class AccessToken extends Listener implements ListenerInterface {
     /**
+     * Parameters for the listener
+     *
+     * @var array
+     */
+    private $params = array(
+        /**
+         * Use this parameter to enforce the access token listener for only some of the image
+         * transformations (if the request is against an image). Each transformation must be
+         * specified with the FQCN:
+         *
+         * 'transformations' => array(
+         *     'whitelist' => array(
+         *         'Imbo\Image\Transformation\Border',
+         *         'Imbo\Image\Transformation\Convert',
+         *      ),
+         * )
+         *
+         * Use the 'whitelist' for making the listener skip the access token check for some
+         * transformations, and the 'blacklist' key for the opposite:
+         *
+         * 'whitelist' => array('Imbo\Image\Transformation\Convert') means that the access token
+         * will *not* be enforced for the Convert transformation, but for all others.
+         *
+         * 'blacklist' => array('Imbo\Image\Transformation\Convert') means that the access token
+         * will be enforced *only* when the Convert transformation is in effect.
+         *
+         * If both the 'whitelist' and 'blacklist'
+         */
+        'transformations' => array(
+            'whitelist' => array(),
+            'blacklist' => array(),
+        ),
+    );
+
+    /**
+     * Class constructor
+     *
+     * @param array $params Parameters for the listener
+     */
+    public function __construct(array $params = array()) {
+        if ($params) {
+            $this->params = array_replace_recursive($this->params, $params);
+        }
+    }
+    /**
      * @see Imbo\EventListener\ListenerInterface::getEvents()
      */
     public function getEvents() {
