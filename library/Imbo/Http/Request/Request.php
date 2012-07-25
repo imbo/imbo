@@ -254,6 +254,13 @@ class Request implements RequestInterface {
     }
 
     /**
+     * @see Imbo\Http\Request\RequestInterface::hasTransformations()
+     */
+    public function hasTransformations() {
+        return $this->getExtension() || $this->getQuery()->has('t');
+    }
+
+    /**
      * @see Imbo\Http\Request\RequestInterface::getScheme()
      */
     public function getScheme() {

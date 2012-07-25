@@ -550,4 +550,29 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($request, $request->setResource('metadata'));
         $this->assertSame('metadata', $request->getResource());
     }
+
+    /**
+     * @covers Imbo\Http\Request\Request::hasTransformations
+     */
+    public function testHasTransformationsWithExtension() {
+        $request = new Request();
+        $request->setExtension('png');
+        $this->assertTrue($request->hasTransformations());
+    }
+
+    /**
+     * @covers Imbo\Http\Request\Request::hasTransformations
+     */
+    public function testHasTransformationsWithTransformationsInQuery() {
+        $request = new Request(array('t' => array('flipHorizontally')));
+        $this->assertTrue($request->hasTransformations());
+    }
+
+    /**
+     * @covers Imbo\Http\Request\Request::hasTransformations
+     */
+    public function testHasTransformationsWithNoTransformations() {
+        $request = new Request();
+        $this->assertFalse($request->hasTransformations());
+    }
 }
