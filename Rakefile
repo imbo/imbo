@@ -28,13 +28,17 @@ end
 
 desc "Fetch or update composer.phar and update the dependencies"
 task :composer do
-  if File.exists?("composer.phar")
-    system "php -d \"apc.enable_cli=0\" composer.phar self-update"
+  if ENV["TRAVIS"] == "true"
+    system "composer --no-ansi update --dev"
   else
-    system "curl -s http://getcomposer.org/installer | php -d \"apc.enable_cli=0\""
-  end
+    if File.exists?("composer.phar")
+      system "php -d \"apc.enable_cli=0\" composer.phar self-update"
+    else
+      system "curl -s http://getcomposer.org/installer | php -d \"apc.enable_cli=0\""
+    end
 
-  system "php -d \"apc.enable_cli=0\" composer.phar --no-ansi update --dev"
+    system "php -d \"apc.enable_cli=0\" composer.phar --no-ansi update --dev"
+  end
 end
 
 desc "Generate checkstyle.xml using PHP_CodeSniffer"
