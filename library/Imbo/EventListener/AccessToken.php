@@ -32,6 +32,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
+    Imbo\Http\Request\RequestInterface,
     Imbo\Exception\RuntimeException;
 
 /**
@@ -58,25 +59,27 @@ class AccessToken extends Listener implements ListenerInterface {
         /**
          * Use this parameter to enforce the access token listener for only some of the image
          * transformations (if the request is against an image). Each transformation must be
-         * specified with the FQCN:
+         * specified using the short names of the transformations (the name used in the query to
+         * trigger the transformation).
          *
          * 'transformations' => array(
          *     'whitelist' => array(
-         *         'Imbo\Image\Transformation\Border',
-         *         'Imbo\Image\Transformation\Convert',
+         *         'border',
+         *         'convert',
          *      ),
          * )
          *
          * Use the 'whitelist' for making the listener skip the access token check for some
          * transformations, and the 'blacklist' key for the opposite:
          *
-         * 'whitelist' => array('Imbo\Image\Transformation\Convert') means that the access token
+         * 'whitelist' => array('convert') means that the access token
          * will *not* be enforced for the Convert transformation, but for all others.
          *
-         * 'blacklist' => array('Imbo\Image\Transformation\Convert') means that the access token
+         * 'blacklist' => array('convert') means that the access token
          * will be enforced *only* when the Convert transformation is in effect.
          *
-         * If both the 'whitelist' and 'blacklist'
+         * If both 'whitelist' and 'blacklist' are specified all transformations will require an
+         * access token unless included in the 'whitelist'.
          */
         'transformations' => array(
             'whitelist' => array(),
@@ -117,6 +120,12 @@ class AccessToken extends Listener implements ListenerInterface {
     public function invoke(EventInterface $event) {
         $request = $event->getContainer()->get('request');
         $query = $request->getQuery();
+        $eventName = $event->getName();
+
+        if (($eventName === 'image.get.pre' || $eventName === 'image.head.pre') && $this->isWhitelisted($request)) {
+            // All transformations in the request are whitelisted. Skip the access token check
+            return;
+        }
 
         if (!$query->has('accessToken')) {
             throw new RuntimeException('Missing access token', 400);
@@ -133,5 +142,48 @@ class AccessToken extends Listener implements ListenerInterface {
         if ($correctToken !== $token) {
             throw new RuntimeException('Incorrect access token', 400);
         }
+    }
+
+    /**
+     * Check if the request is whitelisted
+     *
+     * @param RequestInterface $request The request instance
+     * @return boolean
+     */
+    private function isWhitelisted(RequestInterface $request) {
+        $filter = $this->params['transformations'];
+
+        if (empty($filter['whitelist']) && empty($filter['blacklist'])) {
+            return false;
+        }
+
+        $whitelist = array_flip($filter['whitelist']);
+        $blacklist = array_flip($filter['blacklist']);
+        $blacklisted = false;
+
+        $transformations = array();
+
+        foreach ($request->getTransformations() as $transformation) {
+            $name = $transformation->getName();
+            $flag = false;
+
+            if (isset($blacklist[$name])) {
+                $blacklisted = true;
+                break;
+            }
+
+            if (isset($whitelist[$name]) || (empty($whitelist) && !empty($blacklist))) {
+                $flag = true;
+            }
+
+            $transformations[$name] = $flag;
+        }
+
+        if ($blacklisted) {
+            // Some of the transformations in the chain are blacklisted
+            return false;
+        }
+
+        return count($transformations) === count(array_filter($transformations));
     }
 }
