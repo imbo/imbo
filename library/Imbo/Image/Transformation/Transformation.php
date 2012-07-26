@@ -43,13 +43,21 @@ use Imagick;
  * @link https://github.com/imbo/imbo
  */
 abstract class Transformation implements TransformationInterface {
-
     /**
      * Imagick instance
      *
      * @var Imagick
      */
     private $imagick;
+
+    /**
+     * @see Imbo\Image\Transformation\TransformationInterface::getName()
+     */
+    public function getName() {
+        $className = get_class($this);
+
+        return strtolower(substr($className, strrpos($className, '\\') + 1));
+    }
 
     /**
      * @see Imbo\Image\Transformation\TransformationInterface::getImagick()

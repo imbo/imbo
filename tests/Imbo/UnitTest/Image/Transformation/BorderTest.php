@@ -46,6 +46,10 @@ class BorderTest extends TransformationTests {
         return new Border();
     }
 
+    protected function getExpectedName() {
+        return 'border';
+    }
+
     /**
      * @covers Imbo\Image\Transformation\Border::applyToImage
      */

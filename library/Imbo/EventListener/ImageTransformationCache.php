@@ -114,10 +114,9 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
         $publicKey          = $request->getPublicKey();
         $imageIdentifier    = $request->getImageIdentifier();
         $imageExtension     = $request->getExtension();
-        $hasTransformations = $request->getQuery()->has('t') || $imageExtension;
         $url                = $request->getUrl();
 
-        if (($eventName === 'image.get.pre' || $eventName === 'image.get.post') && !$hasTransformations) {
+        if (($eventName === 'image.get.pre' || $eventName === 'image.get.post') && !$request->hasTransformations()) {
             // Nothing for the listener to do since we do not want to store/fetch from the cache if
             // no transformations are applied. We still want to remove
             return;

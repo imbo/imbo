@@ -154,7 +154,7 @@ class ImageTransformationCacheTest extends \PHPUnit_Framework_TestCase {
      */
     public function testReturnIfCacheIsNotNeeded() {
         $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.get.pre'));
-        $this->query->expects($this->once())->method('has')->with('t')->will($this->returnValue(false));
+        $this->request->expects($this->once())->method('hasTransformations')->will($this->returnValue(false));
         $this->assertNull($this->listener->invoke($this->event));
     }
 }

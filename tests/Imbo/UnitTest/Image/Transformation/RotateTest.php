@@ -46,6 +46,10 @@ class RotateTest extends TransformationTests {
         return new Rotate(45);
     }
 
+    protected function getExpectedName() {
+        return 'rotate';
+    }
+
     /**
      * @covers Imbo\Image\Transformation\Rotate::applyToImage
      */

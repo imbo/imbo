@@ -127,6 +127,13 @@ class Request implements RequestInterface {
     private $resource;
 
     /**
+     * Chain of image transformations
+     *
+     * @var Imbo\Image\TransformationChain
+     */
+    private $transformationChain;
+
+    /**
      * Class constructor
      *
      * @param array $query Query data ($_GET)
@@ -183,74 +190,86 @@ class Request implements RequestInterface {
      * @see Imbo\Http\Request\RequestInterface::getTransformations()
      */
     public function getTransformations() {
-        $transformations = $this->query->get('t', array());
-        $chain = new TransformationChain();
+        if ($this->transformationChain === null) {
+            $this->transformationChain = new TransformationChain();
+            $transformations = $this->query->get('t', array());
 
-        foreach ($transformations as $transformation) {
-            // See if the transformation has any parameters
-            $pos = strpos($transformation, ':');
-            $urlParams = '';
+            foreach ($transformations as $transformation) {
+                // See if the transformation has any parameters
+                $pos = strpos($transformation, ':');
+                $urlParams = '';
 
-            if ($pos === false) {
-                // No params exist
-                $name = $transformation;
-            } else {
-                list($name, $urlParams) = explode(':', $transformation, 2);
-            }
-
-            // Initialize params for the transformation
-            $params = array();
-
-            // See if we have more than one parameter
-            if (strpos($urlParams, ',') !== false) {
-                $urlParams = explode(',', $urlParams);
-            } else {
-                $urlParams = array($urlParams);
-            }
-
-            foreach ($urlParams as $param) {
-                $pos = strpos($param, '=');
-
-                if ($pos !== false) {
-                    $params[substr($param, 0, $pos)] = substr($param, $pos + 1);
+                if ($pos === false) {
+                    // No params exist
+                    $name = $transformation;
+                } else {
+                    list($name, $urlParams) = explode(':', $transformation, 2);
                 }
-            }
 
-            // Closure to help fetch parameters
-            $p = function($key) use ($params) {
-                return isset($params[$key]) ? $params[$key] : null;
-            };
+                // Lowercase the name
+                $name = strtolower($name);
 
-            if ($name === 'border') {
-                $chain->border($p('color'), $p('width'), $p('height'));
-            } else if ($name === 'compress') {
-                $chain->compress($p('quality'));
-            } else if ($name === 'crop') {
-                $chain->crop($p('x'), $p('y'), $p('width'), $p('height'));
-            } else if ($name === 'flipHorizontally') {
-                $chain->flipHorizontally();
-            } else if ($name === 'flipVertically') {
-                $chain->flipVertically();
-            } else if ($name === 'maxSize') {
-                $chain->maxSize($p('width'), $p('height'));
-            } else if ($name === 'resize') {
-                $chain->resize($p('width'), $p('height'));
-            } else if ($name === 'rotate') {
-                $chain->rotate($p('angle'), $p('bg'));
-            } else if ($name === 'thumbnail') {
-                $chain->thumbnail($p('width'), $p('height'), $p('fit'));
-            } else if ($name === 'canvas') {
-                $chain->canvas($p('width'), $p('height'), $p('mode'), $p('x'), $p('y'), $p('bg'));
-            } else if ($name == 'transpose') {
-                $chain->transpose();
-            } else if ($name == 'transverse') {
-                $chain->transverse();
-            } else {
-                throw new InvalidArgumentException('Invalid transformation: ' . $name, 400);
+                // Initialize params for the transformation
+                $params = array();
+
+                // See if we have more than one parameter
+                if (strpos($urlParams, ',') !== false) {
+                    $urlParams = explode(',', $urlParams);
+                } else {
+                    $urlParams = array($urlParams);
+                }
+
+                foreach ($urlParams as $param) {
+                    $pos = strpos($param, '=');
+
+                    if ($pos !== false) {
+                        $params[substr($param, 0, $pos)] = substr($param, $pos + 1);
+                    }
+                }
+
+                // Closure to help fetch parameters
+                $p = function($key) use ($params) {
+                    return isset($params[$key]) ? $params[$key] : null;
+                };
+
+                if ($name === 'border') {
+                    $this->transformationChain->border($p('color'), $p('width'), $p('height'));
+                } else if ($name === 'compress') {
+                    $this->transformationChain->compress($p('quality'));
+                } else if ($name === 'crop') {
+                    $this->transformationChain->crop($p('x'), $p('y'), $p('width'), $p('height'));
+                } else if ($name === 'fliphorizontally') {
+                    $this->transformationChain->flipHorizontally();
+                } else if ($name === 'flipvertically') {
+                    $this->transformationChain->flipVertically();
+                } else if ($name === 'maxsize') {
+                    $this->transformationChain->maxSize($p('width'), $p('height'));
+                } else if ($name === 'resize') {
+                    $this->transformationChain->resize($p('width'), $p('height'));
+                } else if ($name === 'rotate') {
+                    $this->transformationChain->rotate($p('angle'), $p('bg'));
+                } else if ($name === 'thumbnail') {
+                    $this->transformationChain->thumbnail($p('width'), $p('height'), $p('fit'));
+                } else if ($name === 'canvas') {
+                    $this->transformationChain->canvas($p('width'), $p('height'), $p('mode'), $p('x'), $p('y'), $p('bg'));
+                } else if ($name == 'transpose') {
+                    $this->transformationChain->transpose();
+                } else if ($name == 'transverse') {
+                    $this->transformationChain->transverse();
+                } else {
+                    throw new InvalidArgumentException('Invalid transformation: ' . $name, 400);
+                }
             }
         }
 
-        return $chain;
+        return $this->transformationChain;
+    }
+
+    /**
+     * @see Imbo\Http\Request\RequestInterface::hasTransformations()
+     */
+    public function hasTransformations() {
+        return $this->getExtension() || $this->getQuery()->has('t');
     }
 
     /**
