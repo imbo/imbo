@@ -46,6 +46,10 @@ class ThumbnailTest extends TransformationTests {
         return new Thumbnail();
     }
 
+    protected function getExpectedName() {
+        return 'thumbnail';
+    }
+
     /**
      * @covers Imbo\Image\Transformation\Thumbnail::applyToImage
      */

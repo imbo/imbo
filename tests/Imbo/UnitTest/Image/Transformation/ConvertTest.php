@@ -46,6 +46,10 @@ class ConvertTest extends TransformationTests {
         return new Convert('png');
     }
 
+    protected function getExpectedName() {
+        return 'convert';
+    }
+
     /**
      * @covers Imbo\Image\Transformation\Convert::applyToImage
      */

@@ -46,6 +46,10 @@ class FlipVerticallyTest extends TransformationTests {
         return new FlipVertically();
     }
 
+    protected function getExpectedName() {
+        return 'flipvertically';
+    }
+
     /**
      * @covers Imbo\Image\Transformation\FlipVertically::applyToImage
      */

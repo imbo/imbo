@@ -40,10 +40,18 @@ namespace Imbo\UnitTest\Image\Transformation;
  */
 abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     abstract protected function getTransformation();
+    abstract protected function getExpectedName();
 
     public function setUp() {
         if (!class_exists('Imagick')) {
             $this->markTestSkipped('Imagick must be available to run this test');
         }
+    }
+
+    /**
+     * @covers Imbo\Image\Transformation\Transformation::getName
+     */
+    public function testGetName() {
+        $this->assertSame($this->getTransformation()->getName(), $this->getExpectedName());
     }
 }

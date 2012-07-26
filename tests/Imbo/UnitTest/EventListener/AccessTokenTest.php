@@ -31,7 +31,8 @@
 
 namespace Imbo\UnitTest\EventListener;
 
-use Imbo\EventListener\AccessToken;
+use Imbo\EventListener\AccessToken,
+    Imbo\Exception\RuntimeException;
 
 /**
  * @package TestSuite\UnitTests
@@ -128,9 +129,110 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage Missing access token
      * @expectedExceptionCode 400
+     * @covers Imbo\EventListener\AccessToken::invoke
      */
     public function testRequestWithoutAccessToken() {
         $this->params->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(false));
         $this->listener->invoke($this->event);
+    }
+
+    /**
+     * Get a mocked transformation
+     *
+     * @param string $name The name of the transformation
+     * @return Imbo\Image\Transformation\TransformationInterface
+     */
+    private function getMockedTransformation($name) {
+        $mock = $this->getMock('Imbo\Image\Transformation\TransformationInterface');
+        $mock->expects($this->once())
+             ->method('getName')
+             ->will($this->returnValue($name));
+
+        return $mock;
+    }
+
+    public function getFilterData() {
+        return array(
+            array(
+                $filter = array(),
+                $chain = array(),
+                $whitelisted = false,
+            ),
+            array(
+                $filter = array(),
+                $chain = array(
+                    $this->getMockedTransformation('convert'),
+                ),
+                $whitelisted = false,
+            ),
+            array(
+                $filter = array('transformations' => array('whitelist' => array('convert'))),
+                $chain = array(
+                    $this->getMockedTransformation('convert'),
+                ),
+                $whitelisted = true,
+            ),
+            array(
+                $filter = array('transformations' => array('whitelist' => array('convert'))),
+                $chain = array(
+                    $this->getMockedTransformation('convert'),
+                    $this->getMockedTransformation('border'),
+                ),
+                $whitelisted = false,
+            ),
+            array(
+                $filter = array('transformations' => array('blacklist' => array('convert'))),
+                $chain = array(
+                    $this->getMockedTransformation('border'),
+                ),
+                $whitelisted = true,
+            ),
+            array(
+                $filter = array('transformations' => array('blacklist' => array('convert'))),
+                $chain = array(
+                    $this->getMockedTransformation('convert'),
+                    $this->getMockedTransformation('border'),
+                ),
+                $whitelisted = false,
+            ),
+            array(
+                $filter = array('transformations' => array('whitelist' => array('convert'), 'blacklist' => array('border'))),
+                $chain = array(
+                    $this->getMockedTransformation('convert'),
+                ),
+                $whitelisted = true,
+            ),
+            array(
+                $filter = array('transformations' => array('whitelist' => array('convert'), 'blacklist' => array('border'))),
+                $chain = array(
+                    $this->getMockedTransformation('canvas'),
+                ),
+                $whitelisted = false,
+            ),
+            array(
+                $filter = array('transformations' => array('whitelist' => array('convert'), 'blacklist' => array('convert'))),
+                $chain = array(
+                    $this->getMockedTransformation('convert'),
+                ),
+                $whitelisted = false,
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getFilterData
+     * @covers Imbo\EventListener\AccessToken::invoke
+     */
+    public function testFilters($filter, $chain, $whitelisted) {
+        $listener = new AccessToken($filter);
+
+        if (!$whitelisted) {
+            $this->setExpectedException('Imbo\Exception\RuntimeException', 'Missing access token', 400);
+        }
+
+        $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.get.pre'));
+        $this->request->expects($this->any())->method('getTransformations')->will($this->returnValue($chain));
+
+        $listener->invoke($this->event);
     }
 }

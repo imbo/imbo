@@ -47,6 +47,16 @@ use Imbo\Image\ImageInterface,
  */
 interface TransformationInterface {
     /**
+     * Get the name of the transformation
+     *
+     * The name should be the one used in the query to trigger the transformation. Usually this is
+     * the last part of the class name, in lower case.
+     *
+     * @return string
+     */
+    function getName();
+
+    /**
      * Get the imagick instance
      *
      * @return Imagick

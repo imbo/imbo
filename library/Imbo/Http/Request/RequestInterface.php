@@ -101,6 +101,13 @@ interface RequestInterface {
     function getTransformations();
 
     /**
+     * Check whether or not the request includes image transformations
+     *
+     * @return boolean
+     */
+    function hasTransformations();
+
+    /**
      * Get the current scheme (http or https)
      *
      * @return string
