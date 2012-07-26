@@ -46,6 +46,10 @@ class ResizeTest extends TransformationTests {
         return new Resize(1, 2);
     }
 
+    protected function getExpectedName() {
+        return 'resize';
+    }
+
     /**
      * @covers Imbo\Image\Transformation\Resize::applyToImage
      */

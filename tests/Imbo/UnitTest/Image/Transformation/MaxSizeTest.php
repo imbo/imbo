@@ -47,6 +47,10 @@ class MaxSizeTest extends TransformationTests {
         return new MaxSize(200, 100);
     }
 
+    protected function getExpectedName() {
+        return 'maxsize';
+    }
+
     /**
      * @covers Imbo\Image\Transformation\MaxSize::applyToImage
      */

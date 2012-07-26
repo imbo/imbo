@@ -48,6 +48,10 @@ class CanvasTest extends TransformationTests {
         return new Canvas(100, 100, 'free', 10, 10, '000');
     }
 
+    protected function getExpectedName() {
+        return 'canvas';
+    }
+
     /**
      * @covers Imbo\Image\Transformation\Canvas::applyToImage
      */

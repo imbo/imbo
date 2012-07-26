@@ -46,6 +46,10 @@ class FlipHorizontallyTest extends TransformationTests {
         return new FlipHorizontally();
     }
 
+    protected function getExpectedName() {
+        return 'fliphorizontally';
+    }
+
     /**
      * @covers Imbo\Image\Transformation\FlipHorizontally::applyToImage
      */

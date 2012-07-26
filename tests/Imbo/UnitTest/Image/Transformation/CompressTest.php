@@ -46,6 +46,10 @@ class CompressTest extends TransformationTests {
         return new Compress(90);
     }
 
+    protected function getExpectedName() {
+        return 'compress';
+    }
+
     /**
      * @covers Imbo\Image\Transformation\Compress::applyToImage
      */

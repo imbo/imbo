@@ -46,6 +46,10 @@ class CropTest extends TransformationTests {
         return new Crop(1, 2, 3, 4);
     }
 
+    protected function getExpectedName() {
+        return 'crop';
+    }
+
     /**
      * @covers Imbo\Image\Transformation\Crop::applyToImage
      */
