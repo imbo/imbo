@@ -46,12 +46,12 @@ abstract class Transformation implements TransformationInterface {
     /**
      * Imagick instance
      *
-     * @var Imagick
+     * @var \Imagick
      */
     private $imagick;
 
     /**
-     * @see Imbo\Image\Transformation\TransformationInterface::getName()
+     * {@inheritdoc}
      */
     public function getName() {
         $className = get_class($this);
@@ -60,7 +60,7 @@ abstract class Transformation implements TransformationInterface {
     }
 
     /**
-     * @see Imbo\Image\Transformation\TransformationInterface::getImagick()
+     * {@inheritdoc}
      */
     public function getImagick() {
         if ($this->imagick === null) {
@@ -71,7 +71,7 @@ abstract class Transformation implements TransformationInterface {
     }
 
     /**
-     * @see Imbo\Image\Transformation\TransformationInterface::getImagick()
+     * {@inheritdoc}
      */
     public function setImagick(Imagick $imagick) {
         $this->imagick = $imagick;

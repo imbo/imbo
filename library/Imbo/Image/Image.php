@@ -102,21 +102,21 @@ class Image implements ImageInterface {
     private $height;
 
     /**
-     * @use Imbo\Image\ImageInterface::getFilesize()
+     * {@inheritdoc}
      */
     public function getFilesize() {
         return $this->filesize;
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::getMimeType()
+     * {@inheritdoc}
      */
     public function getMimeType() {
         return $this->mimeType;
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::setMimeType()
+     * {@inheritdoc}
      */
     public function setMimeType($mimeType) {
         $this->mimeType = $mimeType;
@@ -125,14 +125,14 @@ class Image implements ImageInterface {
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::getExtension()
+     * {@inheritdoc}
      */
     public function getExtension() {
         return $this->extension;
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::setExtension()
+     * {@inheritdoc}
      */
     public function setExtension($extension) {
         $this->extension = $extension;
@@ -141,14 +141,14 @@ class Image implements ImageInterface {
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::getBlob()
+     * {@inheritdoc}
      */
     public function getBlob() {
         return $this->blob;
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::setBlob()
+     * {@inheritdoc}
      */
     public function setBlob($blob) {
         $this->blob = $blob;
@@ -158,14 +158,14 @@ class Image implements ImageInterface {
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::getMetadata()
+     * {@inheritdoc}
      */
     public function getMetadata() {
         return $this->metadata;
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::setMetadata()
+     * {@inheritdoc}
      */
     public function setMetadata(array $metadata) {
         $this->metadata = $metadata;
@@ -174,14 +174,14 @@ class Image implements ImageInterface {
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::getWidth()
+     * {@inheritdoc}
      */
     public function getWidth() {
         return $this->width;
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::setWidth()
+     * {@inheritdoc}
      */
     public function setWidth($width) {
         $this->width = (int) $width;
@@ -190,14 +190,14 @@ class Image implements ImageInterface {
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::getHeight()
+     * {@inheritdoc}
      */
     public function getHeight() {
         return $this->height;
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::setHeight()
+     * {@inheritdoc}
      */
     public function setHeight($height) {
         $this->height = (int) $height;
@@ -206,14 +206,14 @@ class Image implements ImageInterface {
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::supportedMimeType()
+     * {@inheritdoc}
      */
     static public function supportedMimeType($mime) {
         return isset(self::$mimeTypes[$mime]);
     }
 
     /**
-     * @use Imbo\Image\ImageInterface::getFileExtension()
+     * {@inheritdoc}
      */
     static public function getFileExtension($mime) {
         return isset(self::$mimeTypes[$mime]) ? self::$mimeTypes[$mime] : false;

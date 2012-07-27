@@ -67,7 +67,7 @@ class Convert extends Transformation implements TransformationInterface {
     }
 
     /**
-     * @see Imbo\Image\Transformation\TransformationInterface::applyToImage()
+     * {@inheritdoc}
      */
     public function applyToImage(ImageInterface $image) {
         if ($image->getExtension() === $this->type) {

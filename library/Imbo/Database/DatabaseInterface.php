@@ -33,7 +33,8 @@
 namespace Imbo\Database;
 
 use Imbo\Image\ImageInterface,
-    Imbo\Resource\Images\QueryInterface;
+    Imbo\Resource\Images\QueryInterface,
+    Imbo\Exception\DatabaseException;
 
 /**
  * Database driver interface
@@ -55,9 +56,9 @@ interface DatabaseInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
-     * @param Imbo\Image\ImageInterface $image The image to insert
+     * @param ImageInterface $image The image to insert
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Exception\DatabaseException
+     * @throws DatabaseException
      */
     function insertImage($publicKey, $imageIdentifier, ImageInterface $image);
 
@@ -67,7 +68,7 @@ interface DatabaseInterface {
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Exception\DatabaseException
+     * @throws DatabaseException
      */
     function deleteImage($publicKey, $imageIdentifier);
 
@@ -78,7 +79,7 @@ interface DatabaseInterface {
      * @param string $imageIdentifier Image identifier
      * @param array $metadata An array with metadata
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Exception\DatabaseException
+     * @throws DatabaseException
      */
     function updateMetadata($publicKey, $imageIdentifier, array $metadata);
 
@@ -88,7 +89,7 @@ interface DatabaseInterface {
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return array Returns the metadata as an array
-     * @throws Imbo\Exception\DatabaseException
+     * @throws DatabaseException
      */
     function getMetadata($publicKey, $imageIdentifier);
 
@@ -98,7 +99,7 @@ interface DatabaseInterface {
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Exception\DatabaseException
+     * @throws DatabaseException
      */
     function deleteMetadata($publicKey, $imageIdentifier);
 
@@ -106,9 +107,9 @@ interface DatabaseInterface {
      * Get images based on some query parameters
      *
      * @param string $publicKey The public key of the user
-     * @param Imbo\Resource\Images\Query
+     * @param QueryInterface $query A query instance
      * @return array
-     * @throws Imbo\Exception\DatabaseException
+     * @throws DatabaseException
      */
     function getImages($publicKey, QueryInterface $query);
 
@@ -117,9 +118,9 @@ interface DatabaseInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
-     * @param Imbo\Image\ImageInterface $image The image object to populate
+     * @param ImageInterface $image The image object to populate
      * @return boolean
-     * @throws Imbo\Exception\DatabaseException
+     * @throws DatabaseException
      */
     function load($publicKey, $imageIdentifier, ImageInterface $image);
 
@@ -132,8 +133,8 @@ interface DatabaseInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
-     * @return DateTime Returns an instance of DateTime
-     * @throws Imbo\Exception\DatabaseException
+     * @return \DateTime Returns an instance of DateTime
+     * @throws DatabaseException
      */
     function getLastModified($publicKey, $imageIdentifier = null);
 
@@ -142,7 +143,7 @@ interface DatabaseInterface {
      *
      * @param string $publicKey The public key of the user
      * @return int Returns the number of images
-     * @throws Imbo\Exception\DatabaseException
+     * @throws DatabaseException
      */
     function getNumImages($publicKey);
 
@@ -161,7 +162,7 @@ interface DatabaseInterface {
      * @param string $publicKey The public key of the user who owns the image
      * @param string $imageIdentifier The image identifier
      * @return string Returns the mime type of the image
-     * @throws Imbo\Exception\DatabaseException
+     * @throws DatabaseException
      */
     function getImageMimeType($publicKey, $imageIdentifier);
 }

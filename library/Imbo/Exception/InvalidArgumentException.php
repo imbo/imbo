@@ -52,7 +52,7 @@ class InvalidArgumentException extends BaseInvalidArgumentException implements E
     private $imboCode;
 
     /**
-     * @see Imbo\Exception::setImboErrorCode()
+     * {@inheritdoc}
      */
     public function setImboErrorCode($code) {
         $this->imboCode = (int) $code;
@@ -61,7 +61,7 @@ class InvalidArgumentException extends BaseInvalidArgumentException implements E
     }
 
     /**
-     * @see Imbo\Exception::getImboErrorCode()
+     * {@inheritdoc}
      */
     public function getImboErrorCode() {
         return $this->imboCode;

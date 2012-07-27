@@ -85,7 +85,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * Doctrine connection
      *
-     * @var Doctrine\DBAL\Connection
+     * @var \Doctrine\DBAL\Connection
      */
     private $connection;
 
@@ -93,8 +93,8 @@ class Doctrine implements DatabaseInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param Doctrine\DBAL\Connection $connection Optional connection instance. Primarily used for
-     *                                             testing
+     * @param \Doctrine\DBAL\Connection $connection Optional connection instance. Primarily used
+     *                                              for testing
      */
     public function __construct(array $params, Connection $connection = null) {
         $this->params = array_merge($this->params, $params);
@@ -105,7 +105,7 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::insertImage()
+     * {@inheritdoc}
      */
     public function insertImage($publicKey, $imageIdentifier, ImageInterface $image) {
         $query = $this->getConnection()->createQueryBuilder();
@@ -145,7 +145,7 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::deleteImage()
+     * {@inheritdoc}
      */
     public function deleteImage($publicKey, $imageIdentifier) {
         $query = $this->getConnection()->createQueryBuilder();
@@ -183,7 +183,7 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::updateMetadata()
+     * {@inheritdoc}
      */
     public function updateMetadata($publicKey, $imageIdentifier, array $metadata) {
         // Fetch the current connection
@@ -210,7 +210,7 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::getMetadata()
+     * {@inheritdoc}
      */
     public function getMetadata($publicKey, $imageIdentifier) {
         $query = $this->getConnection()->createQueryBuilder();
@@ -248,7 +248,7 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::deleteMetadata()
+     * {@inheritdoc}
      */
     public function deleteMetadata($publicKey, $imageIdentifier) {
         $query = $this->getConnection()->createQueryBuilder();
@@ -279,7 +279,7 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::getImages()
+     * {@inheritdoc}
      */
     public function getImages($publicKey, QueryInterface $query) {
         $images = array();
@@ -340,7 +340,7 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::load()
+     * {@inheritdoc}
      */
     public function load($publicKey, $imageIdentifier, ImageInterface $image) {
         $query = $this->getConnection()->createQueryBuilder();
@@ -369,7 +369,7 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::getLastModified()
+     * {@inheritdoc}
      */
     public function getLastModified($publicKey, $imageIdentifier = null) {
         $query = $this->getConnection()->createQueryBuilder();
@@ -396,7 +396,7 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::getNumImages()
+     * {@inheritdoc}
      */
     public function getNumImages($publicKey) {
         $query = $this->getConnection()->createQueryBuilder();
@@ -411,7 +411,7 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::getStatus()
+     * {@inheritdoc}
      */
     public function getStatus() {
         $connection = $this->getConnection();
@@ -420,7 +420,7 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * @see Imbo\Database\DatabaseInterface::getImageMimeType()
+     * {@inheritdoc}
      */
     public function getImageMimeType($publicKey, $imageIdentifier) {
         $query = $this->getConnection()->createQueryBuilder();
@@ -446,8 +446,8 @@ class Doctrine implements DatabaseInterface {
     /**
      * Set the connection instance
      *
-     * @param Doctrine\DBAL\Connection $connection The connection instance
-     * @return Imbo\Database\Doctrine
+     * @param \Doctrine\DBAL\Connection $connection The connection instance
+     * @return Doctrine
      */
     private function setConnection(Connection $connection) {
         $this->connection = $connection;
@@ -458,7 +458,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * Get the Doctrine connection
      *
-     * @return Doctrine\DBAL\Connection
+     * @return \Doctrine\DBAL\Connection
      */
     private function getConnection() {
         if ($this->connection === null) {

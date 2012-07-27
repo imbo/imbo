@@ -32,6 +32,9 @@
 
 namespace Imbo\Http\Request;
 
+use Imbo\Exception\InvalidArgumentException,
+    Imbo\Image\TransformationChain;
+
 /**
  * Request interface
  *
@@ -67,7 +70,7 @@ interface RequestInterface {
      * Set the public key
      *
      * @param string $key The key to set
-     * @return Imbo\Http\Request\RequestInterface
+     * @return RequestInterface
      */
     function setPublicKey($key);
 
@@ -85,7 +88,7 @@ interface RequestInterface {
      * Set the private key
      *
      * @param string $key The key to set
-     * @return Imbo\Http\Request\RequestInterface
+     * @return RequestInterface
      */
     function setPrivateKey($key);
 
@@ -95,8 +98,8 @@ interface RequestInterface {
      * If someone specified a transformation that does not exist, an
      * Imbo\Exception\InvalidArgumentException exception must be thrown.
      *
-     * @throws Imbo\Exception\InvalidArgumentException
-     * @return Imbo\Image\TransformationChain
+     * @throws InvalidArgumentException
+     * @return TransformationChain
      */
     function getTransformations();
 
@@ -168,7 +171,7 @@ interface RequestInterface {
      * Set the image identifier
      *
      * @param string $imageIdentifier The image identifier to set
-     * @return Imbo\Http\Request\RequestInterface
+     * @return RequestInterface
      */
     function setImageIdentifier($imageIdentifier);
 
@@ -192,7 +195,7 @@ interface RequestInterface {
      * Set the extension requested
      *
      * @param string $extension The extension to set
-     * @return Imbo\Http\Request\RequestInterface
+     * @return RequestInterface
      */
     function setExtension($extension);
 
@@ -218,35 +221,35 @@ interface RequestInterface {
      * This method must also update the current imageIdentifier
      *
      * @param string $data The data to set
-     * @return Imbo\Http\Request\RequestInterface
+     * @return RequestInterface
      */
     function setRawData($data);
 
     /**
      * Get the query container
      *
-     * @return Imbo\Http\ParameterContainerInterface
+     * @return ParameterContainerInterface
      */
     function getQuery();
 
     /**
      * Get the requerst container
      *
-     * @return Imbo\Http\ParameterContainer
+     * @return ParameterContainer
      */
     function getRequest();
 
     /**
      * Get the server container
      *
-     * @return Imbo\Http\ServerContainerInterface
+     * @return ServerContainerInterface
      */
     function getServer();
 
     /**
      * Get the HTTP headers
      *
-     * @return Imbo\Http\HeaderContainer
+     * @return HeaderContainer
      */
     function getHeaders();
 
@@ -279,7 +282,7 @@ interface RequestInterface {
      * Set the resource name (one of the constants defined in Imbo\Resource\ResourceInterface)
      *
      * @param string $resource The name of the resource
-     * @return Imbo\Http\Request\RequestInterface
+     * @return RequestInterface
      */
     function setResource($resource);
 

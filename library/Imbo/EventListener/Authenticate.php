@@ -63,7 +63,7 @@ class Authenticate extends Listener implements ListenerInterface {
     private $algorithm = 'sha256';
 
     /**
-     * @see Imbo\EventListener\ListenerInterface::getEvents()
+     * {@inheritdoc}
      */
     public function getEvents() {
         return array(
@@ -80,7 +80,7 @@ class Authenticate extends Listener implements ListenerInterface {
     }
 
     /**
-     * @see Imbo\EventListener\ListenerInterface::invoke()
+     * {@inheritdoc}
      */
     public function invoke(EventInterface $event) {
         $container = $event->getContainer();

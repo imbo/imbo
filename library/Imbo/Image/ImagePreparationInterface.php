@@ -32,7 +32,8 @@
 
 namespace Imbo\Image;
 
-use Imbo\Http\Request\RequestInterface;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Exception\ImageException;
 
 /**
  * Image preparation interface
@@ -51,10 +52,10 @@ interface ImagePreparationInterface {
      * This method should prepare an image object from php://input. The method must also figure out
      * the width, height, mime type  and extension of the image.
      *
-     * @param Imbo\Http\Request\RequestInterface $request A request instance
-     * @param Imbo\Image\ImageInterface $image An image instance
-     * @throws Imbo\Exception\ImageException
-     * @return Imbo\Image\ImagePreparationInterface
+     * @param RequestInterface $request A request instance
+     * @param ImageInterface $image An image instance
+     * @throws ImageException
+     * @return ImagePreparationInterface
      */
     function prepareImage(RequestInterface $request, ImageInterface $image);
 }
