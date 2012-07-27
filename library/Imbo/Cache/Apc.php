@@ -68,28 +68,28 @@ class Apc implements CacheInterface {
     }
 
     /**
-     * @see Imbo\Cache\CacheInterface::get()
+     * {@inheritdoc}
      */
     public function get($key) {
         return apc_fetch($this->getKey($key));
     }
 
     /**
-     * @see Imbo\Cache\CacheInterface::set()
+     * {@inheritdoc}
      */
     public function set($key, $value, $expire = 0) {
         return apc_store($this->getKey($key), $value, $expire);
     }
 
     /**
-     * @see Imbo\Cache\CacheInterface::delete()
+     * {@inheritdoc}
      */
     public function delete($key) {
         return apc_delete($this->getKey($key));
     }
 
     /**
-     * @see Imbo\Cache\CacheInterface::increment()
+     * {@inheritdoc}
      */
     public function increment($key, $amount = 1) {
         $key = $this->getKey($key);
@@ -109,7 +109,7 @@ class Apc implements CacheInterface {
     }
 
     /**
-     * @see Imbo\Cache\CacheInterface::decrement()
+     * {@inheritdoc}
      */
     public function decrement($key, $amount = 1) {
         $key = $this->getKey($key);

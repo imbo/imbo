@@ -67,28 +67,28 @@ class HeaderContainer extends ParameterContainer {
     }
 
     /**
-     * @see Imbo\Http\ParameterContainerInterface::set()
+     * {@inheritdoc}
      */
     public function set($key, $value) {
         return parent::set($this->getName($key), $value);
     }
 
     /**
-     * @see Imbo\Http\ParameterContainerInterface::get()
+     * {@inheritdoc}
      */
     public function get($key, $default = null) {
         return parent::get($this->getName($key), $default);
     }
 
     /**
-     * @see Imbo\Http\ParameterContainerInterface::remove()
+     * {@inheritdoc}
      */
     public function remove($key) {
         return parent::remove($this->getName($key));
     }
 
     /**
-     * @see Imbo\Http\ParameterContainerInterface::has()
+     * {@inheritdoc}
      */
     public function has($key) {
         return parent::has($this->getName($key));

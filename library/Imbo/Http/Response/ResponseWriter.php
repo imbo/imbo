@@ -51,7 +51,7 @@ class ResponseWriter implements ResponseWriterInterface {
     /**
      * Content negotiation instance
      *
-     * @var Imbo\Http\ContentNegotiation
+     * @var ContentNegotiation
      */
     private $cn;
 
@@ -87,7 +87,7 @@ class ResponseWriter implements ResponseWriterInterface {
     /**
      * Class constructor
      *
-     * @param Imbo\Http\ContentNegotiation $cn Content negotiation instance
+     * @param ContentNegotiation $cn Content negotiation instance
      */
     public function __construct(ContentNegotiation $cn = null) {
         if ($cn === null) {
@@ -98,7 +98,7 @@ class ResponseWriter implements ResponseWriterInterface {
     }
 
     /**
-     * @see Imbo\Http\Response\ResponseWriterInterface::write()
+     * {@inheritdoc}
      */
     public function write(array $data, RequestInterface $request, ResponseInterface $response, $strict = true) {
         // The formatter to use

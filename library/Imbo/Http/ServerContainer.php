@@ -46,7 +46,7 @@ namespace Imbo\Http;
  */
 class ServerContainer extends ParameterContainer implements ServerContainerInterface {
     /**
-     * @see Imbo\Http\ServerContainerInterface::getHeaders()
+     * {@inheritdoc}
      */
     public function getHeaders() {
         $headers = array();

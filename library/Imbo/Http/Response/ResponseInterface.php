@@ -58,22 +58,22 @@ interface ResponseInterface {
      * @param int $code The HTTP status code to use in the response
      * @param string $message A custom message to send in the status line instead of the default
      *                        status messages defined in Imbo\Http\Response\Response.php.
-     * @return Imbo\Http\Response\ResponseInterface
+     * @return ResponseInterface
      */
     function setStatusCode($code, $message = null);
 
     /**
      * Get the header container
      *
-     * @return Imbo\Http\HeaderContainer
+     * @return HeaderContainer
      */
     function getHeaders();
 
     /**
      * Set the header container
      *
-     * @param Imbo\Http\HeaderContainer
-     * @return Imbo\Http\Response\ResponesInterface
+     * @param HeaderContainer $headers Container of headers
+     * @return ResponesInterface
      */
     function setHeaders(HeaderContainer $headers);
 
@@ -87,8 +87,8 @@ interface ResponseInterface {
     /**
      * Set the body
      *
-     * @param Imbo\Image\ImageInterface|array $content Either an image instance, or an array
-     * @return Imbo\Http\Response\ResponseInterface
+     * @param ImageInterface|array $content Either an image instance, or an array
+     * @return ResponseInterface
      */
     function setBody($content);
 
@@ -103,7 +103,7 @@ interface ResponseInterface {
      * Set the protocol version header
      *
      * @param string $version The version to set
-     * @return Imbo\Http\Response\ResponseInterface
+     * @return ResponseInterface
      */
     function setProtocolVersion($version);
 
@@ -115,7 +115,7 @@ interface ResponseInterface {
     /**
      * Prepare the response to send 304 Not Modified to the client
      *
-     * @return Imbo\Http\Response\ResponseInterface
+     * @return ResponseInterface
      */
     function setNotModified();
 

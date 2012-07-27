@@ -64,14 +64,14 @@ class GridFS implements StorageInterface {
     /**
      * Mongo instance
      *
-     * @var Mongo
+     * @var \Mongo
      */
     private $mongo;
 
     /**
      * The grid instance
      *
-     * @var MongoGridFS
+     * @var \MongoGridFS
      */
     private $grid;
 
@@ -96,8 +96,8 @@ class GridFS implements StorageInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param Mongo $mongo Mongo instance
-     * @param MongoGridFS $grid MongoGridFS instance
+     * @param \Mongo $mongo Mongo instance
+     * @param \MongoGridFS $grid MongoGridFS instance
      */
     public function __construct(array $params = null, Mongo $mongo = null, MongoGridFS $grid = null) {
         if ($params !== null) {
@@ -114,7 +114,7 @@ class GridFS implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::store()
+     * {@inheritdoc}
      */
     public function store($publicKey, $imageIdentifier, $imageData) {
         if ($this->imageExists($publicKey, $imageIdentifier, true) !== false) {
@@ -142,7 +142,7 @@ class GridFS implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::delete()
+     * {@inheritdoc}
      */
     public function delete($publicKey, $imageIdentifier) {
         if (($file = $this->imageExists($publicKey, $imageIdentifier)) === false) {
@@ -153,7 +153,7 @@ class GridFS implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::getImage()
+     * {@inheritdoc}
      */
     public function getImage($publicKey, $imageIdentifier) {
         if (($file = $this->imageExists($publicKey, $imageIdentifier)) === false) {
@@ -164,7 +164,7 @@ class GridFS implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::getLastModified()
+     * {@inheritdoc}
      */
     public function getLastModified($publicKey, $imageIdentifier) {
         if (($file = $this->imageExists($publicKey, $imageIdentifier)) === false) {
@@ -177,7 +177,7 @@ class GridFS implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::getStatus()
+     * {@inheritdoc}
      */
     public function getStatus() {
         return $this->getMongo()->connect();
@@ -186,7 +186,7 @@ class GridFS implements StorageInterface {
     /**
      * Get the grid instance
      *
-     * @return MongoGridFS
+     * @return \MongoGridFS
      */
     protected function getGrid() {
         if ($this->grid === null) {
@@ -204,7 +204,7 @@ class GridFS implements StorageInterface {
     /**
      * Get the mongo instance
      *
-     * @return Mongo
+     * @return \Mongo
      */
     protected function getMongo() {
         if ($this->mongo === null) {
@@ -227,8 +227,8 @@ class GridFS implements StorageInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
-     * @return boolean|MongoGridFSFile Returns false if the file does not exist or an instance of
-     *                                 MongoGridFSFile if the file exists
+     * @return boolean|\MongoGridFSFile Returns false if the file does not exist or an instance of
+     *                                  MongoGridFSFile if the file exists
      */
     private function imageExists($publicKey, $imageIdentifier) {
         $cursor = $this->getGrid()->find(array(

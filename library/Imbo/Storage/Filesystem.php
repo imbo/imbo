@@ -71,7 +71,7 @@ class Filesystem implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::store()
+     * {@inheritdoc}
      */
     public function store($publicKey, $imageIdentifier, $imageData) {
         if (!is_writable($this->params['dataDir'])) {
@@ -101,7 +101,7 @@ class Filesystem implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::delete()
+     * {@inheritdoc}
      */
     public function delete($publicKey, $imageIdentifier) {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
@@ -114,7 +114,7 @@ class Filesystem implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::getImage()
+     * {@inheritdoc}
      */
     public function getImage($publicKey, $imageIdentifier) {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
@@ -127,7 +127,7 @@ class Filesystem implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::getLastModified()
+     * {@inheritdoc}
      */
     public function getLastModified($publicKey, $imageIdentifier) {
         $path = $this->getImagePath($publicKey, $imageIdentifier);
@@ -144,7 +144,7 @@ class Filesystem implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::getStatus()
+     * {@inheritdoc}
      */
     public function getStatus() {
         return is_writable($this->params['dataDir']);

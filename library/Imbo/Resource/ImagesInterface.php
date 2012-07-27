@@ -51,15 +51,15 @@ interface ImagesInterface extends ResourceInterface {
     /**
      * Fetch a query instance
      *
-     * @return Imbo\Resource\Images\QueryInterface
+     * @return QueryInterface
      */
     function getQuery();
 
     /**
      * Set a query instance
      *
-     * @param Imbo\Resource\Images\QueryInterface $query A query instance
-     * @return Imbo\Resource\ImagesInterface
+     * @param QueryInterface $query A query instance
+     * @return ImagesInterface
      */
     function setQuery(QueryInterface $query);
 }

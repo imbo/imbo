@@ -48,7 +48,7 @@ use Imbo\Http\Request\RequestInterface,
  */
 class Metadata extends Resource implements ResourceInterface {
     /**
-     * @see Imbo\Resource\ResourceInterface::getAllowedMethods()
+     * {@inheritdoc}
      */
     public function getAllowedMethods() {
         return array(
@@ -61,7 +61,7 @@ class Metadata extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::delete()
+     * {@inheritdoc}
      */
     public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $imageIdentifier = $request->getImageIdentifier();
@@ -74,7 +74,7 @@ class Metadata extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::put()
+     * {@inheritdoc}
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $publicKey = $request->getPublicKey();
@@ -103,7 +103,7 @@ class Metadata extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::post()
+     * {@inheritdoc}
      */
     public function post(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $imageIdentifier = $request->getImageIdentifier();
@@ -133,7 +133,7 @@ class Metadata extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::get()
+     * {@inheritdoc}
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $publicKey = $request->getPublicKey();
@@ -165,7 +165,7 @@ class Metadata extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::head()
+     * {@inheritdoc}
      */
     public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $this->get($request, $response, $database, $storage);

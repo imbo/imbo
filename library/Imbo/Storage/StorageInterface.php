@@ -32,7 +32,8 @@
 
 namespace Imbo\Storage;
 
-use Imbo\Image\ImageInterface;
+use Imbo\Image\ImageInterface,
+    Imbo\Exception\StorageException;
 
 /**
  * Storage driver interface
@@ -58,7 +59,7 @@ interface StorageInterface {
      * @param string $imageIdentifier The image identifier
      * @param string $imageData The image data to store
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Exception\StorageException
+     * @throws StorageException
      */
     function store($publicKey, $imageIdentifier, $imageData);
 
@@ -70,7 +71,7 @@ interface StorageInterface {
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return boolean Returns true on success or false on failure
-     * @throws Imbo\Exception\StorageException
+     * @throws StorageException
      */
     function delete($publicKey, $imageIdentifier);
 
@@ -80,7 +81,7 @@ interface StorageInterface {
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return string The binary content of the image
-     * @throws Imbo\Exception\StorageException
+     * @throws StorageException
      */
     function getImage($publicKey, $imageIdentifier);
 
@@ -90,7 +91,7 @@ interface StorageInterface {
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
      * @return DateTime Returns an instance of DateTime
-     * @throws Imbo\Exception\StorageException
+     * @throws StorageException
      */
     function getLastModified($publicKey, $imageIdentifier);
 

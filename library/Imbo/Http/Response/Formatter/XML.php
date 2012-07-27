@@ -49,7 +49,7 @@ use Imbo\Resource\ResourceInterface,
  */
 class XML implements FormatterInterface {
     /**
-     * @see Imbo\Http\Response\Formatter\FormatterInterface::format()
+     * {@inheritdoc}
      */
     public function format(array $data, RequestInterface $request, ResponseInterface $response) {
         // Fetch the name of the resource
@@ -69,7 +69,7 @@ class XML implements FormatterInterface {
     }
 
     /**
-     * @see Imbo\Http\Response\Formatter\FormatterInterface::getContentType()
+     * {@inheritdoc}
      */
     public function getContentType() {
         return 'text/xml';

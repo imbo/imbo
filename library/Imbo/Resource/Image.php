@@ -57,30 +57,30 @@ class Image extends Resource implements ResourceInterface {
     /**
      * Image for the client
      *
-     * @var Imbo\Image\ImageInterface
+     * @var ImageInterface
      */
     private $image;
 
     /**
      * Image prepation instance
      *
-     * @var Imbo\Image\ImagePreparation
+     * @var ImagePreparation
      */
     private $imagePreparation;
 
     /**
      * Content negotiation instance
      *
-     * @var Imbo\Http\ContentNegotiation
+     * @var ContentNegotiation
      */
     private $contentNegotiation;
 
     /**
      * Class constructor
      *
-     * @param Imbo\Image\ImageInterface $image An image instance
-     * @param Imbo\Image\ImagePreparationInterface $imagePreparation An image preparation instance
-     * @param Imbo\Http\ContentNegotiation $contentNegotiation Content negotiation instance
+     * @param ImageInterface $image An image instance
+     * @param ImagePreparationInterface $imagePreparation An image preparation instance
+     * @param ContentNegotiation $contentNegotiation Content negotiation instance
      */
     public function __construct(ImageInterface $image = null, ImagePreparationInterface $imagePreparation = null, ContentNegotiation $contentNegotiation = null) {
         if ($image === null) {
@@ -101,7 +101,7 @@ class Image extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::getAllowedMethods()
+     * {@inheritdoc}
      */
     public function getAllowedMethods() {
         return array(
@@ -113,7 +113,7 @@ class Image extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::put()
+     * {@inheritdoc}
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         // Prepare the image based on the input stream in the request
@@ -141,7 +141,7 @@ class Image extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::delete()
+     * {@inheritdoc}
      */
     public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $publicKey = $request->getPublicKey();
@@ -156,7 +156,7 @@ class Image extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::get()
+     * {@inheritdoc}
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $publicKey       = $request->getPublicKey();
@@ -234,7 +234,7 @@ class Image extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::head()
+     * {@inheritdoc}
      */
     public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $this->get($request, $response, $database, $storage);

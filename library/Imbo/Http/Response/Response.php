@@ -127,7 +127,7 @@ class Response implements ResponseInterface {
     /**
      * Response headers
      *
-     * @var Imbo\Http\HeaderContainer
+     * @var HeaderContainer
      */
     private $headers;
 
@@ -141,9 +141,8 @@ class Response implements ResponseInterface {
     /**
      * Class constructor
      *
-     * @param Imbo\Http\HeaderContainer $headerContainer An optional instance of a header
-     *                                                     container. An empty one will be created
-     *                                                     if not specified.
+     * @param HeaderContainer $headerContainer An optional instance of a header container. An empty
+     *                                         one will be created if not specified.
      */
     public function __construct(HeaderContainer $headerContainer = null) {
         if ($headerContainer === null) {
@@ -154,14 +153,14 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see Imbo\Http\Response\ResponseInterface::getStatusCode()
+     * {@inheritdoc}
      */
     public function getStatusCode() {
         return $this->statusCode;
     }
 
     /**
-     * @see Imbo\Http\Response\ResponseInterface::setStatusCode()
+     * {@inheritdoc}
      */
     public function setStatusCode($code, $message = null) {
         $this->statusCode = (int) $code;
@@ -174,14 +173,14 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see Imbo\Http\Response\ResponseInterface::getHeaders()
+     * {@inheritdoc}
      */
     public function getHeaders() {
         return $this->headers;
     }
 
     /**
-     * @see Imbo\Http\Response\ResponseInterface::setHeaders()
+     * {@inheritdoc}
      */
     public function setHeaders(HeaderContainer $headers) {
         $this->headers = $headers;
@@ -190,14 +189,14 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see Imbo\Http\Response\ResponseInterface::getBody()
+     * {@inheritdoc}
      */
     public function getBody() {
         return $this->body;
     }
 
     /**
-     * @see Imbo\Http\Response\ResponseInterface::setBody()
+     * {@inheritdoc}
      */
     public function setBody($content) {
         $this->body = $content;
@@ -206,14 +205,14 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see Imbo\Http\Response\ResponseInterface::getProtocolVersion()
+     * {@inheritdoc}
      */
     public function getProtocolVersion() {
         return $this->protocolVersion;
     }
 
     /**
-     * @see Imbo\Http\Response\ResponseInterface::setProtocolVersion()
+     * {@inheritdoc}
      */
     public function setProtocolVersion($version) {
         $this->protocolVersion = $version;
@@ -222,7 +221,7 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see Imbo\Http\Response\ResponseInterface::send()
+     * {@inheritdoc}
      */
     public function send() {
         $this->sendHeaders();
@@ -230,7 +229,7 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see Imbo\Http\Response\ResponseInterface::setNotModified()
+     * {@inheritdoc}
      */
     public function setNotModified() {
         $this->setStatusCode(304);
@@ -245,7 +244,7 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * @see Imbo\Http\Response\ResponseInterface::isError()
+     * {@inheritdoc}
      */
     public function isError() {
         return $this->getStatusCode() >= 400;
@@ -253,8 +252,6 @@ class Response implements ResponseInterface {
 
     /**
      * Send all headers to the client
-     *
-     * @codeCoverageIgnore
      */
     private function sendHeaders() {
         if (headers_sent()) {

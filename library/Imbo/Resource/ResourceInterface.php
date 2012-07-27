@@ -77,58 +77,58 @@ interface ResourceInterface {
     /**
      * POST handler
      *
-     * @param Imbo\Http\Request\RequestInterface $request A request instance
-     * @param Imbo\Http\Response\ResponseInterface $response A response instance
-     * @param Imbo\Database\DatabaseInterface $database A database instance
-     * @param Imbo\Storage\StorageInterface $storage A storage instance
+     * @param RequestInterface $request A request instance
+     * @param ResponseInterface $response A response instance
+     * @param DatabaseInterface $database A database instance
+     * @param StorageInterface $storage A storage instance
      */
     function post(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
     /**
      * GET handler
      *
-     * @param Imbo\Http\Request\RequestInterface $request A request instance
-     * @param Imbo\Http\Response\ResponseInterface $response A response instance
-     * @param Imbo\Database\DatabaseInterface $database A database instance
-     * @param Imbo\Storage\StorageInterface $storage A storage instance
+     * @param RequestInterface $request A request instance
+     * @param ResponseInterface $response A response instance
+     * @param DatabaseInterface $database A database instance
+     * @param StorageInterface $storage A storage instance
      */
     function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
     /**
      * HEAD handler
      *
-     * @param Imbo\Http\Request\RequestInterface $request A request instance
-     * @param Imbo\Http\Response\ResponseInterface $response A response instance
-     * @param Imbo\Database\DatabaseInterface $database A database instance
-     * @param Imbo\Storage\StorageInterface $storage A storage instance
+     * @param RequestInterface $request A request instance
+     * @param ResponseInterface $response A response instance
+     * @param DatabaseInterface $database A database instance
+     * @param StorageInterface $storage A storage instance
      */
     function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
     /**
      * DELETE handler
      *
-     * @param Imbo\Http\Request\RequestInterface $request A request instance
-     * @param Imbo\Http\Response\ResponseInterface $response A response instance
-     * @param Imbo\Database\DatabaseInterface $database A database instance
-     * @param Imbo\Storage\StorageInterface $storage A storage instance
+     * @param RequestInterface $request A request instance
+     * @param ResponseInterface $response A response instance
+     * @param DatabaseInterface $database A database instance
+     * @param StorageInterface $storage A storage instance
      */
     function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
     /**
      * PUT handler
      *
-     * @param Imbo\Http\Request\RequestInterface $request A request instance
-     * @param Imbo\Http\Response\ResponseInterface $response A response instance
-     * @param Imbo\Database\DatabaseInterface $database A database instance
-     * @param Imbo\Storage\StorageInterface $storage A storage instance
+     * @param RequestInterface $request A request instance
+     * @param ResponseInterface $response A response instance
+     * @param DatabaseInterface $database A database instance
+     * @param StorageInterface $storage A storage instance
      */
     function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
 
     /**
      * Set the event manager
      *
-     * @param Imbo\EventManager\EventManagerInterface $eventManager An instance of an event manager
-     * @return Imbo\Resource\ResourceInterface
+     * @param EventManagerInterface $eventManager An instance of an event manager
+     * @return ResourceInterface
      */
     function setEventManager(EventManagerInterface $eventManager);
 }
