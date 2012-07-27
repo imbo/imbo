@@ -51,7 +51,7 @@ class FrontController {
     /**
      * Dependency injection container
      *
-     * @var Imbo\Container
+     * @var Container
      */
     private $container;
 
@@ -87,7 +87,7 @@ class FrontController {
     /**
      * Class constructor
      *
-     * @param Imbo\Container $container A container instance
+     * @param Container $container A container instance
      */
     public function __construct(Container $container) {
         $this->container = $container;
@@ -96,9 +96,9 @@ class FrontController {
     /**
      * Create a resource object based on the request
      *
-     * @param Imbo\Http\Request\RequestInterface $request A request instance
-     * @return Imbo\Resource\ResourceInterface
-     * @throws Imbo\Exception\RuntimeException
+     * @param RequestInterface $request A request instance
+     * @return ResourceInterface
+     * @throws RuntimeException
      */
     private function resolveResource(RequestInterface $request) {
         // Fetch current path
@@ -163,9 +163,9 @@ class FrontController {
     /**
      * Handle a request
      *
-     * @param Imbo\Http\Request\RequestInterface $request The request object
-     * @param Imbo\Http\Response\ResponseInterface $response The response object
-     * @throws Imbo\Exception\RuntimeException
+     * @param RequestInterface $request The request object
+     * @param ResponseInterface $response The response object
+     * @throws RuntimeException
      */
     public function handle(RequestInterface $request, ResponseInterface $response) {
         $httpMethod = $request->getMethod();

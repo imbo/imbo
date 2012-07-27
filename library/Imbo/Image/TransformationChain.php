@@ -61,42 +61,42 @@ class TransformationChain implements Iterator, Countable {
     private $position = 0;
 
     /**
-     * @see Iterator::rewind()
+     * {@inheritdoc}
      */
     public function rewind() {
         $this->position = 0;
     }
 
     /**
-     * @see Iterator::current()
+     * {@inheritdoc}
      */
     public function current() {
         return $this->transformations[$this->position];
     }
 
     /**
-     * @see Iterator::key()
+     * {@inheritdoc}
      */
     public function key() {
         return $this->position;
     }
 
     /**
-     * @see Iterator::next()
+     * {@inheritdoc}
      */
     public function next() {
         $this->position++;
     }
 
     /**
-     * @see Countable::count()
+     * {@inheritdoc}
      */
     public function count() {
         return count($this->transformations);
     }
 
     /**
-     * @see Iterator::valid()
+     * {@inheritdoc}
      */
     public function valid() {
         return isset($this->transformations[$this->position]);
@@ -105,8 +105,8 @@ class TransformationChain implements Iterator, Countable {
     /**
      * Apply all transformations to an image object
      *
-     * @param Imbo\Image\ImageInterface $image Image object
-     * @return Imbo\Image\TransformationChain
+     * @param ImageInterface $image Image object
+     * @return TransformationChain
      */
     public function applyToImage(ImageInterface $image) {
         foreach ($this->transformations as $transformation) {
@@ -119,9 +119,9 @@ class TransformationChain implements Iterator, Countable {
     /**
      * Transform an image
      *
-     * @param Imbo\Image\ImageInterface $image Image object
-     * @param Imbo\Image\Transformation\TransformationInterface $transformation Transformation object
-     * @return Imbo\Image\TransformationChain
+     * @param ImageInterface $image Image object
+     * @param TransformationInterface $transformation Transformation object
+     * @return TransformationChain
      */
     public function transformImage(ImageInterface $image, TransformationInterface $transformation) {
         $transformation->applyToImage($image);
@@ -132,8 +132,8 @@ class TransformationChain implements Iterator, Countable {
     /**
      * Add a transformation to the chain
      *
-     * @param Imbo\Image\Transformation\TransformationInterface $transformation The transformation to add
-     * @return Imbo\Image\TransformationChain
+     * @param TransformationInterface $transformation The transformation to add
+     * @return TransformationChain
      */
     public function add(TransformationInterface $transformation) {
         $this->transformations[] = $transformation;
@@ -147,8 +147,8 @@ class TransformationChain implements Iterator, Countable {
      * @param string $color The color to use
      * @param int $width Width of the border
      * @param int $height Height of the border
-     * @return Imbo\Image\TransformationChain
-     * @see Imbo\Image\Transformation\Border
+     * @return TransformationChain
+     * @see Transformation\Border
      */
     public function border($color = null, $width = null, $height = null) {
         return $this->add(new Transformation\Border($color, $width, $height));
@@ -159,8 +159,8 @@ class TransformationChain implements Iterator, Countable {
      *
      * @param int $maxWidth Max width of the image
      * @param int $maxHeight Max height of the image
-     * @return Imbo\Image\TransformationChain
-     * @see Imbo\Image\Transformation\MaxSize
+     * @return TransformationChain
+     * @see Transformation\MaxSize
      */
     public function maxSize($maxWidth = null, $maxHeight = null) {
         return $this->add(new Transformation\MaxSize($maxWidth, $maxHeight));
@@ -170,8 +170,8 @@ class TransformationChain implements Iterator, Countable {
      * Compression transformation
      *
      * @param int $quality Quality of the resulting image
-     * @return Imbo\Image\TransformationChain
-     * @see Imbo\Image\Transformation\Compress
+     * @return TransformationChain
+     * @see Transformation\Compress
      */
     public function compress($quality) {
         return $this->add(new Transformation\Compress($quality));
@@ -184,8 +184,8 @@ class TransformationChain implements Iterator, Countable {
      * @param int $y Y coordinate of the top left corner of the crop
      * @param int $width Width of the crop
      * @param int $height Height of the crop
-     * @return Imbo\Image\TransformationChain
-     * @see Imbo\Image\Transformation\Crop
+     * @return TransformationChain
+     * @see Transformation\Crop
      */
     public function crop($x, $y, $width, $height) {
         return $this->add(new Transformation\Crop($x, $y, $width, $height));
@@ -196,8 +196,8 @@ class TransformationChain implements Iterator, Countable {
      *
      * @param int $angle Angle of the rotation
      * @param string $bg Background color
-     * @return Imbo\Image\TransformationChain
-     * @see Imbo\Image\Transformation\Rotate
+     * @return TransformationChain
+     * @see Transformation\Rotate
      */
     public function rotate($angle, $bg = null) {
         return $this->add(new Transformation\Rotate($angle, $bg));
@@ -208,8 +208,8 @@ class TransformationChain implements Iterator, Countable {
      *
      * @param int $width Width of the resize
      * @param int $height Height of the resize
-     * @return Imbo\Image\TransformationChain
-     * @see Imbo\Image\Transformation\Resize
+     * @return TransformationChain
+     * @see Transformation\Resize
      */
     public function resize($width = null, $height = null) {
         return $this->add(new Transformation\Resize($width, $height));
@@ -221,8 +221,8 @@ class TransformationChain implements Iterator, Countable {
      * @param int $width Width of the thumbnail
      * @param int $height height of the thumbnail
      * @param string $fit Fit style ('inset' or 'outbound')
-     * @return Imbo\Image\TransformationChain
-     * @see Imbo\Image\Transformation\Thumbnail
+     * @return TransformationChain
+     * @see Transformation\Thumbnail
      */
     public function thumbnail($width = null, $height = null, $fit = null) {
         return $this->add(new Transformation\Thumbnail($width, $height, $fit));
@@ -231,8 +231,8 @@ class TransformationChain implements Iterator, Countable {
     /**
      * Flip horizontally transformation
      *
-     * @return Imbo\Image\TransformationChain
-     * @see Imbo\Image\Transformation\FlipHorizontally
+     * @return TransformationChain
+     * @see Transformation\FlipHorizontally
      */
     public function flipHorizontally() {
         return $this->add(new Transformation\FlipHorizontally());
@@ -241,8 +241,8 @@ class TransformationChain implements Iterator, Countable {
     /**
      * Flip vertically transformation
      *
-     * @return Imbo\Image\TransformationChain
-     * @see Imbo\Image\Transformation\FlipVertically
+     * @return TransformationChain
+     * @see Transformation\FlipVertically
      */
     public function flipVertically() {
         return $this->add(new Transformation\FlipVertically());
@@ -257,8 +257,8 @@ class TransformationChain implements Iterator, Countable {
      * @param int $x X coordinate of the placement of the upper left corner of the existing image
      * @param int $y Y coordinate of the placement of the upper left corner of the existing image
      * @param string $bg Background color of the canvas
-     * @return Imbo\Image\TransformationChain
-     * @see Imbo\Image\Transformation\Canvas
+     * @return TransformationChain
+     * @see Transformation\Canvas
      */
     public function canvas($width, $height, $mode = null, $x = null, $y = null, $bg = null) {
         return $this->add(new Transformation\Canvas($width, $height, $mode, $x, $y, $bg));
@@ -267,8 +267,8 @@ class TransformationChain implements Iterator, Countable {
     /**
      * Transpose transformation
      *
-     * @return Imbo\Image\TransformationChain
-     * @see Imbo\Image\Transformation\Transpose
+     * @return TransformationChain
+     * @see Transformation\Transpose
      */
     public function transpose() {
         return $this->add(new Transformation\Transpose());
@@ -277,8 +277,8 @@ class TransformationChain implements Iterator, Countable {
     /**
      * Transverse transformation
      *
-     * @return Imbo\Image\TransformationChain
-     * @see Imbo\Image\Transformation\Transverse
+     * @return TransformationChain
+     * @see Transformation\Transverse
      */
     public function transverse() {
         return $this->add(new Transformation\Transverse());

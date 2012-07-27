@@ -47,7 +47,7 @@ use Imbo\Http\Request\RequestInterface,
  */
 class JSON implements FormatterInterface {
     /**
-     * @see Imbo\Http\Response\Formatter\FormatterInterface::format()
+     * {@inheritdoc}
      */
     public function format(array $data, RequestInterface $request, ResponseInterface $response) {
         // Simply encode the data to JSON, no matter what resource we are dealing with
@@ -65,7 +65,7 @@ class JSON implements FormatterInterface {
     }
 
     /**
-     * @see Imbo\Http\Response\Formatter\FormatterInterface::getContentType()
+     * {@inheritdoc}
      */
     public function getContentType() {
         return 'application/json';

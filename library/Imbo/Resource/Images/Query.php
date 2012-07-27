@@ -86,7 +86,7 @@ class Query implements QueryInterface {
     private $to;
 
     /**
-     * @see Imbo\Resource\Images\QueryInterface::page()
+     * {@inheritdoc}
      */
     public function page($page = null) {
         if ($page === null) {
@@ -99,7 +99,7 @@ class Query implements QueryInterface {
     }
 
     /**
-     * @see Imbo\Resource\Images\QueryInterface::limit()
+     * {@inheritdoc}
      */
     public function limit($limit = null) {
         if ($limit === null) {
@@ -112,7 +112,7 @@ class Query implements QueryInterface {
     }
 
     /**
-     * @see Imbo\Resource\Images\QueryInterface::returnMetadata()
+     * {@inheritdoc}
      */
     public function returnMetadata($returnMetadata = null) {
         if ($returnMetadata === null) {
@@ -125,7 +125,7 @@ class Query implements QueryInterface {
     }
 
     /**
-     * @see Imbo\Resource\Images\QueryInterface::metadataQuery()
+     * {@inheritdoc}
      */
     public function metadataQuery(array $metadataQuery = null) {
         if ($metadataQuery === null) {
@@ -138,7 +138,7 @@ class Query implements QueryInterface {
     }
 
     /**
-     * @see Imbo\Resource\Images\QueryInterface::from()
+     * {@inheritdoc}
      */
     public function from($from = null) {
         if ($from === null) {
@@ -151,7 +151,7 @@ class Query implements QueryInterface {
     }
 
     /**
-     * @see Imbo\Resource\Images\QueryInterface::to()
+     * {@inheritdoc}
      */
     public function to($to = null) {
         if ($to === null) {

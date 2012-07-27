@@ -53,7 +53,7 @@ class Memcached implements CacheInterface {
     /**
      * The memcached instance to use
      *
-     * @var Memcached
+     * @var \Memcached
      */
     private $memcached;
 
@@ -61,7 +61,7 @@ class Memcached implements CacheInterface {
      * Class constructor
      *
      * @param string $namespace A prefix that will be added to all keys
-     * @param Memacached $memcached An instance of pecl/memcached
+     * @param \Memcached $memcached An instance of pecl/memcached
      */
     public function __construct($namespace = null, PeclMemcached $memcached) {
         $this->namespace = $namespace;
@@ -79,35 +79,35 @@ class Memcached implements CacheInterface {
     }
 
     /**
-     * @see Imbo\Cache\CacheInterface::get()
+     * {@inheritdoc}
      */
     public function get($key) {
         return $this->memcached->get($this->getKey($key));
     }
 
     /**
-     * @see Imbo\Cache\CacheInterface::set()
+     * {@inheritdoc}
      */
     public function set($key, $value, $expire = 0) {
         return $this->memcached->set($this->getKey($key), $value, $expire);
     }
 
     /**
-     * @see Imbo\Cache\CacheInterface::delete()
+     * {@inheritdoc}
      */
     public function delete($key) {
         return $this->memcached->delete($this->getKey($key));
     }
 
     /**
-     * @see Imbo\Cache\CacheInterface::increment()
+     * {@inheritdoc}
      */
     public function increment($key, $amount = 1) {
         return $this->memcached->increment($this->getKey($key), $amount);
     }
 
     /**
-     * @see Imbo\Cache\CacheInterface::decrement()
+     * {@inheritdoc}
      */
     public function decrement($key, $amount = 1) {
         return $this->memcached->decrement($this->getKey($key), $amount);

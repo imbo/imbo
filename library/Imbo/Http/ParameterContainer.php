@@ -63,14 +63,14 @@ class ParameterContainer implements ParameterContainerInterface {
     }
 
     /**
-     * @see Imbo\Http\ParameterContainerInterface::getAll()
+     * {@inheritdoc}
      */
     public function getAll() {
         return $this->parameters;
     }
 
     /**
-     * @see Imbo\Http\ParameterContainerInterface::removeAll()
+     * {@inheritdoc}
      */
     public function removeAll() {
         $this->parameters = array();
@@ -79,7 +79,7 @@ class ParameterContainer implements ParameterContainerInterface {
     }
 
     /**
-     * @see Imbo\Http\ParameterContainerInterface::set()
+     * {@inheritdoc}
      */
     public function set($key, $value) {
         $this->parameters[$key] = $value;
@@ -88,14 +88,14 @@ class ParameterContainer implements ParameterContainerInterface {
     }
 
     /**
-     * @see Imbo\Http\ParameterContainerInterface::get()
+     * {@inheritdoc}
      */
     public function get($key, $default = null) {
         return isset($this->parameters[$key]) ? $this->parameters[$key] : $default;
     }
 
     /**
-     * @see Imbo\Http\ParameterContainerInterface::remove()
+     * {@inheritdoc}
      */
     public function remove($key) {
         unset($this->parameters[$key]);
@@ -104,14 +104,14 @@ class ParameterContainer implements ParameterContainerInterface {
     }
 
     /**
-     * @see Imbo\Http\ParameterContainerInterface::has()
+     * {@inheritdoc}
      */
     public function has($key) {
         return isset($this->parameters[$key]);
     }
 
     /**
-     * @see Imbo\Http\ParameterContainerInterface::asString()
+     * {@inheritdoc}
      */
     public function asString() {
         // Translate %5B and %5D back to [] as the client uses [] when generating the access token

@@ -72,7 +72,7 @@ class MaxImageSize extends Listener implements ListenerInterface {
     }
 
     /**
-     * @see Imbo\EventListener\ListenerInterface::getEvents()
+     * {@inheritdoc}
      */
     public function getEvents() {
         return array(
@@ -81,7 +81,7 @@ class MaxImageSize extends Listener implements ListenerInterface {
     }
 
     /**
-     * @see Imbo\EventListener\ListenerInterface::invoke()
+     * {@inheritdoc}
      */
     public function invoke(EventInterface $event) {
         $container = $event->getContainer();

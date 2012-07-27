@@ -49,14 +49,14 @@ abstract class Listener implements ListenerInterface {
     private $publicKeys = array();
 
     /**
-     * @see Imbo\EventListener\ListenerInterface::getPublicKeys()
+     * {@inheritdoc}
      */
     public function getPublicKeys() {
         return $this->publicKeys;
     }
 
     /**
-     * @see Imbo\EventListener\ListenerInterface::setPublicKeys()
+     * {@inheritdoc}
      */
     public function setPublicKeys(array $keys) {
         $this->publicKeys = $keys;

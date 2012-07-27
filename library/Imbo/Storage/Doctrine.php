@@ -79,7 +79,7 @@ class Doctrine implements StorageInterface {
     /**
      * Doctrine connection
      *
-     * @var Doctrine\DBAL\Connection
+     * @var \Doctrine\DBAL\Connection
      */
     private $connection;
 
@@ -87,8 +87,8 @@ class Doctrine implements StorageInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param Doctrine\DBAL\Connection $connection Optional connection instance. Primarily used for
-     *                                             testing
+     * @param \Doctrine\DBAL\Connection $connection Optional connection instance. Primarily used
+     *                                              for testing
      */
     public function __construct(array $params, Connection $connection = null) {
         $this->params = array_merge($this->params, $params);
@@ -99,7 +99,7 @@ class Doctrine implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::store()
+     * {@inheritdoc}
      */
     public function store($publicKey, $imageIdentifier, $imageData) {
         $query = $this->getConnection()->createQueryBuilder();
@@ -131,7 +131,7 @@ class Doctrine implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::delete()
+     * {@inheritdoc}
      */
     public function delete($publicKey, $imageIdentifier) {
         $query = $this->getConnection()->createQueryBuilder();
@@ -165,7 +165,7 @@ class Doctrine implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::getImage()
+     * {@inheritdoc}
      */
     public function getImage($publicKey, $imageIdentifier) {
         $query = $this->getConnection()->createQueryBuilder();
@@ -189,7 +189,7 @@ class Doctrine implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::getLastModified()
+     * {@inheritdoc}
      */
     public function getLastModified($publicKey, $imageIdentifier) {
         $query = $this->getConnection()->createQueryBuilder();
@@ -215,7 +215,7 @@ class Doctrine implements StorageInterface {
     }
 
     /**
-     * @see Imbo\Storage\StorageInterface::getStatus()
+     * {@inheritdoc}
      */
     public function getStatus() {
         $connection = $this->getConnection();
@@ -226,8 +226,8 @@ class Doctrine implements StorageInterface {
     /**
      * Set the connection instance
      *
-     * @param Doctrine\DBAL\Connection $connection The connection instance
-     * @return Imbo\Storage\Doctrine
+     * @param \Doctrine\DBAL\Connection $connection The connection instance
+     * @return Doctrine
      */
     private function setConnection(Connection $connection) {
         $this->connection = $connection;
@@ -238,7 +238,7 @@ class Doctrine implements StorageInterface {
     /**
      * Get the Doctrine connection
      *
-     * @return Doctrine\DBAL\Connection
+     * @return \Doctrine\DBAL\Connection
      */
     private function getConnection() {
         if ($this->connection === null) {

@@ -47,7 +47,7 @@ use Imbo\Http\Request\RequestInterface,
  */
 class User extends Resource implements ResourceInterface {
     /**
-     * @see Imbo\Resource\ResourceInterface::getAllowedMethods()
+     * {@inheritdoc}
      */
     public function getAllowedMethods() {
         return array(
@@ -57,7 +57,7 @@ class User extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::get()
+     * {@inheritdoc}
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $publicKey = $request->getPublicKey();
@@ -94,7 +94,7 @@ class User extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::head()
+     * {@inheritdoc}
      */
     public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $this->get($request, $response, $database, $storage);

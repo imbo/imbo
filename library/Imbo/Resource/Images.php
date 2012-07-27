@@ -67,7 +67,7 @@ class Images extends Resource implements ImagesInterface {
     private $query;
 
     /**
-     * @see Imbo\Resource\ImagesInterface::getQuery()
+     * {@inheritdoc}
      */
     public function getQuery() {
         if ($this->query === null) {
@@ -78,7 +78,7 @@ class Images extends Resource implements ImagesInterface {
     }
 
     /**
-     * @see Imbo\Resource\ImagesInterface::setQuery()
+     * {@inheritdoc}
      */
     public function setQuery(QueryInterface $query) {
         $this->query = $query;
@@ -87,7 +87,7 @@ class Images extends Resource implements ImagesInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::getAllowedMethods()
+     * {@inheritdoc}
      */
     public function getAllowedMethods() {
         return array(
@@ -97,7 +97,7 @@ class Images extends Resource implements ImagesInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::get()
+     * {@inheritdoc}
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $publicKey = $request->getPublicKey();
@@ -166,7 +166,7 @@ class Images extends Resource implements ImagesInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::head()
+     * {@inheritdoc}
      */
     public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $this->get($request, $response, $database, $storage);

@@ -78,7 +78,7 @@ end
 
 desc "Generate API documentation using phpdoc (config in phpdoc.xml)"
 task :apidocs do
-  system "phpdoc"
+  system "phpdoc -d #{source} -t #{build}/docs"
 end
 
 desc "Check syntax on all php files in the project"
@@ -285,7 +285,7 @@ end
 desc "Publish API docs"
 task :docs do
     system "git checkout master"
-    system "phpdoc"
+    Rake::Task["apidocs"].invoke
     wd = Dir.getwd
     Dir.chdir("/home/christer/dev/imbo-ghpages")
     system "git pull origin gh-pages"

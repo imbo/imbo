@@ -58,28 +58,28 @@ class Request implements RequestInterface {
     /**
      * Query data
      *
-     * @var Imbo\Http\ParameterContainerInterface
+     * @var ParameterContainerInterface
      */
     private $query;
 
     /**
      * Request data
      *
-     * @var Imbo\Http\ParameterContainerInterface
+     * @var ParameterContainerInterface
      */
     private $request;
 
     /**
      * Server data
      *
-     * @var Imbo\Http\ServerContainerInterface
+     * @var ServerContainerInterface
      */
     private $server;
 
     /**
      * HTTP headers
      *
-     * @var Imbo\Http\HeaderContainer
+     * @var HeaderContainer
      */
     private $headers;
 
@@ -129,7 +129,7 @@ class Request implements RequestInterface {
     /**
      * Chain of image transformations
      *
-     * @var Imbo\Image\TransformationChain
+     * @var TransformationChain
      */
     private $transformationChain;
 
@@ -155,14 +155,14 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getPublicKey()
+     * {@inheritdoc}
      */
     public function getPublicKey() {
         return $this->publicKey;
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::setPublicKey()
+     * {@inheritdoc}
      */
     public function setPublicKey($key) {
         $this->publicKey = $key;
@@ -171,14 +171,14 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getPrivateKey()
+     * {@inheritdoc}
      */
     public function getPrivateKey() {
         return $this->privateKey;
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::setPrivateKey()
+     * {@inheritdoc}
      */
     public function setPrivateKey($key) {
         $this->privateKey = $key;
@@ -187,7 +187,7 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getTransformations()
+     * {@inheritdoc}
      */
     public function getTransformations() {
         if ($this->transformationChain === null) {
@@ -266,14 +266,14 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::hasTransformations()
+     * {@inheritdoc}
      */
     public function hasTransformations() {
         return $this->getExtension() || $this->getQuery()->has('t');
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getScheme()
+     * {@inheritdoc}
      */
     public function getScheme() {
         $https = strtolower($this->server->get('HTTPS'));
@@ -282,7 +282,7 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getHost()
+     * {@inheritdoc}
      */
     public function getHost() {
         $host = $this->server->get('HTTP_HOST');
@@ -296,28 +296,28 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getPort()
+     * {@inheritdoc}
      */
     public function getPort() {
         return $this->server->get('SERVER_PORT');
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getBaseUrl()
+     * {@inheritdoc}
      */
     public function getBaseUrl() {
         return $this->baseUrl;
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getPath()
+     * {@inheritdoc}
      */
     public function getPath() {
         return $this->path;
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getUrl()
+     * {@inheritdoc}
      */
     public function getUrl() {
         $port = (int) $this->getPort();
@@ -346,14 +346,14 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getImageIdentifier()
+     * {@inheritdoc}
      */
     public function getImageIdentifier() {
         return $this->imageIdentifier;
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::setImageIdentifier()
+     * {@inheritdoc}
      */
     public function setImageIdentifier($imageIdentifier) {
         $this->imageIdentifier = $imageIdentifier;
@@ -362,7 +362,7 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getRealImageIdentifier()
+     * {@inheritdoc}
      */
     public function getRealImageIdentifier() {
         if ($this->rawData === null) {
@@ -373,14 +373,14 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getExtension()
+     * {@inheritdoc}
      */
     public function getExtension() {
         return $this->extension;
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::setExtension()
+     * {@inheritdoc}
      */
     public function setExtension($extension) {
         $this->extension = $extension;
@@ -389,14 +389,14 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getMethod()
+     * {@inheritdoc}
      */
     public function getMethod() {
         return $this->server->get('REQUEST_METHOD');
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getRawData()
+     * {@inheritdoc}
      */
     public function getRawData() {
         if ($this->rawData === null) {
@@ -407,7 +407,7 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::setRawData()
+     * {@inheritdoc}
      */
     public function setRawData($data) {
         $this->rawData = $data;
@@ -416,35 +416,35 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getQuery()
+     * {@inheritdoc}
      */
     public function getQuery() {
         return $this->query;
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getRequest()
+     * {@inheritdoc}
      */
     public function getRequest() {
         return $this->request;
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getServer()
+     * {@inheritdoc}
      */
     public function getServer() {
         return $this->server;
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getHeaders()
+     * {@inheritdoc}
      */
     public function getHeaders() {
         return $this->headers;
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::isUnsafe()
+     * {@inheritdoc}
      */
     public function isUnsafe() {
         $method = $this->getMethod();
@@ -455,7 +455,7 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::splitAcceptHeader()
+     * {@inheritdoc}
      */
     public function splitAcceptHeader($header) {
         if (!$header) {
@@ -509,14 +509,14 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getAcceptableContentTypes()
+     * {@inheritdoc}
      */
     public function getAcceptableContentTypes() {
         return $this->splitAcceptHeader($this->headers->get('Accept'));
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::setResource()
+     * {@inheritdoc}
      */
     public function setResource($resource) {
         $this->resource = $resource;
@@ -525,7 +525,7 @@ class Request implements RequestInterface {
     }
 
     /**
-     * @see Imbo\Http\Request\RequestInterface::getResource()
+     * {@inheritdoc}
      */
     public function getResource() {
         return $this->resource;

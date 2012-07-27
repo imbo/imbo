@@ -60,42 +60,42 @@ abstract class Resource implements ResourceInterface {
     protected $eventManager;
 
     /**
-     * @see Imbo\Resource\ResourceInterface::post()
+     * {@inheritdoc}
      */
     public function post(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         throw new ResourceException('Method not allowed', 405);
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::get()
+     * {@inheritdoc}
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         throw new ResourceException('Method not allowed', 405);
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::head()
+     * {@inheritdoc}
      */
     public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         throw new ResourceException('Method not allowed', 405);
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::delete()
+     * {@inheritdoc}
      */
     public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         throw new ResourceException('Method not allowed', 405);
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::put()
+     * {@inheritdoc}
      */
     public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         throw new ResourceException('Method not allowed', 405);
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::setEventManager()
+     * {@inheritdoc}
      */
     public function setEventManager(EventManagerInterface $eventManager) {
         $this->eventManager = $eventManager;

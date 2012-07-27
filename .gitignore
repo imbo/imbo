@@ -1,6 +1,5 @@
 build
 phpunit.xml
-phpdoc.xml
 composer.phar
 composer.lock
 vendor

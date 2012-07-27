@@ -97,8 +97,9 @@ class AccessToken extends Listener implements ListenerInterface {
             $this->params = array_replace_recursive($this->params, $params);
         }
     }
+
     /**
-     * @see Imbo\EventListener\ListenerInterface::getEvents()
+     * {@inheritdoc}
      */
     public function getEvents() {
         return array(
@@ -115,7 +116,7 @@ class AccessToken extends Listener implements ListenerInterface {
     }
 
     /**
-     * @see Imbo\EventListener\ListenerInterface::invoke()
+     * {@inheritdoc}
      */
     public function invoke(EventInterface $event) {
         $request = $event->getContainer()->get('request');

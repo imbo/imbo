@@ -51,7 +51,7 @@ use Imbo\Http\Request\RequestInterface,
  */
 class Status extends Resource implements ResourceInterface {
     /**
-     * @see Imbo\Resource\ResourceInterface::getAllowedMethods()
+     * {@inheritdoc}
      */
     public function getAllowedMethods() {
         return array(
@@ -61,7 +61,7 @@ class Status extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::get()
+     * {@inheritdoc}
      */
     public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $response->getHeaders()->set('Cache-Control', 'max-age=0');
@@ -89,7 +89,7 @@ class Status extends Resource implements ResourceInterface {
     }
 
     /**
-     * @see Imbo\Resource\ResourceInterface::head()
+     * {@inheritdoc}
      */
     public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
         $this->get($request, $response, $database, $storage);

@@ -47,7 +47,7 @@ use Imbo\Http\Request\RequestInterface,
  */
 class ImagePreparation implements ImagePreparationInterface {
     /**
-     * @see Imbo\Image\ImagePreparationInterface::prepareImage()
+     * {@inheritdoc}
      */
     public function prepareImage(RequestInterface $request, ImageInterface $image) {
         // Fetch image data from input

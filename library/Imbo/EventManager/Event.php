@@ -53,7 +53,7 @@ class Event implements EventInterface {
     /**
      * Container instance
      *
-     * @var Imbo\Container
+     * @var Container
      */
     private $container;
 
@@ -61,7 +61,7 @@ class Event implements EventInterface {
      * Class contsructor
      *
      * @param string $name The name of the current event
-     * @param Imbo\Container $container Container instance
+     * @param Container $container Container instance
      */
     public function __construct($name, Container $container) {
         $this->name = $name;
@@ -69,14 +69,14 @@ class Event implements EventInterface {
     }
 
     /**
-     * @see Imbo\EventManager\EventInterface::getName()
+     * {@inheritdoc}
      */
     public function getName() {
         return $this->name;
     }
 
     /**
-     * @see Imbo\EventManager\EventInterface::getContainer()
+     * {@inheritdoc}
      */
     public function getContainer() {
         return $this->container;

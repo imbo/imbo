@@ -55,21 +55,21 @@ class EventManager implements EventManagerInterface {
     /**
      * Container instance
      *
-     * @var Imbo\Container
+     * @var Container
      */
     private $container;
 
     /**
      * Class constructor
      *
-     * @param Imbo\Container $container Instance of a container
+     * @param Container $container Instance of a container
      */
     public function __construct(Container $container) {
         $this->container = $container;
     }
 
     /**
-     * @see Imbo\EveneManager\EventManagerInterface::attach()
+     * {@inheritdoc}
      */
     public function attach($events, $callback) {
         if (!is_array($events)) {
@@ -92,7 +92,7 @@ class EventManager implements EventManagerInterface {
     }
 
     /**
-     * @see Imbo\EventManager\EventManagagerInterface::attachListener()
+     * {@inheritdoc}
      */
     public function attachListener(ListenerInterface $listener) {
         // Fetch current public key
@@ -113,7 +113,7 @@ class EventManager implements EventManagerInterface {
     }
 
     /**
-     * @see Imbo\EveneManager\EventManagerInterface::trigger()
+     * {@inheritdoc}
      */
     public function trigger($event) {
         if (!empty($this->events[$event])) {

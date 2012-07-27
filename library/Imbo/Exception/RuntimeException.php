@@ -52,7 +52,7 @@ class RuntimeException extends BaseRuntimeException implements Exception {
     private $imboCode;
 
     /**
-     * @see Imbo\Exception::setImboErrorCode()
+     * {@inheritdoc}
      */
     public function setImboErrorCode($code) {
         $this->imboCode = (int) $code;
@@ -61,7 +61,7 @@ class RuntimeException extends BaseRuntimeException implements Exception {
     }
 
     /**
-     * @see Imbo\Exception::getImboErrorCode()
+     * {@inheritdoc}
      */
     public function getImboErrorCode() {
         return $this->imboCode;

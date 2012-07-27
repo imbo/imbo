@@ -63,7 +63,7 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
     /**
      * Content negotiation instance
      *
-     * @var Imbo\Http\ContentNegotiation
+     * @var ContentNegotiation
      */
     private $contentNegotiation;
 
@@ -71,7 +71,7 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
      * Class constructor
      *
      * @param string $path Path to store the temp. images
-     * @param Imbo\Http\ContentNegotiation $contentNegotiation Content negotiation instance
+     * @param ContentNegotiation $contentNegotiation Content negotiation instance
      */
     public function __construct($path, ContentNegotiation $contentNegotiation = null) {
         $this->path = rtrim($path, '/');
@@ -84,7 +84,7 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
     }
 
     /**
-     * @see Imbo\EventListener\ListenerInterface::getEvents
+     * {@inheritdoc}
      */
     public function getEvents() {
         return array(
@@ -102,7 +102,7 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
     }
 
     /**
-     * @see Imbo\EventListener\ListenerInterface::invoke
+     * {@inheritdoc}
      */
     public function invoke(EventInterface $event) {
         $container = $event->getContainer();

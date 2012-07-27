@@ -32,7 +32,8 @@
 
 namespace Imbo\EventManager;
 
-use Imbo\EventListener\ListenerInterface;
+use Imbo\EventListener\ListenerInterface,
+    Imbo\Exception\InvalidArgumentException;
 
 /**
  * Event manager interface
@@ -50,16 +51,16 @@ interface EventManagerInterface {
      *
      * @param array|string $events The event(s) to attach to
      * @param callback $callback Code that will be called when the event is triggered
-     * @throws Imbo\Exception\InvalidArgumentException
-     * @return Imbo\EventManager\EventManagerInterface
+     * @throws InvalidArgumentException
+     * @return EventManagerInterface
      */
     function attach($events, $callback);
 
     /**
      * Attach a listener to the event manager
      *
-     * @param Imbo\EventListener\ListenerInterface $listener The listener to attach
-     * @return Imbo\EventManager\EventManagerInterface
+     * @param ListenerInterface $listener The listener to attach
+     * @return EventManagerInterface
      */
     function attachListener(ListenerInterface $listener);
 
@@ -67,7 +68,7 @@ interface EventManagerInterface {
      * Trigger a given event
      *
      * @param string $event The event to trigger
-     * @return Imbo\EventManager\EventManagerInterface
+     * @return EventManagerInterface
      */
     function trigger($event);
 }
