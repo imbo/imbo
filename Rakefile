@@ -14,7 +14,22 @@ desc "Task used by Travis-CI"
 task :travis => [:composer, :test]
 
 desc "Default task"
-task :default => [:lint, :composer, :test, :phpcs, :apidocs]
+task :default => [:lint, :composer, :test, :phpcs, :apidocs, :readthedocs]
+
+desc "Spell check and generate end user docs"
+task :readthedocs do
+  wd = Dir.getwd
+  Dir.chdir("docs")
+  begin
+    sh %{make spelling}
+  rescue Exception
+    puts "Spelling error in the docs, aborting"
+    exit 1
+  end
+  puts "No spelling errors. Generate docs"
+  sh %{make html}
+  Dir.chdir(wd)
+end
 
 desc "Clean up and create artifact directories"
 task :prepare do
@@ -289,7 +304,7 @@ task :github, :version do |t, args|
 end
 
 desc "Publish API docs"
-task :docs do
+task :publish_api_docs do
     system "git checkout master"
     Rake::Task["apidocs"].invoke
     wd = Dir.getwd
@@ -313,6 +328,9 @@ task :release, :version do |t, args|
     # Unit tests
     Rake::Task["test"].invoke
 
+    # Generate end-user docs
+    Rake::Task["readthedocs"].invoke
+
     # Build PEAR package
     Rake::Task["pear"].invoke(version)
 
@@ -323,7 +341,7 @@ task :release, :version do |t, args|
     Rake::Task["github"].invoke(version)
 
     # Update the API docs and push to gh-pages
-    Rake::Task["docs"].invoke
+    Rake::Task["publish_api_docs"].invoke
   else
     puts "'#{version}' is not a valid version"
     exit 1
