@@ -8,13 +8,13 @@ build   = "#{basedir}/build"
 source  = "#{basedir}/library"
 
 desc "Task used by Jenkins-CI"
-task :jenkins => [:prepare, :lint, :composer, :test, :apidocs, :phploc, :phpcs, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
+task :jenkins => [:prepare, :lint, :composer, :test, :apidocs, :phploc, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
 
 desc "Task used by Travis-CI"
 task :travis => [:composer, :test]
 
 desc "Default task"
-task :default => [:lint, :composer, :test]
+task :default => [:lint, :composer, :test, :phpcs, :apidocs]
 
 desc "Clean up and create artifact directories"
 task :prepare do
@@ -42,8 +42,13 @@ task :composer do
 end
 
 desc "Generate checkstyle.xml using PHP_CodeSniffer"
-task :phpcs do
+task :phpcs_ci do
   system "phpcs --report=checkstyle --report-file=#{build}/logs/checkstyle.xml --standard=Imbo #{source}"
+end
+
+desc "Check CS"
+task :phpcs do
+  system "phpcs --standard=Imbo #{source}"
 end
 
 desc "Aggregate tool output with PHP_CodeBrowser"
@@ -76,7 +81,7 @@ task :phploc do
   system "phploc --log-csv #{build}/logs/phploc.csv --log-xml #{build}/logs/phploc.xml #{source}"
 end
 
-desc "Generate API documentation using phpdoc (config in phpdoc.xml)"
+desc "Generate API documentation using phpdoc"
 task :apidocs do
   system "phpdoc -d #{source} -t #{build}/docs"
 end
