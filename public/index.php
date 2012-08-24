@@ -42,6 +42,7 @@ use Imbo\Database\DatabaseInterface,
     Imbo\Image\Image,
     Imbo\EventManager\EventManager,
     Imbo\Exception\InvalidArgumentException,
+    Imbo\Exception\HaltExecution,
     DateTime;
 
 // Fetch the configuration
@@ -163,7 +164,14 @@ $responseWriter = new ResponseWriter();
 $strict = true;
 
 try {
-    $frontController->handle($request, $response);
+    try {
+        $frontController->handle($request, $response);
+    } catch (HaltExecution $exception) {
+        // Special type of exception that the event manager can throw if an event listener wants to
+        // halt the execution of Imbo. No special action should be taken, simply send the response
+        // as usual
+        unset($exception);
+    }
 
     prepareResponse:
 
