@@ -33,7 +33,8 @@ namespace Imbo\EventManager;
 
 use Imbo\Container,
     Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\InvalidArgumentException;
+    Imbo\Exception\InvalidArgumentException,
+    Imbo\Exception\HaltExecution;
 
 /**
  * Event manager
@@ -104,7 +105,7 @@ class EventManager implements EventManagerInterface {
         if (empty($keys) || in_array($publicKey, $keys)) {
             // Either no keys have been specified, or the listener wants to trigger for the current
             // key
-            return $this->attach($listener->getEvents(), function(EventInterface $event) use($listener) {
+            return $this->attach($listener->getEvents(), function(EventInterface $event) use ($listener) {
                 $listener->invoke($event);
             });
         }
@@ -130,10 +131,10 @@ class EventManager implements EventManagerInterface {
             }
 
             if ($e->executionIsHalted()) {
-                return EventManagerInterface::HALT_EXECUTION;
+                throw new HaltExecution();
             }
         }
 
-        return null;
+        return $this;
     }
 }

@@ -33,7 +33,8 @@
 namespace Imbo\EventManager;
 
 use Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\InvalidArgumentException;
+    Imbo\Exception\InvalidArgumentException,
+    Imbo\Exception\HaltExecution;
 
 /**
  * Event manager interface
@@ -46,13 +47,6 @@ use Imbo\EventListener\ListenerInterface,
  * @link https://github.com/imbo/imbo
  */
 interface EventManagerInterface {
-    /**
-     * Return values for the trigger method
-     *
-     * @var int
-     */
-    const HALT_EXECUTION = 1;
-
     /**
      * Attach a callable to an event
      *
@@ -75,8 +69,8 @@ interface EventManagerInterface {
      * Trigger a given event
      *
      * @param string $event The event to trigger
-     * @return mixed This method should return any of the return flags defined in this interface, or
-     *               null if no specific action should occur.
+     * @throws HaltExecution
+     * @return EventManagerInterface
      */
     function trigger($event);
 }
