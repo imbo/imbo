@@ -31,7 +31,8 @@
 
 namespace Imbo\UnitTest\EventManager;
 
-use Imbo\EventManager\EventManager;
+use Imbo\EventManager\EventManager,
+    Imbo\EventManager\EventManagerInterface;
 
 /**
  * @package TestSuite\UnitTests
@@ -87,10 +88,10 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
                       ->attach('event2', $callback4)
                       ->attach('event4', $callback1);
 
-        $this->manager->trigger('otherevent')
-                      ->trigger('event1')
-                      ->trigger('event2')
-                      ->trigger('event4');
+        $this->manager->trigger('otherevent');
+        $this->manager->trigger('event1');
+        $this->manager->trigger('event2');
+        $this->manager->trigger('event4');
     }
 
     /**
@@ -140,5 +141,32 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
 
         $this->manager->attachListener($listener);
         $this->manager->trigger('event');
+    }
+
+    /**
+     * @covers Imbo\EventManager\EventManager::trigger
+     */
+    public function testListenerCanStopPropagation() {
+        $callback1 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
+        $callback1->expects($this->once())->method('__invoke');
+
+        $callback2 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
+        $callback2->expects($this->never())->method('__invoke');
+
+        $stopper = function($event) { $event->stopPropagation(true); };
+
+        $this->manager->attach('event', $callback1)
+                      ->attach('event', $stopper)
+                      ->attach('event', $callback2);
+
+        $this->assertNull($this->manager->trigger('event'));
+    }
+
+    /**
+     * @covers Imbo\EventManager\EventManager::trigger
+     */
+    public function testTriggerReturnsCorrectValueWhenExecutionIsHalted() {
+        $this->manager->attach('event', function($event) { $event->haltExecution(true); });
+        $this->assertSame(EventManagerInterface::HALT_EXECUTION, $this->manager->trigger('event'));
     }
 }

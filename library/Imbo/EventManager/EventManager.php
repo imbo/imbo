@@ -123,9 +123,17 @@ class EventManager implements EventManagerInterface {
             // Trigger all listeners for this event and pass in the event instance
             foreach ($this->events[$event] as $callback) {
                 $callback($e);
+
+                if ($e->propagationIsStopped()) {
+                    break;
+                }
+            }
+
+            if ($e->executionIsHalted()) {
+                return EventManagerInterface::HALT_EXECUTION;
             }
         }
 
-        return $this;
+        return null;
     }
 }

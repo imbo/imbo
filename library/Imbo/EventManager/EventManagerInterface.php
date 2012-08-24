@@ -47,6 +47,13 @@ use Imbo\EventListener\ListenerInterface,
  */
 interface EventManagerInterface {
     /**
+     * Return values for the trigger method
+     *
+     * @var int
+     */
+    const HALT_EXECUTION = 1;
+
+    /**
      * Attach a callable to an event
      *
      * @param array|string $events The event(s) to attach to
@@ -68,7 +75,8 @@ interface EventManagerInterface {
      * Trigger a given event
      *
      * @param string $event The event to trigger
-     * @return EventManagerInterface
+     * @return mixed This method should return any of the return flags defined in this interface, or
+     *               null if no specific action should occur.
      */
     function trigger($event);
 }
