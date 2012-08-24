@@ -58,6 +58,20 @@ class Event implements EventInterface {
     private $container;
 
     /**
+     * Propagation flag
+     *
+     * @var boolean
+     */
+    private $propagationIsStopped = false;
+
+    /**
+     * Execution flag
+     *
+     * @var boolean
+     */
+    private $executionIsHalted = false;
+
+    /**
      * Class contsructor
      *
      * @param string $name The name of the current event
@@ -80,5 +94,37 @@ class Event implements EventInterface {
      */
     public function getContainer() {
         return $this->container;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function stopPropagation($flag) {
+        $this->propagationIsStopped = $flag;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function propagationIsStopped() {
+        return $this->propagationIsStopped;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function haltExecution($flag) {
+        $this->executionIsHalted = $flag;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function executionIsHalted() {
+        return $this->executionIsHalted;
     }
 }
