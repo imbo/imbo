@@ -283,7 +283,9 @@ class MongoDB implements DatabaseInterface {
         $metadataQuery = $query->metadataQuery();
 
         if (!empty($metadataQuery)) {
-            $queryData['metadata'] = $metadataQuery;
+            foreach ($metadataQuery as $key => $value) {
+                $queryData['metadata.' . $key] = $value;
+            }
         }
 
         // Fields to fetch
