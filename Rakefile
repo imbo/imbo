@@ -99,11 +99,12 @@ task :test do
 
     ini_file = Hash[`php --ini`.split("\n").map {|l| l.split(/:\s+/)}]["Loaded Configuration File"]
 
-    ["imagick", "mongo", "memcached", "APC"].each { |e|
-      system "wget http://pecl.php.net/get/#{e}"
-      system "tar -xzf #{e}"
-      system "sh -c \"cd #{e}-* && phpize && ./configure && make && sudo make install\""
-      system "sudo sh -c \"echo 'extension=#{e.downcase}.so' >> #{ini_file}\""
+    {"imagick" => "3.1.0RC2", "mongo" => "1.2.12", "memcached" => "2.0.1", "APC" => "3.1.12"}.each { |package, version|
+      filename = "#{package}-#{version}.tgz"
+      system "wget http://pecl.php.net/get/#{filename}"
+      system "tar -xzf #{filename}"
+      system "sh -c \"cd #{filename[0..-5]} && phpize && ./configure && make && sudo make install\""
+      system "sudo sh -c \"echo 'extension=#{package.downcase}.so' >> #{ini_file}\""
     }
 
     system "sudo sh -c \"echo 'apc.enable_cli=on' >> #{ini_file}\""
