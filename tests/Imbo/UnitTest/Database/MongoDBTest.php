@@ -53,6 +53,11 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     private $mongo;
 
     /**
+     * @var MongoCollection
+     */
+    private $collection;
+
+    /**
      * Setup method
      */
     public function setUp() {
@@ -61,7 +66,8 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
         }
 
         $this->mongo = $this->getMockBuilder('Mongo')->disableOriginalConstructor()->getMock();
-        $this->driver = new MongoDB(array(), $this->mongo);
+        $this->collection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
+        $this->driver = new MongoDB(array(), $this->mongo, $this->collection);
     }
 
     /**
@@ -69,6 +75,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->mongo = null;
+        $this->collection = null;
         $this->driver = null;
     }
 
@@ -86,5 +93,33 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     public function testGetStatusWhenMongoIsConnectable() {
         $this->mongo->expects($this->once())->method('connect')->will($this->returnValue(true));
         $this->assertTrue($this->driver->getStatus());
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::getStatus
+     */
+    public function testDottedNotationForMetadataQuery() {
+        $publicKey = 'key';
+
+        $query = $this->getMock('Imbo\Resource\Images\QueryInterface');
+        $query->expects($this->once())->method('from')->will($this->returnValue(null));
+        $query->expects($this->once())->method('to')->will($this->returnValue(null));
+        $query->expects($this->once())->method('metadataQuery')->will($this->returnValue(array(
+            'style' => 'IPA',
+            'brewery' => 'Nøgne Ø',
+        )));
+        $query->expects($this->any())->method('limit')->will($this->returnValue(10));
+
+        $cursor = $this->getMockBuilder('MongoCursor')->disableOriginalConstructor()->getMock();
+        $cursor->expects($this->once())->method('limit')->with(10)->will($this->returnSelf());
+        $cursor->expects($this->once())->method('sort')->will($this->returnSelf());
+
+        $this->collection->expects($this->once())->method('find')->with(array(
+            'publicKey' => $publicKey,
+            'metadata.style' => 'IPA',
+            'metadata.brewery' => 'Nøgne Ø',
+        ), $this->isType('array'))->will($this->returnValue($cursor));
+
+        $this->assertSame(array(), $this->driver->getImages($publicKey, $query));
     }
 }
