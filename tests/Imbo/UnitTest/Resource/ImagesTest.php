@@ -90,7 +90,7 @@ class ImagesTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setNotModified');
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 
     /**
@@ -119,7 +119,7 @@ class ImagesTest extends ResourceTests {
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->once())->method('setBody')->with($images);
 
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $resource->get($this->container);
     }
 
     /**
@@ -167,6 +167,6 @@ class ImagesTest extends ResourceTests {
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->once())->method('setBody')->with($images);
 
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $resource->get($this->container);
     }
 }

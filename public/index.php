@@ -165,7 +165,7 @@ $strict = true;
 
 try {
     try {
-        $frontController->handle($request, $response);
+        $frontController->run();
     } catch (HaltExecution $exception) {
         // Special type of exception that the event manager can throw if an event listener wants to
         // halt the execution of Imbo. No special action should be taken, simply send the response

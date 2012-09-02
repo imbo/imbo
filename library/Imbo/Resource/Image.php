@@ -31,10 +31,8 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface,
-    Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface,
+use Imbo\Container,
+    Imbo\Http\Request\RequestInterface,
     Imbo\Image\Image as ImageObject,
     Imbo\Image\ImageInterface,
     Imbo\Image\ImagePreparation,
@@ -115,10 +113,15 @@ class Image extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+    public function put(Container $container) {
         // Prepare the image based on the input stream in the request
-        $this->imagePreparation->prepareImage($request, $this->image);
+        $this->imagePreparation->prepareImage($container->request, $this->image);
         $this->eventManager->trigger('image.put.imagepreparation.post');
+
+        $request = $container->request;
+        $response = $container->response;
+        $database = $container->database;
+        $storage= $container->storage;
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getRealImageIdentifier();
@@ -143,7 +146,12 @@ class Image extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+    public function delete(Container $container) {
+        $request = $container->request;
+        $response = $container->response;
+        $database = $container->database;
+        $storage = $container->storage;
+
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
 
@@ -158,11 +166,16 @@ class Image extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $publicKey       = $request->getPublicKey();
+    public function get(Container $container) {
+        $request = $container->request;
+        $response = $container->response;
+        $database = $container->database;
+        $storage = $container->storage;
+
+        $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
         $serverContainer = $request->getServer();
-        $requestHeaders  = $request->getHeaders();
+        $requestHeaders = $request->getHeaders();
         $responseHeaders = $response->getHeaders();
 
         // Fetch information from the database (injects mime type, width and height to the
@@ -236,10 +249,10 @@ class Image extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $this->get($request, $response, $database, $storage);
+    public function head(Container $container) {
+        $this->get($container);
 
         // Remove body from the response, but keep everything else
-        $response->setBody(null);
+        $container->response->setBody(null);
     }
 }

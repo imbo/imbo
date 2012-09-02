@@ -56,7 +56,7 @@ class MetadataTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $this->getNewResource()->delete($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->delete($this->container);
     }
 
     /**
@@ -72,8 +72,7 @@ class MetadataTest extends ResourceTests {
         $this->request->expects($this->any())->method('getRequest')->will($this->returnValue($paramContainer));
         $this->request->expects($this->any())->method('getRawData')->will($this->returnValue(null));
 
-        $resource = $this->getNewResource();
-        $resource->post($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->post($this->container);
     }
 
     /**
@@ -89,8 +88,7 @@ class MetadataTest extends ResourceTests {
         $this->request->expects($this->any())->method('getRequest')->will($this->returnValue($paramContainer));
         $this->request->expects($this->any())->method('getRawData')->will($this->returnValue('some string'));
 
-        $resource = $this->getNewResource();
-        $resource->post($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->post($this->container);
     }
 
     /**
@@ -109,7 +107,7 @@ class MetadataTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $this->getNewResource()->post($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->post($this->container);
     }
 
     /**
@@ -129,7 +127,7 @@ class MetadataTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $this->getNewResource()->post($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->post($this->container);
     }
 
     /**
@@ -141,8 +139,7 @@ class MetadataTest extends ResourceTests {
     public function testPutWithNoMetadata() {
         $this->request->expects($this->any())->method('getRawData')->will($this->returnValue(null));
 
-        $resource = $this->getNewResource();
-        $resource->put($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->put($this->container);
     }
 
     /**
@@ -153,9 +150,7 @@ class MetadataTest extends ResourceTests {
      */
     public function testPutWithInvalidMetadata() {
         $this->request->expects($this->any())->method('getRawData')->will($this->returnValue('some string'));
-
-        $resource = $this->getNewResource();
-        $resource->put($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->put($this->container);
     }
 
     /**
@@ -171,7 +166,7 @@ class MetadataTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $this->getNewResource()->put($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->put($this->container);
     }
 
     /**
@@ -206,8 +201,7 @@ class MetadataTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setNotModified');
 
-        $resource = $this->getNewResource();
-        $resource->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 
     /**
@@ -239,6 +233,6 @@ class MetadataTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setBody')->with($metadataInDatabase);
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 }

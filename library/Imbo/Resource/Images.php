@@ -32,11 +32,9 @@
 namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface,
-    Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface,
     Imbo\Resource\Images\Query,
     Imbo\Resource\Images\QueryInterface,
+    Imbo\Container,
     DateTime;
 
 /**
@@ -99,7 +97,11 @@ class Images extends Resource implements ImagesInterface {
     /**
      * {@inheritdoc}
      */
-    public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+    public function get(Container $container) {
+        $request = $container->request;
+        $response = $container->response;
+        $database = $container->database;
+
         $publicKey = $request->getPublicKey();
 
         // Fetch header containers
@@ -168,10 +170,10 @@ class Images extends Resource implements ImagesInterface {
     /**
      * {@inheritdoc}
      */
-    public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $this->get($request, $response, $database, $storage);
+    public function head(Container $container) {
+        $this->get($container);
 
         // Remove body from the response, but keep everything else
-        $response->setBody(null);
+        $container->response->setBody(null);
     }
 }

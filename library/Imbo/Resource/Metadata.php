@@ -32,9 +32,7 @@
 namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface,
-    Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface,
+    Imbo\Container,
     Imbo\Exception\InvalidArgumentException;
 
 /**
@@ -63,7 +61,11 @@ class Metadata extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+    public function delete(Container $container) {
+        $request = $container->request;
+        $database = $container->database;
+        $response = $container->response;
+
         $imageIdentifier = $request->getImageIdentifier();
 
         $database->deleteMetadata($request->getPublicKey(), $imageIdentifier);
@@ -76,7 +78,11 @@ class Metadata extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+    public function put(Container $container) {
+        $request = $container->request;
+        $database = $container->database;
+        $response = $container->response;
+
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
         $metadata = $request->getRawData();
@@ -105,7 +111,11 @@ class Metadata extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function post(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+    public function post(Container $container) {
+        $request = $container->request;
+        $database = $container->database;
+        $response = $container->response;
+
         $imageIdentifier = $request->getImageIdentifier();
 
         // Fetch metadata from the request
@@ -135,7 +145,11 @@ class Metadata extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+    public function get(Container $container) {
+        $request = $container->request;
+        $database = $container->database;
+        $response = $container->response;
+
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
         $requestHeaders = $request->getHeaders();
@@ -167,10 +181,10 @@ class Metadata extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
-        $this->get($request, $response, $database, $storage);
+    public function head(Container $container) {
+        $this->get($container);
 
         // Remove body from the response, but keep everything else
-        $response->setBody(null);
+        $container->response->setBody(null);
     }
 }
