@@ -147,12 +147,8 @@ $container->eventManager = $container->shared(function(Container $container) {
     return $manager;
 });
 
-// Fetch some entries from the container
-$request = $container->request;
-$response = $container->response;
-
 // Add a version header
-$response->getHeaders()->set('X-Imbo-Version', Version::getVersionNumber());
+$container->response->getHeaders()->set('X-Imbo-Version', Version::getVersionNumber());
 
 // Create the front controller and handle the request
 $frontController = new FrontController($container);
@@ -172,6 +168,9 @@ try {
         // as usual
         unset($exception);
     }
+
+    $request = $container->request;
+    $response = $container->response;
 
     prepareResponse:
 
