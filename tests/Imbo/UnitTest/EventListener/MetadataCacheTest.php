@@ -125,7 +125,7 @@ class MetadataCacheTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\MetadataCache::invoke
      * @covers Imbo\EventListener\MetadataCache::getCacheKey
      */
-    public function testListenerShouldHaltExecutionWhenACacheHitOccurs() {
+    public function testListenerShouldHaltApplicationWhenACacheHitOccurs() {
         $headers = $this->getMock('Imbo\Http\HeaderContainer');
         $headers->expects($this->once())->method('set')->with('X-Imbo-MetadataCache', 'Hit');
 
@@ -135,7 +135,7 @@ class MetadataCacheTest extends \PHPUnit_Framework_TestCase {
         $cacheKey = 'metadata:' . $this->publicKey . '|' . $this->imageIdentifier;
 
         $this->event->expects($this->once())->method('getName')->will($this->returnValue('metadata.get.pre'));
-        $this->event->expects($this->once())->method('haltExecution')->with(true);
+        $this->event->expects($this->once())->method('haltApplication')->with(true);
         $this->cache->expects($this->once())->method('get')->with($cacheKey)->will($this->returnValue($cachedResponse));
 
         $this->listener->invoke($this->event);

@@ -164,10 +164,10 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\EventManager\EventManager::trigger
-     * @expectedException Imbo\Exception\HaltExecution
+     * @expectedException Imbo\Exception\HaltApplication
      */
-    public function testTriggerReturnsCorrectValueWhenExecutionIsHalted() {
-        $this->manager->attach('event', function($event) { $event->haltExecution(true); });
+    public function testHaltApplicationExceptionShouldBeThrownWhenEventListenerHaltsApplication() {
+        $this->manager->attach('event', function($event) { $event->haltApplication(true); });
         $this->manager->trigger('event');
     }
 }

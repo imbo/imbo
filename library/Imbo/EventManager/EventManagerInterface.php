@@ -34,7 +34,7 @@ namespace Imbo\EventManager;
 
 use Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\HaltExecution;
+    Imbo\Exception\HaltApplication;
 
 /**
  * Event manager interface
@@ -69,7 +69,7 @@ interface EventManagerInterface {
      * Trigger a given event
      *
      * @param string $event The event to trigger
-     * @throws HaltExecution
+     * @throws HaltApplication
      * @return EventManagerInterface
      */
     function trigger($event);

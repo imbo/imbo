@@ -34,7 +34,7 @@ namespace Imbo\EventManager;
 use Imbo\Container,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\HaltExecution;
+    Imbo\Exception\HaltApplication;
 
 /**
  * Event manager
@@ -130,8 +130,8 @@ class EventManager implements EventManagerInterface {
                 }
             }
 
-            if ($e->executionIsHalted()) {
-                throw new HaltExecution();
+            if ($e->applicationIsHalted()) {
+                throw new HaltApplication();
             }
         }
 

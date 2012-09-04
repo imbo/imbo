@@ -34,7 +34,7 @@ namespace Imbo\Exception;
 use Imbo\Exception;
 
 /**
- * Halt execution exception
+ * Halt application exception
  *
  * This exception is used by the event manager if an event listener wants to halt the execution of
  * Imbo.
@@ -45,4 +45,4 @@ use Imbo\Exception;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class HaltExecution extends RuntimeException implements Exception {}
+class HaltApplication extends RuntimeException implements Exception {}

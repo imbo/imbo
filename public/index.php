@@ -42,7 +42,7 @@ use Imbo\Database\DatabaseInterface,
     Imbo\Image\Image,
     Imbo\EventManager\EventManager,
     Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\HaltExecution,
+    Imbo\Exception\HaltApplication,
     DateTime;
 
 // Fetch the configuration
@@ -162,7 +162,7 @@ $strict = true;
 try {
     try {
         $frontController->run();
-    } catch (HaltExecution $exception) {
+    } catch (HaltApplication $exception) {
         // Special type of exception that the event manager can throw if an event listener wants to
         // halt the execution of Imbo. No special action should be taken, simply send the response
         // as usual

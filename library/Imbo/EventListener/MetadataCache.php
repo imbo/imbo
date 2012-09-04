@@ -107,7 +107,7 @@ class MetadataCache extends Listener implements ListenerInterface {
                 $container->response = $result;
 
                 // Halt execution of the application and return
-                $event->haltExecution(true);
+                $event->haltApplication(true);
                 return;
             }
 

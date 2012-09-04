@@ -71,15 +71,15 @@ class EventTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\EventManager\Event::executionIsHalted
-     * @covers Imbo\EventManager\Event::haltExecution
+     * @covers Imbo\EventManager\Event::applicationIsHalted
+     * @covers Imbo\EventManager\Event::haltApplication
      */
-    public function testExecutionCanBeHalted() {
+    public function testApplicationCanBeHalted() {
         $event = new Event('name', $this->getMock('Imbo\Container'));
-        $this->assertFalse($event->executionIsHalted());
-        $this->assertSame($event, $event->haltExecution(true));
-        $this->assertTrue($event->executionIsHalted());
-        $this->assertSame($event, $event->haltExecution(false));
-        $this->assertFalse($event->executionIsHalted());
+        $this->assertFalse($event->applicationIsHalted());
+        $this->assertSame($event, $event->haltApplication(true));
+        $this->assertTrue($event->applicationIsHalted());
+        $this->assertSame($event, $event->haltApplication(false));
+        $this->assertFalse($event->applicationIsHalted());
     }
 }

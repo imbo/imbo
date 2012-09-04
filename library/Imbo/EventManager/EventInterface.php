@@ -78,12 +78,12 @@ interface EventInterface {
      * @param boolean $flag True to halt, false to continue
      * @return EventInterface
      */
-    function haltExecution($flag);
+    function haltApplication($flag);
 
     /**
      * Return whether or not the execution should be halted
      *
      * @return boolean
      */
-    function executionIsHalted();
+    function applicationIsHalted();
 }

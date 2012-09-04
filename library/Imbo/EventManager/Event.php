@@ -69,7 +69,7 @@ class Event implements EventInterface {
      *
      * @var boolean
      */
-    private $executionIsHalted = false;
+    private $applicationIsHalted = false;
 
     /**
      * Class contsructor
@@ -115,8 +115,8 @@ class Event implements EventInterface {
     /**
      * {@inheritdoc}
      */
-    public function haltExecution($flag) {
-        $this->executionIsHalted = $flag;
+    public function haltApplication($flag) {
+        $this->applicationIsHalted = $flag;
 
         return $this;
     }
@@ -124,7 +124,7 @@ class Event implements EventInterface {
     /**
      * {@inheritdoc}
      */
-    public function executionIsHalted() {
-        return $this->executionIsHalted;
+    public function applicationIsHalted() {
+        return $this->applicationIsHalted;
     }
 }
