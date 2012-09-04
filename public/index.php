@@ -190,6 +190,10 @@ try {
         }
     }
 } catch (Exception $exception) {
+    // Fetch request and response from the container
+    $request = $container->request;
+    $response = $container->response;
+
     $date = new DateTime();
 
     $code         = $exception->getCode();
