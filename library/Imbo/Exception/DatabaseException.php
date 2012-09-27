@@ -40,6 +40,4 @@ namespace Imbo\Exception;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class DatabaseException extends RuntimeException {
-
-}
+class DatabaseException extends RuntimeException {}

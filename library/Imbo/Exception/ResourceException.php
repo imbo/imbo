@@ -40,6 +40,4 @@ namespace Imbo\Exception;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class ResourceException extends RuntimeException {
-
-}
+class ResourceException extends RuntimeException {}
