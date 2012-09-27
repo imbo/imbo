@@ -121,7 +121,7 @@ class Image extends Resource implements ResourceInterface {
         $request = $container->request;
         $response = $container->response;
         $database = $container->database;
-        $storage= $container->storage;
+        $storage = $container->storage;
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getRealImageIdentifier();
