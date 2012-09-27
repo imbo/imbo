@@ -13,4 +13,5 @@ branches:
     - master
 before_script:
   - "sudo gem install nokogiri"
+services: mongodb
 script: rake travis
