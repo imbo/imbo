@@ -170,6 +170,21 @@ class MetadataCacheTest extends \PHPUnit_Framework_TestCase {
 
         $this->event->expects($this->once())->method('getName')->will($this->returnValue('metadata.get.post'));
         $this->cache->expects($this->once())->method('set')->with($cacheKey, $this->response);
+        $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(200));
+
+        $this->listener->invoke($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\MetadataCache::invoke
+     * @covers Imbo\EventListener\MetadataCache::getCacheKey
+     */
+    public function testListenerShouldNotStoreResponseInCacheWhenResponseCodeIsNot200() {
+        $cacheKey = 'metadata:' . $this->publicKey . '|' . $this->imageIdentifier;
+
+        $this->event->expects($this->once())->method('getName')->will($this->returnValue('metadata.get.post'));
+        $this->cache->expects($this->never())->method('set');
+        $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(304));
 
         $this->listener->invoke($this->event);
     }

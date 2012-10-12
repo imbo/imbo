@@ -114,7 +114,9 @@ class MetadataCache extends Listener implements ListenerInterface {
             $response->getHeaders()->set('X-Imbo-MetadataCache', 'Miss');
         } else if ($eventName === 'metadata.get.post') {
             // Store the response in the cache for later use
-            $this->cache->set($cacheKey, $response);
+            if ($response->getStatusCode() === 200) {
+                $this->cache->set($cacheKey, $response);
+            }
         } else {
             // Remove metadata from the cache
             $this->cache->delete($cacheKey);
