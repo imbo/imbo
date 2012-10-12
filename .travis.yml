@@ -13,5 +13,7 @@ branches:
     - master
 before_script:
   - "sudo gem install nokogiri"
-services: mongodb
+services:
+  - mongodb
+  - memcached
 script: rake travis
