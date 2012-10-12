@@ -111,7 +111,7 @@ task :test do
 
     puts "Opening phpunit.xml.dist"
     document = Nokogiri::XML(File.open("phpunit.xml.dist"))
-    document.xpath("//phpunit/php/var[@name='MEMCACHED_HOST']").first["value"] = "127.0.0.1"
+    document.xpath("//phpunit/php/var[@name='MEMCACHED_HOST']").first["value"] = "localhost"
     document.xpath("//phpunit/php/var[@name='MEMCACHED_PORT']").first["value"] = "11211"
     document.xpath("//phpunit/logging").remove
 
