@@ -42,6 +42,7 @@ use Imbo\Database\DatabaseInterface,
     Imbo\Image\Image,
     Imbo\EventManager\EventManager,
     Imbo\Exception\InvalidArgumentException,
+    Imbo\Exception\HaltApplication,
     DateTime;
 
 // Fetch the configuration
@@ -146,12 +147,8 @@ $container->eventManager = $container->shared(function(Container $container) {
     return $manager;
 });
 
-// Fetch some entries from the container
-$request = $container->request;
-$response = $container->response;
-
 // Add a version header
-$response->getHeaders()->set('X-Imbo-Version', Version::getVersionNumber());
+$container->response->getHeaders()->set('X-Imbo-Version', Version::getVersionNumber());
 
 // Create the front controller and handle the request
 $frontController = new FrontController($container);
@@ -163,7 +160,17 @@ $responseWriter = new ResponseWriter();
 $strict = true;
 
 try {
-    $frontController->handle($request, $response);
+    try {
+        $frontController->run();
+    } catch (HaltApplication $exception) {
+        // Special type of exception that the event manager can throw if an event listener wants to
+        // halt the execution of Imbo. No special action should be taken, simply send the response
+        // as usual
+        unset($exception);
+    }
+
+    $request = $container->request;
+    $response = $container->response;
 
     prepareResponse:
 
@@ -183,6 +190,10 @@ try {
         }
     }
 } catch (Exception $exception) {
+    // Fetch request and response from the container
+    $request = $container->request;
+    $response = $container->response;
+
     $date = new DateTime();
 
     $code         = $exception->getCode();

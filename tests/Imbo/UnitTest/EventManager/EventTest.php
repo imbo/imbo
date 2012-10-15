@@ -56,4 +56,30 @@ class EventTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($name, $event->getName());
         $this->assertSame($container, $event->getContainer());
     }
+
+    /**
+     * @covers Imbo\EventManager\Event::propagationIsStopped
+     * @covers Imbo\EventManager\Event::stopPropagation
+     */
+    public function testPropagationCanBeStopped() {
+        $event = new Event('name', $this->getMock('Imbo\Container'));
+        $this->assertFalse($event->propagationIsStopped());
+        $this->assertSame($event, $event->stopPropagation(true));
+        $this->assertTrue($event->propagationIsStopped());
+        $this->assertSame($event, $event->stopPropagation(false));
+        $this->assertFalse($event->propagationIsStopped());
+    }
+
+    /**
+     * @covers Imbo\EventManager\Event::applicationIsHalted
+     * @covers Imbo\EventManager\Event::haltApplication
+     */
+    public function testApplicationCanBeHalted() {
+        $event = new Event('name', $this->getMock('Imbo\Container'));
+        $this->assertFalse($event->applicationIsHalted());
+        $this->assertSame($event, $event->haltApplication(true));
+        $this->assertTrue($event->applicationIsHalted());
+        $this->assertSame($event, $event->haltApplication(false));
+        $this->assertFalse($event->applicationIsHalted());
+    }
 }

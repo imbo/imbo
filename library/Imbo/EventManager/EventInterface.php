@@ -56,4 +56,34 @@ interface EventInterface {
      * @return Imbo\Container
      */
     function getContainer();
+
+    /**
+     * Whether or not to stop the execution of more listeners for the current event
+     *
+     * @param boolean $flag True to stop, false to continue
+     * @return EventInterface
+     */
+    function stopPropagation($flag);
+
+    /**
+     * Return whether or not the propagation should stop
+     *
+     * @return boolean
+     */
+    function propagationIsStopped();
+
+    /**
+     * Whether or not to halt the execution of Imbo
+     *
+     * @param boolean $flag True to halt, false to continue
+     * @return EventInterface
+     */
+    function haltApplication($flag);
+
+    /**
+     * Return whether or not the execution should be halted
+     *
+     * @return boolean
+     */
+    function applicationIsHalted();
 }

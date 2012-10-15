@@ -31,7 +31,8 @@
 
 namespace Imbo\UnitTest\Resource;
 
-use Imbo\Resource\Resource;
+use Imbo\Resource\Resource,
+    Imbo\Container;
 
 /**
  * @package TestSuite\UnitTests
@@ -42,20 +43,24 @@ use Imbo\Resource\Resource;
  * @covers Imbo\Resource\Resource
  */
 class ResourceTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @var Imbo\Container
+     */
+    private $container;
+
+    /**
+     * @var Imbo\Resource\Resource
+     */
+    private $resource;
+
     public function setUp() {
+        $this->container = $this->getMock('Imbo\Container');
         $this->resource = new ResourceImplementation();
-        $this->request  = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->storage  = $this->getMock('Imbo\Storage\StorageInterface');
     }
 
     public function tearDown() {
+        $this->container = null;
         $this->resource = null;
-        $this->request  = null;
-        $this->response = null;
-        $this->database = null;
-        $this->storage  = null;
     }
 
     /**
@@ -64,8 +69,8 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Method not allowed
      * @expectedExceptionCode 405
      */
-    public function testGet() {
-        $this->resource->get($this->request, $this->response, $this->database, $this->storage);
+    public function testRespondWith405WhenGetIsNotAllowedAndHttpMethodIsGet() {
+        $this->resource->get($this->container);
     }
 
     /**
@@ -74,8 +79,8 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Method not allowed
      * @expectedExceptionCode 405
      */
-    public function testPut() {
-        $this->resource->put($this->request, $this->response, $this->database, $this->storage);
+    public function testRespondWith405WhenPutIsNotAllowedAndHttpMethodIsPut() {
+        $this->resource->put($this->container);
     }
 
     /**
@@ -84,8 +89,8 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Method not allowed
      * @expectedExceptionCode 405
      */
-    public function testPost() {
-        $this->resource->post($this->request, $this->response, $this->database, $this->storage);
+    public function testRespondWith405WhenPostIsNotAllowedAndHttpMethodIsPost() {
+        $this->resource->post($this->container);
     }
 
     /**
@@ -94,8 +99,8 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Method not allowed
      * @expectedExceptionCode 405
      */
-    public function testDelete() {
-        $this->resource->delete($this->request, $this->response, $this->database, $this->storage);
+    public function testRespondWith405WhenDeleteIsNotAllowedAndHttpMethodIsDelete() {
+        $this->resource->delete($this->container);
     }
 
     /**
@@ -104,8 +109,8 @@ class ResourceTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Method not allowed
      * @expectedExceptionCode 405
      */
-    public function testHead() {
-        $this->resource->head($this->request, $this->response, $this->database, $this->storage);
+    public function testRespondWith405WhenHeadIsNotAllowedAndHttpMethodIsHead() {
+        $this->resource->head($this->container);
     }
 }
 

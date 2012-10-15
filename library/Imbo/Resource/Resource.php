@@ -31,10 +31,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface,
-    Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface,
+use Imbo\Container,
     Imbo\Resource\ResourceInterface,
     Imbo\Exception\ResourceException,
     Imbo\EventManager\EventManagerInterface,
@@ -62,35 +59,35 @@ abstract class Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function post(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+    public function post(Container $container) {
         throw new ResourceException('Method not allowed', 405);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+    public function get(Container $container) {
         throw new ResourceException('Method not allowed', 405);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+    public function head(Container $container) {
         throw new ResourceException('Method not allowed', 405);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+    public function delete(Container $container) {
         throw new ResourceException('Method not allowed', 405);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage) {
+    public function put(Container $container) {
         throw new ResourceException('Method not allowed', 405);
     }
 

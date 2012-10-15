@@ -79,7 +79,7 @@ class UserTest extends ResourceTests {
         $this->database->expects($this->once())->method('getNumImages')->with($this->publicKey)->will($this->returnValue($numImages));
         $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey)->will($this->returnValue($lastModified));
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 
     /**
@@ -118,6 +118,6 @@ class UserTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 }

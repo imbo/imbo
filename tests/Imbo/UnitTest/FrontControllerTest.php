@@ -52,6 +52,11 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     private $controller;
 
     /**
+     * @var Imbo\Container
+     */
+    private $container;
+
+    /**
      * @var string
      */
     private $publicKey;
@@ -68,20 +73,23 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
         $this->publicKey = md5(microtime());
         $this->privateKey = md5(microtime());
 
-        $container = new Container();
-        $container->config = array(
+        $this->container = new Container();
+        $this->container->config = array(
             'auth' => array(
                 $this->publicKey => $this->privateKey,
             ),
         );
-        $container->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $container->storage  = $this->getMock('Imbo\Storage\StorageInterface');
-        $container->imageResource = $this->getMock('Imbo\Resource\Image');
-        $container->imagesResource = $this->getMock('Imbo\Resource\Images');
-        $container->metadataResource = $this->getMock('Imbo\Resource\Metadata');
-        $container->eventManager = $this->getMock('Imbo\EventManager\EventManagerInterface');
+        $this->container->request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $this->container->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $this->container->database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $this->container->storage = $this->getMock('Imbo\Storage\StorageInterface');
 
-        $this->controller = new FrontController($container);
+        $this->container->imageResource = $this->getMock('Imbo\Resource\Image');
+        $this->container->imagesResource = $this->getMock('Imbo\Resource\Images');
+        $this->container->metadataResource = $this->getMock('Imbo\Resource\Metadata');
+        $this->container->eventManager = $this->getMock('Imbo\EventManager\EventManagerInterface');
+
+        $this->controller = new FrontController($this->container);
     }
 
     /**
@@ -155,32 +163,24 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\FrontController::handle
+     * @covers Imbo\FrontController::run
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage I'm a teapot!
      * @expectedExceptionCode 418
      */
-    public function testHandleBrew() {
-        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getMethod')->will($this->returnValue('BREW'));
-
-        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-
-        $this->controller->handle($request, $response);
+    public function testRespondWith418WhenHttpMethodIsBrew() {
+        $this->container->request->expects($this->once())->method('getMethod')->will($this->returnValue('BREW'));
+        $this->controller->run();
     }
 
     /**
-     * @covers Imbo\FrontController::handle
+     * @covers Imbo\FrontController::run
      * @expectedException Imbo\Exception
      * @expectedExceptionMessage Unsupported HTTP method
      * @expectedExceptionCode 501
      */
-    public function testHandleUnsupportedHttpMethod() {
-        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getMethod')->will($this->returnValue('TRACE'));
-
-        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-
-        $this->controller->handle($request, $response);
+    public function testRespondWith501WhenHttpMethodIsNotSupported() {
+        $this->container->request->expects($this->once())->method('getMethod')->will($this->returnValue('TRACE'));
+        $this->controller->run();
     }
 }
