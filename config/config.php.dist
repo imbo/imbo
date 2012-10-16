@@ -113,7 +113,7 @@ return array(
      *
      * Example of how to add different listeners:
      *
-     * 'eventListener' => array(
+     * 'eventListeners' => array(
      *   array(
      *     'listener' => new Imbo\EventListener\AccessToken(),
      *   ),

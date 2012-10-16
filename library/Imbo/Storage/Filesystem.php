@@ -155,7 +155,7 @@ class Filesystem implements StorageInterface {
      *
      * @param string $publicKey The key
      * @param string $imageIdentifier Image identifier
-     * @param boolean $includeFilename Wether or not to include the last part of the path (the
+     * @param boolean $includeFilename Whether or not to include the last part of the path (the
      *                                 filename itself)
      * @return string
      */

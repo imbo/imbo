@@ -98,7 +98,7 @@ class Canvas extends Transformation implements TransformationInterface {
      *
      * @var string
      */
-    private $bg = '#fff';
+    private $bg = '#ffffff';
 
     /**
      * Class constructor
@@ -136,6 +136,14 @@ class Canvas extends Transformation implements TransformationInterface {
      */
     public function applyToImage(ImageInterface $image) {
         try {
+            if (!$this->width) {
+                $this->width = $image->getWidth();
+            }
+
+            if (!$this->height) {
+                $this->height = $image->getHeight();
+            }
+
             // Create a new canvas
             $canvas = new Imagick();
             $canvas->newImage($this->width, $this->height, $this->bg);

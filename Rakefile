@@ -8,13 +8,28 @@ build   = "#{basedir}/build"
 source  = "#{basedir}/library"
 
 desc "Task used by Jenkins-CI"
-task :jenkins => [:prepare, :lint, :composer, :test, :apidocs, :phploc, :phpcs, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
+task :jenkins => [:prepare, :lint, :composer, :test, :apidocs, :phploc, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
 
 desc "Task used by Travis-CI"
 task :travis => [:composer, :test]
 
 desc "Default task"
-task :default => [:lint, :composer, :test]
+task :default => [:lint, :composer, :test, :phpcs, :apidocs, :readthedocs]
+
+desc "Spell check and generate end user docs"
+task :readthedocs do
+  wd = Dir.getwd
+  Dir.chdir("docs")
+  begin
+    sh %{make spelling}
+  rescue Exception
+    puts "Spelling error in the docs, aborting"
+    exit 1
+  end
+  puts "No spelling errors. Generate docs"
+  sh %{make html}
+  Dir.chdir(wd)
+end
 
 desc "Clean up and create artifact directories"
 task :prepare do
@@ -42,8 +57,13 @@ task :composer do
 end
 
 desc "Generate checkstyle.xml using PHP_CodeSniffer"
-task :phpcs do
+task :phpcs_ci do
   system "phpcs --report=checkstyle --report-file=#{build}/logs/checkstyle.xml --standard=Imbo #{source}"
+end
+
+desc "Check CS"
+task :phpcs do
+  system "phpcs --standard=Imbo #{source}"
 end
 
 desc "Aggregate tool output with PHP_CodeBrowser"
@@ -76,7 +96,7 @@ task :phploc do
   system "phploc --log-csv #{build}/logs/phploc.csv --log-xml #{build}/logs/phploc.xml #{source}"
 end
 
-desc "Generate API documentation using phpdoc (config in phpdoc.xml)"
+desc "Generate API documentation using phpdoc"
 task :apidocs do
   system "phpdoc -d #{source} -t #{build}/docs"
 end
@@ -284,7 +304,7 @@ task :github, :version do |t, args|
 end
 
 desc "Publish API docs"
-task :docs do
+task :publish_api_docs do
     system "git checkout master"
     Rake::Task["apidocs"].invoke
     wd = Dir.getwd
@@ -308,6 +328,9 @@ task :release, :version do |t, args|
     # Unit tests
     Rake::Task["test"].invoke
 
+    # Generate end-user docs
+    Rake::Task["readthedocs"].invoke
+
     # Build PEAR package
     Rake::Task["pear"].invoke(version)
 
@@ -318,7 +341,7 @@ task :release, :version do |t, args|
     Rake::Task["github"].invoke(version)
 
     # Update the API docs and push to gh-pages
-    Rake::Task["docs"].invoke
+    Rake::Task["publish_api_docs"].invoke
   else
     puts "'#{version}' is not a valid version"
     exit 1
