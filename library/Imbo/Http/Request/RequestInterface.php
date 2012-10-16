@@ -254,7 +254,7 @@ interface RequestInterface {
     function getHeaders();
 
     /**
-     * Wether or not the request is POST, PUT or DELETE
+     * Whether or not the request is POST, PUT or DELETE
      *
      * @return boolean
      */
