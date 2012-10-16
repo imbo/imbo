@@ -58,16 +58,6 @@ class Apc implements CacheInterface {
     }
 
     /**
-     * Generate a namespaced key
-     *
-     * @param string $key The key specified by the user
-     * @return string A namespaced key
-     */
-    protected function getKey($key) {
-        return $this->namespace . $key;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function get($key) {
@@ -92,44 +82,30 @@ class Apc implements CacheInterface {
      * {@inheritdoc}
      */
     public function increment($key, $amount = 1) {
-        $key = $this->getKey($key);
-
-        if (!apc_exists($key)) {
-            return false;
-        }
-
-        $value = (int) apc_fetch($key);
-        $newValue = $value + $amount;
-
-        if (apc_store($key, $newValue) === false) {
-            return false;
-        }
-
-        return $newValue;
+        return apc_inc($this->getKey($key), $amount);
     }
 
     /**
      * {@inheritdoc}
      */
     public function decrement($key, $amount = 1) {
-        $key = $this->getKey($key);
+        $result = apc_dec($this->getKey($key), $amount);
 
-        if (!apc_exists($key)) {
-            return false;
+        if ($result < 0) {
+            $result = 0;
+            $this->set($key, $result);
         }
 
-        $value = (int) apc_fetch($key);
-        $newValue = $value - $amount;
+        return $result;
+    }
 
-        if ($newValue < 0) {
-            // Don't go below zero
-            $newValue = 0;
-        }
-
-        if (apc_store($key, $newValue) === false) {
-            return false;
-        }
-
-        return $newValue;
+    /**
+     * Generate a namespaced key
+     *
+     * @param string $key The key specified by the user
+     * @return string A namespaced key
+     */
+    protected function getKey($key) {
+        return $this->namespace . $key;
     }
 }

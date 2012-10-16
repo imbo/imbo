@@ -90,5 +90,6 @@ abstract class CacheTests extends \PHPUnit_Framework_TestCase {
         $this->assertSame(9, $this->driver->decrement($key));
         // Make sure we don't go below zero
         $this->assertSame(0, $this->driver->decrement($key, 100));
+        $this->assertSame(0, $this->driver->get($key));
     }
 }

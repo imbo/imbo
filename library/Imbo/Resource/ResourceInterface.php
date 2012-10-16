@@ -32,10 +32,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface,
-    Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface,
+use Imbo\Container,
     Imbo\EventManager\EventManagerInterface;
 
 /**
@@ -77,52 +74,37 @@ interface ResourceInterface {
     /**
      * POST handler
      *
-     * @param RequestInterface $request A request instance
-     * @param ResponseInterface $response A response instance
-     * @param DatabaseInterface $database A database instance
-     * @param StorageInterface $storage A storage instance
+     * @param Container $container A container instance
      */
-    function post(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
+    function post(Container $container);
 
     /**
      * GET handler
      *
-     * @param RequestInterface $request A request instance
-     * @param ResponseInterface $response A response instance
-     * @param DatabaseInterface $database A database instance
-     * @param StorageInterface $storage A storage instance
+     * @param Container $container A container instance
      */
-    function get(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
+    function get(Container $container);
 
     /**
      * HEAD handler
      *
-     * @param RequestInterface $request A request instance
-     * @param ResponseInterface $response A response instance
-     * @param DatabaseInterface $database A database instance
-     * @param StorageInterface $storage A storage instance
+     * @param Container $container A container instance
      */
-    function head(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
+    function head(Container $container);
 
     /**
      * DELETE handler
      *
-     * @param RequestInterface $request A request instance
-     * @param ResponseInterface $response A response instance
-     * @param DatabaseInterface $database A database instance
-     * @param StorageInterface $storage A storage instance
+     * @param Container $container A container instance
      */
-    function delete(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
+    function delete(Container $container);
 
     /**
      * PUT handler
      *
-     * @param RequestInterface $request A request instance
-     * @param ResponseInterface $response A response instance
-     * @param DatabaseInterface $database A database instance
-     * @param StorageInterface $storage A storage instance
+     * @param Container $container A container instance
      */
-    function put(RequestInterface $request, ResponseInterface $response, DatabaseInterface $database, StorageInterface $storage);
+    function put(Container $container);
 
     /**
      * Set the event manager

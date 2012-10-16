@@ -31,7 +31,8 @@
 
 namespace Imbo\UnitTest\EventManager;
 
-use Imbo\EventManager\EventManager;
+use Imbo\EventManager\EventManager,
+    Imbo\EventManager\EventManagerInterface;
 
 /**
  * @package TestSuite\UnitTests
@@ -139,6 +140,34 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('otherkey'));
 
         $this->manager->attachListener($listener);
+        $this->manager->trigger('event');
+    }
+
+    /**
+     * @covers Imbo\EventManager\EventManager::trigger
+     */
+    public function testListenerCanStopPropagation() {
+        $callback1 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
+        $callback1->expects($this->once())->method('__invoke');
+
+        $callback2 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
+        $callback2->expects($this->never())->method('__invoke');
+
+        $stopper = function($event) { $event->stopPropagation(true); };
+
+        $this->manager->attach('event', $callback1)
+                      ->attach('event', $stopper)
+                      ->attach('event', $callback2);
+
+        $this->assertSame($this->manager, $this->manager->trigger('event'));
+    }
+
+    /**
+     * @covers Imbo\EventManager\EventManager::trigger
+     * @expectedException Imbo\Exception\HaltApplication
+     */
+    public function testHaltApplicationExceptionShouldBeThrownWhenEventListenerHaltsApplication() {
+        $this->manager->attach('event', function($event) { $event->haltApplication(true); });
         $this->manager->trigger('event');
     }
 }

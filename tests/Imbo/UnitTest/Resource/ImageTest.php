@@ -102,7 +102,7 @@ class ImageTest extends ResourceTests {
                                ->with($this->request, $this->image)
                                ->will($this->throwException(new ImageException('message', 400)));
 
-        $this->getNewResource()->put($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->put($this->container);
     }
 
     /**
@@ -125,7 +125,7 @@ class ImageTest extends ResourceTests {
                        ->with($this->publicKey, $this->imageIdentifier, $this->image)
                        ->will($this->throwException(new DatabaseException('message', 500)));
 
-        $this->getNewResource()->put($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->put($this->container);
     }
 
     /**
@@ -161,7 +161,7 @@ class ImageTest extends ResourceTests {
                       ->with($this->publicKey, $this->imageIdentifier, $imageData)
                       ->will($this->throwException(new StorageException('message', 500)));
 
-        $this->getNewResource()->put($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->put($this->container);
     }
 
     /**
@@ -182,7 +182,7 @@ class ImageTest extends ResourceTests {
         $this->response->expects($this->once())->method('setStatusCode')->with(201)->will($this->returnValue($this->response));
         $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $this->getNewResource()->put($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->put($this->container);
     }
 
     /**
@@ -200,7 +200,7 @@ class ImageTest extends ResourceTests {
                        ->with($this->publicKey, $this->imageIdentifier)
                        ->will($this->throwException(new DatabaseException('message', 500)));
 
-        $this->getNewResource()->delete($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->delete($this->container);
     }
 
     /**
@@ -222,7 +222,7 @@ class ImageTest extends ResourceTests {
                       ->with($this->publicKey, $this->imageIdentifier)
                       ->will($this->throwException(new StorageException('message', 500)));
 
-        $this->getNewResource()->delete($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->delete($this->container);
     }
 
     /**
@@ -238,7 +238,7 @@ class ImageTest extends ResourceTests {
 
         $this->storage->expects($this->once())->method('delete')->with($this->publicKey, $this->imageIdentifier);
 
-        $this->getNewResource()->delete($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->delete($this->container);
     }
 
     /**
@@ -252,7 +252,7 @@ class ImageTest extends ResourceTests {
                        ->method('load')
                        ->will($this->throwException(new DatabaseException('message', 500)));
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 
     /**
@@ -274,7 +274,7 @@ class ImageTest extends ResourceTests {
                       ->method('getImage')
                       ->will($this->throwException(new StorageException('message', 500)));
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 
     /**
@@ -315,7 +315,7 @@ class ImageTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setNotModified');
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 
     /**
@@ -353,7 +353,7 @@ class ImageTest extends ResourceTests {
 
         $this->contentNegotiation->expects($this->once())->method('isAcceptable')->will($this->returnValue(true));
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 
     /**
@@ -385,7 +385,7 @@ class ImageTest extends ResourceTests {
         $this->image->expects($this->once())->method('getBlob')->will($this->returnValue($imageData));
         $this->contentNegotiation->expects($this->once())->method('isAcceptable')->will($this->returnValue(true));
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 
     /**
@@ -416,6 +416,6 @@ class ImageTest extends ResourceTests {
         $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
         $this->contentNegotiation->expects($this->once())->method('isAcceptable')->will($this->returnValue(false));
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 }

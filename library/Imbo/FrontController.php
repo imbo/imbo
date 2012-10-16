@@ -163,12 +163,10 @@ class FrontController {
     /**
      * Handle a request
      *
-     * @param RequestInterface $request The request object
-     * @param ResponseInterface $response The response object
      * @throws RuntimeException
      */
-    public function handle(RequestInterface $request, ResponseInterface $response) {
-        $httpMethod = $request->getMethod();
+    public function run() {
+        $httpMethod = $this->container->request->getMethod();
 
         if ($httpMethod === RequestInterface::METHOD_BREW) {
             throw new RuntimeException('I\'m a teapot!', 418);
@@ -179,28 +177,29 @@ class FrontController {
         }
 
         // Fetch a resource instance based on the request path
-        $resource = $this->resolveResource($request);
+        $resource = $this->resolveResource($this->container->request);
 
         // Add some response headers
-        $responseHeaders = $response->getHeaders();
+        $responseHeaders = $this->container->response->getHeaders();
 
         // Inform the user agent of which methods are allowed against this resource
         $responseHeaders->set('Allow', implode(', ', $resource->getAllowedMethods()));
 
         // Add Accept to Vary if the client has not specified a specific extension, in which we
         // won't do any content negotiation at all.
-        if (!$request->getExtension()) {
+        if (!$this->container->request->getExtension()) {
             $responseHeaders->set('Vary', 'Accept');
         }
 
         // Fetch the real image identifier (PUT only) or the one from the URL (if present)
-        if (($identifier = $request->getRealImageIdentifier()) || ($identifier = $request->getImageIdentifier())) {
-            $response->getHeaders()->set('X-Imbo-ImageIdentifier', $identifier);
+        if (($identifier = $this->container->request->getRealImageIdentifier()) ||
+            ($identifier = $this->container->request->getImageIdentifier())) {
+            $this->container->response->getHeaders()->set('X-Imbo-ImageIdentifier', $identifier);
         }
 
         // Fetch auth config
         $authConfig = $this->container->config['auth'];
-        $publicKey = $request->getPublicKey();
+        $publicKey = $this->container->request->getPublicKey();
 
         // See if the public key exists
         if ($publicKey) {
@@ -213,7 +212,7 @@ class FrontController {
 
             // Fetch the private key from the config and store it in the request
             $privateKey = $authConfig[$publicKey];
-            $request->setPrivateKey($privateKey);
+            $this->container->request->setPrivateKey($privateKey);
         }
 
         // Lowercase the HTTP method to get the class method to execute
@@ -229,7 +228,7 @@ class FrontController {
         $eventName = $resourceName . '.' . $methodName;
 
         $this->container->eventManager->trigger($eventName . '.pre');
-        $resource->$methodName($request, $response, $this->container->database, $this->container->storage);
+        $resource->$methodName($this->container);
         $this->container->eventManager->trigger($eventName . '.post');
     }
 }

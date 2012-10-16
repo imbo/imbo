@@ -57,7 +57,7 @@ class StatusTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 
     public function testStatusWhenStorageDriverFails() {
@@ -71,7 +71,7 @@ class StatusTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 
     public function testStatusWhenBothDriversFails() {
@@ -85,7 +85,7 @@ class StatusTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 
     public function testStatusWhenNoDriverFails() {
@@ -99,6 +99,6 @@ class StatusTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
 
-        $this->getNewResource()->get($this->request, $this->response, $this->database, $this->storage);
+        $this->getNewResource()->get($this->container);
     }
 }

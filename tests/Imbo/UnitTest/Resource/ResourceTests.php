@@ -31,6 +31,10 @@
 
 namespace Imbo\UnitTest\Resource;
 
+use Imbo\Container,
+    ReflectionClass,
+    ReflectionMethod;
+
 /**
  * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -65,6 +69,11 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
     protected $storage;
 
     /**
+     * @var Container
+     */
+    protected $container;
+
+    /**
      * Public key
      *
      * @var string
@@ -79,11 +88,18 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
     protected $imageIdentifier = '34205548e02b8bd0865287a4b0b3fe5e';
 
     public function setUp() {
-        $this->resource = $this->getNewResource();
-        $this->request  = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
         $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->storage  = $this->getMock('Imbo\Storage\StorageInterface');
+        $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
+
+        $this->container = new Container();
+        $this->container->request = $this->request;
+        $this->container->response = $this->response;
+        $this->container->database = $this->database;
+        $this->container->storage = $this->storage;
+
+        $this->resource = $this->getNewResource();
     }
 
     public function tearDown() {
@@ -92,6 +108,7 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
         $this->response = null;
         $this->database = null;
         $this->storage = null;
+        $this->container = null;
     }
 
     /**
@@ -105,13 +122,13 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
      * Make sure the that resource returns the correct methods for usage in the "Allow" header
      */
     public function testGetAllowedMethods() {
-        $reflection = new \ReflectionClass($this->resource);
+        $reflection = new ReflectionClass($this->resource);
         $className = get_class($this->resource);
         $allHttpMethods = array(
             'get', 'post', 'put', 'delete', 'head',
         );
 
-        $implementedMethods = array_filter($reflection->getMethods(\ReflectionMethod::IS_PUBLIC), function($method) use($className, $allHttpMethods) {
+        $implementedMethods = array_filter($reflection->getMethods(ReflectionMethod::IS_PUBLIC), function($method) use($className, $allHttpMethods) {
             return $method->class == $className && (array_search($method->name, $allHttpMethods) !== false);
         });
 

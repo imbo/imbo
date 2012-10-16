@@ -250,7 +250,8 @@ class Doctrine implements StorageInterface {
 
     /**
      * Method that can be overridden to dynamically select table names based on the public key and
-     * the image identifier.
+     * the image identifier. The default implementation does not use them for anything, and simply
+     * returns the default table name.
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier to fetch

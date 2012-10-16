@@ -22,109 +22,27 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package EventManager
+ * @package Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\EventManager;
+namespace Imbo\Exception;
 
-use Imbo\Container;
+use Imbo\Exception;
 
 /**
- * Event class
+ * Halt application exception
  *
- * @package EventManager
+ * This exception is used by the event manager if an event listener wants to halt the execution of
+ * Imbo.
+ *
+ * @package Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Event implements EventInterface {
-    /**
-     * Name of the current event
-     *
-     * @var string
-     */
-    private $name;
-
-    /**
-     * Container instance
-     *
-     * @var Container
-     */
-    private $container;
-
-    /**
-     * Propagation flag
-     *
-     * @var boolean
-     */
-    private $propagationIsStopped = false;
-
-    /**
-     * Execution flag
-     *
-     * @var boolean
-     */
-    private $applicationIsHalted = false;
-
-    /**
-     * Class contsructor
-     *
-     * @param string $name The name of the current event
-     * @param Container $container Container instance
-     */
-    public function __construct($name, Container $container) {
-        $this->name = $name;
-        $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName() {
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContainer() {
-        return $this->container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function stopPropagation($flag) {
-        $this->propagationIsStopped = $flag;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function propagationIsStopped() {
-        return $this->propagationIsStopped;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function haltApplication($flag) {
-        $this->applicationIsHalted = $flag;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function applicationIsHalted() {
-        return $this->applicationIsHalted;
-    }
-}
+class HaltApplication extends RuntimeException implements Exception {}
