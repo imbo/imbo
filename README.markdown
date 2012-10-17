@@ -13,10 +13,9 @@ Here you will find some notes about how Imbo works internally along with informa
 * [API Documentation](http://ci.starzinger.net/job/Imbo/API_Documentation/)
 * [Code Coverage](http://ci.starzinger.net/job/Imbo/Code_Coverage/)
 * [Code Browser](http://ci.starzinger.net/job/Imbo/Code_Browser/)
-* [End-user docs](http://imbo.readthedocs.org/en/latest/)
 
 ### Get started
-First you must make sure you have both PHPUnit and the Imagick extension installed. If not, you can install them using the following commands:
+First you must make sure you have both [PHPUnit](http://phpunit.de) and the [Imagick extension](http://pecl.php.net/package/imagick) installed. If not, you can install them using the following commands:
 
     sudo pear config-set audo_discover 1
     sudo pear install --alldeps pear.phpunit.de/PHPUnit
@@ -26,7 +25,7 @@ Now click the fork button on github and then clone your fork:
 
     git clone git@github.com:<username>/imbo.git
 
-Enter the newly created directory and initialize the project using composer:
+Enter the newly created directory and initialize the project using [composer](http://getcomposer.org):
 
     cd imbo
     curl -s https://getcomposer.org/installer | php
@@ -36,6 +35,6 @@ And lastly, execute the test suite:
 
     phpunit
 
-Some tests will probably be skipped unless you have already installed all optional dependencies, like APC, Memcached and Doctrine.
+Some tests will probably be skipped unless you have already installed all optional dependencies, like [APC](http://pecl.php.net/package/apc), [Memcached](http://pecl.php.net/package/memcached) and [Doctrine](http://www.doctrine-project.org).
 
 If you send me a pull request I would appreciate it if you include tests for all new code, and make sure that the test suite passes. I also require you to use "feature branches", also for minor fixes like typos in comments.
