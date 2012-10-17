@@ -4,7 +4,7 @@ Imbo is an image "server" that can be used to add/get/delete images using a REST
 [![Current build Status](https://secure.travis-ci.org/imbo/imbo.png)](http://travis-ci.org/imbo/imbo)
 
 ## Documentation
-End-user docs can be found over at [readthedocs.org](http://imbo.readthedocs.org/en/latest/).
+End-user docs can be found [here](http://docs.imbo-project.org/en/latest/).
 
 ## Developer/Contributer notes
 Here you will find some notes about how Imbo works internally along with information on what is needed to develop Imbo.
