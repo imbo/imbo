@@ -31,9 +31,8 @@
 
 namespace Imbo\UnitTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Canvas;
-
-use Imagick;
+use Imbo\Image\Transformation\Canvas,
+    Imagick;
 
 /**
  * @package TestSuite\UnitTests
