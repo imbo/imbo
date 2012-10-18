@@ -22,56 +22,44 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\UnitTest\Image\Transformation;
+namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Convert;
+use Imbo\Image\Transformation\Transpose;
 
 /**
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\Image\Transformation\Convert
+ * @covers Imbo\Image\Transformation\Transpose
  */
-class ConvertTest extends TransformationTests {
+class TransposeTest extends TransformationTests {
     protected function getTransformation() {
-        return new Convert(array('type' => 'png'));
+        return new Transpose();
     }
 
     protected function getExpectedName() {
-        return 'convert';
+        return 'transpose';
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Convert::applyToImage
-     */
-    public function testConvertToSameTypeAsImage() {
-        $convert = $this->getTransformation();
-        $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
-
-        $convert->applyToImage($image);
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\Convert::applyToImage
+     * @covers Imbo\Image\Transformation\Canvas::applyToImage
      */
     public function testApplyToImage() {
-        $convert = $this->getTransformation();
+        $blob = file_get_contents(FIXTURES_DIR . '/image.png');
 
         $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->once())->method('setMimeType')->with('image/png');
-        $image->expects($this->once())->method('setExtension')->with('png');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
+        $image->expects($this->any())->method('getBlob')->will($this->returnValue($blob));
+        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
 
-        $convert->applyToImage($image);
+        $this->getTransformation()->applyToImage($image);
     }
 }

@@ -22,43 +22,41 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\UnitTest\Image\Transformation;
+namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\FlipVertically;
+use Imbo\Image\Transformation\Rotate;
 
 /**
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\Image\Transformation\FlipVertically
+ * @covers Imbo\Image\Transformation\Rotate
  */
-class FlipVerticallyTest extends TransformationTests {
+class RotateTest extends TransformationTests {
     protected function getTransformation() {
-        return new FlipVertically();
-    }
-
-    protected function getExpectedName() {
-        return 'flipvertically';
+        return new Rotate(array('angle' => 45));
     }
 
     /**
-     * @covers Imbo\Image\Transformation\FlipVertically::applyToImage
+     * @covers Imbo\Image\Transformation\Rotate::applyToImage
      */
     public function testApplyToImage() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with($this->isType('int'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with($this->isType('int'))->will($this->returnValue($image));
 
-        $transformation = new FlipVertically();
+        $transformation = new Rotate(array('angle' => 45));
         $transformation->applyToImage($image);
     }
 }

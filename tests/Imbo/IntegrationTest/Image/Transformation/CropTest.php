@@ -22,79 +22,60 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\UnitTest\Image\Transformation;
+namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Canvas,
-    Imagick;
+use Imbo\Image\Transformation\Crop;
 
 /**
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\Image\Transformation\Canvas
+ * @covers Imbo\Image\Transformation\Crop
  */
-class CanvasTest extends TransformationTests {
+class CropTest extends TransformationTests {
     protected function getTransformation() {
-        return new Canvas(array(
-            'width' => 100,
-            'height' => 100,
-            'mode' => 'free',
-            'x' => 10,
-            'y' => 10,
-            'bg' => '000',
+        return new Crop(array(
+            'width' => 1,
+            'height' => 2,
+            'x' => 3,
+            'y' => 4,
         ));
     }
 
     protected function getExpectedName() {
-        return 'canvas';
+        return 'crop';
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Canvas::applyToImage
+     * @covers Imbo\Image\Transformation\Crop::applyToImage
      */
     public function testApplyToImage() {
-        $mode = 'free';
-        $width = 700;
-        $height = 500;
-        $x = 10;
-        $y = 20;
-        $bg = 'bf1942';
-        $blob = file_get_contents(FIXTURES_DIR . '/image.png');
+        $x = 1;
+        $y = 2;
+        $width = 3;
+        $height = 4;
 
         $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->any())->method('getBlob')->will($this->returnValue($blob));
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
-        $image->expects($this->once())->method('getHeight')->will($this->returnValue(463));
         $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
-        $transformation = new Canvas(array(
-            'width' => $width,
-            'height' => $height,
-            'mode' => $mode,
+        $transformation = new Crop(array(
             'x' => $x,
             'y' => $y,
-            'bg' => $bg,
+            'width' => $width,
+            'height' => $height,
         ));
         $transformation->applyToImage($image);
-
-        $imagick = new Imagick();
-        $imagick->readImageBlob($image->getBlob());
-
-        $canvasColor = $imagick->getImagePixelColor(695, 495);
-        $windowColor = $imagick->getImagePixelColor(14, 69);
-        $this->assertSame('rgb(109,106,104)', $canvasColor->getColorAsString());
-        $this->assertSame('rgb(0,0,0)',       $windowColor->getColorAsString());
     }
 }
