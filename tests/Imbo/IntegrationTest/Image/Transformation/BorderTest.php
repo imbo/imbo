@@ -46,7 +46,7 @@ class BorderTest extends TransformationTests {
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Border();
+        return new Border('ffffff', 3, 4);
     }
 
     /**
@@ -64,8 +64,8 @@ class BorderTest extends TransformationTests {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with(667)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with(465)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with(671)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with(471)->will($this->returnValue($image));
 
         return $image;
     }
