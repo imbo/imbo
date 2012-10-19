@@ -31,6 +31,9 @@
 
 namespace Imbo\IntegrationTest\Image\Transformation;
 
+use Imbo\Image\Transformation\TransformationInterface,
+    Imbo\Image\ImageInterface;
+
 /**
  * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -39,11 +42,65 @@ namespace Imbo\IntegrationTest\Image\Transformation;
  * @link https://github.com/imbo/imbo
  */
 abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
+    /**
+     * Test cases must implement this method and return a configured instande of the transformation
+     * they are testing. This transformation instance will be used for the tests in this base test
+     * case
+     *
+     * @return TransformationInterface
+     */
     abstract protected function getTransformation();
 
+    /**
+     * @return string
+     */
+    abstract protected function getExpectedName();
+
+    /**
+     * Get the image mock used in the simple testApplyToImage
+     *
+     * @return ImageInterface
+     */
+    abstract protected function getImageMock();
+
+    /**
+     * Make sure we have Imagick available
+     */
     public function setUp() {
         if (!class_exists('Imagick')) {
             $this->markTestSkipped('Imagick must be available to run this test');
         }
+    }
+
+    /**
+     * Make sure the transformation returns the expected name
+     *
+     * @covers Imbo\Image\Transformation\Transformation::getName
+     */
+    public function testGetName() {
+        $this->assertSame($this->getTransformation()->getName(), $this->getExpectedName());
+    }
+
+    /**
+     * Simply apply the current transformation to an image instance
+     *
+     * The transformation instance returned from getTransformation() will be used
+     */
+    public function testSimpleApplyToImage() {
+        $image = $this->getImageMock();
+
+        $this->getTransformation()->applyToImage($image);
+    }
+
+    /**
+     * @expectedException Imbo\Exception\TransformationException
+     */
+    public function testApplyToImageWithUnknownImageFormat() {
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue('some string'));
+        $image->expects($this->any())->method('getWidth')->will($this->returnValue(1600));
+        $image->expects($this->any())->method('getHeight')->will($this->returnValue(900));
+
+        $this->getTransformation()->applyToImage($image);
     }
 }

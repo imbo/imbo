@@ -42,23 +42,29 @@ use Imbo\Image\Transformation\Compress;
  * @covers Imbo\Image\Transformation\Compress
  */
 class CompressTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
         return new Compress(array('quality' => 90));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getExpectedName() {
         return 'compress';
     }
 
     /**
+     * {@inheritdoc}
      * @covers Imbo\Image\Transformation\Compress::applyToImage
      */
-    public function testApplyToImage() {
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
 
-        $transformation = new Compress(array('quality' => 50));
-        $transformation->applyToImage($image);
+        return $image;
     }
 }

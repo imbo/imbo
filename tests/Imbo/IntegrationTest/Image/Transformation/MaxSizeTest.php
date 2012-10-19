@@ -43,14 +43,25 @@ use Imbo\Image\Transformation\MaxSize;
  * @covers Imbo\Image\Transformation\MaxSize
  */
 class MaxSizeTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
         return new MaxSize(array('width' => 200, 'height' => 100));
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getExpectedName() {
+        return 'maxsize';
+    }
+
+    /**
+     * {@inheritdoc}
      * @covers Imbo\Image\Transformation\MaxSize::applyToImage
      */
-    public function testApplyToImageWithBothParams() {
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
@@ -59,8 +70,7 @@ class MaxSizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with(144)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(100)->will($this->returnValue($image));
 
-        $transformation = new MaxSize(array('width' => 200, 'height' => 100));
-        $transformation->applyToImage($image);
+        return $image;
     }
 
     /**

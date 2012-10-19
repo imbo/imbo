@@ -42,28 +42,67 @@ use Imbo\Image\Transformation\Thumbnail;
  * @covers Imbo\Image\Transformation\Thumbnail
  */
 class ThumbnailTest extends TransformationTests {
+    /**
+     * @var int
+     */
+    private $width = 80;
+
+    /**
+     * @var int
+     */
+    private $height = 90;
+
+    /**
+     * @var string
+     */
+    private $fit = 'outbound';
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
-        return new Thumbnail();
+        return new Thumbnail(array(
+            'width' => $this->width,
+            'height' => $this->height,
+            'mode' => $this->fit,
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExpectedName() {
+        return 'thumbnail';
+    }
+
+    /**
+     * {@inheritdoc}
+     * @covers Imbo\Image\Transformation\Thumbnail::applyToImage
+     */
+    protected function getImageMock() {
+        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
+        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with($this->width)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with($this->height)->will($this->returnValue($image));
+
+        return $image;
     }
 
     /**
      * @covers Imbo\Image\Transformation\Thumbnail::applyToImage
      */
-    public function testApplyToImage() {
-        $width = 80;
-        $height = 90;
-        $fit = 'outbound';
-
+    public function testApplyToImageUsingInsetMode() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with(20)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with(13)->will($this->returnValue($image));
 
         $transformation = new Thumbnail(array(
-            'width' => $width,
-            'height' => $height,
-            'fit' => $fit,
+            'width' => 20,
+            'height' => 20,
+            'fit' => 'inset',
         ));
         $transformation->applyToImage($image);
     }

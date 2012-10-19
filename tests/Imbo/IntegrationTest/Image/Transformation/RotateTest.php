@@ -42,21 +42,31 @@ use Imbo\Image\Transformation\Rotate;
  * @covers Imbo\Image\Transformation\Rotate
  */
 class RotateTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
-        return new Rotate(array('angle' => 45));
+        return new Rotate(array('angle' => 45, 'bg' => 'bd1349'));
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getExpectedName() {
+        return 'rotate';
+    }
+
+    /**
+     * {@inheritdoc}
      * @covers Imbo\Image\Transformation\Rotate::applyToImage
      */
-    public function testApplyToImage() {
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setWidth')->with($this->isType('int'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($this->isType('int'))->will($this->returnValue($image));
 
-        $transformation = new Rotate(array('angle' => 45));
-        $transformation->applyToImage($image);
+        return $image;
     }
 }

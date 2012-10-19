@@ -42,25 +42,31 @@ use Imbo\Image\Transformation\Border;
  * @covers Imbo\Image\Transformation\Border
  */
 class BorderTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
         return new Border();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getExpectedName() {
         return 'border';
     }
 
     /**
+     * {@inheritdoc}
      * @covers Imbo\Image\Transformation\Border::applyToImage
      */
-    public function testApplyToImage() {
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setWidth')->with(667)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(465)->will($this->returnValue($image));
 
-        $transformation = new Border();
-        $transformation->applyToImage($image);
+        return $image;
     }
 }

@@ -42,24 +42,29 @@ use Imbo\Image\Transformation\Transpose;
  * @covers Imbo\Image\Transformation\Transpose
  */
 class TransposeTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
         return new Transpose();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getExpectedName() {
         return 'transpose';
     }
 
     /**
+     * {@inheritdoc}
      * @covers Imbo\Image\Transformation\Canvas::applyToImage
      */
-    public function testApplyToImage() {
-        $blob = file_get_contents(FIXTURES_DIR . '/image.png');
-
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->any())->method('getBlob')->will($this->returnValue($blob));
+        $image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
 
-        $this->getTransformation()->applyToImage($image);
+        return $image;
     }
 }

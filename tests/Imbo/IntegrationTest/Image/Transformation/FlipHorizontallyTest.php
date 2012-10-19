@@ -42,23 +42,29 @@ use Imbo\Image\Transformation\FlipHorizontally;
  * @covers Imbo\Image\Transformation\FlipHorizontally
  */
 class FlipHorizontallyTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
         return new FlipHorizontally();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getExpectedName() {
         return 'fliphorizontally';
     }
 
     /**
+     * {@inheritdoc}
      * @covers Imbo\Image\Transformation\FlipHorizontally::applyToImage
      */
-    public function testApplyToImage() {
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
 
-        $transformation = new FlipHorizontally();
-        $transformation->applyToImage($image);
+        return $image;
     }
 }

@@ -42,36 +42,30 @@ use Imbo\Image\Transformation\Convert;
  * @covers Imbo\Image\Transformation\Convert
  */
 class ConvertTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
         return new Convert(array('type' => 'png'));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getExpectedName() {
         return 'convert';
     }
 
     /**
+     * {@inheritdoc}
      * @covers Imbo\Image\Transformation\Convert::applyToImage
      */
-    public function testConvertToSameTypeAsImage() {
-        $convert = $this->getTransformation();
-        $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
-
-        $convert->applyToImage($image);
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\Convert::applyToImage
-     */
-    public function testApplyToImage() {
-        $convert = $this->getTransformation();
-
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('setMimeType')->with('image/png');
         $image->expects($this->once())->method('setExtension')->with('png');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
 
-        $convert->applyToImage($image);
+        return $image;
     }
 }

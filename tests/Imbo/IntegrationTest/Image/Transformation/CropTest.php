@@ -42,6 +42,9 @@ use Imbo\Image\Transformation\Crop;
  * @covers Imbo\Image\Transformation\Crop
  */
 class CropTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
         return new Crop(array(
             'width' => 1,
@@ -51,31 +54,24 @@ class CropTest extends TransformationTests {
         ));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getExpectedName() {
         return 'crop';
     }
 
     /**
+     * {@inheritdoc}
      * @covers Imbo\Image\Transformation\Crop::applyToImage
      */
-    public function testApplyToImage() {
-        $x = 1;
-        $y = 2;
-        $width = 3;
-        $height = 4;
-
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with(1)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with(2)->will($this->returnValue($image));
 
-        $transformation = new Crop(array(
-            'x' => $x,
-            'y' => $y,
-            'width' => $width,
-            'height' => $height,
-        ));
-        $transformation->applyToImage($image);
+        return $image;
     }
 }
