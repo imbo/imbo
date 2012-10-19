@@ -145,16 +145,17 @@ class Canvas extends Transformation implements TransformationInterface {
             $canvas->setImageFormat($image->getExtension());
 
             // Load existing image
-            $existingImage  = $this->getImagick();
+            $existingImage = $this->getImagick();
             $existingImage->readImageBlob($image->getBlob());
-            $existingWidth  = $image->getWidth();
+
+            $existingWidth = $image->getWidth();
             $existingHeight = $image->getHeight();
 
             if ($existingWidth > $this->width || $existingHeight > $this->height) {
                 // The existing image is bigger than the canvas and needs to be cropped
                 $cropX = 0;
                 $cropY = 0;
-                $cropWidth  = $this->width;
+                $cropWidth = $this->width;
                 $cropHeight = $this->height;
 
                 if ($existingWidth > $this->width) {
@@ -184,6 +185,7 @@ class Canvas extends Transformation implements TransformationInterface {
             // size from the imagick image when calculating since the image may have been cropped
             // above.
             $existingSize = $existingImage->getImageGeometry();
+
             if ($this->mode === 'center') {
                 $x = ($this->width - $existingSize['width']) / 2;
                 $y = ($this->height - $existingSize['height']) / 2;
