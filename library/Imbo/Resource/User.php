@@ -65,7 +65,6 @@ class User extends Resource implements ResourceInterface {
         $publicKey = $request->getPublicKey();
 
         // Fetch header containers
-        $requestHeaders = $request->getHeaders();
         $responseHeaders = $response->getHeaders();
 
         // Fetch the number of images this user has in the database
@@ -77,15 +76,6 @@ class User extends Resource implements ResourceInterface {
         // Generate ETag based on the last modification date and add to the response headers
         $etag = '"' . md5($lastModified) . '"';
         $responseHeaders->set('ETag', $etag);
-
-        if (
-            $lastModified === $requestHeaders->get('if-modified-since') &&
-            $etag === $requestHeaders->get('if-none-match')
-        ) {
-            $response->setNotModified();
-            return;
-        }
-
         $responseHeaders->set('Last-Modified', $lastModified);
 
         $response->setBody(array(

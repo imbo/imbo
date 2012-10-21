@@ -172,42 +172,7 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Metadata::get
      */
-    public function testGetWhenResponseIsNotModified() {
-        $formattedDate = 'Mon, 10 Jan 2011 13:37:00 GMT';
-        $lastModified = $this->getMock('DateTime');
-        $lastModified->expects($this->once())->method('format')->will($this->returnValue(substr($formattedDate, 0, -4)));
-
-        $etag = '"' . md5($this->publicKey . $this->imageIdentifier . $formattedDate) . '"';
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $requestHeaders->expects($this->any())->method('get')->will($this->returnCallback(function($param) use ($formattedDate, $etag) {
-            if ($param === 'if-modified-since') {
-                return $formattedDate;
-            } else if ($param === 'if-none-match') {
-                return $etag;
-            }
-        }));
-
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-
-        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders->expects($this->once())->method('set')->with('ETag', $etag);
-
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-        $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($lastModified));
-
-        $this->response->expects($this->once())->method('setNotModified');
-
-        $this->getNewResource()->get($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\Metadata::get
-     */
-    public function testGetWhenResponseIsModified() {
+    public function testGet() {
         $formattedDate = 'Mon, 10 Jan 2011 13:37:00 GMT';
 
         $lastModified = $this->getMock('DateTime');
@@ -218,9 +183,6 @@ class MetadataTest extends ResourceTests {
 
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
 
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->at(0))->method('set')->with('ETag', $etag);
