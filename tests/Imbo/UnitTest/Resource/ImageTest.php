@@ -271,8 +271,12 @@ class ImageTest extends ResourceTests {
      * @expectedExceptionCode 500
      */
     public function testGetWhenStorageThrowsException() {
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $requestHeaders->expects($this->any())->method('get');
+
         $this->request->expects($this->once())->method('getServer')->will($this->returnValue($this->getMock('Imbo\Http\ServerContainerInterface')));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
+
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
 
         $this->database->expects($this->once())
@@ -282,49 +286,6 @@ class ImageTest extends ResourceTests {
         $this->storage->expects($this->once())
                       ->method('getImage')
                       ->will($this->throwException(new StorageException('message', 500)));
-
-        $this->getNewResource()->get($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::get
-     */
-    public function testGetWhenResponseIsNotModified() {
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
-
-        // The request URI for some image
-        $requestUri = '/users/' . $this->publicKey . '/images/' . $this->imageIdentifier . '.png';
-
-        // Timestamp used for the Last-Modified header
-        $formattedDate = 'Wed, 18 Apr 2012 16:28:08 GMT';
-        $lastModified = $this->getMock('DateTime');
-        $lastModified->expects($this->once())->method('format')->will($this->returnValue(substr($formattedDate, 0, -4)));
-
-        // Generate ETag as it appears in the headers
-        $etag = '"' . md5($this->publicKey . $this->imageIdentifier . 'image/*' . $requestUri) . '"';
-
-        $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($lastModified));
-
-        $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
-        $serverContainer->expects($this->once())->method('get')->with('REQUEST_URI')->will($this->returnValue($requestUri));
-
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $requestHeaders->expects($this->any())->method('get')->will($this->returnCallback(function($arg) use($etag, $formattedDate) {
-            if ($arg == 'if-modified-since') {
-                return $formattedDate;
-            } else if ($arg == 'Accept') {
-                return 'image/*';
-            }
-
-            return $etag;
-        }));
-
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-        $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
-
-        $this->response->expects($this->once())->method('setNotModified');
 
         $this->getNewResource()->get($this->container);
     }
@@ -372,17 +333,19 @@ class ImageTest extends ResourceTests {
     public function testGet() {
         $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
 
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->any())->method('set')->will($this->returnValue($responseHeaders));
 
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $requestHeaders->expects($this->any())->method('get');
+
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
         $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
         $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('*/*' => 1)));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->once())->method('setBody')->with($imageData);
 
@@ -404,17 +367,19 @@ class ImageTest extends ResourceTests {
     public function testGetWhenUserAgentDoesNotAcceptImage() {
         $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
 
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->any())->method('set')->will($this->returnValue($responseHeaders));
 
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $requestHeaders->expects($this->any())->method('get');
+
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
         $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
         $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('image/jpeg' => 1)));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
         $this->storage->expects($this->once())->method('getImage')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($imageData));

@@ -46,6 +46,9 @@ class StatusTest extends ResourceTests {
         return new Status();
     }
 
+    /**
+     * @covers Imbo\Resource\Status::get
+     */
     public function testStatusWhenDatabaseDriverFails() {
         $this->database->expects($this->once())->method('getStatus')->will($this->returnValue(false));
         $this->storage->expects($this->once())->method('getStatus')->will($this->returnValue(true));
@@ -60,6 +63,9 @@ class StatusTest extends ResourceTests {
         $this->getNewResource()->get($this->container);
     }
 
+    /**
+     * @covers Imbo\Resource\Status::get
+     */
     public function testStatusWhenStorageDriverFails() {
         $this->database->expects($this->once())->method('getStatus')->will($this->returnValue(true));
         $this->storage->expects($this->once())->method('getStatus')->will($this->returnValue(false));
@@ -74,6 +80,9 @@ class StatusTest extends ResourceTests {
         $this->getNewResource()->get($this->container);
     }
 
+    /**
+     * @covers Imbo\Resource\Status::get
+     */
     public function testStatusWhenBothDriversFails() {
         $this->database->expects($this->once())->method('getStatus')->will($this->returnValue(false));
         $this->storage->expects($this->once())->method('getStatus')->will($this->returnValue(false));
@@ -88,6 +97,9 @@ class StatusTest extends ResourceTests {
         $this->getNewResource()->get($this->container);
     }
 
+    /**
+     * @covers Imbo\Resource\Status::get
+     */
     public function testStatusWhenNoDriverFails() {
         $this->database->expects($this->once())->method('getStatus')->will($this->returnValue(true));
         $this->storage->expects($this->once())->method('getStatus')->will($this->returnValue(true));

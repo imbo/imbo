@@ -206,14 +206,6 @@ class Image extends Resource implements ImageResourceInterface {
         // Add the ETag to the response headers
         $responseHeaders->set('ETag', $etag);
 
-        if (
-            $lastModified === $requestHeaders->get('if-modified-since') &&
-            $etag === $requestHeaders->get('if-none-match')
-        ) {
-            $response->setNotModified();
-            return;
-        }
-
         // Fetch the image data and store the data in the image instance
         $imageData = $storage->getImage($publicKey, $imageIdentifier);
         $this->image->setBlob($imageData);

@@ -104,8 +104,6 @@ class Images extends Resource implements ImagesInterface {
 
         $publicKey = $request->getPublicKey();
 
-        // Fetch header containers
-        $requestHeaders = $request->getHeaders();
         $responseHeaders = $response->getHeaders();
 
         // Fetch the last modification date of the current user
@@ -114,16 +112,6 @@ class Images extends Resource implements ImagesInterface {
         // Generate ETag based on the last modification date and add to the response headers
         $etag = '"' . md5($lastModified) . '"';
         $responseHeaders->set('ETag', $etag);
-
-        if (
-            $lastModified === $requestHeaders->get('if-modified-since') &&
-            $etag === $requestHeaders->get('if-none-match')
-        ) {
-            $response->setNotModified();
-            return;
-        }
-
-        // Add the last modification date
         $responseHeaders->set('Last-Modified', $lastModified);
 
         $query = $this->getQuery();

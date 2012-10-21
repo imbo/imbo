@@ -50,53 +50,7 @@ class UserTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\User::get
      */
-    public function testGetWhenDataIsNotModified() {
-        $numImages = 42;
-        $formattedDate = 'Thu, 12 Jan 2012 16:13:35 GMT';
-        $lastModified = $this->getMock('DateTime');
-        $lastModified->expects($this->once())->method('format')->will($this->returnValue(substr($formattedDate, 0, -4)));
-
-        $etag = '"' . md5($formattedDate) . '"';
-
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $requestHeaders->expects($this->any())->method('get')->will($this->returnCallback(function ($key) use ($etag, $formattedDate) {
-            if ($key === 'if-modified-since') {
-                return $formattedDate;
-            } else if ($key === 'if-none-match') {
-                return $etag;
-            }
-        }));
-
-        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders->expects($this->once())->method('set')->with('ETag', $etag);
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-        $this->response->expects($this->once())->method('setNotModified');
-
-        $this->database->expects($this->once())->method('getNumImages')->with($this->publicKey)->will($this->returnValue($numImages));
-        $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey)->will($this->returnValue($lastModified));
-
-        $this->getNewResource()->get($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\User::get
-     */
-    public function testGetWhenDataIsModified() {
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $requestHeaders->expects($this->any())->method('get')->will($this->returnCallback(function ($key) {
-            $lastModified = 'Thu, 13 Jan 2012 16:13:35 GMT';
-
-            if ($key === 'if-modified-since') {
-                return $lastModified;
-            } else if ($key === 'if-none-match') {
-                return '"' . md5($lastModified) . '"';
-            }
-        }));
-
+    public function testGet() {
         $numImages = 42;
         $formattedDate = 'Thu, 12 Jan 2012 16:13:35 GMT';
         $lastModified = $this->getMock('DateTime');
@@ -109,7 +63,6 @@ class UserTest extends ResourceTests {
         $responseHeaders->expects($this->at(1))->method('set')->with('Last-Modified', $formattedDate);
 
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
 
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
