@@ -1,0 +1,8 @@
+default:
+  context:
+    parameters:
+      baseUrl: http://imbo
+      imboConfig: /home/christer/dev/imbo/config/config.php
+  paths:
+    features:   'tests/features'
+    bootstrap:  '%behat.paths.features%/bootstrap'
