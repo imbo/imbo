@@ -19,6 +19,11 @@
     <var name="MEMCACHED_HOST" value="" />
     <var name="MEMCACHED_PORT" value="" />
 
+    <!-- Url, public and private keys to use for the Behat integration tests -->
+    <var name="IMBO_INTEGRATION_TEST_URL" value="" />
+    <var name="IMBO_INTEGRATION_TEST_PUBLIC_KEY" value="" />
+    <var name="IMBO_INTEGRATION_TEST_PRIVATE_KEY" value="" />
+
     <!-- Include paths -->
     <includePath>./tests</includePath>
     <includePath>./library</includePath>
