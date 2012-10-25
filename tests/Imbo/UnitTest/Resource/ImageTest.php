@@ -305,7 +305,6 @@ class ImageTest extends ResourceTests {
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
         $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('*/*' => 1)));
 
         $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
 
