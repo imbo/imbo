@@ -32,7 +32,9 @@
 
 namespace Imbo\Http\Response;
 
-use Imbo\Http\HeaderContainer;
+use Imbo\Http\HeaderContainer,
+    Imbo\Exception,
+    Imbo\Http\Request\RequestInterface;
 
 /**
  * Response interface
@@ -125,4 +127,13 @@ interface ResponseInterface {
      * @return boolean
      */
     function isError();
+
+    /**
+     * Create an error based on an exception instance
+     *
+     * @param Exception $exception An Imbo\Exception with a fitting HTTP error code and message
+     * @param RequestInterface The current request instance
+     * @return ResponseInterface
+     */
+    function createError(Exception $exception, RequestInterface $request);
 }

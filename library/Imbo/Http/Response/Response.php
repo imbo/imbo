@@ -31,7 +31,10 @@
 
 namespace Imbo\Http\Response;
 
-use Imbo\Http\HeaderContainer;
+use Imbo\Http\HeaderContainer,
+    Imbo\Exception,
+    Imbo\Http\Request\RequestInterface,
+    DateTime;
 
 /**
  * Response object from the server to the client
@@ -248,6 +251,55 @@ class Response implements ResponseInterface {
      */
     public function isError() {
         return $this->getStatusCode() >= 400;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createError(Exception $exception, RequestInterface $request) {
+        $date = new DateTime();
+
+        $code         = $exception->getCode();
+        $message      = $exception->getMessage();
+        $timestamp    = $date->format('D, d M Y H:i:s') . ' GMT';
+        $internalCode = $exception->getImboErrorCode();
+
+        if ($internalCode === null) {
+            $internalCode = Exception::ERR_UNSPECIFIED;
+        }
+
+        $this->setStatusCode($code);
+
+        // Add error information to the response headers and remove the ETag and Last-Modified headers
+        $this->getHeaders()->set('X-Imbo-Error-Message', $message)
+                           ->set('X-Imbo-Error-InternalCode', $internalCode)
+                           ->set('X-Imbo-Error-Date', $timestamp)
+                           ->remove('ETag')
+                           ->remove('Last-Modified');
+
+        // Prepare response data if the request expects a response body
+        if ($request->getMethod() !== RequestInterface::METHOD_HEAD) {
+            $data = array(
+                'error' => array(
+                    'code'          => $code,
+                    'message'       => $message,
+                    'date'          => $timestamp,
+                    'imboErrorCode' => $internalCode,
+                ),
+            );
+
+            // Fetch the real image identifier (PUT only) or the one from the URL (if present)
+            if (
+                ($identifier = $request->getRealImageIdentifier()) ||
+                ($identifier = $request->getImageIdentifier())
+            ) {
+                $data['imageIdentifier'] = $identifier;
+            }
+
+            $this->setBody($data);
+        }
+
+        return $this;
     }
 
     /**
