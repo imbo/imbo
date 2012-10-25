@@ -144,6 +144,12 @@ return array(
         array(
             'listener' => new EventListener\AccessToken(),
         ),
+        array(
+            'listener' => new EventListener\NotModified(),
+        ),
+        array(
+            'listener' => new EventListener\ResponseFormatter(),
+        ),
     ),
 
     /**
