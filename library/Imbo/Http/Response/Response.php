@@ -336,6 +336,16 @@ class Response implements ResponseInterface {
      * Send the content to the client
      */
     private function sendContent() {
-        print($this->getBody());
+        $body = $this->getBody();
+
+        if (is_array($body)) {
+            if (!headers_sent()) {
+                header('Content-Type: application/json');
+            }
+
+            $body = json_encode($body);
+        }
+
+        echo $body;
     }
 }
