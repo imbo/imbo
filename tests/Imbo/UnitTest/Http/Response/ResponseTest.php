@@ -123,6 +123,20 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Http\Response\Response::send
+     */
+    public function testSendsContentAsJsonWhenContentIsNotAlreadyFormatted() {
+        $content = array('some' => 'value');
+        $this->assertSame($this->response, $this->response->setBody($content));
+
+        ob_start();
+        $this->response->send();
+        $output = ob_get_clean();
+
+        $this->assertSame($output, '{"some":"value"}');
+    }
+
+    /**
      * @covers Imbo\Http\Response\Response::setBody
      * @covers Imbo\Http\Response\Response::setStatusCode
      * @covers Imbo\Http\Response\Response::setNotModified
