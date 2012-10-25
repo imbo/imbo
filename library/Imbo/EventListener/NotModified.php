@@ -31,9 +31,7 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Http\Request\RequestInterface,
-    Imbo\Exception\RuntimeException;
+use Imbo\EventManager\EventInterface;
 
 /**
  * @package EventListener
@@ -48,10 +46,7 @@ class NotModified extends Listener implements ListenerInterface {
      */
     public function getEvents() {
         return array(
-            'user.get.post',
-            'images.get.post',
-            'image.get.post',
-            'metadata.get.post',
+            'response.send',
         );
     }
 

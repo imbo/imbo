@@ -108,10 +108,7 @@ class NotModifiedTest extends \PHPUnit_Framework_TestCase {
     public function testGetEvents() {
         $events = $this->listener->getEvents();
         $expected = array(
-            'user.get.post',
-            'images.get.post',
-            'image.get.post',
-            'metadata.get.post',
+            'response.send',
         );
 
         foreach ($expected as $e) {
