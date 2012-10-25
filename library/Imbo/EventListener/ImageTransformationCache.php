@@ -155,11 +155,11 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
             }
 
             if (is_file($fullPath)) {
-                $response = unserialize(file_get_contents($fullPath));
+                $container->response = unserialize(file_get_contents($fullPath));
+                $container->response->getHeaders()->set('X-Imbo-TransformationCache', 'Hit');
 
-                $response->getHeaders()->set('X-Imbo-TransformationCache', 'Hit');
-                $response->send();
-                exit;
+                $event->haltApplication(true);
+                return;
             }
 
             $response->getHeaders()->set('X-Imbo-TransformationCache', 'Miss');
