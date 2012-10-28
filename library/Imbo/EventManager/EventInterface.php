@@ -86,4 +86,11 @@ interface EventInterface {
      * @return boolean
      */
     function applicationIsHalted();
+
+    /**
+     * Return optional parameters passed to the event instance
+     *
+     * @return array
+     */
+    function getParams();
 }
