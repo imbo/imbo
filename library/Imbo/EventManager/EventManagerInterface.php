@@ -69,8 +69,10 @@ interface EventManagerInterface {
      * Trigger a given event
      *
      * @param string $event The event to trigger
+     * @param array $params Optional extra parameters to send to the event listeners for the current
+     *                      event
      * @throws HaltApplication
      * @return EventManagerInterface
      */
-    function trigger($event);
+    function trigger($event, array $params = array());
 }

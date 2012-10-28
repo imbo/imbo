@@ -72,14 +72,23 @@ class Event implements EventInterface {
     private $applicationIsHalted = false;
 
     /**
+     * Optional parameters
+     *
+     * @var array
+     */
+    private $params;
+
+    /**
      * Class contsructor
      *
      * @param string $name The name of the current event
      * @param Container $container Container instance
+     * @param array $params Optional parameters
      */
-    public function __construct($name, Container $container) {
+    public function __construct($name, Container $container, array $params = array()) {
         $this->name = $name;
         $this->container = $container;
+        $this->params = $params;
     }
 
     /**
@@ -126,5 +135,12 @@ class Event implements EventInterface {
      */
     public function applicationIsHalted() {
         return $this->applicationIsHalted;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParams() {
+        return $this->params;
     }
 }

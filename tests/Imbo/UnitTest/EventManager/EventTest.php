@@ -82,4 +82,14 @@ class EventTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($event, $event->haltApplication(false));
         $this->assertFalse($event->applicationIsHalted());
     }
+
+    /**
+     * @covers Imbo\EventManager\Event::__construct
+     * @covers Imbo\EventManager\Event::getParams
+     */
+    public function testCanUseParameters() {
+        $params = array('some' => 'param');
+        $event = new Event('name', $this->getMock('Imbo\Container'), $params);
+        $this->assertSame($params, $event->getParams());
+    }
 }
