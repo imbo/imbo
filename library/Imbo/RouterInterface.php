@@ -23,56 +23,37 @@
  * IN THE SOFTWARE.
  *
  * @package Interfaces
- * @subpackage EventManager
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\EventManager;
+namespace Imbo;
 
-use Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\HaltApplication;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Resource\ResourceInterface,
+    Imbo\Exception\RuntimeException;
 
 /**
- * Event manager interface
+ * Router interface
  *
  * @package Interfaces
- * @subpackage EventManager
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-interface EventManagerInterface {
+interface RouterInterface {
     /**
-     * Attach a callable to an event
+     * Resolve the current route
      *
-     * @param array|string $events The event(s) to attach to
-     * @param callback $callback Code that will be called when the event is triggered
-     * @throws InvalidArgumentException
-     * @return EventManagerInterface
+     * @param string $path The path currently requested
+     * @param array $matches The different named subpatterns in the regular expressions (routes)
+     *                       will be stored in this array
+     * @return ResourceInterface The resource that handles the path
+     * @throws RuntimeException Throws an exception if the $path is not recognized or of the
+     *                          resource does not exist in the Container instance
      */
-    function attach($events, $callback);
-
-    /**
-     * Attach a listener to the event manager
-     *
-     * @param ListenerInterface $listener The listener to attach
-     * @return EventManagerInterface
-     */
-    function attachListener(ListenerInterface $listener);
-
-    /**
-     * Trigger a given event
-     *
-     * @param string $event The event to trigger
-     * @param array $params Optional extra parameters to send to the event listeners for the current
-     *                      event
-     * @throws HaltApplication
-     * @return EventManagerInterface
-     */
-    function trigger($event, array $params = array());
+    function resolve($path, array &$matches);
 }

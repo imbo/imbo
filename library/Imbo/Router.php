@@ -22,125 +22,77 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package EventManager
+ * @package Core
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\EventManager;
+namespace Imbo;
 
-use Imbo\Container;
+use Imbo\Resource\ResourceInterface,
+    Imbo\Exception\RuntimeException;
 
 /**
- * Event class
+ * Router class containing supported routes
  *
- * @package EventManager
+ * @package Core
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Event implements EventInterface {
+class Router implements RouterInterface {
     /**
-     * Name of the current event
+     * The different routes that imbo handles
      *
-     * @var string
+     * @var array
      */
-    private $name;
+    public $routes = array(
+        ResourceInterface::IMAGE    => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png))?$#',
+        ResourceInterface::STATUS   => '#^/status(/|(\.(?<extension>json|html|xml)))?$#',
+        ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images(/|(\.(?<extension>json|html|xml)))?$#',
+        ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(/|\.(?<extension>json|html|xml))?$#',
+        ResourceInterface::USER     => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})(/|\.(?<extension>json|html|xml))?$#',
+    );
 
     /**
-     * Container instance
-     *
      * @var Container
      */
     private $container;
 
     /**
-     * Propagation flag
+     * Class constructor
      *
-     * @var boolean
+     * @param Container $container An instance of the Container
      */
-    private $propagationIsStopped = false;
-
-    /**
-     * Execution flag
-     *
-     * @var boolean
-     */
-    private $applicationIsHalted = false;
-
-    /**
-     * Optional parameters
-     *
-     * @var array
-     */
-    private $params;
-
-    /**
-     * Class contsructor
-     *
-     * @param string $name The name of the current event
-     * @param Container $container Container instance
-     * @param array $params Optional parameters
-     */
-    public function __construct($name, Container $container, array $params = array()) {
-        $this->name = $name;
+    public function __construct(Container $container) {
         $this->container = $container;
-        $this->params = $params;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName() {
-        return $this->name;
-    }
+    public function resolve($path, array &$matches) {
+        foreach ($this->routes as $resourceName => $route) {
+            if (preg_match($route, $path, $matches)) {
+                break;
+            }
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getContainer() {
-        return $this->container;
-    }
+        // Path matched no route
+        if (!$matches) {
+            throw new RuntimeException('Not Found', 404);
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function stopPropagation($flag) {
-        $this->propagationIsStopped = $flag;
+        $matches['resourceName'] = $resourceName;
+        $entry = $resourceName . 'Resource';
 
-        return $this;
-    }
+        if (!$this->container->has($entry)) {
+            throw new RuntimeException('Unknown Resource', 500);
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function propagationIsStopped() {
-        return $this->propagationIsStopped;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function haltApplication($flag) {
-        $this->applicationIsHalted = $flag;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function applicationIsHalted() {
-        return $this->applicationIsHalted;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParams() {
-        return $this->params;
+        return $this->container->$entry;
     }
 }

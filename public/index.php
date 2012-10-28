@@ -75,6 +75,11 @@ $container->statusResource = $container->shared(function(Container $container) {
     return new Resource\Status();
 });
 
+// Router
+$container->router = $container->shared(function(Container $container) {
+    return new Router($container);
+});
+
 // Create the database entry
 $container->database = $container->shared(function(Container $container) {
     $config = $container->config['database'];

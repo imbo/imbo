@@ -116,10 +116,10 @@ class EventManager implements EventManagerInterface {
     /**
      * {@inheritdoc}
      */
-    public function trigger($event) {
+    public function trigger($event, array $params = array()) {
         if (!empty($this->events[$event])) {
             // Create an event instance
-            $e = new Event($event, $this->container);
+            $e = new Event($event, $this->container, $params);
 
             // Trigger all listeners for this event and pass in the event instance
             foreach ($this->events[$event] as $callback) {
