@@ -70,21 +70,6 @@ class FrontController {
     );
 
     /**
-     * Default class names for the supported resources
-     *
-     * This is the fallback map if the resource is not located in the DIC.
-     *
-     * @var array
-     */
-    static private $resourceClasses = array(
-        ResourceInterface::STATUS   => 'Imbo\Resource\Status',
-        ResourceInterface::USER     => 'Imbo\Resource\User',
-        ResourceInterface::IMAGES   => 'Imbo\Resource\Images',
-        ResourceInterface::IMAGE    => 'Imbo\Resource\Image',
-        ResourceInterface::METADATA => 'Imbo\Resource\Metadata',
-    );
-
-    /**
      * Class constructor
      *
      * @param Container $container A container instance
@@ -101,34 +86,15 @@ class FrontController {
      * @throws RuntimeException
      */
     private function resolveResource(RequestInterface $request) {
-        // Fetch current path
-        $path = $request->getPath();
-
-        // Possible patterns to match where the most accessed match is placed first
-        $routes = array(
-            ResourceInterface::IMAGE    => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png))?$#',
-            ResourceInterface::STATUS   => '#^/status(/|(\.(?<extension>json|html|xml)))?$#',
-            ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images(/|(\.(?<extension>json|html|xml)))?$#',
-            ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(/|\.(?<extension>json|html|xml))?$#',
-            ResourceInterface::USER     => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})(/|\.(?<extension>json|html|xml))?$#',
-        );
-
-        // Initialize matches
         $matches = array();
+        $resource = $this->container->router->resolve($request->getPath(), $matches);
 
-        foreach ($routes as $resourceName => $route) {
-            if (preg_match($route, $path, $matches)) {
-                break;
-            }
-        }
-
-        // Path matched no route
-        if (!$matches) {
-            throw new RuntimeException('Not found', 404);
-        }
+        $this->container->eventManager->trigger('route.resolved', $matches);
 
         // Set the resource name
-        $request->setResource($resourceName);
+        if (!empty($matches['resourceName'])) {
+            $request->setResource($matches['resourceName']);
+        }
 
         // Extract some information from the path and store in the request instance
         if (!empty($matches['publicKey'])) {
@@ -141,17 +107,6 @@ class FrontController {
 
         if (isset($matches['extension'])) {
             $request->setExtension($matches['extension']);
-        }
-
-        // Append "Resource" to the resource name to match the entry in the container
-        $dicEntry = $resourceName . 'Resource';
-
-        if ($this->container->has($dicEntry)) {
-            // Fetch the resource instance from the container
-            $resource = $this->container->$dicEntry;
-        } else {
-            $className = self::$resourceClasses[$resourceName];
-            $resource = new $className();
         }
 
         // Attach the event manager to the resource
@@ -194,7 +149,7 @@ class FrontController {
         // Fetch the real image identifier (PUT only) or the one from the URL (if present)
         if (($identifier = $this->container->request->getRealImageIdentifier()) ||
             ($identifier = $this->container->request->getImageIdentifier())) {
-            $this->container->response->getHeaders()->set('X-Imbo-ImageIdentifier', $identifier);
+            $responseHeaders->set('X-Imbo-ImageIdentifier', $identifier);
         }
 
         // Fetch auth config
@@ -204,7 +159,7 @@ class FrontController {
         // See if the public key exists
         if ($publicKey) {
             if (!isset($authConfig[$publicKey])) {
-                $e = new RuntimeException('Unknown public key', 404);
+                $e = new RuntimeException('Unknown Public Key', 404);
                 $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
 
                 throw $e;
@@ -223,9 +178,8 @@ class FrontController {
             throw new RuntimeException('Method not allowed', 405);
         }
 
-        $className = get_class($resource);
-        $resourceName = strtolower(substr($className, strrpos($className, '\\') + 1));
-        $eventName = $resourceName . '.' . $methodName;
+        // Generate the event name based on the accessed resource and the HTTP method
+        $eventName = $this->container->request->getResource() . '.' . $methodName;
 
         $this->container->eventManager->trigger($eventName . '.pre');
         $resource->$methodName($this->container);
