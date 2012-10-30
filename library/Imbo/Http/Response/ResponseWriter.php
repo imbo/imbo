@@ -107,6 +107,7 @@ class ResponseWriter implements ResponseWriterInterface {
         if ($extension = $request->getExtension()) {
             // The user agent wants a specific type. Skip content negotiation completely
             $mime = $this->defaultMimeType;
+
             if (isset($this->extensionsToMimeType[$extension])) {
                 $mime = $this->extensionsToMimeType[$extension];
             }
