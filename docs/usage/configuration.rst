@@ -19,22 +19,29 @@ Every user that wishes to store images in Imbo needs a public and private key pa
 
         'auth' => array(
             'username'  => '95f02d701b8dc19ee7d3710c477fd5f4633cec32087f562264e4975659029af7',
-            'otherUser' => 'b312ff29d5da23dcd230b61ff4db1e2515c862b9fb0bb59e7dd54ce1e4e94a53',
+            'otheruser' => 'b312ff29d5da23dcd230b61ff4db1e2515c862b9fb0bb59e7dd54ce1e4e94a53',
         ),
 
         // ...
     );
 
-The public keys can be readable names such as ``myUser`` or ``username``. The only requirement is that they are at least 3 characters long and that they can be represented in a URI.
+The public keys can consist of the following characters:
 
-For the private key you can for instance use a `SHA-256`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images. Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo ships with a small command line tool that can be used to generate private keys for you. The script is located in the scripts directory and does not require any arguments:
+* a-z (only lowercase is allowed)
+* 0-9
+* _ and -
+
+For the private keys you can for instance use a `SHA-256`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images. Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key).
+
+Imbo ships with a small command line tool that can be used to generate private keys for you using the `openssl_random_pseudo_bytes`_ function. The script is located in the `scripts` directory and does not require any arguments:
 
 .. code-block:: bash
 
     $ php scripts/generatePrivateKey.php
-    Private key: 3b98dde5f67989a878b8b268d82f81f0858d4f1954597cc713ae161cdffcc84a
+    3b98dde5f67989a878b8b268d82f81f0858d4f1954597cc713ae161cdffcc84a
 
 .. _SHA-256: http://en.wikipedia.org/wiki/SHA-2
+.. _openssl_random_pseudo_bytes: http://php.net/openssl_random_pseudo_bytes
 
 The private key can be changed whenever you want as long as you remember to change it in both the server configuration and in the client you use. The public key can not be changed easily as database and storage drivers use it when storing images and metadata.
 
