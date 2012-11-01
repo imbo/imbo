@@ -42,7 +42,10 @@ return array(
      * Authentication
      *
      * This value must be set to an array with key => value pairs mapping to public and private keys
-     * of the users of this installation.
+     * of the users of this installation. The public keys must match the following case sensitive
+     * expression:
+     *
+     * [a-z0-9_-]{3,}
      *
      * @var array
      */
