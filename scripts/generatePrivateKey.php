@@ -45,4 +45,4 @@ if (!$strong) {
     exit;
 }
 
-echo "Private key: " . hash('sha256', $data) . PHP_EOL;
+echo hash('sha256', $data) . PHP_EOL;

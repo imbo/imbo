@@ -50,11 +50,11 @@ class Router implements RouterInterface {
      * @var array
      */
     public $routes = array(
-        ResourceInterface::IMAGE    => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png))?$#',
+        ResourceInterface::IMAGE    => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(/|.(?<extension>gif|jpg|png))?$#',
         ResourceInterface::STATUS   => '#^/status(/|(\.(?<extension>json|html|xml)))?$#',
-        ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images(/|(\.(?<extension>json|html|xml)))?$#',
-        ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(/|\.(?<extension>json|html|xml))?$#',
-        ResourceInterface::USER     => '#^/users/(?<publicKey>[a-zA-Z0-9]{3,})(/|\.(?<extension>json|html|xml))?$#',
+        ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images(/|(\.(?<extension>json|html|xml)))?$#',
+        ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(/|\.(?<extension>json|html|xml))?$#',
+        ResourceInterface::USER     => '#^/users/(?<publicKey>[a-z0-9_-]{3,})(/|\.(?<extension>json|html|xml))?$#',
     );
 
     /**
