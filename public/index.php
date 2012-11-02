@@ -136,32 +136,35 @@ $container->request = new Request($_GET, $_POST, $_SERVER);
 $container->response = new Response();
 
 // Event manager
-$container->eventManager = $container->shared(function(Container $container) {
-    $manager = new EventManager($container);
-    $listeners = $container->config['eventListeners'];
+$manager = new EventManager($container);
+$listeners = $container->config['eventListeners'];
 
-    foreach ($listeners as $def) {
-        if (empty($def['listener'])) {
-            throw new InvalidArgumentException('Missing listener definition', 500);
-        }
-
-        $listener = $def['listener'];
-
-        if ($listener instanceof ListenerInterface) {
-            if (!empty($def['publicKeys']) && is_array($def['publicKeys'])) {
-                $listener->setPublicKeys($def['publicKeys']);
-            }
-
-            $manager->attachListener($listener);
-        } else if (is_callable($listener) && !empty($def['events']) && is_array($def['events'])) {
-            $manager->attach($def['events'], $listener);
-        } else {
-            throw new InvalidArgumentException('Invalid listener', 500);
-        }
+foreach ($listeners as $definition) {
+    if ($definition instanceof ListenerInterface) {
+        $manager->attachListener($definition);
+        continue;
     }
 
-    return $manager;
-});
+    if (empty($definition['listener'])) {
+        throw new InvalidArgumentException('Missing listener definition', 500);
+    }
+
+    $listener = $definition['listener'];
+
+    if ($listener instanceof ListenerInterface) {
+        if (!empty($definition['publicKeys']) && is_array($definition['publicKeys'])) {
+            $listener->setPublicKeys($definition['publicKeys']);
+        }
+
+        $manager->attachListener($listener);
+    } else if (is_callable($listener) && !empty($definition['events']) && is_array($definition['events'])) {
+        $manager->attach($definition['events'], $listener);
+    } else {
+        throw new InvalidArgumentException('Invalid listener', 500);
+    }
+}
+
+$container->eventManager = $manager;
 
 // Add a version header
 $container->response->getHeaders()->set('X-Imbo-Version', Version::getVersionNumber());
@@ -170,6 +173,8 @@ $container->response->getHeaders()->set('X-Imbo-Version', Version::getVersionNum
 $frontController = new FrontController($container);
 
 try {
+    // Trigger the startup event and run the application
+    $container->eventManager->trigger('startup');
     $frontController->run();
 } catch (HaltApplication $exception) {
     // Special type of exception that the event manager can throw if an event listener wants to
@@ -182,5 +187,9 @@ try {
 }
 
 // Send the response to the client
+$container->eventManager->trigger('response.prepare');
 $container->eventManager->trigger('response.send');
 $container->response->send();
+
+// Trigger shutdown event
+$container->eventManager->trigger('shutdown');
