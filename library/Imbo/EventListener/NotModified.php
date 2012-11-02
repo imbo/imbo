@@ -34,6 +34,9 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface;
 
 /**
+ * This event listener will correctly handle 304 Not Modified for all resources by using the ETag
+ * and Last-Modified headers
+ *
  * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
