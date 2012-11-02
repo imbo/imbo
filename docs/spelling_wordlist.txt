@@ -16,3 +16,4 @@ gif
 jpg
 png
 whitelist
+Nginx
