@@ -104,7 +104,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
     public function testGetEvents() {
         $events = $this->listener->getEvents();
         $expected = array(
-            'response.send',
+            'response.prepare',
         );
 
         foreach ($expected as $e) {

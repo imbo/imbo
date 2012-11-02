@@ -59,7 +59,7 @@ class ResponseFormatter extends Listener implements ListenerInterface {
      */
     public function getEvents() {
         return array(
-            'response.send',
+            'response.prepare',
         );
     }
 
