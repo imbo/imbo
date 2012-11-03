@@ -1,0 +1,28 @@
+server {
+    # Listen on port 80
+    listen 80;
+
+    # Define the server name
+    server_name imbo;
+
+    # Use the line below instead of the server_name above if you want to use multiple host names
+    # server_name imbo imbo1 imbo2 imbo3;
+
+    # Path to the public directory where index.php is located
+    root /path/to/imbo/public;
+    index index.php;
+
+    # Logs
+    error_log /path/to/logs/imbo.error_log;
+    access_log /path/to/logs/imbo.access_log main;
+
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+        location ~ \.php$ {
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME /path/to/imbo/public/index.php;
+            include fastcgi_params;
+        }
+    }
+}

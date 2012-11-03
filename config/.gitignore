@@ -1,2 +1,3 @@
-imbo.conf
+imbo.apache.conf
+imbo.nginx.conf
 config.php
