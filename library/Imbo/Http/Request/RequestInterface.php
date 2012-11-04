@@ -57,6 +57,7 @@ interface RequestInterface {
     const METHOD_HEAD    = 'HEAD';
     const METHOD_POST    = 'POST';
     const METHOD_PUT     = 'PUT';
+    const METHOD_OPTIONS = 'OPTIONS';
     /**#@-*/
 
     /**
