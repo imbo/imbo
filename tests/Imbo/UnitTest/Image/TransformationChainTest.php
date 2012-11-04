@@ -110,6 +110,7 @@ class TransformationChainTest extends \PHPUnit_Framework_TestCase {
                         ->thumbnail(10, 10, '000')
                         ->transpose()
                         ->transverse()
+                        ->desaturate()
         );
     }
 
