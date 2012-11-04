@@ -40,7 +40,7 @@ use Imbo\EventListener\MetadataCache,
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\EventListener\ImageTransformationCache
+ * @covers Imbo\EventListener\MetadataCache
  */
 class MetadataCacheTest extends \PHPUnit_Framework_TestCase {
     /**
