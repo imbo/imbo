@@ -61,12 +61,13 @@ class FrontController {
      * @var array
      */
     static private $supportedHttpMethods = array(
-        RequestInterface::METHOD_GET    => true,
-        RequestInterface::METHOD_POST   => true,
-        RequestInterface::METHOD_PUT    => true,
-        RequestInterface::METHOD_HEAD   => true,
-        RequestInterface::METHOD_DELETE => true,
-        RequestInterface::METHOD_BREW   => true,
+        RequestInterface::METHOD_GET     => true,
+        RequestInterface::METHOD_POST    => true,
+        RequestInterface::METHOD_PUT     => true,
+        RequestInterface::METHOD_HEAD    => true,
+        RequestInterface::METHOD_DELETE  => true,
+        RequestInterface::METHOD_BREW    => true,
+        RequestInterface::METHOD_OPTIONS => true,
     );
 
     /**
