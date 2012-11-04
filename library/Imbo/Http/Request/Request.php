@@ -256,6 +256,8 @@ class Request implements RequestInterface {
                     $this->transformationChain->transpose();
                 } else if ($name == 'transverse') {
                     $this->transformationChain->transverse();
+                } else if ($name == 'desaturate') {
+                    $this->transformationChain->desaturate();
                 } else {
                     throw new InvalidArgumentException('Invalid transformation: ' . $name, 400);
                 }
