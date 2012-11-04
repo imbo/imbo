@@ -61,12 +61,13 @@ class FrontController {
      * @var array
      */
     static private $supportedHttpMethods = array(
-        RequestInterface::METHOD_GET    => true,
-        RequestInterface::METHOD_POST   => true,
-        RequestInterface::METHOD_PUT    => true,
-        RequestInterface::METHOD_HEAD   => true,
-        RequestInterface::METHOD_DELETE => true,
-        RequestInterface::METHOD_BREW   => true,
+        RequestInterface::METHOD_GET     => true,
+        RequestInterface::METHOD_POST    => true,
+        RequestInterface::METHOD_PUT     => true,
+        RequestInterface::METHOD_HEAD    => true,
+        RequestInterface::METHOD_DELETE  => true,
+        RequestInterface::METHOD_BREW    => true,
+        RequestInterface::METHOD_OPTIONS => true,
     );
 
     /**
@@ -173,15 +174,17 @@ class FrontController {
         // Lowercase the HTTP method to get the class method to execute
         $methodName = strtolower($httpMethod);
 
+        // Generate the event name based on the accessed resource and the HTTP method
+        $eventName = $this->container->request->getResource() . '.' . $methodName;
+
+        // Trigger the pre event on the resource so we may react to unsupported events
+        $this->container->eventManager->trigger($eventName . '.pre');
+
         // See if the HTTP method is supported at all
         if (!method_exists($resource, $methodName)) {
             throw new RuntimeException('Method not allowed', 405);
         }
 
-        // Generate the event name based on the accessed resource and the HTTP method
-        $eventName = $this->container->request->getResource() . '.' . $methodName;
-
-        $this->container->eventManager->trigger($eventName . '.pre');
         $resource->$methodName($this->container);
         $this->container->eventManager->trigger($eventName . '.post');
     }
