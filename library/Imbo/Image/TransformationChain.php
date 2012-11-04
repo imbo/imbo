@@ -283,4 +283,14 @@ class TransformationChain implements Iterator, Countable {
     public function transverse() {
         return $this->add(new Transformation\Transverse());
     }
+
+    /**
+     * Desaturate transformation
+     * 
+     * @return TransformationChain
+     * @see Transformation\Desaturate
+     */
+    public function desaturate() {
+        return $this->add(new Transformation\Desaturate());
+    }
 }

@@ -442,6 +442,15 @@ This transformation transverses the image.
 
 * ``t[]=transverse``
 
+desaturate
+##########
+
+This transformation desaturates the image (in practice, grayscales it).
+
+**Examples:**
+
+* ``t[]=desaturate``
+
 PUT /users/<user>/images/<image>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
