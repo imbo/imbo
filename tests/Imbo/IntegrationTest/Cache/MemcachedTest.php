@@ -64,6 +64,6 @@ class MemcachedTest extends CacheTests {
             $timestamp = microtime(true);
         }
 
-        return new Memcached('ImboTestSuite' . $timestamp, $memcached);
+        return new Memcached($memcached, 'ImboTestSuite' . $timestamp);
     }
 }
