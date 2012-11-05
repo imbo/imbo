@@ -9,9 +9,11 @@ Imbo uses a `RESTful`_ API to manage the stored images and metadata. Each image 
 Content types
 -------------
 
-Currently Imbo responds with images (jpg, gif and png), `JSON`_, `XML`_ and `HTML`_, but only accepts images (jpg, gif and png) and JSON as input. Imbo will do content negotiation (using the `Accept`_ headers found in the request) for all requests if you skip the file extension, and will deliver the type requested if you specify an extension (without looking at the Accept headers).
+Currently Imbo responds with images (jpg, gif and png) and `JSON`_, but only accepts images (jpg, gif and png) and JSON as input.
 
-The default `Content-Type`_ for responses is JSON, and for most examples in this document you will see ``.json`` being used. Change that to ``.html`` or ``.xml`` to get HTML and XML respectively. You can also skip the extension and force a specific Content-Type using the Accept header:
+If you choose to enable the :ref:`response-formatter` event listener Imbo will support two more content types (`XML`_ and `HTML`_) and it will do content negotiation using the `Accept`_ header found in the request, unless you specify a file extension, in which case Imbo will deliver the type requested without looking at the Accept header.
+
+The default `Content-Type`_ for responses is JSON, and for most examples in this document you will see ``.json`` being used. Change that to ``.html`` or ``.xml`` to get HTML and XML respectively (if the aforementioned event listener is enabled). You can also skip the extension and force a specific Content-Type using the Accept header:
 
 .. code-block:: bash
 
@@ -25,9 +27,32 @@ and
 
 will end up with the same content-type. Use ``application/xml`` for XML, and ``text/html`` for HTML.
 
+If you use JSON you can wrap the content in a function (`JSONP`_) by using one of the following query parameters:
+
+* ``callback``
+* ``jsonp``
+* ``json``
+
+.. code-block:: bash
+
+    $ curl http://imbo/status.json?callback=func
+
+will result in:
+
+.. code-block:: javascript
+
+    func(
+      {
+        "date": "Mon, 05 Nov 2012 19:18:40 GMT",
+        "database": true,
+        "storage": true
+      }
+    )
+
 .. _Accept: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
 .. _Content-Type: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
 .. _JSON: http://en.wikipedia.org/wiki/JSON
+.. _JSONP: http://en.wikipedia.org/wiki/JSONP
 .. _XML: http://en.wikipedia.org/wiki/XML
 .. _HTML: http://en.wikipedia.org/wiki/HTML
 
@@ -56,14 +81,14 @@ results in:
 .. code-block:: javascript
 
     {
-        "timestamp": "Tue, 24 Apr 2012 14:12:58 GMT",
-        "database": true,
-        "storage": true
+      "timestamp": "Tue, 24 Apr 2012 14:12:58 GMT",
+      "database": true,
+      "storage": true
     }
 
 where ``timestamp`` is the current timestamp on the server, and ``database`` and ``storage`` are boolean values informing of the status of the current database and storage drivers respectively. If both are ``true`` the HTTP status code is ``200 OK``, and if one or both are ``false`` the status code is ``500``. When the status code is ``500`` the status message will inform you whether it's the database or the storage driver (or both) that is having issues.
 
-The status resource can also be used to test authentication for any given use by specifying the following query parameters:
+The status resource can also be used to test authentication for any given user by specifying the following query parameters:
 
 * ``publicKey``
 * ``signature``
@@ -97,9 +122,9 @@ results in:
 .. code-block:: javascript
 
     {
-        "publicKey": "<user>",
-        "numImages": 42,
-        "lastModified": "Wed, 18 Apr 2012 15:12:52 GMT"
+      "publicKey": "<user>",
+      "numImages": 42,
+      "lastModified": "Wed, 18 Apr 2012 15:12:52 GMT"
     }
 
 where ``publicKey`` is the public key of the user, ``numImages`` is the number of images the user has stored in Imbo and ``lastModified`` is when the user last uploaded an image or updated metadata of an image.
@@ -107,7 +132,7 @@ where ``publicKey`` is the public key of the user, ``numImages`` is the number o
 **Typical response codes:**
 
 * 200 OK
-* 304 Not modified
+* 304 Not modified (If the :ref:`not-modified` event listener is enabled)
 * 404 Not found
 
 .. _images-resource:
@@ -146,21 +171,21 @@ results in:
 .. code-block:: javascript
 
     [
-        {
-            "added": 1334995260,
-            "extension": "png",
-            "height": 77,
-            "imageIdentifier": "<image>",
-            "metadata": {
-                "key": "value",
-                "foo": "bar"
-            },
-            "mime": "image/png",
-            "publicKey": "<user>",
-            "size": 6791,
-            "updated": 1334995260,
-            "width": 1306
-        }
+      {
+        "added": 1334995260,
+        "extension": "png",
+        "height": 77,
+        "imageIdentifier": "<image>",
+        "metadata": {
+          "key": "value",
+          "foo": "bar"
+        },
+        "mime": "image/png",
+        "publicKey": "<user>",
+        "size": 6791,
+        "updated": 1334995260,
+        "width": 1306
+      }
     ]
 
 where ``added`` is a Unix timestamp of when the image was added to Imbo, ``extension`` is the original image extension, ``height`` is the height of the image in pixels, ``imageIdentifier`` is the image identifier (MD5 checksum of the file itself), ``metadata`` is a JSON object containing metadata attached to the image, ``mime`` is the mime type of the image, ``publicKey`` is the public key of the user who owns the image, ``size`` is the size of the image in bytes, ``updated`` is the Unix timestamp of when the image was last updated (read: when metadata attached to the image was last updated, as the image itself never changes), and ``width`` is the width of the image in pixels.
@@ -172,7 +197,7 @@ Images in the array are ordered on the ``added`` field in a descending fashion.
 **Typical response codes:**
 
 * 200 OK
-* 304 Not modified
+* 304 Not modified (If the :ref:`not-modified` event listener is enabled)
 * 404 Not found
 
 .. _image-resource:
@@ -200,7 +225,7 @@ results in:
 **Typical response codes:**
 
 * 200 OK
-* 304 Not modified
+* 304 Not modified (If the :ref:`not-modified` event listener is enabled)
 * 400 Bad Request
 * 404 Not found
 
@@ -463,7 +488,7 @@ results in:
 .. code-block:: javascript
 
     {
-        "imageIdentifier":"<image>"
+      "imageIdentifier": "<image>"
     }
 
 where ``<image>`` can be used to fetch the added image and apply transformations to it. The output from this method is important as the ``<image>`` in the response might not be the same as ``<checksum of file to add>`` in the URI in the above example (which might occur if for instance event listeners transform the image in some way before Imbo stores it).
@@ -487,7 +512,7 @@ results in:
 .. code-block:: javascript
 
     {
-        "imageIdentifier":"<image>"
+      "imageIdentifier": "<image>"
     }
 
 where ``<image>`` is the image identifier of the image that was just deleted (the same as the one used in the URI).
@@ -531,10 +556,10 @@ when there is not metadata, or for example
 .. code-block:: javascript
 
     {
-        "category": "Music",
-        "band": "Koldbrann",
-        "genre": "Black metal",
-        "country": "Norway"
+      "category": "Music",
+      "band": "Koldbrann",
+      "genre": "Black metal",
+      "country": "Norway"
     }
 
 if the image has metadata attached to it.
@@ -542,7 +567,7 @@ if the image has metadata attached to it.
 **Typical response codes:**
 
 * 200 OK
-* 304 Not modified
+* 304 Not modified (If the :ref:`not-modified` event listener is enabled)
 * 404 Not found
 
 PUT /users/<user>/images/<image>/meta
@@ -563,7 +588,7 @@ results in:
 .. code-block:: javascript
 
     {
-        "imageIdentifier":"<image>"
+      "imageIdentifier": "<image>"
     }
 
 where ``<image>`` is the image that just got updated.
@@ -591,7 +616,7 @@ results in:
 .. code-block:: javascript
 
     {
-        "imageIdentifier":"<image>"
+      "imageIdentifier": "<image>"
     }
 
 where ``<image>`` is the image that just got updated.
@@ -616,7 +641,7 @@ results in:
 .. code-block:: javascript
 
     {
-        "imageIdentifier":"<image>"
+      "imageIdentifier":"<image>"
     }
 
 where ``<image>`` is the image identifier of the image that just got all its metadata deleted.
