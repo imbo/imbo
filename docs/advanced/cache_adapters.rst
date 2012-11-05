@@ -20,7 +20,7 @@ Example
     :linenos:
 
     <?php
-    $adapter = new Imbo\Cache\Apc('imbo');
+    $adapter = new Imbo\Cache\APC('imbo');
     $adapter->set('key', 'value');
 
     echo $adapter->get('key'); // outputs "value"
