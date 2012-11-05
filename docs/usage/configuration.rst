@@ -6,7 +6,7 @@ Imbo ships with a sample configuration file named ``config/config.php.dist`` tha
 User key pairs
 --------------
 
-Every user that wishes to store images in Imbo needs a public and private key pair. These keys are stored in the ``auth`` part of the configuration file:
+Every user that wants to store images in Imbo needs a public and private key pair. These keys are stored in the ``auth`` part of the configuration file:
 
 .. code-block:: php
     :linenos:
@@ -276,9 +276,9 @@ Examples
         'database' => array(
             'driver' => 'Imbo\Database\MongoDB',
             'params' => array(
-                'server'         => 'mongodb://server1,server2,server3',
-                'replicaSet'     => 'nameOfReplicaSet',
-                'slaveOk'        => true,
+                'server'     => 'mongodb://server1,server2,server3',
+                'replicaSet' => 'nameOfReplicaSet',
+                'slaveOk'    => true,
             ),
         ),
 
@@ -573,6 +573,24 @@ Imbo also supports event listeners that you can use to hook into Imbo at differe
         // ...
     );
 
+You can also skip the inner array if you want. The following example will accomplish the same as the example above:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            new EventListener\AccessToken(),
+        ),
+
+        // ...
+    );
+
 2) Use a `closure`_:
 
 .. _closure: http://php.net/manual/en/functions.anonymous.php
@@ -623,7 +641,10 @@ Per default an event listener is executed for all public keys (users). If you wa
                 'listener' => function(EventManager\EventInterface $event) {
                     // Custom code
                 },
-                'publicKeys' => array('username', 'anotherUsername'),
+                'publicKeys' => array(
+                    'username',
+                    'anotherusername',
+                ),
                 'events' => array(
                     'image.get.pre',
                     'image.get.post',
@@ -655,12 +676,26 @@ Imbo will trigger an event **before** the main resource logic kicks in per HTTP 
 
 As you can see from the above examples the events are built up by the resource name, the HTTP method and a keyword that can be ``pre`` or ``post``, separated by ``.``.
 
-Below you will see the different event listeners that Imbo ships with and the events they listen for.
+Some other events:
+
+``startup``
+    Before the front controller executes the main application logic.
+
+``response.prepare``
+    Before the response is about to be sent to the client.
+
+``response.send``
+    After the preparation process, before output.
+
+``shutdown``
+    Immediately after the response has been sent to the client.
+
+Below you will see the different event listeners that Imbo ships with and the events they subscribe to.
 
 Event listeners
 +++++++++++++++
 
-Imbo ships with a collection of event listeners for you to use. Two of them are enabled in the sample configuration file.
+Imbo ships with a collection of event listeners for you to use. Some of them are enabled in the sample configuration file.
 
 .. contents::
     :local:
@@ -673,7 +708,7 @@ Access token
 
 This event listener enforces the usage of access tokens on all requests against user-specific resources. You can read more about how the actual access tokens works in the :ref:`access-tokens` topic in the :doc:`api` section.
 
-To enforce the access token check for all read requests this event listener listens for these events:
+To enforce the access token check for all read requests this event listener subscribes to the following events:
 
 * ``user.get.pre``
 * ``images.get.pre``
@@ -722,20 +757,22 @@ This event listener is included in the default configuration file without specif
         // ...
 
         'eventListeners' => array(
-            array(
-                'listener' => new EventListener\AccessToken(),
-            ),
+            new EventListener\AccessToken(),
         ),
 
         // ...
     );
+
+Disable this event listener with care. Clients can easily `DDoS`_ your installation if you let them specify image transformations without limitations.
+
+.. _DDoS: http://en.wikipedia.org/wiki/DDoS
 
 Authenticate
 ^^^^^^^^^^^^
 
 This event listener enforces the usage of signatures on all write requests against user-specific resources. You can read more about how the actual signature check works in the :ref:`signing-write-requests` topic in the :doc:`api` section.
 
-To enforce the signature check for all write requests this event listener listens for these events:
+To enforce the signature check for all write requests this event listener subscribes to the following events:
 
 * ``image.put.pre``
 * ``image.post.pre``
@@ -756,20 +793,20 @@ This event listener does not support any parameters and is enabled per default l
         // ...
 
         'eventListeners' => array(
-            array(
-                'listener' => new EventListener\Authenticate(),
-            ),
+            new EventListener\Authenticate(),
         ),
 
         // ...
     );
+
+Disable this event listener with care. Clients can delete all your images and metadata when this listener is not enabled.
 
 Image transformation cache
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This event listener enables caching of image transformations. Read more about image transformations in the :ref:`image-transformations` topic in the :doc:`api` section.
 
-To achieve this the listener listens for the following events:
+To achieve this the listener subscribes to the following events:
 
 * ``image.get.pre``
 * ``image.get.post``
@@ -792,9 +829,7 @@ and is enabled like this:
         // ...
 
         'eventListeners' => array(
-            array(
-                'listener' => new EventListener\ImageTransformationCache('/path/to/cache'),
-            ),
+            new EventListener\ImageTransformationCache('/path/to/cache'),
         ),
 
         // ...
@@ -821,7 +856,7 @@ Max image size
 
 This event listener can be used to enforce a maximum size (height and width, not byte size) of **new** images. Enabling this event listener will not change images already added to Imbo.
 
-The event listener listens to a special event:
+The event listener subscribes to the following event:
 
 * ``image.put.imagepreparation.post``
 
@@ -845,9 +880,7 @@ and is enabled like this:
         // ...
 
         'eventListeners' => array(
-            array(
-                'listener' => new EventListener\MaxImageSize(1024, 768),
-            ),
+            new EventListener\MaxImageSize(1024, 768),
         ),
 
         // ...
@@ -901,6 +934,92 @@ To enable the listener, use the following:
 ``maxAge`` specifies how long the response of an OPTIONS-request can be cached for, in seconds. Defaults to 3600 (one hour).
 
 If you wish to only enable the CORS-listener for a given set of public keys, specify an array with the key ``publicKeys`` alongside ``listener`` in the configuration (see example above).
+
+Metadata cache
+^^^^^^^^^^^^^^
+
+This event listener enables caching of metadata fetched from the backend so other requests won't need to go all the way to the backend to fetch metadata. To achieve this the listener subscribes to the following events:
+
+* ``metadata.get.pre``
+* ``metadata.get.post``
+* ``metadata.delete.pre``
+* ``metadata.put.post``
+* ``metadata.post.post``
+
+and has the following parameters:
+
+``Imbo\Cache\CacheInterface $cache``
+    An instance of a cache adapter. Imbo ships with :ref:`apc-cache` and :ref:`memcached-cache` adapters, and both can be used for this event listener. If you want to use another form of caching you can simply implement the ``Imbo\Cache\CacheInterface`` interface and pass an instance of the custom adapter to the constructor of the event listener. Here is an example that uses the APC adapter for caching:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            new EventListener\MetadataCache(new Cache\APC('imbo')),
+        ),
+
+        // ...
+    );
+
+.. _not-modified:
+
+Not modified
+^^^^^^^^^^^^
+
+This event listener enables the support of ``HTTP 304 Not Modified`` responses. The listener is enabled in the default configuration file and subscribes to the following event:
+
+* ``response.send``
+
+and is enabled like this:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            new EventListener\NotModified(),
+        ),
+
+        // ...
+    );
+
+.. _response-formatter:
+
+Response formatter
+^^^^^^^^^^^^^^^^^^
+
+This event listener enables response formatting according to the ``Accept`` request header on resources other than images. The listener is enabled in the default configuration file, and if not enabled Imbo will only deliver JSON responses, regardless of the contents of the Accept header. When enabled the listener is able to produce HTML and XML formatted responses. The listener subscribes to the following event:
+
+* ``response.prepare``
+
+and is enabled like this:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            new EventListener\ResponseFormatter(),
+        ),
+
+        // ...
+    );
 
 The event object
 ++++++++++++++++
@@ -1060,49 +1179,3 @@ It's not recommended to use this method for big complicated transformations. It'
     );
 
 where ``My\Custom\BorderTransformation`` implements ``Imbo\Image\Transformation\TransformationInterface``.
-
-Varnish
--------
-
-Imbo strives to follow the `HTTP Protocol`_, and can because of this easily leverage `Varnish`_.
-
-.. _HTTP Protocol: http://www.ietf.org/rfc/rfc2616.txt
-.. _Varnish: https://www.varnish-cache.org/
-
-The only required configuration you need in your `VCL`_ is a default backend:
-
-.. _VCL: https://www.varnish-cache.org/docs/3.0/reference/vcl.html
-
-.. code-block:: console
-
-    backend default {
-        .host = "127.0.0.1";
-        .port = "81";
-    }
-
-where ``.host`` and ``.port`` is where Varnish can reach your web server.
-
-If you use the same host name (or a sub-domain) for your Imbo installation as other services, that in turn uses `Cookies`_, you might want the VCL to ignore these Cookies for the requests made against your Imbo installation (unless you have implemented event listeners for Imbo that uses Cookies). To achieve this you can put the following snippet into your VCL file:
-
-.. _Cookies: http://en.wikipedia.org/wiki/HTTP_cookie
-
-.. code-block:: console
-
-    sub vcl_recv {
-        if (req.http.host == "imbo.example.com") {
-            unset req.http.Cookie;
-        }
-    }
-
-or, if you have Imbo installed in some path:
-
-.. code-block:: console
-
-    sub vcl_recv {
-        if (req.http.host ~ "^(www.)?example.com$" && req.url ~ "^/imbo/") {
-            unset req.http.Cookie;
-        }
-    }
-
-if you have Imbo installed in ``example.com/imbo``.
-
