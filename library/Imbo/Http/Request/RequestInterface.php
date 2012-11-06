@@ -32,8 +32,7 @@
 
 namespace Imbo\Http\Request;
 
-use Imbo\Exception\InvalidArgumentException,
-    Imbo\Image\TransformationChain;
+use Imbo\Exception\InvalidArgumentException;
 
 /**
  * Request interface
@@ -96,11 +95,7 @@ interface RequestInterface {
     /**
      * Get image transformations from the request
      *
-     * If someone specified a transformation that does not exist, an
-     * Imbo\Exception\InvalidArgumentException exception must be thrown.
-     *
-     * @throws InvalidArgumentException
-     * @return TransformationChain
+     * @return array
      */
     function getTransformations();
 

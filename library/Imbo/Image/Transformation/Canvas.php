@@ -103,31 +103,26 @@ class Canvas extends Transformation implements TransformationInterface {
     /**
      * Class constructor
      *
-     * @param int $width Width of the new canvas
-     * @param int $height Height of the new canvas
-     * @param string $mode The placement mode
-     * @param int $x X coordinate of the placement of the upper left corner of the existing image
-     * @param int $y Y coordinate of the placement of the upper left corner of the existing image
-     * @param string $bg Background color of the canvas
+     * @param array $params Parameters for this transformation
      */
-    public function __construct($width, $height, $mode = 'free', $x = 0, $y = 0, $bg = null) {
-        $this->width  = (int) $width;
-        $this->height = (int) $height;
+    public function __construct(array $params) {
+        $this->width = !empty($params['width']) ? (int) $params['width'] : 0;
+        $this->height = !empty($params['height']) ? (int) $params['height'] : 0;
 
-        if ($mode) {
-            $this->mode = $mode;
+        if (!empty($params['mode'])) {
+            $this->mode = $params['mode'];
         }
 
-        if ($x) {
-            $this->x = (int) $x;
+        if (!empty($params['x'])) {
+            $this->x = (int) $params['x'];
         }
 
-        if ($y) {
-            $this->y = (int) $y;
+        if (!empty($params['y'])) {
+            $this->y = (int) $params['y'];
         }
 
-        if ($bg) {
-            $this->bg = $this->formatColor($bg);
+        if (!empty($params['bg'])) {
+            $this->bg = $this->formatColor($params['bg']);
         }
     }
 

@@ -72,21 +72,19 @@ class Border extends Transformation implements TransformationInterface {
     /**
      * Class constructor
      *
-     * @param string $color The color to set
-     * @param int $width Width of the border
-     * @param int $height Height of the border
+     * @param array $params Parameters for this transformation
      */
-    public function __construct($color = null, $width = null, $height = null) {
-        if ($color !== null) {
-            $this->color  = $this->formatColor($color);
+    public function __construct(array $params = array()) {
+        if (!empty($params['color'])) {
+            $this->color = $this->formatColor($params['color']);
         }
 
-        if ($width !== null) {
-            $this->width  = (int) $width;
+        if (!empty($params['width'])) {
+            $this->width = (int) $params['width'];
         }
 
-        if ($height !== null) {
-            $this->height = (int) $height;
+        if (!empty($params['height'])) {
+            $this->height = (int) $params['height'];
         }
     }
 

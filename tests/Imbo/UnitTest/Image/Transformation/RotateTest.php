@@ -43,11 +43,7 @@ use Imbo\Image\Transformation\Rotate;
  */
 class RotateTest extends TransformationTests {
     protected function getTransformation() {
-        return new Rotate(45);
-    }
-
-    protected function getExpectedName() {
-        return 'rotate';
+        return new Rotate(array('angle' => 45));
     }
 
     /**
@@ -60,7 +56,7 @@ class RotateTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with($this->isType('int'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($this->isType('int'))->will($this->returnValue($image));
 
-        $transformation = new Rotate(45);
+        $transformation = new Rotate(array('angle' => 45));
         $transformation->applyToImage($image);
     }
 }

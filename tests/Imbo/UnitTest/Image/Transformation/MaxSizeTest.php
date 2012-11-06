@@ -44,11 +44,7 @@ use Imbo\Image\Transformation\MaxSize;
  */
 class MaxSizeTest extends TransformationTests {
     protected function getTransformation() {
-        return new MaxSize(200, 100);
-    }
-
-    protected function getExpectedName() {
-        return 'maxsize';
+        return new MaxSize(array('width' => 200, 'height' => 100));
     }
 
     /**
@@ -63,7 +59,7 @@ class MaxSizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with(144)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(100)->will($this->returnValue($image));
 
-        $transformation = new MaxSize(200, 100);
+        $transformation = new MaxSize(array('width' => 200, 'height' => 100));
         $transformation->applyToImage($image);
     }
 
@@ -79,7 +75,7 @@ class MaxSizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(139)->will($this->returnValue($image));
 
-        $transformation = new MaxSize(200);
+        $transformation = new MaxSize(array('width' => 200));
         $transformation->applyToImage($image);
     }
 
@@ -95,7 +91,7 @@ class MaxSizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with(287)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(200)->will($this->returnValue($image));
 
-        $transformation = new MaxSize(null, 200);
+        $transformation = new MaxSize(array('height' => 200));
         $transformation->applyToImage($image);
     }
 
@@ -111,7 +107,7 @@ class MaxSizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with(70)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(100)->will($this->returnValue($image));
 
-        $transformation = new MaxSize(200, 100);
+        $transformation = new MaxSize(array('width' => 200, 'height' => 100));
         $transformation->applyToImage($image);
     }
 
@@ -126,7 +122,7 @@ class MaxSizeTest extends TransformationTests {
         $image->expects($this->never())->method('setWidth');
         $image->expects($this->never())->method('setHeight');
 
-        $transformation = new MaxSize(1000, 1000);
+        $transformation = new MaxSize(array('width' => 1000, 'height' => 1000));
         $transformation->applyToImage($image);
     }
 }

@@ -65,14 +65,18 @@ class Rotate extends Transformation implements TransformationInterface {
     /**
      * Class constructor
      *
-     * @param int $angle Angle of the rotation
-     * @param string $bg Background color
+     * @param array $params Parameters for this transformation
+     * @throws TransformationException
      */
-    public function __construct($angle, $bg = null) {
-        $this->angle = (int) $angle;
+    public function __construct(array $params) {
+        if (empty($params['angle'])) {
+            throw new TransformationException('Missing required parameter: angle', 400);
+        }
 
-        if ($bg !== null) {
-            $this->bg = $this->formatColor($bg);
+        $this->angle = (int) $params['angle'];
+
+        if (!empty($params['bg'])) {
+            $this->bg = $this->formatColor($params['bg']);
         }
     }
 
