@@ -46,7 +46,7 @@ class BorderTest extends TransformationTests {
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Border('ffffff', 3, 4);
+        return new Border(array('color' => 'ffffff', 'width' => 3, 'height' => 4));
     }
 
     /**

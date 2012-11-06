@@ -146,7 +146,7 @@ class CanvasTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with($resultingWidth)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($resultingHeight)->will($this->returnValue($image));
 
-        $canvas = new Canvas($width, $height, $mode);
+        $canvas = new Canvas(array('width' => $width, 'height' => $height, 'mode' => $mode));
         $canvas->applyToImage($image);
     }
 }

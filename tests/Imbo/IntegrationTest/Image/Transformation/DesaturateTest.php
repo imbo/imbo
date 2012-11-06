@@ -29,7 +29,7 @@
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\UnitTest\Image\Transformation;
+namespace Imbo\IntegrationTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Desaturate;
 
@@ -43,23 +43,29 @@ use Imbo\Image\Transformation\Desaturate;
  * @covers Imbo\Image\Transformation\Desaturate
  */
 class DesaturateTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
         return new Desaturate();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getExpectedName() {
         return 'desaturate';
     }
 
     /**
+     * {@inheritdoc}
      * @covers Imbo\Image\Transformation\Desaturate::applyToImage
      */
-    public function testApplyToImage() {
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
 
-        $transformation = new Desaturate();
-        $transformation->applyToImage($image);
+        return $image;
     }
 }

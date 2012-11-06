@@ -58,7 +58,7 @@ class ConvertTest extends \PHPUnit_Framework_TestCase {
      * Set up the transformation instance
      */
     public function setUp() {
-        $this->transformation = new Convert($this->extension);
+        $this->transformation = new Convert(array('type' => $this->extension));
     }
 
     /**
@@ -66,13 +66,6 @@ class ConvertTest extends \PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->transformation = null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getExpectedName() {
-        return 'convert';
     }
 
     /**
