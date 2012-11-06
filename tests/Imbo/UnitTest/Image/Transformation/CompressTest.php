@@ -43,7 +43,7 @@ use Imbo\Image\Transformation\Compress;
  */
 class CompressTest extends TransformationTests {
     protected function getTransformation() {
-        return new Compress(90);
+        return new Compress(array('quality' => 90));
     }
 
     protected function getExpectedName() {
@@ -58,7 +58,7 @@ class CompressTest extends TransformationTests {
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
 
-        $transformation = new Compress(50);
+        $transformation = new Compress(array('quality' => 50));
         $transformation->applyToImage($image);
     }
 }

@@ -12,7 +12,7 @@ branches:
     - develop
     - master
 before_script:
-  - "sudo gem install nokogiri"
+  - "gem install nokogiri"
 services:
   - mongodb
   - memcached

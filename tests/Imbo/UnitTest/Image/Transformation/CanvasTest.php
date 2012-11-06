@@ -45,7 +45,14 @@ use Imagick;
  */
 class CanvasTest extends TransformationTests {
     protected function getTransformation() {
-        return new Canvas(100, 100, 'free', 10, 10, '000');
+        return new Canvas(array(
+            'width' => 100,
+            'height' => 100,
+            'mode' => 'free',
+            'x' => 10,
+            'y' => 10,
+            'bg' => '000',
+        ));
     }
 
     protected function getExpectedName() {
@@ -73,7 +80,14 @@ class CanvasTest extends TransformationTests {
         $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
         $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
 
-        $transformation = new Canvas($width, $height, $mode, $x, $y, $bg);
+        $transformation = new Canvas(array(
+            'width' => $width,
+            'height' => $height,
+            'mode' => $mode,
+            'x' => $x,
+            'y' => $y,
+            'bg' => $bg,
+        ));
         $transformation->applyToImage($image);
 
         $imagick = new Imagick();

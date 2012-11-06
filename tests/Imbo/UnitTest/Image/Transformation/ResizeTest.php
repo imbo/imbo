@@ -43,11 +43,10 @@ use Imbo\Image\Transformation\Resize;
  */
 class ResizeTest extends TransformationTests {
     protected function getTransformation() {
-        return new Resize(1, 2);
-    }
-
-    protected function getExpectedName() {
-        return 'resize';
+        return new Resize(array(
+            'width' => 1,
+            'height' => 2,
+        ));
     }
 
     /**
@@ -60,7 +59,7 @@ class ResizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(100)->will($this->returnValue($image));
 
-        $transformation = new Resize(200, 100);
+        $transformation = new Resize(array('width' => 200, 'height' => 100));
         $transformation->applyToImage($image);
     }
 
@@ -76,7 +75,7 @@ class ResizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($this->isType('int'))->will($this->returnValue($image));
 
-        $transformation = new Resize(200);
+        $transformation = new Resize(array('width' => 200));
         $transformation->applyToImage($image);
     }
 
@@ -92,7 +91,7 @@ class ResizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with($this->isType('int'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(200)->will($this->returnValue($image));
 
-        $transformation = new Resize(null, 200);
+        $transformation = new Resize(array('height' => 200));
         $transformation->applyToImage($image);
     }
 }

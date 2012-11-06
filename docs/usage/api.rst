@@ -204,14 +204,10 @@ results in:
 * 400 Bad Request
 * 404 Not found
 
-.. _image-transformations:
-
 Image transformations
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
-Imbo supports a set of image transformations out of the box using the `Imagick PHP extension <http://pecl.php.net/package/imagick>`_.
-
-Transformations are triggered using the ``t[]`` query parameter with the image resource. This parameter should be used as an array so that multiple transformations can be made. The transformations are applied in the order they are specified in the URL. Below you can find information on the transformations available along with their parameters.
+Below you can find information on the transformations shipped with Imbo along with their parameters.
 
 border
 ######
@@ -323,6 +319,15 @@ This transformation is used to crop the image.
 **Examples:**
 
 * ``t[]=crop:x=10,y=25,width=250,height=150``
+
+desaturate
+##########
+
+This transformation desaturates the image (in practice, gray scales it).
+
+**Examples:**
+
+* ``t[]=desaturate``
 
 flipHorizontally
 ################
@@ -441,15 +446,6 @@ This transformation transverses the image.
 **Examples:**
 
 * ``t[]=transverse``
-
-desaturate
-##########
-
-This transformation desaturates the image (in practice, grayscales it).
-
-**Examples:**
-
-* ``t[]=desaturate``
 
 PUT /users/<user>/images/<image>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -40,7 +40,9 @@ use Imbo\Container,
     Imbo\Exception\StorageException,
     Imbo\Exception\ResourceException,
     Imbo\Image\Transformation\Convert,
-    Imbo\Http\ContentNegotiation;
+    Imbo\Image\Transformation\TransformationInterface,
+    Imbo\Http\ContentNegotiation,
+    Imbo\Resource\ImageInterface as ImageResourceInterface;
 
 /**
  * Image resource
@@ -51,7 +53,7 @@ use Imbo\Container,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Image extends Resource implements ResourceInterface {
+class Image extends Resource implements ImageResourceInterface {
     /**
      * Image for the client
      *
@@ -72,6 +74,13 @@ class Image extends Resource implements ResourceInterface {
      * @var ContentNegotiation
      */
     private $contentNegotiation;
+
+    /**
+     * An array of registered transformation handlers
+     *
+     * @var array
+     */
+    private $transformationHandlers = array();
 
     /**
      * Class constructor
@@ -217,9 +226,23 @@ class Image extends Resource implements ResourceInterface {
             ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
             ->set('X-Imbo-OriginalFileSize', $this->image->getFilesize());
 
-        // Apply transformations
-        $transformationChain = $request->getTransformations();
-        $transformationChain->applyToImage($this->image);
+        // Fetch and apply transformations
+        $transformations = $request->getTransformations();
+
+        foreach ($transformations as $name => $params) {
+            if (!isset($this->transformationHandlers[$name])) {
+                throw new ResourceException('Unknown transformation: ' . $name, 400);
+            }
+
+            $callback = $this->transformationHandlers[$name];
+            $transformation = $callback($params);
+
+            if ($transformation instanceof TransformationInterface) {
+                $transformation->applyToImage($this->image);
+            } else if (is_callable($transformation)) {
+                $transformation($this->image);
+            }
+        }
 
         // Fetch the requested resource to see if we have to convert the image
         $path = $request->getPath();
@@ -229,7 +252,7 @@ class Image extends Resource implements ResourceInterface {
             // We have a requested image type
             $extension = substr($resource, 33);
 
-            $convert = new Convert($extension);
+            $convert = new Convert(array('type' => $extension));
             $convert->applyToImage($this->image);
         }
 
@@ -254,5 +277,14 @@ class Image extends Resource implements ResourceInterface {
 
         // Remove body from the response, but keep everything else
         $container->response->setBody(null);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function registerTransformationHandler($name, $callback) {
+        $this->transformationHandlers[$name] = $callback;
+
+        return $this;
     }
 }

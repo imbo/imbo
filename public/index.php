@@ -43,6 +43,7 @@ use Imbo\Database\DatabaseInterface,
     Imbo\EventManager\EventManager,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Exception\HaltApplication,
+    Imbo\Image\Transformation,
     DateTime;
 
 // Fetch the configuration
@@ -66,7 +67,17 @@ $container->imagesResource = $container->shared(function(Container $container) {
     return new Resource\Images();
 });
 $container->imageResource = $container->shared(function(Container $container) {
-    return new Resource\Image($container->image);
+    $resource = new Resource\Image($container->image);
+
+    // If there are any query parameters present in the URL, register all the transformations found
+    // in the configuration file
+    if ($container->request->getQuery()->has('t') && isset($container->config['transformations'])) {
+        foreach ($container->config['transformations'] as $name => $callback) {
+            $resource->registerTransformationHandler($name, $callback);
+        }
+    }
+
+    return $resource;
 });
 $container->userResource = $container->shared(function(Container $container) {
     return new Resource\User();

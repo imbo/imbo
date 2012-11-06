@@ -78,16 +78,20 @@ class Crop extends Transformation implements TransformationInterface {
     /**
      * Class constructor
      *
-     * @param int $x X coordinate of the top left corner of the crop
-     * @param int $y Y coordinate of the top left corner of the crop
-     * @param int $width Width of the crop
-     * @param int $height Height of the crop
+     * @param array $params Parameters for this transformation
+     * @throws TransformationException
      */
-    public function __construct($x, $y, $width, $height) {
-        $this->x      = (int) $x;
-        $this->y      = (int) $y;
-        $this->width  = (int) $width;
-        $this->height = (int) $height;
+    public function __construct(array $params) {
+        foreach (array('x', 'y', 'width', 'height') as $param) {
+            if (empty($params[$param])) {
+                throw new TransformationException('Missing required parameter: ' . $param, 400);
+            }
+        }
+
+        $this->x = (int) $params['x'];
+        $this->y = (int) $params['y'];
+        $this->width = (int) $params['width'];
+        $this->height = (int) $params['height'];
     }
 
     /**

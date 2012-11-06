@@ -22,64 +22,39 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Image
- * @subpackage Transformation
+ * @package Interfaces
+ * @subpackage Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\Image\Transformation;
+namespace Imbo\Resource;
 
-use Imbo\Image\ImageInterface,
-    Imbo\Exception\TransformationException,
-    ImagickException;
+use Imbo\Container,
+    Imbo\EventManager\EventManagerInterface;
 
 /**
- * Compression transformation
+ * Image resource interface
  *
- * @package Image
- * @subpackage Transformation
+ * @package Interfaces
+ * @subpackage Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Compress extends Transformation implements TransformationInterface {
+interface ImageInterface extends ResourceInterface {
     /**
-     * Quality of the resulting image
+     * Register an image transformation handler
      *
-     * @var int
+     * @param string $name The name of the transformation, as used in the query parameters
+     * @param callable $callback A piece of code that can be executed. The callback will receive a
+     *                           single parameter: $params, which is an array with parameters
+     *                           associated with the transformation. The callable must return an
+     *                           instance of Imbo\Image\Transformation\TransformationInterface
+     * @return ResourceInterface
      */
-    private $quality;
-
-    /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     * @throws TransformationException
-     */
-    public function __construct(array $params) {
-        if (empty($params['quality'])) {
-            throw new TransformationException('Missing required parameter: quality', 400);
-        }
-
-        $this->quality = (int) $params['quality'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function applyToImage(ImageInterface $image) {
-        try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-            $imagick->setImageCompressionQuality($this->quality);
-
-            $image->setBlob($imagick->getImageBlob());
-        } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
-        }
-    }
+    function registerTransformationHandler($name, $callback);
 }

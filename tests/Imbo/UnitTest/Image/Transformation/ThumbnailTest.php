@@ -46,10 +46,6 @@ class ThumbnailTest extends TransformationTests {
         return new Thumbnail();
     }
 
-    protected function getExpectedName() {
-        return 'thumbnail';
-    }
-
     /**
      * @covers Imbo\Image\Transformation\Thumbnail::applyToImage
      */
@@ -64,7 +60,11 @@ class ThumbnailTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
 
-        $transformation = new Thumbnail($width, $height, $fit);
+        $transformation = new Thumbnail(array(
+            'width' => $width,
+            'height' => $height,
+            'fit' => $fit,
+        ));
         $transformation->applyToImage($image);
     }
 }

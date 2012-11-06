@@ -43,7 +43,12 @@ use Imbo\Image\Transformation\Crop;
  */
 class CropTest extends TransformationTests {
     protected function getTransformation() {
-        return new Crop(1, 2, 3, 4);
+        return new Crop(array(
+            'width' => 1,
+            'height' => 2,
+            'x' => 3,
+            'y' => 4,
+        ));
     }
 
     protected function getExpectedName() {
@@ -65,7 +70,12 @@ class CropTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
 
-        $transformation = new Crop($x, $y, $width, $height);
+        $transformation = new Crop(array(
+            'x' => $x,
+            'y' => $y,
+            'width' => $width,
+            'height' => $height,
+        ));
         $transformation->applyToImage($image);
     }
 }
