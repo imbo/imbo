@@ -94,7 +94,7 @@ class Resize extends Transformation implements TransformationInterface {
             $imagick = $this->getImagick();
             $imagick->setOption('jpeg:size', $width . 'x' . $height);
             $imagick->readImageBlob($image->getBlob());
-            $imagick->cropThumbnailImage($width, $height);
+            $imagick->thumbnailImage($width, $height);
 
             $size = $imagick->getImageGeometry();
 
