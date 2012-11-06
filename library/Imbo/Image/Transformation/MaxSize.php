@@ -66,12 +66,11 @@ class MaxSize extends Transformation implements TransformationInterface {
     /**
      * Class constructor
      *
-     * @param int $maxWidth Max width of the image
-     * @param int $maxHeight Height of the image
+     * @param array $params Parameters for this transformation
      */
-    public function __construct($maxWidth = null, $maxHeight = null) {
-        $this->maxWidth  = (int) $maxWidth;
-        $this->maxHeight = (int) $maxHeight;
+    public function __construct(array $params) {
+        $this->maxWidth = !empty($params['width']) ? (int) $params['width'] : 0;
+        $this->maxHeight = !empty($params['height']) ? (int) $params['height'] : 0;
     }
 
     /**

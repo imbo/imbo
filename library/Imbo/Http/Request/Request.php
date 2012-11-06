@@ -34,8 +34,6 @@ namespace Imbo\Http\Request;
 use Imbo\Http\ParameterContainer,
     Imbo\Http\ServerContainer,
     Imbo\Http\HeaderContainer,
-    Imbo\Image\Transformation,
-    Imbo\Image\TransformationChain,
     Imbo\Exception\InvalidArgumentException;
 
 /**
@@ -127,11 +125,11 @@ class Request implements RequestInterface {
     private $resource;
 
     /**
-     * Chain of image transformations
+     * Array of transformations
      *
-     * @var TransformationChain
+     * @var array
      */
-    private $transformationChain;
+    private $transformations;
 
     /**
      * Class constructor
@@ -190,8 +188,9 @@ class Request implements RequestInterface {
      * {@inheritdoc}
      */
     public function getTransformations() {
-        if ($this->transformationChain === null) {
-            $this->transformationChain = new TransformationChain();
+        if ($this->transformations === null) {
+            $this->transformations = array();
+
             $transformations = $this->query->get('t', array());
 
             foreach ($transformations as $transformation) {
@@ -205,9 +204,6 @@ class Request implements RequestInterface {
                 } else {
                     list($name, $urlParams) = explode(':', $transformation, 2);
                 }
-
-                // Lowercase the name
-                $name = strtolower($name);
 
                 // Initialize params for the transformation
                 $params = array();
@@ -227,44 +223,11 @@ class Request implements RequestInterface {
                     }
                 }
 
-                // Closure to help fetch parameters
-                $p = function($key) use ($params) {
-                    return isset($params[$key]) ? $params[$key] : null;
-                };
-
-                if ($name === 'border') {
-                    $this->transformationChain->border($p('color'), $p('width'), $p('height'));
-                } else if ($name === 'compress') {
-                    $this->transformationChain->compress($p('quality'));
-                } else if ($name === 'crop') {
-                    $this->transformationChain->crop($p('x'), $p('y'), $p('width'), $p('height'));
-                } else if ($name === 'fliphorizontally') {
-                    $this->transformationChain->flipHorizontally();
-                } else if ($name === 'flipvertically') {
-                    $this->transformationChain->flipVertically();
-                } else if ($name === 'maxsize') {
-                    $this->transformationChain->maxSize($p('width'), $p('height'));
-                } else if ($name === 'resize') {
-                    $this->transformationChain->resize($p('width'), $p('height'));
-                } else if ($name === 'rotate') {
-                    $this->transformationChain->rotate($p('angle'), $p('bg'));
-                } else if ($name === 'thumbnail') {
-                    $this->transformationChain->thumbnail($p('width'), $p('height'), $p('fit'));
-                } else if ($name === 'canvas') {
-                    $this->transformationChain->canvas($p('width'), $p('height'), $p('mode'), $p('x'), $p('y'), $p('bg'));
-                } else if ($name == 'transpose') {
-                    $this->transformationChain->transpose();
-                } else if ($name == 'transverse') {
-                    $this->transformationChain->transverse();
-                } else if ($name == 'desaturate') {
-                    $this->transformationChain->desaturate();
-                } else {
-                    throw new InvalidArgumentException('Invalid transformation: ' . $name, 400);
-                }
+                $this->transformations[$name] = $params;
             }
         }
 
-        return $this->transformationChain;
+        return $this->transformations;
     }
 
     /**

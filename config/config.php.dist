@@ -145,4 +145,66 @@ return array(
             'listener' => new EventListener\AccessToken(),
         ),
     ),
+
+    /**
+     * Image transformations
+     *
+     * This array includes all supported image transformations. The keys are the names of the
+     * transformations that is used in the URL, and the values are closures that receives a single
+     * parameter: $params, which is the parameters associated to the transformation.
+     *
+     * Example:
+     *
+     * t[]=border:width=2,height=3
+     *
+     * will end up doing a new Image\Transformation\Border(array('width' => 2, 'height' => 3))
+     *
+     * All closures must return an instance of the Imbo\Image\Transformation\TransformationInterface
+     * interface or a callable piece of code, that in turn will receive a single parameter:
+     *
+     * Imbo\Image\ImageInterface $image
+     *
+     * which is the image you want your transformation to modify.
+     */
+    'transformations' => array(
+        'border' => function (array $params) {
+            return new Image\Transformation\Border($params);
+        },
+        'canvas' => function (array $params) {
+            return new Image\Transformation\Canvas($params);
+        },
+        'compress' => function (array $params) {
+            return new Image\Transformation\Compress($params);
+        },
+        'crop' => function (array $params) {
+            return new Image\Transformation\Crop($params);
+        },
+        'desaturate' => function (array $params) {
+            return new Image\Transformation\Desaturate($params);
+        },
+        'flipHorizontally' => function (array $params) {
+            return new Image\Transformation\FlipHorizontally();
+        },
+        'flipVertically' => function (array $params) {
+            return new Image\Transformation\FlipVertically();
+        },
+        'maxsize' => function (array $params) {
+            return new Image\Transformation\MaxSize($params);
+        },
+        'resize' => function (array $params) {
+            return new Image\Transformation\Resize($params);
+        },
+        'rotate' => function (array $params) {
+            return new Image\Transformation\Rotate($params);
+        },
+        'thumbnail' => function (array $params) {
+            return new Image\Transformation\Thumbnail($params);
+        },
+        'transpose' => function (array $params) {
+            return new Image\Transformation\Transpose();
+        },
+        'transverse' => function (array $params) {
+            return new Image\Transformation\Transverse();
+        },
+    ),
 );

@@ -868,6 +868,152 @@ The object passed to the event listeners (and closures) is an instance of the ``
 
 Have a look at how the event listeners shipped with Imbo have been implemented with regards to fetching the request and response objects.
 
+.. _image-transformations:
+
+Image transformations
+---------------------
+
+Imbo supports a set of image transformations out of the box using the `Imagick PHP extension <http://pecl.php.net/package/imagick>`_. All supported image transformations are included in the configuration, and you can easily add your own custom transformations or create presets using a combination of existing transformations.
+
+Transformations are triggered using the ``t[]`` query parameter together with the image resource (read more about the image resource and the included transformations and their parameters in the :ref:`image-resource` section). This parameter should be used as an array so that multiple transformations can be made. The transformations are applied in the order they are specified in the URL.
+
+All transformations are registered in the configuration array under the ``transformations`` key:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'transformations' => array(
+            'border' => function (array $params) {
+                return new Image\Transformation\Border($params);
+            },
+            'canvas' => function (array $params) {
+                return new Image\Transformation\Canvas($params);
+            },
+            // ...
+        ),
+
+        // ...
+    );
+
+where the keys are the names of the transformations as specified in the URL, and the values are closures which all receive a single argument. This argument is an array that matches the parameters for the transformation as specified in the URL. If you use the following query parameter:
+
+``t[]=border:width=1,height=2,color=f00``
+
+the ``$params`` array given to the closure will look like this:
+
+.. code-block:: php
+
+    <?php
+    array(
+        'width' => '1',
+        'height' => '1',
+        'color' => 'f00'
+    )
+
+
+The return value of the closure must either be an instance of the ``Imbo\Image\Transformation\TransformationInterface`` interface, or code that is callable (for instance another closure, or a class that includes an ``__invoke`` method). If the return value is a callable piece of code it will receive a single parameter which is an instance of ``Imbo\Image\ImageInterface`` which is the image you want your transformation to modify. See some examples in the :ref:`custom-transformations` section below.
+
+Presets
++++++++
+
+Imbo supports the notion of transformation presets by using the ``Imbo\Image\Transformation\Collection`` transformation. The constructor of this transformation takes an array containing other transformations.
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'transformations' => array(
+            'graythumb' => function ($params) {
+                return new Image\Transformation\Collection(array(
+                    new Image\Transformation\Thumbnail($params),
+                    new Image\Transformation\Desaturate(),
+                ));
+            },
+        ),
+
+        // ...
+    );
+
+which can be triggered using the following query parameter:
+
+``t[]=graythumb``
+
+.. _custom-transformations:
+
+Custom transformations
+++++++++++++++++++++++
+
+You can also implement your own transformations by implementing the ``Imbo\Image\Transformation\TransformationInterface`` interface, or by specifying a callable piece of code. An implementation of the border transformation as a callable piece of code could for instance look like this:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'transformations' => array(
+            'border' => function (array $params) {
+                return function (Image\ImageInterface $image) use ($params) {
+                    $color = !empty($params['color']) ? $params['color'] : '#000';
+                    $width = !empty($params['width']) ? $params['width'] : 1;
+                    $height = !empty($params['height']) ? $params['height'] : 1;
+
+                    try {
+                        $imagick = new \Imagick();
+                        $imagick->readImageBlob($image->getBlob());
+                        $imagick->borderImage($color, $width, $height);
+
+                        $size = $imagick->getImageGeometry();
+
+                        $image->setBlob($imagick->getImageBlob())
+                              ->setWidth($size['width'])
+                              ->setHeight($size['height']);
+                    } catch (\ImagickException $e) {
+                        throw new Image\Transformation\TransformationException($e->getMessage(), 400, $e);
+                    }
+                };
+            },
+        ),
+
+        // ...
+    );
+
+It's not recommended to use this method for big complicated transformations. It's better to implement the interface mentioned above, and refer to that class in the configuration array instead:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ..
+
+        'transformations' => array(
+            'border' => function (array $params) {
+                return new My\Custom\BorderTransformation($params);
+            },
+        ),
+
+        // ...
+    );
+
+where ``My\Custom\BorderTransformation`` implements ``Imbo\Image\Transformation\TransformationInterface``.
+
 Varnish
 -------
 
@@ -912,3 +1058,4 @@ or, if you have Imbo installed in some path:
     }
 
 if you have Imbo installed in ``example.com/imbo``.
+

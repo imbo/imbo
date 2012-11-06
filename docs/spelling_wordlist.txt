@@ -17,3 +17,5 @@ jpg
 png
 whitelist
 Nginx
+desaturate
+desaturates

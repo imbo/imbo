@@ -64,12 +64,16 @@ class Resize extends Transformation implements TransformationInterface {
     /**
      * Class constructor
      *
-     * @param int $width Width of the resize
-     * @param int $height Height of the resize
+     * @param array $params Parameters for this transformation
+     * @throws TransformationException
      */
-    public function __construct($width = null, $height = null) {
-        $this->width  = (int) $width;
-        $this->height = (int) $height;
+    public function __construct(array $params) {
+        if (empty($params['width']) && empty($params['height'])) {
+            throw new TransformationException('Missing both width and height. You need to specify at least one of them', 400);
+        }
+
+        $this->width = !empty($params['width']) ? (int) $params['width'] : 0;
+        $this->height = !empty($params['height']) ? (int) $params['height'] : 0;
     }
 
     /**

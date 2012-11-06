@@ -58,16 +58,26 @@ interface TransformationInterface {
     function getName();
 
     /**
+     * Set the name of the transformation
+     *
+     * This method is mostly used by presets (chains)
+     *
+     * @param string $name The name of the transformation
+     * @return TransformationInterface
+     */
+    function setName($name);
+
+    /**
      * Get the imagick instance
      *
-     * @return \Imagick
+     * @return Imagick
      */
     function getImagick();
 
     /**
      * Set the imagick instance
      *
-     * @param \Imagick $imagick
+     * @param Imagick $imagick
      * @return TransformationInterface
      */
     function setImagick(Imagick $imagick);

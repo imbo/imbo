@@ -40,7 +40,7 @@ use Imbo\EventManager\EventInterface,
  * Cross-Origin Resource Sharing (CORS) event listener
  *
  * This event listener will listen to all incoming OPTIONS requests
- * and adds the correct headers required for CORS to function properly - 
+ * and adds the correct headers required for CORS to function properly -
  * all configured on a per-user/resource base.
  *
  * @package EventListener
@@ -141,7 +141,7 @@ class Cors extends Listener implements ListenerInterface {
 
     /**
      * Returns an array of allowed origins
-     * 
+     *
      * @return array The defined allowed origins
      */
     public function getAllowedOrigins() {
@@ -150,7 +150,7 @@ class Cors extends Listener implements ListenerInterface {
 
     /**
      * Check if the given origin is defined as an allowed origin
-     * 
+     *
      * @param  string $origin Origin to validate
      * @return boolean True if allowed, false otherwise
      */

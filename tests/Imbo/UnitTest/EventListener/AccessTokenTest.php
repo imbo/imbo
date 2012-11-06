@@ -155,26 +155,26 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
         return array(
             array(
                 $filter = array(),
-                $chain = array(),
+                $transformations = array(),
                 $whitelisted = false,
             ),
             array(
                 $filter = array(),
-                $chain = array(
+                $transformations = array(
                     $this->getMockedTransformation('convert'),
                 ),
                 $whitelisted = false,
             ),
             array(
                 $filter = array('transformations' => array('whitelist' => array('convert'))),
-                $chain = array(
+                $transformations = array(
                     $this->getMockedTransformation('convert'),
                 ),
                 $whitelisted = true,
             ),
             array(
                 $filter = array('transformations' => array('whitelist' => array('convert'))),
-                $chain = array(
+                $transformations = array(
                     $this->getMockedTransformation('convert'),
                     $this->getMockedTransformation('border'),
                 ),
@@ -182,14 +182,14 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
             ),
             array(
                 $filter = array('transformations' => array('blacklist' => array('convert'))),
-                $chain = array(
+                $transformations = array(
                     $this->getMockedTransformation('border'),
                 ),
                 $whitelisted = true,
             ),
             array(
                 $filter = array('transformations' => array('blacklist' => array('convert'))),
-                $chain = array(
+                $transformations = array(
                     $this->getMockedTransformation('convert'),
                     $this->getMockedTransformation('border'),
                 ),
@@ -197,21 +197,21 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
             ),
             array(
                 $filter = array('transformations' => array('whitelist' => array('convert'), 'blacklist' => array('border'))),
-                $chain = array(
+                $transformations = array(
                     $this->getMockedTransformation('convert'),
                 ),
                 $whitelisted = true,
             ),
             array(
                 $filter = array('transformations' => array('whitelist' => array('convert'), 'blacklist' => array('border'))),
-                $chain = array(
+                $transformations = array(
                     $this->getMockedTransformation('canvas'),
                 ),
                 $whitelisted = false,
             ),
             array(
                 $filter = array('transformations' => array('whitelist' => array('convert'), 'blacklist' => array('convert'))),
-                $chain = array(
+                $transformations = array(
                     $this->getMockedTransformation('convert'),
                 ),
                 $whitelisted = false,
@@ -223,7 +223,7 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider getFilterData
      * @covers Imbo\EventListener\AccessToken::invoke
      */
-    public function testFilters($filter, $chain, $whitelisted) {
+    public function testFilters($filter, $transformations, $whitelisted) {
         $listener = new AccessToken($filter);
 
         if (!$whitelisted) {
@@ -231,7 +231,7 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
         }
 
         $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.get.pre'));
-        $this->request->expects($this->any())->method('getTransformations')->will($this->returnValue($chain));
+        $this->request->expects($this->any())->method('getTransformations')->will($this->returnValue($transformations));
 
         $listener->invoke($this->event);
     }

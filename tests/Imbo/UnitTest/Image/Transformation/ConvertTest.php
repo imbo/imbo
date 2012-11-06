@@ -43,7 +43,7 @@ use Imbo\Image\Transformation\Convert;
  */
 class ConvertTest extends TransformationTests {
     protected function getTransformation() {
-        return new Convert('png');
+        return new Convert(array('type' => 'png'));
     }
 
     protected function getExpectedName() {

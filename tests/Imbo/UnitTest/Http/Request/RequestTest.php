@@ -48,7 +48,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      */
     public function testGetTransformationsWithNoTransformationsPresent() {
         $request = new Request();
-        $this->assertEquals(new TransformationChain(), $request->getTransformations());
+        $this->assertEquals(array(), $request->getTransformations());
     }
 
     /**
@@ -63,10 +63,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
                 'compress:quality=90',
                 'crop:x=1,y=2,width=3,height=4',
                 'resize:width=100,height=100',
-                'maxSize:width=100,height=100',
-                'rotate:angle=45,bg=fff',
-                'thumbnail:width=100,height=100,fit=outbound',
-                'canvas:width=100,height=100,x=10,y=10,bg=000',
 
                 // Transformations with no options
                 'flipHorizontally',
@@ -75,32 +71,16 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         );
 
         $request = new Request($query);
-        $chain = $request->getTransformations();
-        $this->assertInstanceOf('Imbo\Image\TransformationChain', $chain);
-    }
+        $transformations = $request->getTransformations();
+        $this->assertInternalType('array', $transformations);
+        $this->assertSame(6, count($transformations));
 
-    /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Invalid transformation: foo
-     * @covers Imbo\Http\Request\Request::__construct
-     * @covers Imbo\Http\Request\Request::getTransformations
-     */
-    public function testGetTransformationsWithInvalidTransformation() {
-        $query = array(
-            't' => array(
-                // Valid transformations
-                'thumbnail:width=100,height=100,fit=outbound',
-                'canvas:width=100,height=100,x=10,y=10,bg=000',
-
-                // Invalid
-                'foo:param=1',
-            ),
-        );
-
-        $request = new Request($query);
-        $chain = $request->getTransformations();
-        $this->assertInstanceOf('Imbo\Image\TransformationChain', $chain);
+        $this->assertEquals(array('color' => 'fff', 'width' => 2, 'height' => 2), $transformations['border']);
+        $this->assertEquals(array('quality' => '90'), $transformations['compress']);
+        $this->assertEquals(array('x' => 1, 'y' => 2, 'width' => 3, 'height' => 4), $transformations['crop']);
+        $this->assertEquals(array('width' => 100, 'height' => 100), $transformations['resize']);
+        $this->assertEquals(array(), $transformations['flipHorizontally']);
+        $this->assertEquals(array(), $transformations['flipVertically']);
     }
 
     /**

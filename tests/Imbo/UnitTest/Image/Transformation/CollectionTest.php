@@ -22,64 +22,49 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Image
- * @subpackage Transformation
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\Image\Transformation;
+namespace Imbo\UnitTest\Image\Transformation;
 
-use Imbo\Image\ImageInterface,
-    Imbo\Exception\TransformationException,
-    ImagickException;
+use Imbo\Image\Transformation\Collection;
 
 /**
- * Compression transformation
- *
- * @package Image
- * @subpackage Transformation
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Image\Transformation\Collection
  */
-class Compress extends Transformation implements TransformationInterface {
-    /**
-     * Quality of the resulting image
-     *
-     * @var int
-     */
-    private $quality;
+class CollectionTest extends \PHPUnit_Framework_TestCase {
+    protected function getTransformation() {
+        return new Collection();
+    }
 
-    /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     * @throws TransformationException
-     */
-    public function __construct(array $params) {
-        if (empty($params['quality'])) {
-            throw new TransformationException('Missing required parameter: quality', 400);
-        }
-
-        $this->quality = (int) $params['quality'];
+    protected function getExpectedName() {
+        return 'collection';
     }
 
     /**
-     * {@inheritdoc}
+     * @covers Imbo\Image\Transformation\Collection::applyToImage
      */
-    public function applyToImage(ImageInterface $image) {
-        try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-            $imagick->setImageCompressionQuality($this->quality);
+    public function testApplyToImage() {
+        $image = $this->getMock('Imbo\Image\ImageInterface');
 
-            $image->setBlob($imagick->getImageBlob());
-        } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
-        }
+        $border = $this->getMock('Imbo\Image\Transformation\TransformationInterface');
+        $border->expects($this->once())->method('applyToImage')->with($image);
+
+        $crop = $this->getMock('Imbo\Image\Transformation\TransformationInterface');
+        $crop->expects($this->once())->method('applyToImage')->with($image);
+
+        $transformation = new Collection(array(
+            $border, $crop
+        ));
+        $transformation->applyToImage($image);
     }
 }

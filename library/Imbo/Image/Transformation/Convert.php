@@ -60,10 +60,15 @@ class Convert extends Transformation implements TransformationInterface {
     /**
      * Class constructor
      *
-     * @param string $type The type we want to convert to
+     * @param array $params Parameters for this transformation
+     * @throws TransformationException
      */
-    public function __construct($type) {
-        $this->type = $type;
+    public function __construct(array $params) {
+        if (empty($params['type'])) {
+            throw new TransformationException('Missing required parameter: type', 400);
+        }
+
+        $this->type = $params['type'];
     }
 
     /**

@@ -342,7 +342,7 @@ class ImageTest extends ResourceTests {
         $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
         $this->request->expects($this->once())->method('getPath')->will($this->returnValue($requestUri));
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue($this->getMock('Imbo\Image\TransformationChain')));
+        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
         $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('*/*' => 1)));
 
         $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
@@ -373,7 +373,7 @@ class ImageTest extends ResourceTests {
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue($this->getMock('Imbo\Image\TransformationChain')));
+        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
         $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('*/*' => 1)));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->once())->method('setBody')->with($imageData);
@@ -407,7 +407,7 @@ class ImageTest extends ResourceTests {
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue($this->getMock('Imbo\Image\TransformationChain')));
+        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
         $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('image/jpg' => 1)));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
