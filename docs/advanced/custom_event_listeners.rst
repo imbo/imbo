@@ -1,3 +1,5 @@
+.. _custom-event-listeners:
+
 Custom event listeners
 ======================
 
@@ -18,3 +20,10 @@ There is also an abstract implementation of the interface above that implement t
     :linenos:
 
 Extend this class if you wish to skip copy/pasting these methods.
+
+Event listeners can also have custom methods for each event they subscribe to. If you for instance subscribe to ``image.get.pre`` and ``image.get.post`` your listener can implement the following methods:
+
+* ``onImageGetPre``
+* ``onImageGetPost``
+
+This way listeners does not have to check the name of the current event in the ``invoke`` method, making it easier to subscribe to several events. These custom methods will receive an instance of ``Imbo\EventManager\EventInterface``, just like the ``invoke`` method.

@@ -106,7 +106,21 @@ class EventManager implements EventManagerInterface {
             // Either no keys have been specified, or the listener wants to trigger for the current
             // key
             return $this->attach($listener->getEvents(), function(EventInterface $event) use ($listener) {
-                $listener->invoke($event);
+                $name = preg_replace_callback(
+                    "#(\.)([a-z]{1})#",
+                    function ($matches) {
+                        return strtoupper($matches[2]);
+                    },
+                    $event->getName()
+                );
+
+                $name = 'on' . ucfirst($name);
+
+                if (method_exists($listener, $name)) {
+                    $listener->$name($event);
+                } else {
+                    $listener->invoke($event);
+                }
             });
         }
 
