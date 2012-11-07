@@ -81,46 +81,68 @@ class MetadataCache extends Listener implements ListenerInterface {
     }
 
     /**
+     * Handle the metadata.get.pre event
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function onMetadataGetPre(EventInterface $event) {
+        $container = $event->getContainer();
+
+        $cacheKey = $this->getCacheKey(
+            $container->request->getPublicKey(),
+            $container->request->getImageIdentifier()
+        );
+
+        $result = $this->cache->get($cacheKey);
+
+        if ($result instanceof ResponseInterface) {
+            $result->getHeaders()->set('X-Imbo-MetadataCache', 'Hit');
+
+            // We have a valid response object from the cache. Overwrite the one already in the
+            // container
+            $container->response = $result;
+
+            // Halt execution of the application and return
+            $event->haltApplication(true);
+            return;
+        }
+
+        $container->response->getHeaders()->set('X-Imbo-MetadataCache', 'Miss');
+    }
+
+    /**
+     * Handle the metadata.get.post event
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function onMetadataGetPost(EventInterface $event) {
+        $container = $event->getContainer();
+
+        $cacheKey = $this->getCacheKey(
+            $container->request->getPublicKey(),
+            $container->request->getImageIdentifier()
+        );
+
+        // Store the response in the cache for later use
+        if ($container->response->getStatusCode() === 200) {
+            $this->cache->set($cacheKey, $container->response);
+        }
+    }
+
+    /**
+     * Handle the remaining events
+     *
      * {@inheritdoc}
      */
     public function invoke(EventInterface $event) {
-        $eventName = $event->getName();
         $container = $event->getContainer();
 
-        $request = $container->request;
-        $response = $container->response;
+        $cacheKey = $this->getCacheKey(
+            $container->request->getPublicKey(),
+            $container->request->getImageIdentifier()
+        );
 
-        $publicKey = $request->getPublicKey();
-        $imageIdentifier = $request->getImageIdentifier();
-
-        // Get cache key
-        $cacheKey = $this->getCacheKey($publicKey, $imageIdentifier);
-
-        if ($eventName === 'metadata.get.pre') {
-            $result = $this->cache->get($cacheKey);
-
-            if ($result instanceof ResponseInterface) {
-                $result->getHeaders()->set('X-Imbo-MetadataCache', 'Hit');
-
-                // We have a valid response object from the cache. Overwrite the one already in the
-                // container
-                $container->response = $result;
-
-                // Halt execution of the application and return
-                $event->haltApplication(true);
-                return;
-            }
-
-            $response->getHeaders()->set('X-Imbo-MetadataCache', 'Miss');
-        } else if ($eventName === 'metadata.get.post') {
-            // Store the response in the cache for later use
-            if ($response->getStatusCode() === 200) {
-                $this->cache->set($cacheKey, $response);
-            }
-        } else {
-            // Remove metadata from the cache
-            $this->cache->delete($cacheKey);
-        }
+        $this->cache->delete($cacheKey);
     }
 
     /**
