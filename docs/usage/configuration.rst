@@ -634,7 +634,7 @@ Per default an event listener is executed for all public keys (users). If you wa
         // ...
     );
 
-where ``publicKeys`` is an array containing the public keys you want the listener to trigger for.
+where ``publicKeys`` is an array containing the public keys you want the listener to trigger for. You can read more about creating your own event listeners in the :ref:`custom-event-listeners` section.
 
 Events
 ++++++

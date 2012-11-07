@@ -170,4 +170,32 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $this->manager->attach('event', function($event) { $event->haltApplication(true); });
         $this->manager->trigger('event');
     }
+
+    /**
+     * @covers Imbo\EventManager\EventManager::trigger
+     * @covers Imbo\EventManager\EventManager::attachListener
+     */
+    public function testListenersCanHaveCustomMethodsForEachEvent() {
+        $listener = $this->getMock('Imbo\EventListener\ListenerInterface', array(
+            'invoke',
+            'getEvents',
+            'getPublicKeys',
+            'setPublicKeys',
+            'onEvent',
+            'onEventPre'
+        ));
+        $listener->expects($this->once())->method('getEvents')->will($this->returnValue(array(
+            'event',
+            'event.pre',
+            'event.post',
+        )));
+        $listener->expects($this->once())->method('invoke');
+        $listener->expects($this->once())->method('onEvent');
+        $listener->expects($this->once())->method('onEventPre');
+
+        $this->manager->attachListener($listener)
+                      ->trigger('event')
+                      ->trigger('event.pre')
+                      ->trigger('event.post');
+    }
 }

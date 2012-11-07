@@ -122,7 +122,7 @@ class MetadataCacheTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\EventListener\MetadataCache::invoke
+     * @covers Imbo\EventListener\MetadataCache::onMetadataGetPre
      * @covers Imbo\EventListener\MetadataCache::getCacheKey
      */
     public function testListenerShouldHaltApplicationWhenACacheHitOccurs() {
@@ -134,17 +134,16 @@ class MetadataCacheTest extends \PHPUnit_Framework_TestCase {
 
         $cacheKey = 'metadata:' . $this->publicKey . '|' . $this->imageIdentifier;
 
-        $this->event->expects($this->once())->method('getName')->will($this->returnValue('metadata.get.pre'));
         $this->event->expects($this->once())->method('haltApplication')->with(true);
         $this->cache->expects($this->once())->method('get')->with($cacheKey)->will($this->returnValue($cachedResponse));
 
-        $this->listener->invoke($this->event);
+        $this->listener->onMetadataGetPre($this->event);
 
         $this->assertSame($this->container->response, $cachedResponse);
     }
 
     /**
-     * @covers Imbo\EventListener\MetadataCache::invoke
+     * @covers Imbo\EventListener\MetadataCache::onMetadataGetPre
      * @covers Imbo\EventListener\MetadataCache::getCacheKey
      */
     public function testListenerShouldAddHeaderWhenCacheMissOccurs() {
@@ -155,38 +154,35 @@ class MetadataCacheTest extends \PHPUnit_Framework_TestCase {
 
         $cacheKey = 'metadata:' . $this->publicKey . '|' . $this->imageIdentifier;
 
-        $this->event->expects($this->once())->method('getName')->will($this->returnValue('metadata.get.pre'));
         $this->cache->expects($this->once())->method('get')->with($cacheKey)->will($this->returnValue(null));
 
-        $this->listener->invoke($this->event);
+        $this->listener->onMetadataGetPre($this->event);
     }
 
     /**
-     * @covers Imbo\EventListener\MetadataCache::invoke
+     * @covers Imbo\EventListener\MetadataCache::onMetadataGetPost
      * @covers Imbo\EventListener\MetadataCache::getCacheKey
      */
     public function testListenerShouldStoreResponseInCache() {
         $cacheKey = 'metadata:' . $this->publicKey . '|' . $this->imageIdentifier;
 
-        $this->event->expects($this->once())->method('getName')->will($this->returnValue('metadata.get.post'));
         $this->cache->expects($this->once())->method('set')->with($cacheKey, $this->response);
         $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(200));
 
-        $this->listener->invoke($this->event);
+        $this->listener->onMetadataGetPost($this->event);
     }
 
     /**
-     * @covers Imbo\EventListener\MetadataCache::invoke
+     * @covers Imbo\EventListener\MetadataCache::onMetadataGetPost
      * @covers Imbo\EventListener\MetadataCache::getCacheKey
      */
     public function testListenerShouldNotStoreResponseInCacheWhenResponseCodeIsNot200() {
         $cacheKey = 'metadata:' . $this->publicKey . '|' . $this->imageIdentifier;
 
-        $this->event->expects($this->once())->method('getName')->will($this->returnValue('metadata.get.post'));
         $this->cache->expects($this->never())->method('set');
         $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(304));
 
-        $this->listener->invoke($this->event);
+        $this->listener->onMetadataGetPost($this->event);
     }
 
     /**
@@ -195,18 +191,6 @@ class MetadataCacheTest extends \PHPUnit_Framework_TestCase {
      */
     public function testListenerShouldDeleteResponseFromCacheIfMetadataIsChanged() {
         $cacheKey = 'metadata:' . $this->publicKey . '|' . $this->imageIdentifier;
-
-        $this->event->expects($this->exactly(3))->method('getName')->will($this->returnCallback(function() {
-            static $counter = 0;
-
-            $names = array(
-                'metadata.delete.pre',
-                'metadata.put.post',
-                'metadata.post.post',
-            );
-
-            return $names[$counter++];
-        }));
 
         $this->cache->expects($this->exactly(3))->method('delete')->with($cacheKey);
 
