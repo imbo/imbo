@@ -81,4 +81,25 @@ class ContentNegotiationTest extends \PHPUnit_Framework_TestCase {
     public function testIsAcceptable($mimeType, $acceptable, $result) {
         $this->assertSame($result, $this->cn->isAcceptable($mimeType, $acceptable));
     }
+
+    /**
+     * @return array[]
+     */
+    public function getMimeTypes() {
+        return array(
+            array(array('image/png', 'image/gif'), array('image/*' => 1), 'image/png'),
+            array(array('image/png', 'image/gif'), array('image/png' => 0.9, 'image/gif' => 1), 'image/gif'),
+            array(array('image/png', 'image/gif'), array('application/json' => 1, 'image/*' => 0.9), 'image/png'),
+            array(array('image/png', 'image/gif'), array('application/json' => 1), false),
+        );
+    }
+
+    /**
+     * @dataProvider getMimeTypes
+     * @covers Imbo\Http\ContentNegotiation::bestMatch
+     * @covers Imbo\Http\ContentNegotiation::isAcceptable
+     */
+    public function testBestMatch($mimeTypes, $acceptable, $result) {
+        $this->assertSame($result, $this->cn->bestMatch($mimeTypes, $acceptable));
+    }
 }
