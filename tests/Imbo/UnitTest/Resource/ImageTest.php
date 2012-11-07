@@ -66,6 +66,9 @@ class ImageTest extends ResourceTests {
      */
     private $image;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getNewResource() {
         $this->eventManager = $this->getMock('Imbo\EventManager\EventManagerInterface');
         $image = new Image($this->image, $this->imagePreparation, $this->contentNegotiation);
@@ -74,6 +77,9 @@ class ImageTest extends ResourceTests {
         return $image;
     }
 
+    /**
+     * Set up the resource
+     */
     public function setUp() {
         $this->image = $this->getMock('Imbo\Image\ImageInterface');
         $this->imagePreparation = $this->getMock('Imbo\Image\ImagePreparationInterface');
@@ -82,6 +88,9 @@ class ImageTest extends ResourceTests {
         parent::setUp();
     }
 
+    /**
+     * Tear down the resource
+     */
     public function tearDown() {
         parent::tearDown();
 
