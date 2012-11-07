@@ -152,7 +152,6 @@ class Metadata extends Resource implements ResourceInterface {
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
-        $requestHeaders = $request->getHeaders();
         $responseHeaders = $response->getHeaders();
 
         // See when this particular image was last updated
@@ -160,19 +159,7 @@ class Metadata extends Resource implements ResourceInterface {
 
         // Generate an etag for the content
         $etag = '"' . md5($publicKey . $imageIdentifier . $lastModified) . '"';
-
         $responseHeaders->set('ETag', $etag);
-
-        if (
-            $lastModified === $requestHeaders->get('if-modified-since') &&
-            $etag === $requestHeaders->get('if-none-match'))
-        {
-            // The client already has this object
-            $response->setNotModified();
-            return;
-        }
-
-        // The client did not have this particular version in its cache
         $responseHeaders->set('Last-Modified', $lastModified);
 
         $response->setBody($database->getMetadata($publicKey, $imageIdentifier));

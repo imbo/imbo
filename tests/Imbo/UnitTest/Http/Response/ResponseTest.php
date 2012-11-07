@@ -32,7 +32,9 @@
 namespace Imbo\UnitTest\Http\Response;
 
 use Imbo\Http\Response\Response,
-    Imbo\Exception;
+    Imbo\Exception,
+    Imbo\Exception\RuntimeException,
+    ReflectionProperty;
 
 /**
  * @package TestSuite\UnitTests
@@ -121,6 +123,20 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Http\Response\Response::send
+     */
+    public function testSendsContentAsJsonWhenContentIsNotAlreadyFormatted() {
+        $content = array('some' => 'value');
+        $this->assertSame($this->response, $this->response->setBody($content));
+
+        ob_start();
+        $this->response->send();
+        $output = ob_get_clean();
+
+        $this->assertSame($output, '{"some":"value"}');
+    }
+
+    /**
      * @covers Imbo\Http\Response\Response::setBody
      * @covers Imbo\Http\Response\Response::setStatusCode
      * @covers Imbo\Http\Response\Response::setNotModified
@@ -137,6 +153,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertEmpty($this->response->getBody());
     }
 
+    /**
+     * Return error codes and whether they are errors or not
+     *
+     * @return array[]
+     */
     public function isErrorData() {
         return array(
             array(100, false),
@@ -154,5 +175,89 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
     public function testIsError($code, $error) {
         $this->response->setStatusCode($code);
         $this->assertSame($error, $this->response->isError());
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Response::setStatusCode
+     */
+    public function testCanSetBothCodeAndMessage() {
+        $this->response->setStatusCode(500, 'Oops');
+        $property = new ReflectionProperty('Imbo\Http\Response\Response', 'statusMessage');
+        $property->setAccessible(true);
+        $this->assertSame('Oops', $property->getValue($this->response));
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Response::createError
+     */
+    public function testCanCreateAnErrorBasedOnAnException() {
+        $exception = new RuntimeException('You wronged', 400);
+
+        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
+
+        $this->response->getHeaders()->set('ETag', 'some tag')->set('Last-Modified', 'some date');
+        $this->response->createError($exception, $request);
+
+        $this->assertSame(400, $this->response->getStatusCode());
+
+        $headers = $this->response->getHeaders()->getAll();
+        $body = $this->response->getBody();
+
+        $this->assertArrayHasKey('error', $body);
+        $this->assertArrayHasKey('code', $body['error']);
+        $this->assertArrayHasKey('message', $body['error']);
+
+        $this->assertSame(400, $body['error']['code']);
+        $this->assertSame('You wronged', $body['error']['message']);
+
+        $this->assertArrayHasKey('x-imbo-error-message', $headers);
+        $this->assertSame('You wronged', $headers['x-imbo-error-message']);
+
+        $this->assertArrayNotHasKey('etag', $headers);
+        $this->assertArrayNotHasKey('last-modified', $headers);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Response::createError
+     */
+    public function testWillUseCorrectImageIdentifierFromRequestWhenCreatingError() {
+        $exception = new RuntimeException('You wronged', 400);
+        $exception->setImboErrorCode(123);
+
+        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
+        $request->expects($this->once())->method('getRealImageIdentifier')->will($this->returnValue(null));
+        $request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageIdentifier'));
+
+        $this->response->createError($exception, $request);
+
+        $headers = $this->response->getHeaders()->getAll();
+        $body = $this->response->getBody();
+
+        $this->assertArrayHasKey('x-imbo-error-internalcode', $headers);
+        $this->assertSame(123, $headers['x-imbo-error-internalcode']);
+
+        $this->assertArrayHasKey('error', $body);
+        $this->assertArrayHasKey('imageIdentifier', $body);
+        $this->assertArrayHasKey('imboErrorCode', $body['error']);
+
+        $this->assertSame(123, $body['error']['imboErrorCode']);
+        $this->assertSame('imageIdentifier', $body['imageIdentifier']);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Response::createError
+     */
+    public function testWillNotSetBodyInErrorIfRequestMethodIsHead() {
+        $exception = new RuntimeException('You wronged', 400);
+        $exception->setImboErrorCode(123);
+
+        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getMethod')->will($this->returnValue('HEAD'));
+
+        $this->response->createError($exception, $request);
+
+        $this->assertNull($this->response->getBody());
     }
 }

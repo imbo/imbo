@@ -107,14 +107,14 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
     public function invoke(EventInterface $event) {
         $container = $event->getContainer();
 
-        $eventName          = $event->getName();
-        $request            = $container->get('request');
-        $response           = $container->get('response');
+        $eventName       = $event->getName();
+        $request         = $container->get('request');
+        $response        = $container->get('response');
 
-        $publicKey          = $request->getPublicKey();
-        $imageIdentifier    = $request->getImageIdentifier();
-        $imageExtension     = $request->getExtension();
-        $url                = $request->getUrl();
+        $publicKey       = $request->getPublicKey();
+        $imageIdentifier = $request->getImageIdentifier();
+        $imageExtension  = $request->getExtension();
+        $url             = $request->getUrl();
 
         if (($eventName === 'image.get.pre' || $eventName === 'image.get.post') && !$request->hasTransformations()) {
             // Nothing for the listener to do since we do not want to store/fetch from the cache if
@@ -155,26 +155,11 @@ class ImageTransformationCache extends Listener implements ListenerInterface {
             }
 
             if (is_file($fullPath)) {
-                $response = unserialize(file_get_contents($fullPath));
+                $container->response = unserialize(file_get_contents($fullPath));
+                $container->response->getHeaders()->set('X-Imbo-TransformationCache', 'Hit');
 
-                $ifNoneMatch     = $request->getHeaders()->get('if-none-match');
-                $ifModifiedSince = $request->getHeaders()->get('if-modified-since');
-
-                $etag         = $response->getHeaders()->get('etag');
-                $lastModified = $response->getHeaders()->get('last-modified');
-
-                if (
-                    $ifNoneMatch && $ifModifiedSince &&
-                    $lastModified === $ifModifiedSince &&
-                    $etag === $ifNoneMatch
-                ) {
-                    $response->setNotModified();
-                }
-
-                $response->getHeaders()->set('X-Imbo-TransformationCache', 'Hit');
-
-                $response->send();
-                exit;
+                $event->haltApplication(true);
+                return;
             }
 
             $response->getHeaders()->set('X-Imbo-TransformationCache', 'Miss');

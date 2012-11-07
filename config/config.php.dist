@@ -97,7 +97,8 @@ return array(
     /**
      * Event listeners
      *
-     * Each element in this array is another array with the following keys:
+     * Each element in this array is either an instance of an event listener, or another array with
+     * the following keys:
      *
      * - listener
      * - events
@@ -117,6 +118,7 @@ return array(
      * Example of how to add different listeners:
      *
      * 'eventListeners' => array(
+     *   new EventListener\Authenticate(),
      *   array(
      *     'listener' => new Imbo\EventListener\AccessToken(),
      *   ),
@@ -138,12 +140,10 @@ return array(
      * @var array
      */
     'eventListeners' => array(
-        array(
-            'listener' => new EventListener\Authenticate(),
-        ),
-        array(
-            'listener' => new EventListener\AccessToken(),
-        ),
+        new EventListener\Authenticate(),
+        new EventListener\AccessToken(),
+        new EventListener\NotModified(),
+        new EventListener\ResponseFormatter(),
     ),
 
     /**

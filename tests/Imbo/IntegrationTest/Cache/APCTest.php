@@ -22,90 +22,35 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Cache
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\Cache;
+namespace Imbo\IntegrationTest\Cache;
+
+use Imbo\Cache\APC;
 
 /**
- * APC cache
- *
- * @package Cache
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Cache\APC
  */
-class Apc implements CacheInterface {
-    /**
-     * Key namespace
-     *
-     * @var string
-     */
-    private $namespace;
-
-    /**
-     * Class constructor
-     *
-     * @param string $namespace A prefix that will be added to all keys
-     */
-    public function __construct($namespace = null) {
-        $this->namespace = $namespace;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function get($key) {
-        return apc_fetch($this->getKey($key));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function set($key, $value, $expire = 0) {
-        return apc_store($this->getKey($key), $value, $expire);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function delete($key) {
-        return apc_delete($this->getKey($key));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function increment($key, $amount = 1) {
-        return apc_inc($this->getKey($key), $amount);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function decrement($key, $amount = 1) {
-        $result = apc_dec($this->getKey($key), $amount);
-
-        if ($result < 0) {
-            $result = 0;
-            $this->set($key, $result);
+class APCTest extends CacheTests {
+    protected function getDriver() {
+        if (!extension_loaded('apc')) {
+            $this->markTestSkipped('APC is not installed');
         }
 
-        return $result;
-    }
+        if (!ini_get('apc.enable_cli')) {
+            $this->markTestSkipped('apc.enable_cli must be set to On to run this test case');
+        }
 
-    /**
-     * Generate a namespaced key
-     *
-     * @param string $key The key specified by the user
-     * @return string A namespaced key
-     */
-    protected function getKey($key) {
-        return $this->namespace . $key;
+        return new APC('ImboTestSuite');
     }
 }

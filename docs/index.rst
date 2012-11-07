@@ -22,8 +22,9 @@ Documentation
 Extending Imbo
 --------------
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
+   advanced/cache_adapters
    advanced/custom_database_drivers
    advanced/custom_storage_drivers
    advanced/custom_event_listeners

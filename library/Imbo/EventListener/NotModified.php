@@ -22,76 +22,58 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Resources
+ * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\Resource;
+namespace Imbo\EventListener;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Container;
+use Imbo\EventManager\EventInterface;
 
 /**
- * User resource
+ * This event listener will correctly handle 304 Not Modified for all resources by using the ETag
+ * and Last-Modified headers
  *
- * @package Resources
+ * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class User extends Resource implements ResourceInterface {
+class NotModified extends Listener implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getAllowedMethods() {
+    public function getEvents() {
         return array(
-            RequestInterface::METHOD_GET,
-            RequestInterface::METHOD_HEAD,
+            'response.send',
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get(Container $container) {
-        $request = $container->request;
-        $response = $container->response;
-        $database = $container->database;
+    public function invoke(EventInterface $event) {
+        $container = $event->getContainer();
 
-        $publicKey = $request->getPublicKey();
+        $responseHeaders = $container->response->getHeaders();
+        $requestHeaders = $container->request->getHeaders();
 
-        // Fetch header containers
-        $responseHeaders = $response->getHeaders();
+        $ifModifiedSince = $requestHeaders->get('if-modified-since');
+        $ifNoneMatch = $requestHeaders->get('if-none-match');
+        $lastModified = $responseHeaders->get('last-modified');
+        $etag = $responseHeaders->get('etag');
 
-        // Fetch the number of images this user has in the database
-        $numImages = $database->getNumImages($publicKey);
-
-        // Fetch the last modfified timestamp for the current user
-        $lastModified = $this->formatDate($database->getLastModified($publicKey));
-
-        // Generate ETag based on the last modification date and add to the response headers
-        $etag = '"' . md5($lastModified) . '"';
-        $responseHeaders->set('ETag', $etag);
-        $responseHeaders->set('Last-Modified', $lastModified);
-
-        $response->setBody(array(
-            'publicKey'    => $publicKey,
-            'numImages'    => $numImages,
-            'lastModified' => $lastModified,
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function head(Container $container) {
-        $this->get($container);
-
-        // Remove body from the response, but keep everything else
-        $container->response->setBody(null);
+        if (
+            $ifModifiedSince && $ifNoneMatch && (
+                $lastModified === $ifModifiedSince &&
+                $etag === $ifNoneMatch
+            )
+        ) {
+            $container->response->setNotModified();
+        }
     }
 }

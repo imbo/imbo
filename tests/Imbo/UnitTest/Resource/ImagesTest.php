@@ -61,41 +61,6 @@ class ImagesTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Images::get
      */
-    public function testGetWhenResourceIsNotModified() {
-        $formattedDate = 'Mon, 10 Jan 2011 13:37:00 GMT';
-        $lastModified = $this->getMock('DateTime');
-        $lastModified->expects($this->once())->method('format')->will($this->returnValue(substr($formattedDate, 0, -4)));
-
-        $etag = '"' . md5($formattedDate) . '"';
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-
-        $requestHeaders = $this->getMock('Imbo\Http\ParameterContainerInterface');
-        $requestHeaders->expects($this->any())->method('get')->will($this->returnCallback(function($key, $value) use ($formattedDate, $etag) {
-            if ($key === 'if-modified-since') {
-                return $formattedDate;
-            } else if ($key === 'if-none-match') {
-                return $etag;
-            }
-
-            return null;
-        }));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-
-        $responseHeaders = $this->getMock('Imbo\Http\ParameterContainerInterface');
-        $responseHeaders->expects($this->once())->method('set')->with('ETag', $etag);
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-
-        $this->database->expects($this->once())->method('getLastModified')->will($this->returnValue($lastModified));
-
-        $this->response->expects($this->once())->method('setNotModified');
-
-        $this->getNewResource()->get($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\Images::get
-     */
     public function testSuccessfulGetWithNoQueryParams() {
         $images = array();
 
@@ -108,12 +73,8 @@ class ImagesTest extends ResourceTests {
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->any())->method('set');
 
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $requestHeaders->expects($this->any())->method('get');
-
         $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($parameterContainer));
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
         $this->database->expects($this->once())->method('getImages')->with($this->publicKey, $query)->will($this->returnValue($images));
         $this->database->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
@@ -156,12 +117,8 @@ class ImagesTest extends ResourceTests {
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->any())->method('set');
 
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $requestHeaders->expects($this->any())->method('get');
-
         $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($params));
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
         $this->database->expects($this->once())->method('getImages')->with($this->publicKey, $query)->will($this->returnValue($images));
         $this->database->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
