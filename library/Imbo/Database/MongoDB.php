@@ -199,7 +199,7 @@ class MongoDB implements DatabaseInterface {
                 array('safe' => true, 'multiple' => false)
             );
         } catch (MongoException $e) {
-            throw new DatabaseException('Unable to edit image data', 500, $e);
+            throw new DatabaseException('Unable to update meta data', 500, $e);
         }
 
         return true;
@@ -215,7 +215,7 @@ class MongoDB implements DatabaseInterface {
                 'imageIdentifier' => $imageIdentifier,
             ));
         } catch (MongoException $e) {
-            throw new DatabaseException('Unable to fetch image metadata', 500, $e);
+            throw new DatabaseException('Unable to fetch meta data', 500, $e);
         }
 
         if ($data === null) {
@@ -245,7 +245,7 @@ class MongoDB implements DatabaseInterface {
                 array('safe' => true, 'multiple' => false)
             );
         } catch (MongoException $e) {
-            throw new DatabaseException('Unable to remove metadata', 500, $e);
+            throw new DatabaseException('Unable to delete meta data', 500, $e);
         }
 
         return true;
@@ -411,7 +411,7 @@ class MongoDB implements DatabaseInterface {
                 'imageIdentifier' => $imageIdentifier,
             ));
         } catch (MongoException $e) {
-            throw new DatabaseException('Unable to fetch image metadata', 500, $e);
+            throw new DatabaseException('Unable to fetch image meta data', 500, $e);
         }
 
         if ($data === null) {

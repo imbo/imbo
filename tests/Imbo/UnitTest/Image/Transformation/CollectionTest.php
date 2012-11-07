@@ -42,14 +42,6 @@ use Imbo\Image\Transformation\Collection;
  * @covers Imbo\Image\Transformation\Collection
  */
 class CollectionTest extends \PHPUnit_Framework_TestCase {
-    protected function getTransformation() {
-        return new Collection();
-    }
-
-    protected function getExpectedName() {
-        return 'collection';
-    }
-
     /**
      * @covers Imbo\Image\Transformation\Collection::applyToImage
      */

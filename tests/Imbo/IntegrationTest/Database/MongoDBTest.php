@@ -63,6 +63,9 @@ class MongoDBTest extends DatabaseTests {
         ));
     }
 
+    /**
+     * Make sure we have the mongo extension available and drop the test database just in case
+     */
     public function setUp() {
         if (!extension_loaded('mongo')) {
             $this->markTestSkipped('pecl/mongo is required to run this test');
@@ -74,6 +77,9 @@ class MongoDBTest extends DatabaseTests {
         parent::setUp();
     }
 
+    /**
+     * Drop the test database after each test
+     */
     public function tearDown() {
         if (extension_loaded('mongo')) {
             $mongo = new Mongo();
@@ -81,5 +87,18 @@ class MongoDBTest extends DatabaseTests {
         }
 
         parent::tearDown();
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::getMongo
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Could not connect to database
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenUSingAnInvalidMongodbHostname() {
+        $db = new MongoDB(array(
+            'server' => 'foobar',
+        ));
+        $db->getStatus();
     }
 }

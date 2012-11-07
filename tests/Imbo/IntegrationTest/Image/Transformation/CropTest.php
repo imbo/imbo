@@ -22,45 +22,56 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\UnitTest\Image\Transformation;
+namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Border;
+use Imbo\Image\Transformation\Crop;
 
 /**
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\Image\Transformation\Border
+ * @covers Imbo\Image\Transformation\Crop
  */
-class BorderTest extends TransformationTests {
+class CropTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
-        return new Border();
-    }
-
-    protected function getExpectedName() {
-        return 'border';
+        return new Crop(array(
+            'width' => 1,
+            'height' => 2,
+            'x' => 3,
+            'y' => 4,
+        ));
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Border::applyToImage
+     * {@inheritdoc}
      */
-    public function testApplyToImage() {
+    protected function getExpectedName() {
+        return 'crop';
+    }
+
+    /**
+     * {@inheritdoc}
+     * @covers Imbo\Image\Transformation\Crop::applyToImage
+     */
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with(667)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with(465)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with(1)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with(2)->will($this->returnValue($image));
 
-        $transformation = new Border();
-        $transformation->applyToImage($image);
+        return $image;
     }
 }
