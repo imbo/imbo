@@ -22,43 +22,49 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\UnitTest\Image\Transformation;
+namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\FlipHorizontally;
+use Imbo\Image\Transformation\Transverse;
 
 /**
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\Image\Transformation\FlipHorizontally
+ * @covers Imbo\Image\Transformation\Transverse
  */
-class FlipHorizontallyTest extends TransformationTests {
+class TransverseTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
-        return new FlipHorizontally();
-    }
-
-    protected function getExpectedName() {
-        return 'fliphorizontally';
+        return new Transverse();
     }
 
     /**
-     * @covers Imbo\Image\Transformation\FlipHorizontally::applyToImage
+     * {@inheritdoc}
      */
-    public function testApplyToImage() {
+    protected function getExpectedName() {
+        return 'transverse';
+    }
+
+    /**
+     * {@inheritdoc}
+     * @covers Imbo\Image\Transformation\Canvas::applyToImage
+     */
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
+        $image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
 
-        $transformation = new FlipHorizontally();
-        $transformation->applyToImage($image);
+        return $image;
     }
 }

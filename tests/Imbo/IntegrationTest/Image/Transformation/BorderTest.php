@@ -22,41 +22,51 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\UnitTest\Image\Transformation;
+namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Rotate;
+use Imbo\Image\Transformation\Border;
 
 /**
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\Image\Transformation\Rotate
+ * @covers Imbo\Image\Transformation\Border
  */
-class RotateTest extends TransformationTests {
+class BorderTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
-        return new Rotate(array('angle' => 45));
+        return new Border(array('color' => 'ffffff', 'width' => 3, 'height' => 4));
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Rotate::applyToImage
+     * {@inheritdoc}
      */
-    public function testApplyToImage() {
+    protected function getExpectedName() {
+        return 'border';
+    }
+
+    /**
+     * {@inheritdoc}
+     * @covers Imbo\Image\Transformation\Border::applyToImage
+     */
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with($this->isType('int'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with($this->isType('int'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with(671)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with(471)->will($this->returnValue($image));
 
-        $transformation = new Rotate(array('angle' => 45));
-        $transformation->applyToImage($image);
+        return $image;
     }
 }

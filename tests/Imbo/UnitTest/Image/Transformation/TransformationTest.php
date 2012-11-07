@@ -31,7 +31,10 @@
 
 namespace Imbo\UnitTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Convert;
+use Imbo\Image\Transformation\Transformation,
+    Imbo\Image\ImageInterface,
+    Imagick,
+    ReflectionMethod;
 
 /**
  * @package TestSuite\UnitTests
@@ -39,26 +42,19 @@ use Imbo\Image\Transformation\Convert;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\Image\Transformation\Convert
+ * @covers Imbo\Image\Transformation\Transformation
  */
-class ConvertTest extends \PHPUnit_Framework_TestCase {
+class TransformationTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var Convert
+     * @var Transformation
      */
     private $transformation;
-
-    /**
-     * The extension to use for testing
-     *
-     * @var string
-     */
-    private $extension = 'png';
 
     /**
      * Set up the transformation instance
      */
     public function setUp() {
-        $this->transformation = new Convert(array('type' => $this->extension));
+        $this->transformation = new TransformationImpl();
     }
 
     /**
@@ -69,13 +65,52 @@ class ConvertTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Convert::applyToImage
+     * @covers Imbo\Image\Transformation\Transformation::setImagick
+     * @covers Imbo\Image\Transformation\Transformation::getImagick
      */
-    public function testConvertToSameTypeAsImage() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue($this->extension));
-        $image->expects($this->never())->method('getBlob');
-
-        $this->transformation->applyToImage($image);
+    public function testCanSetAndGetImagick() {
+        $imagick = new Imagick();
+        $this->assertSame($this->transformation, $this->transformation->setImagick($imagick));
+        $this->assertSame($imagick, $this->transformation->getImagick());
     }
+
+    /**
+     * @covers Imbo\Image\Transformation\Transformation::getImagick
+     */
+    public function testCanCreateAnImagickInstanceItself() {
+        $this->assertInstanceOf('Imagick', $this->transformation->getImagick());
+    }
+
+    /**
+     * Get different colors and their formatted version
+     *
+     * @return array[]
+     */
+    public function getColors() {
+        return array(
+            array('red', 'red'),
+            array('000', '#000'),
+            array('000000', '#000000'),
+            array('fff', '#fff'),
+            array('FFF', '#FFF'),
+            array('FFF000', '#FFF000'),
+            array('#FFF', '#FFF'),
+            array('#FFF000', '#FFF000'),
+        );
+    }
+
+    /**
+     * @dataProvider getColors
+     * @covers Imbo\Image\Transformation\Transformation::formatColor
+     */
+    public function testCanFormatColors($color, $expected) {
+        $method = new ReflectionMethod('Imbo\Image\Transformation\Transformation', 'formatColor');
+        $method->setAccessible(true);
+
+        $this->assertSame($expected, $method->invoke($this->transformation, $color));
+    }
+}
+
+class TransformationImpl extends Transformation {
+    public function applyToImage(ImageInterface $image) {}
 }

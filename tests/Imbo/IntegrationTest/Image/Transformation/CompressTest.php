@@ -22,49 +22,49 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\UnitTest\Image\Transformation;
+namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Thumbnail;
+use Imbo\Image\Transformation\Compress;
 
 /**
- * @package TestSuite\UnitTests
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\Image\Transformation\Thumbnail
+ * @covers Imbo\Image\Transformation\Compress
  */
-class ThumbnailTest extends TransformationTests {
+class CompressTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
     protected function getTransformation() {
-        return new Thumbnail();
+        return new Compress(array('quality' => 90));
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Thumbnail::applyToImage
+     * {@inheritdoc}
      */
-    public function testApplyToImage() {
-        $width = 80;
-        $height = 90;
-        $fit = 'outbound';
+    protected function getExpectedName() {
+        return 'compress';
+    }
 
+    /**
+     * {@inheritdoc}
+     * @covers Imbo\Image\Transformation\Compress::applyToImage
+     */
+    protected function getImageMock() {
         $image = $this->getMock('Imbo\Image\ImageInterface');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
 
-        $transformation = new Thumbnail(array(
-            'width' => $width,
-            'height' => $height,
-            'fit' => $fit,
-        ));
-        $transformation->applyToImage($image);
+        return $image;
     }
 }

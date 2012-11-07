@@ -31,7 +31,10 @@
 
 namespace Imbo\UnitTest\Database;
 
-use Imbo\Database\MongoDB;
+use Imbo\Database\MongoDB,
+    MongoException,
+    InvalidArgumentException,
+    ReflectionMethod;
 
 /**
  * @package TestSuite\UnitTests
@@ -41,7 +44,7 @@ use Imbo\Database\MongoDB;
  * @link https://github.com/imbo/imbo
  * @covers Imbo\Database\MongoDB
  */
-class GridFSTest extends \PHPUnit_Framework_TestCase {
+class MongoDBTest extends \PHPUnit_Framework_TestCase {
     /**
      * @var Imbo\Database\MongoDB
      */
@@ -58,7 +61,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     private $collection;
 
     /**
-     * Setup method
+     * Set up the mongo and collection mocks and the driver that we want to test
      */
     public function setUp() {
         if (!extension_loaded('mongo')) {
@@ -71,7 +74,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Teardown method
+     * Teardown the instances
      */
     public function tearDown() {
         $this->mongo = null;
@@ -121,5 +124,167 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
         ), $this->isType('array'))->will($this->returnValue($cursor));
 
         $this->assertSame(array(), $this->driver->getImages($publicKey, $query));
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::insertImage
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Unable to save image data
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenMongoFailsDuringInsertImage() {
+        $this->collection->expects($this->once())
+                         ->method('findOne')
+                         ->will($this->throwException(new MongoException()));
+
+        $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Image\ImageInterface'));
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::deleteImage
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Unable to delete image data
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenMongoFailsDuringDeleteImage() {
+        $this->collection->expects($this->once())
+                         ->method('findOne')
+                         ->will($this->throwException(new MongoException()));
+
+        $this->driver->deleteImage('key', 'identifier');
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::updateMetadata
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Unable to update meta data
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenMongoFailsDuringUpdateMetadata() {
+        $this->collection->expects($this->once())
+                         ->method('findOne')
+                         ->will($this->returnValue(array('some' => 'data')));
+
+        $this->collection->expects($this->once())
+                         ->method('update')
+                         ->will($this->throwException(new MongoException()));
+
+        $this->driver->updateMetadata('key', 'identifier', array('key' => 'value'));
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::getMetadata
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Unable to fetch meta data
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenMongoFailsDuringGetMetadata() {
+        $this->collection->expects($this->once())
+                         ->method('findOne')
+                         ->will($this->throwException(new MongoException()));
+
+        $this->driver->getMetadata('key', 'identifier');
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::deleteMetadata
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Unable to delete meta data
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenMongoFailsDuringDeleteMetadata() {
+        $this->collection->expects($this->once())
+                         ->method('findOne')
+                         ->will($this->throwException(new MongoException()));
+
+        $this->driver->deleteMetadata('key', 'identifier');
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::getImages
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Unable to search for images
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenMongoFailsDuringGetImages() {
+        $this->collection->expects($this->once())
+                         ->method('find')
+                         ->will($this->throwException(new MongoException()));
+
+        $this->driver->getImages('key', $this->getMock('Imbo\Resource\Images\QueryInterface'));
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::load
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Unable to fetch image data
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenMongoFailsDuringLoad() {
+        $this->collection->expects($this->once())
+                         ->method('findOne')
+                         ->will($this->throwException(new MongoException()));
+
+        $this->driver->load('key', 'identifier', $this->getMock('Imbo\Image\ImageInterface'));
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::getLastModified
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Unable to fetch image data
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenMongoFailsDuringGetLastModified() {
+        $this->collection->expects($this->once())
+                         ->method('find')
+                         ->will($this->throwException(new MongoException()));
+
+        $this->driver->getLastModified('key');
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::getNumImages
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Unable to fetch information from the database
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenMongoFailsDuringGetNumImages() {
+        $this->collection->expects($this->once())
+                         ->method('find')
+                         ->will($this->throwException(new MongoException()));
+
+        $this->driver->getNumImages('key');
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::getImageMimeType
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Unable to fetch image meta data
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenMongoFailsDuringGetImageMimeType() {
+        $this->collection->expects($this->once())
+                         ->method('findOne')
+                         ->will($this->throwException(new MongoException()));
+
+        $this->driver->getImageMimeType('key', 'identifier');
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::getCollection
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Could not select collection
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenNotAbleToGetCollection() {
+        $driver = new MongoDB(array(), $this->mongo);
+
+        $this->mongo->expects($this->once())
+                    ->method('selectCollection')
+                    ->will($this->throwException(new InvalidArgumentException()));
+
+        $method = new ReflectionMethod('Imbo\Database\MongoDB', 'getCollection');
+        $method->setAccessible(true);
+        $method->invoke($driver);
     }
 }
