@@ -333,10 +333,6 @@ class ImageTest extends ResourceTests {
      * @covers Imbo\Resource\Image::get
      */
     public function testGetWithImageConversion() {
-        if (!class_exists('Imagick')) {
-            $this->markTestSkipped('Imagick must be available to run this test');
-        }
-
         $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
         $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
@@ -392,9 +388,10 @@ class ImageTest extends ResourceTests {
 
         $this->storage->expects($this->once())->method('getImage')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($imageData));
         $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
+        $this->image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/png'));
         $this->image->expects($this->once())->method('setBlob')->with($imageData);
         $this->image->expects($this->once())->method('getBlob')->will($this->returnValue($imageData));
-        $this->contentNegotiation->expects($this->once())->method('isAcceptable')->will($this->returnValue(true));
+        $this->contentNegotiation->expects($this->once())->method('bestMatch')->will($this->returnValue('image/png'));
 
         $this->getNewResource()->get($this->container);
     }
@@ -422,7 +419,6 @@ class ImageTest extends ResourceTests {
 
         $this->storage->expects($this->once())->method('getImage')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($imageData));
         $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
-        $this->contentNegotiation->expects($this->once())->method('isAcceptable')->will($this->returnValue(false));
 
         $this->getNewResource()->get($this->container);
     }
@@ -431,10 +427,6 @@ class ImageTest extends ResourceTests {
      * @covers Imbo\Resource\Image::get
      */
     public function testGetWhenUserAgentDoesNotAcceptOriginalMimeType() {
-        if (!class_exists('Imagick')) {
-            $this->markTestSkipped('Imagick must be available to run this test');
-        }
-
         $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
         $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
@@ -455,7 +447,6 @@ class ImageTest extends ResourceTests {
 
         $this->response->expects($this->once())->method('setBody')->with($this->isType('string'));
 
-        $this->contentNegotiation->expects($this->once())->method('isAcceptable')->with('image/png', array('image/jpeg' => 1))->will($this->returnValue(false));
         $this->contentNegotiation->expects($this->once())->method('bestMatch')->with($this->isType('array'), array('image/jpeg' => 1))->will($this->returnValue('image/jpeg'));
 
         $convert = $this->getMockBuilder('Imbo\Image\Transformation\Convert')->disableOriginalConstructor()->getMock();

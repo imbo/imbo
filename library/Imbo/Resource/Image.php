@@ -257,10 +257,8 @@ class Image extends Resource implements ImageResourceInterface {
         $imageType = $this->image->getMimeType();
         $acceptableTypes = $request->getAcceptableContentTypes();
 
-        if (!$extension && !$this->contentNegotiation->isAcceptable($imageType, $acceptableTypes)) {
-            // No extension specified, and the user agent does not want the original image type
+        if (!$extension) {
             $typesToCheck = ImageObject::$mimeTypes;
-            unset($typesToCheck[$imageType]);
 
             $match = $this->contentNegotiation->bestMatch(array_keys($typesToCheck), $acceptableTypes);
 
@@ -268,7 +266,10 @@ class Image extends Resource implements ImageResourceInterface {
                 throw new ResourceException('Not Acceptable', 406);
             }
 
-            $extension = $typesToCheck[$match];
+            if ($match !== $imageType) {
+                // The match is of a different type than the original image
+                $extension = $typesToCheck[$match];
+            }
         }
 
         if ($extension) {
