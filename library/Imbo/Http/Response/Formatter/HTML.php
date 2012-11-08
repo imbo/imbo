@@ -105,6 +105,12 @@ DOCUMENT;
      * @return string Returns an HTML string
      */
     private function formatError(array $data) {
+        if (!isset($data['error'])) {
+            // If the $data array does not have an error key, this is simply the status resource
+            // reporting that the system is not stable, which is not a regular error
+            return $this->formatStatus($data);
+        }
+
         $title = 'Error';
         $body = <<<ERROR
 <dl>
@@ -129,15 +135,18 @@ ERROR;
      * @return string Returns an HTML string
      */
     private function formatStatus(array $data) {
+        $database = (int) $data['database'];
+        $storage = (int) $data['storage'];
+
         $title = 'Status';
         $body = <<<STATUS
 <dl>
   <dt>Date</dt>
   <dd>{$data['date']}</dd>
   <dt>Database</dt>
-  <dd>{$data['database']}</dd>
+  <dd>$database</dd>
   <dt>Storage</dt>
-  <dd>{$data['storage']}</dd>
+  <dd>$storage</dd>
 </dl>
 STATUS;
 

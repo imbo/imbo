@@ -126,6 +126,12 @@ class XML implements FormatterInterface {
      * @return string Returns an XML string
      */
     private function formatError(array $data) {
+        if (!isset($data['error'])) {
+            // If the $data array does not have an error key, this is simply the status resource
+            // reporting that the system is not stable, which is not a regular error
+            return $this->formatStatus($data);
+        }
+
         $writer = $this->getWriter();
         $this->writeSimpleDocument($writer, 'error', $data['error']);
 
@@ -139,6 +145,9 @@ class XML implements FormatterInterface {
      * @return string Returns an XML string
      */
     private function formatStatus(array $data) {
+        $data['database'] = (int) $data['database'];
+        $data['storage'] = (int) $data['storage'];
+
         $writer = $this->getWriter();
         $this->writeSimpleDocument($writer, 'status', $data);
 
