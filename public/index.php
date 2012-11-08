@@ -136,32 +136,35 @@ $container->request = new Request($_GET, $_POST, $_SERVER);
 $container->response = new Response();
 
 // Event manager
-$container->eventManager = $container->shared(function(Container $container) {
-    $manager = new EventManager($container);
-    $listeners = $container->config['eventListeners'];
+$manager = new EventManager($container);
+$listeners = $container->config['eventListeners'];
 
-    foreach ($listeners as $def) {
-        if (empty($def['listener'])) {
-            throw new InvalidArgumentException('Missing listener definition', 500);
-        }
-
-        $listener = $def['listener'];
-
-        if ($listener instanceof ListenerInterface) {
-            if (!empty($def['publicKeys']) && is_array($def['publicKeys'])) {
-                $listener->setPublicKeys($def['publicKeys']);
-            }
-
-            $manager->attachListener($listener);
-        } else if (is_callable($listener) && !empty($def['events']) && is_array($def['events'])) {
-            $manager->attach($def['events'], $listener);
-        } else {
-            throw new InvalidArgumentException('Invalid listener', 500);
-        }
+foreach ($listeners as $definition) {
+    if ($definition instanceof ListenerInterface) {
+        $manager->attachListener($definition);
+        continue;
     }
 
-    return $manager;
-});
+    if (!is_array($definition) || empty($definition['listener'])) {
+        throw new InvalidArgumentException('Missing listener definition', 500);
+    }
+
+    $listener = $definition['listener'];
+
+    if ($listener instanceof ListenerInterface) {
+        if (!empty($definition['publicKeys']) && is_array($definition['publicKeys'])) {
+            $listener->setPublicKeys($definition['publicKeys']);
+        }
+
+        $manager->attachListener($listener);
+    } else if (is_callable($listener) && !empty($definition['events']) && is_array($definition['events'])) {
+        $manager->attach($definition['events'], $listener);
+    } else {
+        throw new InvalidArgumentException('Invalid listener', 500);
+    }
+}
+
+$container->eventManager = $manager;
 
 // Add a version header
 $container->response->getHeaders()->set('X-Imbo-Version', Version::getVersionNumber());
