@@ -15,6 +15,7 @@ Installation guide
     installation/upgrading
     installation/configuration
     installation/event_listeners
+    installation/cli
 
 End user guide
 --------------
