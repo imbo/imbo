@@ -189,7 +189,7 @@ return array(
         'flipVertically' => function (array $params) {
             return new Image\Transformation\FlipVertically();
         },
-        'maxsize' => function (array $params) {
+        'maxSize' => function (array $params) {
             return new Image\Transformation\MaxSize($params);
         },
         'resize' => function (array $params) {
