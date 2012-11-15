@@ -666,6 +666,8 @@ Imbo ships with a collection of event listeners for you to use. Two of them are 
     :local:
     :depth: 1
 
+.. _access-token-event-listener:
+
 Access token
 ^^^^^^^^^^^^
 
@@ -854,6 +856,51 @@ and is enabled like this:
 which would effectively downsize all images exceeding a ``width`` of ``1024`` or a ``height`` of ``768``.
 
 The event this listener listens for is special in the case that the image resource has executed parts of its logic, and "prepared" the internal image instance available via the ``$event`` object passed to the listener. If the listener would listen for ``image.put.pre`` the ``$event`` object would not yet have an image instance to work with.
+
+CORS (Cross-Origin Resource Sharing)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This event listener can be used to allow clients such as web browsers to use Imbo when the client is located on a different origin/domain than the Imbo server is. This is implemented by sending a set of CORS-headers on specific requests, if the origin of the request matches a configured domain.
+
+The event listener can be configured on a per-resource and per-method basis, and will therefore listen to any related events. If enabled without any specific configuration, the listener will allow and respond to the **GET**, **HEAD** and **OPTIONS** methods on all resources. Note however that no origins are allowed by default and that a client will still need to provide a valid access token, unless the :ref:`access-token-event-listener` listener is disabled.
+
+To enable the listener, use the following:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            array(
+                'listener' => new EventListener\Cors(array(
+                    'allowedOrigins' => array('http://some.origin'),
+                    'allowedMethods' => array(
+                        'image'  => array('GET', 'HEAD', 'PUT'),
+                        'images' => array('GET', 'HEAD'),
+                    ),
+                    'maxAge' => 3600,
+                )),
+
+                // To only open up certain public keys:
+                // 'publicKeys' => array('pubKey1', 'pubKey2')
+            ),
+        ),
+
+        // ...
+    );
+
+``allowedOrigins`` is an array of allowed origins. Specifying ``*`` as a value in the array will allow any origin.
+
+``allowedMethods`` is an associative array where the keys represent the resource (``image``, ``images``, ``metadata``, ``status`` and ``user``). The value is an array of HTTP methods you wish to open up.
+
+``maxAge`` specifies how long the response of an OPTIONS-request can be cached for, in seconds. Defaults to 3600 (one hour).
+
+If you wish to only enable the CORS-listener for a given set of public keys, specify an array with the key ``publicKeys`` alongside ``listener`` in the configuration (see example above).
 
 The event object
 ++++++++++++++++
