@@ -223,7 +223,10 @@ class Request implements RequestInterface {
                     }
                 }
 
-                $this->transformations[$name] = $params;
+                $this->transformations[] = array(
+                    'name'   => $name,
+                    'params' => $params,
+                );
             }
         }
 

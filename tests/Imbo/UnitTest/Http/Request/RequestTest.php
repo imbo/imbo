@@ -54,6 +54,24 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Request\Request::__construct
      * @covers Imbo\Http\Request\Request::getTransformations
      */
+    public function testGetTransformationsWithCorrectOrder() {
+        $query = array(
+            't' => array(
+                'flipHorizontally',
+                'flipVertically',
+            ),
+        );
+
+        $request = new Request($query);
+        $transformations = $request->getTransformations();
+        $this->assertEquals('flipHorizontally', $transformations[0]['name']);
+        $this->assertEquals('flipVertically',   $transformations[1]['name']);
+    }
+
+    /**
+     * @covers Imbo\Http\Request\Request::__construct
+     * @covers Imbo\Http\Request\Request::getTransformations
+     */
     public function testGetTransformations() {
         $query = array(
             't' => array(
@@ -66,20 +84,24 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
                 // Transformations with no options
                 'flipHorizontally',
                 'flipVertically',
+
+                // The same transformation can be applied multiple times
+                'resize:width=50,height=75',
             ),
         );
 
         $request = new Request($query);
         $transformations = $request->getTransformations();
         $this->assertInternalType('array', $transformations);
-        $this->assertSame(6, count($transformations));
+        $this->assertSame(7, count($transformations));
 
-        $this->assertEquals(array('color' => 'fff', 'width' => 2, 'height' => 2), $transformations['border']);
-        $this->assertEquals(array('quality' => '90'), $transformations['compress']);
-        $this->assertEquals(array('x' => 1, 'y' => 2, 'width' => 3, 'height' => 4), $transformations['crop']);
-        $this->assertEquals(array('width' => 100, 'height' => 100), $transformations['resize']);
-        $this->assertEquals(array(), $transformations['flipHorizontally']);
-        $this->assertEquals(array(), $transformations['flipVertically']);
+        $this->assertEquals(array('color' => 'fff', 'width' => 2, 'height' => 2), $transformations[0]['params']);
+        $this->assertEquals(array('quality' => '90'), $transformations[1]['params']);
+        $this->assertEquals(array('x' => 1, 'y' => 2, 'width' => 3, 'height' => 4), $transformations[2]['params']);
+        $this->assertEquals(array('width' => 100, 'height' => 100), $transformations[3]['params']);
+        $this->assertEquals(array(), $transformations[4]['params']);
+        $this->assertEquals(array(), $transformations[5]['params']);
+        $this->assertEquals(array('width' => 50, 'height' => 75), $transformations[6]['params']);
     }
 
     /**
