@@ -31,8 +31,7 @@
 
 namespace Imbo\UnitTest\Http\Request;
 
-use Imbo\Http\Request\Request,
-    Imbo\Image\TransformationChain;
+use Imbo\Http\Request\Request;
 
 /**
  * @package TestSuite\UnitTests
