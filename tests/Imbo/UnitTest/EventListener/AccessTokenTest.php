@@ -136,21 +136,6 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
         $this->listener->invoke($this->event);
     }
 
-    /**
-     * Get a mocked transformation
-     *
-     * @param string $name The name of the transformation
-     * @return Imbo\Image\Transformation\TransformationInterface
-     */
-    private function getMockedTransformation($name) {
-        $mock = $this->getMock('Imbo\Image\Transformation\TransformationInterface');
-        $mock->expects($this->once())
-             ->method('getName')
-             ->will($this->returnValue($name));
-
-        return $mock;
-    }
-
     public function getFilterData() {
         return array(
             array(
@@ -161,58 +146,58 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
             array(
                 $filter = array(),
                 $transformations = array(
-                    $this->getMockedTransformation('convert'),
+                    array('name' => 'convert', 'params' => array()),
                 ),
                 $whitelisted = false,
             ),
             array(
                 $filter = array('transformations' => array('whitelist' => array('convert'))),
                 $transformations = array(
-                    $this->getMockedTransformation('convert'),
+                    array('name' => 'convert', 'params' => array()),
                 ),
                 $whitelisted = true,
             ),
             array(
                 $filter = array('transformations' => array('whitelist' => array('convert'))),
                 $transformations = array(
-                    $this->getMockedTransformation('convert'),
-                    $this->getMockedTransformation('border'),
+                    array('name' => 'convert', 'params' => array()),
+                    array('name' => 'border', 'params' => array()),
                 ),
                 $whitelisted = false,
             ),
             array(
                 $filter = array('transformations' => array('blacklist' => array('convert'))),
                 $transformations = array(
-                    $this->getMockedTransformation('border'),
+                    array('name' => 'border', 'params' => array()),
                 ),
                 $whitelisted = true,
             ),
             array(
                 $filter = array('transformations' => array('blacklist' => array('convert'))),
                 $transformations = array(
-                    $this->getMockedTransformation('convert'),
-                    $this->getMockedTransformation('border'),
+                    array('name' => 'convert', 'params' => array()),
+                    array('name' => 'border', 'params' => array()),
                 ),
                 $whitelisted = false,
             ),
             array(
                 $filter = array('transformations' => array('whitelist' => array('convert'), 'blacklist' => array('border'))),
                 $transformations = array(
-                    $this->getMockedTransformation('convert'),
+                    array('name' => 'convert', 'params' => array()),
                 ),
                 $whitelisted = true,
             ),
             array(
                 $filter = array('transformations' => array('whitelist' => array('convert'), 'blacklist' => array('border'))),
                 $transformations = array(
-                    $this->getMockedTransformation('canvas'),
+                    array('name' => 'canvas', 'params' => array()),
                 ),
                 $whitelisted = false,
             ),
             array(
                 $filter = array('transformations' => array('whitelist' => array('convert'), 'blacklist' => array('convert'))),
                 $transformations = array(
-                    $this->getMockedTransformation('convert'),
+                    array('name' => 'convert', 'params' => array()),
                 ),
                 $whitelisted = false,
             ),

@@ -235,13 +235,15 @@ class Image extends Resource implements ImageResourceInterface {
         // Fetch and apply transformations
         $transformations = $request->getTransformations();
 
-        foreach ($transformations as $name => $params) {
+        foreach ($transformations as $transformation) {
+            $name = $transformation['name'];
+
             if (!isset($this->transformationHandlers[$name])) {
                 throw new ResourceException('Unknown transformation: ' . $name, 400);
             }
 
             $callback = $this->transformationHandlers[$name];
-            $transformation = $callback($params);
+            $transformation = $callback($transformation['params']);
 
             if ($transformation instanceof TransformationInterface) {
                 $transformation->applyToImage($this->image);

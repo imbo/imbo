@@ -165,7 +165,7 @@ class AccessToken extends Listener implements ListenerInterface {
         $transformations = array();
 
         foreach ($request->getTransformations() as $transformation) {
-            $name = $transformation->getName();
+            $name = $transformation['name'];
             $flag = false;
 
             if (isset($blacklist[$name])) {
