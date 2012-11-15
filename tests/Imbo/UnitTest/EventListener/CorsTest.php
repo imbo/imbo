@@ -144,7 +144,7 @@ class CorsTest extends \PHPUnit_Framework_TestCase {
             'image.get.pre',
             'image.put.pre',
             'image.options.pre',
-            
+
             'images.get.pre',
             'images.head.pre',
             'images.options.pre',
@@ -179,7 +179,8 @@ class CorsTest extends \PHPUnit_Framework_TestCase {
         ));
 
         $headers = $this->getMock('Imbo\Http\HeaderContainer');
-        $headers->expects($this->once())->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org');
+        $headers->expects($this->at(0))->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org');
+        $headers->expects($this->at(1))->method('set')->with('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode');
 
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
         $listener->invoke($this->event);
@@ -195,7 +196,8 @@ class CorsTest extends \PHPUnit_Framework_TestCase {
         ));
 
         $headers = $this->getMock('Imbo\Http\HeaderContainer');
-        $headers->expects($this->once())->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org');
+        $headers->expects($this->at(0))->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org');
+        $headers->expects($this->at(1))->method('set')->with('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode');
 
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
         $listener->invoke($this->event);
@@ -251,7 +253,8 @@ class CorsTest extends \PHPUnit_Framework_TestCase {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
 
         $headers = $this->getMock('Imbo\Http\HeaderContainer');
-        $headers->expects($this->once())->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org');
+        $headers->expects($this->at(0))->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org');
+        $headers->expects($this->at(1))->method('set')->with('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode');
 
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
         $listener->invoke($this->event);
