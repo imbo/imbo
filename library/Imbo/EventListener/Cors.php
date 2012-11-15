@@ -136,6 +136,9 @@ class Cors extends Listener implements ListenerInterface {
             // Since this is an OPTIONS-request, there is no need for further parsing
             $response->setStatusCode('204', 'No Content');
             $event->haltApplication(true);
+        } else {
+            // Expose the internal error code in case something should fail
+            $headers->set('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode');
         }
     }
 
