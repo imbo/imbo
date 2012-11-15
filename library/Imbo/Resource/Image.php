@@ -230,7 +230,8 @@ class Image extends Resource implements ImageResourceInterface {
             ->set('X-Imbo-OriginalMimeType', $this->image->getMimeType())
             ->set('X-Imbo-OriginalWidth', $this->image->getWidth())
             ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
-            ->set('X-Imbo-OriginalFileSize', $this->image->getFilesize());
+            ->set('X-Imbo-OriginalFileSize', $this->image->getFilesize())
+            ->set('X-Imbo-OriginalExtension', $this->image->getExtension());
 
         // Fetch and apply transformations
         $transformations = $request->getTransformations();
