@@ -34,7 +34,8 @@ namespace Imbo\EventManager;
 use Imbo\Container,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\HaltApplication;
+    Imbo\Exception\HaltApplication,
+    SplPriorityQueue;
 
 /**
  * Event manager
@@ -72,7 +73,7 @@ class EventManager implements EventManagerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach($events, $callback) {
+    public function attach($events, $callback, $priority = 1) {
         if (!is_array($events)) {
             $events = array($events);
         }
@@ -83,10 +84,10 @@ class EventManager implements EventManagerInterface {
 
         foreach ($events as $event) {
             if (empty($this->events[$event])) {
-                $this->events[$event] = array();
+                $this->events[$event] = new SplPriorityQueue();
             }
 
-            $this->events[$event][] = $callback;
+            $this->events[$event]->insert($callback, $priority);
         }
 
         return $this;
@@ -95,7 +96,7 @@ class EventManager implements EventManagerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attachListener(ListenerInterface $listener) {
+    public function attachListener(ListenerInterface $listener, $priority = 1) {
         // Fetch current public key
         $publicKey = $this->container->get('request')->getPublicKey();
 
