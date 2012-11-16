@@ -31,7 +31,9 @@
 
 namespace Imbo\UnitTest\EventManager;
 
-use Imbo\EventManager\EventManager,
+use Imbo\Container,
+    Imbo\Http\Request\RequestInterface,
+    Imbo\EventManager\EventManager,
     Imbo\EventManager\EventManagerInterface;
 
 /**
@@ -43,9 +45,19 @@ use Imbo\EventManager\EventManager,
  * @covers Imbo\EventManager\EventManager
  */
 class EventManagerTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @var Container
+     */
     private $container;
+
+    /**
+     * @var RequestInterface
+     */
     private $request;
 
+    /**
+     * Set up the event manager
+     */
     public function setUp() {
         $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $this->container = $this->getMock('Imbo\Container');
@@ -53,9 +65,13 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $this->manager = new EventManager($this->container);
     }
 
+    /**
+     * Tear down the event manager
+     */
     public function tearDown() {
         $this->container = null;
         $this->manager = null;
+        $this->request = null;
     }
 
     /**
@@ -63,9 +79,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      * @expectedException InvalidArgumentException
      */
     public function testAttachNonCallableParameter() {
-        $callback = 'some string';
-
-        $this->manager->attach('event', $callback);
+        $this->manager->attach('event', 'some string');
     }
 
     /**
@@ -153,13 +167,20 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $callback2 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
         $callback2->expects($this->never())->method('__invoke');
 
-        $stopper = function($event) { $event->stopPropagation(true); };
+        $callback3 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
+        $callback3->expects($this->once())->method('__invoke');
 
-        $this->manager->attach('event', $callback1)
-                      ->attach('event', $stopper)
-                      ->attach('event', $callback2);
+        $stopper = function($event) {
+            $event->stopPropagation(true);
+        };
+
+        $this->manager->attach('event', $callback1, 3) // Highest priority, triggers first
+                      ->attach('event', $stopper, 2)
+                      ->attach('event', $callback2, 1) // Lower priority, triggers last
+                      ->attach('event2', $callback3);
 
         $this->assertSame($this->manager, $this->manager->trigger('event'));
+        $this->assertSame($this->manager, $this->manager->trigger('event2'));
     }
 
     /**
