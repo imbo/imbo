@@ -53,11 +53,11 @@ use Imbo\EventListener\ListenerInterface,
  */
 class EventManager implements EventManagerInterface {
     /**
-     * Events that can be triggered
+     * Callbacks that can be triggered
      *
      * @var array
      */
-    private $events;
+    private $callbacks;
 
     /**
      * Request instance
@@ -126,11 +126,11 @@ class EventManager implements EventManagerInterface {
         }
 
         foreach ($events as $event) {
-            if (empty($this->events[$event])) {
-                $this->events[$event] = new SplPriorityQueue();
+            if (empty($this->callbacks[$event])) {
+                $this->callbacks[$event] = new SplPriorityQueue();
             }
 
-            $this->events[$event]->insert($callback, $priority);
+            $this->callbacks[$event]->insert($callback, $priority);
         }
 
         return $this;
@@ -162,14 +162,14 @@ class EventManager implements EventManagerInterface {
             }
 
             $listener->$methodName($event);
-        });
+        }, $priority);
     }
 
     /**
      * {@inheritdoc}
      */
     public function trigger($eventName, array $params = array()) {
-        if (!empty($this->events[$eventName])) {
+        if (!empty($this->callbacks[$eventName])) {
             // Create an event instance
             $event = new Event(
                 $eventName, $this->request, $this->response,
@@ -177,7 +177,7 @@ class EventManager implements EventManagerInterface {
             );
 
             // Trigger all listeners for this event and pass in the event instance
-            foreach ($this->events[$eventName] as $callback) {
+            foreach ($this->callbacks[$eventName] as $callback) {
                 $callback($event);
 
                 if ($event->propagationIsStopped()) {
@@ -197,6 +197,6 @@ class EventManager implements EventManagerInterface {
      * {@inheritdoc}
      */
     public function hasListenersForEvent($eventName) {
-        return !empty($this->events[$eventName]);
+        return !empty($this->callbacks[$eventName]);
     }
 }

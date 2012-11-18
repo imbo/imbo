@@ -108,7 +108,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\EventManager::attach
      * @covers Imbo\EventManager\EventManager::trigger
      */
-    public function testCanAttachAndExecuteRegularCallbacks() {
+    public function testCanAttachAndExecuteRegularCallbacksInAPrioritizedFashion() {
         $callback1 = function ($event) { echo 1; };
         $callback2 = function ($event) { echo 2; };
         $callback3 = function ($event) { echo 3; };
@@ -134,13 +134,37 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\EventManager::attachListener
      * @covers Imbo\EventManager\EventManager::trigger
      */
-    public function testCanAttachAndExecuteListeners() {
-        $listener = $this->getMockBuilder('Imbo\EventListener\ListenerInterface')->setMethods(array('getEvents', 'onEventName'))->getMock();
-        $listener->expects($this->once())->method('getEvents')->will($this->returnValue(array('event.name')));
-        $listener->expects($this->once())->method('onEventName')->with($this->isInstanceOf('Imbo\EventManager\EventInterface'));
+    public function testCanAttachAndExecuteListenersInAPrioritizedFashion() {
+        $listener1 = $this->getMockBuilder('Imbo\EventListener\ListenerInterface')
+                         ->setMethods(array('getEvents', 'onEventName'))
+                         ->getMock();
+        $listener1->expects($this->once())
+                  ->method('getEvents')
+                  ->will($this->returnValue(array('event.name')));
+        $listener1->expects($this->once())
+                  ->method('onEventName')
+                  ->with($this->isInstanceOf('Imbo\EventManager\EventInterface'))
+                  ->will($this->returnCallback(function() { echo 1; }));
 
-        $this->assertSame($this->manager, $this->manager->attachListener($listener));
-        $this->assertSame($this->manager, $this->manager->trigger('event.name'));
+        $listener2 = $this->getMockBuilder('Imbo\EventListener\ListenerInterface')
+                         ->setMethods(array('getEvents', 'onEventName'))
+                         ->getMock();
+        $listener2->expects($this->once())
+                  ->method('getEvents')
+                  ->will($this->returnValue(array('event.name')));
+        $listener2->expects($this->once())
+                  ->method('onEventName')
+                  ->with($this->isInstanceOf('Imbo\EventManager\EventInterface'))
+                  ->will($this->returnCallback(function() { echo 2; }));
+
+        $this->expectOutputString("21");
+
+        $this->assertSame(
+            $this->manager,
+            $this->manager->attachListener($listener1, 10)
+                          ->attachListener($listener2, 20)
+                          ->trigger('event.name')
+        );
     }
 
     /**
