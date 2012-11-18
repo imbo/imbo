@@ -31,8 +31,8 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Container,
+use Imbo\EventManager\EventInterface,
+    Imbo\Http\Request\RequestInterface,
     Imbo\Exception\InvalidArgumentException;
 
 /**
@@ -44,7 +44,7 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Metadata extends Resource implements ResourceInterface {
+class Metadata extends Resource implements MetadataInterface {
     /**
      * {@inheritdoc}
      */
@@ -61,10 +61,23 @@ class Metadata extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete(Container $container) {
-        $request = $container->request;
-        $database = $container->database;
-        $response = $container->response;
+    public function getEvents() {
+        return array(
+            'metadata.get',
+            'metadata.post',
+            'metadata.put',
+            'metadata.delete',
+            'metadata.head',
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onMetadataDelete(EventInterface $event) {
+        $request = $event->getRequest();
+        $database = $event->getDatabase();
+        $response = $event->getResponse();
 
         $imageIdentifier = $request->getImageIdentifier();
 
@@ -78,10 +91,10 @@ class Metadata extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function put(Container $container) {
-        $request = $container->request;
-        $database = $container->database;
-        $response = $container->response;
+    public function onMetadataPut(EventInterface $event) {
+        $request = $event->getRequest();
+        $database = $event->getDatabase();
+        $response = $event->getResponse();
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
@@ -111,10 +124,10 @@ class Metadata extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function post(Container $container) {
-        $request = $container->request;
-        $database = $container->database;
-        $response = $container->response;
+    public function onMetadataPost(EventInterface $event) {
+        $request = $event->getRequest();
+        $database = $event->getDatabase();
+        $response = $event->getResponse();
 
         $imageIdentifier = $request->getImageIdentifier();
 
@@ -145,10 +158,10 @@ class Metadata extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function get(Container $container) {
-        $request = $container->request;
-        $database = $container->database;
-        $response = $container->response;
+    public function onMetadataGet(EventInterface $event) {
+        $request = $event->getRequest();
+        $database = $event->getDatabase();
+        $response = $event->getResponse();
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
@@ -168,10 +181,10 @@ class Metadata extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function head(Container $container) {
-        $this->get($container);
+    public function onMetadataHead(EventInterface $event) {
+        $this->onMetadataGet($event);
 
         // Remove body from the response, but keep everything else
-        $container->response->setBody(null);
+        $event->getResponse()->setBody(null);
     }
 }

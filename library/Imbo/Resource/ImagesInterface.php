@@ -32,7 +32,8 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Resource\Images\QueryInterface;
+use Imbo\Resource\Images\QueryInterface,
+    Imbo\EventManager\EventInterface;
 
 /**
  * Images resource interface
@@ -62,4 +63,18 @@ interface ImagesInterface extends ResourceInterface {
      * @return ImagesInterface
      */
     function setQuery(QueryInterface $query);
+
+    /**
+     * Handle GET requests
+     *
+     * @param EventInterface $event The current event
+     */
+    function onImagesGet(EventInterface $event);
+
+    /**
+     * Handle HEAD requests
+     *
+     * @param EventInterface $event The current event
+     */
+    function onImagesHead(EventInterface $event);
 }

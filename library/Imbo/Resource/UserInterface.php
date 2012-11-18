@@ -35,7 +35,7 @@ namespace Imbo\Resource;
 use Imbo\EventManager\EventInterface;
 
 /**
- * Image resource interface
+ * User resource interface
  *
  * @package Interfaces
  * @subpackage Resources
@@ -44,44 +44,18 @@ use Imbo\EventManager\EventInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-interface ImageInterface extends ResourceInterface {
-    /**
-     * Handle PUT requests
-     *
-     * @param EventInterface
-     */
-    function onImagePut(EventInterface $event);
-
-    /**
-     * Handle DELETE requests
-     *
-     * @param EventInterface
-     */
-    function onImageDelete(EventInterface $event);
-
+interface UserInterface extends ResourceInterface {
     /**
      * Handle GET requests
      *
-     * @param EventInterface
+     * @param EventInterface $event The current event
      */
-    function onImageGet(EventInterface $event);
+    function onUserGet(EventInterface $event);
 
     /**
      * Handle HEAD requests
      *
-     * @param EventInterface
+     * @param EventInterface $event The current event
      */
-    function onImageHead(EventInterface $event);
-
-    /**
-     * Register an image transformation handler
-     *
-     * @param string $name The name of the transformation, as used in the query parameters
-     * @param callable $callback A piece of code that can be executed. The callback will receive a
-     *                           single parameter: $params, which is an array with parameters
-     *                           associated with the transformation. The callable must return an
-     *                           instance of Imbo\Image\Transformation\TransformationInterface
-     * @return ResourceInterface
-     */
-    function registerTransformationHandler($name, $callback);
+    function onUserHead(EventInterface $event);
 }

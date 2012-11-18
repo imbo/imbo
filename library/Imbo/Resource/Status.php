@@ -32,7 +32,7 @@
 namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
-    Imbo\Container,
+    Imbo\EventManager\EventInterface,
     DateTime;
 
 /**
@@ -47,7 +47,7 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Status extends Resource implements ResourceInterface {
+class Status extends Resource implements StatusInterface {
     /**
      * {@inheritdoc}
      */
@@ -61,10 +61,20 @@ class Status extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function get(Container $container) {
-        $response = $container->response;
-        $database = $container->database;
-        $storage = $container->storage;
+    public function getEvents() {
+        return array(
+            'status.get',
+            'status.head',
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onStatusGet(EventInterface $event) {
+        $response = $event->getResponse();
+        $database = $event->getDatabase();
+        $storage = $event->getStorage();
 
         $response->getHeaders()->set('Cache-Control', 'max-age=0');
 
@@ -93,10 +103,10 @@ class Status extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function head(Container $container) {
-        $this->get($container);
+    public function onStatusHead(EventInterface $event) {
+        $this->onStatusGet($event);
 
         // Remove body from the response, but keep everything else
-        $container->response->setBody(null);
+        $event->getResponse()->setBody(null);
     }
 }

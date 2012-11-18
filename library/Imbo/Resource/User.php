@@ -32,7 +32,7 @@
 namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
-    Imbo\Container;
+    Imbo\EventManager\EventInterface;
 
 /**
  * User resource
@@ -43,7 +43,7 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class User extends Resource implements ResourceInterface {
+class User extends Resource implements UserInterface {
     /**
      * {@inheritdoc}
      */
@@ -57,10 +57,20 @@ class User extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function get(Container $container) {
-        $request = $container->request;
-        $response = $container->response;
-        $database = $container->database;
+    public function getEvents() {
+        return array(
+            'user.get',
+            'user.head',
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onUserGet(EventInterface $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        $database = $event->getDatabase();
 
         $publicKey = $request->getPublicKey();
 
@@ -88,10 +98,10 @@ class User extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function head(Container $container) {
-        $this->get($container);
+    public function onUserHead(EventInterface $event) {
+        $this->onUserGet($event);
 
         // Remove body from the response, but keep everything else
-        $container->response->setBody(null);
+        $event->getResponse()->setBody(null);
     }
 }

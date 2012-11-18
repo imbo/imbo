@@ -31,10 +31,8 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Container,
-    Imbo\Resource\ResourceInterface,
+use Imbo\EventManager\EventInterface,
     Imbo\Exception\ResourceException,
-    Imbo\EventManager\EventManagerInterface,
     DateTime;
 
 /**
@@ -49,57 +47,6 @@ use Imbo\Container,
  * @link https://github.com/imbo/imbo
  */
 abstract class Resource implements ResourceInterface {
-    /**
-     * Event manager
-     *
-     * @var Imbo\EventManager\EventManagerInterface
-     */
-    protected $eventManager;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function post(Container $container) {
-        throw new ResourceException('Method not allowed', 405);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function get(Container $container) {
-        throw new ResourceException('Method not allowed', 405);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function head(Container $container) {
-        throw new ResourceException('Method not allowed', 405);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function delete(Container $container) {
-        throw new ResourceException('Method not allowed', 405);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function put(Container $container) {
-        throw new ResourceException('Method not allowed', 405);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEventManager(EventManagerInterface $eventManager) {
-        $this->eventManager = $eventManager;
-
-        return $this;
-    }
-
     /**
      * Get a formatted date
      *

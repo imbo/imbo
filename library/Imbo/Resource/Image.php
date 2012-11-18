@@ -31,8 +31,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Container,
-    Imbo\Http\Request\RequestInterface,
+use Imbo\Http\Request\RequestInterface,
     Imbo\Image\Image as ImageObject,
     Imbo\Image\ImageInterface,
     Imbo\Image\ImagePreparation,
@@ -42,7 +41,8 @@ use Imbo\Container,
     Imbo\Image\Transformation\Convert,
     Imbo\Image\Transformation\TransformationInterface,
     Imbo\Http\ContentNegotiation,
-    Imbo\Resource\ImageInterface as ImageResourceInterface;
+    Imbo\Resource\ImageInterface as ImageResourceInterface,
+    Imbo\EventManager\EventInterface;
 
 /**
  * Image resource
@@ -122,15 +122,27 @@ class Image extends Resource implements ImageResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function put(Container $container) {
-        // Prepare the image based on the input stream in the request
-        $this->imagePreparation->prepareImage($container->request, $this->image);
-        $this->eventManager->trigger('image.put.imagepreparation.post');
+    public function getEvents() {
+        return array(
+            'image.get',
+            'image.head',
+            'image.delete',
+            'image.put',
+        );
+    }
 
-        $request = $container->request;
-        $response = $container->response;
-        $database = $container->database;
-        $storage = $container->storage;
+    /**
+     * {@inheritdoc}
+     */
+    public function onImagePut(EventInterface $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        $database = $event->getDatabase();
+        $storage = $event->getStorage();
+
+        // Prepare the image based on the input stream in the request
+        $this->imagePreparation->prepareImage($request, $this->image);
+        $event->getManager()->trigger('image.put.imagepreparation.post');
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getRealImageIdentifier();
@@ -155,11 +167,11 @@ class Image extends Resource implements ImageResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete(Container $container) {
-        $request = $container->request;
-        $response = $container->response;
-        $database = $container->database;
-        $storage = $container->storage;
+    public function onImageDelete(EventInterface $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        $database = $event->getDatabase();
+        $storage = $event->getStorage();
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
@@ -175,11 +187,11 @@ class Image extends Resource implements ImageResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function get(Container $container) {
-        $request = $container->request;
-        $response = $container->response;
-        $database = $container->database;
-        $storage = $container->storage;
+    public function onImageGet(EventInterface $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        $database = $event->getDatabase();
+        $storage = $event->getStorage();
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
@@ -226,9 +238,7 @@ class Image extends Resource implements ImageResourceInterface {
             ->set('X-Imbo-OriginalExtension', $this->image->getExtension());
 
         // Fetch and apply transformations
-        $transformations = $request->getTransformations();
-
-        foreach ($transformations as $transformation) {
+        foreach ($request->getTransformations() as $transformation) {
             $name = $transformation['name'];
 
             if (!isset($this->transformationHandlers[$name])) {
@@ -269,7 +279,7 @@ class Image extends Resource implements ImageResourceInterface {
 
         if ($extension) {
             // Trigger a conversion
-            $callback = $container->config['transformations']['convert'];
+            $callback = $this->transformationHandlers['convert'];
 
             $convert = $callback(array('type' => $extension));
             $convert->applyToImage($this->image);
@@ -286,11 +296,11 @@ class Image extends Resource implements ImageResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function head(Container $container) {
-        $this->get($container);
+    public function onImageHead(EventInterface $event) {
+        $this->onImageGet($event);
 
         // Remove body from the response, but keep everything else
-        $container->response->setBody(null);
+        $event->getResponse()->setBody(null);
     }
 
     /**

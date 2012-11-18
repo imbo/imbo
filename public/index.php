@@ -35,6 +35,7 @@ namespace Imbo;
 use Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface,
     Imbo\EventListener\ListenerInterface,
+    Imbo\EventListener\PublicKeyAwareListenerInterface,
     Imbo\Http\Request\Request,
     Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\Response,
@@ -50,14 +51,13 @@ use Imbo\Database\DatabaseInterface,
 $configPath = __DIR__ . '/../config/config.php';
 $config = require $configPath;
 
-// Create a new DIC and inject the configuration
+// Create the container and inject some properties
 $container = new Container();
 $container->config = $config;
-
-// Image object that can be used by the image resource
-$container->image = $container->shared(function(Container $container) {
-    return new Image();
-});
+$container->request = new Request($_GET, $_POST, $_SERVER);
+$container->response = new Response();
+$container->response->getHeaders()->set('X-Imbo-Version', Version::getVersionNumber());
+$container->image = new Image();
 
 // Resources
 $container->metadataResource = $container->shared(function(Container $container) {
@@ -66,24 +66,20 @@ $container->metadataResource = $container->shared(function(Container $container)
 $container->imagesResource = $container->shared(function(Container $container) {
     return new Resource\Images();
 });
-$container->imageResource = $container->shared(function(Container $container) {
-    $resource = new Resource\Image($container->image);
-
-    // If there are any query parameters present in the URL, register all the transformations found
-    // in the configuration file
-    if ($container->request->getQuery()->has('t') && isset($container->config['transformations'])) {
-        foreach ($container->config['transformations'] as $name => $callback) {
-            $resource->registerTransformationHandler($name, $callback);
-        }
-    }
-
-    return $resource;
-});
 $container->userResource = $container->shared(function(Container $container) {
     return new Resource\User();
 });
 $container->statusResource = $container->shared(function(Container $container) {
     return new Resource\Status();
+});
+$container->imageResource = $container->shared(function(Container $container) {
+    $imageResource = new Resource\Image($container->image);
+
+    foreach ($container->config['transformations'] as $name => $callback) {
+        $imageResource->registerTransformationHandler($name, $callback);
+    }
+
+    return $imageResource;
 });
 
 // Router
@@ -131,43 +127,54 @@ $container->storage = $container->shared(function(Container $container) {
     return $driver;
 });
 
-// Create request and response objects
-$container->request = new Request($_GET, $_POST, $_SERVER);
-$container->response = new Response();
+// Create the event manager and add listeners
+$container->eventManager = $container->shared(function(Container $container) {
+    $manager = new EventManager(
+        $container->request, $container->response, $container->database, $container->storage
+    );
 
-// Event manager
-$manager = new EventManager($container);
-$listeners = $container->config['eventListeners'];
+    // Register internal event listeners
+    $manager->attachListener($container->statusResource, 50)
+            ->attachListener($container->userResource, 50)
+            ->attachListener($container->imagesResource, 50)
+            ->attachListener($container->imageResource, 50)
+            ->attachListener($container->metadataResource, 50)
+            ->attachListener($container->response, 50);
 
-foreach ($listeners as $definition) {
-    if ($definition instanceof ListenerInterface) {
-        $manager->attachListener($definition);
-        continue;
-    }
+    // Register event listeners from the configuration
+    $listeners = $container->config['eventListeners'];
 
-    if (!is_array($definition) || empty($definition['listener'])) {
-        throw new InvalidArgumentException('Missing listener definition', 500);
-    }
-
-    $listener = $definition['listener'];
-
-    if ($listener instanceof ListenerInterface) {
-        if (!empty($definition['publicKeys']) && is_array($definition['publicKeys'])) {
-            $listener->setPublicKeys($definition['publicKeys']);
+    foreach ($listeners as $definition) {
+        if ($definition instanceof ListenerInterface) {
+            $manager->attachListener($definition);
+            continue;
         }
 
-        $manager->attachListener($listener);
-    } else if (is_callable($listener) && !empty($definition['events']) && is_array($definition['events'])) {
-        $manager->attach($definition['events'], $listener);
-    } else {
-        throw new InvalidArgumentException('Invalid listener', 500);
+        if (!is_array($definition) || empty($definition['listener'])) {
+            throw new InvalidArgumentException('Missing listener definition', 500);
+        }
+
+        $listener = $definition['listener'];
+
+        if ($listener instanceof ListenerInterface) {
+            if (
+                $listener instanceof PublicKeyAwareListenerInterface &&
+                !empty($definition['publicKeys']) &&
+                is_array($definition['publicKeys'])
+            ) {
+                $listener->setPublicKeys($definition['publicKeys']);
+            }
+
+            $manager->attachListener($listener);
+        } else if (is_callable($listener) && !empty($definition['events']) && is_array($definition['events'])) {
+            $manager->attach($definition['events'], $listener);
+        } else {
+            throw new InvalidArgumentException('Invalid listener', 500);
+        }
     }
-}
 
-$container->eventManager = $manager;
-
-// Add a version header
-$container->response->getHeaders()->set('X-Imbo-Version', Version::getVersionNumber());
+    return $manager;
+});
 
 // Create the front controller and handle the request
 $frontController = new FrontController($container);
@@ -184,6 +191,4 @@ try {
     $container->response->createError($exception, $container->request);
 }
 
-// Send the response to the client
 $container->eventManager->trigger('response.send');
-$container->response->send();

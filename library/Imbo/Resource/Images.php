@@ -34,7 +34,7 @@ namespace Imbo\Resource;
 use Imbo\Http\Request\RequestInterface,
     Imbo\Resource\Images\Query,
     Imbo\Resource\Images\QueryInterface,
-    Imbo\Container,
+    Imbo\EventManager\EventInterface,
     DateTime;
 
 /**
@@ -97,10 +97,20 @@ class Images extends Resource implements ImagesInterface {
     /**
      * {@inheritdoc}
      */
-    public function get(Container $container) {
-        $request = $container->request;
-        $response = $container->response;
-        $database = $container->database;
+    public function getEvents() {
+        return array(
+            'images.get',
+            'images.head',
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onImagesGet(EventInterface $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        $database = $event->getDatabase();
 
         $publicKey = $request->getPublicKey();
 
@@ -158,10 +168,10 @@ class Images extends Resource implements ImagesInterface {
     /**
      * {@inheritdoc}
      */
-    public function head(Container $container) {
-        $this->get($container);
+    public function onImagesHead(EventInterface $event) {
+        $this->onImagesGet($event);
 
         // Remove body from the response, but keep everything else
-        $container->response->setBody(null);
+        $event->getResponse()->setBody(null);
     }
 }
