@@ -43,7 +43,7 @@ use Imbo\EventManager\EventInterface;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class NotModified extends Listener implements ListenerInterface {
+class NotModified implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
@@ -56,11 +56,12 @@ class NotModified extends Listener implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function invoke(EventInterface $event) {
-        $container = $event->getContainer();
+    public function onResponseSend(EventInterface $event) {
+        $response = $event->getResponse();
+        $request = $event->getRequest();
 
-        $responseHeaders = $container->response->getHeaders();
-        $requestHeaders = $container->request->getHeaders();
+        $responseHeaders = $response->getHeaders();
+        $requestHeaders = $request->getHeaders();
 
         $ifModifiedSince = $requestHeaders->get('if-modified-since');
         $ifNoneMatch = $requestHeaders->get('if-none-match');
@@ -73,7 +74,7 @@ class NotModified extends Listener implements ListenerInterface {
                 $etag === $ifNoneMatch
             )
         ) {
-            $container->response->setNotModified();
+            $response->setNotModified();
         }
     }
 }
