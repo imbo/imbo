@@ -31,10 +31,15 @@
 
 namespace Imbo\EventManager;
 
-use Imbo\Container,
-    Imbo\EventListener\ListenerInterface,
+use Imbo\EventListener\ListenerInterface,
+    Imbo\EventListener\PublicKeyAwareListenerInterface,
     Imbo\Exception\InvalidArgumentException,
+    Imbo\Exception\RuntimeException,
     Imbo\Exception\HaltApplication,
+    Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface,
     SplPriorityQueue;
 
 /**
@@ -48,26 +53,54 @@ use Imbo\Container,
  */
 class EventManager implements EventManagerInterface {
     /**
-     * Different events that can be triggerd
+     * Events that can be triggered
      *
      * @var array
      */
     private $events;
 
     /**
-     * Container instance
+     * Request instance
      *
-     * @var Container
+     * @var RequestInterface
      */
-    private $container;
+    private $request;
+
+    /**
+     * Response instance
+     *
+     * @var ResponseInterface
+     */
+    private $response;
+
+    /**
+     * Database instance
+     *
+     * @var DatabaseInterface
+     */
+    private $database;
+
+    /**
+     * Storage instance
+     *
+     * @var StorageInterface
+     */
+    private $storage;
 
     /**
      * Class constructor
      *
-     * @param Container $container Instance of a container
+     * @param RequestInterface $request Request instance
+     * @param ResponseInterface $response Response instance
+     * @param DatabaseInterface $database Database instance
+     * @param StorageInterface $storage Storage instance
      */
-    public function __construct(Container $container) {
-        $this->container = $container;
+    public function __construct(RequestInterface $request, ResponseInterface $response,
+                                DatabaseInterface $database, StorageInterface $storage) {
+        $this->request = $request;
+        $this->response = $response;
+        $this->database = $database;
+        $this->storage = $storage;
     }
 
     /**
@@ -97,32 +130,54 @@ class EventManager implements EventManagerInterface {
      * {@inheritdoc}
      */
     public function attachListener(ListenerInterface $listener, $priority = 1) {
-        // Fetch current public key
-        $publicKey = $this->container->get('request')->getPublicKey();
+        if ($listener instanceof PublicKeyAwareListenerInterface && !$listener->triggersFor($this->request->getPublicKey())) {
+            return $this;
+        }
 
-        // Fetch the keys the listener is to be triggered for
-        $keys = $listener->getPublicKeys();
+        return $this->attach($listener->getEvents(), function (EventInterface $event) use ($listener) {
+            $eventName = $event->getName();
 
-        if (empty($keys) || in_array($publicKey, $keys)) {
-            // Either no keys have been specified, or the listener wants to trigger for the current
-            // key
-            return $this->attach($listener->getEvents(), function(EventInterface $event) use ($listener) {
-                $name = preg_replace_callback(
-                    "#(\.)([a-z]{1})#",
-                    function ($matches) {
-                        return strtoupper($matches[2]);
-                    },
-                    $event->getName()
-                );
+            $methodName = preg_replace_callback(
+                "#(\.)([a-z]{1})#",
+                function ($matches) {
+                    return strtoupper($matches[2]);
+                },
+                $eventName
+            );
 
-                $name = 'on' . ucfirst($name);
+            $methodName = 'on' . ucfirst($methodName);
 
-                if (method_exists($listener, $name)) {
-                    $listener->$name($event);
-                } else {
-                    $listener->invoke($event);
+            if (!method_exists($listener, $methodName)) {
+                throw new RuntimeException(get_class($listener) . ' can not execute "' . $eventName . '"');
+            }
+
+            $listener->$methodName($event);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function trigger($eventName, array $params = array()) {
+        if (!empty($this->events[$eventName])) {
+            // Create an event instance
+            $event = new Event(
+                $eventName, $this->request, $this->response,
+                $this->database, $this->storage, $this, $params
+            );
+
+            // Trigger all listeners for this event and pass in the event instance
+            foreach ($this->events[$eventName] as $callback) {
+                $callback($event);
+
+                if ($event->propagationIsStopped()) {
+                    break;
                 }
-            });
+            }
+
+            if ($event->applicationIsHalted()) {
+                throw new HaltApplication();
+            }
         }
 
         return $this;
@@ -131,25 +186,7 @@ class EventManager implements EventManagerInterface {
     /**
      * {@inheritdoc}
      */
-    public function trigger($event, array $params = array()) {
-        if (!empty($this->events[$event])) {
-            // Create an event instance
-            $e = new Event($event, $this->container, $params);
-
-            // Trigger all listeners for this event and pass in the event instance
-            foreach ($this->events[$event] as $callback) {
-                $callback($e);
-
-                if ($e->propagationIsStopped()) {
-                    break;
-                }
-            }
-
-            if ($e->applicationIsHalted()) {
-                throw new HaltApplication();
-            }
-        }
-
-        return $this;
+    public function hasListenersForEvent($eventName) {
+        return !empty($this->events[$eventName]);
     }
 }

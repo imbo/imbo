@@ -34,6 +34,7 @@ namespace Imbo\EventManager;
 
 use Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
+    Imbo\Exception\RuntimeException,
     Imbo\Exception\HaltApplication;
 
 /**
@@ -59,22 +60,31 @@ interface EventManagerInterface {
     function attach($events, $callback, $priority = 1);
 
     /**
-     * Attach a listener to the event manager
+     * Attach an event listener
      *
      * @param ListenerInterface $listener The listener to attach
-     * @param int $priority Priority of the callback
+     * @param int $priority Priority of the listener
      * @return EventManagerInterface
+     * @throws RuntimeException
      */
     function attachListener(ListenerInterface $listener, $priority = 1);
 
     /**
      * Trigger a given event
      *
-     * @param string $event The event to trigger
+     * @param string $eventName The name of the event to trigger
      * @param array $params Optional extra parameters to send to the event listeners for the current
      *                      event
      * @throws HaltApplication
      * @return EventManagerInterface
      */
-    function trigger($event, array $params = array());
+    function trigger($eventName, array $params = array());
+
+    /**
+     * Whether or not the manager has event listeners that subscribes to a specific event
+     *
+     * @param string $eventName The name of the event to check
+     * @return boolean
+     */
+    function hasListenersForEvent($eventName);
 }

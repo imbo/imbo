@@ -22,48 +22,45 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\UnitTests
+ * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\UnitTest\EventListener;
-
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\Listener;
+namespace Imbo\EventListener;
 
 /**
- * @package TestSuite\UnitTests
+ * Abstract public key aware event listener
+ *
+ * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\EventListener\Listener
  */
-class ListenerTest extends \PHPUnit_Framework_TestCase {
-    public function setUp() {
-        $this->listener = new SomeListener();
-    }
+abstract class PublicKeyAwareListener implements PublicKeyAwareListenerInterface {
+    /**
+     * Public keys this listener should trigger for
+     *
+     * @var array
+     */
+    private $publicKeys = array();
 
-    public function tearDown() {
-        $this->listener = null;
+    /**
+     * {@inheritdoc}
+     */
+    public function setPublicKeys(array $keys) {
+        $this->publicKeys = $keys;
+
+        return $this;
     }
 
     /**
-     * @covers Imbo\EventListener\Listener::getPublicKeys
-     * @covers Imbo\EventListener\Listener::setPublicKeys
+     * {@inheritdoc}
      */
-    public function testSetAndGetPublicKeys() {
-        $this->assertSame(array(), $this->listener->getPublicKeys());
-        $keys = array('key1', 'key2');
-        $this->assertSame($this->listener, $this->listener->setPublicKeys($keys));
-        $this->assertSame($keys, $this->listener->getPublicKeys());
+    public function triggersFor($publicKey) {
+        return empty($this->publicKeys) || in_array($publicKey, $this->publicKeys);
     }
-}
-
-class SomeListener extends Listener {
-    public function getEvents() {}
-    public function invoke(EventInterface $event) {}
 }

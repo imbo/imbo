@@ -31,8 +31,7 @@
 
 namespace Imbo\UnitTest\EventManager;
 
-use Imbo\Container,
-    Imbo\Http\Request\RequestInterface,
+use Imbo\Http\Request\RequestInterface,
     Imbo\EventManager\EventManager,
     Imbo\EventManager\EventManagerInterface;
 
@@ -46,39 +45,57 @@ use Imbo\Container,
  */
 class EventManagerTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var Container
-     */
-    private $container;
-
-    /**
      * @var RequestInterface
      */
     private $request;
 
     /**
+     * @var ResponseInterface
+     */
+    private $response;
+
+    /**
+     * @var DatabaseInterface
+     */
+    private $database;
+
+    /**
+     * @var StorageInterface
+     */
+    private $storage;
+
+    /**
      * Set up the event manager
+     *
+     * @covers Imbo\EventManager\EventManager::__construct
      */
     public function setUp() {
         $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->container = $this->getMock('Imbo\Container');
-        $this->container->expects($this->any())->method('get')->with('request')->will($this->returnValue($this->request));
-        $this->manager = new EventManager($this->container);
+        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
+
+        $this->manager = new EventManager(
+            $this->request, $this->response, $this->database, $this->storage
+        );
     }
 
     /**
      * Tear down the event manager
      */
     public function tearDown() {
-        $this->container = null;
         $this->manager = null;
         $this->request = null;
+        $this->response = null;
+        $this->database = null;
+        $this->storage = null;
     }
 
     /**
      * @covers Imbo\EventManager\EventManager::attach
      * @expectedException InvalidArgumentException
      */
-    public function testAttachNonCallableParameter() {
+    public function testThrowsExceptionIfCallbackIsNotCallable() {
         $this->manager->attach('event', 'some string');
     }
 
@@ -86,21 +103,21 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\EventManager::attach
      * @covers Imbo\EventManager\EventManager::trigger
      */
-    public function testAttachAndTriggerEvents() {
-        $callback1 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
-        $callback1->expects($this->exactly(2))->method('__invoke');
+    public function testCanAttachAndExecuteRegularCallbacks() {
+        $callback1 = function ($event) { echo 1; };
+        $callback2 = function ($event) { echo 2; };
+        $callback3 = function ($event) { echo 3; };
 
-        $callback2 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
-        $callback2->expects($this->once())->method('__invoke');
+        $this->assertSame(
+            $this->manager,
+            $this->manager->attach('event1', $callback1)
+                          ->attach('event2', $callback2, 1)
+                          ->attach('event2', $callback3, 2)
+                          ->attach('event3', $callback3)
+                          ->attach('event4', $callback1)
+        );
 
-        $callback3 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
-        $callback4 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
-
-        $this->manager->attach('event1', $callback1)
-                      ->attach('event2', $callback2)
-                      ->attach('event3', $callback3)
-                      ->attach('event2', $callback4)
-                      ->attach('event4', $callback1);
+        $this->expectOutputString('1321');
 
         $this->manager->trigger('otherevent')
                       ->trigger('event1')
@@ -112,75 +129,37 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\EventManager::attachListener
      * @covers Imbo\EventManager\EventManager::trigger
      */
-    public function testAttachListener() {
-        $listener = $this->getMock('Imbo\EventListener\ListenerInterface');
-        $listener->expects($this->once())->method('getEvents')->will($this->returnValue(array('event')));
-        $listener->expects($this->once())->method('invoke')->with($this->isInstanceOf('Imbo\EventManager\EventInterface'));
+    public function testCanAttachAndExecuteListeners() {
+        $listener = $this->getMockBuilder('Imbo\EventListener\ListenerInterface')->setMethods(array('getEvents', 'onEventName'))->getMock();
+        $listener->expects($this->once())->method('getEvents')->will($this->returnValue(array('event.name')));
+        $listener->expects($this->once())->method('onEventName')->with($this->isInstanceOf('Imbo\EventManager\EventInterface'));
 
-        $this->manager->attachListener($listener);
-        $this->manager->trigger('event');
-    }
-
-    /**
-     * @covers Imbo\EventManager\EventManager::attachListener
-     * @covers Imbo\EventManager\EventManager::trigger
-     */
-    public function testAttachListenerWithSpecificPublicKey() {
-        $listener1 = $this->getMock('Imbo\EventListener\ListenerInterface');
-        $listener1->expects($this->once())->method('getEvents')->will($this->returnValue(array('event')));
-        $listener1->expects($this->once())->method('invoke')->with($this->isInstanceOf('Imbo\EventManager\EventInterface'));
-        $listener1->expects($this->once())->method('getPublicKeys')->will($this->returnValue(array('key')));
-
-        $listener2 = $this->getMock('Imbo\EventListener\ListenerInterface');
-        $listener2->expects($this->never())->method('invoke');
-        $listener2->expects($this->once())->method('getPublicKeys')->will($this->returnValue(array('key2')));
-
-        $this->request->expects($this->exactly(2))->method('getPublicKey')->will($this->returnValue('key'));
-
-        $this->manager->attachListener($listener1)->attachListener($listener2);
-        $this->manager->trigger('event');
-    }
-
-    /**
-     * @covers Imbo\EventManager\EventManager::attachListener
-     * @covers Imbo\EventManager\EventManager::trigger
-     */
-    public function testAttachListenerWithSpecificPublicKeyThatDoesNotEqualCurrent() {
-        $listener = $this->getMock('Imbo\EventListener\ListenerInterface');
-        $listener->expects($this->never())->method('getEvents');
-        $listener->expects($this->never())->method('invoke');
-        $listener->expects($this->once())->method('getPublicKeys')->will($this->returnValue(array('key')));
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('otherkey'));
-
-        $this->manager->attachListener($listener);
-        $this->manager->trigger('event');
+        $this->assertSame($this->manager, $this->manager->attachListener($listener));
+        $this->assertSame($this->manager, $this->manager->trigger('event.name'));
     }
 
     /**
      * @covers Imbo\EventManager\EventManager::trigger
      */
-    public function testListenerCanStopPropagation() {
-        $callback1 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
-        $callback1->expects($this->once())->method('__invoke');
-
-        $callback2 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
-        $callback2->expects($this->never())->method('__invoke');
-
-        $callback3 = $this->getMockBuilder('stdClass')->setMethods(array('__invoke'))->getMock();
-        $callback3->expects($this->once())->method('__invoke');
-
+    public function testLetsListenerStopPropagation() {
+        $callback1 = function($event) { echo 1; };
+        $callback2 = function($event) { echo 2; };
+        $callback3 = function($event) { echo 3; };
         $stopper = function($event) {
             $event->stopPropagation(true);
         };
 
-        $this->manager->attach('event', $callback1, 3) // Highest priority, triggers first
+        $this->manager->attach('event', $callback1, 3)
                       ->attach('event', $stopper, 2)
-                      ->attach('event', $callback2, 1) // Lower priority, triggers last
-                      ->attach('event2', $callback3);
+                      ->attach('event', $callback2, 1)
+                      ->attach('otherevent', $callback3);
 
-        $this->assertSame($this->manager, $this->manager->trigger('event'));
-        $this->assertSame($this->manager, $this->manager->trigger('event2'));
+        $this->expectOutputString('13');
+        $this->assertSame(
+            $this->manager,
+            $this->manager->trigger('event')
+                          ->trigger('otherevent')
+        );
     }
 
     /**
@@ -194,29 +173,57 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\EventManager\EventManager::trigger
+     * @expectedException Imbo\Exception\RuntimeException
+     * @expectedExceptionMessage can not execute "event.foo"
+     */
+    public function testThrowsExceptionWhenListenerIsMissingEventMethod() {
+        $listener = $this->getMockBuilder('Imbo\EventListener\ListenerInterface')->setMethods(array('getEvents'))->getMock();
+        $listener->expects($this->once())->method('getEvents')->will($this->returnValue(array('event.foo')));
+
+        $this->manager->attachListener($listener);
+        $this->manager->trigger('event.foo');
+    }
+
+    /**
+     * @covers Imbo\EventManager\EventManager::hasListenersForEvent
+     */
+    public function testCanCheckIfTheManagerHasListenersForSpecificEvents() {
+        $this->manager->attach('event', function($event) {});
+        $this->assertFalse($this->manager->hasListenersForEvent('some.event'));
+        $this->assertTrue($this->manager->hasListenersForEvent('event'));
+    }
+
+    /**
      * @covers Imbo\EventManager\EventManager::attachListener
      */
-    public function testListenersCanHaveCustomMethodsForEachEvent() {
-        $listener = $this->getMock('Imbo\EventListener\ListenerInterface', array(
-            'invoke',
-            'getEvents',
-            'getPublicKeys',
-            'setPublicKeys',
-            'onEvent',
-            'onEventPre'
-        ));
-        $listener->expects($this->once())->method('getEvents')->will($this->returnValue(array(
-            'event',
-            'event.pre',
-            'event.post',
-        )));
-        $listener->expects($this->once())->method('invoke');
-        $listener->expects($this->once())->method('onEvent');
-        $listener->expects($this->once())->method('onEventPre');
+    public function testWillNotTriggerPublicKeyAwareListenersIfTheyDoNotContainTheCurrentPublicKey() {
+        $publicKey = 'key';
+        $this->request->expects($this->exactly(2))->method('getPublicKey')->will($this->returnValue($publicKey));
 
-        $this->manager->attachListener($listener)
-                      ->trigger('event')
-                      ->trigger('event.pre')
-                      ->trigger('event.post');
+        $listener1 = $this->getMockBuilder('Imbo\EventListener\PublicKeyAwareListenerInterface')
+                          ->setMethods(array('getEvents', 'setPublicKeys', 'triggersFor'))
+                          ->getMock();
+        $listener1->expects($this->once())
+                  ->method('triggersFor')
+                  ->with($publicKey)
+                  ->will($this->returnValue(false));
+
+        $listener2 = $this->getMockBuilder('Imbo\EventListener\PublicKeyAwareListenerInterface')
+                          ->setMethods(
+                              array('getEvents', 'setPublicKeys', 'triggersFor', 'onEvent')
+                          )
+                          ->getMock();
+        $listener2->expects($this->once())
+                  ->method('triggersFor')
+                  ->with($publicKey)
+                  ->will($this->returnValue(true));
+        $listener2->expects($this->once())
+                  ->method('getEvents')
+                  ->will($this->returnValue(array('event')));
+        $listener2->expects($this->once())->method('onEvent');
+
+        $this->manager->attachListener($listener1)
+                      ->attachListener($listener2)
+                      ->trigger('event');
     }
 }

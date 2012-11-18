@@ -22,31 +22,54 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Interfaces
- * @subpackage EventListener
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\EventListener;
+namespace Imbo\UnitTest\EventListener;
+
+use Imbo\EventManager\EventInterface,
+    Imbo\EventListener\PublicKeyAwareListener;
 
 /**
- * Internal event listener interface
- *
- * @package Interfaces
- * @subpackage EventListener
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\EventListener\PublicKeyAwareListener
  */
-interface InternalListenerInterface {
+class PublicKeyAwareListenerTest extends \PHPUnit_Framework_TestCase {
     /**
-     * Return the events this listener wants to listen for
-     *
-     * @return array
+     * @covers Imbo\EventListener\PublicKeyAwareListener::triggersFor
      */
-    function getEvents();
+    public function testWillTriggerIfNoPublicKeysHaveBeenSet() {
+        $listener = new SomeListener();
+        $this->assertTrue($listener->triggersFor('key'));
+    }
+
+    /**
+     * @covers Imbo\EventListener\PublicKeyAwareListener::setPublicKeys
+     * @covers Imbo\EventListener\PublicKeyAwareListener::triggersFor
+     */
+    public function testWillNotTriggerIfItContainsTheCurrentPublicKey() {
+        $listener = new SomeListener();
+        $listener->setPublicKeys(array('key1', 'key2'));
+        $this->assertTrue($listener->triggersFor('key1'));
+        $this->assertTrue($listener->triggersFor('key2'));
+        $this->assertFalse($listener->triggersFor('key3'));
+    }
+}
+
+/**
+ * Dummy implementation
+ */
+class SomeListener extends PublicKeyAwareListener {
+    /**
+     * {@inheritdoc}
+     */
+    public function getEvents() { return array('event'); }
 }

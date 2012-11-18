@@ -22,7 +22,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package EventListener
+ * @package Interfaces
+ * @subpackage EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
@@ -31,36 +32,32 @@
 
 namespace Imbo\EventListener;
 
+use Imbo\EventManager\EventInterface,
+    Imbo\Exception;
+
 /**
- * Abstract event listener
+ * Public key aware listener interface
  *
- * @package EventListener
+ * @package Interfaces
+ * @subpackage EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-abstract class Listener implements ListenerInterface {
+interface PublicKeyAwareListenerInterface extends ListenerInterface {
     /**
-     * Public keys this listener should trigger for
+     * Set the list of public keys the listener should be triggered for
      *
-     * @var array
+     * @param array $keys An array of public keys
+     * @return ListenerInterface
      */
-    private $publicKeys = array();
+    function setPublicKeys(array $keys);
 
     /**
-     * {@inheritdoc}
+     * Whether or not the current listener triggers for a given public key
+     *
+     * @return boolean
      */
-    public function getPublicKeys() {
-        return $this->publicKeys;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setPublicKeys(array $keys) {
-        $this->publicKeys = $keys;
-
-        return $this;
-    }
+    function triggersFor($publicKey);
 }
