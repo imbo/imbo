@@ -65,37 +65,40 @@ class Application implements ListenerInterface {
         $response = $event->getResponse();
         $manager = $event->getManager();
         $params = $event->getParams();
+        $config = $event->getConfig();
+
+        $container = $params['container'];
 
         $resource = $request->getResource();
         $entry = $resource . 'Resource';
 
-        if (!$this->container->has($entry)) {
+        if (!$container->has($entry)) {
             throw new RuntimeException('Unknown Resource', 500);
         }
 
-        $resource = $this->container->$entry;
+        $resource = $container->$entry;
 
         // Add some response headers
-        $responseHeaders = $this->container->response->getHeaders();
+        $responseHeaders = $response->getHeaders();
 
         // Inform the user agent of which methods are allowed against this resource
         $responseHeaders->set('Allow', implode(', ', $resource->getAllowedMethods()));
 
         // Add Accept to Vary if the client has not specified a specific extension, in which we
         // won't do any content negotiation at all.
-        if (!$this->container->request->getExtension()) {
+        if (!$request->getExtension()) {
             $responseHeaders->set('Vary', 'Accept');
         }
 
         // Fetch the real image identifier (PUT only) or the one from the URL (if present)
-        if (($identifier = $this->container->request->getRealImageIdentifier()) ||
-            ($identifier = $this->container->request->getImageIdentifier())) {
+        if (($identifier = $request->getRealImageIdentifier()) ||
+            ($identifier = $request->getImageIdentifier())) {
             $responseHeaders->set('X-Imbo-ImageIdentifier', $identifier);
         }
 
         // Fetch auth config
-        $authConfig = $this->container->config['auth'];
-        $publicKey = $this->container->request->getPublicKey();
+        $authConfig = $config['auth'];
+        $publicKey = $request->getPublicKey();
 
         // See if the public key exists
         if ($publicKey) {
@@ -108,18 +111,18 @@ class Application implements ListenerInterface {
 
             // Fetch the private key from the config and store it in the request
             $privateKey = $authConfig[$publicKey];
-            $this->container->request->setPrivateKey($privateKey);
+            $request->setPrivateKey($privateKey);
         }
 
-        $methodName = strtolower($this->container->request->getMethod());
+        $methodName = strtolower($request->getMethod());
 
         // Generate the event name based on the accessed resource and the HTTP method
-        $eventName = $this->container->request->getResource() . '.' . $methodName;
+        $eventName = $request->getResource() . '.' . $methodName;
 
-        if (!$this->container->eventManager->hasListenersForEvent($eventName)) {
+        if (!$manager->hasListenersForEvent($eventName)) {
             throw new RuntimeException('Method not allowed', 405);
         }
 
-        $this->container->eventManager->trigger($eventName);
+        $manager->trigger($eventName);
     }
 }
