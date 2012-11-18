@@ -58,6 +58,7 @@ $container->request = new Request($_GET, $_POST, $_SERVER);
 $container->response = new Response();
 $container->response->getHeaders()->set('X-Imbo-Version', Version::getVersionNumber());
 $container->image = new Image();
+$container->application = new Application();
 
 // Resources
 $container->metadataResource = $container->shared(function(Container $container) {
@@ -130,7 +131,7 @@ $container->storage = $container->shared(function(Container $container) {
 // Create the event manager and add listeners
 $container->eventManager = $container->shared(function(Container $container) {
     $manager = new EventManager(
-        $container->request, $container->response, $container->database, $container->storage
+        $container->request, $container->response, $container->database, $container->storage, $container->config
     );
 
     // Register internal event listeners
@@ -139,7 +140,9 @@ $container->eventManager = $container->shared(function(Container $container) {
             ->attachListener($container->imagesResource, 50)
             ->attachListener($container->imageResource, 50)
             ->attachListener($container->metadataResource, 50)
-            ->attachListener($container->response, 50);
+            ->attachListener($container->response, 50)
+            ->attachListener($container->router, 50)
+            ->attachListener($container->application, 50);
 
     // Register event listeners from the configuration
     $listeners = $container->config['eventListeners'];
@@ -176,11 +179,9 @@ $container->eventManager = $container->shared(function(Container $container) {
     return $manager;
 });
 
-// Create the front controller and handle the request
-$frontController = new FrontController($container);
-
 try {
-    $frontController->run();
+    $container->eventManager->trigger('route')
+                            ->trigger('run', array('container' => $container));
 } catch (HaltApplication $exception) {
     // Special type of exception that the event manager can throw if an event listener wants to
     // halt the execution of Imbo. No special action should be taken, simply send the response
