@@ -80,6 +80,11 @@ class EventTest extends \PHPUnit_Framework_TestCase {
     /**
      * @var array
      */
+    private $config = array('config' => 'value');
+
+    /**
+     * @var array
+     */
     private $params = array('key' => 'value');
 
     /**
@@ -93,7 +98,7 @@ class EventTest extends \PHPUnit_Framework_TestCase {
         $this->manager = $this->getMock('Imbo\EventManager\EventManagerInterface');
 
         $this->event = new Event($this->name, $this->request, $this->response, $this->database,
-                                 $this->storage, $this->manager, $this->params);
+                                 $this->storage, $this->manager, $this->config, $this->params);
     }
 
     /**
@@ -116,6 +121,7 @@ class EventTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\Event::getDatabase
      * @covers Imbo\EventManager\Event::getStorage
      * @covers Imbo\EventManager\Event::getManager
+     * @covers Imbo\EventManager\Event::getConfig
      * @covers Imbo\EventManager\Event::getParams
      */
     public function testEvent() {
@@ -125,6 +131,7 @@ class EventTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->database, $this->event->getDatabase());
         $this->assertSame($this->storage, $this->event->getStorage());
         $this->assertSame($this->manager, $this->event->getManager());
+        $this->assertSame($this->config, $this->event->getConfig());
         $this->assertSame($this->params, $this->event->getParams());
     }
 

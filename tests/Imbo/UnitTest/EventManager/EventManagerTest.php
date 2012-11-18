@@ -65,6 +65,11 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
     private $storage;
 
     /**
+     * @var array
+     */
+    private $config = array('config' => 'value');
+
+    /**
      * Set up the event manager
      *
      * @covers Imbo\EventManager\EventManager::__construct
@@ -76,7 +81,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
 
         $this->manager = new EventManager(
-            $this->request, $this->response, $this->database, $this->storage
+            $this->request, $this->response, $this->database, $this->storage, $this->config
         );
     }
 

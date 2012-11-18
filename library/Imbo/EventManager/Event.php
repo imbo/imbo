@@ -89,6 +89,13 @@ class Event implements EventInterface {
     private $eventManager;
 
     /**
+     * Imbo configuration
+     *
+     * @var array
+     */
+    private $config;
+
+    /**
      * Propagation flag
      *
      * @var boolean
@@ -118,11 +125,13 @@ class Event implements EventInterface {
      * @param DatabaseInterface $database Database instance
      * @param StorageInterface $storage Storage instance
      * @param EventManagerInterface $eventManager The event manager instance
+     * @param array $config Imbo configuration
      * @param array $params Optional parameters
      */
     public function __construct(
         $name, RequestInterface $request, ResponseInterface $response, DatabaseInterface $database,
-        StorageInterface $storage, EventManagerInterface $eventManager, array $params = array()
+        StorageInterface $storage, EventManagerInterface $eventManager, array $config,
+        array $params = array()
     ) {
         $this->name = $name;
         $this->request = $request;
@@ -130,6 +139,7 @@ class Event implements EventInterface {
         $this->database = $database;
         $this->storage = $storage;
         $this->eventManager = $eventManager;
+        $this->config = $config;
         $this->params = $params;
     }
 
@@ -173,6 +183,13 @@ class Event implements EventInterface {
      */
     public function getManager() {
         return $this->eventManager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfig() {
+        return $this->config;
     }
 
     /**

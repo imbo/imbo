@@ -88,19 +88,29 @@ class EventManager implements EventManagerInterface {
     private $storage;
 
     /**
+     * Imbo configuration
+     *
+     * @var array
+     */
+    private $config;
+
+    /**
      * Class constructor
      *
      * @param RequestInterface $request Request instance
      * @param ResponseInterface $response Response instance
      * @param DatabaseInterface $database Database instance
      * @param StorageInterface $storage Storage instance
+     * @param array $config Imbo configuration
      */
     public function __construct(RequestInterface $request, ResponseInterface $response,
-                                DatabaseInterface $database, StorageInterface $storage) {
+                                DatabaseInterface $database, StorageInterface $storage,
+                                array $config) {
         $this->request = $request;
         $this->response = $response;
         $this->database = $database;
         $this->storage = $storage;
+        $this->config = $config;
     }
 
     /**
@@ -163,7 +173,7 @@ class EventManager implements EventManagerInterface {
             // Create an event instance
             $event = new Event(
                 $eventName, $this->request, $this->response,
-                $this->database, $this->storage, $this, $params
+                $this->database, $this->storage, $this, $this->config, $params
             );
 
             // Trigger all listeners for this event and pass in the event instance

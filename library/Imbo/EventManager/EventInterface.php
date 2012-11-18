@@ -91,6 +91,13 @@ interface EventInterface {
     function getManager();
 
     /**
+     * Get the Imbo configuration
+     *
+     * @return array
+     */
+    function getConfig();
+
+    /**
      * Whether or not to stop the execution of more listeners for the current event
      *
      * @param boolean $flag True to stop, false to continue
