@@ -114,13 +114,18 @@ class EventTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\Event::getRequest
      * @covers Imbo\EventManager\Event::getResponse
      * @covers Imbo\EventManager\Event::getDatabase
-     * @covers Imbo\EventManager\Event::getRequest
+     * @covers Imbo\EventManager\Event::getStorage
      * @covers Imbo\EventManager\Event::getManager
      * @covers Imbo\EventManager\Event::getParams
      */
     public function testEvent() {
         $this->assertSame($this->name, $this->event->getName());
         $this->assertSame($this->request, $this->event->getRequest());
+        $this->assertSame($this->response, $this->event->getResponse());
+        $this->assertSame($this->database, $this->event->getDatabase());
+        $this->assertSame($this->storage, $this->event->getStorage());
+        $this->assertSame($this->manager, $this->event->getManager());
+        $this->assertSame($this->params, $this->event->getParams());
     }
 
     /**

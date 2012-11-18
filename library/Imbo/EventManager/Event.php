@@ -125,8 +125,8 @@ class Event implements EventInterface {
         StorageInterface $storage, EventManagerInterface $eventManager, array $params = array()
     ) {
         $this->name = $name;
-        $this->request= $request;
-        $this->respones = $response;
+        $this->request = $request;
+        $this->response = $response;
         $this->database = $database;
         $this->storage = $storage;
         $this->eventManager = $eventManager;
