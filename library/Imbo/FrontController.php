@@ -110,9 +110,6 @@ class FrontController {
             $request->setExtension($matches['extension']);
         }
 
-        // Attach the event manager to the resource
-        $resource->setEventManager($this->container->eventManager);
-
         return $resource;
     }
 
@@ -177,15 +174,10 @@ class FrontController {
         // Generate the event name based on the accessed resource and the HTTP method
         $eventName = $this->container->request->getResource() . '.' . $methodName;
 
-        // Trigger the pre event on the resource so we may react to unsupported events
-        $this->container->eventManager->trigger($eventName . '.pre');
-
-        // See if the HTTP method is supported at all
-        if (!method_exists($resource, $methodName)) {
+        if (!$this->container->eventManager->hasListenersForEvent($eventName)) {
             throw new RuntimeException('Method not allowed', 405);
         }
 
-        $resource->$methodName($this->container);
-        $this->container->eventManager->trigger($eventName . '.post');
+        $this->container->eventManager->trigger($eventName);
     }
 }
