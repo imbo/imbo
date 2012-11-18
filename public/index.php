@@ -168,7 +168,9 @@ $container->eventManager = $container->shared(function(Container $container) {
                 $listener->setPublicKeys($definition['publicKeys']);
             }
 
-            $manager->attachListener($listener);
+            $priority = isset($definition['priority']) ? $definition['priority'] : 1;
+
+            $manager->attachListener($listener, $priority);
         } else if (is_callable($listener) && !empty($definition['events']) && is_array($definition['events'])) {
             $manager->attach($definition['events'], $listener);
         } else {
