@@ -32,6 +32,7 @@
 namespace Imbo\Http\Response;
 
 use Imbo\Http\HeaderContainer,
+    Imbo\EventManager\EventInterface,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
     DateTime;
@@ -226,7 +227,7 @@ class Response implements ResponseInterface {
     /**
      * {@inheritdoc}
      */
-    public function send() {
+    public function onResponseSend(EventInterface $event) {
         $this->sendHeaders();
         $this->sendContent();
     }
@@ -300,6 +301,13 @@ class Response implements ResponseInterface {
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEvents() {
+        return array('response.send');
     }
 
     /**

@@ -33,6 +33,8 @@
 namespace Imbo\Http\Response;
 
 use Imbo\Http\HeaderContainer,
+    Imbo\EventManager\EventInterface,
+    Imbo\EventListener\ListenerInterface,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface;
 
@@ -46,7 +48,7 @@ use Imbo\Http\HeaderContainer,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-interface ResponseInterface {
+interface ResponseInterface extends ListenerInterface {
     /**
      * Get the status code
      *
@@ -75,7 +77,7 @@ interface ResponseInterface {
      * Set the header container
      *
      * @param HeaderContainer $headers Container of headers
-     * @return ResponesInterface
+     * @return ResponseInterface
      */
     function setHeaders(HeaderContainer $headers);
 
@@ -110,9 +112,11 @@ interface ResponseInterface {
     function setProtocolVersion($version);
 
     /**
-     * Send the response to the client (headers and content)
+     * Send the response
+     *
+     * @param EventInterface $event An event instance
      */
-    function send();
+    function onResponseSend(EventInterface $event);
 
     /**
      * Prepare the response to send 304 Not Modified to the client
