@@ -31,7 +31,12 @@
 
 namespace Imbo\UnitTest\EventManager;
 
-use Imbo\EventManager\Event;
+use Imbo\EventManager\Event,
+    Imbo\EventManager\EventManagerInterface,
+    Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface;
 
 /**
  * @package TestSuite\UnitTests
@@ -43,18 +48,79 @@ use Imbo\EventManager\Event;
  */
 class EventTest extends \PHPUnit_Framework_TestCase {
     /**
+     * @var string
+     */
+    private $name = 'some.event.name';
+
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
+     * @var ResponseInterface
+     */
+    private $response;
+
+    /**
+     * @var DatabaseInterface
+     */
+    private $database;
+
+    /**
+     * @var StorageInterface
+     */
+    private $storage;
+
+    /**
+     * @var EventManagerInterface
+     */
+    private $manager;
+
+    /**
+     * @var array
+     */
+    private $params = array('key' => 'value');
+
+    /**
+     * Set up the event instance
+     */
+    public function setUp() {
+        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
+        $this->manager = $this->getMock('Imbo\EventManager\EventManagerInterface');
+
+        $this->event = new Event($this->name, $this->request, $this->response, $this->database,
+                                 $this->storage, $this->manager, $this->params);
+    }
+
+    /**
+     * Set up the event instance
+     */
+    public function tearDown() {
+        $this->event = null;
+        $this->request = null;
+        $this->response = null;
+        $this->database = null;
+        $this->storage = null;
+        $this->manager = null;
+    }
+
+    /**
      * @covers Imbo\EventManager\Event::__construct
      * @covers Imbo\EventManager\Event::getName
-     * @covers Imbo\EventManager\Event::getContainer
+     * @covers Imbo\EventManager\Event::getRequest
+     * @covers Imbo\EventManager\Event::getResponse
+     * @covers Imbo\EventManager\Event::getDatabase
+     * @covers Imbo\EventManager\Event::getRequest
+     * @covers Imbo\EventManager\Event::getManager
+     * @covers Imbo\EventManager\Event::getParams
      */
     public function testEvent() {
-        $name = 'some.event.name';
-        $container = $this->getMock('Imbo\Container');
-
-        $event = new Event($name, $container);
-
-        $this->assertSame($name, $event->getName());
-        $this->assertSame($container, $event->getContainer());
+        $this->assertSame($this->name, $this->event->getName());
+        $this->assertSame($this->request, $this->event->getRequest());
     }
 
     /**
@@ -62,12 +128,11 @@ class EventTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\Event::stopPropagation
      */
     public function testPropagationCanBeStopped() {
-        $event = new Event('name', $this->getMock('Imbo\Container'));
-        $this->assertFalse($event->propagationIsStopped());
-        $this->assertSame($event, $event->stopPropagation(true));
-        $this->assertTrue($event->propagationIsStopped());
-        $this->assertSame($event, $event->stopPropagation(false));
-        $this->assertFalse($event->propagationIsStopped());
+        $this->assertFalse($this->event->propagationIsStopped());
+        $this->assertSame($this->event, $this->event->stopPropagation(true));
+        $this->assertTrue($this->event->propagationIsStopped());
+        $this->assertSame($this->event, $this->event->stopPropagation(false));
+        $this->assertFalse($this->event->propagationIsStopped());
     }
 
     /**
@@ -75,21 +140,10 @@ class EventTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\Event::haltApplication
      */
     public function testApplicationCanBeHalted() {
-        $event = new Event('name', $this->getMock('Imbo\Container'));
-        $this->assertFalse($event->applicationIsHalted());
-        $this->assertSame($event, $event->haltApplication(true));
-        $this->assertTrue($event->applicationIsHalted());
-        $this->assertSame($event, $event->haltApplication(false));
-        $this->assertFalse($event->applicationIsHalted());
-    }
-
-    /**
-     * @covers Imbo\EventManager\Event::__construct
-     * @covers Imbo\EventManager\Event::getParams
-     */
-    public function testCanUseParameters() {
-        $params = array('some' => 'param');
-        $event = new Event('name', $this->getMock('Imbo\Container'), $params);
-        $this->assertSame($params, $event->getParams());
+        $this->assertFalse($this->event->applicationIsHalted());
+        $this->assertSame($this->event, $this->event->haltApplication(true));
+        $this->assertTrue($this->event->applicationIsHalted());
+        $this->assertSame($this->event, $this->event->haltApplication(false));
+        $this->assertFalse($this->event->applicationIsHalted());
     }
 }

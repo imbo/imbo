@@ -32,6 +32,11 @@
 
 namespace Imbo\EventManager;
 
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface;
+
 /**
  * Event interface
  *
@@ -51,11 +56,39 @@ interface EventInterface {
     function getName();
 
     /**
-     * Get the container instance
+     * Get the request instance
      *
-     * @return Imbo\Container
+     * @return RequestInterface
      */
-    function getContainer();
+    function getRequest();
+
+    /**
+     * Get the response instance
+     *
+     * @return ResponseInterface
+     */
+    function getResponse();
+
+    /**
+     * Get the database adapter
+     *
+     * @return DatabaseInterface
+     */
+    function getDatabase();
+
+    /**
+     * Get the storage adapter
+     *
+     * @return StorageInterface
+     */
+    function getStorage();
+
+    /**
+     * Get the event manager that triggered the event
+     *
+     * @return EventManagerInterface
+     */
+    function getManager();
 
     /**
      * Whether or not to stop the execution of more listeners for the current event

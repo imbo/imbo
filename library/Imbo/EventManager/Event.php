@@ -31,7 +31,10 @@
 
 namespace Imbo\EventManager;
 
-use Imbo\Container;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface;
 
 /**
  * Event class
@@ -51,11 +54,39 @@ class Event implements EventInterface {
     private $name;
 
     /**
-     * Container instance
+     * Request instance
      *
-     * @var Container
+     * @var RequestInterface
      */
-    private $container;
+    private $request;
+
+    /**
+     * Response instance
+     *
+     * @var ResponseInterface
+     */
+    private $response;
+
+    /**
+     * The database adapter
+     *
+     * @var DatabaseInterface
+     */
+    private $database;
+
+    /**
+     * The storage adapter
+     *
+     * @var StorageInterface
+     */
+    private $storage;
+
+    /**
+     * The event manager
+     *
+     * @var EventManagerInterface
+     */
+    private $eventManager;
 
     /**
      * Propagation flag
@@ -82,12 +113,23 @@ class Event implements EventInterface {
      * Class contsructor
      *
      * @param string $name The name of the current event
-     * @param Container $container Container instance
+     * @param RequestInterface $request Request instance
+     * @param ResponseInterface $response Response instance
+     * @param DatabaseInterface $database Database instance
+     * @param StorageInterface $storage Storage instance
+     * @param EventManagerInterface $eventManager The event manager instance
      * @param array $params Optional parameters
      */
-    public function __construct($name, Container $container, array $params = array()) {
+    public function __construct(
+        $name, RequestInterface $request, ResponseInterface $response, DatabaseInterface $database,
+        StorageInterface $storage, EventManagerInterface $eventManager, array $params = array()
+    ) {
         $this->name = $name;
-        $this->container = $container;
+        $this->request= $request;
+        $this->respones = $response;
+        $this->database = $database;
+        $this->storage = $storage;
+        $this->eventManager = $eventManager;
         $this->params = $params;
     }
 
@@ -101,8 +143,36 @@ class Event implements EventInterface {
     /**
      * {@inheritdoc}
      */
-    public function getContainer() {
-        return $this->container;
+    public function getRequest() {
+        return $this->request;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResponse() {
+        return $this->response;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDatabase() {
+        return $this->database;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStorage() {
+        return $this->storage;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getManager() {
+        return $this->eventManager;
     }
 
     /**
