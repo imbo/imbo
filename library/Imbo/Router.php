@@ -32,6 +32,8 @@
 namespace Imbo;
 
 use Imbo\Resource\ResourceInterface,
+    Imbo\Http\Request\RequestInterface,
+    Imbo\EventManager\EventInterface,
     Imbo\Exception\RuntimeException;
 
 /**
@@ -44,6 +46,21 @@ use Imbo\Resource\ResourceInterface,
  * @link https://github.com/imbo/imbo
  */
 class Router implements RouterInterface {
+    /**
+     * HTTP methods supported one way or another in Imbo
+     *
+     * @var array
+     */
+    static private $supportedHttpMethods = array(
+        RequestInterface::METHOD_GET     => true,
+        RequestInterface::METHOD_POST    => true,
+        RequestInterface::METHOD_PUT     => true,
+        RequestInterface::METHOD_HEAD    => true,
+        RequestInterface::METHOD_DELETE  => true,
+        RequestInterface::METHOD_BREW    => true,
+        RequestInterface::METHOD_OPTIONS => true,
+    );
+
     /**
      * The different routes that imbo handles
      *
@@ -74,7 +91,28 @@ class Router implements RouterInterface {
     /**
      * {@inheritdoc}
      */
-    public function resolve($path, array &$matches) {
+    public function getEvents() {
+        return array('route');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onRoute(EventInterface $event) {
+        $request = $event->getRequest();
+        $httpMethod = $request->getMethod();
+
+        if ($httpMethod === RequestInterface::METHOD_BREW) {
+            throw new RuntimeException('I\'m a teapot!', 418);
+        }
+
+        if (!isset(self::$supportedHttpMethods[$httpMethod])) {
+            throw new RuntimeException('Unsupported HTTP method: ' . $httpMethod, 501);
+        }
+
+        $path = $request->getPath();
+        $matches = array();
+
         foreach ($this->routes as $resourceName => $route) {
             if (preg_match($route, $path, $matches)) {
                 break;
@@ -86,13 +124,19 @@ class Router implements RouterInterface {
             throw new RuntimeException('Not Found', 404);
         }
 
-        $matches['resourceName'] = $resourceName;
-        $entry = $resourceName . 'Resource';
+        // Set the resource name
+        $request->setResource($resourceName);
 
-        if (!$this->container->has($entry)) {
-            throw new RuntimeException('Unknown Resource', 500);
+        if (!empty($matches['publicKey'])) {
+            $request->setPublicKey($matches['publicKey']);
         }
 
-        return $this->container->$entry;
+        if (isset($matches['imageIdentifier'])) {
+            $request->setImageIdentifier($matches['imageIdentifier']);
+        }
+
+        if (isset($matches['extension'])) {
+            $request->setExtension($matches['extension']);
+        }
     }
 }

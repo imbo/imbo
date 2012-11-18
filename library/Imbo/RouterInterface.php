@@ -31,9 +31,8 @@
 
 namespace Imbo;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Resource\ResourceInterface,
-    Imbo\Exception\RuntimeException;
+use Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface;
 
 /**
  * Router interface
@@ -44,16 +43,11 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-interface RouterInterface {
+interface RouterInterface extends ListenerInterface {
     /**
      * Resolve the current route
      *
-     * @param string $path The path currently requested
-     * @param array $matches The different named subpatterns in the regular expressions (routes)
-     *                       will be stored in this array
-     * @return ResourceInterface The resource that handles the path
-     * @throws RuntimeException Throws an exception if the $path is not recognized or of the
-     *                          resource does not exist in the Container instance
+     * @param EventInterface $event An event instance
      */
-    function resolve($path, array &$matches);
+    function onRoute(EventInterface $event);
 }
