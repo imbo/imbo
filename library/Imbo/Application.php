@@ -31,15 +31,13 @@
 
 namespace Imbo;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface,
-    Imbo\Resource\ResourceInterface,
+use Imbo\EventManager\EventInterface,
+    Imbo\EventListener\ListenerInterface,
     Imbo\Exception\RuntimeException,
-    Imbo\Exception,
-    Imbo\Image\Image;
+    Imbo\Exception;
 
 /**
- * Front controller
+ * Imbo application
  *
  * @package Core
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -47,90 +45,35 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class FrontController {
+class Application implements ListenerInterface {
     /**
-     * Dependency injection container
-     *
-     * @var Container
+     * {@inheritdoc}
      */
-    private $container;
-
-    /**
-     * HTTP methods supported one way or another in Imbo
-     *
-     * @var array
-     */
-    static private $supportedHttpMethods = array(
-        RequestInterface::METHOD_GET     => true,
-        RequestInterface::METHOD_POST    => true,
-        RequestInterface::METHOD_PUT     => true,
-        RequestInterface::METHOD_HEAD    => true,
-        RequestInterface::METHOD_DELETE  => true,
-        RequestInterface::METHOD_BREW    => true,
-        RequestInterface::METHOD_OPTIONS => true,
-    );
-
-    /**
-     * Class constructor
-     *
-     * @param Container $container A container instance
-     */
-    public function __construct(Container $container) {
-        $this->container = $container;
+    public function getEvents() {
+        return array(
+            'run',
+        );
     }
 
     /**
-     * Create a resource object based on the request
+     * Run the application
      *
-     * @param RequestInterface $request A request instance
-     * @return ResourceInterface
-     * @throws RuntimeException
+     * @param EventInterface $event An event instance
      */
-    private function resolveResource(RequestInterface $request) {
-        $matches = array();
-        $resource = $this->container->router->resolve($request->getPath(), $matches);
+    public function onRun(EventInterface $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        $manager = $event->getManager();
+        $params = $event->getParams();
 
-        $this->container->eventManager->trigger('route.resolved', $matches);
+        $resource = $request->getResource();
+        $entry = $resource . 'Resource';
 
-        // Set the resource name
-        if (!empty($matches['resourceName'])) {
-            $request->setResource($matches['resourceName']);
+        if (!$this->container->has($entry)) {
+            throw new RuntimeException('Unknown Resource', 500);
         }
 
-        // Extract some information from the path and store in the request instance
-        if (!empty($matches['publicKey'])) {
-            $request->setPublicKey($matches['publicKey']);
-        }
-
-        if (isset($matches['imageIdentifier'])) {
-            $request->setImageIdentifier($matches['imageIdentifier']);
-        }
-
-        if (isset($matches['extension'])) {
-            $request->setExtension($matches['extension']);
-        }
-
-        return $resource;
-    }
-
-    /**
-     * Handle a request
-     *
-     * @throws RuntimeException
-     */
-    public function run() {
-        $httpMethod = $this->container->request->getMethod();
-
-        if ($httpMethod === RequestInterface::METHOD_BREW) {
-            throw new RuntimeException('I\'m a teapot!', 418);
-        }
-
-        if (!isset(self::$supportedHttpMethods[$httpMethod])) {
-            throw new RuntimeException('Unsupported HTTP method: ' . $httpMethod, 501);
-        }
-
-        // Fetch a resource instance based on the request path
-        $resource = $this->resolveResource($this->container->request);
+        $resource = $this->container->$entry;
 
         // Add some response headers
         $responseHeaders = $this->container->response->getHeaders();
@@ -168,8 +111,7 @@ class FrontController {
             $this->container->request->setPrivateKey($privateKey);
         }
 
-        // Lowercase the HTTP method to get the class method to execute
-        $methodName = strtolower($httpMethod);
+        $methodName = strtolower($this->container->request->getMethod());
 
         // Generate the event name based on the accessed resource and the HTTP method
         $eventName = $this->container->request->getResource() . '.' . $methodName;
