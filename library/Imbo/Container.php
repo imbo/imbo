@@ -47,34 +47,50 @@ use Imbo\Exception\InvalidArgumentException;
  *     namespace Imbo;
  *
  *     $container = new Container();
- *     $container->imageResource = new Resource\Image();
+ *     $container->set('imageResource', new Resource\Image());
  *
  *     $dbParams = array('some' => 'params');
- *     $container->database = new Database\MongoDB($dbParams);
+ *     $container->set('database', new Database\MongoDB($dbParams));
  *
  *     $storageParams = array('some' => 'params');
- *     $container->storage = new Storage\Filesystem($storageParams);
+ *     $container->set('storage', new Storage\Filesystem($storageParams));
  *
  *     // or
  *
  *     namespace Imbo;
  *
  *     $container = new Container();
- *     $container->imageResource = $container->shared(function (Container $container) {
+ *     $container->setStatic('imageResource', function (Container $container) {
  *         return new Resource\Image();
  *     });
  *
  *     $dbParams = array('some' => 'params');
- *     $container->database = $container->shared(function (Container $container) use ($dbParams) {
+ *     $container->setStatic('database', function (Container $container) use ($dbParams) {
  *         return new Database\MongoDB($dbParams);
  *     });
  *
  *     $storageParams = array('some' => 'params');
- *     $container->storage = $container->shared(function (Container $container) use ($storageParams) {
+ *     $container->setStatic('storage', function (Container $container) use ($storageParams) {
  *         return new Storage\Filesystem($storageParams);
  *     });
  *
- * This container is based on code by Fabien Potencier.
+ * If you provide a callable to the set method, the callable will be executed every time you access
+ * the value. This is handy when you want the container to create new instances every time. For
+ * instance:
+ *
+ *     <?php
+ *     namespace Imbo;
+ *
+ *     $container = new Container();
+ *     $container->set('event', function(Container $container, array $params) {
+ *         $eventParams = isset($params['params']) ? $params['params'] : array();
+ *
+ *         return new Event($params['name'], $eventParams);
+ *     });
+ *     $event1 = $container->get('event', array('name' => 'eventname'));
+ *     $event2 = $container->get('event', array('name' => 'othereventname', 'params' => array(
+ *         'some' => 'value',
+ *     )));
  *
  * @package Core
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -136,10 +152,9 @@ class Container {
      * Set a static value
      *
      * @param callback $callable A closure that will be executed when the value is accessed
-     * @return callback
      */
     public function setStatic($id, $callable) {
-        return $this->set($id, function ($container) use ($callable) {
+        $this->set($id, function ($container) use ($callable) {
             static $value;
 
             if (is_null($value)) {
