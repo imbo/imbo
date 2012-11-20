@@ -45,53 +45,33 @@ return array(
      * of the users of this installation. The public keys must match the following case sensitive
      * expression:
      *
-     * [a-z0-9_-]{3,}
+     * ^[a-z0-9_-]{3,}$
      *
      * @var array
      */
     'auth' => array(),
 
     /**
-     * Database configuration
+     * Database adapter
      *
-     * The 'driver' value must be set to one of the following:
-     *
-     * - A fully qualified class name of a driver that implements Imbo\Database\DatabaseInterface.
-     *   Example: 'Imbo\Database\MongoDB'
-     * - An instance of a class implementing Imbo\Database\DatabaseInterface
-     *
-     * The 'params' value will only be used if 'driver' is a string, and will be passed to the
-     * contructor of the class specified in 'driver'.
-     *
-     * @var array
+     * @var Imbo\Database\DatabaseInterface
      */
     'database' => array(
-        'driver' => 'Imbo\Database\MongoDB',
-        'params' => array(
+        new Database\MongoDB(array(
             'databaseName'   => 'imbo',
             'collectionName' => 'images',
-        ),
+        ))
     ),
 
     /**
      * Storage configuration
      *
-     * The 'driver' value must be set to one of the following:
-     *
-     * - A fully qualified class name of a driver that implements Imbo\Storage\StorageInterface.
-     *   Example: 'Imbo\Storage\Filesystem'
-     * - An instance of a class implementing Imbo\Storage\StorageInterface
-     *
-     * The 'params' value will only be used if 'driver' is a string, and will be passed to the
-     * contructor of the class specified in 'driver'.
-     *
-     * @var array
+     * @var Imbo\Storage\StorageInterface
      */
     'storage' => array(
-        'driver' => 'Imbo\Storage\Filesystem',
-        'params' => array(
+        new Storage\Filesystem(array(
             'dataDir' => '/path/to/images',
-        ),
+        ))
     ),
 
     /**
@@ -100,50 +80,60 @@ return array(
      * Each element in this array is either an instance of an event listener, or another array with
      * the following keys:
      *
-     * - listener
      * - events
-     * - publicKeys
+     * - callback
+     * - priority
      *
-     * 'listener' is required and can be one of the following:
+     * 'events' is an array of events that the 'callback' will subscribe to. If you have a single
+     * callback that subscribes to several events, and you want to use different priorities for the
+     * events, simply specify an associative array where the keys are the event names, and the
+     * values are the priorities. If you use this method, the 'priority' key will be ignored.
      *
-     * - An instance of a class implementing Imbo\EventListener\ListenerInterface
-     * - Any callable unit of code that will receive one argument: $event
+     * 'callback' is any callable function. The function will receive a single argument, which is
+     * an instance of Imbo\EventManager\EventInterface.
      *
-     * 'events' is an array of events the current listener will listen for. This only needs to be
-     * set if 'listener' is not an instance of Imbo\EventListener\ListenerInterface.
+     * 'priority' is the priority of your listener. This defaults to 1 (low priority). All internal
+     * Imbo event listeners is registered with low priorities. This can also be a negative number if
+     * you want your listeners to be triggered after Imbo's event listeners.
      *
-     * 'publicKeys' is an array that contains which public keys the listener will trigger for. If
-     * omitted or left empty the listener will trigger for all users.
+     * If you want your listeners to trigger for only some users (public keys) you can have your
+     * listener implement Imbo\EventListener\PublicKeyAwareListenerInterface and implement the
+     * required methods.
      *
-     * Example of how to add different listeners:
+     * Example of how to add listeners:
      *
      * 'eventListeners' => array(
+     *   // Implementation of a listener interface
      *   new EventListener\Authenticate(),
+     *
+     *   // A closure that will subscribe to two events
      *   array(
-     *     'listener' => new Imbo\EventListener\AccessToken(),
-     *   ),
-     *   array(
-     *     'listener' => new Imbo\EventListener\ImageTransformationCache('/tmp/imbocache'),
-     *   ),
-     *   array(
-     *     'listener' => function($event) {
+     *     'callback' => function($event) {
      *       // Some code
      *     },
      *     'events' => array(
-     *       'image.get.pre', 'image.head.pre'
+     *       'image.get', 'image.post'
+     *     ),
+     *     'priority' => 20,
+     *   ),
+     *
+     *   // A closure that will subscribe to two events with different priorities
+     *   array(
+     *     'callback' => function($event) {
+     *       // Some code
+     *     },
+     *     'events' => array(
+     *       'image.get' => 20, // Trigger BEFORE the internal handler for "image.get"
+     *       'image.post' => -20, // Trigger AFTER the internal handler for "image.post"
      *     ),
      *   ),
      * ),
-     *
-     * The listeners are triggered in the order they are added.
      *
      * @var array
      */
     'eventListeners' => array(
         new EventListener\Authenticate(),
         new EventListener\AccessToken(),
-        new EventListener\NotModified(),
-        new EventListener\ResponseFormatter(),
     ),
 
     /**

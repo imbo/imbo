@@ -218,42 +218,24 @@ class Application {
             return $router;
         });
         $container->setStatic('database', function(Container $container) {
-            $imboConfig = $container->get('config');
-            $config = $imboConfig['database'];
-            $driver = $config['driver'];
+            $config = $container->get('config');
+            $adapter = $config['database'];
 
-            if (is_string($driver)) {
-                if (!empty($config['params'])) {
-                    $driver = new $driver($config['params']);
-                } else {
-                    $driver = new $driver();
-                }
+            if (!$adapter instanceof DatabaseInterface) {
+                throw new InvalidArgumentException('Invalid database adapter', 500);
             }
 
-            if (!$driver instanceof DatabaseInterface) {
-                throw new InvalidArgumentException('Invalid database driver', 500);
-            }
-
-            return $driver;
+            return $adapter;
         });
         $container->setStatic('storage', function(Container $container) {
-            $imboConfig = $container->get('config');
-            $config = $imboConfig['storage'];
-            $driver = $config['driver'];
+            $config = $container->get('config');
+            $adapter = $config['storage'];
 
-            if (is_string($driver)) {
-                if (!empty($config['params'])) {
-                    $driver = new $driver($config['params']);
-                } else {
-                    $driver = new $driver();
-                }
+            if (!$adapter instanceof StorageInterface) {
+                throw new InvalidArgumentException('Invalid storage adapter', 500);
             }
 
-            if (!$driver instanceof StorageInterface) {
-                throw new InvalidArgumentException('Invalid storage driver', 500);
-            }
-
-            return $driver;
+            return $adapter;
         });
         $container->setStatic('eventManager', function(Container $container) {
             $manager = new EventManager();
