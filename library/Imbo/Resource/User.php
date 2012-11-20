@@ -32,7 +32,8 @@
 namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
-    Imbo\EventManager\EventInterface;
+    Imbo\EventManager\EventInterface,
+    Imbo\EventManager\EventManagerInterface;
 
 /**
  * User resource
@@ -57,17 +58,15 @@ class User extends Resource implements UserInterface {
     /**
      * {@inheritdoc}
      */
-    public function getEvents() {
-        return array(
-            'user.get',
-            'user.head',
-        );
+    public function attach(EventManagerInterface $manager) {
+        $manager->attach('user.get', array($this, 'get'))
+                ->attach('user.head', array($this, 'head'));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function onUserGet(EventInterface $event) {
+    public function get(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $database = $event->getDatabase();
@@ -98,8 +97,8 @@ class User extends Resource implements UserInterface {
     /**
      * {@inheritdoc}
      */
-    public function onUserHead(EventInterface $event) {
-        $this->onUserGet($event);
+    public function head(EventInterface $event) {
+        $this->get($event);
 
         // Remove body from the response, but keep everything else
         $event->getResponse()->setBody(null);

@@ -35,9 +35,10 @@ use Imbo\Http\Request\Request,
     Imbo\Http\Response\Response,
     Imbo\Http\Response\ResponseFormatter,
     Imbo\Http\Response\ResponseWriter,
+    Imbo\EventListener\ListenerInterface,
     Imbo\EventManager\EventManager,
-    Imbo\Image\Image,
     Imbo\EventManager\Event,
+    Imbo\Image\Image,
     Imbo\Exception\RuntimeException,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Database\DatabaseInterface,
@@ -259,46 +260,47 @@ class Application {
             $manager->setContainer($container);
 
             // Register internal event listeners
-            $manager->attachListener($container->get('statusResource'), 50)
-                    ->attachListener($container->get('userResource'), 50)
-                    ->attachListener($container->get('imagesResource'), 50)
-                    ->attachListener($container->get('imageResource'), 50)
-                    ->attachListener($container->get('metadataResource'), 50)
-                    ->attachListener($container->get('response'), 50)
-                    ->attachListener($container->get('responseFormatter'), 60)
-                    ->attachListener($container->get('router'), 50);
+            $containerEntries = array(
+                'statusResource',
+                'userResource',
+                'imagesResource',
+                'imageResource',
+                'metadataResource',
+                'response',
+                'responseFormatter',
+                'router',
+            );
 
-            // Register event listeners from the configuration
+            foreach ($containerEntries as $listener) {
+                $container->get($listener)->attach($manager);
+            }
+
             $config = $container->get('config');
             $listeners = $config['eventListeners'];
 
             foreach ($listeners as $definition) {
                 if ($definition instanceof ListenerInterface) {
-                    $manager->attachListener($definition);
+                    $definition->attach($manager);
                     continue;
                 }
 
-                if (!is_array($definition) || empty($definition['listener'])) {
-                    throw new InvalidArgumentException('Missing listener definition', 500);
+                if (!is_array($definition) || empty($definition['callback']) || empty($definition['events'])) {
+                    throw new InvalidArgumentException('Invalid event listener definition', 500);
                 }
 
-                $listener = $definition['listener'];
+                $callback = $definition['callback'];
                 $priority = isset($definition['priority']) ? $definition['priority'] : 1;
 
-                if ($listener instanceof ListenerInterface) {
-                    if (
-                        $listener instanceof PublicKeyAwareListenerInterface &&
-                        !empty($definition['publicKeys']) &&
-                        is_array($definition['publicKeys'])
-                    ) {
-                        $listener->setPublicKeys($definition['publicKeys']);
+                foreach ($definition['events'] as $key => $value) {
+                    $event = $value;
+
+                    if (is_string($key)) {
+                        // We have an associative array with <event> => <priority>
+                        $event = $key;
+                        $priority = $value;
                     }
 
-                    $manager->attachListener($listener, $priority);
-                } else if (is_callable($listener) && !empty($definition['events']) && is_array($definition['events'])) {
-                    $manager->attach($definition['events'], $listener, $priority);
-                } else {
-                    throw new InvalidArgumentException('Invalid listener', 500);
+                    $manager->attach($event, $callback, $priority);
                 }
             }
 

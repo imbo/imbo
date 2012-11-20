@@ -42,7 +42,8 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Image\Transformation\TransformationInterface,
     Imbo\Http\ContentNegotiation,
     Imbo\Resource\ImageInterface as ImageResourceInterface,
-    Imbo\EventManager\EventInterface;
+    Imbo\EventManager\EventInterface,
+    Imbo\EventManager\EventManagerInterface;
 
 /**
  * Image resource
@@ -122,19 +123,17 @@ class Image extends Resource implements ImageResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function getEvents() {
-        return array(
-            'image.get',
-            'image.head',
-            'image.delete',
-            'image.put',
-        );
+    public function attach(EventManagerInterface $manager) {
+        $manager->attach('image.get', array($this, 'get'))
+                ->attach('image.head', array($this, 'head'))
+                ->attach('image.delete', array($this, 'delete'))
+                ->attach('image.put', array($this, 'put'));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function onImagePut(EventInterface $event) {
+    public function put(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $database = $event->getDatabase();
@@ -167,7 +166,7 @@ class Image extends Resource implements ImageResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function onImageDelete(EventInterface $event) {
+    public function delete(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $database = $event->getDatabase();
@@ -187,7 +186,7 @@ class Image extends Resource implements ImageResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function onImageGet(EventInterface $event) {
+    public function get(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $database = $event->getDatabase();
@@ -296,8 +295,8 @@ class Image extends Resource implements ImageResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function onImageHead(EventInterface $event) {
-        $this->onImageGet($event);
+    public function head(EventInterface $event) {
+        $this->get($event);
 
         // Remove body from the response, but keep everything else
         $event->getResponse()->setBody(null);

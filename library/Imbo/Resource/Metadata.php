@@ -32,6 +32,7 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
+    Imbo\EventManager\EventManagerInterface,
     Imbo\Http\Request\RequestInterface,
     Imbo\Exception\InvalidArgumentException;
 
@@ -61,20 +62,18 @@ class Metadata extends Resource implements MetadataInterface {
     /**
      * {@inheritdoc}
      */
-    public function getEvents() {
-        return array(
-            'metadata.get',
-            'metadata.post',
-            'metadata.put',
-            'metadata.delete',
-            'metadata.head',
-        );
+    public function attach(EventManagerInterface $manager) {
+        $manager->attach('metadata.get', array($this, 'get'))
+                ->attach('metadata.post', array($this, 'post'))
+                ->attach('metadata.put', array($this, 'put'))
+                ->attach('metadata.delete', array($this, 'delete'))
+                ->attach('metadata.head', array($this, 'head'));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function onMetadataDelete(EventInterface $event) {
+    public function delete(EventInterface $event) {
         $request = $event->getRequest();
         $database = $event->getDatabase();
         $response = $event->getResponse();
@@ -91,7 +90,7 @@ class Metadata extends Resource implements MetadataInterface {
     /**
      * {@inheritdoc}
      */
-    public function onMetadataPut(EventInterface $event) {
+    public function put(EventInterface $event) {
         $request = $event->getRequest();
         $database = $event->getDatabase();
         $response = $event->getResponse();
@@ -124,7 +123,7 @@ class Metadata extends Resource implements MetadataInterface {
     /**
      * {@inheritdoc}
      */
-    public function onMetadataPost(EventInterface $event) {
+    public function post(EventInterface $event) {
         $request = $event->getRequest();
         $database = $event->getDatabase();
         $response = $event->getResponse();
@@ -158,7 +157,7 @@ class Metadata extends Resource implements MetadataInterface {
     /**
      * {@inheritdoc}
      */
-    public function onMetadataGet(EventInterface $event) {
+    public function get(EventInterface $event) {
         $request = $event->getRequest();
         $database = $event->getDatabase();
         $response = $event->getResponse();
@@ -181,8 +180,8 @@ class Metadata extends Resource implements MetadataInterface {
     /**
      * {@inheritdoc}
      */
-    public function onMetadataHead(EventInterface $event) {
-        $this->onMetadataGet($event);
+    public function head(EventInterface $event) {
+        $this->get($event);
 
         // Remove body from the response, but keep everything else
         $event->getResponse()->setBody(null);

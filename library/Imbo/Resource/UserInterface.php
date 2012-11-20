@@ -50,12 +50,12 @@ interface UserInterface extends ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    function onUserGet(EventInterface $event);
+    function get(EventInterface $event);
 
     /**
      * Handle HEAD requests
      *
      * @param EventInterface $event The current event
      */
-    function onUserHead(EventInterface $event);
+    function head(EventInterface $event);
 }

@@ -49,5 +49,5 @@ interface RouterInterface extends ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    function onRoute(EventInterface $event);
+    function route(EventInterface $event);
 }

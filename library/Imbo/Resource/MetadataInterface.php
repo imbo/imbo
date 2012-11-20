@@ -50,33 +50,33 @@ interface MetadataInterface extends ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    function onMetadataDelete(EventInterface $event);
+    function delete(EventInterface $event);
 
     /**
      * Handle PUT requests
      *
      * @param EventInterface $event The current event
      */
-    function onMetadataPut(EventInterface $event);
+    function put(EventInterface $event);
 
     /**
      * Handle POST requests
      *
      * @param EventInterface $event The current event
      */
-    function onMetadataPost(EventInterface $event);
+    function post(EventInterface $event);
 
     /**
      * Handle GET requests
      *
      * @param EventInterface $event The current event
      */
-    function onMetadataGet(EventInterface $event);
+    function get(EventInterface $event);
 
     /**
      * Handle HEAD requests
      *
      * @param EventInterface $event The current event
      */
-    function onMetadataHead(EventInterface $event);
+    function head(EventInterface $event);
 }

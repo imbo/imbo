@@ -50,12 +50,12 @@ interface StatusInterface extends ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    function onStatusGet(EventInterface $event);
+    function get(EventInterface $event);
 
     /**
      * Handle HEAD requests
      *
      * @param EventInterface $event The current event
      */
-    function onStatusHead(EventInterface $event);
+    function head(EventInterface $event);
 }

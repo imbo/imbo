@@ -69,12 +69,12 @@ interface ImagesInterface extends ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    function onImagesGet(EventInterface $event);
+    function get(EventInterface $event);
 
     /**
      * Handle HEAD requests
      *
      * @param EventInterface $event The current event
      */
-    function onImagesHead(EventInterface $event);
+    function head(EventInterface $event);
 }

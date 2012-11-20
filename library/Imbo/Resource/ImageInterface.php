@@ -50,28 +50,28 @@ interface ImageInterface extends ResourceInterface {
      *
      * @param EventInterface
      */
-    function onImagePut(EventInterface $event);
+    function put(EventInterface $event);
 
     /**
      * Handle DELETE requests
      *
      * @param EventInterface
      */
-    function onImageDelete(EventInterface $event);
+    function delete(EventInterface $event);
 
     /**
      * Handle GET requests
      *
      * @param EventInterface
      */
-    function onImageGet(EventInterface $event);
+    function get(EventInterface $event);
 
     /**
      * Handle HEAD requests
      *
      * @param EventInterface
      */
-    function onImageHead(EventInterface $event);
+    function head(EventInterface $event);
 
     /**
      * Register an image transformation handler

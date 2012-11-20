@@ -32,6 +32,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
+    Imbo\EventManager\EventManagerInterface,
     Imbo\Exception\RuntimeException,
     Imbo\Exception;
 
@@ -47,7 +48,7 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Authenticate extends Listener implements ListenerInterface {
+class Authenticate implements ListenerInterface {
     /**
      * Max. diff to tolerate in the timestamp in seconds
      *
@@ -65,35 +66,29 @@ class Authenticate extends Listener implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getEvents() {
-        return array(
-            'status.get.pre',
-
-            'image.put.pre',
-            'image.post.pre',
-            'image.delete.pre',
-
-            'metadata.put.pre',
-            'metadata.post.pre',
-            'metadata.delete.pre',
-        );
+    public function attach(EventManagerInterface $manager) {
+        $manager->attach('status.get', array($this, 'invoke'), 10)
+                ->attach('image.put', array($this, 'invoke'), 10)
+                ->attach('image.post', array($this, 'invoke'), 10)
+                ->attach('image.delete', array($this, 'invoke'), 10)
+                ->attach('metadata.put', array($this, 'invoke'), 10)
+                ->attach('metadata.post', array($this, 'invoke'), 10)
+                ->attach('metadata.delete', array($this, 'invoke'), 10);
     }
 
     /**
      * {@inheritdoc}
      */
     public function invoke(EventInterface $event) {
-        $container = $event->getContainer();
-
-        $config = $container->get('config');
+        $config = $event->getConfig();
         $auth = $config['auth'];
 
-        $response = $container->get('response');
-        $request  = $container->get('request');
+        $response = $event->getResponse();
+        $request  = $event->getRequest();
         $query    = $request->getQuery();
 
         // Whether or not this is a status check
-        $statusCheck = ($event->getName() === 'status.get.pre');
+        $statusCheck = ($event->getName() === 'status.get');
 
         // Required query parameters
         $requiredParams = array('signature', 'timestamp');

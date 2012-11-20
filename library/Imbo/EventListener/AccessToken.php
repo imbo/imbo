@@ -32,6 +32,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
+    Imbo\EventManager\EventManagerInterface,
     Imbo\Http\Request\RequestInterface,
     Imbo\Exception\RuntimeException;
 
@@ -49,7 +50,7 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class AccessToken extends Listener implements ListenerInterface {
+class AccessToken implements ListenerInterface {
     /**
      * Parameters for the listener
      *
@@ -101,29 +102,27 @@ class AccessToken extends Listener implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getEvents() {
-        return array(
-            'user.get.pre',
-            'images.get.pre',
-            'image.get.pre',
-            'metadata.get.pre',
+    public function attach(EventManagerInterface $manager) {
+        $manager->attach('user.get', array($this, 'invoke'), 10)
+                ->attach('images.get', array($this, 'invoke'), 10)
+                ->attach('image.get', array($this, 'invoke'), 10)
+                ->attach('metadata.get', array($this, 'invoke'), 10)
 
-            'user.head.pre',
-            'images.head.pre',
-            'image.head.pre',
-            'metadata.head.pre',
-        );
+                ->attach('user.head', array($this, 'invoke'), 10)
+                ->attach('images.head', array($this, 'invoke'), 10)
+                ->attach('image.head', array($this, 'invoke'), 10)
+                ->attach('metadata.head', array($this, 'invoke'), 10);
     }
 
     /**
      * {@inheritdoc}
      */
     public function invoke(EventInterface $event) {
-        $request = $event->getContainer()->get('request');
+        $request = $event->getRequest();
         $query = $request->getQuery();
         $eventName = $event->getName();
 
-        if (($eventName === 'image.get.pre' || $eventName === 'image.head.pre') && $this->isWhitelisted($request)) {
+        if (($eventName === 'image.get' || $eventName === 'image.head') && $this->isWhitelisted($request)) {
             // All transformations in the request are whitelisted. Skip the access token check
             return;
         }

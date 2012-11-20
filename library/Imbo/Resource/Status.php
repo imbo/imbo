@@ -33,6 +33,7 @@ namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\EventManager\EventInterface,
+    Imbo\EventManager\EventManagerInterface,
     DateTime;
 
 /**
@@ -61,17 +62,15 @@ class Status extends Resource implements StatusInterface {
     /**
      * {@inheritdoc}
      */
-    public function getEvents() {
-        return array(
-            'status.get',
-            'status.head',
-        );
+    public function attach(EventManagerInterface $manager) {
+        $manager->attach('status.get', array($this, 'get'))
+                ->attach('status.head', array($this, 'head'));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function onStatusGet(EventInterface $event) {
+    public function get(EventInterface $event) {
         $response = $event->getResponse();
         $database = $event->getDatabase();
         $storage = $event->getStorage();
@@ -103,8 +102,8 @@ class Status extends Resource implements StatusInterface {
     /**
      * {@inheritdoc}
      */
-    public function onStatusHead(EventInterface $event) {
-        $this->onStatusGet($event);
+    public function head(EventInterface $event) {
+        $this->get($event);
 
         // Remove body from the response, but keep everything else
         $event->getResponse()->setBody(null);

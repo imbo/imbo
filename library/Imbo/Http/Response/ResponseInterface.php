@@ -116,7 +116,7 @@ interface ResponseInterface extends ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    function onResponseSend(EventInterface $event);
+    function send(EventInterface $event);
 
     /**
      * Prepare the response to send 304 Not Modified to the client
@@ -140,4 +140,12 @@ interface ResponseInterface extends ListenerInterface {
      * @return ResponseInterface
      */
     function createError(Exception $exception, RequestInterface $request);
+
+    /**
+     * Populate the current response based on another response
+     *
+     * @param ResponseInterface $response Another response instance
+     * @return ResponseInterface
+     */
+    function populate(ResponseInterface $response);
 }

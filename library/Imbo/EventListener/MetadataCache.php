@@ -68,10 +68,10 @@ class MetadataCache extends Listener implements ListenerInterface {
     public function getEvents() {
         return array(
             // Look for metadata in the cache
-            'metadata.get.pre',
+            'metadata.get',
 
             // Store metadata in the cache
-            'metadata.get.post',
+            'metadata.get',
 
             // Remove metadata from the cache
             'metadata.delete.pre',
@@ -86,11 +86,12 @@ class MetadataCache extends Listener implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function onMetadataGetPre(EventInterface $event) {
-        $container = $event->getContainer();
+        $request = $event->getRequest();
+        $response = $event->getResponse();
 
         $cacheKey = $this->getCacheKey(
-            $container->request->getPublicKey(),
-            $container->request->getImageIdentifier()
+            $request->getPublicKey(),
+            $request->getImageIdentifier()
         );
 
         $result = $this->cache->get($cacheKey);
@@ -100,14 +101,14 @@ class MetadataCache extends Listener implements ListenerInterface {
 
             // We have a valid response object from the cache. Overwrite the one already in the
             // container
-            $container->response = $result;
+            $response->populate($result);
 
-            // Halt execution of the application and return
-            $event->haltApplication(true);
+            // Stop propagation of listeners for this event
+            $event->stopPropagation(true);
             return;
         }
 
-        $container->response->getHeaders()->set('X-Imbo-MetadataCache', 'Miss');
+        $response->getHeaders()->set('X-Imbo-MetadataCache', 'Miss');
     }
 
     /**
@@ -116,17 +117,44 @@ class MetadataCache extends Listener implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function onMetadataGetPost(EventInterface $event) {
-        $container = $event->getContainer();
+        $request = $event->getRequest();
+        $response = $event->getResponse();
 
         $cacheKey = $this->getCacheKey(
-            $container->request->getPublicKey(),
-            $container->request->getImageIdentifier()
+            $request->getPublicKey(),
+            $request->getImageIdentifier()
         );
 
         // Store the response in the cache for later use
-        if ($container->response->getStatusCode() === 200) {
-            $this->cache->set($cacheKey, $container->response);
+        if ($response->getStatusCode() === 200) {
+            $this->cache->set($cacheKey, $response);
         }
+    }
+
+    /**
+     * Handle the metadata.get.post event
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function onMetadataDeletePre() {
+
+    }
+    /**
+     * Handle the metadata.get.post event
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function onMetadataDeletePost() {
+
+    }
+
+    /**
+     * Handle the metadata.get.post event
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function onMetadataPostPost() {
+
     }
 
     /**
