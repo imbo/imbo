@@ -34,8 +34,7 @@ namespace Imbo\EventManager;
 
 use Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\RuntimeException,
-    Imbo\Exception\HaltApplication;
+    Imbo\Exception\RuntimeException;
 
 /**
  * Event manager interface
@@ -75,7 +74,6 @@ interface EventManagerInterface {
      * @param string $eventName The name of the event to trigger
      * @param array $params Optional extra parameters to send to the event listeners for the current
      *                      event
-     * @throws HaltApplication
      * @return EventManagerInterface
      */
     function trigger($eventName, array $params = array());

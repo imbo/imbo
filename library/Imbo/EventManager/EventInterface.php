@@ -113,21 +113,6 @@ interface EventInterface {
     function propagationIsStopped();
 
     /**
-     * Whether or not to halt the execution of Imbo
-     *
-     * @param boolean $flag True to halt, false to continue
-     * @return EventInterface
-     */
-    function haltApplication($flag);
-
-    /**
-     * Return whether or not the execution should be halted
-     *
-     * @return boolean
-     */
-    function applicationIsHalted();
-
-    /**
      * Return optional parameters passed to the event instance
      *
      * @return array

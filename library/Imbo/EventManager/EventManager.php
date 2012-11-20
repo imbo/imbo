@@ -37,7 +37,6 @@ use Imbo\EventListener\ListenerInterface,
     Imbo\EventListener\PublicKeyAwareListenerInterface,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Exception\RuntimeException,
-    Imbo\Exception\HaltApplication,
     Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\ResponseInterface,
     Imbo\Database\DatabaseInterface,
@@ -143,10 +142,6 @@ class EventManager implements ContainerAware, EventManagerInterface {
                 if ($event->propagationIsStopped()) {
                     break;
                 }
-            }
-
-            if ($event->applicationIsHalted()) {
-                throw new HaltApplication();
             }
         }
 

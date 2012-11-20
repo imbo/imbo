@@ -71,13 +71,6 @@ class Event implements ContainerAware, EventInterface {
     private $propagationIsStopped = false;
 
     /**
-     * Execution flag
-     *
-     * @var boolean
-     */
-    private $applicationIsHalted = false;
-
-    /**
      * Class contsructor
      *
      * @param string $name The name of the current event
@@ -158,22 +151,6 @@ class Event implements ContainerAware, EventInterface {
      */
     public function propagationIsStopped() {
         return $this->propagationIsStopped;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function haltApplication($flag) {
-        $this->applicationIsHalted = $flag;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function applicationIsHalted() {
-        return $this->applicationIsHalted;
     }
 
     /**
