@@ -33,6 +33,7 @@ namespace Imbo\EventListener;
 
 use Imbo\Exception\RuntimeException,
     Imbo\EventManager\EventInterface,
+    Imbo\EventManager\EventManagerInterface,
     Imbo\Cache\CacheInterface,
     Imbo\Http\Response\ResponseInterface;
 
@@ -45,7 +46,7 @@ use Imbo\Exception\RuntimeException,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class MetadataCache extends Listener implements ListenerInterface {
+class MetadataCache implements ListenerInterface {
     /**
      * Cache driver
      *
@@ -65,27 +66,28 @@ class MetadataCache extends Listener implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getEvents() {
-        return array(
-            // Look for metadata in the cache
-            'metadata.get',
+    public function attach(EventManagerInterface $manager) {
+        $manager
+            // Look in cache before the resource fetches from the database
+            ->attach('metadata.get', array($this, 'getFromCache'), 10)
 
-            // Store metadata in the cache
-            'metadata.get',
+            // Store data in cache after the resource has fetched from the database
+            ->attach('metadata.get', array($this, 'storeInCache'), -10)
 
-            // Remove metadata from the cache
-            'metadata.delete.pre',
-            'metadata.put.post',
-            'metadata.post.post',
-        );
+            // Delete from cache after the resource has deleted data from the database
+            ->attach('metadata.delete', array($this, 'deleteFromCache'), -10)
+
+            // Store data in cache after the resource has stored new metadata in the database
+            ->attach('metadata.put', array($this, 'storeInCache'), -10)
+            ->attach('metadata.post', array($this, 'storeInCache'), -10);
     }
 
     /**
-     * Handle the metadata.get.pre event
+     * Get data from the cache
      *
      * @param EventInterface $event The event instance
      */
-    public function onMetadataGetPre(EventInterface $event) {
+    public function getFromCache(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
@@ -112,11 +114,11 @@ class MetadataCache extends Listener implements ListenerInterface {
     }
 
     /**
-     * Handle the metadata.get.post event
+     * Store metadata in the cache
      *
      * @param EventInterface $event The event instance
      */
-    public function onMetadataGetPost(EventInterface $event) {
+    public function storeInCache(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
@@ -132,42 +134,16 @@ class MetadataCache extends Listener implements ListenerInterface {
     }
 
     /**
-     * Handle the metadata.get.post event
+     * Delete data from the cache
      *
      * @param EventInterface $event The event instance
      */
-    public function onMetadataDeletePre() {
-
-    }
-    /**
-     * Handle the metadata.get.post event
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function onMetadataDeletePost() {
-
-    }
-
-    /**
-     * Handle the metadata.get.post event
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function onMetadataPostPost() {
-
-    }
-
-    /**
-     * Handle the remaining events
-     *
-     * {@inheritdoc}
-     */
-    public function invoke(EventInterface $event) {
-        $container = $event->getContainer();
+    public function deleteFromCache(EventInterface $event) {
+        $request = $event->getRequest();
 
         $cacheKey = $this->getCacheKey(
-            $container->request->getPublicKey(),
-            $container->request->getImageIdentifier()
+            $request->getPublicKey(),
+            $request->getImageIdentifier()
         );
 
         $this->cache->delete($cacheKey);
@@ -176,9 +152,9 @@ class MetadataCache extends Listener implements ListenerInterface {
     /**
      * Generate a cache key
      *
-     * @param string $url The requested URL
-     * @param string $mime The mime type of the image
-     * @return string Returns a string that can be used as a cache key for the current image
+     * @param string $publicKey The current public key
+     * @param string $imageIdentifier The current image identifier
+     * @return string Returns a cache key
      */
     private function getCacheKey($publicKey, $imageIdentifier) {
         return 'metadata:' . $publicKey . '|' . $imageIdentifier;
