@@ -56,23 +56,19 @@ return array(
      *
      * @var Imbo\Database\DatabaseInterface
      */
-    'database' => array(
-        new Database\MongoDB(array(
-            'databaseName'   => 'imbo',
-            'collectionName' => 'images',
-        ))
-    ),
+    'database' => new Database\MongoDB(array(
+        'databaseName'   => 'imbo',
+        'collectionName' => 'images',
+    )),
 
     /**
      * Storage configuration
      *
      * @var Imbo\Storage\StorageInterface
      */
-    'storage' => array(
-        new Storage\Filesystem(array(
-            'dataDir' => '/path/to/images',
-        ))
-    ),
+    'storage' => new Storage\Filesystem(array(
+        'dataDir' => '/path/to/images',
+    )),
 
     /**
      * Event listeners
