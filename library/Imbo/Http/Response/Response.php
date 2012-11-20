@@ -228,6 +228,23 @@ class Response implements ResponseInterface {
      * {@inheritdoc}
      */
     public function onResponseSend(EventInterface $event) {
+        $request = $event->getRequest();
+        $requestHeaders = $request->getHeaders();
+
+        $ifModifiedSince = $requestHeaders->get('if-modified-since');
+        $ifNoneMatch = $requestHeaders->get('if-none-match');
+        $lastModified = $this->getHeaders()->get('last-modified');
+        $etag = $this->getHeaders()->get('etag');
+
+        if (
+            $ifModifiedSince && $ifNoneMatch && (
+                $lastModified === $ifModifiedSince &&
+                $etag === $ifNoneMatch
+            )
+        ) {
+            $this->setNotModified();
+        }
+
         $this->sendHeaders();
         $this->sendContent();
     }
