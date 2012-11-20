@@ -45,7 +45,7 @@ use Imbo\Resource\ResourceInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Router implements RouterInterface {
+class Router implements ContainerAware, RouterInterface {
     /**
      * HTTP methods supported one way or another in Imbo
      *
@@ -80,11 +80,9 @@ class Router implements RouterInterface {
     private $container;
 
     /**
-     * Class constructor
-     *
-     * @param Container $container An instance of the Container
+     * {@inheritdoc}
      */
-    public function __construct(Container $container) {
+    public function setContainer(Container $container) {
         $this->container = $container;
     }
 

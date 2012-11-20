@@ -31,10 +31,8 @@
 
 namespace Imbo\EventManager;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface,
-    Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface;
+use Imbo\Container,
+    Imbo\ContainerAware;
 
 /**
  * Event class
@@ -45,7 +43,7 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Event implements EventInterface {
+class Event implements ContainerAware, EventInterface {
     /**
      * Name of the current event
      *
@@ -54,46 +52,16 @@ class Event implements EventInterface {
     private $name;
 
     /**
-     * Request instance
-     *
-     * @var RequestInterface
+     * @var Container
      */
-    private $request;
+    private $container;
 
     /**
-     * Response instance
-     *
-     * @var ResponseInterface
-     */
-    private $response;
-
-    /**
-     * The database adapter
-     *
-     * @var DatabaseInterface
-     */
-    private $database;
-
-    /**
-     * The storage adapter
-     *
-     * @var StorageInterface
-     */
-    private $storage;
-
-    /**
-     * The event manager
-     *
-     * @var EventManagerInterface
-     */
-    private $eventManager;
-
-    /**
-     * Imbo configuration
+     * Optional parameters
      *
      * @var array
      */
-    private $config;
+    private $params;
 
     /**
      * Propagation flag
@@ -110,37 +78,21 @@ class Event implements EventInterface {
     private $applicationIsHalted = false;
 
     /**
-     * Optional parameters
-     *
-     * @var array
-     */
-    private $params;
-
-    /**
      * Class contsructor
      *
      * @param string $name The name of the current event
-     * @param RequestInterface $request Request instance
-     * @param ResponseInterface $response Response instance
-     * @param DatabaseInterface $database Database instance
-     * @param StorageInterface $storage Storage instance
-     * @param EventManagerInterface $eventManager The event manager instance
-     * @param array $config Imbo configuration
      * @param array $params Optional parameters
      */
-    public function __construct(
-        $name, RequestInterface $request, ResponseInterface $response, DatabaseInterface $database,
-        StorageInterface $storage, EventManagerInterface $eventManager, array $config,
-        array $params = array()
-    ) {
+    public function __construct($name, array $params = array()) {
         $this->name = $name;
-        $this->request = $request;
-        $this->response = $response;
-        $this->database = $database;
-        $this->storage = $storage;
-        $this->eventManager = $eventManager;
-        $this->config = $config;
         $this->params = $params;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(Container $container) {
+        $this->container = $container;
     }
 
     /**
@@ -154,42 +106,42 @@ class Event implements EventInterface {
      * {@inheritdoc}
      */
     public function getRequest() {
-        return $this->request;
+        return $this->container->get('request');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getResponse() {
-        return $this->response;
+        return $this->container->get('response');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getDatabase() {
-        return $this->database;
+        return $this->container->get('database');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getStorage() {
-        return $this->storage;
+        return $this->container->get('storage');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getManager() {
-        return $this->eventManager;
+        return $this->container->get('eventManager');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getConfig() {
-        return $this->config;
+        return $this->container->get('config');
     }
 
     /**

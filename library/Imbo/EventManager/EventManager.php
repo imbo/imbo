@@ -32,6 +32,8 @@
 namespace Imbo\EventManager;
 
 use Imbo\EventListener\ListenerInterface,
+    Imbo\Container,
+    Imbo\ContainerAware,
     Imbo\EventListener\PublicKeyAwareListenerInterface,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Exception\RuntimeException,
@@ -51,7 +53,7 @@ use Imbo\EventListener\ListenerInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class EventManager implements EventManagerInterface {
+class EventManager implements ContainerAware, EventManagerInterface {
     /**
      * Callbacks that can be triggered
      *
@@ -60,57 +62,15 @@ class EventManager implements EventManagerInterface {
     private $callbacks;
 
     /**
-     * Request instance
-     *
-     * @var RequestInterface
+     * @var Container
      */
-    private $request;
+    private $container;
 
     /**
-     * Response instance
-     *
-     * @var ResponseInterface
+     * {@inheritdoc}
      */
-    private $response;
-
-    /**
-     * Database instance
-     *
-     * @var DatabaseInterface
-     */
-    private $database;
-
-    /**
-     * Storage instance
-     *
-     * @var StorageInterface
-     */
-    private $storage;
-
-    /**
-     * Imbo configuration
-     *
-     * @var array
-     */
-    private $config;
-
-    /**
-     * Class constructor
-     *
-     * @param RequestInterface $request Request instance
-     * @param ResponseInterface $response Response instance
-     * @param DatabaseInterface $database Database instance
-     * @param StorageInterface $storage Storage instance
-     * @param array $config Imbo configuration
-     */
-    public function __construct(RequestInterface $request, ResponseInterface $response,
-                                DatabaseInterface $database, StorageInterface $storage,
-                                array $config) {
-        $this->request = $request;
-        $this->response = $response;
-        $this->database = $database;
-        $this->storage = $storage;
-        $this->config = $config;
+    public function setContainer(Container $container) {
+        $this->container = $container;
     }
 
     /**
@@ -140,7 +100,7 @@ class EventManager implements EventManagerInterface {
      * {@inheritdoc}
      */
     public function attachListener(ListenerInterface $listener, $priority = 1) {
-        if ($listener instanceof PublicKeyAwareListenerInterface && !$listener->triggersFor($this->request->getPublicKey())) {
+        if ($listener instanceof PublicKeyAwareListenerInterface && !$listener->triggersFor($this->container->get('request')->getPublicKey())) {
             return $this;
         }
 
@@ -170,11 +130,11 @@ class EventManager implements EventManagerInterface {
      */
     public function trigger($eventName, array $params = array()) {
         if (!empty($this->callbacks[$eventName])) {
-            // Create an event instance
-            $event = new Event(
-                $eventName, $this->request, $this->response,
-                $this->database, $this->storage, $this, $this->config, $params
-            );
+            // Fetch an event
+            $event = $this->container->get('event', array(
+                'name' => $eventName,
+                'params' => $params,
+            ));
 
             // Trigger all listeners for this event and pass in the event instance
             foreach ($this->callbacks[$eventName] as $callback) {
