@@ -33,6 +33,8 @@ namespace Imbo;
 
 use Imbo\Http\Request\Request,
     Imbo\Http\Response\Response,
+    Imbo\Http\Response\ResponseFormatter,
+    Imbo\Http\Response\ResponseWriter,
     Imbo\EventManager\EventManager,
     Imbo\Image\Image,
     Imbo\EventManager\Event,
@@ -164,9 +166,13 @@ class Application {
 
         $container->set('config', $this->config);
         $container->set('request', new Request($_GET, $_POST, $_SERVER));
+        $container->set('version', new Version());
         $container->setStatic('response', function ($container) {
             $response = new Response();
-            $response->getHeaders()->set('X-Imbo-Version', Version::getVersionNumber());
+            $response->getHeaders()->set(
+                'X-Imbo-Version',
+                $container->get('version')->getVersionNumber()
+            );
 
             return $response;
         });
@@ -176,7 +182,20 @@ class Application {
 
             return $event;
         });
+        $container->setStatic('responseWriter', function(Container $container) {
+            $writer = new ResponseWriter();
+            $writer->setContainer($container);
+
+            return $writer;
+        });
+        $container->setStatic('responseFormatter', function(Container $container) {
+            $formatter = new ResponseFormatter();
+            $formatter->setContainer($container);
+
+            return $formatter;
+        });
         $container->set('image', new Image());
+        $container->set('contentNegotiation', new Http\ContentNegotiation());
         $container->set('metadataResource', new Resource\Metadata());
         $container->set('imagesResource', new Resource\Images());
         $container->set('userResource', new Resource\User());
@@ -246,6 +265,7 @@ class Application {
                     ->attachListener($container->get('imageResource'), 50)
                     ->attachListener($container->get('metadataResource'), 50)
                     ->attachListener($container->get('response'), 50)
+                    ->attachListener($container->get('responseFormatter'), 60)
                     ->attachListener($container->get('router'), 50);
 
             // Register event listeners from the configuration
