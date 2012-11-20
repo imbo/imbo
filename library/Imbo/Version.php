@@ -39,7 +39,6 @@ namespace Imbo;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @codeCoverageIgnore
  */
 class Version {
     /**
@@ -49,18 +48,18 @@ class Version {
      *
      * @var string
      */
-    static private $version = '@package_version@';
+    private $version = '@package_version@';
 
     /**
      * Get the version number only
      *
      * @return string
      */
-    static public function getVersionNumber() {
-        if (strpos(self::$version, '@package_version') === 0) {
+    public function getVersionNumber() {
+        if (strpos($this->version, '@package_version') === 0) {
             return 'dev';
         }
 
-        return self::$version;
+        return $this->version;
     }
 }
