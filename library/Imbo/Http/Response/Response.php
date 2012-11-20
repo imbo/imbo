@@ -49,13 +49,6 @@ use Imbo\Http\HeaderContainer,
  */
 class Response implements ResponseInterface {
     /**
-     * HTTP protocol version
-     *
-     * @var string
-     */
-    private $protocolVersion = '1.1';
-
-    /**
      * Different status codes
      *
      * @var array
@@ -116,6 +109,13 @@ class Response implements ResponseInterface {
     );
 
     /**
+     * HTTP protocol version
+     *
+     * @var string
+     */
+    private $protocolVersion = '1.1';
+
+    /**
      * HTTP status code
      *
      * @var int
@@ -167,12 +167,25 @@ class Response implements ResponseInterface {
     /**
      * {@inheritdoc}
      */
-    public function setStatusCode($code, $message = null) {
+    public function setStatusCode($code) {
         $this->statusCode = (int) $code;
+        $this->statusMessage = null;
 
-        if ($message !== null) {
-            $this->statusMessage = $message;
-        }
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStatusMessage() {
+        return $this->statusMessage ?: self::$statusCodes[$this->getStatusCode()];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setStatusMessage($message) {
+        $this->statusMessage = $message;
 
         return $this;
     }
@@ -325,7 +338,11 @@ class Response implements ResponseInterface {
      * {@inheritdoc}
      */
     public function populate(ResponseInterface $response) {
-        throw new \Exception('not yet implemented');
+        return $this->setProtocolVersion($response->getProtocolVersion())
+                    ->setStatusCode($response->getStatusCode())
+                    ->setStatusMessage($response->getStatusMessage())
+                    ->setHeaders($response->getHeaders())
+                    ->setBody($response->getBody());
     }
 
     /**
@@ -345,7 +362,7 @@ class Response implements ResponseInterface {
 
         $statusCode = $this->getStatusCode();
 
-        $statusLine = sprintf("HTTP/%s %d %s", $this->getProtocolVersion(), $statusCode, $this->statusMessage ?: self::$statusCodes[$statusCode]);
+        $statusLine = sprintf("HTTP/%s %d %s", $this->getProtocolVersion(), $statusCode, $this->getStatusMessage());
         header($statusLine);
 
         // Fetch all headers

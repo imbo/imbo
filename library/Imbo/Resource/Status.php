@@ -89,7 +89,8 @@ class Status extends Resource implements StatusInterface {
                 $message = 'Database error';
             }
 
-            $response->setStatusCode(500, $message);
+            $response->setStatusCode(500)
+                     ->setStatusMessage($message);
         }
 
         $response->setBody(array(

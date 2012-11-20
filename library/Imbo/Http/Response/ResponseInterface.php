@@ -59,12 +59,31 @@ interface ResponseInterface extends ListenerInterface {
     /**
      * Set the status code
      *
+     * When a status code is set, the current optional custom status message should be reset.
+     *
      * @param int $code The HTTP status code to use in the response
      * @param string $message A custom message to send in the status line instead of the default
      *                        status messages defined in Imbo\Http\Response\Response.php.
      * @return ResponseInterface
      */
-    function setStatusCode($code, $message = null);
+    function setStatusCode($code);
+
+    /**
+     * Get the status message
+     *
+     * If not a custom one has been set, return the default message for the current status code
+     *
+     * @return string
+     */
+    function getStatusMessage();
+
+    /**
+     * Set the status message if a custom one is needed
+     *
+     * @param string $message The message to set
+     * @return ResponseInterface
+     */
+    function setStatusMessage($message);
 
     /**
      * Get the header container
