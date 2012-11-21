@@ -33,6 +33,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
+    Imbo\EventManager\EventManagerInterface,
     Imbo\Http\Request\RequestInterface,
     Imbo\Exception\RuntimeException;
 
@@ -49,7 +50,7 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Cors extends Listener implements ListenerInterface {
+class Cors implements ListenerInterface {
     /**
      * Parameters for the listener
      *
@@ -87,74 +88,78 @@ class Cors extends Listener implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getEvents() {
+    public function attach(EventManagerInterface $manager) {
         $events = array();
 
         // Enable the event listener only for resources and methods specified
         foreach ($this->params['allowedMethods'] as $resource => $methods) {
             foreach ($methods as $method) {
-                $events[] = $resource . '.' . strtolower($method) . '.pre';
+                $event = $resource . '.' . strtolower($method);
+                $manager->attach($event, array($this, 'invoke'), 20);
             }
 
             // Always enable the listener for the OPTIONS method
-            $events[] = $resource . '.options.pre';
+            $manager->attach($resource . '.options', array($this, 'options'), 20);
         }
-
-        return $events;
     }
 
     /**
-     * {@inheritdoc}
+     * Handle the OPTIONS requests
+     *
+     * @param EventInterface $event The event instance
      */
-    public function invoke(EventInterface $event) {
-        $container = $event->getContainer();
-        $request   = $container->get('request');
-        $origin    = $request->getHeaders()->get('Origin', '*');
+    public function options(EventInterface $event) {
+        $request = $event->getRequest();
+        $origin = $request->getHeaders()->get('Origin', '*');
 
         // Fall back if the passed origin is not allowed
         if (!$this->originIsAllowed($origin)) {
             return;
         }
 
-        $response  = $container->get('response');
-        $resource  = $request->getResource();
-        $isOptions = $request->getMethod() == RequestInterface::METHOD_OPTIONS;
+        $response = $event->getResponse();
+        $resource = $request->getResource();
 
         $allowedMethods = array('OPTIONS');
+
         if (isset($this->params['allowedMethods'][$resource])) {
             $allowedMethods = array_merge($allowedMethods, $this->params['allowedMethods'][$resource]);
         }
 
         $headers = $response->getHeaders();
         $headers->set('Access-Control-Allow-Origin', $origin);
+        $headers->set('Access-Control-Allow-Methods', implode(', ', $allowedMethods));
+        $headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept');
+        $headers->set('Access-Control-Max-Age', (int) $this->params['maxAge']);
 
-        if ($isOptions) {
-            $headers->set('Access-Control-Allow-Methods', implode(', ', $allowedMethods));
-            $headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept');
-            $headers->set('Access-Control-Max-Age', (int) $this->params['maxAge']);
-
-            // Since this is an OPTIONS-request, there is no need for further parsing
-            $response->setStatusCode('204', 'No Content');
-            $event->haltApplication(true);
-        } else {
-            // Expose the internal error code in case something should fail
-            $headers->set('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode');
-        }
+        // Since this is an OPTIONS-request, there is no need for further parsing
+        $response->setStatusCode(204);
+        $event->stopPropagation(true);
     }
 
     /**
-     * Returns an array of allowed origins
+     * Handle other requests
      *
-     * @return array The defined allowed origins
+     * @param EventInterface $event The event instance
      */
-    public function getAllowedOrigins() {
-        return $this->params['allowedOrigins'];
+    public function invoke(EventInterface $event) {
+        $origin = $event->getRequest()->getHeaders()->get('Origin', '*');
+
+        // Fall back if the passed origin is not allowed
+        if (!$this->originIsAllowed($origin)) {
+            return;
+        }
+
+        $headers = $event->getResponse()->getHeaders();
+
+        $headers->set('Access-Control-Allow-Origin', $origin)
+                ->set('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode');
     }
 
     /**
      * Check if the given origin is defined as an allowed origin
      *
-     * @param  string $origin Origin to validate
+     * @param string $origin Origin to validate
      * @return boolean True if allowed, false otherwise
      */
     private function originIsAllowed($origin) {
