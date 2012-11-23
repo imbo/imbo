@@ -35,7 +35,10 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Resource\Images\Query,
     Imbo\Resource\Images\QueryInterface,
     Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManagerInterface,
+    Imbo\EventManager\EventManager,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\Container,
+    Imbo\ContainerAware,
     DateTime;
 
 /**
@@ -57,7 +60,12 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Images extends Resource implements ImagesInterface {
+class Images implements ContainerAware, ResourceInterface, ListenerInterface {
+    /**
+     * @var Container
+     */
+    private $container;
+
     /**
      * Query instance
      *
@@ -68,6 +76,15 @@ class Images extends Resource implements ImagesInterface {
     /**
      * {@inheritdoc}
      */
+    public function setContainer(Container $container) {
+        $this->container = $container;
+    }
+
+    /**
+     * Fetch a query instance
+     *
+     * @return QueryInterface
+     */
     public function getQuery() {
         if ($this->query === null) {
             $this->query = new Query();
@@ -77,7 +94,10 @@ class Images extends Resource implements ImagesInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Set a query instance
+     *
+     * @param QueryInterface $query A query instance
+     * @return ImagesInterface
      */
     public function setQuery(QueryInterface $query) {
         $this->query = $query;
@@ -98,13 +118,15 @@ class Images extends Resource implements ImagesInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManagerInterface $manager) {
+    public function attach(EventManager $manager) {
         $manager->attach('images.get', array($this, 'get'))
                 ->attach('images.head', array($this, 'head'));
     }
 
     /**
-     * {@inheritdoc}
+     * Handle GET requests
+     *
+     * @param EventInterface $event The current event
      */
     public function get(EventInterface $event) {
         $request = $event->getRequest();
@@ -165,12 +187,24 @@ class Images extends Resource implements ImagesInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Handle HEAD requests
+     *
+     * @param EventInterface $event The current event
      */
     public function head(EventInterface $event) {
         $this->get($event);
 
         // Remove body from the response, but keep everything else
         $event->getResponse()->setBody(null);
+    }
+
+    /**
+     * Wrapper around the dateformatter
+     *
+     * @param DateTime $date A DateTime instance
+     * @return string A formatted date
+     */
+    private function formatDate($date) {
+        return $this->container->get('dateFormatter')->formatDate($date);
     }
 }
