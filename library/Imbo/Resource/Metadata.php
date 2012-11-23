@@ -93,16 +93,9 @@ class Metadata implements ContainerAware, ResourceInterface, ListenerInterface {
      * @param EventInterface $event The current event
      */
     public function delete(EventInterface $event) {
-        $request = $event->getRequest();
-        $imageIdentifier = $request->getImageIdentifier();
-
-        $event->getManager()->trigger('db.metadata.delete', array(
-            'publicKey' => $request->getPublicKey(),
-            'imageIdentifier' => $imageIdentifier,
-        ));
-
+        $event->getManager()->trigger('db.metadata.delete');
         $event->getResponse()->setBody(array(
-            'imageIdentifier' => $imageIdentifier,
+            'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
         ));
     }
 
@@ -112,14 +105,11 @@ class Metadata implements ContainerAware, ResourceInterface, ListenerInterface {
      * @param EventInterface $event The current event
      */
     public function put(EventInterface $event) {
-        $request = $event->getRequest();
-
-        $event->getManager()->trigger('db.metadata.delete', array(
-            'publicKey' => $request->getPublicKey(),
-            'imageIdentifier' => $request->getImageIdentifier(),
+        $event->getManager()->trigger('db.metadata.delete')
+                            ->trigger('db.metadata.update');
+        $event->getResponse()->setBody(array(
+            'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
         ));
-
-        $this->post($event);
     }
 
     /**
@@ -128,19 +118,9 @@ class Metadata implements ContainerAware, ResourceInterface, ListenerInterface {
      * @param EventInterface $event The current event
      */
     public function post(EventInterface $event) {
-        $request = $event->getRequest();
-        $metadata = $request->getRawData();
-
-        $imageIdentifier = $request->getImageIdentifier();
-
-        $event->getManager()->trigger('db.metadata.update', array(
-            'publicKey' => $request->getPublicKey(),
-            'imageIdentifier' => $imageIdentifier,
-            'metadata' => json_decode($metadata, true),
-        ));
-
+        $event->getManager()->trigger('db.metadata.update');
         $event->getResponse()->setBody(array(
-            'imageIdentifier' => $imageIdentifier,
+            'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
         ));
     }
 
@@ -151,24 +131,15 @@ class Metadata implements ContainerAware, ResourceInterface, ListenerInterface {
      */
     public function get(EventInterface $event) {
         $request = $event->getRequest();
-        $database = $event->getDatabase();
         $response = $event->getResponse();
 
-        $publicKey = $request->getPublicKey();
-        $imageIdentifier = $request->getImageIdentifier();
-        $responseHeaders = $response->getHeaders();
+        $event->getManager()->trigger('db.metadata.load');
 
-        // See when this particular image was last updated
-        $lastModified = $this->container->get('dateFormatter')->formatDate(
-            $database->getLastModified($publicKey, $imageIdentifier)
-        );
+        $lastModified = $response->getLastModified();
 
-        // Generate an etag for the content
-        $etag = '"' . md5($publicKey . $imageIdentifier . $lastModified) . '"';
-        $responseHeaders->set('ETag', $etag);
-        $responseHeaders->set('Last-Modified', $lastModified);
+        $hash = md5($request->getPublicKey() . $request->getImageIdentifier() . $lastModified);
 
-        $response->setBody($database->getMetadata($publicKey, $imageIdentifier));
+        $response->getHeaders()->set('ETag', '"' . $hash . '"');
     }
 
     /**
