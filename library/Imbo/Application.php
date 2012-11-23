@@ -201,6 +201,12 @@ class Application {
         $container->set('imagesResource', new Resource\Images());
         $container->set('userResource', new Resource\User());
         $container->set('statusResource', new Resource\Status());
+        $container->setStatic('databaseOperations', function(Container $container) {
+            return new EventListener\DatabaseOperations($container->get('database'));
+        });
+        $container->setStatic('storageOperations', function(Container $container) {
+            return new EventListener\StorageOperations($container->get('storage'));
+        });
         $container->setStatic('imageResource', function(Container $container) {
             $imageResource = new Resource\Image($container->get('image'));
             $config = $container->get('config');
@@ -251,6 +257,8 @@ class Application {
                 'response',
                 'responseFormatter',
                 'router',
+                'databaseOperations',
+                'storageOperations',
             );
 
             foreach ($containerEntries as $listener) {
