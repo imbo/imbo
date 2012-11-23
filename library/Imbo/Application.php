@@ -200,12 +200,7 @@ class Application {
         });
         $container->set('image', new Image());
         $container->set('contentNegotiation', new Http\ContentNegotiation());
-        $container->setStatic('imagePreparation', function(Container $container) {
-            $preparation = new ImagePreparation();
-            $preparation->setContainer($container);
-
-            return $preparation;
-        });
+        $container->set('imagePreparation', new ImagePreparation());
         $container->setStatic('metadataResource', function(Container $container) {
             $resource = new Resource\Metadata();
             $resource->setContainer($container);

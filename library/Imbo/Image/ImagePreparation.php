@@ -32,6 +32,9 @@
 namespace Imbo\Image;
 
 use Imbo\Http\Request\RequestInterface,
+    Imbo\EventManager\EventManager,
+    Imbo\EventManager\EventInterface,
+    Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ImageException,
     Imbo\Exception,
     Imbo\Image\Image;
@@ -45,11 +48,27 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class ImagePreparation implements ImagePreparationInterface {
+class ImagePreparation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function prepareImage(RequestInterface $request, ImageInterface $image) {
+    public function attach(EventManager $manager) {
+        $manager->attach('image.put', array($this, 'prepareImage'), 10);
+    }
+
+    /**
+     * Prepare an image
+     *
+     * This method should prepare an image object from php://input. The method must also figure out
+     * the width, height, mime type and extension of the image.
+     *
+     * @param EventInterface $event The current event
+     * @throws ImageException
+     */
+    public function prepareImage(EventInterface $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+
         // Fetch image data from input
         $imageBlob = $request->getRawData();
 
@@ -100,12 +119,10 @@ class ImagePreparation implements ImagePreparationInterface {
         }
 
         // Store relevant information in the image instance
-        $image->setMimeType($mime)
-              ->setExtension($extension)
-              ->setBlob($imageBlob)
-              ->setWidth($size[0])
-              ->setHeight($size[1]);
-
-        return $this;
+        $response->getImage()->setMimeType($mime)
+                             ->setExtension($extension)
+                             ->setBlob($imageBlob)
+                             ->setWidth($size[0])
+                             ->setHeight($size[1]);
     }
 }
