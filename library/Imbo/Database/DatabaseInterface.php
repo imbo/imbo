@@ -33,7 +33,7 @@
 namespace Imbo\Database;
 
 use Imbo\Image\Image,
-    Imbo\Resource\Images\QueryInterface,
+    Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException;
 
 /**
@@ -107,11 +107,11 @@ interface DatabaseInterface {
      * Get images based on some query parameters
      *
      * @param string $publicKey The public key of the user
-     * @param QueryInterface $query A query instance
+     * @param Query $query A query instance
      * @return array
      * @throws DatabaseException
      */
-    function getImages($publicKey, QueryInterface $query);
+    function getImages($publicKey, Query $query);
 
     /**
      * Load information from database into the image object

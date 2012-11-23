@@ -33,7 +33,6 @@ namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\Resource\Images\Query,
-    Imbo\Resource\Images\QueryInterface,
     Imbo\EventManager\EventInterface,
     Imbo\EventManager\EventManager,
     Imbo\EventListener\ListenerInterface,
@@ -69,7 +68,7 @@ class Images implements ContainerAware, ResourceInterface, ListenerInterface {
     /**
      * Query instance
      *
-     * @var Imbo\Resource\Images\QueryInterface
+     * @var Query
      */
     private $query;
 
@@ -83,7 +82,7 @@ class Images implements ContainerAware, ResourceInterface, ListenerInterface {
     /**
      * Fetch a query instance
      *
-     * @return QueryInterface
+     * @return Query
      */
     public function getQuery() {
         if ($this->query === null) {
@@ -96,10 +95,10 @@ class Images implements ContainerAware, ResourceInterface, ListenerInterface {
     /**
      * Set a query instance
      *
-     * @param QueryInterface $query A query instance
+     * @param Query $query A query instance
      * @return ImagesResource
      */
-    public function setQuery(QueryInterface $query) {
+    public function setQuery(Query $query) {
         $this->query = $query;
 
         return $this;

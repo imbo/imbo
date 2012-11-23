@@ -32,7 +32,7 @@
 namespace Imbo\Database;
 
 use Imbo\Image\Image,
-    Imbo\Resource\Images\QueryInterface,
+    Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     Imbo\Exception,
     Doctrine\DBAL\Configuration,
@@ -281,7 +281,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImages($publicKey, QueryInterface $query) {
+    public function getImages($publicKey, Query $query) {
         $images = array();
 
         $qb = $this->getConnection()->createQueryBuilder();

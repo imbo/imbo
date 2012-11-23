@@ -32,7 +32,7 @@
 namespace Imbo\Database;
 
 use Imbo\Image\Image,
-    Imbo\Resource\Images\QueryInterface,
+    Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     Imbo\Exception,
     Mongo,
@@ -254,7 +254,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImages($publicKey, QueryInterface $query) {
+    public function getImages($publicKey, Query $query) {
         // Initialize return value
         $images = array();
 
