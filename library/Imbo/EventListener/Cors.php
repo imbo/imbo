@@ -33,9 +33,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManagerInterface,
-    Imbo\Http\Request\RequestInterface,
-    Imbo\Exception\RuntimeException;
+    Imbo\EventManager\EventManagerInterface;
 
 /**
  * Cross-Origin Resource Sharing (CORS) event listener
