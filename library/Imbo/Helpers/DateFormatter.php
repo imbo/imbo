@@ -22,38 +22,34 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Resources
+ * @package Helpers
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\Resource;
+namespace Imbo\Helpers;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\ResourceException,
-    DateTime;
+use DateTime;
 
 /**
- * Abstract resource class
+ * Date formatter helper class
  *
- * Resources can extend this class and override supported methods.
- *
- * @package Resources
+ * @package Helpers
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-abstract class Resource implements ResourceInterface {
+class DateFormatter {
     /**
      * Get a formatted date
      *
      * @param DateTime $date An instance of DateTime
      * @return string Returns a formatted date string
      */
-    protected function formatDate(DateTime $date) {
+    public function formatDate(DateTime $date) {
         return $date->format('D, d M Y H:i:s') . ' GMT';
     }
 }

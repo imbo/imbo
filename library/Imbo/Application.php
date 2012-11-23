@@ -166,10 +166,12 @@ class Application {
         $container = new Container();
 
         $container->set('config', $this->config);
+        $conatiner->set('dateFormatter', new Helper\DateFormatter());
         $container->set('request', new Request($_GET, $_POST, $_SERVER));
         $container->set('version', new Version());
         $container->setStatic('response', function ($container) {
             $response = new Response();
+            $response->setImage($container->get('image'));
             $response->getHeaders()->set(
                 'X-Imbo-Version',
                 $container->get('version')->getVersionNumber()
@@ -201,14 +203,8 @@ class Application {
         $container->set('imagesResource', new Resource\Images());
         $container->set('userResource', new Resource\User());
         $container->set('statusResource', new Resource\Status());
-        $container->setStatic('databaseOperations', function(Container $container) {
-            return new EventListener\DatabaseOperations($container->get('database'));
-        });
-        $container->setStatic('storageOperations', function(Container $container) {
-            return new EventListener\StorageOperations($container->get('storage'));
-        });
         $container->setStatic('imageResource', function(Container $container) {
-            $imageResource = new Resource\Image($container->get('image'));
+            $imageResource = new Resource\Image();
             $config = $container->get('config');
 
             foreach ($config['transformations'] as $name => $callback) {
@@ -242,6 +238,12 @@ class Application {
             }
 
             return $adapter;
+        });
+        $container->setStatic('databaseOperations', function(Container $container) {
+            return new EventListener\DatabaseOperations($container->get('database'));
+        });
+        $container->setStatic('storageOperations', function(Container $container) {
+            return new EventListener\StorageOperations($container->get('storage'));
         });
         $container->setStatic('eventManager', function(Container $container) {
             $manager = new EventManager();
