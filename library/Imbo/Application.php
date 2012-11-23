@@ -39,6 +39,7 @@ use Imbo\Http\Request\Request,
     Imbo\EventManager\EventManager,
     Imbo\EventManager\Event,
     Imbo\Image\Image,
+    Imbo\Image\ImagePreparation,
     Imbo\Exception\RuntimeException,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Database\DatabaseInterface,
@@ -166,7 +167,7 @@ class Application {
         $container = new Container();
 
         $container->set('config', $this->config);
-        $conatiner->set('dateFormatter', new Helper\DateFormatter());
+        $container->set('dateFormatter', new Helpers\DateFormatter());
         $container->set('request', new Request($_GET, $_POST, $_SERVER));
         $container->set('version', new Version());
         $container->setStatic('response', function ($container) {
@@ -199,19 +200,47 @@ class Application {
         });
         $container->set('image', new Image());
         $container->set('contentNegotiation', new Http\ContentNegotiation());
-        $container->set('metadataResource', new Resource\Metadata());
-        $container->set('imagesResource', new Resource\Images());
-        $container->set('userResource', new Resource\User());
-        $container->set('statusResource', new Resource\Status());
+        $container->setStatic('imagePreparation', function(Container $container) {
+            $preparation = new ImagePreparation();
+            $preparation->setContainer($container);
+
+            return $preparation;
+        });
+        $container->setStatic('metadataResource', function(Container $container) {
+            $resource = new Resource\Metadata();
+            $resource->setContainer($container);
+
+            return $resource;
+        });
+        $container->setStatic('imagesResource', function(Container $container) {
+            $resource = new Resource\Images();
+            $resource->setContainer($container);
+
+            return $resource;
+        });
+        $container->setStatic('userResource', function(Container $container) {
+            $resource = new Resource\User();
+            $resource->setContainer($container);
+
+            return $resource;
+        });
+        $container->setStatic('statusResource', function(Container $container) {
+            $resource = new Resource\Status();
+            $resource->setContainer($container);
+
+            return $resource;
+        });
         $container->setStatic('imageResource', function(Container $container) {
-            $imageResource = new Resource\Image();
+            $resource = new Resource\Image();
+            $resource->setContainer($container);
+
             $config = $container->get('config');
 
             foreach ($config['transformations'] as $name => $callback) {
-                $imageResource->registerTransformationHandler($name, $callback);
+                $resource->registerTransformationHandler($name, $callback);
             }
 
-            return $imageResource;
+            return $resource;
         });
         $container->setStatic('router', function(Container $container) {
             $router = new Router();
@@ -261,6 +290,7 @@ class Application {
                 'router',
                 'databaseOperations',
                 'storageOperations',
+                'imagePreparation',
             );
 
             foreach ($containerEntries as $listener) {
