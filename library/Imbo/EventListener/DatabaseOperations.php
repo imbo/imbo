@@ -77,12 +77,12 @@ class DatabaseOperations implements ListenerInterface {
      */
     public function insertImage(EventInterface $event) {
         $request = $event->getRequest();
-        $params = $event->getParams();
+        $response = $event->getResponse();
 
         $this->db->insertImage(
             $request->getPublicKey(),
             $request->getRealImageIdentifier(),
-            $params['image']
+            $response->getImage()
         );
     }
 
@@ -107,12 +107,12 @@ class DatabaseOperations implements ListenerInterface {
      */
     public function loadImage(EventInterface $event) {
         $request = $event->getRequest();
-        $params = $event->getParams();
+        $response = $event->getResponse();
 
         $this->db->load(
             $request->getPublicKey(),
             $request->getImageIdentifier(),
-            $params['image']
+            $response->getImage()
         );
     }
 
