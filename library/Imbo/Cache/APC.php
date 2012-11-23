@@ -106,6 +106,6 @@ class APC implements CacheInterface {
      * @return string A namespaced key
      */
     protected function getKey($key) {
-        return $this->namespace . $key;
+        return $this->namespace . ':' . $key;
     }
 }
