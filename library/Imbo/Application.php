@@ -264,7 +264,10 @@ class Application {
             return $adapter;
         });
         $container->setStatic('databaseOperations', function(Container $container) {
-            return new EventListener\DatabaseOperations($container->get('database'));
+            $listener = new EventListener\DatabaseOperations($container->get('database'));
+            $listener->setContainer($container);
+
+            return $listener;
         });
         $container->setStatic('storageOperations', function(Container $container) {
             return new EventListener\StorageOperations($container->get('storage'));
