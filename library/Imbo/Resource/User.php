@@ -33,7 +33,10 @@ namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManagerInterface;
+    Imbo\EventManager\EventManager,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\Container,
+    Imbo\ContainerAware;
 
 /**
  * User resource
@@ -44,7 +47,19 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class User extends Resource implements UserInterface {
+class User implements ContainerAware, ResourceInterface, ListenerInterface {
+    /**
+     * @var Container
+     */
+    private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(Container $container) {
+        $this->container = $container;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -58,13 +73,15 @@ class User extends Resource implements UserInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManagerInterface $manager) {
+    public function attach(EventManager $manager) {
         $manager->attach('user.get', array($this, 'get'))
                 ->attach('user.head', array($this, 'head'));
     }
 
     /**
-     * {@inheritdoc}
+     * Handle GET requests
+     *
+     * @param EventInterface $event The current event
      */
     public function get(EventInterface $event) {
         $request = $event->getRequest();
@@ -80,7 +97,9 @@ class User extends Resource implements UserInterface {
         $numImages = $database->getNumImages($publicKey);
 
         // Fetch the last modfified timestamp for the current user
-        $lastModified = $this->formatDate($database->getLastModified($publicKey));
+        $lastModified = $this->container->get('dateFormatter')->formatDate(
+            $database->getLastModified($publicKey)
+        );
 
         // Generate ETag based on the last modification date and add to the response headers
         $etag = '"' . md5($lastModified) . '"';
@@ -95,7 +114,9 @@ class User extends Resource implements UserInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Handle HEAD requests
+     *
+     * @param EventInterface $event The current event
      */
     public function head(EventInterface $event) {
         $this->get($event);
