@@ -33,7 +33,9 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\EventManager\EventManager,
-    Imbo\Database\DatabaseInterface;
+    Imbo\Database\DatabaseInterface,
+    Imbo\Container,
+    Imbo\ContainerAware;
 
 /**
  * Database operations event listener
@@ -44,7 +46,12 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class DatabaseOperations implements ListenerInterface {
+class DatabaseOperations implements ContainerAware, ListenerInterface {
+    /**
+     * @var Container
+     */
+    private $container;
+
     /**
      * @var DatabaseInterface
      */
@@ -62,12 +69,20 @@ class DatabaseOperations implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
+    public function setContainer(Container $container) {
+        $this->container = $container;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function attach(EventManager $manager) {
         $manager->attach('db.image.insert', array($this, 'insertImage'))
                 ->attach('db.image.delete', array($this, 'deleteImage'))
                 ->attach('db.image.load', array($this, 'loadImage'))
                 ->attach('db.metadata.delete', array($this, 'deleteMetadata'))
-                ->attach('db.metadata.update', array($this, 'updateMetadata'));
+                ->attach('db.metadata.update', array($this, 'updateMetadata'))
+                ->attach('db.metadata.load', array($this, 'loadMetadata'));
     }
 
     /**
@@ -122,11 +137,11 @@ class DatabaseOperations implements ListenerInterface {
      * @param EventInterface $event An event instance
      */
     public function deleteMetadata(EventInterface $event) {
-        $params = $event->getParams();
+        $request = $event->getRequest();
 
         $this->db->deleteMetadata(
-            $params['publicKey'],
-            $params['imageIdentifier']
+            $request->getPublicKey(),
+            $request->getImageIdentifier()
         );
     }
 
@@ -137,12 +152,31 @@ class DatabaseOperations implements ListenerInterface {
      */
     public function updateMetadata(EventInterface $event) {
         $request = $event->getRequest();
-        $params = $event->getParams();
 
         $this->db->updateMetadata(
             $request->getPublicKey(),
             $request->getImageIdentifier(),
-            $params['metadata']
+            json_decode($request->getRawData(), true)
+        );
+    }
+
+    /**
+     * Load metadata
+     *
+     * @param EventInterface $event An event instance
+     */
+    public function loadMetadata(EventInterface $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        $publicKey = $request->getPublicKey();
+        $imageIdentifier = $request->getImageIdentifier();
+
+        $response->setBody($this->db->getMetadata($publicKey, $imageIdentifier));
+        $response->getHeaders()->set(
+            'Last-Modified',
+            $this->container->get('dateFormatter')->formatDate(
+                $this->db->getLastModified($publicKey, $imageIdentifier)
+            )
         );
     }
 }
