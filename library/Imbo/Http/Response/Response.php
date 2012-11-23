@@ -36,7 +36,7 @@ use Imbo\Http\HeaderContainer,
     Imbo\EventManager\EventManager,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
-    Imbo\Image\ImageInterface,
+    Imbo\Image\Image,
     DateTime;
 
 /**
@@ -147,7 +147,7 @@ class Response implements ResponseInterface {
     /**
      * Image instance used with the image resource
      *
-     * @var ImageInterface
+     * @var Image
      */
     private $image;
 
@@ -256,7 +256,7 @@ class Response implements ResponseInterface {
     /**
      * {@inheritdoc}
      */
-    public function setImage(ImageInterface $image) {
+    public function setImage(Image $image) {
         $this->image = $image;
 
         return $this;

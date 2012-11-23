@@ -31,7 +31,7 @@
 
 namespace Imbo\Database;
 
-use Imbo\Image\ImageInterface,
+use Imbo\Image\Image,
     Imbo\Resource\Images\QueryInterface,
     Imbo\Exception\DatabaseException,
     Imbo\Exception,
@@ -120,7 +120,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($publicKey, $imageIdentifier, ImageInterface $image) {
+    public function insertImage($publicKey, $imageIdentifier, Image $image) {
         $now = time();
 
         $data = array(
@@ -320,7 +320,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function load($publicKey, $imageIdentifier, ImageInterface $image) {
+    public function load($publicKey, $imageIdentifier, Image $image) {
         try {
             $data = $this->getCollection()->findOne(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),

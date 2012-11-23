@@ -37,7 +37,7 @@ use Imbo\Http\HeaderContainer,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
-    Imbo\Image\ImageInterface;
+    Imbo\Image\Image;
 
 /**
  * Response interface
@@ -111,7 +111,7 @@ interface ResponseInterface extends ListenerInterface {
     /**
      * Set the body
      *
-     * @param ImageInterface|array $content Either an image instance, or an array
+     * @param Image|array $content Either an image instance, or an array
      * @return ResponseInterface
      */
     function setBody($content);
@@ -134,17 +134,17 @@ interface ResponseInterface extends ListenerInterface {
     /**
      * Get the image instance
      *
-     * @return ImageInterface
+     * @return Image
      */
     function getImage();
 
     /**
      * Set an image instance
      *
-     * @param ImageInterface $image An image instance
+     * @param Image $image An image instance
      * @return ResponseInterface
      */
-    function setImage(ImageInterface $image);
+    function setImage(Image $image);
 
     /**
      * Send the response

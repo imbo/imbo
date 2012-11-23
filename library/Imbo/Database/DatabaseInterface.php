@@ -32,7 +32,7 @@
 
 namespace Imbo\Database;
 
-use Imbo\Image\ImageInterface,
+use Imbo\Image\Image,
     Imbo\Resource\Images\QueryInterface,
     Imbo\Exception\DatabaseException;
 
@@ -56,11 +56,11 @@ interface DatabaseInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
-     * @param ImageInterface $image The image to insert
+     * @param Image $image The image to insert
      * @return boolean Returns true on success or false on failure
      * @throws DatabaseException
      */
-    function insertImage($publicKey, $imageIdentifier, ImageInterface $image);
+    function insertImage($publicKey, $imageIdentifier, Image $image);
 
     /**
      * Delete an image from the database
@@ -118,11 +118,11 @@ interface DatabaseInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
-     * @param ImageInterface $image The image object to populate
+     * @param Image $image The image object to populate
      * @return boolean
      * @throws DatabaseException
      */
-    function load($publicKey, $imageIdentifier, ImageInterface $image);
+    function load($publicKey, $imageIdentifier, Image $image);
 
     /**
      * Get the last modified timestamp of a user

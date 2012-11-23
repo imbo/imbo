@@ -32,7 +32,7 @@
 
 namespace Imbo\Storage;
 
-use Imbo\Image\ImageInterface,
+use Imbo\Image\Image,
     Imbo\Exception\StorageException;
 
 /**

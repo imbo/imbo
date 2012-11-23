@@ -33,7 +33,7 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface,
+use Imbo\Image\Image,
     Imbo\Exception\TransformationException,
     ImagickException;
 
@@ -76,7 +76,7 @@ class MaxSize extends Transformation implements TransformationInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(ImageInterface $image) {
+    public function applyToImage(Image $image) {
         try {
             $sourceWidth  = $image->getWidth();
             $sourceHeight = $image->getHeight();

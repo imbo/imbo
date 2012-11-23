@@ -31,7 +31,7 @@
 
 namespace Imbo\Database;
 
-use Imbo\Image\ImageInterface,
+use Imbo\Image\Image,
     Imbo\Resource\Images\QueryInterface,
     Imbo\Exception\DatabaseException,
     Imbo\Exception,
@@ -107,7 +107,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($publicKey, $imageIdentifier, ImageInterface $image) {
+    public function insertImage($publicKey, $imageIdentifier, Image $image) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('id')
               ->from($this->getTableName('imageinfo', $publicKey, $imageIdentifier), 'i')
@@ -342,7 +342,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function load($publicKey, $imageIdentifier, ImageInterface $image) {
+    public function load($publicKey, $imageIdentifier, Image $image) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('*')
               ->from($this->getTableName('imageinfo', $publicKey, $imageIdentifier), 'i')
