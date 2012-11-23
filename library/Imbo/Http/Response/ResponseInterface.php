@@ -161,6 +161,13 @@ interface ResponseInterface extends ListenerInterface {
     function setNotModified();
 
     /**
+     * Fetch the Last-Modified header
+     *
+     * @return string
+     */
+    function getLastModified();
+
+    /**
      * Whether or not the response is an error response
      *
      * @return boolean

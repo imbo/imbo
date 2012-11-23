@@ -305,6 +305,13 @@ class Response implements ResponseInterface {
     /**
      * {@inheritdoc}
      */
+    public function getLastModified() {
+        return $this->headers->get('Last-Modified');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isError() {
         return $this->getStatusCode() >= 400;
     }
