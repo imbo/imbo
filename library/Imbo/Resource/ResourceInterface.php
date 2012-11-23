@@ -48,7 +48,7 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-interface ResourceInterface extends ListenerInterface {
+interface ResourceInterface {
     /**#@+
      * Resource types
      *
