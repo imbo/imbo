@@ -32,8 +32,11 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManagerInterface,
+    Imbo\EventManager\EventManager,
     Imbo\Http\Request\RequestInterface,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\Container,
+    Imbo\ContainerAware,
     Imbo\Exception\InvalidArgumentException;
 
 /**
@@ -45,7 +48,19 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Metadata extends Resource implements MetadataInterface {
+class Metadata implements ContainerAware, ResourceInterface, ListenerInterface {
+    /**
+     * @var Container
+     */
+    private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(Container $container) {
+        $this->container = $container;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -62,12 +77,14 @@ class Metadata extends Resource implements MetadataInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManagerInterface $manager) {
+    public function attach(EventManager $manager) {
         $manager->attach('metadata.get', array($this, 'get'))
                 ->attach('metadata.post', array($this, 'post'))
                 ->attach('metadata.put', array($this, 'put'))
                 ->attach('metadata.delete', array($this, 'delete'))
-                ->attach('metadata.head', array($this, 'head'));
+                ->attach('metadata.head', array($this, 'head'))
+                ->attach('metadata.post', array($this, 'validateMetadata'), 10)
+                ->attach('metadata.put', array($this, 'validateMetadata'), 10);
     }
 
     /**
@@ -75,14 +92,14 @@ class Metadata extends Resource implements MetadataInterface {
      */
     public function delete(EventInterface $event) {
         $request = $event->getRequest();
-        $database = $event->getDatabase();
-        $response = $event->getResponse();
-
         $imageIdentifier = $request->getImageIdentifier();
 
-        $database->deleteMetadata($request->getPublicKey(), $imageIdentifier);
+        $event->getManager()->trigger('db.metadata.delete', array(
+            'publicKey' => $request->getPublicKey(),
+            'imageIdentifier' => $imageIdentifier,
+        ));
 
-        $response->setBody(array(
+        $event->getResponse()->setBody(array(
             'imageIdentifier' => $imageIdentifier,
         ));
     }
@@ -92,32 +109,13 @@ class Metadata extends Resource implements MetadataInterface {
      */
     public function put(EventInterface $event) {
         $request = $event->getRequest();
-        $database = $event->getDatabase();
-        $response = $event->getResponse();
 
-        $publicKey = $request->getPublicKey();
-        $imageIdentifier = $request->getImageIdentifier();
-        $metadata = $request->getRawData();
-
-        if (empty($metadata)) {
-            throw new InvalidArgumentException('Missing JSON data', 400);
-        } else {
-            $metadata = json_decode($metadata, true);
-
-            if ($metadata === null) {
-                throw new InvalidArgumentException('Invalid JSON data', 400);
-            }
-        }
-
-        // Remove existing metadata
-        $database->deleteMetadata($publicKey, $imageIdentifier);
-
-        // Insert new metadata
-        $database->updateMetadata($publicKey, $imageIdentifier, $metadata);
-
-        $response->setBody(array(
-            'imageIdentifier' => $imageIdentifier,
+        $event->getManager()->trigger('db.metadata.delete', array(
+            'publicKey' => $request->getPublicKey(),
+            'imageIdentifier' => $request->getImageIdentifier(),
         ));
+
+        $this->post($event);
     }
 
     /**
@@ -125,31 +123,17 @@ class Metadata extends Resource implements MetadataInterface {
      */
     public function post(EventInterface $event) {
         $request = $event->getRequest();
-        $database = $event->getDatabase();
-        $response = $event->getResponse();
+        $metadata = $request->getRawData();
 
         $imageIdentifier = $request->getImageIdentifier();
 
-        // Fetch metadata from the request
-        if ($request->getRequest()->has('metadata')) {
-            $metadata = $request->getRequest()->get('metadata');
-        } else {
-            $metadata = $request->getRawData();
-        }
+        $event->getManager()->trigger('db.metadata.update', array(
+            'publicKey' => $request->getPublicKey(),
+            'imageIdentifier' => $imageIdentifier,
+            'metadata' => json_decode($metadata, true),
+        ));
 
-        if (empty($metadata)) {
-            throw new InvalidArgumentException('Missing JSON data', 400);
-        } else {
-            $metadata = json_decode($metadata, true);
-
-            if ($metadata === null) {
-                throw new InvalidArgumentException('Invalid JSON data', 400);
-            }
-        }
-
-        $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $metadata);
-
-        $response->setBody(array(
+        $event->getResponse()->setBody(array(
             'imageIdentifier' => $imageIdentifier,
         ));
     }
@@ -167,7 +151,9 @@ class Metadata extends Resource implements MetadataInterface {
         $responseHeaders = $response->getHeaders();
 
         // See when this particular image was last updated
-        $lastModified = $this->formatDate($database->getLastModified($publicKey, $imageIdentifier));
+        $lastModified = $this->container->get('dateFormatter')->formatDate(
+            $database->getLastModified($publicKey, $imageIdentifier)
+        );
 
         // Generate an etag for the content
         $etag = '"' . md5($publicKey . $imageIdentifier . $lastModified) . '"';
@@ -185,5 +171,26 @@ class Metadata extends Resource implements MetadataInterface {
 
         // Remove body from the response, but keep everything else
         $event->getResponse()->setBody(null);
+    }
+
+    /**
+     * Validate metadata found in the request body
+     *
+     * @param EventInterface $event The event instance
+     * @throws InvalidArgumentException
+     */
+    public function validateMetadata(EventInterface $event){
+        $request = $event->getRequest();
+        $metadata = $request->getRawData();
+
+        if (empty($metadata)) {
+            throw new InvalidArgumentException('Missing JSON data', 400);
+        } else {
+            $metadata = json_decode($metadata, true);
+
+            if ($metadata === null) {
+                throw new InvalidArgumentException('Invalid JSON data', 400);
+            }
+        }
     }
 }

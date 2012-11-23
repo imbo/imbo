@@ -32,18 +32,16 @@
 namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
+    Imbo\Container,
+    Imbo\ContainerAware,
+    Imbo\EventListener\ListenerInterface,
     Imbo\Image\Image as ImageObject,
     Imbo\Image\ImageInterface,
-    Imbo\Image\ImagePreparation,
-    Imbo\Image\ImagePreparationInterface,
     Imbo\Exception\StorageException,
     Imbo\Exception\ResourceException,
-    Imbo\Image\Transformation\Convert,
     Imbo\Image\Transformation\TransformationInterface,
-    Imbo\Http\ContentNegotiation,
-    Imbo\Resource\ImageInterface as ImageResourceInterface,
     Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManagerInterface;
+    Imbo\EventManager\EventManager;
 
 /**
  * Image resource
@@ -54,27 +52,11 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Image extends Resource implements ImageResourceInterface {
+class Image implements ContainerAware, ResourceInterface, ListenerInterface {
     /**
-     * Image for the client
-     *
-     * @var ImageInterface
+     * @var Container
      */
-    private $image;
-
-    /**
-     * Image prepation instance
-     *
-     * @var ImagePreparation
-     */
-    private $imagePreparation;
-
-    /**
-     * Content negotiation instance
-     *
-     * @var ContentNegotiation
-     */
-    private $contentNegotiation;
+    private $container;
 
     /**
      * An array of registered transformation handlers
@@ -84,28 +66,10 @@ class Image extends Resource implements ImageResourceInterface {
     private $transformationHandlers = array();
 
     /**
-     * Class constructor
-     *
-     * @param ImageInterface $image An image instance
-     * @param ImagePreparationInterface $imagePreparation An image preparation instance
-     * @param ContentNegotiation $contentNegotiation Content negotiation instance
+     * {@inheritdoc}
      */
-    public function __construct(ImageInterface $image = null, ImagePreparationInterface $imagePreparation = null, ContentNegotiation $contentNegotiation = null) {
-        if ($image === null) {
-            $image = new ImageObject();
-        }
-
-        if ($imagePreparation === null) {
-            $imagePreparation = new ImagePreparation();
-        }
-
-        if ($contentNegotiation === null) {
-            $contentNegotiation = new ContentNegotiation();
-        }
-
-        $this->image = $image;
-        $this->imagePreparation = $imagePreparation;
-        $this->contentNegotiation = $contentNegotiation;
+    public function setContainer(Container $container) {
+        $this->container = $container;
     }
 
     /**
@@ -123,7 +87,7 @@ class Image extends Resource implements ImageResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManagerInterface $manager) {
+    public function attach(EventManager $manager) {
         $manager->attach('image.get', array($this, 'get'))
                 ->attach('image.head', array($this, 'head'))
                 ->attach('image.delete', array($this, 'delete'))
@@ -131,30 +95,25 @@ class Image extends Resource implements ImageResourceInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Handle PUT requests
+     *
+     * @param EventInterface
      */
     public function put(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
-        $database = $event->getDatabase();
         $storage = $event->getStorage();
-
-        // Prepare the image based on the input stream in the request
-        $this->imagePreparation->prepareImage($request, $this->image);
-        $event->getManager()->trigger('image.put.imagepreparation.post');
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getRealImageIdentifier();
 
-        // Insert the image to the database
-        $database->insertImage($publicKey, $imageIdentifier, $this->image);
+        $event->getManager()->trigger('db.image.insert');
 
         // Store the image
         try {
-            $storage->store($publicKey, $imageIdentifier, $this->image->getBlob());
+            $storage->store($publicKey, $imageIdentifier, $response->getImage()->getBlob());
         } catch (StorageException $e) {
-            // Remove image from the database
-            $database->deleteImage($publicKey, $imageIdentifier);
+            $event->getManager()->trigger('db.image.delete');
 
             throw $e;
         }
@@ -164,18 +123,19 @@ class Image extends Resource implements ImageResourceInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Handle DELETE requests
+     *
+     * @param EventInterface
      */
     public function delete(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
-        $database = $event->getDatabase();
         $storage = $event->getStorage();
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
 
-        $database->deleteImage($publicKey, $imageIdentifier);
+        $event->getManager()->trigger('db.image.delete');
         $storage->delete($publicKey, $imageIdentifier);
 
         $response->setBody(array(
@@ -184,12 +144,13 @@ class Image extends Resource implements ImageResourceInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Handle GET requests
+     *
+     * @param EventInterface
      */
     public function get(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
-        $database = $event->getDatabase();
         $storage = $event->getStorage();
 
         $publicKey = $request->getPublicKey();
@@ -197,10 +158,9 @@ class Image extends Resource implements ImageResourceInterface {
         $serverContainer = $request->getServer();
         $requestHeaders = $request->getHeaders();
         $responseHeaders = $response->getHeaders();
+        $image = $response->getImage();
 
-        // Fetch information from the database (injects mime type, width and height to the
-        // image instance)
-        $database->load($publicKey, $imageIdentifier, $this->image);
+        $event->getManager()->trigger('db.image.load');
 
         // Generate ETag using public key, image identifier, Accept headers of the user agent and
         // the requested URI
@@ -212,14 +172,16 @@ class Image extends Resource implements ImageResourceInterface {
         ) . '"';
 
         // Fetch formatted last modified timestamp from the storage driver
-        $lastModified = $this->formatDate($storage->getLastModified($publicKey, $imageIdentifier));
+        $lastModified = $this->container->get('dateFormatter')->formatDate(
+            $storage->getLastModified($publicKey, $imageIdentifier)
+        );
 
         // Add the ETag to the response headers
         $responseHeaders->set('ETag', $etag);
 
         // Fetch the image data and store the data in the image instance
         $imageData = $storage->getImage($publicKey, $imageIdentifier);
-        $this->image->setBlob($imageData);
+        $image->setBlob($imageData);
 
         // Set some response headers before we apply optional transformations
         $responseHeaders
@@ -230,11 +192,11 @@ class Image extends Resource implements ImageResourceInterface {
             ->set('Cache-Control', 'max-age=31536000')
 
             // Custom Imbo headers
-            ->set('X-Imbo-OriginalMimeType', $this->image->getMimeType())
-            ->set('X-Imbo-OriginalWidth', $this->image->getWidth())
-            ->set('X-Imbo-OriginalHeight', $this->image->getHeight())
-            ->set('X-Imbo-OriginalFileSize', $this->image->getFilesize())
-            ->set('X-Imbo-OriginalExtension', $this->image->getExtension());
+            ->set('X-Imbo-OriginalMimeType', $image->getMimeType())
+            ->set('X-Imbo-OriginalWidth', $image->getWidth())
+            ->set('X-Imbo-OriginalHeight', $image->getHeight())
+            ->set('X-Imbo-OriginalFileSize', $image->getFilesize())
+            ->set('X-Imbo-OriginalExtension', $image->getExtension());
 
         // Fetch and apply transformations
         foreach ($request->getTransformations() as $transformation) {
@@ -248,9 +210,9 @@ class Image extends Resource implements ImageResourceInterface {
             $transformation = $callback($transformation['params']);
 
             if ($transformation instanceof TransformationInterface) {
-                $transformation->applyToImage($this->image);
+                $transformation->applyToImage($image);
             } else if (is_callable($transformation)) {
-                $transformation($this->image);
+                $transformation($image);
             }
         }
 
@@ -258,13 +220,16 @@ class Image extends Resource implements ImageResourceInterface {
         // image type in the URI, or if the user agent does not accept the original content type of
         // the requested image.
         $extension = $request->getExtension();
-        $imageType = $this->image->getMimeType();
+        $imageType = $image->getMimeType();
         $acceptableTypes = $request->getAcceptableContentTypes();
 
         if (!$extension && !$this->contentNegotiation->isAcceptable($imageType, $acceptableTypes)) {
             $typesToCheck = ImageObject::$mimeTypes;
 
-            $match = $this->contentNegotiation->bestMatch(array_keys($typesToCheck), $acceptableTypes);
+            $match = $this->container->get('contentNegotiation')->bestMatch(
+                array_keys($typesToCheck),
+                $acceptableTypes
+            );
 
             if (!$match) {
                 throw new ResourceException('Not Acceptable', 406);
@@ -281,19 +246,21 @@ class Image extends Resource implements ImageResourceInterface {
             $callback = $this->transformationHandlers['convert'];
 
             $convert = $callback(array('type' => $extension));
-            $convert->applyToImage($this->image);
+            $convert->applyToImage($image);
         }
 
         // Set the content length and content-type after transformations have been applied
-        $imageData = $this->image->getBlob();
+        $imageData = $image->getBlob();
         $responseHeaders->set('Content-Length', strlen($imageData))
-                        ->set('Content-Type', $this->image->getMimeType());
+                        ->set('Content-Type', $image->getMimeType());
 
         $response->setBody($imageData);
     }
 
     /**
-     * {@inheritdoc}
+     * Handle HEAD requests
+     *
+     * @param EventInterface
      */
     public function head(EventInterface $event) {
         $this->get($event);
@@ -303,7 +270,14 @@ class Image extends Resource implements ImageResourceInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Register an image transformation handler
+     *
+     * @param string $name The name of the transformation, as used in the query parameters
+     * @param callable $callback A piece of code that can be executed. The callback will receive a
+     *                           single parameter: $params, which is an array with parameters
+     *                           associated with the transformation. The callable must return an
+     *                           instance of Imbo\Image\Transformation\TransformationInterface
+     * @return ResourceInterface
      */
     public function registerTransformationHandler($name, $callback) {
         $this->transformationHandlers[$name] = $callback;
