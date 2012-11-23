@@ -34,7 +34,7 @@ namespace Imbo;
 use Imbo\Resource\ResourceInterface,
     Imbo\Http\Request\RequestInterface,
     Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManagerInterface,
+    Imbo\EventManager\EventManager,
     Imbo\Exception\RuntimeException;
 
 /**
@@ -90,7 +90,7 @@ class Router implements ContainerAware, RouterInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManagerInterface $manager) {
+    public function attach(EventManager $manager) {
         $manager->attach('route', array($this, 'route'));
     }
 

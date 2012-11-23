@@ -32,7 +32,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManagerInterface,
+    Imbo\EventManager\EventManager,
     Imbo\Exception\RuntimeException,
     Imbo\Exception;
 
@@ -66,7 +66,7 @@ class Authenticate implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManagerInterface $manager) {
+    public function attach(EventManager $manager) {
         $manager->attach('status.get', array($this, 'invoke'), 10)
                 ->attach('image.put', array($this, 'invoke'), 10)
                 ->attach('image.post', array($this, 'invoke'), 10)

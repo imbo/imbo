@@ -32,7 +32,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManagerInterface,
+    Imbo\EventManager\EventManager,
     Imbo\Http\Request\RequestInterface,
     Imbo\Exception\RuntimeException;
 
@@ -102,7 +102,7 @@ class AccessToken implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManagerInterface $manager) {
+    public function attach(EventManager $manager) {
         $manager->attach('user.get', array($this, 'invoke'), 10)
                 ->attach('images.get', array($this, 'invoke'), 10)
                 ->attach('image.get', array($this, 'invoke'), 10)

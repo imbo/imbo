@@ -32,7 +32,7 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventManagerInterface;
+use Imbo\EventManager\EventManager;
 
 /**
  * Internal event listener interface
@@ -48,7 +48,7 @@ interface ListenerInterface {
     /**
      * Attach to the event manager
      *
-     * @param EventManagerInterface $manager
+     * @param EventManager $manager
      */
-    function attach(EventManagerInterface $manager);
+    function attach(EventManager $manager);
 }

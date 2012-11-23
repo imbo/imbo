@@ -33,7 +33,7 @@ namespace Imbo\EventListener;
 
 use Imbo\Exception\RuntimeException,
     Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManagerInterface,
+    Imbo\EventManager\EventManager,
     Imbo\Cache\CacheInterface,
     Imbo\Http\Response\ResponseInterface;
 
@@ -66,7 +66,7 @@ class MetadataCache implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManagerInterface $manager) {
+    public function attach(EventManager $manager) {
         $manager
             // Look in cache before the resource fetches from the database
             ->attach('metadata.get', array($this, 'getFromCache'), 10)

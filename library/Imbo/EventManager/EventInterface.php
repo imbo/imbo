@@ -86,7 +86,7 @@ interface EventInterface {
     /**
      * Get the event manager that triggered the event
      *
-     * @return EventManagerInterface
+     * @return EventManager
      */
     function getManager();
 

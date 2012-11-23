@@ -33,7 +33,7 @@ namespace Imbo\Http\Response;
 
 use Imbo\Http\HeaderContainer,
     Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManagerInterface,
+    Imbo\EventManager\EventManager,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
     DateTime;
@@ -348,7 +348,7 @@ class Response implements ResponseInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManagerInterface $manager) {
+    public function attach(EventManager $manager) {
         $manager->attach('response.send', array($this, 'send'));
     }
 

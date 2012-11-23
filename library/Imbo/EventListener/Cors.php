@@ -33,7 +33,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManagerInterface;
+    Imbo\EventManager\EventManager;
 
 /**
  * Cross-Origin Resource Sharing (CORS) event listener
@@ -86,7 +86,7 @@ class Cors implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManagerInterface $manager) {
+    public function attach(EventManager $manager) {
         $events = array();
 
         // Enable the event listener only for resources and methods specified
