@@ -33,7 +33,10 @@ namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManagerInterface,
+    Imbo\EventManager\EventManager,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\Container,
+    Imbo\ContainerAware,
     DateTime;
 
 /**
@@ -48,7 +51,19 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Status extends Resource implements StatusInterface {
+class Status implements ContainerAware, ResourceInterface, ListenerInterface {
+    /**
+     * @var Container
+     */
+    private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(Container $container) {
+        $this->container = $container;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -62,13 +77,15 @@ class Status extends Resource implements StatusInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManagerInterface $manager) {
+    public function attach(EventManager $manager) {
         $manager->attach('status.get', array($this, 'get'))
                 ->attach('status.head', array($this, 'head'));
     }
 
     /**
-     * {@inheritdoc}
+     * Handle GET requests
+     *
+     * @param EventInterface $event The current event
      */
     public function get(EventInterface $event) {
         $response = $event->getResponse();
@@ -94,14 +111,16 @@ class Status extends Resource implements StatusInterface {
         }
 
         $response->setBody(array(
-            'date'     => $this->formatDate(new DateTime()),
+            'date'     => $this->container->get('dateFormatter')->formatDate(new DateTime()),
             'database' => $databaseStatus,
             'storage'  => $storageStatus,
         ));
     }
 
     /**
-     * {@inheritdoc}
+     * Handle HEAD requests
+     *
+     * @param EventInterface $event The current event
      */
     public function head(EventInterface $event) {
         $this->get($event);
