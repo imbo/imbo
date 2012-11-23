@@ -46,7 +46,7 @@ use Imbo\Resource\ResourceInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Router implements ContainerAware, RouterInterface {
+class Router implements ContainerAware {
     /**
      * HTTP methods supported one way or another in Imbo
      *
@@ -95,7 +95,9 @@ class Router implements ContainerAware, RouterInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Resolve the current route
+     *
+     * @param EventInterface $event An event instance
      */
     public function route(EventInterface $event) {
         $request = $event->getRequest();
