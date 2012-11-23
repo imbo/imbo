@@ -31,16 +31,9 @@
 
 namespace Imbo\EventManager;
 
-use Imbo\EventListener\ListenerInterface,
-    Imbo\Container,
+use Imbo\Container,
     Imbo\ContainerAware,
-    Imbo\EventListener\PublicKeyAwareListenerInterface,
     Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\RuntimeException,
-    Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface,
-    Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface,
     SplPriorityQueue;
 
 /**
@@ -52,7 +45,7 @@ use Imbo\EventListener\ListenerInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class EventManager implements ContainerAware, EventManagerInterface {
+class EventManager implements ContainerAware {
     /**
      * Callbacks that can be triggered
      *
@@ -73,59 +66,35 @@ class EventManager implements ContainerAware, EventManagerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Attach a callable to an event
+     *
+     * @param string $eventName The event to attach to
+     * @param callback $callback Code that will be called when the event is triggered
+     * @param int $priority Priority of the callback
+     * @throws InvalidArgumentException
+     * @return EventManager
      */
-    public function attach($events, $callback, $priority = 1) {
-        if (!is_array($events)) {
-            $events = array($events);
-        }
-
+    public function attach($eventName, $callback, $priority = 1) {
         if (!is_callable($callback)) {
             throw new InvalidArgumentException('Callback is not callable');
         }
 
-        foreach ($events as $event) {
-            if (empty($this->callbacks[$event])) {
-                $this->callbacks[$event] = new SplPriorityQueue();
-            }
-
-            $this->callbacks[$event]->insert($callback, $priority);
+        if (empty($this->callbacks[$eventName])) {
+            $this->callbacks[$eventName] = new SplPriorityQueue();
         }
+
+        $this->callbacks[$eventName]->insert($callback, $priority);
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function attachListener(ListenerInterface $listener, $priority = 1) {
-        if ($listener instanceof PublicKeyAwareListenerInterface && !$listener->triggersFor($this->container->get('request')->getPublicKey())) {
-            return $this;
-        }
-
-        return $this->attach($listener->getEvents(), function (EventInterface $event) use ($listener) {
-            $eventName = $event->getName();
-
-            $methodName = preg_replace_callback(
-                "#(\.)([a-z]{1})#",
-                function ($matches) {
-                    return strtoupper($matches[2]);
-                },
-                $eventName
-            );
-
-            $methodName = 'on' . ucfirst($methodName);
-
-            if (!method_exists($listener, $methodName)) {
-                throw new RuntimeException(get_class($listener) . ' can not execute "' . $eventName . '"');
-            }
-
-            $listener->$methodName($event);
-        }, $priority);
-    }
-
-    /**
-     * {@inheritdoc}
+     * Trigger a given event
+     *
+     * @param string $eventName The name of the event to trigger
+     * @param array $params Optional extra parameters to send to the event listeners for the current
+     *                      event
+     * @return EventManager
      */
     public function trigger($eventName, array $params = array()) {
         if (!empty($this->callbacks[$eventName])) {
@@ -149,7 +118,10 @@ class EventManager implements ContainerAware, EventManagerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Whether or not the manager has event listeners that subscribes to a specific event
+     *
+     * @param string $eventName The name of the event to check
+     * @return boolean
      */
     public function hasListenersForEvent($eventName) {
         return !empty($this->callbacks[$eventName]);
