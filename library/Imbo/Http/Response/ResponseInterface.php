@@ -36,7 +36,8 @@ use Imbo\Http\HeaderContainer,
     Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception,
-    Imbo\Http\Request\RequestInterface;
+    Imbo\Http\Request\RequestInterface,
+    Imbo\Image\ImageInterface;
 
 /**
  * Response interface
@@ -129,6 +130,21 @@ interface ResponseInterface extends ListenerInterface {
      * @return ResponseInterface
      */
     function setProtocolVersion($version);
+
+    /**
+     * Get the image instance
+     *
+     * @return ImageInterface
+     */
+    function getImage();
+
+    /**
+     * Set an image instance
+     *
+     * @param ImageInterface $image An image instance
+     * @return ResponseInterface
+     */
+    function setImage(ImageInterface $image);
 
     /**
      * Send the response

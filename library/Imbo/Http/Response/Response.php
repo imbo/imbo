@@ -36,6 +36,7 @@ use Imbo\Http\HeaderContainer,
     Imbo\EventManager\EventManager,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
+    Imbo\Image\ImageInterface,
     DateTime;
 
 /**
@@ -144,6 +145,13 @@ class Response implements ResponseInterface {
     private $body;
 
     /**
+     * Image instance used with the image resource
+     *
+     * @var ImageInterface
+     */
+    private $image;
+
+    /**
      * Class constructor
      *
      * @param HeaderContainer $headerContainer An optional instance of a header container. An empty
@@ -234,6 +242,22 @@ class Response implements ResponseInterface {
      */
     public function setProtocolVersion($version) {
         $this->protocolVersion = $version;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getImage() {
+        return $this->image;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setImage(ImageInterface $image) {
+        $this->image = $image;
 
         return $this;
     }
