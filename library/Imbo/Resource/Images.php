@@ -97,7 +97,7 @@ class Images implements ContainerAware, ResourceInterface, ListenerInterface {
      * Set a query instance
      *
      * @param QueryInterface $query A query instance
-     * @return ImagesInterface
+     * @return ImagesResource
      */
     public function setQuery(QueryInterface $query) {
         $this->query = $query;

@@ -88,7 +88,9 @@ class Metadata implements ContainerAware, ResourceInterface, ListenerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Handle DELETE requests
+     *
+     * @param EventInterface $event The current event
      */
     public function delete(EventInterface $event) {
         $request = $event->getRequest();
@@ -105,7 +107,9 @@ class Metadata implements ContainerAware, ResourceInterface, ListenerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Handle PUT requests
+     *
+     * @param EventInterface $event The current event
      */
     public function put(EventInterface $event) {
         $request = $event->getRequest();
@@ -119,7 +123,9 @@ class Metadata implements ContainerAware, ResourceInterface, ListenerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Handle POST requests
+     *
+     * @param EventInterface $event The current event
      */
     public function post(EventInterface $event) {
         $request = $event->getRequest();
@@ -139,7 +145,9 @@ class Metadata implements ContainerAware, ResourceInterface, ListenerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Handle GET requests
+     *
+     * @param EventInterface $event The current event
      */
     public function get(EventInterface $event) {
         $request = $event->getRequest();
@@ -164,7 +172,9 @@ class Metadata implements ContainerAware, ResourceInterface, ListenerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Handle HEAD requests
+     *
+     * @param EventInterface $event The current event
      */
     public function head(EventInterface $event) {
         $this->get($event);
