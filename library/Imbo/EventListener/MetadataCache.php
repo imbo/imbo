@@ -31,11 +31,9 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\Exception\RuntimeException,
-    Imbo\EventManager\EventInterface,
+use Imbo\EventManager\EventInterface,
     Imbo\EventManager\EventManager,
-    Imbo\Cache\CacheInterface,
-    Imbo\Http\Response\ResponseInterface;
+    Imbo\Cache\CacheInterface;
 
 /**
  * Metadata cache
@@ -68,18 +66,15 @@ class MetadataCache implements ListenerInterface {
      */
     public function attach(EventManager $manager) {
         $manager
-            // Look in cache before the resource fetches from the database
-            ->attach('metadata.get', array($this, 'getFromCache'), 10)
+            // Load from cache
+            ->attach('db.metadata.load', array($this, 'loadFromCache'), 10)
 
-            // Store data in cache after the resource has fetched from the database
-            ->attach('metadata.get', array($this, 'storeInCache'), -10)
+            // Delete from cache
+            ->attach('db.metadata.delete', array($this, 'deleteFromCache'), -10)
 
-            // Delete from cache after the resource has deleted data from the database
-            ->attach('metadata.delete', array($this, 'deleteFromCache'), -10)
-
-            // Store data in cache after the resource has stored new metadata in the database
-            ->attach('metadata.put', array($this, 'storeInCache'), -10)
-            ->attach('metadata.post', array($this, 'storeInCache'), -10);
+            // Store in cache
+            ->attach('db.metadata.load', array($this, 'storeInCache'), -10)
+            ->attach('db.metadata.update', array($this, 'storeInCache'), -10);
     }
 
     /**
@@ -87,7 +82,7 @@ class MetadataCache implements ListenerInterface {
      *
      * @param EventInterface $event The event instance
      */
-    public function getFromCache(EventInterface $event) {
+    public function loadFromCache(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
@@ -98,12 +93,10 @@ class MetadataCache implements ListenerInterface {
 
         $result = $this->cache->get($cacheKey);
 
-        if ($result instanceof ResponseInterface) {
-            $result->getHeaders()->set('X-Imbo-MetadataCache', 'Hit');
-
-            // We have a valid response object from the cache. Overwrite the one already in the
-            // container
-            $response->populate($result);
+        if (is_array($result) && isset($result['lastModified']) && isset($result['metadata'])) {
+            $response->setBody($result['metadata']);
+            $response->getHeaders()->set('X-Imbo-MetadataCache', 'Hit')
+                                   ->set('Last-Modified', $result['lastModified']);
 
             // Stop propagation of listeners for this event
             $event->stopPropagation(true);
@@ -129,7 +122,10 @@ class MetadataCache implements ListenerInterface {
 
         // Store the response in the cache for later use
         if ($response->getStatusCode() === 200) {
-            $this->cache->set($cacheKey, $response);
+            $this->cache->set($cacheKey, array(
+                'lastModified' => $response->getLastModified(),
+                'metadata' => $response->getBody(),
+            ));
         }
     }
 
