@@ -33,7 +33,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Image\Image,
-    Imbo\Image\Image,
     Imbo\Exception\TransformationException,
     ImagickException;
 
