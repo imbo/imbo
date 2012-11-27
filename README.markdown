@@ -6,7 +6,7 @@ Imbo is an image "server" that can be used to add/get/delete images using a REST
 ## Documentation
 End-user docs can be found [here](http://docs.imbo-project.org/en/latest/).
 
-### Community
+## Community
 Feel free to join `#imbo` on the Freenode IRC network (`chat.freenet.net`) if you have any questions.
 
 ## Developer/Contributer notes
