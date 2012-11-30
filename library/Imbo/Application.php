@@ -229,13 +229,19 @@ class Application {
             $resource = new Resource\Image();
             $resource->setContainer($container);
 
+            return $resource;
+        });
+        $container->setStatic('imageTransformer', function(Container $container) {
+            $transformer = new EventListener\ImageTransformer();
+            $transformer->setContainer($container);
+
             $config = $container->get('config');
 
             foreach ($config['transformations'] as $name => $callback) {
-                $resource->registerTransformationHandler($name, $callback);
+                $transformer->registerTransformationHandler($name, $callback);
             }
 
-            return $resource;
+            return $transformer;
         });
         $container->setStatic('router', function(Container $container) {
             $router = new Router();
@@ -289,6 +295,7 @@ class Application {
                 'databaseOperations',
                 'storageOperations',
                 'imagePreparation',
+                'imageTransformer',
             );
 
             foreach ($containerEntries as $listener) {
