@@ -67,8 +67,7 @@ class Authenticate implements ListenerInterface {
      * {@inheritdoc}
      */
     public function attach(EventManager $manager) {
-        $manager->attach('status.get', array($this, 'invoke'), 10)
-                ->attach('image.put', array($this, 'invoke'), 10)
+        $manager->attach('image.put', array($this, 'invoke'), 10)
                 ->attach('image.post', array($this, 'invoke'), 10)
                 ->attach('image.delete', array($this, 'invoke'), 10)
                 ->attach('metadata.put', array($this, 'invoke'), 10)
@@ -80,32 +79,16 @@ class Authenticate implements ListenerInterface {
      * {@inheritdoc}
      */
     public function invoke(EventInterface $event) {
-        $config = $event->getConfig();
-        $auth = $config['auth'];
-
         $response = $event->getResponse();
-        $request  = $event->getRequest();
-        $query    = $request->getQuery();
-
-        // Whether or not this is a status check
-        $statusCheck = ($event->getName() === 'status.get');
+        $request = $event->getRequest();
+        $query = $request->getQuery();
 
         // Required query parameters
         $requiredParams = array('signature', 'timestamp');
 
-        if ($statusCheck) {
-            // We have a status check. The public key is provided as a query parameter
-            $requiredParams[] = 'publicKey';
-        }
-
         // Check for signature and timestamp
         foreach ($requiredParams as $param) {
             if (!$query->has($param)) {
-                if ($statusCheck) {
-                    // This is a status check, let's bail.
-                    return;
-                }
-
                 $e = new RuntimeException('Missing required authentication parameter: ' . $param, 400);
                 $e->setImboErrorCode(Exception::AUTH_MISSING_PARAM);
 
@@ -116,16 +99,8 @@ class Authenticate implements ListenerInterface {
         // Fetch values we want to validate and remove them from the request
         $timestamp  = $query->get('timestamp');
         $signature  = $query->get('signature');
-        $publicKey  = $statusCheck ? $query->get('publicKey') : $request->getPublicKey();
-
-        if ($statusCheck && !isset($auth[$publicKey])) {
-            $e = new RuntimeException('Unknown public key', 404);
-            $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
-
-            throw $e;
-        }
-
-        $privateKey = $statusCheck ? $auth[$publicKey] : $request->getPrivateKey();
+        $publicKey  = $request->getPublicKey();
+        $privateKey = $request->getPrivateKey();
 
         $query->remove('signature')
               ->remove('timestamp');
