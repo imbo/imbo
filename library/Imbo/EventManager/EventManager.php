@@ -76,7 +76,7 @@ class EventManager implements ContainerAware {
      */
     public function attach($eventName, $callback, $priority = 1) {
         if (!is_callable($callback)) {
-            throw new InvalidArgumentException('Callback is not callable');
+            throw new InvalidArgumentException('Callback for event ' . $eventName . ' is not callable');
         }
 
         if (empty($this->callbacks[$eventName])) {
