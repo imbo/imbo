@@ -141,8 +141,11 @@ class Application {
 
             $methodName = strtolower($request->getMethod());
 
+            $resource = $request->getResource();
+            $eventManager->trigger($resource);
+
             // Generate the event name based on the accessed resource and the HTTP method
-            $eventName = $request->getResource() . '.' . $methodName;
+            $eventName = $resource . '.' . $methodName;
 
             if (!$eventManager->hasListenersForEvent($eventName)) {
                 throw new RuntimeException('Method not allowed', 405);
