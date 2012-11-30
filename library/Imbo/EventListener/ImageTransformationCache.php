@@ -113,11 +113,7 @@ class ImageTransformationCache implements ListenerInterface {
 
         $response = $event->getResponse();
         $image = $response->getImage();
-        $eventName = $event->getName();
-        $publicKey = $request->getPublicKey();
-        $imageIdentifier = $request->getImageIdentifier();
         $extension = $request->getExtension();
-        $url = $request->getUrl();
 
         if ($extension) {
             // The user has requested a specific type (convert transformation). Use that mime type
@@ -137,7 +133,7 @@ class ImageTransformationCache implements ListenerInterface {
         }
 
         // Generate cache key and fetch the full path of the cached response
-        $hash = $this->getCacheKey($url, $mimeType);
+        $hash = $this->getCacheKey($request->getUrl(), $mimeType);
         $fullPath = $this->getCacheFilePath($request->getImageIdentifier(), $hash);
 
         if (is_file($fullPath)) {
