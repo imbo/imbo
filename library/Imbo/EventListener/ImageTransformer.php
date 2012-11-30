@@ -112,15 +112,13 @@ class ImageTransformer implements ContainerAware, ListenerInterface {
         // the requested image.
         $extension = $request->getExtension();
         $imageType = $image->getMimeType();
+        $acceptableTypes = $request->getAcceptableContentTypes();
+        $contentNegotiation = $this->container->get('contentNegotiation');
 
-        if (!$extension) {
-            $acceptableTypes = $request->getAcceptableContentTypes();
+        if (!$extension && !$contentNegotiation->isAcceptable($imageType, $acceptableTypes)) {
             $typesToCheck = Image::$mimeTypes;
 
-            $match = $this->container->get('contentNegotiation')->bestMatch(
-                array_keys($typesToCheck),
-                $acceptableTypes
-            );
+            $match = $contentNegotiation->bestMatch(array_keys($typesToCheck), $acceptableTypes);
 
             if (!$match) {
                 throw new TransformationException('Not Acceptable', 406);
