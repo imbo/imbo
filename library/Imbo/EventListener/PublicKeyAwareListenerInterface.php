@@ -32,9 +32,6 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception;
-
 /**
  * Public key aware listener interface
  *
