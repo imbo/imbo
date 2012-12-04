@@ -85,9 +85,10 @@ abstract class Transformation implements TransformationInterface {
     public function getImagick() {
         if ($this->imagick === null) {
             $this->imagick = new Imagick();
+            $this->imagick->setOption('png:exclude-chunks', 'all');
         }
 
-        return $this->imagick;
+        return clone $this->imagick;
     }
 
     /**
