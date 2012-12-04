@@ -34,6 +34,7 @@ namespace Imbo\Http\Response;
 use Imbo\Http\HeaderContainer,
     Imbo\EventManager\EventInterface,
     Imbo\EventManager\EventManager,
+    Imbo\EventListener\ListenerInterface,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
     Imbo\Image\Image,
