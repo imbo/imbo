@@ -33,6 +33,8 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
+    Imbo\EventManager\EventManager,
+    Imbo\EventListener\ListenerInterface,
     Imbo\Image\Transformation\MaxSize;
 
 /**
@@ -45,7 +47,7 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class MaxImageSize extends Listener implements ListenerInterface {
+class MaxImageSize implements ListenerInterface {
     /**
      * Max width
      *
@@ -67,36 +69,32 @@ class MaxImageSize extends Listener implements ListenerInterface {
      * @param int $height Max height
      */
     public function __construct($width = null, $height = null) {
-        $this->width  = (int) $width;
+        $this->width = (int) $width;
         $this->height = (int) $height;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getEvents() {
-        return array(
-            'image.put.imagepreparation.post',
-        );
+    public function attach(EventManager $manager) {
+        $manager->attach('image.put', array($this, 'invoke'), 25);
     }
 
     /**
      * {@inheritdoc}
      */
     public function invoke(EventInterface $event) {
-        $container = $event->getContainer();
+        $image = $event->getRequest()->getImage();
 
-        $image  = $container->get('image');
-
-        $width  = $image->getWidth();
+        $width = $image->getWidth();
         $height = $image->getHeight();
 
         if (($this->width && ($width > $this->width)) || ($this->height && ($height > $this->height))) {
-            $transformation = new MaxSize($this->width, $this->height);
+            $transformation = new MaxSize(array(
+                'width' => $this->width,
+                'height' => $this->height,
+            ));
             $transformation->applyToImage($image);
-
-            // Update raw data in request to reflect the new image
-            $container->get('request')->setRawData($image->getBlob());
         }
     }
 }
