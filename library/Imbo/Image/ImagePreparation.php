@@ -68,7 +68,7 @@ class ImagePreparation implements ContainerAware, ListenerInterface {
      * {@inheritdoc}
      */
     public function attach(EventManager $manager) {
-        $manager->attach('image.put', array($this, 'prepareImage'), 10);
+        $manager->attach('image.put', array($this, 'prepareImage'), 50);
     }
 
     /**

@@ -67,12 +67,12 @@ class Authenticate implements ListenerInterface {
      * {@inheritdoc}
      */
     public function attach(EventManager $manager) {
-        $manager->attach('image.put', array($this, 'invoke'), 20)
-                ->attach('image.post', array($this, 'invoke'), 20)
-                ->attach('image.delete', array($this, 'invoke'), 20)
-                ->attach('metadata.put', array($this, 'invoke'), 20)
-                ->attach('metadata.post', array($this, 'invoke'), 20)
-                ->attach('metadata.delete', array($this, 'invoke'), 20);
+        $manager->attach('image.put', array($this, 'invoke'), 100)
+                ->attach('image.post', array($this, 'invoke'), 100)
+                ->attach('image.delete', array($this, 'invoke'), 100)
+                ->attach('metadata.put', array($this, 'invoke'), 100)
+                ->attach('metadata.post', array($this, 'invoke'), 100)
+                ->attach('metadata.delete', array($this, 'invoke'), 100);
     }
 
     /**

@@ -103,15 +103,14 @@ class AccessToken implements ListenerInterface {
      * {@inheritdoc}
      */
     public function attach(EventManager $manager) {
-        $manager->attach('user.get', array($this, 'invoke'), 10)
-                ->attach('images.get', array($this, 'invoke'), 10)
-                ->attach('image.get', array($this, 'invoke'), 10)
-                ->attach('metadata.get', array($this, 'invoke'), 10)
-
-                ->attach('user.head', array($this, 'invoke'), 10)
-                ->attach('images.head', array($this, 'invoke'), 10)
-                ->attach('image.head', array($this, 'invoke'), 10)
-                ->attach('metadata.head', array($this, 'invoke'), 10);
+        $manager->attach('user.get', array($this, 'invoke'), 100)
+                ->attach('images.get', array($this, 'invoke'), 100)
+                ->attach('image.get', array($this, 'invoke'), 100)
+                ->attach('metadata.get', array($this, 'invoke'), 100)
+                ->attach('user.head', array($this, 'invoke'), 100)
+                ->attach('images.head', array($this, 'invoke'), 100)
+                ->attach('image.head', array($this, 'invoke'), 100)
+                ->attach('metadata.head', array($this, 'invoke'), 100);
     }
 
     /**
