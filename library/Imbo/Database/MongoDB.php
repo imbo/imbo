@@ -134,7 +134,7 @@ class MongoDB implements DatabaseInterface {
             'updated'         => $now,
             'width'           => $image->getWidth(),
             'height'          => $image->getHeight(),
-            'checksum'        => md5($image->getBlob()),
+            'checksum'        => $image->getChecksum(),
         );
 
         try {
@@ -308,6 +308,8 @@ class MongoDB implements DatabaseInterface {
 
             foreach ($cursor as $image) {
                 unset($image['_id']);
+                $image['added'] = new DateTime('@' . $image['added']);
+                $image['updated'] = new DateTime('@' . $image['updated']);
                 $images[] = $image;
             }
         } catch (MongoException $e) {

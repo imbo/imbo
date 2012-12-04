@@ -33,6 +33,9 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\EventManager\EventManager,
+    Imbo\Exception\StorageException,
+    Imbo\Container,
+    Imbo\ContainerAware,
     Imbo\Storage\StorageInterface;
 
 /**
@@ -44,7 +47,12 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class StorageOperations implements ListenerInterface {
+class StorageOperations implements ContainerAware, ListenerInterface {
+    /**
+     * @var Container
+     */
+    private $container;
+
     /**
      * @var StorageInterface
      */
@@ -62,6 +70,70 @@ class StorageOperations implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
+    public function setContainer(Container $container) {
+        $this->container = $container;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function attach(EventManager $manager) {
+        $manager->attach('storage.image.delete', array($this, 'deleteImage'))
+                ->attach('storage.image.load', array($this, 'loadImage'))
+                ->attach('storage.image.insert', array($this, 'insertImage'));
+    }
+
+    /**
+     * Delete an image
+     *
+     * @param EventInterface $event An event instance
+     */
+    public function deleteImage(EventInterface $event) {
+        $request = $event->getRequest();
+        $this->storage->delete($request->getPublicKey(), $request->getImageIdentifier());
+    }
+
+    /**
+     * Load an image
+     *
+     * @param EventInterface $event An event instance
+     */
+    public function loadImage(EventInterface $event) {
+        $request = $event->getRequest();
+        $publicKey = $request->getPublicKey();
+        $imageIdentifier = $request->getImageIdentifier();
+
+        $imageData = $this->storage->getImage($publicKey, $imageIdentifier);
+        $lastModified = $this->container->get('dateFormatter')->formatDate(
+            $this->storage->getLastModified($publicKey, $imageIdentifier)
+        );
+
+        $event->getResponse()->getHeaders()->set('Last-Modified', $lastModified);
+        $event->getResponse()->getImage()->setBlob($imageData);
+    }
+
+    /**
+     * Insert an image
+     *
+     * @param EventInterface $event An event instance
+     */
+    public function insertImage(EventInterface $event) {
+        $request = $event->getRequest();
+        $image = $request->getImage();
+        $response = $event->getResponse();
+
+        try {
+            $this->storage->store(
+                $request->getPublicKey(),
+                $image->getChecksum(),
+                $image->getBlob()
+            );
+        } catch (StorageException $e) {
+            $event->getManager()->trigger('db.image.delete', array(
+                'imageIdentifier' => $image->getChecksum(),
+            ));
+
+            throw $e;
+        }
     }
 }

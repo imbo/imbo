@@ -84,33 +84,12 @@ class User implements ContainerAware, ResourceInterface, ListenerInterface {
      * @param EventInterface $event The current event
      */
     public function get(EventInterface $event) {
-        $request = $event->getRequest();
+        $event->getManager()->trigger('db.user.load');
+
         $response = $event->getResponse();
-        $database = $event->getDatabase();
 
-        $publicKey = $request->getPublicKey();
-
-        // Fetch header containers
-        $responseHeaders = $response->getHeaders();
-
-        // Fetch the number of images this user has in the database
-        $numImages = $database->getNumImages($publicKey);
-
-        // Fetch the last modfified timestamp for the current user
-        $lastModified = $this->container->get('dateFormatter')->formatDate(
-            $database->getLastModified($publicKey)
-        );
-
-        // Generate ETag based on the last modification date and add to the response headers
-        $etag = '"' . md5($lastModified) . '"';
-        $responseHeaders->set('ETag', $etag);
-        $responseHeaders->set('Last-Modified', $lastModified);
-
-        $response->setBody(array(
-            'publicKey'    => $publicKey,
-            'numImages'    => $numImages,
-            'lastModified' => $lastModified,
-        ));
+        $etag = '"' . md5($response->getLastModified()) . '"';
+        $response->getHeaders()->set('ETag', $etag);
     }
 
     /**

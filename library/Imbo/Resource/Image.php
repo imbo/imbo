@@ -35,7 +35,6 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Container,
     Imbo\ContainerAware,
     Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\StorageException,
     Imbo\Exception\ResourceException,
     Imbo\EventManager\EventInterface,
     Imbo\EventManager\EventManager;
@@ -90,26 +89,14 @@ class Image implements ContainerAware, ResourceInterface, ListenerInterface {
      * @param EventInterface
      */
     public function put(EventInterface $event) {
+        $event->getManager()->trigger('db.image.insert');
+        $event->getManager()->trigger('storage.image.insert');
+
         $request = $event->getRequest();
         $response = $event->getResponse();
-        $storage = $event->getStorage();
-
-        $publicKey = $request->getPublicKey();
-        $imageIdentifier = $request->getRealImageIdentifier();
-
-        $event->getManager()->trigger('db.image.insert');
-
-        // Store the image
-        try {
-            $storage->store($publicKey, $imageIdentifier, $response->getImage()->getBlob());
-        } catch (StorageException $e) {
-            $event->getManager()->trigger('db.image.delete');
-
-            throw $e;
-        }
 
         $response->setStatusCode(201)
-                 ->setBody(array('imageIdentifier' => $imageIdentifier));
+                 ->setBody(array('imageIdentifier' => $request->getImage()->getChecksum()));
     }
 
     /**
@@ -118,18 +105,10 @@ class Image implements ContainerAware, ResourceInterface, ListenerInterface {
      * @param EventInterface
      */
     public function delete(EventInterface $event) {
-        $request = $event->getRequest();
-        $response = $event->getResponse();
-        $storage = $event->getStorage();
-
-        $publicKey = $request->getPublicKey();
-        $imageIdentifier = $request->getImageIdentifier();
-
         $event->getManager()->trigger('db.image.delete');
-        $storage->delete($publicKey, $imageIdentifier);
-
-        $response->setBody(array(
-            'imageIdentifier' => $imageIdentifier,
+        $event->getManager()->trigger('storage.image.delete');
+        $event->getResponse()->setBody(array(
+            'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
         ));
     }
 
@@ -141,7 +120,6 @@ class Image implements ContainerAware, ResourceInterface, ListenerInterface {
     public function get(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
-        $storage = $event->getStorage();
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
@@ -151,6 +129,7 @@ class Image implements ContainerAware, ResourceInterface, ListenerInterface {
         $image = $response->getImage();
 
         $event->getManager()->trigger('db.image.load');
+        $event->getManager()->trigger('storage.image.load');
 
         // Generate ETag using public key, image identifier, Accept headers of the user agent and
         // the requested URI
@@ -161,22 +140,10 @@ class Image implements ContainerAware, ResourceInterface, ListenerInterface {
             $serverContainer->get('REQUEST_URI')
         ) . '"';
 
-        // Fetch formatted last modified timestamp from the storage driver
-        $lastModified = $this->container->get('dateFormatter')->formatDate(
-            $storage->getLastModified($publicKey, $imageIdentifier)
-        );
-
-        // Add the ETag to the response headers
-        $responseHeaders->set('ETag', $etag);
-
-        // Fetch the image data and store the data in the image instance
-        $imageData = $storage->getImage($publicKey, $imageIdentifier);
-        $image->setBlob($imageData);
-
         // Set some response headers before we apply optional transformations
         $responseHeaders
-            // Set the last modification date
-            ->set('Last-Modified', $lastModified)
+            // ETags
+            ->set('ETag', $etag)
 
             // Set the max-age to a year since the image never changes
             ->set('Cache-Control', 'max-age=31536000')
@@ -188,10 +155,12 @@ class Image implements ContainerAware, ResourceInterface, ListenerInterface {
             ->set('X-Imbo-OriginalFileSize', $image->getFilesize())
             ->set('X-Imbo-OriginalExtension', $image->getExtension());
 
+        // Trigger possible image transformations
         $event->getManager()->trigger('image.transform');
 
         // Set the content length and content-type after transformations have been applied
         $imageData = $image->getBlob();
+
         $responseHeaders->set('Content-Length', strlen($imageData))
                         ->set('Content-Type', $image->getMimeType());
 

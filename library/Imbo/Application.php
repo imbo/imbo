@@ -43,7 +43,8 @@ use Imbo\Http\Request\Request,
     Imbo\Exception\RuntimeException,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface;
+    Imbo\Storage\StorageInterface,
+    Imbo\Resource\Images\Query;
 
 /**
  * Imbo application
@@ -114,12 +115,6 @@ class Application {
                 $responseHeaders->set('Vary', 'Accept');
             }
 
-            // Fetch the real image identifier (PUT only) or the one from the URL (if present)
-            if (($identifier = $request->getRealImageIdentifier()) ||
-                ($identifier = $request->getImageIdentifier())) {
-                $responseHeaders->set('X-Imbo-ImageIdentifier', $identifier);
-            }
-
             // Fetch auth config
             $config = $this->container->get('config');
             $authConfig = $config['auth'];
@@ -170,6 +165,9 @@ class Application {
         $container = new Container();
 
         $container->set('config', $this->config);
+        $container->set('query', function(Container $container) {
+            return new Query();
+        });
         $container->set('dateFormatter', new Helpers\DateFormatter());
         $container->set('request', new Request($_GET, $_POST, $_SERVER));
         $container->set('version', new Version());
@@ -201,9 +199,16 @@ class Application {
 
             return $formatter;
         });
-        $container->set('image', new Image());
+        $container->set('image', function(Container $container) {
+            return new Image();
+        });
         $container->set('contentNegotiation', new Http\ContentNegotiation());
-        $container->set('imagePreparation', new ImagePreparation());
+        $container->setStatic('imagePreparation', function(Container $container) {
+            $preparation = new ImagePreparation();
+            $preparation->setContainer($container);
+
+            return $preparation;
+        });
         $container->setStatic('metadataResource', function(Container $container) {
             $resource = new Resource\Metadata();
             $resource->setContainer($container);
@@ -279,7 +284,10 @@ class Application {
             return $listener;
         });
         $container->setStatic('storageOperations', function(Container $container) {
-            return new EventListener\StorageOperations($container->get('storage'));
+            $listener = new EventListener\StorageOperations($container->get('storage'));
+            $listener->setContainer($container);
+
+            return $listener;
         });
         $container->setStatic('eventManager', function(Container $container) {
             $manager = new EventManager();

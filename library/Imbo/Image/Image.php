@@ -102,6 +102,13 @@ class Image {
     private $height;
 
     /**
+     * MD5 checksum of the image data
+     *
+     * @var string
+     */
+    private $checksum;
+
+    /**
      * Get the size of the image data in bytes
      *
      * @return int
@@ -162,9 +169,7 @@ class Image {
     }
 
     /**
-     * Set the blob
-     *
-     * This method will also update the size property of the image (returned by getFileSize()).
+     * Set the blob and update filesize and checksum properties
      *
      * @param string $blob The binary data to set
      * @return Image
@@ -172,6 +177,7 @@ class Image {
     public function setBlob($blob) {
         $this->blob = $blob;
         $this->filesize = strlen($blob);
+        $this->checksum = md5($blob);
 
         return $this;
     }
@@ -237,6 +243,15 @@ class Image {
         $this->height = (int) $height;
 
         return $this;
+    }
+
+    /**
+     * Get the checksum of the current image data
+     *
+     * @return string
+     */
+    public function getChecksum() {
+        return $this->checksum;
     }
 
     /**

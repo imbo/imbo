@@ -37,7 +37,10 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ImageException,
     Imbo\Exception,
-    Imbo\Image\Image;
+    Imbo\Image\Image,
+    Imbo\Container,
+    Imbo\ContainerAware,
+    finfo;
 
 /**
  * Image preparation
@@ -48,7 +51,19 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class ImagePreparation implements ListenerInterface {
+class ImagePreparation implements ContainerAware, ListenerInterface {
+    /**
+     * @var Container
+     */
+    private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(Container $container) {
+        $this->container = $container;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -67,7 +82,6 @@ class ImagePreparation implements ListenerInterface {
      */
     public function prepareImage(EventInterface $event) {
         $request = $event->getRequest();
-        $response = $event->getResponse();
 
         // Fetch image data from input
         $imageBlob = $request->getRawData();
@@ -93,7 +107,7 @@ class ImagePreparation implements ListenerInterface {
         }
 
         // Use the file info extension to fetch the mime type
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mime = $finfo->buffer($imageBlob);
 
         if (!Image::supportedMimeType($mime)) {
@@ -105,11 +119,15 @@ class ImagePreparation implements ListenerInterface {
 
         $extension = Image::getFileExtension($mime);
 
-        // Store file to disk and use getimagesize() to fetch width/height
-        $tmpFile = tempnam(sys_get_temp_dir(), 'Imbo_uploaded_image');
-        file_put_contents($tmpFile, $imageBlob);
-        $size = getimagesize($tmpFile);
-        unlink($tmpFile);
+        if (function_exists('getimagesizefromstring')) {
+            // Available since php-5.4.0
+            $size = getimagesizefromstring($imageBlob);
+        } else {
+            $tmpFile = tempnam(sys_get_temp_dir(), 'Imbo_uploaded_image');
+            file_put_contents($tmpFile, $imageBlob);
+            $size = getimagesize($tmpFile);
+            unlink($tmpFile);
+        }
 
         if (!$size) {
             $e = new ImageException('Broken image', 415);
@@ -118,11 +136,14 @@ class ImagePreparation implements ListenerInterface {
             throw $e;
         }
 
-        // Store relevant information in the image instance
-        $response->getImage()->setMimeType($mime)
-                             ->setExtension($extension)
-                             ->setBlob($imageBlob)
-                             ->setWidth($size[0])
-                             ->setHeight($size[1]);
+        // Store relevant information in the image instance and attach it to the request
+        $image = $this->container->get('image');
+        $image->setMimeType($mime)
+              ->setExtension($extension)
+              ->setBlob($imageBlob)
+              ->setWidth($size[0])
+              ->setHeight($size[1]);
+
+        $request->setImage($image);
     }
 }

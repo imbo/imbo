@@ -32,13 +32,11 @@
 namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
-    Imbo\Resource\Images\Query,
     Imbo\EventManager\EventInterface,
     Imbo\EventManager\EventManager,
     Imbo\EventListener\ListenerInterface,
     Imbo\Container,
-    Imbo\ContainerAware,
-    DateTime;
+    Imbo\ContainerAware;
 
 /**
  * Images resource
@@ -66,42 +64,10 @@ class Images implements ContainerAware, ResourceInterface, ListenerInterface {
     private $container;
 
     /**
-     * Query instance
-     *
-     * @var Query
-     */
-    private $query;
-
-    /**
      * {@inheritdoc}
      */
     public function setContainer(Container $container) {
         $this->container = $container;
-    }
-
-    /**
-     * Fetch a query instance
-     *
-     * @return Query
-     */
-    public function getQuery() {
-        if ($this->query === null) {
-            $this->query = new Query();
-        }
-
-        return $this->query;
-    }
-
-    /**
-     * Set a query instance
-     *
-     * @param Query $query A query instance
-     * @return ImagesResource
-     */
-    public function setQuery(Query $query) {
-        $this->query = $query;
-
-        return $this;
     }
 
     /**
@@ -129,23 +95,9 @@ class Images implements ContainerAware, ResourceInterface, ListenerInterface {
      */
     public function get(EventInterface $event) {
         $request = $event->getRequest();
-        $response = $event->getResponse();
-        $database = $event->getDatabase();
-
-        $publicKey = $request->getPublicKey();
-
-        $responseHeaders = $response->getHeaders();
-
-        // Fetch the last modification date of the current user
-        $lastModified = $this->formatDate($database->getLastModified($publicKey));
-
-        // Generate ETag based on the last modification date and add to the response headers
-        $etag = '"' . md5($lastModified) . '"';
-        $responseHeaders->set('ETag', $etag);
-        $responseHeaders->set('Last-Modified', $lastModified);
-
-        $query = $this->getQuery();
         $params = $request->getQuery();
+        $response = $event->getResponse();
+        $query = $this->container->get('query');
 
         if ($params->has('page')) {
             $query->page($params->get('page'));
@@ -175,14 +127,11 @@ class Images implements ContainerAware, ResourceInterface, ListenerInterface {
             }
         }
 
-        $images = $database->getImages($publicKey, $query);
+        $event->getManager()->trigger('db.images.load', array('query' => $query));
 
-        foreach ($images as &$image) {
-            $image['added']   = $this->formatDate(new DateTime('@' . $image['added']));
-            $image['updated'] = $this->formatDate(new DateTime('@' . $image['updated']));
-        }
-
-        $response->setBody($images);
+        // Generate ETag based on the last modification date and add to the response headers
+        $etag = '"' . md5($response->getLastModified()) . '"';
+        $response->getHeaders()->set('ETag', $etag);
     }
 
     /**
@@ -195,15 +144,5 @@ class Images implements ContainerAware, ResourceInterface, ListenerInterface {
 
         // Remove body from the response, but keep everything else
         $event->getResponse()->setBody(null);
-    }
-
-    /**
-     * Wrapper around the dateformatter
-     *
-     * @param DateTime $date A DateTime instance
-     * @return string A formatted date
-     */
-    private function formatDate($date) {
-        return $this->container->get('dateFormatter')->formatDate($date);
     }
 }

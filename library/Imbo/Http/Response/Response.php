@@ -48,7 +48,7 @@ use Imbo\Http\HeaderContainer,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Response implements ResponseInterface {
+class Response implements ListenerInterface, ResponseInterface {
     /**
      * Different status codes
      *
@@ -263,7 +263,9 @@ class Response implements ResponseInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Send the response to the client, including headers
+     *
+     * @param EventInterface $event The current event
      */
     public function send(EventInterface $event) {
         $request = $event->getRequest();
@@ -271,8 +273,8 @@ class Response implements ResponseInterface {
 
         $ifModifiedSince = $requestHeaders->get('if-modified-since');
         $ifNoneMatch = $requestHeaders->get('if-none-match');
-        $lastModified = $this->getHeaders()->get('last-modified');
-        $etag = $this->getHeaders()->get('etag');
+        $lastModified = $this->headers->get('last-modified');
+        $etag = $this->headers->get('etag');
 
         if (
             $ifModifiedSince && $ifNoneMatch && (
@@ -281,6 +283,23 @@ class Response implements ResponseInterface {
             )
         ) {
             $this->setNotModified();
+        }
+
+        // Inject a possible image identifier into the response headers
+        $imageIdentifier = null;
+
+        if ($image = $request->getImage()) {
+            // The request has an image. This means that an image was just added. Use the image's
+            // checksum
+            $imageIdentifier = $image->getChecksum();
+        } else if ($identifier = $request->getImageIdentifier()) {
+            // An image identifier exists in the request, use that one (and not a possible image
+            // checksum for an image attached to the response)
+            $imageIdentifier = $identifier;
+        }
+
+        if ($imageIdentifier) {
+            $this->headers->set('X-Imbo-ImageIdentifier', $imageIdentifier);
         }
 
         $this->sendHeaders();
@@ -351,11 +370,9 @@ class Response implements ResponseInterface {
                 ),
             );
 
-            // Fetch the real image identifier (PUT only) or the one from the URL (if present)
-            if (
-                ($identifier = $request->getRealImageIdentifier()) ||
-                ($identifier = $request->getImageIdentifier())
-            ) {
+            if ($image = $request->getImage()) {
+                $data['imageIdentifier'] = $image->getChecksum();
+            } else if ($identifier = $request->getImageIdentifier()) {
                 $data['imageIdentifier'] = $identifier;
             }
 

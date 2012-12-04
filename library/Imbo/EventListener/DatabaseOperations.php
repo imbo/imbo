@@ -35,7 +35,8 @@ use Imbo\EventManager\EventInterface,
     Imbo\EventManager\EventManager,
     Imbo\Database\DatabaseInterface,
     Imbo\Container,
-    Imbo\ContainerAware;
+    Imbo\ContainerAware,
+    DateTime;
 
 /**
  * Database operations event listener
@@ -80,9 +81,11 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $manager->attach('db.image.insert', array($this, 'insertImage'))
                 ->attach('db.image.delete', array($this, 'deleteImage'))
                 ->attach('db.image.load', array($this, 'loadImage'))
+                ->attach('db.images.load', array($this, 'loadImages'))
                 ->attach('db.metadata.delete', array($this, 'deleteMetadata'))
                 ->attach('db.metadata.update', array($this, 'updateMetadata'))
-                ->attach('db.metadata.load', array($this, 'loadMetadata'));
+                ->attach('db.metadata.load', array($this, 'loadMetadata'))
+                ->attach('db.user.load', array($this, 'loadUser'));
     }
 
     /**
@@ -96,8 +99,8 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
 
         $this->db->insertImage(
             $request->getPublicKey(),
-            $request->getRealImageIdentifier(),
-            $response->getImage()
+            $request->getImage()->getChecksum(),
+            $request->getImage()
         );
     }
 
@@ -108,10 +111,17 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
      */
     public function deleteImage(EventInterface $event) {
         $request = $event->getRequest();
+        $params = $event->getParams();
+
+        $imageIdentifier = $request->getImageIdentifier();
+
+        if (isset($params['imageIdentifier'])) {
+            $imageIdentifier = $params['imageIdentifier'];
+        }
 
         $this->db->deleteImage(
             $request->getPublicKey(),
-            $request->getImageIdentifier()
+            $imageIdentifier
         );
     }
 
@@ -178,5 +188,60 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
                 $this->db->getLastModified($publicKey, $imageIdentifier)
             )
         );
+    }
+
+    /**
+     * Load images
+     *
+     * @param EventInterface $event An event instance
+     */
+    public function loadImages(EventInterface $event) {
+        $publicKey = $event->getRequest()->getPublicKey();
+        $response = $event->getResponse();
+        $params = $event->getParams();
+        $query = $params['query'];
+
+        $images = $this->db->getImages($publicKey, $query);
+
+        foreach ($images as &$image) {
+            $image['added'] = $this->formatDate($image['added']);
+            $image['updated'] = $this->formatDate($image['updated']);
+        }
+
+        $response->setBody($images);
+
+        $lastModified = $this->formatDate($this->db->getLastModified($publicKey));
+        $response->getHeaders()->set('Last-Modified', $lastModified);
+    }
+
+    /**
+     * Load user data
+     *
+     * @param EventInterface $event An event instance
+     */
+    public function loadUser(EventInterface $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        $publicKey = $request->getPublicKey();
+
+        $numImages = $this->db->getNumImages($publicKey);
+        $lastModified = $this->formatDate($this->db->getLastModified($publicKey));
+
+        $response->setBody(array(
+            'publicKey'    => $publicKey,
+            'numImages'    => $numImages,
+            'lastModified' => $lastModified,
+        ));
+        $response->getHeaders()->set('Last-Modified', $lastModified);
+    }
+
+    /**
+     * Format a DateTime instance
+     *
+     * @param DateTime $date A DateTime instance
+     * @return string A formatted date
+     */
+    private function formatDate(DateTime $date) {
+        return $this->container->get('dateFormatter')->formatDate($date);
     }
 }

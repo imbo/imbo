@@ -33,8 +33,6 @@
 namespace Imbo\Http\Response;
 
 use Imbo\Http\HeaderContainer,
-    Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
     Imbo\Image\Image;
@@ -49,7 +47,7 @@ use Imbo\Http\HeaderContainer,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-interface ResponseInterface extends ListenerInterface {
+interface ResponseInterface {
     /**
      * Get the status code
      *
@@ -145,13 +143,6 @@ interface ResponseInterface extends ListenerInterface {
      * @return ResponseInterface
      */
     function setImage(Image $image);
-
-    /**
-     * Send the response
-     *
-     * @param EventInterface $event An event instance
-     */
-    function send(EventInterface $event);
 
     /**
      * Prepare the response to send 304 Not Modified to the client
