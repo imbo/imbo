@@ -260,7 +260,7 @@ class Image extends Resource implements ImageResourceInterface {
         $imageType = $this->image->getMimeType();
         $acceptableTypes = $request->getAcceptableContentTypes();
 
-        if (!$extension) {
+        if (!$extension && !$this->contentNegotiation->isAcceptable($imageType, $acceptableTypes)) {
             $typesToCheck = ImageObject::$mimeTypes;
 
             $match = $this->contentNegotiation->bestMatch(array_keys($typesToCheck), $acceptableTypes);
