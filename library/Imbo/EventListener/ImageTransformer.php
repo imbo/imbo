@@ -82,11 +82,6 @@ class ImageTransformer implements ContainerAware, ListenerInterface {
      */
     public function transform(EventInterface $event) {
         $request = $event->getRequest();
-
-        if (!$request->hasTransformations()) {
-            return;
-        }
-
         $image = $event->getResponse()->getImage();
 
         // Fetch and apply transformations
