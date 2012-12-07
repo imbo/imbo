@@ -109,6 +109,13 @@ class Image {
     private $checksum;
 
     /**
+     * Flag used with image transformations
+     *
+     * @var boolean
+     */
+    private $transformed = false;
+
+    /**
      * Get the size of the image data in bytes
      *
      * @return int
@@ -252,6 +259,23 @@ class Image {
      */
     public function getChecksum() {
         return $this->checksum;
+    }
+
+    /**
+     * Update or get the transformed flag
+     *
+     * @param boolean $flag Set this to true or false to update the current flag. If not specified
+     *                      this method will return the current value of this flag.
+     * @return Image|boolean
+     */
+    public function hasBeenTransformed($flag = null) {
+        if ($flag === null) {
+            return $this->transformed;
+        }
+
+        $this->transformed = (boolean) $flag;
+
+        return $this;
     }
 
     /**

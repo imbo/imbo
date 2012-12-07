@@ -83,6 +83,7 @@ class ImageTransformer implements ContainerAware, ListenerInterface {
     public function transform(EventInterface $event) {
         $request = $event->getRequest();
         $image = $event->getResponse()->getImage();
+        $transformed = false;
 
         // Fetch and apply transformations
         foreach ($request->getTransformations() as $transformation) {
@@ -100,6 +101,8 @@ class ImageTransformer implements ContainerAware, ListenerInterface {
             } else if (is_callable($transformation)) {
                 $transformation($image);
             }
+
+            $transformed = true;
         }
 
         // See if we want to trigger a conversion. This happens if the user agent has specified an
@@ -131,7 +134,11 @@ class ImageTransformer implements ContainerAware, ListenerInterface {
 
             $convert = $callback(array('type' => $extension));
             $convert->applyToImage($image);
+
+            $transformed = true;
         }
+
+        $image->hasBeenTransformed($transformed);
     }
 
     /**
