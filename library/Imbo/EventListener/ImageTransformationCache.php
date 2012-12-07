@@ -105,36 +105,45 @@ class ImageTransformationCache implements ListenerInterface {
      */
     public function loadFromCache(EventInterface $event) {
         $request = $event->getRequest();
-
-        if (!$request->hasTransformations()) {
-            // No transformations, nothing to cache
-            return;
-        }
-
         $response = $event->getResponse();
+
         $image = $response->getImage();
+        $originalMimeType = $image->getMimeType();
         $extension = $request->getExtension();
+        $acceptableTypes = $request->getAcceptableContentTypes();
 
         if ($extension) {
             // The user has requested a specific type (convert transformation). Use that mime type
             $tables = Image::$mimeTypes;
             $types = array_flip($tables); // ╯°□°）╯︵ ┻━┻
             $mimeType = $types[$extension];
-        } else {
+        } else if (!$this->contentNegotiation->isAcceptable($originalMimeType, $acceptableTypes)) {
+            // The client does not accept the original mime type, find the best match
             $mimeType = $this->contentNegotiation->bestMatch(
                 array_keys(Image::$mimeTypes),
-                $request->getAcceptableContentTypes()
+                $acceptableTypes
             );
+
+            if (!$mimeType) {
+                // The client does not seem to accept any of our mime types. What a douche!
+                return;
+            }
+        } else {
+            $mimeType = $originalMimeType;
         }
 
-        if (!$mimeType) {
-            // The client does not seem to accept any of our mime types. What a douche!
+        if ($mimeType === $originalMimeType && !$request->hasTransformations()) {
+            // No conversion needed, and no transformations present in the URL
             return;
         }
 
         // Generate cache key and fetch the full path of the cached response
-        $hash = $this->getCacheKey($request->getUrl(), $mimeType);
-        $fullPath = $this->getCacheFilePath($request->getImageIdentifier(), $hash);
+        $publicKey = $request->getPublicKey();
+        $imageIdentifier = $request->getImageIdentifier();
+        $transformations = $request->getQuery()->getAll();
+
+        $hash = $this->getCacheKey($publicKey, $imageIdentifier, $mimeType, $transformations);
+        $fullPath = $this->getCacheFilePath($imageIdentifier, $hash);
 
         if (is_file($fullPath)) {
             $image->setBlob(file_get_contents($fullPath))
@@ -155,23 +164,22 @@ class ImageTransformationCache implements ListenerInterface {
      * @param EventInterface $event The current event
      */
     public function storeInCache(EventInterface $event) {
-        $request = $event->getRequest();
-
-        if (!$request->hasTransformations()) {
-            return;
-        }
-
         $response = $event->getResponse();
-
-        if ($response->getStatusCode() !== 200) {
-            // We only want to put 200 OK responses in the cache
-            return;
-        }
-
         $image = $response->getImage();
 
-        $hash = $this->getCacheKey($request->getUrl(), $image->getMimeType());
-        $fullPath = $this->getCacheFilePath($request->getImageIdentifier(), $hash);
+        if (!$image->hasBeenTransformed()) {
+            // We only want to put images that has been transformed in the cache
+            return;
+        }
+
+        $request = $event->getRequest();
+        $publicKey = $request->getPublicKey();
+        $imageIdentifier = $request->getImageIdentifier();
+        $mimeType = $image->getMimeType();
+        $transformations = $request->getQuery()->getAll();
+
+        $hash = $this->getCacheKey($publicKey, $imageIdentifier, $mimeType, $transformations);
+        $fullPath = $this->getCacheFilePath($imageIdentifier, $hash);
 
         $dir = dirname($fullPath);
 
@@ -219,12 +227,20 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Generate a cache key
      *
-     * @param string $url The request URL
-     * @param string $mime The mime type
+     * @param string $publicKey The public key
+     * @param string $imageIdentifier The image identifier
+     * @param string $mimeType The mime type of the image
+     * @param array $transformations The transformations as specified in the URL
      * @return string Returns a string that can be used as a cache key for the current image
      */
-    private function getCacheKey($url, $mime) {
-        return hash('sha256', $url . '|' . $mime);
+    private function getCacheKey($publicKey, $imageIdentifier, $mimeType, array $transformations) {
+        return hash(
+            'sha256',
+            $publicKey . '|' .
+            $imageIdentifier . '|' .
+            $mimeType . '|' .
+            http_build_query($transformations)
+        );
     }
 
     /**
