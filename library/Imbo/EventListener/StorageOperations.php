@@ -54,20 +54,6 @@ class StorageOperations implements ContainerAware, ListenerInterface {
     private $container;
 
     /**
-     * @var StorageInterface
-     */
-    private $storage;
-
-    /**
-     * Class constructor
-     *
-     * @param StorageInterface $storage A storage adapter
-     */
-    public function __construct(StorageInterface $storage) {
-        $this->storage = $storage;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function setContainer(Container $container) {
@@ -90,7 +76,7 @@ class StorageOperations implements ContainerAware, ListenerInterface {
      */
     public function deleteImage(EventInterface $event) {
         $request = $event->getRequest();
-        $this->storage->delete($request->getPublicKey(), $request->getImageIdentifier());
+        $event->getStorage()->delete($request->getPublicKey(), $request->getImageIdentifier());
     }
 
     /**
@@ -99,13 +85,14 @@ class StorageOperations implements ContainerAware, ListenerInterface {
      * @param EventInterface $event An event instance
      */
     public function loadImage(EventInterface $event) {
+        $storage = $event->getStorage();
         $request = $event->getRequest();
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
 
-        $imageData = $this->storage->getImage($publicKey, $imageIdentifier);
+        $imageData = $storage->getImage($publicKey, $imageIdentifier);
         $lastModified = $this->container->get('dateFormatter')->formatDate(
-            $this->storage->getLastModified($publicKey, $imageIdentifier)
+            $storage->getLastModified($publicKey, $imageIdentifier)
         );
 
         $event->getResponse()->getHeaders()->set('Last-Modified', $lastModified);
@@ -119,19 +106,22 @@ class StorageOperations implements ContainerAware, ListenerInterface {
      */
     public function insertImage(EventInterface $event) {
         $request = $event->getRequest();
+        $publicKey = $request->getPublicKey();
         $image = $request->getImage();
-        $response = $event->getResponse();
+        $imageIdentifier = $image->getChecksum();
+        $blob = $image->getBlob();
 
         try {
-            $this->storage->store(
-                $request->getPublicKey(),
-                $image->getChecksum(),
-                $image->getBlob()
+            $event->getStorage()->store(
+                $publicKey,
+                $imageIdentifier,
+                $blob
             );
         } catch (StorageException $e) {
-            $event->getManager()->trigger('db.image.delete', array(
-                'imageIdentifier' => $image->getChecksum(),
-            ));
+            $event->getDatabase()->deleteImage(
+                $publicKey,
+                $imageIdentifier
+            );
 
             throw $e;
         }

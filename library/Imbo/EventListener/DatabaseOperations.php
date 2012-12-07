@@ -54,20 +54,6 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
     private $container;
 
     /**
-     * @var DatabaseInterface
-     */
-    private $db;
-
-    /**
-     * Class constructor
-     *
-     * @param DatabaseInterface $db A database adapter
-     */
-    public function __construct(DatabaseInterface $db) {
-        $this->db = $db;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function setContainer(Container $container) {
@@ -97,7 +83,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
-        $this->db->insertImage(
+        $event->getDatabase()->insertImage(
             $request->getPublicKey(),
             $request->getImage()->getChecksum(),
             $request->getImage()
@@ -111,17 +97,10 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
      */
     public function deleteImage(EventInterface $event) {
         $request = $event->getRequest();
-        $params = $event->getParams();
 
-        $imageIdentifier = $request->getImageIdentifier();
-
-        if (isset($params['imageIdentifier'])) {
-            $imageIdentifier = $params['imageIdentifier'];
-        }
-
-        $this->db->deleteImage(
+        $event->getDatabase()->deleteImage(
             $request->getPublicKey(),
-            $imageIdentifier
+            $request->getImageIdentifier()
         );
     }
 
@@ -134,7 +113,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
-        $this->db->load(
+        $event->getDatabase()->load(
             $request->getPublicKey(),
             $request->getImageIdentifier(),
             $response->getImage()
@@ -149,7 +128,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
     public function deleteMetadata(EventInterface $event) {
         $request = $event->getRequest();
 
-        $this->db->deleteMetadata(
+        $event->getDatabase()->deleteMetadata(
             $request->getPublicKey(),
             $request->getImageIdentifier()
         );
@@ -163,7 +142,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
     public function updateMetadata(EventInterface $event) {
         $request = $event->getRequest();
 
-        $this->db->updateMetadata(
+        $event->getDatabase()->updateMetadata(
             $request->getPublicKey(),
             $request->getImageIdentifier(),
             json_decode($request->getRawData(), true)
@@ -180,12 +159,13 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $response = $event->getResponse();
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
+        $database = $event->getDatabase();
 
-        $response->setBody($this->db->getMetadata($publicKey, $imageIdentifier));
+        $response->setBody($database->getMetadata($publicKey, $imageIdentifier));
         $response->getHeaders()->set(
             'Last-Modified',
             $this->container->get('dateFormatter')->formatDate(
-                $this->db->getLastModified($publicKey, $imageIdentifier)
+                $database->getLastModified($publicKey, $imageIdentifier)
             )
         );
     }
@@ -196,22 +176,52 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
      * @param EventInterface $event An event instance
      */
     public function loadImages(EventInterface $event) {
+        $params = $event->getRequest()->getQuery();
+        $query = $this->container->get('imagesQuery');
+
+        if ($params->has('page')) {
+            $query->page($params->get('page'));
+        }
+
+        if ($params->has('limit')) {
+            $query->limit($params->get('limit'));
+        }
+
+        if ($params->has('metadata')) {
+            $query->returnMetadata($params->get('metadata'));
+        }
+
+        if ($params->has('from')) {
+            $query->from($params->get('from'));
+        }
+
+        if ($params->has('to')) {
+            $query->to($params->get('to'));
+        }
+
+        if ($params->has('query')) {
+            $data = json_decode($params->get('query'), true);
+
+            if (is_array($data)) {
+                $query->metadataQuery($data);
+            }
+        }
+
         $publicKey = $event->getRequest()->getPublicKey();
         $response = $event->getResponse();
-        $params = $event->getParams();
-        $query = $params['query'];
+        $database = $event->getDatabase();
 
-        $images = $this->db->getImages($publicKey, $query);
+        $images = $database->getImages($publicKey, $query);
 
         foreach ($images as &$image) {
             $image['added'] = $this->formatDate($image['added']);
             $image['updated'] = $this->formatDate($image['updated']);
         }
 
-        $response->setBody($images);
+        $lastModified = $this->formatDate($database->getLastModified($publicKey));
 
-        $lastModified = $this->formatDate($this->db->getLastModified($publicKey));
-        $response->getHeaders()->set('Last-Modified', $lastModified);
+        $response->setBody($images)
+                 ->getHeaders()->set('Last-Modified', $lastModified);
     }
 
     /**
@@ -223,9 +233,10 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $publicKey = $request->getPublicKey();
+        $database = $event->getDatabase();
 
-        $numImages = $this->db->getNumImages($publicKey);
-        $lastModified = $this->formatDate($this->db->getLastModified($publicKey));
+        $numImages = $database->getNumImages($publicKey);
+        $lastModified = $this->formatDate($database->getLastModified($publicKey));
 
         $response->setBody(array(
             'publicKey'    => $publicKey,
