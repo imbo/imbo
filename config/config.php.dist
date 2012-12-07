@@ -54,6 +54,8 @@ return array(
     /**
      * Database adapter
      *
+     * See the different adapter implementations for possible configuration parameters
+     *
      * @var Imbo\Database\DatabaseInterface
      */
     'database' => new Database\MongoDB(array(
@@ -62,12 +64,14 @@ return array(
     )),
 
     /**
-     * Storage configuration
+     * Storage adapter
+     *
+     * See the different adapter implementations for possible configuration parameters
      *
      * @var Imbo\Storage\StorageInterface
      */
-    'storage' => new Storage\Filesystem(array(
-        'dataDir' => '/path/to/images',
+    'storage' => new Storage\GridFS(array(
+        'databaseName' => 'imbo_storage',
     )),
 
     /**
@@ -88,9 +92,9 @@ return array(
      * 'callback' is any callable function. The function will receive a single argument, which is
      * an instance of Imbo\EventManager\EventInterface.
      *
-     * 'priority' is the priority of your listener. This defaults to 1 (low priority). All internal
-     * Imbo event listeners is registered with low priorities. This can also be a negative number if
-     * you want your listeners to be triggered after Imbo's event listeners.
+     * 'priority' is the priority of your listener. This defaults to 1 (low priority). The priority
+     * can also be a negative number if you want your listeners to be triggered after Imbo's event
+     * listeners.
      *
      * If you want your listeners to trigger for only some users (public keys) you can have your
      * listener implement Imbo\EventListener\PublicKeyAwareListenerInterface and implement the
@@ -136,8 +140,9 @@ return array(
      * Image transformations
      *
      * This array includes all supported image transformations. The keys are the names of the
-     * transformations that is used in the URL, and the values are closures that receives a single
-     * parameter: $params, which is the parameters associated to the transformation.
+     * transformations that is used in the URL, and the values are closures that will receive a
+     * single parameter: $params, which is the parameters found in the URL associated with the
+     * transformation.
      *
      * Example:
      *
@@ -148,9 +153,14 @@ return array(
      * All closures must return an instance of the Imbo\Image\Transformation\TransformationInterface
      * interface or a callable piece of code, that in turn will receive a single parameter:
      *
-     * Imbo\Image\ImageInterface $image
+     * Imbo\Image\Image $image
      *
      * which is the image you want your transformation to modify.
+     *
+     * All image transformations shipped by Imbo uses imagick, and if you want to use something
+     * else, simply supply your own classes in the array below.
+     *
+     * @var array
      */
     'transformations' => array(
         'border' => function (array $params) {
