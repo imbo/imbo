@@ -98,11 +98,9 @@ class EventManager implements ContainerAware {
      */
     public function trigger($eventName, array $params = array()) {
         if (!empty($this->callbacks[$eventName])) {
-            // Fetch an event
-            $event = $this->container->get('event', array(
-                'name' => $eventName,
-                'params' => $params,
-            ));
+            // Fetch and configure a new event
+            $event = $this->container->get('event');
+            $event->setName($eventName);
 
             // Trigger all listeners for this event and pass in the event instance
             foreach ($this->callbacks[$eventName] as $callback) {

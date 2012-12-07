@@ -52,16 +52,11 @@ class Event implements ContainerAware, EventInterface {
     private $name;
 
     /**
+     * Container instance
+     *
      * @var Container
      */
     private $container;
-
-    /**
-     * Optional parameters
-     *
-     * @var array
-     */
-    private $params;
 
     /**
      * Propagation flag
@@ -74,11 +69,11 @@ class Event implements ContainerAware, EventInterface {
      * Class contsructor
      *
      * @param string $name The name of the current event
-     * @param array $params Optional parameters
      */
-    public function __construct($name, array $params = array()) {
-        $this->name = $name;
-        $this->params = $params;
+    public function __construct($name = null) {
+        if ($name !== null) {
+            $this->setName($name);
+        }
     }
 
     /**
@@ -86,6 +81,15 @@ class Event implements ContainerAware, EventInterface {
      */
     public function setContainer(Container $container) {
         $this->container = $container;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setName($name) {
+        $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -151,12 +155,5 @@ class Event implements ContainerAware, EventInterface {
      */
     public function propagationIsStopped() {
         return $this->propagationIsStopped;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParams() {
-        return $this->params;
     }
 }

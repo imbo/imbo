@@ -49,6 +49,14 @@ use Imbo\Http\Request\RequestInterface,
  */
 interface EventInterface {
     /**
+     * Set the name of the event
+     *
+     * @param string $name The name of the event
+     * @return EventInterface
+     */
+    function setName($name);
+
+    /**
      * Get the name of the event
      *
      * @return string
@@ -111,11 +119,4 @@ interface EventInterface {
      * @return boolean
      */
     function propagationIsStopped();
-
-    /**
-     * Return optional parameters passed to the event instance
-     *
-     * @return array
-     */
-    function getParams();
 }
