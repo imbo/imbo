@@ -94,40 +94,9 @@ class Images implements ContainerAware, ResourceInterface, ListenerInterface {
      * @param EventInterface $event The current event
      */
     public function get(EventInterface $event) {
-        $request = $event->getRequest();
-        $params = $request->getQuery();
+        $event->getManager()->trigger('db.images.load');
+
         $response = $event->getResponse();
-        $query = $this->container->get('query');
-
-        if ($params->has('page')) {
-            $query->page($params->get('page'));
-        }
-
-        if ($params->has('limit')) {
-            $query->limit($params->get('limit'));
-        }
-
-        if ($params->has('metadata')) {
-            $query->returnMetadata($params->get('metadata'));
-        }
-
-        if ($params->has('from')) {
-            $query->from($params->get('from'));
-        }
-
-        if ($params->has('to')) {
-            $query->to($params->get('to'));
-        }
-
-        if ($params->has('query')) {
-            $data = json_decode($params->get('query'), true);
-
-            if (is_array($data)) {
-                $query->metadataQuery($data);
-            }
-        }
-
-        $event->getManager()->trigger('db.images.load', array('query' => $query));
 
         // Generate ETag based on the last modification date and add to the response headers
         $etag = '"' . md5($response->getLastModified()) . '"';
