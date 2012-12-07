@@ -35,6 +35,7 @@ use Imbo\Resource\ResourceInterface,
     Imbo\Http\Request\RequestInterface,
     Imbo\EventManager\EventInterface,
     Imbo\EventManager\EventManager,
+    Imbo\EventListener\ListenerInterface,
     Imbo\Exception\RuntimeException;
 
 /**
@@ -46,7 +47,7 @@ use Imbo\Resource\ResourceInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Router implements ContainerAware {
+class Router implements ContainerAware, ListenerInterface {
     /**
      * HTTP methods supported one way or another in Imbo
      *
