@@ -164,13 +164,24 @@ class Application {
     private function bootstrap() {
         $container = new Container();
 
+        // Main configuration
         $container->set('config', $this->config);
-        $container->set('query', function(Container $container) {
+
+        // Query object used when querying for images
+        $container->set('imagesQuery', function(Container $container) {
             return new Query();
         });
+
+        // Date formatter helper
         $container->set('dateFormatter', new Helpers\DateFormatter());
+
+        // Request from the client
         $container->set('request', new Request($_GET, $_POST, $_SERVER));
+
+        // Version component
         $container->set('version', new Version());
+
+        // Response to the client
         $container->setStatic('response', function ($container) {
             $response = new Response();
             $response->setImage($container->get('image'));
@@ -181,82 +192,110 @@ class Application {
 
             return $response;
         });
-        $container->set('event', function(Container $container, array $params) {
-            $event = new Event($params['name'], $params['params']);
+
+        // Event object
+        $container->set('event', function(Container $container) {
+            $event = new Event();
             $event->setContainer($container);
 
             return $event;
         });
+
+        // Response writer
         $container->setStatic('responseWriter', function(Container $container) {
             $writer = new ResponseWriter();
             $writer->setContainer($container);
 
             return $writer;
         });
+
+        // Response formatter
         $container->setStatic('responseFormatter', function(Container $container) {
             $formatter = new ResponseFormatter();
             $formatter->setContainer($container);
 
             return $formatter;
         });
+
+        // Image instance that will be attached to the request or the response instances
         $container->set('image', function(Container $container) {
             return new Image();
         });
+
+        // Content negotiation component
         $container->set('contentNegotiation', new Http\ContentNegotiation());
+
+        // Image preparation component
         $container->setStatic('imagePreparation', function(Container $container) {
             $preparation = new ImagePreparation();
             $preparation->setContainer($container);
 
             return $preparation;
         });
+
+        // Metadata resource
         $container->setStatic('metadataResource', function(Container $container) {
             $resource = new Resource\Metadata();
             $resource->setContainer($container);
 
             return $resource;
         });
+
+        // Images resource
         $container->setStatic('imagesResource', function(Container $container) {
             $resource = new Resource\Images();
             $resource->setContainer($container);
 
             return $resource;
         });
+
+        // User resource
         $container->setStatic('userResource', function(Container $container) {
             $resource = new Resource\User();
             $resource->setContainer($container);
 
             return $resource;
         });
+
+        // Status resource
         $container->setStatic('statusResource', function(Container $container) {
             $resource = new Resource\Status();
             $resource->setContainer($container);
 
             return $resource;
         });
+
+        // Image resource
         $container->setStatic('imageResource', function(Container $container) {
             $resource = new Resource\Image();
             $resource->setContainer($container);
 
             return $resource;
         });
+
+        // Image transformer listener
         $container->setStatic('imageTransformer', function(Container $container) {
             $transformer = new EventListener\ImageTransformer();
             $transformer->setContainer($container);
 
             $config = $container->get('config');
 
-            foreach ($config['transformations'] as $name => $callback) {
+            foreach ($config['imageTransformations'] as $name => $callback) {
                 $transformer->registerTransformationHandler($name, $callback);
             }
 
             return $transformer;
         });
+
+        // Router component
         $container->setStatic('router', function(Container $container) {
             $router = new Router();
             $router->setContainer($container);
 
             return $router;
         });
+
+        // Database adapter
         $container->setStatic('database', function(Container $container) {
             $config = $container->get('config');
             $adapter = $config['database'];
@@ -267,6 +306,8 @@ class Application {
 
             return $adapter;
         });
+
+        // Storage adapter
         $container->setStatic('storage', function(Container $container) {
             $config = $container->get('config');
             $adapter = $config['storage'];
@@ -277,18 +318,24 @@ class Application {
 
             return $adapter;
         });
+
+        // Database operations listener
         $container->setStatic('databaseOperations', function(Container $container) {
-            $listener = new EventListener\DatabaseOperations($container->get('database'));
+            $listener = new EventListener\DatabaseOperations();
             $listener->setContainer($container);
 
             return $listener;
         });
+
+        // Storage operations listener
         $container->setStatic('storageOperations', function(Container $container) {
-            $listener = new EventListener\StorageOperations($container->get('storage'));
+            $listener = new EventListener\StorageOperations();
             $listener->setContainer($container);
 
             return $listener;
         });
+
+        // Event manager component
         $container->setStatic('eventManager', function(Container $container) {
             $manager = new EventManager();
             $manager->setContainer($container);
