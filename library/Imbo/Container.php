@@ -75,22 +75,18 @@ use Imbo\Exception\InvalidArgumentException;
  *     });
  *
  * If you provide a callable to the set method, the callable will be executed every time you access
- * the value. This is handy when you want the container to create new instances every time. For
- * instance:
+ * the value. This is handy when you want the container to create new instances every time you
+ * fetch a property. For instance:
  *
  *     <?php
  *     namespace Imbo;
  *
  *     $container = new Container();
- *     $container->set('event', function(Container $container, array $params) {
- *         $eventParams = isset($params['params']) ? $params['params'] : array();
- *
- *         return new Event($params['name'], $eventParams);
+ *     $container->set('event', function(Container $container) {
+ *         return new Event();
  *     });
- *     $event1 = $container->get('event', array('name' => 'eventname'));
- *     $event2 = $container->get('event', array('name' => 'othereventname', 'params' => array(
- *         'some' => 'value',
- *     )));
+ *     $someEvent = $container->get('event');
+ *     $someOtherEvent = $container->get('event');
  *
  * @package Core
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -130,19 +126,18 @@ class Container {
      * Get a property
      *
      * @param string $id The accessed property
-     * @param array $params If $id points to a callable, $params will be sent as the second argument
      * @return mixed
      * @throws InvalidArgumentException Throws an exception when trying to get a value that does not
      *                                  exist.
      */
-    public function get($id, array $params = array()) {
+    public function get($id) {
         if (!isset($this->values[$id])) {
             throw new InvalidArgumentException(sprintf('Value %s is not defined.', $id));
         }
 
         // If the property is callable, execute it with the closure as a parameter
         if (is_callable($this->values[$id])) {
-            return $this->values[$id]($this, $params);
+            return $this->values[$id]($this);
         }
 
         return $this->values[$id];
