@@ -67,22 +67,11 @@ class Application {
     private $container;
 
     /**
-     * Class constructor
-     *
-     * @param array $config Main Imbo configuration
-     * @param Container $container Pre-bootstrapped container
-     */
-    public function __construct(array $config, Container $container = null) {
-        $this->config = $config;
-        $this->container = $container;
-    }
-
-    /**
      * Run the application
      */
     public function run() {
         if (!$this->container) {
-            $this->bootstrap();
+            throw new RuntimeException('Application has not been bootstrapped', 500);
         }
 
         $eventManager = $this->container->get('eventManager');
@@ -160,12 +149,18 @@ class Application {
 
     /**
      * Bootstrap the container
+     *
+     * @param array $config Imbo configuration
+     * @param Container $container Optional container instance
+     * @return Application
      */
-    private function bootstrap() {
-        $container = new Container();
+    public function bootstrap(array $config, Container $container = null) {
+        if (!$container) {
+            $container = new Container();
+        }
 
         // Main configuration
-        $container->set('config', $this->config);
+        $container->set('config', $config);
 
         // Query object used when querying for images
         $container->set('imagesQuery', function(Container $container) {
@@ -393,5 +388,7 @@ class Application {
         });
 
         $this->container = $container;
+
+        return $this;
     }
 }

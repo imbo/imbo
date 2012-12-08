@@ -34,13 +34,18 @@ namespace Imbo;
 
 use Exception as BaseException;
 
-// Fetch the configuration
-$configPath = __DIR__ . '/../config/config.php';
-$config = require $configPath;
-
 try {
-    $application = new Application($config);
-    $application->run();
+    // Fetch the configuration
+    $configPath = __DIR__ . '/../config/config.php';
+
+    if (!is_file($configPath)) {
+        throw new BaseException('Missing configuration file');
+    }
+
+    $config = require $configPath;
+
+    $application = new Application();
+    $application->bootstrap($config)->run();
 } catch (BaseException $e) {
     header('HTTP/1.1 500 Internal Server Error');
     trigger_error('Uncaught Exception with message: ' . $e->getMessage(), E_USER_ERROR);
