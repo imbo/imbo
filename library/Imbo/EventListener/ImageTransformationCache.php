@@ -143,7 +143,7 @@ class ImageTransformationCache implements ListenerInterface {
         $transformations = $request->getQuery()->getAll();
 
         $hash = $this->getCacheKey($publicKey, $imageIdentifier, $mimeType, $transformations);
-        $fullPath = $this->getCacheFilePath($imageIdentifier, $hash);
+        $fullPath = $this->getCacheFilePath($publicKey, $imageIdentifier, $hash);
 
         if (is_file($fullPath)) {
             $image->setBlob(file_get_contents($fullPath))
@@ -179,7 +179,7 @@ class ImageTransformationCache implements ListenerInterface {
         $transformations = $request->getQuery()->getAll();
 
         $hash = $this->getCacheKey($publicKey, $imageIdentifier, $mimeType, $transformations);
-        $fullPath = $this->getCacheFilePath($imageIdentifier, $hash);
+        $fullPath = $this->getCacheFilePath($publicKey, $imageIdentifier, $hash);
 
         $dir = dirname($fullPath);
 
@@ -196,7 +196,8 @@ class ImageTransformationCache implements ListenerInterface {
      * @param EventInterface $event The current event
      */
     public function deleteFromCache(EventInterface $event) {
-        $cacheDir = $this->getCacheDir($event->getRequest()->getImageIdentifier());
+        $request = $event->getRequest();
+        $cacheDir = $this->getCacheDir($request->getPublicKey(), $request->getImageIdentifier());
 
         if (is_dir($cacheDir)) {
             $this->rmdir($cacheDir);
@@ -206,22 +207,42 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Get the path to the current image cache dir
      *
+     * @param string $publicKey The public key
      * @param string $imageIdentifier The image identifier
      * @return string Returns the absolute path to the image cache dir
      */
-    private function getCacheDir($imageIdentifier) {
-        return sprintf('%s/%s/%s/%s/%s', $this->path, $imageIdentifier[0], $imageIdentifier[1], $imageIdentifier[2], $imageIdentifier);
+    private function getCacheDir($publicKey, $imageIdentifier) {
+        return sprintf(
+            '%s/%s/%s/%s/%s/%s/%s/%s/%s',
+            $this->path,
+            $publicKey[0],
+            $publicKey[1],
+            $publicKey[2],
+            $publicKey,
+            $imageIdentifier[0],
+            $imageIdentifier[1],
+            $imageIdentifier[2],
+            $imageIdentifier
+        );
     }
 
     /**
      * Get the absolute path to cache file
      *
+     * @param string $publicKey The public key
      * @param string $imageIdentifier The image identifier
      * @param string $hash The hash used as cache key
      * @return string Returns the absolute path to the cache file
      */
-    private function getCacheFilePath($imageIdentifier, $hash) {
-        return sprintf('%s/%s/%s/%s/%s', $this->getCacheDir($imageIdentifier), $hash[0], $hash[1], $hash[2], $hash);
+    private function getCacheFilePath($publicKey, $imageIdentifier, $hash) {
+        return sprintf(
+            '%s/%s/%s/%s/%s',
+            $this->getCacheDir($publicKey, $imageIdentifier),
+            $hash[0],
+            $hash[1],
+            $hash[2],
+            $hash
+        );
     }
 
     /**
