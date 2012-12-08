@@ -125,10 +125,10 @@ class Cors implements ListenerInterface {
         }
 
         $headers = $response->getHeaders();
-        $headers->set('Access-Control-Allow-Origin', $origin);
-        $headers->set('Access-Control-Allow-Methods', implode(', ', $allowedMethods));
-        $headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept');
-        $headers->set('Access-Control-Max-Age', (int) $this->params['maxAge']);
+        $headers->set('Access-Control-Allow-Origin', $origin)
+                ->set('Access-Control-Allow-Methods', implode(', ', $allowedMethods))
+                ->set('Access-Control-Allow-Headers', 'Content-Type, Accept')
+                ->set('Access-Control-Max-Age', (int) $this->params['maxAge']);
 
         // Since this is an OPTIONS-request, there is no need for further parsing
         $response->setStatusCode(204);
@@ -152,6 +152,15 @@ class Cors implements ListenerInterface {
 
         $headers->set('Access-Control-Allow-Origin', $origin)
                 ->set('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode');
+    }
+
+    /**
+     * Returns an array of allowed origins
+     *
+     * @return array The defined allowed origins
+     */
+    public function getAllowedOrigins() {
+        return $this->params['allowedOrigins'];
     }
 
     /**
