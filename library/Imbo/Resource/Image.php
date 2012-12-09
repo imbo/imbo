@@ -32,8 +32,6 @@
 namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
-    Imbo\Container,
-    Imbo\ContainerAware,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ResourceException,
     Imbo\EventManager\EventInterface,
@@ -48,19 +46,7 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Image implements ContainerAware, ResourceInterface, ListenerInterface {
-    /**
-     * @var Container
-     */
-    private $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-    }
-
+class Image implements ResourceInterface, ListenerInterface {
     /**
      * {@inheritdoc}
      */

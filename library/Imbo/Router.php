@@ -47,7 +47,7 @@ use Imbo\Resource\ResourceInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Router implements ContainerAware, ListenerInterface {
+class Router implements ListenerInterface {
     /**
      * HTTP methods supported one way or another in Imbo
      *
@@ -75,18 +75,6 @@ class Router implements ContainerAware, ListenerInterface {
         ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(/|\.(?<extension>json|html|xml))?$#',
         ResourceInterface::USER     => '#^/users/(?<publicKey>[a-z0-9_-]{3,})(/|\.(?<extension>json|html|xml))?$#',
     );
-
-    /**
-     * @var Container
-     */
-    private $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-    }
 
     /**
      * {@inheritdoc}

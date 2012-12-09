@@ -34,9 +34,7 @@ namespace Imbo\Resource;
 use Imbo\Http\Request\RequestInterface,
     Imbo\EventManager\EventInterface,
     Imbo\EventManager\EventManager,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\Container,
-    Imbo\ContainerAware;
+    Imbo\EventListener\ListenerInterface;
 
 /**
  * User resource
@@ -47,19 +45,7 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class User implements ContainerAware, ResourceInterface, ListenerInterface {
-    /**
-     * @var Container
-     */
-    private $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-    }
-
+class User implements ResourceInterface, ListenerInterface {
     /**
      * {@inheritdoc}
      */
