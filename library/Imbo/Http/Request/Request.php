@@ -57,21 +57,21 @@ class Request implements RequestInterface {
     /**
      * Query data
      *
-     * @var ParameterContainerInterface
+     * @var ParameterContainer
      */
     private $query;
 
     /**
      * Request data
      *
-     * @var ParameterContainerInterface
+     * @var ParameterContainer
      */
     private $request;
 
     /**
      * Server data
      *
-     * @var ServerContainerInterface
+     * @var ServerContainer
      */
     private $server;
 

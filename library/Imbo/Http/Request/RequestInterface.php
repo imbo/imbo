@@ -209,7 +209,7 @@ interface RequestInterface {
     /**
      * Get the query container
      *
-     * @return ParameterContainerInterface
+     * @return ParameterContainer
      */
     function getQuery();
 
@@ -223,7 +223,7 @@ interface RequestInterface {
     /**
      * Get the server container
      *
-     * @return ServerContainerInterface
+     * @return ServerContainer
      */
     function getServer();
 
