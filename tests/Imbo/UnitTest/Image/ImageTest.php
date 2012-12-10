@@ -43,21 +43,19 @@ use Imbo\Image\Image;
  */
 class ImageTest extends \PHPUnit_Framework_TestCase {
     /**
-     * Image instance
-     *
      * @var Imbo\Image\Image
      */
     private $image;
 
     /**
-     * Set up method
+     * Set up the image instance
      */
     public function setUp() {
         $this->image = new Image();
     }
 
     /**
-     * Tear down method
+     * Tear down the image instance
      */
     public function tearDown() {
         $this->image = null;
@@ -67,7 +65,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Image::setMetadata
      * @covers Imbo\Image\Image::getMetadata
      */
-    public function testSetGetMetadata() {
+    public function testCanSetAndGetMetadata() {
         $data = array(
             'foo' => 'bar',
             'bar' => 'foo',
@@ -80,7 +78,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Image::setMimeType
      * @covers Imbo\Image\Image::getMimeType
      */
-    public function testSetGetMimeType() {
+    public function testCanSetAndGetMimeType() {
         $mimeType = 'image/png';
         $this->assertSame($this->image, $this->image->setMimeType($mimeType));
         $this->assertSame($mimeType, $this->image->getMimeType());
@@ -90,19 +88,29 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Image::setBlob
      * @covers Imbo\Image\Image::getBlob
      * @covers Imbo\Image\Image::getFilesize
+     * @covers Imbo\Image\Image::getChecksum
      */
-    public function testSetGetBlob() {
+    public function testCanSetAndGetBlob() {
         $blob = 'some string';
+        $hash = md5($blob);
         $this->assertSame($this->image, $this->image->setBlob($blob));
         $this->assertSame($blob, $this->image->getBlob());
         $this->assertSame(11, $this->image->getFilesize());
+        $this->assertSame($hash, $this->image->getChecksum());
+
+        $blob = 'some other string';
+        $hash = md5($blob);
+        $this->assertSame($this->image, $this->image->setBlob($blob));
+        $this->assertSame($blob, $this->image->getBlob());
+        $this->assertSame(17, $this->image->getFilesize());
+        $this->assertSame($hash, $this->image->getChecksum());
     }
 
     /**
      * @covers Imbo\Image\Image::setExtension
      * @covers Imbo\Image\Image::getExtension
      */
-    public function testSetGetExtension() {
+    public function testCanSetAndGetExtension() {
         $extension = 'png';
         $this->assertSame($this->image, $this->image->setExtension($extension));
         $this->assertSame($extension, $this->image->getExtension());
@@ -112,7 +120,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Image::setWidth
      * @covers Imbo\Image\Image::getWidth
      */
-    public function testSetGetWidth() {
+    public function testCanSetAndGetWidth() {
         $width = 123;
         $this->assertSame($this->image, $this->image->setWidth($width));
         $this->assertSame($width, $this->image->getWidth());
@@ -122,7 +130,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Image::setHeight
      * @covers Imbo\Image\Image::getHeight
      */
-    public function testSetGetHeight() {
+    public function testCanSetAndGetHeight() {
         $height = 234;
         $this->assertSame($this->image, $this->image->setHeight($height));
         $this->assertSame($height, $this->image->getHeight());
@@ -146,7 +154,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Image::supportedMimeType
      * @dataProvider getMimeTypes
      */
-    public function testSupportedMimeType($type, $result) {
+    public function testCanInformAboutSupportedMimeType($type, $result) {
         $this->assertSame($result, Image::supportedMimeType($type));
     }
 
@@ -168,7 +176,18 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Image::getFileExtension
      * @dataProvider getFileExtensions
      */
-    public function testGetFileExtension($type, $extension) {
+    public function testCanGetAFileExtensionBasedOnAMimeType($type, $extension) {
         $this->assertSame($extension, Image::getFileExtension($type));
+    }
+
+    /**
+     * @covers Imbo\Image\Image::hasBeenTransformed
+     */
+    public function testCanMarkIfTheImageHasBeenTransformedOrNot() {
+        $this->assertFalse($this->image->hasBeenTransformed());
+        $this->assertSame($this->image, $this->image->hasBeenTransformed(true));
+        $this->assertTrue($this->image->hasBeenTransformed());
+        $this->assertSame($this->image, $this->image->hasBeenTransformed(false));
+        $this->assertFalse($this->image->hasBeenTransformed());
     }
 }
