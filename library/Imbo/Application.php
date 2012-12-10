@@ -231,7 +231,6 @@ class Application {
         // Metadata resource
         $container->setStatic('metadataResource', function(Container $container) {
             $resource = new Resource\Metadata();
-            $resource->setContainer($container);
 
             return $resource;
         });
@@ -239,7 +238,6 @@ class Application {
         // Images resource
         $container->setStatic('imagesResource', function(Container $container) {
             $resource = new Resource\Images();
-            $resource->setContainer($container);
 
             return $resource;
         });
@@ -247,7 +245,6 @@ class Application {
         // User resource
         $container->setStatic('userResource', function(Container $container) {
             $resource = new Resource\User();
-            $resource->setContainer($container);
 
             return $resource;
         });
@@ -263,7 +260,6 @@ class Application {
         // Image resource
         $container->setStatic('imageResource', function(Container $container) {
             $resource = new Resource\Image();
-            $resource->setContainer($container);
 
             return $resource;
         });
@@ -285,7 +281,6 @@ class Application {
         // Router component
         $container->setStatic('router', function(Container $container) {
             $router = new Router();
-            $router->setContainer($container);
 
             return $router;
         });
