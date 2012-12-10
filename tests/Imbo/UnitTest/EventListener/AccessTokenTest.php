@@ -31,8 +31,7 @@
 
 namespace Imbo\UnitTest\EventListener;
 
-use Imbo\EventListener\AccessToken,
-    Imbo\Exception\RuntimeException;
+use Imbo\EventListener\AccessToken;
 
 /**
  * @package TestSuite\UnitTests
@@ -42,87 +41,46 @@ use Imbo\EventListener\AccessToken,
  * @link https://github.com/imbo/imbo
  * @covers Imbo\EventListener\AccessToken
  */
-class AccessTokenTest extends \PHPUnit_Framework_TestCase {
+class AccessTokenTest extends ListenerTests {
     /**
-     * @var Imbo\EventListener\AccessToken
+     * @var AccessToken
      */
     private $listener;
 
-    /**
-     * @var Imbo\EventManager\EventInterface
-     */
     private $event;
-
-    /**
-     * @var Imbo\Http\Request\RequestInterface
-     */
     private $request;
+    private $query;
 
     /**
-     * @var Imbo\Http\Response\ResponseInterface
+     * Set up the listener
      */
-    private $response;
-
-    /**
-     * @var Imbo\Container
-     */
-    private $container;
-
-    /**
-     * @var Imbo\Http\ParameterContainerInterface
-     */
-    private $params;
-
     public function setUp() {
-        $this->params = $this->getMock('Imbo\Http\ParameterContainerInterface');
+        $this->query = $this->getMock('Imbo\Http\ParameterContainerInterface');
 
-        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->any())->method('getQuery')->will($this->returnValue($this->params));
-
-        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-
-        $this->container = $this->getMock('Imbo\Container');
-        $this->container->expects($this->any())->method('get')->will($this->returnCallback(function($key) use($request, $response) {
-            return $$key;
-        }));
-
-        $this->request = $request;
-        $this->response = $response;
+        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $this->request->expects($this->any())->method('getQuery')->will($this->returnValue($this->query));
 
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
-        $this->event->expects($this->any())->method('getContainer')->will($this->returnValue($this->container));
+        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
 
         $this->listener = new AccessToken();
     }
 
-    public function tearDown() {
-        $this->params = null;
-        $this->request = null;
-        $this->response = null;
-        $this->event = null;
-        $this->listener = null;
-        $this->container = null;
+    /**
+     * {@inheritdoc}
+     */
+    protected function getListener() {
+        return $this->listener;
     }
 
     /**
-     * @covers Imbo\EventListener\AccessToken::getEvents
+     * Tear down the listener
      */
-    public function testGetEvents() {
-        $events = $this->listener->getEvents();
-        $expected = array(
-            'user.get.pre',
-            'images.get.pre',
-            'image.get.pre',
-            'metadata.get.pre',
-            'user.head.pre',
-            'images.head.pre',
-            'image.head.pre',
-            'metadata.head.pre',
-        );
-
-        foreach ($expected as $e) {
-            $this->assertContains($e, $events);
-        }
+    public function tearDown() {
+        $this->query = null;
+        $this->request = null;
+        $this->event = null;
+        $this->listener = null;
     }
 
     /**
@@ -131,11 +89,18 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 400
      * @covers Imbo\EventListener\AccessToken::invoke
      */
-    public function testRequestWithoutAccessToken() {
-        $this->params->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(false));
+    public function testThrowsExceptionIfAnAccessTokenIsMissingFromTheRequestWhenNotWhitelisted() {
+        $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.get'));
+        $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(false));
+
         $this->listener->invoke($this->event);
     }
 
+    /**
+     * Different filter combinations
+     *
+     * @return array[]
+     */
     public function getFilterData() {
         return array(
             array(
@@ -208,16 +173,61 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider getFilterData
      * @covers Imbo\EventListener\AccessToken::invoke
      */
-    public function testFilters($filter, $transformations, $whitelisted) {
+    public function testSupportsFilters($filter, $transformations, $whitelisted) {
         $listener = new AccessToken($filter);
 
         if (!$whitelisted) {
             $this->setExpectedException('Imbo\Exception\RuntimeException', 'Missing access token', 400);
         }
 
-        $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.get.pre'));
+        $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.get'));
         $this->request->expects($this->any())->method('getTransformations')->will($this->returnValue($transformations));
 
         $listener->invoke($this->event);
+    }
+
+    /**
+     * Get access tokens
+     *
+     * @return array[]
+     */
+    public function getAccessTokens() {
+        return array(
+            array(
+                'http://imbo/users/christer',
+                'some access token',
+                'private key',
+                false
+            ),
+            array(
+                'http://imbo/users/christer',
+                '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
+                'private key',
+                true
+            ),
+            array(
+                'http://imbo/users/christer',
+                '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
+                'other private key',
+                false
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getAccessTokens
+     * @covers Imbo\EventListener\AccessToken::invoke
+     */
+    public function testThrowsExceptionOnIncorrectToken($url, $token, $privateKey, $correct) {
+        if (!$correct) {
+            $this->setExpectedException('Imbo\Exception\RuntimeException', 'Incorrect access token', 400);
+        }
+
+        $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(true));
+        $this->query->expects($this->once())->method('get')->with('accessToken')->will($this->returnValue($token));
+        $this->request->expects($this->once())->method('getUrl')->will($this->returnValue($url));
+        $this->request->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
+
+        $this->listener->invoke($this->event);
     }
 }

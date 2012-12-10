@@ -31,8 +31,7 @@
 
 namespace Imbo\UnitTest\Resource;
 
-use Imbo\Resource\User,
-    DateTime;
+use Imbo\Resource\User;
 
 /**
  * @package TestSuite\UnitTests
@@ -43,34 +42,65 @@ use Imbo\Resource\User,
  * @covers Imbo\Resource\User
  */
 class UserTest extends ResourceTests {
+    /**
+     * @var User
+     */
+    private $resource;
+
+    private $request;
+    private $response;
+    private $database;
+    private $storage;
+    private $event;
+    private $publicKey = 'key';
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getNewResource() {
         return new User();
     }
 
     /**
+     * Set up the resource
+     */
+    public function setUp() {
+        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
+        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
+        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
+        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
+        $this->event->expects($this->any())->method('getStorage')->will($this->returnValue($this->storage));
+
+        $this->resource = $this->getNewResource();
+    }
+
+    /**
+     * Tear down the resource
+     */
+    public function tearDown() {
+        $this->resource = null;
+        $this->response = null;
+        $this->database = null;
+        $this->storage = null;
+        $this->event = null;
+    }
+
+    /**
      * @covers Imbo\Resource\User::get
      */
-    public function testGet() {
-        $numImages = 42;
-        $formattedDate = 'Thu, 12 Jan 2012 16:13:35 GMT';
-        $lastModified = $this->getMock('DateTime');
-        $lastModified->expects($this->once())->method('format')->will($this->returnValue(substr($formattedDate, 0, -4)));
+    public function testSupportsHttpGet() {
+        $manager = $this->getMock('Imbo\EventManager\EventManager');
+        $manager->expects($this->once())->method('trigger')->with('db.user.load');
+        $this->event->expects($this->once())->method('getManager')->will($this->returnValue($manager));
+        $this->response->expects($this->once())->method('getLastModified')->will($this->returnValue('some date'));
+        $headers = $this->getMock('Imbo\Http\HeaderContainer');
+        $headers->expects($this->once())->method('set')->with('ETag', '"73cc5b4252b4d06f472ff157a11fc208"');
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
 
-        $etag = '"' . md5($formattedDate) . '"';
-
-        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders->expects($this->at(0))->method('set')->with('ETag', $etag);
-        $responseHeaders->expects($this->at(1))->method('set')->with('Last-Modified', $formattedDate);
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-
-        $this->database->expects($this->once())->method('getNumImages')->with($this->publicKey)->will($this->returnValue($numImages));
-        $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey)->will($this->returnValue($lastModified));
-
-        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
-
-        $this->getNewResource()->get($this->container);
+        $this->resource->get($this->event);
     }
 }

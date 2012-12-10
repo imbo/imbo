@@ -32,6 +32,7 @@
 namespace Imbo\UnitTest\EventListener;
 
 use Imbo\EventManager\EventInterface,
+    Imbo\EventManager\EventManager,
     Imbo\EventListener\PublicKeyAwareListener;
 
 /**
@@ -71,5 +72,5 @@ class SomeListener extends PublicKeyAwareListener {
     /**
      * {@inheritdoc}
      */
-    public function getEvents() { return array('event'); }
+    public function attach(EventManager $manager) {}
 }

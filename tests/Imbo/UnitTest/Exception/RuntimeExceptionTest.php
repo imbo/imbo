@@ -42,6 +42,11 @@ use Imbo\Exception\RuntimeException;
  * @covers Imbo\Exception\RuntimeException
  */
 class RuntimeExceptionTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * Fetch imbo error codes
+     *
+     * @return array[]
+     */
     public function getErrorCodes() {
         return array(
             array(123, 123),

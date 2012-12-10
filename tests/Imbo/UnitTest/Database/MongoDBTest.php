@@ -104,7 +104,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     public function testDottedNotationForMetadataQuery() {
         $publicKey = 'key';
 
-        $query = $this->getMock('Imbo\Resource\Images\QueryInterface');
+        $query = $this->getMock('Imbo\Resource\Images\Query');
         $query->expects($this->once())->method('from')->will($this->returnValue(null));
         $query->expects($this->once())->method('to')->will($this->returnValue(null));
         $query->expects($this->once())->method('metadataQuery')->will($this->returnValue(array(
@@ -137,7 +137,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                          ->method('findOne')
                          ->will($this->throwException(new MongoException()));
 
-        $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Image\ImageInterface'));
+        $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Image\Image'));
     }
 
     /**
@@ -211,7 +211,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                          ->method('find')
                          ->will($this->throwException(new MongoException()));
 
-        $this->driver->getImages('key', $this->getMock('Imbo\Resource\Images\QueryInterface'));
+        $this->driver->getImages('key', $this->getMock('Imbo\Resource\Images\Query'));
     }
 
     /**
@@ -225,7 +225,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                          ->method('findOne')
                          ->will($this->throwException(new MongoException()));
 
-        $this->driver->load('key', 'identifier', $this->getMock('Imbo\Image\ImageInterface'));
+        $this->driver->load('key', 'identifier', $this->getMock('Imbo\Image\Image'));
     }
 
     /**

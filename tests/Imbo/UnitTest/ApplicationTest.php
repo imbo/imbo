@@ -31,9 +31,7 @@
 
 namespace Imbo\UnitTest;
 
-use Imbo\FrontController,
-    Imbo\Container,
-    Imbo\Router;
+use Imbo\Application;
 
 /**
  * @package TestSuite\UnitTests
@@ -41,13 +39,13 @@ use Imbo\FrontController,
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\FrontController
+ * @covers Imbo\Application
  */
-class FrontControllerTest extends \PHPUnit_Framework_TestCase {
+class ApplicationTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var FrontController
+     * @var Application
      */
-    private $controller;
+    private $application;
 
     /**
      * @var Container
@@ -55,121 +53,32 @@ class FrontControllerTest extends \PHPUnit_Framework_TestCase {
     private $container;
 
     /**
-     * @var string
+     * @var array
      */
-    private $publicKey;
+    private $config = array();
 
     /**
-     * @var string
-     */
-    private $privateKey;
-
-    /**
-     * @var Router
-     */
-    private $router;
-
-    /**
-     * Set up method
+     * Set up the application
      */
     public function setUp() {
-        $this->publicKey = md5(microtime());
-        $this->privateKey = md5(microtime());
-
-        $this->container = new Container();
-        $this->container->config = array(
-            'auth' => array(
-                $this->publicKey => $this->privateKey,
-            ),
-        );
-        $this->container->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->container->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-        $this->container->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->container->storage = $this->getMock('Imbo\Storage\StorageInterface');
-        $this->container->eventManager = $this->getMock('Imbo\EventManager\EventManagerInterface');
-        $this->container->router = $this->getMockBuilder('Imbo\Router')->disableOriginalConstructor()->getMock();
-
-        $this->controller = new FrontController($this->container);
+        $this->container = $this->getMock('Imbo\Container');
+        $this->application = new Application();
     }
 
     /**
-     * Tear down method
+     * Tear down the application
      */
     public function tearDown() {
-        $this->controller = null;
-    }
-
-    /**
-     * @covers Imbo\FrontController::run
-     * @expectedException Imbo\Exception
-     * @expectedExceptionMessage I'm a teapot!
-     * @expectedExceptionCode 418
-     */
-    public function testRespondWith418WhenHttpMethodIsBrew() {
-        $this->container->request->expects($this->once())->method('getMethod')->will($this->returnValue('BREW'));
-        $this->controller->run();
-    }
-
-    /**
-     * @covers Imbo\FrontController::run
-     * @expectedException Imbo\Exception
-     * @expectedExceptionMessage Unsupported HTTP method
-     * @expectedExceptionCode 501
-     */
-    public function testRespondWith501WhenHttpMethodIsNotSupported() {
-        $this->container->request->expects($this->once())->method('getMethod')->will($this->returnValue('TRACE'));
-        $this->controller->run();
-    }
-
-    /**
-     * @covers Imbo\FrontController::run
-     * @covers Imbo\FrontController::resolveResource
-     */
-    public function testCanHandleAValidRequest() {
-        $this->container->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
-        $this->container->request->expects($this->once())->method('getPath')->will($this->returnValue('/status'));
-        $this->container->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->container->request->expects($this->once())->method('setPrivateKey')->will($this->returnValue($this->privateKey));
-        $this->container->request->expects($this->once())->method('getResource')->will($this->returnValue('status'));
-
-        $resource = $this->getMock('Imbo\Resource\Status');
-        $resource->expects($this->once())->method('get')->with($this->container);
-        $resource->expects($this->once())->method('getAllowedMethods')->will($this->returnValue(array('HEAD', 'GET')));
-        $this->container->router->expects($this->once())->method('resolve')->with('/status', $this->isType('array'))->will($this->returnValue($resource));
-
-        $this->container->eventManager->expects($this->at(0))->method('trigger')->with('route.resolved', $this->isType('array'));
-        $this->container->eventManager->expects($this->at(1))->method('trigger')->with('status.get.pre');
-        $this->container->eventManager->expects($this->at(2))->method('trigger')->with('status.get.post');
-
-        $responseHeaders = $this->getMock('Imbo\Http\ParameterContainerInterface');
-        $responseHeaders->expects($this->at(0))->method('set')->with('Allow', 'HEAD, GET');
-        $responseHeaders->expects($this->at(1))->method('set')->with('Vary', 'Accept');
-        $this->container->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-
-        $this->controller->run();
+        $this->container = null;
+        $this->application = null;
     }
 
     /**
      * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Unknown Public Key
-     * @expectedExceptionCode 404
-     * @covers Imbo\FrontController::run
+     * @expectedExceptionMessage Application has not been bootstrapped
+     * @covers Imbo\Application::run
      */
-    public function testThrowsExceptionWhenAnUnknownPublicKeyIsRequested() {
-        $this->container->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
-        $this->container->request->expects($this->once())->method('getPath')->will($this->returnValue('/status'));
-        $this->container->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('unknownPublicKey'));
-
-        $resource = $this->getMock('Imbo\Resource\Status');
-        $resource->expects($this->once())->method('getAllowedMethods')->will($this->returnValue(array('HEAD', 'GET')));
-        $this->container->router->expects($this->once())->method('resolve')->with('/status', $this->isType('array'))->will($this->returnValue($resource));
-
-        $this->container->eventManager->expects($this->at(0))->method('trigger')->with('route.resolved', $this->isType('array'));
-
-        $responseHeaders = $this->getMock('Imbo\Http\ParameterContainerInterface');
-        $responseHeaders->expects($this->at(0))->method('set')->with('Allow', $this->isType('string'));
-        $this->container->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-
-        $this->controller->run();
+    public function testWillThrowExceptionWhenNotBootstrapped() {
+        $this->application->run();
     }
 }

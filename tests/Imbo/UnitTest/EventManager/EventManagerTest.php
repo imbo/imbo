@@ -31,9 +31,7 @@
 
 namespace Imbo\UnitTest\EventManager;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\EventManager\EventManager,
-    Imbo\EventManager\EventManagerInterface;
+use Imbo\EventManager\EventManager;
 
 /**
  * @package TestSuite\UnitTests
@@ -45,44 +43,21 @@ use Imbo\Http\Request\RequestInterface,
  */
 class EventManagerTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var RequestInterface
+     * @var EventManager
      */
-    private $request;
+    private $manager;
 
-    /**
-     * @var ResponseInterface
-     */
-    private $response;
-
-    /**
-     * @var DatabaseInterface
-     */
-    private $database;
-
-    /**
-     * @var StorageInterface
-     */
-    private $storage;
-
-    /**
-     * @var array
-     */
-    private $config = array('config' => 'value');
+    private $container;
 
     /**
      * Set up the event manager
      *
-     * @covers Imbo\EventManager\EventManager::__construct
+     * @covers Imbo\EventManager\EventManager::setContainer
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
-
-        $this->manager = new EventManager(
-            $this->request, $this->response, $this->database, $this->storage, $this->config
-        );
+        $this->container = $this->getMock('Imbo\Container');
+        $this->manager = new EventManager();
+        $this->manager->setContainer($this->container);
     }
 
     /**
@@ -90,10 +65,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->manager = null;
-        $this->request = null;
-        $this->response = null;
-        $this->database = null;
-        $this->storage = null;
+        $this->container = null;
     }
 
     /**
@@ -124,47 +96,21 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
 
         $this->expectOutputString('1321');
 
+        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event->expects($this->at(0))->method('setName')->with('event1');
+        $event->expects($this->at(1))->method('propagationIsStopped');
+        $event->expects($this->at(2))->method('setName')->with('event2');
+        $event->expects($this->at(3))->method('propagationIsStopped');
+        $event->expects($this->at(4))->method('propagationIsStopped');
+        $event->expects($this->at(5))->method('setName')->with('event4');
+        $event->expects($this->at(6))->method('propagationIsStopped');
+
+        $this->container->expects($this->exactly(3))->method('get')->with('event')->will($this->returnValue($event));
+
         $this->manager->trigger('otherevent')
                       ->trigger('event1')
                       ->trigger('event2')
                       ->trigger('event4');
-    }
-
-    /**
-     * @covers Imbo\EventManager\EventManager::attachListener
-     * @covers Imbo\EventManager\EventManager::trigger
-     */
-    public function testCanAttachAndExecuteListenersInAPrioritizedFashion() {
-        $listener1 = $this->getMockBuilder('Imbo\EventListener\ListenerInterface')
-                         ->setMethods(array('getEvents', 'onEventName'))
-                         ->getMock();
-        $listener1->expects($this->once())
-                  ->method('getEvents')
-                  ->will($this->returnValue(array('event.name')));
-        $listener1->expects($this->once())
-                  ->method('onEventName')
-                  ->with($this->isInstanceOf('Imbo\EventManager\EventInterface'))
-                  ->will($this->returnCallback(function() { echo 1; }));
-
-        $listener2 = $this->getMockBuilder('Imbo\EventListener\ListenerInterface')
-                         ->setMethods(array('getEvents', 'onEventName'))
-                         ->getMock();
-        $listener2->expects($this->once())
-                  ->method('getEvents')
-                  ->will($this->returnValue(array('event.name')));
-        $listener2->expects($this->once())
-                  ->method('onEventName')
-                  ->with($this->isInstanceOf('Imbo\EventManager\EventInterface'))
-                  ->will($this->returnCallback(function() { echo 2; }));
-
-        $this->expectOutputString("21");
-
-        $this->assertSame(
-            $this->manager,
-            $this->manager->attachListener($listener1, 10)
-                          ->attachListener($listener2, 20)
-                          ->trigger('event.name')
-        );
     }
 
     /**
@@ -184,33 +130,22 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
                       ->attach('otherevent', $callback3);
 
         $this->expectOutputString('13');
+
+        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event->expects($this->at(0))->method('setName')->with('event');
+        $event->expects($this->at(1))->method('propagationIsStopped');
+        $event->expects($this->at(2))->method('stopPropagation')->with(true);
+        $event->expects($this->at(3))->method('propagationIsStopped')->will($this->returnValue(true));
+        $event->expects($this->at(4))->method('setName')->with('otherevent');
+        $event->expects($this->at(5))->method('propagationIsStopped');
+
+        $this->container->expects($this->exactly(2))->method('get')->with('event')->will($this->returnValue($event));
+
         $this->assertSame(
             $this->manager,
             $this->manager->trigger('event')
                           ->trigger('otherevent')
         );
-    }
-
-    /**
-     * @covers Imbo\EventManager\EventManager::trigger
-     * @expectedException Imbo\Exception\HaltApplication
-     */
-    public function testHaltApplicationExceptionShouldBeThrownWhenEventListenerHaltsApplication() {
-        $this->manager->attach('event', function($event) { $event->haltApplication(true); });
-        $this->manager->trigger('event');
-    }
-
-    /**
-     * @covers Imbo\EventManager\EventManager::trigger
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage can not execute "event.foo"
-     */
-    public function testThrowsExceptionWhenListenerIsMissingEventMethod() {
-        $listener = $this->getMockBuilder('Imbo\EventListener\ListenerInterface')->setMethods(array('getEvents'))->getMock();
-        $listener->expects($this->once())->method('getEvents')->will($this->returnValue(array('event.foo')));
-
-        $this->manager->attachListener($listener);
-        $this->manager->trigger('event.foo');
     }
 
     /**
@@ -220,39 +155,5 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $this->manager->attach('event', function($event) {});
         $this->assertFalse($this->manager->hasListenersForEvent('some.event'));
         $this->assertTrue($this->manager->hasListenersForEvent('event'));
-    }
-
-    /**
-     * @covers Imbo\EventManager\EventManager::attachListener
-     */
-    public function testWillNotTriggerPublicKeyAwareListenersIfTheyDoNotContainTheCurrentPublicKey() {
-        $publicKey = 'key';
-        $this->request->expects($this->exactly(2))->method('getPublicKey')->will($this->returnValue($publicKey));
-
-        $listener1 = $this->getMockBuilder('Imbo\EventListener\PublicKeyAwareListenerInterface')
-                          ->setMethods(array('getEvents', 'setPublicKeys', 'triggersFor'))
-                          ->getMock();
-        $listener1->expects($this->once())
-                  ->method('triggersFor')
-                  ->with($publicKey)
-                  ->will($this->returnValue(false));
-
-        $listener2 = $this->getMockBuilder('Imbo\EventListener\PublicKeyAwareListenerInterface')
-                          ->setMethods(
-                              array('getEvents', 'setPublicKeys', 'triggersFor', 'onEvent')
-                          )
-                          ->getMock();
-        $listener2->expects($this->once())
-                  ->method('triggersFor')
-                  ->with($publicKey)
-                  ->will($this->returnValue(true));
-        $listener2->expects($this->once())
-                  ->method('getEvents')
-                  ->will($this->returnValue(array('event')));
-        $listener2->expects($this->once())->method('onEvent');
-
-        $this->manager->attachListener($listener1)
-                      ->attachListener($listener2)
-                      ->trigger('event');
     }
 }
