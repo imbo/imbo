@@ -39,27 +39,13 @@ namespace Imbo;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @codeCoverageIgnore
  */
 class Version {
     /**
      * The current version
      *
-     * This string will be replaced by pear when the package is installed
-     *
      * @var string
      */
-    private $version = '@package_version@';
-
-    /**
-     * Get the version number only
-     *
-     * @return string
-     */
-    public function getVersionNumber() {
-        if (strpos($this->version, '@package_version') === 0) {
-            return 'dev';
-        }
-
-        return $this->version;
-    }
+    const VERSION = '0.1';
 }
