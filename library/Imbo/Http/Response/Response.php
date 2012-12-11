@@ -354,11 +354,12 @@ class Response implements ListenerInterface, ResponseInterface {
         $this->setStatusCode($code);
 
         // Add error information to the response headers and remove the ETag and Last-Modified headers
-        $this->getHeaders()->set('X-Imbo-Error-Message', $message)
-                           ->set('X-Imbo-Error-InternalCode', $internalCode)
-                           ->set('X-Imbo-Error-Date', $timestamp)
-                           ->remove('ETag')
-                           ->remove('Last-Modified');
+        $responseHeaders = $this->getHeaders();
+        $responseHeaders->set('X-Imbo-Error-Message', $message)
+                        ->set('X-Imbo-Error-InternalCode', $internalCode)
+                        ->set('X-Imbo-Error-Date', $timestamp)
+                        ->remove('ETag')
+                        ->remove('Last-Modified');
 
         // Prepare response data if the request expects a response body
         if ($request->getMethod() !== RequestInterface::METHOD_HEAD) {
@@ -386,17 +387,6 @@ class Response implements ListenerInterface, ResponseInterface {
     /**
      * {@inheritdoc}
      */
-    public function populate(ResponseInterface $response) {
-        return $this->setProtocolVersion($response->getProtocolVersion())
-                    ->setStatusCode($response->getStatusCode())
-                    ->setStatusMessage($response->getStatusMessage())
-                    ->setHeaders($response->getHeaders())
-                    ->setBody($response->getBody());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function attach(EventManager $manager) {
         $manager->attach('response.send', array($this, 'send'));
     }
@@ -418,7 +408,7 @@ class Response implements ListenerInterface, ResponseInterface {
         $headers = $this->headers->getAll();
 
         // Closure that will translate the normalized header names to a prettier format (HTTP
-        // header names are case insensitive anyways (RFC2616, section 4.2)
+        // header names are case insensitive anyways (RFC2616, section 4.2))
         $transform = function($name) {
             return preg_replace_callback('/^[a-z]|-[a-z]/', function($match) {
                 return strtoupper($match[0]);

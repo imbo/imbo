@@ -173,12 +173,4 @@ interface ResponseInterface {
      * @return ResponseInterface
      */
     function createError(Exception $exception, RequestInterface $request);
-
-    /**
-     * Populate the current response based on another response
-     *
-     * @param ResponseInterface $response Another response instance
-     * @return ResponseInterface
-     */
-    function populate(ResponseInterface $response);
 }
