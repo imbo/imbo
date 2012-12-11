@@ -149,7 +149,7 @@ class ImageTransformer implements ContainerAware, ListenerInterface {
      *                           single parameter: $params, which is an array with parameters
      *                           associated with the transformation. The callable must return an
      *                           instance of Imbo\Image\Transformation\TransformationInterface
-     * @return ResourceInterface
+     * @return ImageTransformer
      */
     public function registerTransformationHandler($name, $callback) {
         $this->transformationHandlers[$name] = $callback;
