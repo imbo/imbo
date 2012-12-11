@@ -164,7 +164,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $response->setBody($database->getMetadata($publicKey, $imageIdentifier));
         $response->getHeaders()->set(
             'Last-Modified',
-            $this->container->get('dateFormatter')->formatDate(
+            $this->formatDate(
                 $database->getLastModified($publicKey, $imageIdentifier)
             )
         );
