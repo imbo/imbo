@@ -173,17 +173,11 @@ class Application {
         // Request from the client
         $container->set('request', new Request($_GET, $_POST, $_SERVER));
 
-        // Version component
-        $container->set('version', new Version());
-
         // Response to the client
         $container->setStatic('response', function ($container) {
             $response = new Response();
             $response->setImage($container->get('image'));
-            $response->getHeaders()->set(
-                'X-Imbo-Version',
-                $container->get('version')->getVersionNumber()
-            );
+            $response->getHeaders()->set('X-Imbo-Version', Version::VERSION);
 
             return $response;
         });
