@@ -48,7 +48,7 @@ class HeaderContainerTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\HeaderContainer::remove
      * @covers Imbo\Http\HeaderContainer::has
      */
-    public function testHeaderContainer() {
+    public function testCanSetAndGetValues() {
         $parameters = array(
             'key' => 'value',
             'otherKey' => 'otherValue',

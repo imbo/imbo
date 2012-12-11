@@ -29,9 +29,10 @@
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\IntegrationTest\Image\Transformation;
+namespace Imbo\IntegrationTest\EventListener;
 
-use Imbo\Image\Transformation\FlipHorizontally;
+use Imbo\EventListener\MaxImageSize,
+    Imbo\Image\Image;
 
 /**
  * @package TestSuite\IntegrationTests
@@ -39,32 +40,43 @@ use Imbo\Image\Transformation\FlipHorizontally;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\Image\Transformation\FlipHorizontally
+ * @covers Imbo\EventListener\MaxImageSize
  */
-class FlipHorizontallyTest extends TransformationTests {
+class MaxImageSizeTest extends \PHPUnit_Framework_TestCase {
     /**
-     * {@inheritdoc}
+     * Get dimensions for the test
+     *
+     * @return array[]
      */
-    protected function getTransformation() {
-        return new FlipHorizontally();
+    public function getDimensions() {
+        return array(
+            array(20, 10, 14, 10),
+            array(100, 1000, 100, 70),
+            array(1000, 1000, 665, 463),
+        );
     }
 
     /**
-     * {@inheritdoc}
+     * @dataProvider getDimensions
+     * @covers Imbo\EventListener\MaxImageSize::__construct
+     * @covers Imbo\EventListener\MaxImageSize::invoke
      */
-    protected function getExpectedName() {
-        return 'fliphorizontally';
-    }
+    public function testCanResizeImages($maxWidth, $maxHeight, $expectedWidth, $expectedHeight) {
+        $listener = new MaxImageSize($maxWidth, $maxHeight);
 
-    /**
-     * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\FlipHorizontally::applyToImage
-     */
-    protected function getImageMock() {
-        $image = $this->getMock('Imbo\Image\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image = new Image();
+        $image->setBlob(file_get_contents(FIXTURES_DIR . '/image.png'))
+              ->setWidth(665)
+              ->setHeight(463);
 
-        return $image;
+        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
+
+        $listener->invoke($event);
+
+        $this->assertSame($expectedWidth, $image->getWidth());
+        $this->assertSame($expectedHeight, $image->getHeight());
     }
 }

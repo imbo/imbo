@@ -76,7 +76,7 @@ class ImageTransformationCacheTest extends ListenerTests {
         }
 
         $this->responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $this->query = $this->getMock('Imbo\Http\ParameterContainerInterface');
+        $this->query = $this->getMockBuilder('Imbo\Http\ParameterContainer')->disableOriginalConstructor()->getMock();
         $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
         $this->response->expects($this->any())->method('getHeaders')->will($this->returnValue($this->responseHeaders));
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');

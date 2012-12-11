@@ -22,49 +22,49 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package TestSuite\IntegrationTests
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\IntegrationTest\Image\Transformation;
+namespace Imbo\UnitTest\EventListener;
 
-use Imbo\Image\Transformation\FlipHorizontally;
+use Imbo\EventListener\MaxImageSize;
 
 /**
- * @package TestSuite\IntegrationTests
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\Image\Transformation\FlipHorizontally
+ * @covers Imbo\EventListener\MaxImageSize
  */
-class FlipHorizontallyTest extends TransformationTests {
+class MaxImageSizeTest extends ListenerTests {
     /**
-     * {@inheritdoc}
+     * @var MaxImageSize
      */
-    protected function getTransformation() {
-        return new FlipHorizontally();
+    private $listener;
+
+    /**
+     * Set up the listener
+     */
+    public function setUp() {
+        $this->listener = new MaxImageSize();
+    }
+
+    /**
+     * Tear down the listener
+     */
+    public function tearDown() {
+        $this->listener = null;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'fliphorizontally';
-    }
-
-    /**
-     * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\FlipHorizontally::applyToImage
-     */
-    protected function getImageMock() {
-        $image = $this->getMock('Imbo\Image\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-
-        return $image;
+    protected function getListener() {
+        return $this->listener;
     }
 }

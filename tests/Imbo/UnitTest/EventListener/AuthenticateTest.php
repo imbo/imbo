@@ -56,7 +56,7 @@ class AuthenticateTest extends ListenerTests {
      * Set up the listener
      */
     public function setUp() {
-        $this->query = $this->getMock('Imbo\Http\ParameterContainerInterface');
+        $this->query = $this->getMockBuilder('Imbo\Http\ParameterContainer')->disableOriginalConstructor()->getMock();
 
         $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $this->request->expects($this->any())->method('getQuery')->will($this->returnValue($this->query));

@@ -79,7 +79,7 @@ class CanvasTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Canvas::applyToImage
      */
     protected function getImageMock() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image = $this->getMock('Imbo\Image\Image');
         $image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
@@ -137,7 +137,7 @@ class CanvasTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Canvas::applyToImage
      */
     public function testApplyToImageWithDifferentParameters($width, $height, $mode = 'free', $resultingWidth = 665, $resultingHeight = 463) {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image = $this->getMock('Imbo\Image\Image');
         $image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->any())->method('getWidth')->will($this->returnValue(665));
         $image->expects($this->any())->method('getHeight')->will($this->returnValue(463));
