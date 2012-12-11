@@ -311,6 +311,24 @@ class Doctrine implements DatabaseInterface {
             $qb->setFirstResult($offset);
         }
 
+        if ($metadataQuery = $query->metadataQuery()) {
+            $qb->leftJoin('i', 'metadata', 'm', 'i.id = m.imageId');
+            $tag = $qb->expr()->andx();
+            $tmp = 0;
+
+            foreach ($metadataQuery as $key => $value) {
+                $qb->andWhere($qb->expr()->andx(
+                    $qb->expr()->eq('m.tagName', ':tagName' . $tmp),
+                    $qb->expr()->eq('m.tagValue', ':tagValue' . $tmp)
+                ));
+                $qb->setParameters(array(
+                    ':tagName' . $tmp => $key,
+                    ':tagValue' . $tmp => $value,
+                ));
+                $tmp++;
+            }
+        }
+
         $stmt = $qb->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $returnMetadata = $query->returnMetadata();
