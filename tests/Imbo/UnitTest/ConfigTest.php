@@ -45,9 +45,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
     public function testTransformationNames() {
         $config = require __DIR__ . '/../../../config/config.php.dist';
 
-        $this->assertArrayHasKey('transformations', $config);
+        $this->assertArrayHasKey('imageTransformations', $config);
 
-        $transformations = $config['transformations'];
+        $transformations = $config['imageTransformations'];
 
         $expected = array(
             'border',
