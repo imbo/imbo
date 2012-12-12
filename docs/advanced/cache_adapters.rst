@@ -1,7 +1,7 @@
 Cache adapters
 ==============
 
-If you want to leverage caching in a custom event listener Imbo ships with some different solutions:
+If you want to leverage caching in a custom event listener, Imbo ships with some different solutions:
 
 .. _apc-cache:
 

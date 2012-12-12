@@ -24,3 +24,5 @@ Memcached
 namespace
 pecl
 memcached
+Freenode
+freenode
