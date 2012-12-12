@@ -105,7 +105,15 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $event->expects($this->at(5))->method('setName')->with('event4');
         $event->expects($this->at(6))->method('propagationIsStopped');
 
-        $this->container->expects($this->exactly(3))->method('get')->with('event')->will($this->returnValue($event));
+        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request->expects($this->any())->method('getPublicKey')->will($this->returnValue(null));
+
+        $this->container->expects($this->at(0))->method('get')->with('request')->will($this->returnValue($request));
+        $this->container->expects($this->at(1))->method('get')->with('event')->will($this->returnValue($event));
+        $this->container->expects($this->at(2))->method('get')->with('request')->will($this->returnValue($request));
+        $this->container->expects($this->at(3))->method('get')->with('event')->will($this->returnValue($event));
+        $this->container->expects($this->at(4))->method('get')->with('request')->will($this->returnValue($request));
+        $this->container->expects($this->at(5))->method('get')->with('event')->will($this->returnValue($event));
 
         $this->manager->trigger('otherevent')
                       ->trigger('event1')
@@ -139,7 +147,13 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $event->expects($this->at(4))->method('setName')->with('otherevent');
         $event->expects($this->at(5))->method('propagationIsStopped');
 
-        $this->container->expects($this->exactly(2))->method('get')->with('event')->will($this->returnValue($event));
+        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request->expects($this->any())->method('getPublicKey')->will($this->returnValue(null));
+
+        $this->container->expects($this->at(0))->method('get')->with('request')->will($this->returnValue($request));
+        $this->container->expects($this->at(1))->method('get')->with('event')->will($this->returnValue($event));
+        $this->container->expects($this->at(2))->method('get')->with('request')->will($this->returnValue($request));
+        $this->container->expects($this->at(3))->method('get')->with('event')->will($this->returnValue($event));
 
         $this->assertSame(
             $this->manager,
@@ -155,5 +169,45 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $this->manager->attach('event', function($event) {});
         $this->assertFalse($this->manager->hasListenersForEvent('some.event'));
         $this->assertTrue($this->manager->hasListenersForEvent('event'));
+    }
+
+    /**
+     * Fetch public keys to test filtering
+     *
+     * @return array[]
+     */
+    public function getPublicKeys() {
+        return array(
+            array(null, array(), '1'),
+            array(null, array('christer'), '1'),
+            array('christer', array('exclude' => array('christer', 'user')), ''),
+            array('christer', array('exclude' => array('user')), '1'),
+            array('christer', array('include' => array('user')), ''),
+            array('christer', array('include' => array('christer', 'user')), '1'),
+        );
+    }
+
+    /**
+     * @dataProvider getPublicKeys
+     * @covers Imbo\EventManager\EventManager::hasListenersForEvent
+     * @covers Imbo\EventManager\EventManager::triggersFor
+     */
+    public function testCanIncludeAndExcludePublicKeys($publicKey, $publicKeys, $output = '') {
+        $callback = function ($event) { echo '1'; };
+
+        $this->manager->attach('event', $callback, 1, $publicKeys);
+
+        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event->expects($this->any())->method('setName')->with('event');
+        $event->expects($this->any())->method('propagationIsStopped');
+
+        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request->expects($this->any())->method('getPublicKey')->will($this->returnValue($publicKey));
+
+        $this->container->expects($this->at(0))->method('get')->with('request')->will($this->returnValue($request));
+        $this->container->expects($this->at(1))->method('get')->with('event')->will($this->returnValue($event));
+
+        $this->expectOutputString($output);
+        $this->manager->trigger('event');
     }
 }

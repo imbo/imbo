@@ -353,12 +353,13 @@ class Application {
                     continue;
                 }
 
-                if (!is_array($definition) || empty($definition['callback']) || empty($definition['events'])) {
+                if (!is_array($definition) || (empty($definition['callback']) || empty($definition['events']))) {
                     throw new InvalidArgumentException('Invalid event listener definition', 500);
                 }
 
                 $callback = $definition['callback'];
                 $priority = isset($definition['priority']) ? $definition['priority'] : 1;
+                $publicKeys = isset($definition['publicKeys']) ? $definition['publicKeys'] : array();
 
                 foreach ($definition['events'] as $key => $value) {
                     $event = $value;
@@ -369,7 +370,7 @@ class Application {
                         $priority = $value;
                     }
 
-                    $manager->attach($event, $callback, $priority);
+                    $manager->attach($event, $callback, $priority, $publicKeys);
                 }
             }
 

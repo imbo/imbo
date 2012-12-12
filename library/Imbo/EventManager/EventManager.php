@@ -71,10 +71,11 @@ class EventManager implements ContainerAware {
      * @param string $eventName The event to attach to
      * @param callback $callback Code that will be called when the event is triggered
      * @param int $priority Priority of the callback
+     * @param array $publicKeys Filter using "include" or "exclude"
      * @throws InvalidArgumentException
      * @return EventManager
      */
-    public function attach($eventName, $callback, $priority = 1) {
+    public function attach($eventName, $callback, $priority = 1, $publicKeys = array()) {
         if (!is_callable($callback)) {
             throw new InvalidArgumentException('Callback for event ' . $eventName . ' is not callable');
         }
@@ -83,7 +84,10 @@ class EventManager implements ContainerAware {
             $this->callbacks[$eventName] = new SplPriorityQueue();
         }
 
-        $this->callbacks[$eventName]->insert($callback, $priority);
+        $this->callbacks[$eventName]->insert(array(
+            'callback' => $callback,
+            'publicKeys' => $publicKeys,
+        ), $priority);
 
         return $this;
     }
@@ -98,12 +102,22 @@ class EventManager implements ContainerAware {
      */
     public function trigger($eventName, array $params = array()) {
         if (!empty($this->callbacks[$eventName])) {
+            // Fetch current public key
+            $publicKey = $this->container->get('request')->getPublicKey();
+
             // Fetch and configure a new event
             $event = $this->container->get('event');
             $event->setName($eventName);
 
             // Trigger all listeners for this event and pass in the event instance
-            foreach ($this->callbacks[$eventName] as $callback) {
+            foreach ($this->callbacks[$eventName] as $listener) {
+                $callback = $listener['callback'];
+                $publicKeys = $listener['publicKeys'];
+
+                if (!$this->triggersFor($publicKey, $publicKeys)) {
+                    continue;
+                }
+
                 $callback($event);
 
                 if ($event->propagationIsStopped()) {
@@ -123,5 +137,27 @@ class EventManager implements ContainerAware {
      */
     public function hasListenersForEvent($eventName) {
         return !empty($this->callbacks[$eventName]);
+    }
+
+    /**
+     * Check if a listener will trigger for a given public key
+     *
+     * @param string $publicKey The public key to check for, can be null
+     * @param array $publicKeys The array from the listener with "include" and "exclude"
+     * @return boolean
+     */
+    private function triggersFor($publicKey, array $publicKeys) {
+        if (empty($publicKey) || empty($publicKeys)) {
+            return true;
+        }
+
+        if (
+            (isset($publicKeys['include']) && !in_array($publicKey, $publicKeys['include'])) ||
+            (isset($publicKeys['exclude']) && in_array($publicKey, $publicKeys['exclude']))
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }
