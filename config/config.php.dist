@@ -77,36 +77,44 @@ return array(
     /**
      * Event listeners
      *
-     * Each element in this array is either an instance of an event listener, or another array with
-     * the following keys:
+     * Each element in this array can be one of the following:
      *
-     * - events
-     * - callback
-     * - priority
+     * 1) An instance of the Imbo\EventListener\ListenerInterface interface
      *
-     * 'events' is an array of events that the 'callback' will subscribe to. If you have a single
-     * callback that subscribes to several events, and you want to use different priorities for the
-     * events, simply specify an associative array where the keys are the event names, and the
-     * values are the priorities. If you use this method, the 'priority' key will be ignored.
+     * 2) An array with the following keys:
      *
-     * 'callback' is any callable function. The function will receive a single argument, which is
-     * an instance of Imbo\EventManager\EventInterface.
+     *   - events (required)
+     *   - callback (required)
+     *   - priority
+     *   - publicKeys
      *
-     * 'priority' is the priority of your listener. This defaults to 1 (low priority). The priority
-     * can also be a negative number if you want your listeners to be triggered after Imbo's event
-     * listeners.
+     *   where 'events' is an array of events that 'callback' will subscribe to. If you have a
+     *   single callback that subscribes to several events, and you want to use different priorities
+     *   for the events, simply specify an associative array where the keys are the event names, and
+     *   the values are the priorities. If you use this method, the 'priority' key will be ignored.
      *
-     * If you want your listeners to trigger for only some users (public keys) you can have your
-     * listener implement Imbo\EventListener\PublicKeyAwareListenerInterface and implement the
-     * required methods.
+     *   'callback' is any callable function. The function will receive a single argument, which is
+     *   an instance of Imbo\EventManager\EventInterface.
+     *
+     *   'priority' is the priority of your callback. This defaults to 1 (low priority). The
+     *   priority can also be a negative number if you want your listeners to be triggered after
+     *   Imbo's event listeners.
+     *
+     *   'publicKeys' is an array with one of the following keys:
+     *
+     *     - include
+     *     - exclude
+     *
+     *     where 'include' is an array of public keys that the listener *will* trigger for, and
+     *     'exclude' is an array of public keys that the listener *will not* trigger for.
      *
      * Example of how to add listeners:
      *
      * 'eventListeners' => array(
-     *   // Implementation of a listener interface
+     *   // 1) Implementation of a listener interface
      *   new EventListener\Authenticate(),
      *
-     *   // A closure that will subscribe to two events
+     *   // 2) A closure that will subscribe to two events using one priority
      *   array(
      *     'callback' => function($event) {
      *       // Some code
@@ -115,9 +123,13 @@ return array(
      *       'image.get', 'image.post'
      *     ),
      *     'priority' => 20,
+     *     'publicKeys' => array(
+     *       'include' => array( ... ),
+     *       // 'exclude' => array( ... ),
+     *     )
      *   ),
      *
-     *   // A closure that will subscribe to two events with different priorities
+     *   // 3) A closure that will subscribe to two events with different priorities
      *   array(
      *     'callback' => function($event) {
      *       // Some code
@@ -162,7 +174,7 @@ return array(
      *
      * @var array
      */
-    'transformations' => array(
+    'imageTransformations' => array(
         'border' => function (array $params) {
             return new Image\Transformation\Border($params);
         },
