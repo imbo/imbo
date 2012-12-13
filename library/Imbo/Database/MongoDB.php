@@ -54,8 +54,6 @@ use Imbo\Image\Image,
  *                              'mongodb://localhost:27017'
  * - (array) options Options to use when creating the Mongo instance. Defaults to
  *                              array('connect' => true, 'timeout' => 1000).
- * - (string) slaveOk If reads should be sent to secondary members of a replica set for all
- *                    possible queries. Defaults to false.
  *
  * @package Database
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -91,9 +89,6 @@ class MongoDB implements DatabaseInterface {
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
         'options' => array('connect' => true, 'timeout' => 1000),
-
-        // Other options
-        'slaveOk' => true,
     );
 
     /**
@@ -465,10 +460,6 @@ class MongoDB implements DatabaseInterface {
         if ($this->mongo === null) {
             try {
                 $this->mongo = new Mongo($this->params['server'], $this->params['options']);
-
-                if ($this->params['slaveOk'] === true) {
-                    $this->mongo->setSlaveOkay(true);
-                }
             } catch (MongoException $e) {
                 throw new DatabaseException('Could not connect to database', 500);
             }
