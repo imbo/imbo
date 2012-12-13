@@ -32,9 +32,11 @@
 namespace Imbo\EventManager;
 
 use Imbo\Container,
+    Imbo\ContainerAware,
+    Imbo\EventListener\ListenerDefinition,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\HaltApplication;
+    SplPriorityQueue;
 
 /**
  * Event manager
@@ -45,110 +47,148 @@ use Imbo\Container,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class EventManager implements EventManagerInterface {
+class EventManager implements ContainerAware {
     /**
-     * Different events that can be triggerd
+     * Callbacks that can be triggered
      *
      * @var array
      */
-    private $events;
+    private $callbacks;
 
     /**
-     * Container instance
-     *
      * @var Container
      */
     private $container;
 
     /**
-     * Class constructor
-     *
-     * @param Container $container Instance of a container
+     * {@inheritdoc}
      */
-    public function __construct(Container $container) {
+    public function setContainer(Container $container) {
         $this->container = $container;
     }
 
     /**
-     * {@inheritdoc}
+     * Attach a callable to an event
+     *
+     * @param string $eventName The event to attach to
+     * @param callback $callback Code that will be called when the event is triggered
+     * @param int $priority Priority of the callback
+     * @param array $publicKeys Filter using "include" or "exclude"
+     * @throws InvalidArgumentException
+     * @return EventManager
      */
-    public function attach($events, $callback) {
-        if (!is_array($events)) {
-            $events = array($events);
-        }
-
+    public function attach($eventName, $callback, $priority = 1, $publicKeys = array()) {
         if (!is_callable($callback)) {
-            throw new InvalidArgumentException('Callback is not callable');
+            throw new InvalidArgumentException('Callback for event ' . $eventName . ' is not callable');
         }
 
-        foreach ($events as $event) {
-            if (empty($this->events[$event])) {
-                $this->events[$event] = array();
-            }
-
-            $this->events[$event][] = $callback;
+        if (empty($this->callbacks[$eventName])) {
+            $this->callbacks[$eventName] = new SplPriorityQueue();
         }
+
+        $this->callbacks[$eventName]->insert(array(
+            'callback' => $callback,
+            'publicKeys' => $publicKeys,
+        ), $priority);
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * Attach a listener definition
+     *
+     * @param ListenerDefinition $definition An instance of a listener definition
+     * @return EventManager
+     */
+    public function attachDefinition(ListenerDefinition $definition) {
+        return $this->attach(
+            $definition->getEventName(),
+            $definition->getCallback(),
+            $definition->getPriority(),
+            $definition->getPublicKeys()
+        );
+    }
+
+    /**
+     * Attach a listener
+     *
+     * @param ListenerInterface $listener An instance of an event listener
+     * @return EventManager
      */
     public function attachListener(ListenerInterface $listener) {
-        // Fetch current public key
-        $publicKey = $this->container->get('request')->getPublicKey();
-
-        // Fetch the keys the listener is to be triggered for
-        $keys = $listener->getPublicKeys();
-
-        if (empty($keys) || in_array($publicKey, $keys)) {
-            // Either no keys have been specified, or the listener wants to trigger for the current
-            // key
-            return $this->attach($listener->getEvents(), function(EventInterface $event) use ($listener) {
-                $name = preg_replace_callback(
-                    "#(\.)([a-z]{1})#",
-                    function ($matches) {
-                        return strtoupper($matches[2]);
-                    },
-                    $event->getName()
-                );
-
-                $name = 'on' . ucfirst($name);
-
-                if (method_exists($listener, $name)) {
-                    $listener->$name($event);
-                } else {
-                    $listener->invoke($event);
-                }
-            });
+        foreach ($listener->getDefinition() as $definition) {
+            $this->attachDefinition($definition);
         }
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * Trigger a given event
+     *
+     * @param string $eventName The name of the event to trigger
+     * @param array $params Optional extra parameters to send to the event listeners for the current
+     *                      event
+     * @return EventManager
      */
-    public function trigger($event, array $params = array()) {
-        if (!empty($this->events[$event])) {
-            // Create an event instance
-            $e = new Event($event, $this->container, $params);
+    public function trigger($eventName, array $params = array()) {
+        if (!empty($this->callbacks[$eventName])) {
+            // Fetch current public key
+            $publicKey = $this->container->get('request')->getPublicKey();
+
+            // Fetch and configure a new event
+            $event = $this->container->get('event');
+            $event->setName($eventName);
 
             // Trigger all listeners for this event and pass in the event instance
-            foreach ($this->events[$event] as $callback) {
-                $callback($e);
+            foreach ($this->callbacks[$eventName] as $listener) {
+                $callback = $listener['callback'];
+                $publicKeys = $listener['publicKeys'];
 
-                if ($e->propagationIsStopped()) {
+                if (!$this->triggersFor($publicKey, $publicKeys)) {
+                    continue;
+                }
+
+                $callback($event);
+
+                if ($event->propagationIsStopped()) {
                     break;
                 }
             }
-
-            if ($e->applicationIsHalted()) {
-                throw new HaltApplication();
-            }
         }
 
         return $this;
+    }
+
+    /**
+     * Whether or not the manager has event listeners that subscribes to a specific event
+     *
+     * @param string $eventName The name of the event to check
+     * @return boolean
+     */
+    public function hasListenersForEvent($eventName) {
+        return !empty($this->callbacks[$eventName]);
+    }
+
+    /**
+     * Check if a listener will trigger for a given public key
+     *
+     * @param string $publicKey The public key to check for, can be null
+     * @param array $publicKeys The array from the listener with "include" and "exclude"
+     * @return boolean
+     */
+    private function triggersFor($publicKey, array $publicKeys) {
+        if (empty($publicKey) || empty($publicKeys)) {
+            return true;
+        }
+
+        if (
+            (isset($publicKeys['include']) && !in_array($publicKey, $publicKeys['include'])) ||
+            (isset($publicKeys['exclude']) && in_array($publicKey, $publicKeys['exclude']))
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

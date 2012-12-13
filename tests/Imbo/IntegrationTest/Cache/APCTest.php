@@ -22,45 +22,35 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package EventListener
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\EventListener;
+namespace Imbo\IntegrationTest\Cache;
+
+use Imbo\Cache\APC;
 
 /**
- * Abstract event listener
- *
- * @package EventListener
+ * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Cache\APC
  */
-abstract class Listener implements ListenerInterface {
-    /**
-     * Public keys this listener should trigger for
-     *
-     * @var array
-     */
-    private $publicKeys = array();
+class APCTest extends CacheTests {
+    protected function getDriver() {
+        if (!extension_loaded('apc')) {
+            $this->markTestSkipped('APC is not installed');
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPublicKeys() {
-        return $this->publicKeys;
-    }
+        if (!ini_get('apc.enable_cli')) {
+            $this->markTestSkipped('apc.enable_cli must be set to On to run this test case');
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setPublicKeys(array $keys) {
-        $this->publicKeys = $keys;
-
-        return $this;
+        return new APC('ImboTestSuite');
     }
 }

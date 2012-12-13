@@ -31,8 +31,10 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Container,
+use Imbo\EventManager\EventInterface,
+    Imbo\EventListener\ListenerDefinition,
+    Imbo\Http\Request\RequestInterface,
+    Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException;
 
 /**
@@ -44,7 +46,7 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Metadata extends Resource implements ResourceInterface {
+class Metadata implements ResourceInterface, ListenerInterface {
     /**
      * {@inheritdoc}
      */
@@ -61,30 +63,93 @@ class Metadata extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete(Container $container) {
-        $request = $container->request;
-        $database = $container->database;
-        $response = $container->response;
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('metadata.get', array($this, 'get')),
+            new ListenerDefinition('metadata.post', array($this, 'post')),
+            new ListenerDefinition('metadata.put', array($this, 'put')),
+            new ListenerDefinition('metadata.delete', array($this, 'delete')),
+            new ListenerDefinition('metadata.head', array($this, 'head')),
+            new ListenerDefinition('metadata.post', array($this, 'validateMetadata'), 10),
+            new ListenerDefinition('metadata.put', array($this, 'validateMetadata'), 10),
+        );
+    }
 
-        $imageIdentifier = $request->getImageIdentifier();
-
-        $database->deleteMetadata($request->getPublicKey(), $imageIdentifier);
-
-        $response->setBody(array(
-            'imageIdentifier' => $imageIdentifier,
+    /**
+     * Handle DELETE requests
+     *
+     * @param EventInterface $event The current event
+     */
+    public function delete(EventInterface $event) {
+        $event->getManager()->trigger('db.metadata.delete');
+        $event->getResponse()->setBody(array(
+            'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
         ));
     }
 
     /**
-     * {@inheritdoc}
+     * Handle PUT requests
+     *
+     * @param EventInterface $event The current event
      */
-    public function put(Container $container) {
-        $request = $container->request;
-        $database = $container->database;
-        $response = $container->response;
+    public function put(EventInterface $event) {
+        $event->getManager()->trigger('db.metadata.delete')
+                            ->trigger('db.metadata.update');
+        $event->getResponse()->setBody(array(
+            'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
+        ));
+    }
 
-        $publicKey = $request->getPublicKey();
-        $imageIdentifier = $request->getImageIdentifier();
+    /**
+     * Handle POST requests
+     *
+     * @param EventInterface $event The current event
+     */
+    public function post(EventInterface $event) {
+        $event->getManager()->trigger('db.metadata.update');
+        $event->getResponse()->setBody(array(
+            'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
+        ));
+    }
+
+    /**
+     * Handle GET requests
+     *
+     * @param EventInterface $event The current event
+     */
+    public function get(EventInterface $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+
+        $event->getManager()->trigger('db.metadata.load');
+
+        $lastModified = $response->getLastModified();
+
+        $hash = md5($request->getPublicKey() . $request->getImageIdentifier() . $lastModified);
+
+        $response->getHeaders()->set('ETag', '"' . $hash . '"');
+    }
+
+    /**
+     * Handle HEAD requests
+     *
+     * @param EventInterface $event The current event
+     */
+    public function head(EventInterface $event) {
+        $this->get($event);
+
+        // Remove body from the response, but keep everything else
+        $event->getResponse()->setBody(null);
+    }
+
+    /**
+     * Validate metadata found in the request body
+     *
+     * @param EventInterface $event The event instance
+     * @throws InvalidArgumentException
+     */
+    public function validateMetadata(EventInterface $event){
+        $request = $event->getRequest();
         $metadata = $request->getRawData();
 
         if (empty($metadata)) {
@@ -96,95 +161,5 @@ class Metadata extends Resource implements ResourceInterface {
                 throw new InvalidArgumentException('Invalid JSON data', 400);
             }
         }
-
-        // Remove existing metadata
-        $database->deleteMetadata($publicKey, $imageIdentifier);
-
-        // Insert new metadata
-        $database->updateMetadata($publicKey, $imageIdentifier, $metadata);
-
-        $response->setBody(array(
-            'imageIdentifier' => $imageIdentifier,
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function post(Container $container) {
-        $request = $container->request;
-        $database = $container->database;
-        $response = $container->response;
-
-        $imageIdentifier = $request->getImageIdentifier();
-
-        // Fetch metadata from the request
-        if ($request->getRequest()->has('metadata')) {
-            $metadata = $request->getRequest()->get('metadata');
-        } else {
-            $metadata = $request->getRawData();
-        }
-
-        if (empty($metadata)) {
-            throw new InvalidArgumentException('Missing JSON data', 400);
-        } else {
-            $metadata = json_decode($metadata, true);
-
-            if ($metadata === null) {
-                throw new InvalidArgumentException('Invalid JSON data', 400);
-            }
-        }
-
-        $database->updateMetadata($request->getPublicKey(), $imageIdentifier, $metadata);
-
-        $response->setBody(array(
-            'imageIdentifier' => $imageIdentifier,
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function get(Container $container) {
-        $request = $container->request;
-        $database = $container->database;
-        $response = $container->response;
-
-        $publicKey = $request->getPublicKey();
-        $imageIdentifier = $request->getImageIdentifier();
-        $requestHeaders = $request->getHeaders();
-        $responseHeaders = $response->getHeaders();
-
-        // See when this particular image was last updated
-        $lastModified = $this->formatDate($database->getLastModified($publicKey, $imageIdentifier));
-
-        // Generate an etag for the content
-        $etag = '"' . md5($publicKey . $imageIdentifier . $lastModified) . '"';
-
-        $responseHeaders->set('ETag', $etag);
-
-        if (
-            $lastModified === $requestHeaders->get('if-modified-since') &&
-            $etag === $requestHeaders->get('if-none-match'))
-        {
-            // The client already has this object
-            $response->setNotModified();
-            return;
-        }
-
-        // The client did not have this particular version in its cache
-        $responseHeaders->set('Last-Modified', $lastModified);
-
-        $response->setBody($database->getMetadata($publicKey, $imageIdentifier));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function head(Container $container) {
-        $this->get($container);
-
-        // Remove body from the response, but keep everything else
-        $container->response->setBody(null);
     }
 }

@@ -32,7 +32,7 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface,
+use Imbo\Image\Image,
     Imbo\Exception\TransformationException,
     Imagick;
 
@@ -85,8 +85,8 @@ interface TransformationInterface {
     /**
      * Apply a transformation to an image object
      *
-     * @param ImageInterface Image instance
+     * @param Image Image instance
      * @throws TransformationException
      */
-    function applyToImage(ImageInterface $image);
+    function applyToImage(Image $image);
 }

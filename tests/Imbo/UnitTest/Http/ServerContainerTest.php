@@ -46,7 +46,7 @@ class ServerContainerTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\ServerContainer::__construct
      * @covers Imbo\Http\ServerContainer::getHeaders
      */
-    public function testGetHeaders() {
+    public function testCanSetAndGetHeaders() {
         $parameters = array(
             'key' => 'value',
             'otherKey' => 'otherValue',

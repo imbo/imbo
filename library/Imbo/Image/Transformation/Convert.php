@@ -32,8 +32,7 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface,
-    Imbo\Image\Image,
+use Imbo\Image\Image,
     Imbo\Exception\TransformationException,
     ImagickException;
 
@@ -74,7 +73,7 @@ class Convert extends Transformation implements TransformationInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(ImageInterface $image) {
+    public function applyToImage(Image $image) {
         if ($image->getExtension() === $this->type) {
             // The requested extension is the same as the image, no conversion is needed
             return;

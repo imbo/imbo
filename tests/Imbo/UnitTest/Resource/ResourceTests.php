@@ -31,8 +31,7 @@
 
 namespace Imbo\UnitTest\Resource;
 
-use Imbo\Container,
-    ReflectionClass,
+use ReflectionClass,
     ReflectionMethod;
 
 /**
@@ -44,74 +43,6 @@ use Imbo\Container,
  */
 abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
     /**
-     * @var Imbo\Resource\ResourceInterface
-     */
-    protected $resource;
-
-    /**
-     * @var Imbo\Http\Request\RequestInterface
-     */
-    protected $request;
-
-    /**
-     * @var Imbo\Http\Response\ResponseInterface
-     */
-    protected $response;
-
-    /**
-     * @var Imbo\Database\DatabaseInterface
-     */
-    protected $database;
-
-    /**
-     * @var Imbo\Storage\StorageInterface
-     */
-    protected $storage;
-
-    /**
-     * @var Container
-     */
-    protected $container;
-
-    /**
-     * Public key
-     *
-     * @var string
-     */
-    protected $publicKey = '84ddfea4384c0d2093540fbe6d8b13cb';
-
-    /**
-     * Image identifier
-     *
-     * @var string
-     */
-    protected $imageIdentifier = '34205548e02b8bd0865287a4b0b3fe5e';
-
-    public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
-
-        $this->container = new Container();
-        $this->container->request = $this->request;
-        $this->container->response = $this->response;
-        $this->container->database = $this->database;
-        $this->container->storage = $this->storage;
-
-        $this->resource = $this->getNewResource();
-    }
-
-    public function tearDown() {
-        $this->resource = null;
-        $this->request = null;
-        $this->response = null;
-        $this->database = null;
-        $this->storage = null;
-        $this->container = null;
-    }
-
-    /**
      * Return a resource that can be tested
      *
      * @return Imbo\Resource\ResourceInterface
@@ -122,8 +53,9 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
      * Make sure the that resource returns the correct methods for usage in the "Allow" header
      */
     public function testGetAllowedMethods() {
-        $reflection = new ReflectionClass($this->resource);
-        $className = get_class($this->resource);
+        $resource = $this->getNewResource();
+        $reflection = new ReflectionClass($resource);
+        $className = get_class($resource);
         $allHttpMethods = array(
             'get', 'post', 'put', 'delete', 'head',
         );
@@ -134,9 +66,18 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
 
         array_walk($implementedMethods, function(&$value, $key) { $value = strtoupper($value->name); });
         sort($implementedMethods);
-        $expectedMethods = $this->resource->getAllowedMethods();
+        $expectedMethods = $resource->getAllowedMethods();
         sort($expectedMethods);
 
         $this->assertSame($expectedMethods, $implementedMethods);
+    }
+
+    public function testReturnsACorrectDefinition() {
+        $definition = $this->getNewResource()->getDefinition();
+        $this->assertInternalType('array', $definition);
+
+        foreach ($definition as $d) {
+            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
+        }
     }
 }

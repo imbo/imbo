@@ -45,22 +45,7 @@ class Version {
     /**
      * The current version
      *
-     * This string will be replaced by pear when the package is installed
-     *
      * @var string
      */
-    static private $version = '@package_version@';
-
-    /**
-     * Get the version number only
-     *
-     * @return string
-     */
-    static public function getVersionNumber() {
-        if (strpos(self::$version, '@package_version') === 0) {
-            return 'dev';
-        }
-
-        return self::$version;
-    }
+    const VERSION = '0.1';
 }

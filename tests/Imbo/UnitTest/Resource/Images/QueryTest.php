@@ -43,16 +43,20 @@ use Imbo\Resource\Images\Query;
  */
 class QueryTest extends \PHPUnit_Framework_TestCase {
     /**
-     * Query instance
-     *
-     * @var Imbo\Resource\Images\Query
+     * @var Query
      */
     private $query;
 
+    /**
+     * Set up the query
+     */
     public function setUp() {
         $this->query = new Query();
     }
 
+    /**
+     * Tear down the query
+     */
     public function tearDown() {
         $this->query = null;
     }

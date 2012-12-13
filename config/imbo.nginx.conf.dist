@@ -13,8 +13,8 @@ server {
     index index.php;
 
     # Logs
-    error_log /path/to/logs/imbo.error_log;
-    access_log /path/to/logs/imbo.access_log main;
+    # error_log /path/to/logs/imbo.error_log;
+    # access_log /path/to/logs/imbo.access_log main;
 
     location / {
         try_files $uri $uri/ /index.php?$args;

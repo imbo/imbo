@@ -45,97 +45,119 @@ return array(
      * of the users of this installation. The public keys must match the following case sensitive
      * expression:
      *
-     * [a-z0-9_-]{3,}
+     * ^[a-z0-9_-]{3,}$
      *
      * @var array
      */
     'auth' => array(),
 
     /**
-     * Database configuration
+     * Database adapter
      *
-     * The 'driver' value must be set to one of the following:
+     * See the different adapter implementations for possible configuration parameters
      *
-     * - A fully qualified class name of a driver that implements Imbo\Database\DatabaseInterface.
-     *   Example: 'Imbo\Database\MongoDB'
-     * - An instance of a class implementing Imbo\Database\DatabaseInterface
-     *
-     * The 'params' value will only be used if 'driver' is a string, and will be passed to the
-     * contructor of the class specified in 'driver'.
-     *
-     * @var array
+     * @var Imbo\Database\DatabaseInterface
      */
-    'database' => array(
-        'driver' => 'Imbo\Database\MongoDB',
-        'params' => array(
-            'databaseName'   => 'imbo',
-            'collectionName' => 'images',
-        ),
-    ),
+    'database' => new Database\MongoDB(array(
+        'databaseName'   => 'imbo',
+        'collectionName' => 'images',
+    )),
 
     /**
-     * Storage configuration
+     * Storage adapter
      *
-     * The 'driver' value must be set to one of the following:
+     * See the different adapter implementations for possible configuration parameters
      *
-     * - A fully qualified class name of a driver that implements Imbo\Storage\StorageInterface.
-     *   Example: 'Imbo\Storage\Filesystem'
-     * - An instance of a class implementing Imbo\Storage\StorageInterface
-     *
-     * The 'params' value will only be used if 'driver' is a string, and will be passed to the
-     * contructor of the class specified in 'driver'.
-     *
-     * @var array
+     * @var Imbo\Storage\StorageInterface
      */
-    'storage' => array(
-        'driver' => 'Imbo\Storage\Filesystem',
-        'params' => array(
-            'dataDir' => '/path/to/images',
-        ),
-    ),
+    'storage' => new Storage\GridFS(array(
+        'databaseName' => 'imbo_storage',
+    )),
 
     /**
      * Event listeners
      *
-     * Each element in this array is either an instance of an event listener, or another array with
-     * the following keys:
+     * Each element in this array can be one of the following:
      *
-     * - listener
-     * - events
-     * - publicKeys
+     * 1) An instance of the Imbo\EventListener\ListenerInterface interface
      *
-     * 'listener' is required and can be one of the following:
+     * 2) An array with the following keys:
      *
-     * - An instance of a class implementing Imbo\EventListener\ListenerInterface
-     * - Any callable unit of code that will receive one argument: $event
+     *   - listener
+     *   - publicKeys
      *
-     * 'events' is an array of events the current listener will listen for. This only needs to be
-     * set if 'listener' is not an instance of Imbo\EventListener\ListenerInterface.
+     *   where 'listener' is an instance of the Imbo\EventListener\ListenerInterface interface, and
+     *   'publicKeys' is an array with one of the following keys:
      *
-     * 'publicKeys' is an array that contains which public keys the listener will trigger for. If
-     * omitted or left empty the listener will trigger for all users.
+     *     - include
+     *     - exclude
      *
-     * Example of how to add different listeners:
+     *     where 'include' is an array of public keys that the listener *will* trigger for, and
+     *     'exclude' is an array of public keys that the listener *will not* trigger for.
+     *
+     * 3) An array with the following keys:
+     *
+     *   - events (required)
+     *   - callback (required)
+     *   - priority
+     *   - publicKeys
+     *
+     *   where 'events' is an array of events that 'callback' will subscribe to. If you have a
+     *   single callback that subscribes to several events, and you want to use different priorities
+     *   for the events, simply specify an associative array where the keys are the event names, and
+     *   the values are the priorities. If you use this method, the 'priority' key will be ignored.
+     *
+     *   'callback' is any callable function. The function will receive a single argument, which is
+     *   an instance of Imbo\EventManager\EventInterface.
+     *
+     *   'priority' is the priority of your callback. This defaults to 1 (low priority). The
+     *   priority can also be a negative number if you want your listeners to be triggered after
+     *   Imbo's event listeners.
+     *
+     *   'publicKeys' is the same as described above.
+     *
+     * Example of how to add listeners:
      *
      * 'eventListeners' => array(
+     *   // 1) Implementation of a listener interface
      *   new EventListener\Authenticate(),
+     *
+     *   // 2) Implementation of a listener interface with a public key filter
      *   array(
-     *     'listener' => new Imbo\EventListener\AccessToken(),
+     *     'listener' => EventListener\MaxImageSize(1024, 768),
+     *     'publicKeys' => array(
+     *       'include' => array( ... ),
+     *       // 'exclude' => array( ... ),
+     *       )
+     *     )
      *   ),
+     *
+     *   // 3) A closure that will subscribe to two events using one priority
      *   array(
-     *     'listener' => new Imbo\EventListener\ImageTransformationCache('/tmp/imbocache'),
-     *   ),
-     *   array(
-     *     'listener' => function($event) {
+     *     'callback' => function($event) {
      *       // Some code
      *     },
      *     'events' => array(
-     *       'image.get.pre', 'image.head.pre'
+     *       'image.get', 'image.post'
+     *     ),
+     *     'priority' => 20,
+     *     'publicKeys' => array(
+     *       'include' => array( ... ),
+     *       // 'exclude' => array( ... ),
+     *     )
+     *   ),
+     *
+     *   // 4) A closure that will subscribe to two events with different priorities
+     *   array(
+     *     'callback' => function($event) {
+     *       // Some code
+     *     },
+     *     'events' => array(
+     *       'image.get' => 20, // Trigger BEFORE the internal handler for "image.get"
+     *       'image.post' => -20, // Trigger AFTER the internal handler for "image.post"
      *     ),
      *   ),
      * ),
-     *
-     * The listeners are triggered in the order they are added.
      *
      * @var array
      */
@@ -148,8 +170,9 @@ return array(
      * Image transformations
      *
      * This array includes all supported image transformations. The keys are the names of the
-     * transformations that is used in the URL, and the values are closures that receives a single
-     * parameter: $params, which is the parameters associated to the transformation.
+     * transformations that is used in the URL, and the values are closures that will receive a
+     * single parameter: $params, which is the parameters found in the URL associated with the
+     * transformation.
      *
      * Example:
      *
@@ -160,11 +183,16 @@ return array(
      * All closures must return an instance of the Imbo\Image\Transformation\TransformationInterface
      * interface or a callable piece of code, that in turn will receive a single parameter:
      *
-     * Imbo\Image\ImageInterface $image
+     * Imbo\Image\Image $image
      *
      * which is the image you want your transformation to modify.
+     *
+     * All image transformations shipped by Imbo uses imagick, and if you want to use something
+     * else, simply supply your own classes in the array below.
+     *
+     * @var array
      */
-    'transformations' => array(
+    'imageTransformations' => array(
         'border' => function (array $params) {
             return new Image\Transformation\Border($params);
         },

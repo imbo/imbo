@@ -9,8 +9,8 @@
     DocumentRoot /path/to/imbo/public
 
     # Logging
-    CustomLog /path/to/logs/imbo.access_log combined
-    ErrorLog /path/to/logs/imbo.error_log
+    # CustomLog /path/to/logs/imbo.access_log combined
+    # ErrorLog /path/to/logs/imbo.error_log
 
     # Rewrite rules that rewrite all requests to the index.php script
     <Directory /path/to/imbo/public>

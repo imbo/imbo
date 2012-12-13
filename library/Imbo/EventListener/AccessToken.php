@@ -49,7 +49,7 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class AccessToken extends Listener implements ListenerInterface {
+class AccessToken implements ListenerInterface {
     /**
      * Parameters for the listener
      *
@@ -101,29 +101,32 @@ class AccessToken extends Listener implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getEvents() {
-        return array(
-            'user.get.pre',
-            'images.get.pre',
-            'image.get.pre',
-            'metadata.get.pre',
-
-            'user.head.pre',
-            'images.head.pre',
-            'image.head.pre',
-            'metadata.head.pre',
+    public function getDefinition() {
+        $callback = array($this, 'invoke');
+        $priority = 100;
+        $events = array(
+            'user.get', 'images.get', 'image.get', 'metadata.get',
+            'user.head', 'images.head', 'image.head', 'metadata.head'
         );
+
+        $definition = array();
+
+        foreach($events as $eventName) {
+            $definition[] = new ListenerDefinition($eventName, $callback, $priority);
+        }
+
+        return $definition;
     }
 
     /**
      * {@inheritdoc}
      */
     public function invoke(EventInterface $event) {
-        $request = $event->getContainer()->get('request');
+        $request = $event->getRequest();
         $query = $request->getQuery();
         $eventName = $event->getName();
 
-        if (($eventName === 'image.get.pre' || $eventName === 'image.head.pre') && $this->isWhitelisted($request)) {
+        if (($eventName === 'image.get' || $eventName === 'image.head') && $this->isWhitelisted($request)) {
             // All transformations in the request are whitelisted. Skip the access token check
             return;
         }

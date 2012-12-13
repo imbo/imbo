@@ -34,7 +34,8 @@ namespace Imbo\Http\Request;
 use Imbo\Http\ParameterContainer,
     Imbo\Http\ServerContainer,
     Imbo\Http\HeaderContainer,
-    Imbo\Exception\InvalidArgumentException;
+    Imbo\Exception\InvalidArgumentException,
+    Imbo\Image\Image;
 
 /**
  * Request class
@@ -56,21 +57,21 @@ class Request implements RequestInterface {
     /**
      * Query data
      *
-     * @var ParameterContainerInterface
+     * @var ParameterContainer
      */
     private $query;
 
     /**
      * Request data
      *
-     * @var ParameterContainerInterface
+     * @var ParameterContainer
      */
     private $request;
 
     /**
      * Server data
      *
-     * @var ServerContainerInterface
+     * @var ServerContainer
      */
     private $server;
 
@@ -94,6 +95,11 @@ class Request implements RequestInterface {
      * @var string
      */
     private $privateKey;
+
+    /**
+     * @var Image
+     */
+    private $image;
 
     /**
      * The current image identifier (if any)
@@ -150,6 +156,22 @@ class Request implements RequestInterface {
         if (strpos($this->path, '?') !== false) {
             $this->path = substr($this->path, 0, strpos($this->path, '?'));
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setImage(Image $image) {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getImage() {
+        return $this->image;
     }
 
     /**
@@ -327,17 +349,6 @@ class Request implements RequestInterface {
         $this->imageIdentifier = $imageIdentifier;
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRealImageIdentifier() {
-        if ($this->rawData === null) {
-            return null;
-        }
-
-        return md5($this->rawData);
     }
 
     /**

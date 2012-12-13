@@ -53,19 +53,19 @@ class Memcached implements CacheInterface {
     /**
      * The memcached instance to use
      *
-     * @var \Memcached
+     * @var PeclMemcached
      */
     private $memcached;
 
     /**
      * Class constructor
      *
+     * @param PeclMemcached $memcached An instance of pecl/memcached
      * @param string $namespace A prefix that will be added to all keys
-     * @param \Memcached $memcached An instance of pecl/memcached
      */
-    public function __construct($namespace = null, PeclMemcached $memcached) {
-        $this->namespace = $namespace;
+    public function __construct(PeclMemcached $memcached, $namespace = null) {
         $this->memcached = $memcached;
+        $this->namespace = $namespace;
     }
 
     /**
@@ -75,7 +75,7 @@ class Memcached implements CacheInterface {
      * @return string A namespaced key
      */
     protected function getKey($key) {
-        return $this->namespace . $key;
+        return $this->namespace . ':' . $key;
     }
 
     /**

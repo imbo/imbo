@@ -45,7 +45,7 @@ namespace Imbo\Http;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class ParameterContainer implements ParameterContainerInterface {
+class ParameterContainer {
     /**
      * Parameters in the container
      *

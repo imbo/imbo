@@ -32,7 +32,8 @@
 
 namespace Imbo\Http\Request;
 
-use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\InvalidArgumentException,
+    Imbo\Image\Image;
 
 /**
  * Request interface
@@ -154,11 +155,6 @@ interface RequestInterface {
     /**
      * Get the image identifier from the URL
      *
-     * Note that this might not be valid for the current image data since event listeners have the
-     * possibility to change the image data before the imbo application handles it. The method
-     * called getRealImageIdentifier() returns the identifier of the image data currently stored in
-     * the request instance.
-     *
      * @return string|null
      */
     function getImageIdentifier();
@@ -170,15 +166,6 @@ interface RequestInterface {
      * @return RequestInterface
      */
     function setImageIdentifier($imageIdentifier);
-
-    /**
-     * Get the image identifier from the image data stored in the request instance
-     *
-     * This method returns null if there is no stored raw data.
-     *
-     * @return string|null
-     */
-    function getRealImageIdentifier();
 
     /**
      * Get the current requested extension (if any)
@@ -214,8 +201,6 @@ interface RequestInterface {
     /**
      * Set the raw data
      *
-     * This method must also update the current imageIdentifier
-     *
      * @param string $data The data to set
      * @return RequestInterface
      */
@@ -224,7 +209,7 @@ interface RequestInterface {
     /**
      * Get the query container
      *
-     * @return ParameterContainerInterface
+     * @return ParameterContainer
      */
     function getQuery();
 
@@ -238,7 +223,7 @@ interface RequestInterface {
     /**
      * Get the server container
      *
-     * @return ServerContainerInterface
+     * @return ServerContainer
      */
     function getServer();
 
@@ -288,4 +273,19 @@ interface RequestInterface {
      * @return string
      */
     function getResource();
+
+    /**
+     * Set an image instance
+     *
+     * @param Image $image An image instance
+     * @return RequestInterface
+     */
+    function setImage(Image $image);
+
+    /**
+     * Get an image instance
+     *
+     * @return null|Image
+     */
+    function getImage();
 }

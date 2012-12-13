@@ -32,7 +32,7 @@
 namespace Imbo\IntegrationTest\Image\Transformation;
 
 use Imbo\Image\Transformation\TransformationInterface,
-    Imbo\Image\ImageInterface;
+    Imbo\Image\Image;
 
 /**
  * @package TestSuite\IntegrationTests
@@ -59,7 +59,7 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     /**
      * Get the image mock used in the simple testApplyToImage
      *
-     * @return ImageInterface
+     * @return Image
      */
     abstract protected function getImageMock();
 
@@ -96,7 +96,7 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\TransformationException
      */
     public function testApplyToImageWithUnknownImageFormat() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image = $this->getMock('Imbo\Image\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('some string'));
         $image->expects($this->any())->method('getWidth')->will($this->returnValue(1600));
         $image->expects($this->any())->method('getHeight')->will($this->returnValue(900));

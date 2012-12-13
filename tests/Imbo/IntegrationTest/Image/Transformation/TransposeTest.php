@@ -61,7 +61,7 @@ class TransposeTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Canvas::applyToImage
      */
     protected function getImageMock() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image = $this->getMock('Imbo\Image\Image');
         $image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
 

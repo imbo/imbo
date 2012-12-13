@@ -31,7 +31,7 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface;
+use Imbo\Image\Image;
 
 /**
  * Transformation collection
@@ -62,7 +62,7 @@ class Collection extends Transformation implements TransformationInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(ImageInterface $image) {
+    public function applyToImage(Image $image) {
         foreach ($this->transformations as $transformation) {
             $transformation->applyToImage($image);
         }

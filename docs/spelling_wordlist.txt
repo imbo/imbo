@@ -17,5 +17,12 @@ jpg
 png
 whitelist
 Nginx
+httpd
 desaturate
 desaturates
+Memcached
+namespace
+pecl
+memcached
+Freenode
+freenode

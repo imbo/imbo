@@ -32,7 +32,11 @@
 namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
+    Imbo\EventManager\EventInterface,
+    Imbo\EventListener\ListenerDefinition,
+    Imbo\EventListener\ListenerInterface,
     Imbo\Container,
+    Imbo\ContainerAware,
     DateTime;
 
 /**
@@ -47,7 +51,19 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Status extends Resource implements ResourceInterface {
+class Status implements ContainerAware, ResourceInterface, ListenerInterface {
+    /**
+     * @var Container
+     */
+    private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(Container $container) {
+        $this->container = $container;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -61,10 +77,22 @@ class Status extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function get(Container $container) {
-        $response = $container->response;
-        $database = $container->database;
-        $storage = $container->storage;
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('status.get', array($this, 'get')),
+            new ListenerDefinition('status.head', array($this, 'head')),
+        );
+    }
+
+    /**
+     * Handle GET requests
+     *
+     * @param EventInterface $event The current event
+     */
+    public function get(EventInterface $event) {
+        $response = $event->getResponse();
+        $database = $event->getDatabase();
+        $storage = $event->getStorage();
 
         $response->getHeaders()->set('Cache-Control', 'max-age=0');
 
@@ -80,23 +108,26 @@ class Status extends Resource implements ResourceInterface {
                 $message = 'Database error';
             }
 
-            $response->setStatusCode(500, $message);
+            $response->setStatusCode(500)
+                     ->setStatusMessage($message);
         }
 
         $response->setBody(array(
-            'date'     => $this->formatDate(new DateTime()),
+            'date'     => $this->container->get('dateFormatter')->formatDate(new DateTime()),
             'database' => $databaseStatus,
             'storage'  => $storageStatus,
         ));
     }
 
     /**
-     * {@inheritdoc}
+     * Handle HEAD requests
+     *
+     * @param EventInterface $event The current event
      */
-    public function head(Container $container) {
-        $this->get($container);
+    public function head(EventInterface $event) {
+        $this->get($event);
 
         // Remove body from the response, but keep everything else
-        $container->response->setBody(null);
+        $event->getResponse()->setBody(null);
     }
 }

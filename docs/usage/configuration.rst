@@ -6,7 +6,7 @@ Imbo ships with a sample configuration file named ``config/config.php.dist`` tha
 User key pairs
 --------------
 
-Every user that wishes to store images in Imbo needs a public and private key pair. These keys are stored in the ``auth`` part of the configuration file:
+Every user that wants to store images in Imbo needs a public and private key pair. These keys are stored in the ``auth`` part of the configuration file:
 
 .. code-block:: php
     :linenos:
@@ -31,7 +31,7 @@ The public keys can consist of the following characters:
 * 0-9
 * _ and -
 
-For the private keys you can for instance use a `SHA-256`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images. Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key).
+For the private keys you can for instance use a `SHA-256`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images. Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want.
 
 Imbo ships with a small command line tool that can be used to generate private keys for you using the `openssl_random_pseudo_bytes`_ function. The script is located in the `scripts` directory and does not require any arguments:
 
@@ -50,9 +50,7 @@ Database configuration
 
 The database driver you decide to use is responsible for storing metadata and basic image information, like width and height for example. Imbo ships with some different implementations that you can use. Remember that you will not be able to switch the driver whenever you want and expect all data to be automatically transferred. Choosing a database driver should be a long term commitment unless you have migration scripts available.
 
-In the sample configuration file the :ref:`default-database-driver` storage driver is used. Which database driver to use is specified in the ``driver`` part of the ``database`` array in the configuration file. The driver can be specified in two different ways:
-
-1) By specifying the fully qualified class name of the database driver to use, along with parameters that will be passed to the constructor of the driver:
+In the sample configuration file the :ref:`default-database-driver` storage driver is used. Which database driver to use is specified in the ``database`` key in the configuration array:
 
 .. code-block:: php
     :linenos:
@@ -63,39 +61,13 @@ In the sample configuration file the :ref:`default-database-driver` storage driv
     return array(
         // ...
 
-        'database' => array(
-            'driver' => 'Imbo\Database\MongoDB',
-            'params' => array(
-                'databaseName'   => 'imbo',
-                'collectionName' => 'images',
-            ),
-        ),
+        'database' => new Database\MongoDB(array(
+            'databaseName'   => 'imbo',
+            'collectionName' => 'images',
+        )),
 
         // ...
     );
-
-2) or by specifying an instance of a driver:
-
-.. code-block:: php
-    :linenos:
-
-    <?php
-    namespace Imbo;
-
-    return array(
-        // ...
-
-        'database' => array(
-            'driver' => new Database\MongoDB(array(
-                'databaseName'   => 'imbo',
-                'collectionName' => 'images',
-            )),
-        ),
-
-        // ...
-    );
-
-By using the former method Imbo will not instantiate the driver before it is needed.
 
 Available database drivers
 ++++++++++++++++++++++++++
@@ -149,9 +121,9 @@ When using this driver you need to create a couple of tables in the `DBMS`_ you 
         tagValue TEXT NOT NULL
     )
 
-If you wish to use some other DBMS, like for instance `MySQL`_ or `PostgreSQL`_ you will have to make some small changes to the statements above.
-
 .. note:: Imbo will not create these tables automatically.
+
+If you wish to use some other DBMS, like for instance `MySQL`_ or `PostgreSQL`_ you will have to make some small changes to the statements above.
 
 .. _MySQL: http://www.mysql.com/
 .. _PostgreSQL: http://www.postgresql.org/
@@ -174,12 +146,9 @@ Here are some examples on how to use the Doctrine driver in the configuration fi
     return array(
         // ...
 
-        'database' => array(
-            'driver' => 'Imbo\Database\Doctrine',
-            'params' => array(
-                'pdo' => new \PDO('sqlite:/path/to/database'),
-            ),
-        ),
+        'database' => new Database\Doctrine(array(
+            'pdo' => new \PDO('sqlite:/path/to/database'),
+        )),
 
         // ...
     );
@@ -197,16 +166,13 @@ Here are some examples on how to use the Doctrine driver in the configuration fi
     return array(
         // ...
 
-        'database' => array(
-            'driver' => 'Imbo\Database\Doctrine',
-            'params' => array(
-                'dbname'   => 'database',
-                'user'     => 'username',
-                'password' => 'password',
-                'host'     => 'hostname',
-                'driver'   => 'pdo_mysql',
-            ),
-        ),
+        'database' => new Database\Doctrine(array(
+            'dbname'   => 'database',
+            'user'     => 'username',
+            'password' => 'password',
+            'host'     => 'hostname',
+            'driver'   => 'pdo_mysql',
+        )),
 
         // ...
     );
@@ -253,9 +219,7 @@ Examples
     return array(
         // ...
 
-        'database' => array(
-            'driver' => 'Imbo\Database\MongoDB',
-        ),
+        'database' => new Database\MongoDB(),
 
         // ...
     );
@@ -273,14 +237,11 @@ Examples
     return array(
         // ...
 
-        'database' => array(
-            'driver' => 'Imbo\Database\MongoDB',
-            'params' => array(
-                'server'         => 'mongodb://server1,server2,server3',
-                'replicaSet'     => 'nameOfReplicaSet',
-                'slaveOk'        => true,
-            ),
-        ),
+        'database' => new Database\MongoDB(array(
+            'server'     => 'mongodb://server1,server2,server3',
+            'replicaSet' => 'nameOfReplicaSet',
+            'slaveOk'    => true,
+        )),
 
         // ...
     );
@@ -290,9 +251,7 @@ Storage configuration
 
 Storage drivers are responsible for storing the original images you put into imbo. Like with the database driver it is not possible to simply switch a driver without having migration scripts available to move the stored images. Choose a driver with care.
 
-In the sample configuration file the :ref:`default-storage-driver` storage driver is used. Which storage driver to use is specified in the ``driver`` part of the ``storage`` array in the configuration file. The driver can be specified in two different ways:
-
-1) By specifying the fully qualified class name of the storage driver to use, along with parameters that will be passed to the constructor of the driver:
+In the sample configuration file the :ref:`default-storage-driver` storage driver is used. Which storage driver to use is specified in the ``storage`` key in the configuration array:
 
 .. code-block:: php
     :linenos:
@@ -303,37 +262,12 @@ In the sample configuration file the :ref:`default-storage-driver` storage drive
     return array(
         // ...
 
-        'storage' => array(
-            'driver' => 'Imbo\Storage\Filesystem',
-            'params' => array(
-                'dataDir' => '/path/to/images',
-            ),
-        ),
+        'storage' => new Storage\Filesystem(array(
+            'dataDir' => '/path/to/images',
+        )),
 
         // ...
     );
-
-2) or by specifying an instance of a driver:
-
-.. code-block:: php
-    :linenos:
-
-    <?php
-    namespace Imbo;
-
-    return array(
-        // ...
-
-        'storage' => array(
-            'driver' => new Storage\Filesystem(array(
-                'dataDir' => '/path/to/images',
-            )),
-        ),
-
-        // ...
-    );
-
-By using the former method Imbo will not instantiate the driver before it is needed.
 
 Available storage drivers
 +++++++++++++++++++++++++
@@ -373,9 +307,9 @@ When using this driver you need to create a table in the `DBMS`_ you choose to u
         PRIMARY KEY (publicKey,imageIdentifier)
     )
 
-If you wish to use some other DBMS, like for instance `MySQL`_ or `PostgreSQL`_ you will have to make some small changes to the statement above.
-
 .. note:: Imbo will not create the table automatically.
+
+If you wish to use some other DBMS, like for instance `MySQL`_ or `PostgreSQL`_ you will have to make some small changes to the statement above.
 
 .. _MySQL: http://www.mysql.com/
 .. _PostgreSQL: http://www.postgresql.org/
@@ -397,12 +331,9 @@ Here are some examples on how to use the Doctrine driver in the configuration fi
     return array(
         // ...
 
-        'storage' => array(
-            'driver' => 'Imbo\Storage\Doctrine',
-            'params' => array(
-                'pdo' => new \PDO('sqlite:/path/to/database'),
-            ),
-        ),
+        'storage' => new Storage\Doctrine(array(
+            'pdo' => new \PDO('sqlite:/path/to/database'),
+        )),
 
         // ...
     );
@@ -419,22 +350,18 @@ Here are some examples on how to use the Doctrine driver in the configuration fi
     return array(
         // ...
 
-        'storage' => array(
-            'driver' => 'Imbo\Storage\Doctrine',
-            'params' => array(
-                'dbname'   => 'database',
-                'user'     => 'username',
-                'password' => 'password',
-                'host'     => 'hostname',
-                'driver'   => 'pdo_mysql',
-            ),
-        ),
+        'storage' => new Storage\Doctrine(array(
+            'dbname'   => 'database',
+            'user'     => 'username',
+            'password' => 'password',
+            'host'     => 'hostname',
+            'driver'   => 'pdo_mysql',
+        )),
 
         // ...
     );
 
 .. _filesystem-storage-driver:
-.. _default-storage-driver:
 
 Filesystem
 ^^^^^^^^^^
@@ -471,17 +398,15 @@ Default configuration:
     return array(
         // ...
 
-        'storage' => array(
-            'driver' => 'Imbo\Storage\Filesystem',
-            'params' => array(
-                'dataDir' => '/path/to/images',
-            ),
-        ),
+        'storage' => new Storage\Filesystem(array(
+            'dataDir' => '/path/to/images',
+        )),
 
         // ...
     );
 
 .. _gridfs-storage-driver:
+.. _default-storage-driver:
 
 GridFS
 ^^^^^^
@@ -516,9 +441,7 @@ Examples
     return array(
         // ...
 
-        'storage' => array(
-            'driver' => 'Imbo\Storage\GridFS',
-        ),
+        'storage' => new Storage\GridFS(),
 
         // ...
     );
@@ -534,14 +457,11 @@ Examples
     return array(
         // ...
 
-        'storage' => array(
-            'driver' => 'Imbo\Storage\GridFS',
-            'params' => array(
-                'server'         => 'mongodb://server1,server2,server3',
-                'replicaSet'     => 'nameOfReplicaSet',
-                'slaveOk'        => true,
-            ),
-        ),
+        'storage' => new Storage\GridFS(array(
+            'server'     => 'mongodb://server1,server2,server3',
+            'replicaSet' => 'nameOfReplicaSet',
+            'slaveOk'    => true,
+        )),
 
         // ...
     );
@@ -551,7 +471,7 @@ Examples
 Event listeners
 ---------------
 
-Imbo also supports event listeners that you can use to hook into Imbo at different phases without having to edit Imbo itself. An event listener is simply a piece of code that will be executed when a certain event is triggered from Imbo. Event listeners are added to the ``eventListeners`` part of the configuration array and can be added in two ways:
+Imbo also supports event listeners that you can use to hook into Imbo at different phases without having to edit Imbo itself. An event listener is simply a piece of code that will be executed when a certain event is triggered from Imbo. Event listeners are added to the ``eventListeners`` part of the configuration array and can be added in the following ways:
 
 1) Use an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface:
 
@@ -565,15 +485,39 @@ Imbo also supports event listeners that you can use to hook into Imbo at differe
         // ...
 
         'eventListeners' => array(
+            new EventListener\AccessToken(),
+        ),
+
+        // ...
+    );
+
+2) Use an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface together with a public key filter:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'eventListeners' => array(
             array(
-                'listener' => new EventListener\AccessToken(),
+                'listener' => new EventListener\MaxImageSize(1024, 768),
+                'publicKeys' => array(
+                    'include' => array('user'),
+                    // 'exclude' => array('someotheruser'),
+                ),
             ),
         ),
 
         // ...
     );
 
-2) Use a `closure`_:
+where ``listener`` is an instance of the ``Imbo\EventListener\ListenerInterface`` interface, and ``publicKeys`` is an array that you can use if you want your listener to only be triggered for some users (public keys). The value of this is an array with one of two keys: ``include`` or ``exclude`` where ``include`` is an array you want your listener to trigger for, and ``exclude`` is an array of users you don't want your listener to trigger for. ``publicKeys`` is optional, and per default the listener will trigger for all users.
+
+3) Use a `closure`_:
 
 .. _closure: http://php.net/manual/en/functions.anonymous.php
 
@@ -588,12 +532,14 @@ Imbo also supports event listeners that you can use to hook into Imbo at differe
 
         'eventListeners' => array(
             array(
-                'listener' => function(EventManager\EventInterface $event) {
+                'callback' => function(EventManager\EventInterface $event) {
                     // Custom code
                 },
-                'events' => array(
-                    'image.get.pre',
-                    'image.get.post',
+                'events' => array('image.get'),
+                'priority' => 1,
+                'publicKeys' => array(
+                    'include' => array('user'),
+                    // 'exclude' => array('someotheruser'),
                 ),
             ),
         ),
@@ -601,40 +547,7 @@ Imbo also supports event listeners that you can use to hook into Imbo at differe
         // ...
     );
 
-where ``listener`` is the code you want executed, and ``events`` is an array of the events you want it triggered for.
-
-Per default an event listener is executed for all public keys (users). If you want a listener to only trigger for a specific public key you can specify this in the configuration:
-
-.. code-block:: php
-    :linenos:
-
-    <?php
-    namespace Imbo;
-
-    return array(
-        // ...
-
-        'eventListeners' => array(
-            array(
-                'listener' => new EventListener\AccessToken(),
-                'publicKeys' => array('someUser', 'andAnotherUser'),
-            ),
-            array(
-                'listener' => function(EventManager\EventInterface $event) {
-                    // Custom code
-                },
-                'publicKeys' => array('username', 'anotherUsername'),
-                'events' => array(
-                    'image.get.pre',
-                    'image.get.post',
-                ),
-            ),
-        ),
-
-        // ...
-    );
-
-where ``publicKeys`` is an array containing the public keys you want the listener to trigger for. You can read more about creating your own event listeners in the :ref:`custom-event-listeners` section.
+where ``callback`` is the code you want executed, and ``events`` is an array of the events you want it triggered for. ``priority`` is the priority of the listener and defaults to 1. The higher the number, the earlier in the chain your listener will be triggered. This number can also be negative. Imbo's internal event listeners uses numbers between 1 and 100. ``publicKeys`` uses the same format as described above.
 
 Events
 ++++++
@@ -647,20 +560,34 @@ When configuring an event listener you need to know about the events that Imbo t
 * :ref:`image <image-resource>`
 * :ref:`metadata <metadata-resource>`
 
-Imbo will trigger an event **before** the main resource logic kicks in per HTTP method, and also **after**. Examples of events that is triggered:
+Examples of events that is triggered:
 
-* ``image.get.pre``
-* ``image.put.pre``
-* ``image.delete.post``
+* ``image.get``
+* ``image.put``
+* ``image.delete``
 
-As you can see from the above examples the events are built up by the resource name, the HTTP method and a keyword that can be ``pre`` or ``post``, separated by ``.``.
+As you can see from the above examples the events are built up by the resource name and the HTTP method, separated by ``.``.
 
-Below you will see the different event listeners that Imbo ships with and the events they listen for.
+Some other notable events:
+
+* ``storage.image.insert``
+* ``storage.image.load``
+* ``storage.image.delete``
+* ``db.image.insert``
+* ``db.image.load``
+* ``db.image.delete``
+* ``db.metadata.update``
+* ``db.metadata.load``
+* ``db.metadata.delete``
+* ``route``
+* ``response.send``
+
+Below you will see the different event listeners that Imbo ships with and the events they subscribe to.
 
 Event listeners
 +++++++++++++++
 
-Imbo ships with a collection of event listeners for you to use. Two of them are enabled in the sample configuration file.
+Imbo ships with a collection of event listeners for you to use. Some of them are enabled in the sample configuration file.
 
 .. contents::
     :local:
@@ -671,18 +598,18 @@ Imbo ships with a collection of event listeners for you to use. Two of them are 
 Access token
 ^^^^^^^^^^^^
 
-This event listener enforces the usage of access tokens on all requests against user-specific resources. You can read more about how the actual access tokens works in the :ref:`access-tokens` topic in the :doc:`api` section.
+This event listener enforces the usage of access tokens on all read requests against user-specific resources. You can read more about how the actual access tokens works in the :ref:`access-tokens` topic in the :doc:`api` section.
 
-To enforce the access token check for all read requests this event listener listens for these events:
+To enforce the access token check for all read requests this event listener subscribes to the following events:
 
-* ``user.get.pre``
-* ``images.get.pre``
-* ``image.get.pre``
-* ``metadata.get.pre``
-* ``user.head.pre``
-* ``images.head.pre``
-* ``image.head.pre``
-* ``metadata.head.pre``
+* ``user.get``
+* ``images.get``
+* ``image.get``
+* ``metadata.get``
+* ``user.head``
+* ``images.head``
+* ``image.head``
+* ``metadata.head``
 
 This event listener has a single parameter that can be used to whitelist and/or blacklist certain image transformations, used when the current request is against an image resource. The parameter is an array with a single key: ``transformations``. This is another array with two keys: ``whitelist`` and ``blacklist``. These two values are arrays where you specify which transformation(s) to whitelist or blacklist. The names of the transformations are the same as the ones used in the request. See :ref:`image-transformations` for a complete list of the supported transformations.
 
@@ -722,27 +649,29 @@ This event listener is included in the default configuration file without specif
         // ...
 
         'eventListeners' => array(
-            array(
-                'listener' => new EventListener\AccessToken(),
-            ),
+            new EventListener\AccessToken(),
         ),
 
         // ...
     );
+
+Disable this event listener with care. Clients can easily `DDoS`_ your installation if you let them specify image transformations without limitations.
+
+.. _DDoS: http://en.wikipedia.org/wiki/DDoS
 
 Authenticate
 ^^^^^^^^^^^^
 
 This event listener enforces the usage of signatures on all write requests against user-specific resources. You can read more about how the actual signature check works in the :ref:`signing-write-requests` topic in the :doc:`api` section.
 
-To enforce the signature check for all write requests this event listener listens for these events:
+To enforce the signature check for all write requests this event listener subscribes to the following events:
 
-* ``image.put.pre``
-* ``image.post.pre``
-* ``image.delete.pre``
-* ``metadata.put.pre``
-* ``metadata.post.pre``
-* ``metadata.delete.pre``
+* ``image.put``
+* ``image.post``
+* ``image.delete``
+* ``metadata.put``
+* ``metadata.post``
+* ``metadata.delete``
 
 This event listener does not support any parameters and is enabled per default like this:
 
@@ -756,24 +685,23 @@ This event listener does not support any parameters and is enabled per default l
         // ...
 
         'eventListeners' => array(
-            array(
-                'listener' => new EventListener\Authenticate(),
-            ),
+            new EventListener\Authenticate(),
         ),
 
         // ...
     );
+
+Disable this event listener with care. Clients can delete all your images and metadata when this listener is not enabled.
 
 Image transformation cache
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This event listener enables caching of image transformations. Read more about image transformations in the :ref:`image-transformations` topic in the :doc:`api` section.
 
-To achieve this the listener listens for the following events:
+To achieve this the listener subscribes to the following events:
 
-* ``image.get.pre``
-* ``image.get.post``
-* ``image.delete.post``
+* ``image.get`` (both before and after the main application logic)
+* ``image.delete``
 
 The event listener has one parameter:
 
@@ -792,9 +720,7 @@ and is enabled like this:
         // ...
 
         'eventListeners' => array(
-            array(
-                'listener' => new EventListener\ImageTransformationCache('/path/to/cache'),
-            ),
+            new EventListener\ImageTransformationCache('/path/to/cache'),
         ),
 
         // ...
@@ -810,7 +736,7 @@ and is enabled like this:
 
     .. code-block:: bash
 
-        find /path/to/cache -ctime +7 -type f -delete
+        $ find /path/to/cache -ctime +7 -type f -delete
 
     The above command will delete all files in /path/to/cache older than 7 days and can be used with for instance `crontab`_.
 
@@ -821,9 +747,9 @@ Max image size
 
 This event listener can be used to enforce a maximum size (height and width, not byte size) of **new** images. Enabling this event listener will not change images already added to Imbo.
 
-The event listener listens to a special event:
+The event listener subscribes to the following event:
 
-* ``image.put.imagepreparation.post``
+* ``image.put``
 
 and has the following parameters:
 
@@ -845,17 +771,13 @@ and is enabled like this:
         // ...
 
         'eventListeners' => array(
-            array(
-                'listener' => new EventListener\MaxImageSize(1024, 768),
-            ),
+            new EventListener\MaxImageSize(1024, 768),
         ),
 
         // ...
     );
 
-which would effectively downsize all images exceeding a ``width`` of ``1024`` or a ``height`` of ``768``.
-
-The event this listener listens for is special in the case that the image resource has executed parts of its logic, and "prepared" the internal image instance available via the ``$event`` object passed to the listener. If the listener would listen for ``image.put.pre`` the ``$event`` object would not yet have an image instance to work with.
+which would effectively downsize all images exceeding a ``width`` of ``1024`` or a ``height`` of ``768``. The aspect ratio will be kept.
 
 CORS (Cross-Origin Resource Sharing)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -876,19 +798,14 @@ To enable the listener, use the following:
         // ...
 
         'eventListeners' => array(
-            array(
-                'listener' => new EventListener\Cors(array(
-                    'allowedOrigins' => array('http://some.origin'),
-                    'allowedMethods' => array(
-                        'image'  => array('GET', 'HEAD', 'PUT'),
-                        'images' => array('GET', 'HEAD'),
-                    ),
-                    'maxAge' => 3600,
-                )),
-
-                // To only open up certain public keys:
-                // 'publicKeys' => array('pubKey1', 'pubKey2')
-            ),
+            new EventListener\Cors(array(
+                'allowedOrigins' => array('http://some.origin'),
+                'allowedMethods' => array(
+                    'image'  => array('GET', 'HEAD', 'PUT'),
+                    'images' => array('GET', 'HEAD'),
+                ),
+                'maxAge' => 3600,
+            )),
         ),
 
         // ...
@@ -900,31 +817,19 @@ To enable the listener, use the following:
 
 ``maxAge`` specifies how long the response of an OPTIONS-request can be cached for, in seconds. Defaults to 3600 (one hour).
 
-If you wish to only enable the CORS-listener for a given set of public keys, specify an array with the key ``publicKeys`` alongside ``listener`` in the configuration (see example above).
+Metadata cache
+^^^^^^^^^^^^^^
 
-The event object
-++++++++++++++++
+This event listener enables caching of metadata fetched from the backend so other requests won't need to go all the way to the backend to fetch metadata. To achieve this the listener subscribes to the following events:
 
-The object passed to the event listeners (and closures) is an instance of the ``Imbo\EventManager\EventInterface`` interface. This interface has two methods that event listeners can use:
+* ``db.metadata.load``
+* ``db.metadata.delete``
+* ``db.metadata.update``
 
-``getName()``
-    Get the name of the current event. For instance ``image.delete.post``.
+and has the following parameters:
 
-``getContainer()``
-    Get the dependency injection container. This container can be used to fetch the current request and response objects for instance.
-
-Have a look at how the event listeners shipped with Imbo have been implemented with regards to fetching the request and response objects.
-
-.. _image-transformations:
-
-Image transformations
----------------------
-
-Imbo supports a set of image transformations out of the box using the `Imagick PHP extension <http://pecl.php.net/package/imagick>`_. All supported image transformations are included in the configuration, and you can easily add your own custom transformations or create presets using a combination of existing transformations.
-
-Transformations are triggered using the ``t[]`` query parameter together with the image resource (read more about the image resource and the included transformations and their parameters in the :ref:`image-resource` section). This parameter should be used as an array so that multiple transformations can be made. The transformations are applied in the order they are specified in the URL.
-
-All transformations are registered in the configuration array under the ``transformations`` key:
+``Imbo\Cache\CacheInterface $cache``
+    An instance of a cache adapter. Imbo ships with :ref:`apc-cache` and :ref:`memcached-cache` adapters, and both can be used for this event listener. If you want to use another form of caching you can simply implement the ``Imbo\Cache\CacheInterface`` interface and pass an instance of the custom adapter to the constructor of the event listener. Here is an example that uses the APC adapter for caching:
 
 .. code-block:: php
     :linenos:
@@ -935,7 +840,57 @@ All transformations are registered in the configuration array under the ``transf
     return array(
         // ...
 
-        'transformations' => array(
+        'eventListeners' => array(
+            new EventListener\MetadataCache(new Cache\APC('imbo')),
+        ),
+
+        // ...
+    );
+
+The event object
+++++++++++++++++
+
+The object passed to the event listeners (and closures) is an instance of the ``Imbo\EventManager\EventInterface`` interface. This interface has some methods that event listeners can use:
+
+``getName()``
+    Get the name of the current event. For instance ``image.delete``.
+
+``getRequest()``
+    Get the current request object (an instance of ``Imbo\Http\Request\RequestInterface``)
+
+``getResponse()``
+    Get the current response object (an instance of ``Imbo\Http\Response\ResponseInterface``)
+
+``getDatabase()``
+    Get the current database adapter (an instance of ``Imbo\Database\DatabaseInterface``)
+
+``getStorage()``
+    Get the current storage adapter (an instance of ``Imbo\Storage\StorageInterface``)
+
+``getManager()``
+    Get the current event manager (an instance of ``Imbo\EventManager\EventManager``)
+
+.. _image-transformations:
+
+Image transformations
+---------------------
+
+Imbo supports a set of image transformations out of the box using the `Imagick PHP extension <http://pecl.php.net/package/imagick>`_. All supported image transformations are included in the configuration, and you can easily add your own custom transformations or create presets using a combination of existing transformations.
+
+Transformations are triggered using the ``t[]`` query parameter together with the image resource (read more about the image resource and the included transformations and their parameters in the :ref:`image-resource` section). This parameter should be used as an array so that multiple transformations can be made. The transformations are applied in the order they are specified in the URL.
+
+All transformations are registered in the configuration array under the ``imageTransformations`` key:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'imageTransformations' => array(
             'border' => function (array $params) {
                 return new Image\Transformation\Border($params);
             },
@@ -964,7 +919,7 @@ the ``$params`` array given to the closure will look like this:
     )
 
 
-The return value of the closure must either be an instance of the ``Imbo\Image\Transformation\TransformationInterface`` interface, or code that is callable (for instance another closure, or a class that includes an ``__invoke`` method). If the return value is a callable piece of code it will receive a single parameter which is an instance of ``Imbo\Image\ImageInterface`` which is the image you want your transformation to modify. See some examples in the :ref:`custom-transformations` section below.
+The return value of the closure must either be an instance of the ``Imbo\Image\Transformation\TransformationInterface`` interface, or code that is callable (for instance another closure, or a class that includes an ``__invoke`` method). If the return value is a callable piece of code it will receive a single parameter which is an instance of ``Imbo\Image\Image``, which is the image you want your transformation to modify. See some examples in the :ref:`custom-transformations` section below.
 
 Presets
 +++++++
@@ -980,11 +935,11 @@ Imbo supports the notion of transformation presets by using the ``Imbo\Image\Tra
     return array(
         // ...
 
-        'transformations' => array(
+        'imageTransformations' => array(
             'graythumb' => function ($params) {
                 return new Image\Transformation\Collection(array(
-                    new Image\Transformation\Thumbnail($params),
                     new Image\Transformation\Desaturate(),
+                    new Image\Transformation\Thumbnail($params),
                 ));
             },
         ),
@@ -1012,7 +967,7 @@ You can also implement your own transformations by implementing the ``Imbo\Image
     return array(
         // ...
 
-        'transformations' => array(
+        'imageTransformations' => array(
             'border' => function (array $params) {
                 return function (Image\ImageInterface $image) use ($params) {
                     $color = !empty($params['color']) ? $params['color'] : '#000';
@@ -1039,7 +994,7 @@ You can also implement your own transformations by implementing the ``Imbo\Image
         // ...
     );
 
-It's not recommended to use this method for big complicated transformations. It's better to implement the interface mentioned above, and refer to that class in the configuration array instead:
+It's not recommended to use this method for big complicated transformations. It's better to implement the interface mentioned above, and refer to your class in the configuration array instead:
 
 .. code-block:: php
     :linenos:
@@ -1050,7 +1005,7 @@ It's not recommended to use this method for big complicated transformations. It'
     return array(
         // ..
 
-        'transformations' => array(
+        'imageTransformations' => array(
             'border' => function (array $params) {
                 return new My\Custom\BorderTransformation($params);
             },
@@ -1060,49 +1015,3 @@ It's not recommended to use this method for big complicated transformations. It'
     );
 
 where ``My\Custom\BorderTransformation`` implements ``Imbo\Image\Transformation\TransformationInterface``.
-
-Varnish
--------
-
-Imbo strives to follow the `HTTP Protocol`_, and can because of this easily leverage `Varnish`_.
-
-.. _HTTP Protocol: http://www.ietf.org/rfc/rfc2616.txt
-.. _Varnish: https://www.varnish-cache.org/
-
-The only required configuration you need in your `VCL`_ is a default backend:
-
-.. _VCL: https://www.varnish-cache.org/docs/3.0/reference/vcl.html
-
-.. code-block:: console
-
-    backend default {
-        .host = "127.0.0.1";
-        .port = "81";
-    }
-
-where ``.host`` and ``.port`` is where Varnish can reach your web server.
-
-If you use the same host name (or a sub-domain) for your Imbo installation as other services, that in turn uses `Cookies`_, you might want the VCL to ignore these Cookies for the requests made against your Imbo installation (unless you have implemented event listeners for Imbo that uses Cookies). To achieve this you can put the following snippet into your VCL file:
-
-.. _Cookies: http://en.wikipedia.org/wiki/HTTP_cookie
-
-.. code-block:: console
-
-    sub vcl_recv {
-        if (req.http.host == "imbo.example.com") {
-            unset req.http.Cookie;
-        }
-    }
-
-or, if you have Imbo installed in some path:
-
-.. code-block:: console
-
-    sub vcl_recv {
-        if (req.http.host ~ "^(www.)?example.com$" && req.url ~ "^/imbo/") {
-            unset req.http.Cookie;
-        }
-    }
-
-if you have Imbo installed in ``example.com/imbo``.
-

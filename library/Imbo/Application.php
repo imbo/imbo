@@ -1,0 +1,399 @@
+<?php
+/**
+ * Imbo
+ *
+ * Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * * The above copyright notice and this permission notice shall be included in
+ *   all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * @package Core
+ * @author Christer Edvartsen <cogo@starzinger.net>
+ * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
+ * @license http://www.opensource.org/licenses/mit-license MIT License
+ * @link https://github.com/imbo/imbo
+ */
+
+namespace Imbo;
+
+use Imbo\Http\Request\Request,
+    Imbo\Http\Response\Response,
+    Imbo\Http\Response\ResponseFormatter,
+    Imbo\Http\Response\ResponseWriter,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventListener\ListenerDefinition,
+    Imbo\EventManager\Event,
+    Imbo\EventManager\EventManager,
+    Imbo\Image\Image,
+    Imbo\Image\ImagePreparation,
+    Imbo\Exception\RuntimeException,
+    Imbo\Exception\InvalidArgumentException,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface,
+    Imbo\Resource\Images\Query;
+
+/**
+ * Imbo application
+ *
+ * @package Core
+ * @author Christer Edvartsen <cogo@starzinger.net>
+ * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
+ * @license http://www.opensource.org/licenses/mit-license MIT License
+ * @link https://github.com/imbo/imbo
+ */
+class Application {
+    /**
+     * @var array
+     */
+    private $config;
+
+    /**
+     * @var Container
+     */
+    private $container;
+
+    /**
+     * Run the application
+     */
+    public function run() {
+        if (!$this->container) {
+            throw new RuntimeException('Application has not been bootstrapped', 500);
+        }
+
+        $eventManager = $this->container->get('eventManager');
+        $request = $this->container->get('request');
+        $response = $this->container->get('response');
+
+        try {
+            // Route the request
+            $eventManager->trigger('route');
+
+            // Fetch the name of the current resource
+            $resource = $request->getResource();
+            $entry = $resource . 'Resource';
+
+            if (!$this->container->has($entry)) {
+                throw new RuntimeException('Unknown Resource', 500);
+            }
+
+            $resource = $this->container->get($entry);
+
+            // Add some response headers
+            $responseHeaders = $response->getHeaders();
+
+            // Inform the user agent of which methods are allowed against this resource
+            $responseHeaders->set('Allow', implode(', ', $resource->getAllowedMethods()));
+
+            // Add Accept to Vary if the client has not specified a specific extension, in which we
+            // won't do any content negotiation at all.
+            if (!$request->getExtension()) {
+                $responseHeaders->set('Vary', 'Accept');
+            }
+
+            // Fetch auth config
+            $config = $this->container->get('config');
+            $authConfig = $config['auth'];
+            $publicKey = $request->getPublicKey();
+
+            // See if the public key exists
+            if ($publicKey) {
+                if (!isset($authConfig[$publicKey])) {
+                    $e = new RuntimeException('Unknown Public Key', 404);
+                    $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
+
+                    throw $e;
+                }
+
+                // Fetch the private key from the config and store it in the request
+                $privateKey = $authConfig[$publicKey];
+                $request->setPrivateKey($privateKey);
+            }
+
+            $methodName = strtolower($request->getMethod());
+
+            $resource = $request->getResource();
+            $eventManager->trigger($resource);
+
+            // Generate the event name based on the accessed resource and the HTTP method
+            $eventName = $resource . '.' . $methodName;
+
+            if (!$eventManager->hasListenersForEvent($eventName)) {
+                throw new RuntimeException('Method not allowed', 405);
+            }
+
+            $eventManager->trigger($eventName);
+        } catch (Exception $exception) {
+            // An error has occured. Create an error and send the response
+            $this->container->get('response')->createError(
+                $exception,
+                $this->container->get('request')
+            );
+        }
+
+        $eventManager->trigger('response.send');
+    }
+
+    /**
+     * Bootstrap the container
+     *
+     * @param array $config Imbo configuration
+     * @param Container $container Optional container instance
+     * @return Application
+     */
+    public function bootstrap(array $config, Container $container = null) {
+        if (!$container) {
+            $container = new Container();
+        }
+
+        // Main configuration
+        $container->set('config', $config);
+
+        // Query object used when querying for images
+        $container->set('imagesQuery', function(Container $container) {
+            return new Query();
+        });
+
+        // Date formatter helper
+        $container->set('dateFormatter', new Helpers\DateFormatter());
+
+        // Request from the client
+        $container->set('request', new Request($_GET, $_POST, $_SERVER));
+
+        // Response to the client
+        $container->setStatic('response', function ($container) {
+            $response = new Response();
+            $response->setImage($container->get('image'));
+            $response->getHeaders()->set('X-Imbo-Version', Version::VERSION);
+
+            return $response;
+        });
+
+        // Event object
+        $container->set('event', function(Container $container) {
+            $event = new Event();
+            $event->setContainer($container);
+
+            return $event;
+        });
+
+        // Response writer
+        $container->setStatic('responseWriter', function(Container $container) {
+            $writer = new ResponseWriter();
+            $writer->setContainer($container);
+
+            return $writer;
+        });
+
+        // Response formatter
+        $container->setStatic('responseFormatter', function(Container $container) {
+            $formatter = new ResponseFormatter();
+            $formatter->setContainer($container);
+
+            return $formatter;
+        });
+
+        // Image instance that will be attached to the request or the response instances
+        $container->set('image', function(Container $container) {
+            return new Image();
+        });
+
+        // Content negotiation component
+        $container->set('contentNegotiation', new Http\ContentNegotiation());
+
+        // Image preparation component
+        $container->setStatic('imagePreparation', function(Container $container) {
+            $preparation = new ImagePreparation();
+            $preparation->setContainer($container);
+
+            return $preparation;
+        });
+
+        // Metadata resource
+        $container->setStatic('metadataResource', function(Container $container) {
+            $resource = new Resource\Metadata();
+
+            return $resource;
+        });
+
+        // Images resource
+        $container->setStatic('imagesResource', function(Container $container) {
+            $resource = new Resource\Images();
+
+            return $resource;
+        });
+
+        // User resource
+        $container->setStatic('userResource', function(Container $container) {
+            $resource = new Resource\User();
+
+            return $resource;
+        });
+
+        // Status resource
+        $container->setStatic('statusResource', function(Container $container) {
+            $resource = new Resource\Status();
+            $resource->setContainer($container);
+
+            return $resource;
+        });
+
+        // Image resource
+        $container->setStatic('imageResource', function(Container $container) {
+            $resource = new Resource\Image();
+
+            return $resource;
+        });
+
+        // Image transformer listener
+        $container->setStatic('imageTransformer', function(Container $container) {
+            $transformer = new EventListener\ImageTransformer();
+            $transformer->setContainer($container);
+
+            $config = $container->get('config');
+
+            foreach ($config['imageTransformations'] as $name => $callback) {
+                $transformer->registerTransformationHandler($name, $callback);
+            }
+
+            return $transformer;
+        });
+
+        // Router component
+        $container->setStatic('router', function(Container $container) {
+            $router = new Router();
+
+            return $router;
+        });
+
+        // Database adapter
+        $container->setStatic('database', function(Container $container) {
+            $config = $container->get('config');
+            $adapter = $config['database'];
+
+            if (!$adapter instanceof DatabaseInterface) {
+                throw new InvalidArgumentException('Invalid database adapter', 500);
+            }
+
+            return $adapter;
+        });
+
+        // Storage adapter
+        $container->setStatic('storage', function(Container $container) {
+            $config = $container->get('config');
+            $adapter = $config['storage'];
+
+            if (!$adapter instanceof StorageInterface) {
+                throw new InvalidArgumentException('Invalid storage adapter', 500);
+            }
+
+            return $adapter;
+        });
+
+        // Database operations listener
+        $container->setStatic('databaseOperations', function(Container $container) {
+            $listener = new EventListener\DatabaseOperations();
+            $listener->setContainer($container);
+
+            return $listener;
+        });
+
+        // Storage operations listener
+        $container->setStatic('storageOperations', function(Container $container) {
+            $listener = new EventListener\StorageOperations();
+            $listener->setContainer($container);
+
+            return $listener;
+        });
+
+        // Event manager component
+        $container->setStatic('eventManager', function(Container $container) {
+            $manager = new EventManager();
+            $manager->setContainer($container);
+
+            // Register internal event listeners
+            $containerEntries = array(
+                'statusResource',
+                'userResource',
+                'imagesResource',
+                'imageResource',
+                'metadataResource',
+                'response',
+                'responseFormatter',
+                'router',
+                'databaseOperations',
+                'storageOperations',
+                'imagePreparation',
+                'imageTransformer',
+            );
+
+            foreach ($containerEntries as $listener) {
+                $manager->attachListener($container->get($listener));
+            }
+
+            $config = $container->get('config');
+            $listeners = $config['eventListeners'];
+
+            foreach ($listeners as $definition) {
+                if ($definition instanceof ListenerInterface) {
+                    $manager->attachListener($definition);
+                    continue;
+                }
+
+                if (!empty($definition['listener']) && $definition['listener'] instanceof ListenerInterface) {
+                    $publicKeys = isset($definition['publicKeys']) ? $definition['publicKeys'] : array();
+                    $listener = $definition['listener'];
+
+                    if (empty($publicKeys)) {
+                        $manager->attachListener($listener);
+                    } else {
+                        $definition = $listener->getDefinition();
+
+                        foreach ($definition as $d) {
+                            $d->setPublicKeys($publicKeys);
+                            $manager->attachDefinition($d);
+                        }
+                    }
+                } else if (!empty($definition['callback']) && !empty($definition['events'])) {
+                    $callback = $definition['callback'];
+                    $priority = isset($definition['priority']) ? $definition['priority'] : 1;
+                    $publicKeys = isset($definition['publicKeys']) ? $definition['publicKeys'] : array();
+
+                    foreach ($definition['events'] as $key => $value) {
+                        $event = $value;
+
+                        if (is_string($key)) {
+                            // We have an associative array with <event> => <priority>
+                            $event = $key;
+                            $priority = $value;
+                        }
+
+                        $manager->attach($event, $callback, $priority, $publicKeys);
+                    }
+                } else {
+                    throw new InvalidArgumentException('Invalid event listener definition', 500);
+                }
+            }
+
+            return $manager;
+        });
+
+        $this->container = $container;
+
+        return $this;
+    }
+}

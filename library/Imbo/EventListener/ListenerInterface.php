@@ -32,11 +32,8 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception;
-
 /**
- * Listener interface
+ * Event listener interface
  *
  * @package Interfaces
  * @subpackage EventListener
@@ -47,37 +44,9 @@ use Imbo\EventManager\EventInterface,
  */
 interface ListenerInterface {
     /**
-     * Return the events this listener wants to listen for
+     * Return a list of listener definitions
      *
-     * @return array
+     * @return ListenerDefinition[]
      */
-    function getEvents();
-
-    /**
-     * Returns a list of public keys this event listener should be triggered for
-     *
-     * If an empty array is returned the listener is triggered for all users
-     *
-     * @return array
-     */
-    function getPublicKeys();
-
-    /**
-     * Set the list of public keys the listener should be triggered for
-     *
-     * @param array $keys An array of public keys
-     * @return ListenerInterface
-     */
-    function setPublicKeys(array $keys);
-
-    /**
-     * Invoke method
-     *
-     * This method will get triggered by the event manager
-     *
-     * @param EventInterface $event The triggered event
-     * @throws Exception This method can throw exceptions implementing the base Imbo exception
-     *                   interface.
-     */
-    function invoke(EventInterface $event);
+    function getDefinition();
 }

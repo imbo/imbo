@@ -42,7 +42,7 @@ namespace Imbo\Resource\Images;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Query implements QueryInterface {
+class Query {
     /**
      * The page to get
      *
@@ -86,7 +86,10 @@ class Query implements QueryInterface {
     private $to;
 
     /**
-     * {@inheritdoc}
+     * Set or get the page property
+     *
+     * @param int $page Give this a value to set the page property
+     * @return int|Query
      */
     public function page($page = null) {
         if ($page === null) {
@@ -99,7 +102,10 @@ class Query implements QueryInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Set or get the limit property
+     *
+     * @param int $limit Give this a value to set the limit property
+     * @return int|Query
      */
     public function limit($limit = null) {
         if ($limit === null) {
@@ -112,7 +118,10 @@ class Query implements QueryInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Set or get the returnMetadata flag
+     *
+     * @param boolean $returnMetadata Give this a value to set the returnMetadata flag
+     * @return boolean|Query
      */
     public function returnMetadata($returnMetadata = null) {
         if ($returnMetadata === null) {
@@ -125,7 +134,10 @@ class Query implements QueryInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Set or get the metadataQuery property
+     *
+     * @param array $metadataQuery Give this a value to set the property
+     * @return array|Query
      */
     public function metadataQuery(array $metadataQuery = null) {
         if ($metadataQuery === null) {
@@ -138,7 +150,10 @@ class Query implements QueryInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Set or get the from attribute
+     *
+     * @param int $from Give this a value to set the from property
+     * @return int|Query
      */
     public function from($from = null) {
         if ($from === null) {
@@ -151,7 +166,10 @@ class Query implements QueryInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Set or get the to attribute
+     *
+     * @param int $to Give this a value to set the to property
+     * @return int|Query
      */
     public function to($to = null) {
         if ($to === null) {

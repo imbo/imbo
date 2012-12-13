@@ -47,34 +47,46 @@ use Imbo\Exception\InvalidArgumentException;
  *     namespace Imbo;
  *
  *     $container = new Container();
- *     $container->imageResource = new Resource\Image();
+ *     $container->set('imageResource', new Resource\Image());
  *
  *     $dbParams = array('some' => 'params');
- *     $container->database = new Database\MongoDB($dbParams);
+ *     $container->set('database', new Database\MongoDB($dbParams));
  *
  *     $storageParams = array('some' => 'params');
- *     $container->storage = new Storage\Filesystem($storageParams);
+ *     $container->set('storage', new Storage\Filesystem($storageParams));
  *
  *     // or
  *
  *     namespace Imbo;
  *
  *     $container = new Container();
- *     $container->imageResource = $container->shared(function (Container $container) {
+ *     $container->setStatic('imageResource', function (Container $container) {
  *         return new Resource\Image();
  *     });
  *
  *     $dbParams = array('some' => 'params');
- *     $container->database = $container->shared(function (Container $container) use ($dbParams) {
+ *     $container->setStatic('database', function (Container $container) use ($dbParams) {
  *         return new Database\MongoDB($dbParams);
  *     });
  *
  *     $storageParams = array('some' => 'params');
- *     $container->storage = $container->shared(function (Container $container) use ($storageParams) {
+ *     $container->setStatic('storage', function (Container $container) use ($storageParams) {
  *         return new Storage\Filesystem($storageParams);
  *     });
  *
- * This container is based on code by Fabien Potencier.
+ * If you provide a callable to the set method, the callable will be executed every time you access
+ * the value. This is handy when you want the container to create new instances every time you
+ * fetch a property. For instance:
+ *
+ *     <?php
+ *     namespace Imbo;
+ *
+ *     $container = new Container();
+ *     $container->set('event', function(Container $container) {
+ *         return new Event();
+ *     });
+ *     $someEvent = $container->get('event');
+ *     $someOtherEvent = $container->get('event');
  *
  * @package Core
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -106,21 +118,8 @@ class Container {
      * @param string $id The accessed property
      * @param mixed $value The value to set
      */
-    public function __set($id, $value) {
-        $this->values[$id] = $value;
-    }
-
-    /**
-     * Alias of __set
-     *
-     * @param string $id The accessed property
-     * @param mixed $value The value to set
-     * @return Imbo\Container
-     */
     public function set($id, $value) {
-        $this->$id = $value;
-
-        return $this;
+        $this->values[$id] = $value;
     }
 
     /**
@@ -128,10 +127,10 @@ class Container {
      *
      * @param string $id The accessed property
      * @return mixed
-     * @throws Imbo\Exception\InvalidArgumentException If someone tries to access a value that is
-     *                                                 not yet defined an exception will be thrown.
+     * @throws InvalidArgumentException Throws an exception when trying to get a value that does not
+     *                                  exist.
      */
-    public function __get($id) {
+    public function get($id) {
         if (!isset($this->values[$id])) {
             throw new InvalidArgumentException(sprintf('Value %s is not defined.', $id));
         }
@@ -145,23 +144,12 @@ class Container {
     }
 
     /**
-     * Alias of __get
-     *
-     * @param string $id The accessed property
-     * @return mixed
-     */
-    public function get($id) {
-        return $this->$id;
-    }
-
-    /**
-     * Helper function used when you want to lazy load a property, and make it static
+     * Set a static value
      *
      * @param callback $callable A closure that will be executed when the value is accessed
-     * @return callback
      */
-    public function shared($callable) {
-        return function ($container) use ($callable) {
+    public function setStatic($id, $callable) {
+        $this->set($id, function ($container) use ($callable) {
             static $value;
 
             if (is_null($value)) {
@@ -169,6 +157,6 @@ class Container {
             }
 
             return $value;
-        };
+        });
     }
 }

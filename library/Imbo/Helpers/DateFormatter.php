@@ -22,44 +22,36 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Interfaces
- * @subpackage Resources
+ * @package Helpers
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\Resource;
+namespace Imbo\Helpers;
 
-use Imbo\Resource\Images\QueryInterface;
+use DateTime,
+    DateTimeZone;
 
 /**
- * Images resource interface
+ * Date formatter helper class
  *
- * This interface extends the resource interface with two methods for setting and getting a query
- * instance.
- *
- * @package Interfaces
- * @subpackage Resources
+ * @package Helpers
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-interface ImagesInterface extends ResourceInterface {
+class DateFormatter {
     /**
-     * Fetch a query instance
+     * Get a formatted date
      *
-     * @return QueryInterface
+     * @param DateTime $date An instance of DateTime
+     * @return string Returns a formatted date string
      */
-    function getQuery();
-
-    /**
-     * Set a query instance
-     *
-     * @param QueryInterface $query A query instance
-     * @return ImagesInterface
-     */
-    function setQuery(QueryInterface $query);
+    public function formatDate(DateTime $date) {
+        $date->setTimezone(new DateTimeZone('UTC'));
+        return $date->format('D, d M Y H:i:s') . ' GMT';
+    }
 }

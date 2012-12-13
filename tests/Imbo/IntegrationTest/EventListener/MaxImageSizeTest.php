@@ -29,9 +29,10 @@
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\IntegrationTest\Cache;
+namespace Imbo\IntegrationTest\EventListener;
 
-use Imbo\Cache\Apc;
+use Imbo\EventListener\MaxImageSize,
+    Imbo\Image\Image;
 
 /**
  * @package TestSuite\IntegrationTests
@@ -39,18 +40,43 @@ use Imbo\Cache\Apc;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\Cache\Apc
+ * @covers Imbo\EventListener\MaxImageSize
  */
-class ApcTest extends CacheTests {
-    protected function getDriver() {
-        if (!extension_loaded('apc')) {
-            $this->markTestSkipped('APC is not installed');
-        }
+class MaxImageSizeTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * Get dimensions for the test
+     *
+     * @return array[]
+     */
+    public function getDimensions() {
+        return array(
+            array(20, 10, 14, 10),
+            array(100, 1000, 100, 70),
+            array(1000, 1000, 665, 463),
+        );
+    }
 
-        if (!ini_get('apc.enable_cli')) {
-            $this->markTestSkipped('apc.enable_cli must be set to On to run this test case');
-        }
+    /**
+     * @dataProvider getDimensions
+     * @covers Imbo\EventListener\MaxImageSize::__construct
+     * @covers Imbo\EventListener\MaxImageSize::invoke
+     */
+    public function testCanResizeImages($maxWidth, $maxHeight, $expectedWidth, $expectedHeight) {
+        $listener = new MaxImageSize($maxWidth, $maxHeight);
 
-        return new Apc('ImboTestSuite');
+        $image = new Image();
+        $image->setBlob(file_get_contents(FIXTURES_DIR . '/image.png'))
+              ->setWidth(665)
+              ->setHeight(463);
+
+        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
+
+        $listener->invoke($event);
+
+        $this->assertSame($expectedWidth, $image->getWidth());
+        $this->assertSame($expectedHeight, $image->getHeight());
     }
 }

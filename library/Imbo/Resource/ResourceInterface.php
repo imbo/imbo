@@ -32,8 +32,8 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Container,
-    Imbo\EventManager\EventManagerInterface;
+use Imbo\EventManager\EventInterface,
+    Imbo\EventListener\ListenerInterface;
 
 /**
  * Resource interface
@@ -52,9 +52,6 @@ interface ResourceInterface {
     /**#@+
      * Resource types
      *
-     * The values of the constants maps to the names (appended with Resource) used in
-     * Imbo\Container for the resource entries.
-     *
      * @var string
      */
     const STATUS   = 'status';
@@ -70,47 +67,4 @@ interface ResourceInterface {
      * @return string[]
      */
     function getAllowedMethods();
-
-    /**
-     * POST handler
-     *
-     * @param Container $container A container instance
-     */
-    function post(Container $container);
-
-    /**
-     * GET handler
-     *
-     * @param Container $container A container instance
-     */
-    function get(Container $container);
-
-    /**
-     * HEAD handler
-     *
-     * @param Container $container A container instance
-     */
-    function head(Container $container);
-
-    /**
-     * DELETE handler
-     *
-     * @param Container $container A container instance
-     */
-    function delete(Container $container);
-
-    /**
-     * PUT handler
-     *
-     * @param Container $container A container instance
-     */
-    function put(Container $container);
-
-    /**
-     * Set the event manager
-     *
-     * @param EventManagerInterface $eventManager An instance of an event manager
-     * @return ResourceInterface
-     */
-    function setEventManager(EventManagerInterface $eventManager);
 }

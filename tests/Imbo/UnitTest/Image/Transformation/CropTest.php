@@ -81,7 +81,7 @@ class CropTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Transformation\Crop::applyToImage
      */
     public function testUsesAllParamsWithImagick($params, $width, $height, $x = 0, $y = 0) {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image = $this->getMock('Imbo\Image\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('originalimage'));
         $image->expects($this->once())->method('setBlob')->with('newimage')->will($this->returnSelf());
         $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnSelf());

@@ -43,7 +43,7 @@ use Imbo\Http\ContentNegotiation;
  */
 class ContentNegotiationTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var Imbo\Http\ContentNegotiation
+     * @var ContentNegotiation
      */
     private $cn;
 
@@ -78,7 +78,7 @@ class ContentNegotiationTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider getIsAcceptableData
      * @covers Imbo\Http\ContentNegotiation::isAcceptable
      */
-    public function testIsAcceptable($mimeType, $acceptable, $result) {
+    public function testCanCheckIfAMimeTypeIsAcceptable($mimeType, $acceptable, $result) {
         $this->assertSame($result, $this->cn->isAcceptable($mimeType, $acceptable));
     }
 
@@ -99,7 +99,7 @@ class ContentNegotiationTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\ContentNegotiation::bestMatch
      * @covers Imbo\Http\ContentNegotiation::isAcceptable
      */
-    public function testBestMatch($mimeTypes, $acceptable, $result) {
+    public function testCanPickTheBestMatchFromASetOfMimeTypes($mimeTypes, $acceptable, $result) {
         $this->assertSame($result, $this->cn->bestMatch($mimeTypes, $acceptable));
     }
 }
