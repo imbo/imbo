@@ -83,6 +83,20 @@ return array(
      *
      * 2) An array with the following keys:
      *
+     *   - listener
+     *   - publicKeys
+     *
+     *   where 'listener' is an instance of the Imbo\EventListener\ListenerInterface interface, and
+     *   'publicKeys' is an array with one of the following keys:
+     *
+     *     - include
+     *     - exclude
+     *
+     *     where 'include' is an array of public keys that the listener *will* trigger for, and
+     *     'exclude' is an array of public keys that the listener *will not* trigger for.
+     *
+     * 3) An array with the following keys:
+     *
      *   - events (required)
      *   - callback (required)
      *   - priority
@@ -100,13 +114,7 @@ return array(
      *   priority can also be a negative number if you want your listeners to be triggered after
      *   Imbo's event listeners.
      *
-     *   'publicKeys' is an array with one of the following keys:
-     *
-     *     - include
-     *     - exclude
-     *
-     *     where 'include' is an array of public keys that the listener *will* trigger for, and
-     *     'exclude' is an array of public keys that the listener *will not* trigger for.
+     *   'publicKeys' is the same as described above.
      *
      * Example of how to add listeners:
      *
@@ -114,7 +122,17 @@ return array(
      *   // 1) Implementation of a listener interface
      *   new EventListener\Authenticate(),
      *
-     *   // 2) A closure that will subscribe to two events using one priority
+     *   // 2) Implementation of a listener interface with a public key filter
+     *   array(
+     *     'listener' => EventListener\MaxImageSize(1024, 768),
+     *     'publicKeys' => array(
+     *       'include' => array( ... ),
+     *       // 'exclude' => array( ... ),
+     *       )
+     *     )
+     *   ),
+     *
+     *   // 3) A closure that will subscribe to two events using one priority
      *   array(
      *     'callback' => function($event) {
      *       // Some code
@@ -129,7 +147,7 @@ return array(
      *     )
      *   ),
      *
-     *   // 3) A closure that will subscribe to two events with different priorities
+     *   // 4) A closure that will subscribe to two events with different priorities
      *   array(
      *     'callback' => function($event) {
      *       // Some code
