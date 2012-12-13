@@ -123,6 +123,20 @@ class MongoDB implements DatabaseInterface {
     public function insertImage($publicKey, $imageIdentifier, Image $image) {
         $now = time();
 
+        if ($this->imageExists($publicKey, $imageIdentifier)) {
+            try {
+                $this->getCollection()->update(
+                    array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
+                    array('$set' => array('updated' => $now)),
+                    array('safe' => true, 'multiple' => false)
+                );
+
+                return true;
+            } catch (MongoException $e) {
+                throw new DatabaseException('Unable to save image data', 500, $e);
+            }
+        }
+
         $data = array(
             'size'            => $image->getFilesize(),
             'publicKey'       => $publicKey,
@@ -138,19 +152,6 @@ class MongoDB implements DatabaseInterface {
         );
 
         try {
-            // See if the image already exists
-            $row = $this->getCollection()->findOne(array(
-                'publicKey' => $publicKey,
-                'imageIdentifier' => $imageIdentifier,
-            ));
-
-            if ($row) {
-                $e = new DatabaseException('Image already exists', 400);
-                $e->setImboErrorCode(Exception::IMAGE_ALREADY_EXISTS);
-
-                throw $e;
-            }
-
             $this->getCollection()->insert($data, array('safe' => true));
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to save image data', 500, $e);
@@ -421,6 +422,18 @@ class MongoDB implements DatabaseInterface {
         }
 
         return $data['mime'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function imageExists($publicKey, $imageIdentifier) {
+        $data = $this->getCollection()->findOne(array(
+            'publicKey' => $publicKey,
+            'imageIdentifier' => $imageIdentifier,
+        ));
+
+        return $data !== null;
     }
 
     /**

@@ -77,7 +77,7 @@ class DoctrineTest extends StorageTests {
                 publicKey TEXT NOT NULL,
                 imageIdentifier TEXT NOT NULL,
                 data BLOB NOT NULL,
-                created INTEGER NOT NULL,
+                updated INTEGER NOT NULL,
                 PRIMARY KEY (publicKey,imageIdentifier)
             )
         ");

@@ -98,7 +98,6 @@ class ImageTest extends ResourceTests {
     public function testSupportsHttpPut() {
         $this->manager->expects($this->at(0))->method('trigger')->with('db.image.insert');
         $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.insert');
-        $this->response->expects($this->once())->method('setStatusCode')->with(201)->will($this->returnSelf());
         $image = $this->getMock('Imbo\Image\Image');
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('id'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));

@@ -55,6 +55,8 @@ interface StorageInterface {
      * actual storage driver. If an error occurs the driver should throw an
      * Imbo\Exception\StorageException exception.
      *
+     * If the image already exists, simply overwrite it.
+     *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
      * @param string $imageData The image data to store
@@ -103,4 +105,14 @@ interface StorageInterface {
      * @return boolean
      */
     function getStatus();
+
+    /**
+     * See if the image already exists
+     *
+     * @param string $publicKey The public key of the user
+     * @param string $imageIdentifier Image identifier
+     * @return DateTime Returns an instance of DateTime
+     * @throws StorageException
+     */
+    function imageExists($publicKey, $imageIdentifier);
 }

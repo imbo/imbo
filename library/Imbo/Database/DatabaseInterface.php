@@ -52,7 +52,8 @@ interface DatabaseInterface {
     /**
      * Insert a new image
      *
-     * This method will insert a new image into the database
+     * This method will insert a new image into the database. If the same image already exists,
+     * just update the "updated" information.
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier Image identifier
@@ -165,4 +166,14 @@ interface DatabaseInterface {
      * @throws DatabaseException
      */
     function getImageMimeType($publicKey, $imageIdentifier);
+
+    /**
+     * Check if an image already exists
+     *
+     * @param string $publicKey The public key of the user who owns the image
+     * @param string $imageIdentifier The image identifier
+     * @return boolean Returns true of the image exists, false otherwise
+     * @throws DatabaseException
+     */
+    function imageExists($publicKey, $imageIdentifier);
 }

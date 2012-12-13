@@ -83,8 +83,7 @@ class Image implements ResourceInterface, ListenerInterface {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
-        $response->setStatusCode(201)
-                 ->setBody(array('imageIdentifier' => $request->getImage()->getChecksum()));
+        $response->setBody(array('imageIdentifier' => $request->getImage()->getChecksum()));
     }
 
     /**

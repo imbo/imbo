@@ -98,24 +98,6 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionCode 400
-     * @covers Imbo\Storage\GridFS::store
-     * @covers Imbo\Storage\GridFS::imageExists
-     */
-    public function testStoreWhenImageExists() {
-        $file = $this->getMockBuilder('MongoGridFSFile')->disableOriginalConstructor()->getMock();
-
-        $cursor = $this->getMockBuilder('MongoGridFSCursor')->disableOriginalConstructor()->getMock();
-        $cursor->expects($this->once())->method('count')->will($this->returnValue(1));
-        $cursor->expects($this->once())->method('getNext')->will($this->returnValue($file));
-
-        $this->grid->expects($this->once())->method('find')->will($this->returnValue($cursor));
-
-        $this->driver->store($this->publicKey, $this->imageIdentifier, $this->getMock('Imbo\Image\ImageInterface'));
-    }
-
-    /**
      * @covers Imbo\Storage\GridFS::store
      * @covers Imbo\Storage\GridFS::imageExists
      */
@@ -125,26 +107,14 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
         $cursor = $this->getMockBuilder('MongoGridFSCursor')->disableOriginalConstructor()->getMock();
         $cursor->expects($this->once())->method('count')->will($this->returnValue(0));
 
-        $this->grid->expects($this->once())->method('find')->will($this->returnValue($cursor));
-        $this->grid->expects($this->once())->method('storeBytes')->with($data, $this->isType('array'), $this->isType('array'))->will($this->returnValue($cursor));
-
-        $this->assertTrue($this->driver->store($this->publicKey, $this->imageIdentifier, $data));
-    }
-
-    /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionCode 500
-     * @covers Imbo\Storage\GridFS::store
-     * @covers Imbo\Storage\GridFS::imageExists
-     */
-    public function testStoreWhenMongoThrowsException() {
-        $data = 'some content';
-
-        $cursor = $this->getMockBuilder('MongoGridFSCursor')->disableOriginalConstructor()->getMock();
-        $cursor->expects($this->once())->method('count')->will($this->returnValue(0));
-
-        $this->grid->expects($this->once())->method('find')->will($this->returnValue($cursor));
-        $this->grid->expects($this->once())->method('storeBytes')->will($this->throwException($this->getMock('MongoCursorException')));
+        $this->grid->expects($this->at(0))
+                   ->method('find')
+                   ->with(array(
+                       'publicKey' => $this->publicKey,
+                       'imageIdentifier' => $this->imageIdentifier
+                   ))
+                   ->will($this->returnValue($cursor));
+        $this->grid->expects($this->once())->method('storeBytes')->with($data, $this->isType('array'));
 
         $this->assertTrue($this->driver->store($this->publicKey, $this->imageIdentifier, $data));
     }
@@ -268,7 +238,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
 if (class_exists('MongoGridFSFile')) {
     class TestFile extends MongoGridFSFile {
         public $file = array(
-            'created' => 1334579830,
+            'updated' => 1334579830,
         );
 
         public function __construct() {}

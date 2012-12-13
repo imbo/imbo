@@ -127,24 +127,6 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionMessage Image already exists
-     * @expectedExceptionCode 400
-     * @covers Imbo\Storage\Filesystem::store
-     */
-    public function testStoreFileTwice() {
-        $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
-        $baseDir = 'someDir';
-
-        // Create the virtual directory
-        vfsStream::setup($baseDir);
-
-        $driver = new Filesystem(array('dataDir' => vfsStream::url($baseDir)));
-        $this->assertTrue($driver->store($this->publicKey, $this->imageIdentifier, $imageData));
-        $driver->store($this->publicKey, $this->imageIdentifier, $imageData);
-    }
-
-    /**
      * @covers Imbo\Storage\Filesystem::store
      */
     public function testStore() {
