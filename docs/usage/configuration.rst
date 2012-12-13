@@ -471,7 +471,7 @@ Examples
 Event listeners
 ---------------
 
-Imbo also supports event listeners that you can use to hook into Imbo at different phases without having to edit Imbo itself. An event listener is simply a piece of code that will be executed when a certain event is triggered from Imbo. Event listeners are added to the ``eventListeners`` part of the configuration array and can be added in two ways:
+Imbo also supports event listeners that you can use to hook into Imbo at different phases without having to edit Imbo itself. An event listener is simply a piece of code that will be executed when a certain event is triggered from Imbo. Event listeners are added to the ``eventListeners`` part of the configuration array and can be added in the following ways:
 
 1) Use an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface:
 
@@ -491,7 +491,33 @@ Imbo also supports event listeners that you can use to hook into Imbo at differe
         // ...
     );
 
-2) Use a `closure`_:
+2) Use an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface together with a public key filter:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            array(
+                'listener' => new EventListener\MaxImageSize(1024, 768),
+                'publicKeys' => array(
+                    'include' => array('user'),
+                    // 'exclude' => array('someotheruser'),
+                ),
+            ),
+        ),
+
+        // ...
+    );
+
+where ``listener`` is an instance of the ``Imbo\EventListener\ListenerInterface`` interface, and ``publicKeys`` is an array that you can use if you want your listener to only be triggered for some users (public keys). The value of this is an array with one of two keys: ``include`` or ``exclude`` where ``include`` is an array you want your listener to trigger for, and ``exclude`` is an array of users you don't want your listener to trigger for. ``publicKeys`` is optional, and per default the listener will trigger for all users.
+
+3) Use a `closure`_:
 
 .. _closure: http://php.net/manual/en/functions.anonymous.php
 
@@ -513,6 +539,7 @@ Imbo also supports event listeners that you can use to hook into Imbo at differe
                 'priority' => 1,
                 'publicKeys' => array(
                     'include' => array('user'),
+                    // 'exclude' => array('someotheruser'),
                 ),
             ),
         ),
@@ -520,7 +547,7 @@ Imbo also supports event listeners that you can use to hook into Imbo at differe
         // ...
     );
 
-where ``callback`` is the code you want executed, and ``events`` is an array of the events you want it triggered for. ``priority`` is the priority of the listener and defaults to 1. The higher the number, the earlier in the chain your listener will be triggered. This number can also be negative. Imbo's internal event listeners uses numbers between 1 and 100. ``publicKeys`` is an array that you can use if you want your listener to only be triggered for some users (public keys). The value of this is an array with one of two keys: ``include`` and ``exclude`` where ``include`` is an array you want your listener to trigger for, and ``exclude`` is an array of users you don't want your listener to trigger for. ``publicKeys`` is optional, and per default the listener will trigger for all users.
+where ``callback`` is the code you want executed, and ``events`` is an array of the events you want it triggered for. ``priority`` is the priority of the listener and defaults to 1. The higher the number, the earlier in the chain your listener will be triggered. This number can also be negative. Imbo's internal event listeners uses numbers between 1 and 100. ``publicKeys`` uses the same format as described above.
 
 Events
 ++++++
@@ -541,7 +568,19 @@ Examples of events that is triggered:
 
 As you can see from the above examples the events are built up by the resource name and the HTTP method, separated by ``.``.
 
-All available events is specified in the ``Imbo\EventManager\Event`` class.
+Some other notable events:
+
+* ``storage.image.insert``
+* ``storage.image.load``
+* ``storage.image.delete``
+* ``db.image.insert``
+* ``db.image.load``
+* ``db.image.delete``
+* ``db.metadata.update``
+* ``db.metadata.load``
+* ``db.metadata.delete``
+* ``route``
+* ``response.send``
 
 Below you will see the different event listeners that Imbo ships with and the events they subscribe to.
 
