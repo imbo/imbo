@@ -210,4 +210,34 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $this->expectOutputString($output);
         $this->manager->trigger('event');
     }
+
+    /**
+     * @covers Imbo\EventManager\EventManager::attachDefinition
+     */
+    public function testCanAttachListenerDefinitions() {
+        $definition = $this->getMockBuilder('Imbo\EventListener\ListenerDefinition')->disableOriginalConstructor()->getMock();
+        $definition->expects($this->once())->method('getEventName')->will($this->returnValue('event'));
+        $definition->expects($this->once())->method('getCallback')->will($this->returnValue(function($event) { echo '1'; }));
+        $definition->expects($this->once())->method('getPriority')->will($this->returnValue(1));
+        $definition->expects($this->once())->method('getPublicKeys')->will($this->returnValue(array()));
+
+        $this->manager->attachDefinition($definition);
+    }
+
+    /**
+     * @covers Imbo\EventManager\EventManager::attachListener
+     * @depends testCanAttachListenerDefinitions
+     */
+    public function testCanAttachListener() {
+        $definition = $this->getMockBuilder('Imbo\EventListener\ListenerDefinition')->disableOriginalConstructor()->getMock();
+        $definition->expects($this->once())->method('getEventName')->will($this->returnValue('event'));
+        $definition->expects($this->once())->method('getCallback')->will($this->returnValue(function($event) { echo '1'; }));
+        $definition->expects($this->once())->method('getPriority')->will($this->returnValue(1));
+        $definition->expects($this->once())->method('getPublicKeys')->will($this->returnValue(array()));
+
+        $listener = $this->getMock('Imbo\EventListener\ListenerInterface');
+        $listener->expects($this->once())->method('getDefinition')->will($this->returnValue(array($definition)));
+
+        $this->manager->attachListener($listener);
+    }
 }

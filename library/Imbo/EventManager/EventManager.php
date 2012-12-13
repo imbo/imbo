@@ -33,6 +33,8 @@ namespace Imbo\EventManager;
 
 use Imbo\Container,
     Imbo\ContainerAware,
+    Imbo\EventListener\ListenerDefinition,
+    Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
     SplPriorityQueue;
 
@@ -88,6 +90,35 @@ class EventManager implements ContainerAware {
             'callback' => $callback,
             'publicKeys' => $publicKeys,
         ), $priority);
+
+        return $this;
+    }
+
+    /**
+     * Attach a listener definition
+     *
+     * @param ListenerDefinition $definition An instance of a listener definition
+     * @return EventManager
+     */
+    public function attachDefinition(ListenerDefinition $definition) {
+        return $this->attach(
+            $definition->getEventName(),
+            $definition->getCallback(),
+            $definition->getPriority(),
+            $definition->getPublicKeys()
+        );
+    }
+
+    /**
+     * Attach a listener
+     *
+     * @param ListenerInterface $listener An instance of an event listener
+     * @return EventManager
+     */
+    public function attachListener(ListenerInterface $listener) {
+        foreach ($listener->getDefinition() as $definition) {
+            $this->attachDefinition($definition);
+        }
 
         return $this;
     }
