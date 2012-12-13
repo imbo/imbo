@@ -33,7 +33,6 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager,
     Imbo\EventListener\ListenerInterface,
     Imbo\Image\Transformation\MaxSize;
 
@@ -76,8 +75,10 @@ class MaxImageSize implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('image.put', array($this, 'invoke'), 25);
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('image.put', array($this, 'invoke'), 25),
+        );
     }
 
     /**

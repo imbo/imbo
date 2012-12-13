@@ -32,8 +32,7 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager;
+use Imbo\EventManager\EventInterface;
 
 /**
  * Cross-Origin Resource Sharing (CORS) event listener
@@ -86,19 +85,23 @@ class Cors implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $events = array();
+    public function getDefinition() {
+        $definition = array();
+        $priority = 20;
 
         // Enable the event listener only for resources and methods specified
         foreach ($this->params['allowedMethods'] as $resource => $methods) {
             foreach ($methods as $method) {
                 $event = $resource . '.' . strtolower($method);
-                $manager->attach($event, array($this, 'invoke'), 20);
+                $definition[] = new ListenerDefinition($event, array($this, 'invoke'), 20);
             }
 
             // Always enable the listener for the OPTIONS method
-            $manager->attach($resource . '.options', array($this, 'options'), 20);
+            $event = $resource . '.options';
+            $definition[] = new ListenerDefinition($event, array($this, 'options'), 20);
         }
+
+        return $definition;
     }
 
     /**

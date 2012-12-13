@@ -34,7 +34,7 @@ namespace Imbo;
 use Imbo\Resource\ResourceInterface,
     Imbo\Http\Request\RequestInterface,
     Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager,
+    Imbo\EventListener\ListenerDefinition,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\RuntimeException;
 
@@ -79,8 +79,10 @@ class Router implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('route', array($this, 'route'));
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('route', array($this, 'route')),
+        );
     }
 
     /**

@@ -32,7 +32,6 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager,
     Imbo\Cache\CacheInterface;
 
 /**
@@ -64,17 +63,18 @@ class MetadataCache implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager
+    public function getDefinition() {
+        return array(
             // Load from cache
-            ->attach('db.metadata.load', array($this, 'loadFromCache'), 10)
+            new ListenerDefinition('db.metadata.load', array($this, 'loadFromCache'), 10),
 
             // Delete from cache
-            ->attach('db.metadata.delete', array($this, 'deleteFromCache'), -10)
+            new ListenerDefinition('db.metadata.delete', array($this, 'deleteFromCache'), -10),
 
             // Store in cache
-            ->attach('db.metadata.load', array($this, 'storeInCache'), -10)
-            ->attach('db.metadata.update', array($this, 'storeInCache'), -10);
+            new ListenerDefinition('db.metadata.load', array($this, 'storeInCache'), -10),
+            new ListenerDefinition('db.metadata.update', array($this, 'storeInCache'), -10),
+        );
     }
 
     /**

@@ -72,10 +72,12 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expectedMethods, $implementedMethods);
     }
 
-    public function testAttachesItselfToTheEventManager() {
-        $resource = $this->getNewResource();
-        $manager = $this->getMock('Imbo\EventManager\EventManager');
-        $manager->expects($this->atLeastOnce())->method('attach')->will($this->returnSelf());
-        $resource->attach($manager);
+    public function testReturnsACorrectDefinition() {
+        $definition = $this->getNewResource()->getDefinition();
+        $this->assertInternalType('array', $definition);
+
+        foreach ($definition as $d) {
+            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
+        }
     }
 }

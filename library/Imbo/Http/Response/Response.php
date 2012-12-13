@@ -33,8 +33,8 @@ namespace Imbo\Http\Response;
 
 use Imbo\Http\HeaderContainer,
     Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager,
     Imbo\EventListener\ListenerInterface,
+    Imbo\EventListener\ListenerDefinition,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
     Imbo\Image\Image,
@@ -387,8 +387,10 @@ class Response implements ListenerInterface, ResponseInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('response.send', array($this, 'send'));
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('response.send', array($this, 'send')),
+        );
     }
 
     /**

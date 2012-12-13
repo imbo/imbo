@@ -33,7 +33,7 @@ namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
     Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager,
+    Imbo\EventListener\ListenerDefinition,
     Imbo\EventListener\ListenerInterface;
 
 /**
@@ -69,9 +69,11 @@ class Images implements ResourceInterface, ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('images.get', array($this, 'get'))
-                ->attach('images.head', array($this, 'head'));
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('images.get', array($this, 'get')),
+            new ListenerDefinition('images.head', array($this, 'head')),
+        );
     }
 
     /**

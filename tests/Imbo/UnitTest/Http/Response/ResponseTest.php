@@ -274,12 +274,15 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\Response::attach
+     * @covers Imbo\Http\Response\Response::getDefinition
      */
-    public function testAttachesItselfToAnEventManager() {
-        $manager = $this->getMock('Imbo\EventManager\EventManager');
-        $manager->expects($this->atLeastOnce())->method('attach');
-        $this->response->attach($manager);
+    public function testReturnsACorrectDefinition() {
+        $definition = $this->response->getDefinition();
+        $this->assertInternalType('array', $definition);
+
+        foreach ($definition as $d) {
+            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
+        }
     }
 
     /**

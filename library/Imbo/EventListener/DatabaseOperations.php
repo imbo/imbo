@@ -32,7 +32,6 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager,
     Imbo\Database\DatabaseInterface,
     Imbo\Container,
     Imbo\ContainerAware,
@@ -63,15 +62,17 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('db.image.insert', array($this, 'insertImage'))
-                ->attach('db.image.delete', array($this, 'deleteImage'))
-                ->attach('db.image.load', array($this, 'loadImage'))
-                ->attach('db.images.load', array($this, 'loadImages'))
-                ->attach('db.metadata.delete', array($this, 'deleteMetadata'))
-                ->attach('db.metadata.update', array($this, 'updateMetadata'))
-                ->attach('db.metadata.load', array($this, 'loadMetadata'))
-                ->attach('db.user.load', array($this, 'loadUser'));
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('db.image.insert', array($this, 'insertImage')),
+            new ListenerDefinition('db.image.delete', array($this, 'deleteImage')),
+            new ListenerDefinition('db.image.load', array($this, 'loadImage')),
+            new ListenerDefinition('db.images.load', array($this, 'loadImages')),
+            new ListenerDefinition('db.metadata.delete', array($this, 'deleteMetadata')),
+            new ListenerDefinition('db.metadata.update', array($this, 'updateMetadata')),
+            new ListenerDefinition('db.metadata.load', array($this, 'loadMetadata')),
+            new ListenerDefinition('db.user.load', array($this, 'loadUser')),
+        );
     }
 
     /**

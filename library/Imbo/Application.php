@@ -36,8 +36,9 @@ use Imbo\Http\Request\Request,
     Imbo\Http\Response\ResponseFormatter,
     Imbo\Http\Response\ResponseWriter,
     Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventManager,
+    Imbo\EventListener\ListenerDefinition,
     Imbo\EventManager\Event,
+    Imbo\EventManager\EventManager,
     Imbo\Image\Image,
     Imbo\Image\ImagePreparation,
     Imbo\Exception\RuntimeException,
@@ -341,7 +342,7 @@ class Application {
             );
 
             foreach ($containerEntries as $listener) {
-                $container->get($listener)->attach($manager);
+                $manager->attachListener($container->get($listener));
             }
 
             $config = $container->get('config');
@@ -349,28 +350,42 @@ class Application {
 
             foreach ($listeners as $definition) {
                 if ($definition instanceof ListenerInterface) {
-                    $definition->attach($manager);
+                    $manager->attachListener($definition);
                     continue;
                 }
 
-                if (!is_array($definition) || (empty($definition['callback']) || empty($definition['events']))) {
-                    throw new InvalidArgumentException('Invalid event listener definition', 500);
-                }
+                if (!empty($definition['listener']) && $definition['listener'] instanceof ListenerInterface) {
+                    $publicKeys = isset($definition['publicKeys']) ? $definition['publicKeys'] : array();
+                    $listener = $definition['listener'];
 
-                $callback = $definition['callback'];
-                $priority = isset($definition['priority']) ? $definition['priority'] : 1;
-                $publicKeys = isset($definition['publicKeys']) ? $definition['publicKeys'] : array();
+                    if (empty($publicKeys)) {
+                        $manager->attachListener($listener);
+                    } else {
+                        $definition = $listener->getDefinition();
 
-                foreach ($definition['events'] as $key => $value) {
-                    $event = $value;
-
-                    if (is_string($key)) {
-                        // We have an associative array with <event> => <priority>
-                        $event = $key;
-                        $priority = $value;
+                        foreach ($definition as $d) {
+                            $d->setPublicKeys($publicKeys);
+                            $manager->attachDefinition($d);
+                        }
                     }
+                } else if (!empty($definition['callback']) && !empty($definition['events'])) {
+                    $callback = $definition['callback'];
+                    $priority = isset($definition['priority']) ? $definition['priority'] : 1;
+                    $publicKeys = isset($definition['publicKeys']) ? $definition['publicKeys'] : array();
 
-                    $manager->attach($event, $callback, $priority, $publicKeys);
+                    foreach ($definition['events'] as $key => $value) {
+                        $event = $value;
+
+                        if (is_string($key)) {
+                            // We have an associative array with <event> => <priority>
+                            $event = $key;
+                            $priority = $value;
+                        }
+
+                        $manager->attach($event, $callback, $priority, $publicKeys);
+                    }
+                } else {
+                    throw new InvalidArgumentException('Invalid event listener definition', 500);
                 }
             }
 

@@ -32,7 +32,7 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager,
+    Imbo\EventListener\ListenerDefinition,
     Imbo\Http\Request\RequestInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException;
@@ -63,14 +63,16 @@ class Metadata implements ResourceInterface, ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('metadata.get', array($this, 'get'))
-                ->attach('metadata.post', array($this, 'post'))
-                ->attach('metadata.put', array($this, 'put'))
-                ->attach('metadata.delete', array($this, 'delete'))
-                ->attach('metadata.head', array($this, 'head'))
-                ->attach('metadata.post', array($this, 'validateMetadata'), 10)
-                ->attach('metadata.put', array($this, 'validateMetadata'), 10);
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('metadata.get', array($this, 'get')),
+            new ListenerDefinition('metadata.post', array($this, 'post')),
+            new ListenerDefinition('metadata.put', array($this, 'put')),
+            new ListenerDefinition('metadata.delete', array($this, 'delete')),
+            new ListenerDefinition('metadata.head', array($this, 'head')),
+            new ListenerDefinition('metadata.post', array($this, 'validateMetadata'), 10),
+            new ListenerDefinition('metadata.put', array($this, 'validateMetadata'), 10),
+        );
     }
 
     /**

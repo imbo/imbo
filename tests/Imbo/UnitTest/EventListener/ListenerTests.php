@@ -49,12 +49,14 @@ abstract class ListenerTests extends \PHPUnit_Framework_TestCase {
     abstract protected function getListener();
 
     /**
-     * @covers Imbo\EventListener\AccessToken::attach
+     * @covers Imbo\EventListener\AccessToken::getDefinition
      */
-    public function testAttachesToEvents() {
-        $manager = $this->getMock('Imbo\EventManager\EventManager');
-        $manager->expects($this->atLeastOnce())->method('attach')->will($this->returnValue($manager));
+    public function testReturnsDefinitions() {
+        $definition = $this->getListener()->getDefinition();
+        $this->assertInternalType('array', $definition);
 
-        $events = $this->getListener()->attach($manager);
+        foreach ($definition as $d) {
+            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
+        }
     }
 }

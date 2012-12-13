@@ -32,7 +32,6 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager,
     Imbo\Exception\RuntimeException,
     Imbo\Exception;
 
@@ -66,13 +65,21 @@ class Authenticate implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('image.put', array($this, 'invoke'), 100)
-                ->attach('image.post', array($this, 'invoke'), 100)
-                ->attach('image.delete', array($this, 'invoke'), 100)
-                ->attach('metadata.put', array($this, 'invoke'), 100)
-                ->attach('metadata.post', array($this, 'invoke'), 100)
-                ->attach('metadata.delete', array($this, 'invoke'), 100);
+    public function getDefinition() {
+        $callback = array($this, 'invoke');
+        $priority = 100;
+        $events = array(
+            'image.put', 'image.post', 'image.delete',
+            'metadata.put', 'metadata.post', 'metadata.delete'
+        );
+
+        $definition = array();
+
+        foreach($events as $eventName) {
+            $definition[] = new ListenerDefinition($eventName, $callback, $priority);
+        }
+
+        return $definition;
     }
 
     /**

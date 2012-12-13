@@ -35,7 +35,6 @@ use Imbo\EventManager\EventInterface,
     Imbo\Exception\TransformationException,
     Imbo\Container,
     Imbo\ContainerAware,
-    Imbo\EventManager\EventManager,
     Imbo\Image\Transformation\TransformationInterface,
     Imbo\Image\Image;
 
@@ -71,8 +70,10 @@ class ImageTransformer implements ContainerAware, ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('image.transform', array($this, 'transform'));
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('image.transform', array($this, 'transform')),
+        );
     }
 
     /**

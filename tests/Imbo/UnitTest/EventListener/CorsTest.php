@@ -117,9 +117,9 @@ class CorsTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\Cors::__construct
-     * @covers Imbo\EventListener\Cors::attach
+     * @covers Imbo\EventListener\Cors::getDefinition
      */
-    public function testAttachesToTheCorrectEvents() {
+    public function testReturnsACorrectListenerDefinition() {
         $listener = new Cors(array(
             'allowedMethods' => array(
                 'image'    => array('GET', 'PUT'),
@@ -128,17 +128,19 @@ class CorsTest extends ListenerTests {
             )
         ));
 
-        $manager = $this->getMock('Imbo\EventManager\EventManager');
-        $manager->expects($this->at(0))->method('attach')->with('image.get', $this->isType('array'), $this->isType('int'));
-        $manager->expects($this->at(1))->method('attach')->with('image.put', $this->isType('array'), $this->isType('int'));
-        $manager->expects($this->at(2))->method('attach')->with('image.options', $this->isType('array'), $this->isType('int'));
-        $manager->expects($this->at(3))->method('attach')->with('images.get', $this->isType('array'), $this->isType('int'));
-        $manager->expects($this->at(4))->method('attach')->with('images.head', $this->isType('array'), $this->isType('int'));
-        $manager->expects($this->at(5))->method('attach')->with('images.options', $this->isType('array'), $this->isType('int'));
-        $manager->expects($this->at(6))->method('attach')->with('metadata.post', $this->isType('array'), $this->isType('int'));
-        $manager->expects($this->at(7))->method('attach')->with('metadata.options', $this->isType('array'), $this->isType('int'));
+        $definition = $listener->getDefinition();
+        $this->assertCount(8, $definition);
+        $events = array();
 
-        $events = $listener->attach($manager);
+        foreach ($definition as $d) {
+            $events[] = $d->getEventName();
+        }
+
+        $this->assertEquals(array(
+            'image.get', 'image.put', 'image.options',
+            'images.get', 'images.head', 'images.options',
+            'metadata.post', 'metadata.options'
+        ), $events);
     }
 
     /**

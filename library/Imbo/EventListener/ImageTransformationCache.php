@@ -32,7 +32,6 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager,
     Imbo\Http\ContentNegotiation,
     Imbo\Image\Image,
     RecursiveDirectoryIterator,
@@ -86,16 +85,17 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager
+    public function getDefinition() {
+        return array(
             // Look for images in the cache before transformations occur
-            ->attach('image.transform', array($this, 'loadFromCache'), 20)
+            new ListenerDefinition('image.transform', array($this, 'loadFromCache'), 20),
 
             // Store images in the cache after transformations has occured
-            ->attach('image.transform', array($this, 'storeInCache'), -20)
+            new ListenerDefinition('image.transform', array($this, 'storeInCache'), -20),
 
             // Remove from the cache when an image is deleted from Imbo
-            ->attach('image.delete', array($this, 'deleteFromCache'), 10);
+            new ListenerDefinition('image.delete', array($this, 'deleteFromCache'), 10),
+        );
     }
 
     /**

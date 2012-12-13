@@ -32,7 +32,6 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager,
     Imbo\Exception\StorageException,
     Imbo\Container,
     Imbo\ContainerAware,
@@ -63,10 +62,12 @@ class StorageOperations implements ContainerAware, ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('storage.image.delete', array($this, 'deleteImage'))
-                ->attach('storage.image.load', array($this, 'loadImage'))
-                ->attach('storage.image.insert', array($this, 'insertImage'));
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('storage.image.delete', array($this, 'deleteImage')),
+            new ListenerDefinition('storage.image.load', array($this, 'loadImage')),
+            new ListenerDefinition('storage.image.insert', array($this, 'insertImage')),
+        );
     }
 
     /**

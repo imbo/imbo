@@ -32,10 +32,8 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventManager;
-
 /**
- * Internal event listener interface
+ * Event listener interface
  *
  * @package Interfaces
  * @subpackage EventListener
@@ -46,9 +44,9 @@ use Imbo\EventManager\EventManager;
  */
 interface ListenerInterface {
     /**
-     * Attach to the event manager
+     * Return a list of listener definitions
      *
-     * @param EventManager $manager
+     * @return ListenerDefinition[]
      */
-    function attach(EventManager $manager);
+    function getDefinition();
 }

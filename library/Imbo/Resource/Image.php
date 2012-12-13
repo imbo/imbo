@@ -35,7 +35,7 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ResourceException,
     Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager;
+    Imbo\EventListener\ListenerDefinition;
 
 /**
  * Image resource
@@ -62,11 +62,13 @@ class Image implements ResourceInterface, ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('image.get', array($this, 'get'))
-                ->attach('image.head', array($this, 'head'))
-                ->attach('image.delete', array($this, 'delete'))
-                ->attach('image.put', array($this, 'put'));
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('image.get', array($this, 'get')),
+            new ListenerDefinition('image.head', array($this, 'head')),
+            new ListenerDefinition('image.delete', array($this, 'delete')),
+            new ListenerDefinition('image.put', array($this, 'put')),
+        );
     }
 
     /**

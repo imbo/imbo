@@ -32,7 +32,7 @@
 namespace Imbo\Image;
 
 use Imbo\Http\Request\RequestInterface,
-    Imbo\EventManager\EventManager,
+    Imbo\EventListener\ListenerDefinition,
     Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ImageException,
@@ -67,8 +67,10 @@ class ImagePreparation implements ContainerAware, ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('image.put', array($this, 'prepareImage'), 50);
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('image.put', array($this, 'prepareImage'), 50),
+        );
     }
 
     /**

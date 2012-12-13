@@ -77,12 +77,15 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Image\ImagePreparation::attach
+     * @covers Imbo\Image\ImagePreparation::getDefinition
      */
-    public function testAttachesItselfToTheEventManager() {
-        $manager = $this->getMock('Imbo\EventManager\EventManager');
-        $manager->expects($this->any())->method('attach');
-        $this->prepare->attach($manager);
+    public function testReturnsACorrectDefinition() {
+        $definition = $this->prepare->getDefinition();
+        $this->assertInternalType('array', $definition);
+
+        foreach ($definition as $d) {
+            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
+        }
     }
 
     /**

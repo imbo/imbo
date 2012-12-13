@@ -32,7 +32,7 @@
 namespace Imbo\Http\Response;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager,
+    Imbo\EventListener\ListenerDefinition,
     Imbo\EventListener\ListenerInterface,
     Imbo\Container,
     Imbo\ContainerAware,
@@ -57,8 +57,10 @@ class ResponseFormatter implements ContainerAware, ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('response.send', array($this, 'send'), 10);
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('response.send', array($this, 'send'), 10),
+        );
     }
 
     /**

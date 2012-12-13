@@ -70,12 +70,15 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Router::attach
+     * @covers Imbo\Router::getDefinition
      */
-    public function testAttachesItselfToTheEventManager() {
-        $manager = $this->getMock('Imbo\EventManager\EventManager');
-        $manager->expects($this->once())->method('attach');
-        $this->router->attach($manager);
+    public function testReturnsACorrectDefinition() {
+        $definition = $this->router->getDefinition();
+        $this->assertInternalType('array', $definition);
+
+        foreach ($definition as $d) {
+            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
+        }
     }
 
     /**

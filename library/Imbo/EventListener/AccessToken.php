@@ -32,7 +32,6 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventManager\EventManager,
     Imbo\Http\Request\RequestInterface,
     Imbo\Exception\RuntimeException;
 
@@ -102,15 +101,21 @@ class AccessToken implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function attach(EventManager $manager) {
-        $manager->attach('user.get', array($this, 'invoke'), 100)
-                ->attach('images.get', array($this, 'invoke'), 100)
-                ->attach('image.get', array($this, 'invoke'), 100)
-                ->attach('metadata.get', array($this, 'invoke'), 100)
-                ->attach('user.head', array($this, 'invoke'), 100)
-                ->attach('images.head', array($this, 'invoke'), 100)
-                ->attach('image.head', array($this, 'invoke'), 100)
-                ->attach('metadata.head', array($this, 'invoke'), 100);
+    public function getDefinition() {
+        $callback = array($this, 'invoke');
+        $priority = 100;
+        $events = array(
+            'user.get', 'images.get', 'image.get', 'metadata.get',
+            'user.head', 'images.head', 'image.head', 'metadata.head'
+        );
+
+        $definition = array();
+
+        foreach($events as $eventName) {
+            $definition[] = new ListenerDefinition($eventName, $callback, $priority);
+        }
+
+        return $definition;
     }
 
     /**
