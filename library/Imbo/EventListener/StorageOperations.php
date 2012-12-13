@@ -113,6 +113,7 @@ class StorageOperations implements ContainerAware, ListenerInterface {
         $blob = $image->getBlob();
 
         try {
+            $exists = $event->getStorage()->imageExists($publicKey, $imageIdentifier);
             $event->getStorage()->store(
                 $publicKey,
                 $imageIdentifier,
@@ -126,5 +127,7 @@ class StorageOperations implements ContainerAware, ListenerInterface {
 
             throw $e;
         }
+
+        $event->getResponse()->setStatusCode($exists ? 200 : 201);
     }
 }
