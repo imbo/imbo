@@ -31,7 +31,14 @@
 
 namespace Imbo\Http\Response;
 
-use Imbo\Http\HeaderContainer;
+use Imbo\Http\HeaderContainer,
+    Imbo\EventManager\EventInterface,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventListener\ListenerDefinition,
+    Imbo\Exception,
+    Imbo\Http\Request\RequestInterface,
+    Imbo\Image\Image,
+    DateTime;
 
 /**
  * Response object from the server to the client
@@ -42,14 +49,7 @@ use Imbo\Http\HeaderContainer;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Response implements ResponseInterface {
-    /**
-     * HTTP protocol version
-     *
-     * @var string
-     */
-    private $protocolVersion = '1.1';
-
+class Response implements ListenerInterface, ResponseInterface {
     /**
      * Different status codes
      *
@@ -111,6 +111,13 @@ class Response implements ResponseInterface {
     );
 
     /**
+     * HTTP protocol version
+     *
+     * @var string
+     */
+    private $protocolVersion = '1.1';
+
+    /**
      * HTTP status code
      *
      * @var int
@@ -139,6 +146,13 @@ class Response implements ResponseInterface {
     private $body;
 
     /**
+     * Image instance used with the image resource
+     *
+     * @var Image
+     */
+    private $image;
+
+    /**
      * Class constructor
      *
      * @param HeaderContainer $headerContainer An optional instance of a header container. An empty
@@ -162,12 +176,25 @@ class Response implements ResponseInterface {
     /**
      * {@inheritdoc}
      */
-    public function setStatusCode($code, $message = null) {
+    public function setStatusCode($code) {
         $this->statusCode = (int) $code;
+        $this->statusMessage = null;
 
-        if ($message !== null) {
-            $this->statusMessage = $message;
-        }
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStatusMessage() {
+        return $this->statusMessage ?: self::$statusCodes[$this->getStatusCode()];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setStatusMessage($message) {
+        $this->statusMessage = $message;
 
         return $this;
     }
@@ -223,7 +250,59 @@ class Response implements ResponseInterface {
     /**
      * {@inheritdoc}
      */
-    public function send() {
+    public function getImage() {
+        return $this->image;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setImage(Image $image) {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * Send the response to the client, including headers
+     *
+     * @param EventInterface $event The current event
+     */
+    public function send(EventInterface $event) {
+        $request = $event->getRequest();
+        $requestHeaders = $request->getHeaders();
+
+        $ifModifiedSince = $requestHeaders->get('if-modified-since');
+        $ifNoneMatch = $requestHeaders->get('if-none-match');
+        $lastModified = $this->headers->get('last-modified');
+        $etag = $this->headers->get('etag');
+
+        if (
+            $ifModifiedSince && $ifNoneMatch && (
+                $lastModified === $ifModifiedSince &&
+                $etag === $ifNoneMatch
+            )
+        ) {
+            $this->setNotModified();
+        }
+
+        // Inject a possible image identifier into the response headers
+        $imageIdentifier = null;
+
+        if ($image = $request->getImage()) {
+            // The request has an image. This means that an image was just added. Use the image's
+            // checksum
+            $imageIdentifier = $image->getChecksum();
+        } else if ($identifier = $request->getImageIdentifier()) {
+            // An image identifier exists in the request, use that one (and not a possible image
+            // checksum for an image attached to the response)
+            $imageIdentifier = $identifier;
+        }
+
+        if ($imageIdentifier) {
+            $this->headers->set('X-Imbo-ImageIdentifier', $imageIdentifier);
+        }
+
         $this->sendHeaders();
         $this->sendContent();
     }
@@ -246,8 +325,72 @@ class Response implements ResponseInterface {
     /**
      * {@inheritdoc}
      */
+    public function getLastModified() {
+        return $this->headers->get('Last-Modified');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isError() {
         return $this->getStatusCode() >= 400;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createError(Exception $exception, RequestInterface $request) {
+        $date = new DateTime();
+
+        $code         = $exception->getCode();
+        $message      = $exception->getMessage();
+        $timestamp    = $date->format('D, d M Y H:i:s') . ' GMT';
+        $internalCode = $exception->getImboErrorCode();
+
+        if ($internalCode === null) {
+            $internalCode = Exception::ERR_UNSPECIFIED;
+        }
+
+        $this->setStatusCode($code);
+
+        // Add error information to the response headers and remove the ETag and Last-Modified headers
+        $responseHeaders = $this->getHeaders();
+        $responseHeaders->set('X-Imbo-Error-Message', $message)
+                        ->set('X-Imbo-Error-InternalCode', $internalCode)
+                        ->set('X-Imbo-Error-Date', $timestamp)
+                        ->remove('ETag')
+                        ->remove('Last-Modified');
+
+        // Prepare response data if the request expects a response body
+        if ($request->getMethod() !== RequestInterface::METHOD_HEAD) {
+            $data = array(
+                'error' => array(
+                    'code'          => $code,
+                    'message'       => $message,
+                    'date'          => $timestamp,
+                    'imboErrorCode' => $internalCode,
+                ),
+            );
+
+            if ($image = $request->getImage()) {
+                $data['imageIdentifier'] = $image->getChecksum();
+            } else if ($identifier = $request->getImageIdentifier()) {
+                $data['imageIdentifier'] = $identifier;
+            }
+
+            $this->setBody($data);
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('response.send', array($this, 'send')),
+        );
     }
 
     /**
@@ -260,14 +403,14 @@ class Response implements ResponseInterface {
 
         $statusCode = $this->getStatusCode();
 
-        $statusLine = sprintf("HTTP/%s %d %s", $this->getProtocolVersion(), $statusCode, $this->statusMessage ?: self::$statusCodes[$statusCode]);
+        $statusLine = sprintf("HTTP/%s %d %s", $this->getProtocolVersion(), $statusCode, $this->getStatusMessage());
         header($statusLine);
 
         // Fetch all headers
         $headers = $this->headers->getAll();
 
         // Closure that will translate the normalized header names to a prettier format (HTTP
-        // header names are case insensitive anyways (RFC2616, section 4.2)
+        // header names are case insensitive anyways (RFC2616, section 4.2))
         $transform = function($name) {
             return preg_replace_callback('/^[a-z]|-[a-z]/', function($match) {
                 return strtoupper($match[0]);
@@ -284,6 +427,16 @@ class Response implements ResponseInterface {
      * Send the content to the client
      */
     private function sendContent() {
-        print($this->getBody());
+        $body = $this->getBody();
+
+        if (is_array($body)) {
+            if (!headers_sent()) {
+                header('Content-Type: application/json');
+            }
+
+            $body = json_encode($body);
+        }
+
+        echo $body;
     }
 }

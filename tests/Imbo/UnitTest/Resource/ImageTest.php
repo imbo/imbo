@@ -31,11 +31,7 @@
 
 namespace Imbo\UnitTest\Resource;
 
-use Imbo\Resource\Image,
-    Imbo\Exception\ImageException,
-    Imbo\Exception\DatabaseException,
-    Imbo\Exception\StorageException,
-    Imbo\Exception\TransformationException;
+use Imbo\Resource\Image;
 
 /**
  * @package TestSuite\UnitTests
@@ -47,418 +43,118 @@ use Imbo\Resource\Image,
  */
 class ImageTest extends ResourceTests {
     /**
-     * @var Imbo\Image\ImagePreparationInterface
+     * @var Image
      */
-    private $imagePreparation;
+    private $resource;
 
-    /**
-     * @var Imbo\Http\ContentNegotiation
-     */
-    private $contentNegotiation;
-
-    /**
-     * @var Imbo\EventManager\EventManagerInterface
-     */
-    private $eventManager;
-
-    /**
-     * @var Imbo\Image\ImageInterface
-     */
-    private $image;
+    private $request;
+    private $response;
+    private $database;
+    private $storage;
+    private $manager;
+    private $event;
 
     /**
      * {@inheritdoc}
      */
     protected function getNewResource() {
-        $this->eventManager = $this->getMock('Imbo\EventManager\EventManagerInterface');
-        $image = new Image($this->image, $this->imagePreparation, $this->contentNegotiation);
-        $image->setEventManager($this->eventManager);
-
-        return $image;
+        return new Image();
     }
 
     /**
      * Set up the resource
      */
     public function setUp() {
-        $this->image = $this->getMock('Imbo\Image\ImageInterface');
-        $this->imagePreparation = $this->getMock('Imbo\Image\ImagePreparationInterface');
-        $this->contentNegotiation = $this->getMock('Imbo\Http\ContentNegotiation');
+        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
+        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
+        $this->manager = $this->getMock('Imbo\EventManager\EventManager');
+        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
+        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
+        $this->event->expects($this->any())->method('getStorage')->will($this->returnValue($this->storage));
+        $this->event->expects($this->any())->method('getManager')->will($this->returnValue($this->manager));
 
-        parent::setUp();
+        $this->resource = $this->getNewResource();
     }
 
     /**
      * Tear down the resource
      */
     public function tearDown() {
-        parent::tearDown();
-
-        $this->image = null;
-        $this->imagePreparation = null;
-        $this->contentNegotiation = null;
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::put
-     * @expectedException Imbo\Exception\ImageException
-     * @expectedExceptionMessage message
-     * @expectedExceptionCode 400
-     */
-    public function testPutWhenImagePreparationThrowsException() {
-        $this->imagePreparation->expects($this->once())
-                               ->method('prepareImage')
-                               ->with($this->request, $this->image)
-                               ->will($this->throwException(new ImageException('message', 400)));
-
-        $this->getNewResource()->put($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::put
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionMessage message
-     * @expectedExceptionCode 500
-     */
-    public function testPutWhenDatabaseThrowsException() {
-        $this->request->expects($this->once())
-                      ->method('getPublicKey')
-                      ->will($this->returnValue($this->publicKey));
-
-        $this->request->expects($this->once())
-                      ->method('getRealImageIdentifier')
-                      ->will($this->returnValue($this->imageIdentifier));
-
-        $this->database->expects($this->once())
-                       ->method('insertImage')
-                       ->with($this->publicKey, $this->imageIdentifier, $this->image)
-                       ->will($this->throwException(new DatabaseException('message', 500)));
-
-        $this->getNewResource()->put($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::put
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionMessage message
-     * @expectedExceptionCode 500
-     */
-    public function testPutWhenStorageThrowsException() {
-        $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
-
-        $this->image->expects($this->once())
-                    ->method('getBlob')
-                    ->will($this->returnValue($imageData));
-
-        $this->request->expects($this->once())
-                      ->method('getPublicKey')
-                      ->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())
-                      ->method('getRealImageIdentifier')
-                      ->will($this->returnValue($this->imageIdentifier));
-
-        $this->database->expects($this->once())
-                       ->method('insertImage')
-                       ->with($this->publicKey, $this->imageIdentifier, $this->image);
-
-        $this->database->expects($this->once())
-                       ->method('deleteImage')
-                       ->with($this->publicKey, $this->imageIdentifier);
-
-        $this->storage->expects($this->once())
-                      ->method('store')
-                      ->with($this->publicKey, $this->imageIdentifier, $imageData)
-                      ->will($this->throwException(new StorageException('message', 500)));
-
-        $this->getNewResource()->put($this->container);
+        $this->resource = null;
+        $this->response = null;
+        $this->database = null;
+        $this->storage = null;
+        $this->event = null;
+        $this->manager = null;
     }
 
     /**
      * @covers Imbo\Resource\Image::put
      */
-    public function testSuccessfulPut() {
-        $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
+    public function testSupportsHttpPut() {
+        $this->manager->expects($this->at(0))->method('trigger')->with('db.image.insert');
+        $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.insert');
+        $this->response->expects($this->once())->method('setStatusCode')->with(201)->will($this->returnSelf());
+        $image = $this->getMock('Imbo\Image\Image');
+        $image->expects($this->once())->method('getChecksum')->will($this->returnValue('id'));
+        $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $this->response->expects($this->once())->method('setBody')->with(array('imageIdentifier' => 'id'));
 
-        $this->image->expects($this->once())->method('getBlob')->will($this->returnValue($imageData));
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getRealImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-
-        $this->database->expects($this->once())->method('insertImage')->with($this->publicKey, $this->imageIdentifier, $this->image);
-
-        $this->storage->expects($this->once())->method('store')->with($this->publicKey, $this->imageIdentifier, $imageData);
-
-        $this->response->expects($this->once())->method('setStatusCode')->with(201)->will($this->returnValue($this->response));
-        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
-
-        $this->getNewResource()->put($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::delete
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionMessage message
-     * @expectedExceptionCode 500
-     */
-    public function testDeleteWhenDatabaseThrowsAnException() {
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-
-        $this->database->expects($this->once())
-                       ->method('deleteImage')
-                       ->with($this->publicKey, $this->imageIdentifier)
-                       ->will($this->throwException(new DatabaseException('message', 500)));
-
-        $this->getNewResource()->delete($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::delete
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionMessage message
-     * @expectedExceptionCode 500
-     */
-    public function testDeleteWhenStorageThrowsAnException() {
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-
-        $this->database->expects($this->once())
-                       ->method('deleteImage')
-                       ->with($this->publicKey, $this->imageIdentifier);
-
-        $this->storage->expects($this->once())
-                      ->method('delete')
-                      ->with($this->publicKey, $this->imageIdentifier)
-                      ->will($this->throwException(new StorageException('message', 500)));
-
-        $this->getNewResource()->delete($this->container);
+        $this->resource->put($this->event);
     }
 
     /**
      * @covers Imbo\Resource\Image::delete
      */
-    public function testSuccessfulDelete() {
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
+    public function testSupportsHttpDelete() {
+        $this->manager->expects($this->at(0))->method('trigger')->with('db.image.delete');
+        $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.delete');
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
+        $this->response->expects($this->once())->method('setBody')->with(array('imageIdentifier' => 'id'));
 
-        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
-
-        $this->database->expects($this->once())->method('deleteImage')->with($this->publicKey, $this->imageIdentifier);
-
-        $this->storage->expects($this->once())->method('delete')->with($this->publicKey, $this->imageIdentifier);
-
-        $this->getNewResource()->delete($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::get
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionMessage message
-     * @expectedExceptionCode 500
-     */
-    public function testGetWhenDatabaseThrowsException() {
-        $this->database->expects($this->once())
-                       ->method('load')
-                       ->will($this->throwException(new DatabaseException('message', 500)));
-
-        $this->getNewResource()->get($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::get
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionMessage message
-     * @expectedExceptionCode 500
-     */
-    public function testGetWhenStorageThrowsException() {
-        $this->request->expects($this->once())->method('getServer')->will($this->returnValue($this->getMock('Imbo\Http\ServerContainerInterface')));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
-
-        $this->database->expects($this->once())
-                       ->method('load');
-
-        $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
-        $this->storage->expects($this->once())
-                      ->method('getImage')
-                      ->will($this->throwException(new StorageException('message', 500)));
-
-        $this->getNewResource()->get($this->container);
+        $this->resource->delete($this->event);
     }
 
     /**
      * @covers Imbo\Resource\Image::get
      */
-    public function testGetWhenResponseIsNotModified() {
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($this->getMock('Imbo\Http\HeaderContainer')));
-
-        // The request URI for some image
-        $requestUri = '/users/' . $this->publicKey . '/images/' . $this->imageIdentifier . '.png';
-
-        // Timestamp used for the Last-Modified header
-        $formattedDate = 'Wed, 18 Apr 2012 16:28:08 GMT';
-        $lastModified = $this->getMock('DateTime');
-        $lastModified->expects($this->once())->method('format')->will($this->returnValue(substr($formattedDate, 0, -4)));
-
-        // Generate ETag as it appears in the headers
-        $etag = '"' . md5($this->publicKey . $this->imageIdentifier . 'image/*' . $requestUri) . '"';
-
-        $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($lastModified));
-
-        $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
-        $serverContainer->expects($this->once())->method('get')->with('REQUEST_URI')->will($this->returnValue($requestUri));
-
+    public function testSupportsHttpGet() {
+        $serverContainer = $this->getMockBuilder('Imbo\Http\ServerContainer')->disableOriginalConstructor()->getMock();
+        $serverContainer->expects($this->once())->method('get')->with('REQUEST_URI')->will($this->returnValue('http://imbo/users/christer/images/id'));
         $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $requestHeaders->expects($this->any())->method('get')->will($this->returnCallback(function($arg) use($etag, $formattedDate) {
-            if ($arg == 'if-modified-since') {
-                return $formattedDate;
-            } else if ($arg == 'Accept') {
-                return 'image/*';
-            }
-
-            return $etag;
-        }));
-
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-        $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
-
-        $this->response->expects($this->once())->method('setNotModified');
-
-        $this->getNewResource()->get($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::get
-     */
-    public function testGetWithImageConversion() {
-        $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $requestHeaders->expects($this->once())->method('get')->with('Accept')->will($this->returnValue('image/*'));
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders->expects($this->any())->method('set')->will($this->returnValue($responseHeaders));
-
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-
-        $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
         $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('*/*' => 1)));
-
-        $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
-
-        $this->image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $this->image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/png'));
-
-        $this->response->expects($this->once())->method('setBody')->with($this->isType('string'));
-
-        $convert = $this->getMockBuilder('Imbo\Image\Transformation\Convert')->disableOriginalConstructor()->getMock();
-
-        $this->container->config = array(
-            'transformations' => array(
-                'convert' => function ($params) use ($convert) {
-                    return $convert;
-                },
-            ),
-        );
-
-        $this->getNewResource()->get($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::get
-     */
-    public function testGet() {
-        $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
-
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
-        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders->expects($this->any())->method('set')->will($this->returnValue($responseHeaders));
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('*/*' => 1)));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-        $this->response->expects($this->once())->method('setBody')->with($imageData);
+        $image = $this->getMock('Imbo\Image\Image');
+        $image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/png'));
+        $image->expects($this->once())->method('getWidth')->will($this->returnValue(200));
+        $image->expects($this->once())->method('getHeight')->will($this->returnValue(100));
+        $image->expects($this->once())->method('getFilesize')->will($this->returnValue(123123));
+        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
+        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
 
-        $this->storage->expects($this->once())->method('getImage')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($imageData));
-        $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
-        $this->image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/png'));
-        $this->image->expects($this->once())->method('setBlob')->with($imageData);
-        $this->image->expects($this->once())->method('getBlob')->will($this->returnValue($imageData));
-        $this->contentNegotiation->expects($this->once())->method('bestMatch')->will($this->returnValue('image/png'));
+        $this->manager->expects($this->at(0))->method('trigger')->with('db.image.load');
+        $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.load');
 
-        $this->getNewResource()->get($this->container);
-    }
+        $responseHeaders->expects($this->at(0))->method('set')->with('ETag', '"63a73d7e50cd4e42b396e4ad9d0ce67e"')->will($this->returnSelf());
+        $responseHeaders->expects($this->at(1))->method('set')->with('Cache-Control', 'max-age=31536000')->will($this->returnSelf());
+        $responseHeaders->expects($this->at(2))->method('set')->with('X-Imbo-OriginalMimeType', 'image/png')->will($this->returnSelf());
+        $responseHeaders->expects($this->at(3))->method('set')->with('X-Imbo-OriginalWidth', 200)->will($this->returnSelf());
+        $responseHeaders->expects($this->at(4))->method('set')->with('X-Imbo-OriginalHeight', 100)->will($this->returnSelf());
+        $responseHeaders->expects($this->at(5))->method('set')->with('X-Imbo-OriginalFileSize', 123123)->will($this->returnSelf());
+        $responseHeaders->expects($this->at(6))->method('set')->with('X-Imbo-OriginalExtension', 'png')->will($this->returnSelf());
+        $responseHeaders->expects($this->at(7))->method('set')->with('Content-Length', 10)->will($this->returnSelf());
+        $responseHeaders->expects($this->at(8))->method('set')->with('Content-Type', 'image/png')->will($this->returnSelf());
 
-    /**
-     * @covers Imbo\Resource\Image::get
-     * @expectedException Imbo\Exception\ResourceException
-     * @expectedExceptionCode 406
-     */
-    public function testGetWhenUserAgentDoesNotAcceptImage() {
-        $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
-
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
-        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders->expects($this->any())->method('set')->will($this->returnValue($responseHeaders));
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-        $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('image/jpeg' => 1)));
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-
-        $this->storage->expects($this->once())->method('getImage')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($imageData));
-        $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
-
-        $this->getNewResource()->get($this->container);
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::get
-     */
-    public function testGetWhenUserAgentDoesNotAcceptOriginalMimeType() {
-        $serverContainer = $this->getMock('Imbo\Http\ServerContainerInterface');
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders->expects($this->any())->method('set')->will($this->returnValue($responseHeaders));
-
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-
-        $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
-        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
-        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('image/jpeg' => 1)));
-
-        $this->storage->expects($this->once())->method('getLastModified')->will($this->returnValue($this->getMock('DateTime')));
-
-        $this->image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $this->image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/png'));
-
-        $this->response->expects($this->once())->method('setBody')->with($this->isType('string'));
-
-        $this->contentNegotiation->expects($this->once())->method('bestMatch')->with($this->isType('array'), array('image/jpeg' => 1))->will($this->returnValue('image/jpeg'));
-
-        $convert = $this->getMockBuilder('Imbo\Image\Transformation\Convert')->disableOriginalConstructor()->getMock();
-
-        $this->container->config = array(
-            'transformations' => array(
-                'convert' => function ($params) use ($convert) {
-                    return $convert;
-                },
-            ),
-        );
-
-        $this->getNewResource()->get($this->container);
+        $this->resource->get($this->event);
     }
 }

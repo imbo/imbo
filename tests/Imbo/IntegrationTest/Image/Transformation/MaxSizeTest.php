@@ -62,7 +62,7 @@ class MaxSizeTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\MaxSize::applyToImage
      */
     protected function getImageMock() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image = $this->getMock('Imbo\Image\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
@@ -77,7 +77,7 @@ class MaxSizeTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\MaxSize::applyToImage
      */
     public function testApplyToImageWithOnlyWidth() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image = $this->getMock('Imbo\Image\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
@@ -93,7 +93,7 @@ class MaxSizeTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\MaxSize::applyToImage
      */
     public function testApplyToImageWithOnlyHeight() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image = $this->getMock('Imbo\Image\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
@@ -109,7 +109,7 @@ class MaxSizeTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\MaxSize::applyToImage
      */
     public function testApplyToTallImage() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image = $this->getMock('Imbo\Image\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/tall-image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(463));
@@ -125,7 +125,7 @@ class MaxSizeTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\MaxSize::applyToImage
      */
     public function testApplyToImageSmallerThanParams() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image = $this->getMock('Imbo\Image\Image');
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(463));
         $image->expects($this->once())->method('getHeight')->will($this->returnValue(665));
         $image->expects($this->never())->method('setBlob');

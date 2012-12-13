@@ -42,20 +42,50 @@ use Imbo\Image\ImagePreparation;
  * @covers Imbo\Image\ImagePreparation
  */
 class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @var ImagePreparation
+     */
     private $preparation;
-    private $request;
-    private $image;
 
+    private $request;
+    private $event;
+    private $container;
+
+    /**
+     * Set up the image preparation instance
+     *
+     * @covers Imbo\Image\ImagePreparation::setContainer
+     */
     public function setUp() {
         $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->image = $this->getMock('Imbo\Image\ImageInterface');
+        $this->container = $this->getMock('Imbo\Container');
+        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
+        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
+
         $this->prepare = new ImagePreparation();
+        $this->prepare->setContainer($this->container);
     }
 
+    /**
+     * Tear down the image prepration instance
+     */
     public function tearDown() {
         $this->preparation = null;
         $this->request = null;
-        $this->image = null;
+        $this->container = null;
+        $this->event = null;
+    }
+
+    /**
+     * @covers Imbo\Image\ImagePreparation::getDefinition
+     */
+    public function testReturnsACorrectDefinition() {
+        $definition = $this->prepare->getDefinition();
+        $this->assertInternalType('array', $definition);
+
+        foreach ($definition as $d) {
+            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
+        }
     }
 
     /**
@@ -64,10 +94,10 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage No image attached
      * @expectedExceptionCode 400
      */
-    public function testPrepareImageWithMissingImageData() {
+    public function testThrowsExceptionWhenNoImageIsAttached() {
         $this->request->expects($this->once())->method('getRawData')->will($this->returnValue(''));
 
-        $this->prepare->prepareImage($this->request, $this->image);
+        $this->prepare->prepareImage($this->event);
     }
 
     /**
@@ -76,11 +106,11 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Hash mismatch
      * @expectedExceptionCode 400
      */
-    public function testPrepareImageWithHashMismatch() {
+    public function testThrowsExceptionWhenImageInRequestDoesNotMatchImageIdentifierInUrl() {
         $this->request->expects($this->once())->method('getRawData')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('asd'));
 
-        $this->prepare->prepareImage($this->request, $this->image);
+        $this->prepare->prepareImage($this->event);
     }
 
     /**
@@ -89,11 +119,11 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Unsupported image type
      * @expectedExceptionCode 415
      */
-    public function testPrepareImageWithUnsupportedImageType() {
+    public function testThrowsExceptionWhenImageTypeIsNotSupported() {
         $this->request->expects($this->once())->method('getRawData')->will($this->returnValue(file_get_contents(__FILE__)));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(md5_file(__FILE__)));
 
-        $this->prepare->prepareImage($this->request, $this->image);
+        $this->prepare->prepareImage($this->event);
     }
 
     /**
@@ -102,19 +132,19 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Broken image
      * @expectedExceptionCode 415
      */
-    public function testPrepareImageWithBrokenImage() {
+    public function testThrowsExceptionWhenImageIsBroken() {
         $filePath = FIXTURES_DIR . '/broken-image.jpg';
 
         $this->request->expects($this->once())->method('getRawData')->will($this->returnValue(file_get_contents($filePath)));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(md5_file($filePath)));
 
-        $this->prepare->prepareImage($this->request, $this->image);
+        $this->prepare->prepareImage($this->event);
     }
 
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
      */
-    public function testSuccessfulPrepareImage() {
+    public function testPopulatesRequestWhenImageIsValid() {
         $imagePath = FIXTURES_DIR . '/image.png';
         $imageData = file_get_contents($imagePath);
         $imageIdentifier = md5($imageData);
@@ -122,12 +152,17 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
         $this->request->expects($this->once())->method('getRawData')->will($this->returnValue($imageData));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
 
-        $this->image->expects($this->once())->method('setMimeType')->with('image/png')->will($this->returnValue($this->image));
-        $this->image->expects($this->once())->method('setExtension')->with('png')->will($this->returnValue($this->image));
-        $this->image->expects($this->once())->method('setBlob')->with($imageData)->will($this->returnValue($this->image));
-        $this->image->expects($this->once())->method('setWidth')->with(665)->will($this->returnValue($this->image));
-        $this->image->expects($this->once())->method('setHeight')->with(463)->will($this->returnValue($this->image));
+        $image = $this->getMock('Imbo\Image\Image');
+        $this->container->expects($this->once())->method('get')->with('image')->will($this->returnValue($image));
 
-        $this->prepare->prepareImage($this->request, $this->image);
+        $this->request->expects($this->once())->method('setImage')->with($image);
+
+        $image->expects($this->once())->method('setMimeType')->with('image/png')->will($this->returnSelf());
+        $image->expects($this->once())->method('setExtension')->with('png')->will($this->returnSelf());
+        $image->expects($this->once())->method('setBlob')->with($imageData)->will($this->returnSelf());
+        $image->expects($this->once())->method('setWidth')->with(665)->will($this->returnSelf());
+        $image->expects($this->once())->method('setHeight')->with(463)->will($this->returnSelf());
+
+        $this->prepare->prepareImage($this->event);
     }
 }

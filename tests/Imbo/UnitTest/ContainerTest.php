@@ -42,16 +42,30 @@ use Imbo\Container;
  * @covers Imbo\Container
  */
 class ContainerTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @var Container
+     */
     private $container;
 
+    /**
+     * Set up the container
+     */
     public function setUp() {
         $this->container = new Container();
     }
 
+    /**
+     * Tear down the container
+     */
     public function tearDown() {
         $this->container = null;
     }
 
+    /**
+     * Fetch different values
+     *
+     * @return array[]
+     */
     public function getContainerValues() {
         return array(
             array('key1', 'value1', 'value1'),
@@ -62,54 +76,49 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\Container::set
-     * @covers Imbo\Container::__set
      * @covers Imbo\Container::get
-     * @covers Imbo\Container::__get
      * @dataProvider getContainerValues()
      */
-    public function testSetGet($key, $value, $expected) {
+    public function testCanSetAndGetValues($key, $value, $expected) {
         $this->container->set($key, $value);
-        $this->assertSame($expected, $this->container->$key);
         $this->assertSame($expected, $this->container->get($key));
     }
 
     /**
      * @covers Imbo\Container::has
-     * @covers Imbo\Container::__set
+     * @covers Imbo\Container::set
      */
-    public function testHas() {
+    public function testCanCheckIfItHasAValueWithAGivenKey() {
         $this->assertFalse($this->container->has('key'));
-        $this->container->key = 'value';
+        $this->container->set('key', 'value');
         $this->assertTrue($this->container->has('key'));
     }
 
     /**
      * @expectedException InvalidArgumentException
-     * @covers Imbo\Container::__get
+     * @covers Imbo\Container::get
      */
-    public function testGetUndefinedValues() {
-        $this->container->foobar;
+    public function testThrowsAnExceptionWhenFetchingAKeyThatDoesNotExist() {
+        $this->container->get('foobar');
     }
 
     /**
-     * @covers Imbo\Container::__get
+     * @covers Imbo\Container::get
      */
-    public function testCallback() {
-        $this->container->key = function($container) { return new \stdClass(); };
+    public function testCanGenerateNewInstancesWhenFetching() {
+        $this->container->set('key', function($container) { return new \stdClass(); });
 
         // Make sure that we don't get the same instance when referencing the key more than once
-        $this->assertNotSame($this->container->key, $this->container->key);
+        $this->assertNotSame($this->container->get('key'), $this->container->get('key'));
     }
 
     /**
-     * @covers Imbo\Container::shared
+     * @covers Imbo\Container::setStatic
      */
-    public function testShared() {
-        $callback = function($container) { return new \stdClass(); };
-
-        $this->container->key = $this->container->shared($callback);
+    public function testCanReuseInstancesWhenFetching() {
+        $this->container->setStatic('key', function($container) { return new \stdClass(); });
 
         // Make sure that we get the same instance when referencing the key more than once
-        $this->assertSame($this->container->key, $this->container->key);
+        $this->assertSame($this->container->get('key'), $this->container->get('key'));
     }
 }

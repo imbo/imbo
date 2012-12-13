@@ -35,7 +35,9 @@ namespace Imbo\Http\Response;
 use Imbo\Http\Request\RequestInterface,
     Imbo\Http\Response\Formatter,
     Imbo\Http\ContentNegotiation,
-    Imbo\Exception\RuntimeException;
+    Imbo\Exception\RuntimeException,
+    Imbo\Container,
+    Imbo\ContainerAware;
 
 /**
  * Response writer
@@ -47,13 +49,11 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class ResponseWriter implements ResponseWriterInterface {
+class ResponseWriter implements ContainerAware, ResponseWriterInterface {
     /**
-     * Content negotiation instance
-     *
-     * @var ContentNegotiation
+     * @var Container
      */
-    private $cn;
+    private $container;
 
     /**
      * Supported content types and the associated formatter class name or instance
@@ -85,16 +85,10 @@ class ResponseWriter implements ResponseWriterInterface {
     private $defaultMimeType = 'application/json';
 
     /**
-     * Class constructor
-     *
-     * @param ContentNegotiation $cn Content negotiation instance
+     * {@inheritdoc}
      */
-    public function __construct(ContentNegotiation $cn = null) {
-        if ($cn === null) {
-            $cn = new ContentNegotiation();
-        }
-
-        $this->cn = $cn;
+    public function setContainer(Container $container) {
+        $this->container = $container;
     }
 
     /**
@@ -119,7 +113,7 @@ class ResponseWriter implements ResponseWriterInterface {
             $maxQ = 0;
 
             foreach ($this->supportedTypes as $mime => $formatterClass) {
-                if (($q = $this->cn->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
+                if (($q = $this->container->get('contentNegotiation')->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
                     $maxQ = $q;
                     $match = true;
                     $formatter = $formatterClass;

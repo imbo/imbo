@@ -32,6 +32,11 @@
 
 namespace Imbo\EventManager;
 
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Response\ResponseInterface,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface;
+
 /**
  * Event interface
  *
@@ -44,6 +49,14 @@ namespace Imbo\EventManager;
  */
 interface EventInterface {
     /**
+     * Set the name of the event
+     *
+     * @param string $name The name of the event
+     * @return EventInterface
+     */
+    function setName($name);
+
+    /**
      * Get the name of the event
      *
      * @return string
@@ -51,11 +64,46 @@ interface EventInterface {
     function getName();
 
     /**
-     * Get the container instance
+     * Get the request instance
      *
-     * @return Imbo\Container
+     * @return RequestInterface
      */
-    function getContainer();
+    function getRequest();
+
+    /**
+     * Get the response instance
+     *
+     * @return ResponseInterface
+     */
+    function getResponse();
+
+    /**
+     * Get the database adapter
+     *
+     * @return DatabaseInterface
+     */
+    function getDatabase();
+
+    /**
+     * Get the storage adapter
+     *
+     * @return StorageInterface
+     */
+    function getStorage();
+
+    /**
+     * Get the event manager that triggered the event
+     *
+     * @return EventManager
+     */
+    function getManager();
+
+    /**
+     * Get the Imbo configuration
+     *
+     * @return array
+     */
+    function getConfig();
 
     /**
      * Whether or not to stop the execution of more listeners for the current event
@@ -71,26 +119,4 @@ interface EventInterface {
      * @return boolean
      */
     function propagationIsStopped();
-
-    /**
-     * Whether or not to halt the execution of Imbo
-     *
-     * @param boolean $flag True to halt, false to continue
-     * @return EventInterface
-     */
-    function haltApplication($flag);
-
-    /**
-     * Return whether or not the execution should be halted
-     *
-     * @return boolean
-     */
-    function applicationIsHalted();
-
-    /**
-     * Return optional parameters passed to the event instance
-     *
-     * @return array
-     */
-    function getParams();
 }

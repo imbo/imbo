@@ -31,7 +31,8 @@
 
 namespace Imbo\UnitTest\Storage;
 
-use Imbo\Storage\Doctrine;
+use Imbo\Storage\Doctrine,
+    Doctrine\DBAL\Connection;
 
 /**
  * @package TestSuite\UnitTests
@@ -43,17 +44,17 @@ use Imbo\Storage\Doctrine;
  */
 class DoctrineTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var Imbo\Storage\Doctrine
+     * @var Doctrine
      */
     private $driver;
 
     /**
-     * @var Doctrine\DBAL\Connection
+     * @var Connection
      */
     private $connection;
 
     /**
-     * Setup method
+     * Set up the driver
      */
     public function setUp() {
         if (!class_exists('Doctrine\DBAL\Connection')) {
@@ -64,6 +65,9 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
         $this->driver = new Doctrine(array(), $this->connection);
     }
 
+    /**
+     * Tear down the driver
+     */
     public function tearDown() {
         $this->connection = null;
         $this->driver = null;

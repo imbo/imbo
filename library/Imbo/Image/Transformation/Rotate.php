@@ -32,7 +32,7 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface,
+use Imbo\Image\Image,
     Imbo\Exception\TransformationException,
     ImagickException,
     ImagickPixelException;
@@ -83,7 +83,7 @@ class Rotate extends Transformation implements TransformationInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(ImageInterface $image) {
+    public function applyToImage(Image $image) {
         try {
             $imagick = $this->getImagick();
             $imagick->readImageBlob($image->getBlob());

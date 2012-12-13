@@ -32,7 +32,7 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\ImageInterface,
+use Imbo\Image\Image,
     Imbo\Exception\TransformationException,
     Imagick,
     ImagickException,
@@ -129,7 +129,7 @@ class Canvas extends Transformation implements TransformationInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(ImageInterface $image) {
+    public function applyToImage(Image $image) {
         try {
             if (!$this->width) {
                 $this->width = $image->getWidth();

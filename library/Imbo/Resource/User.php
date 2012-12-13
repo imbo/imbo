@@ -32,7 +32,9 @@
 namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
-    Imbo\Container;
+    Imbo\EventManager\EventInterface,
+    Imbo\EventListener\ListenerDefinition,
+    Imbo\EventListener\ListenerInterface;
 
 /**
  * User resource
@@ -43,7 +45,7 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class User extends Resource implements ResourceInterface {
+class User implements ResourceInterface, ListenerInterface {
     /**
      * {@inheritdoc}
      */
@@ -57,51 +59,36 @@ class User extends Resource implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function get(Container $container) {
-        $request = $container->request;
-        $response = $container->response;
-        $database = $container->database;
-
-        $publicKey = $request->getPublicKey();
-
-        // Fetch header containers
-        $requestHeaders = $request->getHeaders();
-        $responseHeaders = $response->getHeaders();
-
-        // Fetch the number of images this user has in the database
-        $numImages = $database->getNumImages($publicKey);
-
-        // Fetch the last modfified timestamp for the current user
-        $lastModified = $this->formatDate($database->getLastModified($publicKey));
-
-        // Generate ETag based on the last modification date and add to the response headers
-        $etag = '"' . md5($lastModified) . '"';
-        $responseHeaders->set('ETag', $etag);
-
-        if (
-            $lastModified === $requestHeaders->get('if-modified-since') &&
-            $etag === $requestHeaders->get('if-none-match')
-        ) {
-            $response->setNotModified();
-            return;
-        }
-
-        $responseHeaders->set('Last-Modified', $lastModified);
-
-        $response->setBody(array(
-            'publicKey'    => $publicKey,
-            'numImages'    => $numImages,
-            'lastModified' => $lastModified,
-        ));
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('user.get', array($this, 'get')),
+            new ListenerDefinition('user.head', array($this, 'head')),
+        );
     }
 
     /**
-     * {@inheritdoc}
+     * Handle GET requests
+     *
+     * @param EventInterface $event The current event
      */
-    public function head(Container $container) {
-        $this->get($container);
+    public function get(EventInterface $event) {
+        $event->getManager()->trigger('db.user.load');
+
+        $response = $event->getResponse();
+
+        $etag = '"' . md5($response->getLastModified()) . '"';
+        $response->getHeaders()->set('ETag', $etag);
+    }
+
+    /**
+     * Handle HEAD requests
+     *
+     * @param EventInterface $event The current event
+     */
+    public function head(EventInterface $event) {
+        $this->get($event);
 
         // Remove body from the response, but keep everything else
-        $container->response->setBody(null);
+        $event->getResponse()->setBody(null);
     }
 }

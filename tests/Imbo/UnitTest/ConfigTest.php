@@ -37,7 +37,6 @@ namespace Imbo\UnitTest;
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\FrontController
  */
 class ConfigTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -46,9 +45,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
     public function testTransformationNames() {
         $config = require __DIR__ . '/../../../config/config.php.dist';
 
-        $this->assertArrayHasKey('transformations', $config);
+        $this->assertArrayHasKey('imageTransformations', $config);
 
-        $transformations = $config['transformations'];
+        $transformations = $config['imageTransformations'];
 
         $expected = array(
             'border',

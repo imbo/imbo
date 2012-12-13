@@ -22,40 +22,49 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Interfaces
- * @subpackage Image
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\Image;
+namespace Imbo\UnitTest\EventListener;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Exception\ImageException;
+use Imbo\EventListener\MaxImageSize;
 
 /**
- * Image preparation interface
- *
- * @package Interfaces
- * @subpackage Image
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\EventListener\MaxImageSize
  */
-interface ImagePreparationInterface {
+class MaxImageSizeTest extends ListenerTests {
     /**
-     * Prepare an image
-     *
-     * This method should prepare an image object from php://input. The method must also figure out
-     * the width, height, mime type  and extension of the image.
-     *
-     * @param RequestInterface $request A request instance
-     * @param ImageInterface $image An image instance
-     * @throws ImageException
-     * @return ImagePreparationInterface
+     * @var MaxImageSize
      */
-    function prepareImage(RequestInterface $request, ImageInterface $image);
+    private $listener;
+
+    /**
+     * Set up the listener
+     */
+    public function setUp() {
+        $this->listener = new MaxImageSize();
+    }
+
+    /**
+     * Tear down the listener
+     */
+    public function tearDown() {
+        $this->listener = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getListener() {
+        return $this->listener;
+    }
 }

@@ -22,91 +22,90 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Resources
+ * @package Cache
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\Resource;
-
-use Imbo\Container,
-    Imbo\Resource\ResourceInterface,
-    Imbo\Exception\ResourceException,
-    Imbo\EventManager\EventManagerInterface,
-    DateTime;
+namespace Imbo\Cache;
 
 /**
- * Abstract resource class
+ * APC cache
  *
- * Resources can extend this class and override supported methods.
- *
- * @package Resources
+ * @package Cache
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-abstract class Resource implements ResourceInterface {
+class APC implements CacheInterface {
     /**
-     * Event manager
+     * Key namespace
      *
-     * @var Imbo\EventManager\EventManagerInterface
+     * @var string
      */
-    protected $eventManager;
+    private $namespace;
 
     /**
-     * {@inheritdoc}
-     */
-    public function post(Container $container) {
-        throw new ResourceException('Method not allowed', 405);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function get(Container $container) {
-        throw new ResourceException('Method not allowed', 405);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function head(Container $container) {
-        throw new ResourceException('Method not allowed', 405);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function delete(Container $container) {
-        throw new ResourceException('Method not allowed', 405);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function put(Container $container) {
-        throw new ResourceException('Method not allowed', 405);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEventManager(EventManagerInterface $eventManager) {
-        $this->eventManager = $eventManager;
-
-        return $this;
-    }
-
-    /**
-     * Get a formatted date
+     * Class constructor
      *
-     * @param DateTime $date An instance of DateTime
-     * @return string Returns a formatted date string
+     * @param string $namespace A prefix that will be added to all keys
      */
-    protected function formatDate(DateTime $date) {
-        return $date->format('D, d M Y H:i:s') . ' GMT';
+    public function __construct($namespace = null) {
+        $this->namespace = $namespace;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get($key) {
+        return apc_fetch($this->getKey($key));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function set($key, $value, $expire = 0) {
+        return apc_store($this->getKey($key), $value, $expire);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete($key) {
+        return apc_delete($this->getKey($key));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function increment($key, $amount = 1) {
+        return apc_inc($this->getKey($key), $amount);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function decrement($key, $amount = 1) {
+        $result = apc_dec($this->getKey($key), $amount);
+
+        if ($result < 0) {
+            $result = 0;
+            $this->set($key, $result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Generate a namespaced key
+     *
+     * @param string $key The key specified by the user
+     * @return string A namespaced key
+     */
+    protected function getKey($key) {
+        return $this->namespace . ':' . $key;
     }
 }

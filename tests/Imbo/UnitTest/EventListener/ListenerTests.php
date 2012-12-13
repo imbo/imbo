@@ -22,38 +22,41 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Interfaces
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo;
+namespace Imbo\UnitTest\EventListener;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Resource\ResourceInterface,
-    Imbo\Exception\RuntimeException;
+use Imbo\EventListener\ListenerInterface;
 
 /**
- * Router interface
- *
- * @package Interfaces
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-interface RouterInterface {
+abstract class ListenerTests extends \PHPUnit_Framework_TestCase {
     /**
-     * Resolve the current route
+     * Get the listener we are testing
      *
-     * @param string $path The path currently requested
-     * @param array $matches The different named subpatterns in the regular expressions (routes)
-     *                       will be stored in this array
-     * @return ResourceInterface The resource that handles the path
-     * @throws RuntimeException Throws an exception if the $path is not recognized or of the
-     *                          resource does not exist in the Container instance
+     * @return ListenerInterface
      */
-    function resolve($path, array &$matches);
+    abstract protected function getListener();
+
+    /**
+     * @covers Imbo\EventListener\AccessToken::getDefinition
+     */
+    public function testReturnsDefinitions() {
+        $definition = $this->getListener()->getDefinition();
+        $this->assertInternalType('array', $definition);
+
+        foreach ($definition as $d) {
+            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
+        }
+    }
 }

@@ -453,6 +453,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($port, $request->getPort());
     }
 
+    /**
+     * Fetch different base URLs
+     *
+     * @return array[]
+     */
     public function getBaseUrlData() {
         return array(
             array('/doc/root', '/doc/root/index.php', ''),
@@ -484,18 +489,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $request = new Request();
         $this->assertSame($request, $request->setRawData($image));
         $this->assertSame($image, $request->getRawData());
-    }
-
-    /**
-     * @covers Imbo\Http\Request\Request::getRealImageIdentifier
-     */
-    public function testGetRealImageIdentifier() {
-        $request = new Request();
-        $this->assertNull($request->getRealImageIdentifier());
-
-        $image = file_get_contents(FIXTURES_DIR . '/image.png');
-        $this->assertSame($request, $request->setRawData($image));
-        $this->assertSame('929db9c5fc3099f7576f5655207eba47', $request->getRealImageIdentifier());
     }
 
     /**
@@ -575,5 +568,38 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     public function testHasTransformationsWithNoTransformations() {
         $request = new Request();
         $this->assertFalse($request->hasTransformations());
+    }
+
+    /**
+     * @covers Imbo\Http\Request\Request::getImage
+     * @covers Imbo\Http\Request\Request::setImage
+     */
+    public function testCanSetAndGetAnImage() {
+        $request = new Request();
+        $image = $this->getMock('Imbo\Image\Image');
+        $this->assertSame($request, $request->setImage($image));
+        $this->assertSame($image, $request->getImage());
+    }
+
+    /**
+     * Get Accept headers
+     *
+     * @return array[]
+     */
+    public function getAcceptHeader() {
+        return array(
+            array('image/jpeg', array('image/jpeg' => 1.0)),
+            array('', array()),
+        );
+    }
+
+    /**
+     * @dataProvider getAcceptHeader
+     * @covers Imbo\Http\Request\Request::getAcceptableContentTypes
+     * @covers Imbo\Http\Request\Request::splitAcceptHeader
+     */
+    public function testCanFetchAcceptableContentTypesBasedOnTheAcceptHeader($accept, $expected) {
+        $request = new Request(array(), array(), array('HTTP_ACCEPT' => $accept));
+        $this->assertSame($expected, $request->getAcceptableContentTypes());
     }
 }

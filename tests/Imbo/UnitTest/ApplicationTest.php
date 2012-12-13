@@ -22,79 +22,63 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Interfaces
- * @subpackage Http\Containers
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\Http;
+namespace Imbo\UnitTest;
+
+use Imbo\Application;
 
 /**
- * Parameter container interface
- *
- * @package Interfaces
- * @subpackage Http\Containers
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Application
  */
-interface ParameterContainerInterface {
+class ApplicationTest extends \PHPUnit_Framework_TestCase {
     /**
-     * Get all parameters as an associative array
-     *
-     * @return array
+     * @var Application
      */
-    function getAll();
+    private $application;
 
     /**
-     * Remove all parameters
-     *
-     * @return Imbo\Http\ParameterContainerInterface
+     * @var Container
      */
-    function removeAll();
+    private $container;
 
     /**
-     * Set a parameter value
-     *
-     * @param string $key The key to store the value to
-     * @param mixed $value The value itself
-     * @return Imbo\Http\ParameterContainerInterface
+     * @var array
      */
-    function set($key, $value);
+    private $config = array();
 
     /**
-     * Get a parameter value
-     *
-     * @param string $key The key to fetch
-     * @param mixed $default If the key does not exist, return this value instead
-     * @return mixed
+     * Set up the application
      */
-    function get($key, $default = null);
+    public function setUp() {
+        $this->container = $this->getMock('Imbo\Container');
+        $this->application = new Application();
+    }
 
     /**
-     * Remove a single value from the parameter list
-     *
-     * @param string $key The key to remove
-     * @return Imbo\Http\ParameterContainerInterface
+     * Tear down the application
      */
-    function remove($key);
+    public function tearDown() {
+        $this->container = null;
+        $this->application = null;
+    }
 
     /**
-     * See if the container has a given key
-     *
-     * @param string $key The key to check for
-     * @return boolean
+     * @expectedException Imbo\Exception\RuntimeException
+     * @expectedExceptionMessage Application has not been bootstrapped
+     * @covers Imbo\Application::run
      */
-    function has($key);
-
-    /**
-     * Return the query as a string
-     *
-     * @return string
-     */
-    function asString();
+    public function testWillThrowExceptionWhenNotBootstrapped() {
+        $this->application->run();
+    }
 }

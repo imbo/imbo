@@ -33,6 +33,8 @@ namespace Imbo\UnitTest\Storage;
 
 use Imbo\Storage\GridFS,
     DateTime,
+    Mongo,
+    MongoGridFS,
     MongoGridFSFile;
 
 /**
@@ -45,7 +47,7 @@ use Imbo\Storage\GridFS,
  */
 class GridFSTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var Imbo\Storage\GridFS
+     * @var GridFS
      */
     private $driver;
 
@@ -74,7 +76,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     private $imageIdentifier = '96d08a5943ebf1c5635a2995c9408cdd';
 
     /**
-     * Setup method
+     * Set up the driver
      */
     public function setUp() {
         if (!extension_loaded('mongo')) {
@@ -87,7 +89,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Teardown method
+     * Tear down the driver
      */
     public function tearDown() {
         $this->grid = null;

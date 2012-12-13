@@ -32,10 +32,9 @@
 namespace Imbo\Resource;
 
 use Imbo\Http\Request\RequestInterface,
-    Imbo\Resource\Images\Query,
-    Imbo\Resource\Images\QueryInterface,
-    Imbo\Container,
-    DateTime;
+    Imbo\EventManager\EventInterface,
+    Imbo\EventListener\ListenerDefinition,
+    Imbo\EventListener\ListenerInterface;
 
 /**
  * Images resource
@@ -56,34 +55,7 @@ use Imbo\Http\Request\RequestInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Images extends Resource implements ImagesInterface {
-    /**
-     * Query instance
-     *
-     * @var Imbo\Resource\Images\QueryInterface
-     */
-    private $query;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getQuery() {
-        if ($this->query === null) {
-            $this->query = new Query();
-        }
-
-        return $this->query;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setQuery(QueryInterface $query) {
-        $this->query = $query;
-
-        return $this;
-    }
-
+class Images implements ResourceInterface, ListenerInterface {
     /**
      * {@inheritdoc}
      */
@@ -97,83 +69,37 @@ class Images extends Resource implements ImagesInterface {
     /**
      * {@inheritdoc}
      */
-    public function get(Container $container) {
-        $request = $container->request;
-        $response = $container->response;
-        $database = $container->database;
-
-        $publicKey = $request->getPublicKey();
-
-        // Fetch header containers
-        $requestHeaders = $request->getHeaders();
-        $responseHeaders = $response->getHeaders();
-
-        // Fetch the last modification date of the current user
-        $lastModified = $this->formatDate($database->getLastModified($publicKey));
-
-        // Generate ETag based on the last modification date and add to the response headers
-        $etag = '"' . md5($lastModified) . '"';
-        $responseHeaders->set('ETag', $etag);
-
-        if (
-            $lastModified === $requestHeaders->get('if-modified-since') &&
-            $etag === $requestHeaders->get('if-none-match')
-        ) {
-            $response->setNotModified();
-            return;
-        }
-
-        // Add the last modification date
-        $responseHeaders->set('Last-Modified', $lastModified);
-
-        $query = $this->getQuery();
-        $params = $request->getQuery();
-
-        if ($params->has('page')) {
-            $query->page($params->get('page'));
-        }
-
-        if ($params->has('limit')) {
-            $query->limit($params->get('limit'));
-        }
-
-        if ($params->has('metadata')) {
-            $query->returnMetadata($params->get('metadata'));
-        }
-
-        if ($params->has('from')) {
-            $query->from($params->get('from'));
-        }
-
-        if ($params->has('to')) {
-            $query->to($params->get('to'));
-        }
-
-        if ($params->has('query')) {
-            $data = json_decode($params->get('query'), true);
-
-            if (is_array($data)) {
-                $query->metadataQuery($data);
-            }
-        }
-
-        $images = $database->getImages($publicKey, $query);
-
-        foreach ($images as &$image) {
-            $image['added']   = $this->formatDate(new DateTime('@' . $image['added']));
-            $image['updated'] = $this->formatDate(new DateTime('@' . $image['updated']));
-        }
-
-        $response->setBody($images);
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('images.get', array($this, 'get')),
+            new ListenerDefinition('images.head', array($this, 'head')),
+        );
     }
 
     /**
-     * {@inheritdoc}
+     * Handle GET requests
+     *
+     * @param EventInterface $event The current event
      */
-    public function head(Container $container) {
-        $this->get($container);
+    public function get(EventInterface $event) {
+        $event->getManager()->trigger('db.images.load');
+
+        $response = $event->getResponse();
+
+        // Generate ETag based on the last modification date and add to the response headers
+        $etag = '"' . md5($response->getLastModified()) . '"';
+        $response->getHeaders()->set('ETag', $etag);
+    }
+
+    /**
+     * Handle HEAD requests
+     *
+     * @param EventInterface $event The current event
+     */
+    public function head(EventInterface $event) {
+        $this->get($event);
 
         // Remove body from the response, but keep everything else
-        $container->response->setBody(null);
+        $event->getResponse()->setBody(null);
     }
 }

@@ -23,38 +23,30 @@
  * IN THE SOFTWARE.
  *
  * @package Interfaces
- * @subpackage Resources
+ * @subpackage Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\Resource;
-
-use Imbo\Container,
-    Imbo\EventManager\EventManagerInterface;
+namespace Imbo;
 
 /**
- * Image resource interface
+ * Container aware interface
  *
  * @package Interfaces
- * @subpackage Resources
+ * @subpackage Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-interface ImageInterface extends ResourceInterface {
+interface ContainerAware {
     /**
-     * Register an image transformation handler
+     * Set an instance of the container
      *
-     * @param string $name The name of the transformation, as used in the query parameters
-     * @param callable $callback A piece of code that can be executed. The callback will receive a
-     *                           single parameter: $params, which is an array with parameters
-     *                           associated with the transformation. The callable must return an
-     *                           instance of Imbo\Image\Transformation\TransformationInterface
-     * @return ResourceInterface
+     * @param Container $container A populated container
      */
-    function registerTransformationHandler($name, $callback);
+    function setContainer(Container $container);
 }

@@ -31,8 +31,7 @@
 
 namespace Imbo\UnitTest\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\Listener;
+use Imbo\EventListener\ListenerDefinition;
 
 /**
  * @package TestSuite\UnitTests
@@ -40,30 +39,65 @@ use Imbo\EventManager\EventInterface,
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
- * @covers Imbo\EventListener\Listener
+ * @covers Imbo\EventListener\ListenerDefinition
  */
-class ListenerTest extends \PHPUnit_Framework_TestCase {
-    public function setUp() {
-        $this->listener = new SomeListener();
-    }
+class ListenerDefinitionTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @var ListenerDefinition
+     */
+    private $definition;
 
-    public function tearDown() {
-        $this->listener = null;
+    private $eventName = 'event';
+    private $callback;
+    private $priority = 1;
+    private $publicKeys = array('include' => array('user'));
+
+    /**
+     * Set up the definition
+     *
+     * @covers Imbo\EventListener\ListenerDefinition::__construct
+     * @covers Imbo\EventListener\ListenerDefinition::setEventName
+     * @covers Imbo\EventListener\ListenerDefinition::setCallback
+     * @covers Imbo\EventListener\ListenerDefinition::setPriority
+     * @covers Imbo\EventListener\ListenerDefinition::setPublicKeys
+     */
+    public function setUp() {
+        $this->callback = function($event) {};
+        $this->definition = new ListenerDefinition($this->eventName, $this->callback, $this->priority, $this->publicKeys);
     }
 
     /**
-     * @covers Imbo\EventListener\Listener::getPublicKeys
-     * @covers Imbo\EventListener\Listener::setPublicKeys
+     * Tear down the definition
      */
-    public function testSetAndGetPublicKeys() {
-        $this->assertSame(array(), $this->listener->getPublicKeys());
-        $keys = array('key1', 'key2');
-        $this->assertSame($this->listener, $this->listener->setPublicKeys($keys));
-        $this->assertSame($keys, $this->listener->getPublicKeys());
+    public function tearDown() {
+        $this->definition = null;
     }
-}
 
-class SomeListener extends Listener {
-    public function getEvents() {}
-    public function invoke(EventInterface $event) {}
+    /**
+     * @covers Imbo\EventListener\ListenerDefinition::getEventName
+     */
+    public function testCanGetEventName() {
+        $this->assertSame($this->eventName, $this->definition->getEventName());
+    }
+
+    /**
+     * @covers Imbo\EventListener\ListenerDefinition::getCallback
+     */
+    public function testCanGetCallback() {
+        $this->assertSame($this->callback, $this->definition->getCallback());
+    }
+
+    /**
+     * @covers Imbo\EventListener\ListenerDefinition::getPriority
+     */
+    public function testCanGetPriority() {
+        $this->assertSame($this->priority, $this->definition->getPriority());
+    }
+
+    /**
+     * @covers Imbo\EventListener\ListenerDefinition::getPublicKeys
+     */
+    public function testCanGetPublicKeys() {
+        $this->assertSame($this->publicKeys, $this->definition->getPublicKeys());
+    }
 }

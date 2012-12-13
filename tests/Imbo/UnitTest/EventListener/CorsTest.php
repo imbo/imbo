@@ -31,8 +31,7 @@
 
 namespace Imbo\UnitTest\EventListener;
 
-use Imbo\EventListener\Cors,
-    Imbo\Container;
+use Imbo\EventListener\Cors;
 
 /**
  * @package TestSuite\UnitTests
@@ -42,70 +41,59 @@ use Imbo\EventListener\Cors,
  * @link https://github.com/imbo/imbo
  * @covers Imbo\EventListener\Cors
  */
-class CorsTest extends \PHPUnit_Framework_TestCase {
+class CorsTest extends ListenerTests {
     /**
-     * @var Imbo\EventListener\Cors
+     * @var Cors
      */
     private $listener;
 
-    /**
-     * @var Imbo\EventManager\EventInterface
-     */
     private $event;
-
-    /**
-     * @var Imbo\Container
-     */
-    private $container;
-
-    /**
-     * @var Imbo\Http\Request\RequestInterface
-     */
     private $request;
-
-    /**
-     * @var Imbo\Http\Response\ResponseInterface
-     */
     private $response;
 
     /**
-     * Set up method
+     * Set up the listener
      *
      * @covers Imbo\EventListener\Cors::__construct
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
         $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-
-        $this->container = new Container();
-        $this->container->request = $this->request;
-        $this->container->response= $this->response;
-
         $requestHeaders->expects($this->any())->method('get')->with('Origin', '*')->will($this->returnValue('http://imbo-project.org'));
-        $this->event->expects($this->any())->method('getContainer')->will($this->returnValue($this->container));
+
+        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $this->request->expects($this->any())->method('getHeaders')->will($this->returnValue($requestHeaders));
+
+        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+
+        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
+        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
 
         $this->listener = new Cors();
     }
 
     /**
-     * Tear down method
+     * Tear down the listener
      */
     public function tearDown() {
         $this->request = null;
         $this->response = null;
         $this->event = null;
-        $this->container = null;
         $this->listener = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getListener() {
+        return $this->listener;
     }
 
     /**
      * @covers Imbo\EventListener\Cors::__construct
      * @covers Imbo\EventListener\Cors::getAllowedOrigins
      */
-    public function testListenerShouldCleanupOrigins() {
+    public function testCleansUpOrigins() {
         $listener = new Cors(array(
             'allowedOrigins' => array(
                 'HTTP://www.rexxars.com:8080/',
@@ -114,6 +102,7 @@ class CorsTest extends \PHPUnit_Framework_TestCase {
         ));
 
         $allowed = $listener->getAllowedOrigins();
+
         $expected = array(
             'http://www.rexxars.com:8080',
             'https://imbo-project.org',
@@ -128,9 +117,9 @@ class CorsTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\EventListener\Cors::__construct
-     * @covers Imbo\EventListener\Cors::getEvents
+     * @covers Imbo\EventListener\Cors::getDefinition
      */
-    public function testGetEventsShouldGenerateCorrectEvents() {
+    public function testReturnsACorrectListenerDefinition() {
         $listener = new Cors(array(
             'allowedMethods' => array(
                 'image'    => array('GET', 'PUT'),
@@ -139,32 +128,35 @@ class CorsTest extends \PHPUnit_Framework_TestCase {
             )
         ));
 
-        $events = $listener->getEvents();
-        $expected = array(
-            'image.get.pre',
-            'image.put.pre',
-            'image.options.pre',
+        $definition = $listener->getDefinition();
+        $this->assertCount(8, $definition);
+        $events = array();
 
-            'images.get.pre',
-            'images.head.pre',
-            'images.options.pre',
-
-            'metadata.post.pre',
-            'metadata.options.pre',
-        );
-
-        foreach ($expected as $e) {
-            $this->assertContains($e, $events);
+        foreach ($definition as $d) {
+            $events[] = $d->getEventName();
         }
 
-        $this->assertCount(8, $events);
+        $this->assertEquals(array(
+            'image.get', 'image.put', 'image.options',
+            'images.get', 'images.head', 'images.options',
+            'metadata.post', 'metadata.options'
+        ), $events);
+    }
+
+    /**
+     * @covers Imbo\EventListener\Cors::options
+     * @covers Imbo\EventListener\Cors::originIsAllowed
+     */
+    public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOptions() {
+        $this->response->expects($this->never())->method('getHeaders');
+        $this->listener->options($this->event);
     }
 
     /**
      * @covers Imbo\EventListener\Cors::invoke
      * @covers Imbo\EventListener\Cors::originIsAllowed
      */
-    public function testListenerShouldNotAddHeadersWhenOriginIsDisallowed() {
+    public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOtherThanOptions() {
         $this->response->expects($this->never())->method('getHeaders');
         $this->listener->invoke($this->event);
     }
@@ -173,14 +165,14 @@ class CorsTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\Cors::invoke
      * @covers Imbo\EventListener\Cors::originIsAllowed
      */
-    public function testListenerShouldAllowIfWildcardOriginIsDefined() {
+    public function testAddsHeadersIfWildcardOriginIsDefined() {
         $listener = new Cors(array(
             'allowedOrigins' => array('*')
         ));
 
         $headers = $this->getMock('Imbo\Http\HeaderContainer');
-        $headers->expects($this->at(0))->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org');
-        $headers->expects($this->at(1))->method('set')->with('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode');
+        $headers->expects($this->at(0))->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org')->will($this->returnValue($headers));
+        $headers->expects($this->at(1))->method('set')->with('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode')->will($this->returnValue($headers));
 
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
         $listener->invoke($this->event);
@@ -190,74 +182,42 @@ class CorsTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\Cors::invoke
      * @covers Imbo\EventListener\Cors::originIsAllowed
      */
-    public function testListenerShouldAllowIfOriginIsDefined() {
+    public function testAddsHeadersIfOriginIsDefinedAndAllowed() {
         $listener = new Cors(array(
             'allowedOrigins' => array('http://imbo-project.org')
         ));
 
         $headers = $this->getMock('Imbo\Http\HeaderContainer');
-        $headers->expects($this->at(0))->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org');
-        $headers->expects($this->at(1))->method('set')->with('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode');
+        $headers->expects($this->at(0))->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org')->will($this->returnValue($headers));
+        $headers->expects($this->at(1))->method('set')->with('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode')->will($this->returnValue($headers));
 
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
         $listener->invoke($this->event);
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::invoke
+     * @covers Imbo\EventListener\Cors::options
      */
-    public function testListenerShouldSetAllowedMethodsOnOptionsRequest() {
+    public function testSetsCorrectResposeHeadersOnOptionsRequestWhenOriginIsAllowed() {
         $listener = new Cors(array(
             'allowedOrigins' => array('*'),
             'allowedMethods' => array(
                 'image' => array('HEAD'),
             ),
+            'maxAge' => 60,
         ));
 
         $this->request->expects($this->once())->method('getResource')->will($this->returnValue('image'));
-        $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('OPTIONS'));
 
         $headers = $this->getMock('Imbo\Http\HeaderContainer');
-        $headers->expects($this->at(1))->method('set')->with('Access-Control-Allow-Methods', 'OPTIONS, HEAD');
+        $headers->expects($this->at(0))->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org')->will($this->returnValue($headers));
+        $headers->expects($this->at(1))->method('set')->with('Access-Control-Allow-Methods', 'OPTIONS, HEAD')->will($this->returnValue($headers));
+        $headers->expects($this->at(2))->method('set')->with('Access-Control-Allow-Headers', 'Content-Type, Accept')->will($this->returnValue($headers));
+        $headers->expects($this->at(3))->method('set')->with('Access-Control-Max-Age', 60)->will($this->returnValue($headers));
 
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
-        $listener->invoke($this->event);
+        $this->response->expects($this->once())->method('setStatusCode')->with(204);
+        $this->event->expects($this->once())->method('stopPropagation');
+        $listener->options($this->event);
     }
-
-    /**
-     * @covers Imbo\EventListener\Cors::invoke
-     */
-    public function testListenerShouldSetDefinedMaxAgeOnOptionsRequest() {
-        $listener = new Cors(array(
-            'allowedOrigins' => array('*'),
-            'maxAge'         => 60,
-        ));
-
-        $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('OPTIONS'));
-
-        $headers = $this->getMock('Imbo\Http\HeaderContainer');
-        $headers->expects($this->at(3))->method('set')->with('Access-Control-Max-Age', 60);
-
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
-        $listener->invoke($this->event);
-    }
-
-    /**
-     * @covers Imbo\EventListener\Cors::invoke
-     */
-    public function testListenerShouldNotSetAllowedHeadersOnNonOptionsRequest() {
-        $listener = new Cors(array(
-            'allowedOrigins' => array('*'),
-        ));
-
-        $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
-
-        $headers = $this->getMock('Imbo\Http\HeaderContainer');
-        $headers->expects($this->at(0))->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org');
-        $headers->expects($this->at(1))->method('set')->with('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode');
-
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
-        $listener->invoke($this->event);
-    }
-
 }

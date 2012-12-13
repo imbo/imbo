@@ -31,10 +31,8 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\Exception\RuntimeException,
-    Imbo\EventManager\EventInterface,
-    Imbo\Cache\CacheInterface,
-    Imbo\Http\Response\ResponseInterface;
+use Imbo\EventManager\EventInterface,
+    Imbo\Cache\CacheInterface;
 
 /**
  * Metadata cache
@@ -45,7 +43,7 @@ use Imbo\Exception\RuntimeException,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class MetadataCache extends Listener implements ListenerInterface {
+class MetadataCache implements ListenerInterface {
     /**
      * Cache driver
      *
@@ -65,81 +63,83 @@ class MetadataCache extends Listener implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getEvents() {
+    public function getDefinition() {
         return array(
-            // Look for metadata in the cache
-            'metadata.get.pre',
+            // Load from cache
+            new ListenerDefinition('db.metadata.load', array($this, 'loadFromCache'), 10),
 
-            // Store metadata in the cache
-            'metadata.get.post',
+            // Delete from cache
+            new ListenerDefinition('db.metadata.delete', array($this, 'deleteFromCache'), -10),
 
-            // Remove metadata from the cache
-            'metadata.delete.pre',
-            'metadata.put.post',
-            'metadata.post.post',
+            // Store in cache
+            new ListenerDefinition('db.metadata.load', array($this, 'storeInCache'), -10),
+            new ListenerDefinition('db.metadata.update', array($this, 'storeInCache'), -10),
         );
     }
 
     /**
-     * Handle the metadata.get.pre event
+     * Get data from the cache
      *
      * @param EventInterface $event The event instance
      */
-    public function onMetadataGetPre(EventInterface $event) {
-        $container = $event->getContainer();
+    public function loadFromCache(EventInterface $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
 
         $cacheKey = $this->getCacheKey(
-            $container->request->getPublicKey(),
-            $container->request->getImageIdentifier()
+            $request->getPublicKey(),
+            $request->getImageIdentifier()
         );
 
         $result = $this->cache->get($cacheKey);
 
-        if ($result instanceof ResponseInterface) {
-            $result->getHeaders()->set('X-Imbo-MetadataCache', 'Hit');
+        if (is_array($result) && isset($result['lastModified']) && isset($result['metadata'])) {
+            $response->setBody($result['metadata']);
+            $response->getHeaders()->set('X-Imbo-MetadataCache', 'Hit')
+                                   ->set('Last-Modified', $result['lastModified']);
 
-            // We have a valid response object from the cache. Overwrite the one already in the
-            // container
-            $container->response = $result;
-
-            // Halt execution of the application and return
-            $event->haltApplication(true);
+            // Stop propagation of listeners for this event
+            $event->stopPropagation(true);
             return;
         }
 
-        $container->response->getHeaders()->set('X-Imbo-MetadataCache', 'Miss');
+        $response->getHeaders()->set('X-Imbo-MetadataCache', 'Miss');
     }
 
     /**
-     * Handle the metadata.get.post event
+     * Store metadata in the cache
      *
      * @param EventInterface $event The event instance
      */
-    public function onMetadataGetPost(EventInterface $event) {
-        $container = $event->getContainer();
+    public function storeInCache(EventInterface $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
 
         $cacheKey = $this->getCacheKey(
-            $container->request->getPublicKey(),
-            $container->request->getImageIdentifier()
+            $request->getPublicKey(),
+            $request->getImageIdentifier()
         );
 
         // Store the response in the cache for later use
-        if ($container->response->getStatusCode() === 200) {
-            $this->cache->set($cacheKey, $container->response);
+        if ($response->getStatusCode() === 200) {
+            $this->cache->set($cacheKey, array(
+                'lastModified' => $response->getLastModified(),
+                'metadata' => $response->getBody(),
+            ));
         }
     }
 
     /**
-     * Handle the remaining events
+     * Delete data from the cache
      *
-     * {@inheritdoc}
+     * @param EventInterface $event The event instance
      */
-    public function invoke(EventInterface $event) {
-        $container = $event->getContainer();
+    public function deleteFromCache(EventInterface $event) {
+        $request = $event->getRequest();
 
         $cacheKey = $this->getCacheKey(
-            $container->request->getPublicKey(),
-            $container->request->getImageIdentifier()
+            $request->getPublicKey(),
+            $request->getImageIdentifier()
         );
 
         $this->cache->delete($cacheKey);
@@ -148,9 +148,9 @@ class MetadataCache extends Listener implements ListenerInterface {
     /**
      * Generate a cache key
      *
-     * @param string $url The requested URL
-     * @param string $mime The mime type of the image
-     * @return string Returns a string that can be used as a cache key for the current image
+     * @param string $publicKey The current public key
+     * @param string $imageIdentifier The current image identifier
+     * @return string Returns a cache key
      */
     private function getCacheKey($publicKey, $imageIdentifier) {
         return 'metadata:' . $publicKey . '|' . $imageIdentifier;

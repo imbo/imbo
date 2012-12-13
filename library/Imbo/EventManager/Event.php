@@ -31,7 +31,8 @@
 
 namespace Imbo\EventManager;
 
-use Imbo\Container;
+use Imbo\Container,
+    Imbo\ContainerAware;
 
 /**
  * Event class
@@ -42,7 +43,7 @@ use Imbo\Container;
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Event implements EventInterface {
+class Event implements ContainerAware, EventInterface {
     /**
      * Name of the current event
      *
@@ -65,30 +66,30 @@ class Event implements EventInterface {
     private $propagationIsStopped = false;
 
     /**
-     * Execution flag
-     *
-     * @var boolean
-     */
-    private $applicationIsHalted = false;
-
-    /**
-     * Optional parameters
-     *
-     * @var array
-     */
-    private $params;
-
-    /**
      * Class contsructor
      *
      * @param string $name The name of the current event
-     * @param Container $container Container instance
-     * @param array $params Optional parameters
      */
-    public function __construct($name, Container $container, array $params = array()) {
-        $this->name = $name;
+    public function __construct($name = null) {
+        if ($name !== null) {
+            $this->setName($name);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(Container $container) {
         $this->container = $container;
-        $this->params = $params;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setName($name) {
+        $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -101,8 +102,43 @@ class Event implements EventInterface {
     /**
      * {@inheritdoc}
      */
-    public function getContainer() {
-        return $this->container;
+    public function getRequest() {
+        return $this->container->get('request');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResponse() {
+        return $this->container->get('response');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDatabase() {
+        return $this->container->get('database');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStorage() {
+        return $this->container->get('storage');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getManager() {
+        return $this->container->get('eventManager');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfig() {
+        return $this->container->get('config');
     }
 
     /**
@@ -119,28 +155,5 @@ class Event implements EventInterface {
      */
     public function propagationIsStopped() {
         return $this->propagationIsStopped;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function haltApplication($flag) {
-        $this->applicationIsHalted = $flag;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function applicationIsHalted() {
-        return $this->applicationIsHalted;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParams() {
-        return $this->params;
     }
 }

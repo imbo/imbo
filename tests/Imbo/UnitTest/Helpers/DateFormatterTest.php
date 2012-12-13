@@ -22,57 +22,64 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @package Interfaces
- * @subpackage EventManager
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
 
-namespace Imbo\EventManager;
+namespace Imbo\UnitTest;
 
-use Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\HaltApplication;
+use Imbo\Helpers\DateFormatter,
+    DateTime,
+    DateTimeZone;
 
 /**
- * Event manager interface
- *
- * @package Interfaces
- * @subpackage EventManager
+ * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @copyright Copyright (c) 2011-2012, Christer Edvartsen <cogo@starzinger.net>
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
+ * @covers Imbo\Helpers\DateFormatter
  */
-interface EventManagerInterface {
+class DateFormatterTest extends \PHPUnit_Framework_TestCase {
     /**
-     * Attach a callable to an event
-     *
-     * @param array|string $events The event(s) to attach to
-     * @param callback $callback Code that will be called when the event is triggered
-     * @throws InvalidArgumentException
-     * @return EventManagerInterface
+     * @var DateFormatter
      */
-    function attach($events, $callback);
+    private $helper;
 
     /**
-     * Attach a listener to the event manager
-     *
-     * @param ListenerInterface $listener The listener to attach
-     * @return EventManagerInterface
+     * Set up the helper
      */
-    function attachListener(ListenerInterface $listener);
+    public function setUp() {
+        $this->helper = new DateFormatter();
+    }
 
     /**
-     * Trigger a given event
-     *
-     * @param string $event The event to trigger
-     * @param array $params Optional extra parameters to send to the event listeners for the current
-     *                      event
-     * @throws HaltApplication
-     * @return EventManagerInterface
+     * Tear down the helper
      */
-    function trigger($event, array $params = array());
+    public function tearDown() {
+        $this->helper = null;
+    }
+
+    /**
+     * Get different datetimes
+     *
+     * @return array[]
+     */
+    public function getDates() {
+        return array(
+            array(new DateTime('@1234567890'), 'Fri, 13 Feb 2009 23:31:30 GMT'),
+            array(new DateTime('16/Mar/2012:15:05:00 +0100'), 'Fri, 16 Mar 2012 14:05:00 GMT'),
+        );
+    }
+
+    /**
+     * @dataProvider getDates
+     * @covers Imbo\Helpers\DateFormatter::formatDate
+     */
+    public function testCanFormatADateTimeInstance($datetime, $expected) {
+        $this->assertSame($expected, $this->helper->formatDate($datetime));
+    }
 }

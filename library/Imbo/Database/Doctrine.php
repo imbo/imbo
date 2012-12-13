@@ -31,8 +31,8 @@
 
 namespace Imbo\Database;
 
-use Imbo\Image\ImageInterface,
-    Imbo\Resource\Images\QueryInterface,
+use Imbo\Image\Image,
+    Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     Imbo\Exception,
     Doctrine\DBAL\Configuration,
@@ -107,7 +107,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($publicKey, $imageIdentifier, ImageInterface $image) {
+    public function insertImage($publicKey, $imageIdentifier, Image $image) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('id')
               ->from($this->getTableName('imageinfo', $publicKey, $imageIdentifier), 'i')
@@ -281,7 +281,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImages($publicKey, QueryInterface $query) {
+    public function getImages($publicKey, Query $query) {
         $images = array();
 
         $qb = $this->getConnection()->createQueryBuilder();
@@ -309,6 +309,24 @@ class Doctrine implements DatabaseInterface {
         if ($page = $query->page()) {
             $offset = (int) $query->limit() * ($page - 1);
             $qb->setFirstResult($offset);
+        }
+
+        if ($metadataQuery = $query->metadataQuery()) {
+            $qb->leftJoin('i', 'metadata', 'm', 'i.id = m.imageId');
+            $tag = $qb->expr()->andx();
+            $tmp = 0;
+
+            foreach ($metadataQuery as $key => $value) {
+                $qb->andWhere($qb->expr()->andx(
+                    $qb->expr()->eq('m.tagName', ':tagName' . $tmp),
+                    $qb->expr()->eq('m.tagValue', ':tagValue' . $tmp)
+                ));
+                $qb->setParameters(array(
+                    ':tagName' . $tmp => $key,
+                    ':tagValue' . $tmp => $value,
+                ));
+                $tmp++;
+            }
         }
 
         $stmt = $qb->execute();
@@ -342,7 +360,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function load($publicKey, $imageIdentifier, ImageInterface $image) {
+    public function load($publicKey, $imageIdentifier, Image $image) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('*')
               ->from($this->getTableName('imageinfo', $publicKey, $imageIdentifier), 'i')

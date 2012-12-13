@@ -31,8 +31,8 @@
 
 namespace Imbo\Database;
 
-use Imbo\Image\ImageInterface,
-    Imbo\Resource\Images\QueryInterface,
+use Imbo\Image\Image,
+    Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     Imbo\Exception,
     Mongo,
@@ -120,7 +120,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($publicKey, $imageIdentifier, ImageInterface $image) {
+    public function insertImage($publicKey, $imageIdentifier, Image $image) {
         $now = time();
 
         $data = array(
@@ -134,7 +134,7 @@ class MongoDB implements DatabaseInterface {
             'updated'         => $now,
             'width'           => $image->getWidth(),
             'height'          => $image->getHeight(),
-            'checksum'        => md5($image->getBlob()),
+            'checksum'        => $image->getChecksum(),
         );
 
         try {
@@ -254,7 +254,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImages($publicKey, QueryInterface $query) {
+    public function getImages($publicKey, Query $query) {
         // Initialize return value
         $images = array();
 
@@ -308,6 +308,8 @@ class MongoDB implements DatabaseInterface {
 
             foreach ($cursor as $image) {
                 unset($image['_id']);
+                $image['added'] = new DateTime('@' . $image['added']);
+                $image['updated'] = new DateTime('@' . $image['updated']);
                 $images[] = $image;
             }
         } catch (MongoException $e) {
@@ -320,7 +322,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function load($publicKey, $imageIdentifier, ImageInterface $image) {
+    public function load($publicKey, $imageIdentifier, Image $image) {
         try {
             $data = $this->getCollection()->findOne(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),

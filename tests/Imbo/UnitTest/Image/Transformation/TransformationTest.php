@@ -32,7 +32,7 @@
 namespace Imbo\UnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Transformation,
-    Imbo\Image\ImageInterface,
+    Imbo\Image\Image,
     Imagick,
     ReflectionMethod;
 
@@ -71,7 +71,7 @@ class TransformationTest extends \PHPUnit_Framework_TestCase {
     public function testCanSetAndGetImagick() {
         $imagick = new Imagick();
         $this->assertSame($this->transformation, $this->transformation->setImagick($imagick));
-        $this->assertSame($imagick, $this->transformation->getImagick());
+        $this->assertEquals($imagick, $this->transformation->getImagick());
     }
 
     /**
@@ -112,5 +112,5 @@ class TransformationTest extends \PHPUnit_Framework_TestCase {
 }
 
 class TransformationImpl extends Transformation {
-    public function applyToImage(ImageInterface $image) {}
+    public function applyToImage(Image $image) {}
 }

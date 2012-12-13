@@ -47,7 +47,7 @@ use Imbo\EventManager\EventInterface,
  * @license http://www.opensource.org/licenses/mit-license MIT License
  * @link https://github.com/imbo/imbo
  */
-class Authenticate extends Listener implements ListenerInterface {
+class Authenticate implements ListenerInterface {
     /**
      * Max. diff to tolerate in the timestamp in seconds
      *
@@ -65,52 +65,37 @@ class Authenticate extends Listener implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getEvents() {
-        return array(
-            'status.get.pre',
-
-            'image.put.pre',
-            'image.post.pre',
-            'image.delete.pre',
-
-            'metadata.put.pre',
-            'metadata.post.pre',
-            'metadata.delete.pre',
+    public function getDefinition() {
+        $callback = array($this, 'invoke');
+        $priority = 100;
+        $events = array(
+            'image.put', 'image.post', 'image.delete',
+            'metadata.put', 'metadata.post', 'metadata.delete'
         );
+
+        $definition = array();
+
+        foreach($events as $eventName) {
+            $definition[] = new ListenerDefinition($eventName, $callback, $priority);
+        }
+
+        return $definition;
     }
 
     /**
      * {@inheritdoc}
      */
     public function invoke(EventInterface $event) {
-        $container = $event->getContainer();
-
-        $config = $container->get('config');
-        $auth = $config['auth'];
-
-        $response = $container->get('response');
-        $request  = $container->get('request');
-        $query    = $request->getQuery();
-
-        // Whether or not this is a status check
-        $statusCheck = ($event->getName() === 'status.get.pre');
+        $response = $event->getResponse();
+        $request = $event->getRequest();
+        $query = $request->getQuery();
 
         // Required query parameters
         $requiredParams = array('signature', 'timestamp');
 
-        if ($statusCheck) {
-            // We have a status check. The public key is provided as a query parameter
-            $requiredParams[] = 'publicKey';
-        }
-
         // Check for signature and timestamp
         foreach ($requiredParams as $param) {
             if (!$query->has($param)) {
-                if ($statusCheck) {
-                    // This is a status check, let's bail.
-                    return;
-                }
-
                 $e = new RuntimeException('Missing required authentication parameter: ' . $param, 400);
                 $e->setImboErrorCode(Exception::AUTH_MISSING_PARAM);
 
@@ -121,16 +106,8 @@ class Authenticate extends Listener implements ListenerInterface {
         // Fetch values we want to validate and remove them from the request
         $timestamp  = $query->get('timestamp');
         $signature  = $query->get('signature');
-        $publicKey  = $statusCheck ? $query->get('publicKey') : $request->getPublicKey();
-
-        if ($statusCheck && !isset($auth[$publicKey])) {
-            $e = new RuntimeException('Unknown public key', 404);
-            $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
-
-            throw $e;
-        }
-
-        $privateKey = $statusCheck ? $auth[$publicKey] : $request->getPrivateKey();
+        $publicKey  = $request->getPublicKey();
+        $privateKey = $request->getPrivateKey();
 
         $query->remove('signature')
               ->remove('timestamp');
