@@ -32,7 +32,7 @@
 namespace Imbo\IntegrationTest\Storage;
 
 use Imbo\Storage\GridFS,
-    Mongo;
+    MongoClient;
 
 /**
  * @package TestSuite\IntegrationTests
@@ -60,20 +60,20 @@ class GridFSTest extends StorageTests {
     }
 
     public function setUp() {
-        if (!extension_loaded('mongo')) {
-            $this->markTestSkipped('pecl/mongo is required to run this test');
+        if (!extension_loaded('mongo') || !class_exists('MongoClient')) {
+            $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
         }
 
-        $mongo = new Mongo();
-        $mongo->selectDB($this->testDbName)->drop();
+        $client = new MongoClient();
+        $client->selectDB($this->testDbName)->drop();
 
         parent::setUp();
     }
 
     public function tearDown() {
-        if (extension_loaded('mongo')) {
-            $mongo = new Mongo();
-            $mongo->selectDB($this->testDbName)->drop();
+        if (extension_loaded('mongo') && class_exists('MongoClient')) {
+            $client = new MongoClient();
+            $client->selectDB($this->testDbName)->drop();
         }
 
         parent::tearDown();
