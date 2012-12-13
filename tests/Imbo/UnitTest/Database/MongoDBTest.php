@@ -135,6 +135,26 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     public function testThrowsExceptionWhenMongoFailsDuringInsertImage() {
         $this->collection->expects($this->once())
                          ->method('findOne')
+                         ->will($this->returnValue(null));
+        $this->collection->expects($this->once())
+                         ->method('insert')
+                         ->will($this->throwException(new MongoException()));
+
+        $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Image\Image'));
+    }
+
+    /**
+     * @covers Imbo\Database\MongoDB::insertImage
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Unable to save image data
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenMongoFailsDuringInsertImageAndImageAlreadyExists() {
+        $this->collection->expects($this->once())
+                         ->method('findOne')
+                         ->will($this->returnValue(array('some' => 'data')));
+        $this->collection->expects($this->once())
+                         ->method('update')
                          ->will($this->throwException(new MongoException()));
 
         $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Image\Image'));

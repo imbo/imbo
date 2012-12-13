@@ -303,7 +303,7 @@ When using this driver you need to create a table in the `DBMS`_ you choose to u
         publicKey TEXT NOT NULL,
         imageIdentifier TEXT NOT NULL,
         data BLOB NOT NULL,
-        created INTEGER NOT NULL,
+        updated INTEGER NOT NULL,
         PRIMARY KEY (publicKey,imageIdentifier)
     )
 

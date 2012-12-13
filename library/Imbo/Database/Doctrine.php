@@ -108,27 +108,15 @@ class Doctrine implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function insertImage($publicKey, $imageIdentifier, Image $image) {
-        $query = $this->getConnection()->createQueryBuilder();
-        $query->select('id')
-              ->from($this->getTableName('imageinfo', $publicKey, $imageIdentifier), 'i')
-              ->where('i.publicKey = :publicKey')
-              ->andWhere('i.imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
-                  ':publicKey'       => $publicKey,
-                  ':imageIdentifier' => $imageIdentifier,
-        ));
-
-        $stmt = $query->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($row) {
-            $e = new DatabaseException('Image already exists', 400);
-            $e->setImboErrorCode(Exception::IMAGE_ALREADY_EXISTS);
-
-            throw $e;
-        }
-
         $now = time();
+
+        if ($id = $this->getImageId($publicKey, $imageIdentifier)) {
+            return (boolean) $this->getConnection()->update($this->getTableName('imageinfo', $publicKey, $imageIdentifier), array(
+                'updated' => $now,
+            ), array(
+                'id' => $id
+            ));
+        }
 
         return (boolean) $this->getConnection()->insert($this->getTableName('imageinfo', $publicKey, $imageIdentifier), array(
             'size'            => $image->getFilesize(),
@@ -148,35 +136,22 @@ class Doctrine implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function deleteImage($publicKey, $imageIdentifier) {
-        $query = $this->getConnection()->createQueryBuilder();
-        $query->select('id')
-              ->from($this->getTableName('imageinfo', $publicKey, $imageIdentifier), 'i')
-              ->where('i.publicKey = :publicKey')
-              ->andWhere('i.imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
-                  ':publicKey'       => $publicKey,
-                  ':imageIdentifier' => $imageIdentifier,
-              ));
-
-        $stmt = $query->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$row) {
+        if (!$id = $this->getImageId($publicKey, $imageIdentifier)) {
             throw new DatabaseException('Image not found', 404);
         }
 
-        $query->resetQueryParts();
+        $query = $this->getConnection()->createQueryBuilder();
         $query->delete($this->getTableName('imageinfo', $publicKey, $imageIdentifier))
               ->where('id = :id')
               ->setParameters(array(
-                  ':id' => $row['id'],
+                  ':id' => $id,
               ))->execute();
 
         $query->resetQueryParts();
         $query->delete($this->getTableName('metadata', $publicKey, $imageIdentifier))
               ->where('imageId = :imageId')
               ->setParameters(array(
-                  ':imageId' => $row['id'],
+                  ':imageId' => $id,
               ))->execute();
 
         return true;
@@ -213,28 +188,15 @@ class Doctrine implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function getMetadata($publicKey, $imageIdentifier) {
-        $query = $this->getConnection()->createQueryBuilder();
-        $query->select('id')
-              ->from($this->getTableName('imageinfo', $publicKey, $imageIdentifier), 'i')
-              ->where('i.publicKey = :publicKey')
-              ->andWhere('i.imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
-                  ':publicKey'       => $publicKey,
-                  ':imageIdentifier' => $imageIdentifier,
-              ));
-
-        $stmt = $query->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$row) {
+        if (!$id = $this->getImageId($publicKey, $imageIdentifier)) {
             throw new DatabaseException('Image not found', 404);
         }
 
-        $query->resetQueryParts();
+        $query = $this->getConnection()->createQueryBuilder();
         $query->select('tagName', 'tagValue')
               ->from($this->getTableName('metadata', $publicKey, $imageIdentifier), 'm')
               ->where('imageId = :imageId')
-              ->setParameters(array(':imageId' => $row['id']));
+              ->setParameters(array(':imageId' => $id));
 
         $stmt = $query->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -251,28 +213,15 @@ class Doctrine implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function deleteMetadata($publicKey, $imageIdentifier) {
-        $query = $this->getConnection()->createQueryBuilder();
-        $query->select('id')
-              ->from($this->getTableName('imageinfo', $publicKey, $imageIdentifier), 'i')
-              ->where('i.publicKey = :publicKey')
-              ->andWhere('i.imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
-                  ':publicKey'       => $publicKey,
-                  ':imageIdentifier' => $imageIdentifier,
-              ));
-
-        $stmt = $query->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$row) {
+        if (!$id = $this->getImageId($publicKey, $imageIdentifier)) {
             throw new DatabaseException('Image not found', 404);
         }
 
-        $query->resetQueryParts();
+        $query = $this->getConnection()->createQueryBuilder();
         $query->delete($this->getTableName('metadata', $publicKey, $imageIdentifier))
               ->where('imageId = :imageId')
               ->setParameters(array(
-                  ':imageId' => $row['id'],
+                  ':imageId' => $id,
                 ))->execute();
 
         return true;
@@ -459,6 +408,13 @@ class Doctrine implements DatabaseInterface {
         }
 
         return $mime;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function imageExists($publicKey, $imageIdentifier) {
+        return (boolean) $this->getImageId($publicKey, $imageIdentifier);
     }
 
     /**

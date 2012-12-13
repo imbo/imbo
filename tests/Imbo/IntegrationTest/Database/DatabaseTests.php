@@ -112,14 +112,13 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->driver->load($this->publicKey, $this->imageIdentifier, $image));
     }
 
-    /**
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Image already exists
-     */
     public function testStoreSameImageTwice() {
         $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
-        $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image);
+        $lastModified1 = $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+        sleep(1);
+        $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
+        $lastModified2 = $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+        $this->assertTrue($lastModified2 > $lastModified1);
     }
 
     /**
@@ -370,5 +369,11 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      */
     public function testGetMimeTypeWhenImageDoesNotExist() {
         $this->driver->getImageMimeType($this->publicKey, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+    }
+
+    public function testCanCheckIfImageAlreadyExists() {
+        $this->assertFalse($this->driver->imageExists($this->publicKey, $this->imageIdentifier));
+        $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image);
+        $this->assertTrue($this->driver->imageExists($this->publicKey, $this->imageIdentifier));
     }
 }

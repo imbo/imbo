@@ -78,7 +78,10 @@ class Filesystem implements StorageInterface {
             throw new StorageException('Could not store image', 500);
         }
 
-        // Create path for the image
+        if ($this->imageExists($publicKey, $imageIdentifier)) {
+            return touch($this->getImagePath($publicKey, $imageIdentifier));
+        }
+
         $imageDir = $this->getImagePath($publicKey, $imageIdentifier, false);
         $oldUmask = umask(0);
 
@@ -90,13 +93,6 @@ class Filesystem implements StorageInterface {
 
         $imagePath = $imageDir . '/' . $imageIdentifier;
 
-        if (file_exists($imagePath)) {
-            $e = new StorageException('Image already exists', 400);
-            $e->setImboErrorCode(Exception::IMAGE_ALREADY_EXISTS);
-
-            throw $e;
-        }
-
         return (bool) file_put_contents($imagePath, $imageData);
     }
 
@@ -104,11 +100,11 @@ class Filesystem implements StorageInterface {
      * {@inheritdoc}
      */
     public function delete($publicKey, $imageIdentifier) {
-        $path = $this->getImagePath($publicKey, $imageIdentifier);
-
-        if (!is_file($path)) {
+        if (!$this->imageExists($publicKey, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
+
+        $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         return unlink($path);
     }
@@ -117,11 +113,11 @@ class Filesystem implements StorageInterface {
      * {@inheritdoc}
      */
     public function getImage($publicKey, $imageIdentifier) {
-        $path = $this->getImagePath($publicKey, $imageIdentifier);
-
-        if (!is_file($path)) {
+        if (!$this->imageExists($publicKey, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
+
+        $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         return file_get_contents($path);
     }
@@ -130,11 +126,11 @@ class Filesystem implements StorageInterface {
      * {@inheritdoc}
      */
     public function getLastModified($publicKey, $imageIdentifier) {
-        $path = $this->getImagePath($publicKey, $imageIdentifier);
-
-        if (!is_file($path)) {
+        if (!$this->imageExists($publicKey, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
+
+        $path = $this->getImagePath($publicKey, $imageIdentifier);
 
         // Get the unix timestamp
         $timestamp = filemtime($path);
@@ -148,6 +144,15 @@ class Filesystem implements StorageInterface {
      */
     public function getStatus() {
         return is_writable($this->params['dataDir']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function imageExists($publicKey, $imageIdentifier) {
+        $path = $this->getImagePath($publicKey, $imageIdentifier);
+
+        return file_exists($path);
     }
 
     /**

@@ -88,14 +88,15 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->imageData, $this->driver->getImage($this->publicKey, $this->imageIdentifier));
     }
 
-    /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Image already exists
-     */
     public function testStoreSameImageTwice() {
         $this->assertTrue($this->driver->store($this->publicKey, $this->imageIdentifier, $this->imageData));
-        $this->driver->store($this->publicKey, $this->imageIdentifier, $this->imageData);
+        $lastModified1 = $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+        clearstatcache();
+        sleep(1);
+        $this->assertTrue($this->driver->store($this->publicKey, $this->imageIdentifier, $this->imageData));
+        $lastModified2 = $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+
+        $this->assertTrue($lastModified2 > $lastModified1);
     }
 
     /**
@@ -135,5 +136,11 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
     public function testGetLastModified() {
         $this->assertTrue($this->driver->store($this->publicKey, $this->imageIdentifier, $this->imageData));
         $this->assertInstanceOf('DateTime', $this->driver->getLastModified($this->publicKey, $this->imageIdentifier));
+    }
+
+    public function testCanCheckIfImageAlreadyExists() {
+        $this->assertFalse($this->driver->imageExists($this->publicKey, $this->imageIdentifier));
+        $this->driver->store($this->publicKey, $this->imageIdentifier, $this->imageData);
+        $this->assertTrue($this->driver->imageExists($this->publicKey, $this->imageIdentifier));
     }
 }

@@ -102,31 +102,22 @@ class Doctrine implements StorageInterface {
      * {@inheritdoc}
      */
     public function store($publicKey, $imageIdentifier, $imageData) {
-        $query = $this->getConnection()->createQueryBuilder();
-        $query->select('created')
-              ->from($this->getTableName($publicKey, $imageIdentifier), 'i')
-              ->where('i.publicKey = :publicKey')
-              ->andWhere('i.imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
-                  ':publicKey'       => $publicKey,
-                  ':imageIdentifier' => $imageIdentifier,
-              ));
+        $now = time();
 
-        $stmt = $query->execute();
-        $row = $stmt->fetch();
-
-        if ($row) {
-            $e = new StorageException('Image already exists', 400);
-            $e->setImboErrorCode(Exception::IMAGE_ALREADY_EXISTS);
-
-            throw $e;
+        if ($this->imageExists($publicKey, $imageIdentifier)) {
+            return (boolean) $this->getConnection()->update($this->getTableName($publicKey, $imageIdentifier), array(
+                'updated' => $now,
+            ), array(
+                'publicKey' => $publicKey,
+                'imageIdentifier' => $imageIdentifier,
+            ));
         }
 
         return (boolean) $this->getConnection()->insert($this->getTableName($publicKey, $imageIdentifier), array(
             'publicKey'       => $publicKey,
             'imageIdentifier' => $imageIdentifier,
             'data'            => $imageData,
-            'created'         => time(),
+            'updated'         => $now,
         ));
     }
 
@@ -134,82 +125,28 @@ class Doctrine implements StorageInterface {
      * {@inheritdoc}
      */
     public function delete($publicKey, $imageIdentifier) {
-        $query = $this->getConnection()->createQueryBuilder();
-        $query->select('created')
-              ->from($this->getTableName($publicKey, $imageIdentifier), 'i')
-              ->where('i.publicKey = :publicKey')
-              ->andWhere('i.imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
-                  ':publicKey'       => $publicKey,
-                  ':imageIdentifier' => $imageIdentifier,
-              ));
-
-        $stmt = $query->execute();
-        $row = $stmt->fetch();
-
-        if (!$row) {
+        if (!$this->imageExists($publicKey, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
 
-        $query->resetQueryParts();
-
-        $query->delete($this->getTableName($publicKey, $imageIdentifier))
-              ->where('publicKey = :publicKey')
-              ->andWhere('imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
-                  ':publicKey'       => $publicKey,
-                  ':imageIdentifier' => $imageIdentifier,
-              ));
-
-        return (boolean) $query->execute();
+        return (boolean) $this->getConnection()->delete($this->getTableName($publicKey, $imageIdentifier), array(
+            'publicKey' => $publicKey,
+            'imageIdentifier' => $imageIdentifier,
+        ));
     }
 
     /**
      * {@inheritdoc}
      */
     public function getImage($publicKey, $imageIdentifier) {
-        $query = $this->getConnection()->createQueryBuilder();
-        $query->select('data')
-              ->from($this->getTableName($publicKey, $imageIdentifier), 'i')
-              ->where('i.publicKey = :publicKey')
-              ->andWhere('i.imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
-                  ':publicKey'       => $publicKey,
-                  ':imageIdentifier' => $imageIdentifier,
-              ));
-
-        $stmt = $query->execute();
-        $row = $stmt->fetch();
-
-        if (!$row) {
-            throw new StorageException('File not found', 404);
-        }
-
-        return $row['data'];
+        return $this->getField($publicKey, $imageIdentifier, 'data');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getLastModified($publicKey, $imageIdentifier) {
-        $query = $this->getConnection()->createQueryBuilder();
-        $query->select('created')
-              ->from($this->getTableName($publicKey, $imageIdentifier), 'i')
-              ->where('publicKey = :publicKey')
-              ->andWhere('imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
-                  ':publicKey'       => $publicKey,
-                  ':imageIdentifier' => $imageIdentifier,
-              ));
-
-        $stmt = $query->execute();
-        $row = $stmt->fetch();
-
-        if (!$row) {
-            throw new StorageException('File not found', 404);
-        }
-
-        $timestamp = (int) $row['created'];
+        $timestamp = (int) $this->getField($publicKey, $imageIdentifier, 'updated');
 
         return new DateTime('@' . $timestamp);
     }
@@ -221,6 +158,45 @@ class Doctrine implements StorageInterface {
         $connection = $this->getConnection();
 
         return $connection->isConnected() || $connection->connect();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function imageExists($publicKey, $imageIdentifier) {
+        try {
+            return (boolean) $this->getField($publicKey, $imageIdentifier, 'publicKey');
+        } catch (StorageException $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Fetch a field from the image table
+     *
+     * @param string $publicKey The public key
+     * @param string $imageIdentifier The image identifier
+     * @param string $field The field to fetch
+     */
+    private function getField($publicKey, $imageIdentifier, $field) {
+        $query = $this->getConnection()->createQueryBuilder();
+        $query->select($field)
+              ->from($this->getTableName($publicKey, $imageIdentifier), 'i')
+              ->where('publicKey = :publicKey')
+              ->andWhere('imageIdentifier = :imageIdentifier')
+              ->setParameters(array(
+                  ':publicKey'       => $publicKey,
+                  ':imageIdentifier' => $imageIdentifier,
+              ));
+
+        $stmt = $query->execute();
+        $row = $stmt->fetch();
+
+        if (!$row) {
+            throw new StorageException('File not found', 404);
+        }
+
+        return $row[$field];
     }
 
     /**
