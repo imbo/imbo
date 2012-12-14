@@ -200,9 +200,6 @@ This driver uses PHP's `mongo extension`_ to store data in `MongoDB`_. The follo
 ``options``
     Options passed to the underlying driver. Defaults to ``array('connect' => true, 'timeout' => 1000)``. See the `manual for the Mongo constructor`_ at `php.net <http://php.net>`_ for available options.
 
-``slaveOk``
-    Whether or not reads should be sent to secondary members of a replica set for all possible queries. Defaults to ``false``.
-
 .. _manual for the Mongo constructor: http://php.net/manual/en/mongo.construct.php
 
 Examples
@@ -238,9 +235,10 @@ Examples
         // ...
 
         'database' => new Database\MongoDB(array(
-            'server'     => 'mongodb://server1,server2,server3',
-            'replicaSet' => 'nameOfReplicaSet',
-            'slaveOk'    => true,
+            'server' => 'mongodb://server1,server2,server3',
+            'options' => array(
+                'replicaSet' => 'nameOfReplicaSet',
+            ),
         )),
 
         // ...
@@ -424,9 +422,6 @@ The GridFS driver is used to store the images in MongoDB using the `GridFS speci
 ``options``
     Options passed to the underlying driver. Defaults to ``array('connect' => true, 'timeout' => 1000)``. See the `manual for the Mongo constructor`_ at `php.net <http://php.net>`_ for available options.
 
-``slaveOk``
-    Whether or not reads should be sent to secondary members of a replica set for all possible queries. Defaults to ``false``.
-
 Examples
 ~~~~~~~~
 
@@ -459,8 +454,9 @@ Examples
 
         'storage' => new Storage\GridFS(array(
             'server'     => 'mongodb://server1,server2,server3',
-            'replicaSet' => 'nameOfReplicaSet',
-            'slaveOk'    => true,
+            'options' => array(
+                'replicaSet' => 'nameOfReplicaSet',
+            ),
         )),
 
         // ...

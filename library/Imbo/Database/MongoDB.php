@@ -34,11 +34,9 @@ namespace Imbo\Database;
 use Imbo\Image\Image,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
-    Imbo\Exception,
     Mongo,
     MongoCollection,
     MongoException,
-    InvalidArgumentException,
     DateTime;
 
 /**
@@ -54,8 +52,6 @@ use Imbo\Image\Image,
  *                              'mongodb://localhost:27017'
  * - (array) options Options to use when creating the Mongo instance. Defaults to
  *                              array('connect' => true, 'timeout' => 1000).
- * - (string) slaveOk If reads should be sent to secondary members of a replica set for all
- *                    possible queries. Defaults to false.
  *
  * @package Database
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -91,9 +87,6 @@ class MongoDB implements DatabaseInterface {
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
         'options' => array('connect' => true, 'timeout' => 1000),
-
-        // Other options
-        'slaveOk' => true,
     );
 
     /**
@@ -448,8 +441,8 @@ class MongoDB implements DatabaseInterface {
                     $this->params['databaseName'],
                     $this->params['collectionName']
                 );
-            } catch (InvalidArgumentException $d) {
-                throw new DatabaseException('Could not select collection', 500);
+            } catch (MongoException $e) {
+                throw new DatabaseException('Could not select collection', 500, $e);
             }
         }
 
@@ -465,12 +458,8 @@ class MongoDB implements DatabaseInterface {
         if ($this->mongo === null) {
             try {
                 $this->mongo = new Mongo($this->params['server'], $this->params['options']);
-
-                if ($this->params['slaveOk'] === true) {
-                    $this->mongo->setSlaveOkay(true);
-                }
             } catch (MongoException $e) {
-                throw new DatabaseException('Could not connect to database', 500);
+                throw new DatabaseException('Could not connect to database', 500, $e);
             }
         }
 
