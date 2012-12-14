@@ -146,6 +146,7 @@ class Container {
     /**
      * Set a static value
      *
+     * @param string $id The key to use
      * @param callback $callable A closure that will be executed when the value is accessed
      */
     public function setStatic($id, $callable) {

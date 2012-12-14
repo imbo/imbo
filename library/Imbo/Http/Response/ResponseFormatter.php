@@ -50,6 +50,8 @@ use Imbo\EventManager\EventInterface,
  */
 class ResponseFormatter implements ContainerAware, ListenerInterface {
     /**
+     * Service container
+     *
      * @var Container
      */
     private $container;

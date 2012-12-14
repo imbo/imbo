@@ -97,6 +97,8 @@ class Request implements RequestInterface {
     private $privateKey;
 
     /**
+     * Image instance
+     *
      * @var Image
      */
     private $image;

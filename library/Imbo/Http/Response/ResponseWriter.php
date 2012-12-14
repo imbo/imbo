@@ -51,6 +51,8 @@ use Imbo\Http\Request\RequestInterface,
  */
 class ResponseWriter implements ContainerAware, ResponseWriterInterface {
     /**
+     * Service container
+     *
      * @var Container
      */
     private $container;

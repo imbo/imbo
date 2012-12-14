@@ -49,6 +49,8 @@ use Imbo\EventManager\EventInterface,
  */
 class ImageTransformer implements ContainerAware, ListenerInterface {
     /**
+     * Service container
+     *
      * @var Container
      */
     private $container;

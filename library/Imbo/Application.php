@@ -58,11 +58,15 @@ use Imbo\Http\Request\Request,
  */
 class Application {
     /**
+     * Application configuration
+     *
      * @var array
      */
     private $config;
 
     /**
+     * Service container
+     *
      * @var Container
      */
     private $container;
