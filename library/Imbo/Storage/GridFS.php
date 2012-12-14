@@ -33,10 +33,9 @@ namespace Imbo\Storage;
 
 use Imbo\Image\Image,
     Imbo\Exception\StorageException,
-    Imbo\Exception,
     Mongo,
     MongoGridFS,
-    MongoCursorException,
+    MongoException,
     DateTime;
 
 /**
@@ -51,8 +50,6 @@ use Imbo\Image\Image,
  *                              'mongodb://localhost:27017'
  * - <pre>(array) options</pre> Options to use when creating the Mongo instance. Defaults to
  *                              array('connect' => true, 'timeout' => 1000).
- * - <pre>(string) slaveOk</pre> If reads should be sent to secondary members of a replica set for
- *                               all possible queries. Defaults to false.
  *
  * @package Storage
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -87,9 +84,6 @@ class GridFS implements StorageInterface {
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
         'options' => array('connect' => true, 'timeout' => 1000),
-
-        // Other options
-        'slaveOk' => true,
     );
 
     /**
@@ -203,8 +197,8 @@ class GridFS implements StorageInterface {
             try {
                 $database = $this->getMongo()->selectDB($this->params['databaseName']);
                 $this->grid = $database->getGridFS();
-            } catch (InvalidArgumentException $d) {
-                throw new DatabaseException('Could not fetch grid FS', 500);
+            } catch (MongoException $e) {
+                throw new StorageException('Could not connect to database', 500, $e);
             }
         }
 
@@ -220,12 +214,8 @@ class GridFS implements StorageInterface {
         if ($this->mongo === null) {
             try {
                 $this->mongo = new Mongo($this->params['server'], $this->params['options']);
-
-                if ($this->params['slaveOk'] === true) {
-                    $this->mongo->setSlaveOkay(true);
-                }
             } catch (MongoException $e) {
-                throw new StorageException('Could not connect to database', 500);
+                throw new StorageException('Could not connect to database', 500, $e);
             }
         }
 

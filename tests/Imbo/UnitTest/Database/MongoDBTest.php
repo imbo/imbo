@@ -33,7 +33,6 @@ namespace Imbo\UnitTest\Database;
 
 use Imbo\Database\MongoDB,
     MongoException,
-    InvalidArgumentException,
     ReflectionMethod;
 
 /**
@@ -301,7 +300,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
 
         $this->mongo->expects($this->once())
                     ->method('selectCollection')
-                    ->will($this->throwException(new InvalidArgumentException()));
+                    ->will($this->throwException(new MongoException()));
 
         $method = new ReflectionMethod('Imbo\Database\MongoDB', 'getCollection');
         $method->setAccessible(true);
