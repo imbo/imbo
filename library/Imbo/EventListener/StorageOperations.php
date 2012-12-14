@@ -48,6 +48,8 @@ use Imbo\EventManager\EventInterface,
  */
 class StorageOperations implements ContainerAware, ListenerInterface {
     /**
+     * Service container
+     *
      * @var Container
      */
     private $container;

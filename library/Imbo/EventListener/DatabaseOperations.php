@@ -48,6 +48,8 @@ use Imbo\EventManager\EventInterface,
  */
 class DatabaseOperations implements ContainerAware, ListenerInterface {
     /**
+     * Service container
+     *
      * @var Container
      */
     private $container;

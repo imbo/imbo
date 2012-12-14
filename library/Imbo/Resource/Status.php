@@ -53,6 +53,8 @@ use Imbo\Http\Request\RequestInterface,
  */
 class Status implements ContainerAware, ResourceInterface, ListenerInterface {
     /**
+     * Service container
+     *
      * @var Container
      */
     private $container;

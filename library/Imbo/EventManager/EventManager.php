@@ -56,6 +56,8 @@ class EventManager implements ContainerAware {
     private $callbacks;
 
     /**
+     * Service container
+     *
      * @var Container
      */
     private $container;
