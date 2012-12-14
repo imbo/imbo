@@ -34,11 +34,9 @@ namespace Imbo\Database;
 use Imbo\Image\Image,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
-    Imbo\Exception,
     Mongo,
     MongoCollection,
     MongoException,
-    InvalidArgumentException,
     DateTime;
 
 /**
@@ -443,8 +441,8 @@ class MongoDB implements DatabaseInterface {
                     $this->params['databaseName'],
                     $this->params['collectionName']
                 );
-            } catch (InvalidArgumentException $d) {
-                throw new DatabaseException('Could not select collection', 500);
+            } catch (MongoException $e) {
+                throw new DatabaseException('Could not select collection', 500, $e);
             }
         }
 
@@ -461,7 +459,7 @@ class MongoDB implements DatabaseInterface {
             try {
                 $this->mongo = new Mongo($this->params['server'], $this->params['options']);
             } catch (MongoException $e) {
-                throw new DatabaseException('Could not connect to database', 500);
+                throw new DatabaseException('Could not connect to database', 500, $e);
             }
         }
 

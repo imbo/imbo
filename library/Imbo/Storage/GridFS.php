@@ -33,10 +33,9 @@ namespace Imbo\Storage;
 
 use Imbo\Image\Image,
     Imbo\Exception\StorageException,
-    Imbo\Exception,
     Mongo,
     MongoGridFS,
-    MongoCursorException,
+    MongoException,
     DateTime;
 
 /**
@@ -198,8 +197,8 @@ class GridFS implements StorageInterface {
             try {
                 $database = $this->getMongo()->selectDB($this->params['databaseName']);
                 $this->grid = $database->getGridFS();
-            } catch (InvalidArgumentException $d) {
-                throw new DatabaseException('Could not fetch grid FS', 500);
+            } catch (MongoException $e) {
+                throw new StorageException('Could not connect to database', 500, $e);
             }
         }
 
@@ -216,7 +215,7 @@ class GridFS implements StorageInterface {
             try {
                 $this->mongo = new Mongo($this->params['server'], $this->params['options']);
             } catch (MongoException $e) {
-                throw new StorageException('Could not connect to database', 500);
+                throw new StorageException('Could not connect to database', 500, $e);
             }
         }
 
