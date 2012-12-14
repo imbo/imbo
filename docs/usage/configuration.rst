@@ -235,8 +235,10 @@ Examples
         // ...
 
         'database' => new Database\MongoDB(array(
-            'server'     => 'mongodb://server1,server2,server3',
-            'replicaSet' => 'nameOfReplicaSet',
+            'server' => 'mongodb://server1,server2,server3',
+            'options' => array(
+                'replicaSet' => 'nameOfReplicaSet',
+            ),
         )),
 
         // ...
@@ -452,7 +454,9 @@ Examples
 
         'storage' => new Storage\GridFS(array(
             'server'     => 'mongodb://server1,server2,server3',
-            'replicaSet' => 'nameOfReplicaSet',
+            'options' => array(
+                'replicaSet' => 'nameOfReplicaSet',
+            ),
         )),
 
         // ...
