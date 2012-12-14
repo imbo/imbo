@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="false" bootstrap="tests/bootstrap.php">
+  <testsuites>
+    <testsuite name="imbo">
+      <directory>tests/Imbo/UnitTest</directory>
+    </testsuite>
+    <testsuite name="imbo-integration">
+      <directory>tests/Imbo/IntegrationTest</directory>
+    </testsuite>
+  </testsuites>
+
+  <php>
+    <!-- Directory to find fixtures (images, SQL statements, ... ) -->
+    <const name="FIXTURES_DIR" value="tests/Imbo/Fixtures" />
+
+    <!-- Memcached cache driver integration tests -->
+    <var name="MEMCACHED_HOST" value="127.0.0.1" />
+    <var name="MEMCACHED_PORT" value="11211" />
+
+    <!-- Include paths -->
+    <includePath>./tests</includePath>
+    <includePath>./library</includePath>
+  </php>
+</phpunit>
