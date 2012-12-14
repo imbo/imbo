@@ -11,8 +11,6 @@ branches:
   only:
     - develop
     - master
-before_script:
-  - "gem install nokogiri"
 services:
   - mongodb
   - memcached
