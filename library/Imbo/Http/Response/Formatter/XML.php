@@ -72,7 +72,7 @@ class XML implements FormatterInterface {
      * {@inheritdoc}
      */
     public function getContentType() {
-        return 'text/xml';
+        return 'application/xml';
     }
 
     /**
