@@ -61,8 +61,6 @@ interface ResponseInterface {
      * When a status code is set, the current optional custom status message should be reset.
      *
      * @param int $code The HTTP status code to use in the response
-     * @param string $message A custom message to send in the status line instead of the default
-     *                        status messages defined in Imbo\Http\Response\Response.php.
      * @return ResponseInterface
      */
     function setStatusCode($code);
@@ -79,7 +77,8 @@ interface ResponseInterface {
     /**
      * Set the status message if a custom one is needed
      *
-     * @param string $message The message to set
+     * @param string $message A custom message to send in the status line instead of the default
+     *                        status messages defined in Imbo\Http\Response\Response.
      * @return ResponseInterface
      */
     function setStatusMessage($message);

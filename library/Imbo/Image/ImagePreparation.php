@@ -53,6 +53,8 @@ use Imbo\Http\Request\RequestInterface,
  */
 class ImagePreparation implements ContainerAware, ListenerInterface {
     /**
+     * Service container
+     *
      * @var Container
      */
     private $container;

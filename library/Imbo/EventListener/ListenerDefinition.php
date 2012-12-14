@@ -42,21 +42,29 @@ namespace Imbo\EventListener;
  */
 class ListenerDefinition {
     /**
+     * Event name
+     *
      * @var string
      */
     private $eventName;
 
     /**
+     * The callback
+     *
      * @var callable
      */
     private $callback;
 
     /**
+     * Priority if the callback
+     *
      * @var int
      */
     private $priority;
 
     /**
+     * Public key filter
+     *
      * @var array
      */
     private $publicKeys;
