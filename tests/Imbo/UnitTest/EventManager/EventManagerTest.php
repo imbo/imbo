@@ -77,13 +77,20 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Callback used in the method below
+     */
+    public function someCallback($event) {
+        echo 3;
+    }
+
+    /**
      * @covers Imbo\EventManager\EventManager::attach
      * @covers Imbo\EventManager\EventManager::trigger
      */
     public function testCanAttachAndExecuteRegularCallbacksInAPrioritizedFashion() {
         $callback1 = function ($event) { echo 1; };
         $callback2 = function ($event) { echo 2; };
-        $callback3 = function ($event) { echo 3; };
+        $callback3 = array($this, 'someCallback');
 
         $this->assertSame(
             $this->manager,

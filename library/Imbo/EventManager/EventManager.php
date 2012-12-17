@@ -151,7 +151,7 @@ class EventManager implements ContainerAware {
                     continue;
                 }
 
-                $callback($event);
+                call_user_func($callback, $event);
 
                 if ($event->propagationIsStopped()) {
                     break;
