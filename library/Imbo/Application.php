@@ -179,7 +179,7 @@ class Application {
         $container->set('request', new Request($_GET, $_POST, $_SERVER));
 
         // Response to the client
-        $container->setStatic('response', function ($container) {
+        $container->setStatic('response', function(Container $container) {
             $response = new Response();
             $response->setImage($container->get('image'));
             $response->getHeaders()->set('X-Imbo-Version', Version::VERSION);
@@ -289,6 +289,10 @@ class Application {
             $config = $container->get('config');
             $adapter = $config['database'];
 
+            if (is_callable($adapter) && !($adapter instanceof DatabaseInterface)) {
+                $adapter = $adapter();
+            }
+
             if (!$adapter instanceof DatabaseInterface) {
                 throw new InvalidArgumentException('Invalid database adapter', 500);
             }
@@ -300,6 +304,10 @@ class Application {
         $container->setStatic('storage', function(Container $container) {
             $config = $container->get('config');
             $adapter = $config['storage'];
+
+            if (is_callable($adapter) && !($adapter instanceof StorageInterface)) {
+                $adapter = $adapter();
+            }
 
             if (!$adapter instanceof StorageInterface) {
                 throw new InvalidArgumentException('Invalid storage adapter', 500);
@@ -353,14 +361,30 @@ class Application {
             $listeners = $config['eventListeners'];
 
             foreach ($listeners as $definition) {
+                if (!$definition) {
+                    continue;
+                }
+
+                if (is_callable($definition) && !($definition instanceof ListenerInterface)) {
+                    $definition = $definition();
+                }
+
                 if ($definition instanceof ListenerInterface) {
                     $manager->attachListener($definition);
                     continue;
                 }
 
-                if (!empty($definition['listener']) && $definition['listener'] instanceof ListenerInterface) {
+                if (!empty($definition['listener'])) {
                     $publicKeys = isset($definition['publicKeys']) ? $definition['publicKeys'] : array();
                     $listener = $definition['listener'];
+
+                    if (is_callable($listener) && !($listener instanceof ListenerInterface)) {
+                        $listener = $listener();
+                    }
+
+                    if (!$listener instanceof ListenerInterface) {
+                        throw new InvalidArgumentException('Invalid event listener definition', 500);
+                    }
 
                     if (empty($publicKeys)) {
                         $manager->attachListener($listener);
