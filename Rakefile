@@ -129,13 +129,13 @@ task :test do
     system "sudo sh -c \"echo 'apc.enable_cli=on' >> #{ini_file}\""
 
     begin
-      sh %{phpunit --verbose -c phpunit.xml.travis}
+      sh %{vendor/bin/phpunit --verbose -c phpunit.xml.travis}
     rescue Exception
       exit 1
     end
   else
     begin
-      sh %{phpunit --verbose}
+      sh %{vendor/bin/phpunit --verbose}
     rescue Exception
       exit 1
     end

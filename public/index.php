@@ -36,11 +36,7 @@ use Exception as BaseException;
 
 try {
     // Fetch the configuration
-    $configPath = __DIR__ . '/../config/config.php';
-
-    if (!is_file($configPath)) {
-        throw new BaseException('Missing configuration file');
-    }
+    $configPath = __DIR__ . '/../config/config.default.php';
 
     $config = require $configPath;
 

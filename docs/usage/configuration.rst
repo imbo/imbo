@@ -1,7 +1,7 @@
 Configuration
 =============
 
-Imbo ships with a sample configuration file named ``config/config.php.dist`` that you must copy to ``config/config.php``. You will also have to update some configuration values in the ``config/config.php`` file for Imbo to work.
+Imbo ships with a default configuration file named ``config/config.default.php`` that Imbo will load. You can specify your own configuration file, ``config/config.php``, that Imbo will merge with the default. Here you will see the different configuration values you can override.
 
 User key pairs
 --------------
@@ -31,6 +31,8 @@ The public keys can consist of the following characters:
 * 0-9
 * _ and -
 
+and must be at least 3 characters long.
+
 For the private keys you can for instance use a `SHA-256`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images. Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want.
 
 Imbo ships with a small command line tool that can be used to generate private keys for you using the `openssl_random_pseudo_bytes`_ function. The script is located in the `scripts` directory and does not require any arguments:
@@ -50,7 +52,7 @@ Database configuration
 
 The database driver you decide to use is responsible for storing metadata and basic image information, like width and height for example. Imbo ships with some different implementations that you can use. Remember that you will not be able to switch the driver whenever you want and expect all data to be automatically transferred. Choosing a database driver should be a long term commitment unless you have migration scripts available.
 
-In the sample configuration file the :ref:`default-database-driver` storage driver is used. Which database driver to use is specified in the ``database`` key in the configuration array:
+In the default configuration file the :ref:`default-database-driver` storage driver is used, and it is returned via a Closure. You can choose to override this in your ``config.php`` file by specifying a closure that returns a different value, or you can specify an implementation of the ``Imbo\Database\DatabaseInterface`` interface directly. Which database driver to use is specified in the ``database`` key in the configuration array:
 
 .. code-block:: php
     :linenos:
@@ -60,6 +62,15 @@ In the sample configuration file the :ref:`default-database-driver` storage driv
 
     return array(
         // ...
+
+        'database' => function() {
+            return new Database\MongoDB(array(
+                'databaseName'   => 'imbo',
+                'collectionName' => 'images',
+            ));
+        },
+
+        // or
 
         'database' => new Database\MongoDB(array(
             'databaseName'   => 'imbo',
@@ -146,9 +157,11 @@ Here are some examples on how to use the Doctrine driver in the configuration fi
     return array(
         // ...
 
-        'database' => new Database\Doctrine(array(
-            'pdo' => new \PDO('sqlite:/path/to/database'),
-        )),
+        'database' => function() {
+            return new Database\Doctrine(array(
+                'pdo' => new \PDO('sqlite:/path/to/database'),
+            ));
+        },
 
         // ...
     );
@@ -166,13 +179,15 @@ Here are some examples on how to use the Doctrine driver in the configuration fi
     return array(
         // ...
 
-        'database' => new Database\Doctrine(array(
-            'dbname'   => 'database',
-            'user'     => 'username',
-            'password' => 'password',
-            'host'     => 'hostname',
-            'driver'   => 'pdo_mysql',
-        )),
+        'database' => function() {
+            return new Database\Doctrine(array(
+                'dbname'   => 'database',
+                'user'     => 'username',
+                'password' => 'password',
+                'host'     => 'hostname',
+                'driver'   => 'pdo_mysql',
+            ));
+        },
 
         // ...
     );
@@ -216,7 +231,9 @@ Examples
     return array(
         // ...
 
-        'database' => new Database\MongoDB(),
+        'database' => function() {
+            return new Database\MongoDB();
+        },
 
         // ...
     );
@@ -234,12 +251,14 @@ Examples
     return array(
         // ...
 
-        'database' => new Database\MongoDB(array(
-            'server' => 'mongodb://server1,server2,server3',
-            'options' => array(
-                'replicaSet' => 'nameOfReplicaSet',
-            ),
-        )),
+        'database' => function() {
+            return new Database\MongoDB(array(
+                'server' => 'mongodb://server1,server2,server3',
+                'options' => array(
+                    'replicaSet' => 'nameOfReplicaSet',
+                ),
+            ));
+        },
 
         // ...
     );
@@ -249,7 +268,7 @@ Storage configuration
 
 Storage drivers are responsible for storing the original images you put into imbo. Like with the database driver it is not possible to simply switch a driver without having migration scripts available to move the stored images. Choose a driver with care.
 
-In the sample configuration file the :ref:`default-storage-driver` storage driver is used. Which storage driver to use is specified in the ``storage`` key in the configuration array:
+In the default configuration file the :ref:`default-storage-driver` storage driver is used, and it is returned via a Closure. You can choose to override this in your ``config.php`` file by specifying a closure that returns a different value, or you can specify an implementation of the ``Imbo\Storage\StorageInterface`` interface directly. Which storage driver to use is specified in the ``storage`` key in the configuration array:
 
 .. code-block:: php
     :linenos:
@@ -260,9 +279,11 @@ In the sample configuration file the :ref:`default-storage-driver` storage drive
     return array(
         // ...
 
-        'storage' => new Storage\Filesystem(array(
-            'dataDir' => '/path/to/images',
-        )),
+        'storage' => new function() {
+            return new Storage\Filesystem(array(
+                'dataDir' => '/path/to/images',
+            ));
+        },
 
         // ...
     );
@@ -329,9 +350,11 @@ Here are some examples on how to use the Doctrine driver in the configuration fi
     return array(
         // ...
 
-        'storage' => new Storage\Doctrine(array(
-            'pdo' => new \PDO('sqlite:/path/to/database'),
-        )),
+        'storage' => function() {
+            return new Storage\Doctrine(array(
+                'pdo' => new \PDO('sqlite:/path/to/database'),
+            ));
+        },
 
         // ...
     );
@@ -348,13 +371,15 @@ Here are some examples on how to use the Doctrine driver in the configuration fi
     return array(
         // ...
 
-        'storage' => new Storage\Doctrine(array(
-            'dbname'   => 'database',
-            'user'     => 'username',
-            'password' => 'password',
-            'host'     => 'hostname',
-            'driver'   => 'pdo_mysql',
-        )),
+        'storage' => function() {
+            return new Storage\Doctrine(array(
+                'dbname'   => 'database',
+                'user'     => 'username',
+                'password' => 'password',
+                'host'     => 'hostname',
+                'driver'   => 'pdo_mysql',
+            ));
+        },
 
         // ...
     );
@@ -396,9 +421,11 @@ Default configuration:
     return array(
         // ...
 
-        'storage' => new Storage\Filesystem(array(
-            'dataDir' => '/path/to/images',
-        )),
+        'storage' => function() {
+            new Storage\Filesystem(array(
+                'dataDir' => '/path/to/images',
+            ));
+        },
 
         // ...
     );
@@ -436,7 +463,9 @@ Examples
     return array(
         // ...
 
-        'storage' => new Storage\GridFS(),
+        'storage' => function() {
+            return new Storage\GridFS();
+        },
 
         // ...
     );
@@ -452,12 +481,14 @@ Examples
     return array(
         // ...
 
-        'storage' => new Storage\GridFS(array(
-            'server'     => 'mongodb://server1,server2,server3',
-            'options' => array(
-                'replicaSet' => 'nameOfReplicaSet',
-            ),
-        )),
+        'storage' => function() {
+            return new Storage\GridFS(array(
+                'server' => 'mongodb://server1,server2,server3',
+                'options' => array(
+                    'replicaSet' => 'nameOfReplicaSet',
+                ),
+            ));
+        },
 
         // ...
     );
@@ -467,7 +498,9 @@ Examples
 Event listeners
 ---------------
 
-Imbo also supports event listeners that you can use to hook into Imbo at different phases without having to edit Imbo itself. An event listener is simply a piece of code that will be executed when a certain event is triggered from Imbo. Event listeners are added to the ``eventListeners`` part of the configuration array and can be added in the following ways:
+Imbo also supports event listeners that you can use to hook into Imbo at different phases without having to edit Imbo itself. An event listener is simply a piece of code that will be executed when a certain event is triggered from Imbo. Event listeners are added to the ``eventListeners`` part of the configuration array as associative arrays. The keys are short names used to identify the listeners, and are not really used for anything in the Imbo application, but exists so you can override/disable event listeners specified in ``config.default.php``. If you want to disable the default event listeners simply specify the same key in the ``config.php`` file and set the value to ``null`` or ``false``.
+
+Event listeners can be added in the following ways:
 
 1) Use an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface:
 
@@ -481,13 +514,13 @@ Imbo also supports event listeners that you can use to hook into Imbo at differe
         // ...
 
         'eventListeners' => array(
-            new EventListener\AccessToken(),
+            'accessToken' => new EventListener\AccessToken(),
         ),
 
         // ...
     );
 
-2) Use an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface together with a public key filter:
+2) A closure returning an instance of the Imbo\EventListener\ListenerInterface interface
 
 .. code-block:: php
     :linenos:
@@ -499,7 +532,27 @@ Imbo also supports event listeners that you can use to hook into Imbo at differe
         // ...
 
         'eventListeners' => array(
-            array(
+            'accessToken' => function() {
+                return new EventListener\AccessToken();
+            },
+        ),
+
+        // ...
+    );
+
+3) Use an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface together with a public key filter:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            'maxImageSize' => array(
                 'listener' => new EventListener\MaxImageSize(1024, 768),
                 'publicKeys' => array(
                     'include' => array('user'),
@@ -513,7 +566,7 @@ Imbo also supports event listeners that you can use to hook into Imbo at differe
 
 where ``listener`` is an instance of the ``Imbo\EventListener\ListenerInterface`` interface, and ``publicKeys`` is an array that you can use if you want your listener to only be triggered for some users (public keys). The value of this is an array with one of two keys: ``include`` or ``exclude`` where ``include`` is an array you want your listener to trigger for, and ``exclude`` is an array of users you don't want your listener to trigger for. ``publicKeys`` is optional, and per default the listener will trigger for all users.
 
-3) Use a `closure`_:
+4) Use a `closure`_:
 
 .. _closure: http://php.net/manual/en/functions.anonymous.php
 
@@ -527,7 +580,7 @@ where ``listener`` is an instance of the ``Imbo\EventListener\ListenerInterface`
         // ...
 
         'eventListeners' => array(
-            array(
+            'customListener' => array(
                 'callback' => function(EventManager\EventInterface $event) {
                     // Custom code
                 },
@@ -583,7 +636,7 @@ Below you will see the different event listeners that Imbo ships with and the ev
 Event listeners
 +++++++++++++++
 
-Imbo ships with a collection of event listeners for you to use. Some of them are enabled in the sample configuration file.
+Imbo ships with a collection of event listeners for you to use. Some of them are enabled in the default configuration file.
 
 .. contents::
     :local:
@@ -645,7 +698,9 @@ This event listener is included in the default configuration file without specif
         // ...
 
         'eventListeners' => array(
-            new EventListener\AccessToken(),
+            'accessToken' => function() {
+                return new EventListener\AccessToken();
+            },
         ),
 
         // ...
@@ -681,7 +736,9 @@ This event listener does not support any parameters and is enabled per default l
         // ...
 
         'eventListeners' => array(
-            new EventListener\Authenticate(),
+            'authenticate' => function() {
+                return new EventListener\Authenticate();
+            },
         ),
 
         // ...
@@ -716,7 +773,9 @@ and is enabled like this:
         // ...
 
         'eventListeners' => array(
-            new EventListener\ImageTransformationCache('/path/to/cache'),
+            'imageTransformationCache' => function() {
+                return new EventListener\ImageTransformationCache('/path/to/cache');
+            },
         ),
 
         // ...
@@ -767,7 +826,9 @@ and is enabled like this:
         // ...
 
         'eventListeners' => array(
-            new EventListener\MaxImageSize(1024, 768),
+            'maxImageSize' => function() {
+                return new EventListener\MaxImageSize(1024, 768);
+            },
         ),
 
         // ...
@@ -794,14 +855,16 @@ To enable the listener, use the following:
         // ...
 
         'eventListeners' => array(
-            new EventListener\Cors(array(
-                'allowedOrigins' => array('http://some.origin'),
-                'allowedMethods' => array(
-                    'image'  => array('GET', 'HEAD', 'PUT'),
-                    'images' => array('GET', 'HEAD'),
-                ),
-                'maxAge' => 3600,
-            )),
+            'cors' => function() {
+                new EventListener\Cors(array(
+                    'allowedOrigins' => array('http://some.origin'),
+                    'allowedMethods' => array(
+                        'image'  => array('GET', 'HEAD', 'PUT'),
+                        'images' => array('GET', 'HEAD'),
+                    ),
+                    'maxAge' => 3600,
+                ));
+            },
         ),
 
         // ...
@@ -837,7 +900,9 @@ and has the following parameters:
         // ...
 
         'eventListeners' => array(
-            new EventListener\MetadataCache(new Cache\APC('imbo')),
+            'metadataCache' => function() {
+                return new EventListener\MetadataCache(new Cache\APC('imbo'));
+            },
         ),
 
         // ...

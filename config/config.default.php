@@ -33,11 +33,11 @@
 namespace Imbo;
 
 /**
- * Require Imbo autoloader
+ * Require composer autoloader
  */
-require 'autoloader.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-return array(
+$config = array(
     /**
      * Authentication
      *
@@ -54,40 +54,53 @@ return array(
     /**
      * Database adapter
      *
-     * See the different adapter implementations for possible configuration parameters
+     * See the different adapter implementations for possible configuration parameters. The value
+     * must be set to a closure returning an instance of Imbo\Database\DatabaseInterface, or an
+     * implementation of said interface.
      *
-     * @var Imbo\Database\DatabaseInterface
+     * @var Imbo\Database\DatabaseInterface|Closure
      */
-    'database' => new Database\MongoDB(array(
-        'databaseName'   => 'imbo',
-        'collectionName' => 'images',
-    )),
+    'database' => function() {
+        return new Database\MongoDB(array(
+            'databaseName'   => 'imbo',
+            'collectionName' => 'images',
+        ));
+    },
 
     /**
      * Storage adapter
      *
-     * See the different adapter implementations for possible configuration parameters
+     * See the different adapter implementations for possible configuration parameters. The value
+     * must be set to a closure returning an instance of Imbo\Storage\StorageInterface, or an
+     * implementation of said interface.
      *
-     * @var Imbo\Storage\StorageInterface
+     * @var Imbo\Storage\StorageInterface|Closure
      */
-    'storage' => new Storage\GridFS(array(
-        'databaseName' => 'imbo_storage',
-    )),
+    'storage' => function() {
+        return new Storage\GridFS(array(
+            'databaseName' => 'imbo_storage',
+        ));
+    },
 
     /**
      * Event listeners
      *
-     * Each element in this array can be one of the following:
+     * An associative array where the keys are short names for the event listeners (not really used
+     * for anything, but exists so you can override/unset some helpers from config.php). The values
+     * of each element in this array can be one of the following:
      *
      * 1) An instance of the Imbo\EventListener\ListenerInterface interface
      *
-     * 2) An array with the following keys:
+     * 2) A closure returning an instance of the Imbo\EventListener\ListenerInterface interface
+     *
+     * 3) An array with the following keys:
      *
      *   - listener
      *   - publicKeys
      *
-     *   where 'listener' is an instance of the Imbo\EventListener\ListenerInterface interface, and
-     *   'publicKeys' is an array with one of the following keys:
+     *   where 'listener' is an instance of the Imbo\EventListener\ListenerInterface interface or a
+     *   closure returning an instance of said interface, and 'publicKeys' is an array with one of
+     *   the following keys:
      *
      *     - include
      *     - exclude
@@ -95,7 +108,7 @@ return array(
      *     where 'include' is an array of public keys that the listener *will* trigger for, and
      *     'exclude' is an array of public keys that the listener *will not* trigger for.
      *
-     * 3) An array with the following keys:
+     * 4) An array with the following keys:
      *
      *   - events (required)
      *   - callback (required)
@@ -120,10 +133,10 @@ return array(
      *
      * 'eventListeners' => array(
      *   // 1) Implementation of a listener interface
-     *   new EventListener\Authenticate(),
+     *   'auth' => new EventListener\Authenticate(),
      *
      *   // 2) Implementation of a listener interface with a public key filter
-     *   array(
+     *   'maxImageSize' => array(
      *     'listener' => EventListener\MaxImageSize(1024, 768),
      *     'publicKeys' => array(
      *       'include' => array( ... ),
@@ -133,7 +146,7 @@ return array(
      *   ),
      *
      *   // 3) A closure that will subscribe to two events using one priority
-     *   array(
+     *   'someCustomCallback' => array(
      *     'callback' => function($event) {
      *       // Some code
      *     },
@@ -148,7 +161,7 @@ return array(
      *   ),
      *
      *   // 4) A closure that will subscribe to two events with different priorities
-     *   array(
+     *   'anotherCustomCallback' => array(
      *     'callback' => function($event) {
      *       // Some code
      *     },
@@ -162,8 +175,12 @@ return array(
      * @var array
      */
     'eventListeners' => array(
-        new EventListener\Authenticate(),
-        new EventListener\AccessToken(),
+        'auth' => function() {
+            return new EventListener\Authenticate();
+        },
+        'accessToken' => function() {
+            return new EventListener\AccessToken();
+        }
     ),
 
     /**
@@ -237,3 +254,9 @@ return array(
         },
     ),
 );
+
+if (file_exists(__DIR__ . '/config.php') && !defined('IN_TESTSUITE')) {
+    $config = array_replace_recursive($config, require __DIR__ . '/config.php');
+}
+
+return $config;
