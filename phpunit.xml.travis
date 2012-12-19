@@ -13,6 +13,8 @@
     <!-- Directory to find fixtures (images, SQL statements, ... ) -->
     <const name="FIXTURES_DIR" value="tests/Imbo/Fixtures" />
 
+    <const name="IN_TESTSUITE" value="true" />
+
     <!-- Memcached cache driver integration tests -->
     <var name="MEMCACHED_HOST" value="127.0.0.1" />
     <var name="MEMCACHED_PORT" value="11211" />
