@@ -648,7 +648,7 @@ where ``<image>`` is the image identifier of the image that just got all its met
 Authentication
 --------------
 
-Imbo uses two types of authentication out of the box. It requires access tokens for all ``GET`` and ``HEAD`` requests made against all resources (with the exception of the status resource), and a valid request signature for all ``PUT``, ``POST`` and ``DELETE`` requests made against all resources that support these methods. Both mechanisms are enforced by event listeners that is enabled in the sample configuration file.
+Imbo uses two types of authentication out of the box. It requires access tokens for all ``GET`` and ``HEAD`` requests made against all resources (with the exception of the status resource), and a valid request signature for all ``PUT``, ``POST`` and ``DELETE`` requests made against all resources that support these methods. Both mechanisms are enforced by event listeners that is enabled in the default configuration file.
 
 .. _access-tokens:
 
