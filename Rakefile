@@ -15,6 +15,9 @@ task :travis => [:composer, :test]
 desc "Default task"
 task :default => [:lint, :composer, :test, :phpcs, :apidocs, :readthedocs]
 
+desc "Run tests"
+task :test => [:phpunit, :behat]
+
 desc "Spell check and generate end user docs"
 task :readthedocs do
   wd = Dir.getwd
@@ -51,7 +54,7 @@ task :composer do
       system "curl -s http://getcomposer.org/installer | php -d \"apc.enable_cli=0\""
     end
 
-    system "php -d \"apc.enable_cli=0\" composer.phar --no-ansi update --dev"
+    system "php -d \"apc.enable_cli=0\" composer.phar update --dev"
   end
 end
 
@@ -112,7 +115,7 @@ task :lint do
 end
 
 desc "Run PHPUnit tests"
-task :test do
+task :phpunit do
   if ENV["TRAVIS"] == "true"
     system "sudo apt-get install -y php5-sqlite libmagickcore-dev libjpeg-dev libdjvulibre-dev libmagickwand-dev"
 
@@ -139,6 +142,15 @@ task :test do
     rescue Exception
       exit 1
     end
+  end
+end
+
+desc "Run functional tests"
+task :behat do
+  begin
+    sh %{vendor/bin/behat --strict}
+  rescue Exception
+    exit 1
   end
 end
 
