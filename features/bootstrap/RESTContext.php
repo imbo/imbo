@@ -86,7 +86,6 @@ class RESTContext extends BehatContext {
         $this->client = new Client($parameters['url']);
     }
 
-
     /**
      * Try to connect to the url specified in behat.yml. If not successful, start up the built in
      * httpd in php-5.4 and try to connect to that instead.
@@ -152,7 +151,8 @@ class RESTContext extends BehatContext {
      */
     public function assertResponseStatus($code, $message) {
         assertSame((int) $code, (int) $this->response->getStatusCode());
-        assertSame($message, $this->response->getReasonPhrase());
+        $reason = $this->response->getReasonPhrase();
+        assertSame($message, $reason, 'Expected "' . $message . '", got "' . $reason. '"');
     }
 
     /**
