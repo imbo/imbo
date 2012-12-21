@@ -29,6 +29,8 @@
  * @link https://github.com/imbo/imbo
  */
 
+use Behat\Behat\Event\SuiteEvent;
+
 // Use the RESTContext
 require 'RESTContext.php';
 
@@ -42,8 +44,74 @@ require 'RESTContext.php';
  * @link https://github.com/imbo/imbo
  */
 class ImboContext extends RESTContext {
+    private $privateKey;
+
+    /**
+     * @BeforeSuite
+     * @AfterSuite
+     */
+    public static function backupConfig(SuiteEvent $event) {
+        $originalConfig = __DIR__ . '/../../config/config.php';
+        $backup = __DIR__ . '/../../config/config.php.behat.bak';
+
+        if ($event->getName() === 'beforeSuite') {
+            if (is_file($originalConfig)) {
+                rename($originalConfig, $backup);
+            }
+
+        } else {
+            if (is_file($backup)) {
+                rename($backup, $originalConfig);
+            }
+        }
+    }
+
+    /**
+     * Write to the config file
+     *
+     * @param array $config The config array to write
+     */
+    private function writeConfig(array $config) {
+        $path = __DIR__ . '/../../config/config.php';
+
+        $config = sprintf(
+            "<?php return %s;",
+            var_export($config, true)
+        );
+
+        file_put_contents($path, $config);
+    }
+
     /**
      * @Given /^there are no Imbo issues$/
      */
-    public function thereAreNoImboIssues() {}
+    public function thereAreNoImboIssues() {
+        $this->writeConfig(array());
+    }
+
+    /**
+     * @Given /^the user "([^"]*)" exists with private key "([^"]*)"$/
+     */
+    public function generateConfig($publicKey, $privateKey) {
+        $this->privateKey = $privateKey;
+
+        $this->writeConfig(array(
+            'auth' => array(
+                $publicKey => $privateKey,
+            )
+        ));
+    }
+
+    /**
+     * @Given /^I include an access token in the query$/
+     */
+    public function appendAccessToken() {
+        $privateKey = $this->privateKey;
+
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($privateKey) {
+            $request = $event['request'];
+            $accessToken = hash_hmac('sha256', $request->getUrl(), $privateKey);
+            $request->getQuery()->set('accessToken', $accessToken);
+        });
+    }
 }
