@@ -1,8 +1,13 @@
 default:
   context:
     parameters:
-      baseUrl: http://imbo
-      imboConfig: /home/christer/dev/imbo/config/config.php
+      # URL to use for the functional tests
+      url: http://localhost:8888
+
+      # Document root and router used by the built in httpd in php-5.4 if the above URL does not
+      # answer
+      documentRoot: public
+      router: tests/router.php
   paths:
-    features:   'tests/features'
+    features:   'features'
     bootstrap:  '%behat.paths.features%/bootstrap'
