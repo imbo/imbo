@@ -1,5 +1,6 @@
 default:
   context:
+    class: ImboContext
     parameters:
       # URL to use for the functional tests
       url: http://localhost:8888
