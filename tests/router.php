@@ -39,4 +39,7 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'] . $_SERVER['SCRIPT_NAME'])) {
     return false;
 }
 
+// Imbo uses SCRIPT_FILENAME for path resolution, so set that to the expected value
+$_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'] . '/index.php';
+
 require $_SERVER['DOCUMENT_ROOT'] . '/index.php';
