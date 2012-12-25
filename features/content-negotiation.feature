@@ -7,7 +7,7 @@ Feature: Imbo supports content negotiation
         Given there are no Imbo issues
         And the "Accept" request header is "<accept>"
         When I request "/status"
-        Then I should get a response with "200" "OK"
+        Then I should get a response with "200 OK"
         And the "Content-Type" response header is "<content-type>"
 
         Examples:

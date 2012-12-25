@@ -29,7 +29,8 @@
  * @link https://github.com/imbo/imbo
  */
 
-use Behat\Behat\Event\SuiteEvent;
+use Behat\Behat\Event\SuiteEvent,
+    Behat\Behat\Exception\PendingException;
 
 // Use the RESTContext
 require 'RESTContext.php';
@@ -113,5 +114,26 @@ class ImboContext extends RESTContext {
             $accessToken = hash_hmac('sha256', $request->getUrl(), $privateKey);
             $request->getQuery()->set('accessToken', $accessToken);
         });
+    }
+
+    /**
+     * @Given /^the Imbo error message is "([^"]*)"(?: and the error code is "([^"]*)")?$/
+     */
+    public function assertImboError($message, $code = null) {
+        $contentType = $this->response->getContentType();
+
+        if ($contentType === 'application/json') {
+            $data = $this->response->json();
+        } else if ($contentType === 'application/xml') {
+            $data = $this->response->json();
+        } else {
+            throw new PendingException('Not added support for html yet');
+        }
+
+        assertSame($message, $data['error']['message']);
+
+        if ($code !== null) {
+            assertSame((int) $code, (int) $data['error']['imboErrorCode']);
+        }
     }
 }

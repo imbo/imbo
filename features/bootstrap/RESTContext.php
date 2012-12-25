@@ -147,12 +147,13 @@ class RESTContext extends BehatContext {
     }
 
     /**
-     * @Then /^I should get a response with "([^"]*)" "([^"]*)"$/
+     * @Then /^I should get a response with "([^"]*)"$/
      */
-    public function assertResponseStatus($code, $message) {
-        assertSame((int) $code, (int) $this->response->getStatusCode());
-        $reason = $this->response->getReasonPhrase();
-        assertSame($message, $reason, 'Expected "' . $message . '", got "' . $reason. '"');
+    public function assertResponseStatus($status) {
+        assertSame(
+            $status,
+            $this->response->getStatusCode() . ' ' . $this->response->getReasonPhrase()
+        );
     }
 
     /**

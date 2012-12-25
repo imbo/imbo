@@ -6,7 +6,7 @@ Feature: Imbo provides a status endpoint
     Scenario Outline: The status endpoint can respond with different content types
         Given there are no Imbo issues
         When I request "<endpoint>"
-        Then I should get a response with "200" "OK"
+        Then I should get a response with "200 OK"
         And the "Content-Type" response header is "<content-type>"
 
         Examples:
@@ -18,7 +18,7 @@ Feature: Imbo provides a status endpoint
     Scenario Outline: The status endpoint only supports GET and HEAD
         Given there are no Imbo issues
         When I request "/status.json" using HTTP "<method>"
-        Then I should get a response with "405" "Method Not Allowed"
+        Then I should get a response with "405 Method Not Allowed"
 
         Examples:
             | method |
