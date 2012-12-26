@@ -22,3 +22,9 @@ Feature: Imbo provides a user endpoint
         Then I should get a response with "404 Not Found"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Unknown Public Key" and the error code is "100"
+
+    Scenario: Request user that does not exist
+        When I request "/users/usernamedoesnotexist.xml"
+        Then I should get a response with "404 Not Found"
+        And the "Content-Type" response header is "application/xml"
+        And the Imbo error message is "Unknown Public Key" and the error code is "100"

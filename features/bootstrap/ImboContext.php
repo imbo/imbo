@@ -124,16 +124,20 @@ class ImboContext extends RESTContext {
 
         if ($contentType === 'application/json') {
             $data = $this->response->json();
+            $errorMessage = $data['error']['message'];
+            $errorCode = $data['error']['imboErrorCode'];
         } else if ($contentType === 'application/xml') {
-            $data = $this->response->json();
+            $data = $this->response->xml();
+            $errorMessage = (string) $data->error->message;
+            $errorCode = $data->error->imboErrorCode;
         } else {
             throw new PendingException('Not added support for html yet');
         }
 
-        assertSame($message, $data['error']['message']);
+        assertSame($message, $errorMessage);
 
         if ($code !== null) {
-            assertSame((int) $code, (int) $data['error']['imboErrorCode']);
+            assertSame((int) $code, (int) $errorCode);
         }
     }
 }
