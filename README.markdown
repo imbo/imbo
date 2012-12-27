@@ -18,10 +18,8 @@ Here you will find some notes about how Imbo works internally along with informa
 * [Code Browser](http://ci.starzinger.net/job/Imbo/Code_Browser/)
 
 ### Get started
-First you must make sure you have both [PHPUnit](http://phpunit.de) and the [Imagick extension](http://pecl.php.net/package/imagick) installed. If not, you can install them using the following commands:
+First you must make sure you have the [Imagick extension](http://pecl.php.net/package/imagick) installed. If not, you can install it using the following commands (on Ubuntu):
 
-    sudo pear config-set audo_discover 1
-    sudo pear install --alldeps pear.phpunit.de/PHPUnit
     sudo apt-get install php5-imagick
 
 Now click the fork button on github and then clone your fork:
@@ -34,9 +32,30 @@ Enter the newly created directory and initialize the project using [composer](ht
     curl -s https://getcomposer.org/installer | php
     php composer.phar --dev install
 
-And lastly, execute the test suite:
+or by using the Rakefile if you have installed rake:
 
-    phpunit
+    cd imbo
+    rake installdep
+
+And lastly, execute the unit test suite:
+
+    vendor/bin/phpunit
+
+or by using the Rakefile:
+
+    rake phpunit
+
+If you want to run the functional tests using [Behat](http://behat.org/) and [Guzzle](http://guzzlephp.org/) (which requires php-5.4, unless you specify a working url in ``behat.yml``) you can do this by using the behat binary or the Rakefile:
+
+    vendor/bin/behat
+
+or
+
+    rake behat
+
+If you want to run both the unit test suite and the functional tests, you can run:
+
+    rake test
 
 Some tests will probably be skipped unless you have already installed all optional dependencies, like [APC](http://pecl.php.net/package/apc), [Memcached](http://pecl.php.net/package/memcached) and [Doctrine](http://www.doctrine-project.org).
 
