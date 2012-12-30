@@ -50,9 +50,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     private $driver;
 
     /**
-     * @var Mongo
+     * @var MongoClient
      */
-    private $mongo;
+    private $mongoClient;
 
     /**
      * @var MongoCollection
@@ -63,20 +63,20 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * Set up the mongo and collection mocks and the driver that we want to test
      */
     public function setUp() {
-        if (!extension_loaded('mongo')) {
-            $this->markTestSkipped('pecl/mongo is required to run this test');
+        if (!extension_loaded('mongo') || !class_exists('MongoClient')) {
+            $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
         }
 
-        $this->mongo = $this->getMockBuilder('Mongo')->disableOriginalConstructor()->getMock();
+        $this->mongoClient = $this->getMockBuilder('MongoClient')->disableOriginalConstructor()->getMock();
         $this->collection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
-        $this->driver = new MongoDB(array(), $this->mongo, $this->collection);
+        $this->driver = new MongoDB(array(), $this->mongoClient, $this->collection);
     }
 
     /**
      * Teardown the instances
      */
     public function tearDown() {
-        $this->mongo = null;
+        $this->mongoClient = null;
         $this->collection = null;
         $this->driver = null;
     }
@@ -85,7 +85,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Database\MongoDB::getStatus
      */
     public function testGetStatusWhenMongoIsNotConnectable() {
-        $this->mongo->expects($this->once())->method('connect')->will($this->returnValue(false));
+        $this->mongoClient->expects($this->once())->method('connect')->will($this->returnValue(false));
         $this->assertFalse($this->driver->getStatus());
     }
 
@@ -93,7 +93,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Database\MongoDB::getStatus
      */
     public function testGetStatusWhenMongoIsConnectable() {
-        $this->mongo->expects($this->once())->method('connect')->will($this->returnValue(true));
+        $this->mongoClient->expects($this->once())->method('connect')->will($this->returnValue(true));
         $this->assertTrue($this->driver->getStatus());
     }
 
@@ -296,11 +296,11 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenNotAbleToGetCollection() {
-        $driver = new MongoDB(array(), $this->mongo);
+        $driver = new MongoDB(array(), $this->mongoClient);
 
-        $this->mongo->expects($this->once())
-                    ->method('selectCollection')
-                    ->will($this->throwException(new MongoException()));
+        $this->mongoClient->expects($this->once())
+                          ->method('selectCollection')
+                          ->will($this->throwException(new MongoException()));
 
         $method = new ReflectionMethod('Imbo\Database\MongoDB', 'getCollection');
         $method->setAccessible(true);
