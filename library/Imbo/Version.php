@@ -47,5 +47,5 @@ class Version {
      *
      * @var string
      */
-    const VERSION = '0.1';
+    const VERSION = 'dev';
 }
