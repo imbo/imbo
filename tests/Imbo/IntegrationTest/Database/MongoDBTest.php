@@ -32,7 +32,7 @@
 namespace Imbo\IntegrationTest\Database;
 
 use Imbo\Database\MongoDB,
-    Mongo;
+    MongoClient;
 
 /**
  * @package TestSuite\IntegrationTests
@@ -67,12 +67,12 @@ class MongoDBTest extends DatabaseTests {
      * Make sure we have the mongo extension available and drop the test database just in case
      */
     public function setUp() {
-        if (!extension_loaded('mongo')) {
-            $this->markTestSkipped('pecl/mongo is required to run this test');
+        if (!extension_loaded('mongo') || !class_exists('MongoClient')) {
+            $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
         }
 
-        $mongo = new Mongo();
-        $mongo->selectDB($this->testDbName)->drop();
+        $client = new MongoClient();
+        $client->selectDB($this->testDbName)->drop();
 
         parent::setUp();
     }
@@ -81,16 +81,16 @@ class MongoDBTest extends DatabaseTests {
      * Drop the test database after each test
      */
     public function tearDown() {
-        if (extension_loaded('mongo')) {
-            $mongo = new Mongo();
-            $mongo->selectDB($this->testDbName)->drop();
+        if (extension_loaded('mongo') && class_exists('MongoClient')) {
+            $client = new MongoClient();
+            $client->selectDB($this->testDbName)->drop();
         }
 
         parent::tearDown();
     }
 
     /**
-     * @covers Imbo\Database\MongoDB::getMongo
+     * @covers Imbo\Database\MongoDB::getMongoClient
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionMessage Could not connect to database
      * @expectedExceptionCode 500
