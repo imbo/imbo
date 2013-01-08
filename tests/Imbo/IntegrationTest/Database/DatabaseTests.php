@@ -14,8 +14,8 @@ use Imbo\Image\Image,
     Imbo\Resource\Images\Query;
 
 /**
- * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Integration tests
  */
 abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     /**

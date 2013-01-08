@@ -24,8 +24,8 @@ use Imbo\Image\Image,
  *
  * - <pre>(string) dataDir</pre> Absolute path to the base directory the images should be stored in
  *
- * @package Storage
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Storage
  */
 class Filesystem implements StorageInterface {
     /**

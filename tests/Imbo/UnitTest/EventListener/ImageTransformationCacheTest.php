@@ -14,8 +14,8 @@ use Imbo\EventListener\ImageTransformationCache,
     org\bovigo\vfs\vfsStream;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\EventListener\ImageTransformationCache
  */
 class ImageTransformationCacheTest extends ListenerTests {

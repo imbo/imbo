@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\Cors;
 
 /**
- * @package TestSuite\UnitTests
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
+ * @package Test suite\Unit tests
  * @covers Imbo\EventListener\Cors
  */
 class CorsTest extends ListenerTests {

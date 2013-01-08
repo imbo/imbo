@@ -13,9 +13,8 @@ namespace Imbo;
 /**
  * Container aware interface
  *
- * @package Interfaces
- * @subpackage Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Core
  */
 interface ContainerAware {
     /**

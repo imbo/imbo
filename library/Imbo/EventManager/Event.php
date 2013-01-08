@@ -16,8 +16,8 @@ use Imbo\Container,
 /**
  * Event class
  *
- * @package EventManager
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Event
  */
 class Event implements ContainerAware, EventInterface {
     /**

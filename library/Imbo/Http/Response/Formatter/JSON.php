@@ -16,9 +16,8 @@ use Imbo\Http\Request\RequestInterface,
 /**
  * JSON formatter
  *
- * @package Http\Response
- * @subpackage Formatters
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 class JSON implements FormatterInterface {
     /**

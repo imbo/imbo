@@ -13,8 +13,8 @@ namespace Imbo\Image;
 /**
  * Class that represents a single image
  *
- * @package Image
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image
  */
 class Image {
     /**

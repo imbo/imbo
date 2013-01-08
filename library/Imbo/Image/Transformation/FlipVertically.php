@@ -17,9 +17,8 @@ use Imbo\Image\Image,
 /**
  * Flip vertically transformation
  *
- * @package Image
- * @subpackage Transformation
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image\Transformations
  */
 class FlipVertically extends Transformation implements TransformationInterface {
     /**

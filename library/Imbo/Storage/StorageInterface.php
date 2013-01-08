@@ -18,9 +18,8 @@ use Imbo\Image\Image,
  *
  * This is an interface for different storage drivers for Imbo.
  *
- * @package Interfaces
- * @subpackage Storage
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Storage
  */
 interface StorageInterface {
     /**

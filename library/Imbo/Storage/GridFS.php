@@ -30,8 +30,8 @@ use Imbo\Image\Image,
  * - <pre>(array) options</pre> Options to use when creating the Mongo instance. Defaults to
  *                              array('connect' => true, 'timeout' => 1000).
  *
- * @package Storage
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Storage
  */
 class GridFS implements StorageInterface {
     /**

@@ -15,9 +15,8 @@ namespace Imbo\Cache;
  *
  * This is an interface for different database drivers.
  *
- * @package Interfaces
- * @subpackage Cache
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Cache
  */
 interface CacheInterface {
     /**

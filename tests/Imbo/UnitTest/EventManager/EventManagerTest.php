@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\EventManager;
 use Imbo\EventManager\EventManager;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\EventManager\EventManager
  */
 class EventManagerTest extends \PHPUnit_Framework_TestCase {

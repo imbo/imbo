@@ -13,7 +13,7 @@ namespace Imbo\Exception;
 /**
  * Resource exception
  *
- * @package Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Exceptions
  */
 class ResourceException extends RuntimeException {}

@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\Image\Transformation;
 use Imbo\Image\Transformation\Crop;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\Image\Transformation\Crop
  */
 class CropTest extends \PHPUnit_Framework_TestCase {

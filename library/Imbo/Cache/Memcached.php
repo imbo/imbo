@@ -15,8 +15,8 @@ use Memcached as PeclMemcached;
 /**
  * Memcached cache
  *
- * @package Cache
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Cache
  */
 class Memcached implements CacheInterface {
     /**

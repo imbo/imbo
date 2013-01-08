@@ -20,8 +20,8 @@ use Imbo\EventManager\EventInterface,
 /**
  * Image transformer listener
  *
- * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Event\Listeners
  */
 class ImageTransformer implements ContainerAware, ListenerInterface {
     /**

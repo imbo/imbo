@@ -17,9 +17,8 @@ use Imbo\Resource\ResourceInterface,
 /**
  * HTML5 formatter
  *
- * @package Http\Response
- * @subpackage Formatters
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 class HTML implements FormatterInterface {
     /**

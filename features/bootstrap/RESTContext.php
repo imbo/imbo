@@ -21,8 +21,8 @@ require 'PHPUnit/Framework/Assert/Functions.php';
 /**
  * REST context for Behat tests
  *
- * @package Tests/Behat
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Functional tests
  */
 class RESTContext extends BehatContext {
     /**

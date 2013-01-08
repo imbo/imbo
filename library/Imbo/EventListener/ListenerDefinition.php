@@ -13,8 +13,8 @@ namespace Imbo\EventListener;
 /**
  * Event listener definition
  *
- * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Event\Listeners
  */
 class ListenerDefinition {
     /**

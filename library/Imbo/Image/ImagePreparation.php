@@ -24,8 +24,8 @@ use Imbo\Http\Request\RequestInterface,
 /**
  * Image preparation
  *
- * @package Image
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image
  */
 class ImagePreparation implements ContainerAware, ListenerInterface {
     /**

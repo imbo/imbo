@@ -16,8 +16,8 @@ use DateTime,
 /**
  * Date formatter helper class
  *
- * @package Helpers
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Core\Helpers
  */
 class DateFormatter {
     /**

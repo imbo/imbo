@@ -16,9 +16,8 @@ use Imbo\Exception\InvalidArgumentException,
 /**
  * Request interface
  *
- * @package Interfaces
- * @subpackage Http
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 interface RequestInterface {
     /**#@+

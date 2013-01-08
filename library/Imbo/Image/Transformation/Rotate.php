@@ -18,9 +18,8 @@ use Imbo\Image\Image,
 /**
  * Rotate transformation
  *
- * @package Image
- * @subpackage Transformation
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image\Transformations
  */
 class Rotate extends Transformation implements TransformationInterface {
     /**

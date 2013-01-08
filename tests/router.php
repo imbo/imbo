@@ -8,10 +8,15 @@
  * distributed with this source code.
  */
 
-// Router for the built in httpd in php-5.4. Route everything through index.php. When ran from the
-// base project directory, the command looks like this:
-//
-// php -S localhost:8888 -t public tests/router.php
+/**
+ * Router for the built in httpd in php-5.4. Route everything through index.php. When ran from the
+ * base project directory, the command looks like this:
+ *
+ * php -S localhost:8888 -t public tests/router.php
+ *
+ * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite
+ */
 
 if (file_exists($_SERVER['DOCUMENT_ROOT'] . $_SERVER['SCRIPT_NAME'])) {
     // The file exists, serve the file as is

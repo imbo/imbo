@@ -19,8 +19,8 @@ use Imbo\EventManager\EventInterface;
  * and adds the correct headers required for CORS to function properly -
  * all configured on a per-user/resource base.
  *
- * @package EventListener
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
+ * @package Event\Listeners
  */
 class Cors implements ListenerInterface {
     /**

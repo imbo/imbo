@@ -16,8 +16,8 @@ use Imbo\Exception,
 /**
  * Runtime exception
  *
- * @package Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Exceptions
  */
 class RuntimeException extends BaseRuntimeException implements Exception {
     /**

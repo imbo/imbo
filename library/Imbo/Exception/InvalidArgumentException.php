@@ -16,8 +16,8 @@ use Imbo\Exception,
 /**
  * Invalid argument exception
  *
- * @package Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Exceptions
  */
 class InvalidArgumentException extends BaseInvalidArgumentException implements Exception {
     /**

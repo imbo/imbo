@@ -16,8 +16,8 @@ use Imbo\EventManager\EventInterface,
 /**
  * Metadata cache
  *
- * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Event\Listeners
  */
 class MetadataCache implements ListenerInterface {
     /**

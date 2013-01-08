@@ -24,8 +24,8 @@ use Imbo\Http\Request\RequestInterface,
  * This resource can be used to monitor the imbo installation to see if it has access to the
  * current database and storage.
  *
- * @package Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Resources
  */
 class Status implements ContainerAware, ResourceInterface, ListenerInterface {
     /**

@@ -16,9 +16,8 @@ use Imbo\Http\Request\RequestInterface,
 /**
  * Interface for formatters
  *
- * @package Interfaces
- * @subpackage Http\Response\Formatters
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 interface FormatterInterface {
     /**

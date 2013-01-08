@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\Resource;
 use Imbo\Resource\Images;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\Resource\Images
  */
 class ImagesTest extends ResourceTests {

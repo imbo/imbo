@@ -13,7 +13,7 @@ namespace Imbo\Exception;
 /**
  * Storage exception
  *
- * @package Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Exceptions
  */
 class StorageException extends RuntimeException {}

@@ -18,9 +18,8 @@ use Imbo\Http\HeaderContainer,
 /**
  * Response interface
  *
- * @package Interfaces
- * @subpackage Http
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 interface ResponseInterface {
     /**

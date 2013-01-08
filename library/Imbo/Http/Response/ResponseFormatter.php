@@ -21,8 +21,8 @@ use Imbo\EventManager\EventInterface,
  * This event listener will correctly format the response body based on the Accept headers in the
  * request. If the request is for an image resource it will not do anything.
  *
- * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 class ResponseFormatter implements ContainerAware, ListenerInterface {
     /**

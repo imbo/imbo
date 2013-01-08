@@ -19,9 +19,8 @@ use Imbo\Image\Image,
  *
  * This transformation can be used to convert the image from one type to another.
  *
- * @package Image
- * @subpackage Transformation
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image\Transformations
  */
 class Convert extends Transformation implements TransformationInterface {
     /**

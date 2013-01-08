@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\DatabaseOperations;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\EventListener\DatabaseOperations
  */
 class DatabaseOperationsTest extends ListenerTests {

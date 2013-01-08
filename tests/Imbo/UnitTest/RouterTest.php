@@ -13,8 +13,8 @@ namespace Imbo\UnitTest;
 use Imbo\Router;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\Router
  */
 class RouterTest extends \PHPUnit_Framework_TestCase {

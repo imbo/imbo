@@ -17,9 +17,8 @@ use Imbo\Image\Image,
 /**
  * Resize transformation
  *
- * @package Image
- * @subpackage Transformation
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image\Transformations
  */
 class Resize extends Transformation implements TransformationInterface {
     /**

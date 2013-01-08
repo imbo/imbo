@@ -17,8 +17,8 @@ require 'RESTContext.php';
 /**
  * Imbo Context
  *
- * @package Tests/Behat
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Functional tests
  */
 class ImboContext extends RESTContext {
     private $privateKey;

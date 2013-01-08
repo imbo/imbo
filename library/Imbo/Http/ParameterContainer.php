@@ -16,9 +16,8 @@ namespace Imbo\Http;
  * Instances of this container will usually hold paramters found in for instance the $_GET or
  * $_POST superglobals.
  *
- * @package Http
- * @subpackage Containers
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 class ParameterContainer {
     /**

@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\MaxImageSize;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\EventListener\MaxImageSize
  */
 class MaxImageSizeTest extends ListenerTests {

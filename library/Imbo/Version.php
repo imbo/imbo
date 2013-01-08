@@ -13,8 +13,8 @@ namespace Imbo;
 /**
  * Version class
  *
- * @package Core
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Core
  * @codeCoverageIgnore
  */
 class Version {

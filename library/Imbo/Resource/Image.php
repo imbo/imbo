@@ -19,8 +19,8 @@ use Imbo\Http\Request\RequestInterface,
 /**
  * Image resource
  *
- * @package Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Resources
  */
 class Image implements ResourceInterface, ListenerInterface {
     /**

@@ -13,8 +13,8 @@ namespace Imbo\UnitTest;
 use Imbo\Container;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\Container
  */
 class ContainerTest extends \PHPUnit_Framework_TestCase {

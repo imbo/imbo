@@ -18,8 +18,8 @@ use Imbo\EventManager\Event,
     Imbo\Storage\StorageInterface;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\EventManager\Event
  */
 class EventTest extends \PHPUnit_Framework_TestCase {

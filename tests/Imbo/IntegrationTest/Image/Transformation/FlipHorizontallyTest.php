@@ -13,8 +13,8 @@ namespace Imbo\IntegrationTest\Image\Transformation;
 use Imbo\Image\Transformation\FlipHorizontally;
 
 /**
- * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Integration tests
  * @covers Imbo\Image\Transformation\FlipHorizontally
  */
 class FlipHorizontallyTest extends TransformationTests {

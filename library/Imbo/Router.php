@@ -20,8 +20,8 @@ use Imbo\Resource\ResourceInterface,
 /**
  * Router class containing supported routes
  *
- * @package Core
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Router
  */
 class Router implements ListenerInterface {
     /**

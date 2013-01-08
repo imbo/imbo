@@ -19,8 +19,8 @@ use Imbo\EventManager\EventInterface,
 /**
  * Storage operations event listener
  *
- * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Event\Listeners
  */
 class StorageOperations implements ContainerAware, ListenerInterface {
     /**

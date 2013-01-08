@@ -22,8 +22,8 @@ use Imbo\Http\HeaderContainer,
 /**
  * Response object from the server to the client
  *
- * @package Http
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 class Response implements ListenerInterface, ResponseInterface {
     /**

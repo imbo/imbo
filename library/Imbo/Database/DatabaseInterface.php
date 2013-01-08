@@ -19,9 +19,8 @@ use Imbo\Image\Image,
  *
  * This is an interface for different database drivers.
  *
- * @package Interfaces
- * @subpackage Database
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Database
  */
 interface DatabaseInterface {
     /**

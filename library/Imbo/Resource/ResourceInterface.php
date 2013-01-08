@@ -19,9 +19,8 @@ use Imbo\EventManager\EventInterface,
  * Available resources must implement this interface. They can also extend the abstract resource
  * class (Imbo\Resource\Resource) for convenience.
  *
- * @package Interfaces
- * @subpackage Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Resources
  */
 interface ResourceInterface {
     /**#@+

@@ -18,9 +18,8 @@ use Imbo\Http\Request\RequestInterface,
 /**
  * Event interface
  *
- * @package Interfaces
- * @subpackage EventManager
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Event
  */
 interface EventInterface {
     /**

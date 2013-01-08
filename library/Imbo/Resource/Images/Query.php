@@ -13,9 +13,8 @@ namespace Imbo\Resource\Images;
 /**
  * Query object for the images resource
  *
- * @package Resources
- * @subpackage ImagesQuery
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Resources\Images
  */
 class Query {
     /**

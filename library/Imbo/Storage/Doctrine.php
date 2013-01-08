@@ -28,8 +28,8 @@ use Imbo\Exception\StorageException,
  * - <pre>(string) host</pre> Hostname to use when connecting
  * - <pre>(string) driver</pre> Which driver to use
  *
- * @package Storage
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Storage
  */
 class Doctrine implements StorageInterface {
     /**

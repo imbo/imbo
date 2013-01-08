@@ -14,8 +14,8 @@ use Imbo\Storage\Doctrine,
     Doctrine\DBAL\Connection;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\Storage\Doctrine
  */
 class DoctrineTest extends \PHPUnit_Framework_TestCase {

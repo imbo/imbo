@@ -13,8 +13,8 @@ namespace Imbo\Http;
 /**
  * Content negotiation
  *
- * @package Http
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 class ContentNegotiation {
     /**

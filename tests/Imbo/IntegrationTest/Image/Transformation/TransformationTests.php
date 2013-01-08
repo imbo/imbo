@@ -14,8 +14,8 @@ use Imbo\Image\Transformation\TransformationInterface,
     Imbo\Image\Image;
 
 /**
- * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Integration tests
  */
 abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     /**

@@ -13,9 +13,8 @@ namespace Imbo;
 /**
  * Base exception interface
  *
- * @package Interfaces
- * @subpackage Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Exceptions
  */
 interface Exception {
     /**#@+

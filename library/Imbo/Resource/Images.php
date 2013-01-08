@@ -28,8 +28,8 @@ use Imbo\Http\Request\RequestInterface,
  * from     => Unix timestamp to fetch from
  * to       => Unit timestamp to fetch to
  *
- * @package Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Resources
  */
 class Images implements ResourceInterface, ListenerInterface {
     /**

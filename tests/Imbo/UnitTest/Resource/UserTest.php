@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\Resource;
 use Imbo\Resource\User;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\Resource\User
  */
 class UserTest extends ResourceTests {

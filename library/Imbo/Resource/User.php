@@ -18,8 +18,8 @@ use Imbo\Http\Request\RequestInterface,
 /**
  * User resource
  *
- * @package Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Resources
  */
 class User implements ResourceInterface, ListenerInterface {
     /**

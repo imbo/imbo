@@ -15,9 +15,8 @@ namespace Imbo\Http;
  *
  * This container contains HTTP headers along with some methods for normalizing the header names.
  *
- * @package Http
- * @subpackage Containers
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 class HeaderContainer extends ParameterContainer {
     /**

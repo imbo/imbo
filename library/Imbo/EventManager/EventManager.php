@@ -20,8 +20,8 @@ use Imbo\Container,
 /**
  * Event manager
  *
- * @package EventManager
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Event\Manager
  */
 class EventManager implements ContainerAware {
     /**

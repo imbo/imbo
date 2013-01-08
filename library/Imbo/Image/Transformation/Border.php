@@ -18,9 +18,8 @@ use Imbo\Image\Image,
 /**
  * Border transformation
  *
- * @package Image
- * @subpackage Transformation
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image\Transformations
  */
 class Border extends Transformation implements TransformationInterface {
     /**

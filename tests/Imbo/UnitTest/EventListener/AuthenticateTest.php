@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\Authenticate;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\EventListener\Authenticate
  */
 class AuthenticateTest extends ListenerTests {

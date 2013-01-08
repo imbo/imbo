@@ -15,9 +15,8 @@ use Imbo\Http\Request\RequestInterface;
 /**
  * Response writer interface
  *
- * @package Interfaces
- * @subpackage Http\Response
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 interface ResponseWriterInterface {
     /**

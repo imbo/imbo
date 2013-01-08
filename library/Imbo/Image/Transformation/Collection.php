@@ -15,8 +15,8 @@ use Imbo\Image\Image;
 /**
  * Transformation collection
  *
- * @package Image
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image\Transformations
  */
 class Collection extends Transformation implements TransformationInterface {
     /**

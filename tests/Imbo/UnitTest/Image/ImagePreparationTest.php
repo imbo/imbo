@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\Image;
 use Imbo\Image\ImagePreparation;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\Image\ImagePreparation
  */
 class ImagePreparationTest extends \PHPUnit_Framework_TestCase {

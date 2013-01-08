@@ -17,9 +17,9 @@ use Imbo\EventManager\EventInterface,
 /**
  * Max image size event listener
  *
- * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
+ * @package Event\Listeners
  */
 class MaxImageSize implements ListenerInterface {
     /**

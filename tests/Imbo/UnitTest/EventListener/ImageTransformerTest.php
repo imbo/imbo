@@ -16,8 +16,8 @@ use Imbo\EventListener\ImageTransformer,
     Imbo\Image\Image;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\EventListener\ImageTransformer
  */
 class ImageTransformerTest extends ListenerTests {
@@ -170,6 +170,10 @@ class ImageTransformerTest extends ListenerTests {
     }
 }
 
+/**
+ * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
+ */
 class SomeTransformation extends Transformation implements TransformationInterface {
     private $output;
 

@@ -18,9 +18,8 @@ use Imbo\Resource\ResourceInterface,
 /**
  * XML formatter
  *
- * @package Http\Response
- * @subpackage Formatters
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 class XML implements FormatterInterface {
     /**

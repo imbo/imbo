@@ -17,10 +17,9 @@ use Imbo\Image\Image,
 /**
  * Transpose transformation
  *
- * @package Image
- * @subpackage Transformation
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image\Transformations
  */
 class Transpose extends Transformation implements TransformationInterface {
     /**

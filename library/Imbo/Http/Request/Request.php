@@ -19,8 +19,8 @@ use Imbo\Http\ParameterContainer,
 /**
  * Request class
  *
- * @package Http
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 class Request implements RequestInterface {
     /**

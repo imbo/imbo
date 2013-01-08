@@ -20,8 +20,8 @@ use Imbo\EventManager\EventInterface,
  * This listener enforces the usage of the signature and timestamp parameters when the user agent
  * wants to perform write operations (PUT/POST/DELETE).
  *
- * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Event\Listeners
  */
 class Authenticate implements ListenerInterface {
     /**

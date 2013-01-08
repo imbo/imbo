@@ -14,8 +14,8 @@ use Imbo\EventListener\MaxImageSize,
     Imbo\Image\Image;
 
 /**
- * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Integration tests
  * @covers Imbo\EventListener\MaxImageSize
  */
 class MaxImageSizeTest extends \PHPUnit_Framework_TestCase {

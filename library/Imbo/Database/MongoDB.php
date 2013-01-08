@@ -32,8 +32,8 @@ use Imbo\Image\Image,
  * - (array) options Options to use when creating the Mongo instance. Defaults to
  *                              array('connect' => true, 'timeout' => 1000).
  *
- * @package Database
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Database
  */
 class MongoDB implements DatabaseInterface {
     /**

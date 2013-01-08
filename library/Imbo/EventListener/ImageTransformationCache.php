@@ -24,8 +24,8 @@ use Imbo\EventManager\EventInterface,
  * will not be cached. The listener will also delete images from the cache when they are deleted
  * from Imbo.
  *
- * @package EventListener
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Event\Listeners
  */
 class ImageTransformationCache implements ListenerInterface {
     /**

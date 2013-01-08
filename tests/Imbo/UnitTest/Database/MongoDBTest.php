@@ -15,8 +15,8 @@ use Imbo\Database\MongoDB,
     ReflectionMethod;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\Database\MongoDB
  */
 class MongoDBTest extends \PHPUnit_Framework_TestCase {

@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\Http;
 use Imbo\Http\ContentNegotiation;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\Http\ContentNegotiation
  */
 class ContentNegotiationTest extends \PHPUnit_Framework_TestCase {

@@ -19,9 +19,8 @@ use Imbo\Image\Image,
 /**
  * Canvas transformation
  *
- * @package Image
- * @subpackage Transformation
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image\Transformations
  */
 class Canvas extends Transformation implements TransformationInterface {
     /**

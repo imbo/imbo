@@ -13,8 +13,8 @@ namespace Imbo\Cache;
 /**
  * APC cache
  *
- * @package Cache
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Cache
  */
 class APC implements CacheInterface {
     /**

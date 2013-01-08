@@ -11,8 +11,8 @@
 namespace Imbo\IntegrationTest\Cache;
 
 /**
- * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Integration tests
  */
 abstract class CacheTests extends \PHPUnit_Framework_TestCase {
     private $driver;

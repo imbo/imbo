@@ -67,8 +67,8 @@ use Imbo\Exception\InvalidArgumentException;
  *     $someEvent = $container->get('event');
  *     $someOtherEvent = $container->get('event');
  *
- * @package Core
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Core
  */
 class Container {
     /**

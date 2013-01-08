@@ -17,9 +17,8 @@ use Imbo\Image\Image,
 /**
  * Image transformation interface
  *
- * @package Interfaces
- * @subpackage Transformation
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image\Transformations
  */
 interface TransformationInterface {
     /**

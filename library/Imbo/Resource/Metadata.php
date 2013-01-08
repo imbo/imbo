@@ -19,8 +19,8 @@ use Imbo\EventManager\EventInterface,
 /**
  * Metadata resource
  *
- * @package Resources
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Resources
  */
 class Metadata implements ResourceInterface, ListenerInterface {
     /**

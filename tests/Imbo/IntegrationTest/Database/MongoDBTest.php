@@ -14,8 +14,8 @@ use Imbo\Database\MongoDB,
     Mongo;
 
 /**
- * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Integration tests
  * @covers Imbo\Database\MongoDB
  */
 class MongoDBTest extends DatabaseTests {

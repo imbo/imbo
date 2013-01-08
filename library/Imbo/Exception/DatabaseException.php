@@ -13,7 +13,7 @@ namespace Imbo\Exception;
 /**
  * Database exception
  *
- * @package Exceptions
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Exceptions
  */
 class DatabaseException extends RuntimeException {}

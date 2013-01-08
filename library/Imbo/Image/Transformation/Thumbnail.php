@@ -17,9 +17,8 @@ use Imbo\Image\Image,
 /**
  * Thumbnail transformation
  *
- * @package Image
- * @subpackage Transformation
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image\Transformations
  */
 class Thumbnail extends Transformation implements TransformationInterface {
     /**

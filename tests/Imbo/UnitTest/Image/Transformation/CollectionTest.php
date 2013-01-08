@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\Image\Transformation;
 use Imbo\Image\Transformation\Collection;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\Image\Transformation\Collection
  */
 class CollectionTest extends \PHPUnit_Framework_TestCase {

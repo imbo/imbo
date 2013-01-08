@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\Resource;
 use Imbo\Resource\Status;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\Resource\Status
  */
 class StatusTest extends ResourceTests {

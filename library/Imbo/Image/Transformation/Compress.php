@@ -17,9 +17,8 @@ use Imbo\Image\Image,
 /**
  * Compression transformation
  *
- * @package Image
- * @subpackage Transformation
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Image\Transformations
  */
 class Compress extends Transformation implements TransformationInterface {
     /**

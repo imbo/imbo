@@ -15,9 +15,8 @@ namespace Imbo\Http;
  *
  * This container will hold parameters usually found in the $_SERVER superglobal.
  *
- * @package Http
- * @subpackage Containers
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 class ServerContainer extends ParameterContainer {
     /**

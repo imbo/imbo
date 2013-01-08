@@ -20,9 +20,8 @@ use Imbo\Http\Request\RequestInterface,
 /**
  * Response writer
  *
- * @package Http
- * @subpackage Response
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Http
  */
 class ResponseWriter implements ContainerAware, ResponseWriterInterface {
     /**

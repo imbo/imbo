@@ -13,8 +13,8 @@ namespace Imbo\IntegrationTest\Storage;
 use Imbo\Storage\Filesystem;
 
 /**
- * @package TestSuite\IntegrationTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Integration tests
  * @covers Imbo\Storage\Filesystem
  */
 class FilesystemTest extends StorageTests {

@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\Http;
 use Imbo\Http\ParameterContainer;
 
 /**
- * @package TestSuite\UnitTests
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
  * @covers Imbo\Http\ParameterContainer
  */
 class ParameterContainerTest extends \PHPUnit_Framework_TestCase {
