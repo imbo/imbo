@@ -9,7 +9,7 @@
  */
 
 // Router for the built in httpd in php-5.4. Route everything through index.php. When ran from the
-//  base project directory, the command looks like this:
+// base project directory, the command looks like this:
 //
 // php -S localhost:8888 -t public tests/router.php
 
