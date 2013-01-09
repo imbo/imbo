@@ -98,7 +98,7 @@ class MongoDB implements DatabaseInterface {
                 $this->getCollection()->update(
                     array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                     array('$set' => array('updated' => $now)),
-                    array('safe' => true, 'multiple' => false)
+                    array('multiple' => false)
                 );
 
                 return true;
@@ -122,7 +122,7 @@ class MongoDB implements DatabaseInterface {
         );
 
         try {
-            $this->getCollection()->insert($data, array('safe' => true));
+            $this->getCollection()->insert($data);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to save image data', 500, $e);
         }
@@ -146,7 +146,7 @@ class MongoDB implements DatabaseInterface {
 
             $this->getCollection()->remove(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('justOne' => true, 'safe' => true)
+                array('justOne' => true)
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to delete image data', 500, $e);
@@ -167,7 +167,7 @@ class MongoDB implements DatabaseInterface {
             $this->getCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('$set' => array('updated' => time(), 'metadata' => $updatedMetadata)),
-                array('safe' => true, 'multiple' => false)
+                array('multiple' => false)
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to update meta data', 500, $e);
@@ -213,7 +213,7 @@ class MongoDB implements DatabaseInterface {
             $this->getCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('$set' => array('metadata' => array())),
-                array('safe' => true, 'multiple' => false)
+                array('multiple' => false)
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to delete meta data', 500, $e);
