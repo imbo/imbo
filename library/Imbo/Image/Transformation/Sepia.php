@@ -34,7 +34,7 @@ class Sepia extends Transformation implements TransformationInterface {
      * @param array $params Parameters for this transformation
      */
     public function __construct(array $params) {
-        $this->threshold = !empty($params['threshold']) ? (float) $params['threshold'] : 80;
+        $this->threshold = isset($params['threshold']) ? (float) $params['threshold'] : 80;
     }
 
     /**
