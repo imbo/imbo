@@ -424,6 +424,20 @@ This transformation will rotate the image clock-wise.
 * ``t[]=rotate:angle=90``
 * ``t[]=rotate:angle=45,bg=fff``
 
+sepia
+#####
+
+This transformation will apply a sepia color tone transformation to the image.
+
+**Parameters:**
+
+``threshold``
+    Threshold ranges from 0 to QuantumRange and is a measure of the extent of the sepia toning. Defaults to ``80``
+
+**Examples:**
+
+* ``t[]=sepia``
+* ``t[]=sepia:threshold=70``
 
 thumbnail
 #########
