@@ -221,6 +221,9 @@ $config = array(
         'rotate' => function (array $params) {
             return new Image\Transformation\Rotate($params);
         },
+        'sepia' => function (array $params) {
+            return new Image\Transformation\Sepia($params);
+        },
         'thumbnail' => function (array $params) {
             return new Image\Transformation\Thumbnail($params);
         },
