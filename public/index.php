@@ -14,7 +14,7 @@ use Exception as BaseException;
 
 try {
     // Fetch the configuration
-    $configPath = __DIR__ . '/../config/config.default.php';
+    $configPath = defined('IMBO_CONFIG_PATH') ? IMBO_CONFIG_PATH : __DIR__ . '/../config/config.default.php';
 
     $config = require $configPath;
 

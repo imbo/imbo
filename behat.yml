@@ -2,11 +2,10 @@ default:
   context:
     class: ImboContext
     parameters:
-      # URL to use for the functional tests
+      # URL to use for the functional tests with the built in httpd in php-5.4
       url: http://localhost:8888
 
-      # Document root and router used by the built in httpd in php-5.4 if the above URL does not
-      # answer
+      # Document root and router used by the httpd
       documentRoot: public
       router: tests/router.php
   paths:
