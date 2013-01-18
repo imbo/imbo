@@ -4,15 +4,15 @@ Feature: Imbo provides a user endpoint
     I want to make requests against the user endpoint
 
     Scenario: Request user information using a valid access token
-        Given the user "username" exists with private key "key"
+        Given the user "publickey" exists with private key "privatekey"
         And I include an access token in the query
-        When I request "/users/username.json"
+        When I request "/users/publickey.json"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "application/json"
 
     Scenario: Request user information without a valid access token
-        Given the user "username" exists with private key "key"
-        When I request "/users/username.json"
+        Given the user "publickey" exists with private key "privatekey"
+        When I request "/users/publickey.json"
         Then I should get a response with "400 Bad Request"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Missing access token" and the error code is "0"
