@@ -18,6 +18,9 @@
  * @package Test suite
  */
 
+// Define a custom configuration file
+define('IMBO_CONFIG_PATH', __DIR__ . '/../config/config.testing.php');
+
 if (file_exists($_SERVER['DOCUMENT_ROOT'] . $_SERVER['SCRIPT_NAME'])) {
     // The file exists, serve the file as is
     return false;

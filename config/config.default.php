@@ -10,9 +10,7 @@
 
 namespace Imbo;
 
-/**
- * Require composer autoloader
- */
+// Require composer autoloader
 require __DIR__ . '/../vendor/autoload.php';
 
 $config = array(

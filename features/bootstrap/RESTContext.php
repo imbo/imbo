@@ -26,7 +26,7 @@ require 'PHPUnit/Framework/Assert/Functions.php';
  */
 class RESTContext extends BehatContext {
     /**
-     * Pid for the optional built-in httpd in php-5.4 that will be used if no other httpd responds
+     * Pid for the built-in httpd in php-5.4
      *
      * @var int
      */
@@ -63,8 +63,7 @@ class RESTContext extends BehatContext {
     }
 
     /**
-     * Try to connect to the url specified in behat.yml. If not successful, start up the built in
-     * httpd in php-5.4 and try to connect to that instead.
+     * Start up the built in httpd in php-5.4
      *
      * @BeforeSuite
      */
@@ -73,20 +72,17 @@ class RESTContext extends BehatContext {
         $url = parse_url($params['url']);
         $port = !empty($url['port']) ? $url['port'] : 80;
 
+        self::$pid = self::startBuiltInHttpd(
+            $url['host'],
+            $port,
+            $params['documentRoot'],
+            $params['router']
+        );
+
+        sleep(1);
+
         if (!self::canConnectToHttpd($url['host'], $port)) {
-            // No connection. Let's try and fire up the built in httpd (requires php-5.4)
-            self::$pid = self::startBuiltInHttpd(
-                $url['host'],
-                $url['port'],
-                $params['documentRoot'],
-                $params['router']
-            );
-
-            sleep(1);
-
-            if (!self::canConnectToHttpd($url['host'], $port)) {
-                throw new RuntimeException('Could not start the built in httpd');
-            }
+            throw new RuntimeException('Could not start the built in httpd');
         }
     }
 
