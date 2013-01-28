@@ -16,7 +16,7 @@ use Imbo\Http\HeaderContainer,
     Imbo\EventListener\ListenerDefinition,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
-    Imbo\Image\Image,
+    Imbo\Model\Image,
     Imbo\Model,
     DateTime,
     DateTimeZone;

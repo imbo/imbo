@@ -15,7 +15,7 @@ use Imbo\EventManager\EventInterface,
     Imbo\Container,
     Imbo\ContainerAware,
     Imbo\Image\Transformation\TransformationInterface,
-    Imbo\Image\Image;
+    Imbo\Model\Image;
 
 /**
  * Image transformer listener

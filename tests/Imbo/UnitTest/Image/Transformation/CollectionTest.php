@@ -21,7 +21,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Transformation\Collection::applyToImage
      */
     public function testApplyToImage() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
 
         $border = $this->getMock('Imbo\Image\Transformation\TransformationInterface');
         $border->expects($this->once())->method('applyToImage')->with($image);

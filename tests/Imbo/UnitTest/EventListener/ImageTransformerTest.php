@@ -13,7 +13,7 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\ImageTransformer,
     Imbo\Image\Transformation\Transformation,
     Imbo\Image\Transformation\TransformationInterface,
-    Imbo\Image\Image;
+    Imbo\Model\Image;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -42,7 +42,7 @@ class ImageTransformerTest extends ListenerTests {
         $this->container = $this->getMock('Imbo\Container');
         $this->container->expects($this->any())->method('get')->with('contentNegotiation')->will($this->returnValue($this->cn));
         $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->image = $this->getMock('Imbo\Image\Image');
+        $this->image = $this->getMock('Imbo\Model\Image');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->response->expects($this->any())->method('getImage')->will($this->returnValue($this->image));
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');

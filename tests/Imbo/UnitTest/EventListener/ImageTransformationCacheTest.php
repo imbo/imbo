@@ -92,7 +92,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     public function testDoesNotLookInCacheIfClientDoesNotAcceptSupportedMimeTypes() {
         $mimeType = 'image/png';
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMimeType')->will($this->returnValue($mimeType));
         $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $this->cn->expects($this->once())->method('isAcceptable')->will($this->returnValue(false));
@@ -108,7 +108,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     public function testDoesNotLookInCacheIfNoTransformationsIsNeededToDeliverTheImage() {
         $mimeType = 'image/png';
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMimeType')->will($this->returnValue($mimeType));
         $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $this->cn->expects($this->once())->method('isAcceptable')->will($this->returnValue(true));
@@ -124,7 +124,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     public function testLooksInCacheIfImboCanProvideAnAcceptableMimeTypeDifferentFromTheOriginal() {
         $mimeType = 'image/png';
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMimeType')->will($this->returnValue($mimeType));
         $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $this->cn->expects($this->once())->method('isAcceptable')->will($this->returnValue(false));
@@ -144,7 +144,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     public function testDoesNotDoContentNegotiationWhenExtensionIsSet() {
         $mimeType = 'image/png';
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMimeType')->will($this->returnValue($mimeType));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
         $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
@@ -165,7 +165,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     public function testPopulatesImageOnCacheHit() {
         $mimeType = 'image/png';
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMimeType')->will($this->returnValue($mimeType));
         $image->expects($this->once())->method('setBlob')->with('image data')->will($this->returnSelf());
         $image->expects($this->once())->method('setMimeType')->with('image/jpeg')->will($this->returnSelf());
@@ -193,7 +193,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformationCache::storeInCache
      */
     public function testDoesNotStoreImageInCacheIfNoTransformationHaveBeenApplied() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->will($this->returnValue(false));
         $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $this->event->expects($this->never())->method('getRequest');
@@ -209,7 +209,7 @@ class ImageTransformationCacheTest extends ListenerTests {
     public function testStoresImageInCacheWhenTransformationsHaveBeenApplied() {
         $mimeType = 'image/png';
         $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->will($this->returnValue(true));
         $image->expects($this->once())->method('getBlob')->will($this->returnValue($imageData));
         $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));

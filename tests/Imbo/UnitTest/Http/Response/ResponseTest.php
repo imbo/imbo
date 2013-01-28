@@ -222,7 +222,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $request->expects($this->never())->method('checksum');
@@ -276,7 +276,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Response::getImage
      */
     public function testCanSetAndGetImage() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $this->assertSame($this->response, $this->response->setImage($image));
         $this->assertSame($image, $this->response->getImage());
     }
@@ -339,7 +339,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanSendHeadersAndContentUsingImageInstanceForImageIdentifier() {
         $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');

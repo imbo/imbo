@@ -13,7 +13,7 @@ namespace Imbo\Http\Response;
 use Imbo\Http\HeaderContainer,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
-    Imbo\Image\Image,
+    Imbo\Model\Image,
     Imbo\Model\ModelInterface;
 
 /**

@@ -12,7 +12,7 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Http\ContentNegotiation,
-    Imbo\Image\Image,
+    Imbo\Model\Image,
     RecursiveDirectoryIterator,
     RecursiveIteratorIterator;
 

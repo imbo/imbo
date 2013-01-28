@@ -73,7 +73,7 @@ class ImageTest extends ResourceTests {
     public function testSupportsHttpPut() {
         $this->manager->expects($this->at(0))->method('trigger')->with('db.image.insert');
         $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.insert');
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('id'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $this->response->expects($this->once())->method('setBody')->with(array('imageIdentifier' => 'id'));
@@ -107,7 +107,7 @@ class ImageTest extends ResourceTests {
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/png'));
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(200));
         $image->expects($this->once())->method('getHeight')->will($this->returnValue(100));

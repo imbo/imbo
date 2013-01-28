@@ -1019,7 +1019,7 @@ the ``$params`` array given to the closure will look like this:
     )
 
 
-The return value of the closure must either be an instance of the ``Imbo\Image\Transformation\TransformationInterface`` interface, or code that is callable (for instance another closure, or a class that includes an ``__invoke`` method). If the return value is a callable piece of code it will receive a single parameter which is an instance of ``Imbo\Image\Image``, which is the image you want your transformation to modify. See some examples in the :ref:`custom-transformations` section below.
+The return value of the closure must either be an instance of the ``Imbo\Image\Transformation\TransformationInterface`` interface, or code that is callable (for instance another closure, or a class that includes an ``__invoke`` method). If the return value is a callable piece of code it will receive a single parameter which is an instance of ``Imbo\Model\Image``, which is the image you want your transformation to modify. See some examples in the :ref:`custom-transformations` section below.
 
 Presets
 +++++++

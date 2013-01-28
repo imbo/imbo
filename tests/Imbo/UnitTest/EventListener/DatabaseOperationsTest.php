@@ -44,7 +44,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->formatter = $this->getMock('Imbo\Helpers\DateFormatter');
         $this->container = $this->getMock('Imbo\Container');
         $this->container->expects($this->any())->method('get')->with('dateFormatter')->will($this->returnValue($this->formatter));
-        $this->image = $this->getMock('Imbo\Image\Image');
+        $this->image = $this->getMock('Imbo\Model\Image');
 
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));

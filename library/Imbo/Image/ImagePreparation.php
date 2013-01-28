@@ -16,7 +16,7 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ImageException,
     Imbo\Exception,
-    Imbo\Image\Image,
+    Imbo\Model\Image,
     Imbo\Container,
     Imbo\ContainerAware,
     finfo;

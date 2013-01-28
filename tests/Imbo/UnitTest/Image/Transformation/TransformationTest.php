@@ -11,7 +11,7 @@
 namespace Imbo\UnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Transformation,
-    Imbo\Image\Image,
+    Imbo\Model\Image,
     Imagick,
     ReflectionMethod;
 

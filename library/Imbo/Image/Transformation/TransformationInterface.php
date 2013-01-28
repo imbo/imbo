@@ -10,7 +10,7 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\Image,
+use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
     Imagick;
 
