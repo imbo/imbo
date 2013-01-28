@@ -14,7 +14,7 @@ namespace Imbo\Model;
  * Image model
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Model
+ * @package Models
  */
 class Image implements ModelInterface {
     /**
