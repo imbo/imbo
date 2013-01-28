@@ -38,18 +38,30 @@ class ErrorTest extends \PHPUnit_Framework_TestCase {
         $this->model = null;
     }
 
+    /**
+     * @covers Imbo\Model\Error::getHttpCode
+     * @covers Imbo\Model\Error::setHttpCode
+     */
     public function testCanSetAndGetHttpCode() {
         $this->assertNull($this->model->getHttpCode());
         $this->assertSame($this->model, $this->model->setHttpCode(404));
         $this->assertSame(404, $this->model->getHttpCode());
     }
 
+    /**
+     * @covers Imbo\Model\Error::getErrorMessage
+     * @covers Imbo\Model\Error::setErrorMessage
+     */
     public function testCanSetAndGetErrorMessage() {
         $this->assertNull($this->model->getErrorMessage());
         $this->assertSame($this->model, $this->model->setErrorMessage('message'));
         $this->assertSame('message', $this->model->getErrorMessage());
     }
 
+    /**
+     * @covers Imbo\Model\Error::getDate
+     * @covers Imbo\Model\Error::setDate
+     */
     public function testCanSetAndGetDate() {
         $date = new DateTime();
         $this->assertNull($this->model->getDate());
@@ -57,12 +69,20 @@ class ErrorTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($date, $this->model->getDate());
     }
 
+    /**
+     * @covers Imbo\Model\Error::getImboErrorCode
+     * @covers Imbo\Model\Error::setImboErrorCode
+     */
     public function testCanSetAndGetImboErrorCode() {
         $this->assertNull($this->model->getImboErrorCode());
         $this->assertSame($this->model, $this->model->setImboErrorCode(100));
         $this->assertSame(100, $this->model->getImboErrorCode());
     }
 
+    /**
+     * @covers Imbo\Model\Error::getImageIdentifier
+     * @covers Imbo\Model\Error::setImageIdentifier
+     */
     public function testCanSetAndGetImageIdentifier() {
         $this->assertNull($this->model->getImageIdentifier());
         $this->assertSame($this->model, $this->model->setImageIdentifier('identifier'));
