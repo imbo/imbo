@@ -13,7 +13,8 @@ namespace Imbo\Storage;
 use Imbo\Image\Image,
     Imbo\Exception\StorageException,
     Imbo\Exception,
-    DateTime;
+    DateTime,
+    DateTimeZone;
 
 /**
  * Filesystem storage driver
@@ -112,7 +113,7 @@ class Filesystem implements StorageInterface {
         $timestamp = filemtime($path);
 
         // Create a new datetime instance
-        return new DateTime('@' . $timestamp);
+        return new DateTime('@' . $timestamp, new DateTimeZone('UTC'));
     }
 
     /**

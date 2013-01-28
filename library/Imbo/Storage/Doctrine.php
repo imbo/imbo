@@ -15,7 +15,8 @@ use Imbo\Exception\StorageException,
     Doctrine\DBAL\Configuration,
     Doctrine\DBAL\DriverManager,
     Doctrine\DBAL\Connection,
-    DateTime;
+    DateTime,
+    DateTimeZone;
 
 /**
  * Doctrine 2 storage driver
@@ -124,7 +125,7 @@ class Doctrine implements StorageInterface {
     public function getLastModified($publicKey, $imageIdentifier) {
         $timestamp = (int) $this->getField($publicKey, $imageIdentifier, 'updated');
 
-        return new DateTime('@' . $timestamp);
+        return new DateTime('@' . $timestamp, new DateTimeZone('UTC'));
     }
 
     /**
