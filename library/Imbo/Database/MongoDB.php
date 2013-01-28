@@ -16,7 +16,8 @@ use Imbo\Image\Image,
     Mongo,
     MongoCollection,
     MongoException,
-    DateTime;
+    DateTime,
+    DateTimeZone;
 
 /**
  * MongoDB database driver
@@ -278,8 +279,8 @@ class MongoDB implements DatabaseInterface {
 
             foreach ($cursor as $image) {
                 unset($image['_id']);
-                $image['added'] = new DateTime('@' . $image['added']);
-                $image['updated'] = new DateTime('@' . $image['updated']);
+                $image['added'] = new DateTime('@' . $image['added'], new DateTimeZone('UTC'));
+                $image['updated'] = new DateTime('@' . $image['updated'], new DateTimeZone('UTC'));
                 $images[] = $image;
             }
         } catch (MongoException $e) {
@@ -346,7 +347,7 @@ class MongoDB implements DatabaseInterface {
             $data = array('updated' => time());
         }
 
-        return new DateTime('@' . $data['updated']);
+        return new DateTime('@' . $data['updated'], new DateTimeZone('UTC'));
     }
 
     /**

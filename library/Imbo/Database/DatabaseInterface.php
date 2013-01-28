@@ -12,7 +12,8 @@ namespace Imbo\Database;
 
 use Imbo\Image\Image,
     Imbo\Resource\Images\Query,
-    Imbo\Exception\DatabaseException;
+    Imbo\Exception\DatabaseException,
+    DateTime;
 
 /**
  * Database driver interface
@@ -108,7 +109,7 @@ interface DatabaseInterface {
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier
-     * @return \DateTime Returns an instance of DateTime
+     * @return DateTime Returns an instance of DateTime
      * @throws DatabaseException
      */
     function getLastModified($publicKey, $imageIdentifier = null);

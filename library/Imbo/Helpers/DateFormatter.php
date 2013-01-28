@@ -28,6 +28,7 @@ class DateFormatter {
      */
     public function formatDate(DateTime $date) {
         $date->setTimezone(new DateTimeZone('UTC'));
+
         return $date->format('D, d M Y H:i:s') . ' GMT';
     }
 }

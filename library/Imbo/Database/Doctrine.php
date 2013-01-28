@@ -18,7 +18,8 @@ use Imbo\Image\Image,
     Doctrine\DBAL\DriverManager,
     Doctrine\DBAL\Connection,
     PDO,
-    DateTime;
+    DateTime,
+    DateTimeZone;
 
 /**
  * Doctrine 2 database driver
@@ -335,7 +336,7 @@ class Doctrine implements DatabaseInterface {
             $row = array('updated' => time());
         }
 
-        return new DateTime('@' . $row['updated']);
+        return new DateTime('@' . $row['updated'], new DateTimeZone('UTC'));
     }
 
     /**
