@@ -96,6 +96,17 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Http\Response\Response::setModel
+     * @covers Imbo\Http\Response\Response::getModel
+     */
+    public function testCanSetAndGetModel() {
+        $model = $this->getMock('Imbo\Model\ModelInterface');
+        $this->assertNull($this->response->getModel());
+        $this->assertSame($this->response, $this->response->setModel($model));
+        $this->assertSame($model, $this->response->getModel());
+    }
+
+    /**
      * @covers Imbo\Http\Response\Response::setBody
      * @covers Imbo\Http\Response\Response::setStatusCode
      * @covers Imbo\Http\Response\Response::setNotModified

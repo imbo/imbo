@@ -17,6 +17,7 @@ use Imbo\Http\HeaderContainer,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
     Imbo\Image\Image,
+    Imbo\Model,
     DateTime,
     DateTimeZone;
 
@@ -130,6 +131,13 @@ class Response implements ListenerInterface, ResponseInterface {
     private $image;
 
     /**
+     * Model instance
+     *
+     * @var Model\ModelInterface
+     */
+    private $model;
+
+    /**
      * Class constructor
      *
      * @param HeaderContainer $headerContainer An optional instance of a header container. An empty
@@ -204,6 +212,22 @@ class Response implements ListenerInterface, ResponseInterface {
      */
     public function setBody($content) {
         $this->body = $content;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getModel() {
+        return $this->model;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setModel(Model\ModelInterface $model) {
+        $this->model = $model;
 
         return $this;
     }
