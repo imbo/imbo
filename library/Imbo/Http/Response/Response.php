@@ -17,7 +17,8 @@ use Imbo\Http\HeaderContainer,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
     Imbo\Image\Image,
-    DateTime;
+    DateTime,
+    DateTimeZone;
 
 /**
  * Response object from the server to the client
@@ -316,7 +317,7 @@ class Response implements ListenerInterface, ResponseInterface {
      * {@inheritdoc}
      */
     public function createError(Exception $exception, RequestInterface $request) {
-        $date = new DateTime();
+        $date = new DateTime('now', new DateTimeZone('UTC'));
 
         $code         = $exception->getCode();
         $message      = $exception->getMessage();

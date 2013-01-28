@@ -15,7 +15,8 @@ use Imbo\Image\Image,
     Mongo,
     MongoGridFS,
     MongoException,
-    DateTime;
+    DateTime,
+    DateTimeZone;
 
 /**
  * GridFS (MongoDB) database driver
@@ -141,7 +142,7 @@ class GridFS implements StorageInterface {
 
         $timestamp = $file->file['updated'];
 
-        return new DateTime('@' . $timestamp);
+        return new DateTime('@' . $timestamp, new DateTimeZone('UTC'));
     }
 
     /**
