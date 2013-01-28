@@ -8,15 +8,15 @@
  * distributed with this source code.
  */
 
-namespace Imbo\Image;
+namespace Imbo\Model;
 
 /**
- * Class that represents a single image
+ * Image model
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Image
+ * @package Model
  */
-class Image {
+class Image implements ModelInterface {
     /**
      * Supported mime types and the correct file extensions
      *

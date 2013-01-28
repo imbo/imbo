@@ -8,9 +8,9 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Image;
+namespace Imbo\UnitTest\Model;
 
-use Imbo\Image\Image;
+use Imbo\Model\Image;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -18,27 +18,27 @@ use Imbo\Image\Image;
  */
 class ImageTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var Imbo\Image\Image
+     * @var Image
      */
     private $image;
 
     /**
-     * Set up the image instance
+     * Set up the model
      */
     public function setUp() {
         $this->image = new Image();
     }
 
     /**
-     * Tear down the image instance
+     * Tear down the model
      */
     public function tearDown() {
         $this->image = null;
     }
 
     /**
-     * @covers Imbo\Image\Image::setMetadata
-     * @covers Imbo\Image\Image::getMetadata
+     * @covers Imbo\Model\Image::setMetadata
+     * @covers Imbo\Model\Image::getMetadata
      */
     public function testCanSetAndGetMetadata() {
         $data = array(
@@ -50,8 +50,8 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Image::setMimeType
-     * @covers Imbo\Image\Image::getMimeType
+     * @covers Imbo\Model\Image::setMimeType
+     * @covers Imbo\Model\Image::getMimeType
      */
     public function testCanSetAndGetMimeType() {
         $mimeType = 'image/png';
@@ -60,10 +60,10 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Image::setBlob
-     * @covers Imbo\Image\Image::getBlob
-     * @covers Imbo\Image\Image::getFilesize
-     * @covers Imbo\Image\Image::getChecksum
+     * @covers Imbo\Model\Image::setBlob
+     * @covers Imbo\Model\Image::getBlob
+     * @covers Imbo\Model\Image::getFilesize
+     * @covers Imbo\Model\Image::getChecksum
      */
     public function testCanSetAndGetBlob() {
         $blob = 'some string';
@@ -82,8 +82,8 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Image::setExtension
-     * @covers Imbo\Image\Image::getExtension
+     * @covers Imbo\Model\Image::setExtension
+     * @covers Imbo\Model\Image::getExtension
      */
     public function testCanSetAndGetExtension() {
         $extension = 'png';
@@ -92,8 +92,8 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Image::setWidth
-     * @covers Imbo\Image\Image::getWidth
+     * @covers Imbo\Model\Image::setWidth
+     * @covers Imbo\Model\Image::getWidth
      */
     public function testCanSetAndGetWidth() {
         $width = 123;
@@ -102,8 +102,8 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Image::setHeight
-     * @covers Imbo\Image\Image::getHeight
+     * @covers Imbo\Model\Image::setHeight
+     * @covers Imbo\Model\Image::getHeight
      */
     public function testCanSetAndGetHeight() {
         $height = 234;
@@ -126,7 +126,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Image::supportedMimeType
+     * @covers Imbo\Model\Image::supportedMimeType
      * @dataProvider getMimeTypes
      */
     public function testCanInformAboutSupportedMimeType($type, $result) {
@@ -148,7 +148,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Image::getFileExtension
+     * @covers Imbo\Model\Image::getFileExtension
      * @dataProvider getFileExtensions
      */
     public function testCanGetAFileExtensionBasedOnAMimeType($type, $extension) {
@@ -156,7 +156,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Image::hasBeenTransformed
+     * @covers Imbo\Model\Image::hasBeenTransformed
      */
     public function testCanMarkIfTheImageHasBeenTransformedOrNot() {
         $this->assertFalse($this->image->hasBeenTransformed());
