@@ -10,38 +10,15 @@
 
 namespace Imbo\Http\Response\Formatter;
 
-use Imbo\Resource\ResourceInterface,
-    Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface,
-    XMLWriter;
+use Imbo\Model;
 
 /**
  * XML formatter
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Http
+ * @package Response\Formatters
  */
-class XML implements FormatterInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function format(array $data, RequestInterface $request, ResponseInterface $response) {
-        // Fetch the name of the resource
-        $resource = $request->getResource();
-
-        if ($response->isError()) {
-            return $this->formatError($data);
-        } else if ($resource === ResourceInterface::STATUS) {
-            return $this->formatStatus($data);
-        } else if ($resource === ResourceInterface::USER) {
-            return $this->formatUser($data);
-        } else if ($resource === ResourceInterface::IMAGES) {
-            return $this->formatImages($data);
-        } else if ($resource === ResourceInterface::METADATA) {
-            return $this->formatMetadata($data);
-        }
-    }
-
+class XML extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
@@ -50,160 +27,111 @@ class XML implements FormatterInterface {
     }
 
     /**
-     * Get an XMLWriter instance with some basic options set
-     *
-     * @return XMLWriter
+     * {@inheritdoc}
      */
-    private function getWriter() {
-        $writer = new XMLWriter();
-        $writer->openMemory();
-        $writer->setIndent(true);
-        $writer->setIndentString('  ');
-        $writer->startDocument('1.0', 'UTF-8');
-
-        return $writer;
+    public function formatError(Model\Error $model) {
+        return <<<ERROR
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <error>
+    <code>{$model->getHttpCode()}</code>
+    <message>{$model->getErrorMessage()}</message>
+    <date>{$this->dateFormatter->formatDate($model->getDate())}</date>
+    <imboErrorCode>{$model->getImboErrorCode()}</imboErrorCode>
+  </error>
+</imbo>
+ERROR;
     }
 
     /**
-     * Write a simple document with "imbo" as main tag
-     *
-     * @param XMLWriter $writer The writer instance
-     * @param string $tag The tag to put $data in
-     * @param array $data One dimensional associative array
+     * {@inheritdoc}
      */
-    private function writeSimpleDocument(XMLWriter $writer, $tag, array $data) {
-        $writer->startElement('imbo');
-        $writer->startElement($tag);
+    public function formatStatus(Model\Status $model) {
+        $database = (int) $model->getDatabaseStatus();
+        $storage = (int) $model->getStorageStatus();
 
-        $this->writeKeyValues($writer, $data);
-
-        $writer->endElement();
-        $writer->endElement();
+        return <<<STATUS
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <status>
+    <date>{$this->dateFormatter->formatDate($model->getDate())}</date>
+    <database>{$database}</database>
+    <storage>{$storage}</storage>
+  </status>
+</imbo>
+STATUS;
     }
 
     /**
-     * Write a one dimensional associative array to the document
-     *
-     * @param XMLWriter $writer The writer instance
-     * @param array $data One dimensional associative array
+     * {@inheritdoc}
      */
-    private function writeKeyValues(XMLWriter $writer, array $data) {
-        foreach ($data as $key => $value) {
-            $writer->writeElement($key, $value);
-        }
+    public function formatUser(Model\User $model) {
+        return <<<USER
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <user>
+    <publicKey>{$model->getPublicKey()}</publicKey>
+    <numImages>{$model->getNumImages()}</numImages>
+    <lastModified>{$this->dateFormatter->formatDate($model->getLastModified())}</lastModified>
+  </user>
+</imbo>
+USER;
     }
 
     /**
-     * Format an error response
-     *
-     * @param array $data Error information
-     * @return string Returns an XML string
+     * {@inheritdoc}
      */
-    private function formatError(array $data) {
-        if (!isset($data['error'])) {
-            // If the $data array does not have an error key, this is simply the status resource
-            // reporting that the system is not stable, which is not a regular error
-            return $this->formatStatus($data);
-        }
+    public function formatImages(Model\Images $model) {
+        $images = '';
 
-        $writer = $this->getWriter();
-        $this->writeSimpleDocument($writer, 'error', $data['error']);
+        foreach ($model->getImages() as $image) {
+            $metadata = '';
 
-        return $writer->outputMemory();
-    }
-
-    /**
-     * Format response for the status resource
-     *
-     * @param array $data Status information
-     * @return string Returns an XML string
-     */
-    private function formatStatus(array $data) {
-        $data['database'] = (int) $data['database'];
-        $data['storage'] = (int) $data['storage'];
-
-        $writer = $this->getWriter();
-        $this->writeSimpleDocument($writer, 'status', $data);
-
-        return $writer->outputMemory();
-    }
-
-    /**
-     * Format response for the user resource
-     *
-     * @param array $data User information
-     * @return string Returns an XML string
-     */
-    private function formatUser(array $data) {
-        $writer = $this->getWriter();
-        $this->writeSimpleDocument($writer, 'user', $data);
-
-        return $writer->outputMemory();
-    }
-
-    /**
-     * Format response for the images resource
-     *
-     * @param array $data Images array
-     * @return string Returns an XML string
-     */
-    private function formatImages(array $data) {
-        $writer = $this->getWriter();
-
-        $writer->startElement('imbo');
-        $writer->startElement('images');
-
-        foreach ($data as $images) {
-            $writer->startElement('image');
-
-            foreach ($images as $key => $value) {
-                if (is_array($value)) {
-                    $writer->startElement('metadata');
-
-                    foreach ($value as $key => $value) {
-                        $writer->startElement('tag');
-                        $writer->writeAttribute('key', $key);
-                        $writer->text($value);
-                        $writer->endElement();
-                    }
-
-                    $writer->endElement();
-                } else {
-                    $writer->writeElement($key, $value);
-                }
+            foreach ($image->getMetadata() as $key => $value) {
+                $metadata .= '<tag key="' . $key . '">' . $value . '</tag>';
             }
 
-            $writer->endElement();
+            $images .= <<<IMAGE
+<image>
+  <publicKey>{$image->getPublicKey()}</publicKey>
+  <imageIdentifier>{$image->getImageIdentifier()}</imageIdentifier>
+  <checksum>{$image->getChecksum()}</checksum>
+  <mime>{$image->getMimetype()}</mime>
+  <extension>{$image->getExtension()}</extension>
+  <added>{$this->dateFormatter->formatDate($image->getAddedDate())}</added>
+  <updated>{$this->dateFormatter->formatDate($image->getUpdatedDate())}</updated>
+  <size>{$image->getFilesize()}</size>
+  <width>{$image->getWidth()}</width>
+  <height>{$image->getHeight()}</height>
+  <metadata>{$metadata}</metadata>
+</image>
+IMAGE;
+
         }
 
-        $writer->endElement();
-        $writer->endElement();
-
-        return $writer->outputMemory();
+        return <<<IMAGES
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <images>{$images}</images>
+</imbo>
+IMAGES;
     }
 
     /**
-     * Format response for the metadata resource
-     *
-     * @param array $data Metadata
-     * @return string Returns an XML string
+     * {@inheritdoc}
      */
-    private function formatMetadata(array $data) {
-        $writer = $this->getWriter();
+    public function formatMetadata(Model\Metadata $model) {
+        $metadata = '';
 
-        $writer->startElement('imbo');
-        $writer->startElement('metadata');
-
-        foreach ($data as $key => $value) {
-            $writer->startElement('tag');
-            $writer->writeAttribute('key', $key);
-            $writer->text($value);
-            $writer->endElement();
+        foreach ($model->getData() as $key => $value) {
+            $metadata .= '<tag key="' . $key . '">' . $value . '</tag>';
         }
 
-        $writer->endElement();
-        $writer->endElement();
-
-        return $writer->outputMemory();
+        return <<<METADATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <metadata>{$metadata}</metadata>
+</imbo>
+METADATA;
     }
 }

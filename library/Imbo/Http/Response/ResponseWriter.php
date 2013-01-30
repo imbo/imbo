@@ -111,6 +111,17 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
         $formatter = new $formatter();
         $formattedData = $formatter->format($data, $request, $response);
 
+        /*
+        $query = $request->getQuery();
+
+        foreach (array('callback', 'jsonp', 'json') as $param) {
+            if ($query->has($param)) {
+                $jsonEncoded = sprintf("%s(%s)", $query->get($param), $jsonEncoded);
+                break;
+            }
+        }
+         */
+
         $response->getHeaders()->set('Content-Type', $formatter->getContentType())
                                ->set('Content-Length', strlen($formattedData));
 
