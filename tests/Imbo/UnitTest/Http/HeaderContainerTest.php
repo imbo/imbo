@@ -15,7 +15,6 @@ use Imbo\Http\HeaderContainer;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Http\HeaderContainer
  */
 class HeaderContainerTest extends \PHPUnit_Framework_TestCase {
     /**

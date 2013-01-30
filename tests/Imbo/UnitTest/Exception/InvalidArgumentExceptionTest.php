@@ -15,7 +15,6 @@ use Imbo\Exception\InvalidArgumentException;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Exception\InvalidArgumentException
  */
 class InvalidArgumentExceptionTest extends \PHPUnit_Framework_TestCase {
     /**

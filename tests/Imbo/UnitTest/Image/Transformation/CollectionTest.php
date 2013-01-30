@@ -15,7 +15,6 @@ use Imbo\Image\Transformation\Collection;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Image\Transformation\Collection
  */
 class CollectionTest extends \PHPUnit_Framework_TestCase {
     /**

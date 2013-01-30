@@ -15,7 +15,6 @@ use Imbo\Image\Transformation\Crop;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
- * @covers Imbo\Image\Transformation\Crop
  */
 class CropTest extends TransformationTests {
     /**

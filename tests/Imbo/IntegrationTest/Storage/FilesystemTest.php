@@ -15,7 +15,6 @@ use Imbo\Storage\Filesystem;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
- * @covers Imbo\Storage\Filesystem
  */
 class FilesystemTest extends StorageTests {
     /**
