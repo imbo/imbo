@@ -101,7 +101,7 @@ interface ResponseInterface {
      * @param ModelInterface $model A model instance
      * @return ResponseInterface
      */
-    function setModel(ModelInterface $model);
+    function setModel(ModelInterface $model = null);
 
     /**
      * Get the HTTP protocol version

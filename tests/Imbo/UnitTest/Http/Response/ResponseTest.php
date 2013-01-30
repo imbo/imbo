@@ -104,6 +104,8 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($this->response->getModel());
         $this->assertSame($this->response, $this->response->setModel($model));
         $this->assertSame($model, $this->response->getModel());
+        $this->assertSame($this->response, $this->response->setModel(null));
+        $this->assertNull($this->response->getModel());
     }
 
     /**

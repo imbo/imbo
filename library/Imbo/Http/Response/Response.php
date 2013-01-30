@@ -225,7 +225,7 @@ class Response implements ListenerInterface, ResponseInterface {
     /**
      * {@inheritdoc}
      */
-    public function setModel(Model\ModelInterface $model) {
+    public function setModel(Model\ModelInterface $model = null) {
         $this->model = $model;
 
         return $this;
