@@ -33,7 +33,11 @@ abstract class Formatter implements FormatterInterface {
      *
      * @param DateFormatter $formatter An instance of the date formatter helper
      */
-    public function __construct(DateFormatter $formatter) {
+    public function __construct(DateFormatter $formatter = null) {
+        if ($formatter === null) {
+            $formatter = new DateFormatter();
+        }
+
         $this->dateFormatter = $formatter;
     }
 
