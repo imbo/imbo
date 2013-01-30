@@ -16,7 +16,6 @@ use Imbo\Model\Error,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Model\Error
  */
 class ErrorTest extends \PHPUnit_Framework_TestCase {
     /**
