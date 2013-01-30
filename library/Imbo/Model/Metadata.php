@@ -15,33 +15,6 @@ namespace Imbo\Model;
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
+ * @codeCoverageIgnore
  */
-class Metadata implements ModelInterface {
-    /**
-     * Metadata
-     *
-     * @var array
-     */
-    private $data = array();
-
-    /**
-     * Set metadata
-     *
-     * @param array $data The metadata
-     * @return Metadata
-     */
-    public function setData(array $data) {
-        $this->data = $data;
-
-        return $this;
-    }
-
-    /**
-     * Get metadata
-     *
-     * @return array
-     */
-    public function getData() {
-        return $this->data;
-    }
-}
+class Metadata extends ArrayModel {}
