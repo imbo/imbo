@@ -149,7 +149,11 @@ class GridFS implements StorageInterface {
      * {@inheritdoc}
      */
     public function getStatus() {
-        return $this->getMongo()->connect();
+        try {
+            return $this->getMongo()->connect();
+        } catch (StorageException $e) {
+            return false;
+        }
     }
 
     /**
