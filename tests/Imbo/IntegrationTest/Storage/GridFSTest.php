@@ -54,4 +54,14 @@ class GridFSTest extends StorageTests {
 
         parent::tearDown();
     }
+
+    /**
+     * @covers Imbo\Storage\GridFS::getStatus
+     */
+    public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() {
+        $storage = new GridFS(array(
+            'server' => 'foobar',
+        ));
+        $this->assertFalse($storage->getStatus());
+    }
 }

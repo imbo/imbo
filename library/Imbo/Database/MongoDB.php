@@ -371,7 +371,11 @@ class MongoDB implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function getStatus() {
-        return $this->getMongo()->connect();
+        try {
+            return $this->getMongo()->connect();
+        } catch (DatabaseException $e) {
+            return false;
+        }
     }
 
     /**
