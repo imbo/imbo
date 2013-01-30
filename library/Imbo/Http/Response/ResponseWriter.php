@@ -111,17 +111,20 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
         // Create an instance of the formatter
         $formatter = new $formatter();
         $formattedData = $formatter->format($model);
+        $contentType = $formatter->getContentType();
 
-        $query = $request->getQuery();
+        if ($contentType === 'application/json') {
+            $query = $request->getQuery();
 
-        foreach (array('callback', 'jsonp', 'json') as $param) {
-            if ($query->has($param)) {
-                $formattedData = sprintf("%s(%s)", $query->get($param), $formattedData);
-                break;
+            foreach (array('callback', 'jsonp', 'json') as $param) {
+                if ($query->has($param)) {
+                    $formattedData = sprintf("%s(%s)", $query->get($param), $formattedData);
+                    break;
+                }
             }
         }
 
-        $response->getHeaders()->set('Content-Type', $formatter->getContentType())
+        $response->getHeaders()->set('Content-Type', $contentType)
                                ->set('Content-Length', strlen($formattedData));
 
         if ($request->getMethod() === RequestInterface::METHOD_HEAD) {
