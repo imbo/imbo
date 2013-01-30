@@ -325,8 +325,8 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanFormatAnArrayModel() {
         $data = array(
-            'some key' => 'some value',
-            'some other key' => 'some other value',
+            'key1' => 'value1',
+            'key2' => 'value2',
         );
         $model = $this->getMock('Imbo\Model\ArrayModel');
         $model->expects($this->once())->method('getData')->will($this->returnValue($data));
@@ -336,10 +336,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         foreach ($data as $key => $value) {
             $this->assertTag(
                 array(
-                    'tag' => 'tag',
-                    'attributes' => array(
-                        'key' => $key,
-                    ),
+                    'tag' => $key,
                     'content' => $value,
                     'parent' => array(
                         'tag' => 'imbo',

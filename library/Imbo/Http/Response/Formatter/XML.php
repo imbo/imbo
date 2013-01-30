@@ -156,7 +156,7 @@ METADATA;
         $data = '';
 
         foreach ($model->getData() as $key => $value) {
-            $data .= '<tag key="' . $key . '">' . $value . '</tag>';
+            $data .= '<' . $key . '>' . $value . '</' . $key . '>';
         }
 
         return <<<DATA
