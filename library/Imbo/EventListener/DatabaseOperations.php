@@ -14,6 +14,7 @@ use Imbo\EventManager\EventInterface,
     Imbo\Database\DatabaseInterface,
     Imbo\Container,
     Imbo\ContainerAware,
+    Imbo\Model,
     DateTime;
 
 /**
@@ -215,14 +216,15 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $database = $event->getDatabase();
 
         $numImages = $database->getNumImages($publicKey);
-        $lastModified = $this->formatDate($database->getLastModified($publicKey));
+        $lastModified = $database->getLastModified($publicKey);
 
-        $response->setBody(array(
-            'publicKey'    => $publicKey,
-            'numImages'    => $numImages,
-            'lastModified' => $lastModified,
-        ));
-        $response->getHeaders()->set('Last-Modified', $lastModified);
+        $userModel = new Model\User();
+        $userModel->setPublicKey($publicKey)
+                  ->setNumImages($numImages)
+                  ->setLastModified($lastModified);
+
+        $response->setModel($userModel)
+                 ->getHeaders()->set('Last-Modified', $this->formatDate($lastModified));
     }
 
     /**

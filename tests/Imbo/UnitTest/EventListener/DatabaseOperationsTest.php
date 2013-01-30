@@ -222,11 +222,8 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->formatter->expects($this->once())->method('formatDate')->with($datetime)->will($this->returnValue($date));
         $this->database->expects($this->once())->method('getNumImages')->with($this->publicKey)->will($this->returnValue(123));
         $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey)->will($this->returnValue($datetime));
-        $this->response->expects($this->once())->method('setBody')->with(array(
-            'publicKey' => $this->publicKey,
-            'numImages' => 123,
-            'lastModified' => $date,
-        ));
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\User'))->will($this->returnSelf());
+
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->once())->method('set')->with('Last-Modified', $date);
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
