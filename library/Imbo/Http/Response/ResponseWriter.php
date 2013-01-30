@@ -15,7 +15,8 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Http\ContentNegotiation,
     Imbo\Exception\RuntimeException,
     Imbo\Container,
-    Imbo\ContainerAware;
+    Imbo\ContainerAware,
+    Imbo\Model\ModelInterface;
 
 /**
  * Response writer
@@ -70,7 +71,7 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
     /**
      * {@inheritdoc}
      */
-    public function write(array $data, RequestInterface $request, ResponseInterface $response, $strict = true) {
+    public function write(ModelInterface $model, RequestInterface $request, ResponseInterface $response, $strict = true) {
         // The formatter to use
         $formatter = null;
 
@@ -109,18 +110,16 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
 
         // Create an instance of the formatter
         $formatter = new $formatter();
-        $formattedData = $formatter->format($data, $request, $response);
+        $formattedData = $formatter->format($model);
 
-        /*
         $query = $request->getQuery();
 
         foreach (array('callback', 'jsonp', 'json') as $param) {
             if ($query->has($param)) {
-                $jsonEncoded = sprintf("%s(%s)", $query->get($param), $jsonEncoded);
+                $formattedData = sprintf("%s(%s)", $query->get($param), $formattedData);
                 break;
             }
         }
-         */
 
         $response->getHeaders()->set('Content-Type', $formatter->getContentType())
                                ->set('Content-Length', strlen($formattedData));

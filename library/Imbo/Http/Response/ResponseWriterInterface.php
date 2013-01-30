@@ -10,7 +10,8 @@
 
 namespace Imbo\Http\Response;
 
-use Imbo\Http\Request\RequestInterface;
+use Imbo\Http\Request\RequestInterface,
+    Imbo\Model\ModelInterface;
 
 /**
  * Response writer interface
@@ -22,7 +23,7 @@ interface ResponseWriterInterface {
     /**
      * Return a formatted message using a chosen formatter based on the request
      *
-     * @param array $data Data to write in another format
+     * @param ModelInterface $model Model to write in another format
      * @param RequestInterface $request A request instance
      * @param ResponseInterface $response A response instance
      * @param boolean $strict Whether or not the response writer will throw a RuntimeException with
@@ -30,5 +31,5 @@ interface ResponseWriterInterface {
      *                        content for the user agent.
      * @throws RuntimeException
      */
-    function write(array $data, RequestInterface $request, ResponseInterface $response, $strict = true);
+    function write(ModelInterface $model, RequestInterface $request, ResponseInterface $response, $strict = true);
 }
