@@ -101,14 +101,22 @@ USER;
             $metadata = $image->getMetadata();
             $metadataHtml = '';
 
-            if (!empty($metadata)) {
-                $metadataHtml = '<dt>Metadata</dt><dd><dl>';
+            if (is_array($metadata)) {
+                $metadataHtml = '<dt>Metadata</dt><dd>';
 
-                foreach ($metadata as $key => $value) {
-                    $metadataHtml .= '<dt>' . $key . '</dt><dd>' . $value . '</dd>';
+                if (empty($metadata)) {
+                    $metadataHtml .= '<p>No metadata</p>';
+                } else {
+                    $metadataHtml .= '<dl>';
+
+                    foreach ($metadata as $key => $value) {
+                        $metadataHtml .= '<dt>' . $key . '</dt><dd>' . $value . '</dd>';
+                    }
+
+                    $metadataHtml .= '</dl>';
                 }
 
-                $metadataHtml .= '</dl></dd>';
+                $metadataHtml .= '</dd>';
             }
 
             $entry = <<<IMAGE

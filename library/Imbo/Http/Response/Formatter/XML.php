@@ -86,10 +86,17 @@ USER;
         $images = '';
 
         foreach ($model->getImages() as $image) {
-            $metadata = '';
+            $metadata = $image->getMetadata();
+            $metadataXml = '';
 
-            foreach ($image->getMetadata() as $key => $value) {
-                $metadata .= '<tag key="' . $key . '">' . $value . '</tag>';
+            if (is_array($metadata)) {
+                $metadataXml .= '<metadata>';
+
+                foreach ($metadata as $key => $value) {
+                    $metadataXml .= '<tag key="' . $key . '">' . $value . '</tag>';
+                }
+
+                $metadataXml .= '</metadata>';
             }
 
             $images .= <<<IMAGE
@@ -104,7 +111,7 @@ USER;
   <size>{$image->getFilesize()}</size>
   <width>{$image->getWidth()}</width>
   <height>{$image->getHeight()}</height>
-  <metadata>{$metadata}</metadata>
+  {$metadataXml}
 </image>
 IMAGE;
 

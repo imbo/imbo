@@ -212,6 +212,25 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\XML::formatImages
      */
+    public function testCanFormatAnImagesModelWithNoMetadataSet() {
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->once())->method('getMetadata')->will($this->returnValue(null));
+        $image->expects($this->once())->method('getAddedDate')->will($this->returnValue($this->getMock('DateTime')));
+        $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue($this->getMock('DateTime')));
+
+        $images = array($image);
+        $model = $this->getMock('Imbo\Model\Images');
+        $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
+
+        $xml = $this->formatter->format($model);
+
+        $this->assertNotTag(array('tag' => 'metadata'), $xml, '', false);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatImages
+     */
     public function testCanFormatAnImagesModelWithNoMetadata() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMetadata')->will($this->returnValue(array()));

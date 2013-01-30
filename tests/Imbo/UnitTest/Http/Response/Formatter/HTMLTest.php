@@ -196,6 +196,25 @@ class HTMLTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\HTML::formatImages
      */
+    public function testCanFormatAnImagesModelWithNoMetadataSet() {
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->once())->method('getMetadata')->will($this->returnValue(null));
+        $image->expects($this->once())->method('getAddedDate')->will($this->returnValue($this->getMock('DateTime')));
+        $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue($this->getMock('DateTime')));
+
+        $images = array($image);
+        $model = $this->getMock('Imbo\Model\Images');
+        $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
+
+        $html = $this->formatter->format($model);
+
+        $this->assertNotTag(array('tag' => 'dt', 'content' => 'Metadata'), $html, 'Metadata should not be present');
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\HTML::formatImages
+     */
     public function testCanFormatAnImagesModelWithNoMetadata() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMetadata')->will($this->returnValue(array()));
@@ -208,7 +227,8 @@ class HTMLTest extends \PHPUnit_Framework_TestCase {
 
         $html = $this->formatter->format($model);
 
-        $this->assertNotTag(array('tag' => 'dt', 'content' => 'Metadata'), $html, 'Metadata should not be present');
+        $this->assertTag(array('tag' => 'dt', 'content' => 'Metadata'), $html, 'Missing metadata');
+        $this->assertTag(array('tag' => 'p', 'content' => 'No metadata'), $html, 'Missing "No metadata" text');
     }
 
     /**

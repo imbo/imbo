@@ -10,7 +10,8 @@
 
 namespace Imbo\Http\Response\Formatter;
 
-use Imbo\Model;
+use Imbo\Model,
+    stdClass;
 
 /**
  * JSON formatter
@@ -84,7 +85,13 @@ class JSON extends Formatter implements FormatterInterface {
                 'publicKey' => $image->getPublicKey(),
             );
 
-            if ($metadata = $image->getMetadata()) {
+            $metadata = $image->getMetadata();
+
+            if (is_array($metadata)) {
+                if (empty($metadata)) {
+                    $metadata = new stdClass();
+                }
+
                 $entry['metadata'] = $metadata;
             }
 
@@ -98,16 +105,16 @@ class JSON extends Formatter implements FormatterInterface {
      * {@inheritdoc}
      */
     public function formatMetadata(Model\Metadata $model) {
-        return $this->encode($model->getData());
+        return $this->encode($model->getData() ?: new stdClass());
     }
 
     /**
      * JSON encode an array
      *
-     * @param array $data The array to encode
+     * @param mixed $data The data to encode
      * @return string
      */
-    private function encode(array $data) {
+    private function encode($data) {
         return json_encode($data);
     }
 }

@@ -187,6 +187,29 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatImages
      */
+    public function testCanFormatAnImagesModelWithNoMetadataSet() {
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->once())->method('getMetadata')->will($this->returnValue(null));
+        $image->expects($this->once())->method('getAddedDate')->will($this->returnValue($this->getMock('DateTime')));
+        $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue($this->getMock('DateTime')));
+
+        $images = array($image);
+        $model = $this->getMock('Imbo\Model\Images');
+        $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
+
+        $json = $this->formatter->format($model);
+
+        $data = json_decode($json, true);
+        $this->assertCount(1, $data);
+        $image = $data[0];
+
+        $this->assertArrayNotHasKey('metadata', $image);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatImages
+     */
     public function testCanFormatAnImagesModelWithNoMetadata() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMetadata')->will($this->returnValue(array()));
@@ -203,7 +226,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(1, $data);
         $image = $data[0];
 
-        $this->assertArrayNotHasKey('metadata', $image);
+        $this->assertEmpty($image['metadata']);
     }
 
     /**
