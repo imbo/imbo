@@ -76,7 +76,7 @@ class ImageTest extends ResourceTests {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('id'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->response->expects($this->once())->method('setBody')->with(array('imageIdentifier' => 'id'));
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
 
         $this->resource->put($this->event);
     }
@@ -88,7 +88,7 @@ class ImageTest extends ResourceTests {
         $this->manager->expects($this->at(0))->method('trigger')->with('db.image.delete');
         $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.delete');
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
-        $this->response->expects($this->once())->method('setBody')->with(array('imageIdentifier' => 'id'));
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
 
         $this->resource->delete($this->event);
     }

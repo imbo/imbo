@@ -14,7 +14,8 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ResourceException,
     Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition;
+    Imbo\EventListener\ListenerDefinition,
+    Imbo\Model;
 
 /**
  * Image resource
@@ -59,7 +60,12 @@ class Image implements ResourceInterface, ListenerInterface {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
-        $response->setBody(array('imageIdentifier' => $request->getImage()->getChecksum()));
+        $model = new Model\ArrayModel();
+        $model->setData(array(
+            'imageIdentifier' => $request->getImage()->getChecksum(),
+        ));
+
+        $response->setModel($model);
     }
 
     /**
@@ -70,9 +76,13 @@ class Image implements ResourceInterface, ListenerInterface {
     public function delete(EventInterface $event) {
         $event->getManager()->trigger('db.image.delete');
         $event->getManager()->trigger('storage.image.delete');
-        $event->getResponse()->setBody(array(
+
+        $model = new Model\ArrayModel();
+        $model->setData(array(
             'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
         ));
+
+        $event->getResponse()->setModel($model);
     }
 
     /**

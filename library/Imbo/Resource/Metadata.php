@@ -14,7 +14,8 @@ use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
     Imbo\Http\Request\RequestInterface,
     Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\InvalidArgumentException;
+    Imbo\Exception\InvalidArgumentException,
+    Imbo\Model;
 
 /**
  * Metadata resource
@@ -58,9 +59,13 @@ class Metadata implements ResourceInterface, ListenerInterface {
      */
     public function delete(EventInterface $event) {
         $event->getManager()->trigger('db.metadata.delete');
-        $event->getResponse()->setBody(array(
+
+        $model = new Model\ArrayModel();
+        $model->setData(array(
             'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
         ));
+
+        $event->getResponse()->setModel($model);
     }
 
     /**
@@ -71,9 +76,13 @@ class Metadata implements ResourceInterface, ListenerInterface {
     public function put(EventInterface $event) {
         $event->getManager()->trigger('db.metadata.delete')
                             ->trigger('db.metadata.update');
-        $event->getResponse()->setBody(array(
+
+        $model = new Model\ArrayModel();
+        $model->setData(array(
             'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
         ));
+
+        $event->getResponse()->setModel($model);
     }
 
     /**
@@ -83,9 +92,13 @@ class Metadata implements ResourceInterface, ListenerInterface {
      */
     public function post(EventInterface $event) {
         $event->getManager()->trigger('db.metadata.update');
-        $event->getResponse()->setBody(array(
+
+        $model = new Model\ArrayModel();
+        $model->setData(array(
             'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
         ));
+
+        $event->getResponse()->setModel($model);
     }
 
     /**
