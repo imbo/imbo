@@ -63,14 +63,15 @@ class ResponseFormatter implements ContainerAware, ListenerInterface {
         prepareResponse:
 
         // Fetch the response body
-        $body = $response->getBody();
+        $model = $response->getModel();
 
-        // If the body is not an array it's an image and we don't need to format that
-        if (is_array($body)) {
+        // Regular images are not yet used as models, and the body of the response object is
+        // already populated with the image blob.
+        if ($model) {
             // Write the correct response body. This will throw an exception if the client does
             // not accept any of the supported content types and the $strict flag has been set to true.
             try {
-                $this->container->get('responseWriter')->write($body, $request, $response, $strict);
+                $this->container->get('responseWriter')->write($model, $request, $response, $strict);
             } catch (Exception $exception) {
                 // Generate an error
                 $response->createError($exception, $request);
