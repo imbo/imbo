@@ -141,13 +141,14 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $imageIdentifier = $request->getImageIdentifier();
         $database = $event->getDatabase();
 
-        $response->setBody($database->getMetadata($publicKey, $imageIdentifier));
-        $response->getHeaders()->set(
-            'Last-Modified',
-            $this->formatDate(
-                $database->getLastModified($publicKey, $imageIdentifier)
-            )
-        );
+        $model = new Model\Metadata();
+        $model->setData($database->getMetadata($publicKey, $imageIdentifier));
+
+        $response->setModel($model)
+                 ->getHeaders()->set(
+                     'Last-Modified',
+                     $this->formatDate($database->getLastModified($publicKey, $imageIdentifier))
+                 );
     }
 
     /**

@@ -140,6 +140,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($datetime));
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->once())->method('set')->with('Last-Modified', $date);
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Metadata'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
         $this->listener->loadMetadata($this->event);
