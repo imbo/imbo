@@ -63,7 +63,7 @@ class Image implements ModelInterface {
      *
      * @var array
      */
-    private $metadata = array();
+    private $metadata;
 
     /**
      * Width of the image
@@ -131,6 +131,18 @@ class Image implements ModelInterface {
     }
 
     /**
+     * Set the size of the image in bytes
+     *
+     * @param int $size The size of the image
+     * @return Image
+     */
+    public function setFilesize($size) {
+        $this->filesize = (int) $size;
+
+        return $this;
+    }
+
+    /**
      * Get the mime type
      *
      * @return string
@@ -189,8 +201,8 @@ class Image implements ModelInterface {
      */
     public function setBlob($blob) {
         $this->blob = $blob;
-        $this->filesize = strlen($blob);
-        $this->checksum = md5($blob);
+        $this->setFilesize(strlen($blob));
+        $this->setChecksum(md5($blob));
 
         return $this;
     }
@@ -349,6 +361,18 @@ class Image implements ModelInterface {
      */
     public function getChecksum() {
         return $this->checksum;
+    }
+
+    /**
+     * Set the checksum
+     *
+     * @param string $checksum The checksum to set
+     * @return Image
+     */
+    public function setChecksum($checksum) {
+        $this->checksum = $checksum;
+
+        return $this;
     }
 
     /**

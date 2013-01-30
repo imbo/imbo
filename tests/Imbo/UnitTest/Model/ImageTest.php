@@ -41,6 +41,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Model\Image::getMetadata
      */
     public function testCanSetAndGetMetadata() {
+        $this->assertNull($this->image->getMetadata());
         $data = array(
             'foo' => 'bar',
             'bar' => 'foo',
@@ -63,7 +64,9 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Model\Image::setBlob
      * @covers Imbo\Model\Image::getBlob
      * @covers Imbo\Model\Image::getFilesize
+     * @covers Imbo\Model\Image::setFilesize
      * @covers Imbo\Model\Image::getChecksum
+     * @covers Imbo\Model\Image::setChecksum
      */
     public function testCanSetAndGetBlob() {
         $blob = 'some string';
