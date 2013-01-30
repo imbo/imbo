@@ -78,8 +78,7 @@ class StatusTest extends ResourceTests {
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->once())->method('setStatusCode')->with(500)->will($this->returnSelf());
         $this->response->expects($this->once())->method('setStatusMessage')->with('Database error');
-        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
-        $this->container->expects($this->once())->method('get')->with('dateFormatter')->will($this->returnValue($this->getMock('Imbo\Helpers\DateFormatter')));
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
 
         $this->resource->get($this->event);
     }
@@ -96,8 +95,7 @@ class StatusTest extends ResourceTests {
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->once())->method('setStatusCode')->with(500)->will($this->returnSelf());
         $this->response->expects($this->once())->method('setStatusMessage')->with('Storage error');
-        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
-        $this->container->expects($this->once())->method('get')->with('dateFormatter')->will($this->returnValue($this->getMock('Imbo\Helpers\DateFormatter')));
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
 
         $this->resource->get($this->event);
     }
@@ -114,8 +112,7 @@ class StatusTest extends ResourceTests {
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->once())->method('setStatusCode')->with(500)->will($this->returnSelf());
         $this->response->expects($this->once())->method('setStatusMessage')->with('Database and storage error');
-        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
-        $this->container->expects($this->once())->method('get')->with('dateFormatter')->will($this->returnValue($this->getMock('Imbo\Helpers\DateFormatter')));
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
 
         $this->resource->get($this->event);
     }
@@ -131,8 +128,7 @@ class StatusTest extends ResourceTests {
         $responseHeaders->expects($this->any())->method('set')->with('Cache-Control', 'max-age=0')->will($this->returnSelf());
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
         $this->response->expects($this->never())->method('setStatusCode');
-        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'));
-        $this->container->expects($this->once())->method('get')->with('dateFormatter')->will($this->returnValue($this->getMock('Imbo\Helpers\DateFormatter')));
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
 
         $this->resource->get($this->event);
     }
