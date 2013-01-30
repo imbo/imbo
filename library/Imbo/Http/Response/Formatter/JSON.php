@@ -31,15 +31,20 @@ class JSON extends Formatter implements FormatterInterface {
      * {@inheritdoc}
      */
     public function formatError(Model\Error $model) {
-        return $this->encode(array(
+        $data = array(
             'error' => array(
                 'code' => $model->getHttpCode(),
                 'message' => $model->getErrorMessage(),
                 'date' => $this->dateFormatter->formatDate($model->getDate()),
                 'imboErrorCode' => $model->getImboErrorCode(),
             ),
-            'imageIdentifier' => $model->getImageIdentifier(),
-        ));
+        );
+
+        if ($imageIdentifier = $model->getImageIdentifier()) {
+            $data['imageIdentifier'] = $imageIdentifier;
+        }
+
+        return $this->encode($data);
     }
 
     /**

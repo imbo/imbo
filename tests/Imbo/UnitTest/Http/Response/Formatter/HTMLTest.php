@@ -80,6 +80,21 @@ class HTMLTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Http\Response\Formatter\HTML::formatError
+     */
+    public function testCanFormatAnErrorModelWhenNoImageIdentifierExists() {
+        $date = $this->getMock('DateTime');
+
+        $model = $this->getMock('Imbo\Model\Error');
+        $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
+        $model->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(null));
+
+        $html = $this->formatter->format($model);
+
+        $this->assertNotTag(array('tag' => 'dt', 'content' => 'Image identifier'), $html, 'Image identifier should not be present');
+    }
+
+    /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\HTML::formatStatus
      */

@@ -31,6 +31,13 @@ class HTML extends Formatter implements FormatterInterface {
      */
     public function formatError(Model\Error $model) {
         $date = $this->dateFormatter->formatDate($model->getDate());
+
+        $imageIdentifierHtml = '';
+
+        if ($imageIdentifier = $model->getImageIdentifier()) {
+            $imageIdentifierHtml = '<dt>Image identifier</dt><dd>' . $imageIdentifier . '</dd>';
+        }
+
         $body = <<<ERROR
 <dl>
   <dt>Code</dt>
@@ -41,8 +48,7 @@ class HTML extends Formatter implements FormatterInterface {
   <dd>{$date}</dd>
   <dt>Imbo error code</dt>
   <dd>{$model->getImboErrorCode()}</dd>
-  <dt>Image identifier</dt>
-  <dd>{$model->getImageIdentifier()}</dd>
+  {$imageIdentifierHtml}
 </dl>
 ERROR;
 

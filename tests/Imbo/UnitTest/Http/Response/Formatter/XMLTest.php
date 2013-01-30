@@ -76,6 +76,21 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Http\Response\Formatter\XML::formatError
+     */
+    public function testCanFormatAnErrorModelWhenNoImageIdentifierExists() {
+        $date = $this->getMock('DateTime');
+
+        $model = $this->getMock('Imbo\Model\Error');
+        $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
+        $model->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(null));
+
+        $xml = $this->formatter->format($model);
+
+        $this->assertNotTag(array('tag' => 'imageIdentifier'), $xml, 'Image identifier should not be present', false);
+    }
+
+    /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\XML::formatStatus
      */

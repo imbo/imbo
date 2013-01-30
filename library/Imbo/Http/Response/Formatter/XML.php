@@ -30,6 +30,12 @@ class XML extends Formatter implements FormatterInterface {
      * {@inheritdoc}
      */
     public function formatError(Model\Error $model) {
+        $imageIdentifierXml = '';
+
+        if ($imageIdentifier = $model->getImageIdentifier()) {
+            $imageIdentifierXml = '<imageIdentifier>' . $imageIdentifier . '</imageIdentifier>';
+        }
+
         return <<<ERROR
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
@@ -39,7 +45,7 @@ class XML extends Formatter implements FormatterInterface {
     <date>{$this->dateFormatter->formatDate($model->getDate())}</date>
     <imboErrorCode>{$model->getImboErrorCode()}</imboErrorCode>
   </error>
-  <imageIdentifier>{$model->getImageIdentifier()}</imageIdentifier>
+  {$imageIdentifierXml}
 </imbo>
 ERROR;
     }

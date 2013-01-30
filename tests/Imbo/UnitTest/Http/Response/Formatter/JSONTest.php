@@ -78,6 +78,22 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Http\Response\Formatter\JSON::formatError
+     */
+    public function testCanFormatAnErrorModelWhenNoImageIdentifierExists() {
+        $date = $this->getMock('DateTime');
+
+        $model = $this->getMock('Imbo\Model\Error');
+        $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
+        $model->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(null));
+
+        $json = $this->formatter->format($model);
+
+        $data = json_decode($json, true);
+        $this->assertArrayNotHasKey('imageIdentifier', $data);
+    }
+
+    /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatStatus
      */
