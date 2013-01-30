@@ -38,9 +38,11 @@ class HTML extends Formatter implements FormatterInterface {
   <dt>Message</dt>
   <dd>{$model->getErrorMessage()}</dd>
   <dt>Date</dt>
-  <dd>{$date}}</dd>
+  <dd>{$date}</dd>
   <dt>Imbo error code</dt>
   <dd>{$model->getImboErrorCode()}</dd>
+  <dt>Image identifier</dt>
+  <dd>{$model->getImageIdentifier()}</dd>
 </dl>
 ERROR;
 

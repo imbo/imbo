@@ -63,6 +63,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $model->expects($this->once())->method('getErrorMessage')->will($this->returnValue('Unknown public key'));
         $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
         $model->expects($this->once())->method('getImboErrorCode')->will($this->returnValue(100));
+        $model->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('identifier'));
 
         $this->dateFormatter->expects($this->once())->method('formatDate')->with($date)->will($this->returnValue($formattedDate));
 
@@ -73,6 +74,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame('Unknown public key', $data['error']['message']);
         $this->assertSame(404, $data['error']['code']);
         $this->assertSame(100, $data['error']['imboErrorCode']);
+        $this->assertSame('identifier', $data['imageIdentifier']);
     }
 
     /**

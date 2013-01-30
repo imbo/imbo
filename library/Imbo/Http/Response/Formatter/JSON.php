@@ -37,6 +37,7 @@ class JSON extends Formatter implements FormatterInterface {
                 'date' => $this->dateFormatter->formatDate($model->getDate()),
                 'imboErrorCode' => $model->getImboErrorCode(),
             ),
+            'imageIdentifier' => $model->getImageIdentifier(),
         ));
     }
 

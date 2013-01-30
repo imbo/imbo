@@ -62,6 +62,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $model->expects($this->once())->method('getErrorMessage')->will($this->returnValue('Unknown public key'));
         $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
         $model->expects($this->once())->method('getImboErrorCode')->will($this->returnValue(100));
+        $model->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('identifier'));
 
         $this->dateFormatter->expects($this->once())->method('formatDate')->with($date)->will($this->returnValue($formattedDate));
 
@@ -71,6 +72,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $this->assertTag(array('tag' => 'message', 'content' => 'Unknown public key', 'parent' => array('tag' => 'error')), $xml, 'Missing error message', false);
         $this->assertTag(array('tag' => 'date', 'content' => $formattedDate, 'parent' => array('tag' => 'error')), $xml, 'Missing date', false);
         $this->assertTag(array('tag' => 'imboErrorCode', 'content' => '100', 'parent' => array('tag' => 'error')), $xml, 'Missing imbo error code', false);
+        $this->assertTag(array('tag' => 'imageIdentifier', 'content' => 'identifier', 'parent' => array('tag' => 'imbo')), $xml, 'Missing image identifier', false);
     }
 
     /**

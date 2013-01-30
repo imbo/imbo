@@ -63,6 +63,7 @@ class HTMLTest extends \PHPUnit_Framework_TestCase {
         $model->expects($this->once())->method('getErrorMessage')->will($this->returnValue('Unknown public key'));
         $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
         $model->expects($this->once())->method('getImboErrorCode')->will($this->returnValue(100));
+        $model->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('identifier'));
 
         $this->dateFormatter->expects($this->once())->method('formatDate')->with($date)->will($this->returnValue($formattedDate));
 
@@ -75,6 +76,7 @@ class HTMLTest extends \PHPUnit_Framework_TestCase {
         $this->assertTag(array('tag' => 'dd', 'content' => 'Unknown public key'), $html, 'Missing error message');
         $this->assertTag(array('tag' => 'dd', 'content' => $formattedDate), $html, 'Missing date');
         $this->assertTag(array('tag' => 'dd', 'content' => '100'), $html, 'Missing imbo error code');
+        $this->assertTag(array('tag' => 'dd', 'content' => 'identifier'), $html, 'Missing image identifier');
     }
 
     /**

@@ -39,6 +39,7 @@ class XML extends Formatter implements FormatterInterface {
     <date>{$this->dateFormatter->formatDate($model->getDate())}</date>
     <imboErrorCode>{$model->getImboErrorCode()}</imboErrorCode>
   </error>
+  <imageIdentifier>{$model->getImageIdentifier()}</imageIdentifier>
 </imbo>
 ERROR;
     }
