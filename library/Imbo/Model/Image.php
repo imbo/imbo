@@ -10,6 +10,8 @@
 
 namespace Imbo\Model;
 
+use DateTime;
+
 /**
  * Image model
  *
@@ -90,6 +92,34 @@ class Image implements ModelInterface {
      * @var boolean
      */
     private $transformed = false;
+
+    /**
+     * Added date
+     *
+     * @var DateTime
+     */
+    private $added;
+
+    /**
+     * Updated date
+     *
+     * @var DateTime
+     */
+    private $updated;
+
+    /**
+     * Public key
+     *
+     * @var string
+     */
+    private $publicKey;
+
+    /**
+     * Image identifier
+     *
+     * @var string
+     */
+    private $imageIdentifier;
 
     /**
      * Get the size of the image data in bytes
@@ -224,6 +254,90 @@ class Image implements ModelInterface {
      */
     public function setHeight($height) {
         $this->height = (int) $height;
+
+        return $this;
+    }
+
+    /**
+     * Get the added date
+     *
+     * @return DateTime
+     */
+    public function getAddedDate() {
+        return $this->added;
+    }
+
+    /**
+     * Set the added date
+     *
+     * @param DateTime $added When the image was added
+     * @return Image
+     */
+    public function setAddedDate(DateTime $added) {
+        $this->added = $added;
+
+        return $this;
+    }
+
+    /**
+     * Get the updated date
+     *
+     * @return DateTime
+     */
+    public function getUpdatedDate() {
+        return $this->updated;
+    }
+
+    /**
+     * Set the updated date
+     *
+     * @param DateTime $updated When the image was updated
+     * @return Image
+     */
+    public function setUpdatedDate(DateTime $updated) {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get the public key
+     *
+     * @return string
+     */
+    public function getPublicKey() {
+        return $this->publicKey;
+    }
+
+    /**
+     * Set the public key
+     *
+     * @param string $publicKey The public key
+     * @return Image
+     */
+    public function setPublicKey($publicKey) {
+        $this->publicKey = $publicKey;
+
+        return $this;
+    }
+
+    /**
+     * Get the image identifier
+     *
+     * @return string
+     */
+    public function getImageIdentifier() {
+        return $this->imageIdentifier;
+    }
+
+    /**
+     * Set the public key
+     *
+     * @param string $imageIdentifier The public key
+     * @return Image
+     */
+    public function setImageIdentifier($imageIdentifier) {
+        $this->imageIdentifier = $imageIdentifier;
 
         return $this;
     }

@@ -112,6 +112,48 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Model\Image::setAddedDate
+     * @covers Imbo\Model\Image::getAddedDate
+     */
+    public function testCanSetAndGetTheAddedDate() {
+        $date = $this->getMock('DateTime');
+        $this->assertNull($this->image->getAddedDate());
+        $this->assertSame($this->image, $this->image->setAddedDate($date));
+        $this->assertSame($date, $this->image->getAddedDate());
+    }
+
+    /**
+     * @covers Imbo\Model\Image::setUpdatedDate
+     * @covers Imbo\Model\Image::getUpdatedDate
+     */
+    public function testCanSetAndGetTheUpdatedDate() {
+        $date = $this->getMock('DateTime');
+        $this->assertNull($this->image->getUpdatedDate());
+        $this->assertSame($this->image, $this->image->setUpdatedDate($date));
+        $this->assertSame($date, $this->image->getUpdatedDate());
+    }
+
+    /**
+     * @covers Imbo\Model\Image::setPublicKey
+     * @covers Imbo\Model\Image::getPublicKey
+     */
+    public function testCanSetAndGetThePublicKey() {
+        $this->assertNull($this->image->getPublicKey());
+        $this->assertSame($this->image, $this->image->setPublicKey('christer'));
+        $this->assertSame('christer', $this->image->getPublicKey());
+    }
+
+    /**
+     * @covers Imbo\Model\Image::setImageIdentifier
+     * @covers Imbo\Model\Image::getImageIdentifier
+     */
+    public function testCanSetAndGetTheImageIdentifier() {
+        $this->assertNull($this->image->getImageIdentifier());
+        $this->assertSame($this->image, $this->image->setImageIdentifier('identifier'));
+        $this->assertSame('identifier', $this->image->getImageIdentifier());
+    }
+
+    /**
      * Get mime types and whether or not they are supported
      *
      * @return array
