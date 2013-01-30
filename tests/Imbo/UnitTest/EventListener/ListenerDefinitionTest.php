@@ -15,7 +15,6 @@ use Imbo\EventListener\ListenerDefinition;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\EventListener\ListenerDefinition
  */
 class ListenerDefinitionTest extends \PHPUnit_Framework_TestCase {
     /**

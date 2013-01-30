@@ -16,7 +16,6 @@ use Imbo\EventListener\StorageOperations,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\EventListener\StorageOperations
  */
 class StorageOperationsTest extends ListenerTests {
     /**

@@ -15,7 +15,6 @@ use Imbo\Http\ServerContainer;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Http\ServerContainer
  */
 class ServerContainerTest extends \PHPUnit_Framework_TestCase {
     /**

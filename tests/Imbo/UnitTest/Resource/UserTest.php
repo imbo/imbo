@@ -15,7 +15,6 @@ use Imbo\Resource\User;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Resource\User
  */
 class UserTest extends ResourceTests {
     /**

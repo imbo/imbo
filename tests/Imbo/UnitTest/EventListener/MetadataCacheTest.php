@@ -15,7 +15,6 @@ use Imbo\EventListener\MetadataCache;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\EventListener\MetadataCache
  */
 class MetadataCacheTest extends ListenerTests {
     /**

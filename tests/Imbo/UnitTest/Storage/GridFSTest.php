@@ -19,7 +19,6 @@ use Imbo\Storage\GridFS,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Storage\GridFS
  */
 class GridFSTest extends \PHPUnit_Framework_TestCase {
     /**

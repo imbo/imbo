@@ -15,7 +15,6 @@ use Imbo\EventListener\AccessToken;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\EventListener\AccessToken
  */
 class AccessTokenTest extends ListenerTests {
     /**

@@ -15,7 +15,6 @@ use Imbo\Http\ParameterContainer;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Http\ParameterContainer
  */
 class ParameterContainerTest extends \PHPUnit_Framework_TestCase {
     /**

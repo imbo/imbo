@@ -15,7 +15,6 @@ use Imbo\Http\Request\Request;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Http\Request\Request
  */
 class RequestTest extends \PHPUnit_Framework_TestCase {
     /**
