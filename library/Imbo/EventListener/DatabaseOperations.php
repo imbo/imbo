@@ -158,6 +158,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
     public function loadImages(EventInterface $event) {
         $params = $event->getRequest()->getQuery();
         $query = $this->container->get('imagesQuery');
+        $returnMetadata = false;
 
         if ($params->has('page')) {
             $query->page($params->get('page'));
@@ -169,6 +170,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
 
         if ($params->has('metadata')) {
             $query->returnMetadata($params->get('metadata'));
+            $returnMetadata = true;
         }
 
         if ($params->has('from')) {
@@ -192,15 +194,34 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $database = $event->getDatabase();
 
         $images = $database->getImages($publicKey, $query);
+        $modelImages = array();
 
-        foreach ($images as &$image) {
-            $image['added'] = $this->formatDate($image['added']);
-            $image['updated'] = $this->formatDate($image['updated']);
+        foreach ($images as $image) {
+            $entry = new Model\Image();
+            $entry->setFilesize($image['size'])
+                  ->setWidth($image['width'])
+                  ->setHeight($image['height'])
+                  ->setPublicKey($publicKey)
+                  ->setImageIdentifier($image['imageIdentifier'])
+                  ->setChecksum($image['checksum'])
+                  ->setMimeType($image['mime'])
+                  ->setExtension($image['extension'])
+                  ->setAddedDate($image['added'])
+                  ->setUpdatedDate($image['updated']);
+
+            if ($returnMetadata) {
+                $entry->setMetadata($image['metadata']);
+            }
+
+            $modelImages[] = $entry;
         }
+
+        $model = new Model\Images();
+        $model->setImages($modelImages);
 
         $lastModified = $this->formatDate($database->getLastModified($publicKey));
 
-        $response->setBody($images)
+        $response->setModel($model)
                  ->getHeaders()->set('Last-Modified', $lastModified);
     }
 
