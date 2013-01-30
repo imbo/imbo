@@ -293,4 +293,39 @@ class HTMLTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertTag(array('tag' => 'p', 'content' => 'No metadata'), $html, 'Metadata should not be present');
     }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\HTML::formatArrayModel
+     */
+    public function testCanFormatAnArrayModel() {
+        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model->expects($this->once())->method('getData')->will($this->returnValue(array(
+            'some key' => 'some value',
+            'some other key' => 'some other value',
+        )));
+
+        $html = $this->formatter->format($model);
+
+        $this->assertTag(array('tag' => 'title', 'content' => 'Imbo response'), $html, 'Title is not correct');
+        $this->assertTag(array('tag' => 'h1', 'content' => 'Imbo response'), $html, 'Title is not correct');
+
+        $this->assertTag(array('tag' => 'dt', 'content' => 'some key'), $html, 'Missing key');
+        $this->assertTag(array('tag' => 'dt', 'content' => 'some other key'), $html, 'Missing key');
+        $this->assertTag(array('tag' => 'dd', 'content' => 'some value'), $html, 'Missing value');
+        $this->assertTag(array('tag' => 'dd', 'content' => 'some other value'), $html, 'Missing value');
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\HTML::formatArrayModel
+     */
+    public function testCanFormatAnEmptyArrayModel() {
+        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model->expects($this->once())->method('getData')->will($this->returnValue(array()));
+
+        $html = $this->formatter->format($model);
+
+        $this->assertTag(array('tag' => 'p', 'content' => 'No data'), $html, 'Data should not be present');
+    }
 }

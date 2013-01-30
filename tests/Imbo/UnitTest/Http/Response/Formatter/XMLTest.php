@@ -318,4 +318,46 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertTag(array('tag' => 'metadata', 'content' => ''), $xml, '', false);
     }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatArrayModel
+     */
+    public function testCanFormatAnArrayModel() {
+        $data = array(
+            'some key' => 'some value',
+            'some other key' => 'some other value',
+        );
+        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($data));
+
+        $xml = $this->formatter->format($model);
+
+        foreach ($data as $key => $value) {
+            $this->assertTag(
+                array(
+                    'tag' => 'tag',
+                    'attributes' => array(
+                        'key' => $key,
+                    ),
+                    'content' => $value,
+                    'parent' => array(
+                        'tag' => 'imbo',
+                    ),
+                ), $xml, '', false);
+        }
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatArrayModel
+     */
+    public function testCanFormatAnEmptyArrayModel() {
+        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model->expects($this->once())->method('getData')->will($this->returnValue(array()));
+
+        $xml = $this->formatter->format($model);
+
+        $this->assertTag(array('tag' => 'imbo', 'content' => ''), $xml, '', false);
+    }
 }

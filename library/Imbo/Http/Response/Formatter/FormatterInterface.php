@@ -70,6 +70,14 @@ interface FormatterInterface {
     function formatMetadata(Model\Metadata $model);
 
     /**
+     * Format an array model
+     *
+     * @param Model\ArrayModel $model The model to format
+     * @return string Formatted data
+     */
+    function formatArrayModel(Model\ArrayModel $model);
+
+    /**
      * Get the content type for the current formatter
      *
      * Return the content type for the current formatter, excluding the character set, for instance

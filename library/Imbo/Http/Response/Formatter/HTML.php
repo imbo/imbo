@@ -186,6 +186,27 @@ IMAGE;
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function formatArrayModel(Model\ArrayModel $model) {
+        $data = $model->getData();
+
+        if (empty($data)) {
+            $body = '<p>No data</p>';
+        } else {
+            $body = '<dl>';
+
+            foreach ($data as $key => $value) {
+                $body .= '<dt>' . $key . '</dt><dd>' . $value . '</dd>';
+            }
+
+            $body .= '</dl>';
+        }
+
+        return $this->getDocument('Imbo response', $body);
+    }
+
+    /**
      * Get an HTML5 document with some placeholders
      *
      * @return string

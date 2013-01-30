@@ -55,6 +55,8 @@ abstract class Formatter implements FormatterInterface {
             return $this->formatImages($model);
         } else if ($model instanceof Model\Metadata) {
             return $this->formatMetadata($model);
+        } else if ($model instanceof Model\ArrayModel) {
+            return $this->formatArrayModel($model);
         }
 
         throw new InvalidArgumentException('Unsupported model type', 500);

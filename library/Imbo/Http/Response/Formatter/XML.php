@@ -148,4 +148,20 @@ IMAGES;
 </imbo>
 METADATA;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatArrayModel(Model\ArrayModel $model) {
+        $data = '';
+
+        foreach ($model->getData() as $key => $value) {
+            $data .= '<tag key="' . $key . '">' . $value . '</tag>';
+        }
+
+        return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>{$data}</imbo>
+DATA;
+    }
 }

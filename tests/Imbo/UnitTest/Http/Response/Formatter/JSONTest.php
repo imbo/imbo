@@ -290,4 +290,35 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $data = json_decode($json, true);
         $this->assertSame(array(), $data);
     }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatArrayModel
+     */
+    public function testCanFormatAnArrayModel() {
+        $data = array(
+            'some key' => 'some value',
+            'some other key' => 'some other value',
+        );
+        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($data));
+
+        $json = $this->formatter->format($model);
+
+        $this->assertSame(json_decode($json, true), $data);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatArrayModel
+     */
+    public function testCanFormatAnEmptyArrayModel() {
+        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model->expects($this->once())->method('getData')->will($this->returnValue(array()));
+
+        $json = $this->formatter->format($model);
+
+        $data = json_decode($json, true);
+        $this->assertSame(array(), $data);
+    }
 }
