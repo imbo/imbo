@@ -66,15 +66,12 @@ class MongoDBTest extends DatabaseTests {
     }
 
     /**
-     * @covers Imbo\Database\MongoDB::getMongo
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionMessage Could not connect to database
-     * @expectedExceptionCode 500
+     * @covers Imbo\Database\MongoDB::getStatus
      */
-    public function testThrowsExceptionWhenUSingAnInvalidMongodbHostname() {
+    public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() {
         $db = new MongoDB(array(
             'server' => 'foobar',
         ));
-        $db->getStatus();
+        $this->assertFalse($db->getStatus());
     }
 }
