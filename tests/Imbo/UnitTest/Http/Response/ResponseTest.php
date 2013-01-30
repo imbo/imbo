@@ -167,14 +167,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame(400, $this->response->getStatusCode());
 
-        $body = $this->response->getBody();
+        $model = $this->response->getModel();
 
-        $this->assertArrayHasKey('error', $body);
-        $this->assertArrayHasKey('code', $body['error']);
-        $this->assertArrayHasKey('message', $body['error']);
-
-        $this->assertSame(400, $body['error']['code']);
-        $this->assertSame('You wronged', $body['error']['message']);
+        $this->assertSame(400, $model->getHttpCode());
+        $this->assertSame('You wronged', $model->getErrorMessage());
     }
 
     /**
@@ -197,14 +193,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
         $this->response->createError($exception, $request);
 
-        $body = $this->response->getBody();
+        $model = $this->response->getModel();
 
-        $this->assertArrayHasKey('error', $body);
-        $this->assertArrayHasKey('imageIdentifier', $body);
-        $this->assertArrayHasKey('imboErrorCode', $body['error']);
-
-        $this->assertSame(123, $body['error']['imboErrorCode']);
-        $this->assertSame('imageIdentifier', $body['imageIdentifier']);
+        $this->assertSame(123, $model->getImboErrorCode());
+        $this->assertSame('imageIdentifier', $model->getImageIdentifier());
     }
 
     /**
@@ -229,14 +221,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
         $this->response->createError($exception, $request);
 
-        $body = $this->response->getBody();
+        $model = $this->response->getModel();
 
-        $this->assertArrayHasKey('error', $body);
-        $this->assertArrayHasKey('imageIdentifier', $body);
-        $this->assertArrayHasKey('imboErrorCode', $body['error']);
-
-        $this->assertSame(123, $body['error']['imboErrorCode']);
-        $this->assertSame('checksum', $body['imageIdentifier']);
+        $this->assertSame(123, $model->getImboErrorCode());
+        $this->assertSame('checksum', $model->getImageIdentifier());
     }
 
     /**
