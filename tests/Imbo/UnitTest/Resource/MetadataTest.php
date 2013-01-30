@@ -15,7 +15,6 @@ use Imbo\Resource\Metadata;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Resource\Metadata
  */
 class MetadataTest extends ResourceTests {
     /**

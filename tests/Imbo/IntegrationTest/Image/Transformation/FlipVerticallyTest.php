@@ -15,7 +15,6 @@ use Imbo\Image\Transformation\FlipVertically;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
- * @covers Imbo\Image\Transformation\FlipVertically
  */
 class FlipVerticallyTest extends TransformationTests {
     /**

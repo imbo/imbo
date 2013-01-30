@@ -16,7 +16,6 @@ use Imbo\Storage\GridFS,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
- * @covers Imbo\Storage\GridFS
  */
 class GridFSTest extends StorageTests {
     /**

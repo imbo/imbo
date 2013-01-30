@@ -15,7 +15,6 @@ use Imbo\Image\Transformation\Crop;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Image\Transformation\Crop
  */
 class CropTest extends \PHPUnit_Framework_TestCase {
     /**

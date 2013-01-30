@@ -16,7 +16,6 @@ use Imbo\Database\Doctrine,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Database\Doctrine
  */
 class DoctrineTest extends \PHPUnit_Framework_TestCase {
     /**

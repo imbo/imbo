@@ -15,7 +15,6 @@ use Imbo\EventListener\Authenticate;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\EventListener\Authenticate
  */
 class AuthenticateTest extends ListenerTests {
     /**

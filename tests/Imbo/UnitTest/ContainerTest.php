@@ -15,7 +15,6 @@ use Imbo\Container;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Container
  */
 class ContainerTest extends \PHPUnit_Framework_TestCase {
     /**

@@ -18,7 +18,6 @@ use Imbo\Http\Response\Response,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Http\Response\Response
  */
 class ResponseTest extends \PHPUnit_Framework_TestCase {
     /**

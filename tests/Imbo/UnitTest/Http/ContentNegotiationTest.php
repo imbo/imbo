@@ -15,7 +15,6 @@ use Imbo\Http\ContentNegotiation;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Http\ContentNegotiation
  */
 class ContentNegotiationTest extends \PHPUnit_Framework_TestCase {
     /**

@@ -15,7 +15,6 @@ use Imbo\EventManager\EventManager;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\EventManager\EventManager
  */
 class EventManagerTest extends \PHPUnit_Framework_TestCase {
     /**

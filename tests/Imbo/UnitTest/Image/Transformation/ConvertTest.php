@@ -15,7 +15,6 @@ use Imbo\Image\Transformation\Convert;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Image\Transformation\Convert
  */
 class ConvertTest extends \PHPUnit_Framework_TestCase {
     /**

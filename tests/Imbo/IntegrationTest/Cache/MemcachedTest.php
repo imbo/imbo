@@ -16,7 +16,6 @@ use Imbo\Cache\Memcached,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
- * @covers Imbo\Cache\Memcached
  */
 class MemcachedTest extends CacheTests {
     protected function getDriver() {

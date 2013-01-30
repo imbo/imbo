@@ -18,7 +18,6 @@ use Imbo\Image\Transformation\Transformation,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Image\Transformation\Transformation
  */
 class TransformationTest extends \PHPUnit_Framework_TestCase {
     /**
