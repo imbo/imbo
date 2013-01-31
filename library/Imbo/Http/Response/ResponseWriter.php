@@ -33,17 +33,14 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
     private $container;
 
     /**
-     * Supported content types and the associated container entries for the formatters
+     * Supported content types and the associated formatter class name or instance
      *
      * @var array
      */
     private $supportedTypes = array(
-        'application/json' => 'jsonFormatter',
-        'application/xml'  => 'xmlFormatter',
-        'text/html'        => 'htmlFormatter',
-        'image/gif'        => 'gifFormatter',
-        'image/jpeg'       => 'jpgFormatter',
-        'image/png'        => 'pngFormatter',
+        'application/json' => 'Imbo\Http\Response\Formatter\JSON',
+        'application/xml'  => 'Imbo\Http\Response\Formatter\XML',
+        'text/html'        => 'Imbo\Http\Response\Formatter\HTML',
     );
 
     /**
@@ -55,9 +52,6 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
         'json' => 'application/json',
         'xml'  => 'application/xml',
         'html' => 'text/html',
-        'gif'  => 'image/gif',
-        'jpg'  => 'image/jpeg',
-        'png'  => 'image/png',
     );
 
     /**
@@ -96,11 +90,11 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
             $match = false;
             $maxQ = 0;
 
-            foreach ($this->supportedTypes as $mime => $containerEntry) {
+            foreach ($this->supportedTypes as $mime => $formatterClass) {
                 if (($q = $this->container->get('contentNegotiation')->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
                     $maxQ = $q;
                     $match = true;
-                    $formatter = $containerEntry;
+                    $formatter = $formatterClass;
                 }
             }
 
@@ -116,22 +110,17 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
         }
 
         // Create an instance of the formatter
-        $formatter = $this->container->get($formatter);
+        $formatter = new $formatter();
+        $formattedData = $formatter->format($model);
         $contentType = $formatter->getContentType();
 
-        if ($formatter instanceof Formatter\ImageFormatterInterface) {
-            $formattedData = $formatter->formatImage($model);
-        } else {
-            $formattedData = $formatter->format($model);
+        if ($contentType === 'application/json') {
+            $query = $request->getQuery();
 
-            if ($contentType === 'application/json') {
-                $query = $request->getQuery();
-
-                foreach (array('callback', 'jsonp', 'json') as $param) {
-                    if ($query->has($param)) {
-                        $formattedData = sprintf("%s(%s)", $query->get($param), $formattedData);
-                        break;
-                    }
+            foreach (array('callback', 'jsonp', 'json') as $param) {
+                if ($query->has($param)) {
+                    $formattedData = sprintf("%s(%s)", $query->get($param), $formattedData);
+                    break;
                 }
             }
         }
