@@ -22,17 +22,21 @@ class GifTest extends \PHPUnit_Framework_TestCase {
      */
     private $formatter;
 
+    private $transformation;
+
     /**
      * Set up the formatter
      */
     public function setUp() {
-        $this->formatter = new Gif();
+        $this->transformation = $this->getMock('Imbo\Image\Transformation\TransformationInterface');
+        $this->formatter = new Gif($this->transformation);
     }
 
     /**
      * Tear down the formatter
      */
     public function tearDown() {
+        $this->transformation = null;
         $this->formatter = null;
     }
 
