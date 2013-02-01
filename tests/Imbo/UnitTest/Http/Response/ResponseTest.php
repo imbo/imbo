@@ -319,8 +319,8 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->headers->expects($this->at(1))->method('get')->with('etag')->will($this->returnValue(null));
         $this->headers->expects($this->at(2))->method('set')->with('X-Imbo-ImageIdentifier', 'imageIdentifier');
 
-        $this->expectOutputString('{"foo":"bar"}');
-        $this->response->setBody(array('foo' => 'bar'))->send($event);
+        $this->expectOutputString('foobar');
+        $this->response->setBody('foobar')->send($event);
     }
 
     /**
@@ -343,8 +343,8 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->headers->expects($this->at(1))->method('get')->with('etag')->will($this->returnValue(null));
         $this->headers->expects($this->at(2))->method('set')->with('X-Imbo-ImageIdentifier', 'checksum');
 
-        $this->expectOutputString('{"foo":"bar"}');
-        $this->response->setBody(array('foo' => 'bar'))->send($event);
+        $this->expectOutputString('foobar');
+        $this->response->setBody('foobar')->send($event);
     }
 
     /**

@@ -424,16 +424,6 @@ class Response implements ListenerInterface, ResponseInterface {
      * Send the content to the client
      */
     private function sendContent() {
-        $body = $this->getBody();
-
-        if (is_array($body)) {
-            if (!headers_sent()) {
-                header('Content-Type: application/json');
-            }
-
-            $body = json_encode($body);
-        }
-
-        echo $body;
+        echo $this->getBody();
     }
 }
