@@ -84,39 +84,6 @@ class ImageTransformer implements ContainerAware, ListenerInterface {
             $transformed = true;
         }
 
-        // See if we want to trigger a conversion. This happens if the user agent has specified an
-        // image type in the URI, or if the user agent does not accept the original content type of
-        // the requested image.
-        $extension = $request->getExtension();
-        $imageType = $image->getMimeType();
-        $acceptableTypes = $request->getAcceptableContentTypes();
-        $contentNegotiation = $this->container->get('contentNegotiation');
-
-        if (!$extension && !$contentNegotiation->isAcceptable($imageType, $acceptableTypes)) {
-            $typesToCheck = Image::$mimeTypes;
-
-            $match = $contentNegotiation->bestMatch(array_keys($typesToCheck), $acceptableTypes);
-
-            if (!$match) {
-                throw new TransformationException('Not Acceptable', 406);
-            }
-
-            if ($match !== $imageType) {
-                // The match is of a different type than the original image
-                $extension = $typesToCheck[$match];
-            }
-        }
-
-        if ($extension) {
-            // Trigger a conversion
-            $callback = $this->transformationHandlers['convert'];
-
-            $convert = $callback(array('type' => $extension));
-            $convert->applyToImage($image);
-
-            $transformed = true;
-        }
-
         $image->hasBeenTransformed($transformed);
     }
 
