@@ -84,6 +84,8 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $image->expects($this->once())->method('setHeight')->with(463)->will($this->returnSelf());
         $image->expects($this->once())->method('setMimeType')->with('image/png')->will($this->returnSelf());
         $image->expects($this->once())->method('setExtension')->with('png')->will($this->returnSelf());
+        $image->expects($this->once())->method('setAddedDate')->with($this->isInstanceOf('DateTime'))->will($this->returnSelf());
+        $image->expects($this->once())->method('setUpdatedDate')->with($this->isInstanceOf('DateTime'))->will($this->returnSelf());
 
         $this->assertTrue($this->driver->load($this->publicKey, $this->imageIdentifier, $image));
     }

@@ -297,7 +297,7 @@ class MongoDB implements DatabaseInterface {
         try {
             $data = $this->getCollection()->findOne(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('size', 'width', 'height', 'mime', 'extension')
+                array('size', 'width', 'height', 'mime', 'extension', 'added', 'updated')
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch image data', 500, $e);
@@ -310,7 +310,9 @@ class MongoDB implements DatabaseInterface {
         $image->setWidth($data['width'])
               ->setHeight($data['height'])
               ->setMimeType($data['mime'])
-              ->setExtension($data['extension']);
+              ->setExtension($data['extension'])
+              ->setAddedDate(new DateTime('@' . $data['added'], new DateTimeZone('UTC')))
+              ->setUpdatedDate(new DateTime('@' . $data['updated'], new DateTimeZone('UTC')));
 
         return true;
     }
