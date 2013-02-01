@@ -19,7 +19,7 @@ use Imbo\EventManager\EventInterface,
 
 /**
  * This event listener will correctly format the response body based on the Accept headers in the
- * request. If the request is for an image resource it will not do anything.
+ * request
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Http
@@ -65,24 +65,20 @@ class ResponseFormatter implements ContainerAware, ListenerInterface {
         // Fetch the response body
         $model = $response->getModel();
 
-        // Regular images are not yet used as models, and the body of the response object is
-        // already populated with the image blob.
-        if ($model) {
-            // Write the correct response body. This will throw an exception if the client does
-            // not accept any of the supported content types and the $strict flag has been set to true.
-            try {
-                $this->container->get('responseWriter')->write($model, $request, $response, $strict);
-            } catch (Exception $exception) {
-                // Generate an error
-                $response->createError($exception, $request);
+        // Write the correct response body. This will throw an exception if the client does not
+        // accept any of the supported content types and the $strict flag has been set to true.
+        try {
+            $this->container->get('responseWriter')->write($model, $request, $response, $strict);
+        } catch (Exception $exception) {
+            // Generate an error
+            $response->createError($exception, $request);
 
-                // The response writer could not produce acceptable content. Flip flag and prepare
-                // the response one more time
-                $strict = false;
+            // The response writer could not produce acceptable content. Flip flag and prepare
+            // the response one more time
+            $strict = false;
 
-                // Go back up and prepare the new response
-                goto prepareResponse;
-            }
+            // Go back up and prepare the new response
+            goto prepareResponse;
         }
     }
 }
