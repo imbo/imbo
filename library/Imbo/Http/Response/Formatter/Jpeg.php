@@ -11,27 +11,19 @@
 namespace Imbo\Http\Response\Formatter;
 
 use Imbo\Model,
-    Imbo\Exception\InvalidArgumentException;
+    Imbo\Image\Transformation\TransformationInterface;
 
 /**
- * Interface for formatters
+ * Jpeg image formatter
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Response\Formatters
  */
-interface ImageFormatterInterface {
+class Jpeg extends ImageFormatter implements ImageFormatterInterface {
     /**
-     * Format an image model
-     *
-     * @param Model\Image $model The model to format
-     * @return string Formatted data
+     * {@inheritdoc}
      */
-    function format(Model\Image $model);
-
-    /**
-     * Get the content type for the current formatter
-     *
-     * @return string
-     */
-    function getContentType();
+    public function getContentType() {
+        return 'image/jpeg';
+    }
 }

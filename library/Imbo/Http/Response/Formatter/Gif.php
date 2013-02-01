@@ -19,34 +19,11 @@ use Imbo\Model,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Response\Formatters
  */
-class Gif implements ImageFormatterInterface {
-    /**
-     * Convert transformation
-     *
-     * @var TransformationInterface
-     */
-    private $transformation;
-
-    /**
-     * Class constructor
-     *
-     * @param TransformationInterface $transformation A convert transformation
-     */
-    public function __construct(TransformationInterface $transformation) {
-        $this->transformation = $transformation;
-    }
-
+class Gif extends ImageFormatter implements ImageFormatterInterface {
     /**
      * {@inheritdoc}
      */
     public function getContentType() {
         return 'image/gif';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function formatImage(Model\Image $model) {
-
     }
 }
