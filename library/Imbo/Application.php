@@ -414,12 +414,12 @@ class Application {
 
             return new Formatter\Gif($transformation);
         });
-        $container->setStatic('jpgFormatter', function(Container $container) {
+        $container->setStatic('jpegFormatter', function(Container $container) {
             $config = $container->get('config');
             $callback = $config['imageTransformations']['convert'];
             $transformation = $callback(array('type' => 'jpg'));
 
-            return new Formatter\Jpg($transformation);
+            return new Formatter\Jpeg($transformation);
         });
         $container->setStatic('pngFormatter', function(Container $container) {
             $config = $container->get('config');
