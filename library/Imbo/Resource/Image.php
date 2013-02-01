@@ -99,7 +99,10 @@ class Image implements ResourceInterface, ListenerInterface {
         $serverContainer = $request->getServer();
         $requestHeaders = $request->getHeaders();
         $responseHeaders = $response->getHeaders();
+
         $image = $response->getImage();
+        $image->setImageIdentifier($imageIdentifier)
+              ->setPublicKey($publicKey);
 
         $event->getManager()->trigger('db.image.load');
         $event->getManager()->trigger('storage.image.load');
@@ -112,6 +115,7 @@ class Image implements ResourceInterface, ListenerInterface {
             $requestHeaders->get('Accept') .
             $serverContainer->get('REQUEST_URI')
         ) . '"';
+
 
         // Set some response headers before we apply optional transformations
         $responseHeaders
@@ -131,12 +135,6 @@ class Image implements ResourceInterface, ListenerInterface {
         // Trigger possible image transformations
         $event->getManager()->trigger('image.transform');
 
-        // Set the content length and content-type after transformations have been applied
-        $imageData = $image->getBlob();
-
-        $responseHeaders->set('Content-Length', strlen($imageData))
-                        ->set('Content-Type', $image->getMimeType());
-
-        $response->setBody($imageData);
+        $response->setModel($image);
     }
 }
