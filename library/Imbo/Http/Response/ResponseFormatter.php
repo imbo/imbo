@@ -56,29 +56,16 @@ class ResponseFormatter implements ContainerAware, ListenerInterface {
     public function send(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
-
-        // Default mode for the response writer
-        $strict = true;
-
-        prepareResponse:
-
-        // Fetch the response body
         $model = $response->getModel();
+        $responseWriter = $this->container->get('responseWriter');
 
-        // Write the correct response body. This will throw an exception if the client does not
-        // accept any of the supported content types and the $strict flag has been set to true.
         try {
-            $this->container->get('responseWriter')->write($model, $request, $response, $strict);
+            $responseWriter->write($model, $request, $response);
         } catch (Exception $exception) {
-            // Generate an error
             $response->createError($exception, $request);
 
-            // The response writer could not produce acceptable content. Flip flag and prepare
-            // the response one more time
-            $strict = false;
-
-            // Go back up and prepare the new response
-            goto prepareResponse;
+            // Write the error in non-strict mode
+            $responseWriter->write($model, $request, $response, false);
         }
     }
 }
