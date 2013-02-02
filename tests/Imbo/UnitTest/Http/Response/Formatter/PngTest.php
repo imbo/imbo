@@ -10,26 +10,26 @@
 
 namespace Imbo\UnitTest\Http\Response\Formatter;
 
-use Imbo\Http\Response\Formatter\Gif,
+use Imbo\Http\Response\Formatter\Png,
     Imbo\Image\Transformation\TransformationInterface;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
  */
-class GifTest extends ImageFormatterTests {
+class PngTest extends ImageFormatterTests {
 
     /**
      * {@inheritdoc}
      */
     protected function getFormatter(TransformationInterface $transformation) {
-        return new Gif($transformation);
+        return new Png($transformation);
     }
 
     /**
      * {@inheritdoc}
      */
     protected function getExpectedContentType() {
-        return 'image/gif';
+        return 'image/png';
     }
 }
