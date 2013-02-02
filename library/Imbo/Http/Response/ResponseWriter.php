@@ -16,7 +16,7 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\Exception\RuntimeException,
     Imbo\Container,
     Imbo\ContainerAware,
-    Imbo\Model\ModelInterface;
+    Imbo\Model;
 
 /**
  * Response writer
@@ -24,7 +24,7 @@ use Imbo\Http\Request\RequestInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Http
  */
-class ResponseWriter implements ContainerAware, ResponseWriterInterface {
+class ResponseWriter implements ContainerAware {
     /**
      * Service container
      *
@@ -38,9 +38,12 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
      * @var array
      */
     private $supportedTypes = array(
-        'application/json' => 'Imbo\Http\Response\Formatter\JSON',
-        'application/xml'  => 'Imbo\Http\Response\Formatter\XML',
-        'text/html'        => 'Imbo\Http\Response\Formatter\HTML',
+        'application/json' => 'jsonFormatter',
+        'application/xml'  => 'xmlFormatter',
+        'text/html'        => 'htmlFormatter',
+        'image/gif'        => 'gifFormatter',
+        'image/png'        => 'pngFormatter',
+        'image/jpeg'       => 'jpegFormatter',
     );
 
     /**
@@ -52,6 +55,33 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
         'json' => 'application/json',
         'xml'  => 'application/xml',
         'html' => 'text/html',
+        'gif'  => 'image/gif',
+        'jpg'  => 'image/jpeg',
+        'png'  => 'image/png',
+    );
+
+    /**
+     * The default types that models support
+     *
+     * @var array
+     */
+    private $defaultModelTypes = array(
+        'application/json',
+        'application/xml',
+        'text/html',
+    );
+
+    /**
+     * The types the different models can be expressed as, if they don't support the default ones
+     *
+     * @var array
+     */
+    private $modelTypes = array(
+        'image' => array(
+            'image/gif',
+            'image/png',
+            'image/jpeg',
+        ),
     );
 
     /**
@@ -71,9 +101,9 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
     /**
      * {@inheritdoc}
      */
-    public function write(ModelInterface $model, RequestInterface $request, ResponseInterface $response, $strict = true) {
-        // The formatter to use
-        $formatter = null;
+    public function write(Model\ModelInterface $model, RequestInterface $request, ResponseInterface $response, $strict = true) {
+        // The entry of the formatter to fetch from the container
+        $entry = null;
 
         if ($extension = $request->getExtension()) {
             // The user agent wants a specific type. Skip content negotiation completely
@@ -83,34 +113,59 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
                 $mime = $this->extensionsToMimeType[$extension];
             }
 
-            $formatter = $this->supportedTypes[$mime];
+            $entry = $this->supportedTypes[$mime];
         } else {
-            // Try to find the best match
+            // No extension have been provided
+            $contentNegotiation = $this->container->get('contentNegotiation');
             $acceptableTypes = $request->getAcceptableContentTypes();
-            $match = false;
-            $maxQ = 0;
 
-            foreach ($this->supportedTypes as $mime => $formatterClass) {
-                if (($q = $this->container->get('contentNegotiation')->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
-                    $maxQ = $q;
-                    $match = true;
-                    $formatter = $formatterClass;
+            // If we have an image, see if the client accepts the current format
+            if ($model instanceof Model\Image) {
+                $mimeType = $model->getMimeType();
+
+                if ($contentNegotiation->isAcceptable($mimeType, $acceptableTypes)) {
+                    $entry = $this->supportedTypes[$mimeType];
                 }
             }
 
-            if (!$match && $strict) {
-                // No types matched with strict mode enabled. The client does not want any of Imbo's
-                // supported types. Y U NO ACCEPT MY TYPES?! FFFFUUUUUUU!
-                throw new RuntimeException('Not acceptable', 406);
-            } else if (!$match) {
-                // There was no match but we don't want to be an ass about it. Send a response
-                // anyway (allowed according to RFC2616, section 10.4.7)
-                $formatter = $this->supportedTypes[$this->defaultMimeType];
+            if (!$entry) {
+                // Try to find the best match since the client does not accept the original mime
+                // type
+                $match = false;
+                $maxQ = 0;
+
+                // Specify which types to check for since all models can't be formatted by all
+                // formatters
+                $modelClass = get_class($model);
+                $modelType = strtolower(substr($modelClass, strrpos($modelClass, '\\') + 1));
+                $types = $this->defaultModelTypes;
+
+                if (isset($this->modelTypes[$modelType])) {
+                    $types = $this->modelTypes[$modelType];
+                }
+
+                foreach ($types as $mime) {
+                    if (($q = $this->container->get('contentNegotiation')->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
+                        $maxQ = $q;
+                        $match = true;
+                        $entry = $this->supportedTypes[$mime];
+                    }
+                }
+
+                if (!$match && $strict) {
+                    // No types matched with strict mode enabled. The client does not want any of Imbo's
+                    // supported types. Y U NO ACCEPT MY TYPES?! FFFFUUUUUUU!
+                    throw new RuntimeException('Not acceptable', 406);
+                } else if (!$match) {
+                    // There was no match but we don't want to be an ass about it. Send a response
+                    // anyway (allowed according to RFC2616, section 10.4.7)
+                    $entry = $this->supportedTypes[$this->defaultMimeType];
+                }
             }
         }
 
         // Create an instance of the formatter
-        $formatter = new $formatter();
+        $formatter = $this->container->get($entry);
         $formattedData = $formatter->format($model);
         $contentType = $formatter->getContentType();
 
@@ -128,9 +183,7 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
         $response->getHeaders()->set('Content-Type', $contentType)
                                ->set('Content-Length', strlen($formattedData));
 
-        if ($request->getMethod() === RequestInterface::METHOD_HEAD) {
-            $response->setBody(null);
-        } else {
+        if ($request->getMethod() !== RequestInterface::METHOD_HEAD) {
             $response->setBody($formattedData);
         }
     }
