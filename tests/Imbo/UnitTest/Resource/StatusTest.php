@@ -37,8 +37,6 @@ class StatusTest extends ResourceTests {
 
     /**
      * Set up the resource
-     *
-     * @covers Imbo\Resource\Status::setContainer
      */
     public function setUp() {
         $this->container = $this->getMock('Imbo\Container');
