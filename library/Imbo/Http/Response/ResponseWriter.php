@@ -74,6 +74,11 @@ class ResponseWriter implements ContainerAware {
     /**
      * The types the different models can be expressed as, if they don't support the default ones
      *
+     * The keys are the last part of the model name, lowercased:
+     *
+     * Imbo\Model\Image => image
+     * Imbo\Model\FooBar => foobar
+     *
      * @var array
      */
     private $modelTypes = array(
@@ -123,6 +128,9 @@ class ResponseWriter implements ContainerAware {
 
             $entry = $this->supportedTypes[$mime];
         } else {
+            // Set Vary to Accept since we are doing content negotiation based on Accept
+            $response->getHeaders()->set('Vary', 'Accept');
+
             // No extension have been provided
             $contentNegotiation = $this->container->get('contentNegotiation');
             $acceptableTypes = $request->getAcceptableContentTypes();
@@ -153,7 +161,7 @@ class ResponseWriter implements ContainerAware {
                 }
 
                 foreach ($types as $mime) {
-                    if (($q = $this->container->get('contentNegotiation')->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
+                    if (($q = $contentNegotiation->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
                         $maxQ = $q;
                         $match = true;
                         $entry = $this->supportedTypes[$mime];
@@ -180,9 +188,9 @@ class ResponseWriter implements ContainerAware {
         if ($contentType === 'application/json') {
             $query = $request->getQuery();
 
-            foreach (array('callback', 'jsonp', 'json') as $param) {
-                if ($query->has($param)) {
-                    $formattedData = sprintf("%s(%s)", $query->get($param), $formattedData);
+            foreach (array('callback', 'jsonp', 'json') as $validParam) {
+                if ($query->has($validParam)) {
+                    $formattedData = sprintf("%s(%s)", $query->get($validParam), $formattedData);
                     break;
                 }
             }

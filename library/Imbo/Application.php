@@ -80,12 +80,6 @@ class Application {
             // Inform the user agent of which methods are allowed against this resource
             $responseHeaders->set('Allow', implode(', ', $resource->getAllowedMethods()));
 
-            // Add Accept to Vary if the client has not specified a specific extension, in which we
-            // won't do any content negotiation at all.
-            if (!$request->getExtension()) {
-                $responseHeaders->set('Vary', 'Accept');
-            }
-
             // Fetch auth config
             $config = $this->container->get('config');
             $authConfig = $config['auth'];
