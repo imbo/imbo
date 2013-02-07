@@ -54,9 +54,15 @@ class ResponseFormatter implements ContainerAware, ListenerInterface {
      * @param EventInterface $event The current event
      */
     public function send(EventInterface $event) {
-        $request = $event->getRequest();
         $response = $event->getResponse();
         $model = $response->getModel();
+
+        if ($response->getStatusCode() === 204 || !$model) {
+            // No content to write
+            return;
+        }
+
+        $request = $event->getRequest();
         $responseWriter = $this->container->get('responseWriter');
 
         try {
