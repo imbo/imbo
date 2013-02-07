@@ -61,7 +61,7 @@ class ResponseWriter implements ContainerAware {
     );
 
     /**
-     * The default types that models support
+     * The default types that models support, in a prioritized order
      *
      * @var array
      */
@@ -72,7 +72,9 @@ class ResponseWriter implements ContainerAware {
     );
 
     /**
-     * The types the different models can be expressed as, if they don't support the default ones
+     * The types the different models can be expressed as, if they don't support the default ones,
+     * in a prioritized order. If the user agent sends "Accept: image/*" the first one will be the
+     * one used.
      *
      * The keys are the last part of the model name, lowercased:
      *
@@ -83,9 +85,9 @@ class ResponseWriter implements ContainerAware {
      */
     private $modelTypes = array(
         'image' => array(
-            'image/gif',
-            'image/png',
             'image/jpeg',
+            'image/png',
+            'image/gif',
         ),
     );
 
@@ -135,48 +137,38 @@ class ResponseWriter implements ContainerAware {
             $contentNegotiation = $this->container->get('contentNegotiation');
             $acceptableTypes = $request->getAcceptableContentTypes();
 
-            // If we have an image, see if the client accepts the current format
-            if ($model instanceof Model\Image) {
-                $mimeType = $model->getMimeType();
+            // Try to find the best match since the client does not accept the original mime
+            // type
+            $match = false;
+            $maxQ = 0;
 
-                if ($contentNegotiation->isAcceptable($mimeType, $acceptableTypes)) {
-                    $entry = $this->supportedTypes[$mimeType];
+            // Specify which types to check for since all models can't be formatted by all
+            // formatters
+            $modelClass = get_class($model);
+            $modelType = strtolower(substr($modelClass, strrpos($modelClass, '\\') + 1));
+
+            $types = $this->defaultModelTypes;
+
+            if (isset($this->modelTypes[$modelType])) {
+                $types = $this->modelTypes[$modelType];
+            }
+
+            foreach ($types as $mime) {
+                if (($q = $contentNegotiation->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
+                    $maxQ = $q;
+                    $match = true;
+                    $entry = $this->supportedTypes[$mime];
                 }
             }
 
-            if (!$entry) {
-                // Try to find the best match since the client does not accept the original mime
-                // type
-                $match = false;
-                $maxQ = 0;
-
-                // Specify which types to check for since all models can't be formatted by all
-                // formatters
-                $modelClass = get_class($model);
-                $modelType = strtolower(substr($modelClass, strrpos($modelClass, '\\') + 1));
-                $types = $this->defaultModelTypes;
-
-                if (isset($this->modelTypes[$modelType])) {
-                    $types = $this->modelTypes[$modelType];
-                }
-
-                foreach ($types as $mime) {
-                    if (($q = $contentNegotiation->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
-                        $maxQ = $q;
-                        $match = true;
-                        $entry = $this->supportedTypes[$mime];
-                    }
-                }
-
-                if (!$match && $strict) {
-                    // No types matched with strict mode enabled. The client does not want any of Imbo's
-                    // supported types. Y U NO ACCEPT MY TYPES?! FFFFUUUUUUU!
-                    throw new RuntimeException('Not acceptable', 406);
-                } else if (!$match) {
-                    // There was no match but we don't want to be an ass about it. Send a response
-                    // anyway (allowed according to RFC2616, section 10.4.7)
-                    $entry = $this->supportedTypes[$this->defaultMimeType];
-                }
+            if (!$match && $strict) {
+                // No types matched with strict mode enabled. The client does not want any of Imbo's
+                // supported types. Y U NO ACCEPT MY TYPES?! FFFFUUUUUUU!
+                throw new RuntimeException('Not acceptable', 406);
+            } else if (!$match) {
+                // There was no match but we don't want to be an ass about it. Send a response
+                // anyway (allowed according to RFC2616, section 10.4.7)
+                $entry = $this->supportedTypes[$this->defaultMimeType];
             }
         }
 
