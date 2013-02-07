@@ -65,7 +65,7 @@ class ResponseFormatter implements ContainerAware, ListenerInterface {
             $response->createError($exception, $request);
 
             // Write the error in non-strict mode
-            $responseWriter->write($model, $request, $response, false);
+            $responseWriter->write($response->getModel(), $request, $response, false);
         }
     }
 }
