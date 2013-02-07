@@ -110,12 +110,14 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\Http\Response\Response::setBody
+     * @covers Imbo\Http\Response\Response::setModel
      * @covers Imbo\Http\Response\Response::setStatusCode
      * @covers Imbo\Http\Response\Response::setNotModified
      * @covers Imbo\Http\Response\Response::getStatusCode
      * @covers Imbo\Http\Response\Response::getBody
      */
     public function testCanMarkItselfAsNotModified() {
+        $this->assertSame($this->response, $this->response->setModel($this->getMock('Imbo\Model\ModelInterface')));
         $this->assertSame($this->response, $this->response->setBody('some content'));
         $this->assertSame($this->response, $this->response->setStatusCode(200));
 
@@ -123,6 +125,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame(304, $this->response->getStatusCode());
         $this->assertEmpty($this->response->getBody());
+        $this->assertNull($this->response->getModel());
     }
 
     /**

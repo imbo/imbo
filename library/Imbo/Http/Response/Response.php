@@ -312,7 +312,7 @@ class Response implements ListenerInterface, ResponseInterface {
      */
     public function setNotModified() {
         $this->setStatusCode(304);
-        $this->setBody(null);
+        $this->setModel(null)->setBody(null);
         $headers = $this->getHeaders();
 
         foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Last-Modified') as $header) {
