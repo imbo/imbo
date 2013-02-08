@@ -75,6 +75,7 @@ class Image implements ResourceInterface, ListenerInterface {
      */
     public function delete(EventInterface $event) {
         $event->getManager()->trigger('db.image.delete');
+        $event->getManager()->trigger('db.metadata.delete');
         $event->getManager()->trigger('storage.image.delete');
 
         $model = new Model\ArrayModel();
