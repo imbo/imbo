@@ -86,8 +86,7 @@ class ImageTest extends ResourceTests {
      */
     public function testSupportsHttpDelete() {
         $this->manager->expects($this->at(0))->method('trigger')->with('db.image.delete');
-        $this->manager->expects($this->at(1))->method('trigger')->with('db.metadata.delete');
-        $this->manager->expects($this->at(2))->method('trigger')->with('storage.image.delete');
+        $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.delete');
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
 

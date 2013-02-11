@@ -47,6 +47,7 @@ class MetadataCache implements ListenerInterface {
 
             // Delete from cache
             new ListenerDefinition('db.metadata.delete', array($this, 'deleteFromCache'), -10),
+            new ListenerDefinition('db.image.delete', array($this, 'deleteFromCache'), -10),
 
             // Store in cache
             new ListenerDefinition('db.metadata.load', array($this, 'storeInCache'), -10),
