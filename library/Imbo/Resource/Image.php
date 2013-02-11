@@ -136,6 +136,9 @@ class Image implements ResourceInterface, ListenerInterface {
         // Trigger possible image transformations
         $event->getManager()->trigger('image.transform');
 
+        // Fetch the image once more as event listeners might have set a new instance during the
+        // transformation phase
+        $image = $response->getImage();
         $response->setModel($image);
     }
 }

@@ -120,7 +120,7 @@ class ImageTest extends ResourceTests {
         $image->expects($this->once())->method('getHeight')->will($this->returnValue(100));
         $image->expects($this->once())->method('getFilesize')->will($this->returnValue(123123));
         $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
-        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $this->response->expects($this->exactly(2))->method('getImage')->will($this->returnValue($image));
         $this->response->expects($this->once())->method('setModel')->will($this->returnValue($image));
 
         $this->manager->expects($this->at(0))->method('trigger')->with('db.image.load');
@@ -133,6 +133,35 @@ class ImageTest extends ResourceTests {
         $responseHeaders->expects($this->at(4))->method('set')->with('X-Imbo-OriginalHeight', 100)->will($this->returnSelf());
         $responseHeaders->expects($this->at(5))->method('set')->with('X-Imbo-OriginalFileSize', 123123)->will($this->returnSelf());
         $responseHeaders->expects($this->at(6))->method('set')->with('X-Imbo-OriginalExtension', 'png')->will($this->returnSelf());
+
+        $this->resource->get($this->event);
+    }
+
+    /**
+     * @covers Imbo\Resource\Image::get
+     */
+    public function testFetchesTheImageTwiceInCaseAnEventListenerHasChangeTheInstance() {
+        $serverContainer = $this->getMockBuilder('Imbo\Http\ServerContainer')->disableOriginalConstructor()->getMock();
+        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+
+        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
+        $this->request->expects($this->once())->method('getHeaders')->will($this->returnValue($requestHeaders));
+        $this->request->expects($this->once())->method('getServer')->will($this->returnValue($serverContainer));
+        $this->request->expects($this->once())->method('getPublicKey');
+        $this->request->expects($this->once())->method('getImageIdentifier');
+
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->once())->method('setImageIdentifier')->will($this->returnSelf());
+        $image->expects($this->once())->method('setPublicKey')->will($this->returnSelf());
+
+        $modifiedImage = $this->getMock('Imbo\Model\Image');
+
+        $this->response->expects($this->at(1))->method('getImage')->will($this->returnValue($image));
+        $this->response->expects($this->at(2))->method('getImage')->will($this->returnValue($modifiedImage));
+        $this->response->expects($this->once())->method('setModel')->will($this->returnValue($modifiedImage));
+
+        $responseHeaders->expects($this->any())->method('set')->will($this->returnSelf());
 
         $this->resource->get($this->event);
     }
