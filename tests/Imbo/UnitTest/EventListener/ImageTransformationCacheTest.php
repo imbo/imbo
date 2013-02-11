@@ -34,7 +34,6 @@ class ImageTransformationCacheTest extends ListenerTests {
     private $request;
     private $response;
     private $query;
-    private $cn;
     private $publicKey = 'publicKey';
     private $imageIdentifier = '7bf2e67f09de203da740a86cd37bbe8d';
     private $responseHeaders;
@@ -42,8 +41,6 @@ class ImageTransformationCacheTest extends ListenerTests {
 
     /**
      * Set up the listener
-     *
-     * @covers Imbo\EventListener\ImageTransformationCache::__construct
      */
     public function setUp() {
         if (!class_exists('org\bovigo\vfs\vfsStream')) {
@@ -55,7 +52,6 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
         $this->response->expects($this->any())->method('getHeaders')->will($this->returnValue($this->responseHeaders));
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
-        $this->cn = $this->getMock('Imbo\Http\ContentNegotiation');
         $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
         $this->request->expects($this->any())->method('getQuery')->will($this->returnValue($this->query));
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
@@ -64,7 +60,7 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
         $this->cacheDir = vfsStream::setup($this->path);
-        $this->listener = new ImageTransformationCache(vfsStream::url($this->path), $this->cn);
+        $this->listener = new ImageTransformationCache(vfsStream::url($this->path));
     }
 
     /**
@@ -75,7 +71,6 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->request = null;
         $this->response = null;
         $this->event = null;
-        $this->cn = null;
         $this->listener = null;
         $this->cacheDir = null;
     }
@@ -90,70 +85,10 @@ class ImageTransformationCacheTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\ImageTransformationCache::loadFromCache
      */
-    public function testDoesNotLookInCacheIfClientDoesNotAcceptSupportedMimeTypes() {
-        $mimeType = 'image/png';
+    public function testDoesNotLookInCacheIfNoTransformationsExists() {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getMimeType')->will($this->returnValue($mimeType));
-        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->cn->expects($this->once())->method('isAcceptable')->will($this->returnValue(false));
-        $this->cn->expects($this->once())->method('bestMatch')->will($this->returnValue(false));
-        $this->request->expects($this->never())->method('hasTransformations');
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array()));
-
-        $this->listener->loadFromCache($this->event);
-    }
-
-    /**
-     * @covers Imbo\EventListener\ImageTransformationCache::loadFromCache
-     */
-    public function testDoesNotLookInCacheIfNoTransformationsIsNeededToDeliverTheImage() {
-        $mimeType = 'image/png';
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getMimeType')->will($this->returnValue($mimeType));
-        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->cn->expects($this->once())->method('isAcceptable')->will($this->returnValue(true));
-        $this->request->expects($this->once())->method('hasTransformations');
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('image/png' => 1)));
-        $this->request->expects($this->never())->method('getPublicKey');
-
-        $this->listener->loadFromCache($this->event);
-    }
-
-    /**
-     * @covers Imbo\EventListener\ImageTransformationCache::loadFromCache
-     */
-    public function testLooksInCacheIfImboCanProvideAnAcceptableMimeTypeDifferentFromTheOriginal() {
-        $mimeType = 'image/png';
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getMimeType')->will($this->returnValue($mimeType));
-        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->cn->expects($this->once())->method('isAcceptable')->will($this->returnValue(false));
-        $this->cn->expects($this->once())->method('bestMatch')->will($this->returnValue('image/jpeg'));
-        $this->request->expects($this->never())->method('hasTransformations');
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('image/jpeg' => 1)));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-        $this->query->expects($this->once())->method('getAll')->will($this->returnValue(array()));
-        $this->responseHeaders->expects($this->once())->method('set')->with('X-Imbo-TransformationCache', 'Miss');
-
-        $this->listener->loadFromCache($this->event);
-    }
-
-    /**
-     * @covers Imbo\EventListener\ImageTransformationCache::loadFromCache
-     */
-    public function testDoesNotDoContentNegotiationWhenExtensionIsSet() {
-        $mimeType = 'image/png';
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getMimeType')->will($this->returnValue($mimeType));
-        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
-        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->cn->expects($this->never())->method('isAcceptable');
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('image/jpeg' => 1)));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-        $this->query->expects($this->once())->method('getAll')->will($this->returnValue(array()));
-        $this->responseHeaders->expects($this->once())->method('set')->with('X-Imbo-TransformationCache', 'Miss');
+        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(null));
+        $this->response->expects($this->never())->method('getImage');
 
         $this->listener->loadFromCache($this->event);
     }
@@ -163,28 +98,76 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformationCache::getCacheKey
      * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
      */
-    public function testPopulatesImageOnCacheHit() {
-        $mimeType = 'image/png';
+    public function testChangesTheImageInstanceOnCacheHit() {
+        $imageFromCache = $this->getMock('Imbo\Model\Image');
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getMimeType')->will($this->returnValue($mimeType));
-        $image->expects($this->once())->method('setBlob')->with('image data')->will($this->returnSelf());
-        $image->expects($this->once())->method('setMimeType')->with('image/jpeg')->will($this->returnSelf());
-        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
+
+        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(array('thumbnail')));
         $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->cn->expects($this->never())->method('isAcceptable');
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('image/jpeg' => 1)));
+        $this->response->expects($this->once())->method('setImage')->with($imageFromCache);
+
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-        $this->query->expects($this->once())->method('getAll')->will($this->returnValue(array()));
+
         $this->responseHeaders->expects($this->once())->method('set')->with('X-Imbo-TransformationCache', 'Hit');
         $this->event->expects($this->once())->method('stopPropagation')->with(true);
 
-        $dir = 'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/d/c/1';
-        $file = 'dc17b60a5c2182f6a424ea6df7b1d058b50e04d0e5ca9f4928892d188a813889';
+        $dir = 'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/c/9/5';
+        $file = 'c955032a862e0c8e76c8e51f5f402a6cf4e908ce013027e4a1400bc8754dcadd';
         $fullPath = $dir . '/' . $file;
 
         mkdir($dir, 0775, true);
-        file_put_contents($fullPath, 'image data');
+        file_put_contents($fullPath, serialize($imageFromCache));
+
+        $this->listener->loadFromCache($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageTransformationCache::loadFromCache
+     * @covers Imbo\EventListener\ImageTransformationCache::getCacheKey
+     * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
+     */
+    public function testRemovesCorruptCachedDataOnCacheHit() {
+        $imageFromCache = $this->getMock('Imbo\Model\Image');
+        $image = $this->getMock('Imbo\Model\Image');
+
+        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(array('thumbnail')));
+        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $this->response->expects($this->never())->method('setImage');
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
+
+        $this->responseHeaders->expects($this->once())->method('set')->with('X-Imbo-TransformationCache', 'Miss');
+
+        $dir = 'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/c/9/5';
+        $file = 'c955032a862e0c8e76c8e51f5f402a6cf4e908ce013027e4a1400bc8754dcadd';
+        $fullPath = $dir . '/' . $file;
+
+        mkdir($dir, 0775, true);
+        file_put_contents($fullPath, 'invalid data');
+
+        $this->assertTrue(file_exists($fullPath));
+        $this->listener->loadFromCache($this->event);
+        $this->assertFalse(file_exists($fullPath));
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageTransformationCache::loadFromCache
+     * @covers Imbo\EventListener\ImageTransformationCache::getCacheKey
+     * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
+     */
+    public function testAddsCorrectResponseHeaderOnCacheMiss() {
+        $imageFromCache = $this->getMock('Imbo\Model\Image');
+        $image = $this->getMock('Imbo\Model\Image');
+
+        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(array('thumbnail')));
+        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
+
+        $this->responseHeaders->expects($this->once())->method('set')->with('X-Imbo-TransformationCache', 'Miss');
 
         $this->listener->loadFromCache($this->event);
     }
@@ -207,20 +190,19 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
      */
     public function testStoresImageInCacheWhenTransformationsHaveBeenApplied() {
-        $mimeType = 'image/png';
-        $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->will($this->returnValue(true));
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue($imageData));
-        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->query->expects($this->once())->method('getAll')->will($this->returnValue(array()));
+        $fileContents = serialize($image);
 
-        $cacheFile = 'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/f/30f0763c8422360d10fd84573dd582933a463e084b4f12b2b88eb1467e9eb338';
+        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(array('thumbnail')));
+
+        $cacheFile = 'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/c/9/5/c955032a862e0c8e76c8e51f5f402a6cf4e908ce013027e4a1400bc8754dcadd';
 
         $this->assertFalse(is_file($cacheFile));
         $this->listener->storeInCache($this->event);
         $this->assertTrue(is_file($cacheFile));
-        $this->assertSame($imageData, file_get_contents($cacheFile));
+        $this->assertEquals($image, unserialize(file_get_contents($cacheFile)));
     }
 
     /**
