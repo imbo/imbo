@@ -45,7 +45,7 @@ class Metadata implements ResourceInterface, ListenerInterface {
             new ListenerDefinition('metadata.post', array($this, 'post')),
             new ListenerDefinition('metadata.put', array($this, 'put')),
             new ListenerDefinition('metadata.delete', array($this, 'delete')),
-            new ListenerDefinition('metadata.head', array($this, 'head')),
+            new ListenerDefinition('metadata.head', array($this, 'get')),
             new ListenerDefinition('metadata.post', array($this, 'validateMetadata'), 10),
             new ListenerDefinition('metadata.put', array($this, 'validateMetadata'), 10),
         );
@@ -104,18 +104,6 @@ class Metadata implements ResourceInterface, ListenerInterface {
         $hash = md5($request->getPublicKey() . $request->getImageIdentifier() . $lastModified);
 
         $response->getHeaders()->set('ETag', '"' . $hash . '"');
-    }
-
-    /**
-     * Handle HEAD requests
-     *
-     * @param EventInterface $event The current event
-     */
-    public function head(EventInterface $event) {
-        $this->get($event);
-
-        // Remove body from the response, but keep everything else
-        $event->getResponse()->setBody(null);
     }
 
     /**

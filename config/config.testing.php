@@ -18,7 +18,7 @@ return array(
 
     'database' => function() {
         return new Database\MongoDB(array(
-            'databaseName'   => 'imbo_testing',
+            'databaseName' => 'imbo_testing',
         ));
     },
 
