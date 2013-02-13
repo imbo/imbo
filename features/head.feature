@@ -21,3 +21,4 @@ Feature: Imbo supports HTTP HEAD for all resources
         When I request "/users/publickey/images" using HTTP "HEAD"
         And make the same request using HTTP "GET"
         Then the response headers should be the same
+
