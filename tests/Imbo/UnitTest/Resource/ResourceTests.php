@@ -25,29 +25,6 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
      */
     abstract protected function getNewResource();
 
-    /**
-     * Make sure the that resource returns the correct methods for usage in the "Allow" header
-     */
-    public function testGetAllowedMethods() {
-        $resource = $this->getNewResource();
-        $reflection = new ReflectionClass($resource);
-        $className = get_class($resource);
-        $allHttpMethods = array(
-            'get', 'post', 'put', 'delete', 'head',
-        );
-
-        $implementedMethods = array_filter($reflection->getMethods(ReflectionMethod::IS_PUBLIC), function($method) use($className, $allHttpMethods) {
-            return $method->class == $className && (array_search($method->name, $allHttpMethods) !== false);
-        });
-
-        array_walk($implementedMethods, function(&$value, $key) { $value = strtoupper($value->name); });
-        sort($implementedMethods);
-        $expectedMethods = $resource->getAllowedMethods();
-        sort($expectedMethods);
-
-        $this->assertSame($expectedMethods, $implementedMethods);
-    }
-
     public function testReturnsACorrectDefinition() {
         $definition = $this->getNewResource()->getDefinition();
         $this->assertInternalType('array', $definition);

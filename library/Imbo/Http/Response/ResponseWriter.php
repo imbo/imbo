@@ -114,6 +114,10 @@ class ResponseWriter implements ContainerAware, ResponseWriterInterface {
         $response->getHeaders()->set('Content-Type', $formatter->getContentType())
                                ->set('Content-Length', strlen($formattedData));
 
-        $response->setBody($formattedData);
+        if ($request->getMethod() === RequestInterface::METHOD_HEAD) {
+            $response->setBody(null);
+        } else {
+            $response->setBody($formattedData);
+        }
     }
 }

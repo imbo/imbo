@@ -40,11 +40,11 @@ class RESTContext extends BehatContext {
     protected $client;
 
     /**
-     * The current response object used by the client (populated when the request is sent)
+     * The current response objects used by the client (populated when the request is sent)
      *
-     * @var Response
+     * @var Response[]
      */
-    protected $response;
+    protected $responses = array();
 
     /**
      * Headers for the request
@@ -52,6 +52,20 @@ class RESTContext extends BehatContext {
      * @var array
      */
     protected $requestHeaders = array();
+
+    /**
+     * Optional request body to add to the request
+     *
+     * @var string
+     */
+    protected $requestBody;
+
+    /**
+     * The previously requested path
+     *
+     * @var string
+     */
+    private $prevRequestedPath;
 
     /**
      * Class constructor
@@ -71,6 +85,10 @@ class RESTContext extends BehatContext {
         $params = $event->getContextParameters();
         $url = parse_url($params['url']);
         $port = !empty($url['port']) ? $url['port'] : 80;
+
+        if (self::canConnectToHttpd($url['host'], $port)) {
+            throw new RuntimeException('Something is already running on ' . $params['url'] . '. Aborting tests.');
+        }
 
         self::$pid = self::startBuiltInHttpd(
             $url['host'],
@@ -109,12 +127,48 @@ class RESTContext extends BehatContext {
      * @When /^I request "([^"]*)"(?: using HTTP "([^"]*)")?$/
      */
     public function request($path, $method = 'GET') {
+        $this->prevRequestedPath = $path;
+
+        if (empty($this->requestHeaders['Accept'])) {
+            $this->requestHeaders['Accept'] = 'application/json';
+        }
+
         $request = $this->client->createRequest($method, $path, $this->requestHeaders);
 
+        if ($this->requestBody) {
+            $request->setBody($this->requestBody);
+        }
+
         try {
-            $this->response = $request->send();
+            $this->responses[] = $request->send();
         } catch (Exception $e) {
-            $this->response = $e->getResponse();
+            $this->responses[] = $e->getResponse();
+        }
+    }
+
+    /**
+     * @Given /^make the same request using HTTP "([^"]*)"$/
+     */
+    public function makeSameRequest($method) {
+        $this->request($this->prevRequestedPath, $method);
+    }
+
+    /**
+     * @Then /^the response headers should be the same$/
+     */
+    public function assertEqualResponseHeaders() {
+        if (count($this->responses) < 2) {
+            throw new \Exception('Need more than one response');
+        }
+
+        for ($i = 0; $i < count($this->responses) - 1; $i++) {
+            $headers1 = $this->responses[$i]->getHeaders()->toArray();
+            $headers2 = $this->responses[$i + 1]->getHeaders()->toArray();
+
+            ksort($headers1);
+            ksort($headers2);
+
+            assertSame($headers1, $headers2);
         }
     }
 
@@ -122,18 +176,38 @@ class RESTContext extends BehatContext {
      * @Then /^I should get a response with "([^"]*)"$/
      */
     public function assertResponseStatus($status) {
-        assertSame(
-            $status,
-            $this->response->getStatusCode() . ' ' . $this->response->getReasonPhrase()
-        );
+        $response = $this->getLastResponse();
+        $actual = $response->getStatusCode() . ' ' . $response->getReasonPhrase();
+        assertSame($status, $actual, 'Expected "' . $status . '", got "' . $actual . '"');
     }
 
     /**
      * @Given /^the "([^"]*)" response header is "([^"]*)"$/
      */
-     public function assertResponseHeader($header, $value) {
-         assertSame($value, (string) $this->response->getHeader($header));
-     }
+    public function assertResponseHeader($header, $value) {
+        $response = $this->getLastResponse();
+        $actual = (string) $response->getHeader($header);
+        assertSame($value, $actual, 'Expected "' . $value . '", got "' . $actual . '"');
+    }
+
+    /**
+     * @Given /^I attach "([^"]*)" to the request body$/
+     */
+    public function attachRequestBody($path) {
+        if (!$fullPath = realpath($path)) {
+            throw new RuntimeException('Path "' . $path . '" is invalid');
+        }
+
+        $this->requestBody = file_get_contents($fullPath);
+    }
+
+    /**
+     * @Given /^the response body should be empty$/
+     */
+    public function assertEmptyResponseBody() {
+        $response = $this->getLastResponse();
+        assertEmpty((string) $response->getBody());
+    }
 
     /**
      * See if we have an httpd we can connect to
@@ -182,5 +256,14 @@ class RESTContext extends BehatContext {
         exec($command, $output);
 
         return (int) $output[0];
+    }
+
+    /**
+     * Get the response to the last request made by the Guzzle client
+     *
+     * @return Response
+     */
+    protected function getLastResponse() {
+        return $this->responses[count($this->responses) - 1];
     }
 }

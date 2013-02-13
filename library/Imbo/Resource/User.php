@@ -38,7 +38,7 @@ class User implements ResourceInterface, ListenerInterface {
     public function getDefinition() {
         return array(
             new ListenerDefinition('user.get', array($this, 'get')),
-            new ListenerDefinition('user.head', array($this, 'head')),
+            new ListenerDefinition('user.head', array($this, 'get')),
         );
     }
 
@@ -54,17 +54,5 @@ class User implements ResourceInterface, ListenerInterface {
 
         $etag = '"' . md5($response->getLastModified()) . '"';
         $response->getHeaders()->set('ETag', $etag);
-    }
-
-    /**
-     * Handle HEAD requests
-     *
-     * @param EventInterface $event The current event
-     */
-    public function head(EventInterface $event) {
-        $this->get($event);
-
-        // Remove body from the response, but keep everything else
-        $event->getResponse()->setBody(null);
     }
 }
