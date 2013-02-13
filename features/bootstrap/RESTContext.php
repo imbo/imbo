@@ -40,11 +40,11 @@ class RESTContext extends BehatContext {
     protected $client;
 
     /**
-     * The current response object used by the client (populated when the request is sent)
+     * The current response objects used by the client (populated when the request is sent)
      *
-     * @var Response
+     * @var Response[]
      */
-    protected $response;
+    protected $responses = array();
 
     /**
      * Headers for the request
@@ -59,6 +59,13 @@ class RESTContext extends BehatContext {
      * @var string
      */
     protected $requestBody;
+
+    /**
+     * The previously requested path
+     *
+     * @var string
+     */
+    private $prevRequestedPath;
 
     /**
      * Class constructor
@@ -120,6 +127,8 @@ class RESTContext extends BehatContext {
      * @When /^I request "([^"]*)"(?: using HTTP "([^"]*)")?$/
      */
     public function request($path, $method = 'GET') {
+        $this->prevRequestedPath = $path;
+
         if (empty($this->requestHeaders['Accept'])) {
             $this->requestHeaders['Accept'] = 'application/json';
         }
@@ -131,9 +140,35 @@ class RESTContext extends BehatContext {
         }
 
         try {
-            $this->response = $request->send();
+            $this->responses[] = $request->send();
         } catch (Exception $e) {
-            $this->response = $e->getResponse();
+            $this->responses[] = $e->getResponse();
+        }
+    }
+
+    /**
+     * @Given /^make the same request using HTTP "([^"]*)"$/
+     */
+    public function makeSameRequest($method) {
+        $this->request($this->prevRequestedPath, $method);
+    }
+
+    /**
+     * @Then /^the response headers should be the same$/
+     */
+    public function assertEqualResponseHeaders() {
+        if (count($this->responses) < 2) {
+            throw new \Exception('Need more than one response');
+        }
+
+        for ($i = 0; $i < count($this->responses) - 1; $i++) {
+            $headers1 = $this->responses[$i]->getHeaders()->toArray();
+            $headers2 = $this->responses[$i + 1]->getHeaders()->toArray();
+
+            ksort($headers1);
+            ksort($headers2);
+
+            assertSame($headers1, $headers2);
         }
     }
 
@@ -141,7 +176,8 @@ class RESTContext extends BehatContext {
      * @Then /^I should get a response with "([^"]*)"$/
      */
     public function assertResponseStatus($status) {
-        $actual = $this->response->getStatusCode() . ' ' . $this->response->getReasonPhrase();
+        $response = $this->getLastResponse();
+        $actual = $response->getStatusCode() . ' ' . $response->getReasonPhrase();
         assertSame($status, $actual, 'Expected "' . $status . '", got "' . $actual . '"');
     }
 
@@ -149,8 +185,9 @@ class RESTContext extends BehatContext {
      * @Given /^the "([^"]*)" response header is "([^"]*)"$/
      */
     public function assertResponseHeader($header, $value) {
-         $actual = (string) $this->response->getHeader($header);
-         assertSame($value, $actual, 'Expected "' . $value . '", got "' . $actual . '"');
+        $response = $this->getLastResponse();
+        $actual = (string) $response->getHeader($header);
+        assertSame($value, $actual, 'Expected "' . $value . '", got "' . $actual . '"');
     }
 
     /**
@@ -168,7 +205,8 @@ class RESTContext extends BehatContext {
      * @Given /^the response body should be empty$/
      */
     public function assertEmptyResponseBody() {
-         assertEmpty((string) $this->response->getBody());
+        $response = $this->getLastResponse();
+        assertEmpty((string) $response->getBody());
     }
 
     /**
@@ -218,5 +256,14 @@ class RESTContext extends BehatContext {
         exec($command, $output);
 
         return (int) $output[0];
+    }
+
+    /**
+     * Get the response to the last request made by the Guzzle client
+     *
+     * @return Response
+     */
+    protected function getLastResponse() {
+        return $this->responses[count($this->responses) - 1];
     }
 }

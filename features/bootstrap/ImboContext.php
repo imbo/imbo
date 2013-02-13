@@ -82,14 +82,15 @@ class ImboContext extends RESTContext {
      * @Given /^the Imbo error message is "([^"]*)"(?: and the error code is "([^"]*)")?$/
      */
     public function assertImboError($message, $code = null) {
-        $contentType = $this->response->getContentType();
+        $response = $this->getLastResponse();
+        $contentType = $response->getContentType();
 
         if ($contentType === 'application/json') {
-            $data = $this->response->json();
+            $data = $response->json();
             $errorMessage = $data['error']['message'];
             $errorCode = $data['error']['imboErrorCode'];
         } else if ($contentType === 'application/xml') {
-            $data = $this->response->xml();
+            $data = $response->xml();
             $errorMessage = (string) $data->error->message;
             $errorCode = $data->error->imboErrorCode;
         } else {
