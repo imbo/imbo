@@ -21,6 +21,18 @@ require 'RESTContext.php';
  * @package Test suite\Functional tests
  */
 class ImboContext extends RESTContext {
+    /**
+     * The public key used by the client
+     *
+     * @var string
+     */
+    private $publicKey;
+
+    /**
+     * The private key used by the client
+     *
+     * @var string
+     */
     private $privateKey;
 
     /**
@@ -29,9 +41,9 @@ class ImboContext extends RESTContext {
     public function thereAreNoImboIssues() {}
 
     /**
-     * @Given /^the user "([^"]*)" exists with private key "([^"]*)"$/
+     * @Given /^I use "([^"]*)" and "([^"]*)" for public and private keys$/
      */
-    public function userExists($publicKey, $privateKey) {
+    public function setClientAuth($publicKey, $privateKey) {
         $this->publicKey = $publicKey;
         $this->privateKey = $privateKey;
     }
@@ -44,6 +56,25 @@ class ImboContext extends RESTContext {
             $request = $event['request'];
             $accessToken = hash_hmac('sha256', $request->getUrl(), $this->privateKey);
             $request->getQuery()->set('accessToken', $accessToken);
+        });
+    }
+
+    /**
+     * @Given /^I sign the request$/
+     */
+    public function signRequest() {
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) {
+            $request = $event['request'];
+
+            $timestamp = gmdate('Y-m-d\TH:i:s\Z');
+            $data = $request->getMethod() . '|' . $request->getUrl() . '|' . $this->publicKey . '|' . $timestamp;
+
+            // Generate signature
+            $signature = hash_hmac('sha256', $data, $this->privateKey);
+
+            $query = $request->getQuery();
+            $query->set('signature', rawurlencode($signature));
+            $query->set('timestamp', rawurlencode($timestamp));
         });
     }
 
@@ -65,10 +96,13 @@ class ImboContext extends RESTContext {
             throw new PendingException('Not added support for html yet');
         }
 
-        assertSame($message, $errorMessage);
+        assertSame($message, $errorMessage, 'Expected "' . $message. '", got "' . $errorMessage . '"');
 
         if ($code !== null) {
-            assertSame((int) $code, (int) $errorCode);
+            $expected = (int) $code;
+            $actual = (int) $errorCode;
+
+            assertSame($expected, $actual, 'Expected "' . $expected . '", got "' . $actual . '"');
         }
     }
 }

@@ -4,27 +4,38 @@ Feature: Imbo provides a user endpoint
     I want to make requests against the user endpoint
 
     Scenario: Request user information using a valid access token
-        Given the user "publickey" exists with private key "privatekey"
+        Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey.json"
+        When I request "/users/publickey"
         Then I should get a response with "200 OK"
-        And the "Content-Type" response header is "application/json"
+
+    Scenario: Request user information using the wrong private key
+        Given I use "publickey" and "foobar" for public and private keys
+        And I include an access token in the query
+        When I request "/users/publickey"
+        Then I should get a response with "400 Bad Request"
+        And the Imbo error message is "Incorrect access token" and the error code is "0"
 
     Scenario: Request user information without a valid access token
-        Given the user "publickey" exists with private key "privatekey"
-        When I request "/users/publickey.json"
+        Given I use "publickey" and "foobar" for public and private keys
+        When I request "/users/publickey"
         Then I should get a response with "400 Bad Request"
-        And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Missing access token" and the error code is "0"
 
     Scenario: Request user that does not exist
-        When I request "/users/usernamedoesnotexist.json"
+        Given I use "foo" and "bar" for public and private keys
+        When I request "/users/foo"
         Then I should get a response with "404 Not Found"
-        And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Unknown Public Key" and the error code is "100"
 
-    Scenario: Request user that does not exist
-        When I request "/users/usernamedoesnotexist.xml"
-        Then I should get a response with "404 Not Found"
-        And the "Content-Type" response header is "application/xml"
-        And the Imbo error message is "Unknown Public Key" and the error code is "100"
+    Scenario: Request user information using POST
+        Given I use "publickey" and "privatekey" for public and private keys
+        When I request "/users/publickey" using HTTP "POST"
+        Then I should get a response with "405 Method Not Allowed"
+
+    Scenario: Request user information using HEAD
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        When I request "/users/publickey" using HTTP "HEAD"
+        Then I should get a response with "200 OK"
+        And the response body should be empty

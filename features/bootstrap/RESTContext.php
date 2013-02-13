@@ -54,6 +54,13 @@ class RESTContext extends BehatContext {
     protected $requestHeaders = array();
 
     /**
+     * Optional request body to add to the request
+     *
+     * @var string
+     */
+    protected $requestBody;
+
+    /**
      * Class constructor
      *
      * @param array $parameters Context parameters
@@ -71,6 +78,10 @@ class RESTContext extends BehatContext {
         $params = $event->getContextParameters();
         $url = parse_url($params['url']);
         $port = !empty($url['port']) ? $url['port'] : 80;
+
+        if (self::canConnectToHttpd($url['host'], $port)) {
+            throw new RuntimeException('Something is already running on ' . $params['url'] . '. Aborting tests.');
+        }
 
         self::$pid = self::startBuiltInHttpd(
             $url['host'],
@@ -109,7 +120,15 @@ class RESTContext extends BehatContext {
      * @When /^I request "([^"]*)"(?: using HTTP "([^"]*)")?$/
      */
     public function request($path, $method = 'GET') {
+        if (empty($this->requestHeaders['Accept'])) {
+            $this->requestHeaders['Accept'] = 'application/json';
+        }
+
         $request = $this->client->createRequest($method, $path, $this->requestHeaders);
+
+        if ($this->requestBody) {
+            $request->setBody($this->requestBody);
+        }
 
         try {
             $this->response = $request->send();
@@ -122,18 +141,35 @@ class RESTContext extends BehatContext {
      * @Then /^I should get a response with "([^"]*)"$/
      */
     public function assertResponseStatus($status) {
-        assertSame(
-            $status,
-            $this->response->getStatusCode() . ' ' . $this->response->getReasonPhrase()
-        );
+        $actual = $this->response->getStatusCode() . ' ' . $this->response->getReasonPhrase();
+        assertSame($status, $actual, 'Expected "' . $status . '", got "' . $actual . '"');
     }
 
     /**
      * @Given /^the "([^"]*)" response header is "([^"]*)"$/
      */
-     public function assertResponseHeader($header, $value) {
-         assertSame($value, (string) $this->response->getHeader($header));
-     }
+    public function assertResponseHeader($header, $value) {
+         $actual = (string) $this->response->getHeader($header);
+         assertSame($value, $actual, 'Expected "' . $value . '", got "' . $actual . '"');
+    }
+
+    /**
+     * @Given /^I attach "([^"]*)" to the request body$/
+     */
+    public function attachRequestBody($path) {
+        if (!$fullPath = realpath($path)) {
+            throw new RuntimeException('Path "' . $path . '" is invalid');
+        }
+
+        $this->requestBody = file_get_contents($fullPath);
+    }
+
+    /**
+     * @Given /^the response body should be empty$/
+     */
+    public function assertEmptyResponseBody() {
+         assertEmpty((string) $this->response->getBody());
+    }
 
     /**
      * See if we have an httpd we can connect to
