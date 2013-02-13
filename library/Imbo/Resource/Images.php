@@ -48,7 +48,7 @@ class Images implements ResourceInterface, ListenerInterface {
     public function getDefinition() {
         return array(
             new ListenerDefinition('images.get', array($this, 'get')),
-            new ListenerDefinition('images.head', array($this, 'head')),
+            new ListenerDefinition('images.head', array($this, 'get')),
         );
     }
 
@@ -65,17 +65,5 @@ class Images implements ResourceInterface, ListenerInterface {
         // Generate ETag based on the last modification date and add to the response headers
         $etag = '"' . md5($response->getLastModified()) . '"';
         $response->getHeaders()->set('ETag', $etag);
-    }
-
-    /**
-     * Handle HEAD requests
-     *
-     * @param EventInterface $event The current event
-     */
-    public function head(EventInterface $event) {
-        $this->get($event);
-
-        // Remove body from the response, but keep everything else
-        $event->getResponse()->setBody(null);
     }
 }

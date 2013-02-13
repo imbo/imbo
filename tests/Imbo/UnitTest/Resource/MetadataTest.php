@@ -134,25 +134,6 @@ class MetadataTest extends ResourceTests {
     }
 
     /**
-     * @dataProvider getData
-     * @covers Imbo\Resource\Metadata::head
-     */
-    public function testSupportsHttpHead($publicKey, $imageIdentifier, $lastModified, $etag) {
-        $this->manager->expects($this->once())->method('trigger')->with('db.metadata.load');
-        $this->response->expects($this->once())->method('getLastModified')->will($this->returnValue($lastModified));
-        $this->response->expects($this->once())->method('setBody')->will($this->returnValue(null));
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-
-        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders->expects($this->at(0))->method('set')->with('ETag', $etag);
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-
-        $this->resource->head($this->event);
-    }
-
-    /**
      * @covers Imbo\Resource\Metadata::validateMetadata
      * @expectedException Imbo\Exception\InvalidArgumentException
      * @expectedExceptionMessage Missing JSON data

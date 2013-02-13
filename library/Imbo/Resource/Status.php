@@ -59,7 +59,7 @@ class Status implements ContainerAware, ResourceInterface, ListenerInterface {
     public function getDefinition() {
         return array(
             new ListenerDefinition('status.get', array($this, 'get')),
-            new ListenerDefinition('status.head', array($this, 'head')),
+            new ListenerDefinition('status.head', array($this, 'get')),
         );
     }
 
@@ -98,17 +98,5 @@ class Status implements ContainerAware, ResourceInterface, ListenerInterface {
             'database' => $databaseStatus,
             'storage'  => $storageStatus,
         ));
-    }
-
-    /**
-     * Handle HEAD requests
-     *
-     * @param EventInterface $event The current event
-     */
-    public function head(EventInterface $event) {
-        $this->get($event);
-
-        // Remove body from the response, but keep everything else
-        $event->getResponse()->setBody(null);
     }
 }
