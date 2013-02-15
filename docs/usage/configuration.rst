@@ -102,10 +102,14 @@ This driver uses the `Doctrine Database Abstraction Layer`_. The options you pas
 Database schema
 ~~~~~~~~~~~~~~~
 
-When using this driver you need to create a couple of tables in the `DBMS`_ you choose to use. Below you will find statements to create the necessary tables in `SQLite`_:
+When using this driver you need to create a couple of tables in the `DBMS`_ you choose to use. Below you will find statements to create the necessary tables for `SQLite`_ and `MySQL`_.
 
 .. _DBMS: http://en.wikipedia.org/wiki/Relational_database_management_system
 .. _SQLite: http://www.sqlite.org/
+.. _MySQL: http://www.mysql.com/
+
+SQLite
+''''''
 
 .. code-block:: sql
     :linenos:
@@ -132,12 +136,38 @@ When using this driver you need to create a couple of tables in the `DBMS`_ you 
         tagValue TEXT NOT NULL
     )
 
+MySQL
+'''''
+
+.. code-block:: sql
+    :linenos:
+
+    CREATE TABLE IF NOT EXISTS `imageinfo` (
+        `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+        `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
+        `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
+        `size` int(10) unsigned NOT NULL,
+        `extension` varchar(5) COLLATE utf8_danish_ci NOT NULL,
+        `mime` varchar(20) COLLATE utf8_danish_ci NOT NULL,
+        `added` int(10) unsigned NOT NULL,
+        `updated` int(10) unsigned NOT NULL,
+        `width` int(10) unsigned NOT NULL,
+        `height` int(10) unsigned NOT NULL,
+        `checksum` char(32) COLLATE utf8_danish_ci NOT NULL,
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `image` (`publicKey`,`imageIdentifier`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci AUTO_INCREMENT=1 ;
+
+    CREATE TABLE IF NOT EXISTS `metadata` (
+        `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+        `imageId` int(10) unsigned NOT NULL,
+        `tagName` varchar(255) COLLATE utf8_danish_ci NOT NULL,
+        `tagValue` varchar(255) COLLATE utf8_danish_ci NOT NULL,
+        PRIMARY KEY (`id`),
+        KEY `imageId` (`imageId`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci AUTO_INCREMENT=1 ;
+
 .. note:: Imbo will not create these tables automatically.
-
-If you wish to use some other DBMS, like for instance `MySQL`_ or `PostgreSQL`_ you will have to make some small changes to the statements above.
-
-.. _MySQL: http://www.mysql.com/
-.. _PostgreSQL: http://www.postgresql.org/
 
 Examples
 ~~~~~~~~
@@ -310,10 +340,10 @@ This driver uses the `Doctrine Database Abstraction Layer`_. The options you pas
 Database schema
 ~~~~~~~~~~~~~~~
 
-When using this driver you need to create a table in the `DBMS`_ you choose to use. This table will hold your image data. Below you will find a statement to create this table in `SQLite`_:
+When using this driver you need to create a table in the `DBMS`_ you choose to use. Below you will find a statement to create this table in `SQLite`_ and `MySQL`_.
 
-.. _DBMS: http://en.wikipedia.org/wiki/Relational_database_management_system
-.. _SQLite: http://www.sqlite.org/
+SQLite
+''''''
 
 .. code-block:: sql
     :linenos:
@@ -326,12 +356,21 @@ When using this driver you need to create a table in the `DBMS`_ you choose to u
         PRIMARY KEY (publicKey,imageIdentifier)
     )
 
+MySQL
+'''''
+
+.. code-block:: sql
+    :linenos:
+
+    CREATE TABLE IF NOT EXISTS `storage_images` (
+        `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
+        `imageIdentifier` varchar(32) COLLATE utf8_danish_ci NOT NULL,
+        `data` blob NOT NULL,
+        `updated` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`publicKey`,`imageIdentifier`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+
 .. note:: Imbo will not create the table automatically.
-
-If you wish to use some other DBMS, like for instance `MySQL`_ or `PostgreSQL`_ you will have to make some small changes to the statement above.
-
-.. _MySQL: http://www.mysql.com/
-.. _PostgreSQL: http://www.postgresql.org/
 
 Examples
 ~~~~~~~~
@@ -520,7 +559,7 @@ Event listeners can be added in the following ways:
         // ...
     );
 
-2) A closure returning an instance of the Imbo\EventListener\ListenerInterface interface
+2) A closure returning an instance of the ``Imbo\EventListener\ListenerInterface`` interface
 
 .. code-block:: php
     :linenos:
