@@ -262,9 +262,9 @@ class Doctrine implements DatabaseInterface {
         foreach ($rows as $row) {
             $image = array(
                 'extension'       => $row['extension'],
-                'added'           => $row['added'],
+                'added'           => new DateTime('@' . $row['added'], new DateTimeZone('UTC')),
+                'updated'         => new DateTime('@' . $row['updated'], new DateTimeZone('UTC')),
                 'checksum'        => $row['checksum'],
-                'updated'         => $row['updated'],
                 'publicKey'       => $publicKey,
                 'imageIdentifier' => $row['imageIdentifier'],
                 'mime'            => $row['mime'],
