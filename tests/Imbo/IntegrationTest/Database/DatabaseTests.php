@@ -263,7 +263,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $query = new Query();
         $images = $this->driver->getImages($this->publicKey, $query);
 
-        foreach (array('added', 'extension', 'height', 'width', 'imageIdentifier', 'mime', 'publicKey', 'size') as $key) {
+        foreach (array('added', 'updated', 'extension', 'height', 'width', 'imageIdentifier', 'mime', 'publicKey', 'size') as $key) {
             $this->assertArrayHasKey($key, $images[0]);
         }
 
@@ -280,6 +280,12 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertSame(array('key2' => 'value2'), $images[2]['metadata']);
         $this->assertSame(array('key1' => 'value1'), $images[3]['metadata']);
         $this->assertSame(array('key0' => 'value0'), $images[4]['metadata']);
+
+        foreach (array('added', 'updated') as $dateField) {
+            for ($i = 0; $i < 5; $i++) {
+                $this->assertInstanceOf('DateTime', $images[$i][$dateField]);
+            }
+        }
 
         // Test page and limit
         $query = new Query();
