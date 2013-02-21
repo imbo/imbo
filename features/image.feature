@@ -18,7 +18,7 @@ Feature: Imbo provides an image endpoint
     Scenario Outline: Fetch different formats of the image based on the Accept header
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        Given the "Accept" request header is "<accept>"
+        And the "Accept" request header is "<accept>"
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "<content-type>"
