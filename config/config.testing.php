@@ -10,6 +10,10 @@
 
 namespace Imbo;
 
+use PHPUnit_Framework_MockObject_Generator,
+    PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount,
+    PHPUnit_Framework_MockObject_Stub_Return;
+
 // Require composer autoloader
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -17,15 +21,31 @@ return array(
     'auth' => array('publickey' => 'privatekey'),
 
     'database' => function() {
-        return new Database\MongoDB(array(
-            'databaseName' => 'imbo_testing',
-        ));
+        $adapter = PHPUnit_Framework_MockObject_Generator::getMock(
+            'Imbo\Database\MongoDB',
+            array('getStatus'),
+            array(array('databaseName' => 'imbo_testing'))
+        );
+
+        $adapter->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount())
+                ->method('getStatus')
+                ->will(new PHPUnit_Framework_MockObject_Stub_Return(isset($_GET['databaseDown']) ? false : true));
+
+        return $adapter;
     },
 
     'storage' => function() {
-        return new Storage\GridFS(array(
-            'databaseName' => 'imbo_testing',
-        ));
+        $adapter = PHPUnit_Framework_MockObject_Generator::getMock(
+            'Imbo\Storage\GridFS',
+            array('getStatus'),
+            array(array('databaseName' => 'imbo_testing'))
+        );
+
+        $adapter->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount())
+                ->method('getStatus')
+                ->will(new PHPUnit_Framework_MockObject_Stub_Return(isset($_GET['storageDown']) ? false : true));
+
+        return $adapter;
     },
 
     'eventListeners' => array(

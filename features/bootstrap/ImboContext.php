@@ -9,7 +9,8 @@
  */
 
 use Behat\Behat\Event\SuiteEvent,
-    Behat\Behat\Exception\PendingException;
+    Behat\Behat\Exception\PendingException,
+    Behat\Behat\Context\Step\Given;
 
 // Use the RESTContext
 require 'RESTContext.php';
@@ -36,9 +37,23 @@ class ImboContext extends RESTContext {
     private $privateKey;
 
     /**
-     * @Given /^there are no Imbo issues$/
+     * @Given /^the (storage|database) is down$/
      */
-    public function thereAreNoImboIssues() {}
+    public function forceAdapterFailure($adapter) {
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($adapter) {
+            $event['request']->getQuery()->set($adapter . 'Down', 1);
+        });
+    }
+
+    /**
+     * @Given /^the database and the storage is down$/
+     */
+    public function forceBothAdapterFailure() {
+        return array(
+            new Given('the storage is down'),
+            new Given('the database is down'),
+        );
+    }
 
     /**
      * @Given /^I use "([^"]*)" and "([^"]*)" for public and private keys$/
@@ -73,8 +88,8 @@ class ImboContext extends RESTContext {
             $signature = hash_hmac('sha256', $data, $this->privateKey);
 
             $query = $request->getQuery();
-            $query->set('signature', rawurlencode($signature));
-            $query->set('timestamp', rawurlencode($timestamp));
+            $query->set('signature', $signature);
+            $query->set('timestamp', $timestamp);
         });
     }
 
