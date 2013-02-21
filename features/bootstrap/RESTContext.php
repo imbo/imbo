@@ -141,10 +141,12 @@ class RESTContext extends BehatContext {
         }
 
         try {
-            $this->responses[] = $request->send();
+            $response = $request->send();
         } catch (Exception $e) {
-            $this->responses[] = $e->getResponse();
+            $response = $e->getResponse();
         }
+
+        $this->responses[] = $response;
     }
 
     /**
@@ -211,19 +213,19 @@ class RESTContext extends BehatContext {
     }
 
     /**
-     * @Given /^the response body (contains|is):$/
+     * @Given /^the response body (contains|is|matches):$/
      */
     public function assertResponseBody($match, PyStringNode $expected) {
         $expected = trim((string) $expected);
+
         $actual = trim((string) $this->getLastResponse()->getBody());
 
         if ($match === 'is') {
             assertSame($expected, $actual, sprintf('Expected %s, got %s', $expected, $actual));
+        } else if ($match === 'matches') {
+            assertRegExp($expected, $actual);
         } else {
-            assertContains(
-                $expected,
-                $actual
-            );
+            assertContains($expected, $actual);
         }
 
     }
