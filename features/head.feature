@@ -21,10 +21,3 @@ Feature: Imbo supports HTTP HEAD for all resources
         When I request "/users/publickey/images" using HTTP "HEAD"
         And make the same request using HTTP "GET"
         Then the response headers should be the same
-
-    Scenario: Request user images using a valid access token
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
-        When I request "/users/publickey/images" using HTTP "HEAD"
-        And make the same request using HTTP "GET"
-        Then the response headers should be the same
