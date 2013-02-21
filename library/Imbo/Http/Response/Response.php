@@ -361,22 +361,19 @@ class Response implements ListenerInterface, ResponseInterface {
                         ->remove('ETag')
                         ->remove('Last-Modified');
 
-        // Prepare response data if the request expects a response body
-        if ($request->getMethod() !== RequestInterface::METHOD_HEAD) {
-            $model = new Model\Error();
-            $model->setHttpCode($code)
-                  ->setErrorMessage($message)
-                  ->setDate($date)
-                  ->setImboErrorCode($internalCode);
+        $model = new Model\Error();
+        $model->setHttpCode($code)
+              ->setErrorMessage($message)
+              ->setDate($date)
+              ->setImboErrorCode($internalCode);
 
-            if ($image = $request->getImage()) {
-                $model->setImageIdentifier($image->getChecksum());
-            } else if ($identifier = $request->getImageIdentifier()) {
-                $model->setImageIdentifier($identifier);
-            }
-
-            $this->setModel($model);
+        if ($image = $request->getImage()) {
+            $model->setImageIdentifier($image->getChecksum());
+        } else if ($identifier = $request->getImageIdentifier()) {
+            $model->setImageIdentifier($identifier);
         }
+
+        $this->setModel($model);
 
         return $this;
     }

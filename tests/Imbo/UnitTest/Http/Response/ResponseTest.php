@@ -163,7 +163,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->headers->expects($this->at(4))->method('remove')->with('Last-Modified')->will($this->returnSelf());
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageIdentifier'));
 
         $exception = new RuntimeException('You wronged', 400);
@@ -192,7 +191,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $exception->setImboErrorCode(123);
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $request->expects($this->once())->method('getImage')->will($this->returnValue(null));
         $request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageIdentifier'));
 
@@ -218,7 +216,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $exception->setImboErrorCode(123);
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
@@ -230,26 +227,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame(123, $model->getImboErrorCode());
         $this->assertSame('checksum', $model->getImageIdentifier());
-    }
-
-    /**
-     * @covers Imbo\Http\Response\Response::createError
-     */
-    public function testWillNotSetBodyInErrorIfRequestMethodIsHead() {
-        $this->headers->expects($this->at(0))->method('set')->with('X-Imbo-Error-Message', 'You wronged')->will($this->returnSelf());
-        $this->headers->expects($this->at(1))->method('set')->with('X-Imbo-Error-InternalCode', 0)->will($this->returnSelf());
-        $this->headers->expects($this->at(2))->method('set')->with('X-Imbo-Error-Date', $this->isType('string'))->will($this->returnSelf());
-        $this->headers->expects($this->at(3))->method('remove')->with('ETag')->will($this->returnSelf());
-        $this->headers->expects($this->at(4))->method('remove')->with('Last-Modified')->will($this->returnSelf());
-
-        $exception = new RuntimeException('You wronged', 400);
-
-        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getMethod')->will($this->returnValue('HEAD'));
-
-        $this->response->createError($exception, $request);
-
-        $this->assertNull($this->response->getBody());
     }
 
     /**
