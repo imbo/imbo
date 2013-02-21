@@ -4,8 +4,7 @@ Feature: Imbo supports content negotiation
     I can specify the type I want in the Accept request header
 
     Scenario Outline: The status endpoint can respond with different content types using content negotiation
-        Given there are no Imbo issues
-        And the "Accept" request header is "<accept>"
+        Given the "Accept" request header is "<accept>"
         When I request "/status"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "<content-type>"
