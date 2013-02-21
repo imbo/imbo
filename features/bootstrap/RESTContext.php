@@ -11,6 +11,7 @@
 use Behat\Behat\Context\BehatContext,
     Behat\Behat\Exception\PendingException,
     Behat\Behat\Event\SuiteEvent,
+    Behat\Gherkin\Node\PyStringNode,
     Guzzle\Http\Client,
     Guzzle\Http\Message\Request,
     Guzzle\Http\Message\Response;
@@ -207,6 +208,24 @@ class RESTContext extends BehatContext {
     public function assertEmptyResponseBody() {
         $response = $this->getLastResponse();
         assertEmpty((string) $response->getBody());
+    }
+
+    /**
+     * @Given /^the response body (contains|is):$/
+     */
+    public function assertResponseBody($match, PyStringNode $expected) {
+        $expected = trim((string) $expected);
+        $actual = trim((string) $this->getLastResponse()->getBody());
+
+        if ($match === 'is') {
+            assertSame($expected, $actual, sprintf('Expected %s, got %s', $expected, $actual));
+        } else {
+            assertContains(
+                $expected,
+                $actual
+            );
+        }
+
     }
 
     /**
