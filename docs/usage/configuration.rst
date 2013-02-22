@@ -1,7 +1,7 @@
 Configuration
 =============
 
-Imbo ships with a default configuration file named ``config/config.default.php`` that Imbo will load. You can specify your own configuration file, ``config/config.php``, that Imbo will merge with the default. Here you will see the different configuration values you can override.
+Imbo ships with a default configuration file named ``config/config.default.php`` that Imbo will load. You can specify your own configuration file, ``config/config.php``, that Imbo will merge with the default. You should never update ``config/config.default.php``.
 
 User key pairs
 --------------
@@ -364,7 +364,7 @@ MySQL
 
     CREATE TABLE IF NOT EXISTS `storage_images` (
         `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-        `imageIdentifier` varchar(32) COLLATE utf8_danish_ci NOT NULL,
+        `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
         `data` blob NOT NULL,
         `updated` int(10) unsigned NOT NULL,
         PRIMARY KEY (`publicKey`,`imageIdentifier`)
@@ -1069,7 +1069,7 @@ You can also implement your own transformations by implementing the ``Imbo\Image
 
         'imageTransformations' => array(
             'border' => function (array $params) {
-                return function (Image\ImageInterface $image) use ($params) {
+                return function (Model\Image $image) use ($params) {
                     $color = !empty($params['color']) ? $params['color'] : '#000';
                     $width = !empty($params['width']) ? $params['width'] : 1;
                     $height = !empty($params['height']) ? $params['height'] : 1;
