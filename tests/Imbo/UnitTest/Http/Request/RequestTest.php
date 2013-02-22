@@ -551,7 +551,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanSetAndGetAnImage() {
         $request = new Request();
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $this->assertSame($request, $request->setImage($image));
         $this->assertSame($image, $request->getImage());
     }

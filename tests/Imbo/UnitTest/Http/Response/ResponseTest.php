@@ -96,13 +96,28 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Http\Response\Response::setModel
+     * @covers Imbo\Http\Response\Response::getModel
+     */
+    public function testCanSetAndGetModel() {
+        $model = $this->getMock('Imbo\Model\ModelInterface');
+        $this->assertNull($this->response->getModel());
+        $this->assertSame($this->response, $this->response->setModel($model));
+        $this->assertSame($model, $this->response->getModel());
+        $this->assertSame($this->response, $this->response->setModel(null));
+        $this->assertNull($this->response->getModel());
+    }
+
+    /**
      * @covers Imbo\Http\Response\Response::setBody
+     * @covers Imbo\Http\Response\Response::setModel
      * @covers Imbo\Http\Response\Response::setStatusCode
      * @covers Imbo\Http\Response\Response::setNotModified
      * @covers Imbo\Http\Response\Response::getStatusCode
      * @covers Imbo\Http\Response\Response::getBody
      */
     public function testCanMarkItselfAsNotModified() {
+        $this->assertSame($this->response, $this->response->setModel($this->getMock('Imbo\Model\ModelInterface')));
         $this->assertSame($this->response, $this->response->setBody('some content'));
         $this->assertSame($this->response, $this->response->setStatusCode(200));
 
@@ -110,6 +125,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame(304, $this->response->getStatusCode());
         $this->assertEmpty($this->response->getBody());
+        $this->assertNull($this->response->getModel());
     }
 
     /**
@@ -147,7 +163,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->headers->expects($this->at(4))->method('remove')->with('Last-Modified')->will($this->returnSelf());
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageIdentifier'));
 
         $exception = new RuntimeException('You wronged', 400);
@@ -156,14 +171,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame(400, $this->response->getStatusCode());
 
-        $body = $this->response->getBody();
+        $model = $this->response->getModel();
 
-        $this->assertArrayHasKey('error', $body);
-        $this->assertArrayHasKey('code', $body['error']);
-        $this->assertArrayHasKey('message', $body['error']);
-
-        $this->assertSame(400, $body['error']['code']);
-        $this->assertSame('You wronged', $body['error']['message']);
+        $this->assertSame(400, $model->getHttpCode());
+        $this->assertSame('You wronged', $model->getErrorMessage());
     }
 
     /**
@@ -180,20 +191,15 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $exception->setImboErrorCode(123);
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $request->expects($this->once())->method('getImage')->will($this->returnValue(null));
         $request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageIdentifier'));
 
         $this->response->createError($exception, $request);
 
-        $body = $this->response->getBody();
+        $model = $this->response->getModel();
 
-        $this->assertArrayHasKey('error', $body);
-        $this->assertArrayHasKey('imageIdentifier', $body);
-        $this->assertArrayHasKey('imboErrorCode', $body['error']);
-
-        $this->assertSame(123, $body['error']['imboErrorCode']);
-        $this->assertSame('imageIdentifier', $body['imageIdentifier']);
+        $this->assertSame(123, $model->getImboErrorCode());
+        $this->assertSame('imageIdentifier', $model->getImageIdentifier());
     }
 
     /**
@@ -210,42 +216,17 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $exception->setImboErrorCode(123);
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $request->expects($this->never())->method('checksum');
 
         $this->response->createError($exception, $request);
 
-        $body = $this->response->getBody();
+        $model = $this->response->getModel();
 
-        $this->assertArrayHasKey('error', $body);
-        $this->assertArrayHasKey('imageIdentifier', $body);
-        $this->assertArrayHasKey('imboErrorCode', $body['error']);
-
-        $this->assertSame(123, $body['error']['imboErrorCode']);
-        $this->assertSame('checksum', $body['imageIdentifier']);
-    }
-
-    /**
-     * @covers Imbo\Http\Response\Response::createError
-     */
-    public function testWillNotSetBodyInErrorIfRequestMethodIsHead() {
-        $this->headers->expects($this->at(0))->method('set')->with('X-Imbo-Error-Message', 'You wronged')->will($this->returnSelf());
-        $this->headers->expects($this->at(1))->method('set')->with('X-Imbo-Error-InternalCode', 0)->will($this->returnSelf());
-        $this->headers->expects($this->at(2))->method('set')->with('X-Imbo-Error-Date', $this->isType('string'))->will($this->returnSelf());
-        $this->headers->expects($this->at(3))->method('remove')->with('ETag')->will($this->returnSelf());
-        $this->headers->expects($this->at(4))->method('remove')->with('Last-Modified')->will($this->returnSelf());
-
-        $exception = new RuntimeException('You wronged', 400);
-
-        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $request->expects($this->once())->method('getMethod')->will($this->returnValue('HEAD'));
-
-        $this->response->createError($exception, $request);
-
-        $this->assertNull($this->response->getBody());
+        $this->assertSame(123, $model->getImboErrorCode());
+        $this->assertSame('checksum', $model->getImageIdentifier());
     }
 
     /**
@@ -265,7 +246,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Response::getImage
      */
     public function testCanSetAndGetImage() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $this->assertSame($this->response, $this->response->setImage($image));
         $this->assertSame($image, $this->response->getImage());
     }
@@ -318,8 +299,8 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->headers->expects($this->at(1))->method('get')->with('etag')->will($this->returnValue(null));
         $this->headers->expects($this->at(2))->method('set')->with('X-Imbo-ImageIdentifier', 'imageIdentifier');
 
-        $this->expectOutputString('{"foo":"bar"}');
-        $this->response->setBody(array('foo' => 'bar'))->send($event);
+        $this->expectOutputString('foobar');
+        $this->response->setBody('foobar')->send($event);
     }
 
     /**
@@ -328,7 +309,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanSendHeadersAndContentUsingImageInstanceForImageIdentifier() {
         $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
 
         $request = $this->getMock('Imbo\Http\Request\RequestInterface');
@@ -342,8 +323,8 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->headers->expects($this->at(1))->method('get')->with('etag')->will($this->returnValue(null));
         $this->headers->expects($this->at(2))->method('set')->with('X-Imbo-ImageIdentifier', 'checksum');
 
-        $this->expectOutputString('{"foo":"bar"}');
-        $this->response->setBody(array('foo' => 'bar'))->send($event);
+        $this->expectOutputString('foobar');
+        $this->response->setBody('foobar')->send($event);
     }
 
     /**

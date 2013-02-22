@@ -10,25 +10,72 @@
 
 namespace Imbo\Http\Response\Formatter;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface;
+use Imbo\Model,
+    Imbo\Exception\InvalidArgumentException;
 
 /**
  * Interface for formatters
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Http
+ * @package Response\Formatters
  */
 interface FormatterInterface {
     /**
-     * Format data
+     * Format a model
      *
-     * @param array $data The data to format
-     * @param RequestInterface $request The current request
-     * @param ResponseInterface $response The current response
-     * @return string Formatted data ready to be sent to the client
+     * @param Model\ModelInterface $model The model to format
+     * @return string
+     * @throws InvalidArgumentException Throws an exception if the model is not supported
      */
-    function format(array $data, RequestInterface $request, ResponseInterface $response);
+    function format(Model\ModelInterface $model);
+
+    /**
+     * Format an error model
+     *
+     * @param Model\Error $model The model to format
+     * @return string Formatted data
+     */
+    function formatError(Model\Error $model);
+
+    /**
+     * Format a status model
+     *
+     * @param Model\Status $model The model to format
+     * @return string Formatted data
+     */
+    function formatStatus(Model\Status $model);
+
+    /**
+     * Format a user model
+     *
+     * @param Model\User $model The model to format
+     * @return string Formatted data
+     */
+    function formatUser(Model\User $model);
+
+    /**
+     * Format an images model
+     *
+     * @param Model\Images $model The model to format
+     * @return string Formatted data
+     */
+    function formatImages(Model\Images $model);
+
+    /**
+     * Format a metadata model
+     *
+     * @param Model\Metadata $model The model to format
+     * @return string Formatted data
+     */
+    function formatMetadata(Model\Metadata $model);
+
+    /**
+     * Format an array model
+     *
+     * @param Model\ArrayModel $model The model to format
+     * @return string Formatted data
+     */
+    function formatArrayModel(Model\ArrayModel $model);
 
     /**
      * Get the content type for the current formatter

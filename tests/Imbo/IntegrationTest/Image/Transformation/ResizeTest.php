@@ -39,7 +39,7 @@ class ResizeTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Resize::applyToImage
      */
     protected function getImageMock() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
@@ -52,7 +52,7 @@ class ResizeTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Resize::applyToImage
      */
     public function testApplyToImageWithOnlyWidth() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('getHeight')->will($this->returnValue(665));
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(463));
@@ -68,7 +68,7 @@ class ResizeTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Resize::applyToImage
      */
     public function testApplyToImageWithOnlyHeight() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('getHeight')->will($this->returnValue(665));
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(463));

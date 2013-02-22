@@ -79,7 +79,7 @@ class MetadataCacheTest extends ListenerTests {
 
         $this->responseHeaders->expects($this->at(0))->method('set')->with('X-Imbo-MetadataCache', 'Hit')->will($this->returnSelf());
         $this->responseHeaders->expects($this->at(1))->method('set')->with('Last-Modified', 'some date')->will($this->returnSelf());
-        $this->response->expects($this->once())->method('setBody')->with(array('key' => 'value'))->will($this->returnSelf());
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Metadata'))->will($this->returnSelf());
 
         $this->event->expects($this->once())->method('stopPropagation')->with(true);
 
@@ -106,9 +106,31 @@ class MetadataCacheTest extends ListenerTests {
             'lastModified' => $lastModified,
             'metadata' => $data,
         ));
+
+        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($data));
+
         $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(200));
         $this->response->expects($this->once())->method('getLastModified')->will($this->returnValue($lastModified));
-        $this->response->expects($this->once())->method('getBody')->will($this->returnValue($data));
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($model));
+
+        $this->listener->storeInCache($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\MetadataCache::storeInCache
+     */
+    public function testStoresDataInCacheWhenResponseCodeIs200AndHasNoModel() {
+        $lastModified = 'some date';
+
+        $this->cache->expects($this->once())->method('set')->with($this->isType('string'), array(
+            'lastModified' => $lastModified,
+            'metadata' => array(),
+        ));
+
+        $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(200));
+        $this->response->expects($this->once())->method('getLastModified')->will($this->returnValue($lastModified));
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue(null));
 
         $this->listener->storeInCache($this->event);
     }

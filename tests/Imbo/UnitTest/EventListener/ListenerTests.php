@@ -24,9 +24,6 @@ abstract class ListenerTests extends \PHPUnit_Framework_TestCase {
      */
     abstract protected function getListener();
 
-    /**
-     * @covers Imbo\EventListener\AccessToken::getDefinition
-     */
     public function testReturnsDefinitions() {
         $definition = $this->getListener()->getDefinition();
         $this->assertInternalType('array', $definition);

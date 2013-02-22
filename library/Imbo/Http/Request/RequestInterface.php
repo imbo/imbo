@@ -11,7 +11,7 @@
 namespace Imbo\Http\Request;
 
 use Imbo\Exception\InvalidArgumentException,
-    Imbo\Image\Image;
+    Imbo\Model\Image;
 
 /**
  * Request interface

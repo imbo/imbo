@@ -11,7 +11,8 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Cache\CacheInterface;
+    Imbo\Cache\CacheInterface,
+    Imbo\Model;
 
 /**
  * Metadata cache
@@ -46,6 +47,7 @@ class MetadataCache implements ListenerInterface {
 
             // Delete from cache
             new ListenerDefinition('db.metadata.delete', array($this, 'deleteFromCache'), -10),
+            new ListenerDefinition('db.image.delete', array($this, 'deleteFromCache'), -10),
 
             // Store in cache
             new ListenerDefinition('db.metadata.load', array($this, 'storeInCache'), -10),
@@ -70,7 +72,10 @@ class MetadataCache implements ListenerInterface {
         $result = $this->cache->get($cacheKey);
 
         if (is_array($result) && isset($result['lastModified']) && isset($result['metadata'])) {
-            $response->setBody($result['metadata']);
+            $model = new Model\Metadata();
+            $model->setData($result['metadata']);
+
+            $response->setModel($model);
             $response->getHeaders()->set('X-Imbo-MetadataCache', 'Hit')
                                    ->set('Last-Modified', $result['lastModified']);
 
@@ -98,9 +103,15 @@ class MetadataCache implements ListenerInterface {
 
         // Store the response in the cache for later use
         if ($response->getStatusCode() === 200) {
+            $metadata = array();
+
+            if ($model = $response->getModel()) {
+                $metadata = $model->getData();
+            }
+
             $this->cache->set($cacheKey, array(
                 'lastModified' => $response->getLastModified(),
-                'metadata' => $response->getBody(),
+                'metadata' => $metadata,
             ));
         }
     }

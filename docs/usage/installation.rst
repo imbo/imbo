@@ -1,7 +1,7 @@
 Installation
 ============
 
-The easiest way to install Imbo is to `clone the repository`, and then use `composer`_ to install the dependencies:
+The easiest way to install Imbo is to `clone the repository`, and then use `Composer`_ to install the dependencies:
 
 .. code-block:: bash
 
@@ -11,7 +11,7 @@ The easiest way to install Imbo is to `clone the repository`, and then use `comp
     $ php composer.phar install
 
 .. _clone the repository: http://github.com/imbo/imbo
-.. _composer: http://getcomposer.org/
+.. _Composer: http://getcomposer.org/
 
 After installing the PHP files you will need to configure your web server.
 

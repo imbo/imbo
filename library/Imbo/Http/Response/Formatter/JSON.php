@@ -10,38 +10,123 @@
 
 namespace Imbo\Http\Response\Formatter;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface;
+use Imbo\Model,
+    stdClass;
 
 /**
  * JSON formatter
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Http
+ * @package Response\Formatters
  */
-class JSON implements FormatterInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function format(array $data, RequestInterface $request, ResponseInterface $response) {
-        // Simply encode the data to JSON, no matter what resource we are dealing with
-        $jsonEncoded = json_encode($data);
-        $query = $request->getQuery();
-
-        foreach (array('callback', 'jsonp', 'json') as $param) {
-            if ($query->has($param)) {
-                $jsonEncoded = sprintf("%s(%s)", $query->get($param), $jsonEncoded);
-                break;
-            }
-        }
-
-        return $jsonEncoded;
-    }
-
+class JSON extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
     public function getContentType() {
         return 'application/json';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatError(Model\Error $model) {
+        $data = array(
+            'error' => array(
+                'code' => $model->getHttpCode(),
+                'message' => $model->getErrorMessage(),
+                'date' => $this->dateFormatter->formatDate($model->getDate()),
+                'imboErrorCode' => $model->getImboErrorCode(),
+            ),
+        );
+
+        if ($imageIdentifier = $model->getImageIdentifier()) {
+            $data['imageIdentifier'] = $imageIdentifier;
+        }
+
+        return $this->encode($data);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatStatus(Model\Status $model) {
+        return $this->encode(array(
+            'date' => $this->dateFormatter->formatDate($model->getDate()),
+            'database' => $model->getDatabaseStatus(),
+            'storage' => $model->getStorageStatus(),
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatUser(Model\User $model) {
+        return $this->encode(array(
+            'publicKey' => $model->getPublicKey(),
+            'numImages' => $model->getNumImages(),
+            'lastModified' => $this->dateFormatter->formatDate($model->getLastModified()),
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatImages(Model\Images $model) {
+        $images = $model->getImages();
+        $data = array();
+
+        foreach ($images as $image) {
+            $entry = array(
+                'added' => $this->dateFormatter->formatDate($image->getAddedDate()),
+                'updated' => $this->dateFormatter->formatDate($image->getUpdatedDate()),
+                'checksum' => $image->getChecksum(),
+                'extension' => $image->getExtension(),
+                'size' => $image->getFilesize(),
+                'width' => $image->getWidth(),
+                'height' => $image->getHeight(),
+                'mime' => $image->getMimeType(),
+                'imageIdentifier' => $image->getImageIdentifier(),
+                'publicKey' => $image->getPublicKey(),
+            );
+
+            $metadata = $image->getMetadata();
+
+            if (is_array($metadata)) {
+                if (empty($metadata)) {
+                    $metadata = new stdClass();
+                }
+
+                $entry['metadata'] = $metadata;
+            }
+
+            $data[] = $entry;
+        }
+
+        return $this->encode($data);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatMetadata(Model\Metadata $model) {
+        return $this->encode($model->getData() ?: new stdClass());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatArrayModel(Model\ArrayModel $model) {
+        return $this->encode($model->getData() ?: new stdClass());
+    }
+
+    /**
+     * JSON encode an array
+     *
+     * @param mixed $data The data to encode
+     * @return string
+     */
+    private function encode($data) {
+        return json_encode($data);
     }
 }

@@ -13,7 +13,8 @@ namespace Imbo\Http\Response;
 use Imbo\Http\HeaderContainer,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
-    Imbo\Image\Image;
+    Imbo\Model\Image,
+    Imbo\Model\ModelInterface;
 
 /**
  * Response interface
@@ -86,6 +87,21 @@ interface ResponseInterface {
      * @return ResponseInterface
      */
     function setBody($content);
+
+    /**
+     * Get the model instance
+     *
+     * @return null|ModelInterface
+     */
+    function getModel();
+
+    /**
+     * Set the model instance
+     *
+     * @param ModelInterface $model A model instance
+     * @return ResponseInterface
+     */
+    function setModel(ModelInterface $model = null);
 
     /**
      * Get the HTTP protocol version

@@ -91,6 +91,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
             array('/users/christer.json/'),
             array('/users/Christer.json/'),
             array('/users/christer/images.json/'),
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/'),
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c.gif/'),
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta.json/'),
         );
@@ -143,7 +144,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
             // Image resource
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c.png', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'png'),
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c.jpg', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'jpg'),
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c.gif', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'gif'),

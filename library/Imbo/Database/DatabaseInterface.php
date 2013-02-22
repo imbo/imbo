@@ -10,7 +10,7 @@
 
 namespace Imbo\Database;
 
-use Imbo\Image\Image,
+use Imbo\Model\Image,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     DateTime;

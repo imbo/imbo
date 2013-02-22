@@ -14,7 +14,8 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ResourceException,
     Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition;
+    Imbo\EventListener\ListenerDefinition,
+    Imbo\Model;
 
 /**
  * Image resource
@@ -59,7 +60,12 @@ class Image implements ResourceInterface, ListenerInterface {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
-        $response->setBody(array('imageIdentifier' => $request->getImage()->getChecksum()));
+        $model = new Model\ArrayModel();
+        $model->setData(array(
+            'imageIdentifier' => $request->getImage()->getChecksum(),
+        ));
+
+        $response->setModel($model);
     }
 
     /**
@@ -70,9 +76,13 @@ class Image implements ResourceInterface, ListenerInterface {
     public function delete(EventInterface $event) {
         $event->getManager()->trigger('db.image.delete');
         $event->getManager()->trigger('storage.image.delete');
-        $event->getResponse()->setBody(array(
+
+        $model = new Model\ArrayModel();
+        $model->setData(array(
             'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
         ));
+
+        $event->getResponse()->setModel($model);
     }
 
     /**
@@ -89,7 +99,10 @@ class Image implements ResourceInterface, ListenerInterface {
         $serverContainer = $request->getServer();
         $requestHeaders = $request->getHeaders();
         $responseHeaders = $response->getHeaders();
+
         $image = $response->getImage();
+        $image->setImageIdentifier($imageIdentifier)
+              ->setPublicKey($publicKey);
 
         $event->getManager()->trigger('db.image.load');
         $event->getManager()->trigger('storage.image.load');
@@ -121,12 +134,9 @@ class Image implements ResourceInterface, ListenerInterface {
         // Trigger possible image transformations
         $event->getManager()->trigger('image.transform');
 
-        // Set the content length and content-type after transformations have been applied
-        $imageData = $image->getBlob();
-
-        $responseHeaders->set('Content-Length', strlen($imageData))
-                        ->set('Content-Type', $image->getMimeType());
-
-        $response->setBody($imageData);
+        // Fetch the image once more as event listeners might have set a new instance during the
+        // transformation phase
+        $image = $response->getImage();
+        $response->setModel($image);
     }
 }

@@ -10,7 +10,7 @@
 
 namespace Imbo\IntegrationTest\Database;
 
-use Imbo\Image\Image,
+use Imbo\Model\Image,
     Imbo\Resource\Images\Query;
 
 /**
@@ -34,7 +34,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     private $imageIdentifier = '9cb263819af35064af0b6665a1b0fddd';
 
     /**
-     * @var Imbo\Image\Image
+     * @var Image
      */
     private $image;
 
@@ -56,7 +56,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     public function setUp() {
         $this->imageData = file_get_contents(FIXTURES_DIR . '/image.png');
 
-        $this->image = $this->getMock('Imbo\Image\Image');
+        $this->image = $this->getMock('Imbo\Model\Image');
         $this->image->expects($this->any())->method('getFilesize')->will($this->returnValue(strlen($this->imageData)));
         $this->image->expects($this->any())->method('getExtension')->will($this->returnValue('png'));
         $this->image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/png'));
@@ -79,11 +79,13 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     public function testInsertAndGetImage() {
         $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
 
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('setWidth')->with(665)->will($this->returnSelf());
         $image->expects($this->once())->method('setHeight')->with(463)->will($this->returnSelf());
         $image->expects($this->once())->method('setMimeType')->with('image/png')->will($this->returnSelf());
         $image->expects($this->once())->method('setExtension')->with('png')->will($this->returnSelf());
+        $image->expects($this->once())->method('setAddedDate')->with($this->isInstanceOf('DateTime'))->will($this->returnSelf());
+        $image->expects($this->once())->method('setUpdatedDate')->with($this->isInstanceOf('DateTime'))->will($this->returnSelf());
 
         $this->assertTrue($this->driver->load($this->publicKey, $this->imageIdentifier, $image));
     }
@@ -105,7 +107,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     public function testStoreDeleteAndGetImage() {
         $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
         $this->assertTrue($this->driver->deleteImage($this->publicKey, $this->imageIdentifier));
-        $this->driver->load($this->publicKey, $this->imageIdentifier, $this->getMock('Imbo\Image\Image'));
+        $this->driver->load($this->publicKey, $this->imageIdentifier, $this->getMock('Imbo\Model\Image'));
     }
 
     /**
@@ -123,7 +125,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Image not found
      */
     public function testLoadImageThatDoesNotExist() {
-        $this->driver->load($this->publicKey, $this->imageIdentifier, $this->getMock('Imbo\Image\Image'));
+        $this->driver->load($this->publicKey, $this->imageIdentifier, $this->getMock('Imbo\Model\Image'));
     }
 
     /**

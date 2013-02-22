@@ -114,7 +114,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                          ->method('insert')
                          ->will($this->throwException(new MongoException()));
 
-        $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Image\Image'));
+        $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Model\Image'));
     }
 
     /**
@@ -131,7 +131,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                          ->method('update')
                          ->will($this->throwException(new MongoException()));
 
-        $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Image\Image'));
+        $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Model\Image'));
     }
 
     /**
@@ -219,7 +219,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                          ->method('findOne')
                          ->will($this->throwException(new MongoException()));
 
-        $this->driver->load('key', 'identifier', $this->getMock('Imbo\Image\Image'));
+        $this->driver->load('key', 'identifier', $this->getMock('Imbo\Model\Image'));
     }
 
     /**

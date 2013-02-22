@@ -1,7 +1,9 @@
 Requirements
 ============
 
-Imbo requires a web server running `PHP-5.3`_, a running `MongoDB`_ and the `Mongo`_ and `Imagick`_ extensions for PHP.
+Imbo requires a web server running `PHP-5.3`_ and the `Imagick`_ extension for PHP.
+
+You will also need a backend for storage of image information, like for instance `MongoDB`_ or `MySQL`_.
 
 Optional requirements are `Doctrine Database Abstraction Layer`_ (for some storage and database drivers), and `Memcached`_ and/or `APC`_ for caching.
 
@@ -12,3 +14,4 @@ Optional requirements are `Doctrine Database Abstraction Layer`_ (for some stora
 .. _Doctrine Database Abstraction Layer: http://www.doctrine-project.org/projects/dbal.html
 .. _Memcached: http://pecl.php.net/package/memcached
 .. _APC: http://pecl.php.net/package/apc
+.. _MySQL: http://www.mysql.com

@@ -14,7 +14,7 @@ use Imbo\Http\ParameterContainer,
     Imbo\Http\ServerContainer,
     Imbo\Http\HeaderContainer,
     Imbo\Exception\InvalidArgumentException,
-    Imbo\Image\Image;
+    Imbo\Model\Image;
 
 /**
  * Request class

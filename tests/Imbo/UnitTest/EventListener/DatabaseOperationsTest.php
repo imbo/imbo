@@ -44,7 +44,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->formatter = $this->getMock('Imbo\Helpers\DateFormatter');
         $this->container = $this->getMock('Imbo\Container');
         $this->container->expects($this->any())->method('get')->with('dateFormatter')->will($this->returnValue($this->formatter));
-        $this->image = $this->getMock('Imbo\Image\Image');
+        $this->image = $this->getMock('Imbo\Model\Image');
 
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
@@ -140,6 +140,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($datetime));
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->once())->method('set')->with('Last-Modified', $date);
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Metadata'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
         $this->listener->loadMetadata($this->event);
@@ -153,26 +154,44 @@ class DatabaseOperationsTest extends ListenerTests {
             array(
                 'added' => $this->getMock('DateTime'),
                 'updated' => $this->getMock('DateTime'),
+                'size' => 123,
+                'width' => 50,
+                'height' => 50,
+                'imageIdentifier' => 'identifier1',
+                'checksum' => 'checksum1',
+                'mime' => 'image/png',
+                'extension' => 'png',
+                'metadata' => array(),
             ),
             array(
                 'added' => $this->getMock('DateTime'),
                 'updated' => $this->getMock('DateTime'),
+                'size' => 456,
+                'width' => 60,
+                'height' => 60,
+                'imageIdentifier' => 'identifier2',
+                'checksum' => 'checksum2',
+                'mime' => 'image/png',
+                'extension' => 'png',
+                'metadata' => array(),
             ),
             array(
                 'added' => $this->getMock('DateTime'),
                 'updated' => $this->getMock('DateTime'),
+                'size' => 789,
+                'width' => 70,
+                'height' => 70,
+                'imageIdentifier' => 'identifier3',
+                'checksum' => 'checksum3',
+                'mime' => 'image/png',
+                'extension' => 'png',
+                'metadata' => array(),
             ),
         );
 
         $date = 'Fri, 16 Mar 2012 14:05:00 GMT';
         $datetime = $this->getMock('DateTime');
-        $this->formatter->expects($this->at(0))->method('formatDate')->with($this->isInstanceOf('DateTime'));
-        $this->formatter->expects($this->at(1))->method('formatDate')->with($this->isInstanceOf('DateTime'));
-        $this->formatter->expects($this->at(2))->method('formatDate')->with($this->isInstanceOf('DateTime'));
-        $this->formatter->expects($this->at(3))->method('formatDate')->with($this->isInstanceOf('DateTime'));
-        $this->formatter->expects($this->at(4))->method('formatDate')->with($this->isInstanceOf('DateTime'));
-        $this->formatter->expects($this->at(5))->method('formatDate')->with($this->isInstanceOf('DateTime'));
-        $this->formatter->expects($this->at(6))->method('formatDate')->with($datetime)->will($this->returnValue($date));
+        $this->formatter->expects($this->at(0))->method('formatDate')->with($datetime)->will($this->returnValue($date));
 
         $query = $this->getMockBuilder('Imbo\Http\ParameterContainer')->disableOriginalConstructor()->getMock();
         $query->expects($this->any(0))->method('has')->will($this->returnValue(true));
@@ -193,12 +212,6 @@ class DatabaseOperationsTest extends ListenerTests {
         $container = $this->getMock('Imbo\Container');
         $container->expects($this->at(0))->method('get')->with('imagesQuery')->will($this->returnValue($imagesQuery));
         $container->expects($this->at(1))->method('get')->with('dateFormatter')->will($this->returnValue($this->formatter));
-        $container->expects($this->at(2))->method('get')->with('dateFormatter')->will($this->returnValue($this->formatter));
-        $container->expects($this->at(3))->method('get')->with('dateFormatter')->will($this->returnValue($this->formatter));
-        $container->expects($this->at(4))->method('get')->with('dateFormatter')->will($this->returnValue($this->formatter));
-        $container->expects($this->at(5))->method('get')->with('dateFormatter')->will($this->returnValue($this->formatter));
-        $container->expects($this->at(6))->method('get')->with('dateFormatter')->will($this->returnValue($this->formatter));
-        $container->expects($this->at(7))->method('get')->with('dateFormatter')->will($this->returnValue($this->formatter));
 
         $this->database->expects($this->once())->method('getImages')->with($this->publicKey, $imagesQuery)->will($this->returnValue($images));
         $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey)->will($this->returnValue($datetime));
@@ -206,7 +219,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->once())->method('set')->with('Last-Modified', $date);
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-        $this->response->expects($this->once())->method('setBody')->with($this->isType('array'))->will($this->returnSelf());
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Images'))->will($this->returnSelf());
 
         $this->listener->setContainer($container);
         $this->listener->loadImages($this->event);
@@ -222,11 +235,8 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->formatter->expects($this->once())->method('formatDate')->with($datetime)->will($this->returnValue($date));
         $this->database->expects($this->once())->method('getNumImages')->with($this->publicKey)->will($this->returnValue(123));
         $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey)->will($this->returnValue($datetime));
-        $this->response->expects($this->once())->method('setBody')->with(array(
-            'publicKey' => $this->publicKey,
-            'numImages' => 123,
-            'lastModified' => $date,
-        ));
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\User'))->will($this->returnSelf());
+
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->once())->method('set')->with('Last-Modified', $date);
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));

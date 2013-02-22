@@ -11,8 +11,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Http\ContentNegotiation,
-    Imbo\Image\Image,
+    Imbo\Model\Image,
     RecursiveDirectoryIterator,
     RecursiveIteratorIterator;
 
@@ -36,26 +35,12 @@ class ImageTransformationCache implements ListenerInterface {
     private $path;
 
     /**
-     * Content negotiation instance
-     *
-     * @var ContentNegotiation
-     */
-    private $contentNegotiation;
-
-    /**
      * Class constructor
      *
      * @param string $path Path to store the temp. images
-     * @param ContentNegotiation $contentNegotiation Content negotiation instance
      */
-    public function __construct($path, ContentNegotiation $contentNegotiation = null) {
+    public function __construct($path) {
         $this->path = rtrim($path, '/');
-
-        if ($contentNegotiation === null) {
-            $contentNegotiation = new ContentNegotiation();
-        }
-
-        $this->contentNegotiation = $contentNegotiation;
     }
 
     /**
@@ -82,53 +67,36 @@ class ImageTransformationCache implements ListenerInterface {
     public function loadFromCache(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
+        $transformations = $request->getQuery()->get('t');
 
-        $image = $response->getImage();
-        $originalMimeType = $image->getMimeType();
-        $extension = $request->getExtension();
-        $acceptableTypes = $request->getAcceptableContentTypes();
-
-        if ($extension) {
-            // The user has requested a specific type (convert transformation). Use that mime type
-            $tables = Image::$mimeTypes;
-            $types = array_flip($tables); // ╯°□°）╯︵ ┻━┻
-            $mimeType = $types[$extension];
-        } else if (!$this->contentNegotiation->isAcceptable($originalMimeType, $acceptableTypes)) {
-            // The client does not accept the original mime type, find the best match
-            $mimeType = $this->contentNegotiation->bestMatch(
-                array_keys(Image::$mimeTypes),
-                $acceptableTypes
-            );
-
-            if (!$mimeType) {
-                // The client does not seem to accept any of our mime types. What a douche!
-                return;
-            }
-        } else {
-            $mimeType = $originalMimeType;
-        }
-
-        if ($mimeType === $originalMimeType && !$request->hasTransformations()) {
-            // No conversion needed, and no transformations present in the URL
+        if (!$transformations) {
+            // No transformations exist in the query, nothing to load
             return;
         }
+
+        $image = $response->getImage();
 
         // Generate cache key and fetch the full path of the cached response
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
-        $transformations = $request->getQuery()->getAll();
 
-        $hash = $this->getCacheKey($publicKey, $imageIdentifier, $mimeType, $transformations);
+        $hash = $this->getCacheKey($publicKey, $imageIdentifier, $transformations);
         $fullPath = $this->getCacheFilePath($publicKey, $imageIdentifier, $hash);
 
         if (is_file($fullPath)) {
-            $image->setBlob(file_get_contents($fullPath))
-                  ->setMimeType($mimeType);
+            $image = @unserialize(file_get_contents($fullPath));
 
-            $response->getHeaders()->set('X-Imbo-TransformationCache', 'Hit');
-            $event->stopPropagation(true);
+            if ($image instanceof Image) {
+                $response->setImage($image);
+                $response->getHeaders()->set('X-Imbo-TransformationCache', 'Hit');
 
-            return;
+                $event->stopPropagation(true);
+
+                return;
+            } else {
+                // Invalid data in the cache, delete the file
+                unlink($fullPath);
+            }
         }
 
         $response->getHeaders()->set('X-Imbo-TransformationCache', 'Miss');
@@ -144,23 +112,22 @@ class ImageTransformationCache implements ListenerInterface {
         $image = $response->getImage();
 
         if (!$image->hasBeenTransformed()) {
-            // We only want to put images that has been transformed in the cache
+            // We only want to put images that have been transformed in the cache
             return;
         }
 
         $request = $event->getRequest();
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
-        $mimeType = $image->getMimeType();
-        $transformations = $request->getQuery()->getAll();
+        $transformations = $event->getRequest()->getQuery()->get('t');
 
-        $hash = $this->getCacheKey($publicKey, $imageIdentifier, $mimeType, $transformations);
+        $hash = $this->getCacheKey($publicKey, $imageIdentifier, $transformations);
         $fullPath = $this->getCacheFilePath($publicKey, $imageIdentifier, $hash);
 
         $dir = dirname($fullPath);
 
         if (is_dir($dir) || mkdir($dir, 0775, true)) {
-            if (file_put_contents($fullPath . '.tmp', $image->getBlob())) {
+            if (file_put_contents($fullPath . '.tmp', serialize($image))) {
                 rename($fullPath . '.tmp', $fullPath);
             }
         }
@@ -226,17 +193,15 @@ class ImageTransformationCache implements ListenerInterface {
      *
      * @param string $publicKey The public key
      * @param string $imageIdentifier The image identifier
-     * @param string $mimeType The mime type of the image
      * @param array $transformations The transformations as specified in the URL
      * @return string Returns a string that can be used as a cache key for the current image
      */
-    private function getCacheKey($publicKey, $imageIdentifier, $mimeType, array $transformations) {
+    private function getCacheKey($publicKey, $imageIdentifier, array $transformations) {
         return hash(
             'sha256',
             $publicKey . '|' .
             $imageIdentifier . '|' .
-            $mimeType . '|' .
-            http_build_query($transformations)
+            join(',', $transformations)
         );
     }
 

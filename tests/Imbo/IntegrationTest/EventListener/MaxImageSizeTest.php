@@ -11,7 +11,7 @@
 namespace Imbo\IntegrationTest\EventListener;
 
 use Imbo\EventListener\MaxImageSize,
-    Imbo\Image\Image;
+    Imbo\Model\Image;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>

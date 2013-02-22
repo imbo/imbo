@@ -10,7 +10,7 @@
 
 namespace Imbo\Database;
 
-use Imbo\Image\Image,
+use Imbo\Model\Image,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     Imbo\Exception,
@@ -307,7 +307,9 @@ class Doctrine implements DatabaseInterface {
         $image->setWidth($row['width'])
               ->setHeight($row['height'])
               ->setMimeType($row['mime'])
-              ->setExtension($row['extension']);
+              ->setExtension($row['extension'])
+              ->setAddedDate(new DateTime('@' . $row['added'], new DateTimeZone('UTC')))
+              ->setUpdatedDate(new DateTime('@' . $row['updated'], new DateTimeZone('UTC')));
 
         return true;
     }

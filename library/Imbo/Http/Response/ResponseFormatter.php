@@ -19,7 +19,7 @@ use Imbo\EventManager\EventInterface,
 
 /**
  * This event listener will correctly format the response body based on the Accept headers in the
- * request. If the request is for an image resource it will not do anything.
+ * request
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Http
@@ -54,34 +54,24 @@ class ResponseFormatter implements ContainerAware, ListenerInterface {
      * @param EventInterface $event The current event
      */
     public function send(EventInterface $event) {
-        $request = $event->getRequest();
         $response = $event->getResponse();
+        $model = $response->getModel();
 
-        // Default mode for the response writer
-        $strict = true;
+        if ($response->getStatusCode() === 204 || !$model) {
+            // No content to write
+            return;
+        }
 
-        prepareResponse:
+        $request = $event->getRequest();
+        $responseWriter = $this->container->get('responseWriter');
 
-        // Fetch the response body
-        $body = $response->getBody();
+        try {
+            $responseWriter->write($model, $request, $response);
+        } catch (Exception $exception) {
+            $response->createError($exception, $request);
 
-        // If the body is not an array it's an image and we don't need to format that
-        if (is_array($body)) {
-            // Write the correct response body. This will throw an exception if the client does
-            // not accept any of the supported content types and the $strict flag has been set to true.
-            try {
-                $this->container->get('responseWriter')->write($body, $request, $response, $strict);
-            } catch (Exception $exception) {
-                // Generate an error
-                $response->createError($exception, $request);
-
-                // The response writer could not produce acceptable content. Flip flag and prepare
-                // the response one more time
-                $strict = false;
-
-                // Go back up and prepare the new response
-                goto prepareResponse;
-            }
+            // Write the error in non-strict mode
+            $responseWriter->write($response->getModel(), $request, $response, false);
         }
     }
 }
