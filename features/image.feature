@@ -22,7 +22,6 @@ Feature: Imbo provides an image endpoint
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "<content-type>"
-        And the "Content-Length" response header is "<content-length>"
         And the "X-Imbo-Originalextension" response header is "png"
         And the "X-Imbo-Originalfilesize" response header is "95576"
         And the "X-Imbo-Originalheight" response header is "417"
@@ -30,10 +29,10 @@ Feature: Imbo provides an image endpoint
         And the "X-Imbo-Originalwidth" response header is "599"
 
         Examples:
-            | accept    | content-type | content-length |
-            | image/gif | image/gif    | 41456          |
-            | image/jpeg| image/jpeg   | 52922          |
-            | image/png | image/png    | 95576          |
+            | accept    | content-type |
+            | image/gif | image/gif    |
+            | image/jpeg| image/jpeg   |
+            | image/png | image/png    |
 
     Scenario: Fetch image when not accepting images
         Given I use "publickey" and "privatekey" for public and private keys
