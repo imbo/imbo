@@ -6,7 +6,6 @@ basedir  = "."
 build    = "#{basedir}/build"
 source   = "#{basedir}/library"
 tests    = "#{basedir}/tests"
-features = "#{basedir}/features"
 
 desc "Task used by Jenkins-CI"
 task :jenkins => [:prepare, :lint, :installdep, :test, :apidocs, :phploc, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
@@ -112,7 +111,7 @@ end
 
 desc "Generate API documentation using phpdoc"
 task :apidocs do
-  system "phpdoc -d #{features} -d #{tests} -d #{source} -t #{build}/docs --title \"Imbo API docs\""
+  system "phpdoc -d #{source} -t #{build}/docs --title \"Imbo API docs\""
 end
 
 desc "Check syntax on all php files in the project"

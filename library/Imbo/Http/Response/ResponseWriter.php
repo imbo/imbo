@@ -108,7 +108,7 @@ class ResponseWriter implements ContainerAware {
     /**
      * Return a formatted message using a chosen formatter based on the request
      *
-     * @param ModelInterface $model Model to write in another format
+     * @param Model\ModelInterface $model Model to write in another format
      * @param RequestInterface $request A request instance
      * @param ResponseInterface $response A response instance
      * @param boolean $strict Whether or not the response writer will throw a RuntimeException with
