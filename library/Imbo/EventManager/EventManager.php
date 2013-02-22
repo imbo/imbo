@@ -105,11 +105,9 @@ class EventManager implements ContainerAware {
      * Trigger a given event
      *
      * @param string $eventName The name of the event to trigger
-     * @param array $params Optional extra parameters to send to the event listeners for the current
-     *                      event
      * @return EventManager
      */
-    public function trigger($eventName, array $params = array()) {
+    public function trigger($eventName) {
         if (!empty($this->callbacks[$eventName])) {
             // Fetch current public key
             $publicKey = $this->container->get('request')->getPublicKey();

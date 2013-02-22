@@ -116,7 +116,6 @@ class Image implements ResourceInterface, ListenerInterface {
             $serverContainer->get('REQUEST_URI')
         ) . '"';
 
-
         // Set some response headers before we apply optional transformations
         $responseHeaders
             // ETags

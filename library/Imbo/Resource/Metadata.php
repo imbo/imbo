@@ -125,7 +125,7 @@ class Metadata implements ResourceInterface, ListenerInterface {
      * @param EventInterface $event The event instance
      * @throws InvalidArgumentException
      */
-    public function validateMetadata(EventInterface $event){
+    public function validateMetadata(EventInterface $event) {
         $request = $event->getRequest();
         $metadata = $request->getRawData();
 
