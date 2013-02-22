@@ -10,37 +10,15 @@
 
 namespace Imbo\Http\Response\Formatter;
 
-use Imbo\Resource\ResourceInterface,
-    Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface;
+use Imbo\Model;
 
 /**
  * HTML5 formatter
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Http
+ * @package Response\Formatters
  */
-class HTML implements FormatterInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function format(array $data, RequestInterface $request, ResponseInterface $response) {
-        // Fetch the name of the resource
-        $resource = $request->getResource();
-
-        if ($response->isError()) {
-            return $this->formatError($data);
-        } else if ($resource === ResourceInterface::STATUS) {
-            return $this->formatStatus($data);
-        } else if ($resource === ResourceInterface::USER) {
-            return $this->formatUser($data);
-        } else if ($resource === ResourceInterface::IMAGES) {
-            return $this->formatImages($data);
-        } else if ($resource === ResourceInterface::METADATA) {
-            return $this->formatMetadata($data);
-        }
-    }
-
+class HTML extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
@@ -49,177 +27,172 @@ class HTML implements FormatterInterface {
     }
 
     /**
-     * Get an HTML5 document with some placeholders
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    private function getDocument() {
-        return <<<DOCUMENT
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>%TITLE%</title>
-    <style type="text/css">
-      dt { font-weight: bold; }
-    </style>
-  </head>
-  <body>
-    <h1>%TITLE%</h1>
-    %BODY%
-  </body>
-</html>
-DOCUMENT;
-    }
+    public function formatError(Model\Error $model) {
+        $date = $this->dateFormatter->formatDate($model->getDate());
 
-    /**
-     * Format an error response
-     *
-     * @param array $data Error information
-     * @return string Returns an HTML string
-     */
-    private function formatError(array $data) {
-        if (!isset($data['error'])) {
-            // If the $data array does not have an error key, this is simply the status resource
-            // reporting that the system is not stable, which is not a regular error
-            return $this->formatStatus($data);
+        $imageIdentifierHtml = '';
+
+        if ($imageIdentifier = $model->getImageIdentifier()) {
+            $imageIdentifierHtml = '<dt>Image identifier</dt><dd>' . $imageIdentifier . '</dd>';
         }
 
-        $title = 'Error';
         $body = <<<ERROR
 <dl>
   <dt>Code</dt>
-  <dd>{$data['error']['code']}</dd>
+  <dd>{$model->getHttpCode()}</dd>
   <dt>Message</dt>
-  <dd>{$data['error']['message']}</dd>
+  <dd>{$model->getErrorMessage()}</dd>
   <dt>Date</dt>
-  <dd>{$data['error']['date']}</dd>
+  <dd>{$date}</dd>
   <dt>Imbo error code</dt>
-  <dd>{$data['error']['imboErrorCode']}</dd>
+  <dd>{$model->getImboErrorCode()}</dd>
+  {$imageIdentifierHtml}
 </dl>
 ERROR;
 
-        return str_replace(array('%TITLE%', '%BODY%'), array($title, $body), $this->getDocument());
+        return $this->getDocument('Error', $body);
     }
 
     /**
-     * Format response for the status resource
-     *
-     * @param array $data Status information
-     * @return string Returns an HTML string
+     * {@inheritdoc}
      */
-    private function formatStatus(array $data) {
-        $database = (int) $data['database'];
-        $storage = (int) $data['storage'];
+    public function formatStatus(Model\Status $model) {
+        $date = $this->dateFormatter->formatDate($model->getDate());
+        $database = (int) $model->getDatabaseStatus();
+        $storage = (int) $model->getStorageStatus();
 
-        $title = 'Status';
         $body = <<<STATUS
 <dl>
   <dt>Date</dt>
-  <dd>{$data['date']}</dd>
+  <dd>{$date}</dd>
   <dt>Database</dt>
-  <dd>$database</dd>
+  <dd class="database">{$database}</dd>
   <dt>Storage</dt>
-  <dd>$storage</dd>
+  <dd class="storage">{$storage}</dd>
 </dl>
 STATUS;
 
-        return str_replace(array('%TITLE%', '%BODY%'), array($title, $body), $this->getDocument());
+        return $this->getDocument('Status', $body);
     }
 
     /**
-     * Format response for the user resource
-     *
-     * @param array $data User information
-     * @return string Returns an HTML string
+     * {@inheritdoc}
      */
-    private function formatUser(array $data) {
-        $title = 'User';
+    public function formatUser(Model\User $model) {
+        $lastModified = $this->dateFormatter->formatDate($model->getLastModified());
+
         $body = <<<USER
 <dl>
   <dt>Public key</dt>
-  <dd>{$data['publicKey']}</dd>
+  <dd>{$model->getPublicKey()}</dd>
   <dt>Num. images</dt>
-  <dd>{$data['numImages']}</dd>
+  <dd>{$model->getNumImages()}</dd>
   <dt>Last modified</dt>
-  <dd>{$data['lastModified']}</dd>
+  <dd>{$lastModified}</dd>
 </dl>
 USER;
 
-        return str_replace(array('%TITLE%', '%BODY%'), array($title, $body), $this->getDocument());
+        return $this->getDocument('User', $body);
     }
 
     /**
-     * Format response for the images resource
-     *
-     * @param array $data Images array
-     * @return string Returns an HTML string
+     * {@inheritdoc}
      */
-    private function formatImages(array $data) {
-        $title = 'Images';
-        $images = array();
+    public function formatImages(Model\Images $model) {
+        $images = '';
 
-        foreach ($data as $image) {
-            $metadata = null;
+        foreach ($model->getImages() as $image) {
+            $metadata = $image->getMetadata();
+            $metadataHtml = '';
 
-            if (isset($image['metadata']) && count($image['metadata'])) {
-                $metadata = '<dt>Metadata</dt><dd><dl>';
+            if (is_array($metadata)) {
+                $metadataHtml = '<dt>Metadata</dt><dd>';
 
-                foreach ($image['metadata'] as $key => $value) {
-                    $metadata .= '<dt>' . $key . '</dt><dd>' . $value . '</dd>';
+                if (empty($metadata)) {
+                    $metadataHtml .= '<p>No metadata</p>';
+                } else {
+                    $metadataHtml .= '<dl>';
+
+                    foreach ($metadata as $key => $value) {
+                        $metadataHtml .= '<dt>' . $key . '</dt><dd>' . $value . '</dd>';
+                    }
+
+                    $metadataHtml .= '</dl>';
                 }
 
-                $metadata .= '</dl></dd>';
+                $metadataHtml .= '</dd>';
             }
 
             $entry = <<<IMAGE
 <li>
   <dl>
     <dt>Public key</dt>
-    <dd>{$image['publicKey']}</dd>
+    <dd>{$image->getPublicKey()}</dd>
     <dt>Image identifier</dt>
-    <dd>{$image['imageIdentifier']}</dd>
+    <dd>{$image->getImageIdentifier()}</dd>
+    <dt>Checksum</dt>
+    <dd>{$image->getChecksum()}</dd>
     <dt>Extension</dt>
-    <dd>{$image['extension']}</dd>
+    <dd>{$image->getExtension()}</dd>
     <dt>Mime type</dt>
-    <dd>{$image['mime']}</dd>
+    <dd>{$image->getMimeType()}</dd>
     <dt>Added</dt>
-    <dd>{$image['added']}</dd>
+    <dd>{$this->dateFormatter->formatDate($image->getAddedDate())}</dd>
     <dt>Updated</dt>
-    <dd>{$image['updated']}</dd>
+    <dd>{$this->dateFormatter->formatDate($image->getUpdatedDate())}</dd>
     <dt>Size</dt>
-    <dd>{$image['size']}</dd>
+    <dd>{$image->getFilesize()}</dd>
     <dt>Width</dt>
-    <dd>{$image['width']}</dd>
+    <dd>{$image->getWidth()}</dd>
     <dt>Height</dt>
-    <dd>{$image['height']}</dd>
-    $metadata
+    <dd>{$image->getHeight()}</dd>
+    {$metadataHtml}
   </dl>
 </li>
 IMAGE;
             $images[] = $entry;
         }
 
-        if ($images) {
+        if (!empty($images)) {
             $body = '<ul>' . join("\n", $images) . '</ul>';
         } else {
             $body = '<p>No images</p>';
         }
 
-        return str_replace(array('%TITLE%', '%BODY%'), array($title, $body), $this->getDocument());
+        return $this->getDocument('Images', $body);
     }
 
     /**
-     * Format response for the metadata resource
-     *
-     * @param array $data Metadata
-     * @return string Returns an HTML string
+     * {@inheritdoc}
      */
-    private function formatMetadata(array $data) {
-        $title = 'Metadata';
+    public function formatMetadata(Model\Metadata $model) {
+        $metadata = $model->getData();
+
+        if (empty($metadata)) {
+            $body = '<p>No metadata</p>';
+        } else {
+            $body = '<dl>';
+
+            foreach ($metadata as $key => $value) {
+                $body .= '<dt>' . $key . '</dt><dd>' . $value . '</dd>';
+            }
+
+            $body .= '</dl>';
+        }
+
+        return $this->getDocument('Metadata', $body);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatArrayModel(Model\ArrayModel $model) {
+        $data = $model->getData();
 
         if (empty($data)) {
-            $body = '<p>No metadata</p>';
+            $body = '<p>No data</p>';
         } else {
             $body = '<dl>';
 
@@ -230,6 +203,30 @@ IMAGE;
             $body .= '</dl>';
         }
 
-        return str_replace(array('%TITLE%', '%BODY%'), array($title, $body), $this->getDocument());
+        return $this->getDocument('Imbo response', $body);
+    }
+
+    /**
+     * Get an HTML5 document with some placeholders
+     *
+     * @return string
+     */
+    private function getDocument($title, $body) {
+        return <<<DOCUMENT
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{$title}</title>
+    <style type="text/css">
+      dt { font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <h1>{$title}</h1>
+    {$body}
+  </body>
+</html>
+DOCUMENT;
     }
 }

@@ -13,7 +13,7 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\ImageTransformer,
     Imbo\Image\Transformation\Transformation,
     Imbo\Image\Transformation\TransformationInterface,
-    Imbo\Image\Image;
+    Imbo\Model\Image;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -42,7 +42,7 @@ class ImageTransformerTest extends ListenerTests {
         $this->container = $this->getMock('Imbo\Container');
         $this->container->expects($this->any())->method('get')->with('contentNegotiation')->will($this->returnValue($this->cn));
         $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->image = $this->getMock('Imbo\Image\Image');
+        $this->image = $this->getMock('Imbo\Model\Image');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->response->expects($this->any())->method('getImage')->will($this->returnValue($this->image));
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
@@ -99,53 +99,9 @@ class ImageTransformerTest extends ListenerTests {
                 echo 'thumbnail';
             };
         });
-        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('image/png' => 1.0)));
-        $this->image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/png'));
-        $this->cn->expects($this->once())->method('isAcceptable')->with('image/png', array('image/png' => 1.0))->will($this->returnValue(true));
-        $this->cn->expects($this->never())->method('bestMatch');
         $this->image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
         $this->expectOutputString('resizethumbnail');
-        $this->listener->transform($this->event);
-    }
-
-    /**
-     * @covers Imbo\EventListener\ImageTransformer::transform
-     */
-    public function testWillConvertImageIfMimeTypeIsNotAcceptable() {
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
-
-        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('image/png' => 1.0)));
-        $this->image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/png'));
-        $this->cn->expects($this->once())->method('isAcceptable')->with('image/png', array('image/png' => 1.0))->will($this->returnValue(false));
-        $this->cn->expects($this->once())->method('bestMatch')->with($this->isType('array'), $this->isType('array'))->will($this->returnValue('image/jpeg'));
-        $this->image->expects($this->once())->method('hasBeenTransformed')->with(true);
-
-        $this->listener->registerTransformationHandler('convert', function($params) {
-            return new SomeTransformation('convert');
-        });
-
-        $this->expectOutputString('convert');
-        $this->listener->transform($this->event);
-    }
-
-    /**
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionMessage Not Acceptable
-     * @expectedExceptionCode 406
-     * @covers Imbo\EventListener\ImageTransformer::transform
-     */
-    public function testThrowsExceptionWhenClientDoesNotAcceptSupportedMimeTypes() {
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
-
-        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array('image/png' => 1.0)));
-        $this->image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/gif'));
-        $this->cn->expects($this->once())->method('isAcceptable')->with('image/gif', array('image/png' => 1.0))->will($this->returnValue(false));
-        $this->cn->expects($this->once())->method('bestMatch')->with($this->isType('array'), $this->isType('array'))->will($this->returnValue(false));
-
         $this->listener->transform($this->event);
     }
 

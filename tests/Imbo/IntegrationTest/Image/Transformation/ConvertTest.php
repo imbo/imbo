@@ -36,7 +36,7 @@ class ConvertTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Convert::applyToImage
      */
     protected function getImageMock() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('setMimeType')->with('image/png');
         $image->expects($this->once())->method('setExtension')->with('png');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));

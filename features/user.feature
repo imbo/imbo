@@ -32,10 +32,3 @@ Feature: Imbo provides a user endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         When I request "/users/publickey" using HTTP "POST"
         Then I should get a response with "405 Method Not Allowed"
-
-    Scenario: Request user information using HEAD
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
-        When I request "/users/publickey" using HTTP "HEAD"
-        Then I should get a response with "200 OK"
-        And the response body should be empty

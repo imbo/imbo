@@ -8,15 +8,17 @@
  * distributed with this source code.
  */
 
-namespace Imbo\Image;
+namespace Imbo\Model;
+
+use DateTime;
 
 /**
- * Class that represents a single image
+ * Image model
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Image
+ * @package Models
  */
-class Image {
+class Image implements ModelInterface {
     /**
      * Supported mime types and the correct file extensions
      *
@@ -61,7 +63,7 @@ class Image {
      *
      * @var array
      */
-    private $metadata = array();
+    private $metadata;
 
     /**
      * Width of the image
@@ -92,12 +94,52 @@ class Image {
     private $transformed = false;
 
     /**
+     * Added date
+     *
+     * @var DateTime
+     */
+    private $added;
+
+    /**
+     * Updated date
+     *
+     * @var DateTime
+     */
+    private $updated;
+
+    /**
+     * Public key
+     *
+     * @var string
+     */
+    private $publicKey;
+
+    /**
+     * Image identifier
+     *
+     * @var string
+     */
+    private $imageIdentifier;
+
+    /**
      * Get the size of the image data in bytes
      *
      * @return int
      */
     public function getFilesize() {
         return $this->filesize;
+    }
+
+    /**
+     * Set the size of the image in bytes
+     *
+     * @param int $size The size of the image
+     * @return Image
+     */
+    public function setFilesize($size) {
+        $this->filesize = (int) $size;
+
+        return $this;
     }
 
     /**
@@ -159,8 +201,8 @@ class Image {
      */
     public function setBlob($blob) {
         $this->blob = $blob;
-        $this->filesize = strlen($blob);
-        $this->checksum = md5($blob);
+        $this->setFilesize(strlen($blob));
+        $this->setChecksum(md5($blob));
 
         return $this;
     }
@@ -229,12 +271,108 @@ class Image {
     }
 
     /**
+     * Get the added date
+     *
+     * @return DateTime
+     */
+    public function getAddedDate() {
+        return $this->added;
+    }
+
+    /**
+     * Set the added date
+     *
+     * @param DateTime $added When the image was added
+     * @return Image
+     */
+    public function setAddedDate(DateTime $added) {
+        $this->added = $added;
+
+        return $this;
+    }
+
+    /**
+     * Get the updated date
+     *
+     * @return DateTime
+     */
+    public function getUpdatedDate() {
+        return $this->updated;
+    }
+
+    /**
+     * Set the updated date
+     *
+     * @param DateTime $updated When the image was updated
+     * @return Image
+     */
+    public function setUpdatedDate(DateTime $updated) {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get the public key
+     *
+     * @return string
+     */
+    public function getPublicKey() {
+        return $this->publicKey;
+    }
+
+    /**
+     * Set the public key
+     *
+     * @param string $publicKey The public key
+     * @return Image
+     */
+    public function setPublicKey($publicKey) {
+        $this->publicKey = $publicKey;
+
+        return $this;
+    }
+
+    /**
+     * Get the image identifier
+     *
+     * @return string
+     */
+    public function getImageIdentifier() {
+        return $this->imageIdentifier;
+    }
+
+    /**
+     * Set the public key
+     *
+     * @param string $imageIdentifier The public key
+     * @return Image
+     */
+    public function setImageIdentifier($imageIdentifier) {
+        $this->imageIdentifier = $imageIdentifier;
+
+        return $this;
+    }
+
+    /**
      * Get the checksum of the current image data
      *
      * @return string
      */
     public function getChecksum() {
         return $this->checksum;
+    }
+
+    /**
+     * Set the checksum
+     *
+     * @param string $checksum The checksum to set
+     * @return Image
+     */
+    public function setChecksum($checksum) {
+        $this->checksum = $checksum;
+
+        return $this;
     }
 
     /**

@@ -127,7 +127,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
         $this->request->expects($this->once())->method('getRawData')->will($this->returnValue($imageData));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
 
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $this->container->expects($this->once())->method('get')->with('image')->will($this->returnValue($image));
 
         $this->request->expects($this->once())->method('setImage')->with($image);

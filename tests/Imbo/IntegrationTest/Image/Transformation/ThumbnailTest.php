@@ -55,7 +55,7 @@ class ThumbnailTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Thumbnail::applyToImage
      */
     protected function getImageMock() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setWidth')->with($this->width)->will($this->returnValue($image));
@@ -68,7 +68,7 @@ class ThumbnailTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Thumbnail::applyToImage
      */
     public function testApplyToImageUsingInsetMode() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setWidth')->with(20)->will($this->returnValue($image));

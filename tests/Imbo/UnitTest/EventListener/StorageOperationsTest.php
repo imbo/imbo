@@ -92,7 +92,7 @@ class StorageOperationsTest extends ListenerTests {
         $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
         $responseHeaders->expects($this->once())->method('set')->with('Last-Modified', 'some date');
         $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('setBlob')->with('image data');
         $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
 
@@ -103,7 +103,7 @@ class StorageOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\StorageOperations::insertImage
      */
     public function testCanInsertImage() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
@@ -118,7 +118,7 @@ class StorageOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\StorageOperations::insertImage
      */
     public function testCanInsertImageThatAlreadyExists() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
@@ -136,7 +136,7 @@ class StorageOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\StorageOperations::insertImage
      */
     public function testWillDeleteImageFromDatabaseAndThrowExceptionWhenStoringFails() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));

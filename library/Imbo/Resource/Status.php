@@ -16,6 +16,7 @@ use Imbo\Http\Request\RequestInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Container,
     Imbo\ContainerAware,
+    Imbo\Model,
     DateTime,
     DateTimeZone;
 
@@ -91,12 +92,11 @@ class Status implements ContainerAware, ResourceInterface, ListenerInterface {
                      ->setStatusMessage($message);
         }
 
-        $date = new DateTime('now', new DateTimeZone('UTC'));
+        $statusModel = new Model\Status();
+        $statusModel->setDate(new DateTime('now', new DateTimeZone('UTC')))
+                    ->setDatabaseStatus($databaseStatus)
+                    ->setStorageStatus($storageStatus);
 
-        $response->setBody(array(
-            'date'     => $this->container->get('dateFormatter')->formatDate($date),
-            'database' => $databaseStatus,
-            'storage'  => $storageStatus,
-        ));
+        $response->setModel($statusModel);
     }
 }

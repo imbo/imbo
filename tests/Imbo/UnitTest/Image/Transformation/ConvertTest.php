@@ -47,7 +47,7 @@ class ConvertTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Transformation\Convert::applyToImage
      */
     public function testConvertToSameTypeAsImage() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getExtension')->will($this->returnValue($this->extension));
         $image->expects($this->never())->method('getBlob');
 

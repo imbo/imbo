@@ -16,7 +16,7 @@ use Imbo\Http\HeaderContainer,
     Imbo\EventListener\ListenerDefinition,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
-    Imbo\Image\Image,
+    Imbo\Model,
     DateTime,
     DateTimeZone;
 
@@ -125,9 +125,16 @@ class Response implements ListenerInterface, ResponseInterface {
     /**
      * Image instance used with the image resource
      *
-     * @var Image
+     * @var Model\Image
      */
     private $image;
+
+    /**
+     * Model instance
+     *
+     * @var Model\ModelInterface
+     */
+    private $model;
 
     /**
      * Class constructor
@@ -211,6 +218,22 @@ class Response implements ListenerInterface, ResponseInterface {
     /**
      * {@inheritdoc}
      */
+    public function getModel() {
+        return $this->model;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setModel(Model\ModelInterface $model = null) {
+        $this->model = $model;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getProtocolVersion() {
         return $this->protocolVersion;
     }
@@ -234,7 +257,7 @@ class Response implements ListenerInterface, ResponseInterface {
     /**
      * {@inheritdoc}
      */
-    public function setImage(Image $image) {
+    public function setImage(Model\Image $image) {
         $this->image = $image;
 
         return $this;
@@ -289,7 +312,7 @@ class Response implements ListenerInterface, ResponseInterface {
      */
     public function setNotModified() {
         $this->setStatusCode(304);
-        $this->setBody(null);
+        $this->setModel(null)->setBody(null);
         $headers = $this->getHeaders();
 
         foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Last-Modified') as $header) {
@@ -338,25 +361,19 @@ class Response implements ListenerInterface, ResponseInterface {
                         ->remove('ETag')
                         ->remove('Last-Modified');
 
-        // Prepare response data if the request expects a response body
-        if ($request->getMethod() !== RequestInterface::METHOD_HEAD) {
-            $data = array(
-                'error' => array(
-                    'code'          => $code,
-                    'message'       => $message,
-                    'date'          => $timestamp,
-                    'imboErrorCode' => $internalCode,
-                ),
-            );
+        $model = new Model\Error();
+        $model->setHttpCode($code)
+              ->setErrorMessage($message)
+              ->setDate($date)
+              ->setImboErrorCode($internalCode);
 
-            if ($image = $request->getImage()) {
-                $data['imageIdentifier'] = $image->getChecksum();
-            } else if ($identifier = $request->getImageIdentifier()) {
-                $data['imageIdentifier'] = $identifier;
-            }
-
-            $this->setBody($data);
+        if ($image = $request->getImage()) {
+            $model->setImageIdentifier($image->getChecksum());
+        } else if ($identifier = $request->getImageIdentifier()) {
+            $model->setImageIdentifier($identifier);
         }
+
+        $this->setModel($model);
 
         return $this;
     }
@@ -404,16 +421,6 @@ class Response implements ListenerInterface, ResponseInterface {
      * Send the content to the client
      */
     private function sendContent() {
-        $body = $this->getBody();
-
-        if (is_array($body)) {
-            if (!headers_sent()) {
-                header('Content-Type: application/json');
-            }
-
-            $body = json_encode($body);
-        }
-
-        echo $body;
+        echo $this->getBody();
     }
 }

@@ -36,7 +36,7 @@ class SepiaTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Sepia::applyToImage
      */
     protected function getImageMock() {
-        $image = $this->getMock('Imbo\Image\Image');
+        $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
 

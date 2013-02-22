@@ -176,7 +176,7 @@ $config = array(
      * All closures must return an instance of the Imbo\Image\Transformation\TransformationInterface
      * interface or a callable piece of code, that in turn will receive a single parameter:
      *
-     * Imbo\Image\Image $image
+     * Imbo\Model\Image $image
      *
      * which is the image you want your transformation to modify.
      *
