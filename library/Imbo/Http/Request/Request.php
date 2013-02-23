@@ -10,10 +10,7 @@
 
 namespace Imbo\Http\Request;
 
-use Imbo\Http\ParameterContainer,
-    Imbo\Http\ServerContainer,
-    Imbo\Http\HeaderContainer,
-    Imbo\Exception\InvalidArgumentException,
+use Imbo\Exception\InvalidArgumentException,
     Imbo\Model\Image,
     Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 

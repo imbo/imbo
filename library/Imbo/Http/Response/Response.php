@@ -10,8 +10,7 @@
 
 namespace Imbo\Http\Response;
 
-use Imbo\Http\HeaderContainer,
-    Imbo\EventManager\EventInterface,
+use Imbo\EventManager\EventInterface,
     Imbo\Exception,
     Imbo\Http\Request\RequestInterface,
     Imbo\Model,
