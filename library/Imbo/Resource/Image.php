@@ -96,7 +96,6 @@ class Image implements ResourceInterface, ListenerInterface {
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
-        $serverContainer = $request->getServer();
         $requestHeaders = $request->getHeaders();
         $responseHeaders = $response->getHeaders();
 
@@ -113,7 +112,7 @@ class Image implements ResourceInterface, ListenerInterface {
             $publicKey .
             $imageIdentifier .
             $requestHeaders->get('Accept') .
-            $serverContainer->get('REQUEST_URI')
+            $request->getRequestUri()
         ) . '"';
 
         // Set some response headers before we apply optional transformations
