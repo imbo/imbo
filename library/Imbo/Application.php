@@ -249,6 +249,11 @@ class Application {
             return $transformer;
         });
 
+        // Response sender
+        $container->setStatic('responseSender', function(Container $container) {
+            return new EventListener\ResponseSender();
+        });
+
         // Router component
         $container->setStatic('router', function(Container $container) {
             $router = new Router();
@@ -323,6 +328,7 @@ class Application {
                 'storageOperations',
                 'imagePreparation',
                 'imageTransformer',
+                'responseSender',
             );
 
             foreach ($containerEntries as $listener) {
