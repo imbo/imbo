@@ -132,7 +132,7 @@ class ResponseWriter implements ContainerAware {
             $entry = $this->supportedTypes[$mime];
         } else {
             // Set Vary to Accept since we are doing content negotiation based on Accept
-            $response->getHeaders()->set('Vary', 'Accept');
+            $response->headers->set('Vary', 'Accept');
 
             // No extension have been provided
             $contentNegotiation = $this->container->get('contentNegotiation');
@@ -187,8 +187,10 @@ class ResponseWriter implements ContainerAware {
             }
         }
 
-        $response->getHeaders()->set('Content-Type', $contentType)
-                               ->set('Content-Length', strlen($formattedData));
+        $response->headers->add(array(
+            'Content-Type' => $contentType,
+            'Content-Length' => strlen($formattedData),
+        ));
 
         if ($request->getMethod() !== RequestInterface::METHOD_HEAD) {
             $response->setBody($formattedData);

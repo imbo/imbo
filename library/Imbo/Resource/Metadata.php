@@ -112,11 +112,11 @@ class Metadata implements ResourceInterface, ListenerInterface {
 
         $event->getManager()->trigger('db.metadata.load');
 
-        $lastModified = $response->getLastModified();
+        $lastModified = $response->getLastModified()->format('D, d M Y H:i:s') . ' GMT';
 
         $hash = md5($request->getPublicKey() . $request->getImageIdentifier() . $lastModified);
 
-        $response->getHeaders()->set('ETag', '"' . $hash . '"');
+        $response->setEtag('"' . $hash . '"');
     }
 
     /**

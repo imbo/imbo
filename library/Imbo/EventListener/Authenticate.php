@@ -105,7 +105,7 @@ class Authenticate implements ListenerInterface {
         $url = $request->getUrl();
 
         // Add the URL used for auth to the response headers
-        $response->getHeaders()->set('X-Imbo-AuthUrl', $url);
+        $response->headers->set('X-Imbo-AuthUrl', $url);
 
         if (!$this->signatureIsValid($request->getMethod(), $url, $publicKey, $privateKey, $timestamp, $signature)) {
             $e = new RuntimeException('Signature mismatch', 400);

@@ -93,49 +93,47 @@ class Image implements ResourceInterface, ListenerInterface {
     public function get(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
+        $eventManager = $event->getManager();
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
-        $requestHeaders = $request->getHeaders();
-        $responseHeaders = $response->getHeaders();
 
         $image = $response->getImage();
         $image->setImageIdentifier($imageIdentifier)
               ->setPublicKey($publicKey);
 
-        $event->getManager()->trigger('db.image.load');
-        $event->getManager()->trigger('storage.image.load');
+        $eventManager->trigger('db.image.load');
+        $eventManager->trigger('storage.image.load');
 
         // Generate ETag using public key, image identifier, Accept headers of the user agent and
         // the requested URI
         $etag = '"' . md5(
             $publicKey .
             $imageIdentifier .
-            $requestHeaders->get('Accept') .
+            $request->headers->get('Accept') .
             $request->getRequestUri()
         ) . '"';
 
         // Set some response headers before we apply optional transformations
-        $responseHeaders
-            // ETags
-            ->set('ETag', $etag)
+        $response->setEtag($etag);
 
+        $response->headers->add(array(
             // Set the max-age to a year since the image never changes
-            ->set('Cache-Control', 'max-age=31536000')
+            'Cache-Control' => 'max-age=31536000',
 
             // Custom Imbo headers
-            ->set('X-Imbo-OriginalMimeType', $image->getMimeType())
-            ->set('X-Imbo-OriginalWidth', $image->getWidth())
-            ->set('X-Imbo-OriginalHeight', $image->getHeight())
-            ->set('X-Imbo-OriginalFileSize', $image->getFilesize())
-            ->set('X-Imbo-OriginalExtension', $image->getExtension());
+            'X-Imbo-OriginalMimeType' => $image->getMimeType(),
+            'X-Imbo-OriginalWidth' => $image->getWidth(),
+            'X-Imbo-OriginalHeight' => $image->getHeight(),
+            'X-Imbo-OriginalFileSize' => $image->getFilesize(),
+            'X-Imbo-OriginalExtension' => $image->getExtension(),
+        ));
 
         // Trigger possible image transformations
-        $event->getManager()->trigger('image.transform');
+        $eventManager->trigger('image.transform');
 
         // Fetch the image once more as event listeners might have set a new instance during the
         // transformation phase
-        $image = $response->getImage();
-        $response->setModel($image);
+        $response->setModel($response->getImage());
     }
 }

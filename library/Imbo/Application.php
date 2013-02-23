@@ -75,11 +75,8 @@ class Application {
 
             $resource = $this->container->get($entry);
 
-            // Add some response headers
-            $responseHeaders = $response->getHeaders();
-
             // Inform the user agent of which methods are allowed against this resource
-            $responseHeaders->set('Allow', implode(', ', $resource->getAllowedMethods()));
+            $response->headers->set('Allow', implode(', ', $resource->getAllowedMethods()));
 
             // Fetch auth config
             $config = $this->container->get('config');
@@ -154,7 +151,7 @@ class Application {
         $container->setStatic('response', function(Container $container) {
             $response = new Response();
             $response->setImage($container->get('image'));
-            $response->getHeaders()->set('X-Imbo-Version', Version::VERSION);
+            $response->headers->set('X-Imbo-Version', Version::VERSION);
 
             return $response;
         });

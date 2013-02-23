@@ -145,10 +145,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $model->setData($database->getMetadata($publicKey, $imageIdentifier));
 
         $response->setModel($model)
-                 ->getHeaders()->set(
-                     'Last-Modified',
-                     $this->formatDate($database->getLastModified($publicKey, $imageIdentifier))
-                 );
+                 ->setLastModified($database->getLastModified($publicKey, $imageIdentifier));
     }
 
     /**
@@ -220,10 +217,10 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $model = new Model\Images();
         $model->setImages($modelImages);
 
-        $lastModified = $this->formatDate($database->getLastModified($publicKey));
+        $lastModified = $database->getLastModified($publicKey);
 
         $response->setModel($model)
-                 ->getHeaders()->set('Last-Modified', $lastModified);
+                 ->setLastModified($lastModified);
     }
 
     /**
@@ -246,16 +243,6 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
                   ->setLastModified($lastModified);
 
         $response->setModel($userModel)
-                 ->getHeaders()->set('Last-Modified', $this->formatDate($lastModified));
-    }
-
-    /**
-     * Format a DateTime instance
-     *
-     * @param DateTime $date A DateTime instance
-     * @return string A formatted date
-     */
-    private function formatDate(DateTime $date) {
-        return $this->container->get('dateFormatter')->formatDate($date);
+                 ->setLastModified($lastModified);
     }
 }

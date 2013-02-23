@@ -99,8 +99,8 @@ class ImageTransformationCache implements ListenerInterface {
                 $data['headers']->set('X-Imbo-TransformationCache', 'Hit');
 
                 // Replace all headers and set the image model
-                $response->setHeaders($data['headers'])
-                         ->setModel($data['image']);
+                $response->headers = $data['headers'];
+                $response->setModel($data['image']);
 
                 // Stop other listeners on this event
                 $event->stopPropagation(true);
@@ -112,8 +112,7 @@ class ImageTransformationCache implements ListenerInterface {
             }
         }
 
-        // Mark as cache miss
-        $response->getHeaders()->set('X-Imbo-TransformationCache', 'Miss');
+        $response->headers->set('X-Imbo-TransformationCache', 'Miss');
     }
 
     /**
