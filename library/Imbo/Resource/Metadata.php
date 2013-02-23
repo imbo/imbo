@@ -120,7 +120,7 @@ class Metadata implements ResourceInterface, ListenerInterface {
      */
     public function validateMetadata(EventInterface $event) {
         $request = $event->getRequest();
-        $metadata = $request->getRawData();
+        $metadata = $request->getContent();
 
         if (empty($metadata)) {
             throw new InvalidArgumentException('Missing JSON data', 400);

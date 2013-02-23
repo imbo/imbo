@@ -63,7 +63,7 @@ class ImagePreparation implements ContainerAware, ListenerInterface {
         $request = $event->getRequest();
 
         // Fetch image data from input
-        $imageBlob = $request->getRawData();
+        $imageBlob = $request->getContent();
 
         if (empty($imageBlob)) {
             $e = new ImageException('No image attached', 400);

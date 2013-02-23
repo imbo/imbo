@@ -125,7 +125,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $event->getDatabase()->updateMetadata(
             $request->getPublicKey(),
             $request->getImageIdentifier(),
-            json_decode($request->getRawData(), true)
+            json_decode($request->getContent(), true)
         );
     }
 
