@@ -11,7 +11,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Request\Request,
     Imbo\Exception\RuntimeException;
 
 /**
@@ -127,10 +127,10 @@ class AccessToken implements ListenerInterface {
     /**
      * Check if the request is whitelisted
      *
-     * @param RequestInterface $request The request instance
+     * @param Request $request The request instance
      * @return boolean
      */
-    private function isWhitelisted(RequestInterface $request) {
+    private function isWhitelisted(Request $request) {
         $filter = $this->params['transformations'];
 
         if (empty($filter['whitelist']) && empty($filter['blacklist'])) {

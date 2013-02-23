@@ -10,8 +10,7 @@
 
 namespace Imbo\Image;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\EventListener\ListenerDefinition,
+use Imbo\EventListener\ListenerDefinition,
     Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ImageException,

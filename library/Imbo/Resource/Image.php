@@ -10,8 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\EventListener\ListenerInterface,
+use Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ResourceException,
     Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
@@ -28,12 +27,7 @@ class Image implements ResourceInterface, ListenerInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array(
-            RequestInterface::METHOD_GET,
-            RequestInterface::METHOD_HEAD,
-            RequestInterface::METHOD_DELETE,
-            RequestInterface::METHOD_PUT,
-        );
+        return array('GET', 'HEAD', 'DELETE', 'PUT');
     }
 
     /**

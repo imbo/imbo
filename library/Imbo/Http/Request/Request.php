@@ -75,7 +75,7 @@ class Request extends SymfonyRequest {
      * Set an image model
      *
      * @param Image $image An image model instance
-     * @return RequestInterface
+     * @return Request
      */
     public function setImage(Image $image) {
         $this->image = $image;
@@ -105,7 +105,7 @@ class Request extends SymfonyRequest {
      * Set the public key
      *
      * @param string $key The key to set
-     * @return RequestInterface
+     * @return Request
      */
     public function setPublicKey($key) {
         $this->publicKey = $key;
@@ -129,7 +129,7 @@ class Request extends SymfonyRequest {
      * Set the private key
      *
      * @param string $key The key to set
-     * @return RequestInterface
+     * @return Request
      */
     public function setPrivateKey($key) {
         $this->privateKey = $key;
@@ -210,7 +210,7 @@ class Request extends SymfonyRequest {
      * Set the image identifier
      *
      * @param string $imageIdentifier The image identifier to set
-     * @return RequestInterface
+     * @return Request
      */
     public function setImageIdentifier($imageIdentifier) {
         $this->imageIdentifier = $imageIdentifier;
@@ -231,7 +231,7 @@ class Request extends SymfonyRequest {
      * Set the extension requested
      *
      * @param string $extension The extension to set
-     * @return RequestInterface
+     * @return Request
      */
     public function setExtension($extension) {
         $this->extension = $extension;
@@ -243,7 +243,7 @@ class Request extends SymfonyRequest {
      * Set the resource name (one of the constants defined in Imbo\Resource\ResourceInterface)
      *
      * @param string $resource The name of the resource
-     * @return RequestInterface
+     * @return Request
      */
     public function setResource($resource) {
         $this->resource = $resource;

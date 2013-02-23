@@ -12,7 +12,6 @@ namespace Imbo\Http\Response;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Exception,
-    Imbo\Http\Request\RequestInterface,
     Imbo\Model,
     Symfony\Component\HttpFoundation\Response as SymfonyResponse,
     DateTime,

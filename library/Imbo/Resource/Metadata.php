@@ -12,7 +12,6 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
-    Imbo\Http\Request\RequestInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Model;
@@ -28,13 +27,7 @@ class Metadata implements ResourceInterface, ListenerInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array(
-            RequestInterface::METHOD_GET,
-            RequestInterface::METHOD_POST,
-            RequestInterface::METHOD_PUT,
-            RequestInterface::METHOD_DELETE,
-            RequestInterface::METHOD_HEAD,
-        );
+        return array('GET', 'POST', 'PUT', 'DELETE', 'HEAD');
     }
 
     /**
