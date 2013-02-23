@@ -110,13 +110,13 @@ class ResponseWriter implements ContainerAware {
      *
      * @param Model\ModelInterface $model Model to write in another format
      * @param Request $request A request instance
-     * @param ResponseInterface $response A response instance
+     * @param Response $response A response instance
      * @param boolean $strict Whether or not the response writer will throw a RuntimeException with
      *                        status code 406 (Not Acceptable) if it can not produce acceptable
      *                        content for the user agent.
      * @throws RuntimeException
      */
-    public function write(Model\ModelInterface $model, Request $request, ResponseInterface $response, $strict = true) {
+    public function write(Model\ModelInterface $model, Request $request, Response $response, $strict = true) {
         // The entry of the formatter to fetch from the container
         $entry = null;
         $extension = $request->getExtension();

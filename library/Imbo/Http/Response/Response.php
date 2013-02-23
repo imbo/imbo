@@ -51,7 +51,7 @@ class Response extends SymfonyResponse {
      * Set the model instance
      *
      * @param ModelInterface $model A model instance
-     * @return ResponseInterface
+     * @return Response
      */
     public function setModel(Model\ModelInterface $model = null) {
         $this->model = $model;
@@ -72,7 +72,7 @@ class Response extends SymfonyResponse {
      * Set an image instance
      *
      * @param Image $image An image instance
-     * @return ResponseInterface
+     * @return Response
      */
     public function setImage(Model\Image $image) {
         $this->image = $image;

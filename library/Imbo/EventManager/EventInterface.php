@@ -11,7 +11,7 @@
 namespace Imbo\EventManager;
 
 use Imbo\Http\Request\Request,
-    Imbo\Http\Response\ResponseInterface,
+    Imbo\Http\Response\Response,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface;
 
@@ -47,7 +47,7 @@ interface EventInterface {
     /**
      * Get the response instance
      *
-     * @return ResponseInterface
+     * @return Response
      */
     function getResponse();
 
