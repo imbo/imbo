@@ -157,7 +157,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
      * @param EventInterface $event An event instance
      */
     public function loadImages(EventInterface $event) {
-        $params = $event->getRequest()->getQuery();
+        $params = $event->getRequest()->query;
         $query = $this->container->get('imagesQuery');
         $returnMetadata = false;
 

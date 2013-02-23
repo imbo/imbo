@@ -179,11 +179,9 @@ class ResponseWriter implements ContainerAware {
         $contentType = $formatter->getContentType();
 
         if ($contentType === 'application/json') {
-            $query = $request->getQuery();
-
             foreach (array('callback', 'jsonp', 'json') as $validParam) {
-                if ($query->has($validParam)) {
-                    $formattedData = sprintf("%s(%s)", $query->get($validParam), $formattedData);
+                if ($request->query->has($validParam)) {
+                    $formattedData = sprintf("%s(%s)", $request->query->get($validParam), $formattedData);
                     break;
                 }
             }

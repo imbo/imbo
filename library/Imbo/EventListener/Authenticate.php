@@ -64,7 +64,7 @@ class Authenticate implements ListenerInterface {
     public function invoke(EventInterface $event) {
         $response = $event->getResponse();
         $request = $event->getRequest();
-        $query = $request->getQuery();
+        $query = $request->query;
 
         // Required query parameters
         $requiredParams = array('signature', 'timestamp');

@@ -99,7 +99,7 @@ class AccessToken implements ListenerInterface {
      */
     public function invoke(EventInterface $event) {
         $request = $event->getRequest();
-        $query = $request->getQuery();
+        $query = $request->query;
         $eventName = $event->getName();
 
         if (($eventName === 'image.get' || $eventName === 'image.head') && $this->isWhitelisted($request)) {
