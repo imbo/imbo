@@ -109,13 +109,11 @@ class Image implements ResourceInterface, ListenerInterface {
         ) . '"';
 
         // Set some response headers before we apply optional transformations
-        $response->setEtag($etag);
+        $response->setEtag($etag)
+                 ->setMaxAge(31536000);
 
+        // Custom Imbo headers
         $response->headers->add(array(
-            // Set the max-age to a year since the image never changes
-            'Cache-Control' => 'max-age=31536000',
-
-            // Custom Imbo headers
             'X-Imbo-OriginalMimeType' => $image->getMimeType(),
             'X-Imbo-OriginalWidth' => $image->getWidth(),
             'X-Imbo-OriginalHeight' => $image->getHeight(),

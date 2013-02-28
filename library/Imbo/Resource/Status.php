@@ -70,8 +70,6 @@ class Status implements ContainerAware, ResourceInterface, ListenerInterface {
         $database = $event->getDatabase();
         $storage = $event->getStorage();
 
-        $response->headers->set('Cache-Control', 'max-age=0');
-
         $databaseStatus = $database->getStatus();
         $storageStatus = $storage->getStatus();
 
@@ -84,9 +82,12 @@ class Status implements ContainerAware, ResourceInterface, ListenerInterface {
                 $message = 'Database error';
             }
 
-            $response->setStatusCode(500)
-                     ->setStatusMessage($message);
+            $response->setStatusCode(500, $message);
         }
+
+        $response->setMaxAge(0)
+                 ->setPrivate();
+        $response->headers->addCacheControlDirective('no-store');
 
         $statusModel = new Model\Status();
         $statusModel->setDate(new DateTime('now', new DateTimeZone('UTC')))
