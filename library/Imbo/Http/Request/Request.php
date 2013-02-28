@@ -259,4 +259,19 @@ class Request extends SymfonyRequest {
     public function getResource() {
         return $this->resource;
     }
+
+    /**
+     * Get the URI without the Symfony normalization applied to the query string
+     *
+     * @return string
+     */
+    public function getRawUri() {
+        $query = $this->server->get('QUERY_STRING');
+
+        if (!empty($query)) {
+            $query = '?' . $query;
+        }
+
+        return $this->getSchemeAndHttpHost() . $this->getBaseUrl() . $this->getPathInfo() . $query;
+    }
 }
