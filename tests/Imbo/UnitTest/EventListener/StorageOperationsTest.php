@@ -23,7 +23,6 @@ class StorageOperationsTest extends ListenerTests {
      */
     private $listener;
 
-    private $container;
     private $event;
     private $request;
     private $response;
@@ -33,13 +32,10 @@ class StorageOperationsTest extends ListenerTests {
 
     /**
      * Set up the listener
-     *
-     * @covers Imbo\EventListener\StorageOperations::setContainer
      */
     public function setUp() {
-        $this->container = $this->getMock('Imbo\Container');
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
@@ -49,14 +45,12 @@ class StorageOperationsTest extends ListenerTests {
         $this->event->expects($this->any())->method('getStorage')->will($this->returnValue($this->storage));
 
         $this->listener = new StorageOperations();
-        $this->listener->setContainer($this->container);
     }
 
     /**
      * Tear down the listener
      */
     public function tearDown() {
-        $this->container = null;
         $this->listener = null;
         $this->request = null;
         $this->response = null;
@@ -83,15 +77,10 @@ class StorageOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\StorageOperations::loadImage
      */
     public function testCanLoadImage() {
-        $datetime = $this->getMock('DateTime');
+        $date = $this->getMock('DateTime');
         $this->storage->expects($this->once())->method('getImage')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue('image data'));
-        $this->storage->expects($this->once())->method('getLastModified')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($datetime));
-        $formatter = $this->getMock('Imbo\Helpers\DateFormatter');
-        $formatter->expects($this->once())->method('formatDate')->with($datetime)->will($this->returnValue('some date'));
-        $this->container->expects($this->once())->method('get')->with('dateFormatter')->will($this->returnValue($formatter));
-        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders->expects($this->once())->method('set')->with('Last-Modified', 'some date');
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
+        $this->storage->expects($this->once())->method('getLastModified')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($date));
+        $this->response->expects($this->once())->method('setLastModified')->with($date)->will($this->returnSelf());
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('setBlob')->with('image data');
         $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));

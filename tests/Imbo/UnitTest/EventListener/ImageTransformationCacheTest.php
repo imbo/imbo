@@ -49,17 +49,20 @@ class ImageTransformationCacheTest extends ListenerTests {
             $this->markTestSkipped('This testcase requires vfsStream to run');
         }
 
-        $this->responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $this->requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $this->query = $this->getMockBuilder('Imbo\Http\ParameterContainer')->disableOriginalConstructor()->getMock();
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-        $this->response->expects($this->any())->method('getHeaders')->will($this->returnValue($this->responseHeaders));
-        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->request->expects($this->any())->method('getQuery')->will($this->returnValue($this->query));
+        $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $this->requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+
+        $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->response->headers = $this->responseHeaders;
+
+        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request->query = $this->query;
+        $this->request->headers = $this->requestHeaders;
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-        $this->request->expects($this->any())->method('getHeaders')->will($this->returnValue($this->requestHeaders));
+
+        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 

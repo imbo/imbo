@@ -32,13 +32,13 @@ class CorsTest extends ListenerTests {
      * @covers Imbo\EventListener\Cors::__construct
      */
     public function setUp() {
-        $requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
+        $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $requestHeaders->expects($this->any())->method('get')->with('Origin', '*')->will($this->returnValue('http://imbo-project.org'));
 
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->request->expects($this->any())->method('getHeaders')->will($this->returnValue($requestHeaders));
+        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request->headers = $requestHeaders;
 
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $this->response = $this->getMock('Imbo\Http\Response\Response');
 
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
@@ -123,7 +123,7 @@ class CorsTest extends ListenerTests {
      * @covers Imbo\EventListener\Cors::originIsAllowed
      */
     public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOptions() {
-        $this->response->expects($this->never())->method('getHeaders');
+        $this->event->expects($this->never())->method('getResponse');
         $this->listener->options($this->event);
     }
 
@@ -132,7 +132,7 @@ class CorsTest extends ListenerTests {
      * @covers Imbo\EventListener\Cors::originIsAllowed
      */
     public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOtherThanOptions() {
-        $this->response->expects($this->never())->method('getHeaders');
+        $this->event->expects($this->never())->method('getResponse');
         $this->listener->invoke($this->event);
     }
 
@@ -145,11 +145,13 @@ class CorsTest extends ListenerTests {
             'allowedOrigins' => array('*')
         ));
 
-        $headers = $this->getMock('Imbo\Http\HeaderContainer');
-        $headers->expects($this->at(0))->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org')->will($this->returnValue($headers));
-        $headers->expects($this->at(1))->method('set')->with('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode')->will($this->returnValue($headers));
+        $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $headers->expects($this->once())->method('add')->with(array(
+            'Access-Control-Allow-Origin' => 'http://imbo-project.org',
+            'Access-Control-Expose-Headers' => 'X-Imbo-Error-Internalcode',
+        ));
 
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
+        $this->response->headers = $headers;
         $listener->invoke($this->event);
     }
 
@@ -162,11 +164,13 @@ class CorsTest extends ListenerTests {
             'allowedOrigins' => array('http://imbo-project.org')
         ));
 
-        $headers = $this->getMock('Imbo\Http\HeaderContainer');
-        $headers->expects($this->at(0))->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org')->will($this->returnValue($headers));
-        $headers->expects($this->at(1))->method('set')->with('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode')->will($this->returnValue($headers));
+        $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $headers->expects($this->once())->method('add')->with(array(
+            'Access-Control-Allow-Origin' => 'http://imbo-project.org',
+            'Access-Control-Expose-Headers' => 'X-Imbo-Error-Internalcode',
+        ));
 
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
+        $this->response->headers = $headers;
         $listener->invoke($this->event);
     }
 
@@ -184,13 +188,15 @@ class CorsTest extends ListenerTests {
 
         $this->request->expects($this->once())->method('getResource')->will($this->returnValue('image'));
 
-        $headers = $this->getMock('Imbo\Http\HeaderContainer');
-        $headers->expects($this->at(0))->method('set')->with('Access-Control-Allow-Origin', 'http://imbo-project.org')->will($this->returnValue($headers));
-        $headers->expects($this->at(1))->method('set')->with('Access-Control-Allow-Methods', 'OPTIONS, HEAD')->will($this->returnValue($headers));
-        $headers->expects($this->at(2))->method('set')->with('Access-Control-Allow-Headers', 'Content-Type, Accept')->will($this->returnValue($headers));
-        $headers->expects($this->at(3))->method('set')->with('Access-Control-Max-Age', 60)->will($this->returnValue($headers));
+        $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $headers->expects($this->once())->method('add')->with(array(
+            'Access-Control-Allow-Origin' => 'http://imbo-project.org',
+            'Access-Control-Allow-Methods' => 'OPTIONS, HEAD',
+            'Access-Control-Allow-Headers' => 'Content-Type, Accept',
+            'Access-Control-Max-Age' => 60,
+        ));
 
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($headers));
+        $this->response->headers = $headers;
         $this->response->expects($this->once())->method('setStatusCode')->with(204);
         $this->event->expects($this->once())->method('stopPropagation');
         $listener->options($this->event);

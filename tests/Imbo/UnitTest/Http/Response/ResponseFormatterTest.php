@@ -61,19 +61,16 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
     public function testWritesAgainWhenFirstCallFails() {
         $exception = $this->getMock('Imbo\Exception\RuntimeException');
         $model = $this->getMock('Imbo\Model\ModelInterface');
-        $error = $this->getMock('Imbo\Model\Error');
-        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-        $response->expects($this->once())->method('createError')->with($exception, $request);
+        $request = $this->getMock('Imbo\Http\Request\Request');
+        $response = $this->getMock('Imbo\Http\Response\Response');
         $response->expects($this->once())->method('getStatusCode')->will($this->returnValue(200));
-        $response->expects($this->at(0))->method('getModel')->will($this->returnValue($model));
-        $response->expects($this->at(3))->method('getModel')->will($this->returnValue($error));
+        $response->expects($this->once())->method('getModel')->will($this->returnValue($model));
         $event = $this->getMock('Imbo\EventManager\EventInterface');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->once())->method('getResponse')->will($this->returnValue($response));
         $responseWriter = $this->getMock('Imbo\Http\Response\ResponseWriter');
         $responseWriter->expects($this->at(0))->method('write')->with($model, $request, $response)->will($this->throwException($exception));
-        $responseWriter->expects($this->at(1))->method('write')->with($error, $request, $response, false);
+        $responseWriter->expects($this->at(1))->method('write')->with($this->isInstanceOf('Imbo\Model\Error'), $request, $response, false);
         $this->container->expects($this->once())->method('get')->with('responseWriter')->will($this->returnValue($responseWriter));
 
         $this->responseFormatter->send($event);
@@ -83,7 +80,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\ResponseFormatter::send
      */
     public function testReturnWhenStatusCodeIs204() {
-        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $response = $this->getMock('Imbo\Http\Response\Response');
         $response->expects($this->once())->method('getStatusCode')->will($this->returnValue(204));
 
         $event = $this->getMock('Imbo\EventManager\EventInterface');
@@ -99,7 +96,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\ResponseFormatter::send
      */
     public function testReturnWhenThereIsNoModel() {
-        $response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $response = $this->getMock('Imbo\Http\Response\Response');
         $response->expects($this->once())->method('getStatusCode')->will($this->returnValue(200));
         $response->expects($this->once())->method('getModel')->will($this->returnValue(null));
 
