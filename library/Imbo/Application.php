@@ -19,6 +19,7 @@ use Imbo\Http\Request\Request,
     Imbo\EventManager\Event,
     Imbo\EventManager\EventManager,
     Imbo\Model\Image,
+    Imbo\Model\Error,
     Imbo\Image\ImagePreparation,
     Imbo\Exception\RuntimeException,
     Imbo\Exception\InvalidArgumentException,
@@ -70,7 +71,7 @@ class Application {
             $entry = $resource . 'Resource';
 
             if (!$this->container->has($entry)) {
-                throw new RuntimeException('Unknown Resource', 500);
+                throw new RuntimeException('Unknown resource', 500);
             }
 
             $resource = $this->container->get($entry);
@@ -86,7 +87,7 @@ class Application {
             // See if the public key exists
             if ($publicKey) {
                 if (!isset($authConfig[$publicKey])) {
-                    $e = new RuntimeException('Unknown Public Key', 404);
+                    $e = new RuntimeException('Unknown public key', 404);
                     $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
 
                     throw $e;
@@ -112,10 +113,8 @@ class Application {
             $eventManager->trigger($eventName);
         } catch (Exception $exception) {
             // An error has occured. Create an error and send the response
-            $this->container->get('response')->createError(
-                $exception,
-                $this->container->get('request')
-            );
+            $error = Error::createFromException($exception, $this->container->get('request'));
+            $this->container->get('response')->setError($error);
         }
 
         $eventManager->trigger('response.send');
@@ -145,12 +144,14 @@ class Application {
         $container->set('dateFormatter', new Helpers\DateFormatter());
 
         // Request from the client
-        $container->set('request', new Request($_GET, $_POST, $_SERVER));
+        $container->set('request', Request::createFromGlobals());
 
         // Response to the client
         $container->setStatic('response', function(Container $container) {
             $response = new Response();
-            $response->setImage($container->get('image'));
+
+            $response->setImage($container->get('image'))
+                     ->setPublic();
             $response->headers->set('X-Imbo-Version', Version::VERSION);
 
             return $response;
@@ -235,7 +236,6 @@ class Application {
         // Image transformer listener
         $container->setStatic('imageTransformer', function(Container $container) {
             $transformer = new EventListener\ImageTransformer();
-            $transformer->setContainer($container);
 
             $config = $container->get('config');
 
@@ -300,10 +300,7 @@ class Application {
 
         // Storage operations listener
         $container->setStatic('storageOperations', function(Container $container) {
-            $listener = new EventListener\StorageOperations();
-            $listener->setContainer($container);
-
-            return $listener;
+            return new EventListener\StorageOperations();
         });
 
         // Event manager component
@@ -318,7 +315,6 @@ class Application {
                 'imagesResource',
                 'imageResource',
                 'metadataResource',
-                'response',
                 'responseFormatter',
                 'router',
                 'databaseOperations',
