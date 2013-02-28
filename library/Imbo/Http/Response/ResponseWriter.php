@@ -132,11 +132,11 @@ class ResponseWriter implements ContainerAware {
             $entry = $this->supportedTypes[$mime];
         } else {
             // Set Vary to Accept since we are doing content negotiation based on Accept
-            $response->headers->set('Vary', 'Accept');
+            $response->setVary('Accept');
 
             // No extension have been provided
             $contentNegotiation = $this->container->get('contentNegotiation');
-            $acceptableTypes = $request->getAcceptableContentTypes();
+            $acceptableTypes = $request->splitHttpAcceptHeader($request->headers->get('Accept'));
 
             // Try to find the best match since the client does not accept the original mime
             // type
@@ -193,7 +193,7 @@ class ResponseWriter implements ContainerAware {
         ));
 
         if ($request->getMethod() !== 'HEAD') {
-            $response->setBody($formattedData);
+            $response->setContent($formattedData);
         }
     }
 }
