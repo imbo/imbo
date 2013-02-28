@@ -97,13 +97,15 @@ class Response extends SymfonyResponse {
      * @return Response
      */
     public function setError(Model\Error $error) {
+        $errorMessage = $error->getErrorMessage();
+
         $this->headers->add(array(
-            'X-Imbo-Error-Message' => $error->getErrorMessage(),
+            'X-Imbo-Error-Message' => $errorMessage,
             'X-Imbo-Error-InternalCode' => $error->getImboErrorCode(),
             'X-Imbo-Error-Date' => $error->getDate()->format('D, d M Y H:i:s') . ' GMT',
         ));
 
-        $this->setStatusCode($error->getHttpCode())
+        $this->setStatusCode($error->getHttpCode(), $errorMessage)
              ->setEtag(null)
              ->setLastModified(null);
 
