@@ -77,7 +77,7 @@ class Router implements ListenerInterface {
             throw new RuntimeException('Unsupported HTTP method: ' . $httpMethod, 501);
         }
 
-        $path = $request->getPath();
+        $path = $request->getPathInfo();
         $matches = array();
 
         foreach ($this->routes as $resourceName => $route) {
