@@ -112,10 +112,10 @@ class AccessToken implements ListenerInterface {
         }
 
         $token = $query->get('accessToken');
-        $url = $request->getUrl();
+        $url = $request->getRawUri();
 
         // Remove the access token from the query string as it's not used to generate the HMAC
-        $url = trim(preg_replace('/(\?|&)accessToken=' . preg_quote($token, '/') . '&?/', '\\1', $url), '&?');
+        $url = rtrim(preg_replace('/(?<=(\?|&))accessToken=[^&]+&?/', '', $url), '&?');
 
         $correctToken = hash_hmac('sha256', $url, $request->getPrivateKey());
 
