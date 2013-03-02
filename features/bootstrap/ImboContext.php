@@ -37,6 +37,15 @@ class ImboContext extends RESTContext {
     private $privateKey;
 
     /**
+     * @BeforeSuite
+     */
+    public static function prepare(SuiteEvent $event) {
+        // Drop mongo test collection
+        $mongo = new MongoClient();
+        $mongo->imbo_testing->drop();
+     }
+
+    /**
      * @Given /^the (storage|database) is down$/
      */
     public function forceAdapterFailure($adapter) {
