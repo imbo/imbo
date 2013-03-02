@@ -12,6 +12,7 @@ namespace Imbo\UnitTest\Http\Response;
 
 use Imbo\Http\Response\ResponseWriter,
     Imbo\Http\ParameterContainer,
+    Imbo\Model\Error,
     Imbo\Model\Image,
     Imbo\Model\ArrayModel;
 
@@ -232,6 +233,35 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
         $this->responseHeaders->expects($this->at(2))->method('set')->with('Content-Length', strlen($imageData))->will($this->returnSelf());
 
         $this->response->expects($this->once())->method('setBody')->with($imageData);
+
+        $this->responseWriter->write($this->model, $this->request, $this->response);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\ResponseWriter::write
+     */
+    public function testForcesContentNegotiationOnErrorModels() {
+        $this->model = new Error();
+        $error = '{"some":"error"}';
+        $query = $this->getMockBuilder('Imbo\Http\ParameterContainer')->disableOriginalConstructor()->getMock();
+
+        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array(
+            '*/*' => 1,
+        )));
+        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
+        $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+
+        $this->responseHeaders->expects($this->any())->method('set')->will($this->returnSelf());
+
+        $formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
+        $formatter->expects($this->once())->method('format')->with($this->model)->will($this->returnValue($error));
+        $formatter->expects($this->once())->method('getContentType')->will($this->returnValue('application/json'));
+
+        $contentNegotiation = $this->getMock('Imbo\Http\ContentNegotiation');
+        $contentNegotiation->expects($this->any())->method('isAcceptable')->will($this->returnValue(1));
+
+        $this->container->expects($this->at(0))->method('get')->with('contentNegotiation')->will($this->returnValue($contentNegotiation));
+        $this->container->expects($this->at(1))->method('get')->with('jsonFormatter')->will($this->returnValue($formatter));
 
         $this->responseWriter->write($this->model, $this->request, $this->response);
     }

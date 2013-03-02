@@ -119,8 +119,9 @@ class ResponseWriter implements ContainerAware {
     public function write(Model\ModelInterface $model, RequestInterface $request, ResponseInterface $response, $strict = true) {
         // The entry of the formatter to fetch from the container
         $entry = null;
+        $extension = $request->getExtension();
 
-        if ($extension = $request->getExtension()) {
+        if ($extension && !($model instanceof Model\Error)) {
             // The user agent wants a specific type. Skip content negotiation completely
             $mime = $this->defaultMimeType;
 
