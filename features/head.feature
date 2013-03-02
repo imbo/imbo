@@ -6,18 +6,39 @@ Feature: Imbo supports HTTP HEAD for all resources
     Scenario: Request status information
         When I request "/status" using HTTP "HEAD"
         And make the same request using HTTP "GET"
-        Then the response headers should be the same
+        Then the following response headers should be the same:
+        """
+        cache-control
+        allow
+        vary
+        content-type
+        content-length
+        """
 
     Scenario: Request user information using a valid access token
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/publickey" using HTTP "HEAD"
         And make the same request using HTTP "GET"
-        Then the response headers should be the same
+        Then the following response headers should be the same:
+        """
+        cache-control
+        allow
+        vary
+        content-type
+        content-length
+        """
 
     Scenario: Request user images using a valid access token
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/publickey/images" using HTTP "HEAD"
         And make the same request using HTTP "GET"
-        Then the response headers should be the same
+        Then the following response headers should be the same:
+        """
+        cache-control
+        allow
+        vary
+        content-type
+        content-length
+        """

@@ -8,7 +8,8 @@
  * distributed with this source code.
  */
 
-use Behat\Behat\Event\SuiteEvent,
+use Behat\Behat\Event\FeatureEvent,
+    Behat\Behat\Event\SuiteEvent,
     Behat\Behat\Exception\PendingException,
     Behat\Behat\Context\Step\Given;
 
@@ -37,9 +38,9 @@ class ImboContext extends RESTContext {
     private $privateKey;
 
     /**
-     * @BeforeSuite
+     * @BeforeFeature
      */
-    public static function prepare(SuiteEvent $event) {
+    public static function cleanDatabase(FeatureEvent $event) {
         // Drop mongo test collection
         $mongo = new MongoClient();
         $mongo->imbo_testing->drop();
@@ -80,7 +81,7 @@ class ImboContext extends RESTContext {
             $request = $event['request'];
             $accessToken = hash_hmac('sha256', $request->getUrl(), $this->privateKey);
             $request->getQuery()->set('accessToken', $accessToken);
-        });
+        }, -100);
     }
 
     /**
@@ -99,7 +100,34 @@ class ImboContext extends RESTContext {
             $query = $request->getQuery();
             $query->set('signature', $signature);
             $query->set('timestamp', $timestamp);
+        }, -100);
+    }
+
+    /**
+     * @Given /^I specify "([^"]*)" as transformation$/
+     */
+    public function applyTransformation($transformation) {
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($transformation) {
+            $event['request']->getQuery()->set('t', array($transformation));
         });
+    }
+
+    /**
+     * @Given /^the (width|height) of the image is "([^"]*)"$/
+     */
+    public function theWidthOfTheImageIs($value, $size) {
+        $image = (string) $this->getLastResponse()->getBody();
+        $size = (int) $size;
+
+        $info = getimagesizefromstring($image);
+
+        if ($value === 'width') {
+            $index = 0;
+        } else {
+            $index = 1;
+        }
+
+        assertSame($size, $info[$index], 'Incorrect ' . $value . ', expected ' . $size . ', got ' . $info[$index]);
     }
 
     /**
