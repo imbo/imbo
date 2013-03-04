@@ -226,6 +226,8 @@ Image transformations
 
 Below you can find information on the transformations shipped with Imbo along with their parameters.
 
+.. _border-transformation:
+
 border
 ######
 
@@ -297,8 +299,6 @@ This transformation compresses images on the fly resulting in a smaller payload.
 .. warning::
     This transformation currently only works as expected for ``image/jpeg`` images.
 
-.. _convert-transformation:
-
 convert
 #######
 
@@ -313,6 +313,8 @@ This transformation can be used to change the image type. It is not applied like
 * ``curl http://imbo/users/<user>/images/<image>.gif``
 * ``curl http://imbo/users/<user>/images/<image>.jpg``
 * ``curl http://imbo/users/<user>/images/<image>.png``
+
+It is not possible to explicitly trigger this transformation via the ``t[]`` query parameter.
 
 crop
 ####

@@ -11,7 +11,7 @@
 namespace Imbo\Http\Response\Formatter;
 
 use Imbo\Model,
-    Imbo\Image\Transformation\TransformationInterface;
+    Imbo\Image\Transformation;
 
 /**
  * Gif image formatter
@@ -23,7 +23,7 @@ abstract class ImageFormatter implements ImageFormatterInterface {
     /**
      * Convert transformation
      *
-     * @var TransformationInterface
+     * @var Transformation\Convert
      */
     private $transformation;
 
@@ -32,7 +32,7 @@ abstract class ImageFormatter implements ImageFormatterInterface {
      *
      * @param TransformationInterface $transformation A convert transformation
      */
-    public function __construct(TransformationInterface $transformation) {
+    public function __construct(Transformation\Convert $transformation) {
         $this->transformation = $transformation;
     }
 

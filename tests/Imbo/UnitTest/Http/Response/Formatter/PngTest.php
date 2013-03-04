@@ -11,7 +11,7 @@
 namespace Imbo\UnitTest\Http\Response\Formatter;
 
 use Imbo\Http\Response\Formatter\Png,
-    Imbo\Image\Transformation\TransformationInterface;
+    Imbo\Image\Transformation\Convert;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -22,8 +22,8 @@ class PngTest extends ImageFormatterTests {
     /**
      * {@inheritdoc}
      */
-    protected function getFormatter(TransformationInterface $transformation) {
-        return new Png($transformation);
+    protected function getFormatter(Convert $convert) {
+        return new Png($convert);
     }
 
     /**

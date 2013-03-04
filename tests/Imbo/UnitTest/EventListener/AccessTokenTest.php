@@ -86,58 +86,58 @@ class AccessTokenTest extends ListenerTests {
             array(
                 $filter = array(),
                 $transformations = array(
-                    array('name' => 'convert', 'params' => array()),
-                ),
-                $whitelisted = false,
-            ),
-            array(
-                $filter = array('transformations' => array('whitelist' => array('convert'))),
-                $transformations = array(
-                    array('name' => 'convert', 'params' => array()),
-                ),
-                $whitelisted = true,
-            ),
-            array(
-                $filter = array('transformations' => array('whitelist' => array('convert'))),
-                $transformations = array(
-                    array('name' => 'convert', 'params' => array()),
                     array('name' => 'border', 'params' => array()),
                 ),
                 $whitelisted = false,
             ),
             array(
-                $filter = array('transformations' => array('blacklist' => array('convert'))),
+                $filter = array('transformations' => array('whitelist' => array('border'))),
                 $transformations = array(
                     array('name' => 'border', 'params' => array()),
                 ),
                 $whitelisted = true,
             ),
             array(
-                $filter = array('transformations' => array('blacklist' => array('convert'))),
+                $filter = array('transformations' => array('whitelist' => array('border'))),
                 $transformations = array(
-                    array('name' => 'convert', 'params' => array()),
                     array('name' => 'border', 'params' => array()),
+                    array('name' => 'thumbnail', 'params' => array()),
                 ),
                 $whitelisted = false,
             ),
             array(
-                $filter = array('transformations' => array('whitelist' => array('convert'), 'blacklist' => array('border'))),
+                $filter = array('transformations' => array('blacklist' => array('border'))),
                 $transformations = array(
-                    array('name' => 'convert', 'params' => array()),
+                    array('name' => 'thumbnail', 'params' => array()),
                 ),
                 $whitelisted = true,
             ),
             array(
-                $filter = array('transformations' => array('whitelist' => array('convert'), 'blacklist' => array('border'))),
+                $filter = array('transformations' => array('blacklist' => array('border'))),
+                $transformations = array(
+                    array('name' => 'border', 'params' => array()),
+                    array('name' => 'thumbnail', 'params' => array()),
+                ),
+                $whitelisted = false,
+            ),
+            array(
+                $filter = array('transformations' => array('whitelist' => array('border'), 'blacklist' => array('thumbnail'))),
+                $transformations = array(
+                    array('name' => 'border', 'params' => array()),
+                ),
+                $whitelisted = true,
+            ),
+            array(
+                $filter = array('transformations' => array('whitelist' => array('border'), 'blacklist' => array('thumbnail'))),
                 $transformations = array(
                     array('name' => 'canvas', 'params' => array()),
                 ),
                 $whitelisted = false,
             ),
             array(
-                $filter = array('transformations' => array('whitelist' => array('convert'), 'blacklist' => array('convert'))),
+                $filter = array('transformations' => array('whitelist' => array('border'), 'blacklist' => array('border'))),
                 $transformations = array(
-                    array('name' => 'convert', 'params' => array()),
+                    array('name' => 'border', 'params' => array()),
                 ),
                 $whitelisted = false,
             ),

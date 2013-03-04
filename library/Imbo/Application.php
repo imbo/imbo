@@ -25,7 +25,8 @@ use Imbo\Http\Request\Request,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface,
     Imbo\Resource\Images\Query,
-    Imbo\Http\Response\Formatter;
+    Imbo\Http\Response\Formatter,
+    Imbo\Image\Transformation;
 
 /**
  * Imbo application
@@ -402,25 +403,13 @@ class Application {
             return new Formatter\XML($container->get('dateFormatter'));
         });
         $container->setStatic('gifFormatter', function(Container $container) {
-            $config = $container->get('config');
-            $callback = $config['imageTransformations']['convert'];
-            $transformation = $callback(array('type' => 'gif'));
-
-            return new Formatter\Gif($transformation);
+            return new Formatter\Gif(new Transformation\Convert(array('type' => 'gif')));
         });
         $container->setStatic('jpegFormatter', function(Container $container) {
-            $config = $container->get('config');
-            $callback = $config['imageTransformations']['convert'];
-            $transformation = $callback(array('type' => 'jpg'));
-
-            return new Formatter\Jpeg($transformation);
+            return new Formatter\Jpeg(new Transformation\Convert(array('type' => 'jpg')));
         });
         $container->setStatic('pngFormatter', function(Container $container) {
-            $config = $container->get('config');
-            $callback = $config['imageTransformations']['convert'];
-            $transformation = $callback(array('type' => 'png'));
-
-            return new Formatter\Png($transformation);
+            return new Formatter\Png(new Transformation\Convert(array('type' => 'png')));
         });
 
         $this->container = $container;
