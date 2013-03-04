@@ -164,7 +164,7 @@ class ImageTest extends ResourceTests {
         $modifiedImage = $this->getMock('Imbo\Model\Image');
 
         $this->response->expects($this->at(0))->method('getImage')->will($this->returnValue($image));
-        $this->response->expects($this->at(1))->method('setEtag')->with('"d41d8cd98f00b204e9800998ecf8427e"')->will($this->returnSelf());
+        $this->response->expects($this->at(1))->method('setEtag')->with('"65330eb47d0175f264fdb29633829c0b"')->will($this->returnSelf());
         $this->response->expects($this->at(2))->method('setMaxAge')->with(31536000);
         $this->response->expects($this->at(3))->method('getImage')->will($this->returnValue($modifiedImage));
         $this->response->expects($this->at(4))->method('setModel')->with($modifiedImage);

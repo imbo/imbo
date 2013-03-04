@@ -282,4 +282,33 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
 
         $this->responseWriter->write($this->model, $this->request, $this->response);
     }
+
+    /**
+     * @covers Imbo\Http\Response\ResponseWriter::write
+     */
+    public function testAcceptsAllMediaTypesWhenAcceptIsEmpty() {
+        $model = new Error();
+        $error = '{"some":"error"}';
+
+        // Mimic a missing $_SERVER['HTTP_ACCEPT'] value
+        $this->requestHeaders->expects($this->once())->method('get')->with('Accept')->will($this->returnValue(null));
+
+        // Make sure the missing value falls back to */*
+        $this->request->expects($this->once())->method('splitHttpAcceptHeader')->with('*/*')->will($this->returnValue(array('*/*' => 1)));
+        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
+        $this->request->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+
+
+        $formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
+        $formatter->expects($this->once())->method('format')->with($model)->will($this->returnValue($error));
+        $formatter->expects($this->once())->method('getContentType')->will($this->returnValue('application/json'));
+
+        $contentNegotiation = $this->getMock('Imbo\Http\ContentNegotiation');
+        $contentNegotiation->expects($this->any())->method('isAcceptable')->will($this->returnValue(1));
+
+        $this->container->expects($this->at(0))->method('get')->with('contentNegotiation')->will($this->returnValue($contentNegotiation));
+        $this->container->expects($this->at(1))->method('get')->with('jsonFormatter')->will($this->returnValue($formatter));
+
+        $this->responseWriter->write($model, $this->request, $this->response);
+    }
 }

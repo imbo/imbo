@@ -136,7 +136,9 @@ class ResponseWriter implements ContainerAware {
 
             // No extension have been provided
             $contentNegotiation = $this->container->get('contentNegotiation');
-            $acceptableTypes = $request->splitHttpAcceptHeader($request->headers->get('Accept'));
+
+            $accept = $request->headers->get('Accept') ?: '*/*';
+            $acceptableTypes = $request->splitHttpAcceptHeader($accept);
 
             // Try to find the best match since the client does not accept the original mime
             // type
