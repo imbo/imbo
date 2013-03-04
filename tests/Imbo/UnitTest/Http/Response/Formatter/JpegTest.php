@@ -11,7 +11,7 @@
 namespace Imbo\UnitTest\Http\Response\Formatter;
 
 use Imbo\Http\Response\Formatter\Jpeg,
-    Imbo\Image\Transformation\TransformationInterface;
+    Imbo\Image\Transformation\Convert;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -22,8 +22,8 @@ class JpegTest extends ImageFormatterTests {
     /**
      * {@inheritdoc}
      */
-    protected function getFormatter(TransformationInterface $transformation) {
-        return new Jpeg($transformation);
+    protected function getFormatter(Convert $convert) {
+        return new Jpeg($convert);
     }
 
     /**

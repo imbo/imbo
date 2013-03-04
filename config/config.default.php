@@ -195,9 +195,6 @@ $config = array(
         'compress' => function (array $params) {
             return new Image\Transformation\Compress($params);
         },
-        'convert' => function (array $params) {
-            return new Image\Transformation\Convert($params);
-        },
         'crop' => function (array $params) {
             return new Image\Transformation\Crop($params);
         },

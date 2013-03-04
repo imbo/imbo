@@ -707,21 +707,21 @@ Use ``whitelist`` if you want the listener to skip the access token check for ce
 
     array('transformations' => array(
         'whitelist' => array(
-            'convert',
+            'border',
         )
     ))
 
-means that the access token will **not** be enforced for the :ref:`convert-transformation` transformation.
+means that the access token will **not** be enforced for the :ref:`border-transformation` transformation.
 
 .. code-block:: php
 
     array('transformations' => array(
         'blacklist' => array(
-            'convert',
+            'border',
         )
     ))
 
-means that the access token will be enforced **only** for the :ref:`convert-transformation` transformation.
+means that the access token will be enforced **only** for the :ref:`border-transformation` transformation.
 
 If both ``whitelist`` and ``blacklist`` are specified all transformations will require an access token unless it's included in ``whitelist``.
 

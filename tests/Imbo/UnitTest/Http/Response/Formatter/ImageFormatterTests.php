@@ -10,7 +10,7 @@
 
 namespace Imbo\UnitTest\Http\Response\Formatter;
 
-use Imbo\Image\Transformation\TransformationInterface;
+use Imbo\Image\Transformation\Convert;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -28,10 +28,10 @@ abstract class ImageFormatterTests extends \PHPUnit_Framework_TestCase {
     /**
      * Get the formatter we want to test
      *
-     * @param TransformationInterface $transformation The transformation to use with the formatter
+     * @param Convert $convert The convert transformation to use with the formatter
      * @return ImageFormatterInterface
      */
-    abstract protected function getFormatter(TransformationInterface $transformation);
+    abstract protected function getFormatter(Convert $convert);
 
     /**
      * Get the expected content type for the formatter
@@ -44,7 +44,7 @@ abstract class ImageFormatterTests extends \PHPUnit_Framework_TestCase {
      * Set up the formatter
      */
     public function setUp() {
-        $this->transformation = $this->getMock('Imbo\Image\Transformation\TransformationInterface');
+        $this->transformation = $this->getMockBuilder('Imbo\Image\Transformation\Convert')->disableOriginalConstructor()->getMock();
         $this->formatter = $this->getFormatter($this->transformation);
         $this->model = $this->getMock('Imbo\Model\Image');
     }
