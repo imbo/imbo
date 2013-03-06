@@ -60,6 +60,18 @@ class AccessTokenTest extends ListenerTests {
 
     /**
      * @expectedException Imbo\Exception\RuntimeException
+     * @expectedExceptionMessage Incorrect access token
+     * @expectedExceptionCode 400
+     * @covers Imbo\EventListener\AccessToken::invoke
+     */
+    public function testRequestWithBogusAccessToken() {
+        $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(true));
+        $this->query->expects($this->once())->method('get')->with('accessToken')->will($this->returnValue('/string'));
+        $this->listener->invoke($this->event);
+    }
+
+    /**
+     * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage Missing access token
      * @expectedExceptionCode 400
      * @covers Imbo\EventListener\AccessToken::invoke
