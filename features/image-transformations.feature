@@ -31,27 +31,28 @@ Feature: Imbo enables dynamic transformations of images
         And the height of the image is "<height>"
 
         Examples:
-            | transformation                   | width | height |
-            | border                           | 601   | 419    |
-            | border:width=4,height=5          | 607   | 427    |
-            | canvas                           | 599   | 417    |
-            | canvas:width=700,height=600      | 700   | 600    |
-            | crop:width=50,height=60,x=1,y=10 | 50    | 60     |
-            | desaturate                       | 599   | 417    |
-            | flipHorizontally                 | 599   | 417    |
-            | flipVertically                   | 599   | 417    |
-            | maxSize:width=200                | 200   | 139    |
-            | maxSize:height=200               | 287   | 200    |
-            | maxSize:width=100,height=100     | 100   | 70     |
-            | resize:width=100                 | 100   | 69     |
-            | resize:height=200                | 287   | 200    |
-            | resize:width=100,height=100      | 100   | 100    |
-            | rotate:angle=90                  | 417   | 599    |
-            | sepia                            | 599   | 417    |
-            | thumbnail                        | 50    | 50     |
-            | thumbnail:width=40,height=30     | 40    | 30     |
-            | transpose                        | 417   | 599    |
-            | transverse                       | 417   | 599    |
+            | transformation                      | width | height |
+            | border                              | 601   | 419    |
+            | border:width=4,height=5             | 607   | 427    |
+            | border:mode=inline,width=4,height=5 | 599   | 417    |
+            | canvas                              | 599   | 417    |
+            | canvas:width=700,height=600         | 700   | 600    |
+            | crop:width=50,height=60,x=1,y=10    | 50    | 60     |
+            | desaturate                          | 599   | 417    |
+            | flipHorizontally                    | 599   | 417    |
+            | flipVertically                      | 599   | 417    |
+            | maxSize:width=200                   | 200   | 139    |
+            | maxSize:height=200                  | 287   | 200    |
+            | maxSize:width=100,height=100        | 100   | 70     |
+            | resize:width=100                    | 100   | 69     |
+            | resize:height=200                   | 287   | 200    |
+            | resize:width=100,height=100         | 100   | 100    |
+            | rotate:angle=90                     | 417   | 599    |
+            | sepia                               | 599   | 417    |
+            | thumbnail                           | 50    | 50     |
+            | thumbnail:width=40,height=30        | 40    | 30     |
+            | transpose                           | 417   | 599    |
+            | transverse                          | 417   | 599    |
 
 
     Scenario Outline: Gracefully handle transformation errors
