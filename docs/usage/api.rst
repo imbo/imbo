@@ -244,9 +244,13 @@ This transformation will apply a border around the image.
 ``height``
     Height of the border in pixels on the top and bottom sides of the image. Defaults to ``1``.
 
+``mode``
+    Mode of the border. Can be ``inline`` or ``outbound``. Defaults to ``outbound``. Outbound places the border outside of the image, increasing the dimensions of the image. ``inline`` paints the border inside of the image, retaining the original width and height of the image.
+
 **Examples:**
 
 * ``t[]=border``
+* ``t[]=border:mode=inline``
 * ``t[]=border:color=000``
 * ``t[]=border:color=f00,width=2,height=2``
 
