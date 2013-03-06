@@ -47,17 +47,17 @@ end
 desc "Install dependencies"
 task :installdep do
   if ENV["TRAVIS"] == "true"
-    system "composer --no-ansi install --dev"
+    system "composer -n --no-ansi install --dev"
   else
     Rake::Task["install_composer"].invoke
-    system "php -d \"apc.enable_cli=0\" composer.phar install --dev"
+    system "php -d \"apc.enable_cli=0\" composer.phar -n install --dev"
   end
 end
 
 desc "Update dependencies"
 task :updatedep do
   Rake::Task["install_composer"].invoke
-  system "php -d \"apc.enable_cli=0\" composer.phar update --dev"
+  system "php -d \"apc.enable_cli=0\" composer.phar -n update --dev"
 end
 
 desc "Install/update composer itself"
