@@ -44,4 +44,23 @@ class BorderTest extends TransformationTests {
 
         return $image;
     }
+
+    /**
+     * @covers Imbo\Image\Transformation\Border::__construct
+     * @covers Imbo\Image\Transformation\Border::applyToImage
+     */
+    public function testTransformationSupportsDifferentModes() {
+        $imagePath = FIXTURES_DIR . '/image.png';
+
+        $size = getimagesize($imagePath);
+
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents($imagePath)));
+        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with($size[0])->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with($size[1])->will($this->returnValue($image));
+
+        $transformation = new Border(array('color' => 'white', 'width' => 3, 'height' => 4, 'mode' => 'inline'));
+        $transformation->applyToImage($image);
+    }
 }
