@@ -13,7 +13,8 @@ namespace Imbo\Image\Transformation;
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
     ImagickException,
-    ImagickPixelException;
+    ImagickPixelException,
+    ImagickDraw;
 
 /**
  * Border transformation
@@ -44,6 +45,13 @@ class Border extends Transformation implements TransformationInterface {
     private $height = 1;
 
     /**
+     * Border mode, "inline" or "outbound"
+     *
+     * @var string
+     */
+    private $mode = 'outbound';
+
+    /**
      * Class constructor
      *
      * @param array $params Parameters for this transformation
@@ -60,6 +68,10 @@ class Border extends Transformation implements TransformationInterface {
         if (!empty($params['height'])) {
             $this->height = (int) $params['height'];
         }
+
+        if (!empty($params['mode'])) {
+            $this->mode = $params['mode'];
+        }
     }
 
     /**
@@ -69,7 +81,35 @@ class Border extends Transformation implements TransformationInterface {
         try {
             $imagick = $this->getImagick();
             $imagick->readImageBlob($image->getBlob());
-            $imagick->borderImage($this->color, $this->width, $this->height);
+
+            if ($this->mode === 'outbound') {
+                // Paint the border outside of the image, increasing the width/height
+                $imagick->borderImage($this->color, $this->width, $this->height);
+            } else {
+                // Paint the border inside of the image, keeping the orignal width/height
+                $imageWidth = $image->getWidth();
+                $imageHeight = $image->getHeight();
+
+                $rect = new ImagickDraw();
+                $rect->setStrokeColor($this->color);
+                $rect->setFillColor($this->color);
+                $rect->setStrokeAntialias(false);
+
+                // Left
+                $rect->rectangle(0, 0, $this->width - 1, $imageHeight);
+
+                // Right
+                $rect->rectangle($imageWidth - $this->width, 0, $imageWidth, $imageHeight);
+
+                // Top
+                $rect->rectangle(0, 0, $imageWidth, $this->height - 1);
+
+                // Bottom
+                $rect->rectangle(0, $imageHeight - $this->height, $imageWidth, $imageHeight);
+
+                // Draw the border
+                $imagick->drawImage($rect);
+            }
 
             $size = $imagick->getImageGeometry();
 
