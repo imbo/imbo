@@ -153,11 +153,7 @@ METADATA;
      * {@inheritdoc}
      */
     public function formatArrayModel(Model\ArrayModel $model) {
-        $data = '';
-
-        foreach ($model->getData() as $key => $value) {
-            $data .= '<' . $key . '>' . $value . '</' . $key . '>';
-        }
+        $data = $this->formatNested($model->getData());
 
         return <<<DATA
 <?xml version="1.0" encoding="UTF-8"?>
@@ -186,5 +182,29 @@ DATA;
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>{$data}</imbo>
 DATA;
+    }
+
+    /**
+     * Format a nested dataset
+     *
+     * @param array $data A nested array
+     * @return string
+     */
+    private function formatNested(array $data) {
+        $xml = '';
+
+        foreach ($data as $key => $value) {
+            $xml .= '<' . $key . '>';
+
+            if (is_array($value)) {
+                $xml .= $this->formatNested($value);
+            } else {
+                $xml .= $value;
+            }
+
+            $xml .= '</' . $key . '>';
+        }
+
+        return $xml;
     }
 }
