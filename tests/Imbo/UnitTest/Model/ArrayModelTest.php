@@ -45,4 +45,14 @@ class ArrayModelTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->model, $this->model->setData(array('key' => 'value')));
         $this->assertSame(array('key' => 'value'), $this->model->getData());
     }
+
+    /**
+     * @covers Imbo\Model\ArrayModel::setTitle
+     * @covers Imbo\Model\ArrayModel::getTitle
+     */
+    public function testCanSetAndGetTitle() {
+        $this->assertNull($this->model->getTitle());
+        $this->assertSame($this->model, $this->model->setTitle('title'));
+        $this->assertSame('title', $this->model->getTitle());
+    }
 }
