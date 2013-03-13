@@ -43,7 +43,7 @@ class ImboContext extends RESTContext {
         // Drop mongo test collection
         $mongo = new MongoClient();
         $mongo->imbo_testing->drop();
-     }
+    }
 
     /**
      * @Given /^the (storage|database) is down$/
