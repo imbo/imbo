@@ -158,8 +158,10 @@ end
 
 desc "Run functional tests"
 task :behat do
+  profile = ENV["travis"] == "true" ? "travis" : "default"
+
   begin
-    sh %{vendor/bin/behat --strict}
+    sh %{vendor/bin/behat --strict --profile #{profile}}
   rescue Exception
     exit 1
   end

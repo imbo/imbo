@@ -16,8 +16,11 @@ use Behat\Behat\Context\BehatContext,
     Guzzle\Http\Message\Request,
     Guzzle\Http\Message\Response;
 
-// PHPUnit assert functions
+// PHPUnit related classes
 require 'PHPUnit/Framework/Assert/Functions.php';
+require 'PHP/CodeCoverage.php';
+require 'PHP/CodeCoverage/Filter.php';
+require 'PHP/CodeCoverage/Report/HTML.php';
 
 /**
  * REST context for Behat tests
@@ -69,12 +72,26 @@ class RESTContext extends BehatContext {
     private $prevRequestedPath;
 
     /**
+     * The current coverage session id
+     *
+     * @var string
+     */
+    private static $coverageSession;
+
+    /**
      * Class constructor
      *
      * @param array $parameters Context parameters
      */
     public function __construct(array $parameters) {
         $this->client = new Client($parameters['url']);
+
+        if ($parameters['enableCodeCoverage']) {
+            $this->client->setDefaultHeaders(array(
+                'X-Enable-Coverage' => 1,
+                'X-Coverage-Session' => self::$coverageSession,
+            ));
+        }
     }
 
     /**
@@ -103,6 +120,8 @@ class RESTContext extends BehatContext {
         if (!self::canConnectToHttpd($url['host'], $port)) {
             throw new RuntimeException('Could not start the built in httpd');
         }
+
+        self::$coverageSession = uniqid('', true);
     }
 
     /**
@@ -111,6 +130,31 @@ class RESTContext extends BehatContext {
      * @AfterSuite
      */
     public static function tearDown(SuiteEvent $event) {
+        $parameters = $event->getContextParameters();
+
+        if ($parameters['enableCodeCoverage']) {
+            $client = new Client($parameters['url']);
+            $response = $client->get('/', array(
+                'X-Enable-Coverage' => 1,
+                'X-Coverage-Session' => self::$coverageSession,
+                'X-Collect-Coverage' => 1,
+            ))->send();
+
+            $data = unserialize((string) $response->getBody());
+
+            $filter = new PHP_CodeCoverage_Filter();
+
+            foreach ($parameters['whitelist'] as $dir) {
+                $filter->addDirectoryToWhitelist($dir);
+            }
+
+            $coverage = new PHP_CodeCoverage(null, $filter);
+            $coverage->append($data, 'behat-suite');
+
+            $report = new PHP_CodeCoverage_Report_HTML();
+            $report->process($coverage, $parameters['coveragePath']);
+        }
+
         if (self::$pid) {
             exec('kill ' . self::$pid);
             self::$pid = null;

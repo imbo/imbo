@@ -8,6 +8,18 @@ default:
       # Document root and router used by the httpd
       documentRoot: public
       router: tests/router.php
+
+      enableCodeCoverage: true
+      coveragePath: 'build/behat-coverage'
+      whitelist:
+        - library
+        - public
+
   paths:
     features:   'features'
     bootstrap:  '%behat.paths.features%/bootstrap'
+
+travis:
+  context:
+    parameters:
+      enableCodeCoverage: false
