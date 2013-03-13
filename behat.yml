@@ -18,3 +18,8 @@ default:
   paths:
     features:   'features'
     bootstrap:  '%behat.paths.features%/bootstrap'
+
+travis:
+  context:
+    parameters:
+      enableCodeCoverage: false
