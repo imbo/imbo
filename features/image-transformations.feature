@@ -53,6 +53,7 @@ Feature: Imbo enables dynamic transformations of images
             | thumbnail:width=40,height=30        | 40    | 30     |
             | transpose                           | 417   | 599    |
             | transverse                          | 417   | 599    |
+            | graythumb:width=40,height=40        | 40    | 40     |
 
 
     Scenario Outline: Gracefully handle transformation errors
