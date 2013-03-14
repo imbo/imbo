@@ -8,7 +8,7 @@ Feature: Imbo enables dynamic transformations of images
         And I sign the request
         And I attach "tests/Imbo/Fixtures/image1.png" to the request body
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "PUT"
-        And the "Content-Type" response header is "application/json"
+        Then the "Content-Type" response header is "application/json"
         And the response body is:
           """
           {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}
