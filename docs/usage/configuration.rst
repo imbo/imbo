@@ -792,7 +792,7 @@ This event listener will auto rotate new images based on metadata embedded in th
 
 .. _EXIF: http://en.wikipedia.org/wiki/Exchangeable_image_file_format
 
-The listener does not support any parameters and is enabled per default like this:
+The listener does not support any parameters and can be enabled like this:
 
 .. code-block:: php
     :linenos:
@@ -812,7 +812,7 @@ The listener does not support any parameters and is enabled per default like thi
         // ...
     );
 
-If you disable this event listener, images will be stored in the original orientation.
+If you enable this listener all new images added to Imbo will be auto rotated based on the EXIF data.
 
 CORS (Cross-Origin Resource Sharing)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
