@@ -5,7 +5,7 @@ Imbo-0.2.0
 ----------
 __N/A__
 
-* Pull request #162: Imbo now autoloads new images per default (Kristoffer Brabrand)
+* Pull request #162: Imbo now auto-rotates new images by default (Kristoffer Brabrand)
 * Fixed #156: Requests with XSS injections can break access token validation (André Roaldseth)
 * The convert transformation can no longer be triggered via the t query parameter per default
 * Fixed #150: Error model can't be formatted using an image formatter
