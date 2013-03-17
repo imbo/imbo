@@ -156,6 +156,9 @@ $config = array(
         },
         'accessToken' => function() {
             return new EventListener\AccessToken();
+        },
+        'autoRotate' => function() {
+            return new EventListener\AutoRotateImage();
         }
     ),
 
