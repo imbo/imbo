@@ -22,12 +22,6 @@ use Imbo\EventManager\EventInterface,
  */
 class AutoRotateImage implements ListenerInterface {
     /**
-     * Class constructor
-     *
-     */
-    public function __construct() {}
-
-    /**
      * {@inheritdoc}
      */
     public function getDefinition() {

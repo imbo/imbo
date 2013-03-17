@@ -27,31 +27,31 @@ class AutoRotateTest extends \PHPUnit_Framework_TestCase {
             array(
                 'x' => 0,
                 'y' => 0,
-                'color' => 'srgb(128,63,193)'
+                'color' => 'rgb(128,63,193)'
             ),
             array(
                 'x' => 0,
                 'y' => 1000,
-                'color' => 'srgb(254,57,126)'
+                'color' => 'rgb(254,57,126)'
             ),
             array(
                 'x' => 1000,
                 'y' => 0,
-                'color' => 'srgb(127,131,194)'
+                'color' => 'rgb(127,131,194)'
             ),
             array(
                 'x' => 1000,
                 'y' => 1000,
-                'color' => 'srgb(249,124,192)'
+                'color' => 'rgb(249,124,192)'
             ),
         );
 
         /**
          * Load the test images one after the other, perform the auto rotate tranformation
          * and check that the color codes in the four corner pixels match the known color
-         * values as defined in $colorvalues
+         * values as defined in $colorValues
          */
-        for ($i=1; $i<=8; $i++) {
+        for ($i = 1; $i <= 8; $i++) {
             $image = new Image();
             $image->setBlob(file_get_contents(FIXTURES_DIR . '/autoRotate/orientation' . $i . '.jpeg'));
 
@@ -66,7 +66,7 @@ class AutoRotateTest extends \PHPUnit_Framework_TestCase {
             foreach ($colorValues as $pixelInfo) {
                 $pixelValue = $imagick->getImagePixelColor($pixelInfo['x'], $pixelInfo['y'])->getColorAsString();
 
-                $this->assertEquals($pixelValue, $pixelInfo['color']);
+                $this->assertStringEndsWith($pixelInfo['color'], $pixelValue);
             }
         }
     }
