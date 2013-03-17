@@ -26,14 +26,16 @@ class AutoRotateImage implements ListenerInterface {
      */
     public function getDefinition() {
         return array(
-            new ListenerDefinition('image.put', array($this, 'invoke'), 25),
+            new ListenerDefinition('image.put', array($this, 'autoRotate'), 25),
         );
     }
 
     /**
-     * {@inheritdoc}
+     * Autorotate images when new images are added to Imbo
+     *
+     * @param EventInterface $event The triggered event
      */
-    public function invoke(EventInterface $event) {
+    public function autoRotate(EventInterface $event) {
         $image = $event->getRequest()->getImage();
 
         $transformation = new AutoRotate();
