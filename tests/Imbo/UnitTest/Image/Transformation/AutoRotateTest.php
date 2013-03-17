@@ -53,7 +53,7 @@ class AutoRotateTest extends \PHPUnit_Framework_TestCase {
          */
         for ($i=1; $i<=8; $i++) {
             $image = new Image();
-            $image->setBlob(file_get_contents(FIXTURES_DIR . '/autoRotate/test' . $i . '.jpeg'));
+            $image->setBlob(file_get_contents(FIXTURES_DIR . '/autoRotate/orientation' . $i . '.jpeg'));
 
             // Perform the auto rotate transformation on the image
             $transformation = new AutoRotate();
