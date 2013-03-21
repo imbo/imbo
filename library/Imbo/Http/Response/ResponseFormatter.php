@@ -37,7 +37,7 @@ class ResponseFormatter implements ContainerAware, ListenerInterface {
      */
     public function getDefinition() {
         return array(
-            new ListenerDefinition('response.send', array($this, 'send'), 10),
+            new ListenerDefinition('response.send', array($this, 'send'), 20),
         );
     }
 
