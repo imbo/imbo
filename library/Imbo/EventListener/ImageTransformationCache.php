@@ -11,9 +11,9 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Http\Request\RequestInterface,
-    Imbo\Http\HeaderContainer,
+    Imbo\Http\Request\Request,
     Imbo\Model\Image,
+    Symfony\Component\HttpFoundation\ResponseHeaderBag,
     RecursiveDirectoryIterator,
     RecursiveIteratorIterator;
 
@@ -93,7 +93,7 @@ class ImageTransformationCache implements ListenerInterface {
                 isset($data['image']) &&
                 isset($data['headers']) &&
                 ($data['image'] instanceof Image) &&
-                ($data['headers'] instanceof HeaderContainer)
+                ($data['headers'] instanceof ResponseHeaderBag)
             ) {
                 // Mark as cache hit
                 $data['headers']->set('X-Imbo-TransformationCache', 'Hit');
@@ -112,6 +112,7 @@ class ImageTransformationCache implements ListenerInterface {
             }
         }
 
+        // Mark as cache miss
         $response->headers->set('X-Imbo-TransformationCache', 'Miss');
     }
 
@@ -136,7 +137,7 @@ class ImageTransformationCache implements ListenerInterface {
         // Prepare data for the data
         $data = serialize(array(
             'image' => $model,
-            'headers' => $response->getHeaders(),
+            'headers' => $response->headers,
         ));
 
         // Create directory if it does not already exist. The last is_dir is there because race
@@ -192,10 +193,10 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Get the absolute path to response in the cache
      *
-     * @param RequestInterface $request The current request instance
+     * @param Request $request The current request instance
      * @return string Returns the absolute path to the cache file
      */
-    private function getCacheFilePath(RequestInterface $request) {
+    private function getCacheFilePath(Request $request) {
         $hash = $this->getCacheKey($request);
         $dir = $this->getCacheDir($request->getPublicKey(), $request->getImageIdentifier());
 
@@ -212,13 +213,13 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Generate a cache key
      *
-     * @param RequestInterface $request The current request instance
+     * @param Request $request The current request instance
      * @return string Returns a string that can be used as a cache key for the current image
      */
-    private function getCacheKey(RequestInterface $request) {
+    private function getCacheKey(Request $request) {
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
-        $accept = $request->getHeaders()->get('Accept', '*/*');
+        $accept = $request->headers->get('Accept', '*/*');
 
         $accept = array_filter(explode(',', $accept), function(&$value) {
             // Trim whitespace
@@ -241,7 +242,7 @@ class ImageTransformationCache implements ListenerInterface {
         $accept = implode(',', $accept);
 
         $extension = $request->getExtension();
-        $transformations = $request->getQuery()->get('t');
+        $transformations = $request->query->get('t');
 
         if (!empty($transformations)) {
             $transformations = implode('&', $transformations);

@@ -49,7 +49,7 @@ class ImageTransformationCacheTest extends ListenerTests {
             $this->markTestSkipped('This testcase requires vfsStream to run');
         }
 
-        $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $this->requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
 
@@ -97,7 +97,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     public function testChangesTheImageInstanceOnCacheHit() {
         $imageFromCache = $this->getMock('Imbo\Model\Image');
-        $headersFromCache = $this->getMock('Imbo\Http\HeaderContainer');
+        $headersFromCache = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $cachedData = serialize(array(
             'image' => $imageFromCache,
             'headers' => $headersFromCache,
@@ -116,7 +116,6 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(array('thumbnail')));
 
         $this->response->expects($this->once())->method('setModel')->with($imageFromCache)->will($this->returnSelf());
-        $this->response->expects($this->once())->method('setHeaders')->with($headersFromCache)->will($this->returnSelf());;
         $this->event->expects($this->once())->method('stopPropagation')->with(true);
 
         $dir = 'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/6/7/7';
@@ -127,6 +126,8 @@ class ImageTransformationCacheTest extends ListenerTests {
         file_put_contents($fullPath, $cachedData);
 
         $this->listener->loadFromCache($this->event);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ResponseHeaderBag', $this->response->headers);
     }
 
     /**
