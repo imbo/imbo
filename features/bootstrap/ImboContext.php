@@ -158,4 +158,16 @@ class ImboContext extends RESTContext {
             assertSame($expected, $actual, 'Expected "' . $expected . '", got "' . $actual . '"');
         }
     }
+
+    /**
+     * @Given /^"([^"]*)" exists in Imbo with identifier "([^"]*)"$/
+     */
+    public function addImageToImbo($imagePath, $imageIdentifier) {
+        return array(
+            new Given('I use "publickey" and "privatekey" for public and private keys'),
+            new Given('I sign the request'),
+            new Given('I attach "tests/Imbo/Fixtures/image1.png" to the request body'),
+            new Given('I request "/users/publickey/images/' . $imageIdentifier . '" using HTTP "PUT"'),
+        );
+    }
 }
