@@ -40,10 +40,38 @@ class ImboContext extends RESTContext {
     /**
      * @BeforeFeature
      */
-    public static function cleanDatabase(FeatureEvent $event) {
+    public static function prepare(FeatureEvent $event) {
         // Drop mongo test collection
         $mongo = new MongoClient();
         $mongo->imbo_testing->drop();
+
+        $cachePath = '/tmp/imbo-behat-image-transformation-cache';
+
+        if (is_dir($cachePath)) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($cachePath),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
+
+            foreach ($iterator as $file) {
+                $name = $file->getPathname();
+
+                if (substr($name, -1) === '.') {
+                    continue;
+                }
+
+                if ($file->isDir()) {
+                    // Remove dir
+                    rmdir($name);
+                } else {
+                    // Remove file
+                    unlink($name);
+                }
+            }
+
+            // Remove the directory itself
+            rmdir($cachePath);
+        }
     }
 
     /**

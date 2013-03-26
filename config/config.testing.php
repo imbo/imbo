@@ -55,7 +55,10 @@ return array(
         },
         'accessToken' => function() {
             return new EventListener\AccessToken();
-        }
+        },
+        'imageTransformationCache' => function() {
+            return new EventListener\ImageTransformationCache('/tmp/imbo-behat-image-transformation-cache');
+        },
     ),
 
     'imageTransformations' => array(
