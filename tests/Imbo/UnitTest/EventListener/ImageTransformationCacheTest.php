@@ -241,14 +241,22 @@ class ImageTransformationCacheTest extends ListenerTests {
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
-     * @expectedExceptionMessage Cache path is not writable by the webserver
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Image transformation cache path is not writable by the webserver: vfs://cacheDir/dir
+     * @expectedExceptionCode 500
      * @covers Imbo\EventListener\ImageTransformationCache::__construct
      */
-    public function testTriggersWarningIfCacheDirIsNotWritable() {
+    public function testThrowsExceptionWhenCacheDirIsNotWritable() {
         $dir = new vfsStreamDirectory('dir', 0);
         $this->cacheDir->addChild($dir);
 
         $listener = new ImageTransformationCache('vfs://cacheDir/dir');
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageTransformationCache::__construct
+     */
+    public function testDoesNotTriggerWarningIfCachePathDoesNotExistAndParentIsWritable() {
+        $listener = new ImageTransformationCache('vfs://cacheDir/some/dir/that/does/not/exist');
     }
 }

@@ -13,6 +13,7 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface,
     Imbo\Http\Request\Request,
     Imbo\Model\Image,
+    Imbo\Exception\InvalidArgumentException,
     Symfony\Component\HttpFoundation\ResponseHeaderBag,
     RecursiveDirectoryIterator,
     RecursiveIteratorIterator;
@@ -46,14 +47,18 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Class constructor
      *
-     * @param string $path Path to store the temp. images
+     * @param string $path Path to store the cached images
+     * @throws InvalidArgumentException Throws an exception if the specified path is not writable
      */
     public function __construct($path) {
-        $this->path = rtrim($path, '/');
-
-        if (!is_writable($this->path)) {
-            trigger_error('Cache path is not writable by the webserver: ' . $this->path, E_USER_WARNING);
+        if (!$this->isWritable($path)) {
+            throw new InvalidArgumentException(
+                'Image transformation cache path is not writable by the webserver: ' . $path,
+                500
+            );
         }
+
+        $this->path = $path;
     }
 
     /**
@@ -280,5 +285,21 @@ class ImageTransformationCache implements ListenerInterface {
 
         // Remove the directory itself
         rmdir($dir);
+    }
+
+    /**
+     * Check whether or not a directory (or its parent) is writable
+     *
+     * @param string $path The path to check
+     * @return boolean
+     */
+    private function isWritable($path) {
+        if (!is_dir($path)) {
+            // Path does not exist, check parent
+            return $this->isWritable(dirname($path));
+        }
+
+        // Dir exists, check if it's writable
+        return is_writable($path);
     }
 }
