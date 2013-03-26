@@ -182,6 +182,7 @@ class RESTContext extends BehatContext {
 
         if ($this->requestBody) {
             $request->setBody($this->requestBody);
+            $this->requestBody = null;
         }
 
         try {
