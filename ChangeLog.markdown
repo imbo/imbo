@@ -5,6 +5,7 @@ Imbo-0.2.0
 ----------
 __N/A__
 
+* Bumped the requirement of pecl/mongo to 1.3.0 because Imbo now uses the MongoClient class instead of the Mongo class
 * The image transforation cache now also caches image formatting, and not only transformations triggered by query parameters
 * Pull request #162: Imbo can auto-rotate new images by enabling the AutoRotateImage event listener (Kristoffer Brabrand)
 * Fixed #156: Requests with XSS injections can break access token validation (André Roaldseth)
