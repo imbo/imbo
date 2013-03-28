@@ -132,15 +132,13 @@ task :phpunit do
 
     ini_file = Hash[`php --ini`.split("\n").map {|l| l.split(/:\s+/)}]["Loaded Configuration File"]
 
-    {"imagick" => "3.1.0RC2", "mongo" => "1.3.1", "memcached" => "2.0.1", "APC" => "3.1.12"}.each { |package, version|
+    {"imagick" => "3.1.0RC2"}.each { |package, version|
       filename = "#{package}-#{version}.tgz"
       system "wget http://pecl.php.net/get/#{filename}"
       system "tar -xzf #{filename}"
       system "sh -c \"cd #{filename[0..-5]} && phpize && ./configure && make && sudo make install\""
       system "sudo sh -c \"echo 'extension=#{package.downcase}.so' >> #{ini_file}\""
     }
-
-    system "sudo sh -c \"echo 'apc.enable_cli=on' >> #{ini_file}\""
 
     begin
       sh %{vendor/bin/phpunit --verbose -c phpunit.xml.travis}
