@@ -13,6 +13,7 @@ namespace Imbo\Storage;
 use Imbo\Model\Image,
     Imbo\Exception\StorageException,
     Mongo,
+    MongoClient,
     MongoGridFS,
     MongoException,
     DateTime,
@@ -28,7 +29,7 @@ use Imbo\Model\Image,
  * - <pre>(string) databaseName</pre> Name of the database. Defaults to 'imbo_storage'
  * - <pre>(string) server</pre> The server string to use when connecting to MongoDB. Defaults to
  *                              'mongodb://localhost:27017'
- * - <pre>(array) options</pre> Options to use when creating the Mongo instance. Defaults to
+ * - <pre>(array) options</pre> Options to use when creating the Mongo client instance. Defaults to
  *                              array('connect' => true, 'timeout' => 1000).
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -36,11 +37,11 @@ use Imbo\Model\Image,
  */
 class GridFS implements StorageInterface {
     /**
-     * Mongo instance
+     * Mongo client instance
      *
-     * @var Mongo
+     * @var MongoClient
      */
-    private $mongo;
+    private $mongoClient;
 
     /**
      * The grid instance
@@ -67,16 +68,16 @@ class GridFS implements StorageInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param Mongo $mongo Mongo instance
+     * @param MongoClient $client Mongo client instance
      * @param MongoGridFS $grid MongoGridFS instance
      */
-    public function __construct(array $params = null, Mongo $mongo = null, MongoGridFS $grid = null) {
+    public function __construct(array $params = null, MongoClient $client = null, MongoGridFS $grid = null) {
         if ($params !== null) {
             $this->params = array_replace_recursive($this->params, $params);
         }
 
-        if ($mongo !== null) {
-            $this->mongo = $mongo;
+        if ($client !== null) {
+            $this->mongoClient = $client;
         }
 
         if ($grid !== null) {
@@ -118,7 +119,9 @@ class GridFS implements StorageInterface {
             throw new StorageException('File not found', 404);
         }
 
-        return $this->getGrid()->delete($file->file['_id']);
+        $this->getGrid()->delete($file->file['_id']);
+
+        return true;
     }
 
     /**
@@ -150,7 +153,7 @@ class GridFS implements StorageInterface {
      */
     public function getStatus() {
         try {
-            return $this->getMongo()->connect();
+            return $this->getMongoClient()->connect();
         } catch (StorageException $e) {
             return false;
         }
@@ -176,7 +179,7 @@ class GridFS implements StorageInterface {
     protected function getGrid() {
         if ($this->grid === null) {
             try {
-                $database = $this->getMongo()->selectDB($this->params['databaseName']);
+                $database = $this->getMongoClient()->selectDB($this->params['databaseName']);
                 $this->grid = $database->getGridFS();
             } catch (MongoException $e) {
                 throw new StorageException('Could not connect to database', 500, $e);
@@ -187,20 +190,20 @@ class GridFS implements StorageInterface {
     }
 
     /**
-     * Get the mongo instance
+     * Get the mongo client instance
      *
-     * @return Mongo
+     * @return MongoClient
      */
-    protected function getMongo() {
-        if ($this->mongo === null) {
+    protected function getMongoClient() {
+        if ($this->mongoClient === null) {
             try {
-                $this->mongo = new Mongo($this->params['server'], $this->params['options']);
+                $this->mongoClient = new MongoClient($this->params['server'], $this->params['options']);
             } catch (MongoException $e) {
                 throw new StorageException('Could not connect to database', 500, $e);
             }
         }
 
-        return $this->mongo;
+        return $this->mongoClient;
     }
 
     /**

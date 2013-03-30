@@ -12,17 +12,12 @@
       "homepage": "http://cogo.wordpress.com"
     }
   ],
-  "require": {
-    "php": ">=5.3.2"
-  },
   "support": {
     "issues": "https://github.com/imbo/imbo/issues",
     "irc": "irc://irc.freenode.net/imbo"
   },
-  "autoload": {
-    "psr-0": {
-      "Imbo": "library"
-    }
+  "require": {
+    "php": ">=5.3.2"
   },
   "require-dev": {
     "mikey179/vfsStream": "1.1.*",
@@ -30,5 +25,14 @@
     "phpunit/phpunit": "3.7.*",
     "behat/behat": "2.4.*",
     "guzzle/guzzle": "3.0.*"
+  },
+  "suggests": {
+    "ext-mongo": ">=1.3.0",
+    "ext-memcached": ">=2.0.0"
+  },
+  "autoload": {
+    "psr-0": {
+      "Imbo": "library"
+    }
   }
 }
