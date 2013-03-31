@@ -12,7 +12,7 @@ namespace Imbo\UnitTest\Storage;
 
 use Imbo\Storage\GridFS,
     DateTime,
-    Mongo,
+    MongoClient,
     MongoGridFS,
     MongoGridFSFile;
 
@@ -32,9 +32,9 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     private $grid;
 
     /**
-     * @var Mongo
+     * @var MongoClient
      */
-    private $mongo;
+    private $mongoClient;
 
     /**
      * Public key that can be used in tests
@@ -54,13 +54,13 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      * Set up the driver
      */
     public function setUp() {
-        if (!extension_loaded('mongo')) {
-            $this->markTestSkipped('pecl/mongo is required to run this test');
+        if (!extension_loaded('mongo') || !class_exists('MongoClient')) {
+            $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
         }
 
         $this->grid = $this->getMockBuilder('MongoGridFS')->disableOriginalConstructor()->getMock();
-        $this->mongo = $this->getMockBuilder('Mongo')->disableOriginalConstructor()->getMock();
-        $this->driver = new GridFS(array(), $this->mongo, $this->grid);
+        $this->mongoClient = $this->getMockBuilder('MongoClient')->disableOriginalConstructor()->getMock();
+        $this->driver = new GridFS(array(), $this->mongoClient, $this->grid);
     }
 
     /**
@@ -68,7 +68,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->grid = null;
-        $this->mongo = null;
+        $this->mongoClient = null;
         $this->driver = null;
     }
 
@@ -197,7 +197,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Storage\GridFS::getStatus
      */
     public function testGetStatusWhenMongoIsNotConnectable() {
-        $this->mongo->expects($this->once())->method('connect')->will($this->returnValue(false));
+        $this->mongoClient->expects($this->once())->method('connect')->will($this->returnValue(false));
         $this->assertFalse($this->driver->getStatus());
     }
 
@@ -205,7 +205,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Storage\GridFS::getStatus
      */
     public function testGetStatusWhenMongoIsConnectable() {
-        $this->mongo->expects($this->once())->method('connect')->will($this->returnValue(true));
+        $this->mongoClient->expects($this->once())->method('connect')->will($this->returnValue(true));
         $this->assertTrue($this->driver->getStatus());
     }
 }

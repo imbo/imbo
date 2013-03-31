@@ -13,7 +13,7 @@ namespace Imbo\Database;
 use Imbo\Model\Image,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
-    Mongo,
+    MongoClient,
     MongoCollection,
     MongoException,
     DateTime,
@@ -30,7 +30,7 @@ use Imbo\Model\Image,
  * - (string) collectionName Name of the collection to store data in. Defaults to 'images'
  * - (string) server The server string to use when connecting to MongoDB. Defaults to
  *                              'mongodb://localhost:27017'
- * - (array) options Options to use when creating the Mongo instance. Defaults to
+ * - (array) options Options to use when creating the MongoClient instance. Defaults to
  *                              array('connect' => true, 'timeout' => 1000).
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -38,16 +38,16 @@ use Imbo\Model\Image,
  */
 class MongoDB implements DatabaseInterface {
     /**
-     * Mongo instance
+     * Mongo client instance
      *
-     * @var \Mongo
+     * @var MongoClient
      */
-    private $mongo;
+    private $mongoClient;
 
     /**
      * The collection instance used by the driver
      *
-     * @var \MongoCollection
+     * @var MongoCollection
      */
     private $collection;
 
@@ -70,16 +70,16 @@ class MongoDB implements DatabaseInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param \Mongo $mongo Mongo instance
-     * @param \MongoCollection $collection MongoCollection instance
+     * @param MongoClient $client MongoClient instance
+     * @param MongoCollection $collection MongoCollection instance
      */
-    public function __construct(array $params = null, Mongo $mongo = null, MongoCollection $collection = null) {
+    public function __construct(array $params = null, MongoClient $client = null, MongoCollection $collection = null) {
         if ($params !== null) {
             $this->params = array_replace_recursive($this->params, $params);
         }
 
-        if ($mongo !== null) {
-            $this->mongo = $mongo;
+        if ($client !== null) {
+            $this->mongoClient = $client;
         }
 
         if ($collection !== null) {
@@ -98,7 +98,7 @@ class MongoDB implements DatabaseInterface {
                 $this->getCollection()->update(
                     array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                     array('$set' => array('updated' => $now)),
-                    array('safe' => true, 'multiple' => false)
+                    array('multiple' => false)
                 );
 
                 return true;
@@ -122,7 +122,7 @@ class MongoDB implements DatabaseInterface {
         );
 
         try {
-            $this->getCollection()->insert($data, array('safe' => true));
+            $this->getCollection()->insert($data);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to save image data', 500, $e);
         }
@@ -146,7 +146,7 @@ class MongoDB implements DatabaseInterface {
 
             $this->getCollection()->remove(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('justOne' => true, 'safe' => true)
+                array('justOne' => true)
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to delete image data', 500, $e);
@@ -167,7 +167,7 @@ class MongoDB implements DatabaseInterface {
             $this->getCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('$set' => array('updated' => time(), 'metadata' => $updatedMetadata)),
-                array('safe' => true, 'multiple' => false)
+                array('multiple' => false)
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to update meta data', 500, $e);
@@ -213,7 +213,7 @@ class MongoDB implements DatabaseInterface {
             $this->getCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('$set' => array('metadata' => array())),
-                array('safe' => true, 'multiple' => false)
+                array('multiple' => false)
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to delete meta data', 500, $e);
@@ -374,7 +374,7 @@ class MongoDB implements DatabaseInterface {
      */
     public function getStatus() {
         try {
-            return $this->getMongo()->connect();
+            return $this->getMongoClient()->connect();
         } catch (DatabaseException $e) {
             return false;
         }
@@ -415,12 +415,12 @@ class MongoDB implements DatabaseInterface {
     /**
      * Get the mongo collection instance
      *
-     * @return \MongoCollection
+     * @return MongoCollection
      */
     protected function getCollection() {
         if ($this->collection === null) {
             try {
-                $this->collection = $this->getMongo()->selectCollection(
+                $this->collection = $this->getMongoClient()->selectCollection(
                     $this->params['databaseName'],
                     $this->params['collectionName']
                 );
@@ -433,19 +433,19 @@ class MongoDB implements DatabaseInterface {
     }
 
     /**
-     * Get the mongo instance
+     * Get the mongo client instance
      *
-     * @return \Mongo
+     * @return MongoClient
      */
-    protected function getMongo() {
-        if ($this->mongo === null) {
+    protected function getMongoClient() {
+        if ($this->mongoClient === null) {
             try {
-                $this->mongo = new Mongo($this->params['server'], $this->params['options']);
+                $this->mongoClient = new MongoClient($this->params['server'], $this->params['options']);
             } catch (MongoException $e) {
                 throw new DatabaseException('Could not connect to database', 500, $e);
             }
         }
 
-        return $this->mongo;
+        return $this->mongoClient;
     }
 }
