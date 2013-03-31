@@ -73,7 +73,6 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
         $formatter->expects($this->once())->method('format')->with($this->model)->will($this->returnValue($formattedData));
         $formatter->expects($this->once())->method('getContentType')->will($this->returnValue('image/jpeg'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
-        $this->request->expects($this->never())->method('splitHttpAcceptHeader');
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $this->container->expects($this->once())->method('get')->with('jpegFormatter')->will($this->returnValue($formatter));
         $this->responseHeaders->expects($this->once())->method('add')->with(array(
@@ -94,7 +93,6 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
         $formatter->expects($this->once())->method('format')->with($this->model)->will($this->returnValue($formattedData));
         $formatter->expects($this->once())->method('getContentType')->will($this->returnValue('image/jpeg'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
-        $this->request->expects($this->never())->method('splitHttpAcceptHeader');
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('HEAD'));
         $this->container->expects($this->once())->method('get')->with('jpegFormatter')->will($this->returnValue($formatter));
         $this->responseHeaders->expects($this->once())->method('add')->with(array(
@@ -141,7 +139,6 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
         ));
 
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('json'));
-        $this->request->expects($this->never())->method('splitHttpAcceptHeader');
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $this->request->query = $query;
         $this->container->expects($this->once())->method('get')->with('jsonFormatter')->will($this->returnValue($formatter));
@@ -161,12 +158,7 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\ResponseWriter::write
      */
     public function testThrowsAnExceptionInStrictModeWhenTheUserAgentDoesNotSupportAnyOfImbosMediaTypes() {
-        $acceptableTypes = array(
-            'text/xml' => 1,
-        );
-
-        $this->requestHeaders->expects($this->once())->method('get')->with('Accept');
-        $this->request->expects($this->once())->method('splitHttpAcceptHeader')->will($this->returnValue($acceptableTypes));
+        $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('text/xml'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
 
         $contentNegotiation = $this->getMock('Imbo\Http\ContentNegotiation');
@@ -181,16 +173,11 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\ResponseWriter::write
      */
     public function testUsesDefaultMediaTypeInNonStrictModeWhenTheUserAgentDoesNotSupportAnyMediaTypes() {
-        $acceptableTypes = array(
-            'text/xml' => 1,
-        );
-
         $json = '"data"';
 
         $query = new ParameterBag(array());
 
-        $this->requestHeaders->expects($this->once())->method('get')->with('Accept');
-        $this->request->expects($this->once())->method('splitHttpAcceptHeader')->will($this->returnValue($acceptableTypes));
+        $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('text/xml'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $this->request->query = $query;
@@ -222,14 +209,9 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
     public function testPicksThePrioritizedMediaTypeIfMoreThanOneWithSameQualityAreSupportedByTheUserAgent() {
         $this->model = new Image();
 
-        $acceptableTypes = array(
-            'image/*' => 1,
-        );
-
         $imageData = 'binary image data';
 
-        $this->requestHeaders->expects($this->once())->method('get')->with('Accept');
-        $this->request->expects($this->once())->method('splitHttpAcceptHeader')->will($this->returnValue($acceptableTypes));
+        $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('image/*'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
 
@@ -262,9 +244,7 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
         $error = '{"some":"error"}';
         $query = new ParameterBag();
 
-        $this->request->expects($this->once())->method('splitHttpAcceptHeader')->will($this->returnValue(array(
-            '*/*' => 1,
-        )));
+        $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('*/*'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
         $this->request->query = $query;
 
@@ -291,13 +271,10 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
         $error = '{"some":"error"}';
 
         // Mimic a missing $_SERVER['HTTP_ACCEPT'] value
-        $this->requestHeaders->expects($this->once())->method('get')->with('Accept')->will($this->returnValue(null));
+        $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('*/*'));
 
         // Make sure the missing value falls back to */*
-        $this->request->expects($this->once())->method('splitHttpAcceptHeader')->with('*/*')->will($this->returnValue(array('*/*' => 1)));
-        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
         $this->request->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
-
 
         $formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
         $formatter->expects($this->once())->method('format')->with($model)->will($this->returnValue($error));

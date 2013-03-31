@@ -16,7 +16,8 @@ use Imbo\Http\Request\Request,
     Imbo\Exception\RuntimeException,
     Imbo\Container,
     Imbo\ContainerAware,
-    Imbo\Model;
+    Imbo\Model,
+    Symfony\Component\HttpFoundation\AcceptHeader;
 
 /**
  * Response writer
@@ -137,8 +138,11 @@ class ResponseWriter implements ContainerAware {
             // No extension have been provided
             $contentNegotiation = $this->container->get('contentNegotiation');
 
-            $accept = $request->headers->get('Accept') ?: '*/*';
-            $acceptableTypes = $request->splitHttpAcceptHeader($accept);
+            $acceptableTypes = array();
+
+            foreach (AcceptHeader::fromString($request->headers->get('Accept', '*/*'))->all() as $item) {
+                $acceptableTypes[$item->getValue()] = $item->getQuality();
+            }
 
             // Try to find the best match since the client does not accept the original mime
             // type
