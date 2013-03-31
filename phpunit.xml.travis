@@ -16,9 +16,5 @@
     <!-- Memcached cache driver integration tests -->
     <var name="MEMCACHED_HOST" value="127.0.0.1" />
     <var name="MEMCACHED_PORT" value="11211" />
-
-    <!-- Include paths -->
-    <includePath>./tests</includePath>
-    <includePath>./library</includePath>
   </php>
 </phpunit>
