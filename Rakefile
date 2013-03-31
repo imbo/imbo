@@ -181,20 +181,6 @@ task :github, :version do |t, args|
   end
 end
 
-desc "Publish API docs"
-task :publish_api_docs do
-    system "git checkout master"
-    Rake::Task["apidocs"].invoke
-    wd = Dir.getwd
-    Dir.chdir("/home/christer/dev/imbo-ghpages")
-    system "git pull origin gh-pages"
-    system "cp -r #{wd}/build/docs/* ."
-    system "git add --all"
-    system "git commit -a -m 'Updated API docs [ci skip]'"
-    system "git push origin gh-pages"
-    Dir.chdir(wd)
-end
-
 desc "Release a new version"
 task :release, :version do |t, args|
   version = args[:version]
@@ -211,9 +197,6 @@ task :release, :version do |t, args|
 
     # Tag the current state of master and push to GitHub
     Rake::Task["github"].invoke(version)
-
-    # Update the API docs and push to gh-pages
-    Rake::Task["publish_api_docs"].invoke
   else
     puts "'#{version}' is not a valid version"
     exit 1
