@@ -13,6 +13,7 @@ namespace Imbo\Http\Response;
 use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
     Imbo\EventListener\ListenerInterface,
+    Imbo\Model\Error,
     Imbo\Container,
     Imbo\ContainerAware,
     Imbo\Exception;
@@ -68,10 +69,11 @@ class ResponseFormatter implements ContainerAware, ListenerInterface {
         try {
             $responseWriter->write($model, $request, $response);
         } catch (Exception $exception) {
-            $response->createError($exception, $request);
+            $error = Error::createFromException($exception, $request);
+            $response->setError($error);
 
             // Write the error in non-strict mode
-            $responseWriter->write($response->getModel(), $request, $response, false);
+            $responseWriter->write($error, $request, $response, false);
         }
     }
 }

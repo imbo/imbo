@@ -10,8 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\EventManager\EventInterface,
+use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
     Imbo\EventListener\ListenerInterface;
 
@@ -36,10 +35,7 @@ class Images implements ResourceInterface, ListenerInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array(
-            RequestInterface::METHOD_GET,
-            RequestInterface::METHOD_HEAD,
-        );
+        return array('GET', 'HEAD');
     }
 
     /**
@@ -61,9 +57,6 @@ class Images implements ResourceInterface, ListenerInterface {
         $event->getManager()->trigger('db.images.load');
 
         $response = $event->getResponse();
-
-        // Generate ETag based on the last modification date and add to the response headers
-        $etag = '"' . md5($response->getLastModified()) . '"';
-        $response->getHeaders()->set('ETag', $etag);
+        $response->setEtag('"' . md5($response->getLastModified()->format('D, d M Y H:i:s') . ' GMT') . '"');
     }
 }

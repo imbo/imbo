@@ -147,7 +147,7 @@ task :phpunit do
     end
   else
     begin
-      sh %{vendor/bin/phpunit --verbose}
+      sh %{vendor/bin/phpunit --verbose --coverage-html build/coverage --coverage-clover build/logs/clover.xml --log-junit build/logs/junit.xml}
     rescue Exception
       exit 1
     end

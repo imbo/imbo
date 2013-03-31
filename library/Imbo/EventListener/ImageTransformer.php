@@ -12,8 +12,6 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Exception\TransformationException,
-    Imbo\Container,
-    Imbo\ContainerAware,
     Imbo\Image\Transformation\TransformationInterface,
     Imbo\Model\Image;
 
@@ -23,27 +21,13 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
-class ImageTransformer implements ContainerAware, ListenerInterface {
-    /**
-     * Service container
-     *
-     * @var Container
-     */
-    private $container;
-
+class ImageTransformer implements ListenerInterface {
     /**
      * An array of registered transformation handlers
      *
      * @var array
      */
     private $transformationHandlers = array();
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-    }
 
     /**
      * {@inheritdoc}

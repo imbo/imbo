@@ -10,11 +10,9 @@
 
 namespace Imbo\Http\Request;
 
-use Imbo\Http\ParameterContainer,
-    Imbo\Http\ServerContainer,
-    Imbo\Http\HeaderContainer,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Model\Image;
+use Imbo\Exception\InvalidArgumentException,
+    Imbo\Model\Image,
+    Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 /**
  * Request class
@@ -22,42 +20,7 @@ use Imbo\Http\ParameterContainer,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Http
  */
-class Request implements RequestInterface {
-    /**
-     * The current accessed path
-     *
-     * @var string
-     */
-    private $path;
-
-    /**
-     * Query data
-     *
-     * @var ParameterContainer
-     */
-    private $query;
-
-    /**
-     * Request data
-     *
-     * @var ParameterContainer
-     */
-    private $request;
-
-    /**
-     * Server data
-     *
-     * @var ServerContainer
-     */
-    private $server;
-
-    /**
-     * HTTP headers
-     *
-     * @var HeaderContainer
-     */
-    private $headers;
-
+class Request extends SymfonyRequest {
     /**
      * The public key from the request
      *
@@ -87,13 +50,6 @@ class Request implements RequestInterface {
     private $imageIdentifier;
 
     /**
-     * Raw image data
-     *
-     * @var string
-     */
-    private $rawData;
-
-    /**
      * The current extension (if any)
      *
      * @var string
@@ -101,7 +57,7 @@ class Request implements RequestInterface {
     private $extension;
 
     /**
-     * The currently requested resorce name (as defined by the constants in
+     * The currently requested resource name (as defined by the constants in
      * Imbo\Resource\ResourceInterface).
      *
      * @var string
@@ -116,28 +72,10 @@ class Request implements RequestInterface {
     private $transformations;
 
     /**
-     * Class constructor
+     * Set an image model
      *
-     * @param array $query Query data ($_GET)
-     * @param array $request Request data ($_POST)
-     * @param array $server Server data ($_SERVER)
-     */
-    public function __construct(array $query = array(), array $request = array(), array $server = array()) {
-        $this->query   = new ParameterContainer($query);
-        $this->request = new ParameterContainer($request);
-        $this->server  = new ServerContainer($server);
-        $this->headers = new HeaderContainer($this->server->getHeaders());
-
-        $this->baseUrl = str_replace(rtrim($this->server->get('DOCUMENT_ROOT'), '/'), '', dirname($this->server->get('SCRIPT_FILENAME')));
-        $this->path = str_replace($this->baseUrl, '', $this->server->get('REQUEST_URI'));
-
-        if (strpos($this->path, '?') !== false) {
-            $this->path = substr($this->path, 0, strpos($this->path, '?'));
-        }
-    }
-
-    /**
-     * {@inheritdoc}
+     * @param Image $image An image model instance
+     * @return Request
      */
     public function setImage(Image $image) {
         $this->image = $image;
@@ -146,21 +84,28 @@ class Request implements RequestInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Get an image model attached to the request (on PUT)
+     *
+     * @return null|Image
      */
     public function getImage() {
         return $this->image;
     }
 
     /**
-     * {@inheritdoc}
+     * Get the public key found in the request
+     *
+     * @return string
      */
     public function getPublicKey() {
         return $this->publicKey;
     }
 
     /**
-     * {@inheritdoc}
+     * Set the public key
+     *
+     * @param string $key The key to set
+     * @return Request
      */
     public function setPublicKey($key) {
         $this->publicKey = $key;
@@ -169,14 +114,22 @@ class Request implements RequestInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Get the private key
+     *
+     * The private key property is populated by the server based on the public key from the
+     * request. The client itself does not place the private key in the request.
+     *
+     * @return string
      */
     public function getPrivateKey() {
         return $this->privateKey;
     }
 
     /**
-     * {@inheritdoc}
+     * Set the private key
+     *
+     * @param string $key The key to set
+     * @return Request
      */
     public function setPrivateKey($key) {
         $this->privateKey = $key;
@@ -185,7 +138,9 @@ class Request implements RequestInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Get image transformations from the request
+     *
+     * @return array
      */
     public function getTransformations() {
         if ($this->transformations === null) {
@@ -234,94 +189,28 @@ class Request implements RequestInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Check whether or not the request includes image transformations
+     *
+     * @return boolean
      */
     public function hasTransformations() {
-        return $this->getExtension() || $this->getQuery()->has('t');
+        return $this->getExtension() || $this->query->has('t');
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getScheme() {
-        $https = strtolower($this->server->get('HTTPS'));
-
-        return ($https === 'on' || $https == 1) ? 'https' : 'http';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getHost() {
-        $host = $this->server->get('HTTP_HOST');
-
-        // Remove optional port
-        if (($pos = strpos($host, ':')) !== false) {
-            $host = substr($host, 0, $pos);
-        }
-
-        return $host;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPort() {
-        return $this->server->get('SERVER_PORT');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBaseUrl() {
-        return $this->baseUrl;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPath() {
-        return $this->path;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUrl() {
-        $port = (int) $this->getPort();
-        $scheme = $this->getScheme();
-
-        if (
-            !$port ||
-            ($scheme === 'http' && $port === 80) ||
-            ($scheme === 'https' && $port === 443)
-        ) {
-            $port = '';
-        } else if ($port) {
-            $port = ':' . $port;
-        }
-
-        // Fetch query string
-        $queryString = $this->getQuery()->asString();
-
-        if (!empty($queryString)) {
-            $queryString = '?' . $queryString;
-        }
-
-        $url = sprintf('%s://%s%s%s%s%s', $scheme, $this->getHost(), $port, $this->getBaseUrl(), $this->getPath(), $queryString);
-
-        return $url;
-    }
-
-    /**
-     * {@inheritdoc}
+     * Get the image identifier from the URL
+     *
+     * @return string|null
      */
     public function getImageIdentifier() {
         return $this->imageIdentifier;
     }
 
     /**
-     * {@inheritdoc}
+     * Set the image identifier
+     *
+     * @param string $imageIdentifier The image identifier to set
+     * @return Request
      */
     public function setImageIdentifier($imageIdentifier) {
         $this->imageIdentifier = $imageIdentifier;
@@ -330,14 +219,19 @@ class Request implements RequestInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Get the current requested extension (if any)
+     *
+     * @return string|null
      */
     public function getExtension() {
         return $this->extension;
     }
 
     /**
-     * {@inheritdoc}
+     * Set the extension requested
+     *
+     * @param string $extension The extension to set
+     * @return Request
      */
     public function setExtension($extension) {
         $this->extension = $extension;
@@ -346,134 +240,10 @@ class Request implements RequestInterface {
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getMethod() {
-        return $this->server->get('REQUEST_METHOD');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRawData() {
-        if ($this->rawData === null) {
-            $this->rawData = file_get_contents('php://input');
-        }
-
-        return $this->rawData;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setRawData($data) {
-        $this->rawData = $data;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getQuery() {
-        return $this->query;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRequest() {
-        return $this->request;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getServer() {
-        return $this->server;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getHeaders() {
-        return $this->headers;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isUnsafe() {
-        $method = $this->getMethod();
-
-        return $method === RequestInterface::METHOD_POST ||
-               $method === RequestInterface::METHOD_PUT ||
-               $method === RequestInterface::METHOD_DELETE;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function splitAcceptHeader($header) {
-        if (!$header) {
-            return array();
-        }
-
-        $values = array();
-
-        // Explode on , to get all media types
-        $mediaTypes = array_map('trim', explode(',', $header));
-
-        // Remove possible empty values due to poorly formatted headers
-        $mediaTypes = array_filter($mediaTypes);
-
-        foreach ($mediaTypes as $type) {
-            $quality = 1;
-
-            if (preg_match('/;\s*q=(\d\.?\d?)/', $type, $match)) {
-                $quality = (float) $match[1];
-
-                // Remove the matched string from the type
-                $type = substr($type, 0, -strlen($match[0]));
-            }
-
-            if ($quality) {
-                $values[$type] = $quality;
-            }
-        }
-
-        // Increase all quality values to be able to get a correct sort
-        $f = .00001;
-        $i = 0;
-
-        $values = array_reverse($values);
-        $factor = array();
-
-        foreach ($values as $type => $q) {
-            $values[$type] += ($f * ++$i);
-            $factor[$type] = $i;
-        }
-
-        // Sort the values and maintain key association
-        arsort($values);
-
-        // Decrease the values back to the original values
-        foreach ($values as $type => $q) {
-            $values[$type] -= $f * $factor[$type];
-        }
-
-        return $values;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAcceptableContentTypes() {
-        return $this->splitAcceptHeader($this->headers->get('Accept'));
-    }
-
-    /**
-     * {@inheritdoc}
+     * Set the resource name (one of the constants defined in Imbo\Resource\ResourceInterface)
+     *
+     * @param string $resource The name of the resource
+     * @return Request
      */
     public function setResource($resource) {
         $this->resource = $resource;
@@ -482,9 +252,26 @@ class Request implements RequestInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Get the resource name
+     *
+     * @return string
      */
     public function getResource() {
         return $this->resource;
+    }
+
+    /**
+     * Get the URI without the Symfony normalization applied to the query string
+     *
+     * @return string
+     */
+    public function getRawUri() {
+        $query = $this->server->get('QUERY_STRING');
+
+        if (!empty($query)) {
+            $query = '?' . $query;
+        }
+
+        return $this->getSchemeAndHttpHost() . $this->getBaseUrl() . $this->getPathInfo() . $query;
     }
 }

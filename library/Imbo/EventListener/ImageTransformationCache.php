@@ -11,9 +11,10 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Http\Request\RequestInterface,
-    Imbo\Http\HeaderContainer,
+    Imbo\Http\Request\Request,
     Imbo\Model\Image,
+    Imbo\Exception\InvalidArgumentException,
+    Symfony\Component\HttpFoundation\ResponseHeaderBag,
     RecursiveDirectoryIterator,
     RecursiveIteratorIterator;
 
@@ -46,14 +47,18 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Class constructor
      *
-     * @param string $path Path to store the temp. images
+     * @param string $path Path to store the cached images
+     * @throws InvalidArgumentException Throws an exception if the specified path is not writable
      */
     public function __construct($path) {
-        $this->path = rtrim($path, '/');
-
-        if (!is_writable($this->path)) {
-            trigger_error('Cache path is not writable by the webserver: ' . $this->path, E_USER_WARNING);
+        if (!$this->isWritable($path)) {
+            throw new InvalidArgumentException(
+                'Image transformation cache path is not writable by the webserver: ' . $path,
+                500
+            );
         }
+
+        $this->path = $path;
     }
 
     /**
@@ -93,14 +98,14 @@ class ImageTransformationCache implements ListenerInterface {
                 isset($data['image']) &&
                 isset($data['headers']) &&
                 ($data['image'] instanceof Image) &&
-                ($data['headers'] instanceof HeaderContainer)
+                ($data['headers'] instanceof ResponseHeaderBag)
             ) {
                 // Mark as cache hit
                 $data['headers']->set('X-Imbo-TransformationCache', 'Hit');
 
                 // Replace all headers and set the image model
-                $response->setHeaders($data['headers'])
-                         ->setModel($data['image']);
+                $response->headers = $data['headers'];
+                $response->setModel($data['image']);
 
                 // Stop other listeners on this event
                 $event->stopPropagation(true);
@@ -113,7 +118,7 @@ class ImageTransformationCache implements ListenerInterface {
         }
 
         // Mark as cache miss
-        $response->getHeaders()->set('X-Imbo-TransformationCache', 'Miss');
+        $response->headers->set('X-Imbo-TransformationCache', 'Miss');
     }
 
     /**
@@ -137,7 +142,7 @@ class ImageTransformationCache implements ListenerInterface {
         // Prepare data for the data
         $data = serialize(array(
             'image' => $model,
-            'headers' => $response->getHeaders(),
+            'headers' => $response->headers,
         ));
 
         // Create directory if it does not already exist. The last is_dir is there because race
@@ -193,10 +198,10 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Get the absolute path to response in the cache
      *
-     * @param RequestInterface $request The current request instance
+     * @param Request $request The current request instance
      * @return string Returns the absolute path to the cache file
      */
-    private function getCacheFilePath(RequestInterface $request) {
+    private function getCacheFilePath(Request $request) {
         $hash = $this->getCacheKey($request);
         $dir = $this->getCacheDir($request->getPublicKey(), $request->getImageIdentifier());
 
@@ -213,13 +218,13 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Generate a cache key
      *
-     * @param RequestInterface $request The current request instance
+     * @param Request $request The current request instance
      * @return string Returns a string that can be used as a cache key for the current image
      */
-    private function getCacheKey(RequestInterface $request) {
+    private function getCacheKey(Request $request) {
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
-        $accept = $request->getHeaders()->get('Accept', '*/*');
+        $accept = $request->headers->get('Accept', '*/*');
 
         $accept = array_filter(explode(',', $accept), function(&$value) {
             // Trim whitespace
@@ -242,7 +247,7 @@ class ImageTransformationCache implements ListenerInterface {
         $accept = implode(',', $accept);
 
         $extension = $request->getExtension();
-        $transformations = $request->getQuery()->get('t');
+        $transformations = $request->query->get('t');
 
         if (!empty($transformations)) {
             $transformations = implode('&', $transformations);
@@ -280,5 +285,21 @@ class ImageTransformationCache implements ListenerInterface {
 
         // Remove the directory itself
         rmdir($dir);
+    }
+
+    /**
+     * Check whether or not a directory (or its parent) is writable
+     *
+     * @param string $path The path to check
+     * @return boolean
+     */
+    private function isWritable($path) {
+        if (!is_dir($path)) {
+            // Path does not exist, check parent
+            return $this->isWritable(dirname($path));
+        }
+
+        // Dir exists, check if it's writable
+        return is_writable($path);
     }
 }

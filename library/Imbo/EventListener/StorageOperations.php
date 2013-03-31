@@ -12,8 +12,6 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Exception\StorageException,
-    Imbo\Container,
-    Imbo\ContainerAware,
     Imbo\Storage\StorageInterface;
 
 /**
@@ -22,21 +20,7 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
-class StorageOperations implements ContainerAware, ListenerInterface {
-    /**
-     * Service container
-     *
-     * @var Container
-     */
-    private $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-    }
-
+class StorageOperations implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
@@ -66,16 +50,15 @@ class StorageOperations implements ContainerAware, ListenerInterface {
     public function loadImage(EventInterface $event) {
         $storage = $event->getStorage();
         $request = $event->getRequest();
+        $response = $event->getResponse();
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
 
         $imageData = $storage->getImage($publicKey, $imageIdentifier);
-        $lastModified = $this->container->get('dateFormatter')->formatDate(
-            $storage->getLastModified($publicKey, $imageIdentifier)
-        );
+        $lastModified = $storage->getLastModified($publicKey, $imageIdentifier);
 
-        $event->getResponse()->getHeaders()->set('Last-Modified', $lastModified);
-        $event->getResponse()->getImage()->setBlob($imageData);
+        $response->setLastModified($lastModified)
+                 ->getImage()->setBlob($imageData);
     }
 
     /**

@@ -10,7 +10,9 @@
 
 namespace Imbo\UnitTest\Resource;
 
-use Imbo\Resource\Metadata;
+use Imbo\Resource\Metadata,
+    DateTime,
+    DateTimeZone;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -40,8 +42,8 @@ class MetadataTest extends ResourceTests {
      * Set up the resource
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
         $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
@@ -108,10 +110,10 @@ class MetadataTest extends ResourceTests {
      */
     public function getData() {
         return array(
-            array('key', 'id', 'some date', '"d319355bcb6f1336d99ac49506fe7338"'),
-            array('key', 'id2', 'some date', '"b75f50d8f98f0cb173405188b103b69d"'),
-            array('key2', 'id', 'some date', '"58bf743310061549ac6919e34fd89de1"'),
-            array('key2', 'id2', 'some date', '"6c3c80af196bc8d62cc4d7b3bbcc9827"'),
+            array('key', 'id', new DateTime('@1361628772', new DateTimeZone('UTC')), '"a69f7f6c12a8fb5557afefe03ca29f91"'),
+            array('key', 'id2', new DateTime('@1361628772', new DateTimeZone('UTC')), '"3e973107af60e3d6da827016b2572144"'),
+            array('key2', 'id', new DateTime('@1361628772', new DateTimeZone('UTC')), '"0a7e131bb8e56db498b3a3a6f2c3c74b"'),
+            array('key2', 'id2', new DateTime('@1361628772', new DateTimeZone('UTC')), '"50f886483a65680dc5ece85953d85562"'),
         );
     }
 
@@ -122,13 +124,10 @@ class MetadataTest extends ResourceTests {
     public function testSupportsHttpGet($publicKey, $imageIdentifier, $lastModified, $etag) {
         $this->manager->expects($this->once())->method('trigger')->with('db.metadata.load');
         $this->response->expects($this->once())->method('getLastModified')->will($this->returnValue($lastModified));
+        $this->response->expects($this->once())->method('setEtag')->with($etag);
 
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-
-        $responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $responseHeaders->expects($this->at(0))->method('set')->with('ETag', $etag);
-        $this->response->expects($this->once())->method('getHeaders')->will($this->returnValue($responseHeaders));
 
         $this->resource->get($this->event);
     }
@@ -140,7 +139,7 @@ class MetadataTest extends ResourceTests {
      * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenValidatingMissingJsonData() {
-        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue(null));
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue(null));
         $this->resource->validateMetadata($this->event);
     }
 
@@ -151,7 +150,7 @@ class MetadataTest extends ResourceTests {
      * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenValidatingInvalidJsonData() {
-        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue('some string'));
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('some string'));
         $this->resource->validateMetadata($this->event);
     }
 
@@ -159,7 +158,7 @@ class MetadataTest extends ResourceTests {
      * @covers Imbo\Resource\Metadata::validateMetadata
      */
     public function testAllowsValidJsonData() {
-        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue('{"foo":"bar"}'));
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"foo":"bar"}'));
         $this->resource->validateMetadata($this->event);
     }
 }

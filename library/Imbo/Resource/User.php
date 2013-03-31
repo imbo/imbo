@@ -10,8 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\EventManager\EventInterface,
+use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
     Imbo\EventListener\ListenerInterface;
 
@@ -26,10 +25,7 @@ class User implements ResourceInterface, ListenerInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array(
-            RequestInterface::METHOD_GET,
-            RequestInterface::METHOD_HEAD,
-        );
+        return array('GET', 'HEAD');
     }
 
     /**
@@ -51,8 +47,6 @@ class User implements ResourceInterface, ListenerInterface {
         $event->getManager()->trigger('db.user.load');
 
         $response = $event->getResponse();
-
-        $etag = '"' . md5($response->getLastModified()) . '"';
-        $response->getHeaders()->set('ETag', $etag);
+        $response->setEtag('"' . md5($response->getLastModified()->format('D, d M Y H:i:s') . ' GMT') . '"');
     }
 }

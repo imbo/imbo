@@ -12,7 +12,6 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
-    Imbo\Http\Request\RequestInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Model;
@@ -28,13 +27,7 @@ class Metadata implements ResourceInterface, ListenerInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array(
-            RequestInterface::METHOD_GET,
-            RequestInterface::METHOD_POST,
-            RequestInterface::METHOD_PUT,
-            RequestInterface::METHOD_DELETE,
-            RequestInterface::METHOD_HEAD,
-        );
+        return array('GET', 'POST', 'PUT', 'DELETE', 'HEAD');
     }
 
     /**
@@ -112,11 +105,11 @@ class Metadata implements ResourceInterface, ListenerInterface {
 
         $event->getManager()->trigger('db.metadata.load');
 
-        $lastModified = $response->getLastModified();
+        $lastModified = $response->getLastModified()->format('D, d M Y H:i:s') . ' GMT';
 
         $hash = md5($request->getPublicKey() . $request->getImageIdentifier() . $lastModified);
 
-        $response->getHeaders()->set('ETag', '"' . $hash . '"');
+        $response->setEtag('"' . $hash . '"');
     }
 
     /**
@@ -127,7 +120,7 @@ class Metadata implements ResourceInterface, ListenerInterface {
      */
     public function validateMetadata(EventInterface $event) {
         $request = $event->getRequest();
-        $metadata = $request->getRawData();
+        $metadata = $request->getContent();
 
         if (empty($metadata)) {
             throw new InvalidArgumentException('Missing JSON data', 400);

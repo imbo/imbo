@@ -11,10 +11,10 @@
 namespace Imbo\UnitTest\Http\Response;
 
 use Imbo\Http\Response\ResponseWriter,
-    Imbo\Http\ParameterContainer,
     Imbo\Model\Error,
     Imbo\Model\Image,
-    Imbo\Model\ArrayModel;
+    Imbo\Model\ArrayModel,
+    Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -31,6 +31,7 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
     private $request;
     private $response;
     private $responseHeaders;
+    private $requestHeaders;
 
     /**
      * Set up the response writer
@@ -40,10 +41,13 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
     public function setUp() {
         $this->container = $this->getMock('Imbo\Container');
         $this->model = $this->getMock('Imbo\Model\ModelInterface');
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-        $this->response->expects($this->any())->method('getHeaders')->will($this->returnValue($this->responseHeaders));
+        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $this->requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->response->headers = $this->responseHeaders;
+        $this->request->headers = $this->requestHeaders;
+
         $this->responseWriter = new ResponseWriter();
         $this->responseWriter->setContainer($this->container);
     }
@@ -69,12 +73,13 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
         $formatter->expects($this->once())->method('format')->with($this->model)->will($this->returnValue($formattedData));
         $formatter->expects($this->once())->method('getContentType')->will($this->returnValue('image/jpeg'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
-        $this->request->expects($this->never())->method('getAcceptableContentTypes');
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $this->container->expects($this->once())->method('get')->with('jpegFormatter')->will($this->returnValue($formatter));
-        $this->responseHeaders->expects($this->at(0))->method('set')->with('Content-Type', 'image/jpeg')->will($this->returnSelf());
-        $this->responseHeaders->expects($this->at(1))->method('set')->with('Content-Length', strlen($formattedData))->will($this->returnSelf());
-        $this->response->expects($this->once())->method('setBody')->with($formattedData);
+        $this->responseHeaders->expects($this->once())->method('add')->with(array(
+            'Content-Type' => 'image/jpeg',
+            'Content-Length' => strlen($formattedData),
+        ));
+        $this->response->expects($this->once())->method('setContent')->with($formattedData);
 
         $this->responseWriter->write($this->model, $this->request, $this->response);
     }
@@ -82,18 +87,19 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Http\Response\ResponseWriter::write
      */
-    public function testDoesNotSetAResponseBodyWhenHttpMethodIsHead() {
+    public function testDoesNotSetAResponseContentWhenHttpMethodIsHead() {
         $formattedData = 'formatted data';
         $formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
         $formatter->expects($this->once())->method('format')->with($this->model)->will($this->returnValue($formattedData));
         $formatter->expects($this->once())->method('getContentType')->will($this->returnValue('image/jpeg'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
-        $this->request->expects($this->never())->method('getAcceptableContentTypes');
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('HEAD'));
         $this->container->expects($this->once())->method('get')->with('jpegFormatter')->will($this->returnValue($formatter));
-        $this->responseHeaders->expects($this->at(0))->method('set')->with('Content-Type', 'image/jpeg')->will($this->returnSelf());
-        $this->responseHeaders->expects($this->at(1))->method('set')->with('Content-Length', strlen($formattedData))->will($this->returnSelf());
-        $this->response->expects($this->never())->method('setBody');
+        $this->responseHeaders->expects($this->once())->method('add')->with(array(
+            'Content-Type' => 'image/jpeg',
+            'Content-Length' => strlen($formattedData),
+        ));
+        $this->response->expects($this->never())->method('setContent');
 
         $this->responseWriter->write($this->model, $this->request, $this->response);
     }
@@ -118,28 +124,29 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanWrapJsonDataInSpecifiedCallback($param, $callback, $valid = true) {
         $json = '{"key":"value"}';
-        $expectedBody = $json;
+        $expectedContent = $json;
 
         if ($valid) {
-            $expectedBody = $callback . '(' . $json . ')';
+            $expectedContent = $callback . '(' . $json . ')';
         }
 
         $formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
         $formatter->expects($this->once())->method('format')->with($this->model)->will($this->returnValue($json));
         $formatter->expects($this->once())->method('getContentType')->will($this->returnValue('application/json'));
 
-        $query = new ParameterContainer(array(
+        $query = new ParameterBag(array(
             $param => $callback,
         ));
 
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('json'));
-        $this->request->expects($this->never())->method('getAcceptableContentTypes');
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
-        $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+        $this->request->query = $query;
         $this->container->expects($this->once())->method('get')->with('jsonFormatter')->will($this->returnValue($formatter));
-        $this->responseHeaders->expects($this->at(0))->method('set')->with('Content-Type', 'application/json')->will($this->returnSelf());
-        $this->responseHeaders->expects($this->at(1))->method('set')->with('Content-Length', strlen($expectedBody))->will($this->returnSelf());
-        $this->response->expects($this->once())->method('setBody')->with($expectedBody);
+        $this->responseHeaders->expects($this->once())->method('add')->with(array(
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen($expectedContent),
+        ));
+        $this->response->expects($this->once())->method('setContent')->with($expectedContent);
 
         $this->responseWriter->write($this->model, $this->request, $this->response);
     }
@@ -151,11 +158,7 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\ResponseWriter::write
      */
     public function testThrowsAnExceptionInStrictModeWhenTheUserAgentDoesNotSupportAnyOfImbosMediaTypes() {
-        $acceptableTypes = array(
-            'text/xml' => 1,
-        );
-
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue($acceptableTypes));
+        $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('text/xml'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
 
         $contentNegotiation = $this->getMock('Imbo\Http\ContentNegotiation');
@@ -170,18 +173,14 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\ResponseWriter::write
      */
     public function testUsesDefaultMediaTypeInNonStrictModeWhenTheUserAgentDoesNotSupportAnyMediaTypes() {
-        $acceptableTypes = array(
-            'text/xml' => 1,
-        );
-
         $json = '"data"';
 
-        $query = new ParameterContainer(array());
+        $query = new ParameterBag(array());
 
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue($acceptableTypes));
+        $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('text/xml'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
-        $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+        $this->request->query = $query;
 
         $contentNegotiation = $this->getMock('Imbo\Http\ContentNegotiation');
         $contentNegotiation->expects($this->any())->method('isAcceptable')->will($this->returnValue(false));
@@ -193,11 +192,13 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
         $this->container->expects($this->at(0))->method('get')->with('contentNegotiation')->will($this->returnValue($contentNegotiation));
         $this->container->expects($this->at(1))->method('get')->with('jsonFormatter')->will($this->returnValue($formatter));
 
-        $this->responseHeaders->expects($this->at(0))->method('set')->with('Vary', 'Accept')->will($this->returnSelf());
-        $this->responseHeaders->expects($this->at(1))->method('set')->with('Content-Type', 'application/json')->will($this->returnSelf());
-        $this->responseHeaders->expects($this->at(2))->method('set')->with('Content-Length', strlen($json))->will($this->returnSelf());
+        $this->responseHeaders->expects($this->once())->method('add')->with(array(
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen($json),
+        ));
 
-        $this->response->expects($this->once())->method('setBody')->with($json);
+        $this->response->expects($this->once())->method('setContent')->with($json);
+        $this->response->expects($this->once())->method('setVary')->with('Accept');
 
         $this->responseWriter->write($this->model, $this->request, $this->response, false);
     }
@@ -208,13 +209,9 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
     public function testPicksThePrioritizedMediaTypeIfMoreThanOneWithSameQualityAreSupportedByTheUserAgent() {
         $this->model = new Image();
 
-        $acceptableTypes = array(
-            'image/*' => 1,
-        );
-
         $imageData = 'binary image data';
 
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue($acceptableTypes));
+        $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('image/*'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
 
@@ -228,11 +225,13 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
         $this->container->expects($this->at(0))->method('get')->with('contentNegotiation')->will($this->returnValue($contentNegotiation));
         $this->container->expects($this->at(1))->method('get')->with('jpegFormatter')->will($this->returnValue($formatter));
 
-        $this->responseHeaders->expects($this->at(0))->method('set')->with('Vary', 'Accept')->will($this->returnSelf());
-        $this->responseHeaders->expects($this->at(1))->method('set')->with('Content-Type', 'image/jpeg')->will($this->returnSelf());
-        $this->responseHeaders->expects($this->at(2))->method('set')->with('Content-Length', strlen($imageData))->will($this->returnSelf());
+        $this->responseHeaders->expects($this->once())->method('add')->with(array(
+            'Content-Type' => 'image/jpeg',
+            'Content-Length' => strlen($imageData),
+        ));
 
-        $this->response->expects($this->once())->method('setBody')->with($imageData);
+        $this->response->expects($this->once())->method('setContent')->with($imageData);
+        $this->response->expects($this->once())->method('setVary')->with('Accept');
 
         $this->responseWriter->write($this->model, $this->request, $this->response);
     }
@@ -243,13 +242,11 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
     public function testForcesContentNegotiationOnErrorModels() {
         $this->model = new Error();
         $error = '{"some":"error"}';
-        $query = $this->getMockBuilder('Imbo\Http\ParameterContainer')->disableOriginalConstructor()->getMock();
+        $query = new ParameterBag();
 
-        $this->request->expects($this->once())->method('getAcceptableContentTypes')->will($this->returnValue(array(
-            '*/*' => 1,
-        )));
+        $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('*/*'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
-        $this->request->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+        $this->request->query = $query;
 
         $this->responseHeaders->expects($this->any())->method('set')->will($this->returnSelf());
 
@@ -264,5 +261,31 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
         $this->container->expects($this->at(1))->method('get')->with('jsonFormatter')->will($this->returnValue($formatter));
 
         $this->responseWriter->write($this->model, $this->request, $this->response);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\ResponseWriter::write
+     */
+    public function testAcceptsAllMediaTypesWhenAcceptIsEmpty() {
+        $model = new Error();
+        $error = '{"some":"error"}';
+
+        // Mimic a missing $_SERVER['HTTP_ACCEPT'] value
+        $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('*/*'));
+
+        // Make sure the missing value falls back to */*
+        $this->request->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+
+        $formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
+        $formatter->expects($this->once())->method('format')->with($model)->will($this->returnValue($error));
+        $formatter->expects($this->once())->method('getContentType')->will($this->returnValue('application/json'));
+
+        $contentNegotiation = $this->getMock('Imbo\Http\ContentNegotiation');
+        $contentNegotiation->expects($this->any())->method('isAcceptable')->will($this->returnValue(1));
+
+        $this->container->expects($this->at(0))->method('get')->with('contentNegotiation')->will($this->returnValue($contentNegotiation));
+        $this->container->expects($this->at(1))->method('get')->with('jsonFormatter')->will($this->returnValue($formatter));
+
+        $this->responseWriter->write($model, $this->request, $this->response);
     }
 }

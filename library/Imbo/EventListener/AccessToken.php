@@ -11,7 +11,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Http\Request\RequestInterface,
+    Imbo\Http\Request\Request,
     Imbo\Exception\RuntimeException;
 
 /**
@@ -99,7 +99,7 @@ class AccessToken implements ListenerInterface {
      */
     public function invoke(EventInterface $event) {
         $request = $event->getRequest();
-        $query = $request->getQuery();
+        $query = $request->query;
         $eventName = $event->getName();
 
         if (($eventName === 'image.get' || $eventName === 'image.head') && $this->isWhitelisted($request)) {
@@ -112,10 +112,10 @@ class AccessToken implements ListenerInterface {
         }
 
         $token = $query->get('accessToken');
-        $url = $request->getUrl();
+        $url = $request->getRawUri();
 
         // Remove the access token from the query string as it's not used to generate the HMAC
-        $url = trim(preg_replace('/(\?|&)accessToken=' . preg_quote($token, '/') . '&?/', '\\1', $url), '&?');
+        $url = rtrim(preg_replace('/(?<=(\?|&))accessToken=[^&]+&?/', '', $url), '&?');
 
         $correctToken = hash_hmac('sha256', $url, $request->getPrivateKey());
 
@@ -127,10 +127,10 @@ class AccessToken implements ListenerInterface {
     /**
      * Check if the request is whitelisted
      *
-     * @param RequestInterface $request The request instance
+     * @param Request $request The request instance
      * @return boolean
      */
-    private function isWhitelisted(RequestInterface $request) {
+    private function isWhitelisted(Request $request) {
         $filter = $this->params['transformations'];
 
         if (empty($filter['whitelist']) && empty($filter['blacklist'])) {

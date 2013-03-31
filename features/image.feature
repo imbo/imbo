@@ -39,7 +39,7 @@ Feature: Imbo provides an image endpoint
         And I include an access token in the query
         And the "Accept" request header is "application/json"
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2"
-        Then I should get a response with "406 Not Acceptable"
+        Then I should get a response with "406 Not acceptable"
         And the "Content-Type" response header is "application/json"
         And the "X-Imbo-Originalextension" response header is "png"
         And the "X-Imbo-Originalfilesize" response header is "95576"
@@ -73,7 +73,7 @@ Feature: Imbo provides an image endpoint
         And I include an access token in the query
         And the "Accept" request header is "application/json"
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "HEAD"
-        Then I should get a response with "406 Not Acceptable"
+        Then I should get a response with "406 Not acceptable"
         And the "Content-Type" response header is "application/json"
         And the "X-Imbo-Originalextension" response header is "png"
         And the "X-Imbo-Originalfilesize" response header is "95576"
@@ -112,7 +112,7 @@ Feature: Imbo provides an image endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "DELETE"
-        Then I should get a response with "404 Not Found"
+        Then I should get a response with "404 Image not found"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Image not found" and the error code is "0"
 
@@ -121,6 +121,6 @@ Feature: Imbo provides an image endpoint
         And I sign the request
         And I attach "tests/Imbo/Fixtures/broken-image.jpg" to the request body
         When I request "/users/publickey/images/72e38ded1b41eda0c1701e6ff270eaf8" using HTTP "PUT"
-        Then I should get a response with "415 Unsupported Media Type"
+        Then I should get a response with "415 Broken image"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Broken image" and the error code is "204"
