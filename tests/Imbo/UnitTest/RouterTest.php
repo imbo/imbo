@@ -30,7 +30,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      */
     public function setUp() {
         $this->router = new Router();
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
     }
@@ -106,7 +106,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      */
     public function testThrowsExceptionWhenNoRouteMatches($route) {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
-        $this->request->expects($this->once())->method('getPath')->will($this->returnValue($route));
+        $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
         $this->router->route($this->event);
     }
 
@@ -167,7 +167,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanMatchValidRoutes($route, $resource, $publicKey = null, $imageIdentifier = null, $extension = null) {
         $this->request->expects($this->once())->method('setResource')->with($resource);
-        $this->request->expects($this->once())->method('getPath')->will($this->returnValue($route));
+        $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
 
         if ($publicKey) {

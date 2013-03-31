@@ -11,7 +11,6 @@
 namespace Imbo;
 
 use Imbo\Resource\ResourceInterface,
-    Imbo\Http\Request\RequestInterface,
     Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
     Imbo\EventListener\ListenerInterface,
@@ -30,13 +29,13 @@ class Router implements ListenerInterface {
      * @var array
      */
     static private $supportedHttpMethods = array(
-        RequestInterface::METHOD_GET     => true,
-        RequestInterface::METHOD_POST    => true,
-        RequestInterface::METHOD_PUT     => true,
-        RequestInterface::METHOD_HEAD    => true,
-        RequestInterface::METHOD_DELETE  => true,
-        RequestInterface::METHOD_BREW    => true,
-        RequestInterface::METHOD_OPTIONS => true,
+        'GET'     => true,
+        'POST'    => true,
+        'PUT'     => true,
+        'HEAD'    => true,
+        'DELETE'  => true,
+        'BREW'    => true,
+        'OPTIONS' => true,
     );
 
     /**
@@ -70,7 +69,7 @@ class Router implements ListenerInterface {
         $request = $event->getRequest();
         $httpMethod = $request->getMethod();
 
-        if ($httpMethod === RequestInterface::METHOD_BREW) {
+        if ($httpMethod === 'BREW') {
             throw new RuntimeException('I\'m a teapot!', 418);
         }
 
@@ -78,7 +77,7 @@ class Router implements ListenerInterface {
             throw new RuntimeException('Unsupported HTTP method: ' . $httpMethod, 501);
         }
 
-        $path = $request->getPath();
+        $path = $request->getPathInfo();
         $matches = array();
 
         foreach ($this->routes as $resourceName => $route) {

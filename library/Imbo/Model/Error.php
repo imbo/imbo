@@ -10,7 +10,10 @@
 
 namespace Imbo\Model;
 
-use DateTime;
+use Imbo\Exception,
+    Imbo\Http\Request\Request,
+    DateTimeZone,
+    DateTime;
 
 /**
  * Error model
@@ -157,5 +160,30 @@ class Error implements ModelInterface {
      */
     public function getImageIdentifier() {
         return $this->imageIdentifier;
+    }
+
+    /**
+     * Create an error based on an exception instance
+     *
+     * @param Exception $exception An Imbo\Exception instance
+     * @param Request The current request
+     * @return Error
+     */
+    public static function createFromException(Exception $exception, Request $request) {
+        $date = new DateTime('now', new DateTimeZone('UTC'));
+
+        $model = new self();
+        $model->setHttpCode($exception->getCode())
+              ->setErrorMessage($exception->getMessage())
+              ->setDate($date)
+              ->setImboErrorCode($exception->getImboErrorCode() ?: Exception::ERR_UNSPECIFIED);
+
+        if ($image = $request->getImage()) {
+            $model->setImageIdentifier($image->getChecksum());
+        } else if ($identifier = $request->getImageIdentifier()) {
+            $model->setImageIdentifier($identifier);
+        }
+
+        return $model;
     }
 }

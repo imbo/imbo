@@ -64,7 +64,7 @@ class Authenticate implements ListenerInterface {
     public function invoke(EventInterface $event) {
         $response = $event->getResponse();
         $request = $event->getRequest();
-        $query = $request->getQuery();
+        $query = $request->query;
 
         // Required query parameters
         $requiredParams = array('signature', 'timestamp');
@@ -85,9 +85,6 @@ class Authenticate implements ListenerInterface {
         $publicKey  = $request->getPublicKey();
         $privateKey = $request->getPrivateKey();
 
-        $query->remove('signature')
-              ->remove('timestamp');
-
         if (!$this->timestampIsValid($timestamp)) {
             $e = new RuntimeException('Invalid timestamp: ' . $timestamp, 400);
             $e->setImboErrorCode(Exception::AUTH_INVALID_TIMESTAMP);
@@ -102,10 +99,13 @@ class Authenticate implements ListenerInterface {
             throw $e;
         }
 
-        $url = $request->getUrl();
+        $url = $request->getRawUri();
+
+        // Remove the signature and timestamp as they are not used when generating the HMAC
+        $url = rtrim(preg_replace('/(?<=(\?|&))(signature|timestamp)=[^&]+&?/', '', $url), '&?');
 
         // Add the URL used for auth to the response headers
-        $response->getHeaders()->set('X-Imbo-AuthUrl', $url);
+        $response->headers->set('X-Imbo-AuthUrl', $url);
 
         if (!$this->signatureIsValid($request->getMethod(), $url, $publicKey, $privateKey, $timestamp, $signature)) {
             $e = new RuntimeException('Signature mismatch', 400);

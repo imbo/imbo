@@ -32,7 +32,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\ImagePreparation::setContainer
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->container = $this->getMock('Imbo\Container');
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
@@ -70,7 +70,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenNoImageIsAttached() {
-        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue(''));
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue(''));
 
         $this->prepare->prepareImage($this->event);
     }
@@ -82,7 +82,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenImageInRequestDoesNotMatchImageIdentifierInUrl() {
-        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('asd'));
 
         $this->prepare->prepareImage($this->event);
@@ -95,7 +95,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 415
      */
     public function testThrowsExceptionWhenImageTypeIsNotSupported() {
-        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue(file_get_contents(__FILE__)));
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents(__FILE__)));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(md5_file(__FILE__)));
 
         $this->prepare->prepareImage($this->event);
@@ -110,7 +110,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     public function testThrowsExceptionWhenImageIsBroken() {
         $filePath = FIXTURES_DIR . '/broken-image.jpg';
 
-        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue(file_get_contents($filePath)));
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents($filePath)));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(md5_file($filePath)));
 
         $this->prepare->prepareImage($this->event);
@@ -124,7 +124,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
         $imageData = file_get_contents($imagePath);
         $imageIdentifier = md5($imageData);
 
-        $this->request->expects($this->once())->method('getRawData')->will($this->returnValue($imageData));
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue($imageData));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
 
         $image = $this->getMock('Imbo\Model\Image');

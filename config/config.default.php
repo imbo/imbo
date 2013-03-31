@@ -231,7 +231,7 @@ $config = array(
     ),
 );
 
-if (file_exists(__DIR__ . '/config.php') && !defined('IN_TESTSUITE')) {
+if (file_exists(__DIR__ . '/config.php')) {
     $config = array_replace_recursive($config, require __DIR__ . '/config.php');
 }
 

@@ -25,7 +25,6 @@ class ImageTransformerTest extends ListenerTests {
      */
     private $listener;
 
-    private $container;
     private $request;
     private $response;
     private $event;
@@ -34,13 +33,9 @@ class ImageTransformerTest extends ListenerTests {
 
     /**
      * Set up the listener
-     *
-     * @covers Imbo\EventListener\ImageTransformer::setContainer
      */
     public function setUp() {
         $this->cn = $this->getMock('Imbo\Http\ContentNegotiation');
-        $this->container = $this->getMock('Imbo\Container');
-        $this->container->expects($this->any())->method('get')->with('contentNegotiation')->will($this->returnValue($this->cn));
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->image = $this->getMock('Imbo\Model\Image');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
@@ -50,14 +45,12 @@ class ImageTransformerTest extends ListenerTests {
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
         $this->listener = new ImageTransformer();
-        $this->listener->setContainer($this->container);
     }
 
     /**
      * Tear down the listener
      */
     public function tearDown() {
-        $this->container = null;
         $this->request = null;
         $this->response = null;
         $this->image = null;

@@ -12,8 +12,8 @@ namespace Imbo\UnitTest\EventManager;
 
 use Imbo\EventManager\Event,
     Imbo\EventManager\EventManagerInterface,
-    Imbo\Http\Request\RequestInterface,
-    Imbo\Http\Response\ResponseInterface,
+    Imbo\Http\Request\Request,
+    Imbo\Http\Response\Response,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface;
 
@@ -44,8 +44,8 @@ class EventTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\Event::setContainer
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
+        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
         $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
         $this->manager = $this->getMock('Imbo\EventManager\EventManagerInterface');

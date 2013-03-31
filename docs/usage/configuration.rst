@@ -985,10 +985,10 @@ The object passed to the event listeners (and closures) is an instance of the ``
     Get the name of the current event. For instance ``image.delete``.
 
 ``getRequest()``
-    Get the current request object (an instance of ``Imbo\Http\Request\RequestInterface``)
+    Get the current request object (an instance of ``Imbo\Http\Request\Request``)
 
 ``getResponse()``
-    Get the current response object (an instance of ``Imbo\Http\Response\ResponseInterface``)
+    Get the current response object (an instance of ``Imbo\Http\Response\Response``)
 
 ``getDatabase()``
     Get the current database adapter (an instance of ``Imbo\Database\DatabaseInterface``)

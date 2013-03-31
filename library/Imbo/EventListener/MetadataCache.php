@@ -12,7 +12,8 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Cache\CacheInterface,
-    Imbo\Model;
+    Imbo\Model,
+    DateTime;
 
 /**
  * Metadata cache
@@ -71,20 +72,24 @@ class MetadataCache implements ListenerInterface {
 
         $result = $this->cache->get($cacheKey);
 
-        if (is_array($result) && isset($result['lastModified']) && isset($result['metadata'])) {
+        if (is_array($result) && isset($result['lastModified']) && ($result['lastModified'] instanceof DateTime) && isset($result['metadata'])) {
             $model = new Model\Metadata();
             $model->setData($result['metadata']);
 
-            $response->setModel($model);
-            $response->getHeaders()->set('X-Imbo-MetadataCache', 'Hit')
-                                   ->set('Last-Modified', $result['lastModified']);
+            $response->setModel($model)
+                     ->setLastModified($result['lastModified']);
+
+            $response->headers->set('X-Imbo-MetadataCache', 'Hit');
 
             // Stop propagation of listeners for this event
             $event->stopPropagation(true);
             return;
+        } else if ($result) {
+            // Invalid result stored in the cache. Delete
+            $this->cache->delete($cacheKey);
         }
 
-        $response->getHeaders()->set('X-Imbo-MetadataCache', 'Miss');
+        $response->headers->set('X-Imbo-MetadataCache', 'Miss');
     }
 
     /**

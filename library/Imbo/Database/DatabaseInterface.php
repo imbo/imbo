@@ -105,7 +105,7 @@ interface DatabaseInterface {
      *
      * If the $imageIdentifier parameter is set, return when that image was last updated. If not
      * set, return when the user last updated any image. If the user does not have any images
-     * stored, return current the timestamp.
+     * stored, return the current timestamp.
      *
      * @param string $publicKey The public key of the user
      * @param string $imageIdentifier The image identifier

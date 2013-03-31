@@ -8,8 +8,10 @@
  * distributed with this source code.
  */
 
-use Behat\Behat\Event\SuiteEvent,
+use Behat\Behat\Event\FeatureEvent,
+    Behat\Behat\Event\SuiteEvent,
     Behat\Behat\Exception\PendingException,
+    Behat\Gherkin\Node\PyStringNode,
     Behat\Behat\Context\Step\Given;
 
 // Use the RESTContext
@@ -37,12 +39,40 @@ class ImboContext extends RESTContext {
     private $privateKey;
 
     /**
-     * @BeforeSuite
+     * @BeforeFeature
      */
-    public static function prepare(SuiteEvent $event) {
+    public static function prepare(FeatureEvent $event) {
         // Drop mongo test collection
         $mongo = new MongoClient();
         $mongo->imbo_testing->drop();
+
+        $cachePath = '/tmp/imbo-behat-image-transformation-cache';
+
+        if (is_dir($cachePath)) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($cachePath),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
+
+            foreach ($iterator as $file) {
+                $name = $file->getPathname();
+
+                if (substr($name, -1) === '.') {
+                    continue;
+                }
+
+                if ($file->isDir()) {
+                    // Remove dir
+                    rmdir($name);
+                } else {
+                    // Remove file
+                    unlink($name);
+                }
+            }
+
+            // Remove the directory itself
+            rmdir($cachePath);
+        }
     }
 
     /**
@@ -80,7 +110,7 @@ class ImboContext extends RESTContext {
             $request = $event['request'];
             $accessToken = hash_hmac('sha256', $request->getUrl(), $this->privateKey);
             $request->getQuery()->set('accessToken', $accessToken);
-        });
+        }, -100);
     }
 
     /**
@@ -99,7 +129,34 @@ class ImboContext extends RESTContext {
             $query = $request->getQuery();
             $query->set('signature', $signature);
             $query->set('timestamp', $timestamp);
+        }, -100);
+    }
+
+    /**
+     * @Given /^I specify "([^"]*)" as transformation$/
+     */
+    public function applyTransformation($transformation) {
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($transformation) {
+            $event['request']->getQuery()->set('t', array($transformation));
         });
+    }
+
+    /**
+     * @Given /^the (width|height) of the image is "([^"]*)"$/
+     */
+    public function theWidthOfTheImageIs($value, $size) {
+        $image = (string) $this->getLastResponse()->getBody();
+        $size = (int) $size;
+
+        $info = getimagesizefromstring($image);
+
+        if ($value === 'width') {
+            $index = 0;
+        } else {
+            $index = 1;
+        }
+
+        assertSame($size, $info[$index], 'Incorrect ' . $value . ', expected ' . $size . ', got ' . $info[$index]);
     }
 
     /**
@@ -128,6 +185,29 @@ class ImboContext extends RESTContext {
             $actual = (int) $errorCode;
 
             assertSame($expected, $actual, 'Expected "' . $expected . '", got "' . $actual . '"');
+        }
+    }
+
+    /**
+     * @Given /^"([^"]*)" exists in Imbo with identifier "([^"]*)"$/
+     */
+    public function addImageToImbo($imagePath, $imageIdentifier) {
+        return array(
+            new Given('I use "publickey" and "privatekey" for public and private keys'),
+            new Given('I sign the request'),
+            new Given('I attach "tests/Imbo/Fixtures/image1.png" to the request body'),
+            new Given('I request "/users/publickey/images/' . $imageIdentifier . '" using HTTP "PUT"'),
+        );
+    }
+
+    /**
+     * @Given /^I specify the following transformations:$/
+     */
+    public function applyTransformations(PyStringNode $transformations) {
+        foreach ($transformations->getLines() as $t) {
+            $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($t) {
+                $event['request']->getQuery()->add('t', $t);
+            });
         }
     }
 }

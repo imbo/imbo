@@ -44,7 +44,7 @@ class MaxImageSizeTest extends \PHPUnit_Framework_TestCase {
               ->setWidth(665)
               ->setHeight(463);
 
-        $request = $this->getMock('Imbo\Http\Request\RequestInterface');
+        $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $event = $this->getMock('Imbo\EventManager\EventInterface');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));

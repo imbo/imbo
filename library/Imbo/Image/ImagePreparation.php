@@ -10,8 +10,7 @@
 
 namespace Imbo\Image;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\EventListener\ListenerDefinition,
+use Imbo\EventListener\ListenerDefinition,
     Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ImageException,
@@ -64,7 +63,7 @@ class ImagePreparation implements ContainerAware, ListenerInterface {
         $request = $event->getRequest();
 
         // Fetch image data from input
-        $imageBlob = $request->getRawData();
+        $imageBlob = $request->getContent();
 
         if (empty($imageBlob)) {
             $e = new ImageException('No image attached', 400);
