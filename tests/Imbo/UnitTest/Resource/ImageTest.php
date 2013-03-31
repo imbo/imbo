@@ -146,9 +146,10 @@ class ImageTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Image::get
      */
-    public function testFetchesTheImageTwiceInCaseAnEventListenerHasChangeTheInstance() {
+    public function testFetchesTheImageTwiceInCaseAnEventListenerHasChangedTheInstance() {
         $serverBag = $this->getMock('Symfony\Component\HttpFoundation\ServerBag');
         $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\ServerBag');
+        $requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('*/*'));
         $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ServerBag');
 
         $this->response->headers = $responseHeaders;

@@ -104,7 +104,7 @@ class Image implements ResourceInterface, ListenerInterface {
         $etag = '"' . md5(
             $publicKey .
             $imageIdentifier .
-            ($request->headers->get('Accept') ?: '*/*') .
+            $request->headers->get('Accept', '*/*') .
             $request->getRequestUri()
         ) . '"';
 
