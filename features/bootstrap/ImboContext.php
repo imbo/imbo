@@ -203,7 +203,7 @@ class ImboContext extends RESTContext {
     /**
      * @Given /^I specify the following transformations:$/
      */
-    public function iSpecifyTheFollowingTransformations(PyStringNode $transformations) {
+    public function applyTransformations(PyStringNode $transformations) {
         foreach ($transformations->getLines() as $t) {
             $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($t) {
                 $event['request']->getQuery()->add('t', $t);
