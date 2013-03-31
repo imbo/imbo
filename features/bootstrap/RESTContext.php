@@ -266,12 +266,19 @@ class RESTContext extends BehatContext {
     /**
      * @Given /^I attach "([^"]*)" to the request body$/
      */
-    public function attachRequestBody($path) {
+    public function attachFileToRequestBody($path) {
         if (!$fullPath = realpath($path)) {
             throw new RuntimeException('Path "' . $path . '" is invalid');
         }
 
         $this->requestBody = file_get_contents($fullPath);
+    }
+
+    /**
+     * @Given /^the request body contains:$/
+     */
+    public function setRequestBody(PyStringNode $body) {
+        $this->requestBody = (string) $body;
     }
 
     /**
