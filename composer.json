@@ -27,7 +27,7 @@
     "behat/behat": "2.4.*",
     "guzzle/guzzle": "3.0.*"
   },
-  "suggests": {
+  "suggest": {
     "ext-mongo": ">=1.3.0",
     "ext-memcached": ">=2.0.0"
   },
