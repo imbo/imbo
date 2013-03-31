@@ -1,6 +1,12 @@
 Changelog for Imbo
 =====================
 
+Imbo-0.3.0
+----------
+__N/A__
+
+* Imbo now uses the Symfony HttpFoundation Component
+
 Imbo-0.2.0
 ----------
 __2013-03-31__
