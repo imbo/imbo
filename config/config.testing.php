@@ -11,6 +11,7 @@
 namespace Imbo;
 
 use Imbo\Image\Transformation,
+    Imbo\Cache,
     PHPUnit_Framework_MockObject_Generator,
     PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount,
     PHPUnit_Framework_MockObject_Stub_Return;
@@ -58,6 +59,9 @@ return array(
         },
         'imageTransformationCache' => function() {
             return new EventListener\ImageTransformationCache('/tmp/imbo-behat-image-transformation-cache');
+        },
+        'metadataCache' => function() {
+            return new EventListener\MetadataCache(new Cache\APC('behat'));
         },
     ),
 
