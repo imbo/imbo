@@ -11,6 +11,7 @@
 use Behat\Behat\Event\FeatureEvent,
     Behat\Behat\Event\SuiteEvent,
     Behat\Behat\Exception\PendingException,
+    Behat\Gherkin\Node\PyStringNode,
     Behat\Behat\Context\Step\Given;
 
 // Use the RESTContext
@@ -197,5 +198,16 @@ class ImboContext extends RESTContext {
             new Given('I attach "tests/Imbo/Fixtures/image1.png" to the request body'),
             new Given('I request "/users/publickey/images/' . $imageIdentifier . '" using HTTP "PUT"'),
         );
+    }
+
+    /**
+     * @Given /^I specify the following transformations:$/
+     */
+    public function iSpecifyTheFollowingTransformations(PyStringNode $transformations) {
+        foreach ($transformations->getLines() as $t) {
+            $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($t) {
+                $event['request']->getQuery()->add('t', $t);
+            });
+        }
     }
 }
