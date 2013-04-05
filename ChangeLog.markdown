@@ -7,6 +7,12 @@ __N/A__
 
 * Imbo now uses the Symfony HttpFoundation Component
 
+Imbo-0.2.1
+----------
+__2013-04-05__
+
+* Fixed version number in end-user docs
+
 Imbo-0.2.0
 ----------
 __2013-03-31__
