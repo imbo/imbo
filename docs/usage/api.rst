@@ -668,7 +668,7 @@ where ``<image>`` is the image identifier of the image that just got all its met
 Authentication
 --------------
 
-Imbo uses two types of authentication out of the box. It requires access tokens for all ``GET`` and ``HEAD`` requests made against all resources (with the exception of the status resource), and a valid request signature for all ``PUT``, ``POST`` and ``DELETE`` requests made against all resources that support these methods. Both mechanisms are enforced by event listeners that is enabled in the default configuration file.
+Imbo uses two types of authentication mechanisms out of the box. It requires access tokens for all ``GET`` and ``HEAD`` requests made against all resources (with the exception of the status resource), and a valid request signature for all ``PUT``, ``POST`` and ``DELETE`` requests made against all resources that support these methods. Both mechanisms are enforced by event listeners that is enabled in the default configuration file.
 
 .. _access-tokens:
 
@@ -694,7 +694,7 @@ If you request a resource from Imbo without a valid access token it will respond
 Signing write requests
 ++++++++++++++++++++++
 
-Imbo uses a similar method when authenticating write operations. To be able to write to Imbo the user agent will have to specify two request parameters: ``signature`` and ``timestamp``. ``signature`` is, like the access token, an HMAC (also using SHA-256 and the private key of the user). This code is generated using the following elements:
+Imbo uses a similar method when authenticating write operations. To be able to write to Imbo the user agent will have to specify two request headers: ``X-Imbo-Authenticate-Signature`` and ``X-Imbo-Authenticate-Timestamp``, or two query parameters: ``signature`` and ``timestamp``. ``X-Imbo-Authenticate-Signature``/``signature`` is, like the access token, an HMAC (also using SHA-256 and the private key of the user), and is generated using the following elements:
 
 * HTTP method (``PUT``, ``POST`` or ``DELETE``)
 * The URI
@@ -707,7 +707,7 @@ These elements are concatenated in the above order with ``|`` as a delimiter cha
     :language: php
     :linenos:
 
-The above code will generate a signature that must be sent along the request using the ``signature`` query parameter. The timestamp used must also be provided using the ``timestamp`` query parameter so that the signature can be re-generated server-side. Imbo requires that the ``timestamp`` is within ± 120 seconds of the current time on the server. Both the ``signature`` and the ``timestamp`` query parameters must be URL-encoded.
+Imbo requires that ``X-Imbo-Authenticate-Timestamp``/``timestamp`` is within ± 120 seconds of the current time on the server. Both the signature and the timestamp must be URL-encoded when used as query parameters.
 
 As with the access token the signature check is enforced by an event listener that can also be disabled. If you want to implement your own authentication paradigm you can do this by creating a custom event listener.
 

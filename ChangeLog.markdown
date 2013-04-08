@@ -6,6 +6,7 @@ Imbo-0.3.0
 __N/A__
 
 * Imbo now uses the Symfony HttpFoundation Component
+* Added support for signing requests using request headers
 
 Imbo-0.2.1
 ----------

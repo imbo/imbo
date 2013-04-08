@@ -26,15 +26,18 @@ class AuthenticateTest extends ListenerTests {
     private $request;
     private $response;
     private $query;
+    private $headers;
 
     /**
      * Set up the listener
      */
     public function setUp() {
         $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+        $this->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
 
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->query = $this->query;
+        $this->request->headers = $this->headers;
 
         $this->response = $this->getMock('Imbo\Http\Response\Response');
 
@@ -60,30 +63,33 @@ class AuthenticateTest extends ListenerTests {
         $this->response = null;
         $this->event = null;
         $this->query = null;
+        $this->headers = null;
         $this->listener = null;
     }
 
     /**
      * @covers Imbo\EventListener\Authenticate::invoke
      * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Missing required authentication parameter: signature
+     * @expectedExceptionMessage Missing authentication timestamp
      * @expectedExceptionCode 400
      */
-    public function testThrowsExceptionWhenSignatureIsMissing() {
-        $this->query->expects($this->any())->method('has')->with('signature')->will($this->returnValue(false));
+    public function testThrowsExceptionWhenAuthInfoIsMissing() {
+        $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(false));
+        $this->headers->expects($this->at(1))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(null));
+
         $this->listener->invoke($this->event);
     }
 
     /**
      * @covers Imbo\EventListener\Authenticate::invoke
      * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Missing required authentication parameter: timestamp
+     * @expectedExceptionMessage Missing authentication signature
      * @expectedExceptionCode 400
      */
-    public function testThrowsExceptionWhenTimestampIsMissing() {
-        $this->query->expects($this->any())->method('has')->will($this->returnCallback(function($arg) {
-            return $arg === 'signature';
-        }));
+    public function testThrowsExceptionWhenSignatureIsMissing() {
+        $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
+        $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
+        $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(gmdate('Y-m-d\TH:i:s\Z')));
 
         $this->listener->invoke($this->event);
     }
@@ -96,16 +102,9 @@ class AuthenticateTest extends ListenerTests {
      * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenTimestampIsInvalid() {
-        $this->query->expects($this->any())->method('has')->will($this->returnValue(true));
-        $this->query->expects($this->any())->method('get')->will($this->returnCallback(function($arg) {
-            if ($arg === 'timestamp') {
-                return 'some string';
-            }
-
-            return 'signature';
-        }));
-
-        $this->query->expects($this->any())->method('remove')->will($this->returnSelf());
+        $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
+        $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
+        $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue('some string'));
 
         $this->listener->invoke($this->event);
     }
@@ -118,16 +117,9 @@ class AuthenticateTest extends ListenerTests {
      * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenTimestampHasExpired() {
-        $this->query->expects($this->any())->method('has')->will($this->returnValue(true));
-        $this->query->expects($this->any())->method('get')->will($this->returnCallback(function($arg) {
-            if ($arg === 'timestamp') {
-                return '2010-10-10T20:10:10Z';
-            }
-
-            return 'signature';
-        }));
-
-        $this->query->expects($this->any())->method('remove');
+        $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
+        $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
+        $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue('2010-10-10T20:10:10Z'));
 
         $this->listener->invoke($this->event);
     }
@@ -139,20 +131,10 @@ class AuthenticateTest extends ListenerTests {
      * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenSignatureDoesNotMatch() {
-        $this->query->expects($this->any())->method('has')->will($this->returnValue(true));
-        $this->query->expects($this->any())->method('remove');
-        $this->query->expects($this->any())->method('get')->will($this->returnCallback(function($arg) {
-            if ($arg === 'timestamp') {
-                return gmdate('Y-m-d\TH:i:s\Z');
-            }
-
-            return 'signature';
-        }));
-
-        $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue('http://imbo/users/christer'));
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $responseHeaders->expects($this->once())->method('set')->with('X-Imbo-AuthUrl', 'http://imbo/users/christer');
-        $this->response->headers = $responseHeaders;
+        $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
+        $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
+        $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(gmdate('Y-m-d\TH:i:s\Z')));
+        $this->headers->expects($this->at(3))->method('get')->with('x-imbo-authenticate-signature')->will($this->returnValue('foobar'));
 
         $this->listener->invoke($this->event);
     }
@@ -172,22 +154,52 @@ class AuthenticateTest extends ListenerTests {
         $data = $httpMethod . '|' . $url . '|' . $publicKey . '|' . $timestamp;
         $signature = hash_hmac('sha256', $data, $privateKey);
 
-        $this->query->expects($this->any())->method('has')->will($this->returnValue(true));
-        $this->query->expects($this->any())->method('remove');
-        $this->query->expects($this->any())->method('get')->will($this->returnCallback(function($arg) use ($timestamp, $signature) {
-            if ($arg === 'timestamp') {
-                return $timestamp;
-            }
-
-            return $signature;
-        }));
+        $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
+        $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
+        $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue($timestamp));
+        $this->headers->expects($this->at(3))->method('get')->with('x-imbo-authenticate-signature')->will($this->returnValue($signature));
 
         $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue($url));
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
         $this->request->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue($httpMethod));
 
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $responseHeaders->expects($this->once())->method('set')->with('X-Imbo-AuthUrl', $url);
+
+        $this->response->headers = $responseHeaders;
+
+        $this->listener->invoke($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\Authenticate::invoke
+     * @covers Imbo\EventListener\Authenticate::signatureIsValid
+     * @covers Imbo\EventListener\Authenticate::timestampIsValid
+     * @covers Imbo\EventListener\Authenticate::timestampHasExpired
+     */
+    public function testApprovesValidSignatureWithAuthInfoFromQueryParameters() {
+        $httpMethod = 'GET';
+        $url = 'http://imbo/users/christer/images/image';
+        $publicKey = 'christer';
+        $privateKey = 'key';
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
+        $data = $httpMethod . '|' . $url . '|' . $publicKey . '|' . $timestamp;
+        $signature = hash_hmac('sha256', $data, $privateKey);
+        $rawUrl = $url . '?signature=' . $signature . '&timestamp=' . $timestamp;
+
+        $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(false));
+        $this->headers->expects($this->at(1))->method('get')->with('x-imbo-authenticate-timestamp', $timestamp)->will($this->returnValue($timestamp));
+        $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-signature', $signature)->will($this->returnValue($signature));
+        $this->query->expects($this->at(0))->method('get')->with('timestamp')->will($this->returnValue($timestamp));
+        $this->query->expects($this->at(1))->method('get')->with('signature')->will($this->returnValue($signature));
+
+        $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue($rawUrl));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
+        $this->request->expects($this->once())->method('getMethod')->will($this->returnValue($httpMethod));
+
+        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $responseHeaders->expects($this->once())->method('set')->with('X-Imbo-AuthUrl', $url);
 
         $this->response->headers = $responseHeaders;
