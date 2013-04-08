@@ -114,10 +114,12 @@ class ImboContext extends RESTContext {
     }
 
     /**
-     * @Given /^I sign the request$/
+     * @Given /^I sign the request( using HTTP headers)?$/
      */
-    public function signRequest() {
-        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) {
+    public function signRequest($useHeaders = false) {
+        $useHeaders = (boolean) $useHeaders;
+
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($useHeaders) {
             $request = $event['request'];
 
             $timestamp = gmdate('Y-m-d\TH:i:s\Z');
@@ -126,9 +128,16 @@ class ImboContext extends RESTContext {
             // Generate signature
             $signature = hash_hmac('sha256', $data, $this->privateKey);
 
-            $query = $request->getQuery();
-            $query->set('signature', $signature);
-            $query->set('timestamp', $timestamp);
+            if ($useHeaders) {
+                $request->addHeaders(array(
+                    'X-Imbo-Authenticate-Signature' => $signature,
+                    'X-Imbo-Authenticate-Timestamp' => $timestamp,
+                ));
+            } else {
+                $query = $request->getQuery();
+                $query->set('signature', $signature);
+                $query->set('timestamp', $timestamp);
+            }
         }, -100);
     }
 
@@ -209,5 +218,16 @@ class ImboContext extends RESTContext {
                 $event['request']->getQuery()->add('t', $t);
             });
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRequestHeader($header, $value) {
+        if ($value === 'current-timestamp') {
+            $value = gmdate('Y-m-d\TH:i:s\Z');
+        }
+
+        parent::setRequestHeader($header, $value);
     }
 }
