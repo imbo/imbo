@@ -97,16 +97,7 @@ class ImagePreparation implements ContainerAware, ListenerInterface {
         }
 
         $extension = Image::getFileExtension($mime);
-
-        if (function_exists('getimagesizefromstring')) {
-            // Available since php-5.4.0
-            $size = getimagesizefromstring($imageBlob);
-        } else {
-            $tmpFile = tempnam(sys_get_temp_dir(), 'Imbo_uploaded_image');
-            file_put_contents($tmpFile, $imageBlob);
-            $size = getimagesize($tmpFile);
-            unlink($tmpFile);
-        }
+        $size = getimagesizefromstring($imageBlob);
 
         if (!$size) {
             $e = new ImageException('Broken image', 415);
