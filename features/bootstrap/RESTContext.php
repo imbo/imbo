@@ -339,11 +339,6 @@ class RESTContext extends BehatContext {
      * @throws RuntimeException
      */
     private static function startBuiltInHttpd($host, $port, $documentRoot, $router = null) {
-        if (version_compare(PHP_VERSION, '5.4.0') < 0) {
-            echo 'Requires php-5.4 to run' . PHP_EOL;
-            exit(0);
-        }
-
         $command = sprintf('php -S %s:%d -t %s %s >/dev/null 2>&1 & echo $!',
                             $host,
                             $port,
