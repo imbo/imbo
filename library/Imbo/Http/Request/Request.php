@@ -72,11 +72,7 @@ class Request extends SymfonyRequest {
     private $transformations;
 
     /**
-     * Creates a new request with values from PHP's super globals.
-     *
-     * @return Request A new request
-     *
-     * @api
+     * {@inheritdoc}
      */
     public static function createFromGlobals()
     {
