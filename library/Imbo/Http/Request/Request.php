@@ -72,6 +72,16 @@ class Request extends SymfonyRequest {
     private $transformations;
 
     /**
+     * {@inheritdoc}
+     */
+    public static function createFromGlobals()
+    {
+        $_SERVER['QUERY_STRING'] = str_replace('t%5B%5D=', 't[]=', $_SERVER['QUERY_STRING']);
+
+        return parent::createFromGlobals();
+    }
+
+    /**
      * Set an image model
      *
      * @param Image $image An image model instance
