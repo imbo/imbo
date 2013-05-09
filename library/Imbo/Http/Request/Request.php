@@ -72,6 +72,20 @@ class Request extends SymfonyRequest {
     private $transformations;
 
     /**
+     * Creates a new request with values from PHP's super globals.
+     *
+     * @return Request A new request
+     *
+     * @api
+     */
+    public static function createFromGlobals()
+    {
+        $_SERVER['QUERY_STRING'] = str_replace('t%5B%5D=', 't[]=', $_SERVER['QUERY_STRING']);
+
+        return parent::createFromGlobals();
+    }
+
+    /**
      * Set an image model
      *
      * @param Image $image An image model instance
