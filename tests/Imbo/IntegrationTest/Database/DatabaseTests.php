@@ -422,7 +422,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertNull($this->driver->getShortUrlParams($shortUrlId));
     }
 
-    public function testCanFilterInImageIdentifiers() {
+    public function testCanFilterOnImageIdentifiers() {
         $publicKey = 'christer';
         $id1 = str_repeat('a', 32);
         $id2 = str_repeat('b', 32);
@@ -455,5 +455,10 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
 
         $query->imageIdentifiers(array($id1, $id2, $id3, $id4, $id5, str_repeat('f', 32)));
         $this->assertCount(5, $this->driver->getImages($publicKey, $query));
+    }
+
+    public function testCanGetNumberOfBytes() {
+        $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image);
+        $this->assertSame(41423, $this->driver->getNumBytes($this->publicKey));
     }
 }

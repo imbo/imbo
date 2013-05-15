@@ -384,6 +384,26 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
+    public function getNumBytes($publicKey) {
+        try {
+            $result = $this->getCollection()->aggregate(
+                array('$match' => array('publicKey' => $publicKey)),
+                array('$group' => array('_id' => null, 'numBytes' => array('$sum' => '$size')))
+            )['result'];
+
+            if (empty($result)) {
+                return 0;
+            }
+
+            return (int) $result[0]['numBytes'];
+        } catch (MongoException $e) {
+            throw new DatabaseException('Unable to fetch information from the database', 500, $e);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStatus() {
         try {
             return $this->getMongoClient()->connect();
