@@ -64,6 +64,40 @@ In this section you will find information on the different resources Imbo's REST
     :local:
     :depth: 1
 
+.. _stats-resource:
+
+Stats resource
+++++++++++++++
+Imbo provides an endpoint for fetching simple statistics about the data stored in Imbo.
+
+.. code-block:: bash
+
+    $ curl http://imbo/stats.json
+
+results in:
+
+.. code-block:: javascript
+
+    {
+      "users": {
+        "someuser": {
+          "numImages": 11,
+          "numBytes": 3817197
+        },
+        "someotheruser": {
+          "numImages": 1,
+          "numBytes": 81097
+        }
+      },
+      "total": {
+        "numImages": 12,
+        "numUsers": 2,
+        "numBytes": 3898294
+      }
+    }
+
+The access control for the stats endpoint is controlled by an :ref:`event listener <stats-access>`, which is enabled per default, and only allows connections from ``127.0.0.1``.
+
 .. _status-resource:
 
 Status resource
