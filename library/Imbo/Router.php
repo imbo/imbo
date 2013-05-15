@@ -51,6 +51,7 @@ class Router implements ListenerInterface {
         ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images(/|(\.(?<extension>json|xml)))?$#',
         ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(/|\.(?<extension>json|xml))?$#',
         ResourceInterface::USER     => '#^/users/(?<publicKey>[a-z0-9_-]{3,})(/|\.(?<extension>json|xml))?$#',
+        ResourceInterface::STATS    => '#^/stats(/|(\.(?<extension>json|xml)))?$#',
     );
 
     /**
