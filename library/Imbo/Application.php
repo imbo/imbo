@@ -222,7 +222,6 @@ class Application {
         // Status resource
         $container->setStatic('statusResource', function(Container $container) {
             $resource = new Resource\Status();
-            $resource->setContainer($container);
 
             return $resource;
         });
