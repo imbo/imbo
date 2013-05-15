@@ -9,11 +9,11 @@ Imbo uses a `RESTful`_ API to manage the stored images and metadata. Each image 
 Content types
 -------------
 
-Currently Imbo responds with images (jpg, gif and png) and `JSON`_, `XML`_ and `HTML`_, but only accepts images (jpg, gif and png) and JSON as input.
+Currently Imbo responds with images (jpg, gif and png), `JSON`_ and `XML`_, but only accepts images (jpg, gif and png) and JSON as input.
 
 Imbo will do content negotiation using the `Accept`_ header found in the request, unless you specify a file extension, in which case Imbo will deliver the type requested without looking at the Accept header.
 
-The default `Content-Type`_ for non-image responses is JSON, and for most examples in this document you will see the ``.json`` extension being used. Change that to ``.html`` or ``.xml`` to get HTML and XML respectively. You can also skip the extension and force a specific Content-Type using the Accept header:
+The default `Content-Type`_ for non-image responses is JSON, and for most examples in this document you will see the ``.json`` extension being used. Change that to ``.xml`` to get XML data. You can also skip the extension and force a specific Content-Type using the Accept header:
 
 .. code-block:: bash
 
@@ -25,7 +25,7 @@ and
 
     $ curl -H "Accept: application/json" http://imbo/status
 
-will end up with the same content-type. Use ``application/xml`` for XML, and ``text/html`` for HTML.
+will end up with the same content-type. Use ``application/xml`` for XML.
 
 If you use JSON you can wrap the content in a function (`JSONP`_) by using one of the following query parameters:
 
@@ -54,7 +54,6 @@ will result in:
 .. _JSON: http://en.wikipedia.org/wiki/JSON
 .. _JSONP: http://en.wikipedia.org/wiki/JSONP
 .. _XML: http://en.wikipedia.org/wiki/XML
-.. _HTML: http://en.wikipedia.org/wiki/HTML
 
 Resources
 ---------

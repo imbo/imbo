@@ -183,8 +183,6 @@ class ImboContext extends RESTContext {
             $data = $response->xml();
             $errorMessage = (string) $data->error->message;
             $errorCode = $data->error->imboErrorCode;
-        } else {
-            throw new PendingException('Not added support for html yet');
         }
 
         assertSame($message, $errorMessage, 'Expected "' . $message. '", got "' . $errorMessage . '"');
