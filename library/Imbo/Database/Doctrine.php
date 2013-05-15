@@ -371,6 +371,21 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
+    public function getNumBytes($publicKey) {
+        $query = $this->getConnection()->createQueryBuilder();
+        $query->select('SUM(i.size)')
+              ->from($this->getTableName('imageinfo', $publicKey), 'i')
+              ->where('i.publicKey = :publicKey')
+              ->setParameter(':publicKey', $publicKey);
+
+        $stmt = $query->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStatus() {
         $connection = $this->getConnection();
 

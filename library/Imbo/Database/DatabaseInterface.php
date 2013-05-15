@@ -124,6 +124,15 @@ interface DatabaseInterface {
     function getNumImages($publicKey);
 
     /**
+     * Fetch the number of bytes stored by a user
+     *
+     * @param string $publicKey The public key of the user
+     * @return int Returns the number of bytes
+     * @throws DatabaseException
+     */
+    function getNumBytes($publicKey);
+
+    /**
      * Get the current status of the database connection
      *
      * This method is used with the status resource.
