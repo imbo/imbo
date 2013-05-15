@@ -263,8 +263,19 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
     public function loadStats(EventInterface $event) {
         $response = $event->getResponse();
         $database = $event->getDatabase();
+        $publicKeys = array_keys($event->getConfig()['auth']);
+        $users = array();
+
+        foreach ($publicKeys as $key) {
+            $users[$key] = array(
+                'numImages' => $database->getNumImages($key),
+                'numBytes' => $database->getNumBytes($key),
+            );
+        }
 
         $statsModel = new Model\Stats();
+        $statsModel->setUsers($users);
+
         $response->setModel($statsModel);
     }
 }
