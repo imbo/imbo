@@ -51,6 +51,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
             new ListenerDefinition('db.metadata.update', array($this, 'updateMetadata')),
             new ListenerDefinition('db.metadata.load', array($this, 'loadMetadata')),
             new ListenerDefinition('db.user.load', array($this, 'loadUser')),
+            new ListenerDefinition('db.stats.load', array($this, 'loadStats')),
         );
     }
 
@@ -252,5 +253,18 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
 
         $response->setModel($userModel)
                  ->setLastModified($lastModified);
+    }
+
+    /**
+     * Load stats
+     *
+     * @param EventInterface $event An event instance
+     */
+    public function loadStats(EventInterface $event) {
+        $response = $event->getResponse();
+        $database = $event->getDatabase();
+
+        $statsModel = new Model\Stats();
+        $response->setModel($statsModel);
     }
 }
