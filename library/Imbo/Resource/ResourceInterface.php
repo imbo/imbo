@@ -34,6 +34,7 @@ interface ResourceInterface {
     const IMAGES   = 'images';
     const IMAGE    = 'image';
     const METADATA = 'metadata';
+    const STATS    = 'stats';
     /**#@-*/
 
     /**
