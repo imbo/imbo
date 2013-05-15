@@ -128,6 +128,17 @@ class JSON extends Formatter implements FormatterInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function formatStats(Model\Stats $model) {
+        return $this->encode(array(
+            'numImages' => 0,
+            'numUsers' => 0,
+            'numBytes' => 0,
+        ));
+    }
+
+    /**
      * JSON encode an array
      *
      * @param mixed $data The data to encode
