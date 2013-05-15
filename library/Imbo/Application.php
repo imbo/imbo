@@ -227,6 +227,11 @@ class Application {
             return $resource;
         });
 
+        // Stats resource
+        $container->setStatic('statsResource', function(Container $container) {
+            return new Resource\Stats();
+        });
+
         // Image resource
         $container->setStatic('imageResource', function(Container $container) {
             $resource = new Resource\Image();
@@ -337,6 +342,7 @@ class Application {
             // Register internal event listeners
             $containerEntries = array_merge(array(
                 'statusResource',
+                'statsResource',
                 'userResource',
                 'imagesResource',
                 'imageResource',
