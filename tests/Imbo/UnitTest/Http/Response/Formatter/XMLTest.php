@@ -348,7 +348,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\XML::formatArrayModel
-     * @covers Imbo\Http\Response\Formatter\XML::formatNested
+     * @covers Imbo\Http\Response\Formatter\XML::formatArray
      */
     public function testCanFormatAnArrayModelWithNestedArrays() {
         $data = array(

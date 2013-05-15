@@ -51,10 +51,9 @@ class Stats implements ResourceInterface, ListenerInterface {
      */
     public function get(EventInterface $event) {
         $response = $event->getResponse();
-        $storage = $event->getStorage();
-
         $response->setMaxAge(0)
                  ->setPrivate();
+
         $response->headers->addCacheControlDirective('no-store');
 
         $event->getManager()->trigger('db.stats.load');
