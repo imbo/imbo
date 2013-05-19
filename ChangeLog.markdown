@@ -13,6 +13,7 @@ __N/A__
 
 * If clients have no preferences regarding images the original mime type of each image is prioritized
 * Added support for custom routes and resources through the constructor
+* Added watermark transformation
 
 Imbo-0.3.2
 ----------

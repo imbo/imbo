@@ -230,6 +230,9 @@ $config = array(
         'transverse' => function (array $params) {
             return new Image\Transformation\Transverse();
         },
+        'watermark' => function (array $params) {
+            return new Image\Transformation\Watermark($params);
+        },
     ),
 
     /**
