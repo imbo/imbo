@@ -25,14 +25,18 @@ trait ImageReaderAwareTrait {
     private $imageReader;
 
     /**
-     * {@inheritdoc}
+     * Set an instance of an image reader
+     *
+     * @param ImageReader $reader An image reader instance
      */
     public function setImageReader(ImageReader $reader) {
         $this->imageReader = $reader;
     }
 
     /**
-     * {@inheritdoc}
+     * Get an instance of an image reader
+     *
+     * @return ImageReader An image reader instance
      */
     public function getImageReader() {
         return $this->imageReader;
