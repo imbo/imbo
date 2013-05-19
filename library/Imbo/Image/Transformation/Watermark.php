@@ -19,9 +19,9 @@ use Imbo\Model\Image,
     ImagickException;
 
 /**
- * Flip horizontally transformation
+ * Watermark transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
+ * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
 class Watermark extends Transformation implements ImageReaderAware, TransformationInterface {

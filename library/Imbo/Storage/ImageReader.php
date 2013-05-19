@@ -62,6 +62,7 @@ class ImageReader {
      * 
      * @param  string $imageIdentifier Image identifier
      * @return boolean Returns true if image exists, false otherwise
+     * @throws StorageException
      */
     public function imageExists($imageIdentifier) {
         return $this->storage->imageExists($this->publicKey, $imageIdentifier);
