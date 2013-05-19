@@ -483,6 +483,37 @@ This transformation transverses the image.
 
 * ``t[]=transverse``
 
+watermark
+#########
+
+This transformation can be used to apply a watermark on top of the original image.
+
+**Parameters:**
+
+``img``
+    Image identifier of the image to apply as watermark. Can be set to a default value in configuration by using ``<setDefaultImage>``.
+
+``width``
+    Width of the watermark image in pixels. If omitted the width of ``<img>`` will be used.
+
+``height``
+    Height of the watermark image in pixels. If omitted the height of ``<img>`` will be used.
+
+``position``
+    The placement of the watermark image. ``top-left``, ``top-right``, ``bottom-left``, ``bottom-right`` and ``center`` are available values. Defaults to ``top-left``.
+
+``x``
+    Number of pixels in the X-axis the watermark image should be offset from the original position (defined by the ``position`` parameter). Supports negative numbers. Defaults to ``0``
+
+``y``
+    Number of pixels in the Y-axis the watermark image should be offset from the original position (defined by the ``position`` parameter). Supports negative numbers. Defaults to ``0``
+
+**Examples:**
+
+* ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f``
+* ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f,width=200,x=5``
+* ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f,height=50,x=-5,y=-5,position=bottom-right``
+
 PUT /users/<user>/images/<image>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
