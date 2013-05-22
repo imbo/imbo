@@ -138,6 +138,7 @@ class JSON extends Formatter implements FormatterInterface {
                 'numUsers' => $model->getNumUsers(),
                 'numBytes' => $model->getNumBytes(),
             ),
+            'custom' => $model->getCustomStats() ?: new stdClass(),
         );
 
         return $this->encode($data);

@@ -28,5 +28,5 @@ Feature: Imbo provides a stats endpoint
         When I request "/stats.json"
         Then the response body is:
            """
-           {"users":{"publickey":{"numImages":1,"numBytes":95576}},"total":{"numImages":1,"numUsers":1,"numBytes":95576}}
+           {"users":{"publickey":{"numImages":1,"numBytes":95576}},"total":{"numImages":1,"numUsers":1,"numBytes":95576},"custom":{}}
            """

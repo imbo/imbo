@@ -118,4 +118,37 @@ class StatsTest extends \PHPUnit_Framework_TestCase {
         $this->model->setUsers($users);
         $this->assertSame($bytes, $this->model->getNumBytes());
     }
+
+    /**
+     * @covers Imbo\Model\Stats::getCustomStats
+     * @covers Imbo\Model\Stats::offsetExists
+     * @covers Imbo\Model\Stats::offsetSet
+     * @covers Imbo\Model\Stats::offsetGet
+     * @covers Imbo\Model\Stats::offsetUnset
+     */
+    public function testSupportsCustomStats() {
+        $this->assertSame(array(), $this->model->getCustomStats());
+
+        $this->model['foo'] = 'bar';
+        $this->model['bar'] = 'foo';
+
+        $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $this->model->getCustomStats());
+
+        $this->assertTrue(isset($this->model['bar']));
+        $this->assertSame('foo', $this->model['bar']);
+        unset($this->model['bar']);
+        $this->assertFalse(isset($this->model['bar']));
+
+        $this->assertSame(array('foo' => 'bar'), $this->model->getCustomStats());
+    }
+
+    /**
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Custom statistics requires a key to be set
+     * @expectedExceptionCode 500
+     * @covers Imbo\Model\Stats::offsetSet
+     */
+    public function testThrowsExceptionWhenUsedAsArrayWithoutAKey() {
+        $this->model[] = 'foobar';
+    }
 }
