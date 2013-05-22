@@ -5,6 +5,7 @@ Imbo-0.3.0
 ----------
 __N/A__
 
+* Imbo no longer includes the HTML formatter
 * Imbo no longer supports php < 5.4
 * Imbo now uses the Symfony HttpFoundation Component
 * Added support for signing requests using request headers

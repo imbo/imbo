@@ -47,6 +47,7 @@ end
 desc "Install dependencies"
 task :installdep do
   if ENV["TRAVIS"] == "true"
+    system "composer self-update"
     system "composer -n --no-ansi install --dev --prefer-source"
   else
     Rake::Task["install_composer"].invoke

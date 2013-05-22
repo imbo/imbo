@@ -41,7 +41,6 @@ class ResponseWriter implements ContainerAware {
     private $supportedTypes = array(
         'application/json' => 'jsonFormatter',
         'application/xml'  => 'xmlFormatter',
-        'text/html'        => 'htmlFormatter',
         'image/gif'        => 'gifFormatter',
         'image/png'        => 'pngFormatter',
         'image/jpeg'       => 'jpegFormatter',
@@ -55,7 +54,6 @@ class ResponseWriter implements ContainerAware {
     private $extensionsToMimeType = array(
         'json' => 'application/json',
         'xml'  => 'application/xml',
-        'html' => 'text/html',
         'gif'  => 'image/gif',
         'jpg'  => 'image/jpeg',
         'png'  => 'image/png',
@@ -69,7 +67,6 @@ class ResponseWriter implements ContainerAware {
     private $defaultModelTypes = array(
         'application/json',
         'application/xml',
-        'text/html',
     );
 
     /**
