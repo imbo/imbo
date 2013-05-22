@@ -13,6 +13,5 @@ Feature: Imbo supports content negotiation
             | accept                                                          | content-type     |
             | application/json                                                | application/json |
             | application/xml                                                 | application/xml  |
-            | text/html                                                       | text/html        |
-            | text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8 | text/html        |
+            | text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8 | application/xml  |
             | image/*,*/*;q=0.1                                               | application/json |

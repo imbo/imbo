@@ -22,7 +22,6 @@ Feature: Imbo provides a metadata endpoint
             | accept           | content-type     | match    | response-body         |
             | application/json | application/json | is       | {}                    |
             | application/xml  | application/xml  | contains | <metadata></metadata> |
-            | text/html        | text/html        | contains | <p>No metadata</p>    |
 
     Scenario: Attach metadata to an image
         Given I use "publickey" and "privatekey" for public and private keys
@@ -55,7 +54,6 @@ Feature: Imbo provides a metadata endpoint
             | accept           | content-type     | match    | response-body                                 |
             | application/json | application/json | is       | {"foo":"bar"}                                 |
             | application/xml  | application/xml  | contains | <metadata><tag key="foo">bar</tag></metadata> |
-            | text/html        | text/html        | contains | <dl><dt>foo</dt><dd>bar</dd></dl>             |
 
     Scenario: Partially update metadata
         Given I use "publickey" and "privatekey" for public and private keys
@@ -88,7 +86,6 @@ Feature: Imbo provides a metadata endpoint
             | accept           | content-type     | match    | response-body                                                         |
             | application/json | application/json | is       | {"foo":"bar","bar":"foo"}                                             |
             | application/xml  | application/xml  | contains | <metadata><tag key="foo">bar</tag><tag key="bar">foo</tag></metadata> |
-            | text/html        | text/html        | contains | <dl><dt>foo</dt><dd>bar</dd><dt>bar</dt><dd>foo</dd></dl>             |
 
     Scenario: Replace metadata
         Given I use "publickey" and "privatekey" for public and private keys
@@ -121,7 +118,6 @@ Feature: Imbo provides a metadata endpoint
             | accept           | content-type     | match    | response-body                                   |
             | application/json | application/json | is       | {"key":"value"}                                 |
             | application/xml  | application/xml  | contains | <metadata><tag key="key">value</tag></metadata> |
-            | text/html        | text/html        | contains | <dl><dt>key</dt><dd>value</dd></dl>             |
 
     Scenario: Delete metadata
         Given I use "publickey" and "privatekey" for public and private keys
@@ -150,4 +146,3 @@ Feature: Imbo provides a metadata endpoint
             | accept           | content-type     | match    | response-body         |
             | application/json | application/json | is       | {}                    |
             | application/xml  | application/xml  | contains | <metadata></metadata> |
-            | text/html        | text/html        | contains | <p>No metadata</p>    |

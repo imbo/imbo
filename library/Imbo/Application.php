@@ -395,9 +395,6 @@ class Application {
         $container->setStatic('jsonFormatter', function(Container $container) {
             return new Formatter\JSON($container->get('dateFormatter'));
         });
-        $container->setStatic('htmlFormatter', function(Container $container) {
-            return new Formatter\HTML($container->get('dateFormatter'));
-        });
         $container->setStatic('xmlFormatter', function(Container $container) {
             return new Formatter\XML($container->get('dateFormatter'));
         });
