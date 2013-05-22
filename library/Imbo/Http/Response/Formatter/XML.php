@@ -193,6 +193,7 @@ DATA;
             'numImages' => $model->getNumImages(),
             'numBytes' => $model->getNumBytes(),
         ));
+        $custom = $this->formatArray($model->getCustomStats() ?: array());
 
         foreach ($model->getUsers() as $user => $stats) {
             $users .= '<user publicKey="' . $user . '">' . $this->formatArray($stats) . '</user>';
@@ -204,6 +205,7 @@ DATA;
   <stats>
     <users>{$users}</users>
     <total>{$total}</total>
+    <custom>{$custom}</custom>
   </stats>
 </imbo>
 STATUS;

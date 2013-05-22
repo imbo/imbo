@@ -10,13 +10,16 @@
 
 namespace Imbo\Model;
 
+use Imbo\Exception\InvalidArgumentException,
+    ArrayAccess;
+
 /**
  * Statistics model
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
-class Stats implements ModelInterface {
+class Stats implements ModelInterface, ArrayAccess {
     /**
      * Total number of images stored
      *
@@ -39,6 +42,13 @@ class Stats implements ModelInterface {
     private $numBytes;
 
     /**
+     * Custom stats that can be set
+     *
+     * @var array
+     */
+    private $customStats = array();
+
+    /**
      * User stats
      *
      * Keys are the public keys of the users , and the values is an array with two elements:
@@ -48,7 +58,7 @@ class Stats implements ModelInterface {
      *
      * @var int
      */
-    public $users = array();
+    private $users = array();
 
     /**
      * Set the users information
@@ -108,5 +118,46 @@ class Stats implements ModelInterface {
      */
     public function getNumUsers() {
         return count($this->users);
+    }
+
+    /**
+     * Get custom stats
+     *
+     * @return array
+     */
+    public function getCustomStats() {
+        return $this->customStats;
+    }
+
+    /**
+     * @link http://www.php.net/manual/en/arrayaccess.offsetexists.php
+     */
+    public function offsetExists($offset) {
+        return isset($this->customStats[$offset]);
+    }
+
+    /**
+     * @link http://www.php.net/manual/en/arrayaccess.offsetget.php
+     */
+    public function offsetGet($offset) {
+        return $this->customStats[$offset];
+    }
+
+    /**
+     * @link http://www.php.net/manual/en/arrayaccess.offsetset.php
+     */
+    public function offsetSet($offset, $value) {
+        if ($offset === null) {
+            throw new InvalidArgumentException('Custom statistics requires a key to be set', 500);
+        }
+
+        $this->customStats[$offset] = $value;
+    }
+
+    /**
+     * @link http://www.php.net/manual/en/arrayaccess.offsetunset.php
+     */
+    public function offsetUnset($offset) {
+        unset($this->customStats[$offset]);
     }
 }
