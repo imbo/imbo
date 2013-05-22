@@ -53,10 +53,14 @@ class Image implements ResourceInterface, ListenerInterface {
 
         $request = $event->getRequest();
         $response = $event->getResponse();
+        $image = $request->getImage();
 
         $model = new Model\ArrayModel();
         $model->setData(array(
-            'imageIdentifier' => $request->getImage()->getChecksum(),
+            'imageIdentifier' => $image->getChecksum(),
+            'width' => $image->getWidth(),
+            'height' => $image->getHeight(),
+            'extension' => $image->getExtension(),
         ));
 
         $response->setModel($model);
