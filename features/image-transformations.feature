@@ -11,7 +11,7 @@ Feature: Imbo enables dynamic transformations of images
         Then the "Content-Type" response header is "application/json"
         And the response body is:
           """
-          {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}
+          {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2","width":599,"height":417,"extension":"png"}
           """
 
     Scenario Outline: Transform the image
