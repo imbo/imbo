@@ -892,7 +892,7 @@ and is enabled like this:
         // ...
     );
 
-which would allow only ``exif:make`` and ``exif:Model`` as metadata tags. Not passing an array to the constructor will allow all tags.
+which would allow only ``exif:Make`` and ``exif:Model`` as metadata tags. Not passing an array to the constructor will allow all tags.
 
 Image transformation cache
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
