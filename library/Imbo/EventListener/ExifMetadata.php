@@ -28,21 +28,21 @@ class ExifMetadata implements ListenerInterface {
      *
      * @var array
      */
-    protected $allowedTags = null;
+    protected $allowedTags = array();
 
     /**
      * Exif properties
      *
      * @var array
      */
-    protected $properties;
+    protected $properties = array();
 
     /**
      * Class constructor
      *
      * @param array $allowedTags An array of tags to use as metadata, if present
      */
-    public function __construct($allowedTags = null) {
+    public function __construct(array $allowedTags = array()) {
         $this->allowedTags = $allowedTags;
     }
 
@@ -110,7 +110,7 @@ class ExifMetadata implements ListenerInterface {
      * @return array A filtered array of properties
      */
     protected function filterProperties(array $properties) {
-        if ($this->allowedTags === null) {
+        if (empty($this->allowedTags)) {
             return $properties;
         }
 
