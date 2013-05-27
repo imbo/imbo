@@ -834,7 +834,7 @@ To enable the listener, use the following:
 
         'eventListeners' => array(
             'cors' => function() {
-                new EventListener\Cors(array(
+                return new EventListener\Cors(array(
                     'allowedOrigins' => array('http://some.origin'),
                     'allowedMethods' => array(
                         'image'  => array('GET', 'HEAD', 'PUT'),
@@ -853,6 +853,46 @@ To enable the listener, use the following:
 ``allowedMethods`` is an associative array where the keys represent the resource (``image``, ``images``, ``metadata``, ``status`` and ``user``). The value is an array of HTTP methods you wish to open up.
 
 ``maxAge`` specifies how long the response of an OPTIONS-request can be cached for, in seconds. Defaults to 3600 (one hour).
+
+Exif metadata
+^^^^^^^^^^^^^
+
+This event listener can be used to fetch the EXIF-tags from uploaded images and adding them as metadata. Enabling this event listener will not populate metadata for images already added to Imbo.
+
+The event listener subscribes to the following events:
+
+* ``image.put``
+* ``db.image.insert``
+
+and has the following parameters:
+
+``$allowedTags``
+    The tags you want to be populated as metadata, if present. Optional - by default all tags are added.
+
+and is enabled like this:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            'exifMetadata' => function() {
+                return new EventListener\ExifMetadata(array(
+                    'exif:Make',
+                    'exif:Model',
+                ));
+            },
+        ),
+
+        // ...
+    );
+
+which would allow only ``exif:Make`` and ``exif:Model`` as metadata tags. Not passing an array to the constructor will allow all tags.
 
 Image transformation cache
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -9,6 +9,7 @@ __N/A__
 * Imbo no longer supports php < 5.4
 * Imbo now uses the Symfony HttpFoundation Component
 * Added support for signing requests using request headers
+* Imbo can populate metadata from EXIF-tags on new images by enabling the ExifMetadata event listener (Espen Hovlandsdal)
 
 Imbo-0.2.1
 ----------
