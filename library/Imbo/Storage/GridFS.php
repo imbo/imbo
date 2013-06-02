@@ -30,7 +30,7 @@ use Imbo\Model\Image,
  * - <pre>(string) server</pre> The server string to use when connecting to MongoDB. Defaults to
  *                              'mongodb://localhost:27017'
  * - <pre>(array) options</pre> Options to use when creating the Mongo client instance. Defaults to
- *                              array('connect' => true, 'timeout' => 1000).
+ *                              array('connect' => true, 'connectTimeoutMS' => 1000).
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Storage
@@ -61,7 +61,7 @@ class GridFS implements StorageInterface {
 
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
-        'options' => array('connect' => true, 'timeout' => 1000),
+        'options' => array('connect' => true, 'connectTimeoutMS' => 1000),
     );
 
     /**

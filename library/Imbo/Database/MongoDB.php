@@ -31,7 +31,7 @@ use Imbo\Model\Image,
  * - (string) server The server string to use when connecting to MongoDB. Defaults to
  *                              'mongodb://localhost:27017'
  * - (array) options Options to use when creating the MongoClient instance. Defaults to
- *                              array('connect' => true, 'timeout' => 1000).
+ *                              array('connect' => true, 'connectTimeoutMS' => 1000).
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
@@ -63,7 +63,7 @@ class MongoDB implements DatabaseInterface {
 
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
-        'options' => array('connect' => true, 'timeout' => 1000),
+        'options' => array('connect' => true, 'connectTimeoutMS' => 1000),
     );
 
     /**
