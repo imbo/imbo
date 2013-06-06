@@ -118,9 +118,12 @@ class ResponseWriter implements ContainerAware {
         // The entry of the formatter to fetch from the container
         $entry = null;
         $extension = $request->getExtension();
+        $resource = $request->getResource();
 
-        if ($extension && !($model instanceof Model\Error)) {
-            // The user agent wants a specific type. Skip content negotiation completely
+        if ($extension && !($model instanceof Model\Error && $resource === 'image')) {
+            // The user agent wants a specific type. Skip content negotiation completely, but not
+            // if the request is against the image resource, and ended up as an error, because then
+            // Imbo would try to render the error as an image.
             $mime = $this->defaultMimeType;
 
             if (isset($this->extensionsToMimeType[$extension])) {

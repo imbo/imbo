@@ -239,16 +239,17 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Http\Response\ResponseWriter::write
      */
-    public function testForcesContentNegotiationOnErrorModels() {
+    public function testForcesContentNegotiationOnErrorModelsWhenResourceIsAnImage() {
         $this->model = new Error();
         $error = '{"some":"error"}';
         $query = new ParameterBag();
 
         $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('*/*'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
+        $this->request->expects($this->once())->method('getResource')->will($this->returnValue('image'));
         $this->request->query = $query;
 
-        $this->responseHeaders->expects($this->any())->method('set')->will($this->returnSelf());
+        $this->response->expects($this->once())->method('setVary')->with('Accept');
 
         $formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
         $formatter->expects($this->once())->method('format')->with($this->model)->will($this->returnValue($error));
@@ -259,6 +260,27 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
 
         $this->container->expects($this->at(0))->method('get')->with('contentNegotiation')->will($this->returnValue($contentNegotiation));
         $this->container->expects($this->at(1))->method('get')->with('jsonFormatter')->will($this->returnValue($formatter));
+
+        $this->responseWriter->write($this->model, $this->request, $this->response);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\ResponseWriter::write
+     */
+    public function testDoesNotForcesContentNegotiationOnErrorModelsWhenResourceIsNotAnImage() {
+        $this->model = new Error();
+        $error = '{"some":"error"}';
+        $query = new ParameterBag();
+
+        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('json'));
+        $this->request->expects($this->once())->method('getResource')->will($this->returnValue('user'));
+        $this->request->query = $query;
+
+        $formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
+        $formatter->expects($this->once())->method('format')->with($this->model)->will($this->returnValue($error));
+        $formatter->expects($this->once())->method('getContentType')->will($this->returnValue('application/json'));
+
+        $this->container->expects($this->once())->method('get')->with('jsonFormatter')->will($this->returnValue($formatter));
 
         $this->responseWriter->write($this->model, $this->request, $this->response);
     }
