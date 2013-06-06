@@ -3,8 +3,9 @@ Changelog for Imbo
 
 Imbo-0.3.0
 ----------
-__N/A__
+__2013-06-06__
 
+* Improved image validation when adding images (Espen Hovlandsdal)
 * Imbo no longer includes the HTML formatter
 * Imbo no longer supports php < 5.4
 * Imbo now uses the Symfony HttpFoundation Component
