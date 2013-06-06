@@ -118,6 +118,21 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
+     * @expectedException Imbo\Exception\ImageException
+     * @expectedExceptionMessage Broken image
+     * @expectedExceptionCode 415
+     */
+    public function testThrowsExceptionWhenImageIsBrokenButSizeIsReadable() {
+        $filePath = FIXTURES_DIR . '/slightly-broken-image.png';
+
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents($filePath)));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(md5_file($filePath)));
+
+        $this->prepare->prepareImage($this->event);
+    }
+
+    /**
+     * @covers Imbo\Image\ImagePreparation::prepareImage
      */
     public function testPopulatesRequestWhenImageIsValid() {
         $imagePath = FIXTURES_DIR . '/image.png';

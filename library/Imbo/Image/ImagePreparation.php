@@ -18,6 +18,8 @@ use Imbo\EventListener\ListenerDefinition,
     Imbo\Model\Image,
     Imbo\Container,
     Imbo\ContainerAware,
+    Imagick,
+    ImagickException,
     finfo;
 
 /**
@@ -99,7 +101,15 @@ class ImagePreparation implements ContainerAware, ListenerInterface {
         $extension = Image::getFileExtension($mime);
         $size = getimagesizefromstring($imageBlob);
 
-        if (!$size) {
+        try {
+            $imagick = new Imagick();
+            $imagick->readImageBlob($imageBlob);
+            $validImage = $imagick->valid();
+        } catch (ImagickException $e) {
+            $validImage = false;
+        }
+
+        if (!$size || !$validImage) {
             $e = new ImageException('Broken image', 415);
             $e->setImboErrorCode(Exception::IMAGE_BROKEN_IMAGE);
 
