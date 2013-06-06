@@ -133,3 +133,18 @@ Feature: Imbo provides an image endpoint
         Then I should get a response with "415 Broken image"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Broken image" and the error code is "204"
+
+    Scenario Outline: Imbo uses the Accept header when encountering errors to choose the error format
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        And the "Accept" request header is "<accept>"
+        When I request "/users/publickey/images/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa<extension>"
+        Then I should get a response with "<reason>"
+        And the "Content-Type" response header is "<content-type>"
+
+        Examples:
+            | accept    | content-type     | extension | reason              |
+            | */*       | application/json | .png      | 404 Image not found |
+            | image/png | application/json | .png      | 406 Not acceptable  |
+            | */*       | application/json |           | 404 Image not found |
+            | image/png | application/json |           | 406 Not acceptable  |
