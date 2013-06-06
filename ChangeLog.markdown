@@ -1,6 +1,12 @@
 Changelog for Imbo
 =====================
 
+Imbo-0.3.2
+----------
+__2013-06-06__
+
+* Fixed #182: Sometimes wrong content-type when errors occur
+
 Imbo-0.3.1
 ----------
 __2013-06-06__
