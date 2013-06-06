@@ -11,7 +11,6 @@
 namespace Imbo;
 
 use Imbo\Resource\ResourceInterface,
-    Imbo\Http\Request\RequestInterface,
     Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
     Imbo\EventListener\ListenerInterface,
@@ -30,13 +29,13 @@ class Router implements ListenerInterface {
      * @var array
      */
     static private $supportedHttpMethods = array(
-        RequestInterface::METHOD_GET     => true,
-        RequestInterface::METHOD_POST    => true,
-        RequestInterface::METHOD_PUT     => true,
-        RequestInterface::METHOD_HEAD    => true,
-        RequestInterface::METHOD_DELETE  => true,
-        RequestInterface::METHOD_BREW    => true,
-        RequestInterface::METHOD_OPTIONS => true,
+        'GET'     => true,
+        'POST'    => true,
+        'PUT'     => true,
+        'HEAD'    => true,
+        'DELETE'  => true,
+        'BREW'    => true,
+        'OPTIONS' => true,
     );
 
     /**
@@ -46,10 +45,10 @@ class Router implements ListenerInterface {
      */
     public $routes = array(
         ResourceInterface::IMAGE    => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(.(?<extension>gif|jpg|png))?$#',
-        ResourceInterface::STATUS   => '#^/status(/|(\.(?<extension>json|html|xml)))?$#',
-        ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images(/|(\.(?<extension>json|html|xml)))?$#',
-        ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(/|\.(?<extension>json|html|xml))?$#',
-        ResourceInterface::USER     => '#^/users/(?<publicKey>[a-z0-9_-]{3,})(/|\.(?<extension>json|html|xml))?$#',
+        ResourceInterface::STATUS   => '#^/status(/|(\.(?<extension>json|xml)))?$#',
+        ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images(/|(\.(?<extension>json|xml)))?$#',
+        ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(/|\.(?<extension>json|xml))?$#',
+        ResourceInterface::USER     => '#^/users/(?<publicKey>[a-z0-9_-]{3,})(/|\.(?<extension>json|xml))?$#',
     );
 
     /**
@@ -70,7 +69,7 @@ class Router implements ListenerInterface {
         $request = $event->getRequest();
         $httpMethod = $request->getMethod();
 
-        if ($httpMethod === RequestInterface::METHOD_BREW) {
+        if ($httpMethod === 'BREW') {
             throw new RuntimeException('I\'m a teapot!', 418);
         }
 
@@ -78,7 +77,7 @@ class Router implements ListenerInterface {
             throw new RuntimeException('Unsupported HTTP method: ' . $httpMethod, 501);
         }
 
-        $path = $request->getPath();
+        $path = $request->getPathInfo();
         $matches = array();
 
         foreach ($this->routes as $resourceName => $route) {

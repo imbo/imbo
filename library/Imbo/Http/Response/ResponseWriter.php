@@ -10,13 +10,14 @@
 
 namespace Imbo\Http\Response;
 
-use Imbo\Http\Request\RequestInterface,
+use Imbo\Http\Request\Request,
     Imbo\Http\Response\Formatter,
     Imbo\Http\ContentNegotiation,
     Imbo\Exception\RuntimeException,
     Imbo\Container,
     Imbo\ContainerAware,
-    Imbo\Model;
+    Imbo\Model,
+    Symfony\Component\HttpFoundation\AcceptHeader;
 
 /**
  * Response writer
@@ -40,7 +41,6 @@ class ResponseWriter implements ContainerAware {
     private $supportedTypes = array(
         'application/json' => 'jsonFormatter',
         'application/xml'  => 'xmlFormatter',
-        'text/html'        => 'htmlFormatter',
         'image/gif'        => 'gifFormatter',
         'image/png'        => 'pngFormatter',
         'image/jpeg'       => 'jpegFormatter',
@@ -54,7 +54,6 @@ class ResponseWriter implements ContainerAware {
     private $extensionsToMimeType = array(
         'json' => 'application/json',
         'xml'  => 'application/xml',
-        'html' => 'text/html',
         'gif'  => 'image/gif',
         'jpg'  => 'image/jpeg',
         'png'  => 'image/png',
@@ -68,7 +67,6 @@ class ResponseWriter implements ContainerAware {
     private $defaultModelTypes = array(
         'application/json',
         'application/xml',
-        'text/html',
     );
 
     /**
@@ -109,14 +107,14 @@ class ResponseWriter implements ContainerAware {
      * Return a formatted message using a chosen formatter based on the request
      *
      * @param Model\ModelInterface $model Model to write in another format
-     * @param RequestInterface $request A request instance
-     * @param ResponseInterface $response A response instance
+     * @param Request $request A request instance
+     * @param Response $response A response instance
      * @param boolean $strict Whether or not the response writer will throw a RuntimeException with
      *                        status code 406 (Not Acceptable) if it can not produce acceptable
      *                        content for the user agent.
      * @throws RuntimeException
      */
-    public function write(Model\ModelInterface $model, RequestInterface $request, ResponseInterface $response, $strict = true) {
+    public function write(Model\ModelInterface $model, Request $request, Response $response, $strict = true) {
         // The entry of the formatter to fetch from the container
         $entry = null;
         $extension = $request->getExtension();
@@ -132,11 +130,16 @@ class ResponseWriter implements ContainerAware {
             $entry = $this->supportedTypes[$mime];
         } else {
             // Set Vary to Accept since we are doing content negotiation based on Accept
-            $response->getHeaders()->set('Vary', 'Accept');
+            $response->setVary('Accept');
 
             // No extension have been provided
             $contentNegotiation = $this->container->get('contentNegotiation');
-            $acceptableTypes = $request->getAcceptableContentTypes();
+
+            $acceptableTypes = array();
+
+            foreach (AcceptHeader::fromString($request->headers->get('Accept', '*/*'))->all() as $item) {
+                $acceptableTypes[$item->getValue()] = $item->getQuality();
+            }
 
             // Try to find the best match since the client does not accept the original mime
             // type
@@ -179,21 +182,21 @@ class ResponseWriter implements ContainerAware {
         $contentType = $formatter->getContentType();
 
         if ($contentType === 'application/json') {
-            $query = $request->getQuery();
-
             foreach (array('callback', 'jsonp', 'json') as $validParam) {
-                if ($query->has($validParam)) {
-                    $formattedData = sprintf("%s(%s)", $query->get($validParam), $formattedData);
+                if ($request->query->has($validParam)) {
+                    $formattedData = sprintf("%s(%s)", $request->query->get($validParam), $formattedData);
                     break;
                 }
             }
         }
 
-        $response->getHeaders()->set('Content-Type', $contentType)
-                               ->set('Content-Length', strlen($formattedData));
+        $response->headers->add(array(
+            'Content-Type' => $contentType,
+            'Content-Length' => strlen($formattedData),
+        ));
 
-        if ($request->getMethod() !== RequestInterface::METHOD_HEAD) {
-            $response->setBody($formattedData);
+        if ($request->getMethod() !== 'HEAD') {
+            $response->setContent($formattedData);
         }
     }
 }

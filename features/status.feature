@@ -12,11 +12,10 @@ Feature: Imbo provides a status endpoint
             | endpoint     | content-type     |
             | /status.json | application/json |
             | /status.xml  | application/xml  |
-            | /status.html | text/html        |
 
     Scenario Outline: The status endpoint only supports GET and HEAD
         When I request "/status.json" using HTTP "<method>"
-        Then I should get a response with "405 Method Not Allowed"
+        Then I should get a response with "405 Method not allowed"
 
         Examples:
             | method |

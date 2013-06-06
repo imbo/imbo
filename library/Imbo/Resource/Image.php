@@ -10,8 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\RequestInterface,
-    Imbo\EventListener\ListenerInterface,
+use Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ResourceException,
     Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
@@ -28,12 +27,7 @@ class Image implements ResourceInterface, ListenerInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array(
-            RequestInterface::METHOD_GET,
-            RequestInterface::METHOD_HEAD,
-            RequestInterface::METHOD_DELETE,
-            RequestInterface::METHOD_PUT,
-        );
+        return array('GET', 'HEAD', 'DELETE', 'PUT');
     }
 
     /**
@@ -59,10 +53,14 @@ class Image implements ResourceInterface, ListenerInterface {
 
         $request = $event->getRequest();
         $response = $event->getResponse();
+        $image = $request->getImage();
 
         $model = new Model\ArrayModel();
         $model->setData(array(
-            'imageIdentifier' => $request->getImage()->getChecksum(),
+            'imageIdentifier' => $image->getChecksum(),
+            'width' => $image->getWidth(),
+            'height' => $image->getHeight(),
+            'extension' => $image->getExtension(),
         ));
 
         $response->setModel($model);
@@ -93,50 +91,45 @@ class Image implements ResourceInterface, ListenerInterface {
     public function get(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
+        $eventManager = $event->getManager();
 
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
-        $serverContainer = $request->getServer();
-        $requestHeaders = $request->getHeaders();
-        $responseHeaders = $response->getHeaders();
 
         $image = $response->getImage();
         $image->setImageIdentifier($imageIdentifier)
               ->setPublicKey($publicKey);
 
-        $event->getManager()->trigger('db.image.load');
-        $event->getManager()->trigger('storage.image.load');
+        $eventManager->trigger('db.image.load');
+        $eventManager->trigger('storage.image.load');
 
         // Generate ETag using public key, image identifier, Accept headers of the user agent and
         // the requested URI
         $etag = '"' . md5(
             $publicKey .
             $imageIdentifier .
-            $requestHeaders->get('Accept') .
-            $serverContainer->get('REQUEST_URI')
+            $request->headers->get('Accept', '*/*') .
+            $request->getRequestUri()
         ) . '"';
 
         // Set some response headers before we apply optional transformations
-        $responseHeaders
-            // ETags
-            ->set('ETag', $etag)
+        $response->setEtag($etag)
+                 ->setMaxAge(31536000);
 
-            // Set the max-age to a year since the image never changes
-            ->set('Cache-Control', 'max-age=31536000')
-
-            // Custom Imbo headers
-            ->set('X-Imbo-OriginalMimeType', $image->getMimeType())
-            ->set('X-Imbo-OriginalWidth', $image->getWidth())
-            ->set('X-Imbo-OriginalHeight', $image->getHeight())
-            ->set('X-Imbo-OriginalFileSize', $image->getFilesize())
-            ->set('X-Imbo-OriginalExtension', $image->getExtension());
+        // Custom Imbo headers
+        $response->headers->add(array(
+            'X-Imbo-OriginalMimeType' => $image->getMimeType(),
+            'X-Imbo-OriginalWidth' => $image->getWidth(),
+            'X-Imbo-OriginalHeight' => $image->getHeight(),
+            'X-Imbo-OriginalFileSize' => $image->getFilesize(),
+            'X-Imbo-OriginalExtension' => $image->getExtension(),
+        ));
 
         // Trigger possible image transformations
-        $event->getManager()->trigger('image.transform');
+        $eventManager->trigger('image.transform');
 
         // Fetch the image once more as event listeners might have set a new instance during the
         // transformation phase
-        $image = $response->getImage();
-        $response->setModel($image);
+        $response->setModel($response->getImage());
     }
 }

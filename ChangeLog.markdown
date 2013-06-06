@@ -1,6 +1,17 @@
 Changelog for Imbo
 =====================
 
+Imbo-0.3.0
+----------
+__2013-06-06__
+
+* Improved image validation when adding images (Espen Hovlandsdal)
+* Imbo no longer includes the HTML formatter
+* Imbo no longer supports php < 5.4
+* Imbo now uses the Symfony HttpFoundation Component
+* Added support for signing requests using request headers
+* Imbo can populate metadata from EXIF-tags on new images by enabling the ExifMetadata event listener (Espen Hovlandsdal)
+
 Imbo-0.2.1
 ----------
 __2013-04-05__

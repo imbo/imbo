@@ -182,6 +182,7 @@ class RESTContext extends BehatContext {
 
         if ($this->requestBody) {
             $request->setBody($this->requestBody);
+            $this->requestBody = null;
         }
 
         try {
@@ -201,22 +202,47 @@ class RESTContext extends BehatContext {
     }
 
     /**
-     * @Then /^the response headers should be the same$/
+     * @Then /^the following response headers should be the same:$/
      */
-    public function assertEqualResponseHeaders() {
+    public function assertEqualResponseHeaders(PyStringNode $list) {
         if (count($this->responses) < 2) {
             throw new \Exception('Need more than one response');
         }
 
-        for ($i = 0; $i < count($this->responses) - 1; $i++) {
-            $headers1 = $this->responses[$i]->getHeaders()->toArray();
-            $headers2 = $this->responses[$i + 1]->getHeaders()->toArray();
+        $headersToMatch = $list->getLines();
+        $numResponses = count($this->responses);
 
-            ksort($headers1);
-            ksort($headers2);
+        $latestResponse = $this->responses[$numResponses - 1];
+        $previousResponse = $this->responses[$numResponses - 2];
 
-            assertSame($headers1, $headers2);
+        foreach ($headersToMatch as $header) {
+            assertTrue($latestResponse->hasHeader($header), 'Header "' . $header . '" is missing');
+            assertTrue($previousResponse->hasHeader($header), 'Header "' . $header . '" is missing');
+            assertSame((string) $latestResponse->getHeader($header), (string) $previousResponse->getHeader($header), 'Header "' . $header . '" does not match');
         }
+    }
+
+    /**
+     * @Given /^the following response headers should not be present:$/
+     */
+    public function assertMissingHeaders(PyStringNode $list) {
+        $headers = $list->getLines();
+
+
+        foreach ($headers as $header) {
+            assertFalse($this->responses[count($this->responses) - 1]->hasHeader($header), 'Header "' . $header . '" should not be present');
+        }
+    }
+
+    /**
+     * @Given /^the response is (not )?cacheable$/
+     */
+    public function assertResponseIsCacheable($cacheable = true) {
+        if ($cacheable !== true) {
+            $cacheable = false;
+        }
+
+        assertSame($cacheable, $this->responses[count($this->responses) - 1]->canCache());
     }
 
     /**
@@ -240,12 +266,19 @@ class RESTContext extends BehatContext {
     /**
      * @Given /^I attach "([^"]*)" to the request body$/
      */
-    public function attachRequestBody($path) {
+    public function attachFileToRequestBody($path) {
         if (!$fullPath = realpath($path)) {
             throw new RuntimeException('Path "' . $path . '" is invalid');
         }
 
         $this->requestBody = file_get_contents($fullPath);
+    }
+
+    /**
+     * @Given /^the request body contains:$/
+     */
+    public function setRequestBody(PyStringNode $body) {
+        $this->requestBody = (string) $body;
     }
 
     /**
@@ -306,11 +339,6 @@ class RESTContext extends BehatContext {
      * @throws RuntimeException
      */
     private static function startBuiltInHttpd($host, $port, $documentRoot, $router = null) {
-        if (version_compare(PHP_VERSION, '5.4.0') < 0) {
-            echo 'Requires php-5.4 to run' . PHP_EOL;
-            exit(0);
-        }
-
         $command = sprintf('php -S %s:%d -t %s %s >/dev/null 2>&1 & echo $!',
                             $host,
                             $port,

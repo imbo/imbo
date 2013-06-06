@@ -86,7 +86,7 @@ class Cors implements ListenerInterface {
      */
     public function options(EventInterface $event) {
         $request = $event->getRequest();
-        $origin = $request->getHeaders()->get('Origin', '*');
+        $origin = $request->headers->get('Origin', '*');
 
         // Fall back if the passed origin is not allowed
         if (!$this->originIsAllowed($origin)) {
@@ -102,11 +102,12 @@ class Cors implements ListenerInterface {
             $allowedMethods = array_merge($allowedMethods, $this->params['allowedMethods'][$resource]);
         }
 
-        $headers = $response->getHeaders();
-        $headers->set('Access-Control-Allow-Origin', $origin)
-                ->set('Access-Control-Allow-Methods', implode(', ', $allowedMethods))
-                ->set('Access-Control-Allow-Headers', 'Content-Type, Accept')
-                ->set('Access-Control-Max-Age', (int) $this->params['maxAge']);
+        $response->headers->add(array(
+            'Access-Control-Allow-Origin' => $origin,
+            'Access-Control-Allow-Methods' => implode(', ', $allowedMethods),
+            'Access-Control-Allow-Headers' => 'Content-Type, Accept',
+            'Access-Control-Max-Age' => (int) $this->params['maxAge'],
+        ));
 
         // Since this is an OPTIONS-request, there is no need for further parsing
         $response->setStatusCode(204);
@@ -119,17 +120,17 @@ class Cors implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function invoke(EventInterface $event) {
-        $origin = $event->getRequest()->getHeaders()->get('Origin', '*');
+        $origin = $event->getRequest()->headers->get('Origin', '*');
 
         // Fall back if the passed origin is not allowed
         if (!$this->originIsAllowed($origin)) {
             return;
         }
 
-        $headers = $event->getResponse()->getHeaders();
-
-        $headers->set('Access-Control-Allow-Origin', $origin)
-                ->set('Access-Control-Expose-Headers', 'X-Imbo-Error-Internalcode');
+        $event->getResponse()->headers->add(array(
+            'Access-Control-Allow-Origin' => $origin,
+            'Access-Control-Expose-Headers' => 'X-Imbo-Error-Internalcode'
+        ));
     }
 
     /**

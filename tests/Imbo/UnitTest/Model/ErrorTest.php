@@ -11,6 +11,8 @@
 namespace Imbo\UnitTest\Model;
 
 use Imbo\Model\Error,
+    Imbo\Exception\RuntimeException,
+    Imbo\Exception,
     DateTime;
 
 /**
@@ -86,5 +88,57 @@ class ErrorTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($this->model->getImageIdentifier());
         $this->assertSame($this->model, $this->model->setImageIdentifier('identifier'));
         $this->assertSame('identifier', $this->model->getImageIdentifier());
+    }
+
+    /**
+     * @covers Imbo\Model\Error::createFromException
+     */
+    public function testCanCreateAnErrorBasedOnAnException() {
+        $request = $this->getMock('Imbo\Http\Request\Request');
+
+        $exception = new RuntimeException('You wronged', 400);
+
+        $model = Error::createFromException($exception, $request);
+
+        $this->assertSame(400, $model->getHttpCode());
+        $this->assertSame('You wronged', $model->getErrorMessage());
+        $this->assertNull($model->getImageIdentifier());
+        $this->assertSame(Exception::ERR_UNSPECIFIED, $model->getImboErrorCode());
+    }
+
+    /**
+     * @covers Imbo\Model\Error::createFromException
+     */
+    public function testWillUseCorrectImageIdentifierFromRequestWhenCreatingError() {
+        $exception = new RuntimeException('You wronged', 400);
+        $exception->setImboErrorCode(123);
+
+        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request->expects($this->once())->method('getImage')->will($this->returnValue(null));
+        $request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageIdentifier'));
+
+        $model = Error::createFromException($exception, $request);
+
+        $this->assertSame(123, $model->getImboErrorCode());
+        $this->assertSame('imageIdentifier', $model->getImageIdentifier());
+    }
+
+    /**
+     * @covers Imbo\Model\Error::createFromException
+     */
+    public function testWillUseImageChecksumAsImageIdentifierIfRequestHasAnImageWhenCreatingError() {
+        $exception = new RuntimeException('You wronged', 400);
+        $exception->setImboErrorCode(123);
+
+        $request = $this->getMock('Imbo\Http\Request\Request');
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
+        $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $request->expects($this->never())->method('checksum');
+
+        $model = Error::createFromException($exception, $request);
+
+        $this->assertSame(123, $model->getImboErrorCode());
+        $this->assertSame('checksum', $model->getImageIdentifier());
     }
 }

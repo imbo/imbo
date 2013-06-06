@@ -49,17 +49,20 @@ class ImageTransformationCacheTest extends ListenerTests {
             $this->markTestSkipped('This testcase requires vfsStream to run');
         }
 
-        $this->responseHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $this->requestHeaders = $this->getMock('Imbo\Http\HeaderContainer');
-        $this->query = $this->getMockBuilder('Imbo\Http\ParameterContainer')->disableOriginalConstructor()->getMock();
-        $this->response = $this->getMock('Imbo\Http\Response\ResponseInterface');
-        $this->response->expects($this->any())->method('getHeaders')->will($this->returnValue($this->responseHeaders));
-        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->request->expects($this->any())->method('getQuery')->will($this->returnValue($this->query));
+        $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $this->requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+
+        $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->response->headers = $this->responseHeaders;
+
+        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request->query = $this->query;
+        $this->request->headers = $this->requestHeaders;
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-        $this->request->expects($this->any())->method('getHeaders')->will($this->returnValue($this->requestHeaders));
+
+        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
@@ -94,7 +97,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     public function testChangesTheImageInstanceOnCacheHit() {
         $imageFromCache = $this->getMock('Imbo\Model\Image');
-        $headersFromCache = $this->getMock('Imbo\Http\HeaderContainer');
+        $headersFromCache = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $cachedData = serialize(array(
             'image' => $imageFromCache,
             'headers' => $headersFromCache,
@@ -113,7 +116,6 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(array('thumbnail')));
 
         $this->response->expects($this->once())->method('setModel')->with($imageFromCache)->will($this->returnSelf());
-        $this->response->expects($this->once())->method('setHeaders')->with($headersFromCache)->will($this->returnSelf());;
         $this->event->expects($this->once())->method('stopPropagation')->with(true);
 
         $dir = 'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/6/7/7';
@@ -124,6 +126,8 @@ class ImageTransformationCacheTest extends ListenerTests {
         file_put_contents($fullPath, $cachedData);
 
         $this->listener->loadFromCache($this->event);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ResponseHeaderBag', $this->response->headers);
     }
 
     /**
@@ -237,14 +241,22 @@ class ImageTransformationCacheTest extends ListenerTests {
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
-     * @expectedExceptionMessage Cache path is not writable by the webserver
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Image transformation cache path is not writable by the webserver: vfs://cacheDir/dir
+     * @expectedExceptionCode 500
      * @covers Imbo\EventListener\ImageTransformationCache::__construct
      */
-    public function testTriggersWarningIfCacheDirIsNotWritable() {
+    public function testThrowsExceptionWhenCacheDirIsNotWritable() {
         $dir = new vfsStreamDirectory('dir', 0);
         $this->cacheDir->addChild($dir);
 
         $listener = new ImageTransformationCache('vfs://cacheDir/dir');
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageTransformationCache::__construct
+     */
+    public function testDoesNotTriggerWarningIfCachePathDoesNotExistAndParentIsWritable() {
+        $listener = new ImageTransformationCache('vfs://cacheDir/some/dir/that/does/not/exist');
     }
 }

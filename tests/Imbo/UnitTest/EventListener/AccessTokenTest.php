@@ -30,10 +30,10 @@ class AccessTokenTest extends ListenerTests {
      * Set up the listener
      */
     public function setUp() {
-        $this->query = $this->getMockBuilder('Imbo\Http\ParameterContainer')->disableOriginalConstructor()->getMock();
+        $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
 
-        $this->request = $this->getMock('Imbo\Http\Request\RequestInterface');
-        $this->request->expects($this->any())->method('getQuery')->will($this->returnValue($this->query));
+        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request->query = $this->query;
 
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
@@ -75,6 +75,7 @@ class AccessTokenTest extends ListenerTests {
      * @expectedExceptionMessage Missing access token
      * @expectedExceptionCode 400
      * @covers Imbo\EventListener\AccessToken::invoke
+     * @covers Imbo\EventListener\AccessToken::isWhitelisted
      */
     public function testThrowsExceptionIfAnAccessTokenIsMissingFromTheRequestWhenNotWhitelisted() {
         $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.get'));
@@ -158,7 +159,9 @@ class AccessTokenTest extends ListenerTests {
 
     /**
      * @dataProvider getFilterData
+     * @covers Imbo\EventListener\AccessToken::__construct
      * @covers Imbo\EventListener\AccessToken::invoke
+     * @covers Imbo\EventListener\AccessToken::isWhitelisted
      */
     public function testSupportsFilters($filter, $transformations, $whitelisted) {
         $listener = new AccessToken($filter);
@@ -212,7 +215,7 @@ class AccessTokenTest extends ListenerTests {
 
         $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(true));
         $this->query->expects($this->once())->method('get')->with('accessToken')->will($this->returnValue($token));
-        $this->request->expects($this->once())->method('getUrl')->will($this->returnValue($url));
+        $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue($url));
         $this->request->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
 
         $this->listener->invoke($this->event);

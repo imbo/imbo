@@ -10,7 +10,9 @@
 
 namespace Imbo;
 
-use PHPUnit_Framework_MockObject_Generator,
+use Imbo\Image\Transformation,
+    Imbo\Cache,
+    PHPUnit_Framework_MockObject_Generator,
     PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount,
     PHPUnit_Framework_MockObject_Stub_Return;
 
@@ -54,54 +56,68 @@ return array(
         },
         'accessToken' => function() {
             return new EventListener\AccessToken();
-        }
+        },
+        'imageTransformationCache' => function() {
+            return new EventListener\ImageTransformationCache('/tmp/imbo-behat-image-transformation-cache');
+        },
+        'metadataCache' => function() {
+            return new EventListener\MetadataCache(new Cache\APC('behat'));
+        },
     ),
 
     'imageTransformations' => array(
         'border' => function (array $params) {
-            return new Image\Transformation\Border($params);
+            return new Transformation\Border($params);
         },
         'canvas' => function (array $params) {
-            return new Image\Transformation\Canvas($params);
+            return new Transformation\Canvas($params);
         },
         'compress' => function (array $params) {
-            return new Image\Transformation\Compress($params);
+            return new Transformation\Compress($params);
         },
         'convert' => function (array $params) {
-            return new Image\Transformation\Convert($params);
+            return new Transformation\Convert($params);
         },
         'crop' => function (array $params) {
-            return new Image\Transformation\Crop($params);
+            return new Transformation\Crop($params);
         },
         'desaturate' => function (array $params) {
-            return new Image\Transformation\Desaturate();
+            return new Transformation\Desaturate();
         },
         'flipHorizontally' => function (array $params) {
-            return new Image\Transformation\FlipHorizontally();
+            return new Transformation\FlipHorizontally();
         },
         'flipVertically' => function (array $params) {
-            return new Image\Transformation\FlipVertically();
+            return new Transformation\FlipVertically();
         },
         'maxSize' => function (array $params) {
-            return new Image\Transformation\MaxSize($params);
+            return new Transformation\MaxSize($params);
         },
         'resize' => function (array $params) {
-            return new Image\Transformation\Resize($params);
+            return new Transformation\Resize($params);
         },
         'rotate' => function (array $params) {
-            return new Image\Transformation\Rotate($params);
+            return new Transformation\Rotate($params);
         },
         'sepia' => function (array $params) {
-            return new Image\Transformation\Sepia($params);
+            return new Transformation\Sepia($params);
         },
         'thumbnail' => function (array $params) {
-            return new Image\Transformation\Thumbnail($params);
+            return new Transformation\Thumbnail($params);
         },
         'transpose' => function (array $params) {
-            return new Image\Transformation\Transpose();
+            return new Transformation\Transpose();
         },
         'transverse' => function (array $params) {
-            return new Image\Transformation\Transverse();
+            return new Transformation\Transverse();
         },
+
+        // collection
+        'graythumb' => function (array $params) {
+            return new Transformation\Collection(array(
+                new Transformation\Thumbnail($params),
+                new Transformation\Desaturate(),
+            ));
+        }
     ),
 );
