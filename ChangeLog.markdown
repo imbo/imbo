@@ -1,6 +1,12 @@
 Changelog for Imbo
 =====================
 
+Imbo-0.3.1
+----------
+__2013-06-06__
+
+* Updated composer dependencies
+
 Imbo-0.3.0
 ----------
 __2013-06-06__
