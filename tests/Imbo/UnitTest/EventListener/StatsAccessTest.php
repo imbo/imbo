@@ -114,6 +114,36 @@ class StatsAccessTest extends ListenerTests {
                 array('127.0.0.2', '127.0.0.3'),
                 false
             ),
+            'client ip does not exist in any filters' => array(
+                '127.0.0.5',
+                array('127.0.0.1', '127.0.0.2'),
+                array('127.0.0.3', '127.0.0.4'),
+                false
+            ),
+            'cidr notation with ip in whitelist range' => array(
+                '192.168.1.10',
+                array('192.168.1.0/24'),
+                array(),
+                true
+            ),
+            'cidr notation with ip in blacklist range' => array(
+                '192.168.1.10',
+                array(),
+                array('192.168.1.0/24'),
+                false
+            ),
+            'cidr notation with ip not in whitelist range' => array(
+                '192.168.1.32',
+                array('192.168.1.32/27'),
+                array(),
+                true
+            ),
+            'cidr notation with ip not in whitelist range' => array(
+                '192.168.1.64',
+                array('192.168.1.32/27'),
+                array(),
+                false
+            ),
         );
     }
 

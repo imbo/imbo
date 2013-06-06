@@ -18,8 +18,8 @@ use Imbo\EventManager\EventInterface,
  * Stats access listener
  *
  * This event listener lets you control the access to the /stats endpoint by white-/blacklisting ip
- * addresses. If you disable the listener from the configuration it will be open to anyone (and it
- * does not require an access token by default)
+ * addresses or subnets (using CIDR notation). If you disable the listener from the configuration
+ * it will be open to anyone (and it does not require an access token by default).
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
@@ -31,8 +31,8 @@ class StatsAccess implements ListenerInterface {
      * If the whitelist is populated with one or more ip addresses, all others will automatically
      * be blacklisted. If the blacklist is populated with one or more ip addresses, all other will
      * automatically be whitelisted. If both filters contain values, the current ip must be in the
-     * whitelits to gain access. If the current ip is located in both filters, it will not gain
-     * access.
+     * whitelist to gain access. If the current ip is located in both filters, it will not gain
+     * access as the blacklist is checked last.
      *
      * @var array
      */
@@ -89,7 +89,7 @@ class StatsAccess implements ListenerInterface {
      * @return boolean
      */
     private function isWhitelisted($ip) {
-        return in_array($ip, $this->params['whitelist']);
+        return $this->filter($ip, 'whitelist');
     }
 
     /**
@@ -99,6 +99,46 @@ class StatsAccess implements ListenerInterface {
      * @return boolean
      */
     private function isBlacklisted($ip) {
-        return in_array($ip, $this->params['blacklist']);
+        return $this->filter($ip, 'blacklist');
+    }
+
+    /**
+     * Filter an IP address
+     *
+     * @param string $ip An IPv4 address
+     * @param string $filter "whitelist" or "blacklist"
+     * @return boolean
+     */
+    private function filter($ip, $filter) {
+        foreach ($this->params[$filter] as $range) {
+            if ((strpos($range, '/') !== false && $this->cidrMatch($ip, $range)) || $ip === $range) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if an IPv4 is in a subnet
+     *
+     * @param string $ip The IP address to check (for instance 192.168.1.10)
+     * @param string $range A CIDR notated IP address and routing prefix (for instance 192.168.1.0/24)
+     * @return boolean
+     */
+    private function cidrMatch($ip, $range) {
+        // Split CIDR on /
+        list($subnet, $bits) = explode('/', $range);
+
+        // Convert ip's to long
+        $ip = ip2long($ip);
+        $subnet = ip2long($subnet);
+
+        // Generate mask and align the subnet if necessary
+        $mask = -1 << (32 - $bits);
+        $subnet &= $mask;
+
+        // Check for match
+        return ($ip & $mask) === $subnet;
     }
 }
