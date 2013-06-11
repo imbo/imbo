@@ -10,7 +10,8 @@
 
 namespace Imbo\UnitTest\Http\Request;
 
-use Imbo\Http\Request\Request;
+use Imbo\Http\Request\Request,
+    Imbo\Router\Route;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -18,11 +19,29 @@ use Imbo\Http\Request\Request;
  */
 class RequestTest extends \PHPUnit_Framework_TestCase {
     /**
+     * @var Request
+     */
+    private $request;
+
+    /**
+     * Set up the request
+     */
+    public function setUp() {
+        $this->request = new Request();
+    }
+
+    /**
+     * Tear down the request
+     */
+    public function tearDown() {
+        $this->request = null;
+    }
+
+    /**
      * @covers Imbo\Http\Request\Request::getTransformations
      */
     public function testGetTransformationsWithNoTransformationsPresent() {
-        $request = new Request();
-        $this->assertEquals(array(), $request->getTransformations());
+        $this->assertEquals(array(), $this->request->getTransformations());
     }
 
     /**
@@ -79,37 +98,47 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\Http\Request\Request::getImageIdentifier
-     * @covers Imbo\Http\Request\Request::setImageIdentifier
      */
     public function testSetGetImageIdentifier() {
-        $request = new Request();
-        $identifier = md5(microtime());
-        $this->assertNull($request->getImageIdentifier());
-        $this->assertSame($request, $request->setImageIdentifier($identifier));
-        $this->assertSame($identifier, $request->getImageIdentifier());
+        $identifier = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+        $this->assertNull($this->request->getImageIdentifier());
+
+        $route = new Route();
+        $this->request->setRoute($route);
+
+        $this->assertNull($this->request->getImageIdentifier());
+        $route->set('imageIdentifier', $identifier);
+        $this->assertSame($identifier, $this->request->getImageIdentifier());
     }
 
     /**
      * @covers Imbo\Http\Request\Request::getExtension
-     * @covers Imbo\Http\Request\Request::setExtension
      */
     public function testSetGetExtension() {
-        $request = new Request();
-        $extension = 'gif';
-        $this->assertNull($request->getExtension());
-        $this->assertSame($request, $request->setExtension($extension));
-        $this->assertSame($extension, $request->getExtension());
+        $extension = 'jpg';
+        $this->assertNull($this->request->getExtension());
+
+        $route = new Route();
+        $this->request->setRoute($route);
+
+        $this->assertNull($this->request->getExtension());
+        $route->set('extension', $extension);
+        $this->assertSame($extension, $this->request->getExtension());
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::setPublicKey
      * @covers Imbo\Http\Request\Request::getPublicKey
      */
     public function testSetGetPublicKey() {
-        $request = new Request();
-        $publicKey = 'publicKey';
-        $this->assertSame($request, $request->setPublicKey($publicKey));
-        $this->assertSame($publicKey, $request->getPublicKey());
+        $publicKey = 'christer';
+        $this->assertNull($this->request->getPublicKey());
+
+        $route = new Route();
+        $this->request->setRoute($route);
+
+        $this->assertNull($this->request->getPublicKey());
+        $route->set('publicKey', $publicKey);
+        $this->assertSame($publicKey, $this->request->getPublicKey());
     }
 
     /**
@@ -117,10 +146,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Request\Request::getPrivateKey
      */
     public function testSetGetPrivateKey() {
-        $request = new Request();
         $privateKey = '55b90a334854ac17b91f5c5690944f31';
-        $this->assertSame($request, $request->setPrivateKey($privateKey));
-        $this->assertSame($privateKey, $request->getPrivateKey());
+        $this->assertSame($this->request, $this->request->setPrivateKey($privateKey));
+        $this->assertSame($privateKey, $this->request->getPrivateKey());
     }
 
     /**
@@ -128,34 +156,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Request\Request::setResource
      */
     public function testSetGetResource() {
-        $request = new Request();
-        $this->assertSame($request, $request->setResource('metadata'));
-        $this->assertSame('metadata', $request->getResource());
-    }
-
-    /**
-     * @covers Imbo\Http\Request\Request::hasTransformations
-     */
-    public function testHasTransformationsWithExtension() {
-        $request = new Request();
-        $request->setExtension('png');
-        $this->assertTrue($request->hasTransformations());
-    }
-
-    /**
-     * @covers Imbo\Http\Request\Request::hasTransformations
-     */
-    public function testHasTransformationsWithTransformationsInQuery() {
-        $request = new Request(array('t' => array('flipHorizontally')));
-        $this->assertTrue($request->hasTransformations());
-    }
-
-    /**
-     * @covers Imbo\Http\Request\Request::hasTransformations
-     */
-    public function testHasTransformationsWithNoTransformations() {
-        $request = new Request();
-        $this->assertFalse($request->hasTransformations());
+        $this->assertSame($this->request, $this->request->setResource('metadata'));
+        $this->assertSame('metadata', $this->request->getResource());
     }
 
     /**
@@ -163,9 +165,19 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Request\Request::setImage
      */
     public function testCanSetAndGetAnImage() {
-        $request = new Request();
         $image = $this->getMock('Imbo\Model\Image');
-        $this->assertSame($request, $request->setImage($image));
-        $this->assertSame($image, $request->getImage());
+        $this->assertSame($this->request, $this->request->setImage($image));
+        $this->assertSame($image, $this->request->getImage());
+    }
+
+    /**
+     * @covers Imbo\Http\Request\Request::getRoute
+     * @covers Imbo\Http\Request\Request::setRoute
+     */
+    public function testCanSetAndGetARoute() {
+        $this->assertNull($this->request->getRoute());
+        $route = $this->getMockBuilder('Imbo\Router\Route')->disableOriginalConstructor()->getMock();
+        $this->assertSame($this->request, $this->request->setRoute($route));
+        $this->assertSame($route, $this->request->getRoute());
     }
 }
