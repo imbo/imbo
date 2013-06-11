@@ -120,4 +120,7 @@ return array(
             ));
         }
     ),
+
+    'routes' => array(),
+    'resources' => array(),
 );
