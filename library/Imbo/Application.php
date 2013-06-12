@@ -27,7 +27,8 @@ use Imbo\Http\Request\Request,
     Imbo\Storage\StorageInterface,
     Imbo\Resource\Images\Query,
     Imbo\Http\Response\Formatter,
-    Imbo\Image\Transformation;
+    Imbo\Image\Transformation,
+    Imbo\Resource\ResourceInterface;
 
 /**
  * Imbo application
@@ -233,6 +234,24 @@ class Application {
             return $resource;
         });
 
+        // Custom resources
+        foreach ($container->get('config')['resources'] as $resourceName => $resourceClass) {
+            $resourceName = $resourceName . 'Resource';
+            $container->setStatic($resourceName, function(Container $container) use ($resourceClass) {
+                if (is_string($resourceClass)) {
+                    $resourceClass = new $resourceClass();
+                } else if (is_callable($resourceClass)) {
+                    $resourceClass = $resourceClass();
+                }
+
+                if (!$resourceClass instanceof ResourceInterface) {
+                    throw new InvalidArgumentException('Invalid resource class', 500);
+                }
+
+                return $resourceClass;
+            });
+        }
+
         // Image transformer listener
         $container->setStatic('imageTransformer', function(Container $container) {
             $transformer = new EventListener\ImageTransformer();
@@ -253,7 +272,7 @@ class Application {
 
         // Router component
         $container->setStatic('router', function(Container $container) {
-            $router = new Router();
+            $router = new Router($container->get('config')['routes']);
 
             return $router;
         });
@@ -309,7 +328,7 @@ class Application {
             $manager->setContainer($container);
 
             // Register internal event listeners
-            $containerEntries = array(
+            $containerEntries = array_merge(array(
                 'statusResource',
                 'userResource',
                 'imagesResource',
@@ -322,7 +341,9 @@ class Application {
                 'imagePreparation',
                 'imageTransformer',
                 'responseSender',
-            );
+            ), array_map(function($key) {
+                return $key . 'Resource';
+            }, array_keys($container->get('config')['resources'])));
 
             foreach ($containerEntries as $listener) {
                 $manager->attachListener($container->get($listener));
