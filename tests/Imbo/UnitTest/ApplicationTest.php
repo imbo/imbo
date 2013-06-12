@@ -70,6 +70,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
                     'eventListeners' => array(
                         'auth' => new EventListener\Authenticate(),
                     ),
+                    'routes' => array(),
+                    'resources' => array(),
                 ),
             ),
             array(
@@ -100,6 +102,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
                             'publicKeys' => array('include' => array('someuser')),
                         ),
                     ),
+                    'routes' => array(),
+                    'resources' => array(),
                 ),
             ),
         );
@@ -131,6 +135,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $container = new Container();
         $this->application->bootstrap(array(
             'database' => function() { return new \stdClass(); },
+            'routes' => array(),
+            'resources' => array(),
         ), $container);
         $container->get('database');
     }
@@ -145,6 +151,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $container = new Container();
         $this->application->bootstrap(array(
             'storage' => function() { return new \stdClass(); },
+            'routes' => array(),
+            'resources' => array(),
         ), $container);
         $container->get('storage');
     }
@@ -160,12 +168,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
                 array(
                     'eventListeners' => array('foo' => 'bar'),
                     'imageTransformations' => array(),
+                    'routes' => array(),
+                    'resources' => array(),
                 ),
             ),
             array(
                 array(
                     'eventListeners' => array('custom' => array('listener' => 'somefunction')),
                     'imageTransformations' => array(),
+                    'routes' => array(),
+                    'resources' => array(),
                 ),
             ),
         );
