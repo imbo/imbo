@@ -14,7 +14,8 @@ use Imbo\Resource\ResourceInterface,
     Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
     Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\RuntimeException;
+    Imbo\Exception\RuntimeException,
+    Imbo\Router\Route;
 
 /**
  * Router class containing supported routes
@@ -43,13 +44,22 @@ class Router implements ListenerInterface {
      *
      * @var array
      */
-    public $routes = array(
-        ResourceInterface::IMAGE    => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(.(?<extension>gif|jpg|png))?$#',
+    private $routes = array(
+        ResourceInterface::IMAGE    => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(\.(?<extension>gif|jpg|png))?$#',
         ResourceInterface::STATUS   => '#^/status(/|(\.(?<extension>json|xml)))?$#',
         ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images(/|(\.(?<extension>json|xml)))?$#',
         ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(/|\.(?<extension>json|xml))?$#',
         ResourceInterface::USER     => '#^/users/(?<publicKey>[a-z0-9_-]{3,})(/|\.(?<extension>json|xml))?$#',
     );
+
+    /**
+     * Class constructor
+     *
+     * @param array $extraRoutes Extra routes passed in from configuration
+     */
+    public function __construct(array $extraRoutes = array()) {
+        $this->routes = array_merge($this->routes, $extraRoutes);
+    }
 
     /**
      * {@inheritdoc}
@@ -91,19 +101,19 @@ class Router implements ListenerInterface {
             throw new RuntimeException('Not Found', 404);
         }
 
+        // Create and populate a route instance that we want to inject into the request
+        $route = new Route();
+
+        // Inject all matches into the route as parameters
+        foreach ($matches as $key => $value) {
+            if (is_string($key)) {
+                $route->set($key, $value);
+            }
+        }
+
+        $request->setRoute($route);
+
         // Set the resource name
         $request->setResource($resourceName);
-
-        if (!empty($matches['publicKey'])) {
-            $request->setPublicKey($matches['publicKey']);
-        }
-
-        if (isset($matches['imageIdentifier'])) {
-            $request->setImageIdentifier($matches['imageIdentifier']);
-        }
-
-        if (isset($matches['extension'])) {
-            $request->setExtension($matches['extension']);
-        }
     }
 }

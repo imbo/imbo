@@ -30,7 +30,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      */
     public function setUp() {
         $this->router = new Router();
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request = $this->getMockBuilder('Imbo\Http\Request\Request')
+                              ->setMethods(array('setResource', 'getPathInfo', 'getMethod'))
+                              ->getMock();
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
     }
@@ -166,18 +168,12 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
         $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
 
-        if ($publicKey) {
-            $this->request->expects($this->once())->method('setPublicKey')->with($publicKey);
-        }
-
-        if ($imageIdentifier) {
-            $this->request->expects($this->once())->method('setImageIdentifier')->with($imageIdentifier);
-        }
-
-        if ($extension) {
-            $this->request->expects($this->once())->method('setExtension')->with($extension);
-        }
-
         $this->router->route($this->event);
+
+        $routeInstance = $this->request->getRoute();
+
+        $this->assertSame($publicKey, $routeInstance->get('publicKey'));
+        $this->assertSame($imageIdentifier, $routeInstance->get('imageIdentifier'));
+        $this->assertSame($extension, $routeInstance->get('extension'));
     }
 }

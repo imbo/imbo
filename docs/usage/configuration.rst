@@ -1184,3 +1184,101 @@ It's not recommended to use this method for big complicated transformations. It'
     );
 
 where ``My\Custom\BorderTransformation`` implements ``Imbo\Image\Transformation\TransformationInterface``.
+
+Custom resources and routes
+---------------------------
+
+.. warning:: Custom resources and routes is an experimental and advanced way of extending Imbo, and requires extensive knowledge of how Imbo works internally.
+
+If you need to create a custom route you can attach a route and a custom resource class using the configuration. Two keys exists for this purpose: ``routes`` and ``resources``:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'routes' => array(
+            'users' => '#^/users(?:.(?<extension>json|xml))?$#',
+        ),
+
+        'resources' => array(
+            'users' => function() {
+                return new Users();
+            },
+
+            // or
+
+            'users' => __NAMESPACE__ . '\Users',
+        ),
+
+        // ...
+    );
+
+In the above example we are creating a route for Imbo using a regular expression, called ``users``. The route itself will match the following three requests:
+
+* ``/users``
+* ``/users.json``
+* ``/users.xml``
+
+When a request is made against any of these endpoints Imbo will try to access a resource that is specified with the same key (``users``). The value specified for this entry in the ``resources`` array must either be a string representing the name of the resource class or a closure that, when executed, returns an instance of the resource class. This resource class must implement at least two interfaces to be able to respond to a request: ``Imbo\Resource\ResourceInterface`` and ``Imbo\EventListener\ListenerInterface``.
+
+Below is an example implementation of the ``Imbo\Users`` resource:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    namespace Imbo;
+
+    use Imbo\Resource\ResourceInterface,
+        Imbo\EventListener\ListenerInterface,
+        Imbo\EventListener\ListenerDefinition,
+        Imbo\EventManager\EventInterface,
+        Imbo\Model\ListModel;
+
+    class Users implements ResourceInterface, ListenerInterface {
+        public function getAllowedMethods() {
+            return array('GET');
+        }
+
+        public function getDefinition() {
+            return array(
+                new ListenerDefinition('users.get', array($this, 'get')),
+            );
+        }
+
+        public function get(EventInterface $event) {
+            $model = new ListModel();
+            $model->setList('users', 'user', array_keys($event->getConfig()['auth']));
+            $event->getResponse()->setModel($model);
+        }
+    }
+
+This resource informs Imbo that it supports ``HTTP GET``, and specifies a callback for the ``users.get`` event. The name of the event is the name specified for the resource in the configuration above, along with the HTTP method, separated with a dot.
+
+In the ``get()`` method we are simply creating a list model for Imbo's response formatter, and we are supplying the keys from the ``auth`` part of the configuration as data. When formatted as JSON the response looks like this:
+
+.. code-block:: json
+
+    {
+      "users": [
+        "someuser",
+        "someotheruser"
+      ]
+    }
+
+and the XML representation looks like this:
+
+.. code-block:: xml
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <imbo>
+      <users>
+        <user>someuser</user>
+        <user>someotheruser</user>
+      </users>
+    </imbo>

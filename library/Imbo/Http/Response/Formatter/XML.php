@@ -164,4 +164,28 @@ METADATA;
 <imbo>{$data}</imbo>
 DATA;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatListModel(Model\ListModel $model) {
+        $data = '';
+        $entries = '';
+
+        $container = $model->getContainer();
+        $entry = $model->getEntry();
+        $list = $model->getList();
+
+        foreach ($list as $element) {
+            $entries .= '<' . $entry . '>' . $element . '</' . $entry . '>';
+        }
+
+        $data = '<' . $container . '>' . $entries . '</' . $container . '>';
+
+
+        return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>{$data}</imbo>
+DATA;
+    }
 }

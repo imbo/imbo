@@ -321,4 +321,32 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $data = json_decode($json, true);
         $this->assertSame(array(), $data);
     }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatListModel
+     */
+    public function testCanFormatAListModel() {
+        $list = array(1, 2, 3);
+        $container = 'foo';
+        $model = $this->getMock('Imbo\Model\ListModel');
+        $model->expects($this->once())->method('getList')->will($this->returnValue($list));
+        $model->expects($this->once())->method('getContainer')->will($this->returnValue($container));
+
+        $this->assertSame('{"foo":[1,2,3]}', $this->formatter->format($model));
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatListModel
+     */
+    public function testCanFormatAnEmptyListModel() {
+        $list = array();
+        $container = 'foo';
+        $model = $this->getMock('Imbo\Model\ListModel');
+        $model->expects($this->once())->method('getList')->will($this->returnValue($list));
+        $model->expects($this->once())->method('getContainer')->will($this->returnValue($container));
+
+        $this->assertSame('{"foo":[]}', $this->formatter->format($model));
+    }
 }

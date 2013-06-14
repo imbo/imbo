@@ -121,6 +121,13 @@ class JSON extends Formatter implements FormatterInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function formatListModel(Model\ListModel $model) {
+        return $this->encode(array($model->getContainer() => $model->getList()));
+    }
+
+    /**
      * JSON encode an array
      *
      * @param mixed $data The data to encode

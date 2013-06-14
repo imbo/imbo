@@ -229,6 +229,20 @@ $config = array(
             return new Image\Transformation\Transverse();
         },
     ),
+
+    /**
+     * Custom routes for Imbo
+     *
+     * @var array
+     */
+    'routes' => array(),
+
+    /**
+     * Custom resources for Imbo
+     *
+     * @var array
+     */
+    'resources' => array(),
 );
 
 if (file_exists(__DIR__ . '/config.php')) {
