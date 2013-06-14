@@ -7,6 +7,12 @@ __2013-06-06__
 
 * Fixed #214: 0.3.2 is not installable without updating dependencies
 
+Imbo-0.4.0
+----------
+__N/A__
+
+* Added support for custom routes and resources through the constructor
+
 Imbo-0.3.2
 ----------
 __2013-06-06__
