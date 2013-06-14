@@ -78,6 +78,14 @@ interface FormatterInterface {
     function formatArrayModel(Model\ArrayModel $model);
 
     /**
+     * Format a list model
+     *
+     * @param Model\ListModel $model The model to format
+     * @return string Formatted data
+     */
+    function formatListModel(Model\ListModel $model);
+
+    /**
      * Get the content type for the current formatter
      *
      * Return the content type for the current formatter, excluding the character set, for instance

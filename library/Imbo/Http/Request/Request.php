@@ -12,6 +12,7 @@ namespace Imbo\Http\Request;
 
 use Imbo\Exception\InvalidArgumentException,
     Imbo\Model\Image,
+    Imbo\Router\Route,
     Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 /**
@@ -72,6 +73,20 @@ class Request extends SymfonyRequest {
     private $transformations;
 
     /**
+     * The current route
+     *
+     * @param Route
+     */
+    private $route;
+
+    /**
+     * The access token uri
+     *
+     * @var string
+     */
+    private $accessTokenUri;
+
+    /**
      * Set an image model
      *
      * @param Image $image An image model instance
@@ -98,19 +113,7 @@ class Request extends SymfonyRequest {
      * @return string
      */
     public function getPublicKey() {
-        return $this->publicKey;
-    }
-
-    /**
-     * Set the public key
-     *
-     * @param string $key The key to set
-     * @return Request
-     */
-    public function setPublicKey($key) {
-        $this->publicKey = $key;
-
-        return $this;
+        return $this->route ? $this->route->get('publicKey') : null;
     }
 
     /**
@@ -189,33 +192,12 @@ class Request extends SymfonyRequest {
     }
 
     /**
-     * Check whether or not the request includes image transformations
-     *
-     * @return boolean
-     */
-    public function hasTransformations() {
-        return $this->getExtension() || $this->query->has('t');
-    }
-
-    /**
      * Get the image identifier from the URL
      *
      * @return string|null
      */
     public function getImageIdentifier() {
-        return $this->imageIdentifier;
-    }
-
-    /**
-     * Set the image identifier
-     *
-     * @param string $imageIdentifier The image identifier to set
-     * @return Request
-     */
-    public function setImageIdentifier($imageIdentifier) {
-        $this->imageIdentifier = $imageIdentifier;
-
-        return $this;
+        return $this->route ? $this->route->get('imageIdentifier') : null;
     }
 
     /**
@@ -224,19 +206,7 @@ class Request extends SymfonyRequest {
      * @return string|null
      */
     public function getExtension() {
-        return $this->extension;
-    }
-
-    /**
-     * Set the extension requested
-     *
-     * @param string $extension The extension to set
-     * @return Request
-     */
-    public function setExtension($extension) {
-        $this->extension = $extension;
-
-        return $this;
+        return $this->route ? $this->route->get('extension') : null;
     }
 
     /**
@@ -273,5 +243,51 @@ class Request extends SymfonyRequest {
         }
 
         return $this->getSchemeAndHttpHost() . $this->getBaseUrl() . $this->getPathInfo() . $query;
+    }
+
+    /**
+     * Get the access token URI
+     *
+     * @return string
+     */
+    public function getAccessTokenUri() {
+        if (!$this->accessTokenUri) {
+            $this->accessTokenUri = $this->getRawUri();
+        }
+
+        return $this->accessTokenUri;
+    }
+
+    /**
+     * Set the access token URI
+     *
+     * @param string $uri The URI to set
+     * @return self
+     */
+    public function setAccessTokenUri($uri) {
+        $this->accessTokenUri = $uri;
+
+        return $this;
+    }
+
+    /**
+     * Get the current route
+     *
+     * @return Route
+     */
+    public function getRoute() {
+        return $this->route;
+    }
+
+    /**
+     * Set the route
+     *
+     * @param Route $route The current route
+     * @return self
+     */
+    public function setRoute(Route $route) {
+        $this->route = $route;
+
+        return $this;
     }
 }

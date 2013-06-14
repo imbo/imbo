@@ -357,4 +357,38 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertTag(array('tag' => 'imbo', 'content' => ''), $xml, '', false);
     }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatListModel
+     */
+    public function testCanFormatAListModel() {
+        $list = array('foo', 'bar');
+        $container = 'users';
+        $entry = 'user';
+
+        $model = $this->getMock('Imbo\Model\ListModel');
+        $model->expects($this->once())->method('getList')->will($this->returnValue($list));
+        $model->expects($this->once())->method('getContainer')->will($this->returnValue($container));
+        $model->expects($this->once())->method('getEntry')->will($this->returnValue($entry));
+
+        $this->assertContains('<imbo><users><user>foo</user><user>bar</user></users></imbo>', $this->formatter->format($model));
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatListModel
+     */
+    public function testCanFormatAnEmptyListModel() {
+        $list = array();
+        $container = 'users';
+        $entry = 'user';
+
+        $model = $this->getMock('Imbo\Model\ListModel');
+        $model->expects($this->once())->method('getList')->will($this->returnValue($list));
+        $model->expects($this->once())->method('getContainer')->will($this->returnValue($container));
+        $model->expects($this->once())->method('getEntry')->will($this->returnValue($entry));
+
+        $this->assertContains('<imbo><users></users></imbo>', $this->formatter->format($model));
+    }
 }

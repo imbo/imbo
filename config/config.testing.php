@@ -12,12 +12,65 @@ namespace Imbo;
 
 use Imbo\Image\Transformation,
     Imbo\Cache,
+    Imbo\Resource\ResourceInterface,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventListener\ListenerDefinition,
+    Imbo\EventManager\EventInterface,
+    Imbo\Model\ArrayModel,
     PHPUnit_Framework_MockObject_Generator,
     PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount,
     PHPUnit_Framework_MockObject_Stub_Return;
 
 // Require composer autoloader
 require __DIR__ . '/../vendor/autoload.php';
+
+class CustomResource implements ResourceInterface, ListenerInterface {
+    public function getAllowedMethods() {
+        return array('GET');
+    }
+
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('custom1.get', array($this, 'get')),
+        );
+    }
+
+    public function get(EventInterface $event) {
+        $model = new ArrayModel();
+        $model->setData(array(
+            'event' => $event->getName(),
+            'id' => $event->getRequest()->getRoute()->get('id'),
+        ));
+        $event->getResponse()->setModel($model);
+    }
+}
+
+class CustomResource2 implements ResourceInterface, ListenerInterface {
+    public function getAllowedMethods() {
+        return array('GET', 'PUT');
+    }
+
+    public function getDefinition() {
+        return array(
+            new ListenerDefinition('custom2.get', array($this, 'get')),
+            new ListenerDefinition('custom2.put', array($this, 'put')),
+        );
+    }
+
+    public function get(EventInterface $event) {
+        $model = new ArrayModel();
+        $model->setData(array(
+            'event' => $event->getName(),
+        ));
+        $event->getResponse()->setModel($model);
+    }
+
+    public function put(EventInterface $event) {
+        $model = new ArrayModel();
+        $model->setData(array('event' => $event->getName()));
+        $event->getResponse()->setModel($model);
+    }
+}
 
 return array(
     'auth' => array('publickey' => 'privatekey'),
@@ -118,6 +171,18 @@ return array(
                 new Transformation\Thumbnail($params),
                 new Transformation\Desaturate(),
             ));
+        }
+    ),
+
+    'routes' => array(
+        'custom1' => '#^/custom/(?<id>[a-zA-Z0-9]{7})$#',
+        'custom2' => '#^/custom(?:\.(?<extension>json|xml))?$#',
+    ),
+
+    'resources' => array(
+        'custom1' => __NAMESPACE__ . '\CustomResource',
+        'custom2' => function() {
+            return new CustomResource2();
         }
     ),
 );
