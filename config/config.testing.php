@@ -176,7 +176,7 @@ return array(
 
     'routes' => array(
         'custom1' => '#^/custom/(?<id>[a-zA-Z0-9]{7})$#',
-        'custom2' => '#^/custom(?:.(?<extension>json|xml))?$#',
+        'custom2' => '#^/custom(?:\.(?<extension>json|xml))?$#',
     ),
 
     'resources' => array(
