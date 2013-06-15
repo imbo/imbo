@@ -1202,7 +1202,7 @@ If you need to create a custom route you can attach a route and a custom resourc
         // ...
 
         'routes' => array(
-            'users' => '#^/users(?:.(?<extension>json|xml))?$#',
+            'users' => '#^/users(\.(?<extension>json|xml))?$#',
         ),
 
         'resources' => array(
