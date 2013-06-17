@@ -151,4 +151,45 @@ interface DatabaseInterface {
      * @throws DatabaseException
      */
     function imageExists($publicKey, $imageIdentifier);
+
+    /**
+     * Insert a short URL
+     *
+     * @param string $shortUrlId The ID of the URL
+     * @param string $publicKey The public key attached to the URL
+     * @param string $imageIdentifier The image identifier attached to the URL
+     * @param string $extension Optionl image extension
+     * @param array $query Optional query parameters
+     * @return boolean
+     */
+    function insertShortUrl($shortUrlId, $publicKey, $imageIdentifier, $extension = null, array $query = array());
+
+    /**
+     * Fetch the short URL identifier
+     *
+     * @param string $publicKey The public key attached to the URL
+     * @param string $imageIdentifier The image identifier attached to the URL
+     * @param string $extension Optionl image extension
+     * @param array $query Optional query parameters
+     * @return string|null
+     */
+    function getShortUrlId($publicKey, $imageIdentifier, $extension = null, array $query = array());
+
+    /**
+     * Fetch parameters for a short URL
+     *
+     * @param string $shortUrlId The ID of the short URL
+     * @return array|null Returns an array with information regarding the short URL, or null if the
+     *                    short URL is not found
+     */
+    function getShortUrlParams($shortUrlId);
+
+    /**
+     * Delete short URLs attached to a specific image
+     *
+     * @param string $publicKey The public key attached to the URL
+     * @param string $imageIdentifier The image identifier attached to the URL
+     * @return boolean
+     */
+    function deleteShortUrls($publicKey, $imageIdentifier);
 }

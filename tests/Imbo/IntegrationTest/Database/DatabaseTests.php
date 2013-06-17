@@ -360,4 +360,65 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image);
         $this->assertTrue($this->driver->imageExists($this->publicKey, $this->imageIdentifier));
     }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getShortUrlVariations() {
+        return array(
+            'without query and extension' => array(
+                'aaaaaaa',
+            ),
+            'with query and extension' => array(
+                'bbbbbbb',
+                array(
+                    't' => array(
+                        'thumbnail:width=40'
+                    ),
+                    'accessToken' => 'token',
+                ),
+                'png',
+            ),
+            'with query' => array(
+                'ccccccc',
+                array(
+                    't' => array(
+                        'thumbnail:width=40'
+                    ),
+                    'accessToken' => 'token',
+                ),
+            ),
+            'with extension' => array(
+                'ddddddd',
+                array(),
+                'gif',
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getShortUrlVariations
+     */
+    public function testCanInsertAndGetParametersForAShortUrl($shortUrlId, array $query = array(), $extension = null) {
+        $this->assertTrue($this->driver->insertShortUrl($shortUrlId, $this->publicKey, $this->imageIdentifier, $extension, $query));
+
+        $params = $this->driver->getShortUrlParams($shortUrlId);
+
+        $this->assertSame($this->publicKey, $params['publicKey']);
+        $this->assertSame($this->imageIdentifier, $params['imageIdentifier']);
+        $this->assertSame($extension, $params['extension']);
+        $this->assertSame($query, $params['query']);
+
+        $this->assertSame($shortUrlId, $this->driver->getShortUrlId($this->publicKey, $this->imageIdentifier, $extension, $query));
+    }
+
+    public function testCanDeleteShortUrls() {
+        $shortUrlId = 'aaaaaaa';
+
+        $this->assertTrue($this->driver->insertShortUrl($shortUrlId, $this->publicKey, $this->imageIdentifier));
+        $this->assertTrue($this->driver->deleteShortUrls($this->publicKey, $this->imageIdentifier));
+        $this->assertNull($this->driver->getShortUrlParams($shortUrlId));
+    }
 }

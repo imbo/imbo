@@ -19,22 +19,11 @@ use Imbo\Database\MongoDB,
  */
 class MongoDBTest extends DatabaseTests {
     /**
-     * @var string
-     */
-    private $testDbName = 'imboMongoDBIntegrationTestDB';
-
-    /**
-     * @var string
-     */
-    private $testCollectionName = 'imboMongoDBIntegrationTestCollection';
-
-    /**
      * @see Imbo\IntegrationTest\Database\DatabaseTests::getDriver()
      */
     protected function getDriver() {
         return new MongoDB(array(
-            'databaseName' => $this->testDbName,
-            'collectionName' => $this->testCollectionName
+            'databaseName' => 'imboIntegrationTestDatabase',
         ));
     }
 
@@ -47,7 +36,7 @@ class MongoDBTest extends DatabaseTests {
         }
 
         $client = new MongoClient();
-        $client->selectDB($this->testDbName)->drop();
+        $client->selectDB('imboIntegrationTestDatabase')->drop();
 
         parent::setUp();
     }
@@ -58,7 +47,7 @@ class MongoDBTest extends DatabaseTests {
     public function tearDown() {
         if (extension_loaded('mongo') && class_exists('MongoClient')) {
             $client = new MongoClient();
-            $client->selectDB($this->testDbName)->drop();
+            $client->selectDB('imboIntegrationTestDatabase')->drop();
         }
 
         parent::tearDown();
