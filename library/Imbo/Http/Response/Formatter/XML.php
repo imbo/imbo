@@ -182,7 +182,6 @@ DATA;
 
         $data = '<' . $container . '>' . $entries . '</' . $container . '>';
 
-
         return <<<DATA
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>{$data}</imbo>
