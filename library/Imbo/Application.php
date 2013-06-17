@@ -234,6 +234,13 @@ class Application {
             return $resource;
         });
 
+        // Short URL resource
+        $container->setStatic('shorturlResource', function(Container $container) {
+            $resource = new Resource\ShortUrl();
+
+            return $resource;
+        });
+
         // Custom resources
         foreach ($container->get('config')['resources'] as $resourceName => $resourceClass) {
             $resourceName = $resourceName . 'Resource';
@@ -334,6 +341,7 @@ class Application {
                 'imagesResource',
                 'imageResource',
                 'metadataResource',
+                'shorturlResource',
                 'responseFormatter',
                 'router',
                 'databaseOperations',
