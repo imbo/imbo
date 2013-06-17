@@ -138,6 +138,21 @@ SQLite
         tagValue TEXT NOT NULL
     )
 
+    CREATE TABLE IF NOT EXISTS shorturl (
+        shortUrlId TEXT PRIMARY KEY NOT NULL,
+        publicKey TEXT NOT NULL,
+        imageIdentifier TEXT NOT NULL,
+        extension TEXT,
+        query TEXT NOT NULL
+    )
+
+    CREATE INDEX shorturlparams ON shorturl (
+        publicKey,
+        imageIdentifier,
+        extension,
+        query
+    )
+
 MySQL
 '''''
 
@@ -168,6 +183,16 @@ MySQL
         PRIMARY KEY (`id`),
         KEY `imageId` (`imageId`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci AUTO_INCREMENT=1 ;
+
+    CREATE TABLE `shorturl` (
+        `shortUrlId` char(7) COLLATE utf8_danish_ci NOT NULL,
+        `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
+        `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
+        `extension` char(3) COLLATE utf8_danish_ci DEFAULT NULL,
+        `query` text COLLATE utf8_danish_ci NOT NULL,
+        PRIMARY KEY (`shortUrlId`),
+        KEY `params` (`publicKey`,`imageIdentifier`,`extension`,`query`(255))
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
 .. note:: Imbo will not create these tables automatically.
 
