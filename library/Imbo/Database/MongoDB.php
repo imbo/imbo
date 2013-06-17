@@ -27,11 +27,13 @@ use Imbo\Model\Image,
  * Valid parameters for this driver:
  *
  * - (string) databaseName Name of the database. Defaults to 'imbo'
- * - (string) collectionName Name of the collection to store data in. Defaults to 'images'
+ * - (array) collectionNames Name of the collections to store data in. Defaults to
+ *                           array('image' => 'image, 'shortUrl' => 'shortUrl'). Change the values
+ *                           in the array to change the default names.
  * - (string) server The server string to use when connecting to MongoDB. Defaults to
- *                              'mongodb://localhost:27017'
+ *                   'mongodb://localhost:27017'
  * - (array) options Options to use when creating the MongoClient instance. Defaults to
- *                              array('connect' => true, 'connectTimeoutMS' => 1000).
+ *                   array('connect' => true, 'connectTimeoutMS' => 1000).
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
@@ -45,11 +47,14 @@ class MongoDB implements DatabaseInterface {
     private $mongoClient;
 
     /**
-     * The collection instance used by the driver
+     * The collection instances used by the driver
      *
-     * @var MongoCollection
+     * @var array
      */
-    private $collection;
+    private $collections = array(
+        'image' => null,
+        'shortUrl' => null,
+    );
 
     /**
      * Parameters for the driver
@@ -58,8 +63,11 @@ class MongoDB implements DatabaseInterface {
      */
     private $params = array(
         // Database and collection names
-        'databaseName'   => 'imbo',
-        'collectionName' => 'images',
+        'databaseName' => 'imbo',
+        'collectionNames' => array(
+            'image' => 'image',
+            'shortUrl' => 'shortUrl',
+        ),
 
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
@@ -71,9 +79,10 @@ class MongoDB implements DatabaseInterface {
      *
      * @param array $params Parameters for the driver
      * @param MongoClient $client MongoClient instance
-     * @param MongoCollection $collection MongoCollection instance
+     * @param MongoCollection $imageCollection MongoCollection instance for the images
+     * @param MongoCollection $shortUrlCollection MongoCollection instance for the short URLs
      */
-    public function __construct(array $params = null, MongoClient $client = null, MongoCollection $collection = null) {
+    public function __construct(array $params = null, MongoClient $client = null, MongoCollection $imageCollection = null, MongoCollection $shortUrlCollection = null) {
         if ($params !== null) {
             $this->params = array_replace_recursive($this->params, $params);
         }
@@ -82,8 +91,12 @@ class MongoDB implements DatabaseInterface {
             $this->mongoClient = $client;
         }
 
-        if ($collection !== null) {
-            $this->collection = $collection;
+        if ($imageCollection !== null) {
+            $this->collections['image'] = $imageCollection;
+        }
+
+        if ($shortUrlCollection !== null) {
+            $this->collections['shortUrl'] = $shortUrlCollection;
         }
     }
 
@@ -95,7 +108,7 @@ class MongoDB implements DatabaseInterface {
 
         if ($this->imageExists($publicKey, $imageIdentifier)) {
             try {
-                $this->getCollection()->update(
+                $this->getImageCollection()->update(
                     array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                     array('$set' => array('updated' => $now)),
                     array('multiple' => false)
@@ -122,7 +135,7 @@ class MongoDB implements DatabaseInterface {
         );
 
         try {
-            $this->getCollection()->insert($data);
+            $this->getImageCollection()->insert($data);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to save image data', 500, $e);
         }
@@ -135,7 +148,7 @@ class MongoDB implements DatabaseInterface {
      */
     public function deleteImage($publicKey, $imageIdentifier) {
         try {
-            $data = $this->getCollection()->findOne(array(
+            $data = $this->getImageCollection()->findOne(array(
                 'publicKey' => $publicKey,
                 'imageIdentifier' => $imageIdentifier,
             ));
@@ -144,7 +157,7 @@ class MongoDB implements DatabaseInterface {
                 throw new DatabaseException('Image not found', 404);
             }
 
-            $this->getCollection()->remove(
+            $this->getImageCollection()->remove(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('justOne' => true)
             );
@@ -164,7 +177,7 @@ class MongoDB implements DatabaseInterface {
             $existing = $this->getMetadata($publicKey, $imageIdentifier);
             $updatedMetadata = array_merge($existing, $metadata);
 
-            $this->getCollection()->update(
+            $this->getImageCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('$set' => array('updated' => time(), 'metadata' => $updatedMetadata)),
                 array('multiple' => false)
@@ -181,7 +194,7 @@ class MongoDB implements DatabaseInterface {
      */
     public function getMetadata($publicKey, $imageIdentifier) {
         try {
-            $data = $this->getCollection()->findOne(array(
+            $data = $this->getImageCollection()->findOne(array(
                 'publicKey' => $publicKey,
                 'imageIdentifier' => $imageIdentifier,
             ));
@@ -201,7 +214,7 @@ class MongoDB implements DatabaseInterface {
      */
     public function deleteMetadata($publicKey, $imageIdentifier) {
         try {
-            $data = $this->getCollection()->findOne(array(
+            $data = $this->getImageCollection()->findOne(array(
                 'publicKey' => $publicKey,
                 'imageIdentifier' => $imageIdentifier,
             ));
@@ -210,7 +223,7 @@ class MongoDB implements DatabaseInterface {
                 throw new DatabaseException('Image not found', 404);
             }
 
-            $this->getCollection()->update(
+            $this->getImageCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('$set' => array('metadata' => array())),
                 array('multiple' => false)
@@ -267,9 +280,9 @@ class MongoDB implements DatabaseInterface {
         }
 
         try {
-            $cursor = $this->getCollection()->find($queryData, $fields)
-                                            ->limit($query->limit())
-                                            ->sort(array('added' => -1));
+            $cursor = $this->getImageCollection()->find($queryData, $fields)
+                                                 ->limit($query->limit())
+                                                 ->sort(array('added' => -1));
 
             // Skip some images if a page has been set
             if (($page = $query->page()) > 1) {
@@ -295,7 +308,7 @@ class MongoDB implements DatabaseInterface {
      */
     public function load($publicKey, $imageIdentifier, Image $image) {
         try {
-            $data = $this->getCollection()->findOne(
+            $data = $this->getImageCollection()->findOne(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
                 array('size', 'width', 'height', 'mime', 'extension', 'added', 'updated')
             );
@@ -331,11 +344,11 @@ class MongoDB implements DatabaseInterface {
             }
 
             // Create the cursor
-            $cursor = $this->getCollection()->find($query, array('updated'))
-                                            ->limit(1)
-                                            ->sort(array(
-                                                'updated' => MongoCollection::DESCENDING,
-                                            ));
+            $cursor = $this->getImageCollection()->find($query, array('updated'))
+                                                 ->limit(1)
+                                                 ->sort(array(
+                                                     'updated' => MongoCollection::DESCENDING,
+                                                 ));
 
             // Fetch the next row
             $data = $cursor->getNext();
@@ -361,7 +374,7 @@ class MongoDB implements DatabaseInterface {
                 'publicKey' => $publicKey,
             );
 
-            $result = (int) $this->getCollection()->find($query)->count();
+            $result = (int) $this->getImageCollection()->find($query)->count();
 
             return $result;
         } catch (MongoException $e) {
@@ -385,7 +398,7 @@ class MongoDB implements DatabaseInterface {
      */
     public function getImageMimeType($publicKey, $imageIdentifier) {
         try {
-            $data = $this->getCollection()->findOne(array(
+            $data = $this->getImageCollection()->findOne(array(
                 'publicKey' => $publicKey,
                 'imageIdentifier' => $imageIdentifier,
             ));
@@ -404,7 +417,7 @@ class MongoDB implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function imageExists($publicKey, $imageIdentifier) {
-        $data = $this->getCollection()->findOne(array(
+        $data = $this->getImageCollection()->findOne(array(
             'publicKey' => $publicKey,
             'imageIdentifier' => $imageIdentifier,
         ));
@@ -413,23 +426,127 @@ class MongoDB implements DatabaseInterface {
     }
 
     /**
-     * Get the mongo collection instance
+     * {@inheritdoc}
+     */
+    public function insertShortUrl($shortUrlId, $publicKey, $imageIdentifier, $extension = null, array $query = array()) {
+        try {
+            $this->getShortUrlCollection()->insert(array(
+                'shortUrlId' => $shortUrlId,
+                'publicKey' => $publicKey,
+                'imageIdentifier' => $imageIdentifier,
+                'extension' => $extension,
+                'query' => serialize($query),
+            ));
+        } catch (MongoException $e) {
+            throw new DatabaseException('Unable to create short URL', 500, $e);
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShortUrlId($publicKey, $imageIdentifier, $extension = null, array $query = array()) {
+        try {
+            $result = $this->getShortUrlCollection()->findOne(array(
+                'publicKey' => $publicKey,
+                'imageIdentifier' => $imageIdentifier,
+                'extension' => $extension,
+                'query' => serialize($query),
+            ), array(
+                'shortUrlId',
+            ));
+
+            if (!$result) {
+                return null;
+            }
+
+            return $result['shortUrlId'];
+        } catch (MongoException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShortUrlParams($shortUrlId) {
+        try {
+            $result = $this->getShortUrlCollection()->findOne(array(
+                'shortUrlId' => $shortUrlId,
+            ), array(
+                'publicKey',
+                'imageIdentifier',
+                'extension',
+                'query',
+            ));
+
+            if (!$result) {
+                return null;
+            }
+
+            $result['query'] = unserialize($result['query']);
+
+            return $result;
+        } catch (MongoException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteShortUrls($publicKey, $imageIdentifier) {
+        try {
+            $this->getShortUrlCollection()->remove(array(
+                'publicKey' => $publicKey,
+                'imageIdentifier' => $imageIdentifier,
+            ));
+        } catch (MongoException $e) {
+            throw new DatabaseException('Unable to delete short URLs', 500, $e);
+        }
+
+        return true;
+    }
+
+    /**
+     * Fetch the image collection
      *
      * @return MongoCollection
      */
-    protected function getCollection() {
-        if ($this->collection === null) {
+    private function getImageCollection() {
+        return $this->getCollection('image');
+    }
+
+    /**
+     * Fetch the shortUrl collection
+     *
+     * @return MongoCollection
+     */
+    private function getShortUrlCollection() {
+        return $this->getCollection('shortUrl');
+    }
+
+    /**
+     * Get the mongo collection instance
+     *
+     * @param string $type "image" or "shortUrl"
+     * @return MongoCollection
+     */
+    private function getCollection($type) {
+        if ($this->collections[$type] === null) {
             try {
-                $this->collection = $this->getMongoClient()->selectCollection(
+                $this->collections[$type] = $this->getMongoClient()->selectCollection(
                     $this->params['databaseName'],
-                    $this->params['collectionName']
+                    $this->params['collectionNames'][$type]
                 );
             } catch (MongoException $e) {
                 throw new DatabaseException('Could not select collection', 500, $e);
             }
         }
 
-        return $this->collection;
+        return $this->collections[$type];
     }
 
     /**
@@ -437,7 +554,7 @@ class MongoDB implements DatabaseInterface {
      *
      * @return MongoClient
      */
-    protected function getMongoClient() {
+    private function getMongoClient() {
         if ($this->mongoClient === null) {
             try {
                 $this->mongoClient = new MongoClient($this->params['server'], $this->params['options']);

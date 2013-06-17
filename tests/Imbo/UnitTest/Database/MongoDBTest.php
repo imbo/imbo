@@ -20,7 +20,7 @@ use Imbo\Database\MongoDB,
  */
 class MongoDBTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var Imbo\Database\MongoDB
+     * @var MongoDB
      */
     private $driver;
 
@@ -32,7 +32,12 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     /**
      * @var MongoCollection
      */
-    private $collection;
+    private $imageCollection;
+
+    /**
+     * @var MongoCollection
+     */
+    private $shortUrlCollection;
 
     /**
      * Set up the mongo and collection mocks and the driver that we want to test
@@ -43,8 +48,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         }
 
         $this->mongoClient = $this->getMockBuilder('MongoClient')->disableOriginalConstructor()->getMock();
-        $this->collection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
-        $this->driver = new MongoDB(array(), $this->mongoClient, $this->collection);
+        $this->imageCollection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
+        $this->shortUrlCollection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
+        $this->driver = new MongoDB(array(), $this->mongoClient, $this->imageCollection, $this->shortUrlCollection);
     }
 
     /**
@@ -52,7 +58,8 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->mongoClient = null;
-        $this->collection = null;
+        $this->imageCollection = null;
+        $this->shortUrlCollection = null;
         $this->driver = null;
     }
 
@@ -91,7 +98,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
         $cursor->expects($this->once())->method('limit')->with(10)->will($this->returnSelf());
         $cursor->expects($this->once())->method('sort')->will($this->returnSelf());
 
-        $this->collection->expects($this->once())->method('find')->with(array(
+        $this->imageCollection->expects($this->once())->method('find')->with(array(
             'publicKey' => $publicKey,
             'metadata.style' => 'IPA',
             'metadata.brewery' => 'Nøgne Ø',
@@ -107,12 +114,12 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenMongoFailsDuringInsertImage() {
-        $this->collection->expects($this->once())
-                         ->method('findOne')
-                         ->will($this->returnValue(null));
-        $this->collection->expects($this->once())
-                         ->method('insert')
-                         ->will($this->throwException(new MongoException()));
+        $this->imageCollection->expects($this->once())
+                              ->method('findOne')
+                              ->will($this->returnValue(null));
+        $this->imageCollection->expects($this->once())
+                              ->method('insert')
+                              ->will($this->throwException(new MongoException()));
 
         $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Model\Image'));
     }
@@ -124,12 +131,12 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenMongoFailsDuringInsertImageAndImageAlreadyExists() {
-        $this->collection->expects($this->once())
-                         ->method('findOne')
-                         ->will($this->returnValue(array('some' => 'data')));
-        $this->collection->expects($this->once())
-                         ->method('update')
-                         ->will($this->throwException(new MongoException()));
+        $this->imageCollection->expects($this->once())
+                              ->method('findOne')
+                              ->will($this->returnValue(array('some' => 'data')));
+        $this->imageCollection->expects($this->once())
+                              ->method('update')
+                              ->will($this->throwException(new MongoException()));
 
         $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Model\Image'));
     }
@@ -141,9 +148,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenMongoFailsDuringDeleteImage() {
-        $this->collection->expects($this->once())
-                         ->method('findOne')
-                         ->will($this->throwException(new MongoException()));
+        $this->imageCollection->expects($this->once())
+                              ->method('findOne')
+                              ->will($this->throwException(new MongoException()));
 
         $this->driver->deleteImage('key', 'identifier');
     }
@@ -155,13 +162,13 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenMongoFailsDuringUpdateMetadata() {
-        $this->collection->expects($this->once())
-                         ->method('findOne')
-                         ->will($this->returnValue(array('some' => 'data')));
+        $this->imageCollection->expects($this->once())
+                              ->method('findOne')
+                              ->will($this->returnValue(array('some' => 'data')));
 
-        $this->collection->expects($this->once())
-                         ->method('update')
-                         ->will($this->throwException(new MongoException()));
+        $this->imageCollection->expects($this->once())
+                              ->method('update')
+                              ->will($this->throwException(new MongoException()));
 
         $this->driver->updateMetadata('key', 'identifier', array('key' => 'value'));
     }
@@ -173,9 +180,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenMongoFailsDuringGetMetadata() {
-        $this->collection->expects($this->once())
-                         ->method('findOne')
-                         ->will($this->throwException(new MongoException()));
+        $this->imageCollection->expects($this->once())
+                              ->method('findOne')
+                              ->will($this->throwException(new MongoException()));
 
         $this->driver->getMetadata('key', 'identifier');
     }
@@ -187,9 +194,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenMongoFailsDuringDeleteMetadata() {
-        $this->collection->expects($this->once())
-                         ->method('findOne')
-                         ->will($this->throwException(new MongoException()));
+        $this->imageCollection->expects($this->once())
+                              ->method('findOne')
+                              ->will($this->throwException(new MongoException()));
 
         $this->driver->deleteMetadata('key', 'identifier');
     }
@@ -201,9 +208,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenMongoFailsDuringGetImages() {
-        $this->collection->expects($this->once())
-                         ->method('find')
-                         ->will($this->throwException(new MongoException()));
+        $this->imageCollection->expects($this->once())
+                              ->method('find')
+                              ->will($this->throwException(new MongoException()));
 
         $this->driver->getImages('key', $this->getMock('Imbo\Resource\Images\Query'));
     }
@@ -215,9 +222,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenMongoFailsDuringLoad() {
-        $this->collection->expects($this->once())
-                         ->method('findOne')
-                         ->will($this->throwException(new MongoException()));
+        $this->imageCollection->expects($this->once())
+                              ->method('findOne')
+                              ->will($this->throwException(new MongoException()));
 
         $this->driver->load('key', 'identifier', $this->getMock('Imbo\Model\Image'));
     }
@@ -229,9 +236,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenMongoFailsDuringGetLastModified() {
-        $this->collection->expects($this->once())
-                         ->method('find')
-                         ->will($this->throwException(new MongoException()));
+        $this->imageCollection->expects($this->once())
+                              ->method('find')
+                              ->will($this->throwException(new MongoException()));
 
         $this->driver->getLastModified('key');
     }
@@ -243,9 +250,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenMongoFailsDuringGetNumImages() {
-        $this->collection->expects($this->once())
-                         ->method('find')
-                         ->will($this->throwException(new MongoException()));
+        $this->imageCollection->expects($this->once())
+                              ->method('find')
+                              ->will($this->throwException(new MongoException()));
 
         $this->driver->getNumImages('key');
     }
@@ -257,9 +264,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenMongoFailsDuringGetImageMimeType() {
-        $this->collection->expects($this->once())
-                         ->method('findOne')
-                         ->will($this->throwException(new MongoException()));
+        $this->imageCollection->expects($this->once())
+                              ->method('findOne')
+                              ->will($this->throwException(new MongoException()));
 
         $this->driver->getImageMimeType('key', 'identifier');
     }
@@ -279,6 +286,6 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
 
         $method = new ReflectionMethod('Imbo\Database\MongoDB', 'getCollection');
         $method->setAccessible(true);
-        $method->invoke($driver);
+        $method->invoke($driver, 'image');
     }
 }
