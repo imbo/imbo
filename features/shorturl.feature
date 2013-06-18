@@ -22,3 +22,10 @@ Feature: Imbo provides short urls for images
         And the "X-Imbo-Originalheight" response header is "417"
         And the "X-Imbo-Originalmimetype" response header is "image/png"
         And the "X-Imbo-Originalwidth" response header is "599"
+
+    Scenario: Request a non-existing image using the short URL
+        Given "tests/Imbo/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
+        And I fetch the short URL of "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.jpg?t[]=resize:width=400"
+        And the image is deleted
+        When I request the image using the short URL
+        Then I should get a response with "404 Image not found"
