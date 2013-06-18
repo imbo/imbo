@@ -109,6 +109,7 @@ class ImboContext extends RESTContext {
     public function appendAccessToken() {
         $this->client->getEventDispatcher()->addListener('request.before_send', function($event) {
             $request = $event['request'];
+            $request->getQuery()->remove('accessToken');
             $accessToken = hash_hmac('sha256', $request->getUrl(), $this->privateKey);
             $request->getQuery()->set('accessToken', $accessToken);
         }, -100);
@@ -123,6 +124,14 @@ class ImboContext extends RESTContext {
         $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($useHeaders) {
             $request = $event['request'];
 
+            // Remove headers and query params that should not be present at this time
+            $request->removeHeader('X-Imbo-Authenticate-Signature');
+            $request->removeHeader('X-Imbo-Authenticate-Timestamp');
+            $query = $request->getQuery();
+            $query->remove('accessToken');
+            $query->remove('signature');
+            $query->remove('timestamp');
+
             $timestamp = gmdate('Y-m-d\TH:i:s\Z');
             $data = $request->getMethod() . '|' . $request->getUrl() . '|' . $this->publicKey . '|' . $timestamp;
 
@@ -135,7 +144,6 @@ class ImboContext extends RESTContext {
                     'X-Imbo-Authenticate-Timestamp' => $timestamp,
                 ));
             } else {
-                $query = $request->getQuery();
                 $query->set('signature', $signature);
                 $query->set('timestamp', $timestamp);
             }
@@ -246,5 +254,16 @@ class ImboContext extends RESTContext {
      */
     public function requestImageUsingShortUrl() {
         $this->request($this->shortUrl);
+    }
+
+    /**
+     * @Given /^the image is deleted$/
+     */
+    public function deleteImage() {
+        $identifier = $this->getLastResponse()->getHeaders()->toArray()['X-Imbo-ImageIdentifier'][0];
+
+        $this->setClientAuth('publickey', 'privatekey');
+        $this->signRequest();
+        $this->request('/users/publickey/images/' . $identifier, 'DELETE');
     }
 }
