@@ -11,7 +11,14 @@
 namespace Imbo;
 
 // Require composer autoloader
-require __DIR__ . '/../vendor/autoload.php';
+if (is_file(__DIR__ . '/../../../autoload.php')) {
+    // Someone has installed Imbo via a custom composer.json, so the Imbo installation is inside a
+    // vendor dir
+    require __DIR__ . '/../../../autoload.php';
+} else {
+    // Someone has installed Imbo via a simple "git clone"
+    require __DIR__ . '/../vendor/autoload.php';
+}
 
 $config = array(
     /**
@@ -245,7 +252,11 @@ $config = array(
     'resources' => array(),
 );
 
-if (file_exists(__DIR__ . '/config.php')) {
+if (file_exists(__DIR__ . '/../../../../config/config.php')) {
+    // Someone has installed Imbo via a custom composer.json, so the custom config is outside of
+    // the vendor dir
+    $config = array_replace_recursive($config, require __DIR__ . '/../../../../config/config.php');
+} else if (file_exists(__DIR__ . '/config.php')) {
     $config = array_replace_recursive($config, require __DIR__ . '/config.php');
 }
 
