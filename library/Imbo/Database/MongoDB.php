@@ -28,8 +28,8 @@ use Imbo\Model\Image,
  *
  * - (string) databaseName Name of the database. Defaults to 'imbo'
  * - (array) collectionNames Name of the collections to store data in. Defaults to
- *                           array('image' => 'image, 'shortUrl' => 'shortUrl'). Change the values
- *                           in the array to change the default names.
+ *                           array('image' => 'images', 'shortUrl' => 'shortUrls'). Change the
+ *                           values in the array to change the default names.
  * - (string) server The server string to use when connecting to MongoDB. Defaults to
  *                   'mongodb://localhost:27017'
  * - (array) options Options to use when creating the MongoClient instance. Defaults to
@@ -65,8 +65,8 @@ class MongoDB implements DatabaseInterface {
         // Database and collection names
         'databaseName' => 'imbo',
         'collectionNames' => array(
-            'image' => 'image',
-            'shortUrl' => 'shortUrl',
+            'image' => 'images',
+            'shortUrl' => 'shortUrls',
         ),
 
         // Server string and ctor options
