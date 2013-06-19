@@ -46,7 +46,7 @@ class Router implements ListenerInterface {
      */
     private $routes = array(
         ResourceInterface::IMAGE    => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(\.(?<extension>gif|jpg|png))?$#',
-        ResourceInterface::SHORTURL => '#^/s/(?<shortUrlId>[a-zA-Z0-9]{7})(\.(?<extension>gif|jpg|png))?$#',
+        ResourceInterface::SHORTURL => '#^/s/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
         ResourceInterface::STATUS   => '#^/status(/|(\.(?<extension>json|xml)))?$#',
         ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images(/|(\.(?<extension>json|xml)))?$#',
         ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(/|\.(?<extension>json|xml))?$#',
