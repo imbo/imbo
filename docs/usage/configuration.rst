@@ -52,7 +52,7 @@ The private key can be changed whenever you want as long as you remember to chan
 Database configuration
 ----------------------
 
-The database driver you decide to use is responsible for storing metadata and basic image information, like width and height for example. Imbo ships with some different implementations that you can use. Remember that you will not be able to switch the driver whenever you want and expect all data to be automatically transferred. Choosing a database driver should be a long term commitment unless you have migration scripts available.
+The database driver you decide to use is responsible for storing metadata and basic image information, like width and height for example, along with the generated short URLs. Imbo ships with some different implementations that you can use. Remember that you will not be able to switch the driver whenever you want and expect all data to be automatically transferred. Choosing a database driver should be a long term commitment unless you have migration scripts available.
 
 In the default configuration file the :ref:`default-database-driver` storage driver is used, and it is returned via a Closure. You can choose to override this in your ``config.php`` file by specifying a closure that returns a different value, or you can specify an implementation of the ``Imbo\Database\DatabaseInterface`` interface directly. Which database driver to use is specified in the ``database`` key in the configuration array:
 
@@ -68,7 +68,6 @@ In the default configuration file the :ref:`default-database-driver` storage dri
         'database' => function() {
             return new Database\MongoDB(array(
                 'databaseName'   => 'imbo',
-                'collectionName' => 'images',
             ));
         },
 
@@ -76,7 +75,6 @@ In the default configuration file the :ref:`default-database-driver` storage dri
 
         'database' => new Database\MongoDB(array(
             'databaseName'   => 'imbo',
-            'collectionName' => 'images',
         )),
 
         // ...
@@ -263,9 +261,6 @@ This driver uses PHP's `mongo extension`_ to store data in `MongoDB`_. The follo
 ``databaseName``
     Name of the database to use. Defaults to ``imbo``.
 
-``collectionName``
-    Name of the collection to use. Defaults to ``images``.
-
 ``server``
     The server string to use when connecting. Defaults to ``mongodb://localhost:27017``.
 
@@ -277,7 +272,7 @@ This driver uses PHP's `mongo extension`_ to store data in `MongoDB`_. The follo
 Examples
 ~~~~~~~~
 
-1) Connect to a local MongoDB instance using the default ``databaseName`` and ``collectionName``:
+1) Connect to a local MongoDB instance using the default ``databaseName``:
 
 .. code-block:: php
     :linenos:
