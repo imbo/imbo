@@ -27,9 +27,6 @@ use Imbo\Model\Image,
  * Valid parameters for this driver:
  *
  * - (string) databaseName Name of the database. Defaults to 'imbo'
- * - (array) collectionNames Name of the collections to store data in. Defaults to
- *                           array('image' => 'images', 'shortUrl' => 'shortUrls'). Change the
- *                           values in the array to change the default names.
  * - (string) server The server string to use when connecting to MongoDB. Defaults to
  *                   'mongodb://localhost:27017'
  * - (array) options Options to use when creating the MongoClient instance. Defaults to
@@ -62,12 +59,8 @@ class MongoDB implements DatabaseInterface {
      * @var array
      */
     private $params = array(
-        // Database and collection names
+        // Database name
         'databaseName' => 'imbo',
-        'collectionNames' => array(
-            'image' => 'images',
-            'shortUrl' => 'shortUrls',
-        ),
 
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
@@ -539,7 +532,7 @@ class MongoDB implements DatabaseInterface {
             try {
                 $this->collections[$type] = $this->getMongoClient()->selectCollection(
                     $this->params['databaseName'],
-                    $this->params['collectionNames'][$type]
+                    $type
                 );
             } catch (MongoException $e) {
                 throw new DatabaseException('Could not select collection', 500, $e);
