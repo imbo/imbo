@@ -96,6 +96,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/'),
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c.gif/'),
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta.json/'),
+            array('/s/asdfghjk'),
+            array('/s/asdfghj.jpg'),
         );
     }
 
@@ -119,6 +121,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      */
     public function getValidRoutes() {
         return array(
+            // Short URL resource
+            array('/s/asdfghj', 'shorturl'),
+            array('/s/1234567', 'shorturl'),
+            array('/s/1234asd', 'shorturl'),
+
             // Status resource
             array('/status', 'status'),
             array('/status/', 'status'),
