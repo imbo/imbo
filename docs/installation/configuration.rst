@@ -467,7 +467,7 @@ the image will be stored in:
 
 The algorithm that generates the path simply takes the three first characters of ``<user>`` and creates directories for each of them, then the full public key, then a directory of each of the first characters in ``<image>`` and lastly it stores the image in a file with a filename equal to ``<image>``.
 
-Read more about the API in the :doc:`api` topic.
+Read more about the API in the :doc:`../usage/api` topic.
 
 Examples
 ~~~~~~~~
@@ -709,7 +709,7 @@ Imbo ships with a collection of event listeners for you to use. Some of them are
 Access token
 ^^^^^^^^^^^^
 
-This event listener enforces the usage of access tokens on all read requests against user-specific resources. You can read more about how the actual access tokens works in the :ref:`access-tokens` topic in the :doc:`api` section.
+This event listener enforces the usage of access tokens on all read requests against user-specific resources. You can read more about how the actual access tokens works in the :ref:`access-tokens` topic in the :doc:`../usage/api` section.
 
 To enforce the access token check for all read requests this event listener subscribes to the following events:
 
@@ -775,7 +775,7 @@ Disable this event listener with care. Clients can easily `DDoS`_ your installat
 Authenticate
 ^^^^^^^^^^^^
 
-This event listener enforces the usage of signatures on all write requests against user-specific resources. You can read more about how the actual signature check works in the :ref:`signing-write-requests` topic in the :doc:`api` section.
+This event listener enforces the usage of signatures on all write requests against user-specific resources. You can read more about how the actual signature check works in the :ref:`signing-write-requests` topic in the :doc:`../usage/api` section.
 
 To enforce the signature check for all write requests this event listener subscribes to the following events:
 
@@ -920,7 +920,7 @@ which would allow only ``exif:Make`` and ``exif:Model`` as metadata tags. Not pa
 Image transformation cache
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This event listener enables caching of image transformations. Read more about image transformations in the :ref:`image-transformations` topic in the :doc:`api` section.
+This event listener enables caching of image transformations. Read more about image transformations in the :ref:`image-transformations` topic in the :doc:`../usage/api` section.
 
 To achieve this the listener subscribes to the following events:
 
