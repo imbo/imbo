@@ -1,19 +1,52 @@
 Installation
 ============
 
-The easiest way to install Imbo is to `clone the repository`, and then use `Composer`_ to install the dependencies:
-
-.. code-block:: bash
-
-    $ git clone git@github.com:imbo/imbo.git
-    $ cd imbo
-    $ curl -s https://getcomposer.org/installer | php
-    $ php composer.phar install
-
 .. _clone the repository: http://github.com/imbo/imbo
 .. _Composer: http://getcomposer.org/
 
-After installing the PHP files you will need to configure your web server.
+Using composer
+--------------
+
+The recommended way of installing Imbo is by creating a ``composer.json`` file for your installation, and then install Imbo and optional dependencies to 3rd party plug-ins and/or image transformations via `Composer`_. You will need the following directory structure for this to work::
+
+    /path/to/install/composer.json
+    /path/to/install/config/config.php
+
+where the ``composer.json`` file can contain:
+
+.. code-block:: json
+
+    {
+      "name": "yourname/imbo",
+      "require": {
+        "imbo/imbo": "dev-master"
+      }
+    }
+
+and the ``config/config.php`` file is your :ref:`Imbo configuration <configuration>`.
+
+Next you need to install Imbo by using composer:
+
+.. code-block:: bash
+
+    cd /path/to/install
+    curl -s https://getcomposer.org/installer | php
+    php composer.phar install
+
+The correct document root for Imbo would in the above case be ``/path/to/install/vendor/imbo/imbo/public``.
+
+Using git
+---------
+
+You can also install Imbo directly via git, and then use `Composer`_ to install the dependencies:
+
+.. code-block:: bash
+
+    mkdir /path/to/install; cd /path/to/install
+    git clone git@github.com:imbo/imbo.git
+    cd imbo
+    curl -s https://getcomposer.org/installer | php
+    php composer.phar install
 
 Web server configuration
 ------------------------
