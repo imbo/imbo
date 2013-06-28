@@ -79,14 +79,29 @@ class RESTContext extends BehatContext {
     private static $coverageSession;
 
     /**
+     * Parameters from the configuration
+     *
+     * @var array
+     */
+    private $params;
+
+    /**
      * Class constructor
      *
      * @param array $parameters Context parameters
      */
     public function __construct(array $parameters) {
-        $this->client = new Client($parameters['url']);
+        $this->params = $parameters;
+        $this->createClient();
+    }
 
-        if ($parameters['enableCodeCoverage']) {
+    /**
+     * Create a new HTTP client
+     */
+    private function createClient() {
+        $this->client = new Client($this->params['url']);
+
+        if ($this->params['enableCodeCoverage']) {
             $this->client->setDefaultHeaders(array(
                 'X-Enable-Coverage' => 1,
                 'X-Coverage-Session' => self::$coverageSession,
@@ -192,6 +207,9 @@ class RESTContext extends BehatContext {
         }
 
         $this->responses[] = $response;
+
+        // Create a fresh client
+        $this->createClient();
     }
 
     /**
