@@ -308,6 +308,13 @@ class RESTContext extends BehatContext {
     }
 
     /**
+     * @Given /^the response body length is "([^"]*)"$/
+     */
+    public function assertResponseBodyLength($length) {
+        assertSame(strlen((string) $this->getLastResponse()->getBody()), (int) $length);
+    }
+
+    /**
      * See if we have an httpd we can connect to
      *
      * @param string $host The hostname to connect to
