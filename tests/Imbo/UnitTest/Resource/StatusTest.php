@@ -75,7 +75,7 @@ class StatusTest extends ResourceTests {
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;
-        $this->response->expects($this->once())->method('setStatusCode')->with(500, 'Database error');
+        $this->response->expects($this->once())->method('setStatusCode')->with(503, 'Database error');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
         $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
         $this->response->expects($this->once())->method('setPrivate')->will($this->returnSelf());
@@ -94,7 +94,7 @@ class StatusTest extends ResourceTests {
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;
-        $this->response->expects($this->once())->method('setStatusCode')->with(500, 'Storage error');
+        $this->response->expects($this->once())->method('setStatusCode')->with(503, 'Storage error');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
         $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
         $this->response->expects($this->once())->method('setPrivate')->will($this->returnSelf());
@@ -113,7 +113,7 @@ class StatusTest extends ResourceTests {
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;
-        $this->response->expects($this->once())->method('setStatusCode')->with(500, 'Database and storage error');
+        $this->response->expects($this->once())->method('setStatusCode')->with(503, 'Database and storage error');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
         $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
         $this->response->expects($this->once())->method('setPrivate')->will($this->returnSelf());
