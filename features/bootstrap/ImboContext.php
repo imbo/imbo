@@ -42,7 +42,8 @@ class ImboContext extends RESTContext {
      * @BeforeFeature
      */
     public static function prepare(FeatureEvent $event) {
-        // Drop mongo test collection
+        // Drop mongo test collection which stores information regarding images, and the images
+        // themselves
         $mongo = new MongoClient();
         $mongo->imbo_testing->drop();
 
