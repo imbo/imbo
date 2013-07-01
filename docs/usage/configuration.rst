@@ -52,7 +52,7 @@ The private key can be changed whenever you want as long as you remember to chan
 Database configuration
 ----------------------
 
-The database driver you decide to use is responsible for storing metadata and basic image information, like width and height for example. Imbo ships with some different implementations that you can use. Remember that you will not be able to switch the driver whenever you want and expect all data to be automatically transferred. Choosing a database driver should be a long term commitment unless you have migration scripts available.
+The database driver you decide to use is responsible for storing metadata and basic image information, like width and height for example, along with the generated short URLs. Imbo ships with some different implementations that you can use. Remember that you will not be able to switch the driver whenever you want and expect all data to be automatically transferred. Choosing a database driver should be a long term commitment unless you have migration scripts available.
 
 In the default configuration file the :ref:`default-database-driver` storage driver is used, and it is returned via a Closure. You can choose to override this in your ``config.php`` file by specifying a closure that returns a different value, or you can specify an implementation of the ``Imbo\Database\DatabaseInterface`` interface directly. Which database driver to use is specified in the ``database`` key in the configuration array:
 
@@ -68,7 +68,6 @@ In the default configuration file the :ref:`default-database-driver` storage dri
         'database' => function() {
             return new Database\MongoDB(array(
                 'databaseName'   => 'imbo',
-                'collectionName' => 'images',
             ));
         },
 
@@ -76,7 +75,6 @@ In the default configuration file the :ref:`default-database-driver` storage dri
 
         'database' => new Database\MongoDB(array(
             'databaseName'   => 'imbo',
-            'collectionName' => 'images',
         )),
 
         // ...
@@ -138,6 +136,21 @@ SQLite
         tagValue TEXT NOT NULL
     )
 
+    CREATE TABLE IF NOT EXISTS shorturl (
+        shortUrlId TEXT PRIMARY KEY NOT NULL,
+        publicKey TEXT NOT NULL,
+        imageIdentifier TEXT NOT NULL,
+        extension TEXT,
+        query TEXT NOT NULL
+    )
+
+    CREATE INDEX shorturlparams ON shorturl (
+        publicKey,
+        imageIdentifier,
+        extension,
+        query
+    )
+
 MySQL
 '''''
 
@@ -168,6 +181,16 @@ MySQL
         PRIMARY KEY (`id`),
         KEY `imageId` (`imageId`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci AUTO_INCREMENT=1 ;
+
+    CREATE TABLE `shorturl` (
+        `shortUrlId` char(7) COLLATE utf8_danish_ci NOT NULL,
+        `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
+        `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
+        `extension` char(3) COLLATE utf8_danish_ci DEFAULT NULL,
+        `query` text COLLATE utf8_danish_ci NOT NULL,
+        PRIMARY KEY (`shortUrlId`),
+        KEY `params` (`publicKey`,`imageIdentifier`,`extension`,`query`(255))
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
 .. note:: Imbo will not create these tables automatically.
 
@@ -238,9 +261,6 @@ This driver uses PHP's `mongo extension`_ to store data in `MongoDB`_. The follo
 ``databaseName``
     Name of the database to use. Defaults to ``imbo``.
 
-``collectionName``
-    Name of the collection to use. Defaults to ``images``.
-
 ``server``
     The server string to use when connecting. Defaults to ``mongodb://localhost:27017``.
 
@@ -252,7 +272,7 @@ This driver uses PHP's `mongo extension`_ to store data in `MongoDB`_. The follo
 Examples
 ~~~~~~~~
 
-1) Connect to a local MongoDB instance using the default ``databaseName`` and ``collectionName``:
+1) Connect to a local MongoDB instance using the default ``databaseName``:
 
 .. code-block:: php
     :linenos:

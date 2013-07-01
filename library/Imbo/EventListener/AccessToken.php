@@ -99,6 +99,7 @@ class AccessToken implements ListenerInterface {
      */
     public function invoke(EventInterface $event) {
         $request = $event->getRequest();
+        $response = $event->getResponse();
         $query = $request->query;
         $eventName = $event->getName();
 
@@ -107,12 +108,17 @@ class AccessToken implements ListenerInterface {
             return;
         }
 
+        // If the response has a short URL header, we can skip the access token check
+        if ($response->headers->has('X-Imbo-ShortUrl')) {
+            return;
+        }
+
         if (!$query->has('accessToken')) {
             throw new RuntimeException('Missing access token', 400);
         }
 
         $token = $query->get('accessToken');
-        $uri = $request->getAccessTokenUri();
+        $uri = $request->getRawUri();
 
         // Remove the access token from the query string as it's not used to generate the HMAC
         $uri = rtrim(preg_replace('/(?<=(\?|&))accessToken=[^&]+&?/', '', $uri), '&?');

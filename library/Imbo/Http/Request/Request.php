@@ -80,13 +80,6 @@ class Request extends SymfonyRequest {
     private $route;
 
     /**
-     * The access token uri
-     *
-     * @var string
-     */
-    private $accessTokenUri;
-
-    /**
      * Set an image model
      *
      * @param Image $image An image model instance
@@ -243,31 +236,6 @@ class Request extends SymfonyRequest {
         }
 
         return $this->getSchemeAndHttpHost() . $this->getBaseUrl() . $this->getPathInfo() . $query;
-    }
-
-    /**
-     * Get the access token URI
-     *
-     * @return string
-     */
-    public function getAccessTokenUri() {
-        if (!$this->accessTokenUri) {
-            $this->accessTokenUri = $this->getRawUri();
-        }
-
-        return $this->accessTokenUri;
-    }
-
-    /**
-     * Set the access token URI
-     *
-     * @param string $uri The URI to set
-     * @return self
-     */
-    public function setAccessTokenUri($uri) {
-        $this->accessTokenUri = $uri;
-
-        return $this;
     }
 
     /**

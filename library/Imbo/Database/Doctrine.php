@@ -57,12 +57,13 @@ class Doctrine implements DatabaseInterface {
     private $tableNames = array(
         'imageinfo' => 'imageinfo',
         'metadata'  => 'metadata',
+        'shorturl'  => 'shorturl',
     );
 
     /**
      * Doctrine connection
      *
-     * @var \Doctrine\DBAL\Connection
+     * @var Connection
      */
     private $connection;
 
@@ -70,8 +71,7 @@ class Doctrine implements DatabaseInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param \Doctrine\DBAL\Connection $connection Optional connection instance. Primarily used
-     *                                              for testing
+     * @param Connection $connection Optional connection instance. Primarily used for testing
      */
     public function __construct(array $params, Connection $connection = null) {
         $this->params = array_merge($this->params, $params);
@@ -88,14 +88,14 @@ class Doctrine implements DatabaseInterface {
         $now = time();
 
         if ($id = $this->getImageId($publicKey, $imageIdentifier)) {
-            return (boolean) $this->getConnection()->update($this->getTableName('imageinfo', $publicKey, $imageIdentifier), array(
+            return (boolean) $this->getConnection()->update($this->tableNames['imageinfo'], array(
                 'updated' => $now,
             ), array(
                 'id' => $id
             ));
         }
 
-        return (boolean) $this->getConnection()->insert($this->getTableName('imageinfo', $publicKey, $imageIdentifier), array(
+        return (boolean) $this->getConnection()->insert($this->tableNames['imageinfo'], array(
             'size'            => $image->getFilesize(),
             'publicKey'       => $publicKey,
             'imageIdentifier' => $imageIdentifier,
@@ -118,14 +118,14 @@ class Doctrine implements DatabaseInterface {
         }
 
         $query = $this->getConnection()->createQueryBuilder();
-        $query->delete($this->getTableName('imageinfo', $publicKey, $imageIdentifier))
+        $query->delete($this->tableNames['imageinfo'])
               ->where('id = :id')
               ->setParameters(array(
                   ':id' => $id,
               ))->execute();
 
         $query->resetQueryParts();
-        $query->delete($this->getTableName('metadata', $publicKey, $imageIdentifier))
+        $query->delete($this->tableNames['metadata'])
               ->where('imageId = :imageId')
               ->setParameters(array(
                   ':imageId' => $id,
@@ -151,7 +151,7 @@ class Doctrine implements DatabaseInterface {
 
         // Insert merged metadata
         foreach ($metadata as $key => $value) {
-            $connection->insert($this->getTableName('metadata', $publicKey, $imageIdentifier), array(
+            $connection->insert($this->tableNames['metadata'], array(
                 'imageId'  => $imageId,
                 'tagName'  => $key,
                 'tagValue' => $value,
@@ -171,7 +171,7 @@ class Doctrine implements DatabaseInterface {
 
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('tagName', 'tagValue')
-              ->from($this->getTableName('metadata', $publicKey, $imageIdentifier), 'm')
+              ->from($this->tableNames['metadata'], 'm')
               ->where('imageId = :imageId')
               ->setParameters(array(':imageId' => $id));
 
@@ -195,7 +195,7 @@ class Doctrine implements DatabaseInterface {
         }
 
         $query = $this->getConnection()->createQueryBuilder();
-        $query->delete($this->getTableName('metadata', $publicKey, $imageIdentifier))
+        $query->delete($this->tableNames['metadata'])
               ->where('imageId = :imageId')
               ->setParameters(array(
                   ':imageId' => $id,
@@ -212,7 +212,7 @@ class Doctrine implements DatabaseInterface {
 
         $qb = $this->getConnection()->createQueryBuilder();
         $qb->select('*')
-           ->from($this->getTableName('imageinfo', $publicKey), 'i')
+           ->from($this->tableNames['imageinfo'], 'i')
            ->orderBy('added', 'DESC');
 
         $from = $query->from();
@@ -289,7 +289,7 @@ class Doctrine implements DatabaseInterface {
     public function load($publicKey, $imageIdentifier, Image $image) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('*')
-              ->from($this->getTableName('imageinfo', $publicKey, $imageIdentifier), 'i')
+              ->from($this->tableNames['imageinfo'], 'i')
               ->where('i.publicKey = :publicKey')
               ->andWhere('i.imageIdentifier = :imageIdentifier')
               ->setParameters(array(
@@ -320,7 +320,7 @@ class Doctrine implements DatabaseInterface {
     public function getLastModified($publicKey, $imageIdentifier = null) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('updated')
-              ->from($this->getTableName('imageinfo', $publicKey), 'i')
+              ->from($this->tableNames['imageinfo'], 'i')
               ->where('i.publicKey = :publicKey')
               ->setParameter(':publicKey', $publicKey);
 
@@ -347,7 +347,7 @@ class Doctrine implements DatabaseInterface {
     public function getNumImages($publicKey) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('COUNT(i.id)')
-              ->from($this->getTableName('imageinfo', $publicKey), 'i')
+              ->from($this->tableNames['imageinfo'], 'i')
               ->where('i.publicKey = :publicKey')
               ->setParameter(':publicKey', $publicKey);
 
@@ -371,7 +371,7 @@ class Doctrine implements DatabaseInterface {
     public function getImageMimeType($publicKey, $imageIdentifier) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('mime')
-              ->from($this->getTableName('imageinfo', $publicKey, $imageIdentifier), 'i')
+              ->from($this->tableNames['imageinfo'], 'i')
               ->where('i.publicKey = :publicKey')
               ->andWhere('i.imageIdentifier = :imageIdentifier')
               ->setParameters(array(
@@ -397,10 +397,93 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function insertShortUrl($shortUrlId, $publicKey, $imageIdentifier, $extension = null, array $query = array()) {
+        return (boolean) $this->getConnection()->insert($this->tableNames['shorturl'], array(
+            'shortUrlId' => $shortUrlId,
+            'publicKey' => $publicKey,
+            'imageIdentifier' => $imageIdentifier,
+            'extension' => $extension,
+            'query' => serialize($query),
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShortUrlParams($shortUrlId) {
+        $qb = $this->getConnection()->createQueryBuilder();
+        $qb->select('publicKey', 'imageIdentifier', 'extension', 'query')
+           ->from($this->tableNames['shorturl'], 's')
+           ->where('shortUrlId = :shortUrlId')
+           ->setParameters(array(':shortUrlId' => $shortUrlId));
+
+        $stmt = $qb->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            return null;
+        }
+
+        $row['query'] = unserialize($row['query']);
+
+        return $row;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShortUrlId($publicKey, $imageIdentifier, $extension = null, array $query = array()) {
+        $qb = $this->getConnection()->createQueryBuilder();
+        $qb->select('shortUrlId')
+           ->from($this->tableNames['shorturl'], 's')
+           ->where('publicKey = :publicKey')
+           ->andWhere('imageIdentifier = :imageIdentifier')
+           ->andWhere('query = :query')
+           ->setParameters(array(
+               ':publicKey' => $publicKey,
+               ':imageIdentifier' => $imageIdentifier,
+               ':query' => serialize($query),
+           ));
+
+        if ($extension === null) {
+            $qb->andWhere('extension is NULL');
+        } else {
+            $qb->andWhere('extension = :extension')
+               ->setParameter(':extension', $extension);
+        }
+
+        $stmt = $qb->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            return null;
+        }
+
+        return $row['shortUrlId'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteShortUrls($publicKey, $imageIdentifier) {
+        $qb = $this->getConnection()->createQueryBuilder();
+
+        return (boolean) $qb->delete($this->tableNames['shorturl'])
+                            ->where('publicKey = :publicKey')
+                            ->andWhere('imageIdentifier = :imageIdentifier')
+                            ->setParameters(array(
+                                ':publicKey' => $publicKey,
+                                ':imageIdentifier' => $imageIdentifier,
+                            ))->execute();
+    }
+
+    /**
      * Set the connection instance
      *
-     * @param \Doctrine\DBAL\Connection $connection The connection instance
-     * @return Doctrine
+     * @param Connection $connection The connection instance
+     * @return self
      */
     private function setConnection(Connection $connection) {
         $this->connection = $connection;
@@ -411,7 +494,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * Get the Doctrine connection
      *
-     * @return \Doctrine\DBAL\Connection
+     * @return Connection
      */
     private function getConnection() {
         if ($this->connection === null) {
@@ -431,7 +514,7 @@ class Doctrine implements DatabaseInterface {
     private function getImageId($publicKey, $imageIdentifier) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('i.id')
-              ->from($this->getTableName('imageinfo', $publicKey, $imageIdentifier), 'i')
+              ->from($this->tableNames['imageinfo'], 'i')
               ->where('i.publicKey = :publicKey')
               ->andWhere('i.imageIdentifier = :imageIdentifier')
               ->setParameters(array(
@@ -443,18 +526,5 @@ class Doctrine implements DatabaseInterface {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return (int) $row['id'];
-    }
-
-    /**
-     * Method that can be overridden to dynamically select table names based on the public key and
-     * the image identifier.
-     *
-     * @param string $type The type of the table. Either "metadata" or "imageinfo"
-     * @param string $publicKey The public key of the user
-     * @param string $imageIdentifier The image identifier to fetch
-     * @return string Returns a table name where the image is located
-     */
-    protected function getTableName($type, $publicKey, $imageIdentifier = null) {
-        return $this->tableNames[$type];
     }
 }

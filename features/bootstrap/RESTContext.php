@@ -274,12 +274,19 @@ class RESTContext extends BehatContext {
     }
 
     /**
-     * @Given /^the "([^"]*)" response header is "([^"]*)"$/
+     * @Given /^the "([^"]*)" response header (is|contains|matches) "([^"]*)"$/
      */
-    public function assertResponseHeader($header, $value) {
+    public function assertResponseHeader($header, $match, $value) {
         $response = $this->getLastResponse();
         $actual = (string) $response->getHeader($header);
-        assertSame($value, $actual, 'Expected "' . $value . '", got "' . $actual . '"');
+
+        if ($match === 'is') {
+            assertSame($value, $actual, 'Expected "' . $value . '", got "' . $actual . '"');
+        } else if ($match === 'matches') {
+            assertRegExp('#^' . $value . '$#', $actual, $actual . ' does not match ' . $value);
+        } else {
+            assertContains($value, $actual, $actual . ' does not contain ' . $value);
+        }
     }
 
     /**
