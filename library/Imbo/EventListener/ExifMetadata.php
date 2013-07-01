@@ -93,7 +93,7 @@ class ExifMetadata implements ListenerInterface {
         $database = $event->getDatabase();
 
         try {
-            $success = $database->updateMetadata(
+            $database->updateMetadata(
                 $request->getPublicKey(),
                 $request->getImage()->getChecksum(),
                 $this->properties
