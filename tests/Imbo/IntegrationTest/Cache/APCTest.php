@@ -18,8 +18,8 @@ use Imbo\Cache\APC;
  */
 class APCTest extends CacheTests {
     protected function getDriver() {
-        if (!extension_loaded('apc')) {
-            $this->markTestSkipped('APC is not installed');
+        if (!extension_loaded('apc') && !extension_loaded('apcu')) {
+            $this->markTestSkipped('APC(u) is not installed');
         }
 
         if (!ini_get('apc.enable_cli')) {

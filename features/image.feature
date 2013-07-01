@@ -15,76 +15,6 @@ Feature: Imbo provides an image endpoint
           {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2","width":599,"height":417,"extension":"png"}
           """
 
-    Scenario Outline: Fetch different formats of the image based on the Accept header
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
-        And the "Accept" request header is "<accept>"
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2"
-        Then I should get a response with "200 OK"
-        And the "Content-Type" response header is "<content-type>"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
-
-        Examples:
-            | accept    | content-type |
-            | image/gif | image/gif    |
-            | image/jpeg| image/jpeg   |
-            | image/png | image/png    |
-
-    Scenario: Fetch image when not accepting images
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
-        And the "Accept" request header is "application/json"
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2"
-        Then I should get a response with "406 Not acceptable"
-        And the "Content-Type" response header is "application/json"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
-        And the response body matches:
-          """
-          /{"error":{"code":406,"message":"Not acceptable","date":"[^"]+","imboErrorCode":0},"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}/
-          """
-
-    Scenario: Fetch image information using HTTP HEAD
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
-        And the "Accept" request header is "image/png"
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "HEAD"
-        Then I should get a response with "200 OK"
-        And the "Content-Type" response header is "image/png"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
-        And the response body matches:
-          """
-          //
-          """
-
-    Scenario: Fetch image information using HTTP HEAD when not accepting images
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
-        And the "Accept" request header is "application/json"
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "HEAD"
-        Then I should get a response with "406 Not acceptable"
-        And the "Content-Type" response header is "application/json"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
-        And the response body matches:
-          """
-          //
-          """
-
     Scenario: Add an image that already exists
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
@@ -96,6 +26,33 @@ Feature: Imbo provides an image endpoint
           """
           {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2","width":599,"height":417,"extension":"png"}
           """
+
+    Scenario: Fetch image
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        And the "Accept" request header is "image/png"
+        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2"
+        Then I should get a response with "200 OK"
+        And the "Content-Type" response header is "image/png"
+        And the "X-Imbo-Originalextension" response header is "png"
+        And the "X-Imbo-Originalfilesize" response header is "95576"
+        And the "X-Imbo-Originalheight" response header is "417"
+        And the "X-Imbo-Originalmimetype" response header is "image/png"
+        And the "X-Imbo-Originalwidth" response header is "599"
+        And the response body length is "95576"
+
+    Scenario: Fetch image information when not accepting images
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        And the "Accept" request header is "application/json"
+        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2"
+        Then I should get a response with "406 Not acceptable"
+        And the "Content-Type" response header is "application/json"
+        And the "X-Imbo-Originalextension" response header is "png"
+        And the "X-Imbo-Originalfilesize" response header is "95576"
+        And the "X-Imbo-Originalheight" response header is "417"
+        And the "X-Imbo-Originalmimetype" response header is "image/png"
+        And the "X-Imbo-Originalwidth" response header is "599"
 
     Scenario: Delete an image
         Given I use "publickey" and "privatekey" for public and private keys
@@ -111,7 +68,7 @@ Feature: Imbo provides an image endpoint
     Scenario: Delete an image that does not exist
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "DELETE"
+        When I request "/users/publickey/images/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" using HTTP "DELETE"
         Then I should get a response with "404 Image not found"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Image not found" and the error code is "0"
@@ -133,18 +90,3 @@ Feature: Imbo provides an image endpoint
         Then I should get a response with "415 Broken image"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Broken image" and the error code is "204"
-
-    Scenario Outline: Imbo uses the Accept header when encountering errors to choose the error format
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
-        And the "Accept" request header is "<accept>"
-        When I request "/users/publickey/images/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa<extension>"
-        Then I should get a response with "<reason>"
-        And the "Content-Type" response header is "<content-type>"
-
-        Examples:
-            | accept    | content-type     | extension | reason              |
-            | */*       | application/json | .png      | 404 Image not found |
-            | image/png | application/json | .png      | 406 Not acceptable  |
-            | */*       | application/json |           | 404 Image not found |
-            | image/png | application/json |           | 406 Not acceptable  |

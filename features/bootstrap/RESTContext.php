@@ -79,14 +79,29 @@ class RESTContext extends BehatContext {
     private static $coverageSession;
 
     /**
+     * Parameters from the configuration
+     *
+     * @var array
+     */
+    private $params;
+
+    /**
      * Class constructor
      *
      * @param array $parameters Context parameters
      */
     public function __construct(array $parameters) {
-        $this->client = new Client($parameters['url']);
+        $this->params = $parameters;
+        $this->createClient();
+    }
 
-        if ($parameters['enableCodeCoverage']) {
+    /**
+     * Create a new HTTP client
+     */
+    private function createClient() {
+        $this->client = new Client($this->params['url']);
+
+        if ($this->params['enableCodeCoverage']) {
             $this->client->setDefaultHeaders(array(
                 'X-Enable-Coverage' => 1,
                 'X-Coverage-Session' => self::$coverageSession,
@@ -192,12 +207,16 @@ class RESTContext extends BehatContext {
         }
 
         $this->responses[] = $response;
+
+        // Create a fresh client
+        $this->createClient();
     }
 
     /**
      * @Given /^make the same request using HTTP "([^"]*)"$/
      */
     public function makeSameRequest($method) {
+        $this->appendAccessToken();
         $this->request($this->prevRequestedPath, $method);
     }
 
@@ -242,7 +261,7 @@ class RESTContext extends BehatContext {
             $cacheable = false;
         }
 
-        assertSame($cacheable, $this->responses[count($this->responses) - 1]->canCache());
+        assertSame($cacheable, $this->getLastResponse()->canCache());
     }
 
     /**
@@ -305,6 +324,13 @@ class RESTContext extends BehatContext {
             assertContains($expected, $actual);
         }
 
+    }
+
+    /**
+     * @Given /^the response body length is "([^"]*)"$/
+     */
+    public function assertResponseBodyLength($length) {
+        assertSame(strlen((string) $this->getLastResponse()->getBody()), (int) $length);
     }
 
     /**

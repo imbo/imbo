@@ -144,8 +144,6 @@ class ResponseWriter implements ContainerAware {
                 $acceptableTypes[$item->getValue()] = $item->getQuality();
             }
 
-            // Try to find the best match since the client does not accept the original mime
-            // type
             $match = false;
             $maxQ = 0;
 
@@ -158,6 +156,21 @@ class ResponseWriter implements ContainerAware {
 
             if (isset($this->modelTypes[$modelType])) {
                 $types = $this->modelTypes[$modelType];
+            }
+
+            // If we are dealing with images we want to make sure the original mime type of the
+            // image is checked first. If the client does not really have any preference with
+            // regards to the mime type (*/* or image/*) this results in the original mime type of
+            // the image being sent.
+            if ($model instanceof Model\Image) {
+                $original = $model->getMimeType();
+
+                if ($types[0] !== $original) {
+                    $types = array_filter($types, function($type) use ($original) {
+                        return $type !== $original;
+                    });
+                    array_unshift($types, $original);
+                }
             }
 
             foreach ($types as $mime) {
