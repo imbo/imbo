@@ -216,6 +216,7 @@ class RESTContext extends BehatContext {
      * @Given /^make the same request using HTTP "([^"]*)"$/
      */
     public function makeSameRequest($method) {
+        $this->appendAccessToken();
         $this->request($this->prevRequestedPath, $method);
     }
 
