@@ -11,7 +11,7 @@ desc "Task used by Jenkins-CI"
 task :jenkins => [:prepare, :lint, :installdep, :test, :apidocs, :phploc, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
 
 desc "Task used by Travis-CI"
-task :travis => [:installdep, :test]
+task :travis => [:travis_bootstrap, :installdep, :test]
 
 desc "Default task"
 task :default => [:lint, :installdep, :test, :phpcs, :apidocs, :readthedocs]
@@ -126,8 +126,8 @@ task :lint do
   end
 end
 
-desc "Run PHPUnit tests"
-task :phpunit do
+desc "Bootstrap Travis-CI"
+task :travis_bootstrap do
   if ENV["TRAVIS"] == "true"
     system "sudo apt-get install -y php5-sqlite libmagickcore-dev libjpeg-dev libdjvulibre-dev libmagickwand-dev"
 
@@ -140,18 +140,22 @@ task :phpunit do
       system "sh -c \"cd #{filename[0..-5]} && phpize && ./configure && make && sudo make install\""
       system "sudo sh -c \"echo 'extension=#{package.downcase}.so' >> #{ini_file}\""
     }
-
-    begin
-      sh %{vendor/bin/phpunit --verbose -c phpunit.xml.travis}
-    rescue Exception
-      exit 1
-    end
   else
-    begin
+   puts "Will only be used by Travis-CI"
+   exit 1
+  end
+end
+
+desc "Run PHPUnit tests"
+task :phpunit do
+  begin
+    if ENV["TRAVIS"] == "true"
+      sh %{vendor/bin/phpunit --verbose -c phpunit.xml.travis}
+    else
       sh %{vendor/bin/phpunit --verbose --coverage-html build/coverage --coverage-clover build/logs/clover.xml --log-junit build/logs/junit.xml}
-    rescue Exception
-      exit 1
     end
+  rescue Exception
+    exit 1
   end
 end
 
