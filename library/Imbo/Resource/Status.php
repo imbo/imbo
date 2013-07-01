@@ -82,7 +82,7 @@ class Status implements ContainerAware, ResourceInterface, ListenerInterface {
                 $message = 'Database error';
             }
 
-            $response->setStatusCode(500, $message);
+            $response->setStatusCode(503, $message);
         }
 
         $response->setMaxAge(0)

@@ -5,6 +5,7 @@ Imbo-0.4.0
 ----------
 __N/A__
 
+* If clients have no preferences regarding images the original mime type of each image is prioritized
 * Added support for custom routes and resources through the constructor
 
 Imbo-0.3.2
