@@ -1,9 +1,9 @@
 Feature: Imbo supports custom resources
     In order to implement custom features for Imbo
     As an developer
-    I can implement custom routes and resources
+    I can implement custom routes and resources and add them to the server configuration
 
-    Scenario: Request a custom route with a static resource name in the configuration
+    Scenario: Request a custom route specified in the configuration
         Given the "Accept" request header is "application/json"
         When I request "/custom/1234567"
         Then I should get a response with "200 OK"
@@ -31,7 +31,7 @@ Feature: Imbo supports custom resources
            {"event":"custom2.put"}
            """
 
-    Scenario: Request a custom route with a closure returning the resource in the configuration with xml as an extension
+    Scenario: Request the XML representation of a custom resource with a closure returning the resource in the configuration
         When I request "/custom.xml"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "application/xml"
