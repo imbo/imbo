@@ -29,6 +29,7 @@ interface ResourceInterface {
      * @var string
      */
     const STATUS   = 'status';
+    const SHORTURL = 'shorturl';
     const USER     = 'user';
     const IMAGES   = 'images';
     const IMAGE    = 'image';

@@ -36,11 +36,12 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
 
     public function testReturnsTheCorrectAllowedMethods() {
         $resource = $this->getNewResource();
+        $shortName = strtolower(substr(get_class($resource), strrpos(get_class($resource), '\\') + 1));
         $methods = $resource->getAllowedMethods();
         $definition = $resource->getDefinition();
 
         foreach ($methods as $method) {
-            $expectedEventName = strtolower(substr(get_class($resource), strrpos(get_class($resource), '\\') + 1) . '.' . $method);
+            $expectedEventName = strtolower($shortName . '.' . $method);
 
             foreach ($definition as $d) {
                 $eventName = $d->getEventName();
@@ -55,6 +56,11 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
 
         foreach ($definition as $d) {
             $eventName = $d->getEventName();
+
+            if (strpos($eventName, $shortName) !== 0) {
+                continue;
+            }
+
             $expectedMethod = strtoupper(substr($eventName, strrpos($eventName, '.') + 1));
 
             foreach ($methods as $method) {

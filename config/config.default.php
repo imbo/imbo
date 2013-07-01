@@ -44,10 +44,7 @@ $config = array(
      * @var Imbo\Database\DatabaseInterface|Closure
      */
     'database' => function() {
-        return new Database\MongoDB(array(
-            'databaseName'   => 'imbo',
-            'collectionName' => 'images',
-        ));
+        return new Database\MongoDB();
     },
 
     /**
@@ -60,9 +57,7 @@ $config = array(
      * @var Imbo\Storage\StorageInterface|Closure
      */
     'storage' => function() {
-        return new Storage\GridFS(array(
-            'databaseName' => 'imbo_storage',
-        ));
+        return new Storage\GridFS();
     },
 
     /**

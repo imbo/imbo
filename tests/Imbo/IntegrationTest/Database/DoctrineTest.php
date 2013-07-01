@@ -71,6 +71,23 @@ class DoctrineTest extends DatabaseTests {
                 tagValue TEXT NOT NULL
             )
         ");
+        $this->pdo->query("
+            CREATE TABLE IF NOT EXISTS shorturl (
+                shortUrlId TEXT PRIMARY KEY NOT NULL,
+                publicKey TEXT NOT NULL,
+                imageIdentifier TEXT NOT NULL,
+                extension TEXT,
+                query TEXT NOT NULL
+            )
+        ");
+        $this->pdo->query("
+            CREATE INDEX shorturlparams ON shorturl (
+                publicKey,
+                imageIdentifier,
+                extension,
+                query
+            )
+        ");
 
         parent::setUp();
     }
