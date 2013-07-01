@@ -260,7 +260,7 @@ class RESTContext extends BehatContext {
             $cacheable = false;
         }
 
-        assertSame($cacheable, $this->responses[count($this->responses) - 1]->canCache());
+        assertSame($cacheable, $this->getLastResponse()->canCache());
     }
 
     /**
