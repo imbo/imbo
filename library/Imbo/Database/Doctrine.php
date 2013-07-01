@@ -239,7 +239,6 @@ class Doctrine implements DatabaseInterface {
 
         if ($metadataQuery = $query->metadataQuery()) {
             $qb->leftJoin('i', 'metadata', 'm', 'i.id = m.imageId');
-            $tag = $qb->expr()->andx();
             $tmp = 0;
 
             foreach ($metadataQuery as $key => $value) {
@@ -374,7 +373,7 @@ class Doctrine implements DatabaseInterface {
     public function getNumBytes($publicKey) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('SUM(i.size)')
-              ->from($this->getTableName('imageinfo', $publicKey), 'i')
+              ->from($this->tableNames['imageinfo'], 'i')
               ->where('i.publicKey = :publicKey')
               ->setParameter(':publicKey', $publicKey);
 

@@ -21,27 +21,6 @@ use Imbo\Exception\InvalidArgumentException,
  */
 class Stats implements ModelInterface, ArrayAccess {
     /**
-     * Total number of images stored
-     *
-     * @var int
-     */
-    private $numImages;
-
-    /**
-     * Total number of users
-     *
-     * @var int
-     */
-    private $numUsers;
-
-    /**
-     * Total number of bytes stored in the storage
-     *
-     * @var int
-     */
-    private $numBytes;
-
-    /**
      * Custom stats that can be set
      *
      * @var array

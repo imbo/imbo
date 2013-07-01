@@ -62,7 +62,6 @@ class Cors implements ListenerInterface {
      */
     public function getDefinition() {
         $definition = array();
-        $priority = 20;
 
         // Enable the event listener only for resources and methods specified
         foreach ($this->params['allowedMethods'] as $resource => $methods) {

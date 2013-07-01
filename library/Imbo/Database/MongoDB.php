@@ -386,7 +386,7 @@ class MongoDB implements DatabaseInterface {
      */
     public function getNumBytes($publicKey) {
         try {
-            $result = $this->getCollection()->aggregate(
+            $result = $this->getImageCollection()->aggregate(
                 array('$match' => array('publicKey' => $publicKey)),
                 array('$group' => array('_id' => null, 'numBytes' => array('$sum' => '$size')))
             )['result'];

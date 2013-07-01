@@ -62,7 +62,6 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
      */
     public function insertImage(EventInterface $event) {
         $request = $event->getRequest();
-        $response = $event->getResponse();
 
         $event->getDatabase()->insertImage(
             $request->getPublicKey(),
