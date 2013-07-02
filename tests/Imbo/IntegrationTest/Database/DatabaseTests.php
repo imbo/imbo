@@ -421,4 +421,39 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->driver->deleteShortUrls($this->publicKey, $this->imageIdentifier));
         $this->assertNull($this->driver->getShortUrlParams($shortUrlId));
     }
+
+    public function testCanFilterInImageIdentifiers() {
+        $publicKey = 'christer';
+        $id1 = str_repeat('a', 32);
+        $id2 = str_repeat('b', 32);
+        $id3 = str_repeat('c', 32);
+        $id4 = str_repeat('d', 32);
+        $id5 = str_repeat('e', 32);
+
+        $this->assertTrue($this->driver->insertImage($publicKey, $id1, $this->image));
+        $this->assertTrue($this->driver->insertImage($publicKey, $id2, $this->image));
+        $this->assertTrue($this->driver->insertImage($publicKey, $id3, $this->image));
+        $this->assertTrue($this->driver->insertImage($publicKey, $id4, $this->image));
+        $this->assertTrue($this->driver->insertImage($publicKey, $id5, $this->image));
+
+        $query = new Query();
+
+        $query->imageIdentifiers(array($id1));
+        $this->assertCount(1, $this->driver->getImages($publicKey, $query));
+
+        $query->imageIdentifiers(array($id1, $id2));
+        $this->assertCount(2, $this->driver->getImages($publicKey, $query));
+
+        $query->imageIdentifiers(array($id1, $id2, $id3));
+        $this->assertCount(3, $this->driver->getImages($publicKey, $query));
+
+        $query->imageIdentifiers(array($id1, $id2, $id3, $id4));
+        $this->assertCount(4, $this->driver->getImages($publicKey, $query));
+
+        $query->imageIdentifiers(array($id1, $id2, $id3, $id4, $id5));
+        $this->assertCount(5, $this->driver->getImages($publicKey, $query));
+
+        $query->imageIdentifiers(array($id1, $id2, $id3, $id4, $id5, str_repeat('f', 32)));
+        $this->assertCount(5, $this->driver->getImages($publicKey, $query));
+    }
 }

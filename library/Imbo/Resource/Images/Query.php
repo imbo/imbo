@@ -60,10 +60,17 @@ class Query {
     private $to;
 
     /**
+     * Image identifiers filter
+     *
+     * @var array
+     */
+    private $imageIdentifiers = array();
+
+    /**
      * Set or get the page property
      *
      * @param int $page Give this a value to set the page property
-     * @return int|Query
+     * @return int|self
      */
     public function page($page = null) {
         if ($page === null) {
@@ -79,7 +86,7 @@ class Query {
      * Set or get the limit property
      *
      * @param int $limit Give this a value to set the limit property
-     * @return int|Query
+     * @return int|self
      */
     public function limit($limit = null) {
         if ($limit === null) {
@@ -95,7 +102,7 @@ class Query {
      * Set or get the returnMetadata flag
      *
      * @param boolean $returnMetadata Give this a value to set the returnMetadata flag
-     * @return boolean|Query
+     * @return boolean|self
      */
     public function returnMetadata($returnMetadata = null) {
         if ($returnMetadata === null) {
@@ -111,7 +118,7 @@ class Query {
      * Set or get the metadataQuery property
      *
      * @param array $metadataQuery Give this a value to set the property
-     * @return array|Query
+     * @return array|self
      */
     public function metadataQuery(array $metadataQuery = null) {
         if ($metadataQuery === null) {
@@ -127,7 +134,7 @@ class Query {
      * Set or get the from attribute
      *
      * @param int $from Give this a value to set the from property
-     * @return int|Query
+     * @return int|self
      */
     public function from($from = null) {
         if ($from === null) {
@@ -143,7 +150,7 @@ class Query {
      * Set or get the to attribute
      *
      * @param int $to Give this a value to set the to property
-     * @return int|Query
+     * @return int|self
      */
     public function to($to = null) {
         if ($to === null) {
@@ -151,6 +158,22 @@ class Query {
         }
 
         $this->to = (int) $to;
+
+        return $this;
+    }
+
+    /**
+     * Set or get the imageIdentifiers filter
+     *
+     * @param array $imageIdentifiers Give this a value to set the property
+     * @return array|self
+     */
+    public function imageIdentifiers(array $imageIdentifiers = null) {
+        if ($imageIdentifiers === null) {
+            return $this->imageIdentifiers;
+        }
+
+        $this->imageIdentifiers = $imageIdentifiers;
 
         return $this;
     }

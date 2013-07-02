@@ -265,6 +265,12 @@ class MongoDB implements DatabaseInterface {
             }
         }
 
+        $imageIdentifiers = $query->imageIdentifiers();
+
+        if (!empty($imageIdentifiers)) {
+            $queryData['imageIdentifier']['$in'] = $imageIdentifiers;
+        }
+
         // Fields to fetch
         $fields = array('extension', 'added', 'checksum', 'updated', 'publicKey', 'imageIdentifier', 'mime', 'size', 'width', 'height');
 
