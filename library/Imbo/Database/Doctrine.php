@@ -255,6 +255,18 @@ class Doctrine implements DatabaseInterface {
             }
         }
 
+        if ($imageIdentifiers = $query->imageIdentifiers()) {
+            $expr = $qb->expr();
+            $composite = $expr->orX();
+
+            foreach ($imageIdentifiers as $i => $id) {
+                $composite->add($expr->eq('i.imageIdentifier', ':imageIdentifier' . $i));
+                $qb->setParameter(':imageIdentifier' . $i, $id);
+            }
+
+            $qb->andWhere($composite);
+        }
+
         $stmt = $qb->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $returnMetadata = $query->returnMetadata();
