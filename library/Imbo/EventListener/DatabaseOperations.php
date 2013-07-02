@@ -187,6 +187,14 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
             }
         }
 
+        if ($params->has('imageIdentifiers')) {
+            $imageIdentifiers = trim($params->get('imageIdentifiers'));
+
+            if (!empty($imageIdentifiers)) {
+                $query->imageIdentifiers(explode(',', $imageIdentifiers));
+            }
+        }
+
         $publicKey = $event->getRequest()->getPublicKey();
         $response = $event->getResponse();
         $database = $event->getDatabase();
