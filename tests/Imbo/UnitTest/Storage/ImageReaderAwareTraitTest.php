@@ -8,10 +8,9 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest;
+namespace Imbo\UnitTest\Storage;
 
-use Imbo\Storage\ImageReaderAware,
-    Imbo\Storage\ImageReaderAwareTrait;
+use Imbo\Storage\ImageReaderAwareTrait;
 
 /**
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
@@ -19,9 +18,7 @@ use Imbo\Storage\ImageReaderAware,
  */
 class ImageReaderAwareTraitTest extends \PHPUnit_Framework_TestCase {
     /**
-     * Image reader aware class instance
-     * 
-     * @var DummyImageReaderAwareClass
+     * @var ImageReaderAwareTrait
      */
     private $readerAware;
 
@@ -29,7 +26,7 @@ class ImageReaderAwareTraitTest extends \PHPUnit_Framework_TestCase {
      * Set up the image reader aware class
      */
     public function setUp() {
-        $this->readerAware = new DummyImageReaderAwareClass();
+        $this->readerAware = $this->getObjectForTrait('Imbo\Storage\ImageReaderAwareTrait');
     }
 
     /**
@@ -51,14 +48,4 @@ class ImageReaderAwareTraitTest extends \PHPUnit_Framework_TestCase {
         $this->readerAware->setImageReader($reader);
         $this->assertSame($reader, $this->readerAware->getImageReader());
     }
-}
-
-/**
- * Dummy class for testing the image reader aware trait
- *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
- * @package Test suite\Unit tests
- */
-class DummyImageReaderAwareClass implements ImageReaderAware {
-    use ImageReaderAwareTrait;
 }

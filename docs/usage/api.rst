@@ -514,6 +514,28 @@ This transformation can be used to apply a watermark on top of the original imag
 * ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f,width=200,x=5``
 * ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f,height=50,x=-5,y=-5,position=bottom-right``
 
+If you want to set the default watermark image you will have to do so in the configuration:
+
+.. code-block:: php
+
+    <?php
+    return array(
+        // ...
+
+        'imageTransformations' => array(
+            'watermark' => function (array $params) {
+                $transformation = new Imbo\Image\Transformation\Watermark($params);
+                $transformation->setDefaultImage('some image identifier');
+
+                return $transformation;
+            },
+        ),
+
+        // ...
+    );
+
+When you have specified a default watermark image you are not required to use the ``img`` option for the transformation, but if you do so it will override the default one.
+
 PUT /users/<user>/images/<image>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
