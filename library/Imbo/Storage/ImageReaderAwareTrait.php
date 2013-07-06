@@ -19,7 +19,7 @@ namespace Imbo\Storage;
 trait ImageReaderAwareTrait {
     /**
      * Image reader instance
-     * 
+     *
      * @var ImageReader
      */
     private $imageReader;

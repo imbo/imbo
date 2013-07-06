@@ -31,7 +31,7 @@ class ImageReader {
 
     /**
      * Storage instance
-     * 
+     *
      * @var StorageInterface
      */
     private $storage;
@@ -48,7 +48,7 @@ class ImageReader {
 
     /**
      * Get image content
-     * 
+     *
      * @param  string $imageIdentifier Image identifier
      * @return string The binary content of the image
      * @throws StorageException
@@ -59,7 +59,7 @@ class ImageReader {
 
     /**
      * See if an image identifier exists in storage
-     * 
+     *
      * @param  string $imageIdentifier Image identifier
      * @return boolean Returns true if image exists, false otherwise
      * @throws StorageException
