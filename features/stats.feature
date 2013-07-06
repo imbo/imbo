@@ -3,30 +3,32 @@ Feature: Imbo provides a stats endpoint
     As an HTTP Client
     I want to make requests against the stats endpoint
 
-    Scenario Outline: The stats endpoint can respond with different content types
-        When I request "<endpoint>"
-        Then I should get a response with "200 OK"
-        And the "Content-Type" response header is "<content-type>"
-
-        Examples:
-            | endpoint    | content-type     |
-            | /stats.json | application/json |
-            | /stats.xml  | application/xml  |
-
-    Scenario Outline: The stats endpoint only supports GET and HEAD
-        When I request "/stats.json" using HTTP "<method>"
-        Then I should get a response with "405 Method not allowed"
-
-        Examples:
-            | method |
-            | POST   |
-            | PUT    |
-            | DELETE |
-
-    Scenario: The stats endpoint provides statistics
+    Background:
         Given "tests/Imbo/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
-        When I request "/stats.json"
-        Then the response body is:
-           """
-           {"users":{"publickey":{"numImages":1,"numBytes":95576}},"total":{"numImages":1,"numUsers":1,"numBytes":95576},"custom":{}}
-           """
+        And "tests/Imbo/Fixtures/image.jpg" exists in Imbo with identifier "f3210f1bb34bfbfa432cc3560be40761"
+        And "tests/Imbo/Fixtures/image.gif" exists in Imbo with identifier "b5426b4c008e378c201526d2baaec599"
+
+    Scenario Outline: Fetch stats
+        When I request "/stats.<extension>"
+        Then I should get a response with "200 OK"
+        And the response body <match>:
+            """
+            <response>
+            """
+
+        Examples:
+            | extension | match   | response |
+            | json      | is      | {"users":{"publickey":{"numImages":3,"numBytes":226424}},"total":{"numImages":3,"numUsers":1,"numBytes":226424},"custom":{}} |
+            | xml       | matches | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<stats>\s*<users>\s*<user publicKey="publickey">\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*</user>\s*</users>\s*<total>\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*</total>\s*<custom></custom>\s*</stats>\s*</imbo>$#ms |
+
+    Scenario Outline: The stats endpoint only supports HTTP GET and HEAD
+        When I request "/stats.json" using HTTP "<method>"
+        Then I should get a response with "<status>"
+
+        Examples:
+            | method | status                 |
+            | GET    | 200 OK                 |
+            | HEAD   | 200 OK                 |
+            | POST   | 405 Method not allowed |
+            | PUT    | 405 Method not allowed |
+            | DELETE | 405 Method not allowed |
