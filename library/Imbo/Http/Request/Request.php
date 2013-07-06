@@ -23,13 +23,6 @@ use Imbo\Exception\InvalidArgumentException,
  */
 class Request extends SymfonyRequest {
     /**
-     * The public key from the request
-     *
-     * @var string
-     */
-    private $publicKey;
-
-    /**
      * The private key
      *
      * @var string
@@ -42,20 +35,6 @@ class Request extends SymfonyRequest {
      * @var Image
      */
     private $image;
-
-    /**
-     * The current image identifier (if any)
-     *
-     * @var string
-     */
-    private $imageIdentifier;
-
-    /**
-     * The current extension (if any)
-     *
-     * @var string
-     */
-    private $extension;
 
     /**
      * The currently requested resource name (as defined by the constants in

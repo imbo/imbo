@@ -664,6 +664,7 @@ Events
 
 When configuring an event listener you need to know about the events that Imbo triggers. The most important events are combinations of the accessed resource along with the HTTP method used. Imbo currently provides five resources:
 
+* :ref:`stats <stats-resource>`
 * :ref:`status <status-resource>`
 * :ref:`user <user-resource>`
 * :ref:`images <images-resource>`
@@ -1037,6 +1038,38 @@ and has the following parameters:
 
         // ...
     );
+
+.. _stats-access:
+
+Stats access
+^^^^^^^^^^^^
+
+This event listener controls the access to the :ref:`stats endpoint <stats-resource>` by using simple white-/blacklists containing IP addresses.
+
+This listener is enabled per default, and only allows ``127.0.0.1`` to access the statistics:
+
+
+.. code-block:: php
+
+    <?php
+    namespace Imbo;
+
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            'statsAccess' => function() {
+                return new EventListener\StatsAccess(array(
+                    'whitelist' => array('127.0.0.1'),
+                    'blacklist' => array(),
+                ));
+            },
+        ),
+
+        // ...
+    );
+
+If the whitelist is populated, only the listed IP addresses will gain access. If the blacklist is populated only the listed IP addresses will be denied access. If both lists are populated the IP address of the client must be present in the whitelist to gain access. If an IP address is present in both lists, it will not gain access.
 
 The event object
 ++++++++++++++++

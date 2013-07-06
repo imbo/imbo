@@ -348,6 +348,48 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\XML::formatArrayModel
+     * @covers Imbo\Http\Response\Formatter\XML::formatArray
+     */
+    public function testCanFormatAnArrayModelWithNestedArrays() {
+        $data = array(
+            'key' => array(
+                'sub' => array(
+                    'subsub' => 'value',
+                ),
+            ),
+            'key2' => 'value',
+        );
+        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($data));
+
+        $xml = $this->formatter->format($model);
+
+        $this->assertTag(array(
+            'tag' => 'subsub',
+            'content' => 'value',
+            'parent' => array(
+                'tag' => 'sub',
+                'parent' => array(
+                    'tag' => 'key',
+                    'parent' => array(
+                        'tag' => 'imbo',
+                    ),
+                ),
+            ),
+        ), $xml, '', false);
+
+        $this->assertTag(array(
+            'tag' => 'key2',
+            'content' => 'value',
+            'parent' => array(
+                'tag' => 'imbo',
+            ),
+        ), $xml, '', false);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatArrayModel
      */
     public function testCanFormatAnEmptyArrayModel() {
         $model = $this->getMock('Imbo\Model\ArrayModel');

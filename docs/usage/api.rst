@@ -64,6 +64,105 @@ In this section you will find information on the different resources Imbo's REST
     :local:
     :depth: 1
 
+.. _stats-resource:
+
+Stats resource
+++++++++++++++
+Imbo provides an endpoint for fetching simple statistics about the data stored in Imbo.
+
+.. code-block:: bash
+
+    $ curl http://imbo/stats.json
+
+results in:
+
+.. code-block:: javascript
+
+    {
+      "users": {
+        "someuser": {
+          "numImages": 11,
+          "numBytes": 3817197
+        },
+        "someotheruser": {
+          "numImages": 1,
+          "numBytes": 81097
+        }
+      },
+      "total": {
+        "numImages": 12,
+        "numUsers": 2,
+        "numBytes": 3898294
+      },
+      "custom": {}
+    }
+
+Access control
+~~~~~~~~~~~~~~
+
+The access control for the stats endpoint is controlled by an :ref:`event listener <stats-access>`, which is enabled per default, and only allows connections from ``127.0.0.1``.
+
+Custom statistics
+~~~~~~~~~~~~~~~~~
+
+The stats resource lets users attach custom data via event listeners by using the model as a regular associative array. The following example attaches a simple event listener in the configuration file that populates some custom data in the statistics model:
+
+.. code-block:: php
+    :linenos:
+
+    <?php
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            'customStats' => array(
+                'events' => array('stats.get'),
+                'callback' => function($event) {
+                    // Fetch the model from the response
+                    $model = $event->getResponse()->getModel();
+
+                    // Set some values
+                    $model['someValue'] = 123;
+                    $model['someOtherValue'] = array(
+                        'foo' => 'bar',
+                    );
+                }
+            ),
+        ),
+
+        // ...
+    );
+
+When requesting the stats endpoint, the output will look like this:
+
+.. code-block:: javascript
+
+    {
+      "users": {
+        "someuser": {
+          "numImages": 11,
+          "numBytes": 3817197
+        },
+        "someotheruser": {
+          "numImages": 1,
+          "numBytes": 81097
+        }
+      },
+      "total": {
+        "numImages": 12,
+        "numUsers": 2,
+        "numBytes": 3898294
+      },
+      "custom": {
+        "someValue": 123,
+        "someOtherValue": {
+          "foo": "bar"
+        }
+      }
+    }
+
+Use cases for this might be to simply store data in some backend in various events (for instance ``image.get`` or ``metadata.get``) and then fetch these and display then when requesting the stats endpoint (``stats.get``).
+
 .. _status-resource:
 
 Status resource

@@ -25,18 +25,18 @@ use Imbo\Model\Image,
  * @package Image\Transformations
  */
 class Watermark extends Transformation implements ImageReaderAware, TransformationInterface {
-    use ImageReaderAwareTrait; 
+    use ImageReaderAwareTrait;
 
     /**
      * Default image identifier to use for watermarks
-     * 
+     *
      * @var string
      */
     private $defaultImage;
 
     /**
      * Image identifier to use as watermark image
-     * 
+     *
      * @var string
      */
     private $imageIdentifier;
@@ -79,7 +79,7 @@ class Watermark extends Transformation implements ImageReaderAware, Transformati
      * - "bottom-left": Places the watermark in the bottom left corner
      * - "bottom-right": Places the watermark in the bottom right corner
      * - "center": Places the watermark in the center of the image
-     * 
+     *
      * @var string
      */
     private $position = 'top-left';
@@ -112,7 +112,7 @@ class Watermark extends Transformation implements ImageReaderAware, Transformati
 
     /**
      * Set default image identifier to use if no identifier has been specified
-     * 
+     *
      * @param string $imageIdentifier Image identifier for the default image
      */
     public function setDefaultImage($imageIdentifier) {
@@ -134,7 +134,7 @@ class Watermark extends Transformation implements ImageReaderAware, Transformati
         try {
             $watermarkIdentifier = $this->imageIdentifier ?: $this->defaultImage;
             $watermarkData = $this->getImageReader()->getImage($watermarkIdentifier);
-            
+
             $watermark = new Imagick();
             $watermark->readImageBlob($watermarkData);
             $watermarkSize = $watermark->getImageGeometry();
@@ -149,7 +149,7 @@ class Watermark extends Transformation implements ImageReaderAware, Transformati
         // Should we resize the watermark?
         $width = $this->width ?: 0;
         $height = $this->height ?: 0;
-        
+
         if ($height || $width) {
             // Calculate width or height if not both have been specified
             if (!$height) {
