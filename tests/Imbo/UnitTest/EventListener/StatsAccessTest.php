@@ -72,75 +72,93 @@ class StatsAccessTest extends ListenerTests {
      */
     public function getFilterData() {
         return array(
-            'single whitelisted valid ip' => array(
-                '127.0.0.1',
-                array('127.0.0.1'),
-                array(),
-                true
+            'IPv4 in whitelist' => array(
+                '127.0.0.1',        // IP
+                array('127.0.0.1'), // Whitelist
+                array(),            // Blacklist
+                true                // Access?
             ),
-            'single whitelisted invalid ip' => array(
+            'IPv4 not in whitelist' => array(
                 '127.0.0.2',
                 array('127.0.0.1'),
                 array(),
                 false
             ),
-            'single blacklisted valid ip' => array(
+            'IPv4 not in blacklist' => array(
                 '127.0.0.2',
                 array(),
                 array('127.0.0.1'),
                 true
             ),
-            'single blacklisted invalid ip' => array(
+            'IPv4 in blacklist' => array(
                 '127.0.0.1',
                 array(),
                 array('127.0.0.1'),
                 false
             ),
-            'whitelisted ip when both filters are used' => array(
+            'IPv4 in whitelist with both filters populated' => array(
                 '127.0.0.1',
                 array('127.0.0.1', '127.0.0.2'),
                 array('127.0.0.3', '127.0.0.4'),
                 true
             ),
-            'blacklisted ip when both filters are used' => array(
+            'IPv4 in blacklist with both filters populated' => array(
                 '127.0.0.3',
                 array('127.0.0.1', '127.0.0.2'),
                 array('127.0.0.3', '127.0.0.4'),
                 false
             ),
-            'client ip which exists in both filters' => array(
+            'IPv4 in both lists with both filters populated' => array(
                 '127.0.0.2',
                 array('127.0.0.1', '127.0.0.2'),
                 array('127.0.0.2', '127.0.0.3'),
                 false
             ),
-            'client ip does not exist in any filters' => array(
+            'IPv4 in no lists with both filters populated' => array(
                 '127.0.0.5',
                 array('127.0.0.1', '127.0.0.2'),
                 array('127.0.0.3', '127.0.0.4'),
                 false
             ),
-            'cidr notation with ip in whitelist range' => array(
+            'IPv4 in whitelist range' => array(
                 '192.168.1.10',
                 array('192.168.1.0/24'),
                 array(),
                 true
             ),
-            'cidr notation with ip in blacklist range' => array(
+            'IPv4 in blacklist range' => array(
                 '192.168.1.10',
                 array(),
                 array('192.168.1.0/24'),
                 false
             ),
-            'cidr notation with ip not in whitelist range' => array(
-                '192.168.1.32',
+            'IPv4 outsiden of whitelist range' => array(
+                '192.168.1.64',
                 array('192.168.1.32/27'),
+                array(),
+                false
+            ),
+            'IPv6 in whitelist (in short format)' => array(
+                '2a00:1b60:1011:0000:0000:0000:0000:1338',
+                array('2a00:1b60:1011::1338'),
                 array(),
                 true
             ),
-            'cidr notation with ip not in whitelist range' => array(
-                '192.168.1.64',
-                array('192.168.1.32/27'),
+            'IPv6 in whitelist (in full format)' => array(
+                '2a00:1b60:1011:0000:0000:0000:0000:1338',
+                array('2a00:1b60:1011:0000:0000:0000:0000:1338'),
+                array(),
+                true
+            ),
+            'IPv6 in whitelist range' => array(
+                '2001:0db8:0000:0000:0000:0000:0000:0000',
+                array('2001:db8::/48'),
+                array(),
+                true
+            ),
+            'IPv6 outside of whitelist range' => array(
+                '2001:0db9:0000:0000:0000:0000:0000:0000',
+                array('2001:db8::/48'),
                 array(),
                 false
             ),
