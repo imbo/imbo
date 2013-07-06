@@ -38,13 +38,6 @@ use Imbo\Http\Request\Request,
  */
 class Application {
     /**
-     * Application configuration
-     *
-     * @var array
-     */
-    private $config;
-
-    /**
      * Service container
      *
      * @var Container
@@ -222,9 +215,13 @@ class Application {
         // Status resource
         $container->setStatic('statusResource', function(Container $container) {
             $resource = new Resource\Status();
-            $resource->setContainer($container);
 
             return $resource;
+        });
+
+        // Stats resource
+        $container->setStatic('statsResource', function(Container $container) {
+            return new Resource\Stats();
         });
 
         // Image resource
@@ -337,6 +334,7 @@ class Application {
             // Register internal event listeners
             $containerEntries = array_merge(array(
                 'statusResource',
+                'statsResource',
                 'userResource',
                 'imagesResource',
                 'imageResource',

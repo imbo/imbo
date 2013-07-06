@@ -299,6 +299,11 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $data = array(
             'some key' => 'some value',
             'some other key' => 'some other value',
+            'nested' => array(
+                'subkey' => array(
+                    'subsubkey' => 'some value',
+                ),
+            ),
         );
         $model = $this->getMock('Imbo\Model\ArrayModel');
         $model->expects($this->once())->method('getData')->will($this->returnValue($data));

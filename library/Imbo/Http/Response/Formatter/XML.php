@@ -153,11 +153,7 @@ METADATA;
      * {@inheritdoc}
      */
     public function formatArrayModel(Model\ArrayModel $model) {
-        $data = '';
-
-        foreach ($model->getData() as $key => $value) {
-            $data .= '<' . $key . '>' . $value . '</' . $key . '>';
-        }
+        $data = $this->formatArray($model->getData());
 
         return <<<DATA
 <?xml version="1.0" encoding="UTF-8"?>
@@ -186,5 +182,56 @@ DATA;
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>{$data}</imbo>
 DATA;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatStats(Model\Stats $model) {
+        $users = '';
+        $total = $this->formatArray(array(
+            'numImages' => $model->getNumImages(),
+            'numBytes' => $model->getNumBytes(),
+        ));
+        $custom = $this->formatArray($model->getCustomStats() ?: array());
+
+        foreach ($model->getUsers() as $user => $stats) {
+            $users .= '<user publicKey="' . $user . '">' . $this->formatArray($stats) . '</user>';
+        }
+
+        return <<<STATUS
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <stats>
+    <users>{$users}</users>
+    <total>{$total}</total>
+    <custom>{$custom}</custom>
+  </stats>
+</imbo>
+STATUS;
+    }
+
+    /**
+     * Format a nested dataset
+     *
+     * @param array $data A nested array
+     * @return string
+     */
+    private function formatArray(array $data) {
+        $xml = '';
+
+        foreach ($data as $key => $value) {
+            $xml .= '<' . $key . '>';
+
+            if (is_array($value)) {
+                $xml .= $this->formatArray($value);
+            } else {
+                $xml .= $value;
+            }
+
+            $xml .= '</' . $key . '>';
+        }
+
+        return $xml;
     }
 }

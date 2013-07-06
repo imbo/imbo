@@ -159,6 +159,12 @@ $config = array(
         'accessToken' => function() {
             return new EventListener\AccessToken();
         },
+        'statsAccess' => function() {
+            return new EventListener\StatsAccess(array(
+                'whitelist' => array('127.0.0.1'),
+                'blacklist' => array(),
+            ));
+        }
     ),
 
     /**

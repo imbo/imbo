@@ -51,6 +51,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
             new ListenerDefinition('db.metadata.update', array($this, 'updateMetadata')),
             new ListenerDefinition('db.metadata.load', array($this, 'loadMetadata')),
             new ListenerDefinition('db.user.load', array($this, 'loadUser')),
+            new ListenerDefinition('db.stats.load', array($this, 'loadStats')),
         );
     }
 
@@ -61,7 +62,6 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
      */
     public function insertImage(EventInterface $event) {
         $request = $event->getRequest();
-        $response = $event->getResponse();
 
         $event->getDatabase()->insertImage(
             $request->getPublicKey(),
@@ -252,5 +252,29 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
 
         $response->setModel($userModel)
                  ->setLastModified($lastModified);
+    }
+
+    /**
+     * Load stats
+     *
+     * @param EventInterface $event An event instance
+     */
+    public function loadStats(EventInterface $event) {
+        $response = $event->getResponse();
+        $database = $event->getDatabase();
+        $publicKeys = array_keys($event->getConfig()['auth']);
+        $users = array();
+
+        foreach ($publicKeys as $key) {
+            $users[$key] = array(
+                'numImages' => $database->getNumImages($key),
+                'numBytes' => $database->getNumBytes($key),
+            );
+        }
+
+        $statsModel = new Model\Stats();
+        $statsModel->setUsers($users);
+
+        $response->setModel($statsModel);
     }
 }

@@ -86,6 +86,14 @@ interface FormatterInterface {
     function formatListModel(Model\ListModel $model);
 
     /**
+     * Format a stats model
+     *
+     * @param Model\Stats $model The model to format
+     * @return string Formatted data
+     */
+    function formatStats(Model\Stats $model);
+
+    /**
      * Get the content type for the current formatter
      *
      * Return the content type for the current formatter, excluding the character set, for instance
