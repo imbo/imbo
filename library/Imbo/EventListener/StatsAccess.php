@@ -209,7 +209,7 @@ class StatsAccess implements ListenerInterface {
         $hexMask = str_pad($hexMask, 32, '0');
 
         // Pack into binary string
-        return pack('H*' , $hexMask);
+        return hex2bin($hexMask);
     }
 
     /**
@@ -230,7 +230,7 @@ class StatsAccess implements ListenerInterface {
      */
     private function expandIPv6($ip) {
         // Convert to in_addr an unpack as hex
-        $hex = strtolower(unpack('H*ip', inet_pton($ip))['ip']);
+        $hex = strtolower(bin2hex(inet_pton($ip)));
 
         // Inject colons
         return substr(preg_replace('/([a-f0-9]{4})/', '$1:', $hex), 0, -1);
