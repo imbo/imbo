@@ -16,8 +16,7 @@ $data = $method . '|' . $url . '|' . $publicKey . '|' . $timestamp;
 // Generate the token
 $signature = hash_hmac('sha256', $data, $privateKey);
 
-// Request using request headers
-
+// Create the context for the request
 $context = stream_context_create(array(
     'http' => array(
         'method' => $method,
@@ -28,18 +27,4 @@ $context = stream_context_create(array(
         ),
     ),
 ));
-file_get_contents($url, false, $context);
-
-// or, request using query parameters
-
-$context = stream_context_create(array(
-    'http' => array(
-        'method' => $method,
-    ),
-));
-$url = sprintf('%s?signature=%s&timestamp=%s',
-               $url,
-               rawurlencode($signature),
-               rawurlencode($timestamp));
-
 file_get_contents($url, false, $context);
