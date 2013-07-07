@@ -3,7 +3,15 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
+<<<<<<< HEAD
     "hash": "20563499d2ff8b9c1cddb9b8d22836c0",
+=======
+<<<<<<< HEAD
+    "hash": "ec9f88978e43c7f7c61bb939f04d9fcb",
+=======
+    "hash": "ff4d84ad4435a8e93e190ec35f3eda95",
+>>>>>>> Moved some dependencies around
+>>>>>>> Moved some dependencies around
     "packages": [
         {
             "name": "symfony/event-dispatcher",
@@ -703,7 +711,12 @@
         },
         {
             "name": "guzzle/guzzle",
+<<<<<<< HEAD
             "version": "v3.8.0",
+=======
+<<<<<<< HEAD
+            "version": "v3.7.4",
+>>>>>>> Moved some dependencies around
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
@@ -711,8 +724,25 @@
             },
             "dist": {
                 "type": "zip",
+<<<<<<< HEAD
                 "url": "https://api.github.com/repos/guzzle/guzzle/zipball/b4a3ce8c05e777fa18b802956d5d0e38ad338a69",
                 "reference": "b4a3ce8c05e777fa18b802956d5d0e38ad338a69",
+=======
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/b170b028c6bb5799640e46c8803015b0f9a45ed9",
+                "reference": "b170b028c6bb5799640e46c8803015b0f9a45ed9",
+=======
+            "version": "v3.7.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/guzzle.git",
+                "reference": "v3.7.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/v3.7.1",
+                "reference": "v3.7.1",
+>>>>>>> Moved some dependencies around
+>>>>>>> Moved some dependencies around
                 "shasum": ""
             },
             "require": {
@@ -791,7 +821,15 @@
                 "rest",
                 "web service"
             ],
+<<<<<<< HEAD
             "time": "2013-12-05 23:39:20"
+=======
+<<<<<<< HEAD
+            "time": "2013-10-02 20:47:00"
+=======
+            "time": "2013-07-05 20:17:54"
+>>>>>>> Moved some dependencies around
+>>>>>>> Moved some dependencies around
         },
         {
             "name": "mikey179/vfsStream",
@@ -825,6 +863,7 @@
         },
         {
             "name": "phpunit/php-code-coverage",
+<<<<<<< HEAD
             "version": "1.2.13",
             "source": {
                 "type": "git",
@@ -835,6 +874,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/466e7cd2554b4e264c9e3f31216d25ac0e5f3d94",
                 "reference": "466e7cd2554b4e264c9e3f31216d25ac0e5f3d94",
+=======
+            "version": "1.2.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
+                "reference": "1.2.12"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/1.2.12",
+                "reference": "1.2.12",
+>>>>>>> Moved some dependencies around
                 "shasum": ""
             },
             "require": {
@@ -882,7 +933,11 @@
                 "testing",
                 "xunit"
             ],
+<<<<<<< HEAD
             "time": "2013-09-10 08:14:32"
+=======
+            "time": "2013-07-06 06:26:16"
+>>>>>>> Moved some dependencies around
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -1069,6 +1124,7 @@
         },
         {
             "name": "phpunit/phpunit",
+<<<<<<< HEAD
             "version": "3.7.28",
             "source": {
                 "type": "git",
@@ -1079,6 +1135,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/3b97c8492bcafbabe6b6fbd2ab35f2f04d932a8d",
                 "reference": "3b97c8492bcafbabe6b6fbd2ab35f2f04d932a8d",
+=======
+            "version": "3.7.22",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/phpunit.git",
+                "reference": "3.7.22"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/3.7.22",
+                "reference": "3.7.22",
+>>>>>>> Moved some dependencies around
                 "shasum": ""
             },
             "require": {
@@ -1090,7 +1158,11 @@
                 "phpunit/php-code-coverage": "~1.2.1",
                 "phpunit/php-file-iterator": ">=1.3.1",
                 "phpunit/php-text-template": ">=1.1.1",
+<<<<<<< HEAD
                 "phpunit/php-timer": ">=1.0.4",
+=======
+                "phpunit/php-timer": "~1.0.2",
+>>>>>>> Moved some dependencies around
                 "phpunit/phpunit-mock-objects": "~1.2.0",
                 "symfony/yaml": "~2.0"
             },
@@ -1139,7 +1211,11 @@
                 "testing",
                 "xunit"
             ],
+<<<<<<< HEAD
             "time": "2013-10-17 07:27:40"
+=======
+            "time": "2013-07-06 06:29:15"
+>>>>>>> Moved some dependencies around
         },
         {
             "name": "phpunit/phpunit-mock-objects",
