@@ -13,7 +13,7 @@ Using composer
 The recommended way of installing Imbo is by creating a ``composer.json`` file for your installation, and then install Imbo and optional 3rd party plug-ins and/or image transformations via `Composer <https://getcomposer.org>`_. You will need the following directory structure for this to work::
 
     /path/to/install/composer.json
-    /path/to/install/config.php
+    /path/to/install/config/config.php
 
 where the ``composer.json`` file can contain:
 
@@ -26,7 +26,9 @@ where the ``composer.json`` file can contain:
       }
     }
 
-and the ``config.php`` file is your :ref:`Imbo configuration <configuration>`. If you want to install 3rd party transformations and/or for instance the Doctrine DBAL library simply add these to the ``require`` object in your ``composer.json``:
+and the ``config/config.php`` file is your :ref:`Imbo configuration <configuration>`.
+
+If you want to install 3rd party transformations and/or for instance the Doctrine DBAL library simply add these to the ``require`` object in your ``composer.json``:
 
 .. code-block:: json
 
@@ -41,11 +43,10 @@ and the ``config.php`` file is your :ref:`Imbo configuration <configuration>`. I
 
 Regarding the Imbo version you are about to install you can use ``dev-master`` for the latest released version, or you can use a specific version if you want to. Head over to `Packagist <https://packagist.org/packages/imbo/imbo>`_ to see the available versions.
 
-When you have created the ``composer.json`` file you will need to install Imbo by using Composer:
+When you have created the ``composer.json`` file you can install Imbo with Composer:
 
 .. code-block:: bash
 
-    mkdir /path/to/install; cd /path/to/install
     curl -s https://getcomposer.org/installer | php
     php composer.phar install -o --no-dev
 
@@ -61,7 +62,7 @@ You can also install Imbo directly via git, and then use Composer to install the
 .. code-block:: bash
 
     mkdir /path/to/install; cd /path/to/install
-    git clone git@github.com:imbo/imbo.git
+    git clone https://github.com/imbo/imbo.git
     cd imbo
     curl -s https://getcomposer.org/installer | php
     php composer.phar install -o --no-dev
@@ -86,7 +87,7 @@ You will need to update ``ServerName`` to match the host name you will use for I
 Nginx
 ~~~~~
 
-The sample Nginx configuration uses PHP via `FastCGI <http://www.fastcgi.com/>`_:
+Below is an example on how to configure Nginx for Imbo. This example uses PHP via `FastCGI <http://www.fastcgi.com/>`_:
 
 .. literalinclude:: ../../config/imbo.nginx.conf.dist
     :language: console
@@ -166,6 +167,17 @@ MySQL
         KEY `imageId` (`imageId`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci AUTO_INCREMENT=1 ;
 
+    CREATE TABLE `shorturl` (
+        `shortUrlId` char(7) COLLATE utf8_danish_ci NOT NULL,
+        `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
+        `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
+        `extension` char(3) COLLATE utf8_danish_ci DEFAULT NULL,
+        `query` text COLLATE utf8_danish_ci NOT NULL,
+        PRIMARY KEY (`shortUrlId`),
+        KEY `params` (`publicKey`,`imageIdentifier`,`extension`,`query`(255))
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+
+
 The following table is only needed if you plan on storing the actual images themselves in MySQL:
 
 .. code-block:: sql
@@ -203,6 +215,21 @@ SQLite
         imageId KEY INTEGER NOT NULL,
         tagName TEXT NOT NULL,
         tagValue TEXT NOT NULL
+    )
+
+    CREATE TABLE IF NOT EXISTS shorturl (
+        shortUrlId TEXT PRIMARY KEY NOT NULL,
+        publicKey TEXT NOT NULL,
+        imageIdentifier TEXT NOT NULL,
+        extension TEXT,
+        query TEXT NOT NULL
+    )
+
+    CREATE INDEX shorturlparams ON shorturl (
+        publicKey,
+        imageIdentifier,
+        extension,
+        query
     )
 
 The following table is only needed if you plan on storing the actual images themselves in SQLite:
