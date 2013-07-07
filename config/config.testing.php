@@ -13,7 +13,6 @@ namespace Imbo;
 use Imbo\Image\Transformation,
     Imbo\Cache,
     Imbo\Resource\ResourceInterface,
-    Imbo\EventListener\ListenerInterface,
     Imbo\EventListener\ListenerDefinition,
     Imbo\EventManager\EventInterface,
     Imbo\Model\ArrayModel,
@@ -24,7 +23,7 @@ use Imbo\Image\Transformation,
 // Require composer autoloader
 require __DIR__ . '/../vendor/autoload.php';
 
-class CustomResource implements ResourceInterface, ListenerInterface {
+class CustomResource implements ResourceInterface {
     public function getAllowedMethods() {
         return array('GET');
     }
@@ -45,7 +44,7 @@ class CustomResource implements ResourceInterface, ListenerInterface {
     }
 }
 
-class CustomResource2 implements ResourceInterface, ListenerInterface {
+class CustomResource2 implements ResourceInterface {
     public function getAllowedMethods() {
         return array('GET', 'PUT');
     }

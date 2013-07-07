@@ -12,7 +12,6 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
-    Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ResourceException,
     Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -23,7 +22,7 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-class ShortUrl implements ResourceInterface, ListenerInterface {
+class ShortUrl implements ResourceInterface {
     /**
      * {@inheritdoc}
      */

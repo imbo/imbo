@@ -12,7 +12,6 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
-    Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Model;
 
@@ -22,7 +21,7 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-class Metadata implements ResourceInterface, ListenerInterface {
+class Metadata implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
