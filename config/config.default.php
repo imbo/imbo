@@ -153,18 +153,18 @@ $config = array(
      * @var array
      */
     'eventListeners' => array(
-        'auth' => function() {
-            return new EventListener\Authenticate();
-        },
         'accessToken' => function() {
             return new EventListener\AccessToken();
+        },
+        'auth' => function() {
+            return new EventListener\Authenticate();
         },
         'statsAccess' => function() {
             return new EventListener\StatsAccess(array(
                 'whitelist' => array('127.0.0.1'),
                 'blacklist' => array(),
             ));
-        }
+        },
     ),
 
     /**
@@ -241,19 +241,22 @@ $config = array(
         },
     ),
 
-    /**
-     * Custom routes for Imbo
-     *
-     * @var array
-     */
-    'routes' => array(),
 
     /**
      * Custom resources for Imbo
      *
+     * @link http://docs.imbo-project.org
      * @var array
      */
     'resources' => array(),
+
+    /**
+     * Custom routes for Imbo
+     *
+     * @link http://docs.imbo-project.org
+     * @var array
+     */
+    'routes' => array(),
 );
 
 if (file_exists(__DIR__ . '/../../../../config/config.php')) {
