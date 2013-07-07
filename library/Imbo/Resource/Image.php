@@ -10,8 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\ResourceException,
+use Imbo\Exception\ResourceException,
     Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
     Imbo\Model;
@@ -22,7 +21,7 @@ use Imbo\EventListener\ListenerInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-class Image implements ResourceInterface, ListenerInterface {
+class Image implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
