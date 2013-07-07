@@ -1,62 +1,10 @@
-RESTful API
-===========
+Imbo's API
+==========
 
-Imbo uses a `RESTful`_ API to manage the stored images and metadata. Each image is identified by a public key (the "username") and an MD5 checksum of the file itself. The public key and the image identifier will be referred to as ``<user>`` and ``<image>`` respectively for the remainder of this document. For all `cURL`_ examples ``imbo`` will be used as a host name. The examples will also omit access tokens and authentication signatures.
+In this chapter you will learn more about how Imbo's API works, and how you as a user is able to read from and write to Imbo. Most examples used in this chapter will use `cURL <http://curl.haxx.se/>`_, so while playing around with the API it's encourages to have cURL easily available. For the sake of simplicity the access tokens and signature information is not used in the examples. See the :ref:`authentication-and-access-tokens` section for more information regarding this.
 
-.. _cURL: http://curl.haxx.se/
-.. _RESTful: http://en.wikipedia.org/wiki/REST
-
-Content types
--------------
-
-Currently Imbo responds with images (jpg, gif and png), `JSON`_ and `XML`_, but only accepts images (jpg, gif and png) and JSON as input.
-
-Imbo will do content negotiation using the `Accept`_ header found in the request, unless you specify a file extension, in which case Imbo will deliver the type requested without looking at the Accept header.
-
-The default `Content-Type`_ for non-image responses is JSON, and for most examples in this document you will see the ``.json`` extension being used. Change that to ``.xml`` to get XML data. You can also skip the extension and force a specific Content-Type using the Accept header:
-
-.. code-block:: bash
-
-    $ curl http://imbo/status.json
-
-and
-
-.. code-block:: bash
-
-    $ curl -H "Accept: application/json" http://imbo/status
-
-will end up with the same content-type. Use ``application/xml`` for XML.
-
-If you use JSON you can wrap the content in a function (`JSONP`_) by using one of the following query parameters:
-
-* ``callback``
-* ``jsonp``
-* ``json``
-
-.. code-block:: bash
-
-    $ curl http://imbo/status.json?callback=func
-
-will result in:
-
-.. code-block:: javascript
-
-    func(
-      {
-        "date": "Mon, 05 Nov 2012 19:18:40 GMT",
-        "database": true,
-        "storage": true
-      }
-    )
-
-.. _Accept: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-.. _Content-Type: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-.. _JSON: http://en.wikipedia.org/wiki/JSON
-.. _JSONP: http://en.wikipedia.org/wiki/JSONP
-.. _XML: http://en.wikipedia.org/wiki/XML
-
-Resources
----------
+Resources/endpoints
+-------------------
 
 In this section you will find information on the different resources Imbo's RESTful API expose, along with their capabilities:
 
@@ -172,7 +120,7 @@ Imbo includes a simple status resource that can be used with for instance monito
 
 .. code-block:: bash
 
-    $ curl http://imbo/status.json
+    curl http://imbo/status.json
 
 results in:
 
@@ -184,28 +132,29 @@ results in:
       "storage": true
     }
 
-where ``timestamp`` is the current timestamp on the server, and ``database`` and ``storage`` are boolean values informing of the status of the current database and storage drivers respectively. If both are ``true`` the HTTP status code is ``200 OK``, and if one or both are ``false`` the status code is ``500``. When the status code is ``500`` the status message will inform you whether it's the database or the storage driver (or both) that is having issues.
+where ``timestamp`` is the current timestamp on the server, and ``database`` and ``storage`` are boolean values informing of the status of the current database and storage adapters respectively. If both are ``true`` the HTTP status code is ``200 OK``, and if one or both are ``false`` the status code is ``500``. When the status code is ``500`` the status message will inform you whether it's the database or the storage adapter (or both) that is having issues.
+
+**Supported HTTP methods:**
+
+* GET
 
 **Typical response codes:**
 
 * 200 OK
-* 500 Internal Server Error
+* 500 Database error
+* 500 Storage error
+* 500 Storage and database error
 
 .. _user-resource:
 
 User resource
 +++++++++++++
 
-The user resource represents a single user on the current Imbo installation.
-
-GET /users/<user>
-~~~~~~~~~~~~~~~~~
-
-Fetch information about a specific user. The output contains basic user information:
+The user resource represents a single user on the current Imbo installation. The output contains basic user information:
 
 .. code-block:: bash
 
-    $ curl http://imbo/users/<user>.json
+    curl http://imbo/users/<user>.json
 
 results in:
 
@@ -218,6 +167,10 @@ results in:
     }
 
 where ``publicKey`` is the public key of the user, ``numImages`` is the number of images the user has stored in Imbo and ``lastModified`` is when the user last uploaded an image or updated metadata of an image.
+
+**Supported HTTP methods:**
+
+* GET
 
 **Typical response codes:**
 
@@ -254,7 +207,7 @@ Get information about the images stored in Imbo for a specific user. Supported q
 
 .. code-block:: bash
 
-    $ curl "http://imbo/users/<user>/images.json?limit=1&metadata=1"
+    curl "http://imbo/users/<user>/images.json?limit=1&metadata=1"
 
 results in:
 
@@ -304,7 +257,7 @@ Fetch the image identified by ``<image>`` owned by ``<user>``. Without any query
 
 .. code-block:: bash
 
-    $ curl http://imbo/users/<user>/images/<image>
+    curl http://imbo/users/<user>/images/<image>
 
 results in:
 
@@ -644,7 +597,7 @@ The body of the response contains a JSON object containing the image identifier 
 
 .. code-block:: bash
 
-    $ curl -XPUT http://imbo/users/<user>/images/<checksum of file to add> --data-binary @<file to add>
+    curl -XPUT http://imbo/users/<user>/images/<checksum of file to add> --data-binary @<file to add>
 
 results in:
 
@@ -669,7 +622,7 @@ Delete the image identified by ``<image>`` owned by ``<user>`` along with all me
 
 .. code-block:: bash
 
-    $ curl -XDELETE http://imbo/users/<user>/images/<image>
+    curl -XDELETE http://imbo/users/<user>/images/<image>
 
 results in:
 
@@ -707,7 +660,7 @@ Get all metadata attached to ``<image>`` owned by ``<user>``. The output from Im
 
 .. code-block:: bash
 
-    $ curl http://imbo/users/<user>/images/<image>/meta.json
+    curl http://imbo/users/<user>/images/<image>/meta.json
 
 results in:
 
@@ -741,7 +694,7 @@ Replace all existing metadata attached to ``<image>`` owned by ``<user>`` with t
 
 .. code-block:: bash
 
-    $ curl -XPUT http://imbo/users/<user>/images/<image>/meta.json -d '{
+    curl -XPUT http://imbo/users/<user>/images/<image>/meta.json -d '{
         "beer":"Dark Horizon First Edition",
         "brewery":"Nøgne Ø",
         "style":"Imperial Stout"
@@ -770,7 +723,7 @@ Edit existing metadata and/or add new keys/values to ``<image>`` owned by ``<use
 
 .. code-block:: bash
 
-    $ curl -XPOST http://imbo/users/<user>/images/<image>/meta.json -d '{
+    curl -XPOST http://imbo/users/<user>/images/<image>/meta.json -d '{
         "ABV":"16%",
         "score":"100/100"
     }'
@@ -798,7 +751,7 @@ Delete all existing metadata attached to ``<image>`` owner by ``<user>``. The re
 
 .. code-block:: bash
 
-    $ curl -XDELETE http://imbo/users/<user>/images/<image>/meta.json
+    curl -XDELETE http://imbo/users/<user>/images/<image>/meta.json
 
 results in:
 
@@ -816,36 +769,38 @@ where ``<image>`` is the image identifier of the image that just got all its met
 * 400 Bad Request
 * 404 Not found
 
-Authentication
---------------
+.. _authentication-and-access-tokens:
 
-Imbo uses two types of authentication mechanisms out of the box. It requires access tokens for all ``GET`` and ``HEAD`` requests made against all resources (with the exception of the status resource), and a valid request signature for all ``PUT``, ``POST`` and ``DELETE`` requests made against all resources that support these methods. Both mechanisms are enforced by event listeners that is enabled in the default configuration file.
+Authentication and access tokens
+--------------------------------
+
+Imbo uses a RESTful API to manage the content stored in Imbo. To be able to fetch content (HTTP ``GET`` and ``HEAD``) each request must include an access token, and when writing to Imbo (HTTP ``PUT``, ``POST`` and ``DELETE``) the request needs to be signed with a signature and a timestamp. The default configuration enforces this via two event listeners: :ref:`access-token-event-listener` and :ref:`authenticate-event-listener`.
 
 .. _access-tokens:
 
 Access tokens
 +++++++++++++
 
-Access tokens for all read requests are enforced by an event listener that is enabled per default. The access tokens are used to prevent `DoS`_ attacks so think twice (or maybe even some more) before you remove the listener. More about how to remove the listener in :ref:`configuration-event-listeners`.
+Access tokens are enforced by an event listener that is enabled in the default configuration file. The access tokens are used to prevent `DoS <http://en.wikipedia.org/wiki/Denial-of-service_attack>`_ attacks so think twice before you disable the listener.
 
-The access token, when enforced, must be supplied in the URI using the ``accessToken`` query parameter and without it all ``GET`` and ``HEAD`` requests will result in a ``400 Bad Request`` response. The value of the ``accessToken`` parameter is a `Hash-based Message Authentication Code`_ (HMAC). The code is a hash of the URI itself (hashed with the `SHA-256`_ algorithm) using the private key of the user as the secret key. Below is an example on how to generate a valid access token for a specific image using PHP:
-
-.. _SHA-256: http://en.wikipedia.org/wiki/SHA-2
-.. _DoS: http://en.wikipedia.org/wiki/Denial-of-service_attack
-.. _Hash-based Message Authentication Code: http://en.wikipedia.org/wiki/HMAC
+An access token, when enforced by the listener, must be supplied in the URI using the ``accessToken`` query parameter and without it all ``GET`` and ``HEAD`` requests will result in a ``400 Bad Request`` response. The value of the ``accessToken`` parameter is a `Hash-based Message Authentication Code <http://en.wikipedia.org/wiki/HMAC>`_ (HMAC). The code is a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of the URI itself using the private key of the user as the secret key. It is very important that the URI is not URL encoded when generating the hash. Below is an example on how to generate a valid access token for a specific image using PHP:
 
 .. literalinclude:: ../examples/generateAccessToken.php
     :language: php
     :linenos:
 
-If you request a resource from Imbo without a valid access token it will respond with a ``400 Bad Request``. If the event listener enforcing the access token check is removed, Imbo will ignore the ``accessToken`` query parameter completely. If you wish to implement your own form of access token you can do this by implementing an event listener of your own (see :doc:`/advanced/custom_event_listeners` for more information).
+If the event listener enforcing the access token check is removed, Imbo will ignore the ``accessToken`` query parameter completely. If you wish to implement your own form of access token you can do this by implementing an event listener of your own (see :doc:`../advanced/custom_event_listeners` for more information).
 
 .. _signing-write-requests:
 
 Signing write requests
 ++++++++++++++++++++++
 
-Imbo uses a similar method when authenticating write operations. To be able to write to Imbo the user agent will have to specify two request headers: ``X-Imbo-Authenticate-Signature`` and ``X-Imbo-Authenticate-Timestamp``, or two query parameters: ``signature`` and ``timestamp``. ``X-Imbo-Authenticate-Signature``/``signature`` is, like the access token, an HMAC (also using SHA-256 and the private key of the user), and is generated using the following elements:
+To be able to write to Imbo the user agent will have to specify two request headers: ``X-Imbo-Authenticate-Signature`` and ``X-Imbo-Authenticate-Timestamp``.
+
+``X-Imbo-Authenticate-Signature`` is, like the access token, an HMAC (also using SHA-256 and the private key of the user).
+
+The data for the hash is generated using the following elements:
 
 * HTTP method (``PUT``, ``POST`` or ``DELETE``)
 * The URI
@@ -858,9 +813,57 @@ These elements are concatenated in the above order with ``|`` as a delimiter cha
     :language: php
     :linenos:
 
-Imbo requires that ``X-Imbo-Authenticate-Timestamp``/``timestamp`` is within ± 120 seconds of the current time on the server. Both the signature and the timestamp must be URL-encoded when used as query parameters.
+Imbo requires that ``X-Imbo-Authenticate-Timestamp`` is within ± 120 seconds of the current time on the server.
 
-As with the access token the signature check is enforced by an event listener that can also be disabled. If you want to implement your own authentication paradigm you can do this by creating a custom event listener.
+As with the access token the signature check is enforced by an event listener that can also be disabled. If you disable this event listener you effectively open up for writing from anybody, which you probably don't want to do.
+
+If you want to implement your own authentication paradigm you can do this by creating a custom event listener.
+
+Supported content types
+-----------------------
+
+Imbo currently responds with images (jpg, gif and png), `JSON <http://en.wikipedia.org/wiki/JSON>`_ and `XML <http://en.wikipedia.org/wiki/XML>`_, but only accepts images (jpg, gif and png) and JSON as input.
+
+Imbo will do content negotiation using the `Accept <http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html>`_ header found in the request, unless you specify a file extension, in which case Imbo will deliver the type requested without looking at the Accept header.
+
+The default Content-Type for non-image responses is JSON, and for most examples in this document you will see the ``.json`` extension being used. Change that to ``.xml`` to get XML data. You can also skip the extension and force a specific Content-Type using the Accept header:
+
+.. code-block:: bash
+
+    curl http://imbo/status.json
+
+and
+
+.. code-block:: bash
+
+    curl -H "Accept: application/json" http://imbo/status
+
+will end up with the same content-type. Use ``application/xml`` for XML.
+
+If you use JSON you can wrap the content in a function (`JSONP <http://en.wikipedia.org/wiki/JSONP>`_) by using one of the following query parameters:
+
+* ``callback``
+* ``jsonp``
+* ``json``
+
+.. code-block:: bash
+
+    curl http://imbo/status.json?callback=func
+
+will result in:
+
+.. code-block:: javascript
+
+    func(
+      {
+        "date": "Mon, 05 Nov 2012 19:18:40 GMT",
+        "database": true,
+        "storage": true
+      }
+    )
+
+HTTP response codes
+-------------------
 
 Errors
 ------
@@ -869,7 +872,7 @@ When an error occurs Imbo will respond with a fitting HTTP response code along w
 
 .. code-block:: bash
 
-    $ curl "http://imbo/users/<user>/images/<image>.jpg?t\[\]=foobar"
+    curl "http://imbo/users/<user>/images/<image>.jpg?t\[\]=foobar"
 
 results in:
 
@@ -893,7 +896,7 @@ If the user agent specifies a nonexistent username the following occurs:
 
 .. code-block:: bash
 
-    $ curl http://imbo/users/<user>.json
+    curl http://imbo/users/<user>.json
 
 results in:
 
