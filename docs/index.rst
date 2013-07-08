@@ -17,11 +17,10 @@ Installation guide
 End user guide
 --------------
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
 
     usage/api
     usage/images
-    usage/metadata
 
 Extending/customizing Imbo
 --------------------------
