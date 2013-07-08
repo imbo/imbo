@@ -28,8 +28,7 @@ Extending/customizing Imbo
     :maxdepth: 2
 
     develop/event_listeners
-
-    advanced/cache_adapters
+    develop/cache_adapters
     develop/custom_database_adapters
     develop/custom_storage_adapters
     develop/image_transformations
