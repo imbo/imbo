@@ -127,14 +127,14 @@ SQLite
         height INTEGER NOT NULL,
         checksum TEXT NOT NULL,
         UNIQUE (publicKey,imageIdentifier)
-    )
+    );
 
     CREATE TABLE IF NOT EXISTS metadata (
         id INTEGER PRIMARY KEY NOT NULL,
         imageId KEY INTEGER NOT NULL,
         tagName TEXT NOT NULL,
         tagValue TEXT NOT NULL
-    )
+    );
 
     CREATE TABLE IF NOT EXISTS shorturl (
         shortUrlId TEXT PRIMARY KEY NOT NULL,
@@ -142,14 +142,14 @@ SQLite
         imageIdentifier TEXT NOT NULL,
         extension TEXT,
         query TEXT NOT NULL
-    )
+    );
 
     CREATE INDEX shorturlparams ON shorturl (
         publicKey,
         imageIdentifier,
         extension,
         query
-    )
+    );
 
 MySQL
 '''''
