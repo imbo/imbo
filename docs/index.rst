@@ -20,7 +20,7 @@ End user guide
     :maxdepth: 3
 
     usage/api
-    usage/images
+    usage/image-transformations
 
 Extending/customizing Imbo
 --------------------------
