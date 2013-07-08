@@ -489,6 +489,7 @@ The default configuration file includes some event listeners by default:
 
 * :ref:`access-token-event-listener`
 * :ref:`authenticate-event-listener`
+* :ref:`stats-access-event-listener`
 
 Read more about these listeners in the :doc:`../develop/event_listeners` chapter. If you want to disable any of these you could do so in your configuration file in the following way:
 
@@ -501,21 +502,22 @@ Read more about these listeners in the :doc:`../develop/event_listeners` chapter
         'eventListeners' => array(
             'accessToken' => null,
             'auth' => null,
+            'statsAccess' => null,
         ),
 
         // ...
     );
 
-Keep in mind that these listeners are added by default for a reason, so make sure you know what it means to remove them.
+Keep in mind that these listeners are added by default for a reason, so make sure you know what it means to remove them before you do so.
 
-.. _image-transformations:
+.. _image-transformations-config:
 
 Image transformations - ``imageTransformations``
 ------------------------------------------------
 
 Imbo supports a set of image transformations out of the box using the `Imagick PHP extension <http://pecl.php.net/package/imagick>`_. All supported image transformations are included in the configuration, and you can easily add your own custom transformations or create presets using a combination of existing transformations.
 
-Transformations are triggered using the ``t[]`` query parameter together with the image resource (read more about the image resource and the included transformations and their parameters in the :ref:`image-resource` section). This query parameter is used as an array so that multiple transformations can be applied. The transformations are applied in the order they are specified in the URL.
+Transformations are triggered using the ``t`` query parameter together with the image resource (read more about the image resource and the included transformations and their parameters in the :ref:`image-resource` section). This query parameter is used as an array so that multiple transformations can be applied. The transformations are applied in the order they are specified in the URL.
 
 All transformations are registered in the configuration array under the ``imageTransformations`` key:
 
@@ -559,7 +561,7 @@ The return value of the closure must either be an instance of the ``Imbo\Image\T
 Presets
 +++++++
 
-Imbo supports the notion of transformation presets by using the ``Imbo\Image\Transformation\Collection`` transformation. The constructor of this transformation takes an array containing other transformations.
+Imbo supports transformation presets by using the ``Imbo\Image\Transformation\Collection`` transformation. The constructor of this transformation takes an array containing other transformations.
 
 .. code-block:: php
 

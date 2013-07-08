@@ -116,6 +116,8 @@ This event listener does not support any parameters and is enabled per default l
 
 Disable this event listener with care. Clients can delete all your images and metadata when this listener is not enabled.
 
+.. _auto-rotate-image-event-listener:
+
 Auto rotate image
 +++++++++++++++++
 
@@ -225,7 +227,7 @@ which would allow only ``exif:Make`` and ``exif:Model`` as metadata tags. Not pa
 Image transformation cache
 ++++++++++++++++++++++++++
 
-This event listener enables caching of image transformations. Read more about image transformations in the :ref:`image-transformations` topic in the :doc:`../usage/api` section.
+This event listener enables caching of image transformations. Read more about image transformations in the :ref:`image-transformations` section.
 
 To achieve this the listener subscribes to the following events:
 
@@ -271,6 +273,8 @@ and is enabled like this:
     The above command will delete all files in /path/to/cache older than 7 days and can be used with for instance `crontab`_.
 
 .. _crontab: http://en.wikipedia.org/wiki/Cron
+
+.. _max-image-size-event-listener:
 
 Max image size
 ++++++++++++++
@@ -342,7 +346,7 @@ and has the following parameters:
     );
 
 
-.. _stats-access:
+.. _stats-access-event-listener:
 
 Stats access
 ++++++++++++
