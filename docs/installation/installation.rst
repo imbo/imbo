@@ -182,7 +182,7 @@ MySQL
         KEY `imageId` (`imageId`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci AUTO_INCREMENT=1 ;
 
-    CREATE TABLE `shorturl` (
+    CREATE TABLE IF NOT EXISTS `shorturl` (
         `shortUrlId` char(7) COLLATE utf8_danish_ci NOT NULL,
         `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
         `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
@@ -223,14 +223,14 @@ SQLite
         height INTEGER NOT NULL,
         checksum TEXT NOT NULL,
         UNIQUE (publicKey,imageIdentifier)
-    )
+    );
 
     CREATE TABLE IF NOT EXISTS metadata (
         id INTEGER PRIMARY KEY NOT NULL,
         imageId KEY INTEGER NOT NULL,
         tagName TEXT NOT NULL,
         tagValue TEXT NOT NULL
-    )
+    );
 
     CREATE TABLE IF NOT EXISTS shorturl (
         shortUrlId TEXT PRIMARY KEY NOT NULL,
@@ -238,23 +238,23 @@ SQLite
         imageIdentifier TEXT NOT NULL,
         extension TEXT,
         query TEXT NOT NULL
-    )
+    );
 
     CREATE INDEX shorturlparams ON shorturl (
         publicKey,
         imageIdentifier,
         extension,
         query
-    )
+    );
 
 The following table is only needed if you plan on storing the actual images themselves in SQLite:
 
 .. code-block:: sql
 
-    CREATE TABLE storage_images (
+    CREATE TABLE IF NOT EXISTS storage_images (
         publicKey TEXT NOT NULL,
         imageIdentifier TEXT NOT NULL,
         data BLOB NOT NULL,
         updated INTEGER NOT NULL,
         PRIMARY KEY (publicKey,imageIdentifier)
-    )
+    );
