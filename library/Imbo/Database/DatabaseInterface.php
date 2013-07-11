@@ -16,9 +16,9 @@ use Imbo\Model\Image,
     DateTime;
 
 /**
- * Database driver interface
+ * Database adapter interface
  *
- * This is an interface for different database drivers.
+ * This is an interface for storage adapters in Imbo.
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
