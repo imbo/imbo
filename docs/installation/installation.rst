@@ -10,10 +10,10 @@ To install Imbo on the server you can choose between two different methods, :ref
 Using composer
 --------------
 
-The recommended way of installing Imbo is by creating a ``composer.json`` file for your installation, and then install Imbo and optional 3rd party plug-ins and/or image transformations via `Composer <https://getcomposer.org>`_. You will need the following directory structure for this to work::
+The recommended way of installing Imbo is by creating a ``composer.json`` file for your installation, and then install Imbo and optional 3rd party plug-ins via `Composer <https://getcomposer.org>`_. You will need the following directory structure for this method to work::
 
     /path/to/install/composer.json
-    /path/to/install/config/config.php
+    /path/to/install/config/
 
 where the ``composer.json`` file can contain:
 
@@ -26,9 +26,9 @@ where the ``composer.json`` file can contain:
       }
     }
 
-and the ``config/config.php`` file is your :ref:`Imbo configuration <configuration>`.
+and the ``config/`` directory contains one or more configuration files that will be merged with the :ref:`default configuration <configuration>`.
 
-If you want to install 3rd party transformations and/or for instance the Doctrine DBAL library simply add these to the ``require`` object in your ``composer.json``:
+If you want to install 3rd party plug-ins and/or for instance the Doctrine DBAL library simply add these to the ``require`` object in your ``composer.json``:
 
 .. code-block:: json
 
@@ -41,6 +41,15 @@ If you want to install 3rd party transformations and/or for instance the Doctrin
       }
     }
 
+If some of the 3rd party plug-ins provide configuration files, you can link to these in the ``config/`` directory to have Imbo automatically load them:
+
+.. code-block:: bash
+
+    cd /path/to/install/config
+    ln -s ../vendor/rexxars/imbo-hipsta/config/config.php 01-imbo-hipsta.php
+
+To be able to control the order that Imbo will use when loading the configuration files you should prefix them with a number, like ``01`` in the example above. Lower numbers will be loaded first, meaning that configuration files with higher numbers will override settings set in configuration files with a lower number.
+
 Regarding the Imbo version you are about to install you can use ``dev-master`` for the latest released version, or you can use a specific version if you want to. Head over to `Packagist <https://packagist.org/packages/imbo/imbo>`_ to see the available versions.
 
 When you have created the ``composer.json`` file you can install Imbo with Composer:
@@ -51,6 +60,12 @@ When you have created the ``composer.json`` file you can install Imbo with Compo
     php composer.phar install -o --no-dev
 
 After composer has finished installing Imbo and optional dependencies the Imbo installation will reside in ``/path/to/install/vendor/imbo/imbo``. The correct web server document root in this case would be ``/path/to/install/vendor/imbo/imbo/public``.
+
+If you later want to update Imbo you can bump the version number you have specified in ``composer.json`` and run:
+
+.. code-block:: bash
+
+    php composer.phar update -o --no-dev
 
 .. _git-clone:
 
