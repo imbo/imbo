@@ -220,16 +220,26 @@ STATUS;
     private function formatArray(array $data) {
         $xml = '';
 
-        foreach ($data as $key => $value) {
-            $xml .= '<' . $key . '>';
+        if (isset($data[0])) {
+            $xml .= '<list>';
 
-            if (is_array($value)) {
-                $xml .= $this->formatArray($value);
-            } else {
-                $xml .= $value;
+            foreach ($data as $value) {
+                $xml .= '<value>' . $value . '</value>';
             }
 
-            $xml .= '</' . $key . '>';
+            $xml .= '</list>';
+        } else {
+            foreach ($data as $key => $value) {
+                $xml .= '<' . $key . '>';
+
+                if (is_array($value)) {
+                    $xml .= $this->formatArray($value);
+                } else {
+                    $xml .= $value;
+                }
+
+                $xml .= '</' . $key . '>';
+            }
         }
 
         return $xml;

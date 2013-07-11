@@ -1,3 +1,5 @@
+schemas
+cURL
 Exif
 Imbo
 imbo
@@ -27,3 +29,4 @@ pecl
 memcached
 Freenode
 freenode
+IPv

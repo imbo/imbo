@@ -153,18 +153,18 @@ $config = array(
      * @var array
      */
     'eventListeners' => array(
-        'auth' => function() {
-            return new EventListener\Authenticate();
-        },
         'accessToken' => function() {
             return new EventListener\AccessToken();
         },
+        'auth' => function() {
+            return new EventListener\Authenticate();
+        },
         'statsAccess' => function() {
             return new EventListener\StatsAccess(array(
-                'whitelist' => array('127.0.0.1'),
+                'whitelist' => array('127.0.0.1', '::1'),
                 'blacklist' => array(),
             ));
-        }
+        },
     ),
 
     /**
@@ -241,25 +241,30 @@ $config = array(
         },
     ),
 
-    /**
-     * Custom routes for Imbo
-     *
-     * @var array
-     */
-    'routes' => array(),
 
     /**
      * Custom resources for Imbo
      *
+     * @link http://docs.imbo-project.org
      * @var array
      */
     'resources' => array(),
+
+    /**
+     * Custom routes for Imbo
+     *
+     * @link http://docs.imbo-project.org
+     * @var array
+     */
+    'routes' => array(),
 );
 
-if (file_exists(__DIR__ . '/../../../../config/config.php')) {
+if (is_dir(__DIR__ . '/../../../../config')) {
     // Someone has installed Imbo via a custom composer.json, so the custom config is outside of
-    // the vendor dir
-    $config = array_replace_recursive($config, require __DIR__ . '/../../../../config/config.php');
+    // the vendor dir. Loop through all available php files in the config dir
+    foreach (glob(__DIR__ . '/../../../../config/*.php') as $file) {
+        $config = array_replace_recursive($config, require $file);
+    }
 } else if (file_exists(__DIR__ . '/config.php')) {
     $config = array_replace_recursive($config, require __DIR__ . '/config.php');
 }

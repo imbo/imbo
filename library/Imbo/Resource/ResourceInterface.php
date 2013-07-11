@@ -10,8 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface;
+use Imbo\EventListener\ListenerInterface;
 
 /**
  * Resource interface
@@ -22,7 +21,7 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-interface ResourceInterface {
+interface ResourceInterface extends ListenerInterface {
     /**#@+
      * Resource types
      *

@@ -81,7 +81,7 @@ class Application {
             // See if the public key exists
             if ($publicKey) {
                 if (!isset($authConfig[$publicKey])) {
-                    $e = new RuntimeException('Unknown public key', 404);
+                    $e = new RuntimeException('Public key not found', 404);
                     $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
 
                     throw $e;

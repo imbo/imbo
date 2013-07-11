@@ -14,9 +14,9 @@ use Imbo\Model\Image,
     Imbo\Exception\StorageException;
 
 /**
- * Storage driver interface
+ * Storage adapter interface
  *
- * This is an interface for different storage drivers for Imbo.
+ * This is an interface for storage adapters in Imbo.
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Storage
@@ -26,7 +26,7 @@ interface StorageInterface {
      * Store an image
      *
      * This method will receive the binary data of the image and store it somewhere suited for the
-     * actual storage driver. If an error occurs the driver should throw an
+     * actual storage adaper. If an error occurs the adapter should throw an
      * Imbo\Exception\StorageException exception.
      *
      * If the image already exists, simply overwrite it.

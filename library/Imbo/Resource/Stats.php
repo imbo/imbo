@@ -12,7 +12,6 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
-    Imbo\EventListener\ListenerInterface,
     Imbo\Model,
     DateTime,
     DateTimeZone;
@@ -26,7 +25,7 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-class Stats implements ResourceInterface, ListenerInterface {
+class Stats implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
