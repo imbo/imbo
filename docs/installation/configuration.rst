@@ -3,9 +3,9 @@
 Configuration
 =============
 
-Imbo ships with a default configuration file that it will load. You will have to create a configuration file of your own that will automatically be loaded and merged with the default configuration by Imbo. The location of this file depends on the :ref:`installation method <installation>` you choose. You should never have to update the default configuration file provided by Imbo.
+Imbo ships with a default configuration file that it will load. You will have to create one or more configuration files of your own that will automatically be loaded and merged with the default configuration by Imbo. The location of these files depends on the :ref:`installation method <installation>` you choose. You should never have to edit the default configuration file provided by Imbo.
 
-The configuration file you need to create should simply return an array with configuration data. All available configuration options is covered in this chapter.
+The configuration file(s) you need to create should simply return arrays with configuration data. All available configuration options is covered in this chapter.
 
 .. contents::
     :local:
@@ -56,7 +56,7 @@ Database configuration - ``database``
 
 The database adapter you decide to use is responsible for storing metadata and basic image information, like width and height for example, along with the generated short URLs. Imbo ships with some different implementations that you can use. Remember that you will not be able to switch the adapter whenever you want and expect all data to be automatically transferred. Choosing a database adapter should be a long term commitment unless you have migration scripts available.
 
-In the default configuration file the :ref:`default-database-adapter` database adapter is used. You can choose to override this in your ``config.php`` file by specifying a different adapter. You can either specify an instance of a database adapter directly, or specify an anonymous function that will return an instance of a database adapter when executed. Which database adapter to use is specified in the ``database`` key in the configuration array:
+In the default configuration file the :ref:`default-database-adapter` database adapter is used. You can choose to override this in your configuration file by specifying a different adapter. You can either specify an instance of a database adapter directly, or specify an anonymous function that will return an instance of a database adapter when executed. Which database adapter to use is specified in the ``database`` key in the configuration array:
 
 .. code-block:: php
 
@@ -213,7 +213,7 @@ Storage configuration - ``storage``
 
 Storage adapters are responsible for storing the original images you put into Imbo. As with the database adapter it is not possible to simply switch the adapter without having migration scripts available to move the stored images. Choose an adapter with care.
 
-In the default configuration file the :ref:`default-storage-adapter` storage adapter is used. You can choose to override this in your ``config.php`` file by specifying a different adapter. You can either specify an instance of a storage adapter directly, or specify an anonymous function that will return an instance of a storage adapter when executed. Which storage adapter to use is specified in the ``storage`` key in the configuration array:
+In the default configuration file the :ref:`default-storage-adapter` storage adapter is used. You can choose to override this in your configuration file by specifying a different adapter. You can either specify an instance of a storage adapter directly, or specify an anonymous function that will return an instance of a storage adapter when executed. Which storage adapter to use is specified in the ``storage`` key in the configuration array:
 
 .. code-block:: php
 
