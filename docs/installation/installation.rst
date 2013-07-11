@@ -150,7 +150,7 @@ if your Imbo installation is available on ``[www.]example.com/imbo``.
 Database setup
 --------------
 
-If you choose to use a RDMS to store data in, you will need to manually create a database, a user and the tables Imbo stores information in. Below you will find schema's for different RDMS's. You will find information regarding how to authenticate against the RDMS of you choice in the :ref:`configuration` topic.
+If you choose to use a RDMS to store data in, you will need to manually create a database, a user and the tables Imbo stores information in. Below you will find schemas for different RDMSs. You will find information regarding how to authenticate against the RDMS of you choice in the :ref:`configuration` topic.
 
 MySQL
 ~~~~~
