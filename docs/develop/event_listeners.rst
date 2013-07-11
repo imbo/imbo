@@ -8,12 +8,12 @@ Events
 
 When implementing an event listener you need to know about the events that Imbo triggers. The most important events are combinations of the accessed resource along with the HTTP method used. Imbo currently provides these resources:
 
-* :ref:`shorturl <shorturl-resource>`
 * :ref:`stats <stats-resource>`
 * :ref:`status <status-resource>`
 * :ref:`user <user-resource>`
 * :ref:`images <images-resource>`
 * :ref:`image <image-resource>`
+* :ref:`shorturl <shorturl-resource>`
 * :ref:`metadata <metadata-resource>`
 
 Examples of events that are triggered:

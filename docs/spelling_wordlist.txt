@@ -1,3 +1,4 @@
+schemas
 cURL
 Exif
 Imbo
