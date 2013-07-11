@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `metadata` (
     KEY `imageId` (`imageId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci AUTO_INCREMENT=1 ;
 
-CREATE TABLE `shorturl` (
+CREATE TABLE IF NOT EXISTS `shorturl` (
     `shortUrlId` char(7) COLLATE utf8_danish_ci NOT NULL,
     `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
     `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,

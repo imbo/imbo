@@ -11,8 +11,7 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
-    Imbo\EventListener\ListenerInterface;
+    Imbo\EventListener\ListenerDefinition;
 
 /**
  * Images resource
@@ -30,7 +29,7 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-class Images implements ResourceInterface, ListenerInterface {
+class Images implements ResourceInterface {
     /**
      * {@inheritdoc}
      */

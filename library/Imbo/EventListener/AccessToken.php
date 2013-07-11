@@ -87,7 +87,7 @@ class AccessToken implements ListenerInterface {
 
         $definition = array();
 
-        foreach($events as $eventName) {
+        foreach ($events as $eventName) {
             $definition[] = new ListenerDefinition($eventName, $callback, $priority);
         }
 

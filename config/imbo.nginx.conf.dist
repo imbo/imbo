@@ -9,7 +9,7 @@ server {
     # server_name imbo imbo1 imbo2 imbo3;
 
     # Path to the public directory where index.php is located
-    root /path/to/imbo/public;
+    root /path/to/install/vendor/imbo/imbo/public;
     index index.php;
 
     # Logs
@@ -21,7 +21,7 @@ server {
         location ~ \.php$ {
             fastcgi_pass 127.0.0.1:9000;
             fastcgi_index index.php;
-            fastcgi_param SCRIPT_FILENAME /path/to/imbo/public/index.php;
+            fastcgi_param SCRIPT_FILENAME /path/to/install/vendor/imbo/imbo/public/index.php;
             include fastcgi_params;
         }
     }

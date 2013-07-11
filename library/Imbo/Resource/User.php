@@ -11,8 +11,7 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
-    Imbo\EventListener\ListenerInterface;
+    Imbo\EventListener\ListenerDefinition;
 
 /**
  * User resource
@@ -20,7 +19,7 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-class User implements ResourceInterface, ListenerInterface {
+class User implements ResourceInterface {
     /**
      * {@inheritdoc}
      */

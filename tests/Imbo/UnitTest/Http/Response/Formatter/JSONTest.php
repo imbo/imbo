@@ -60,7 +60,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
 
         $model = $this->getMock('Imbo\Model\Error');
         $model->expects($this->once())->method('getHttpCode')->will($this->returnValue(404));
-        $model->expects($this->once())->method('getErrorMessage')->will($this->returnValue('Unknown public key'));
+        $model->expects($this->once())->method('getErrorMessage')->will($this->returnValue('Public key not found'));
         $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
         $model->expects($this->once())->method('getImboErrorCode')->will($this->returnValue(100));
         $model->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('identifier'));
@@ -71,7 +71,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
 
         $data = json_decode($json, true);
         $this->assertSame($formattedDate, $data['error']['date']);
-        $this->assertSame('Unknown public key', $data['error']['message']);
+        $this->assertSame('Public key not found', $data['error']['message']);
         $this->assertSame(404, $data['error']['code']);
         $this->assertSame(100, $data['error']['imboErrorCode']);
         $this->assertSame('identifier', $data['imageIdentifier']);
