@@ -242,7 +242,6 @@ STATUS;
             }
         }
 
-
         return $xml;
     }
 }
