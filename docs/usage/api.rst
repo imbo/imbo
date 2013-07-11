@@ -288,6 +288,17 @@ results in:
 
     <binary data of the original image>
 
+When fetching images Imbo also sends a set of custom HTTP response headers related to the image::
+
+    X-Imbo-Originalextension: png
+    X-Imbo-Originalmimetype: image/png
+    X-Imbo-Originalfilesize: 45826
+    X-Imbo-Originalheight: 390
+    X-Imbo-Originalwidth: 380
+    X-Imbo-ShortUrl: http://imbo/s/w7CiqDM
+
+These are all related to the image that was just requested. The last one points you to the short URL that exists for the image and is generated on demand.
+
 **Typical response codes:**
 
 * 200 OK
@@ -319,6 +330,42 @@ where ``<image>`` is the image identifier of the image that was just deleted (th
 * 200 OK
 * 400 Bad Request
 * 404 Image not found
+
+.. _shorturl-resource:
+
+ShortURL resource - ``/s/<id>``
++++++++++++++++++++++++++++++++
+
+Images in Imbo have short URL's associated with them, which are generated on request when you access an image (with or without image transformations) for the first time. These URL's do not take any query parameters and can be used in place for original image URL's. To fetch these URL's you can request an image using HTTP HEAD, then look for the `X-Imbo-ShortUrl` header in the response::
+
+    curl -Ig "http://imbo/users/<user>/images/<image>?t[]=thumbnail&t[]=desaturate&t[]=border&accessToken=f3fa1d9f0649cfad61e840a6e09b156e851858799364d1d8ee61b386e10b0c05"|grep Imbo
+
+results in (some headers omitted):
+
+.. code-block:: none
+    :emphasize-lines: 6
+
+    X-Imbo-OriginalMimeType: image/gif
+    X-Imbo-OriginalWidth: 771
+    X-Imbo-OriginalHeight: 771
+    X-Imbo-OriginalFileSize: 152066
+    X-Imbo-OriginalExtension: gif
+    X-Imbo-ShortUrl: http://imbo/s/3VEFrpB
+    X-Imbo-ImageIdentifier: 4492acb937a1f056ae43509bc7f85d21
+
+The value of the ``X-Imbo-ShortUrl`` can be used to request the image with the applied transformations, and does not require an access token query parameter.
+
+The format of the random ID part of the short URL can be matched with the following `regular expression <http://en.wikipedia.org/wiki/Regular_expression>`_::
+
+    |^[a-zA-Z0-9]{7}$|
+
+There are some caveats regarding the short URL's:
+
+1) If the URL used to generate the short URL contained an image extension, content negotiation will not be applied to the short URL. You will always get the mime type associated with the extension used to generate the short URL.
+2) If the URL used to generate the short URL did not contain an image extension you can use the ``Accept`` header to decide the mime type of the generated image when requesting the short URL.
+3) Short URL's do not support extensions, so you can not append ``.jpg`` to force ``image/jpeg``. If you need to make sure the image is always a JPEG, simply append ``.jpg`` to the URL when generating the short URL.
+
+.. note:: In Imbo only images have short URL's
 
 .. _metadata-resource:
 
@@ -461,7 +508,7 @@ An access token, when enforced by the event listener, must be supplied in the UR
     :language: php
     :linenos:
 
-If the event listener enforcing the access token check is removed, Imbo will ignore the ``accessToken`` query parameter completely. If you wish to implement your own form of access token you can do this by implementing an event listener of your own (see :doc:`../advanced/custom_event_listeners` for more information).
+If the event listener enforcing the access token check is removed, Imbo will ignore the ``accessToken`` query parameter completely. If you wish to implement your own form of access token you can do this by implementing an event listener of your own (see :ref:`custom-event-listeners` for more information).
 
 .. _signing-write-requests:
 

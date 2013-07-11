@@ -49,6 +49,8 @@ Imbo ships with a small command line tool that can be used to generate private k
 
 The private key can be changed whenever you want as long as you remember to change it in both the server configuration and in the client you use. The public key can not be changed easily as database and storage adapter use it when storing images and metadata.
 
+.. _database-configuration:
+
 Database configuration - ``database``
 -------------------------------------
 
@@ -202,7 +204,9 @@ If you need to create your own database adapter you need to create a class that 
         // ...
     );
 
-More about how to achieve this in the :doc:`../develop/custom_database_adapters` section.
+More about how to achieve this in the :doc:`../develop/custom_adapters` chapter.
+
+.. _storage-configuration:
 
 Storage configuration - ``storage``
 -----------------------------------
@@ -387,7 +391,7 @@ If you need to create your own storage adapter you need to create a class that i
         // ...
     );
 
-More about how to achieve this in the :doc:`../develop/custom_storage_adapters` section.
+More about how to achieve this in the :doc:`../develop/custom_adapters` chapter.
 
 .. _configuration-event-listeners:
 
