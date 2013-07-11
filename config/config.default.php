@@ -161,7 +161,7 @@ $config = array(
         },
         'statsAccess' => function() {
             return new EventListener\StatsAccess(array(
-                'whitelist' => array('127.0.0.1'),
+                'whitelist' => array('127.0.0.1', '::1'),
                 'blacklist' => array(),
             ));
         },
