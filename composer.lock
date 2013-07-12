@@ -4,14 +4,23 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
 <<<<<<< HEAD
+<<<<<<< HEAD
     "hash": "20563499d2ff8b9c1cddb9b8d22836c0",
 =======
+=======
+>>>>>>> Added aws/aws-sdk-php
 <<<<<<< HEAD
     "hash": "ec9f88978e43c7f7c61bb939f04d9fcb",
 =======
     "hash": "ff4d84ad4435a8e93e190ec35f3eda95",
 >>>>>>> Moved some dependencies around
+<<<<<<< HEAD
 >>>>>>> Moved some dependencies around
+=======
+=======
+    "hash": "fa0187ce6c12de69f40ecb175e64e1ea",
+>>>>>>> Added aws/aws-sdk-php
+>>>>>>> Added aws/aws-sdk-php
     "packages": [
         {
             "name": "symfony/event-dispatcher",
@@ -119,6 +128,72 @@
         }
     ],
     "packages-dev": [
+        {
+            "name": "aws/aws-sdk-php",
+            "version": "2.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aws/aws-sdk-php.git",
+                "reference": "2.4.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/2.4.1",
+                "reference": "2.4.1",
+                "shasum": ""
+            },
+            "require": {
+                "guzzle/guzzle": "~3.7.0",
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "doctrine/cache": "~1.0",
+                "ext-openssl": "*",
+                "monolog/monolog": "1.4.*",
+                "phpunit/phpunit": "3.7.*",
+                "symfony/class-loader": "2.*",
+                "symfony/yaml": "2.*"
+            },
+            "suggest": {
+                "doctrine/cache": "Adds support for caching of credentials and responses",
+                "ext-apc": "Allows service description opcode caching, request and response caching, and credentials caching",
+                "ext-openssl": "Allows working with CloudFront private distributions and verifying received SNS messages",
+                "monolog/monolog": "Adds support for logging HTTP requests and responses",
+                "symfony/yaml": "Eases the ability to write manifests for creating jobs in AWS Import/Export"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.4.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Aws": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Amazon Web Services",
+                    "homepage": "http://aws.amazon.com"
+                }
+            ],
+            "description": "AWS SDK for PHP",
+            "homepage": "http://aws.amazon.com/sdkforphp2",
+            "keywords": [
+                "amazon",
+                "aws",
+                "dynamodb",
+                "ec2",
+                "s3",
+                "sdk"
+            ],
+            "time": "2013-07-09 05:40:13"
+        },
         {
             "name": "behat/behat",
             "version": "v2.5.1",
