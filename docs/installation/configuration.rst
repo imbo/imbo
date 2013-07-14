@@ -383,6 +383,43 @@ Examples
         // ...
     );
 
+.. _s3-storage-adapter:
+
+Amazon Simple Storage Service
++++++++++++++++++++++++++++++
+
+This adapter stores your images in a bucket in the Amazon Simple Storage Service (S3). The parameters are:
+
+``key``
+    Your AWS access key
+
+``secret``
+    Your AWS secret key
+
+``bucket``
+    The name of the bucket you want to store your images in. Imbo will **not** create this for you.
+
+This adapter creates subdirectories in the bucket in the same fashion as the :ref:`Filesystem storage adapter <filesystem-storage-adapter>` stores the files on the local file filesystem.
+
+Examples
+^^^^^^^^
+
+.. code-block:: php
+
+    <?php
+    return array(
+        // ...
+
+        'storage' => function() {
+            new Imbo\Storage\S3(array(
+                'key' => '<aws access key>'
+                'secret' => '<aws secret key>',
+            ));
+        },
+
+        // ...
+    );
+
 Custom storage adapter
 ++++++++++++++++++++++
 
