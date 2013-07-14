@@ -10,7 +10,8 @@
 
 namespace Imbo\IntegrationTest\Storage;
 
-use Imbo\Storage\S3;
+use Imbo\Storage\S3,
+    Aws\S3\S3Client;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -37,6 +38,12 @@ class S3Test extends StorageTests {
                 $this->markTestSkipped('This test needs the ' . $key . ' value to be set in phpunit.xml');
             }
         }
+
+        $client = S3Client::factory(array(
+            'key' => $GLOBALS['AWS_S3_KEY'],
+            'secret' => $GLOBALS['AWS_S3_SECRET'],
+        ));
+        $client->clearBucket($GLOBALS['AWS_S3_BUCKET']);
 
         parent::setUp();
     }
