@@ -371,8 +371,8 @@ There are some caveats regarding the short URLs:
 
 .. _metadata-resource:
 
-Metadata resource - ``/users/<user>/images/<image>/meta``
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Metadata resource - ``/users/<user>/images/<image>/metadata``
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Imbo can also be used to attach metadata to the stored images. The metadata is based on a simple ``key => value`` model, for instance:
 
@@ -388,7 +388,7 @@ To add (or replace all existing metadata) on an image a client should make a req
 
 .. code-block:: bash
 
-    curl -XPUT http://imbo/users/<user>/images/<image>/meta.json -d '{
+    curl -XPUT http://imbo/users/<user>/images/<image>/metadata.json -d '{
         "beer":"Dark Horizon First Edition",
         "brewery":"Nøgne Ø",
         "style":"Imperial Stout"
@@ -417,7 +417,7 @@ Partial updates to metadata attached to an image is done by making a request wit
 
 .. code-block:: bash
 
-    curl -XPOST http://imbo/users/<user>/images/<image>/meta.json -d '{
+    curl -XPOST http://imbo/users/<user>/images/<image>/metadata.json -d '{
         "ABV":"16%",
         "score":"100/100"
     }'
@@ -445,7 +445,7 @@ Requests using ``HTTP GET`` on this resource returns all metadata attached to an
 
 .. code-block:: bash
 
-    curl http://imbo/users/<user>/images/<image>/meta.json
+    curl http://imbo/users/<user>/images/<image>/metadata.json
 
 results in:
 
@@ -479,7 +479,7 @@ To remove metadata attached to an image a request using ``HTTP DELETE`` can be m
 
 .. code-block:: bash
 
-    curl -XDELETE http://imbo/users/<user>/images/<image>/meta.json
+    curl -XDELETE http://imbo/users/<user>/images/<image>/metadata.json
 
 results in:
 
