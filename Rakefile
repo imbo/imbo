@@ -147,8 +147,6 @@ end
 desc "Bootstrap Travis-CI"
 task :travis_bootstrap do
   if ENV["TRAVIS"] == "true"
-    system "sudo apt-get install -y php5-sqlite libmagickcore-dev libjpeg-dev libdjvulibre-dev libmagickwand-dev"
-
     ini_file = Hash[`php --ini`.split("\n").map {|l| l.split(/:\s+/)}]["Loaded Configuration File"]
 
     {"imagick" => "3.1.0RC2"}.each { |package, version|
