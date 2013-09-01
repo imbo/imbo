@@ -24,6 +24,11 @@ if (isset($_SERVER['HTTP_X_COLLECT_COVERAGE']) && isset($_SERVER['HTTP_X_COVERAG
     // Output code coverage stored in the .cov files
     $coverageDir = sys_get_temp_dir() . '/behat-coverage';
 
+    if (!is_dir($coverageDir)) {
+        // Create tmp dir
+        mkdir($coverageDir);
+    }
+
     $files = new FilesystemIterator(
         $coverageDir,
         FilesystemIterator::CURRENT_AS_PATHNAME | FilesystemIterator::SKIP_DOTS
