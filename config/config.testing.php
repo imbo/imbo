@@ -16,6 +16,7 @@ use Imbo\Image\Transformation,
     Imbo\EventListener\ListenerDefinition,
     Imbo\EventManager\EventInterface,
     Imbo\Model\ArrayModel,
+    Memcached as PeclMemcached,
     PHPUnit_Framework_MockObject_Generator,
     PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount,
     PHPUnit_Framework_MockObject_Stub_Return;
@@ -113,7 +114,10 @@ return array(
             return new EventListener\ImageTransformationCache('/tmp/imbo-behat-image-transformation-cache');
         },
         'metadataCache' => function() {
-            return new EventListener\MetadataCache(new Cache\APC('behat'));
+            $memcached = new PeclMemcached();
+            $memcached->addServer('localhost', 11211);
+
+            return new EventListener\MetadataCache(new Cache\Memcached($memcached));
         },
     ),
 
