@@ -193,30 +193,22 @@ class Application {
 
         // Metadata resource
         $container->setStatic('metadataResource', function(Container $container) {
-            $resource = new Resource\Metadata();
-
-            return $resource;
+            return new Resource\Metadata();
         });
 
         // Images resource
         $container->setStatic('imagesResource', function(Container $container) {
-            $resource = new Resource\Images();
-
-            return $resource;
+            return new Resource\Images();
         });
 
         // User resource
         $container->setStatic('userResource', function(Container $container) {
-            $resource = new Resource\User();
-
-            return $resource;
+            return new Resource\User();
         });
 
         // Status resource
         $container->setStatic('statusResource', function(Container $container) {
-            $resource = new Resource\Status();
-
-            return $resource;
+            return new Resource\Status();
         });
 
         // Stats resource
@@ -226,16 +218,17 @@ class Application {
 
         // Image resource
         $container->setStatic('imageResource', function(Container $container) {
-            $resource = new Resource\Image();
-
-            return $resource;
+            return new Resource\Image();
         });
 
         // Short URL resource
         $container->setStatic('shorturlResource', function(Container $container) {
-            $resource = new Resource\ShortUrl();
+            return new Resource\ShortUrl();
+        });
 
-            return $resource;
+        // Index resource
+        $container->setStatic('indexResource', function(Container $container) {
+            return new Resource\Index();
         });
 
         // Custom resources
@@ -340,6 +333,7 @@ class Application {
                 'imageResource',
                 'metadataResource',
                 'shorturlResource',
+                'indexResource',
                 'responseFormatter',
                 'router',
                 'databaseOperations',

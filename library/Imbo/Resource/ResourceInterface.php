@@ -22,20 +22,6 @@ use Imbo\EventListener\ListenerInterface;
  * @package Resources
  */
 interface ResourceInterface extends ListenerInterface {
-    /**#@+
-     * Resource types
-     *
-     * @var string
-     */
-    const STATUS   = 'status';
-    const SHORTURL = 'shorturl';
-    const USER     = 'user';
-    const IMAGES   = 'images';
-    const IMAGE    = 'image';
-    const METADATA = 'metadata';
-    const STATS    = 'stats';
-    /**#@-*/
-
     /**
      * Return an array with the allowed (implemented) HTTP methods for the current resource
      *
