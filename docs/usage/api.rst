@@ -31,7 +31,8 @@ results in:
       "version": "dev",
       "urls": {
         "site": "http://www.imbo-project.org",
-        "github": "https://github.com/imbo/imbo",
+        "source": "https://github.com/imbo/imbo",
+        "issues": "https://github.com/imbo/imbo/issues",
         "docs": "http://docs.imbo-project.org"
       },
       "endpoints": {
