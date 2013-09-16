@@ -56,7 +56,8 @@ class Index implements ResourceInterface {
             'version' => Version::VERSION,
             'urls' => array(
                 'site' => 'http://www.imbo-project.org',
-                'github' => 'https://github.com/imbo/imbo',
+                'source' => 'https://github.com/imbo/imbo',
+                'issues' => 'https://github.com/imbo/imbo/issues',
                 'docs' => 'http://docs.imbo-project.org',
             ),
             'endpoints' => array(
