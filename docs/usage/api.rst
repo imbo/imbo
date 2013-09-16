@@ -12,6 +12,48 @@ In this section you will find information on the different resources Imbo's REST
     :local:
     :depth: 1
 
+.. _index-resoure:
+
+Index resource - ``/``
+++++++++++++++++++++++
+
+The index resource shows the version of the Imbo installation along with some external URL's for Imbo-related information, and some internal URL's for the available endpoints.
+
+.. code-block:: bash
+
+    curl -H"Accept: application/json" http://imbo
+
+results in:
+
+.. code-block:: javascript
+
+    {
+      "version": "dev",
+      "urls": {
+        "site": "http://www.imbo-project.org",
+        "source": "https://github.com/imbo/imbo",
+        "issues": "https://github.com/imbo/imbo/issues",
+        "docs": "http://docs.imbo-project.org"
+      },
+      "endpoints": {
+        "status": "http://imbo/status",
+        "stats": "http://imbo/stats",
+        "user": "http://imbo/users/{publicKey}",
+        "images": "http://imbo/users/{publicKey}/images",
+        "image": "http://imbo/users/{publicKey}/images/{imageIdentifier}",
+        "shortImageUrl": "http://imbo/s/{id}",
+        "metadata": "http://imbo/users/{publicKey}/images/{imageIdentifier}/metadata"
+      }
+    }
+
+This resource does not support any extensions in the URI, so you will need to use the ``Accept`` header to fetch different representations of the data.
+
+The index resource does not require any authentication per default.
+
+**Typical response codes:**
+
+* 200 Hell Yeah
+
 .. _stats-resource:
 
 Stats resource - ``/stats``
@@ -114,6 +156,8 @@ When requesting the stats endpoint, the output will look like this:
     }
 
 Use cases for this might be to simply store data in some backend in various events (for instance ``image.get`` or ``metadata.get``) and then fetch these and display then when requesting the stats endpoint (``stats.get``).
+
+.. note:: The stats resource is not cache-able.
 
 .. _status-resource:
 
