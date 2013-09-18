@@ -244,6 +244,9 @@ The images resource represents a collection of images owned by a specific user. 
 ``to``
     Fetch images up until this timestamp.
 
+``fields``
+    A comma separated list of fields to display. When not specified all fields will be displayed.
+
 .. code-block:: bash
 
     curl "http://imbo/users/<user>/images.json?limit=1&metadata=1"
