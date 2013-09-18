@@ -99,6 +99,14 @@ class MongoDB implements DatabaseInterface {
     public function insertImage($publicKey, $imageIdentifier, Image $image) {
         $now = time();
 
+        if ($added = $image->getAddedDate()) {
+            $added = $added->getTimestamp();
+        }
+
+        if ($updated = $image->getUpdatedDate()) {
+            $updated = $updated->getTimestamp();
+        }
+
         if ($this->imageExists($publicKey, $imageIdentifier)) {
             try {
                 $this->getImageCollection()->update(
@@ -120,8 +128,8 @@ class MongoDB implements DatabaseInterface {
             'extension'       => $image->getExtension(),
             'mime'            => $image->getMimeType(),
             'metadata'        => array(),
-            'added'           => $now,
-            'updated'         => $now,
+            'added'           => $added ?: $now,
+            'updated'         => $updated ?: $now,
             'width'           => $image->getWidth(),
             'height'          => $image->getHeight(),
             'checksum'        => $image->getChecksum(),
