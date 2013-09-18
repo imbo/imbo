@@ -50,4 +50,14 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->model, $this->model->setImages($images));
         $this->assertSame($images, $this->model->getImages());
     }
+
+    /**
+     * @covers Imbo\Model\Images::setFields
+     * @covers Imbo\Model\Images::getFields
+     */
+    public function testCanSetAndGetFields() {
+        $this->assertSame(array(), $this->model->getFields());
+        $this->assertSame($this->model, $this->model->setFields(array('width', 'height')));
+        $this->assertSame(array('width', 'height'), $this->model->getFields());
+    }
 }
