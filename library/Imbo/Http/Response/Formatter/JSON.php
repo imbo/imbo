@@ -76,6 +76,11 @@ class JSON extends Formatter implements FormatterInterface {
         $images = $model->getImages();
         $data = array();
 
+        // Fields to display
+        if ($fields = $model->getFields()) {
+            $fields = array_fill_keys($fields, 1);
+        }
+
         foreach ($images as $image) {
             $entry = array(
                 'added' => $this->dateFormatter->formatDate($image->getAddedDate()),
@@ -90,14 +95,26 @@ class JSON extends Formatter implements FormatterInterface {
                 'publicKey' => $image->getPublicKey(),
             );
 
-            $metadata = $image->getMetadata();
+            // Add metadata if the field is to be displayed
+            if (empty($fields) || isset($fields['metadata'])) {
+                $metadata = $image->getMetadata();
 
-            if (is_array($metadata)) {
-                if (empty($metadata)) {
-                    $metadata = new stdClass();
+                if (is_array($metadata)) {
+                    if (empty($metadata)) {
+                        $metadata = new stdClass();
+                    }
+
+                    $entry['metadata'] = $metadata;
                 }
+            }
 
-                $entry['metadata'] = $metadata;
+            // Remove elements that should not be displayed
+            if (!empty($fields)) {
+                foreach (array_keys($entry) as $key) {
+                    if (!isset($fields[$key])) {
+                        unset($entry[$key]);
+                    }
+                }
             }
 
             $data[] = $entry;
