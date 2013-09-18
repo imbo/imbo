@@ -247,6 +247,9 @@ The images resource represents a collection of images owned by a specific user. 
 ``fields``
     A comma separated list of fields to display. When not specified all fields will be displayed.
 
+``sort``
+    A comma separated list of fields to sort by. The direction of the sort is specified by appending ``asc`` or ``desc`` to the field, delimited by ``:``. If no direction is specified ``asc`` will be used. Example: ``?sort=size,width:desc`` is the same as ``?sort=size:asc,width:desc``. If no ``sort`` is specified Imbo will sort by the date the images was added, in a descending fashion.
+
 .. code-block:: bash
 
     curl "http://imbo/users/<user>/images.json?limit=1&metadata=1"

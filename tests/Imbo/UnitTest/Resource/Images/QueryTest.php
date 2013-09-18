@@ -104,4 +104,79 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->query, $this->query->imageIdentifiers($value));
         $this->assertSame($value, $this->query->imageIdentifiers());
     }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getSortData() {
+        return array(
+            'single field without sort' => array(
+                'field1',
+                array(
+                    array(
+                        'field' => 'field1',
+                        'sort' => 'asc',
+                    ),
+                ),
+            ),
+            'single field with sort' => array(
+                'field1:desc',
+                array(
+                    array(
+                        'field' => 'field1',
+                        'sort' => 'desc',
+                    ),
+                ),
+            ),
+            'multiple fields' => array(
+                'field1,field2:desc,field3:asc',
+                array(
+                    array(
+                        'field' => 'field1',
+                        'sort' => 'asc',
+                    ),
+                    array(
+                        'field' => 'field2',
+                        'sort' => 'desc',
+                    ),
+                    array(
+                        'field' => 'field3',
+                        'sort' => 'asc',
+                    ),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getSortData
+     * @covers Imbo\Resource\Images\Query::sort
+     */
+    public function testSort($value, $formatted) {
+        $this->assertNull($this->query->sort());
+        $this->assertSame($this->query, $this->query->sort($value));
+        $this->assertSame($formatted, $this->query->sort());
+    }
+
+    /**
+     * @covers Imbo\Resource\Images\Query::sort
+     * @expectedException Imbo\Exception\RuntimeException
+     * @expectedExceptionMessage Invalid sort value: field:foo
+     * @expectedExceptionCode 400
+     */
+    public function testSortThrowsExceptionOnInvalidSortValues() {
+        $this->query->sort('field:foo');
+    }
+
+    /**
+     * @covers Imbo\Resource\Images\Query::sort
+     * @expectedException Imbo\Exception\RuntimeException
+     * @expectedExceptionMessage Badly formatted sort
+     * @expectedExceptionCode 400
+     */
+    public function testSortThrowsExceptionOnEmptySort() {
+        $this->query->sort('');
+    }
 }

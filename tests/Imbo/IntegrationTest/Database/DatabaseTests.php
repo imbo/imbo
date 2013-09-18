@@ -193,7 +193,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $start = $now;
         $images = array();
 
-        foreach (array('image.png', 'image1.png', 'image2.png', 'image3.png', 'image4.png') as $i => $fileName) {
+        foreach (array('image.jpg', 'image.png', 'image1.png', 'image2.png', 'image3.png', 'image4.png') as $i => $fileName) {
             $path = FIXTURES_DIR . '/' . $fileName;
             $info = getimagesize($path);
 
@@ -226,7 +226,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         // Empty query
         $query = new Query();
         $images = $this->driver->getImages($this->publicKey, $query);
-        $this->assertCount(5, $images);
+        $this->assertCount(6, $images);
     }
 
     public function testGetImagesWithStartAndEndTimestamps() {
@@ -235,7 +235,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         // Fetch to the timestamp of when the last image was added
         $query = new Query();
         $query->to($end);
-        $this->assertCount(5, $this->driver->getImages($this->publicKey, $query));
+        $this->assertCount(6, $this->driver->getImages($this->publicKey, $query));
 
         // Fetch until the second the first image was added
         $query = new Query();
@@ -245,7 +245,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         // Fetch from the second the first image was added
         $query = new Query();
         $query->from($start);
-        $this->assertCount(5, $this->driver->getImages($this->publicKey, $query));
+        $this->assertCount(6, $this->driver->getImages($this->publicKey, $query));
 
         // Fetch from the second the last image was added
         $query = new Query();
@@ -265,11 +265,12 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
             $this->assertArrayHasKey('metadata', $image);
         }
 
-        $this->assertSame(array('key4' => 'value4'), $images[0]['metadata']);
-        $this->assertSame(array('key3' => 'value3'), $images[1]['metadata']);
-        $this->assertSame(array('key2' => 'value2'), $images[2]['metadata']);
-        $this->assertSame(array('key1' => 'value1'), $images[3]['metadata']);
-        $this->assertSame(array('key0' => 'value0'), $images[4]['metadata']);
+        $this->assertSame(array('key5' => 'value5'), $images[0]['metadata']);
+        $this->assertSame(array('key4' => 'value4'), $images[1]['metadata']);
+        $this->assertSame(array('key3' => 'value3'), $images[2]['metadata']);
+        $this->assertSame(array('key2' => 'value2'), $images[3]['metadata']);
+        $this->assertSame(array('key1' => 'value1'), $images[4]['metadata']);
+        $this->assertSame(array('key0' => 'value0'), $images[5]['metadata']);
 
     }
 
@@ -293,6 +294,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
                 'b914b28f4d5faa516e2049b9a6a2577c',
                 'fc7d2d06993047a0b5056e8fac4462a2',
                 '929db9c5fc3099f7576f5655207eba47',
+                'f3210f1bb34bfbfa432cc3560be40761',
             )),
             'no page, 2 images' => array(null, 2, array(
                 'a501051db16e3cbf88ea50bfb0138a47',
@@ -306,8 +308,9 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
                 'b914b28f4d5faa516e2049b9a6a2577c',
                 'fc7d2d06993047a0b5056e8fac4462a2',
             )),
-            'third page, 2 images' => array(3, 2, array(
+            'second page, 4 images' => array(2, 4, array(
                 '929db9c5fc3099f7576f5655207eba47',
+                'f3210f1bb34bfbfa432cc3560be40761',
             )),
             'fourth page, 2 images' => array(4, 2, array()),
         );
@@ -346,7 +349,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $images = $this->driver->getImages($this->publicKey, $query);
 
         $this->assertCount(1, $images);
-        $this->assertSame('b914b28f4d5faa516e2049b9a6a2577c', $images[0]['imageIdentifier']);
+        $this->assertSame('fc7d2d06993047a0b5056e8fac4462a2', $images[0]['imageIdentifier']);
     }
 
     public function testGetImageMimeType() {
@@ -482,5 +485,77 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     public function testCanGetNumberOfBytes() {
         $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image);
         $this->assertSame(41423, $this->driver->getNumBytes($this->publicKey));
+    }
+
+    public function getSortData() {
+        return array(
+            'no sorting' => array(
+                null,
+                'imageIdentifier',
+                array(
+                    'a501051db16e3cbf88ea50bfb0138a47',
+                    '1d5b88aec8a3e1c4c57071307b2dae3a',
+                    'b914b28f4d5faa516e2049b9a6a2577c',
+                    'fc7d2d06993047a0b5056e8fac4462a2',
+                    '929db9c5fc3099f7576f5655207eba47',
+                    'f3210f1bb34bfbfa432cc3560be40761',
+                ),
+            ),
+            'default sort on size' => array(
+                'size',
+                'size',
+                array(
+                    41423,
+                    64828,
+                    74337,
+                    84988,
+                    92795,
+                    95576,
+                ),
+            ),
+            'desc sort on size' => array(
+                'size:desc',
+                'size',
+                array(
+                    95576,
+                    92795,
+                    84988,
+                    74337,
+                    64828,
+                    41423,
+                ),
+            ),
+            'sort on multiple fields' => array(
+                'width:asc,size:desc',
+                'size',
+                array(
+                    74337,
+                    84988,
+                    92795,
+                    95576,
+                    64828,
+                    41423,
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getSortData
+     */
+    public function testCanSortImages($sort = null, $field, array $values) {
+        $this->insertImages();
+
+        $query = new Query();
+
+        if ($sort !== null) {
+            $query->sort($sort);
+        }
+
+        $images = $this->driver->getImages($this->publicKey, $query);
+
+        foreach ($images as $i => $image) {
+            $this->assertSame($values[$i], $image[$field]);
+        }
     }
 }

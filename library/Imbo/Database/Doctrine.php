@@ -13,6 +13,7 @@ namespace Imbo\Database;
 use Imbo\Model\Image,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
+    Imbo\Exception\InvalidArgumentException,
     Imbo\Exception,
     Doctrine\DBAL\Configuration,
     Doctrine\DBAL\DriverManager,
@@ -220,8 +221,33 @@ class Doctrine implements DatabaseInterface {
 
         $qb = $this->getConnection()->createQueryBuilder();
         $qb->select('*')
-           ->from($this->tableNames['imageinfo'], 'i')
-           ->orderBy('added', 'DESC');
+           ->from($this->tableNames['imageinfo'], 'i');
+
+        if ($sort = $query->sort()) {
+            // Fields valid for sorting
+            $validFields = array(
+                'size'            => true,
+                'publicKey'       => true,
+                'imageIdentifier' => true,
+                'extension'       => true,
+                'mime'            => true,
+                'added'           => true,
+                'updated'         => true,
+                'width'           => true,
+                'height'          => true,
+                'checksum'        => true,
+            );
+
+            foreach ($sort as $f) {
+                if (!isset($validFields[$f['field']])) {
+                    throw new InvalidArgumentException('Invalid sort field: ' . $f['field'], 400);
+                }
+
+                $qb->addOrderBy($f['field'], $f['sort']);
+            }
+        } else {
+            $qb->orderBy('added', 'DESC');
+        }
 
         $from = $query->from();
         $to = $query->to();
@@ -287,9 +313,9 @@ class Doctrine implements DatabaseInterface {
                 'publicKey'       => $publicKey,
                 'imageIdentifier' => $row['imageIdentifier'],
                 'mime'            => $row['mime'],
-                'size'            => $row['size'],
-                'width'           => $row['width'],
-                'height'          => $row['height']
+                'size'            => (int) $row['size'],
+                'width'           => (int) $row['width'],
+                'height'          => (int) $row['height']
             );
 
             if ($returnMetadata) {
