@@ -7,6 +7,7 @@ __N/A__
 
 * #204: Images resource should be able to retrieve only specific fields
 * #201: Added an index resource
+* #192: Images resource should allow sorting
 * If clients have no preferences regarding images the original mime type of each image is prioritized
 * Added support for custom routes and resources through the constructor
 * Added watermark transformation

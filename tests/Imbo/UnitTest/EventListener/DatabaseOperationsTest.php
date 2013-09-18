@@ -192,7 +192,9 @@ class DatabaseOperationsTest extends ListenerTests {
         $query->expects($this->at(8))->method('has')->will($this->returnValue(true));
         $query->expects($this->at(9))->method('get')->with('to')->will($this->returnValue(1355176488));
         $query->expects($this->at(10))->method('has')->will($this->returnValue(true));
-        $query->expects($this->at(11))->method('get')->with('query')->will($this->returnValue('{"key":"value"}'));
+        $query->expects($this->at(11))->method('get')->with('sort')->will($this->returnValue('size:desc'));
+        $query->expects($this->at(12))->method('has')->will($this->returnValue(true));
+        $query->expects($this->at(13))->method('get')->with('query')->will($this->returnValue('{"key":"value"}'));
         $this->request->query = $query;
 
         $imagesQuery = $this->getMock('Imbo\Resource\Images\Query');

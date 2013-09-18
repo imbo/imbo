@@ -72,3 +72,37 @@ Feature: Imbo provides an images endpoint
             | xml       | size         | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<images><image><size>\d+</size></image><image><size>\d+</size></image><image><size>\d+</size></image></images>\s*</imbo>$# |
             | json      | width,height | #^\[{"width":\d+,"height":\d+},{"width":\d+,"height":\d+},{"width":\d+,"height":\d+}\]$# |
             | xml       | width,height | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<images><image><width>\d+</width><height>\d+</height></image><image><width>\d+</width><height>\d+</height></image><image><width>\d+</width><height>\d+</height></image></images>\s*</imbo>$# |
+
+    Scenario Outline: Fetch images with metadata
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        When I request "/users/publickey/images.<extension>?metadata=1&fields=<fields>"
+        Then I should get a response with "200 OK"
+        And the response body matches:
+        """
+        <response>
+        """
+
+        Examples:
+            | extension | fields       | response |
+            | json      | size         | #^\[{"size":\d+},{"size":\d+},{"size":\d+}\]$# |
+            | xml       | size         | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<images><image><size>\d+</size></image><image><size>\d+</size></image><image><size>\d+</size></image></images>\s*</imbo>$# |
+            | json      | metadata     | #^\[{"metadata":{}},{"metadata":{}},{"metadata":{}}\]$# |
+            | xml       | metadata     | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<images><image><metadata></metadata></image><image><metadata></metadata></image><image><metadata></metadata></image></images>\s*</imbo>$# |
+
+    Scenario Outline: Fetch images and use custom sorting
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        When I request "/users/publickey/images.json?fields=<fields>&sort=<sort>"
+        Then I should get a response with "200 OK"
+        And the response body matches:
+        """
+        <response>
+        """
+
+        Examples:
+            | fields       | sort            | response |
+            | size         | size            | #^\[{"size":64828},{"size":66020},{"size":95576}\]$# |
+            | size         | size:desc       | #^\[{"size":95576},{"size":66020},{"size":64828}\]$# |
+            | size,width   | width,size:desc | #^\[{"size":95576,"width":599},{"size":66020,"width":665},{"size":64828,"width":665}\]$# |
+            | size,width   | width,size      | #^\[{"size":95576,"width":599},{"size":64828,"width":665},{"size":66020,"width":665}\]$# |
