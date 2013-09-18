@@ -179,6 +179,10 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
             $query->to($params->get('to'));
         }
 
+        if ($params->has('sort')) {
+            $query->sort($params->get('sort'));
+        }
+
         if ($params->has('query')) {
             $data = json_decode($params->get('query'), true);
 
