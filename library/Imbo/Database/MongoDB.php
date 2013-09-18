@@ -279,6 +279,17 @@ class MongoDB implements DatabaseInterface {
             $queryData['imageIdentifier']['$in'] = $imageIdentifiers;
         }
 
+        // Sorting
+        $sort = array('added' => -1);
+
+        if ($querySort = $query->sort()) {
+            $sort = array();
+
+            foreach ($querySort as $s) {
+                $sort[$s['field']] = ($s['sort'] === 'asc' ? 1 : -1);
+            }
+        }
+
         // Fields to fetch
         $fields = array('extension', 'added', 'checksum', 'updated', 'publicKey', 'imageIdentifier', 'mime', 'size', 'width', 'height');
 
@@ -289,7 +300,7 @@ class MongoDB implements DatabaseInterface {
         try {
             $cursor = $this->getImageCollection()->find($queryData, $fields)
                                                  ->limit($query->limit())
-                                                 ->sort(array('added' => -1));
+                                                 ->sort($sort);
 
             // Skip some images if a page has been set
             if (($page = $query->page()) > 1) {
