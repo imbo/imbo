@@ -225,6 +225,14 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $model = new Model\Images();
         $model->setImages($modelImages);
 
+        if ($params->has('fields')) {
+            $fields = trim($params->get('fields'));
+
+            if (!empty($fields)) {
+                $model->setFields(explode(',', $fields));
+            }
+        }
+
         $lastModified = $database->getLastModified($publicKey);
 
         $response->setModel($model)

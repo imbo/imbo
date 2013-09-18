@@ -25,6 +25,13 @@ class Images implements ModelInterface {
     private $images = array();
 
     /**
+     * Which fields to display
+     *
+     * @var string[]
+     */
+    private $fields = array();
+
+    /**
      * Set the array of images
      *
      * @param Image[] $images An array of Image models
@@ -43,5 +50,26 @@ class Images implements ModelInterface {
      */
     public function getImages() {
         return $this->images;
+    }
+
+    /**
+     * Set the fields to display
+     *
+     * @param string[]
+     * @return self
+     */
+    public function setFields(array $fields) {
+        $this->fields = $fields;
+
+        return $this;
+    }
+
+    /**
+     * Get the fields to display
+     *
+     * @return string[]
+     */
+    public function getFields() {
+        return $this->fields;
     }
 }
