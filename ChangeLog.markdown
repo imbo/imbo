@@ -5,6 +5,7 @@ Imbo-0.4.0
 ----------
 __N/A__
 
+* #203: Images resource should be able to retrieve only specific fields
 * #201: Added an index resource
 * If clients have no preferences regarding images the original mime type of each image is prioritized
 * Added support for custom routes and resources through the constructor
