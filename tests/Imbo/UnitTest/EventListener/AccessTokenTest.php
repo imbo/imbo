@@ -24,6 +24,8 @@ class AccessTokenTest extends ListenerTests {
 
     private $event;
     private $request;
+    private $response;
+    private $responseHeaders;
     private $query;
 
     /**
@@ -35,8 +37,13 @@ class AccessTokenTest extends ListenerTests {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->query = $this->query;
 
+        $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->response->headers = $this->responseHeaders;
+
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
+        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
         $this->listener = new AccessToken();
     }
@@ -54,6 +61,8 @@ class AccessTokenTest extends ListenerTests {
     public function tearDown() {
         $this->query = null;
         $this->request = null;
+        $this->response = null;
+        $this->responseHeaders = null;
         $this->event = null;
         $this->listener = null;
     }
@@ -218,6 +227,15 @@ class AccessTokenTest extends ListenerTests {
         $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue($url));
         $this->request->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
 
+        $this->listener->invoke($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\AccessToken::invoke
+     */
+    public function testWillSkipValidationWhenShortUrlHeaderIsPresent() {
+        $this->responseHeaders->expects($this->once())->method('has')->with('X-Imbo-ShortUrl')->will($this->returnValue(true));
+        $this->query->expects($this->never())->method('has');
         $this->listener->invoke($this->event);
     }
 }

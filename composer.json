@@ -18,18 +18,20 @@
   },
   "require": {
     "php": ">=5.4.0",
+    "ext-imagick": ">=3.0.1",
     "symfony/http-foundation": "2.*"
   },
   "require-dev": {
     "mikey179/vfsStream": "1.*",
-    "doctrine/dbal": "2.*",
     "phpunit/phpunit": "3.*",
     "behat/behat": "2.*",
-    "guzzle/guzzle": "3.*"
+    "guzzle/guzzle": "3.*",
+    "doctrine/dbal": "2.*"
   },
   "suggest": {
-    "ext-mongo": ">=1.3.0",
-    "ext-memcached": ">=2.0.0"
+    "ext-mongo": "Enables usage of MongoDB and GridFS as database and store. Recommended version: >=1.4.0",
+    "ext-memcached": "Enables usage of the Memcached cache adapter for custom event listeners. Recommended version: >=2.0.0",
+    "doctrine/dbal": "Enables usage of using RDMS for storing data (and optionally images). Recommended version: >=2.3"
   },
   "autoload": {
     "psr-0": {

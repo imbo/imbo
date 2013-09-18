@@ -30,7 +30,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      */
     public function setUp() {
         $this->router = new Router();
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request = $this->getMockBuilder('Imbo\Http\Request\Request')
+                              ->setMethods(array('setResource', 'getPathInfo', 'getMethod'))
+                              ->getMock();
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
     }
@@ -94,6 +96,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/'),
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c.gif/'),
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta.json/'),
+            array('/s/asdfghjk'),
+            array('/s/asdfghj.jpg'),
         );
     }
 
@@ -117,6 +121,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      */
     public function getValidRoutes() {
         return array(
+            // Short URL resource
+            array('/s/asdfghj', 'shorturl'),
+            array('/s/1234567', 'shorturl'),
+            array('/s/1234asd', 'shorturl'),
+
             // Status resource
             array('/status', 'status'),
             array('/status/', 'status'),
@@ -154,6 +163,12 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta.xml', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'xml'),
             array('/users/user_name/images/a9b80ed42957fd508c617549cad07d6c/meta', 'metadata', 'user_name', 'a9b80ed42957fd508c617549cad07d6c'),
             array('/users/user-name/images/a9b80ed42957fd508c617549cad07d6c/meta', 'metadata', 'user-name', 'a9b80ed42957fd508c617549cad07d6c'),
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata/', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata.json', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'json'),
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata.xml', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'xml'),
+            array('/users/user_name/images/a9b80ed42957fd508c617549cad07d6c/metadata', 'metadata', 'user_name', 'a9b80ed42957fd508c617549cad07d6c'),
+            array('/users/user-name/images/a9b80ed42957fd508c617549cad07d6c/metadata', 'metadata', 'user-name', 'a9b80ed42957fd508c617549cad07d6c'),
         );
     }
 
@@ -166,18 +181,12 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
         $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
 
-        if ($publicKey) {
-            $this->request->expects($this->once())->method('setPublicKey')->with($publicKey);
-        }
-
-        if ($imageIdentifier) {
-            $this->request->expects($this->once())->method('setImageIdentifier')->with($imageIdentifier);
-        }
-
-        if ($extension) {
-            $this->request->expects($this->once())->method('setExtension')->with($extension);
-        }
-
         $this->router->route($this->event);
+
+        $routeInstance = $this->request->getRoute();
+
+        $this->assertSame($publicKey, $routeInstance->get('publicKey'));
+        $this->assertSame($imageIdentifier, $routeInstance->get('imageIdentifier'));
+        $this->assertSame($extension, $routeInstance->get('extension'));
     }
 }

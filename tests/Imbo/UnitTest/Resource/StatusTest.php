@@ -22,7 +22,6 @@ class StatusTest extends ResourceTests {
      */
     private $resource;
 
-    private $container;
     private $response;
     private $database;
     private $storage;
@@ -39,7 +38,6 @@ class StatusTest extends ResourceTests {
      * Set up the resource
      */
     public function setUp() {
-        $this->container = $this->getMock('Imbo\Container');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
         $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
@@ -49,14 +47,12 @@ class StatusTest extends ResourceTests {
         $this->event->expects($this->any())->method('getStorage')->will($this->returnValue($this->storage));
 
         $this->resource = $this->getNewResource();
-        $this->resource->setContainer($this->container);
     }
 
     /**
      * Tear down the resource
      */
     public function tearDown() {
-        $this->container = null;
         $this->resource = null;
         $this->response = null;
         $this->database = null;
@@ -75,7 +71,7 @@ class StatusTest extends ResourceTests {
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;
-        $this->response->expects($this->once())->method('setStatusCode')->with(500, 'Database error');
+        $this->response->expects($this->once())->method('setStatusCode')->with(503, 'Database error');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
         $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
         $this->response->expects($this->once())->method('setPrivate')->will($this->returnSelf());
@@ -94,7 +90,7 @@ class StatusTest extends ResourceTests {
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;
-        $this->response->expects($this->once())->method('setStatusCode')->with(500, 'Storage error');
+        $this->response->expects($this->once())->method('setStatusCode')->with(503, 'Storage error');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
         $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
         $this->response->expects($this->once())->method('setPrivate')->will($this->returnSelf());
@@ -113,7 +109,7 @@ class StatusTest extends ResourceTests {
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;
-        $this->response->expects($this->once())->method('setStatusCode')->with(500, 'Database and storage error');
+        $this->response->expects($this->once())->method('setStatusCode')->with(503, 'Database and storage error');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
         $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
         $this->response->expects($this->once())->method('setPrivate')->will($this->returnSelf());

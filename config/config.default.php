@@ -11,7 +11,14 @@
 namespace Imbo;
 
 // Require composer autoloader
-require __DIR__ . '/../vendor/autoload.php';
+if (is_file(__DIR__ . '/../../../autoload.php')) {
+    // Someone has installed Imbo via a custom composer.json, so the Imbo installation is inside a
+    // vendor dir
+    require __DIR__ . '/../../../autoload.php';
+} else {
+    // Someone has installed Imbo via a simple "git clone"
+    require __DIR__ . '/../vendor/autoload.php';
+}
 
 $config = array(
     /**
@@ -37,10 +44,7 @@ $config = array(
      * @var Imbo\Database\DatabaseInterface|Closure
      */
     'database' => function() {
-        return new Database\MongoDB(array(
-            'databaseName'   => 'imbo',
-            'collectionName' => 'images',
-        ));
+        return new Database\MongoDB();
     },
 
     /**
@@ -53,9 +57,7 @@ $config = array(
      * @var Imbo\Storage\StorageInterface|Closure
      */
     'storage' => function() {
-        return new Storage\GridFS(array(
-            'databaseName' => 'imbo_storage',
-        ));
+        return new Storage\GridFS();
     },
 
     /**
@@ -151,11 +153,17 @@ $config = array(
      * @var array
      */
     'eventListeners' => array(
+        'accessToken' => function() {
+            return new EventListener\AccessToken();
+        },
         'auth' => function() {
             return new EventListener\Authenticate();
         },
-        'accessToken' => function() {
-            return new EventListener\AccessToken();
+        'statsAccess' => function() {
+            return new EventListener\StatsAccess(array(
+                'whitelist' => array('127.0.0.1', '::1'),
+                'blacklist' => array(),
+            ));
         },
     ),
 
@@ -228,10 +236,36 @@ $config = array(
         'transverse' => function (array $params) {
             return new Image\Transformation\Transverse();
         },
+        'watermark' => function (array $params) {
+            return new Image\Transformation\Watermark($params);
+        },
     ),
+
+
+    /**
+     * Custom resources for Imbo
+     *
+     * @link http://docs.imbo-project.org
+     * @var array
+     */
+    'resources' => array(),
+
+    /**
+     * Custom routes for Imbo
+     *
+     * @link http://docs.imbo-project.org
+     * @var array
+     */
+    'routes' => array(),
 );
 
-if (file_exists(__DIR__ . '/config.php')) {
+if (is_dir(__DIR__ . '/../../../../config')) {
+    // Someone has installed Imbo via a custom composer.json, so the custom config is outside of
+    // the vendor dir. Loop through all available php files in the config dir
+    foreach (glob(__DIR__ . '/../../../../config/*.php') as $file) {
+        $config = array_replace_recursive($config, require $file);
+    }
+} else if (file_exists(__DIR__ . '/config.php')) {
     $config = array_replace_recursive($config, require __DIR__ . '/config.php');
 }
 

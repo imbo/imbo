@@ -12,6 +12,8 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Exception\TransformationException,
+    Imbo\Storage\ImageReaderAware,
+    Imbo\Storage\ImageReader,
     Imbo\Image\Transformation\TransformationInterface,
     Imbo\Model\Image;
 
@@ -28,6 +30,13 @@ class ImageTransformer implements ListenerInterface {
      * @var array
      */
     private $transformationHandlers = array();
+
+    /**
+     * An image reader instance
+     * 
+     * @var ImageReader
+     */
+    private $imageReader;
 
     /**
      * {@inheritdoc}
@@ -60,6 +69,10 @@ class ImageTransformer implements ListenerInterface {
             $transformation = $callback($transformation['params']);
 
             if ($transformation instanceof TransformationInterface) {
+                if ($transformation instanceof ImageReaderAware) {
+                    $transformation->setImageReader($this->getImageReader($event));
+                }
+
                 $transformation->applyToImage($image);
             } else if (is_callable($transformation)) {
                 $transformation($image);
@@ -85,5 +98,22 @@ class ImageTransformer implements ListenerInterface {
         $this->transformationHandlers[$name] = $callback;
 
         return $this;
+    }
+
+    /**
+     * Fetch an instance of an image reader
+     * 
+     * @param  EventInterface $event The event that triggered the transformation
+     * @return ImageReader An image reader instance
+     */
+    private function getImageReader(EventInterface $event) {
+        if (!$this->imageReader) {
+            $publicKey = $event->getRequest()->getPublicKey();
+            $storage = $event->getStorage();
+
+            $this->imageReader = new ImageReader($publicKey, $storage);
+        }
+
+        return $this->imageReader;
     }
 }

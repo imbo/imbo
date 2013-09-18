@@ -27,7 +27,8 @@ use Imbo\Http\Request\Request,
     Imbo\Storage\StorageInterface,
     Imbo\Resource\Images\Query,
     Imbo\Http\Response\Formatter,
-    Imbo\Image\Transformation;
+    Imbo\Image\Transformation,
+    Imbo\Resource\ResourceInterface;
 
 /**
  * Imbo application
@@ -36,13 +37,6 @@ use Imbo\Http\Request\Request,
  * @package Core
  */
 class Application {
-    /**
-     * Application configuration
-     *
-     * @var array
-     */
-    private $config;
-
     /**
      * Service container
      *
@@ -87,7 +81,7 @@ class Application {
             // See if the public key exists
             if ($publicKey) {
                 if (!isset($authConfig[$publicKey])) {
-                    $e = new RuntimeException('Unknown public key', 404);
+                    $e = new RuntimeException('Public key not found', 404);
                     $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
 
                     throw $e;
@@ -199,39 +193,61 @@ class Application {
 
         // Metadata resource
         $container->setStatic('metadataResource', function(Container $container) {
-            $resource = new Resource\Metadata();
-
-            return $resource;
+            return new Resource\Metadata();
         });
 
         // Images resource
         $container->setStatic('imagesResource', function(Container $container) {
-            $resource = new Resource\Images();
-
-            return $resource;
+            return new Resource\Images();
         });
 
         // User resource
         $container->setStatic('userResource', function(Container $container) {
-            $resource = new Resource\User();
-
-            return $resource;
+            return new Resource\User();
         });
 
         // Status resource
         $container->setStatic('statusResource', function(Container $container) {
-            $resource = new Resource\Status();
-            $resource->setContainer($container);
+            return new Resource\Status();
+        });
 
-            return $resource;
+        // Stats resource
+        $container->setStatic('statsResource', function(Container $container) {
+            return new Resource\Stats();
         });
 
         // Image resource
         $container->setStatic('imageResource', function(Container $container) {
-            $resource = new Resource\Image();
-
-            return $resource;
+            return new Resource\Image();
         });
+
+        // Short URL resource
+        $container->setStatic('shorturlResource', function(Container $container) {
+            return new Resource\ShortUrl();
+        });
+
+        // Index resource
+        $container->setStatic('indexResource', function(Container $container) {
+            return new Resource\Index();
+        });
+
+        // Custom resources
+        foreach ($container->get('config')['resources'] as $resourceName => $resourceClass) {
+            $resourceName = $resourceName . 'Resource';
+            $container->setStatic($resourceName, function(Container $container) use ($resourceClass) {
+                if (is_string($resourceClass)) {
+                    $resourceClass = new $resourceClass();
+                } else if (is_callable($resourceClass)) {
+                    $resourceClass = $resourceClass();
+                }
+
+                if (!$resourceClass instanceof ResourceInterface) {
+                    throw new InvalidArgumentException('Invalid resource class', 500);
+                }
+
+                return $resourceClass;
+            });
+        }
 
         // Image transformer listener
         $container->setStatic('imageTransformer', function(Container $container) {
@@ -253,7 +269,7 @@ class Application {
 
         // Router component
         $container->setStatic('router', function(Container $container) {
-            $router = new Router();
+            $router = new Router($container->get('config')['routes']);
 
             return $router;
         });
@@ -309,12 +325,15 @@ class Application {
             $manager->setContainer($container);
 
             // Register internal event listeners
-            $containerEntries = array(
+            $containerEntries = array_merge(array(
                 'statusResource',
+                'statsResource',
                 'userResource',
                 'imagesResource',
                 'imageResource',
                 'metadataResource',
+                'shorturlResource',
+                'indexResource',
                 'responseFormatter',
                 'router',
                 'databaseOperations',
@@ -322,7 +341,9 @@ class Application {
                 'imagePreparation',
                 'imageTransformer',
                 'responseSender',
-            );
+            ), array_map(function($key) {
+                return $key . 'Resource';
+            }, array_keys($container->get('config')['resources'])));
 
             foreach ($containerEntries as $listener) {
                 $manager->attachListener($container->get($listener));

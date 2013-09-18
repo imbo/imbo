@@ -12,9 +12,6 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerDefinition,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\Container,
-    Imbo\ContainerAware,
     Imbo\Model,
     DateTime,
     DateTimeZone;
@@ -28,21 +25,7 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-class Status implements ContainerAware, ResourceInterface, ListenerInterface {
-    /**
-     * Service container
-     *
-     * @var Container
-     */
-    private $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-    }
-
+class Status implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
@@ -82,7 +65,7 @@ class Status implements ContainerAware, ResourceInterface, ListenerInterface {
                 $message = 'Database error';
             }
 
-            $response->setStatusCode(500, $message);
+            $response->setStatusCode(503, $message);
         }
 
         $response->setMaxAge(0)

@@ -12,6 +12,7 @@ namespace Imbo\Http\Request;
 
 use Imbo\Exception\InvalidArgumentException,
     Imbo\Model\Image,
+    Imbo\Router\Route,
     Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 /**
@@ -21,13 +22,6 @@ use Imbo\Exception\InvalidArgumentException,
  * @package Http
  */
 class Request extends SymfonyRequest {
-    /**
-     * The public key from the request
-     *
-     * @var string
-     */
-    private $publicKey;
-
     /**
      * The private key
      *
@@ -43,20 +37,6 @@ class Request extends SymfonyRequest {
     private $image;
 
     /**
-     * The current image identifier (if any)
-     *
-     * @var string
-     */
-    private $imageIdentifier;
-
-    /**
-     * The current extension (if any)
-     *
-     * @var string
-     */
-    private $extension;
-
-    /**
      * The currently requested resource name (as defined by the constants in
      * Imbo\Resource\ResourceInterface).
      *
@@ -70,6 +50,13 @@ class Request extends SymfonyRequest {
      * @var array
      */
     private $transformations;
+
+    /**
+     * The current route
+     *
+     * @param Route
+     */
+    private $route;
 
     /**
      * Set an image model
@@ -98,19 +85,7 @@ class Request extends SymfonyRequest {
      * @return string
      */
     public function getPublicKey() {
-        return $this->publicKey;
-    }
-
-    /**
-     * Set the public key
-     *
-     * @param string $key The key to set
-     * @return Request
-     */
-    public function setPublicKey($key) {
-        $this->publicKey = $key;
-
-        return $this;
+        return $this->route ? $this->route->get('publicKey') : null;
     }
 
     /**
@@ -189,33 +164,12 @@ class Request extends SymfonyRequest {
     }
 
     /**
-     * Check whether or not the request includes image transformations
-     *
-     * @return boolean
-     */
-    public function hasTransformations() {
-        return $this->getExtension() || $this->query->has('t');
-    }
-
-    /**
      * Get the image identifier from the URL
      *
      * @return string|null
      */
     public function getImageIdentifier() {
-        return $this->imageIdentifier;
-    }
-
-    /**
-     * Set the image identifier
-     *
-     * @param string $imageIdentifier The image identifier to set
-     * @return Request
-     */
-    public function setImageIdentifier($imageIdentifier) {
-        $this->imageIdentifier = $imageIdentifier;
-
-        return $this;
+        return $this->route ? $this->route->get('imageIdentifier') : null;
     }
 
     /**
@@ -224,19 +178,7 @@ class Request extends SymfonyRequest {
      * @return string|null
      */
     public function getExtension() {
-        return $this->extension;
-    }
-
-    /**
-     * Set the extension requested
-     *
-     * @param string $extension The extension to set
-     * @return Request
-     */
-    public function setExtension($extension) {
-        $this->extension = $extension;
-
-        return $this;
+        return $this->route ? $this->route->get('extension') : null;
     }
 
     /**
@@ -273,5 +215,26 @@ class Request extends SymfonyRequest {
         }
 
         return $this->getSchemeAndHttpHost() . $this->getBaseUrl() . $this->getPathInfo() . $query;
+    }
+
+    /**
+     * Get the current route
+     *
+     * @return Route
+     */
+    public function getRoute() {
+        return $this->route;
+    }
+
+    /**
+     * Set the route
+     *
+     * @param Route $route The current route
+     * @return self
+     */
+    public function setRoute(Route $route) {
+        $this->route = $route;
+
+        return $this;
     }
 }

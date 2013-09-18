@@ -42,7 +42,8 @@ class ImboContext extends RESTContext {
      * @BeforeFeature
      */
     public static function prepare(FeatureEvent $event) {
-        // Drop mongo test collection
+        // Drop mongo test collection which stores information regarding images, and the images
+        // themselves
         $mongo = new MongoClient();
         $mongo->imbo_testing->drop();
 
@@ -108,6 +109,7 @@ class ImboContext extends RESTContext {
     public function appendAccessToken() {
         $this->client->getEventDispatcher()->addListener('request.before_send', function($event) {
             $request = $event['request'];
+            $request->getQuery()->remove('accessToken');
             $accessToken = hash_hmac('sha256', $request->getUrl(), $this->privateKey);
             $request->getQuery()->set('accessToken', $accessToken);
         }, -100);
@@ -122,6 +124,14 @@ class ImboContext extends RESTContext {
         $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($useHeaders) {
             $request = $event['request'];
 
+            // Remove headers and query params that should not be present at this time
+            $request->removeHeader('X-Imbo-Authenticate-Signature');
+            $request->removeHeader('X-Imbo-Authenticate-Timestamp');
+            $query = $request->getQuery();
+            $query->remove('accessToken');
+            $query->remove('signature');
+            $query->remove('timestamp');
+
             $timestamp = gmdate('Y-m-d\TH:i:s\Z');
             $data = $request->getMethod() . '|' . $request->getUrl() . '|' . $this->publicKey . '|' . $timestamp;
 
@@ -134,7 +144,6 @@ class ImboContext extends RESTContext {
                     'X-Imbo-Authenticate-Timestamp' => $timestamp,
                 ));
             } else {
-                $query = $request->getQuery();
                 $query->set('signature', $signature);
                 $query->set('timestamp', $timestamp);
             }
@@ -202,7 +211,7 @@ class ImboContext extends RESTContext {
         return array(
             new Given('I use "publickey" and "privatekey" for public and private keys'),
             new Given('I sign the request'),
-            new Given('I attach "tests/Imbo/Fixtures/image1.png" to the request body'),
+            new Given('I attach "' . $imagePath . '" to the request body'),
             new Given('I request "/users/publickey/images/' . $imageIdentifier . '" using HTTP "PUT"'),
         );
     }
@@ -227,5 +236,34 @@ class ImboContext extends RESTContext {
         }
 
         parent::setRequestHeader($header, $value);
+    }
+
+    /**
+     * @Given /^I fetch the short URL of "([^"]*)"$/
+     */
+    public function fetchShortURL($path) {
+        $this->setClientAuth('publickey', 'privatekey');
+        $this->appendAccessToken();
+        $this->request($path);
+
+        $this->shortUrl = (string) $this->getLastResponse()->getHeader('X-Imbo-ShortUrl');
+    }
+
+    /**
+     * @When /^I request the image using the short URL$/
+     */
+    public function requestImageUsingShortUrl() {
+        $this->request($this->shortUrl);
+    }
+
+    /**
+     * @Given /^the image is deleted$/
+     */
+    public function deleteImage() {
+        $identifier = $this->getLastResponse()->getHeaders()->toArray()['X-Imbo-ImageIdentifier'][0];
+
+        $this->setClientAuth('publickey', 'privatekey');
+        $this->signRequest();
+        $this->request('/users/publickey/images/' . $identifier, 'DELETE');
     }
 }

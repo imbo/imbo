@@ -94,4 +94,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->query, $this->query->to($value));
         $this->assertSame($value, $this->query->to());
     }
+
+    /**
+     * @covers Imbo\Resource\Images\Query::imageIdentifiers
+     */
+    public function testImageIdentifiers() {
+        $value = array('id1', 'id2');
+        $this->assertSame(array(), $this->query->imageIdentifiers());
+        $this->assertSame($this->query, $this->query->imageIdentifiers($value));
+        $this->assertSame($value, $this->query->imageIdentifiers());
+    }
 }

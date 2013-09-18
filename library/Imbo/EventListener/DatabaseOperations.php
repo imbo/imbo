@@ -51,6 +51,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
             new ListenerDefinition('db.metadata.update', array($this, 'updateMetadata')),
             new ListenerDefinition('db.metadata.load', array($this, 'loadMetadata')),
             new ListenerDefinition('db.user.load', array($this, 'loadUser')),
+            new ListenerDefinition('db.stats.load', array($this, 'loadStats')),
         );
     }
 
@@ -61,7 +62,6 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
      */
     public function insertImage(EventInterface $event) {
         $request = $event->getRequest();
-        $response = $event->getResponse();
 
         $event->getDatabase()->insertImage(
             $request->getPublicKey(),
@@ -187,6 +187,14 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
             }
         }
 
+        if ($params->has('imageIdentifiers')) {
+            $imageIdentifiers = trim($params->get('imageIdentifiers'));
+
+            if (!empty($imageIdentifiers)) {
+                $query->imageIdentifiers(explode(',', $imageIdentifiers));
+            }
+        }
+
         $publicKey = $event->getRequest()->getPublicKey();
         $response = $event->getResponse();
         $database = $event->getDatabase();
@@ -217,6 +225,14 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $model = new Model\Images();
         $model->setImages($modelImages);
 
+        if ($params->has('fields')) {
+            $fields = trim($params->get('fields'));
+
+            if (!empty($fields)) {
+                $model->setFields(explode(',', $fields));
+            }
+        }
+
         $lastModified = $database->getLastModified($publicKey);
 
         $response->setModel($model)
@@ -244,5 +260,29 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
 
         $response->setModel($userModel)
                  ->setLastModified($lastModified);
+    }
+
+    /**
+     * Load stats
+     *
+     * @param EventInterface $event An event instance
+     */
+    public function loadStats(EventInterface $event) {
+        $response = $event->getResponse();
+        $database = $event->getDatabase();
+        $publicKeys = array_keys($event->getConfig()['auth']);
+        $users = array();
+
+        foreach ($publicKeys as $key) {
+            $users[$key] = array(
+                'numImages' => $database->getNumImages($key),
+                'numBytes' => $database->getNumBytes($key),
+            );
+        }
+
+        $statsModel = new Model\Stats();
+        $statsModel->setUsers($users);
+
+        $response->setModel($statsModel);
     }
 }

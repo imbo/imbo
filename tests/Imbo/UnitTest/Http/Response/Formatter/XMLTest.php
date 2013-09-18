@@ -59,7 +59,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $model = $this->getMock('Imbo\Model\Error');
         $model->expects($this->once())->method('getHttpCode')->will($this->returnValue(404));
-        $model->expects($this->once())->method('getErrorMessage')->will($this->returnValue('Unknown public key'));
+        $model->expects($this->once())->method('getErrorMessage')->will($this->returnValue('Public key not found'));
         $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
         $model->expects($this->once())->method('getImboErrorCode')->will($this->returnValue(100));
         $model->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('identifier'));
@@ -69,7 +69,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $xml = $this->formatter->format($model);
 
         $this->assertTag(array('tag' => 'code', 'content' => '404', 'parent' => array('tag' => 'error')), $xml, 'Missing HTTP status code', false);
-        $this->assertTag(array('tag' => 'message', 'content' => 'Unknown public key', 'parent' => array('tag' => 'error')), $xml, 'Missing error message', false);
+        $this->assertTag(array('tag' => 'message', 'content' => 'Public key not found', 'parent' => array('tag' => 'error')), $xml, 'Missing error message', false);
         $this->assertTag(array('tag' => 'date', 'content' => $formattedDate, 'parent' => array('tag' => 'error')), $xml, 'Missing date', false);
         $this->assertTag(array('tag' => 'imboErrorCode', 'content' => '100', 'parent' => array('tag' => 'error')), $xml, 'Missing imbo error code', false);
         $this->assertTag(array('tag' => 'imageIdentifier', 'content' => 'identifier', 'parent' => array('tag' => 'imbo')), $xml, 'Missing image identifier', false);
@@ -348,6 +348,65 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\XML::formatArrayModel
+     * @covers Imbo\Http\Response\Formatter\XML::formatArray
+     */
+    public function testCanFormatArrayModelWithLists() {
+        $data = array(
+            'key' => array(1, 2, 3),
+        );
+        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($data));
+
+        $xml = $this->formatter->format($model);
+
+        $this->assertContains('<imbo><key><list><value>1</value><value>2</value><value>3</value></list></key></imbo>', $xml);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatArrayModel
+     * @covers Imbo\Http\Response\Formatter\XML::formatArray
+     */
+    public function testCanFormatAnArrayModelWithNestedArrays() {
+        $data = array(
+            'key' => array(
+                'sub' => array(
+                    'subsub' => 'value',
+                ),
+            ),
+            'key2' => 'value',
+        );
+        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($data));
+
+        $xml = $this->formatter->format($model);
+
+        $this->assertTag(array(
+            'tag' => 'subsub',
+            'content' => 'value',
+            'parent' => array(
+                'tag' => 'sub',
+                'parent' => array(
+                    'tag' => 'key',
+                    'parent' => array(
+                        'tag' => 'imbo',
+                    ),
+                ),
+            ),
+        ), $xml, '', false);
+
+        $this->assertTag(array(
+            'tag' => 'key2',
+            'content' => 'value',
+            'parent' => array(
+                'tag' => 'imbo',
+            ),
+        ), $xml, '', false);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatArrayModel
      */
     public function testCanFormatAnEmptyArrayModel() {
         $model = $this->getMock('Imbo\Model\ArrayModel');
@@ -356,5 +415,39 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $xml = $this->formatter->format($model);
 
         $this->assertTag(array('tag' => 'imbo', 'content' => ''), $xml, '', false);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatListModel
+     */
+    public function testCanFormatAListModel() {
+        $list = array('foo', 'bar');
+        $container = 'users';
+        $entry = 'user';
+
+        $model = $this->getMock('Imbo\Model\ListModel');
+        $model->expects($this->once())->method('getList')->will($this->returnValue($list));
+        $model->expects($this->once())->method('getContainer')->will($this->returnValue($container));
+        $model->expects($this->once())->method('getEntry')->will($this->returnValue($entry));
+
+        $this->assertContains('<imbo><users><user>foo</user><user>bar</user></users></imbo>', $this->formatter->format($model));
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatListModel
+     */
+    public function testCanFormatAnEmptyListModel() {
+        $list = array();
+        $container = 'users';
+        $entry = 'user';
+
+        $model = $this->getMock('Imbo\Model\ListModel');
+        $model->expects($this->once())->method('getList')->will($this->returnValue($list));
+        $model->expects($this->once())->method('getContainer')->will($this->returnValue($container));
+        $model->expects($this->once())->method('getEntry')->will($this->returnValue($entry));
+
+        $this->assertContains('<imbo><users></users></imbo>', $this->formatter->format($model));
     }
 }

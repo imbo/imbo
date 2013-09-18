@@ -60,7 +60,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
 
         $model = $this->getMock('Imbo\Model\Error');
         $model->expects($this->once())->method('getHttpCode')->will($this->returnValue(404));
-        $model->expects($this->once())->method('getErrorMessage')->will($this->returnValue('Unknown public key'));
+        $model->expects($this->once())->method('getErrorMessage')->will($this->returnValue('Public key not found'));
         $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
         $model->expects($this->once())->method('getImboErrorCode')->will($this->returnValue(100));
         $model->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('identifier'));
@@ -71,7 +71,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
 
         $data = json_decode($json, true);
         $this->assertSame($formattedDate, $data['error']['date']);
-        $this->assertSame('Unknown public key', $data['error']['message']);
+        $this->assertSame('Public key not found', $data['error']['message']);
         $this->assertSame(404, $data['error']['code']);
         $this->assertSame(100, $data['error']['imboErrorCode']);
         $this->assertSame('identifier', $data['imageIdentifier']);
@@ -299,6 +299,11 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $data = array(
             'some key' => 'some value',
             'some other key' => 'some other value',
+            'nested' => array(
+                'subkey' => array(
+                    'subsubkey' => 'some value',
+                ),
+            ),
         );
         $model = $this->getMock('Imbo\Model\ArrayModel');
         $model->expects($this->once())->method('getData')->will($this->returnValue($data));
@@ -320,5 +325,33 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
 
         $data = json_decode($json, true);
         $this->assertSame(array(), $data);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatListModel
+     */
+    public function testCanFormatAListModel() {
+        $list = array(1, 2, 3);
+        $container = 'foo';
+        $model = $this->getMock('Imbo\Model\ListModel');
+        $model->expects($this->once())->method('getList')->will($this->returnValue($list));
+        $model->expects($this->once())->method('getContainer')->will($this->returnValue($container));
+
+        $this->assertSame('{"foo":[1,2,3]}', $this->formatter->format($model));
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatListModel
+     */
+    public function testCanFormatAnEmptyListModel() {
+        $list = array();
+        $container = 'foo';
+        $model = $this->getMock('Imbo\Model\ListModel');
+        $model->expects($this->once())->method('getList')->will($this->returnValue($list));
+        $model->expects($this->once())->method('getContainer')->will($this->returnValue($container));
+
+        $this->assertSame('{"foo":[]}', $this->formatter->format($model));
     }
 }

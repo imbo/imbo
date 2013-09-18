@@ -207,9 +207,56 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\ResponseWriter::write
      */
     public function testPicksThePrioritizedMediaTypeIfMoreThanOneWithSameQualityAreSupportedByTheUserAgent() {
-        $this->model = new Image();
+        $this->model = new ArrayModel();
+        $formattedModel = '{"foo":"bar"}';
 
-        $imageData = 'binary image data';
+        $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('application/*'));
+        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
+        $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
+        $this->request->query = new ParameterBag();
+
+        $contentNegotiation = $this->getMock('Imbo\Http\ContentNegotiation');
+        $contentNegotiation->expects($this->any())->method('isAcceptable')->will($this->returnValue(1));
+
+        $formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
+        $formatter->expects($this->once())->method('format')->with($this->model)->will($this->returnValue($formattedModel));
+        $formatter->expects($this->once())->method('getContentType')->will($this->returnValue('application/json'));
+
+        $this->container->expects($this->at(0))->method('get')->with('contentNegotiation')->will($this->returnValue($contentNegotiation));
+        $this->container->expects($this->at(1))->method('get')->with('jsonFormatter')->will($this->returnValue($formatter));
+
+        $this->responseHeaders->expects($this->once())->method('add')->with(array(
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen($formattedModel),
+        ));
+
+        $this->response->expects($this->once())->method('setContent')->with($formattedModel);
+        $this->response->expects($this->once())->method('setVary')->with('Accept');
+
+        $this->responseWriter->write($this->model, $this->request, $this->response);
+    }
+
+    /**
+     * Get mime types and the expected formatter
+     *
+     * @return array[]
+     */
+    public function getOriginalMimeTypes() {
+        return array(
+            'jpeg' => array('image/jpeg', 'jpegFormatter'),
+            'gif' => array('image/gif', 'gifFormatter'),
+            'png' => array('image/png', 'pngFormatter'),
+        );
+    }
+
+    /**
+     * @dataProvider getOriginalMimeTypes
+     * @covers Imbo\Http\Response\ResponseWriter::write
+     */
+    public function testUsesTheOriginalMimeTypeOfTheImageIfTheClientHasNoPreferance($originalMimeType, $expectedFormatter) {
+        $this->model = new Image();
+        $this->model->setMimeType($originalMimeType);
+        $imageData = 'some binary data';
 
         $this->requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('image/*'));
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue(null));
@@ -220,13 +267,13 @@ class ResponseWriterTest extends \PHPUnit_Framework_TestCase {
 
         $formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
         $formatter->expects($this->once())->method('format')->with($this->model)->will($this->returnValue($imageData));
-        $formatter->expects($this->once())->method('getContentType')->will($this->returnValue('image/jpeg'));
+        $formatter->expects($this->once())->method('getContentType')->will($this->returnValue($originalMimeType));
 
         $this->container->expects($this->at(0))->method('get')->with('contentNegotiation')->will($this->returnValue($contentNegotiation));
-        $this->container->expects($this->at(1))->method('get')->with('jpegFormatter')->will($this->returnValue($formatter));
+        $this->container->expects($this->at(1))->method('get')->with($expectedFormatter)->will($this->returnValue($formatter));
 
         $this->responseHeaders->expects($this->once())->method('add')->with(array(
-            'Content-Type' => 'image/jpeg',
+            'Content-Type' => $originalMimeType,
             'Content-Length' => strlen($imageData),
         ));
 
