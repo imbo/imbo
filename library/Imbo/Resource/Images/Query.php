@@ -10,6 +10,8 @@
 
 namespace Imbo\Resource\Images;
 
+use Imbo\Exception\RuntimeException;
+
 /**
  * Query object for the images resource
  *
@@ -65,6 +67,13 @@ class Query {
      * @var array
      */
     private $imageIdentifiers = array();
+
+    /**
+     * Sort
+     *
+     * @var array
+     */
+    private $sort;
 
     /**
      * Set or get the page property
@@ -174,6 +183,49 @@ class Query {
         }
 
         $this->imageIdentifiers = $imageIdentifiers;
+
+        return $this;
+    }
+
+    /**
+     * Set or get the sort data
+     *
+     * @param string $sortString Specify a value to set the sort method
+     * @return array|self
+     */
+    public function sort($sortString = null) {
+        if ($sortString === null) {
+            return $this->sort;
+        }
+
+        $fields = explode(',', trim($sortString));
+        $sortData = array();
+
+        foreach ($fields as $field) {
+            $field = trim($field);
+            $sort = 'asc';
+
+            if (empty($field)) {
+                throw new RuntimeException('Badly formatted sort', 400);
+            }
+
+            if (strpos($field, ':') !== false) {
+                list($fieldName, $sort) = explode(':', $field);
+
+                if ($sort !== 'asc' && $sort !== 'desc') {
+                    throw new RuntimeException('Invalid sort value: ' . $field, 400);
+                }
+
+                $field = $fieldName;
+            }
+
+            $sortData[] = array(
+                'field' => $field,
+                'sort' => $sort,
+            );
+        }
+
+        $this->sort = $sortData;
 
         return $this;
     }
