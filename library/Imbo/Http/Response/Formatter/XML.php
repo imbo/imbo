@@ -91,36 +91,66 @@ USER;
     public function formatImages(Model\Images $model) {
         $images = '';
 
+        if ($fields = $model->getFields()) {
+            $fields = array_fill_keys($fields, 1);
+        }
+
         foreach ($model->getImages() as $image) {
-            $metadata = $image->getMetadata();
-            $metadataXml = '';
+            $images .= '<image>';
 
-            if (is_array($metadata)) {
-                $metadataXml .= '<metadata>';
-
-                foreach ($metadata as $key => $value) {
-                    $metadataXml .= '<tag key="' . $key . '">' . $value . '</tag>';
-                }
-
-                $metadataXml .= '</metadata>';
+            if (empty($fields) || isset($fields['publicKey'])) {
+                $images .= '<publicKey>' . $image->getPublicKey() . '</publicKey>';
             }
 
-            $images .= <<<IMAGE
-<image>
-  <publicKey>{$image->getPublicKey()}</publicKey>
-  <imageIdentifier>{$image->getImageIdentifier()}</imageIdentifier>
-  <checksum>{$image->getChecksum()}</checksum>
-  <mime>{$image->getMimetype()}</mime>
-  <extension>{$image->getExtension()}</extension>
-  <added>{$this->dateFormatter->formatDate($image->getAddedDate())}</added>
-  <updated>{$this->dateFormatter->formatDate($image->getUpdatedDate())}</updated>
-  <size>{$image->getFilesize()}</size>
-  <width>{$image->getWidth()}</width>
-  <height>{$image->getHeight()}</height>
-  {$metadataXml}
-</image>
-IMAGE;
+            if (empty($fields) || isset($fields['imageIdentifier'])) {
+                $images .= '<imageIdentifier>' . $image->getImageIdentifier() . '</imageIdentifier>';
+            }
 
+            if (empty($fields) || isset($fields['checksum'])) {
+                $images .= '<checksum>' . $image->getChecksum() . '</checksum>';
+            }
+
+            if (empty($fields) || isset($fields['mime'])) {
+                $images .= '<mime>' . $image->getMimeType() . '</mime>';
+            }
+
+            if (empty($fields) || isset($fields['extension'])) {
+                $images .= '<extension>' . $image->getExtension() . '</extension>';
+            }
+
+            if (empty($fields) || isset($fields['added'])) {
+                $images .= '<added>' . $this->dateFormatter->formatDate($image->getAddedDate()) . '</added>';
+            }
+
+            if (empty($fields) || isset($fields['updated'])) {
+                $images .= '<updated>' . $this->dateFormatter->formatDate($image->getUpdatedDate()) . '</updated>';
+            }
+
+            if (empty($fields) || isset($fields['size'])) {
+                $images .= '<size>' . $image->getFilesize() . '</size>';
+            }
+
+            if (empty($fields) || isset($fields['width'])) {
+                $images .= '<width>' . $image->getWidth() . '</width>';
+            }
+
+            if (empty($fields) || isset($fields['height'])) {
+                $images .= '<height>' . $image->getHeight() . '</height>';
+            }
+
+            $metadata = $image->getMetadata();
+
+            if (is_array($metadata) && (empty($fields) || isset($fields['metadata']))) {
+                $images .= '<metadata>';
+
+                foreach ($metadata as $key => $value) {
+                    $images .= '<tag key="' . $key . '">' . $value . '</tag>';
+                }
+
+                $images .= '</metadata>';
+            }
+
+            $images .= '</image>';
         }
 
         return <<<IMAGES

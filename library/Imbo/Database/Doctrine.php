@@ -87,6 +87,14 @@ class Doctrine implements DatabaseInterface {
     public function insertImage($publicKey, $imageIdentifier, Image $image) {
         $now = time();
 
+        if ($added = $image->getAddedDate()) {
+            $added = $added->getTimestamp();
+        }
+
+        if ($updated = $image->getUpdatedDate()) {
+            $updated = $updated->getTimestamp();
+        }
+
         if ($id = $this->getImageId($publicKey, $imageIdentifier)) {
             return (boolean) $this->getConnection()->update($this->tableNames['imageinfo'], array(
                 'updated' => $now,
@@ -101,8 +109,8 @@ class Doctrine implements DatabaseInterface {
             'imageIdentifier' => $imageIdentifier,
             'extension'       => $image->getExtension(),
             'mime'            => $image->getMimeType(),
-            'added'           => $now,
-            'updated'         => $now,
+            'added'           => $added ?: $now,
+            'updated'         => $updated ?: $now,
             'width'           => $image->getWidth(),
             'height'          => $image->getHeight(),
             'checksum'        => md5($image->getBlob()),
