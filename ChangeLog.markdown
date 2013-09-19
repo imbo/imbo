@@ -11,6 +11,7 @@ Imbo-0.4.0
 ----------
 __N/A__
 
+* #205: Added a Varnish HashTwo event listener
 * #204: Images resource should be able to retrieve only specific fields
 * #201: Added an index resource
 * #199: Allow /metadata for the meta data resource
