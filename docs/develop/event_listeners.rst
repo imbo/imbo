@@ -536,6 +536,35 @@ This listener is enabled per default, and only allows ``127.0.0.1`` and ``::1`` 
 
 If the whitelist is populated, only the listed IP addresses/subnets will gain access. If the blacklist is populated only the listed IP addresses/subnets will be denied access. If both lists are populated the IP address of the client must be present in the whitelist to gain access. If an IP address is present in both lists, it will not gain access.
 
+Varnish HashTwo
++++++++++++++++
+
+This event listener can be enabled if you want Imbo to send a `HashTwo header <https://www.varnish-software.com/blog/advanced-cache-invalidation-strategies>`_ optionally used by `Varnish <https://www.varnish-software.com/>`_. The listener when enabled subscribes to the following event:
+
+* ``image.get``
+
+The event listener has the following parameters:
+
+``$header`` (optional)
+    Set the header name to use. Defaults to ``X-HashTwo``.
+
+.. code-block:: php
+
+    <?php
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            'hashTwo' => function() {
+                return new Imbo\EventListener\VarnishHashTwo();
+            },
+        ),
+
+        // ...
+    );
+
+The value of the header is a combination of the public key and the current image identifier, separated by ``|``.
+
 Cache adapters
 --------------
 
