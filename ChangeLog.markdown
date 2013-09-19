@@ -13,8 +13,12 @@ __N/A__
 
 * #204: Images resource should be able to retrieve only specific fields
 * #201: Added an index resource
+* #199: Allow /metadata for the meta data resource
 * #192: Images resource should allow sorting
+* #190: Added support for filtering images on one or more image identifiers
 * #189: Prioritize original image mime types when doing content negotiation
+* #188: Support an alternative installation method
+* #186: Added support for short image URL's
 * #185: Add support for custom resources and routes
 * #174: New image transformation: Watermark
 
