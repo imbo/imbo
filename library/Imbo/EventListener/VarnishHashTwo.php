@@ -10,9 +10,7 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Http\Request\Request,
-    Imbo\Exception\RuntimeException;
+use Imbo\EventManager\EventInterface;
 
 /**
  * HashTwo event listener
