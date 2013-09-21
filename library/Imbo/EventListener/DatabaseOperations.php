@@ -41,17 +41,17 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('db.image.insert', array($this, 'insertImage')),
-            new ListenerDefinition('db.image.delete', array($this, 'deleteImage')),
-            new ListenerDefinition('db.image.load', array($this, 'loadImage')),
-            new ListenerDefinition('db.images.load', array($this, 'loadImages')),
-            new ListenerDefinition('db.metadata.delete', array($this, 'deleteMetadata')),
-            new ListenerDefinition('db.metadata.update', array($this, 'updateMetadata')),
-            new ListenerDefinition('db.metadata.load', array($this, 'loadMetadata')),
-            new ListenerDefinition('db.user.load', array($this, 'loadUser')),
-            new ListenerDefinition('db.stats.load', array($this, 'loadStats')),
+            'db.image.insert'    => 'insertImage',
+            'db.image.delete'    => 'deleteImage',
+            'db.image.load'      => 'loadImage',
+            'db.images.load'     => 'loadImages',
+            'db.metadata.delete' => 'deleteMetadata',
+            'db.metadata.update' => 'updateMetadata',
+            'db.metadata.load'   => 'loadMetadata',
+            'db.user.load'       => 'loadUser',
+            'db.stats.load'      => 'loadStats',
         );
     }
 

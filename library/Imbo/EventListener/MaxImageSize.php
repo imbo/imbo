@@ -50,9 +50,9 @@ class MaxImageSize implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('image.put', array($this, 'invoke'), 25),
+            'image.put' => array('invoke', 25),
         );
     }
 
