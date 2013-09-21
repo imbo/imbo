@@ -32,10 +32,10 @@ class Index implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('index.get', array($this, 'get')),
-            new ListenerDefinition('index.head', array($this, 'get')),
+            'index.get' => 'get',
+            'index.head' => 'get',
         );
     }
 

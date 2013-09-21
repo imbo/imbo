@@ -30,10 +30,10 @@ class User implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('user.get', array($this, 'get')),
-            new ListenerDefinition('user.head', array($this, 'get')),
+            'user.get' => 'get',
+            'user.head' => 'get',
         );
     }
 
