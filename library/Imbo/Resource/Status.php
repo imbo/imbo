@@ -11,7 +11,6 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
     Imbo\Model,
     DateTime,
     DateTimeZone;

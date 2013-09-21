@@ -12,7 +12,6 @@ namespace Imbo\Resource;
 
 use Imbo\Exception\ResourceException,
     Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
     Imbo\Model;
 
 /**
