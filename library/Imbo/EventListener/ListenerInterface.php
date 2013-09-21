@@ -18,9 +18,21 @@ namespace Imbo\EventListener;
  */
 interface ListenerInterface {
     /**
-     * Return a list of listener definitions
+     * Return an array with events to subscribe to
      *
-     * @return ListenerDefinition[]
+     * No proirity (priority value defaults to 0):
+     *
+     * return array(
+     *     'event' => 'someMethod',
+     * );
+     *
+     * Priority:
+     *
+     * return array(
+     *     'event' => array('someMethod', 123),
+     * );
+     *
+     * @return array
      */
-    function getDefinition();
+    static function getSubscribedEvents();
 }
