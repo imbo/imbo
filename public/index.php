@@ -19,7 +19,7 @@ try {
     $config = require $configPath;
 
     $application = new Application();
-    $application->bootstrap($config)->run();
+    $application->run($config);
 } catch (BaseException $e) {
     header('HTTP/1.1 500 Internal Server Error');
     trigger_error('Uncaught Exception with message: ' . $e->getMessage(), E_USER_ERROR);
