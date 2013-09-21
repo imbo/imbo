@@ -10,10 +10,7 @@
 
 namespace Imbo;
 
-use Imbo\Resource\ResourceInterface,
-    Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
-    Imbo\EventListener\ListenerInterface,
+use Imbo\Http\Request\Request,
     Imbo\Exception\RuntimeException,
     Imbo\Router\Route;
 
@@ -23,7 +20,7 @@ use Imbo\Resource\ResourceInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Router
  */
-class Router implements ListenerInterface {
+class Router {
     /**
      * HTTP methods supported one way or another in Imbo
      *
@@ -35,7 +32,6 @@ class Router implements ListenerInterface {
         'PUT'     => true,
         'HEAD'    => true,
         'DELETE'  => true,
-        'BREW'    => true,
         'OPTIONS' => true,
     );
 
@@ -65,21 +61,11 @@ class Router implements ListenerInterface {
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getDefinition() {
-        return array(
-            new ListenerDefinition('route', array($this, 'route')),
-        );
-    }
-
-    /**
-     * Resolve the current route
+     * Route the current request
      *
-     * @param EventInterface $event An event instance
+     * @param Request $request The current request
      */
-    public function route(EventInterface $event) {
-        $request = $event->getRequest();
+    public function route(Request $request) {
         $httpMethod = $request->getMethod();
 
         if ($httpMethod === 'BREW') {
@@ -106,6 +92,7 @@ class Router implements ListenerInterface {
 
         // Create and populate a route instance that we want to inject into the request
         $route = new Route();
+        $route->setName($resourceName);
 
         // Inject all matches into the route as parameters
         foreach ($matches as $key => $value) {
@@ -114,9 +101,7 @@ class Router implements ListenerInterface {
             }
         }
 
+        // Store the route in the request
         $request->setRoute($route);
-
-        // Set the resource name
-        $request->setResource($resourceName);
     }
 }
