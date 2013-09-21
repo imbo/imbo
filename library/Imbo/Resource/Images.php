@@ -10,8 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition;
+use Imbo\EventManager\EventInterface;
 
 /**
  * Images resource
