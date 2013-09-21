@@ -59,9 +59,9 @@ class StatsAccess implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('stats.get', array($this, 'checkAccess')),
+            'stats.get' => 'checkAccess',
         );
     }
 

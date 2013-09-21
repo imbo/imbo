@@ -44,10 +44,8 @@ class VarnishHashTwo implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
-        return array(
-            new ListenerDefinition('image.get', array($this, 'addHeader')),
-        );
+    public static function getSubscribedEvents() {
+        return array('image.get' => 'addHeader');
     }
 
     /**

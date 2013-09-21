@@ -25,11 +25,7 @@ abstract class ListenerTests extends \PHPUnit_Framework_TestCase {
     abstract protected function getListener();
 
     public function testReturnsDefinitions() {
-        $definition = $this->getListener()->getDefinition();
-        $this->assertInternalType('array', $definition);
-
-        foreach ($definition as $d) {
-            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
-        }
+        $listener = get_class($this->getListener());
+        $this->assertInternalType('array', $listener::getSubscribedEvents());
     }
 }

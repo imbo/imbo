@@ -22,9 +22,9 @@ class ResponseSender implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('response.send', array($this, 'send')),
+            'response.send' => 'send',
         );
     }
 

@@ -60,7 +60,7 @@ class Cors implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         $definition = array();
 
         // Enable the event listener only for resources and methods specified

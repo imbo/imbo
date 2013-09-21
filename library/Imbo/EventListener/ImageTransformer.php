@@ -33,7 +33,7 @@ class ImageTransformer implements ListenerInterface {
 
     /**
      * An image reader instance
-     * 
+     *
      * @var ImageReader
      */
     private $imageReader;
@@ -41,9 +41,9 @@ class ImageTransformer implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('image.transform', array($this, 'transform')),
+            'image.transform' => 'transform',
         );
     }
 
@@ -102,7 +102,7 @@ class ImageTransformer implements ListenerInterface {
 
     /**
      * Fetch an instance of an image reader
-     * 
+     *
      * @param  EventInterface $event The event that triggered the transformation
      * @return ImageReader An image reader instance
      */
