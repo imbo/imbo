@@ -26,27 +26,21 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
     abstract protected function getNewResource();
 
     public function testReturnsACorrectDefinition() {
-        $definition = $this->getNewResource()->getDefinition();
-        $this->assertInternalType('array', $definition);
-
-        foreach ($definition as $d) {
-            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
-        }
+        $className = get_class($this->getNewResource());
+        $this->assertInternalType('array', $className::getSubscribedEvents());
     }
 
     public function testReturnsTheCorrectAllowedMethods() {
         $resource = $this->getNewResource();
         $shortName = strtolower(substr(get_class($resource), strrpos(get_class($resource), '\\') + 1));
         $methods = $resource->getAllowedMethods();
-        $definition = $resource->getDefinition();
+        $definition = $resource::getSubscribedEvents();
 
         foreach ($methods as $method) {
             $expectedEventName = strtolower($shortName . '.' . $method);
 
-            foreach ($definition as $d) {
-                $eventName = $d->getEventName();
-
-                if ($eventName === $expectedEventName) {
+            foreach ($definition as $event => $callback) {
+                if ($event === $expectedEventName) {
                     continue 2;
                 }
             }
@@ -54,14 +48,12 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
             $this->fail('Resource allows ' . $method . ', but no listener definition subscribes to ' . $expectedEventName);
         }
 
-        foreach ($definition as $d) {
-            $eventName = $d->getEventName();
-
-            if (strpos($eventName, $shortName) !== 0) {
+        foreach ($definition as $event => $callback) {
+            if (strpos($event, $shortName) !== 0) {
                 continue;
             }
 
-            $expectedMethod = strtoupper(substr($eventName, strrpos($eventName, '.') + 1));
+            $expectedMethod = strtoupper(substr($event, strrpos($event, '.') + 1));
 
             foreach ($methods as $method) {
                 if ($method === $expectedMethod) {
@@ -69,7 +61,7 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
                 }
             }
 
-            $this->fail('Resource subscribes to ' . $eventName . ' but does not allow ' . $expectedMethod);
+            $this->fail('Resource subscribes to ' . $event . ' but does not allow ' . $expectedMethod);
         }
     }
 }

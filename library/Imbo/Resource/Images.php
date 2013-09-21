@@ -40,10 +40,10 @@ class Images implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('images.get', array($this, 'get')),
-            new ListenerDefinition('images.head', array($this, 'get')),
+            'images.get' => 'get',
+            'images.head' => 'get',
         );
     }
 

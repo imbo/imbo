@@ -32,12 +32,12 @@ class Image implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('image.get', array($this, 'get')),
-            new ListenerDefinition('image.head', array($this, 'get')),
-            new ListenerDefinition('image.delete', array($this, 'delete')),
-            new ListenerDefinition('image.put', array($this, 'put')),
+            'image.get' => 'get',
+            'image.head' => 'get',
+            'image.delete' => 'delete',
+            'image.put' => 'put',
         );
     }
 

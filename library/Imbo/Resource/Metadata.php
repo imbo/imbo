@@ -32,15 +32,15 @@ class Metadata implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('metadata.get', array($this, 'get')),
-            new ListenerDefinition('metadata.post', array($this, 'post')),
-            new ListenerDefinition('metadata.put', array($this, 'put')),
-            new ListenerDefinition('metadata.delete', array($this, 'delete')),
-            new ListenerDefinition('metadata.head', array($this, 'get')),
-            new ListenerDefinition('metadata.post', array($this, 'validateMetadata'), 10),
-            new ListenerDefinition('metadata.put', array($this, 'validateMetadata'), 10),
+            'metadata.get' => 'get',
+            'metadata.post' => 'post',
+            'metadata.put' => 'put',
+            'metadata.delete' => 'delete',
+            'metadata.head' => 'get',
+            'metadata.post' => array('validateMetadata', 10),
+            'metadata.put' => array('validateMetadata', 10),
         );
     }
 
