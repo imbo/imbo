@@ -38,11 +38,27 @@ interface EventInterface {
     function getName();
 
     /**
+     * Set the request
+     *
+     * @param Request $request The request instance
+     * @return self
+     */
+    function setRequest(Request $request);
+
+    /**
      * Get the request instance
      *
      * @return Request
      */
     function getRequest();
+
+    /**
+     * Set the response
+     *
+     * @param Response $response The response instance
+     * @return self
+     */
+    function setResponse(Response $response);
 
     /**
      * Get the response instance
@@ -52,11 +68,27 @@ interface EventInterface {
     function getResponse();
 
     /**
+     * Set the database adapter
+     *
+     * @param DatabaseInterface $database The database adapter
+     * @return self
+     */
+    function setDatabase(DatabaseInterface $database);
+
+    /**
      * Get the database adapter
      *
      * @return DatabaseInterface
      */
     function getDatabase();
+
+    /**
+     * Set the storage adapter
+     *
+     * @param StorageInterface $storage The storage adapter
+     * @return self
+     */
+    function setStorage(StorageInterface $storage);
 
     /**
      * Get the storage adapter
@@ -66,11 +98,27 @@ interface EventInterface {
     function getStorage();
 
     /**
+     * Set the event manager
+     *
+     * @param EventManager $manager The event manager
+     * @return self
+     */
+    function setManager(EventManager $manager);
+
+    /**
      * Get the event manager that triggered the event
      *
      * @return EventManager
      */
     function getManager();
+
+    /**
+     * Set the configuration
+     *
+     * @param array $config The configuration array
+     * @return self
+     */
+    function setConfig(array $config);
 
     /**
      * Get the Imbo configuration
