@@ -26,7 +26,6 @@ class DatabaseOperationsTest extends ListenerTests {
     private $request;
     private $response;
     private $database;
-    private $container;
     private $publicKey = 'key';
     private $imageIdentifier = 'id';
     private $image;
@@ -38,7 +37,6 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->container = $this->getMock('Imbo\Container');
         $this->image = $this->getMock('Imbo\Model\Image');
 
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
@@ -50,7 +48,6 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
 
         $this->listener = new DatabaseOperations();
-        $this->listener->setContainer($this->container);
     }
 
     /**
@@ -60,7 +57,6 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->request = null;
         $this->response = null;
         $this->database = null;
-        $this->container = null;
         $this->image = null;
         $this->event = null;
         $this->listener = null;
@@ -198,8 +194,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->request->query = $query;
 
         $imagesQuery = $this->getMock('Imbo\Resource\Images\Query');
-        $container = $this->getMock('Imbo\Container');
-        $container->expects($this->at(0))->method('get')->with('imagesQuery')->will($this->returnValue($imagesQuery));
+        $this->listener->setImagesQuery($imagesQuery);
 
         $this->database->expects($this->once())->method('getImages')->with($this->publicKey, $imagesQuery)->will($this->returnValue($images));
         $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey)->will($this->returnValue($date));
@@ -207,7 +202,6 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Images'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setLastModified')->with($date);
 
-        $this->listener->setContainer($container);
         $this->listener->loadImages($this->event);
     }
 
@@ -223,5 +217,13 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->response->expects($this->once())->method('setLastModified')->with($date);
 
         $this->listener->loadUser($this->event);
+    }
+
+    public function testCanCreateItsOwnImagesQuery() {
+        $query = $this->getMock('Imbo\Resource\Images\Query');
+        $this->assertInstanceOf('Imbo\Resource\Images\Query', $this->listener->getImagesQuery());
+        $this->listener->getImagesQuery();
+        $this->assertSame($this->listener, $this->listener->setImagesQuery($query));
+        $this->assertSame($query, $this->listener->getImagesQuery());
     }
 }
