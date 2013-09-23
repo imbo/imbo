@@ -12,8 +12,7 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Database\DatabaseInterface,
-    Imbo\Container,
-    Imbo\ContainerAware,
+    Imbo\Resource\Images\Query as ImagesQuery,
     Imbo\Model,
     DateTime;
 
@@ -23,20 +22,13 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
-class DatabaseOperations implements ContainerAware, ListenerInterface {
+class DatabaseOperations implements ListenerInterface {
     /**
-     * Service container
+     * An images query object
      *
-     * @var Container
+     * @var ImagesQuery
      */
-    private $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-    }
+    private $imagesQuery;
 
     /**
      * {@inheritdoc}
@@ -53,6 +45,31 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
             'db.user.load'       => 'loadUser',
             'db.stats.load'      => 'loadStats',
         );
+    }
+
+    /**
+     * Set the images query
+     *
+     * @param ImagesQuery $query The query object
+     * @return self
+     */
+    public function setImagesQuery(ImagesQuery $query) {
+        $this->imagesQuery = $query;
+
+        return $this;
+    }
+
+    /**
+     * Get the images query
+     *
+     * @return ImagesQuery
+     */
+    public function getImagesQuery() {
+        if (!$this->imagesQuery) {
+            $this->imagesQuery = new ImagesQuery();
+        }
+
+        return $this->imagesQuery;
     }
 
     /**
@@ -154,8 +171,8 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
      * @param EventInterface $event An event instance
      */
     public function loadImages(EventInterface $event) {
+        $query = $this->getImagesQuery();
         $params = $event->getRequest()->query;
-        $query = $this->container->get('imagesQuery');
         $returnMetadata = false;
 
         if ($params->has('page')) {
