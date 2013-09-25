@@ -41,7 +41,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::getDefinition
+     * @covers Imbo\Http\Response\ResponseFormatter::getSubscribedEvents
      */
     public function testReturnsACorrectEventSubscription() {
         $class = get_class($this->responseFormatter);
