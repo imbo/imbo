@@ -40,7 +40,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid database adapter
      * @expectedExceptionCode 500
-     * @covers Imbo\Application::bootstrap
+     * @covers Imbo\Application::run
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidDatabaseAdapter() {
         $this->application->run(array(
@@ -52,7 +52,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Imbo\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid storage adapter
      * @expectedExceptionCode 500
-     * @covers Imbo\Application::bootstrap
+     * @covers Imbo\Application::run
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidStorageAdapter() {
         $this->application->run(array(

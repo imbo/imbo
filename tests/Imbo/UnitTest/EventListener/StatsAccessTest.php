@@ -27,8 +27,6 @@ class StatsAccessTest extends ListenerTests {
 
     /**
      * Set up the listener
-     *
-     * @covers Imbo\EventListener\StatsAccess::getDefinition
      */
     public function setUp() {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
