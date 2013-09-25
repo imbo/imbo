@@ -25,7 +25,7 @@ abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
      */
     abstract protected function getNewResource();
 
-    public function testReturnsACorrectDefinition() {
+    public function testReturnsCorrectEventSubscriptions() {
         $className = get_class($this->getNewResource());
         $this->assertInternalType('array', $className::getSubscribedEvents());
     }

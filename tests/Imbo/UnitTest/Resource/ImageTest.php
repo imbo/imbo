@@ -45,7 +45,7 @@ class ImageTest extends ResourceTests {
         $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
         $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
-        $this->manager = $this->getMock('Imbo\EventManager\EventManager');
+        $this->manager = $this->getMockBuilder('Imbo\EventManager\EventManager')->disableOriginalConstructor()->getMock();
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
@@ -113,18 +113,7 @@ class ImageTest extends ResourceTests {
 
         $this->response->headers = $responseHeaders;
 
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('setPublicKey')->with($publicKey)->will($this->returnSelf());
-        $image->expects($this->once())->method('setImageIdentifier')->with($imageIdentifier)->will($this->returnSelf());
-
-        $image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/png'));
-        $image->expects($this->once())->method('getWidth')->will($this->returnValue(200));
-        $image->expects($this->once())->method('getHeight')->will($this->returnValue(100));
-        $image->expects($this->once())->method('getFilesize')->will($this->returnValue(123123));
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
-
-        $this->response->expects($this->exactly(2))->method('getImage')->will($this->returnValue($image));
-        $this->response->expects($this->once())->method('setModel')->will($this->returnValue($image));
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Image'));
 
         $this->manager->expects($this->at(0))->method('trigger')->with('db.image.load');
         $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.load');
@@ -132,45 +121,13 @@ class ImageTest extends ResourceTests {
         $this->response->expects($this->once())->method('setEtag')->with('"0d3c8690e9ad4b2d3c22520b4c0f4321"')->will($this->returnSelf());
         $this->response->expects($this->once())->method('setMaxAge')->with(31536000)->will($this->returnSelf());
 
-        $responseHeaders->expects($this->once())->method('add')->with(array(
-            'X-Imbo-OriginalMimeType' => 'image/png',
-            'X-Imbo-OriginalWidth' => 200,
-            'X-Imbo-OriginalHeight' => 100,
-            'X-Imbo-OriginalFileSize' => 123123,
-            'X-Imbo-OriginalExtension' => 'png',
-        ));
-
-        $this->resource->get($this->event);
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::get
-     */
-    public function testFetchesTheImageTwiceInCaseAnEventListenerHasChangedTheInstance() {
-        $serverBag = $this->getMock('Symfony\Component\HttpFoundation\ServerBag');
-        $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\ServerBag');
-        $requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('*/*'));
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ServerBag');
-
-        $this->response->headers = $responseHeaders;
-        $this->request->headers = $requestHeaders;
-        $this->request->server = $serverBag;
-        $this->request->expects($this->once())->method('getPublicKey');
-        $this->request->expects($this->once())->method('getImageIdentifier');
-
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('setImageIdentifier')->will($this->returnSelf());
-        $image->expects($this->once())->method('setPublicKey')->will($this->returnSelf());
-
-        $modifiedImage = $this->getMock('Imbo\Model\Image');
-
-        $this->response->expects($this->at(0))->method('getImage')->will($this->returnValue($image));
-        $this->response->expects($this->at(1))->method('setEtag')->with('"65330eb47d0175f264fdb29633829c0b"')->will($this->returnSelf());
-        $this->response->expects($this->at(2))->method('setMaxAge')->with(31536000);
-        $this->response->expects($this->at(3))->method('getImage')->will($this->returnValue($modifiedImage));
-        $this->response->expects($this->at(4))->method('setModel')->with($modifiedImage);
-
-        $responseHeaders->expects($this->any())->method('add')->will($this->returnSelf());
+        $responseHeaders->expects($this->once())->method('add')->with($this->callback(function($headers) {
+            return array_key_exists('X-Imbo-OriginalMimeType', $headers) &&
+                   array_key_exists('X-Imbo-OriginalWidth', $headers) &&
+                   array_key_exists('X-Imbo-OriginalHeight', $headers) &&
+                   array_key_exists('X-Imbo-OriginalFileSize', $headers) &&
+                   array_key_exists('X-Imbo-OriginalExtension', $headers);
+        }));
 
         $this->resource->get($this->event);
     }

@@ -90,14 +90,4 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($this->response->headers->get('ETag'));
         $this->assertNull($this->response->getLastModified());
     }
-
-    /**
-     * @covers Imbo\Http\Response\Response::setImage
-     * @covers Imbo\Http\Response\Response::getImage
-     */
-    public function testCanSetAndGetImage() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $this->assertSame($this->response, $this->response->setImage($image));
-        $this->assertSame($image, $this->response->getImage());
-    }
 }

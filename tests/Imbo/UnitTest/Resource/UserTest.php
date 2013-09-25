@@ -71,7 +71,7 @@ class UserTest extends ResourceTests {
      */
     public function testSupportsHttpGet() {
         $date = new DateTime('@1361628679', new DateTimeZone('UTC'));
-        $manager = $this->getMock('Imbo\EventManager\EventManager');
+        $manager = $this->getMockBuilder('Imbo\EventManager\EventManager')->disableOriginalConstructor()->getMock();
         $manager->expects($this->once())->method('trigger')->with('db.user.load');
         $this->event->expects($this->once())->method('getManager')->will($this->returnValue($manager));
         $this->response->expects($this->once())->method('getLastModified')->will($this->returnValue($date));

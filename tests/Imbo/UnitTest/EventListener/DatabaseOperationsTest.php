@@ -93,7 +93,7 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::loadImage
      */
     public function testCanLoadImage() {
-        $this->response->expects($this->any())->method('getImage')->will($this->returnValue($this->image));
+        $this->response->expects($this->any())->method('getModel')->will($this->returnValue($this->image));
         $this->database->expects($this->once())->method('load')->with($this->publicKey, $this->imageIdentifier, $this->image);
 
         $this->listener->loadImage($this->event);
