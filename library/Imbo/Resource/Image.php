@@ -94,9 +94,11 @@ class Image implements ResourceInterface {
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
 
-        $image = $response->getImage();
+        $image = new Model\Image();
         $image->setImageIdentifier($imageIdentifier)
               ->setPublicKey($publicKey);
+
+        $response->setModel($image);
 
         $eventManager->trigger('db.image.load');
         $eventManager->trigger('storage.image.load');
@@ -125,9 +127,5 @@ class Image implements ResourceInterface {
 
         // Trigger possible image transformations
         $eventManager->trigger('image.transform');
-
-        // Fetch the image once more as event listeners might have set a new instance during the
-        // transformation phase
-        $response->setModel($response->getImage());
     }
 }
