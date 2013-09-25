@@ -43,8 +43,23 @@ class ImageTransformer implements ListenerInterface {
      */
     public static function getSubscribedEvents() {
         return array(
+            // Initialize the image transformations from the configuration
+            'image.get' => array('initialize' => 1),
+
+            // Transform the image
             'image.transform' => 'transform',
         );
+    }
+
+    /**
+     * Initialize the transformer
+     *
+     * @param EventInterface $event The current event
+     */
+    public function initialize(EventInterface $event) {
+        foreach ($event->getConfig()['imageTransformations'] as $name => $callback) {
+            $this->registerTransformationHandler($name, $callback);
+        }
     }
 
     /**
@@ -54,7 +69,7 @@ class ImageTransformer implements ListenerInterface {
      */
     public function transform(EventInterface $event) {
         $request = $event->getRequest();
-        $image = $event->getResponse()->getImage();
+        $image = $event->getResponse()->getModel();
         $transformed = false;
 
         // Fetch and apply transformations

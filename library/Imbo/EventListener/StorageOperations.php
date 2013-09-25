@@ -58,7 +58,7 @@ class StorageOperations implements ListenerInterface {
         $lastModified = $storage->getLastModified($publicKey, $imageIdentifier);
 
         $response->setLastModified($lastModified)
-                 ->getImage()->setBlob($imageData);
+                 ->getModel()->setBlob($imageData);
     }
 
     /**
