@@ -33,13 +33,17 @@ class Metadata implements ResourceInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            'metadata.get' => 'get',
-            'metadata.post' => 'post',
-            'metadata.put' => 'put',
-            'metadata.delete' => 'delete',
             'metadata.head' => 'get',
-            'metadata.post' => array('validateMetadata', 10),
-            'metadata.put' => array('validateMetadata', 10),
+            'metadata.get' => 'get',
+            'metadata.post' => array(
+                'post',
+                'validateMetadata' => 10,
+            ),
+            'metadata.put' => array(
+                'put',
+                'validateMetadata' => 10,
+            ),
+            'metadata.delete' => 'delete',
         );
     }
 
