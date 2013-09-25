@@ -149,7 +149,7 @@ task :travis_bootstrap do
   if ENV["TRAVIS"] == "true"
     ini_file = Hash[`php --ini`.split("\n").map {|l| l.split(/:\s+/)}]["Loaded Configuration File"]
 
-    {"imagick" => "3.1.0RC2"}.each { |package, version|
+    {"imagick" => "3.1.2"}.each { |package, version|
       filename = "#{package}-#{version}.tgz"
       system "wget http://pecl.php.net/get/#{filename}"
       system "tar -xzf #{filename}"
