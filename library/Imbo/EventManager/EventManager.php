@@ -127,7 +127,7 @@ class EventManager {
      * @param array $publicKeys Public key filter for the events
      * @return self
      */
-    public function registerClosure($name, $callback, array $events, array $publicKeys) {
+    public function registerClosure($name, $callback, array $events, array $publicKeys = array()) {
         $this->eventHandlers[$name] = $callback;
 
         foreach ($events as $event => $priority) {
