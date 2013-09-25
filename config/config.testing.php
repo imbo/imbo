@@ -13,8 +13,8 @@ namespace Imbo;
 use Imbo\Image\Transformation,
     Imbo\Cache,
     Imbo\Resource\ResourceInterface,
-    Imbo\EventListener\ListenerDefinition,
     Imbo\EventManager\EventInterface,
+    Imbo\EventListener\ListenerInterface,
     Imbo\Model\ArrayModel,
     Memcached as PeclMemcached,
     PHPUnit_Framework_MockObject_Generator,
@@ -29,9 +29,9 @@ class CustomResource implements ResourceInterface {
         return array('GET');
     }
 
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('custom1.get', array($this, 'get')),
+            'custom1.get' => 'get',
         );
     }
 
@@ -50,10 +50,10 @@ class CustomResource2 implements ResourceInterface {
         return array('GET', 'PUT');
     }
 
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('custom2.get', array($this, 'get')),
-            new ListenerDefinition('custom2.put', array($this, 'put')),
+            'custom2.get' => 'get',
+            'custom2.put' => 'put',
         );
     }
 
@@ -72,8 +72,39 @@ class CustomResource2 implements ResourceInterface {
     }
 }
 
+class CustomEventListener implements ListenerInterface {
+    private $value1;
+    private $value2;
+
+    public function __construct($value1, $value2) {
+        $this->value1 = $value1;
+        $this->value2 = $value2;
+    }
+
+    public static function getSubscribedEvents() {
+        return array(
+            'index.get' => 'getIndex',
+            'user.get' => 'getUser',
+        );
+    }
+
+    public function getIndex(EventManager\EventInterface $event) {
+        $event->getResponse()->headers->add(array(
+            'X-Imbo-Value1' => $this->value1,
+            'X-Imbo-Value2' => $this->value2,
+        ));
+    }
+
+    public function getUser(EventManager\EventInterface $event) {
+        $event->getResponse()->headers->set('X-Imbo-CurrentUser', $event->getRequest()->getPublicKey());
+    }
+}
+
 return array(
-    'auth' => array('publickey' => 'privatekey'),
+    'auth' => array(
+        'publickey' => 'privatekey',
+        'user' => 'key',
+    ),
 
     'database' => function() {
         $adapter = PHPUnit_Framework_MockObject_Generator::getMock(
@@ -104,21 +135,45 @@ return array(
     },
 
     'eventListeners' => array(
-        'auth' => function() {
-            return new EventListener\Authenticate();
-        },
-        'accessToken' => function() {
-            return new EventListener\AccessToken();
-        },
-        'imageTransformationCache' => function() {
-            return new EventListener\ImageTransformationCache('/tmp/imbo-behat-image-transformation-cache');
-        },
+        'auth' => 'Imbo\EventListener\Authenticate',
+        'accessToken' => 'Imbo\EventListener\AccessToken',
+        'imageTransformationCache' => array(
+            'listener' => 'Imbo\EventListener\ImageTransformationCache',
+            'params' => array('/tmp/imbo-behat-image-transformation-cache'),
+        ),
         'metadataCache' => function() {
             $memcached = new PeclMemcached();
             $memcached->addServer('localhost', 11211);
 
             return new EventListener\MetadataCache(new Cache\Memcached($memcached));
         },
+        'someHandler' => array(
+            'events' => array(
+                'index.get' => 1000,
+            ),
+            'callback' => function(EventManager\EventInterface $event) {
+                $event->getResponse()->headers->set('X-Imbo-SomeHandler', microtime(true));
+            }
+        ),
+        'someOtherHandler' => array(
+            'events' => array(
+                'index.get',
+                'index.head',
+            ),
+            'callback' => function(EventManager\EventInterface $event) {
+                $event->getResponse()->headers->set('X-Imbo-SomeOtherHandler', microtime(true));
+            },
+            'priority' => 10,
+        ),
+        'someEventListener' => array(
+            'listener' => __NAMESPACE__ . '\CustomEventListener',
+            'params' => array(
+                'value1', 'value2'
+            ),
+            'publicKeys' => array(
+                'whitelist' => array('publickey'),
+            ),
+        ),
     ),
 
     'imageTransformations' => array(
