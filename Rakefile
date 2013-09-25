@@ -177,7 +177,7 @@ end
 
 desc "Run functional tests"
 task :behat do
-  profile = ENV["travis"] == "true" ? "travis" : "default"
+  profile = ENV["TRAVIS"] == "true" ? "travis" : "default"
 
   begin
     sh %{vendor/bin/behat --strict --profile #{profile}}
