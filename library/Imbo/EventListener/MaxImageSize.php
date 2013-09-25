@@ -52,14 +52,14 @@ class MaxImageSize implements ListenerInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            'image.put' => array('invoke', 25),
+            'image.put' => array('enforceMaxSize' => 25),
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function invoke(EventInterface $event) {
+    public function enforceMaxSize(EventInterface $event) {
         $image = $event->getRequest()->getImage();
 
         $width = $image->getWidth();

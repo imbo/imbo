@@ -26,7 +26,7 @@ class AutoRotateImage implements ListenerInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            'image.put' => array('autoRotate', 25),
+            'image.put' => array('autoRotate' => 25),
         );
     }
 

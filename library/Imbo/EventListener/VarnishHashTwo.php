@@ -45,7 +45,7 @@ class VarnishHashTwo implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array('image.get' => 'addHeader');
+        return array('image.get' => array('addHeader' => -1));
     }
 
     /**
@@ -59,7 +59,7 @@ class VarnishHashTwo implements ListenerInterface {
 
         $response->headers->set(
             $this->header,
-            $request->getPublicKey() . '|' . $response->getImage()->getImageIdentifier()
+            $request->getPublicKey() . '|' . $response->getModel()->getImageIdentifier()
         );
     }
 }

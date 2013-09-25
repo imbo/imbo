@@ -49,7 +49,7 @@ class Authenticate implements ListenerInterface {
         );
 
         foreach ($events as $event) {
-            $callbacks[$event] = array('invoke', 100);
+            $callbacks[$event] = array('authenticate' => 100);
         }
 
         return $callbacks;
@@ -58,7 +58,7 @@ class Authenticate implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function invoke(EventInterface $event) {
+    public function authenticate(EventInterface $event) {
         $response = $event->getResponse();
         $request = $event->getRequest();
 

@@ -43,16 +43,18 @@ class MetadataCache implements ListenerInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            // Load from cache
-            'db.metadata.load' => array('loadFromCache', 10),
+            // Load and store in cache
+            'db.metadata.load' => array(
+                'loadFromCache' => 10,
+                'storeInCache' => -10,
+            ),
 
             // Delete from cache
-            'db.metadata.delete' => array('deleteFromCache', -10),
-            'db.image.delete' => array('deleteFromCache', -10),
+            'db.metadata.delete' => array('deleteFromCache' => -10),
+            'db.image.delete' => array('deleteFromCache' => -10),
 
-            // Store in cache
-            'db.metadata.load' => array('storeInCache', -10),
-            'db.metadata.update' => array('storeInCache', -10),
+            // Store updated data in cache
+            'db.metadata.update' => array('storeInCache' => -10),
         );
     }
 

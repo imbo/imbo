@@ -113,7 +113,7 @@ class DatabaseOperations implements ListenerInterface {
         $event->getDatabase()->load(
             $request->getPublicKey(),
             $request->getImageIdentifier(),
-            $response->getImage()
+            $response->getModel()
         );
     }
 

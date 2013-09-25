@@ -85,7 +85,7 @@ class AccessToken implements ListenerInterface {
         );
 
         foreach ($events as $event) {
-            $callbacks[$event] = array('invoke', 100);
+            $callbacks[$event] = array('checkAccessToken' => 100);
         }
 
         return $callbacks;
@@ -94,7 +94,7 @@ class AccessToken implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function invoke(EventInterface $event) {
+    public function checkAccessToken(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $query = $request->query;
