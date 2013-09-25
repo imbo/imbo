@@ -18,8 +18,8 @@ Feature: Imbo provides a stats endpoint
 
         Examples:
             | extension | match   | response |
-            | json      | is      | {"users":{"publickey":{"numImages":3,"numBytes":226424}},"total":{"numImages":3,"numUsers":1,"numBytes":226424},"custom":{}} |
-            | xml       | matches | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<stats>\s*<users>\s*<user publicKey="publickey">\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*</user>\s*</users>\s*<total>\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*</total>\s*<custom></custom>\s*</stats>\s*</imbo>$#ms |
+            | json      | is      | {"users":{"publickey":{"numImages":3,"numBytes":226424},"user":{"numImages":0,"numBytes":0}},"total":{"numImages":3,"numUsers":2,"numBytes":226424},"custom":{}} |
+            | xml       | matches | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<stats>\s*<users>\s*<user publicKey="publickey">\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*</user>\s*<user publicKey="user">\s*<numImages>0</numImages>\s*<numBytes>0</numBytes>\s*</user>\s*</users>\s*<total>\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*<numUsers>2</numUsers>\s*</total>\s*<custom></custom>\s*</stats>\s*</imbo>$#ms |
 
     Scenario Outline: The stats endpoint only supports HTTP GET and HEAD
         When I request "/stats.json" using HTTP "<method>"
