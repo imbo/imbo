@@ -68,7 +68,7 @@ class AuthenticateTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::invoke
+     * @covers Imbo\EventListener\Authenticate::authenticate
      * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage Missing authentication timestamp
      * @expectedExceptionCode 400
@@ -77,11 +77,11 @@ class AuthenticateTest extends ListenerTests {
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(false));
         $this->headers->expects($this->at(1))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(null));
 
-        $this->listener->invoke($this->event);
+        $this->listener->authenticate($this->event);
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::invoke
+     * @covers Imbo\EventListener\Authenticate::authenticate
      * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage Missing authentication signature
      * @expectedExceptionCode 400
@@ -91,11 +91,11 @@ class AuthenticateTest extends ListenerTests {
         $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
         $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(gmdate('Y-m-d\TH:i:s\Z')));
 
-        $this->listener->invoke($this->event);
+        $this->listener->authenticate($this->event);
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::invoke
+     * @covers Imbo\EventListener\Authenticate::authenticate
      * @covers Imbo\EventListener\Authenticate::timestampIsValid
      * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage Invalid timestamp: some string
@@ -106,11 +106,11 @@ class AuthenticateTest extends ListenerTests {
         $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
         $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue('some string'));
 
-        $this->listener->invoke($this->event);
+        $this->listener->authenticate($this->event);
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::invoke
+     * @covers Imbo\EventListener\Authenticate::authenticate
      * @covers Imbo\EventListener\Authenticate::timestampHasExpired
      * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage Timestamp has expired: 2010-10-10T20:10:10Z
@@ -121,11 +121,11 @@ class AuthenticateTest extends ListenerTests {
         $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
         $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue('2010-10-10T20:10:10Z'));
 
-        $this->listener->invoke($this->event);
+        $this->listener->authenticate($this->event);
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::invoke
+     * @covers Imbo\EventListener\Authenticate::authenticate
      * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage Signature mismatch
      * @expectedExceptionCode 400
@@ -136,11 +136,11 @@ class AuthenticateTest extends ListenerTests {
         $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(gmdate('Y-m-d\TH:i:s\Z')));
         $this->headers->expects($this->at(3))->method('get')->with('x-imbo-authenticate-signature')->will($this->returnValue('foobar'));
 
-        $this->listener->invoke($this->event);
+        $this->listener->authenticate($this->event);
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::invoke
+     * @covers Imbo\EventListener\Authenticate::authenticate
      * @covers Imbo\EventListener\Authenticate::signatureIsValid
      * @covers Imbo\EventListener\Authenticate::timestampIsValid
      * @covers Imbo\EventListener\Authenticate::timestampHasExpired
@@ -169,11 +169,11 @@ class AuthenticateTest extends ListenerTests {
 
         $this->response->headers = $responseHeaders;
 
-        $this->listener->invoke($this->event);
+        $this->listener->authenticate($this->event);
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::invoke
+     * @covers Imbo\EventListener\Authenticate::authenticate
      * @covers Imbo\EventListener\Authenticate::signatureIsValid
      * @covers Imbo\EventListener\Authenticate::timestampIsValid
      * @covers Imbo\EventListener\Authenticate::timestampHasExpired
@@ -204,6 +204,6 @@ class AuthenticateTest extends ListenerTests {
 
         $this->response->headers = $responseHeaders;
 
-        $this->listener->invoke($this->event);
+        $this->listener->authenticate($this->event);
     }
 }

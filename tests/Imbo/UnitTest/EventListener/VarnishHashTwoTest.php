@@ -69,7 +69,7 @@ class VarnishHashTwoTest extends ListenerTests {
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
-        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
         $this->responseHeaders->expects($this->once())->method('set')->with('X-HashTwo', 'key|id');
 
         $this->listener->addHeader($this->event);

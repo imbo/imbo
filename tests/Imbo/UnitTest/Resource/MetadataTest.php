@@ -47,7 +47,7 @@ class MetadataTest extends ResourceTests {
         $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
         $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
-        $this->manager = $this->getMock('Imbo\EventManager\EventManager');
+        $this->manager = $this->getMockBuilder('Imbo\EventManager\EventManager')->disableOriginalConstructor()->getMock();
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
