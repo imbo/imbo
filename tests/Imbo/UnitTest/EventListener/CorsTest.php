@@ -32,7 +32,6 @@ class CorsTest extends ListenerTests {
      * @covers Imbo\EventListener\Cors::__construct
      */
     public function setUp() {
-        $this->markTestSkipped('Will skip until I have solved the issue with the getSubscribedEvents method in the listener');
         $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $requestHeaders->expects($this->any())->method('get')->with('Origin', '*')->will($this->returnValue('http://imbo-project.org'));
 
@@ -92,34 +91,6 @@ class CorsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::__construct
-     * @covers Imbo\EventListener\Cors::getDefinition
-     */
-    public function testReturnsACorrectListenerDefinition() {
-        $listener = new Cors(array(
-            'allowedMethods' => array(
-                'image'    => array('GET', 'PUT'),
-                'images'   => array('GET', 'HEAD'),
-                'metadata' => array('POST')
-            )
-        ));
-
-        $definition = $listener->getDefinition();
-        $this->assertCount(8, $definition);
-        $events = array();
-
-        foreach ($definition as $d) {
-            $events[] = $d->getEventName();
-        }
-
-        $this->assertEquals(array(
-            'image.get', 'image.put', 'image.options',
-            'images.get', 'images.head', 'images.options',
-            'metadata.post', 'metadata.options'
-        ), $events);
-    }
-
-    /**
      * @covers Imbo\EventListener\Cors::options
      * @covers Imbo\EventListener\Cors::originIsAllowed
      */
@@ -153,6 +124,10 @@ class CorsTest extends ListenerTests {
         ));
 
         $this->response->headers = $headers;
+        $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
+        $route = $this->getMock('Imbo\Router\Route');
+        $route->expects($this->once())->method('__toString')->will($this->returnValue('index'));
+        $this->request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
         $listener->invoke($this->event);
     }
 
@@ -172,6 +147,10 @@ class CorsTest extends ListenerTests {
         ));
 
         $this->response->headers = $headers;
+        $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
+        $route = $this->getMock('Imbo\Router\Route');
+        $route->expects($this->once())->method('__toString')->will($this->returnValue('index'));
+        $this->request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
         $listener->invoke($this->event);
     }
 
@@ -187,7 +166,9 @@ class CorsTest extends ListenerTests {
             'maxAge' => 60,
         ));
 
-        $this->request->expects($this->once())->method('getResource')->will($this->returnValue('image'));
+        $route = $this->getMock('Imbo\Router\Route');
+        $route->expects($this->once())->method('__toString')->will($this->returnValue('image'));
+        $this->request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
 
         $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $headers->expects($this->once())->method('add')->with(array(
