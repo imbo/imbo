@@ -50,7 +50,7 @@ If some of the 3rd party plug-ins provide configuration files, you can link to t
 
 To be able to control the order that Imbo will use when loading the configuration files you should prefix them with a number, like ``01`` in the example above. Lower numbers will be loaded first, meaning that configuration files with higher numbers will override settings set in configuration files with a lower number.
 
-Regarding the Imbo version you are about to install you can use ``dev-master`` for the latest released version, or you can use a specific version if you want to. Head over to `Packagist <https://packagist.org/packages/imbo/imbo>`_ to see the available versions.
+Regarding the Imbo version you are about to install you can use ``dev-master`` for the latest released version, or you can use a specific version if you want to. Head over to `Packagist <https://packagist.org/packages/imbo/imbo>`_ to see the available versions. If you're more of a YOLO type of person you can use ``dev-develop`` for the latest development version.
 
 When you have created the ``composer.json`` file you can install Imbo with Composer:
 
@@ -150,7 +150,7 @@ if your Imbo installation is available on ``[www.]example.com/imbo``.
 Database setup
 --------------
 
-If you choose to use a RDMS to store data in, you will need to manually create a database, a user and the tables Imbo stores information in. Below you will find schemas for different RDMSs. You will find information regarding how to authenticate against the RDMS of you choice in the :ref:`configuration` topic.
+If you choose to use a RDBMS to store data in, you will need to manually create a database, a user and the tables Imbo stores information in. Below you will find schemas for different RDBMSs. You will find information regarding how to authenticate against the RDBMS of you choice in the :ref:`configuration` topic.
 
 MySQL
 ~~~~~

@@ -87,9 +87,9 @@ Convert the image type - ``.jpg/.gif/.png``
 
 This transformation can be used to change the image type. It is not applied like the other transformations, but is triggered when specifying a custom extension to the ``<image>``. Currently Imbo can convert to:
 
-* ``jpg``
-* ``png``
-* ``gif``
+* ``image/jpeg``
+* ``image/png``
+* ``image/gif``
 
 **Examples:**
 
@@ -154,7 +154,7 @@ Enforce a max size of an image - ``t[]=maxSize``
 
 This transformation will resize the image using the original aspect ratio. Two parameters are supported and at least one of them must be supplied to apply the transformation.
 
-Note the difference from the :ref:`resize` transformation: given both ``width`` and ``height``, the resulting image will not be the same width and height as specified unless the aspect ratio is the same.
+Note the difference from the :ref:`resize <resize>` transformation: given both ``width`` and ``height``, the resulting image will not be the same width and height as specified unless the aspect ratio is the same.
 
 **Parameters:**
 

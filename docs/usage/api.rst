@@ -1,7 +1,7 @@
 Imbo's API
 ==========
 
-In this chapter you will learn more about how Imbo's API works, and how you as a user are able to read from and write to Imbo. Most examples used in this chapter will use `cURL <http://curl.haxx.se/>`_, so while playing around with the API it's encouraged to have cURL easily available. For the sake of simplicity the access tokens and signature information is not used in the examples. See the :ref:`access-tokens` and :ref:`signing-write-requests` sections for more information regarding this.
+In this chapter you will learn more about how Imbo's API works, and how you as a user are able to read from and write to Imbo. Most examples listed in this chapter will use `cURL <http://curl.haxx.se/>`_, so while playing around with the API it's encouraged to have cURL easily available. For the sake of simplicity the access tokens and authentication information is not used in the examples. See the :ref:`access-tokens` and :ref:`signing-write-requests` sections for more information regarding this.
 
 Resources/endpoints
 -------------------
@@ -12,7 +12,7 @@ In this section you will find information on the different resources Imbo's REST
     :local:
     :depth: 1
 
-.. _index-resoure:
+.. _index-resource:
 
 Index resource - ``/``
 ++++++++++++++++++++++
@@ -93,7 +93,7 @@ if the client making the request is allowed access.
 Access control
 ~~~~~~~~~~~~~~
 
-The access control for the stats endpoint is controlled by an event listener, which is enabled per default, and only allows connections from ``127.0.0.1``. Read more about how to configure this event listener in the :ref:`Stats access event listener <stats-access-event-listener>` section.
+The access control for the stats endpoint is controlled by an event listener, which is enabled per default, and only allows connections from ``127.0.0.1`` (IPv4) and ``::1`` (IPv6). Read more about how to configure this event listener in the :ref:`Stats access event listener <stats-access-event-listener>` section.
 
 Custom statistics
 ~~~~~~~~~~~~~~~~~
@@ -180,7 +180,7 @@ results in:
       "storage": true
     }
 
-where ``timestamp`` is the current timestamp on the server, and ``database`` and ``storage`` are boolean values informing of the status of the current database and storage adapters respectively. If both are ``true`` the HTTP status code is ``200 OK``, and if one or both are ``false`` the status code is ``503``. When the status code is ``503`` the status message will inform you whether it's the database or the storage adapter (or both) that is having issues. As soon as the status code does not equal ``200`` Imbo will no longer work as expected.
+where ``timestamp`` is the current timestamp on the server, and ``database`` and ``storage`` are boolean values informing of the status of the current database and storage adapters respectively. If both are ``true`` the HTTP status code is ``200 OK``, and if one or both are ``false`` the status code is ``503``. When the status code is ``503`` the reason phrase will inform you whether it's the database or the storage adapter (or both) that is having issues. As soon as the status code does not equal ``200`` Imbo will no longer work as expected.
 
 The reason for adapter failures depends on what kind of adapter you are using. The :ref:`file system storage adapter <filesystem-storage-adapter>` will for instance return a failure if it can no longer write to the storage directory. The :ref:`MongoDB <mongodb-database-adapter>` and :ref:`Doctrine <doctrine-database-adapter>` database adapters will fail if they can no longer connect to the server they are configured to talk to.
 
@@ -214,7 +214,7 @@ results in:
       "lastModified": "Wed, 18 Apr 2012 15:12:52 GMT"
     }
 
-where ``publicKey`` is the public key of the user (the same used in the request against this endpoint), ``numImages`` is the number of images the user has stored in Imbo and ``lastModified`` is when the user last uploaded or deleted an image, or when the user last updated metadata of an image.
+where ``publicKey`` is the public key of the user (the same used in the URI of the request), ``numImages`` is the number of images the user has stored in Imbo and ``lastModified`` is when the user last uploaded or deleted an image, or when the user last updated metadata of an image. If the user has not added any images yet, the ``lastModified`` value will be set to the current time on the server.
 
 **Typical response codes:**
 
@@ -280,13 +280,11 @@ where ``added`` is a formatted date of when the image was added to Imbo, ``exten
 
 The ``metadata`` field is only available if you used the ``metadata`` query parameter described above.
 
-Images in the array are ordered on the ``added`` field in a descending fashion.
-
 **Typical response codes:**
 
 * 200 OK
 * 304 Not modified
-* 404 Not found
+* 404 Public key not found
 
 .. _image-resource:
 
@@ -417,7 +415,7 @@ There are some caveats regarding the short URLs:
 2) If the URL used to generate the short URL did not contain an image extension you can use the ``Accept`` header to decide the mime type of the generated image when requesting the short URL.
 3) Short URLs do not support extensions, so you can not append ``.jpg`` to force ``image/jpeg``. If you need to make sure the image is always a JPEG, simply append ``.jpg`` to the URL when generating the short URL.
 
-.. note:: In Imbo only images have short URLs
+.. note:: In Imbo only images have short URL's
 
 .. _metadata-resource:
 
@@ -554,10 +552,22 @@ Access tokens
 
 Access tokens are enforced by an event listener that is enabled in the default configuration file. The access tokens are used to prevent `DoS <http://en.wikipedia.org/wiki/Denial-of-service_attack>`_ attacks so think twice before you disable the event listener.
 
-An access token, when enforced by the event listener, must be supplied in the URI using the ``accessToken`` query parameter and without it all ``GET`` and ``HEAD`` requests will result in a ``400 Bad Request`` response. The value of the ``accessToken`` parameter is a `Hash-based Message Authentication Code <http://en.wikipedia.org/wiki/HMAC>`_ (HMAC). The code is a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of the URI itself using the private key of the user as the secret key. It is very important that the URI is not URL encoded when generating the hash. Below is an example on how to generate a valid access token for a specific image using PHP:
+An access token, when enforced by the event listener, must be supplied in the URI using the ``accessToken`` query parameter and without it, most ``GET`` and ``HEAD`` requests will result in a ``400 Bad Request`` response. The value of the ``accessToken`` parameter is a `Hash-based Message Authentication Code <http://en.wikipedia.org/wiki/HMAC>`_ (HMAC). The code is a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of the URI itself using the private key of the user as the secret key. It is very important that the URI is not URL-encoded when generating the hash. Below is an example on how to generate a valid access token for a specific image using PHP:
 
 .. literalinclude:: ../examples/generateAccessToken.php
     :language: php
+    :linenos:
+
+and Python:
+
+.. literalinclude:: ../examples/generateAccessToken.py
+    :language: python
+    :linenos:
+
+and Ruby:
+
+.. literalinclude:: ../examples/generateAccessToken.rb
+    :language: ruby
     :linenos:
 
 If the event listener enforcing the access token check is removed, Imbo will ignore the ``accessToken`` query parameter completely. If you wish to implement your own form of access token you can do this by implementing an event listener of your own (see :ref:`custom-event-listeners` for more information).
@@ -584,6 +594,18 @@ These elements are concatenated in the above order with ``|`` as a delimiter cha
     :language: php
     :linenos:
 
+and Python (using the `Requests <http://docs.python-requests.org>`_ library):
+
+.. literalinclude:: ../examples/generateSignatureForDelete.py
+    :language: python
+    :linenos:
+
+and Ruby (using the `httpclient <https://rubygems.org/gems/httpclient>`_ gem):
+
+.. literalinclude:: ../examples/generateSignatureForDelete.rb
+    :language: ruby
+    :linenos:
+
 Imbo requires that ``X-Imbo-Authenticate-Timestamp`` is within ± 120 seconds of the current time on the server.
 
 As with the access token the signature check is enforced by an event listener that can also be disabled. If you disable this event listener you effectively open up for writing from anybody, which you probably don't want to do.
@@ -595,9 +617,9 @@ Supported content types
 
 Imbo currently responds with images (jpg, gif and png), `JSON <http://en.wikipedia.org/wiki/JSON>`_ and `XML <http://en.wikipedia.org/wiki/XML>`_, but only accepts images (jpg, gif and png) and JSON as input.
 
-Imbo will do content negotiation using the `Accept <http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html>`_ header found in the request, unless you specify a file extension, in which case Imbo will deliver the type requested without looking at the Accept header.
+Imbo will do content negotiation using the `Accept <http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html>`_ header found in the request, unless you specify a file extension, in which case Imbo will deliver the type requested without looking at the ``Accept`` header.
 
-The default Content-Type for non-image responses is JSON. Examples on this document uses the ``.json`` extension. Change it to ``.xml`` to get the XML representation instead. You can also skip the extension and force a specific Content-Type using the Accept header:
+The default content type for non-image responses is JSON. Examples in this chapter uses the ``.json`` extension. Change it to ``.xml`` to get the XML representation instead. You can also skip the extension and force a specific content type using the ``Accept`` header:
 
 .. code-block:: bash
 
@@ -609,7 +631,7 @@ and
 
     curl -H "Accept: application/json" http://imbo/status
 
-will end up with the same content-type. Use ``application/xml`` for XML.
+will end up with the same content type. Use ``application/xml`` for XML.
 
 If you use JSON you can wrap the content in a function (`JSONP <http://en.wikipedia.org/wiki/JSONP>`_) by using one of the following query parameters:
 
@@ -633,7 +655,7 @@ will result in:
       }
     )
 
-For images the default mime-type is the original mime-type of the image. If you add an ``image/gif`` and fetches that image with ``Accept: */*`` or ``Accept: image/*`` the mime type of the image returned will be ``image/gif``. To choose a different mime type either change the Accept header, or use ``.jpg`` or ``.png`` (for ``image/jpeg`` and ``image/png`` respectively).
+For images the default mime-type is the original mime-type of the image. If you add an ``image/gif`` image and fetch that image with ``Accept: */*`` or ``Accept: image/*`` the mime-type of the image returned will be ``image/gif``. To choose a different mime type either change the ``Accept`` header, or use ``.jpg`` or ``.png`` (for ``image/jpeg`` and ``image/png`` respectively).
 
 Errors
 ------
@@ -642,7 +664,7 @@ When an error occurs Imbo will respond with a fitting HTTP response code along w
 
 .. code-block:: bash
 
-    curl "http://imbo/users/<user>/images/<image>.jpg?t\[\]=foobar"
+    curl -g "http://imbo/users/<user>/images/<image>.jpg?t[]=foobar"
 
 results in:
 
@@ -653,7 +675,7 @@ results in:
         "code": 400,
         "message": "Unknown transformation: foobar",
         "date": "Wed, 12 Dec 2012 21:15:01 GMT",
-        "imboErrorCode":0
+        "imboErrorCode": 0
       },
       "imageIdentifier": "<image>"
     }
