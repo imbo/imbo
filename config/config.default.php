@@ -101,7 +101,7 @@ $config = array(
      *     where 'whitelist' is an array of public keys that the listener *will* trigger for, and
      *     'blacklist' is an array of public keys that the listener *will not* trigger for.
      *
-     * 4) An array with the following keys:
+     * 5) An array with the following keys:
      *
      *   - events (required)
      *   - callback (required)
