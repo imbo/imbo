@@ -54,9 +54,9 @@ The private key can be changed whenever you want as long as you remember to chan
 Database configuration - ``database``
 -------------------------------------
 
-The database adapter you decide to use is responsible for storing metadata and basic image information, like width and height for example, along with the generated short URLs. Imbo ships with some different implementations that you can use. Remember that you will not be able to switch the adapter whenever you want and expect all data to be automatically transferred. Choosing a database adapter should be a long term commitment unless you have migration scripts available.
+The database adapter you decide to use is responsible for storing metadata and basic image information, like width and height for example, along with the generated short URLs. Imbo ships with some different database adapters that you can use. Remember that you will not be able to switch the adapter whenever you want and expect all data to be automatically transferred. Choosing a database adapter should be a long term commitment unless you have migration scripts available.
 
-In the default configuration file the :ref:`default-database-adapter` database adapter is used. You can choose to override this in your configuration file by specifying a different adapter. You can either specify an instance of a database adapter directly, or specify an anonymous function that will return an instance of a database adapter when executed. Which database adapter to use is specified in the ``database`` key in the configuration array:
+In the default configuration file the :ref:`default-database-adapter` database adapter is used. You can choose to override this in your configuration file by specifying a different adapter. You can either specify an instance of a database adapter directly, or specify a closure that will return an instance of a database adapter when executed. Which database adapter to use is specified in the ``database`` key in the configuration array:
 
 .. code-block:: php
 
@@ -78,6 +78,12 @@ In the default configuration file the :ref:`default-database-adapter` database a
 
         // ...
     );
+
+Below you will find documentation on the different database adapters Imbo ships with.
+
+.. contents::
+    :local:
+    :depth: 1
 
 .. _doctrine-database-adapter:
 
@@ -213,7 +219,7 @@ Storage configuration - ``storage``
 
 Storage adapters are responsible for storing the original images you put into Imbo. As with the database adapter it is not possible to simply switch the adapter without having migration scripts available to move the stored images. Choose an adapter with care.
 
-In the default configuration file the :ref:`default-storage-adapter` storage adapter is used. You can choose to override this in your configuration file by specifying a different adapter. You can either specify an instance of a storage adapter directly, or specify an anonymous function that will return an instance of a storage adapter when executed. Which storage adapter to use is specified in the ``storage`` key in the configuration array:
+In the default configuration file the :ref:`default-storage-adapter` storage adapter is used. You can choose to override this in your configuration file by specifying a different adapter. You can either specify an instance of a storage adapter directly, or specify a closure that will return an instance of a storage adapter when executed. Which storage adapter to use is specified in the ``storage`` key in the configuration array:
 
 .. code-block:: php
 
@@ -235,6 +241,12 @@ In the default configuration file the :ref:`default-storage-adapter` storage ada
 
         // ...
     );
+
+Below you will find documentation on the different storage adapters Imbo ships with.
+
+.. contents::
+    :local:
+    :depth: 1
 
 Doctrine
 ++++++++
@@ -398,11 +410,26 @@ More about how to achieve this in the :doc:`../develop/custom_adapters` chapter.
 Event listeners - ``eventListeners``
 ------------------------------------
 
-Imbo also supports event listeners that you can use to hook into Imbo at different phases without having to edit Imbo itself. An event listener is simply a piece of code that will be executed when a certain event is triggered from Imbo. Event listeners are added to the ``eventListeners`` part of the configuration array as associative arrays. The keys are short names used to identify the listeners, and are not really used for anything in the Imbo application, but exists so you can override/disable event listeners specified in the default configuration. If you want to disable some of the default event listeners simply specify the same key in your configuration file and set the value to ``null`` or ``false``.
+Imbo also supports event listeners that you can use to hook into Imbo at different phases without having to edit Imbo itself. An event listener is simply a piece of code that will be executed when a certain event is triggered from Imbo. Event listeners are added to the ``eventListeners`` part of the configuration array as associative arrays. If you want to disable some of the default event listeners simply specify the same key in your configuration file and set the value to ``null`` or ``false``.
 
-Event listeners can be added in the following ways:
+Event listeners can be configured in the following ways:
 
-1) Use an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface:
+1) A string representing a class name of a class implementing the Imbo\EventListener\ListenerInteface interface:
+
+.. code-block:: php
+
+    <?php
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            'accessToken' => 'Imbo\EventListener\AccessToken',
+        ),
+
+        // ...
+    );
+
+2) Use an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface:
 
 .. code-block:: php
 
@@ -417,7 +444,7 @@ Event listeners can be added in the following ways:
         // ...
     );
 
-2) An anonymous function returning an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface:
+3) A closure returning an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface:
 
 .. code-block:: php
 
@@ -434,7 +461,7 @@ Event listeners can be added in the following ways:
         // ...
     );
 
-3) Use an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface together with a public key filter:
+4) Use a class implementing the ``Imbo\EventListener\ListenerInterface`` interface together with an optional public key filter:
 
 .. code-block:: php
 
@@ -446,18 +473,52 @@ Event listeners can be added in the following ways:
             'maxImageSize' => array(
                 'listener' => new Imbo\EventListener\MaxImageSize(1024, 768),
                 'publicKeys' => array(
-                    'include' => array('user'),
-                    // 'exclude' => array('someotheruser'),
+                    'whitelist' => array('user'),
+                    // 'blacklist' => array('someotheruser'),
                 ),
+                // 'params' => array( ... )
             ),
         ),
 
         // ...
     );
 
-where ``listener`` is an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface, and ``publicKeys`` is an array that you can use if you want your listener to only be triggered for some users (public keys). The value of this is an array with one of two keys: ``include`` or ``exclude`` where ``include`` is an array you want your listener to trigger for, and ``exclude`` is an array of users you don't want your listener to trigger for. ``publicKeys`` is optional, and per default the listener will trigger for all users.
+where ``listener`` is one of the following:
 
-4) Use an anonymous function directly:
+a) a string representing a class name of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface
+b) an instance of the ``Imbo\EventListener\ListenerInterface`` interface
+c) a closure returning an instance ``Imbo\EventListener\ListenerInterface``
+
+The ``publicKeys`` element is an array that you can use if you want your listener to only be triggered for some users (public keys). The value of this is an array with two elements, ``whitelist`` and ``blacklist``, where ``whitelist`` is an array of public keys you **want** your listener to trigger for, and ``blacklist`` is an array of public keys you **don't want** your listener to trigger for. ``publicKeys`` is optional, and per default the listener will trigger for all users.
+
+There also exists a ``params`` key that can be used to specify parameters for the event listener, if you choose to specify the listener as a string in the ``listener`` key:
+
+.. code-block:: php
+
+    <?php
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            'maxImageSize' => array(
+                'listener' => 'Imbo\EventListener\MaxImageSize',
+                'publicKeys' => array(
+                    'whitelist' => array('user'),
+                    // 'blacklist' => array('someotheruser'),
+                ),
+                'params' => array(
+                    1024,
+                    768
+                )
+            ),
+        ),
+
+        // ...
+    );
+
+The parameters will be passed to the event listener as separate arguments, and not as an array.
+
+5) Use a closure directly:
 
 .. code-block:: php
 
@@ -473,8 +534,8 @@ where ``listener`` is an instance of a class implementing the ``Imbo\EventListen
                 'events' => array('image.get'),
                 'priority' => 1,
                 'publicKeys' => array(
-                    'include' => array('user'),
-                    // 'exclude' => array('someotheruser'),
+                    'whitelist' => array('user'),
+                    // 'blacklist' => array('someotheruser'),
                 ),
             ),
         ),
@@ -482,9 +543,9 @@ where ``listener`` is an instance of a class implementing the ``Imbo\EventListen
         // ...
     );
 
-where ``callback`` is the code you want executed, and ``events`` is an array of the events you want it triggered for. ``priority`` is the priority of the listener and defaults to 1. The higher the number, the earlier in the chain your listener will be triggered. This number can also be negative. Imbo's internal event listeners uses numbers between 1 and 100. ``publicKeys`` uses the same format as described above. This way of attaching event listeners should mostly be used for quick and temporary solutions.
+where ``callback`` is the code you want executed, and ``events`` is an array of the events you want it triggered for. ``priority`` is the priority of the listener and defaults to 0. The higher the number, the earlier in the chain your listener will be triggered. This number can also be negative. Imbo's internal event listeners uses numbers between 0 and 100. ``publicKeys`` uses the same format as described above. If you use this method, and want your callback to trigger for multiple events with different priorities, specify an associative array in the ``events`` element, where the keys are the event names, and the values are the priorities for the different events. This way of attaching event listeners should mostly be used for quick and temporary solutions.
 
-All event listeners will end up receiving an event object (which implements ``Imbo\EventManager\EventInterface``), that is described in detail in the :ref:`the-event-object` section.
+All event listeners will receive an event object (which implements ``Imbo\EventManager\EventInterface``), that is described in detail in the :ref:`the-event-object` section.
 
 Listeners added by default
 ++++++++++++++++++++++++++
@@ -512,7 +573,7 @@ Read more about these listeners in the :doc:`../develop/event_listeners` chapter
         // ...
     );
 
-Keep in mind that these listeners are added by default for a reason, so make sure you know what it means to remove them before you do so.
+.. warning:: Do not disable these event listeners unless you are absolutely sure about the consequences. Your images can potentially be deleted by anyone.
 
 .. _image-transformations-config:
 
@@ -560,7 +621,7 @@ the ``$params`` array given to the closure will look like this:
     )
 
 
-The return value of the closure must either be an instance of the ``Imbo\Image\Transformation\TransformationInterface`` interface, or code that is callable (for instance another anonymous function, or a class that implements an ``__invoke`` method). If the return value is a callable piece of code it will receive a single parameter which is an instance of ``Imbo\Model\Image``, which is the image you want your transformation to modify.
+The return value of the closure must either be an instance of the ``Imbo\Image\Transformation\TransformationInterface`` interface, or code that is callable (for instance another closure, or a class that implements an ``__invoke`` method). If the return value is a callable piece of code it will receive a single parameter which is an instance of ``Imbo\Model\Image``, which is the image you want your transformation to modify.
 
 Presets
 +++++++
@@ -589,12 +650,12 @@ which can be triggered using the following query parameter:
 
 ``t[]=graythumb``
 
-If you want to implement your own set of image transformation you can see how in the :doc:`../develop/image_transformations` chapter.
+If you want to implement your own set of image transformations you can see how in the :doc:`../develop/image_transformations` chapter.
 
 Custom resources and routes - ``resources`` and ``routes``
 ----------------------------------------------------------
 
-.. warning:: Custom resources and routes is an experimental and advanced way of extending Imbo, and requires extensive knowledge of how Imbo works internally.
+.. warning:: Custom resources and routes is an experimental and advanced way of extending Imbo, and requires extensive knowledge of how Imbo works internally. This feature can potentially be removed in future releases, so only use this for testing purposes.
 
 If you need to create a custom route you can attach a route and a custom resource class using the configuration. Two keys exists for this purpose: ``resources`` and ``routes``:
 
@@ -637,7 +698,7 @@ When a request is made against any of these endpoints Imbo will try to access a 
 2) an instance of a resource class
 3) an anonymous function that, when executed, returns an instance of a resource class
 
-The resource class specified in 2. and returned by 3. must implement the ``Imbo\Resource\ResourceInterface`` interface to be able to response to a request.
+The resource class must implement the ``Imbo\Resource\ResourceInterface`` interface to be able to response to a request.
 
 Below is an example implementation of the ``ImboUsers`` resource used in the above configuration:
 
@@ -645,7 +706,6 @@ Below is an example implementation of the ``ImboUsers`` resource used in the abo
 
     <?php
     use Imbo\Resource\ResourceInterface,
-        Imbo\EventListener\ListenerDefinition,
         Imbo\EventManager\EventInterface,
         Imbo\Model\ListModel;
 
@@ -654,9 +714,9 @@ Below is an example implementation of the ``ImboUsers`` resource used in the abo
             return array('GET');
         }
 
-        public function getDefinition() {
+        public static function getSubscribedEvents() {
             return array(
-                new ListenerDefinition('users.get', array($this, 'get')),
+                'users.get' => 'get',
             );
         }
 
