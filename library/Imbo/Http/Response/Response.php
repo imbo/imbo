@@ -25,13 +25,6 @@ use Imbo\EventManager\EventInterface,
  */
 class Response extends SymfonyResponse {
     /**
-     * Image instance used with the image resource
-     *
-     * @var Model\Image
-     */
-    private $image;
-
-    /**
      * Model instance
      *
      * @var Model\ModelInterface
@@ -55,27 +48,6 @@ class Response extends SymfonyResponse {
      */
     public function setModel(Model\ModelInterface $model = null) {
         $this->model = $model;
-
-        return $this;
-    }
-
-    /**
-     * Get the image instance
-     *
-     * @return Image
-     */
-    public function getImage() {
-        return $this->image;
-    }
-
-    /**
-     * Set an image instance
-     *
-     * @param Image $image An image instance
-     * @return Response
-     */
-    public function setImage(Model\Image $image) {
-        $this->image = $image;
 
         return $this;
     }

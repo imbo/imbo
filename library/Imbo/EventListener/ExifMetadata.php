@@ -49,13 +49,13 @@ class ExifMetadata implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
             // High priority to prevent other listeners from stripping EXIF-data
-            new ListenerDefinition('image.put', array($this, 'populate'), 45),
+            'image.put' => array('populate' => 45),
 
             // When image has been inserted to database, insert metadata
-            new ListenerDefinition('db.image.insert', array($this, 'save'), -100),
+            'db.image.insert' => array('save' => -100),
         );
     }
 

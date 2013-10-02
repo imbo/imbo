@@ -34,7 +34,7 @@ class MaxImageSizeTest extends \PHPUnit_Framework_TestCase {
     /**
      * @dataProvider getDimensions
      * @covers Imbo\EventListener\MaxImageSize::__construct
-     * @covers Imbo\EventListener\MaxImageSize::invoke
+     * @covers Imbo\EventListener\MaxImageSize::enforceMaxSize
      */
     public function testCanResizeImages($maxWidth, $maxHeight, $expectedWidth, $expectedHeight) {
         $listener = new MaxImageSize($maxWidth, $maxHeight);
@@ -49,7 +49,7 @@ class MaxImageSizeTest extends \PHPUnit_Framework_TestCase {
         $event = $this->getMock('Imbo\EventManager\EventInterface');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
 
-        $listener->invoke($event);
+        $listener->enforceMaxSize($event);
 
         $this->assertSame($expectedWidth, $image->getWidth());
         $this->assertSame($expectedHeight, $image->getHeight());

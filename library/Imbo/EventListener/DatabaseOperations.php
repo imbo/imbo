@@ -12,8 +12,7 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Database\DatabaseInterface,
-    Imbo\Container,
-    Imbo\ContainerAware,
+    Imbo\Resource\Images\Query as ImagesQuery,
     Imbo\Model,
     DateTime;
 
@@ -23,36 +22,54 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
-class DatabaseOperations implements ContainerAware, ListenerInterface {
+class DatabaseOperations implements ListenerInterface {
     /**
-     * Service container
+     * An images query object
      *
-     * @var Container
+     * @var ImagesQuery
      */
-    private $container;
+    private $imagesQuery;
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(Container $container) {
-        $this->container = $container;
+    public static function getSubscribedEvents() {
+        return array(
+            'db.image.insert'    => 'insertImage',
+            'db.image.delete'    => 'deleteImage',
+            'db.image.load'      => 'loadImage',
+            'db.images.load'     => 'loadImages',
+            'db.metadata.delete' => 'deleteMetadata',
+            'db.metadata.update' => 'updateMetadata',
+            'db.metadata.load'   => 'loadMetadata',
+            'db.user.load'       => 'loadUser',
+            'db.stats.load'      => 'loadStats',
+        );
     }
 
     /**
-     * {@inheritdoc}
+     * Set the images query
+     *
+     * @param ImagesQuery $query The query object
+     * @return self
      */
-    public function getDefinition() {
-        return array(
-            new ListenerDefinition('db.image.insert', array($this, 'insertImage')),
-            new ListenerDefinition('db.image.delete', array($this, 'deleteImage')),
-            new ListenerDefinition('db.image.load', array($this, 'loadImage')),
-            new ListenerDefinition('db.images.load', array($this, 'loadImages')),
-            new ListenerDefinition('db.metadata.delete', array($this, 'deleteMetadata')),
-            new ListenerDefinition('db.metadata.update', array($this, 'updateMetadata')),
-            new ListenerDefinition('db.metadata.load', array($this, 'loadMetadata')),
-            new ListenerDefinition('db.user.load', array($this, 'loadUser')),
-            new ListenerDefinition('db.stats.load', array($this, 'loadStats')),
-        );
+    public function setImagesQuery(ImagesQuery $query) {
+        $this->imagesQuery = $query;
+
+        return $this;
+    }
+
+    /**
+     * Get the images query
+     *
+     * @return ImagesQuery
+     */
+    public function getImagesQuery() {
+        if (!$this->imagesQuery) {
+            $this->imagesQuery = new ImagesQuery();
+        }
+
+        return $this->imagesQuery;
     }
 
     /**
@@ -96,7 +113,7 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
         $event->getDatabase()->load(
             $request->getPublicKey(),
             $request->getImageIdentifier(),
-            $response->getImage()
+            $response->getModel()
         );
     }
 
@@ -154,8 +171,8 @@ class DatabaseOperations implements ContainerAware, ListenerInterface {
      * @param EventInterface $event An event instance
      */
     public function loadImages(EventInterface $event) {
+        $query = $this->getImagesQuery();
         $params = $event->getRequest()->query;
-        $query = $this->container->get('imagesQuery');
         $returnMetadata = false;
 
         if ($params->has('page')) {

@@ -11,11 +11,8 @@
 namespace Imbo\Http\Response;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
     Imbo\EventListener\ListenerInterface,
     Imbo\Model\Error,
-    Imbo\Container,
-    Imbo\ContainerAware,
     Imbo\Exception;
 
 /**
@@ -25,28 +22,30 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Http
  */
-class ResponseFormatter implements ContainerAware, ListenerInterface {
+class ResponseFormatter implements ListenerInterface {
     /**
-     * Service container
+     * A response writer instance
      *
-     * @var Container
+     * @var ResponseWriter
      */
-    private $container;
+    private $responseWriter;
 
     /**
-     * {@inheritdoc}
+     * Class constructor
+     *
+     * @param ResponseWriter $responseWriter A instance of the respones writer
      */
-    public function getDefinition() {
-        return array(
-            new ListenerDefinition('response.send', array($this, 'send'), 20),
-        );
+    public function __construct(ResponseWriter $responseWriter) {
+        $this->responseWriter = $responseWriter;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(Container $container) {
-        $this->container = $container;
+    public static function getSubscribedEvents() {
+        return array(
+            'response.send' => array('send' => 20),
+        );
     }
 
     /**
@@ -64,16 +63,15 @@ class ResponseFormatter implements ContainerAware, ListenerInterface {
         }
 
         $request = $event->getRequest();
-        $responseWriter = $this->container->get('responseWriter');
 
         try {
-            $responseWriter->write($model, $request, $response);
+            $this->responseWriter->write($model, $request, $response);
         } catch (Exception $exception) {
             $error = Error::createFromException($exception, $request);
             $response->setError($error);
 
             // Write the error in non-strict mode
-            $responseWriter->write($error, $request, $response, false);
+            $this->responseWriter->write($error, $request, $response, false);
         }
     }
 }

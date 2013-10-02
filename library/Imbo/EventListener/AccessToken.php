@@ -77,27 +77,24 @@ class AccessToken implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
-        $callback = array($this, 'invoke');
-        $priority = 100;
+    public static function getSubscribedEvents() {
+        $callbacks = array();
         $events = array(
             'user.get', 'images.get', 'image.get', 'metadata.get',
             'user.head', 'images.head', 'image.head', 'metadata.head'
         );
 
-        $definition = array();
-
-        foreach ($events as $eventName) {
-            $definition[] = new ListenerDefinition($eventName, $callback, $priority);
+        foreach ($events as $event) {
+            $callbacks[$event] = array('checkAccessToken' => 100);
         }
 
-        return $definition;
+        return $callbacks;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function invoke(EventInterface $event) {
+    public function checkAccessToken(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $query = $request->query;

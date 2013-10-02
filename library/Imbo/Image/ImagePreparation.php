@@ -10,14 +10,11 @@
 
 namespace Imbo\Image;
 
-use Imbo\EventListener\ListenerDefinition,
-    Imbo\EventManager\EventInterface,
+use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ImageException,
     Imbo\Exception,
     Imbo\Model\Image,
-    Imbo\Container,
-    Imbo\ContainerAware,
     Imagick,
     ImagickException,
     finfo;
@@ -28,27 +25,13 @@ use Imbo\EventListener\ListenerDefinition,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image
  */
-class ImagePreparation implements ContainerAware, ListenerInterface {
-    /**
-     * Service container
-     *
-     * @var Container
-     */
-    private $container;
-
+class ImagePreparation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('image.put', array($this, 'prepareImage'), 50),
+            'image.put' => array('prepareImage' => 50),
         );
     }
 
@@ -117,7 +100,7 @@ class ImagePreparation implements ContainerAware, ListenerInterface {
         }
 
         // Store relevant information in the image instance and attach it to the request
-        $image = $this->container->get('image');
+        $image = new Image();
         $image->setMimeType($mime)
               ->setExtension($extension)
               ->setBlob($imageBlob)

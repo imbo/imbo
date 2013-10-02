@@ -22,37 +22,30 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
      */
     private $responseFormatter;
 
-    private $container;
+    private $responseWriter;
 
     /**
      * Set up the response formatter
-     *
-     * @covers Imbo\Http\Response\ResponseFormatter::setContainer
      */
     public function setUp() {
-        $this->container = $this->getMock('Imbo\Container');
-        $this->responseFormatter = new ResponseFormatter();
-        $this->responseFormatter->setContainer($this->container);
+        $this->responseWriter = $this->getMockBuilder('Imbo\Http\Response\ResponseWriter')->disableOriginalConstructor()->getMock();
+        $this->responseFormatter = new ResponseFormatter($this->responseWriter);
     }
 
     /**
      * Tear down the response
      */
     public function tearDown() {
-        $this->container = null;
+        $this->responseWriter = null;
         $this->responseFormatter = null;
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::getDefinition
+     * @covers Imbo\Http\Response\ResponseFormatter::getSubscribedEvents
      */
-    public function testReturnsACorrectDefinition() {
-        $definition = $this->responseFormatter->getDefinition();
-        $this->assertInternalType('array', $definition);
-
-        foreach ($definition as $d) {
-            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
-        }
+    public function testReturnsACorrectEventSubscription() {
+        $class = get_class($this->responseFormatter);
+        $this->assertInternalType('array', $class::getSubscribedEvents());
     }
 
     /**
@@ -68,10 +61,8 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $event = $this->getMock('Imbo\EventManager\EventInterface');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->once())->method('getResponse')->will($this->returnValue($response));
-        $responseWriter = $this->getMock('Imbo\Http\Response\ResponseWriter');
-        $responseWriter->expects($this->at(0))->method('write')->with($model, $request, $response)->will($this->throwException($exception));
-        $responseWriter->expects($this->at(1))->method('write')->with($this->isInstanceOf('Imbo\Model\Error'), $request, $response, false);
-        $this->container->expects($this->once())->method('get')->with('responseWriter')->will($this->returnValue($responseWriter));
+        $this->responseWriter->expects($this->at(0))->method('write')->with($model, $request, $response)->will($this->throwException($exception));
+        $this->responseWriter->expects($this->at(1))->method('write')->with($this->isInstanceOf('Imbo\Model\Error'), $request, $response, false);
 
         $this->responseFormatter->send($event);
     }
@@ -86,8 +77,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $event = $this->getMock('Imbo\EventManager\EventInterface');
         $event->expects($this->once())->method('getResponse')->will($this->returnValue($response));
 
-        $responseWriter = $this->getMock('Imbo\Http\Response\ResponseWriter');
-        $responseWriter->expects($this->never())->method('write');
+        $this->responseWriter->expects($this->never())->method('write');
 
         $this->responseFormatter->send($event);
     }
@@ -103,8 +93,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $event = $this->getMock('Imbo\EventManager\EventInterface');
         $event->expects($this->once())->method('getResponse')->will($this->returnValue($response));
 
-        $responseWriter = $this->getMock('Imbo\Http\Response\ResponseWriter');
-        $responseWriter->expects($this->never())->method('write');
+        $this->responseWriter->expects($this->never())->method('write');
 
         $this->responseFormatter->send($event);
     }

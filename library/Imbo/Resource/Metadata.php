@@ -11,7 +11,6 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Model;
 
@@ -32,15 +31,19 @@ class Metadata implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('metadata.get', array($this, 'get')),
-            new ListenerDefinition('metadata.post', array($this, 'post')),
-            new ListenerDefinition('metadata.put', array($this, 'put')),
-            new ListenerDefinition('metadata.delete', array($this, 'delete')),
-            new ListenerDefinition('metadata.head', array($this, 'get')),
-            new ListenerDefinition('metadata.post', array($this, 'validateMetadata'), 10),
-            new ListenerDefinition('metadata.put', array($this, 'validateMetadata'), 10),
+            'metadata.head' => 'get',
+            'metadata.get' => 'get',
+            'metadata.post' => array(
+                'post',
+                'validateMetadata' => 10,
+            ),
+            'metadata.put' => array(
+                'put',
+                'validateMetadata' => 10,
+            ),
+            'metadata.delete' => 'delete',
         );
     }
 

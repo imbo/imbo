@@ -71,26 +71,26 @@ class AccessTokenTest extends ListenerTests {
      * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage Incorrect access token
      * @expectedExceptionCode 400
-     * @covers Imbo\EventListener\AccessToken::invoke
+     * @covers Imbo\EventListener\AccessToken::checkAccessToken
      */
     public function testRequestWithBogusAccessToken() {
         $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(true));
         $this->query->expects($this->once())->method('get')->with('accessToken')->will($this->returnValue('/string'));
-        $this->listener->invoke($this->event);
+        $this->listener->checkAccessToken($this->event);
     }
 
     /**
      * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage Missing access token
      * @expectedExceptionCode 400
-     * @covers Imbo\EventListener\AccessToken::invoke
+     * @covers Imbo\EventListener\AccessToken::checkAccessToken
      * @covers Imbo\EventListener\AccessToken::isWhitelisted
      */
     public function testThrowsExceptionIfAnAccessTokenIsMissingFromTheRequestWhenNotWhitelisted() {
         $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.get'));
         $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(false));
 
-        $this->listener->invoke($this->event);
+        $this->listener->checkAccessToken($this->event);
     }
 
     /**
@@ -169,7 +169,7 @@ class AccessTokenTest extends ListenerTests {
     /**
      * @dataProvider getFilterData
      * @covers Imbo\EventListener\AccessToken::__construct
-     * @covers Imbo\EventListener\AccessToken::invoke
+     * @covers Imbo\EventListener\AccessToken::checkAccessToken
      * @covers Imbo\EventListener\AccessToken::isWhitelisted
      */
     public function testSupportsFilters($filter, $transformations, $whitelisted) {
@@ -182,7 +182,7 @@ class AccessTokenTest extends ListenerTests {
         $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.get'));
         $this->request->expects($this->any())->method('getTransformations')->will($this->returnValue($transformations));
 
-        $listener->invoke($this->event);
+        $listener->checkAccessToken($this->event);
     }
 
     /**
@@ -215,7 +215,7 @@ class AccessTokenTest extends ListenerTests {
 
     /**
      * @dataProvider getAccessTokens
-     * @covers Imbo\EventListener\AccessToken::invoke
+     * @covers Imbo\EventListener\AccessToken::checkAccessToken
      */
     public function testThrowsExceptionOnIncorrectToken($url, $token, $privateKey, $correct) {
         if (!$correct) {
@@ -227,15 +227,15 @@ class AccessTokenTest extends ListenerTests {
         $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue($url));
         $this->request->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
 
-        $this->listener->invoke($this->event);
+        $this->listener->checkAccessToken($this->event);
     }
 
     /**
-     * @covers Imbo\EventListener\AccessToken::invoke
+     * @covers Imbo\EventListener\AccessToken::checkAccessToken
      */
     public function testWillSkipValidationWhenShortUrlHeaderIsPresent() {
         $this->responseHeaders->expects($this->once())->method('has')->with('X-Imbo-ShortUrl')->will($this->returnValue(true));
         $this->query->expects($this->never())->method('has');
-        $this->listener->invoke($this->event);
+        $this->listener->checkAccessToken($this->event);
     }
 }

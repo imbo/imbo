@@ -219,15 +219,20 @@ DATA;
      */
     public function formatStats(Model\Stats $model) {
         $users = '';
-        $total = $this->formatArray(array(
-            'numImages' => $model->getNumImages(),
-            'numBytes' => $model->getNumBytes(),
-        ));
-        $custom = $this->formatArray($model->getCustomStats() ?: array());
+        $numUsers = 0;
 
         foreach ($model->getUsers() as $user => $stats) {
             $users .= '<user publicKey="' . $user . '">' . $this->formatArray($stats) . '</user>';
+            $numUsers++;
         }
+
+        $total = $this->formatArray(array(
+            'numImages' => $model->getNumImages(),
+            'numBytes' => $model->getNumBytes(),
+            'numUsers' => $numUsers,
+        ));
+        $custom = $this->formatArray($model->getCustomStats() ?: array());
+
 
         return <<<STATUS
 <?xml version="1.0" encoding="UTF-8"?>

@@ -24,12 +24,21 @@ abstract class ListenerTests extends \PHPUnit_Framework_TestCase {
      */
     abstract protected function getListener();
 
-    public function testReturnsDefinitions() {
-        $definition = $this->getListener()->getDefinition();
-        $this->assertInternalType('array', $definition);
+    public function testReturnsCorrectEventSubscriptions() {
+        $listener = $this->getListener();
+        $className = get_class($listener);
+        $events = $className::getSubscribedEvents();
+        $this->assertInternalType('array', $events);
 
-        foreach ($definition as $d) {
-            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
+        foreach ($events as $event => $callbacks) {
+            if (is_string($callbacks)) {
+                $this->assertTrue(method_exists($listener, $callbacks), 'Method ' . $callbacks . ' does not exist in class ' . $className);
+            } else {
+                foreach ($callbacks as $method => $priority) {
+                    $this->assertTrue(method_exists($listener, $method), 'Method ' . $method . ' does not exist in class ' . $className);
+                    $this->assertInternalType('integer', $priority);
+                }
+            }
         }
     }
 }

@@ -22,7 +22,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      */
     private $router;
 
-    private $event;
     private $request;
 
     /**
@@ -31,10 +30,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     public function setUp() {
         $this->router = new Router();
         $this->request = $this->getMockBuilder('Imbo\Http\Request\Request')
-                              ->setMethods(array('setResource', 'getPathInfo', 'getMethod'))
+                              ->setMethods(array('getPathInfo', 'getMethod'))
                               ->getMock();
-        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
     }
 
     /**
@@ -43,19 +40,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     public function tearDown() {
         $this->router = null;
         $this->request = null;
-        $this->event = null;
-    }
-
-    /**
-     * @covers Imbo\Router::getDefinition
-     */
-    public function testReturnsACorrectDefinition() {
-        $definition = $this->router->getDefinition();
-        $this->assertInternalType('array', $definition);
-
-        foreach ($definition as $d) {
-            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
-        }
     }
 
     /**
@@ -66,7 +50,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanBeATeaPot() {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('BREW'));
-        $this->router->route($this->event);
+        $this->router->route($this->request);
     }
 
     /**
@@ -77,7 +61,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      */
     public function testThrowsExceptionOnUnsupportedHttpMethod() {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('TRACE'));
-        $this->router->route($this->event);
+        $this->router->route($this->request);
     }
 
     /**
@@ -111,7 +95,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     public function testThrowsExceptionWhenNoRouteMatches($route) {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
-        $this->router->route($this->event);
+        $this->router->route($this->request);
     }
 
     /**
@@ -177,16 +161,16 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Router::route
      */
     public function testCanMatchValidRoutes($route, $resource, $publicKey = null, $imageIdentifier = null, $extension = null) {
-        $this->request->expects($this->once())->method('setResource')->with($resource);
         $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
 
-        $this->router->route($this->event);
+        $this->router->route($this->request);
 
-        $routeInstance = $this->request->getRoute();
+        $route = $this->request->getRoute();
 
-        $this->assertSame($publicKey, $routeInstance->get('publicKey'));
-        $this->assertSame($imageIdentifier, $routeInstance->get('imageIdentifier'));
-        $this->assertSame($extension, $routeInstance->get('extension'));
+        $this->assertSame($publicKey, $route->get('publicKey'));
+        $this->assertSame($imageIdentifier, $route->get('imageIdentifier'));
+        $this->assertSame($extension, $route->get('extension'));
+        $this->assertSame($resource, (string) $route);
     }
 }

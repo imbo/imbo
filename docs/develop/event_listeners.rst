@@ -8,6 +8,7 @@ Events
 
 When implementing an event listener you need to know about the events that Imbo triggers. The most important events are combinations of the accessed resource along with the HTTP method used. Imbo currently provides these resources:
 
+* :ref:`index <index-resource>`
 * :ref:`stats <stats-resource>`
 * :ref:`status <status-resource>`
 * :ref:`user <user-resource>`
@@ -38,7 +39,6 @@ Some other notable events:
 * ``db.metadata.update``
 * ``db.metadata.load``
 * ``db.metadata.delete``
-* ``route``
 * ``response.send``
 
 .. _custom-event-listeners:
@@ -50,7 +50,7 @@ When writing an event listener for Imbo you can choose one of the following appr
 
 1) Implement the ``Imbo\EventListener\ListenerInterface`` interface that comes with Imbo
 2) Implement a callable piece of code, for instance a class with an ``__invoke`` method
-3) Use an anonymous function
+3) Use a `Closure <http://www.php.net/closure>`_
 
 Below you will find examples on the approaches mentioned above.
 
@@ -66,9 +66,9 @@ Below is the complete interface with comments:
     :language: php
     :linenos:
 
-The only method you need to implement is called ``getDefinition`` and that method should return an array of ``Imbo\EventListener\ListenerDefinition`` instances. Each listener definition contains an event name, a callback, a priority and an optional list of public keys, that you can set if you want your listener to only trigger for some users.
+The only method you need to implement is called ``getSubscribedEvents`` and that method should return an array where the keys are event names, and the values are callbacks. You can have several callbacks to the same event, and they can all have specific priorities.
 
-Below is an example of how the :ref:`authenticate-event-listener` event listener implements the ``getDefinition`` method:
+Below is an example of how the :ref:`authenticate-event-listener` event listener implements the ``getSubscribedEvents`` method:
 
 .. code-block:: php
 
@@ -76,32 +76,29 @@ Below is an example of how the :ref:`authenticate-event-listener` event listener
 
     // ...
 
-    public function getDefinition() {
-        $callback = array($this, 'invoke');
-        $priority = 100;
+    public static function getSubscribedEvents() {
+        $callbacks = array();
         $events = array(
             'image.put', 'image.post', 'image.delete',
             'metadata.put', 'metadata.post', 'metadata.delete'
         );
 
-        $definition = array();
-
-        foreach ($events as $eventName) {
-            $definition[] = new ListenerDefinition($eventName, $callback, $priority);
+        foreach ($events as $event) {
+            $callbacks[$event] = array('authenticate' => 100);
         }
 
-        return $definition;
+        return $callbacks;
     }
 
-    public function invoke(Imbo\EventManager\EventInterface $event) {
+    public function authenticate(Imbo\EventManager\EventInterface $event) {
         // Code that handles all events this listener subscribes to
     }
 
     // ...
 
-The ``getDefinition`` method above has an array of event names to subscribe to and creates a listener definition for each of them, attaching the same callback for all of them along with a fixed priority. The higher the priority, the earlier in the chain the event listener will kick in. Last it simply returns the array of listener definitions.
+In the snippet above the same method (``authenticate``) is attached to several events. The priority used is 100, which means it's triggered early in the application flow.
 
-The ``invoke`` method, when executed, receives an instance of :ref:`the event object <the-event-object>` that it can work with. The fact that the above code only uses a single callback for all events is an implementation detail. You can use different callbacks for all events if you want to.
+The ``authenticate`` method, when executed, receives an instance of :ref:`the event object <the-event-object>` that it can work with. The fact that the above code only uses a single callback for all events is an implementation detail. You can use different callbacks for all events if you want to.
 
 Use a class with an ``__invoke`` method
 +++++++++++++++++++++++++++++++++++++++
@@ -117,12 +114,12 @@ You can also keep the listener definition code out of the event listener entirel
         }
     }
 
-where the ``$event`` object is the same as the one passed to the ``invoke`` method in the previous example.
+where the ``$event`` object is the same as the one passed to the ``authenticate`` method in the previous example.
 
-Use an anonymous function
-+++++++++++++++++++++++++
+Use a Closure
++++++++++++++
 
-For testing and/or debugging purposes you can also write the event listener directly in the configuration, by using an anonymous function:
+For testing and/or debugging purposes you can also write the event listener directly in the configuration, by using a `Closure <http://www.php.net/closure>`_:
 
 .. code-block:: php
 
@@ -245,9 +242,7 @@ This event listener is included in the default configuration file without specif
         // ...
 
         'eventListeners' => array(
-            'accessToken' => function() {
-                return new Imbo\EventListener\AccessToken();
-            },
+            'accessToken' => 'Imbo\EventListener\AccessToken',
         ),
 
         // ...
@@ -280,9 +275,7 @@ This event listener does not support any parameters and is enabled per default l
         // ...
 
         'eventListeners' => array(
-            'authenticate' => function() {
-                return new Imbo\EventListener\Authenticate();
-            },
+            'authenticate' => 'Imbo\EventListener\Authenticate',
         ),
 
         // ...
@@ -400,7 +393,8 @@ This event listener enables caching of image transformations. Read more about im
 
 To achieve this the listener subscribes to the following events:
 
-* ``image.get`` (both before and after the main application logic)
+* ``image.get``
+* ``response.send``
 * ``image.delete``
 
 The event listener has one parameter:
@@ -485,6 +479,7 @@ This event listener enables caching of metadata fetched from the backend so othe
 * ``db.metadata.load``
 * ``db.metadata.delete``
 * ``db.metadata.update``
+* ``db.image.delete``
 
 and has the following parameters:
 
@@ -523,12 +518,15 @@ This listener is enabled per default, and only allows ``127.0.0.1`` and ``::1`` 
         // ...
 
         'eventListeners' => array(
-            'statsAccess' => function() {
-                return new Imbo\EventListener\StatsAccess(array(
-                    'whitelist' => array('127.0.0.1', '::1'),
-                    'blacklist' => array(),
-                ));
-            },
+            'statsAccess' => array(
+                'listener' => 'Imbo\EventListener\StatsAccess',
+                'params' => array(
+                    array(
+                        'whitelist' => array('127.0.0.1', '::1'),
+                        'blacklist' => array(),
+                    )
+                ),
+            ),
         ),
 
         // ...
@@ -555,9 +553,7 @@ The event listener has the following parameters:
         // ...
 
         'eventListeners' => array(
-            'hashTwo' => function() {
-                return new Imbo\EventListener\VarnishHashTwo();
-            },
+            'hashTwo' => 'Imbo\EventListener\VarnishHashTwo',
         ),
 
         // ...

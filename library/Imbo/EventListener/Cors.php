@@ -31,11 +31,14 @@ class Cors implements ListenerInterface {
     private $params = array(
         'allowedOrigins' => array(),
         'allowedMethods' => array(
+            'index'    => array('GET', 'HEAD'),
             'image'    => array('GET', 'HEAD'),
             'images'   => array('GET', 'HEAD'),
             'metadata' => array('GET', 'HEAD'),
             'status'   => array('GET', 'HEAD'),
+            'stats'    => array('GET', 'HEAD'),
             'user'     => array('GET', 'HEAD'),
+            'shorturl' => array('GET', 'HEAD'),
         ),
         'maxAge'         => 3600,
     );
@@ -60,22 +63,39 @@ class Cors implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
-        $definition = array();
+    public static function getSubscribedEvents() {
+        // Enable the event listener for all resources/methods. We will end up with a lot more
+        // registered events than actually needed, but the parameters specifying which methods we
+        // want is not available
+        $resources = array(
+            'image',
+            'shorturl',
+            'status',
+            'images',
+            'metadata',
+            'user',
+            'stats',
+            'index'
+        );
+        $methods = array(
+            'GET',
+            'POST',
+            'PUT',
+            'HEAD',
+            'DELETE',
+            'OPTIONS',
+        );
 
-        // Enable the event listener only for resources and methods specified
-        foreach ($this->params['allowedMethods'] as $resource => $methods) {
+        $events = array();
+
+        foreach ($resources as $resource) {
             foreach ($methods as $method) {
                 $event = $resource . '.' . strtolower($method);
-                $definition[] = new ListenerDefinition($event, array($this, 'invoke'), 20);
+                $events[$event] = array('invoke' => 20);
             }
-
-            // Always enable the listener for the OPTIONS method
-            $event = $resource . '.options';
-            $definition[] = new ListenerDefinition($event, array($this, 'options'), 20);
         }
 
-        return $definition;
+        return $events;
     }
 
     /**
@@ -93,7 +113,7 @@ class Cors implements ListenerInterface {
         }
 
         $response = $event->getResponse();
-        $resource = $request->getResource();
+        $resource = (string) $request->getRoute();
 
         $allowedMethods = array('OPTIONS');
 
@@ -119,7 +139,17 @@ class Cors implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function invoke(EventInterface $event) {
-        $origin = $event->getRequest()->headers->get('Origin', '*');
+        $request = $event->getRequest();
+        $resource = (string) $request->getRoute();
+        $method = $request->getMethod();
+        $allowed = $this->params['allowedMethods'];
+
+        if (!isset($allowed[$resource]) || !in_array($method, $allowed[$resource])) {
+            // The listener is not configured for the current method/resource combination
+            return;
+        }
+
+        $origin = $request->headers->get('Origin', '*');
 
         // Fall back if the passed origin is not allowed
         if (!$this->originIsAllowed($origin)) {

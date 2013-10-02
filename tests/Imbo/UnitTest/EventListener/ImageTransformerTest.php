@@ -45,7 +45,7 @@ class ImageTransformerTest extends ListenerTests {
         $this->image = $this->getMock('Imbo\Model\Image');
         $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
-        $this->response->expects($this->any())->method('getImage')->will($this->returnValue($this->image));
+        $this->response->expects($this->any())->method('getModel')->will($this->returnValue($this->image));
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
