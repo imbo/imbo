@@ -149,7 +149,7 @@ class Cors implements ListenerInterface {
             return;
         }
 
-        $origin = $event->getRequest()->headers->get('Origin', '*');
+        $origin = $request->headers->get('Origin', '*');
 
         // Fall back if the passed origin is not allowed
         if (!$this->originIsAllowed($origin)) {
