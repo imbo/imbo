@@ -12,7 +12,6 @@ namespace Imbo\Resource;
 
 use Imbo\Exception\ResourceException,
     Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
     Imbo\Model;
 
 /**
@@ -32,12 +31,12 @@ class Image implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('image.get', array($this, 'get')),
-            new ListenerDefinition('image.head', array($this, 'get')),
-            new ListenerDefinition('image.delete', array($this, 'delete')),
-            new ListenerDefinition('image.put', array($this, 'put')),
+            'image.get' => 'get',
+            'image.head' => 'get',
+            'image.delete' => 'delete',
+            'image.put' => 'put',
         );
     }
 
@@ -95,9 +94,11 @@ class Image implements ResourceInterface {
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
 
-        $image = $response->getImage();
+        $image = new Model\Image();
         $image->setImageIdentifier($imageIdentifier)
               ->setPublicKey($publicKey);
+
+        $response->setModel($image);
 
         $eventManager->trigger('db.image.load');
         $eventManager->trigger('storage.image.load');
@@ -126,9 +127,5 @@ class Image implements ResourceInterface {
 
         // Trigger possible image transformations
         $eventManager->trigger('image.transform');
-
-        // Fetch the image once more as event listeners might have set a new instance during the
-        // transformation phase
-        $response->setModel($response->getImage());
     }
 }

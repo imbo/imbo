@@ -27,32 +27,11 @@ class EventTest extends \PHPUnit_Framework_TestCase {
      */
     private $event;
 
-    private $name = 'some.event.name';
-    private $container;
-    private $request;
-    private $response;
-    private $database;
-    private $storage;
-    private $manager;
-    private $config = array('config' => 'value');
-
     /**
      * Set up the event instance
-     *
-     * @covers Imbo\EventManager\Event::__construct
-     * @covers Imbo\EventManager\Event::setName
-     * @covers Imbo\EventManager\Event::setContainer
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
-        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
-        $this->manager = $this->getMock('Imbo\EventManager\EventManagerInterface');
-        $this->container = $this->getMock('Imbo\Container');
-
-        $this->event = new Event($this->name);
-        $this->event->setContainer($this->container);
+        $this->event = new Event();
     }
 
     /**
@@ -60,39 +39,6 @@ class EventTest extends \PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->event = null;
-        $this->request = null;
-        $this->response = null;
-        $this->database = null;
-        $this->storage = null;
-        $this->manager = null;
-        $this->event = null;
-    }
-
-    /**
-     * @covers Imbo\EventManager\Event::__construct
-     * @covers Imbo\EventManager\Event::getName
-     * @covers Imbo\EventManager\Event::getRequest
-     * @covers Imbo\EventManager\Event::getResponse
-     * @covers Imbo\EventManager\Event::getDatabase
-     * @covers Imbo\EventManager\Event::getStorage
-     * @covers Imbo\EventManager\Event::getManager
-     * @covers Imbo\EventManager\Event::getConfig
-     */
-    public function testCanFetchDependencies() {
-        $this->container->expects($this->at(0))->method('get')->with('request')->will($this->returnValue($this->request));
-        $this->container->expects($this->at(1))->method('get')->with('response')->will($this->returnValue($this->response));
-        $this->container->expects($this->at(2))->method('get')->with('database')->will($this->returnValue($this->database));
-        $this->container->expects($this->at(3))->method('get')->with('storage')->will($this->returnValue($this->storage));
-        $this->container->expects($this->at(4))->method('get')->with('eventManager')->will($this->returnValue($this->manager));
-        $this->container->expects($this->at(5))->method('get')->with('config')->will($this->returnValue($this->config));
-
-        $this->assertSame($this->name, $this->event->getName());
-        $this->assertSame($this->request, $this->event->getRequest());
-        $this->assertSame($this->response, $this->event->getResponse());
-        $this->assertSame($this->database, $this->event->getDatabase());
-        $this->assertSame($this->storage, $this->event->getStorage());
-        $this->assertSame($this->manager, $this->event->getManager());
-        $this->assertSame($this->config, $this->event->getConfig());
     }
 
     /**
@@ -105,5 +51,81 @@ class EventTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->event->propagationIsStopped());
         $this->assertSame($this->event, $this->event->stopPropagation(false));
         $this->assertFalse($this->event->propagationIsStopped());
+    }
+
+    /**
+     * @covers Imbo\EventManager\Event::getName
+     * @covers Imbo\EventManager\Event::setName
+     */
+    public function testCanSetAndGetName() {
+        $this->assertNull($this->event->getName());
+        $this->assertSame($this->event, $this->event->setName('name'));
+        $this->assertSame('name', $this->event->getName());
+    }
+
+    /**
+     * @covers Imbo\EventManager\Event::getRequest
+     * @covers Imbo\EventManager\Event::setRequest
+     */
+    public function testCanSetAndGetRequest() {
+        $this->assertNull($this->event->getRequest());
+        $request = $this->getMock('Imbo\Http\Request\Request');
+        $this->assertSame($this->event, $this->event->setRequest($request));
+        $this->assertSame($request, $this->event->getRequest());
+    }
+
+    /**
+     * @covers Imbo\EventManager\Event::getResponse
+     * @covers Imbo\EventManager\Event::setResponse
+     */
+    public function testCanSetAndGetResponse() {
+        $this->assertNull($this->event->getResponse());
+        $response = $this->getMock('Imbo\Http\Response\Response');
+        $this->assertSame($this->event, $this->event->setResponse($response));
+        $this->assertSame($response, $this->event->getResponse());
+    }
+
+    /**
+     * @covers Imbo\EventManager\Event::getDatabase
+     * @covers Imbo\EventManager\Event::setDatabase
+     */
+    public function testCanSetAndGetDatabase() {
+        $this->assertNull($this->event->getDatabase());
+        $adapter = $this->getMock('Imbo\Database\DatabaseInterface');
+        $this->assertSame($this->event, $this->event->setDatabase($adapter));
+        $this->assertSame($adapter, $this->event->getDatabase());
+    }
+
+    /**
+     * @covers Imbo\EventManager\Event::getStorage
+     * @covers Imbo\EventManager\Event::setStorage
+     */
+    public function testCanSetAndGetStorage() {
+        $this->assertNull($this->event->getStorage());
+        $adapter = $this->getMock('Imbo\Storage\StorageInterface');
+        $this->assertSame($this->event, $this->event->setStorage($adapter));
+        $this->assertSame($adapter, $this->event->getStorage());
+    }
+
+    /**
+     * @covers Imbo\EventManager\Event::getManager
+     * @covers Imbo\EventManager\Event::setManager
+     */
+    public function testCanSetAndGetEventManager() {
+        $this->assertNull($this->event->getManager());
+        $manager = $this->getMockBuilder('Imbo\EventManager\EventManager')->disableOriginalConstructor()->getMock();
+        $this->assertSame($this->event, $this->event->setManager($manager));
+        $this->assertSame($manager, $this->event->getManager());
+    }
+
+    /**
+     * @covers Imbo\EventManager\Event::getConfig
+     * @covers Imbo\EventManager\Event::setConfig
+     */
+    public function testCanSetAndGetConfig() {
+        $this->assertNull($this->event->getConfig());
+        $config = array('foo' => 'bar');
+        $this->assertSame($this->event, $this->event->setConfig($config));
+        $this->assertSame($config, $this->event->getConfig());
     }
 }

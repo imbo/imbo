@@ -24,11 +24,11 @@ class StorageOperations implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('storage.image.delete', array($this, 'deleteImage')),
-            new ListenerDefinition('storage.image.load', array($this, 'loadImage')),
-            new ListenerDefinition('storage.image.insert', array($this, 'insertImage')),
+            'storage.image.delete' => 'deleteImage',
+            'storage.image.load' => 'loadImage',
+            'storage.image.insert' => 'insertImage',
         );
     }
 
@@ -58,7 +58,7 @@ class StorageOperations implements ListenerInterface {
         $lastModified = $storage->getLastModified($publicKey, $imageIdentifier);
 
         $response->setLastModified($lastModified)
-                 ->getImage()->setBlob($imageData);
+                 ->getModel()->setBlob($imageData);
     }
 
     /**

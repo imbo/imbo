@@ -64,16 +64,16 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
             // Look for images in the cache before transformations occur
-            new ListenerDefinition('image.get', array($this, 'loadFromCache'), 20),
+            'image.get' => array('loadFromCache' => 20),
 
             // Store images in the cache before they are sent to the user agent
-            new ListenerDefinition('response.send', array($this, 'storeInCache'), 10),
+            'response.send' => array('storeInCache' => 10),
 
             // Remove from the cache when an image is deleted from Imbo
-            new ListenerDefinition('image.delete', array($this, 'deleteFromCache'), 10),
+            'image.delete' => array('deleteFromCache' => 10),
         );
     }
 

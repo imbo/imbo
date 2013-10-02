@@ -1,5 +1,4 @@
 build
-phpunit.xml
 composer.phar
 vendor
 docs/_build

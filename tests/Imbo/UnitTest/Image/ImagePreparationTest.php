@@ -24,21 +24,16 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
 
     private $request;
     private $event;
-    private $container;
 
     /**
      * Set up the image preparation instance
-     *
-     * @covers Imbo\Image\ImagePreparation::setContainer
      */
     public function setUp() {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->container = $this->getMock('Imbo\Container');
         $this->event = $this->getMock('Imbo\EventManager\EventInterface');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
 
         $this->prepare = new ImagePreparation();
-        $this->prepare->setContainer($this->container);
     }
 
     /**
@@ -47,20 +42,15 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     public function tearDown() {
         $this->preparation = null;
         $this->request = null;
-        $this->container = null;
         $this->event = null;
     }
 
     /**
-     * @covers Imbo\Image\ImagePreparation::getDefinition
+     * @covers Imbo\Image\ImagePreparation::getSubscribedEvents
      */
     public function testReturnsACorrectDefinition() {
-        $definition = $this->prepare->getDefinition();
-        $this->assertInternalType('array', $definition);
-
-        foreach ($definition as $d) {
-            $this->assertInstanceOf('Imbo\EventListener\ListenerDefinition', $d);
-        }
+        $class = get_class($this->prepare);
+        $this->assertInternalType('array', $class::getSubscribedEvents());
     }
 
     /**
@@ -141,17 +131,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
 
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue($imageData));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-
-        $image = $this->getMock('Imbo\Model\Image');
-        $this->container->expects($this->once())->method('get')->with('image')->will($this->returnValue($image));
-
-        $this->request->expects($this->once())->method('setImage')->with($image);
-
-        $image->expects($this->once())->method('setMimeType')->with('image/png')->will($this->returnSelf());
-        $image->expects($this->once())->method('setExtension')->with('png')->will($this->returnSelf());
-        $image->expects($this->once())->method('setBlob')->with($imageData)->will($this->returnSelf());
-        $image->expects($this->once())->method('setWidth')->with(665)->will($this->returnSelf());
-        $image->expects($this->once())->method('setHeight')->with(463)->will($this->returnSelf());
+        $this->request->expects($this->once())->method('setImage')->with($this->isInstanceOf('Imbo\Model\Image'));
 
         $this->prepare->prepareImage($this->event);
     }

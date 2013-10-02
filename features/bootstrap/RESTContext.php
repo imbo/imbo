@@ -290,6 +290,14 @@ class RESTContext extends BehatContext {
     }
 
     /**
+     * @Then /^the "([^"]*)" response header does not exist$/
+     */
+    public function assertHeaderDoesNotExist($header) {
+        $response = $this->getLastResponse();
+        assertFalse($response->hasHeader($header), 'The "' . $header . '" response header should not exist');
+    }
+
+    /**
      * @Given /^I attach "([^"]*)" to the request body$/
      */
     public function attachFileToRequestBody($path) {

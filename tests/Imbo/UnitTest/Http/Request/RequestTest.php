@@ -152,15 +152,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getResource
-     * @covers Imbo\Http\Request\Request::setResource
-     */
-    public function testSetGetResource() {
-        $this->assertSame($this->request, $this->request->setResource('metadata'));
-        $this->assertSame('metadata', $this->request->getResource());
-    }
-
-    /**
      * @covers Imbo\Http\Request\Request::getImage
      * @covers Imbo\Http\Request\Request::setImage
      */

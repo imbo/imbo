@@ -10,8 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition;
+use Imbo\EventManager\EventInterface;
 
 /**
  * Images resource
@@ -40,10 +39,10 @@ class Images implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('images.get', array($this, 'get')),
-            new ListenerDefinition('images.head', array($this, 'get')),
+            'images.get' => 'get',
+            'images.head' => 'get',
         );
     }
 

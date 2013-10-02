@@ -11,7 +11,6 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
     Imbo\Exception\ResourceException,
     Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -33,18 +32,18 @@ class ShortUrl implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
             // Generate and/or fetch short URL
-            new ListenerDefinition('shorturl.get', array($this, 'get')),
-            new ListenerDefinition('shorturl.head', array($this, 'get')),
+            'shorturl.get' => 'get',
+            'shorturl.head' => 'get',
 
             // Add a short URL header to the response
-            new ListenerDefinition('image.get', array($this, 'addShortUrlHeader')),
-            new ListenerDefinition('image.head', array($this, 'addShortUrlHeader')),
+            'image.get' => 'addShortUrlHeader',
+            'image.head' => 'addShortUrlHeader',
 
             // Remove short URLs
-            new ListenerDefinition('image.delete', array($this, 'deleteShortUrls')),
+            'image.delete' => 'deleteShortUrls',
         );
     }
 

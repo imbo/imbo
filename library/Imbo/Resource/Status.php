@@ -11,7 +11,6 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
     Imbo\Model,
     DateTime,
     DateTimeZone;
@@ -36,10 +35,10 @@ class Status implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('status.get', array($this, 'get')),
-            new ListenerDefinition('status.head', array($this, 'get')),
+            'status.get' => 'get',
+            'status.head' => 'get',
         );
     }
 

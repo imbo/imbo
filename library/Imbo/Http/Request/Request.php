@@ -37,14 +37,6 @@ class Request extends SymfonyRequest {
     private $image;
 
     /**
-     * The currently requested resource name (as defined by the constants in
-     * Imbo\Resource\ResourceInterface).
-     *
-     * @var string
-     */
-    private $resource;
-
-    /**
      * Array of transformations
      *
      * @var array
@@ -179,27 +171,6 @@ class Request extends SymfonyRequest {
      */
     public function getExtension() {
         return $this->route ? $this->route->get('extension') : null;
-    }
-
-    /**
-     * Set the resource name (one of the constants defined in Imbo\Resource\ResourceInterface)
-     *
-     * @param string $resource The name of the resource
-     * @return Request
-     */
-    public function setResource($resource) {
-        $this->resource = $resource;
-
-        return $this;
-    }
-
-    /**
-     * Get the resource name
-     *
-     * @return string
-     */
-    public function getResource() {
-        return $this->resource;
     }
 
     /**

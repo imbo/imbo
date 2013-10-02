@@ -14,8 +14,6 @@ use Imbo\Http\Request\Request,
     Imbo\Http\Response\Formatter,
     Imbo\Http\ContentNegotiation,
     Imbo\Exception\RuntimeException,
-    Imbo\Container,
-    Imbo\ContainerAware,
     Imbo\Model,
     Symfony\Component\HttpFoundation\AcceptHeader;
 
@@ -25,26 +23,26 @@ use Imbo\Http\Request\Request,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Http
  */
-class ResponseWriter implements ContainerAware {
-    /**
-     * Service container
-     *
-     * @var Container
-     */
-    private $container;
-
+class ResponseWriter {
     /**
      * Supported content types and the associated formatter class name or instance
      *
      * @var array
      */
     private $supportedTypes = array(
-        'application/json' => 'jsonFormatter',
-        'application/xml'  => 'xmlFormatter',
-        'image/gif'        => 'gifFormatter',
-        'image/png'        => 'pngFormatter',
-        'image/jpeg'       => 'jpegFormatter',
+        'application/json' => 'json',
+        'application/xml'  => 'xml',
+        'image/gif'        => 'gif',
+        'image/png'        => 'png',
+        'image/jpeg'       => 'jpeg',
     );
+
+    /**
+     * Formatters
+     *
+     * @var array
+     */
+    private $formatters;
 
     /**
      * Mapping from extensions to mime types
@@ -97,10 +95,13 @@ class ResponseWriter implements ContainerAware {
     private $defaultMimeType = 'application/json';
 
     /**
-     * {@inheritdoc}
+     * Class constructor
+     *
+     * @param array $formatters An array of formatters to use
      */
-    public function setContainer(Container $container) {
-        $this->container = $container;
+    public function __construct(array $formatters, ContentNegotiation $contentNegotiation) {
+        $this->formatters = $formatters;
+        $this->contentNegotiation = $contentNegotiation;
     }
 
     /**
@@ -115,12 +116,11 @@ class ResponseWriter implements ContainerAware {
      * @throws RuntimeException
      */
     public function write(Model\ModelInterface $model, Request $request, Response $response, $strict = true) {
-        // The entry of the formatter to fetch from the container
-        $entry = null;
+        $formatter = null;
         $extension = $request->getExtension();
-        $resource = $request->getResource();
+        $routeName = (string) $request->getRoute();
 
-        if ($extension && !($model instanceof Model\Error && $resource === 'image')) {
+        if ($extension && !($model instanceof Model\Error && $routeName === 'image')) {
             // The user agent wants a specific type. Skip content negotiation completely, but not
             // if the request is against the image resource, and ended up as an error, because then
             // Imbo would try to render the error as an image.
@@ -130,14 +130,12 @@ class ResponseWriter implements ContainerAware {
                 $mime = $this->extensionsToMimeType[$extension];
             }
 
-            $entry = $this->supportedTypes[$mime];
+            $formatter = $this->supportedTypes[$mime];
         } else {
             // Set Vary to Accept since we are doing content negotiation based on Accept
             $response->setVary('Accept');
 
             // No extension have been provided
-            $contentNegotiation = $this->container->get('contentNegotiation');
-
             $acceptableTypes = array();
 
             foreach (AcceptHeader::fromString($request->headers->get('Accept', '*/*'))->all() as $item) {
@@ -174,10 +172,10 @@ class ResponseWriter implements ContainerAware {
             }
 
             foreach ($types as $mime) {
-                if (($q = $contentNegotiation->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
+                if (($q = $this->contentNegotiation->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
                     $maxQ = $q;
                     $match = true;
-                    $entry = $this->supportedTypes[$mime];
+                    $formatter = $this->supportedTypes[$mime];
                 }
             }
 
@@ -188,12 +186,12 @@ class ResponseWriter implements ContainerAware {
             } else if (!$match) {
                 // There was no match but we don't want to be an ass about it. Send a response
                 // anyway (allowed according to RFC2616, section 10.4.7)
-                $entry = $this->supportedTypes[$this->defaultMimeType];
+                $formatter = $this->supportedTypes[$this->defaultMimeType];
             }
         }
 
         // Create an instance of the formatter
-        $formatter = $this->container->get($entry);
+        $formatter = $this->formatters[$formatter];
         $formattedData = $formatter->format($model);
         $contentType = $formatter->getContentType();
 

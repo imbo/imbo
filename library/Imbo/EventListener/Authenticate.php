@@ -41,27 +41,24 @@ class Authenticate implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
-        $callback = array($this, 'invoke');
-        $priority = 100;
+    public static function getSubscribedEvents() {
+        $callbacks = array();
         $events = array(
             'image.put', 'image.post', 'image.delete',
             'metadata.put', 'metadata.post', 'metadata.delete'
         );
 
-        $definition = array();
-
-        foreach($events as $eventName) {
-            $definition[] = new ListenerDefinition($eventName, $callback, $priority);
+        foreach ($events as $event) {
+            $callbacks[$event] = array('authenticate' => 100);
         }
 
-        return $definition;
+        return $callbacks;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function invoke(EventInterface $event) {
+    public function authenticate(EventInterface $event) {
         $response = $event->getResponse();
         $request = $event->getRequest();
 

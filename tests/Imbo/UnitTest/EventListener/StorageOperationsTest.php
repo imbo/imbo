@@ -83,7 +83,7 @@ class StorageOperationsTest extends ListenerTests {
         $this->response->expects($this->once())->method('setLastModified')->with($date)->will($this->returnSelf());
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('setBlob')->with('image data');
-        $this->response->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
 
         $this->listener->loadImage($this->event);
     }

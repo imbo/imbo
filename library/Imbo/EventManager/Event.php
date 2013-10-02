@@ -10,8 +10,10 @@
 
 namespace Imbo\EventManager;
 
-use Imbo\Container,
-    Imbo\ContainerAware;
+use Imbo\Http\Request\Request,
+    Imbo\Http\Response\Response,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface;
 
 /**
  * Event class
@@ -19,7 +21,7 @@ use Imbo\Container,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event
  */
-class Event implements ContainerAware, EventInterface {
+class Event implements EventInterface {
     /**
      * Name of the current event
      *
@@ -28,11 +30,46 @@ class Event implements ContainerAware, EventInterface {
     private $name;
 
     /**
-     * Container instance
+     * Current request
      *
-     * @var Container
+     * @var Request
      */
-    private $container;
+    private $request;
+
+    /**
+     * Current response
+     *
+     * @var Response
+     */
+    private $response;
+
+    /**
+     * Datebase adapter
+     *
+     * @var DatabaseInterface
+     */
+    private $database;
+
+    /**
+     * Storage adapter
+     *
+     * @var StorageInterface
+     */
+    private $storage;
+
+    /**
+     * Configuration
+     *
+     * @var array
+     */
+    private $config;
+
+    /**
+     * The eventmanager
+     *
+     * @var EventManager
+     */
+    private $manager;
 
     /**
      * Propagation flag
@@ -55,13 +92,6 @@ class Event implements ContainerAware, EventInterface {
     /**
      * {@inheritdoc}
      */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function setName($name) {
         $this->name = $name;
 
@@ -78,43 +108,97 @@ class Event implements ContainerAware, EventInterface {
     /**
      * {@inheritdoc}
      */
+    public function setRequest(Request $request) {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getRequest() {
-        return $this->container->get('request');
+        return $this->request;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setResponse(Response $response) {
+        $this->response = $response;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
     public function getResponse() {
-        return $this->container->get('response');
+        return $this->response;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDatabase(DatabaseInterface $database) {
+        $this->database = $database;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
     public function getDatabase() {
-        return $this->container->get('database');
+        return $this->database;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setStorage(StorageInterface $storage) {
+        $this->storage = $storage;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
     public function getStorage() {
-        return $this->container->get('storage');
+        return $this->storage;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setManager(EventManager $manager) {
+        $this->manager = $manager;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
     public function getManager() {
-        return $this->container->get('eventManager');
+        return $this->manager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setConfig(array $config) {
+        $this->config = $config;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
     public function getConfig() {
-        return $this->container->get('config');
+        return $this->config;
     }
 
     /**

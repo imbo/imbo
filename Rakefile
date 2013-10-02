@@ -166,9 +166,9 @@ desc "Run PHPUnit tests"
 task :phpunit do
   begin
     if ENV["TRAVIS"] == "true"
-      sh %{vendor/bin/phpunit --verbose -c phpunit.xml.travis}
+      sh %{vendor/bin/phpunit --verbose -c tests/phpunit.xml.travis}
     else
-      sh %{vendor/bin/phpunit --verbose --coverage-html build/coverage --coverage-clover build/logs/clover.xml --log-junit build/logs/junit.xml}
+      sh %{vendor/bin/phpunit --verbose -c tests --coverage-html build/coverage --coverage-clover build/logs/clover.xml --log-junit build/logs/junit.xml}
     end
   rescue Exception
     exit 1
@@ -177,7 +177,7 @@ end
 
 desc "Run functional tests"
 task :behat do
-  profile = ENV["travis"] == "true" ? "travis" : "default"
+  profile = ENV["TRAVIS"] == "true" ? "travis" : "default"
 
   begin
     sh %{vendor/bin/behat --strict --profile #{profile}}
