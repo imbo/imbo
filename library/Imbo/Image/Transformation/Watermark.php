@@ -89,7 +89,7 @@ class Watermark extends Transformation implements ImageReaderAware, Transformati
      *
      * @param array $params Parameters for this transformation
      */
-    public function __construct(array $params) {
+    public function __construct(array $params = array()) {
         $this->width = !empty($params['width']) ? (int) $params['width'] : 0;
         $this->height = !empty($params['height']) ? (int) $params['height'] : 0;
 
