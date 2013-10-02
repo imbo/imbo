@@ -165,10 +165,6 @@ class StatsAccessTest extends ListenerTests {
 
     /**
      * @dataProvider getFilterData
-     * @covers Imbo\EventListener\StatsAccess::__construct
-     * @covers Imbo\EventListener\StatsAccess::checkAccess
-     * @covers Imbo\EventListener\StatsAccess::isWhitelisted
-     * @covers Imbo\EventListener\StatsAccess::isBlacklisted
      */
     public function testCanUseDifferentFilters($clientIp, $whitelist, $blacklist, $hasAccess) {
         $this->request->expects($this->once())
