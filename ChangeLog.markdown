@@ -11,6 +11,8 @@ Imbo-0.4.0
 ----------
 __N/A__
 
+New features:
+
 * #205: Added a Varnish HashTwo event listener
 * #204: Images resource should be able to retrieve only specific fields
 * #201: Added an index resource
@@ -22,6 +24,10 @@ __N/A__
 * #186: Added support for short image URL's
 * #185: Add support for custom resources and routes
 * #174: New image transformation: Watermark
+
+Bug fixes:
+
+* #209: The Collection image transformation is not image-reader-aware
 
 Imbo-0.3.2
 ----------
