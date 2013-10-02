@@ -582,7 +582,7 @@ Image transformations - ``imageTransformations``
 
 Imbo supports a set of image transformations out of the box using the `Imagick PHP extension <http://pecl.php.net/package/imagick>`_. All supported image transformations are included in the configuration, and you can easily add your own custom transformations or create presets using a combination of existing transformations.
 
-Transformations are triggered using the ``t`` query parameter together with the image resource (read more about the image resource and the included transformations and their parameters in the :ref:`image-resource` section). This query parameter is used as an array so that multiple transformations can be applied. The transformations are applied in the order they are specified in the URL.
+Transformations are triggered using the ``t`` query parameter together with the image resource (read more about the image resource and the included transformations and their parameters in the :ref:`Image resource <image-resource>` section). This query parameter is used as an array so that multiple transformations can be applied. The transformations are applied in the order they are specified in the URL.
 
 All transformations are registered in the configuration array under the ``imageTransformations`` key:
 
@@ -593,23 +593,19 @@ All transformations are registered in the configuration array under the ``imageT
         // ...
 
         'imageTransformations' => array(
-            'border' => function (array $params) {
-                return new Imbo\Image\Transformation\Border($params);
-            },
-            'canvas' => function (array $params) {
-                return new Imbo\Image\Transformation\Canvas($params);
-            },
+            'border' => 'Imbo\Image\Transformation\Border',
+            'canvas' => 'Imbo\Image\Transformation\Canvas',
             // ...
         ),
 
         // ...
     );
 
-where the keys are the names of the transformations as specified in the URL, and the values are closures which all receive a single argument. This argument is an array that matches the parameters for the transformation as specified in the URL. If you use the following query parameter:
+where the keys are the names of the transformations as specified in the URL, and the values are strings representing class names of classes implementing the ``Imbo\Image\Transformation\TransformationInterface`` interface. You can also specify a closure that, when executed, returns a class implementing said interface. The classes specified as a string will be instantiated with a single argument, and the closures specified will be executed with the same argument. This argument is an array that matches the parameters for the transformation as specified in the URL. If you use the following query parameter:
 
 ``t[]=border:width=1,height=2,color=f00``
 
-the ``$params`` array given to the closure will look like this:
+the ``$params`` array given to the constructor of the transformation class or as an argument to the closure will look like this:
 
 .. code-block:: php
 
@@ -619,9 +615,6 @@ the ``$params`` array given to the closure will look like this:
         'height' => '1',
         'color' => 'f00'
     )
-
-
-The return value of the closure must either be an instance of the ``Imbo\Image\Transformation\TransformationInterface`` interface, or code that is callable (for instance another closure, or a class that implements an ``__invoke`` method). If the return value is a callable piece of code it will receive a single parameter which is an instance of ``Imbo\Model\Image``, which is the image you want your transformation to modify.
 
 Presets
 +++++++
