@@ -3,42 +3,7 @@
 Implement your own image transformations
 ========================================
 
-Imbo also supports custom image transformations. All you need to do is to implement the ``Imbo\Image\Transformation\TransformationInterface`` interface, or specify a callable piece of code in the :ref:`image transformation configuration <image-transformations-config>`. Below is an implementation of the border transformation as a callable piece of code:
-
-.. code-block:: php
-
-    <?php
-    return array(
-        // ...
-
-        'imageTransformations' => array(
-            'border' => function (array $params) {
-                return function (Imbo\Model\Image $image) use ($params) {
-                    $color = !empty($params['color']) ? $params['color'] : '#000';
-                    $width = !empty($params['width']) ? $params['width'] : 1;
-                    $height = !empty($params['height']) ? $params['height'] : 1;
-
-                    try {
-                        $imagick = new Imagick();
-                        $imagick->readImageBlob($image->getBlob());
-                        $imagick->borderImage($color, $width, $height);
-
-                        $size = $imagick->getImageGeometry();
-
-                        $image->setBlob($imagick->getImageBlob())
-                              ->setWidth($size['width'])
-                              ->setHeight($size['height']);
-                    } catch (ImagickException $e) {
-                        throw new Imbo\Image\Transformation\TransformationException($e->getMessage(), 400, $e);
-                    }
-                };
-            },
-        ),
-
-        // ...
-    );
-
-It's not recommended to use this method for big complicated transformations. It's better to implement the interface mentioned above, and refer to your class in the configuration array instead:
+Imbo also supports custom image transformations. All you need to do is to implement the ``Imbo\Image\Transformation\TransformationInterface`` interface, and configure your transformation:
 
 .. code-block:: php
 
@@ -47,9 +12,7 @@ It's not recommended to use this method for big complicated transformations. It'
         // ..
 
         'imageTransformations' => array(
-            'border' => function (array $params) {
-                return new My\Custom\BorderTransformation($params);
-            },
+            'border' => 'My\Custom\BorderTransformation',
         ),
 
         // ...

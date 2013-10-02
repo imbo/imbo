@@ -10,7 +10,9 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Model\Image;
+use Imbo\Model\Image,
+    Imbo\Storage\ImageReader,
+    Imbo\Storage\ImageReaderAware;
 
 /**
  * Transformation collection
@@ -18,7 +20,14 @@ use Imbo\Model\Image;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Collection extends Transformation implements TransformationInterface {
+class Collection extends Transformation implements ImageReaderAware, TransformationInterface {
+    /**
+     * Image reader instance
+     *
+     * @var ImageReader
+     */
+    private $imageReader;
+
     /**
      * Transformations to apply to the image
      *
@@ -44,5 +53,29 @@ class Collection extends Transformation implements TransformationInterface {
         }
 
         return $this;
+    }
+
+    /**
+     * Set an instance of an image reader
+     *
+     * @param ImageReader $reader An image reader instance
+     */
+    public function setImageReader(ImageReader $reader) {
+        foreach ($this->transformations as $transformation) {
+            if ($transformation instanceof ImageReaderAware) {
+                $transformation->setImageReader($reader);
+            }
+        }
+
+        $this->imageReader = $reader;
+    }
+
+    /**
+     * Get an instance of an image reader
+     *
+     * @return ImageReader An image reader instance
+     */
+    public function getImageReader() {
+        return $this->imageReader;
     }
 }

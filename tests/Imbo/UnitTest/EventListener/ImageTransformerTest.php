@@ -87,21 +87,20 @@ class ImageTransformerTest extends ListenerTests {
             ),
             array(
                 'name' => 'thumbnail',
-                'params' => array(),
+                'params' => array(
+                    'some' => 'value',
+                ),
             ),
         )));
 
         $this->listener->registerTransformationHandler('resize', function($params) {
-            return new SomeTransformation('resize');
+            return new SomeTransformation($params);
         });
-        $this->listener->registerTransformationHandler('thumbnail', function($params) {
-            return function($image) {
-                echo 'thumbnail';
-            };
-        });
+        $this->listener->registerTransformationHandler('thumbnail', __NAMESPACE__ . '\SomeOtherTransformation');
+
         $this->image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        $this->expectOutputString('resizethumbnail');
+        $this->expectOutputString('a:1:{s:5:"width";i:100;}a:1:{s:4:"some";s:5:"value";}');
         $this->listener->transform($this->event);
     }
 
@@ -143,7 +142,26 @@ class ImageTransformerTest extends ListenerTests {
         });
         $this->image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        $this->expectOutputString('imagereaderaware-' . $this->publicKey);
+        $this->expectOutputString($this->publicKey);
+        $this->listener->transform($this->event);
+    }
+
+    /**
+     * @expectedException Imbo\Exception\TransformationException
+     * @expectedExceptionMessage Invalid image transformation: transformation
+     * @expectedExceptionCode 500
+     * @covers Imbo\EventListener\ImageTransformer::transform
+     */
+    public function testCallbacksAreNotAllowedAsImageTransformations() {
+        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array(
+            array(
+                'name' => 'transformation',
+                'params' => array(),
+            ),
+        )));
+        $this->listener->registerTransformationHandler('transformation', function ($params) {
+            return function ($image) {};
+        });
         $this->listener->transform($this->event);
     }
 }
@@ -153,16 +171,22 @@ class ImageTransformerTest extends ListenerTests {
  * @package Test suite\Unit tests
  */
 class SomeTransformation extends Transformation implements TransformationInterface {
-    protected $output;
+    protected $params;
 
-    public function __construct($output) {
-        $this->output = $output;
+    public function __construct($params) {
+        $this->params = $params;
     }
 
     public function applyToImage(Image $image) {
-        echo $this->output;
+        echo serialize($this->params);
     }
 }
+
+/**
+ * @author Christer Edvartsen <cogo@starzinger.net>
+ * @package Test suite\Unit tests
+ */
+class SomeOtherTransformation extends SomeTransformation {}
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -172,6 +196,6 @@ class ImageReaderAwareTransformation extends SomeTransformation implements Image
     use ImageReaderAwareTrait;
 
     public function applyToImage(Image $image) {
-        echo $this->output . '-' . $this->getImageReader()->getImage('someImg');
+        echo $this->getImageReader()->getImage('someImg');
     }
 }

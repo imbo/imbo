@@ -75,24 +75,30 @@ class ImageTransformer implements ListenerInterface {
         // Fetch and apply transformations
         foreach ($request->getTransformations() as $transformation) {
             $name = $transformation['name'];
+            $params = $transformation['params'];
+            $transformation = null;
 
             if (!isset($this->transformationHandlers[$name])) {
                 throw new TransformationException('Unknown transformation: ' . $name, 400);
             }
 
             $callback = $this->transformationHandlers[$name];
-            $transformation = $callback($transformation['params']);
 
-            if ($transformation instanceof TransformationInterface) {
-                if ($transformation instanceof ImageReaderAware) {
-                    $transformation->setImageReader($this->getImageReader($event));
-                }
-
-                $transformation->applyToImage($image);
-            } else if (is_callable($transformation)) {
-                $transformation($image);
+            if (is_string($callback)) {
+                $transformation = new $callback($params);
+            } else if (is_callable($callback)) {
+                $transformation = $callback($params);
             }
 
+            if (!($transformation instanceof TransformationInterface)) {
+                throw new TransformationException('Invalid image transformation: ' . $name, 500);
+            }
+
+            if ($transformation instanceof ImageReaderAware) {
+                $transformation->setImageReader($this->getImageReader($event));
+            }
+
+            $transformation->applyToImage($image);
             $transformed = true;
         }
 
