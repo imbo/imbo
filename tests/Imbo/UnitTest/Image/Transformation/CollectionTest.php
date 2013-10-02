@@ -34,4 +34,21 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
         ));
         $transformation->applyToImage($image);
     }
+
+    /**
+     * @covers Imbo\Image\Transformation\Collection::setImageReader
+     * @covers Imbo\Image\Transformation\Collection::getImageReader
+     */
+    public function testSetsTheImageReaderToAllTransformations() {
+        $imageReader = $this->getMockBuilder('Imbo\Storage\ImageReader')->disableOriginalConstructor()->getMock();
+        $transformation1 = $this->getMock('Imbo\Storage\ImageReaderAware');
+        $transformation1->expects($this->once())->method('setImageReader')->with($imageReader);
+        $transformation2 = $this->getMock('Imbo\Image\Transformation\TransformationInterface');
+
+        $collection = new Collection(array(
+            $transformation1, $transformation2
+        ));
+        $collection->setImageReader($imageReader);
+        $this->assertSame($imageReader, $collection->getImageReader());
+    }
 }
