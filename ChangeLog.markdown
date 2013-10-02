@@ -5,8 +5,7 @@ Imbo-0.4.0
 ----------
 __N/A__
 
-New features:
-
+* #210: Image transformations must implement the image transformation interface
 * #205: Added a Varnish HashTwo event listener
 * #204: Images resource should be able to retrieve only specific fields
 * #201: Added an index resource

@@ -183,22 +183,22 @@ $config = array(
      * Image transformations
      *
      * This array includes all supported image transformations. The keys are the names of the
-     * transformations that is used in the URL, and the values are closures that will receive a
-     * single parameter: $params, which is the parameters found in the URL associated with the
+     * transformations that is used in the URL, and the values are class names of a class
+     * implementing the Imbo\Image\Transformation\TransformationInterface interface, or a closure
+     * that will return an instance of such a class. When the value is a closure, it will receive
+     * a single parameter: $params, which is the parameters found in the URL associated with the
      * transformation.
+     *
+     * When the transformation is specified as a string, the parameters will be passed to the
+     * constructor of the transformation class.
      *
      * Example:
      *
      * t[]=border:width=2,height=3
      *
-     * will end up doing a new Image\Transformation\Border(array('width' => 2, 'height' => 3))
+     * will end up doing the following:
      *
-     * All closures must return an instance of the Imbo\Image\Transformation\TransformationInterface
-     * interface or a callable piece of code, that in turn will receive a single parameter:
-     *
-     * Imbo\Model\Image $image
-     *
-     * which is the image you want your transformation to modify.
+     * new Imbo\Image\Transformation\Border(array('width' => '2', 'height' => '3'))
      *
      * All image transformations shipped by Imbo uses imagick, and if you want to use something
      * else, simply supply your own classes in the array below.
@@ -206,51 +206,21 @@ $config = array(
      * @var array
      */
     'imageTransformations' => array(
-        'border' => function (array $params) {
-            return new Image\Transformation\Border($params);
-        },
-        'canvas' => function (array $params) {
-            return new Image\Transformation\Canvas($params);
-        },
-        'compress' => function (array $params) {
-            return new Image\Transformation\Compress($params);
-        },
-        'crop' => function (array $params) {
-            return new Image\Transformation\Crop($params);
-        },
-        'desaturate' => function (array $params) {
-            return new Image\Transformation\Desaturate();
-        },
-        'flipHorizontally' => function (array $params) {
-            return new Image\Transformation\FlipHorizontally();
-        },
-        'flipVertically' => function (array $params) {
-            return new Image\Transformation\FlipVertically();
-        },
-        'maxSize' => function (array $params) {
-            return new Image\Transformation\MaxSize($params);
-        },
-        'resize' => function (array $params) {
-            return new Image\Transformation\Resize($params);
-        },
-        'rotate' => function (array $params) {
-            return new Image\Transformation\Rotate($params);
-        },
-        'sepia' => function (array $params) {
-            return new Image\Transformation\Sepia($params);
-        },
-        'thumbnail' => function (array $params) {
-            return new Image\Transformation\Thumbnail($params);
-        },
-        'transpose' => function (array $params) {
-            return new Image\Transformation\Transpose();
-        },
-        'transverse' => function (array $params) {
-            return new Image\Transformation\Transverse();
-        },
-        'watermark' => function (array $params) {
-            return new Image\Transformation\Watermark($params);
-        },
+        'border' => 'Imbo\Image\Transformation\Border',
+        'canvas' => 'Imbo\Image\Transformation\Canvas',
+        'compress' => 'Imbo\Image\Transformation\Compress',
+        'crop' => 'Imbo\Image\Transformation\Crop',
+        'desaturate' => 'Imbo\Image\Transformation\Desaturate',
+        'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
+        'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
+        'maxSize' => 'Imbo\Image\Transformation\MaxSize',
+        'resize' => 'Imbo\Image\Transformation\Resize',
+        'rotate' => 'Imbo\Image\Transformation\Rotate',
+        'sepia' => 'Imbo\Image\Transformation\Sepia',
+        'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
+        'transpose' => 'Imbo\Image\Transformation\Transpose',
+        'transverse' => 'Imbo\Image\Transformation\Transverse',
+        'watermark' => 'Imbo\Image\Transformation\Watermark',
     ),
 
 
