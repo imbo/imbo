@@ -23,17 +23,10 @@ class ConvertTest extends \PHPUnit_Framework_TestCase {
     private $transformation;
 
     /**
-     * The extension to use for testing
-     *
-     * @var string
-     */
-    private $extension = 'png';
-
-    /**
      * Set up the transformation instance
      */
     public function setUp() {
-        $this->transformation = new Convert(array('type' => $this->extension));
+        $this->transformation = new Convert();
     }
 
     /**
@@ -48,9 +41,9 @@ class ConvertTest extends \PHPUnit_Framework_TestCase {
      */
     public function testConvertToSameTypeAsImage() {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue($this->extension));
+        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
         $image->expects($this->never())->method('getBlob');
 
-        $this->transformation->applyToImage($image);
+        $this->transformation->applyToImage($image, array('type' => 'png'));
     }
 }

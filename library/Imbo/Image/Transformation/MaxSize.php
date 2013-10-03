@@ -23,39 +23,18 @@ use Imbo\Model\Image,
  */
 class MaxSize extends Transformation implements TransformationInterface {
     /**
-     * Max width of the image
-     *
-     * @var int
-     */
-    private $maxWidth;
-
-    /**
-     * Max height of the image
-     *
-     * @var int
-     */
-    private $maxHeight;
-
-    /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     */
-    public function __construct(array $params) {
-        $this->maxWidth = !empty($params['width']) ? (int) $params['width'] : 0;
-        $this->maxHeight = !empty($params['height']) ? (int) $params['height'] : 0;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image) {
+    public function applyToImage(Image $image, array $params = array()) {
+        $maxWidth = !empty($params['width']) ? (int) $params['width'] : 0;
+        $maxHeight = !empty($params['height']) ? (int) $params['height'] : 0;
+
         try {
             $sourceWidth  = $image->getWidth();
             $sourceHeight = $image->getHeight();
 
-            $width  = $this->maxWidth  ?: $sourceWidth;
-            $height = $this->maxHeight ?: $sourceHeight;
+            $width  = $maxWidth  ?: $sourceWidth;
+            $height = $maxHeight ?: $sourceHeight;
 
             // Figure out original ratio
             $ratio = $sourceWidth / $sourceHeight;

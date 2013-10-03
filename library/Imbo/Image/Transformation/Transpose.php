@@ -25,7 +25,7 @@ class Transpose extends Transformation implements TransformationInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image) {
+    public function applyToImage(Image $image, array $params = array()) {
         try {
             $imagick = $this->getImagick();
             $imagick->readImageBlob($image->getBlob());

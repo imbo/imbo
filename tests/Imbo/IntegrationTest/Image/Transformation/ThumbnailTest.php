@@ -15,6 +15,7 @@ use Imbo\Image\Transformation\Thumbnail;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Thumbnail
  */
 class ThumbnailTest extends TransformationTests {
     /**
@@ -36,23 +37,22 @@ class ThumbnailTest extends TransformationTests {
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Thumbnail(array(
-            'width' => $this->width,
-            'height' => $this->height,
-            'mode' => $this->fit,
-        ));
+        return new Thumbnail();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'thumbnail';
+    protected function getDefaultParams() {
+        return array(
+            'width' => $this->width,
+            'height' => $this->height,
+            'mode' => $this->fit,
+        );
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Thumbnail::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');
@@ -64,9 +64,6 @@ class ThumbnailTest extends TransformationTests {
         return $image;
     }
 
-    /**
-     * @covers Imbo\Image\Transformation\Thumbnail::applyToImage
-     */
     public function testApplyToImageUsingInsetMode() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
@@ -74,11 +71,10 @@ class ThumbnailTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with(20)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(13)->will($this->returnValue($image));
 
-        $transformation = new Thumbnail(array(
+        $this->getTransformation()->applyToImage($image, array(
             'width' => 20,
             'height' => 20,
             'fit' => 'inset',
         ));
-        $transformation->applyToImage($image);
     }
 }

@@ -36,48 +36,21 @@ class Crop extends Transformation implements TransformationInterface {
     private $y = 0;
 
     /**
-     * Width of the crop
-     *
-     * @var int
+     * {@inheritdoc}
      */
-    private $width;
-
-    /**
-     * Height of the crop
-     *
-     * @var int
-     */
-    private $height;
-
-    /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     * @throws TransformationException
-     */
-    public function __construct(array $params) {
+    public function applyToImage(Image $image, array $params = array()) {
         foreach (array('width', 'height') as $param) {
             if (!isset($params[$param])) {
                 throw new TransformationException('Missing required parameter: ' . $param, 400);
             }
         }
 
-        $this->width = (int) $params['width'];
-        $this->height = (int) $params['height'];
+        $width = (int) $params['width'];
+        $height = (int) $params['height'];
 
-        if (!empty($params['x'])) {
-            $this->x = (int) $params['x'];
-        }
+        $x = !empty($params['x']) ? (int) $params['x'] : $this->x;
+        $y = !empty($params['y']) ? (int) $params['y'] : $this->y;
 
-        if (!empty($params['y'])) {
-            $this->y = (int) $params['y'];
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function applyToImage(Image $image) {
         try {
             if ($this->x === 0 && $this->y === 0 &&
                 $image->getWidth() <= $this->width &&
@@ -87,7 +60,7 @@ class Crop extends Transformation implements TransformationInterface {
 
             $imagick = $this->getImagick();
             $imagick->readImageBlob($image->getBlob());
-            $imagick->cropImage($this->width, $this->height, $this->x, $this->y);
+            $imagick->cropImage($width, $height, $x, $y);
 
             $size = $imagick->getImageGeometry();
 

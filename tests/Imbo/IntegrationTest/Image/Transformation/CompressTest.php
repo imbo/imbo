@@ -15,25 +15,25 @@ use Imbo\Image\Transformation\Compress;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Compress
  */
 class CompressTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Compress(array('quality' => 90));
+        return new Compress();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'compress';
+    protected function getDefaultParams() {
+        return array('quality' => 90);
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Compress::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');

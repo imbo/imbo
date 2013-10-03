@@ -15,6 +15,7 @@ use Imbo\Image\Transformation\FlipVertically;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\FlipVertically
  */
 class FlipVerticallyTest extends TransformationTests {
     /**
@@ -27,13 +28,12 @@ class FlipVerticallyTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'flipvertically';
+    protected function getDefaultParams() {
+        return array();
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\FlipVertically::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');

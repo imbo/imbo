@@ -22,48 +22,24 @@ use Imbo\Model\Image,
  */
 class Resize extends Transformation implements TransformationInterface {
     /**
-     * Width of the resize
-     *
-     * @var int
+     * {@inheritdoc}
      */
-    private $width;
-
-    /**
-     * Height of the resize
-     *
-     * @var int
-     */
-    private $height;
-
-    /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     * @throws TransformationException
-     */
-    public function __construct(array $params) {
+    public function applyToImage(Image $image, array $params = array()) {
         if (empty($params['width']) && empty($params['height'])) {
             throw new TransformationException('Missing both width and height. You need to specify at least one of them', 400);
         }
 
-        $this->width = !empty($params['width']) ? (int) $params['width'] : 0;
-        $this->height = !empty($params['height']) ? (int) $params['height'] : 0;
-    }
+        $width = !empty($params['width']) ? (int) $params['width'] : 0;
+        $height = !empty($params['height']) ? (int) $params['height'] : 0;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function applyToImage(Image $image) {
+        // Calculate width or height if not both have been specified
+        if (!$height) {
+            $height = ($image->getHeight() / $image->getWidth()) * $width;
+        } else if (!$width) {
+            $width = ($image->getWidth() / $image->getHeight()) * $height;
+        }
+
         try {
-            $width  = $this->width  ?: null;
-            $height = $this->height ?: null;
-
-            // Calculate width or height if not both have been specified
-            if (!$height) {
-                $height = ($image->getHeight() / $image->getWidth()) * $width;
-            } else if (!$width) {
-                $width = ($image->getWidth() / $image->getHeight()) * $height;
-            }
 
             $imagick = $this->getImagick();
             $imagick->setOption('jpeg:size', $width . 'x' . $height);

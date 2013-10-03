@@ -19,18 +19,13 @@ use Imbo\Image\Transformation\TransformationInterface,
  */
 abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     /**
-     * Test cases must implement this method and return a configured instande of the transformation
-     * they are testing. This transformation instance will be used for the tests in this base test
-     * case
+     * Test cases must implement this method and return an instance of the transformation they are
+     * testing. This transformation instance will be used for the tests in this base test
+     * case as well.
      *
      * @return TransformationInterface
      */
     abstract protected function getTransformation();
-
-    /**
-     * @return string
-     */
-    abstract protected function getExpectedName();
 
     /**
      * Get the image mock used in the simple testApplyToImage
@@ -38,6 +33,13 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
      * @return Image
      */
     abstract protected function getImageMock();
+
+    /**
+     * Fetch a set of default parameters for the transformation
+     *
+     * @return array
+     */
+    abstract protected function getDefaultParams();
 
     /**
      * Make sure we have Imagick available
@@ -49,23 +51,14 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Make sure the transformation returns the expected name
-     *
-     * @covers Imbo\Image\Transformation\Transformation::getName
-     */
-    public function testGetName() {
-        $this->assertSame($this->getTransformation()->getName(), $this->getExpectedName());
-    }
-
-    /**
      * Simply apply the current transformation to an image instance
      *
      * The transformation instance returned from getTransformation() will be used
      */
     public function testSimpleApplyToImage() {
-        $image = $this->getImageMock();
-
-        $this->getTransformation()->applyToImage($image);
+        $this->getTransformation()->applyToImage(
+            $this->getImageMock(), $this->getDefaultParams()
+        );
     }
 
     /**
@@ -77,6 +70,6 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
         $image->expects($this->any())->method('getWidth')->will($this->returnValue(1600));
         $image->expects($this->any())->method('getHeight')->will($this->returnValue(900));
 
-        $this->getTransformation()->applyToImage($image);
+        $this->getTransformation()->applyToImage($image, $this->getDefaultParams());
     }
 }

@@ -23,13 +23,6 @@ use Imbo\Model\Image,
  */
 class Rotate extends Transformation implements TransformationInterface {
     /**
-     * Angle of the rotation
-     *
-     * @var int
-     */
-    private $angle;
-
-    /**
      * Background color of the image
      *
      * @var string
@@ -37,32 +30,21 @@ class Rotate extends Transformation implements TransformationInterface {
     private $bg = '#000';
 
     /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     * @throws TransformationException
+     * {@inheritdoc}
      */
-    public function __construct(array $params) {
+    public function applyToImage(Image $image, array $params = array()) {
         if (empty($params['angle'])) {
             throw new TransformationException('Missing required parameter: angle', 400);
         }
 
-        $this->angle = (int) $params['angle'];
+        $angle = (int) $params['angle'];
+        $bg = !empty($params['bg']) ? $this->formatColor($params['bg']) : $this->bg;
 
-        if (!empty($params['bg'])) {
-            $this->bg = $this->formatColor($params['bg']);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function applyToImage(Image $image) {
         try {
             $imagick = $this->getImagick();
             $imagick->readImageBlob($image->getBlob());
 
-            $imagick->rotateImage($this->bg, $this->angle);
+            $imagick->rotateImage($bg, $angle);
 
             $size = $imagick->getImageGeometry();
 

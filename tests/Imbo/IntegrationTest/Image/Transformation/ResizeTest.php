@@ -15,28 +15,28 @@ use Imbo\Image\Transformation\Resize;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Resize
  */
 class ResizeTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Resize(array(
-            'width' => 200,
-            'height' => 100,
-        ));
+        return new Resize();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'resize';
+    protected function getDefaultParams() {
+        return array(
+            'width' => 200,
+            'height' => 100,
+        );
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Resize::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');
@@ -48,9 +48,6 @@ class ResizeTest extends TransformationTests {
         return $image;
     }
 
-    /**
-     * @covers Imbo\Image\Transformation\Resize::applyToImage
-     */
     public function testApplyToImageWithOnlyWidth() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
@@ -60,13 +57,9 @@ class ResizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($this->isType('int'))->will($this->returnValue($image));
 
-        $transformation = new Resize(array('width' => 200));
-        $transformation->applyToImage($image);
+        $this->getTransformation()->applyToImage($image, array('width' => 200));
     }
 
-    /**
-     * @covers Imbo\Image\Transformation\Resize::applyToImage
-     */
     public function testApplyToImageWithOnlyHeight() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
@@ -76,7 +69,6 @@ class ResizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with($this->isType('int'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(200)->will($this->returnValue($image));
 
-        $transformation = new Resize(array('height' => 200));
-        $transformation->applyToImage($image);
+        $this->getTransformation()->applyToImage($image, array('height' => 200));
     }
 }

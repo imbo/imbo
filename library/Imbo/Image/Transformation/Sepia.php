@@ -26,26 +26,19 @@ class Sepia extends Transformation implements TransformationInterface {
      *
      * @var float
      */
-    private $threshold;
-
-    /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     */
-    public function __construct(array $params) {
-        $this->threshold = isset($params['threshold']) ? (float) $params['threshold'] : 80;
-    }
+    private $threshold = 80;
 
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image) {
+    public function applyToImage(Image $image, array $params = array()) {
+        $threshold = !empty($params['threshold']) ? (float) $params['threshold'] : $this->threshold;
+
         try {
             $imagick = $this->getImagick();
             $imagick->readImageBlob($image->getBlob());
 
-            $imagick->sepiaToneImage($this->threshold);
+            $imagick->sepiaToneImage($threshold);
 
             $image->setBlob($imagick->getImageBlob());
         } catch (ImagickException $e) {

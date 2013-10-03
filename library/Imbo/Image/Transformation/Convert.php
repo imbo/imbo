@@ -24,31 +24,16 @@ use Imbo\Model\Image,
  */
 class Convert extends Transformation implements TransformationInterface {
     /**
-     * Type we want to convert to
-     *
-     * @var string
+     * {@inheritdoc}
      */
-    private $type;
-
-    /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     * @throws TransformationException
-     */
-    public function __construct(array $params) {
+    public function applyToImage(Image $image, array $params = array()) {
         if (empty($params['type'])) {
             throw new TransformationException('Missing required parameter: type', 400);
         }
 
-        $this->type = $params['type'];
-    }
+        $type = $params['type'];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function applyToImage(Image $image) {
-        if ($image->getExtension() === $this->type) {
+        if ($image->getExtension() === $type) {
             // The requested extension is the same as the image, no conversion is needed
             return;
         }
@@ -57,12 +42,12 @@ class Convert extends Transformation implements TransformationInterface {
             $imagick = $this->getImagick();
             $imagick->readImageBlob($image->getBlob());
 
-            $imagick->setImageFormat($this->type);
-            $mimeType = array_search($this->type, Image::$mimeTypes);
+            $imagick->setImageFormat($type);
+            $mimeType = array_search($type, Image::$mimeTypes);
 
             $image->setBlob($imagick->getImageBlob());
             $image->setMimeType($mimeType);
-            $image->setExtension($this->type);
+            $image->setExtension($type);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

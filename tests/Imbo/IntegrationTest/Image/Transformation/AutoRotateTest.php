@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\InitegrationTest\Image\Transformation;
+namespace Imbo\IntegrationTest\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Image\Transformation\AutoRotate,
@@ -17,8 +17,36 @@ use Imbo\Model\Image,
 /**
  * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\AutoRotate
  */
-class AutoRotateTest extends \PHPUnit_Framework_TestCase {
+class AutoRotateTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTransformation() {
+        return new AutoRotate();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDefaultParams() {
+        return array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getImageMock() {
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/autoRotate/orientation1.jpeg')));
+        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->any())->method('setWidth')->with(671)->will($this->returnValue($image));
+        $image->expects($this->any())->method('setHeight')->with(471)->will($this->returnValue($image));
+
+        return $image;
+    }
+
     /**
      * Return different files to test with
      *
@@ -37,7 +65,6 @@ class AutoRotateTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @dataProvider getFiles
-     * @covers Imbo\Image\Transformation\AutoRotate::applyToImage
      */
     public function testAutoRotatesAllOrientations($file) {
         $colorValues = array(
@@ -71,8 +98,7 @@ class AutoRotateTest extends \PHPUnit_Framework_TestCase {
         $image->setBlob(file_get_contents($file));
 
         // Perform the auto rotate transformation on the image
-        $transformation = new AutoRotate();
-        $transformation->applyToImage($image);
+        $this->getTransformation()->applyToImage($image);
 
         // Do assertion comparison on the color values
         $imagick = new Imagick();

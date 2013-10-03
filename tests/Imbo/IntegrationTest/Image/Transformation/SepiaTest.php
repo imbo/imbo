@@ -15,25 +15,25 @@ use Imbo\Image\Transformation\Sepia;
 /**
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Sepia
  */
 class SepiaTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Sepia(array('threshold' => 90));
+        return new Sepia();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'sepia';
+    protected function getDefaultParams() {
+        return array('threshold' => 90);
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Sepia::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');

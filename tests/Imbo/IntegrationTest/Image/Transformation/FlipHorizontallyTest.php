@@ -15,6 +15,7 @@ use Imbo\Image\Transformation\FlipHorizontally;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\FlipHorizontally
  */
 class FlipHorizontallyTest extends TransformationTests {
     /**
@@ -27,13 +28,12 @@ class FlipHorizontallyTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'fliphorizontally';
+    protected function getDefaultParams() {
+        return array();
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\FlipHorizontally::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');

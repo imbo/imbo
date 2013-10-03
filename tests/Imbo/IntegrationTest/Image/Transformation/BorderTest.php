@@ -15,25 +15,29 @@ use Imbo\Image\Transformation\Border;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Border
  */
 class BorderTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Border(array('color' => 'ffffff', 'width' => 3, 'height' => 4));
+        return new Border();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'border';
+    protected function getDefaultParams() {
+        return array(
+            'color' => 'ffffff',
+            'width' => 3,
+            'height' => 4,
+        );
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Border::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');
@@ -45,10 +49,6 @@ class BorderTest extends TransformationTests {
         return $image;
     }
 
-    /**
-     * @covers Imbo\Image\Transformation\Border::__construct
-     * @covers Imbo\Image\Transformation\Border::applyToImage
-     */
     public function testTransformationSupportsDifferentModes() {
         $imagePath = FIXTURES_DIR . '/image.png';
 
@@ -60,7 +60,6 @@ class BorderTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with($size[0])->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($size[1])->will($this->returnValue($image));
 
-        $transformation = new Border(array('color' => 'white', 'width' => 3, 'height' => 4, 'mode' => 'inline'));
-        $transformation->applyToImage($image);
+        $this->getTransformation()->applyToImage($image, array('color' => 'white', 'width' => 3, 'height' => 4, 'mode' => 'inline'));
     }
 }

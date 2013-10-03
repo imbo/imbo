@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\Desaturate;
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Desaturate
  */
 class DesaturateTest extends TransformationTests {
     /**
@@ -28,13 +29,12 @@ class DesaturateTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'desaturate';
+    protected function getDefaultParams() {
+        return array();
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Desaturate::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');

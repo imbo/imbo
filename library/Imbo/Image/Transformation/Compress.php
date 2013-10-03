@@ -22,34 +22,19 @@ use Imbo\Model\Image,
  */
 class Compress extends Transformation implements TransformationInterface {
     /**
-     * Quality of the resulting image
-     *
-     * @var int
+     * {@inheritdoc}
      */
-    private $quality;
-
-    /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     * @throws TransformationException
-     */
-    public function __construct(array $params) {
+    public function applyToImage(Image $image, array $params = array()) {
         if (empty($params['quality'])) {
             throw new TransformationException('Missing required parameter: quality', 400);
         }
 
-        $this->quality = (int) $params['quality'];
-    }
+        $quality = (int) $params['quality'];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function applyToImage(Image $image) {
         try {
             $imagick = $this->getImagick();
             $imagick->readImageBlob($image->getBlob());
-            $imagick->setImageCompressionQuality($this->quality);
+            $imagick->setImageCompressionQuality($quality);
 
             $image->setBlob($imagick->getImageBlob());
         } catch (ImagickException $e) {

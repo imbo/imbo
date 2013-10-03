@@ -18,23 +18,25 @@ use Imbo\Image\Transformation\Crop;
  */
 class CropTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @covers Imbo\Image\Transformation\Crop::__construct
+     * @covers Imbo\Image\Transformation\Crop::applyToImage
      * @expectedException Imbo\Exception\TransformationException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Missing required parameter: width
      */
     public function testThrowsExceptionWhenWidthIsMissing() {
-        new Crop(array('height' => 123));
+        $transformation = new Crop();
+        $transformation->applyToImage($this->getMock('Imbo\Model\Image'), array('height' => 123));
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Crop::__construct
+     * @covers Imbo\Image\Transformation\Crop::applyToImage
      * @expectedException Imbo\Exception\TransformationException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Missing required parameter: height
      */
     public function testThrowsExceptionWhenHeightIsMissing() {
-        new Crop(array('width' => 123));
+        $transformation = new Crop();
+        $transformation->applyToImage($this->getMock('Imbo\Model\Image'), array('width' => 123));
     }
 
     /**
@@ -77,7 +79,7 @@ class CropTest extends \PHPUnit_Framework_TestCase {
             $imagick->expects($this->never())->method('cropImage');
         }
 
-        $crop = new Crop($params);
-        $crop->setImagick($imagick)->applyToImage($image);
+        $crop = new Crop();
+        $crop->setImagick($imagick)->applyToImage($image, $params);
     }
 }

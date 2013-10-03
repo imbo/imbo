@@ -45,37 +45,22 @@ class Thumbnail extends Transformation implements TransformationInterface {
     private $fit = 'outbound';
 
     /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     */
-    public function __construct(array $params = array()) {
-        if (!empty($params['width'])) {
-            $this->width = (int) $params['width'];
-        }
-
-        if (!empty($params['height'])) {
-            $this->height = (int) $params['height'];
-        }
-
-        if (!empty($params['fit'])) {
-            $this->fit = $params['fit'];
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image) {
+    public function applyToImage(Image $image, array $params = array()) {
+        $width = !empty($params['width']) ? (int) $params['width'] : $this->width;
+        $height = !empty($params['height']) ? (int) $params['height'] : $this->height;
+        $fit = !empty($params['fit']) ? $params['fit'] : $this->fit;
+
         try {
             $imagick = $this->getImagick();
-            $imagick->setOption('jpeg:size', $this->width . 'x' . $this->height);
+            $imagick->setOption('jpeg:size', $width . 'x' . $height);
             $imagick->readImageBlob($image->getBlob());
 
-            if ($this->fit == 'inset') {
-                $imagick->thumbnailimage($this->width, $this->height, true);
+            if ($fit === 'inset') {
+                $imagick->thumbnailimage($width, $height, true);
             } else {
-                $imagick->cropThumbnailImage($this->width, $this->height);
+                $imagick->cropThumbnailImage($width, $height);
             }
 
             $size = $imagick->getImageGeometry();

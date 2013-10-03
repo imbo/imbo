@@ -15,25 +15,25 @@ use Imbo\Image\Transformation\Rotate;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Rotate
  */
 class RotateTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Rotate(array('angle' => 45, 'bg' => 'bd1349'));
+        return new Rotate();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'rotate';
+    protected function getDefaultParams() {
+        return array('angle' => 45, 'bg' => 'bd1349');
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Rotate::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');

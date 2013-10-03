@@ -27,35 +27,6 @@ abstract class Transformation implements TransformationInterface {
     private $imagick;
 
     /**
-     * The name of the current transformation
-     *
-     * @var string
-     */
-    private $name;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName() {
-        if ($this->name === null) {
-            $className = get_class($this);
-
-            $this->name = strtolower(substr($className, strrpos($className, '\\') + 1));
-        }
-
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setName($name) {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getImagick() {

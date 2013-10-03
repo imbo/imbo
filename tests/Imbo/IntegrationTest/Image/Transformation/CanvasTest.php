@@ -32,26 +32,25 @@ class CanvasTest extends TransformationTests {
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Canvas(array(
+        return new Canvas();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDefaultParams() {
+        return array(
             'width' => $this->width,
             'height' => $this->height,
             'mode' => 'free',
             'x' => 10,
             'y' => 20,
             'bg' => 'bf1942',
-        ));
+        );
     }
 
     /**
      * {@inheritdoc}
-     */
-    protected function getExpectedName() {
-        return 'canvas';
-    }
-
-    /**
-     * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Canvas::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');
@@ -109,7 +108,6 @@ class CanvasTest extends TransformationTests {
 
     /**
      * @dataProvider getCanvasParameters
-     * @covers Imbo\Image\Transformation\Canvas::applyToImage
      */
     public function testApplyToImageWithDifferentParameters($width, $height, $mode = 'free', $resultingWidth = 665, $resultingHeight = 463) {
         $image = $this->getMock('Imbo\Model\Image');
@@ -121,7 +119,6 @@ class CanvasTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with($resultingWidth)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($resultingHeight)->will($this->returnValue($image));
 
-        $canvas = new Canvas(array('width' => $width, 'height' => $height, 'mode' => $mode));
-        $canvas->applyToImage($image);
+        $this->getTransformation()->applyToImage($image, array('width' => $width, 'height' => $height, 'mode' => $mode));
     }
 }

@@ -15,25 +15,25 @@ use Imbo\Image\Transformation\Convert;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Convert
  */
 class ConvertTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Convert(array('type' => 'png'));
+        return new Convert();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'convert';
+    protected function getDefaultParams() {
+        return array('type' => 'png');
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Convert::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');

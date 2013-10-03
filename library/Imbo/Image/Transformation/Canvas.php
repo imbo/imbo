@@ -24,20 +24,6 @@ use Imbo\Model\Image,
  */
 class Canvas extends Transformation implements TransformationInterface {
     /**
-     * Width of the canvas
-     *
-     * @var int
-     */
-    private $width;
-
-    /**
-     * Height of the canvas
-     *
-     * @var int
-     */
-    private $height;
-
-    /**
      * Canvas mode
      *
      * Supported modes:
@@ -75,47 +61,21 @@ class Canvas extends Transformation implements TransformationInterface {
     private $bg = '#ffffff';
 
     /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     */
-    public function __construct(array $params) {
-        $this->width = !empty($params['width']) ? (int) $params['width'] : 0;
-        $this->height = !empty($params['height']) ? (int) $params['height'] : 0;
-
-        if (!empty($params['mode'])) {
-            $this->mode = $params['mode'];
-        }
-
-        if (!empty($params['x'])) {
-            $this->x = (int) $params['x'];
-        }
-
-        if (!empty($params['y'])) {
-            $this->y = (int) $params['y'];
-        }
-
-        if (!empty($params['bg'])) {
-            $this->bg = $this->formatColor($params['bg']);
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image) {
-        try {
-            if (!$this->width) {
-                $this->width = $image->getWidth();
-            }
+    public function applyToImage(Image $image, array $params = array()) {
+        $width  = !empty($params['width']) ? (int) $params['width'] : $image->getWidth();
+        $height = !empty($params['height']) ? (int) $params['height'] : $image->getHeight();
+        $mode   = !empty($params['mode']) ? $params['mode'] : $this->mode;
+        $x      = !empty($params['x']) ? (int) $params['x'] : $this->x;
+        $y      = !empty($params['y']) ? (int) $params['y'] : $this->y;
+        $bg     = !empty($params['bg']) ? $this->formatColor($params['bg']) : $this->bg;
 
-            if (!$this->height) {
-                $this->height = $image->getHeight();
-            }
+        try {
 
             // Create a new canvas
             $canvas = new Imagick();
-            $canvas->newImage($this->width, $this->height, $this->bg);
+            $canvas->newImage($width, $height, $bg);
             $canvas->setImageFormat($image->getExtension());
 
             // Load existing image
@@ -125,24 +85,24 @@ class Canvas extends Transformation implements TransformationInterface {
             $existingWidth = $image->getWidth();
             $existingHeight = $image->getHeight();
 
-            if ($existingWidth > $this->width || $existingHeight > $this->height) {
+            if ($existingWidth > $width || $existingHeight > $height) {
                 // The existing image is bigger than the canvas and needs to be cropped
                 $cropX = 0;
                 $cropY = 0;
-                $cropWidth = $this->width;
-                $cropHeight = $this->height;
+                $cropWidth = $width;
+                $cropHeight = $height;
 
-                if ($existingWidth > $this->width) {
-                    if ($this->mode === 'center' || $this->mode === 'center-x') {
-                        $cropX = (int) ($existingWidth - $this->width) / 2;
+                if ($existingWidth > $width) {
+                    if ($mode === 'center' || $mode === 'center-x') {
+                        $cropX = (int) ($existingWidth - $width) / 2;
                     }
                 } else {
                     $cropWidth = $existingWidth;
                 }
 
-                if ($existingHeight > $this->height) {
-                    if ($this->mode === 'center' || $this->mode === 'center-y') {
-                        $cropY = (int) ($existingHeight - $this->height) / 2;
+                if ($existingHeight > $height) {
+                    if ($mode === 'center' || $mode === 'center-y') {
+                        $cropY = (int) ($existingHeight - $height) / 2;
                     }
                 } else {
                     $cropHeight = $existingHeight;
@@ -151,22 +111,18 @@ class Canvas extends Transformation implements TransformationInterface {
                 $existingImage->cropImage($cropWidth, $cropHeight, $cropX, $cropY);
             }
 
-            // Default placement
-            $x = $this->x;
-            $y = $this->y;
-
             // Figure out the correct placement of the image based on the placement mode. Use the
             // size from the imagick image when calculating since the image may have been cropped
             // above.
             $existingSize = $existingImage->getImageGeometry();
 
-            if ($this->mode === 'center') {
-                $x = ($this->width - $existingSize['width']) / 2;
-                $y = ($this->height - $existingSize['height']) / 2;
-            } else if ($this->mode === 'center-x') {
-                $x = ($this->width - $existingSize['width']) / 2;
-            } else if ($this->mode === 'center-y') {
-                $y = ($this->height - $existingSize['height']) / 2;
+            if ($mode === 'center') {
+                $x = ($width - $existingSize['width']) / 2;
+                $y = ($height - $existingSize['height']) / 2;
+            } else if ($mode === 'center-x') {
+                $x = ($width - $existingSize['width']) / 2;
+            } else if ($mode === 'center-y') {
+                $y = ($height - $existingSize['height']) / 2;
             }
 
             // Paste existing image into the new canvas at the given position
@@ -189,4 +145,3 @@ class Canvas extends Transformation implements TransformationInterface {
         }
     }
 }
-

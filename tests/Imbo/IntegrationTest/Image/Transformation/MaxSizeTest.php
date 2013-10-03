@@ -16,25 +16,25 @@ use Imbo\Image\Transformation\MaxSize;
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\MaxSize
  */
 class MaxSizeTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new MaxSize(array('width' => 200, 'height' => 100));
+        return new MaxSize();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'maxsize';
+    protected function getDefaultParams() {
+        return array('width' => 200, 'height' => 100);
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\MaxSize::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');
@@ -48,9 +48,6 @@ class MaxSizeTest extends TransformationTests {
         return $image;
     }
 
-    /**
-     * @covers Imbo\Image\Transformation\MaxSize::applyToImage
-     */
     public function testApplyToImageWithOnlyWidth() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
@@ -60,29 +57,9 @@ class MaxSizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(139)->will($this->returnValue($image));
 
-        $transformation = new MaxSize(array('width' => 200));
-        $transformation->applyToImage($image);
+        $this->getTransformation()->applyToImage($image, array('width' => 200));
     }
 
-    /**
-     * @covers Imbo\Image\Transformation\MaxSize::applyToImage
-     */
-    public function testApplyToImageWithOnlyHeight() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
-        $image->expects($this->once())->method('getHeight')->will($this->returnValue(463));
-        $image->expects($this->once())->method('setWidth')->with(287)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with(200)->will($this->returnValue($image));
-
-        $transformation = new MaxSize(array('height' => 200));
-        $transformation->applyToImage($image);
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\MaxSize::applyToImage
-     */
     public function testApplyToTallImage() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/tall-image.png')));
@@ -92,13 +69,9 @@ class MaxSizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with(70)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(100)->will($this->returnValue($image));
 
-        $transformation = new MaxSize(array('width' => 200, 'height' => 100));
-        $transformation->applyToImage($image);
+        $this->getTransformation()->applyToImage($image, array('width' => 200, 'height' => 100));
     }
 
-    /**
-     * @covers Imbo\Image\Transformation\MaxSize::applyToImage
-     */
     public function testApplyToImageSmallerThanParams() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(463));
@@ -107,7 +80,6 @@ class MaxSizeTest extends TransformationTests {
         $image->expects($this->never())->method('setWidth');
         $image->expects($this->never())->method('setHeight');
 
-        $transformation = new MaxSize(array('width' => 1000, 'height' => 1000));
-        $transformation->applyToImage($image);
+        $this->getTransformation()->applyToImage($image, array('width' => 1000, 'height' => 1000));
     }
 }

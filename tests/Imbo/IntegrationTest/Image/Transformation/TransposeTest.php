@@ -15,6 +15,7 @@ use Imbo\Image\Transformation\Transpose;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Transpose
  */
 class TransposeTest extends TransformationTests {
     /**
@@ -27,13 +28,12 @@ class TransposeTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'transpose';
+    protected function getDefaultParams() {
+        return array();
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Canvas::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');

@@ -15,30 +15,30 @@ use Imbo\Image\Transformation\Crop;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Crop
  */
 class CropTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Crop(array(
-            'width' => 1,
-            'height' => 2,
-            'x' => 3,
-            'y' => 4,
-        ));
+        return new Crop();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getExpectedName() {
-        return 'crop';
+    protected function getDefaultParams() {
+        return array(
+            'width' => 1,
+            'height' => 2,
+            'x' => 3,
+            'y' => 4,
+        );
     }
 
     /**
      * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Crop::applyToImage
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');

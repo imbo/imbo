@@ -91,5 +91,5 @@ class TransformationTest extends \PHPUnit_Framework_TestCase {
  * @package Test suite\Unit tests
  */
 class TransformationImpl extends Transformation {
-    public function applyToImage(Image $image) {}
+    public function applyToImage(Image $image, array $params = array()) {}
 }

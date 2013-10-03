@@ -27,7 +27,7 @@ class AutoRotate extends Transformation implements TransformationInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image) {
+    public function applyToImage(Image $image, array $params = array()) {
         try {
             // Get orientation from exif data
             $imagick = $this->getImagick();

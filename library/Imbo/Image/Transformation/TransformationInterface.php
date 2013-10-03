@@ -22,26 +22,6 @@ use Imbo\Model\Image,
  */
 interface TransformationInterface {
     /**
-     * Get the name of the transformation
-     *
-     * The name should be the one used in the query to trigger the transformation. Usually this is
-     * the last part of the class name, in lower case.
-     *
-     * @return string
-     */
-    function getName();
-
-    /**
-     * Set the name of the transformation
-     *
-     * This method is mostly used by presets (chains)
-     *
-     * @param string $name The name of the transformation
-     * @return TransformationInterface
-     */
-    function setName($name);
-
-    /**
      * Get the imagick instance
      *
      * @return Imagick
@@ -60,7 +40,8 @@ interface TransformationInterface {
      * Apply a transformation to an image object
      *
      * @param Image Image instance
+     * @param array $params Parameters for the transformation
      * @throws TransformationException
      */
-    function applyToImage(Image $image);
+    function applyToImage(Image $image, array $params = array());
 }
