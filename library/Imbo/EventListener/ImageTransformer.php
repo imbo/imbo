@@ -60,14 +60,10 @@ class ImageTransformer implements ListenerInterface {
     public function transform(EventInterface $event) {
         $request = $event->getRequest();
         $image = $event->getResponse()->getModel();
-        $transformed = false;
 
         // Fetch transformations specifed in the query and transform the image
         foreach ($request->getTransformations() as $transformation) {
             $image->transform($transformation['name'], $transformation['params']);
-            $transformed = true;
         }
-
-        $image->hasBeenTransformed($transformed);
     }
 }

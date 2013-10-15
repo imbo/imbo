@@ -41,8 +41,7 @@ abstract class ImageFormatter implements ImageFormatterInterface {
             return $model->getBlob();
         }
 
-        $model->transform('convert', array('type' => $this->types[$contentType]))
-              ->hasBeenTransformed(true);
+        $model->transform('convert', array('type' => $this->types[$contentType]));
 
         return $model->getBlob();
     }
