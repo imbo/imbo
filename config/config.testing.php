@@ -248,12 +248,10 @@ return array(
         'watermark' => 'Imbo\Image\Transformation\Watermark',
 
         // collection
-        'graythumb' => function (array $params) {
-            return new Transformation\Collection(array(
-                new Transformation\Thumbnail($params),
-                new Transformation\Desaturate(),
-            ));
-        }
+        'graythumb' => array(
+            'thumbnail',
+            'desaturate',
+        ),
     ),
 
     'routes' => array(
