@@ -209,6 +209,7 @@ $config = array(
         'border' => 'Imbo\Image\Transformation\Border',
         'canvas' => 'Imbo\Image\Transformation\Canvas',
         'compress' => 'Imbo\Image\Transformation\Compress',
+        'convert' => 'Imbo\Image\Transformation\Convert',
         'crop' => 'Imbo\Image\Transformation\Crop',
         'desaturate' => 'Imbo\Image\Transformation\Desaturate',
         'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
@@ -222,7 +223,6 @@ $config = array(
         'transverse' => 'Imbo\Image\Transformation\Transverse',
         'watermark' => 'Imbo\Image\Transformation\Watermark',
     ),
-
 
     /**
      * Custom resources for Imbo
