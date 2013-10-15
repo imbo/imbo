@@ -10,8 +10,6 @@
 
 namespace Imbo\UnitTest\Http\Response\Formatter;
 
-use Imbo\Image\Transformation\Convert;
-
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
@@ -22,16 +20,14 @@ abstract class ImageFormatterTests extends \PHPUnit_Framework_TestCase {
      */
     private $formatter;
 
-    protected $transformation;
     protected $model;
 
     /**
      * Get the formatter we want to test
      *
-     * @param Convert $convert The convert transformation to use with the formatter
      * @return ImageFormatterInterface
      */
-    abstract protected function getFormatter(Convert $convert);
+    abstract protected function getFormatter();
 
     /**
      * Get the expected content type for the formatter
@@ -44,8 +40,7 @@ abstract class ImageFormatterTests extends \PHPUnit_Framework_TestCase {
      * Set up the formatter
      */
     public function setUp() {
-        $this->transformation = $this->getMockBuilder('Imbo\Image\Transformation\Convert')->disableOriginalConstructor()->getMock();
-        $this->formatter = $this->getFormatter($this->transformation);
+        $this->formatter = $this->getFormatter();
         $this->model = $this->getMock('Imbo\Model\Image');
     }
 
@@ -53,7 +48,6 @@ abstract class ImageFormatterTests extends \PHPUnit_Framework_TestCase {
      * Tear down the formatter
      */
     public function tearDown() {
-        $this->transformation = null;
         $this->formatter = null;
         $this->model = null;
     }
@@ -64,17 +58,18 @@ abstract class ImageFormatterTests extends \PHPUnit_Framework_TestCase {
 
     public function testDoesNotApplyTransformationWhenImageIsOfCorrectType() {
         $blob = 'image blob';
-        $this->transformation->expects($this->never())->method('applyToImage');
         $this->model->expects($this->once())->method('getMimeType')->will($this->returnValue($this->getExpectedContentType()));
         $this->model->expects($this->once())->method('getBlob')->will($this->returnValue($blob));
+        $this->model->expects($this->never())->method('transform');
+
         $this->assertSame($blob, $this->formatter->format($this->model));
     }
 
     public function testAppliesTransformationIfImageIsOfDifferentType() {
         $blob = 'image blob';
-        $this->transformation->expects($this->once())->method('applyToImage')->with($this->model);
         $this->model->expects($this->once())->method('getMimeType')->will($this->returnValue('image/sometype'));
         $this->model->expects($this->once())->method('getBlob')->will($this->returnValue($blob));
+        $this->model->expects($this->once())->method('transform')->with('convert', $this->isType('array'));
         $this->assertSame($blob, $this->formatter->format($this->model));
     }
 }

@@ -10,11 +10,13 @@
 
 namespace Imbo\UnitTest\Model;
 
-use Imbo\Model\Image;
+use Imbo\Model\Image,
+    Imbo\Image\Transformation\Transformation;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @covers Imbo\Model\Image
  */
 class ImageTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -209,5 +211,93 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->image->hasBeenTransformed());
         $this->assertSame($this->image, $this->image->hasBeenTransformed(false));
         $this->assertFalse($this->image->hasBeenTransformed());
+    }
+
+    /**
+     * @covers Imbo\Model\Image::transform
+     * @covers Imbo\Model\Image::getTransformationHandler
+     * @expectedException Imbo\Exception\TransformationException
+     * @expectedExceptionMessage Unknown transformation: foobar
+     * @expectedExceptionCode 400
+     */
+    public function testThrowsAnExceptionWhenTryingToApplyAnUnknownTransformation() {
+        $this->image->transform('foobar');
+    }
+
+    /**
+     * @covers Imbo\Model\Image::transform
+     * @covers Imbo\Model\Image::getTransformationHandler
+     * @expectedException Imbo\Exception\TransformationException
+     * @expectedExceptionMessage Invalid image transformation: border
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsAnExceptionWhenTryingToApplyAnInvalidTransformation() {
+        $this->image->setTransformationHandler('border', 'stdClass');
+        $this->image->transform('border');
+    }
+
+    public function getTransformations() {
+        return array(
+            'class name as string' => array(
+                'border', __NAMESPACE__ . '\Border', array(), 'a:0:{}'
+            ),
+            'class name as string with params' => array(
+                'border', __NAMESPACE__ . '\Border', array('width' => 100), 'a:1:{s:5:"width";i:100;}'
+            ),
+            'transformation as closure' => array(
+                'border', function() { return new Border(); }, array(), 'a:0:{}'
+            ),
+            'transformation as closure with params' => array(
+                'border', function() { return new Border(); }, array('width' => 100), 'a:1:{s:5:"width";i:100;}'
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getTransformations
+     * @covers Imbo\Model\Image::transform
+     * @covers Imbo\Model\Image::getTransformationHandler
+     */
+    public function testCanTransformAnImageUsingImageTransformations($key, $transformation, $params, $output) {
+        $this->image->setTransformationHandler($key, $transformation);
+        $this->expectOutputString($output);
+        $this->image->transform($key, $params);
+    }
+
+    /**
+     * @covers Imbo\Model\Image::transform
+     * @covers Imbo\Model\Image::getTransformationHandler
+     */
+    public function testCanTransformAnImageUsingPresets() {
+        $this->image->setTransformationHandler('border1', __NAMESPACE__ . '\Border');
+        $this->image->setTransformationHandler('border2', __NAMESPACE__ . '\Border');
+        $this->image->setTransformationHandler('border', array(
+            'border1',
+            'border2' => array(
+                'width' => 5,
+            ),
+        ));
+        $this->expectOutputString('a:1:{s:5:"width";i:1;}a:1:{s:5:"width";i:5;}');
+        $this->image->transform('border', array('width' => 1));
+    }
+
+    /**
+     * @covers Imbo\Model\Image::transform
+     * @covers Imbo\Model\Image::setImageReader
+     */
+    public function testStoresAnImageReaderInImageReaderAwareTransformations() {
+        $reader = $this->getMockBuilder('Imbo\Storage\ImageReader')->disableOriginalConstructor()->getMock();
+        $transformation = $this->getMock('Imbo\Image\Transformation\Watermark');
+        $transformation->expects($this->once())->method('setImageReader')->with($reader);
+
+        $this->image->setImageReader($reader)
+                    ->setTransformationHandler('watermark', function() use ($transformation) { return $transformation; })
+                    ->transform('watermark');
+    }
+}
+
+class Border extends Transformation {
+    public function applyToImage(Image $image, array $params = array()) {
+        echo serialize($params);
     }
 }

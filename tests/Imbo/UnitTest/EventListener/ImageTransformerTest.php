@@ -112,17 +112,7 @@ class ImageTransformerTest extends ListenerTests {
 
         $this->image->expects($this->at(0))->method('transform')->with('resize', array('width' => 100));
         $this->image->expects($this->at(1))->method('transform')->with('thumbnail', array('some' => 'value'));
-        $this->image->expects($this->at(2))->method('hasBeenTransformed')->with(true);
 
-        $this->listener->transform($this->event);
-    }
-
-    /**
-     * @covers Imbo\EventListener\ImageTransformer::transform
-     */
-    public function testDoesNotMarkImageAsTransformedIfNoTransformationsExists() {
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array()));
-        $this->image->expects($this->at(0))->method('hasBeenTransformed')->with(false);
         $this->listener->transform($this->event);
     }
 }

@@ -42,7 +42,8 @@ class MaxImageSizeTest extends \PHPUnit_Framework_TestCase {
         $image = new Image();
         $image->setBlob(file_get_contents(FIXTURES_DIR . '/image.png'))
               ->setWidth(665)
-              ->setHeight(463);
+              ->setHeight(463)
+              ->setTransformationHandler('maxSize', 'Imbo\Image\Transformation\MaxSize');
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));

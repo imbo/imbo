@@ -96,7 +96,8 @@ class AutoRotateImageTest extends \PHPUnit_Framework_TestCase {
          * the four corner pixels match the known color values as defined in $colorValues
          */
         $image = new Image();
-        $image->setBlob(file_get_contents($file));
+        $image->setBlob(file_get_contents($file))
+              ->setTransformationHandler('autoRotate', 'Imbo\Image\Transformation\AutoRotate');
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));

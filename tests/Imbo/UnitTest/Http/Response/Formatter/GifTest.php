@@ -10,20 +10,18 @@
 
 namespace Imbo\UnitTest\Http\Response\Formatter;
 
-use Imbo\Http\Response\Formatter\Gif,
-    Imbo\Image\Transformation\Convert;
+use Imbo\Http\Response\Formatter\Gif;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
  */
 class GifTest extends ImageFormatterTests {
-
     /**
      * {@inheritdoc}
      */
-    protected function getFormatter(Convert $convert) {
-        return new Gif($convert);
+    protected function getFormatter() {
+        return new Gif();
     }
 
     /**

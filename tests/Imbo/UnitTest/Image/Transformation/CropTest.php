@@ -55,7 +55,6 @@ class CropTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @dataProvider getImageParams
-     * @covers Imbo\Image\Transformation\Crop::__construct
      * @covers Imbo\Image\Transformation\Crop::applyToImage
      */
     public function testUsesAllParamsWithImagick($params, $width, $height, $x = 0, $y = 0, $shouldCrop = true) {
