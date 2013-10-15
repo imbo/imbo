@@ -11,8 +11,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\Image\Transformation\AutoRotate;
+    Imbo\EventListener\ListenerInterface;
 
 /**
  * Auto rotate event listener
@@ -37,8 +36,6 @@ class AutoRotateImage implements ListenerInterface {
      */
     public function autoRotate(EventInterface $event) {
         $image = $event->getRequest()->getImage();
-
-        $transformation = new AutoRotate();
-        $transformation->applyToImage($image);
+        $image->transform('autoRotate');
     }
 }
