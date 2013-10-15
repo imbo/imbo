@@ -230,51 +230,22 @@ return array(
     ),
 
     'imageTransformations' => array(
-        'border' => function (array $params) {
-            return new Transformation\Border($params);
-        },
-        'canvas' => function (array $params) {
-            return new Transformation\Canvas($params);
-        },
-        'compress' => function (array $params) {
-            return new Transformation\Compress($params);
-        },
-        'convert' => function (array $params) {
-            return new Transformation\Convert($params);
-        },
-        'crop' => function (array $params) {
-            return new Transformation\Crop($params);
-        },
-        'desaturate' => function (array $params) {
-            return new Transformation\Desaturate();
-        },
-        'flipHorizontally' => function (array $params) {
-            return new Transformation\FlipHorizontally();
-        },
-        'flipVertically' => function (array $params) {
-            return new Transformation\FlipVertically();
-        },
-        'maxSize' => function (array $params) {
-            return new Transformation\MaxSize($params);
-        },
-        'resize' => function (array $params) {
-            return new Transformation\Resize($params);
-        },
-        'rotate' => function (array $params) {
-            return new Transformation\Rotate($params);
-        },
-        'sepia' => function (array $params) {
-            return new Transformation\Sepia($params);
-        },
-        'thumbnail' => function (array $params) {
-            return new Transformation\Thumbnail($params);
-        },
-        'transpose' => function (array $params) {
-            return new Transformation\Transpose();
-        },
-        'transverse' => function (array $params) {
-            return new Transformation\Transverse();
-        },
+        'border' => 'Imbo\Image\Transformation\Border',
+        'canvas' => 'Imbo\Image\Transformation\Canvas',
+        'compress' => 'Imbo\Image\Transformation\Compress',
+        'convert' => 'Imbo\Image\Transformation\Convert',
+        'crop' => 'Imbo\Image\Transformation\Crop',
+        'desaturate' => 'Imbo\Image\Transformation\Desaturate',
+        'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
+        'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
+        'maxSize' => 'Imbo\Image\Transformation\MaxSize',
+        'resize' => 'Imbo\Image\Transformation\Resize',
+        'rotate' => 'Imbo\Image\Transformation\Rotate',
+        'sepia' => 'Imbo\Image\Transformation\Sepia',
+        'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
+        'transpose' => 'Imbo\Image\Transformation\Transpose',
+        'transverse' => 'Imbo\Image\Transformation\Transverse',
+        'watermark' => 'Imbo\Image\Transformation\Watermark',
 
         // collection
         'graythumb' => function (array $params) {
