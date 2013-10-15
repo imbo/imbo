@@ -85,9 +85,9 @@ class Application {
         $responseWriter = new ResponseWriter(array(
             'json' => new Formatter\JSON($dateFormatter),
             'xml'  => new Formatter\XML($dateFormatter),
-            'gif'  => new Formatter\Gif(new Transformation\Convert(array('type' => 'gif'))),
-            'png'  => new Formatter\Png(new Transformation\Convert(array('type' => 'png'))),
-            'jpeg' => new Formatter\Jpeg(new Transformation\Convert(array('type' => 'jpg'))),
+            'gif'  => new Formatter\Gif(),
+            'png'  => new Formatter\Png(),
+            'jpeg' => new Formatter\Jpeg(),
         ), new Http\ContentNegotiation());
 
         // Collect event listener data

@@ -21,31 +21,28 @@ use Imbo\Model,
  */
 abstract class ImageFormatter implements ImageFormatterInterface {
     /**
-     * Convert transformation
+     * Mime type => image type map
      *
-     * @var Transformation\Convert
+     * @var array
      */
-    private $transformation;
-
-    /**
-     * Class constructor
-     *
-     * @param TransformationInterface $transformation A convert transformation
-     */
-    public function __construct(Transformation\Convert $transformation) {
-        $this->transformation = $transformation;
-    }
+    private $types = array(
+        'image/jpeg' => 'jpg',
+        'image/gif' => 'gif',
+        'image/png' => 'png',
+    );
 
     /**
      * {@inheritdoc}
      */
     public function format(Model\Image $model) {
-        if ($this->getContentType() === $model->getMimeType()) {
+        $contentType = $this->getContentType();
+
+        if ($contentType === $model->getMimeType()) {
             return $model->getBlob();
         }
 
-        $this->transformation->applyToImage($model);
-        $model->hasBeenTransformed(true);
+        $model->transform('convert', array('type' => $this->types[$contentType]))
+              ->hasBeenTransformed(true);
 
         return $model->getBlob();
     }
