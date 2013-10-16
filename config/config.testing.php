@@ -174,6 +174,7 @@ return array(
                 'whitelist' => array('publickey'),
             ),
         ),
+        'cors' => 'Imbo\EventListener\Cors',
     ),
 
     'imageTransformations' => array(
