@@ -141,4 +141,19 @@ interface EventInterface {
      * @return boolean
      */
     function propagationIsStopped();
+
+    /**
+     * Set the handler name
+     *
+     * @param string $handler The name of the handler for the current event
+     * @return self
+     */
+    function setHandler($handler);
+
+    /**
+     * Get the handler for the current event
+     *
+     * @return string
+     */
+    function getHandler();
 }
