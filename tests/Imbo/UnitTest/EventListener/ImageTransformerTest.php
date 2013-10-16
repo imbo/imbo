@@ -77,7 +77,6 @@ class ImageTransformerTest extends ListenerTests {
                 'borderedThumbnail' => array(
                     'border', 'thumbnail',
                 ),
-
             ),
         );
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('publickey'));
@@ -89,6 +88,33 @@ class ImageTransformerTest extends ListenerTests {
         $this->image->expects($this->at(3))->method('setTransformationHandler')->with('borderedThumbnail', array('border', 'thumbnail'));
 
         $this->listener->initialize($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageTransformer::initialize
+     */
+    public function testWillInitializeImageTransformationHandlersWhenImageIsLocatedInTheRequest() {
+        $config = array(
+            'imageTransformations' => array(
+                'border' => 'Imbo\Image\Transformation\Border',
+            ),
+        );
+
+        $response = $this->getMock('Imbo\Http\Response\Response');
+        $response->expects($this->once())->method('getModel')->will($this->returnValue(null));
+
+        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
+        $event->expects($this->any())->method('getResponse')->will($this->returnValue($response));
+        $event->expects($this->once())->method('getStorage')->will($this->returnValue($this->getMock('Imbo\Storage\StorageInterface')));
+        $event->expects($this->once())->method('getConfig')->will($this->returnValue($config));
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('publickey'));
+        $this->request->expects($this->once())->method('getImage')->will($this->returnValue($this->image));
+        $this->image->expects($this->at(0))->method('setImageReader')->with($this->isInstanceOf('Imbo\Storage\ImageReader'));
+        $this->image->expects($this->at(1))->method('setTransformationHandler')->with('border', 'Imbo\Image\Transformation\Border');
+
+        $this->listener->initialize($event);
     }
 
     /**

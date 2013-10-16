@@ -32,6 +32,9 @@ class ImageTransformer implements ListenerInterface {
                 'transform' => 0,
                 'initialize' => 10,
             ),
+            'image.put' => array(
+                'initialize' => 45,
+            ),
         );
     }
 
@@ -44,7 +47,7 @@ class ImageTransformer implements ListenerInterface {
         $request = $event->getRequest();
         $imageReader = new ImageReader($request->getPublicKey(), $event->getStorage());
 
-        $image = $event->getResponse()->getModel();
+        $image = $event->getResponse()->getModel() ?: $request->getImage();
         $image->setImageReader($imageReader);
 
         foreach ($event->getConfig()['imageTransformations'] as $name => $transformation) {
