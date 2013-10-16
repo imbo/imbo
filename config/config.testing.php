@@ -183,6 +183,10 @@ return array(
                 ),
             ),
         ),
+        'maxImageSize' => array(
+            'listener' => 'Imbo\EventListener\MaxImageSize',
+            'params' => array(1000, 1000),
+        ),
     ),
 
     'imageTransformations' => array(
