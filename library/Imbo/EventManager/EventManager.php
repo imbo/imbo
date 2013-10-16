@@ -64,12 +64,10 @@ class EventManager {
      *
      * @param string $name The name of the handler
      * @param mixed $handler The handler itself
-     * @param array $events Which events the handler subscribes to
-     * @param array $params Parameters for the handler
-     * @param array $publicKeys Public key filter for the events
+     * @param array $params Parameters for the handler if $handler is a string
      * @return self
      */
-    public function registerEventListener($name, $handler, array $events, array $params = array(), array $publicKeys = array()) {
+    public function addEventHandler($name, $handler, array $params = array()) {
         if (is_string($handler)) {
             $this->eventHandlers[$name] = array(
                 'handler' => $handler,
@@ -79,6 +77,18 @@ class EventManager {
             $this->eventHandlers[$name] = $handler;
         }
 
+        return $this;
+    }
+
+    /**
+     * Add one or more callbacks
+     *
+     * @param string $name The name of the handler that owns the callback
+     * @param array $events Which events the callback will trigger for
+     * @param array $publicKeys Public key filter for the events
+     * @return self
+     */
+    public function addCallbacks($name, array $events, array $publicKeys = array()) {
         // Default priority
         $defaultPriority = 0;
 
@@ -110,36 +120,15 @@ class EventManager {
                         'publicKeys' => $publicKeys,
                     ), $priority);
                 }
+            } else if (is_int($callback)) {
+                // We have a closure as a callback, so $callback is the actual priority
+                $this->callbacks[$event]->insert(array(
+                    'handler' => $name,
+                    'publicKeys' => $publicKeys,
+                ), $callback);
             } else {
                 throw new InvalidArgumentException('Invalid event definition for listener: ' . $name);
             }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Register a closure as a callback
-     *
-     * @param string $name The name of the handler
-     * @param Closure $callback The callback to register
-     * @param array $events The events the callback subscribes to
-     * @param array $publicKeys Public key filter for the events
-     * @return self
-     */
-    public function registerClosure($name, $callback, array $events, array $publicKeys = array()) {
-        $this->eventHandlers[$name] = $callback;
-
-        foreach ($events as $event => $priority) {
-            if (!isset($this->callbacks[$event])) {
-                // Create a priority queue for this event
-                $this->callbacks[$event] = new SplPriorityQueue();
-            }
-
-            $this->callbacks[$event]->insert(array(
-                'handler' => $name,
-                'publicKeys' => $publicKeys,
-            ), $priority);
         }
 
         return $this;
@@ -190,6 +179,7 @@ class EventManager {
 
             // Trigger all listeners for this event and pass in the event instance
             foreach ($this->callbacks[$eventName] as $listener) {
+                $event->setHandler($listener['handler']);
                 $callback = $this->getHandlerInstance($listener['handler']);
 
                 if ($callback instanceof ListenerInterface) {

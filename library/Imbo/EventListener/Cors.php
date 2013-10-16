@@ -64,38 +64,36 @@ class Cors implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        // Enable the event listener for all resources/methods. We will end up with a lot more
-        // registered events than actually needed, but the parameters specifying which methods we
-        // want is not available
-        $resources = array(
-            'image',
-            'shorturl',
-            'status',
-            'images',
-            'metadata',
-            'user',
-            'stats',
-            'index'
+        return array(
+            'route.match' => 'subscribe',
         );
-        $methods = array(
-            'GET',
-            'POST',
-            'PUT',
-            'HEAD',
-            'DELETE',
-            'OPTIONS',
-        );
+    }
 
+    /**
+     * Subscribe to events based on configuration parameters
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function subscribe(EventInterface $event) {
         $events = array();
 
-        foreach ($resources as $resource) {
+        // Enable the event listener only for resources and methods specified
+        foreach ($this->params['allowedMethods'] as $resource => $methods) {
             foreach ($methods as $method) {
-                $event = $resource . '.' . strtolower($method);
-                $events[$event] = array('invoke' => 20);
+                $eventName = $resource . '.' . strtolower($method);
+                $events[$eventName] = array('invoke' => 20);
             }
+
+            // Always enable the listener for the OPTIONS method
+            $eventName = $resource . '.options';
+            $events[$eventName] = array('options' => 20);
         }
 
-        return $events;
+        $manager = $event->getManager();
+        $manager->addCallbacks($event->getHandler(), $events);
+
+        // Add OPTIONS to the Allow header
+        $event->getResponse()->headers->set('Allow', 'OPTIONS', false);
     }
 
     /**
@@ -105,14 +103,17 @@ class Cors implements ListenerInterface {
      */
     public function options(EventInterface $event) {
         $request = $event->getRequest();
+        $response = $event->getResponse();
         $origin = $request->headers->get('Origin', '*');
+
+        // This is an OPTIONS request, send 204 since no more content will follow
+        $response->setStatusCode(204);
 
         // Fall back if the passed origin is not allowed
         if (!$this->originIsAllowed($origin)) {
             return;
         }
 
-        $response = $event->getResponse();
         $resource = (string) $request->getRoute();
 
         $allowedMethods = array('OPTIONS');
@@ -129,7 +130,6 @@ class Cors implements ListenerInterface {
         ));
 
         // Since this is an OPTIONS-request, there is no need for further parsing
-        $response->setStatusCode(204);
         $event->stopPropagation(true);
     }
 

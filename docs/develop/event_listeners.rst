@@ -152,6 +152,9 @@ The object passed to the event listeners is an instance of the ``Imbo\EventManag
 ``getName()``
     Get the name of the current event. For instance ``image.delete``.
 
+``getHandler()``
+    Get the name of the current event handler, as specified in the configuration. Can come in handy when you have to dynamically register more callbacks based on constructor parameters for the event listener. Have a look at the implementation of :ref:`the CORS event listener <cors-event-listener>` for an example on how to achieve this.
+
 ``getRequest()``
     Get the current request object (an instance of ``Imbo\Http\Request\Request``)
 
@@ -299,15 +302,15 @@ The listener does not support any parameters and can be enabled like this:
         // ...
 
         'eventListeners' => array(
-            'autoRotate' => function() {
-                return new Imbo\EventListener\AutoRotateImage();
-            },
+            'autoRotate' => 'Imbo\EventListener\AutoRotateImage',
         ),
 
         // ...
     );
 
 If you enable this listener all new images added to Imbo will be auto rotated based on the EXIF data. This might also cause the image identifier sent in the response to be different from the one used in the URI when storing the image. This can happen with all event listeners which can possibly modify the image before storing it.
+
+.. _cors-event-listener:
 
 CORS (Cross-Origin Resource Sharing)
 ++++++++++++++++++++++++++++++++++++
@@ -325,16 +328,19 @@ Here is an example on how to enable the CORS listener:
         // ...
 
         'eventListeners' => array(
-            'cors' => function() {
-                return new Imbo\EventListener\Cors(array(
-                    'allowedOrigins' => array('http://some.origin'),
-                    'allowedMethods' => array(
-                        'image'  => array('GET', 'HEAD', 'PUT'),
-                        'images' => array('GET', 'HEAD'),
+            'cors' => array(
+                'listener' => 'Imbo\EventListener\Cors',
+                'params' => array(
+                    array(
+                        'allowedOrigins' => array('http://some.origin'),
+                        'allowedMethods' => array(
+                            'image'  => array('GET', 'HEAD', 'PUT'),
+                            'images' => array('GET', 'HEAD'),
+                        ),
+                        'maxAge' => 3600,
                     ),
-                    'maxAge' => 3600,
-                ));
-            },
+                ),
+            ),
         ),
 
         // ...
@@ -373,12 +379,12 @@ and is enabled like this:
         // ...
 
         'eventListeners' => array(
-            'exifMetadata' => function() {
-                return new Imbo\EventListener\ExifMetadata(array(
-                    'exif:Make',
-                    'exif:Model',
-                ));
-            },
+            'exifMetadata' => array(
+                'listener' => 'Imbo\EventListener\ExifMetadata',
+                'params' => array(
+                    array('exif:Make', 'exif:Model'),
+                ),
+            ),
         ),
 
         // ...
@@ -411,9 +417,10 @@ and is enabled like this:
         // ...
 
         'eventListeners' => array(
-            'imageTransformationCache' => function() {
-                return new Imbo\EventListener\ImageTransformationCache('/path/to/cache');
-            },
+            'imageTransformationCache' => array(
+                'listener' => 'Imbo\EventListener\ImageTransformationCache',
+                'params' => array('/path/to/cache'),
+            ),
         ),
 
         // ...
@@ -461,9 +468,10 @@ and is enabled like this:
         // ...
 
         'eventListeners' => array(
-            'maxImageSize' => function() {
-                return new Imbo\EventListener\MaxImageSize(1024, 768);
-            },
+            'maxImageSize' => array(
+                'listener' => 'Imbo\EventListener\MaxImageSize',
+                'params' => array(1024, 768),
+            ),
         ),
 
         // ...
@@ -489,13 +497,17 @@ and has the following parameters:
 .. code-block:: php
 
     <?php
+    // Create the cache adapter
+    $cacheAdapter = new Imbo\Cache\APC('imbo');
+
     return array(
         // ...
 
         'eventListeners' => array(
-            'metadataCache' => function() {
-                return new Imbo\EventListener\MetadataCache(new Imbo\Cache\APC('imbo'));
-            },
+            'metadataCache' => array(
+                'listener' => 'Imbo\EventListener\MetadataCache',
+                'params' => array($cacheAdapter),
+            ),
         ),
 
         // ...
