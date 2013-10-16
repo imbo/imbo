@@ -16,6 +16,7 @@ use Imbo\EventManager\EventManager,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @covers Imbo\EventManager\EventManager
  */
 class EventManagerTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -43,7 +44,8 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\EventManager\EventManager::registerClosure
+     * @covers Imbo\EventManager\EventManager::addEventHandler
+     * @covers Imbo\EventManager\EventManager::addCallbacks
      * @covers Imbo\EventManager\EventManager::trigger
      */
     public function testCanRegisterAndExecuteRegularCallbacksInAPrioritizedFashion() {
@@ -53,11 +55,11 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame(
             $this->manager,
-            $this->manager->registerClosure('handler1', $callback1, array('event1' => 0))
-                          ->registerClosure('handler2', $callback2, array('event2' => 1))
-                          ->registerClosure('handler3', $callback3, array('event2' => 2))
-                          ->registerClosure('handler4', $callback3, array('event3' => 0))
-                          ->registerClosure('handler5', $callback1, array('event4' => 0))
+            $this->manager->addEventHandler('handler1', $callback1)->addCallbacks('handler1', array('event1' => 0))
+                          ->addEventHandler('handler2', $callback2)->addCallbacks('handler2', array('event2' => 1))
+                          ->addEventHandler('handler3', $callback3)->addCallbacks('handler3', array('event2' => 2))
+                          ->addEventHandler('handler4', $callback3)->addCallbacks('handler4', array('event3' => 0))
+                          ->addEventHandler('handler5', $callback1)->addCallbacks('handler5', array('event4' => 0))
         );
 
         $this->expectOutputString('1321');
@@ -79,10 +81,10 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
             $event->stopPropagation(true);
         };
 
-        $this->manager->registerClosure('handler1', $callback1, array('event' => 3))
-                      ->registerClosure('handler2', $stopper, array('event' => 2))
-                      ->registerClosure('handler3', $callback2, array('event' => 1))
-                      ->registerClosure('handler4', $callback3, array('otherevent' => 0));
+        $this->manager->addEventHandler('handler1', $callback1)->addCallbacks('handler1', array('event' => 3))
+                      ->addEventHandler('handler2', $stopper)->addCallbacks('handler2', array('event' => 2))
+                      ->addEventHandler('handler3', $callback2)->addCallbacks('handler3', array('event' => 1))
+                      ->addEventHandler('handler4', $callback3)->addCallbacks('handler4', array('otherevent' => 0));
 
         $this->expectOutputString('13');
 
@@ -97,7 +99,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\EventManager::hasListenersForEvent
      */
     public function testCanCheckIfTheManagerHasListenersForSpecificEvents() {
-        $this->manager->registerClosure('handler', function($event) {}, array('event' => 0));
+        $this->manager->addEventHandler('handler', function($event) {})->addCallbacks('handler', array('event' => 0));
         $this->assertFalse($this->manager->hasListenersForEvent('some.event'));
         $this->assertTrue($this->manager->hasListenersForEvent('event'));
     }
@@ -126,7 +128,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
     public function testCanIncludeAndExcludePublicKeys($publicKey, $publicKeys, $output = '') {
         $callback = function ($event) { echo '1'; };
 
-        $this->manager->registerClosure('handler', $callback, array('event' => 0), $publicKeys);
+        $this->manager->addEventHandler('handler', $callback)->addCallbacks('handler', array('event' => 0), $publicKeys);
 
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($publicKey));
 
