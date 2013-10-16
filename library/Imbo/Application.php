@@ -224,7 +224,7 @@ class Application {
             }
 
             // Inform the user agent of which methods are allowed against this resource
-            $response->headers->set('Allow', implode(', ', $resource->getAllowedMethods()));
+            $response->headers->set('Allow', implode(', ', $resource->getAllowedMethods()), false);
 
             if ($publicKey = $request->getPublicKey()) {
                 if (!isset($config['auth'][$publicKey])) {

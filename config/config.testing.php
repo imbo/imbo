@@ -174,7 +174,15 @@ return array(
                 'whitelist' => array('publickey'),
             ),
         ),
-        'cors' => 'Imbo\EventListener\Cors',
+        'cors' => array(
+            'listener' => 'Imbo\EventListener\Cors',
+            'params' => array(
+                array(
+                    'allowedOrigins' => array('http://allowedhost'),
+                    'maxAge' => 1349,
+                ),
+            ),
+        ),
     ),
 
     'imageTransformations' => array(

@@ -95,7 +95,10 @@ class CorsTest extends ListenerTests {
      * @covers Imbo\EventListener\Cors::originIsAllowed
      */
     public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOptions() {
-        $this->event->expects($this->never())->method('getResponse');
+        $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $headers->expects($this->never())->method('add');
+        $this->response->headers = $headers;
+
         $this->listener->options($this->event);
     }
 
