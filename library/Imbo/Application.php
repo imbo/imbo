@@ -112,7 +112,8 @@ class Application {
                 $params = array();
             }
 
-            $eventManager->registerEventListener($listener, $listener, $listener::getSubscribedEvents(), $params);
+            $eventManager->addEventHandler($listener, $listener, $params)
+                         ->addCallbacks($listener, $listener::getSubscribedEvents());
         }
 
         // Listeners from configuration
@@ -124,7 +125,8 @@ class Application {
 
             if (is_string($definition)) {
                 // Class name
-                $eventManager->registerEventListener($name, $definition, $definition::getSubscribedEvents());
+                $eventManager->addEventHandler($name, $definition)
+                             ->addCallbacks($name, $definition::getSubscribedEvents());
                 continue;
             }
 
@@ -134,7 +136,8 @@ class Application {
             }
 
             if ($definition instanceof ListenerInterface) {
-                $eventManager->registerEventListener($name, $definition, $definition::getSubscribedEvents());
+                $eventManager->addEventHandler($name, $definition)
+                             ->addCallbacks($name, $definition::getSubscribedEvents());
                 continue;
             }
 
@@ -151,7 +154,8 @@ class Application {
                     throw new InvalidArgumentException('Invalid event listener definition', 500);
                 }
 
-                $eventManager->registerEventListener($name, $listener, $listener::getSubscribedEvents(), $params, $publicKeys);
+                $eventManager->addEventHandler($name, $listener, $params)
+                             ->addCallbacks($name, $listener::getSubscribedEvents(), $publicKeys);
             } else if (is_array($definition) && !empty($definition['callback']) && !empty($definition['events'])) {
                 $priority = 0;
                 $events = array();
@@ -174,7 +178,8 @@ class Application {
                     $events[$event] = $p;
                 }
 
-                $eventManager->registerClosure($name, $definition['callback'], $events, $publicKeys);
+                $eventManager->addEventHandler($name, $definition['callback'])
+                             ->addCallbacks($name, $events, $publicKeys);
             } else {
                 throw new InvalidArgumentException('Invalid event listener definition', 500);
             }
@@ -186,12 +191,15 @@ class Application {
                 $resource = $resource();
             }
 
-            $eventManager->registerEventListener($name, $resource, $resource::getSubscribedEvents());
+            $eventManager->addEventHandler($name, $resource)
+                         ->addCallbacks($name, $resource::getSubscribedEvents());
         }
 
         try {
             // Route the request
             $router->route($request);
+
+            $eventManager->trigger('route.match');
 
             // Create the resource
             $routeName = (string) $request->getRoute();
