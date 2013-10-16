@@ -128,4 +128,14 @@ class EventTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->event, $this->event->setConfig($config));
         $this->assertSame($config, $this->event->getConfig());
     }
+
+    /**
+     * @covers Imbo\EventManager\Event::getHandler
+     * @covers Imbo\EventManager\Event::setHandler
+     */
+    public function testCanSetAndGetEventHandlerName() {
+        $this->assertNull($this->event->getHandler());
+        $this->assertSame($this->event, $this->event->setHandler('handler'));
+        $this->assertSame('handler', $this->event->getHandler());
+    }
 }

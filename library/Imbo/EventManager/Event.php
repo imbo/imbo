@@ -79,6 +79,13 @@ class Event implements EventInterface {
     private $propagationIsStopped = false;
 
     /**
+     * The handler for the current event
+     *
+     * @var string
+     */
+    private $handler;
+
+    /**
      * Class contsructor
      *
      * @param string $name The name of the current event
@@ -215,5 +222,21 @@ class Event implements EventInterface {
      */
     public function propagationIsStopped() {
         return $this->propagationIsStopped;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setHandler($handler) {
+        $this->handler = $handler;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHandler() {
+        return $this->handler;
     }
 }
