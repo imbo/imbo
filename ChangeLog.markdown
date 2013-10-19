@@ -1,12 +1,6 @@
 Changelog for Imbo
 ==================
 
-Imbo-0.3.3
-----------
-__2013-06-06__
-
-* Fixed #214: 0.3.2 is not installable without updating dependencies
-
 Imbo-0.4.0
 ----------
 __N/A__
@@ -28,6 +22,12 @@ Bug fixes:
 
 * #211: CORS event listener suppresses "405 Method not allowed" responses when enabled
 * #209: The Collection image transformation is not image-reader-aware
+
+Imbo-0.3.3
+----------
+__2013-10-19__
+
+* Fixed #214: 0.3.2 is not installable without updating dependencies
 
 Imbo-0.3.2
 ----------
