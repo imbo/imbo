@@ -1,5 +1,11 @@
 Changelog for Imbo
-=====================
+==================
+
+Imbo-0.3.3
+----------
+__2013-06-06__
+
+* Fixed #214: 0.3.2 is not installable without updating dependencies
 
 Imbo-0.3.2
 ----------
