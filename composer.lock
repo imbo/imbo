@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "06ecde7daea795334fd18282f73c9954",
+    "hash": "ff4d84ad4435a8e93e190ec35f3eda95",
     "packages": [
         {
             "name": "symfony/http-foundation",
@@ -1551,7 +1551,8 @@
 
     ],
     "platform": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "ext-imagick": ">=3.0.1"
     },
     "platform-dev": [
 
