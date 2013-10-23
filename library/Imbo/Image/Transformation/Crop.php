@@ -45,19 +45,23 @@ class Crop extends Transformation implements TransformationInterface {
             }
         }
 
-        $width = (int) $params['width'];
-        $height = (int) $params['height'];
-
+        // Fetch the x, y, width and height of the resulting image
         $x = !empty($params['x']) ? (int) $params['x'] : $this->x;
         $y = !empty($params['y']) ? (int) $params['y'] : $this->y;
 
-        try {
-            if ($this->x === 0 && $this->y === 0 &&
-                $image->getWidth() <= $this->width &&
-                $image->getHeight() <= $this->height) {
-                    return;
-            }
+        $width = (int) $params['width'];
+        $height = (int) $params['height'];
 
+        // Return if there is no need for cropping
+        if (
+            $x === 0 && $y === 0 &&
+            $image->getWidth() <= $width &&
+            $image->getHeight() <= $height
+        ) {
+            return;
+        }
+
+        try {
             $imagick = $this->getImagick();
             $imagick->readImageBlob($image->getBlob());
             $imagick->cropImage($width, $height, $x, $y);
