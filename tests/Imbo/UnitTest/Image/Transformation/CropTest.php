@@ -44,9 +44,10 @@ class CropTest extends \PHPUnit_Framework_TestCase {
      */
     public function getImageParams() {
         return array(
-            array(array('width' => 123, 'height' => 234), 123, 234),
-            array(array('width' => 123, 'height' => 234, 'y' => 10), 123, 234, 0, 10),
-            array(array('width' => 123, 'height' => 234, 'x' => 10, 'y' => 20), 123, 234, 10, 20),
+            'Do not perform work when cropping same sized images' => array(array('width' => 123, 'height' => 234), 123, 234, 0, 0, false),
+            'Do not perform work when getting a larger crop than image' => array(array('width' => 5123, 'height' => 5234), 123, 234, 0, 0, false),
+            'Create new cropped image #1' => array(array('width' => 123, 'height' => 234, 'y' => 10), 123, 234, 0, 10),
+            'Create new cropped image #2' => array(array('width' => 123, 'height' => 234, 'x' => 10, 'y' => 20), 123, 234, 10, 20),
         );
     }
 
@@ -55,18 +56,26 @@ class CropTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Transformation\Crop::__construct
      * @covers Imbo\Image\Transformation\Crop::applyToImage
      */
-    public function testUsesAllParamsWithImagick($params, $width, $height, $x = 0, $y = 0) {
+    public function testUsesAllParamsWithImagick($params, $width, $height, $x = 0, $y = 0, $shouldCrop = true) {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue('originalimage'));
-        $image->expects($this->once())->method('setBlob')->with('newimage')->will($this->returnSelf());
-        $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnSelf());
-        $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnSelf());
-
         $imagick = $this->getMock('Imagick');
-        $imagick->expects($this->once())->method('readImageBlob')->with('originalimage');
-        $imagick->expects($this->once())->method('cropImage')->with($width, $height, $x, $y);
-        $imagick->expects($this->once())->method('getImageBlob')->will($this->returnValue('newimage'));
-        $imagick->expects($this->once())->method('getImageGeometry')->will($this->returnValue(array('width' => $width, 'height' => $height)));
+
+        $image->expects($this->any())->method('getWidth')->will($this->returnValue($width));
+        $image->expects($this->any())->method('getHeight')->will($this->returnValue($height));
+
+        if ($shouldCrop) {
+            $image->expects($this->once())->method('getBlob')->will($this->returnValue('originalimage'));
+            $image->expects($this->once())->method('setBlob')->with('newimage')->will($this->returnSelf());
+            $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnSelf());
+            $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnSelf());
+
+            $imagick->expects($this->once())->method('readImageBlob')->with('originalimage');
+            $imagick->expects($this->once())->method('cropImage')->with($width, $height, $x, $y);
+            $imagick->expects($this->once())->method('getImageBlob')->will($this->returnValue('newimage'));
+            $imagick->expects($this->once())->method('getImageGeometry')->will($this->returnValue(array('width' => $width, 'height' => $height)));
+        } else {
+            $imagick->expects($this->never())->method('cropImage');
+        }
 
         $crop = new Crop($params);
         $crop->setImagick($imagick)->applyToImage($image);
