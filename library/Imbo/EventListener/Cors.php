@@ -45,7 +45,7 @@ class Cors implements ListenerInterface {
 
     /**
      * Whether the request matched an allowed method + origin
-     * 
+     *
      * @var boolean
      */
     private $requestAllowed = false;
@@ -73,6 +73,7 @@ class Cors implements ListenerInterface {
     public static function getSubscribedEvents() {
         return array(
             'route.match' => 'subscribe',
+            'response.send' => 'setExposedHeaders',
         );
     }
 
@@ -82,9 +83,7 @@ class Cors implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function subscribe(EventInterface $event) {
-        $events = array(
-            'response.send' => 'setExposedHeaders'
-        );
+        $events = array();
 
         // Enable the event listener only for resources and methods specified
         foreach ($this->params['allowedMethods'] as $resource => $methods) {
@@ -106,9 +105,9 @@ class Cors implements ListenerInterface {
     }
 
     /**
-     * Right before the response is sent to the client, whitelist all included
-     * Imbo-headers in the "Access-Control-Expose-Headers"-header
-     * 
+     * Right before the response is sent to the client, whitelist all included Imbo-headers in the
+     * "Access-Control-Expose-Headers"-header
+     *
      * @param EventInterface $event The event instance
      */
     public function setExposedHeaders(EventInterface $event) {
