@@ -44,6 +44,13 @@ class Cors implements ListenerInterface {
     );
 
     /**
+     * Whether the request matched an allowed method + origin
+     * 
+     * @var boolean
+     */
+    private $requestAllowed = false;
+
+    /**
      * Class constructor
      *
      * @param array $params Parameters for the listener
@@ -75,7 +82,9 @@ class Cors implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function subscribe(EventInterface $event) {
-        $events = array();
+        $events = array(
+            'response.send' => 'setExposedHeaders'
+        );
 
         // Enable the event listener only for resources and methods specified
         foreach ($this->params['allowedMethods'] as $resource => $methods) {
@@ -94,6 +103,35 @@ class Cors implements ListenerInterface {
 
         // Add OPTIONS to the Allow header
         $event->getResponse()->headers->set('Allow', 'OPTIONS', false);
+    }
+
+    /**
+     * Right before the response is sent to the client, whitelist all included
+     * Imbo-headers in the "Access-Control-Expose-Headers"-header
+     * 
+     * @param EventInterface $event The event instance
+     */
+    public function setExposedHeaders(EventInterface $event) {
+        // If this request was disallowed, don't expose any headers
+        if (!$this->requestAllowed) {
+            return;
+        }
+
+        $headers = array(
+            // The ResponseSender-listener will add this header and send the response,
+            // so we have no way to pick it up - instead we'll always whitelist it
+            'X-Imbo-ImageIdentifier'
+        );
+
+        foreach ($event->getResponse()->headers as $header => $value) {
+            if (strpos($header, 'x-imbo') === 0) {
+                $headers[] = implode('-', array_map('ucfirst', explode('-', $header)));;
+            }
+        }
+
+        $event->getResponse()->headers->add(array(
+            'Access-Control-Expose-Headers' => implode(', ', $headers)
+        ));
     }
 
     /**
@@ -156,9 +194,11 @@ class Cors implements ListenerInterface {
             return;
         }
 
+        // Flag this as an allowed request
+        $this->requestAllowed = true;
+
         $event->getResponse()->headers->add(array(
             'Access-Control-Allow-Origin' => $origin,
-            'Access-Control-Expose-Headers' => 'X-Imbo-Error-Internalcode'
         ));
     }
 
