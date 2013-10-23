@@ -8,7 +8,7 @@ Feature: Imbo provides an event listener for CORS
         When I request "/" using HTTP "HEAD"
         Then I should get a response with "200 Hell Yeah"
         And the "Access-Control-Allow-Origin" response header is "http://allowedhost"
-        And the "Access-Control-Expose-Headers" response header is "X-Imbo-Error-Internalcode"
+        And the "Access-Control-Expose-Headers" response header is "X-Imbo-ImageIdentifier, X-Imbo-Version, X-Imbo-Someotherhandler"
         And the "Allow" response header is "OPTIONS, GET, HEAD"
 
     Scenario: Request a resource using a non-allowed host

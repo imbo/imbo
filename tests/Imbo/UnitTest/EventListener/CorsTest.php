@@ -123,7 +123,6 @@ class CorsTest extends ListenerTests {
         $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $headers->expects($this->once())->method('add')->with(array(
             'Access-Control-Allow-Origin' => 'http://imbo-project.org',
-            'Access-Control-Expose-Headers' => 'X-Imbo-Error-Internalcode',
         ));
 
         $this->response->headers = $headers;
@@ -146,7 +145,6 @@ class CorsTest extends ListenerTests {
         $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $headers->expects($this->once())->method('add')->with(array(
             'Access-Control-Allow-Origin' => 'http://imbo-project.org',
-            'Access-Control-Expose-Headers' => 'X-Imbo-Error-Internalcode',
         ));
 
         $this->response->headers = $headers;
@@ -155,6 +153,48 @@ class CorsTest extends ListenerTests {
         $route->expects($this->once())->method('__toString')->will($this->returnValue('index'));
         $this->request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
         $listener->invoke($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\Cors::invoke
+     * @covers Imbo\EventListener\Cors::setExposedHeaders
+     */
+    public function testIncludesAllImboHeadersAsExposedHeaders() {
+        $listener = new Cors(array(
+            'allowedOrigins' => array('http://imbo-project.org')
+        ));
+
+        $headerIterator = new \ArrayIterator(array('x-imbo-something' => 'value', 'not-included' => 'foo'));
+
+        $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $headers->expects($this->once())->method('getIterator')->will($this->returnValue($headerIterator));
+        $headers->expects($this->at(0))->method('add')->with(array(
+            'Access-Control-Allow-Origin' => 'http://imbo-project.org',
+        ));
+        $headers->expects($this->at(2))->method('add')->with(array(
+            'Access-Control-Expose-Headers' => 'X-Imbo-ImageIdentifier, X-Imbo-Something',
+        ));
+
+        $this->response->headers = $headers;
+        $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
+        $route = $this->getMock('Imbo\Router\Route');
+        $route->expects($this->once())->method('__toString')->will($this->returnValue('index'));
+        $this->request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
+        $listener->invoke($this->event);
+        $listener->setExposedHeaders($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\Cors::setExposedHeaders
+     */
+    public function testDoesNotAddExposeHeadersHeaderWhenOriginIsInvalid() {
+        $listener = new Cors(array());
+
+        $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $headers->expects($this->never())->method('add');
+
+        $this->response->headers = $headers;
+        $listener->setExposedHeaders($this->event);
     }
 
     /**
