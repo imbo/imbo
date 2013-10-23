@@ -79,6 +79,12 @@ class Crop extends Transformation implements TransformationInterface {
      */
     public function applyToImage(Image $image) {
         try {
+            if ($this->x === 0 && $this->y === 0 &&
+                $image->getWidth() <= $this->width &&
+                $image->getHeight() <= $this->height) {
+                    return;
+            }
+
             $imagick = $this->getImagick();
             $imagick->readImageBlob($image->getBlob());
             $imagick->cropImage($this->width, $this->height, $this->x, $this->y);
