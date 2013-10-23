@@ -19,14 +19,14 @@
   "require": {
     "php": ">=5.4.0",
     "ext-imagick": ">=3.0.1",
-    "symfony/http-foundation": "2.*"
+    "symfony/http-foundation": "~2.0"
   },
   "require-dev": {
-    "mikey179/vfsStream": "1.*",
-    "phpunit/phpunit": "3.*",
-    "behat/behat": "2.*",
-    "guzzle/guzzle": "3.*",
-    "doctrine/dbal": "2.*"
+    "mikey179/vfsStream": "~1.0",
+    "phpunit/phpunit": "~3.0",
+    "behat/behat": "~2.0",
+    "guzzle/guzzle": "~3.0",
+    "doctrine/dbal": "~2.0"
   },
   "suggest": {
     "ext-mongo": "Enables usage of MongoDB and GridFS as database and store. Recommended version: >=1.4.0",
