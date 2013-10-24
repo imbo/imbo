@@ -74,6 +74,7 @@ Feature: Imbo enables dynamic transformations of images
         And I specify the following transformations:
           """
           resize:width=100,height=100
+          resize:width=123,height=456
           desaturate
           flipHorizontally
           flipVertically
