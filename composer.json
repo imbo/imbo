@@ -19,7 +19,8 @@
   "require": {
     "php": ">=5.4.0",
     "ext-imagick": ">=3.0.1",
-    "symfony/http-foundation": "~2.0"
+    "symfony/http-foundation": "~2.0",
+    "symfony/event-dispatcher": "~2.0"
   },
   "require-dev": {
     "mikey179/vfsStream": "~1.0",
