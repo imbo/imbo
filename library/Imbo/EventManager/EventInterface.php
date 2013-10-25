@@ -23,57 +23,18 @@ use Imbo\Http\Request\Request,
  */
 interface EventInterface {
     /**
-     * Set the name of the event
-     *
-     * @param string $name The name of the event
-     * @return EventInterface
-     */
-    function setName($name);
-
-    /**
-     * Get the name of the event
-     *
-     * @return string
-     */
-    function getName();
-
-    /**
-     * Set the request
-     *
-     * @param Request $request The request instance
-     * @return self
-     */
-    function setRequest(Request $request);
-
-    /**
-     * Get the request instance
+     * Get the request parameter
      *
      * @return Request
      */
     function getRequest();
 
     /**
-     * Set the response
-     *
-     * @param Response $response The response instance
-     * @return self
-     */
-    function setResponse(Response $response);
-
-    /**
-     * Get the response instance
+     * Get the response parameter
      *
      * @return Response
      */
     function getResponse();
-
-    /**
-     * Set the database adapter
-     *
-     * @param DatabaseInterface $database The database adapter
-     * @return self
-     */
-    function setDatabase(DatabaseInterface $database);
 
     /**
      * Get the database adapter
@@ -83,27 +44,11 @@ interface EventInterface {
     function getDatabase();
 
     /**
-     * Set the storage adapter
-     *
-     * @param StorageInterface $storage The storage adapter
-     * @return self
-     */
-    function setStorage(StorageInterface $storage);
-
-    /**
      * Get the storage adapter
      *
      * @return StorageInterface
      */
     function getStorage();
-
-    /**
-     * Set the event manager
-     *
-     * @param EventManager $manager The event manager
-     * @return self
-     */
-    function setManager(EventManager $manager);
 
     /**
      * Get the event manager that triggered the event
@@ -113,42 +58,11 @@ interface EventInterface {
     function getManager();
 
     /**
-     * Set the configuration
-     *
-     * @param array $config The configuration array
-     * @return self
-     */
-    function setConfig(array $config);
-
-    /**
      * Get the Imbo configuration
      *
      * @return array
      */
     function getConfig();
-
-    /**
-     * Whether or not to stop the execution of more listeners for the current event
-     *
-     * @param boolean $flag True to stop, false to continue
-     * @return EventInterface
-     */
-    function stopPropagation($flag);
-
-    /**
-     * Return whether or not the propagation should stop
-     *
-     * @return boolean
-     */
-    function propagationIsStopped();
-
-    /**
-     * Set the handler name
-     *
-     * @param string $handler The name of the handler for the current event
-     * @return self
-     */
-    function setHandler($handler);
 
     /**
      * Get the handler for the current event
