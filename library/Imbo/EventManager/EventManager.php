@@ -179,7 +179,7 @@ class EventManager {
 
             // Trigger all listeners for this event and pass in the event instance
             foreach ($this->callbacks[$eventName] as $listener) {
-                $event->setHandler($listener['handler']);
+                $event->setArgument('handler', $listener['handler']);
                 $callback = $this->getHandlerInstance($listener['handler']);
 
                 if ($callback instanceof ListenerInterface) {
@@ -194,7 +194,7 @@ class EventManager {
 
                 $callback($event);
 
-                if ($event->propagationIsStopped()) {
+                if ($event->isPropagationStopped()) {
                     break;
                 }
             }
@@ -222,7 +222,7 @@ class EventManager {
      * @return self
      */
     public function setEventTemplate(EventInterface $event) {
-        $event->setManager($this);
+        $event->setArgument('manager', $this);
         $this->event = $event;
 
         return $this;

@@ -65,12 +65,13 @@ class Application {
 
         $router = new Router($config['routes']);
 
-        $event = new Event();
-        $event->setRequest($request)
-              ->setResponse($response)
-              ->setDatabase($database)
-              ->setStorage($storage)
-              ->setConfig($config);
+        $event = new Event($this, array(
+            'request' => $request,
+            'response' => $response,
+            'database' => $database,
+            'storage' => $storage,
+            'config' => $config,
+        ));
 
         $eventManager = new EventManager($request);
         $eventManager->setEventTemplate($event);

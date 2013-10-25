@@ -108,7 +108,7 @@ class ImageTransformationCache implements ListenerInterface {
                 $response->setModel($data['image']);
 
                 // Stop other listeners on this event
-                $event->stopPropagation(true);
+                $event->stopPropagation();
 
                 return;
             } else {
