@@ -41,7 +41,7 @@ class MetadataCacheTest extends ListenerTests {
         $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->response->headers = $this->responseHeaders;
-        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
+        $this->event = $this->getMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
@@ -81,7 +81,7 @@ class MetadataCacheTest extends ListenerTests {
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Metadata'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setLastModified')->with($date);
 
-        $this->event->expects($this->once())->method('stopPropagation')->with(true);
+        $this->event->expects($this->once())->method('stopPropagation');
 
         $this->listener->loadFromCache($this->event);
     }

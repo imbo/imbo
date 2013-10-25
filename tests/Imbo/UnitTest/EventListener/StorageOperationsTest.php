@@ -39,7 +39,7 @@ class StorageOperationsTest extends ListenerTests {
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
-        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
+        $this->event = $this->getMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getStorage')->will($this->returnValue($this->storage));

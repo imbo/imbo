@@ -65,14 +65,17 @@ class Application {
 
         $router = new Router($config['routes']);
 
+        // Create the event manager and the event template
+        $eventManager = new EventManager();
         $event = new Event();
-        $event->setRequest($request)
-              ->setResponse($response)
-              ->setDatabase($database)
-              ->setStorage($storage)
-              ->setConfig($config);
-
-        $eventManager = new EventManager($request);
+        $event->setArguments(array(
+            'request' => $request,
+            'response' => $response,
+            'database' => $database,
+            'storage' => $storage,
+            'config' => $config,
+            'manager' => $eventManager,
+        ));
         $eventManager->setEventTemplate($event);
 
         // A date formatter helper

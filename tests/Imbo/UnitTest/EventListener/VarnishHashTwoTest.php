@@ -37,7 +37,7 @@ class VarnishHashTwoTest extends ListenerTests {
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->response->headers = $this->responseHeaders;
 
-        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
+        $this->event = $this->getMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 

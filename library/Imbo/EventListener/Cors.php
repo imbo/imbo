@@ -167,7 +167,7 @@ class Cors implements ListenerInterface {
         ));
 
         // Since this is an OPTIONS-request, there is no need for further parsing
-        $event->stopPropagation(true);
+        $event->stopPropagation();
     }
 
     /**

@@ -13,7 +13,8 @@ namespace Imbo\EventManager;
 use Imbo\Http\Request\Request,
     Imbo\Http\Response\Response,
     Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface;
+    Imbo\Storage\StorageInterface,
+    Symfony\Component\EventDispatcher\GenericEvent;
 
 /**
  * Event class
@@ -21,222 +22,53 @@ use Imbo\Http\Request\Request,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event
  */
-class Event implements EventInterface {
-    /**
-     * Name of the current event
-     *
-     * @var string
-     */
-    private $name;
-
-    /**
-     * Current request
-     *
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * Current response
-     *
-     * @var Response
-     */
-    private $response;
-
-    /**
-     * Datebase adapter
-     *
-     * @var DatabaseInterface
-     */
-    private $database;
-
-    /**
-     * Storage adapter
-     *
-     * @var StorageInterface
-     */
-    private $storage;
-
-    /**
-     * Configuration
-     *
-     * @var array
-     */
-    private $config;
-
-    /**
-     * The eventmanager
-     *
-     * @var EventManager
-     */
-    private $manager;
-
-    /**
-     * Propagation flag
-     *
-     * @var boolean
-     */
-    private $propagationIsStopped = false;
-
-    /**
-     * The handler for the current event
-     *
-     * @var string
-     */
-    private $handler;
-
-    /**
-     * Class contsructor
-     *
-     * @param string $name The name of the current event
-     */
-    public function __construct($name = null) {
-        if ($name !== null) {
-            $this->setName($name);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setName($name) {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName() {
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setRequest(Request $request) {
-        $this->request = $request;
-
-        return $this;
-    }
-
+class Event extends GenericEvent implements EventInterface {
     /**
      * {@inheritdoc}
      */
     public function getRequest() {
-        return $this->request;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setResponse(Response $response) {
-        $this->response = $response;
-
-        return $this;
+        return $this->getArgument('request');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getResponse() {
-        return $this->response;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDatabase(DatabaseInterface $database) {
-        $this->database = $database;
-
-        return $this;
+        return $this->getArgument('response');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getDatabase() {
-        return $this->database;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setStorage(StorageInterface $storage) {
-        $this->storage = $storage;
-
-        return $this;
+        return $this->getArgument('database');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getStorage() {
-        return $this->storage;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setManager(EventManager $manager) {
-        $this->manager = $manager;
-
-        return $this;
+        return $this->getArgument('storage');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getManager() {
-        return $this->manager;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConfig(array $config) {
-        $this->config = $config;
-
-        return $this;
+        return $this->getArgument('manager');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getConfig() {
-        return $this->config;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function stopPropagation($flag) {
-        $this->propagationIsStopped = $flag;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function propagationIsStopped() {
-        return $this->propagationIsStopped;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setHandler($handler) {
-        $this->handler = $handler;
-
-        return $this;
+        return $this->getArgument('config');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getHandler() {
-        return $this->handler;
+        return $this->getArgument('handler');
     }
 }

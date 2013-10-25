@@ -173,10 +173,10 @@ The object passed to the event listeners is an instance of the ``Imbo\EventManag
 ``getConfig()``
     Get the complete Imbo configuration. This should be used with caution as it includes all authentication information regarding the Imbo users.
 
-``stopPropagation($flag)``
-    If you want your event listener to force Imbo to skip all following listeners for the same event, call this method with ``true``.
+``stopPropagation()``
+    If you want your event listener to force Imbo to skip all following listeners for the same event, call this method in your listener.
 
-``propagationIsStopped()``
+``isPropagationStopped()``
     This method is used by Imbo to check if a listener wants the propagation to stop. Your listener will most likely never need to use this method.
 
 With these methods you have access to most parts of Imbo that is worth working with. Be careful when using the database and storage adapters as these grant you access to all data stored in Imbo, with both read and write permissions.

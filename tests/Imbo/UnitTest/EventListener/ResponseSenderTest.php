@@ -59,7 +59,7 @@ class ResponseSenderTest extends ListenerTests {
         $response->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $response->headers->expects($this->once())->method('set')->with('X-Imbo-ImageIdentifier', 'checksum');
 
-        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($response));
 
@@ -79,7 +79,7 @@ class ResponseSenderTest extends ListenerTests {
         $response->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $response->headers->expects($this->once())->method('set')->with('X-Imbo-ImageIdentifier', 'checksum');
 
-        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($response));
 

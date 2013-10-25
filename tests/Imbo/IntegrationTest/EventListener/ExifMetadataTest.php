@@ -31,7 +31,7 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
 
         $properties = $listener->populate($event);
@@ -59,7 +59,7 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
 
         $properties = $listener->populate($event);
@@ -83,7 +83,7 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
 
         $properties = $listener->populate($event);
@@ -116,7 +116,7 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
             $this->arrayHasKey('gps:location')
         );
 
-        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->exactly(2))->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
 

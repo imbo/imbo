@@ -62,7 +62,7 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
-        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
+        $this->event = $this->getMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
@@ -116,7 +116,7 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(array('thumbnail')));
 
         $this->response->expects($this->once())->method('setModel')->with($imageFromCache)->will($this->returnSelf());
-        $this->event->expects($this->once())->method('stopPropagation')->with(true);
+        $this->event->expects($this->once())->method('stopPropagation');
 
         $dir = 'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/6/7/7';
         $file = '677605632e7a57c58734e0a60cc1aaa7';

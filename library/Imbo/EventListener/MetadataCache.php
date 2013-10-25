@@ -84,7 +84,7 @@ class MetadataCache implements ListenerInterface {
             $response->headers->set('X-Imbo-MetadataCache', 'Hit');
 
             // Stop propagation of listeners for this event
-            $event->stopPropagation(true);
+            $event->stopPropagation();
             return;
         } else if ($result) {
             // Invalid result stored in the cache. Delete

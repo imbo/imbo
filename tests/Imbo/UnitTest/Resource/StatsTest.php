@@ -40,7 +40,7 @@ class StatsTest extends ResourceTests {
     public function setUp() {
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->eventManager = $this->getMockBuilder('Imbo\EventManager\EventManager')->disableOriginalConstructor()->getMock();
-        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
+        $this->event = $this->getMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getManager')->will($this->returnValue($this->eventManager));
 
