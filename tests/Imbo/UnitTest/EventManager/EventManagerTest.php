@@ -78,7 +78,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $callback2 = function($event) { echo 2; };
         $callback3 = function($event) { echo 3; };
         $stopper = function($event) {
-            $event->stopPropagation(true);
+            $event->stopPropagation();
         };
 
         $this->manager->addEventHandler('handler1', $callback1)->addCallbacks('handler1', array('event' => 3))

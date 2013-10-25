@@ -40,7 +40,7 @@ class CorsTest extends ListenerTests {
 
         $this->response = $this->getMock('Imbo\Http\Response\Response');
 
-        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
+        $this->event = $this->getMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
 
@@ -250,7 +250,7 @@ class CorsTest extends ListenerTests {
         $request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $request->headers = $requestHeaders;
 
-        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->never())->method('getResponse');
 

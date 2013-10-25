@@ -30,7 +30,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
      */
     public function setUp() {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->event = $this->getMock('Imbo\EventManager\EventInterface');
+        $this->event = $this->getMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
 
         $this->prepare = new ImagePreparation();
