@@ -25,14 +25,16 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
     private $manager;
 
     private $request;
+    private $event;
 
     /**
      * Set up the event manager
      */
     public function setUp() {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->manager = new EventManager($this->request);
-        $this->manager->setEventTemplate(new Event());
+        $this->event = new Event($this, array('request' => $this->request));
+        $this->manager = new EventManager();
+        $this->manager->setEventTemplate($this->event);
     }
 
     /**
@@ -40,6 +42,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->request = null;
+        $this->event = null;
         $this->manager = null;
     }
 
@@ -134,5 +137,22 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
 
         $this->expectOutputString($output);
         $this->manager->trigger('event');
+    }
+
+    /**
+     * @covers Imbo\EventManager\EventManager::trigger
+     */
+    public function testCanAddExtraParametersToTheEvent() {
+        $this->manager->addEventHandler('handler', function($event) {
+            echo $event->getArgument('foo');
+            echo $event->getArgument('bar');
+        })->addCallbacks('handler', array('event' => 0));
+
+        $this->expectOutputString('barbaz');
+
+        $this->manager->trigger('event', array(
+            'foo' => 'bar',
+            'bar' => 'baz',
+        ));
     }
 }

@@ -11,7 +11,6 @@
 namespace Imbo\EventManager;
 
 use Imbo\EventListener\ListenerInterface,
-    Imbo\Http\Request\Request,
     ReflectionClass,
     SplPriorityQueue;
 
@@ -42,22 +41,6 @@ class EventManager {
      * @var array
      */
     private $callbacks = array();
-
-    /**
-     * The current request
-     *
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * Class constructor
-     *
-     * @param Request $request The current request
-     */
-    public function __construct(Request $request) {
-        $this->request = $request;
-    }
 
     /**
      * Register an event handler
@@ -167,15 +150,21 @@ class EventManager {
      * Trigger a given event
      *
      * @param string $eventName The name of the event to trigger
+     * @param array $params Extra parameters for the event
      * @return EventManager
      */
-    public function trigger($eventName) {
+    public function trigger($eventName, array $params = array()) {
         if (!empty($this->callbacks[$eventName])) {
-            $event = $this->getNewEvent();
+            $event = clone $this->event;
             $event->setName($eventName);
 
+            // Add optional extra arguments
+            foreach ($params as $key => $value) {
+                $event->setArgument($key, $value);
+            }
+
             // Fetch current public key
-            $publicKey = $this->request->getPublicKey();
+            $publicKey = $event->getRequest()->getPublicKey();
 
             // Trigger all listeners for this event and pass in the event instance
             foreach ($this->callbacks[$eventName] as $listener) {
@@ -222,19 +211,9 @@ class EventManager {
      * @return self
      */
     public function setEventTemplate(EventInterface $event) {
-        $event->setArgument('manager', $this);
         $this->event = $event;
 
         return $this;
-    }
-
-    /**
-     * Get a new event
-     *
-     * @return EventInterface
-     */
-    public function getNewEvent() {
-        return clone $this->event;
     }
 
     /**
