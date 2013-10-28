@@ -49,7 +49,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::send
+     * @covers Imbo\Http\Response\ResponseFormatter::format
      */
     public function testWritesAgainWhenFirstCallFails() {
         $exception = $this->getMock('Imbo\Exception\RuntimeException');
@@ -64,11 +64,11 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $this->responseWriter->expects($this->at(0))->method('write')->with($model, $request, $response)->will($this->throwException($exception));
         $this->responseWriter->expects($this->at(1))->method('write')->with($this->isInstanceOf('Imbo\Model\Error'), $request, $response, false);
 
-        $this->responseFormatter->send($event);
+        $this->responseFormatter->format($event);
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::send
+     * @covers Imbo\Http\Response\ResponseFormatter::format
      */
     public function testReturnWhenStatusCodeIs204() {
         $response = $this->getMock('Imbo\Http\Response\Response');
@@ -79,11 +79,11 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
 
         $this->responseWriter->expects($this->never())->method('write');
 
-        $this->responseFormatter->send($event);
+        $this->responseFormatter->format($event);
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::send
+     * @covers Imbo\Http\Response\ResponseFormatter::format
      */
     public function testReturnWhenThereIsNoModel() {
         $response = $this->getMock('Imbo\Http\Response\Response');
@@ -95,6 +95,6 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
 
         $this->responseWriter->expects($this->never())->method('write');
 
-        $this->responseFormatter->send($event);
+        $this->responseFormatter->format($event);
     }
 }

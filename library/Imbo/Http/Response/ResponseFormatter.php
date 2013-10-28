@@ -44,7 +44,7 @@ class ResponseFormatter implements ListenerInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            'response.send' => array('send' => 20),
+            'response.send' => array('format' => 20),
         );
     }
 
@@ -53,7 +53,7 @@ class ResponseFormatter implements ListenerInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function send(EventInterface $event) {
+    public function format(EventInterface $event) {
         $response = $event->getResponse();
         $model = $response->getModel();
 
