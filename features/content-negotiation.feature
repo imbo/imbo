@@ -52,14 +52,14 @@ Feature: Imbo supports content negotiation
         And the "Accept" request header is "<accept>"
         When I request "/users/publickey/images/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa<extension>"
         Then I should get a response with "<reason>"
-        And the "Content-Type" response header is "<content-type>"
+        And the "Content-Type" response header is "application/json"
 
         Examples:
-            | accept    | content-type     | extension | reason              |
-            | */*       | application/json | .png      | 404 Image not found |
-            | image/png | application/json | .png      | 406 Not acceptable  |
-            | */*       | application/json |           | 404 Image not found |
-            | image/png | application/json |           | 406 Not acceptable  |
+            | accept    | extension | reason              |
+            | */*       | .png      | 404 Image not found |
+            | image/png | .png      | 406 Not acceptable  |
+            | */*       |           | 404 Image not found |
+            | image/png |           | 406 Not acceptable  |
 
     Scenario: Fetch an image when not accepting images
         Given I use "publickey" and "privatekey" for public and private keys
