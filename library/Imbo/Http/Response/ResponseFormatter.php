@@ -124,6 +124,27 @@ class ResponseFormatter implements ListenerInterface {
     }
 
     /**
+     * Set the formatter
+     *
+     * @param string $formatter The formatter to set
+     * @return self
+     */
+    public function setFormatter($formatter) {
+        $this->formatter = $formatter;
+
+        return $this;
+    }
+
+    /**
+     * Get the formatter
+     *
+     * @return string
+     */
+    public function getFormatter() {
+        return $this->formatter;
+    }
+
+    /**
      * Perform content negotiation by looking the the current URL and the Accept request header
      *
      * @param EventInterface $event The event instance
