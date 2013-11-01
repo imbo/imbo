@@ -12,7 +12,6 @@ namespace Imbo;
 
 use Imbo\Http\Request\Request,
     Imbo\Http\Response\Response,
-    Imbo\Http\Response\ResponseWriter,
     Imbo\EventListener\ListenerInterface,
     Imbo\EventManager\Event,
     Imbo\EventManager\EventManager,
@@ -82,13 +81,14 @@ class Application {
         $dateFormatter = new Helpers\DateFormatter();
 
         // A response writer
-        $responseWriter = new ResponseWriter(array(
+        $formatters = array(
             'json' => new Formatter\JSON($dateFormatter),
             'xml'  => new Formatter\XML($dateFormatter),
             'gif'  => new Formatter\Gif(),
             'png'  => new Formatter\Png(),
             'jpeg' => new Formatter\Jpeg(),
-        ), new Http\ContentNegotiation());
+        );
+        $contentNegotiation = new Http\ContentNegotiation();
 
         // Collect event listener data
         $eventListeners = array(
@@ -101,7 +101,7 @@ class Application {
             'Imbo\Resource\Images',
             'Imbo\Resource\Image',
             'Imbo\Resource\Metadata',
-            'Imbo\Http\Response\ResponseFormatter' => array($responseWriter),
+            'Imbo\Http\Response\ResponseFormatter' => array($formatters, $contentNegotiation),
             'Imbo\EventListener\DatabaseOperations',
             'Imbo\EventListener\StorageOperations',
             'Imbo\Image\ImagePreparation',
@@ -250,11 +250,33 @@ class Application {
                 throw new RuntimeException('Method not allowed', 405);
             }
 
-            $eventManager->trigger($eventName);
+            $eventManager->trigger($eventName)
+                         ->trigger('response.negotiate');
         } catch (Exception $exception) {
-            // An error has occured. Create an error and send the response
+            $negotiated = false;
             $error = Error::createFromException($exception, $request);
             $response->setError($error);
+
+            // If the error is not from the previous attempt at doing content negotiation, force
+            // another round since the model has changed into an error model.
+            if ($exception->getCode() !== 406) {
+                try {
+                    $eventManager->trigger('response.negotiate');
+                    $negotiated = true;
+                } catch (Exception $exception) {
+                    // The client does not accept any of the content types. Generate a new error
+                    $error = Error::createFromException($exception, $request);
+                    $response->setError($error);
+                }
+            }
+
+            // Try to negotiate in a non-strict manner if the response format still has not been
+            // chosen
+            if (!$negotiated) {
+                $eventManager->trigger('response.negotiate', array(
+                    'noStrict' => true,
+                ));
+            }
         }
 
         // Send the response
