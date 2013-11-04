@@ -130,7 +130,7 @@ class StatsAccessTest extends ListenerTests {
                 array('192.168.1.0/24'),
                 false
             ),
-            'IPv4 outsiden of whitelist range' => array(
+            'IPv4 outside of whitelist range' => array(
                 '192.168.1.64',
                 array('192.168.1.32/27'),
                 array(),
