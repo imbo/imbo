@@ -100,6 +100,23 @@ class CustomEventListener implements ListenerInterface {
     }
 }
 
+$statsWhitelist = array('127.0.0.1', '::1');
+$statsBlacklist = array();
+
+if (!empty($_GET['statsWhitelist'])) {
+    // The scenario has specified a whitelist to use
+    $statsWhitelist = explode(',', $_GET['statsWhitelist']);
+}
+
+if (!empty($_GET['statsBlacklist'])) {
+    // The scenario has specified a blacklist to use
+    $statsBlacklist = explode(',', $_GET['statsBlacklist']);
+
+    if (empty($_GET['statsWhitelist'])) {
+        $statsWhitelist = array();
+    }
+}
+
 return array(
     'auth' => array(
         'publickey' => 'privatekey',
@@ -137,6 +154,15 @@ return array(
     'eventListeners' => array(
         'auth' => 'Imbo\EventListener\Authenticate',
         'accessToken' => 'Imbo\EventListener\AccessToken',
+        'statsAccess' => array(
+            'listener' => 'Imbo\EventListener\StatsAccess',
+            'params' => array(
+                array(
+                    'whitelist' => $statsWhitelist,
+                    'blacklist' => $statsBlacklist,
+                )
+            ),
+        ),
         'imageTransformationCache' => array(
             'listener' => 'Imbo\EventListener\ImageTransformationCache',
             'params' => array('/tmp/imbo-behat-image-transformation-cache'),
@@ -186,6 +212,11 @@ return array(
         'maxImageSize' => array(
             'listener' => 'Imbo\EventListener\MaxImageSize',
             'params' => array(1000, 1000),
+        ),
+        'varnishHashTwo' => 'Imbo\EventListener\VarnishHashTwo',
+        'customVarnishHashTwo' => array(
+            'listener' => 'Imbo\EventListener\VarnishHashTwo',
+            'params' => array('X-Imbo-HashTwo'),
         ),
     ),
 
