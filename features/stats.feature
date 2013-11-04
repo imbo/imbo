@@ -32,3 +32,20 @@ Feature: Imbo provides a stats endpoint
             | POST   | 405 Method not allowed |
             | PUT    | 405 Method not allowed |
             | DELETE | 405 Method not allowed |
+
+    Scenario Outline: Stats access event listener decides the access level for the stats endpoint
+        When I request "/stats.json?statsWhitelist=<whitelist>&statsBlacklist=<blacklist>"
+        Then I should get a response with "<status>"
+        And the "Content-Type" response header is "application/json"
+        And the response body matches:
+            """
+            #^{.*}$#ms
+            """
+
+        Examples:
+            | whitelist                | blacklist     | status            |
+            |                          |               | 200 OK            |
+            | 10.0.0.0                 |               | 403 Access denied |
+            |                          | 127.0.0.0/24  | 403 Access denied |
+            # see https://github.com/imbo/imbo/issues/220, the next example should be "200 OK"
+            |                          | 2001:db8::/48 | 403 Access denied |
