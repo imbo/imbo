@@ -130,7 +130,7 @@ class StatsAccessTest extends ListenerTests {
                 array('192.168.1.0/24'),
                 false
             ),
-            'IPv4 outsiden of whitelist range' => array(
+            'IPv4 outside of whitelist range' => array(
                 '192.168.1.64',
                 array('192.168.1.32/27'),
                 array(),
@@ -159,6 +159,12 @@ class StatsAccessTest extends ListenerTests {
                 array('2001:db8::/48'),
                 array(),
                 false
+            ),
+            'IPv6 in whitelist (in short format in both fields)' => array(
+                '2a00:1b60:1011::1338',
+                array('2a00:1b60:1011::1338'),
+                array(),
+                true
             ),
         );
     }
