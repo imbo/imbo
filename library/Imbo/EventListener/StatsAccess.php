@@ -73,6 +73,10 @@ class StatsAccess implements ListenerInterface {
         $request = $event->getRequest();
         $ip = $request->getClientIp();
 
+        if ($this->isIPv6($ip)) {
+            $ip = $this->expandIPv6($ip);
+        }
+
         if (empty($this->params['whitelist']) && !empty($this->params['blacklist'])) {
             $access = !$this->isBlacklisted($ip);
         } else if (empty($this->params['blacklist']) && !empty($this->params['whitelist'])) {

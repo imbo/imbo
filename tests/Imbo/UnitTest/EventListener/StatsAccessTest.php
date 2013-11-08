@@ -160,6 +160,12 @@ class StatsAccessTest extends ListenerTests {
                 array(),
                 false
             ),
+            'IPv6 in whitelist (in short format in both fields)' => array(
+                '2a00:1b60:1011::1338',
+                array('2a00:1b60:1011::1338'),
+                array(),
+                true
+            ),
         );
     }
 
