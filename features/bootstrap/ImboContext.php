@@ -266,4 +266,13 @@ class ImboContext extends RESTContext {
         $this->signRequest();
         $this->request('/users/publickey/images/' . $identifier, 'DELETE');
     }
+
+    /**
+     * @Given /^the client IP is "([^"]*)"$/
+     */
+    public function setClientIp($ip) {
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($ip) {
+            $request = $event['request']->setHeader('X-Client-Ip', $ip);
+        });
+    }
 }
