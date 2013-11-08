@@ -117,6 +117,10 @@ if (!empty($_GET['statsBlacklist'])) {
     }
 }
 
+if (isset($_SERVER['HTTP_X_CLIENT_IP'])) {
+    $_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_X_CLIENT_IP'];
+}
+
 return array(
     'auth' => array(
         'publickey' => 'privatekey',
