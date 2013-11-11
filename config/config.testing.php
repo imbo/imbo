@@ -227,9 +227,8 @@ return array(
             'params' => array('X-Imbo-HashTwo'),
         ),
         'exifMetadataListener' => 'Imbo\EventListener\ExifMetadata',
-    ),
 
-    'imageTransformations' => array(
+        // Image transformations
         'border' => 'Imbo\Image\Transformation\Border',
         'canvas' => 'Imbo\Image\Transformation\Canvas',
         'compress' => 'Imbo\Image\Transformation\Compress',
@@ -246,8 +245,9 @@ return array(
         'transpose' => 'Imbo\Image\Transformation\Transpose',
         'transverse' => 'Imbo\Image\Transformation\Transverse',
         'watermark' => 'Imbo\Image\Transformation\Watermark',
+    ),
 
-        // collection
+    'transformationPresets' => array(
         'graythumb' => array(
             'thumbnail',
             'desaturate',

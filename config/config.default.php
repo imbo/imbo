@@ -177,6 +177,25 @@ $config = array(
                 )
             ),
         ),
+
+        // Image transformations
+        'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
+        'border' => 'Imbo\Image\Transformation\Border',
+        'canvas' => 'Imbo\Image\Transformation\Canvas',
+        'compress' => 'Imbo\Image\Transformation\Compress',
+        'convert' => 'Imbo\Image\Transformation\Convert',
+        'crop' => 'Imbo\Image\Transformation\Crop',
+        'desaturate' => 'Imbo\Image\Transformation\Desaturate',
+        'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
+        'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
+        'maxSize' => 'Imbo\Image\Transformation\MaxSize',
+        'resize' => 'Imbo\Image\Transformation\Resize',
+        'rotate' => 'Imbo\Image\Transformation\Rotate',
+        'sepia' => 'Imbo\Image\Transformation\Sepia',
+        'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
+        'transpose' => 'Imbo\Image\Transformation\Transpose',
+        'transverse' => 'Imbo\Image\Transformation\Transverse',
+        'watermark' => 'Imbo\Image\Transformation\Watermark',
     ),
 
     /**
@@ -205,24 +224,15 @@ $config = array(
      *
      * @var array
      */
-    'imageTransformations' => array(
-        'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
-        'border' => 'Imbo\Image\Transformation\Border',
-        'canvas' => 'Imbo\Image\Transformation\Canvas',
-        'compress' => 'Imbo\Image\Transformation\Compress',
-        'convert' => 'Imbo\Image\Transformation\Convert',
-        'crop' => 'Imbo\Image\Transformation\Crop',
-        'desaturate' => 'Imbo\Image\Transformation\Desaturate',
-        'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
-        'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
-        'maxSize' => 'Imbo\Image\Transformation\MaxSize',
-        'resize' => 'Imbo\Image\Transformation\Resize',
-        'rotate' => 'Imbo\Image\Transformation\Rotate',
-        'sepia' => 'Imbo\Image\Transformation\Sepia',
-        'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
-        'transpose' => 'Imbo\Image\Transformation\Transpose',
-        'transverse' => 'Imbo\Image\Transformation\Transverse',
-        'watermark' => 'Imbo\Image\Transformation\Watermark',
+    'transformationPresets' => array(
+        'graythumb' => array(
+            'thumbnail',
+            'desaturate',
+            'border' => array(
+                'width' => 3,
+                'height' => 3,
+            ),
+        ),
     ),
 
     /**
