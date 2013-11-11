@@ -11,8 +11,7 @@
 namespace Imbo\EventManager;
 
 use Imbo\EventListener\ListenerInterface,
-    ReflectionClass,
-    SplPriorityQueue;
+    ReflectionClass;
 
 /**
  * Event manager
@@ -78,7 +77,7 @@ class EventManager {
         foreach ($events as $event => $callback) {
             if (!isset($this->callbacks[$event])) {
                 // Create a priority queue for this event
-                $this->callbacks[$event] = new SplPriorityQueue();
+                $this->callbacks[$event] = new PriorityQueue();
             }
 
             if (is_string($callback)) {
@@ -167,7 +166,7 @@ class EventManager {
             $publicKey = $event->getRequest()->getPublicKey();
 
             // Trigger all listeners for this event and pass in the event instance
-            foreach ($this->callbacks[$eventName] as $listener) {
+            foreach (clone $this->callbacks[$eventName] as $listener) {
                 $event->setArgument('handler', $listener['handler']);
                 $callback = $this->getHandlerInstance($listener['handler']);
 
