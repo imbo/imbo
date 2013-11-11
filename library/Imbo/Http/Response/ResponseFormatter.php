@@ -26,7 +26,7 @@ use Imbo\EventManager\EventInterface,
  */
 class ResponseFormatter implements ListenerInterface {
     /**
-     * Formatters
+     * Content formatters
      *
      * @var array
      */
@@ -53,7 +53,8 @@ class ResponseFormatter implements ListenerInterface {
     );
 
     /**
-     * Supported content types and the associated formatter class name or instance
+     * Supported content types and the associated formatter class name or instance, or in the
+     * case of an image model, the resulting image type
      *
      * @var array
      */
@@ -62,7 +63,7 @@ class ResponseFormatter implements ListenerInterface {
         'application/xml'  => 'xml',
         'image/gif'        => 'gif',
         'image/png'        => 'png',
-        'image/jpeg'       => 'jpeg',
+        'image/jpeg'       => 'jpg',
     );
 
     /**
@@ -247,10 +248,25 @@ class ResponseFormatter implements ListenerInterface {
 
         $request = $event->getRequest();
 
-        // Create an instance of the formatter
-        $formatter = $this->formatters[$this->formatter];
-        $formattedData = $formatter->format($model);
-        $contentType = $formatter->getContentType();
+        // If we are dealing with an image we want to trigger an event that handles a possible
+        // conversion
+        if ($model instanceof Model\Image) {
+            $eventManager = $event->getManager();
+            $eventManager->trigger('image.transformation.convert', array(
+                'image' => $model,
+                'params' => array(
+                    'type' => $this->formatter,
+                ),
+            ));
+            $formattedData = $model->getBlob();
+            $contentType = $model->getMimeType();
+        } else {
+            // Create an instance of the formatter
+            $formatter = $this->formatters[$this->formatter];
+
+            $formattedData = $formatter->format($model);
+            $contentType = $formatter->getContentType();
+        }
 
         if ($contentType === 'application/json') {
             foreach (array('callback', 'jsonp', 'json') as $validParam) {
