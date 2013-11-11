@@ -13,7 +13,6 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface,
     Imbo\Exception\TransformationException,
     Imbo\Storage\ImageReader,
-    Imbo\Image\Transformation\TransformationInterface,
     Imbo\Model\Image;
 
 /**
@@ -28,31 +27,8 @@ class ImageTransformer implements ListenerInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            'image.transform' => array(
-                'transform' => 0,
-                'initialize' => 10,
-            ),
-            'image.put' => array(
-                'initialize' => 45,
-            ),
+            'image.transform' => 'transform',
         );
-    }
-
-    /**
-     * Initialize the transformer
-     *
-     * @param EventInterface $event The current event
-     */
-    public function initialize(EventInterface $event) {
-        $request = $event->getRequest();
-        $imageReader = new ImageReader($request->getPublicKey(), $event->getStorage());
-
-        $image = $event->getResponse()->getModel() ?: $request->getImage();
-        $image->setImageReader($imageReader);
-
-        foreach ($event->getConfig()['imageTransformations'] as $name => $transformation) {
-            $image->setTransformationHandler($name, $transformation);
-        }
     }
 
     /**
@@ -63,10 +39,37 @@ class ImageTransformer implements ListenerInterface {
     public function transform(EventInterface $event) {
         $request = $event->getRequest();
         $image = $event->getResponse()->getModel();
+        $eventManager = $event->getManager();
+        $presets = $event->getConfig()['transformationPresets'];
 
         // Fetch transformations specifed in the query and transform the image
         foreach ($request->getTransformations() as $transformation) {
-            $image->transform($transformation['name'], $transformation['params']);
+            if (isset($presets[$transformation['name']])) {
+                // Preset
+                foreach ($presets[$transformation['name']] as $name => $params) {
+                    if (is_int($name)) {
+                        $name = $params;
+                        $params = $transformation['params'];
+                    }
+
+                    $eventManager->trigger(
+                        'image.transformation.' . strtolower($name),
+                        array(
+                            'image' => $image,
+                            'params' => $params,
+                        )
+                    );
+                }
+            } else {
+                // Regular transformation
+                $eventManager->trigger(
+                    'image.transformation.' . strtolower($transformation['name']),
+                    array(
+                        'image' => $image,
+                        'params' => $transformation['params'],
+                    )
+                );
+            }
         }
     }
 }
