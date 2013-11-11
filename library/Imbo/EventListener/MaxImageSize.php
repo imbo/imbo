@@ -65,9 +65,12 @@ class MaxImageSize implements ListenerInterface {
         $height = $image->getHeight();
 
         if (($this->width && ($width > $this->width)) || ($this->height && ($height > $this->height))) {
-            $image->transform('maxSize', array(
-                'width' => $this->width,
-                'height' => $this->height,
+            $event->getManager()->trigger('image.transformation.maxsize', array(
+                'image' => $image,
+                'params' => array(
+                    'width' => $this->width,
+                    'height' => $this->height,
+                ),
             ));
         }
     }
