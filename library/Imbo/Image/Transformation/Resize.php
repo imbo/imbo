@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -20,11 +22,22 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Resize extends Transformation implements TransformationInterface {
+class Resize extends Transformation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image, array $params = array()) {
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.resize' => 'transform',
+        );
+    }
+
+    /**
+     */
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
+
         if (empty($params['width']) && empty($params['height'])) {
             throw new TransformationException('Missing both width and height. You need to specify at least one of them', 400);
         }

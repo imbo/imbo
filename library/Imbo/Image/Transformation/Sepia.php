@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -20,7 +22,7 @@ use Imbo\Model\Image,
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
-class Sepia extends Transformation implements TransformationInterface {
+class Sepia extends Transformation implements ListenerInterface {
     /**
      * Extent of the sepia toning
      *
@@ -31,7 +33,18 @@ class Sepia extends Transformation implements TransformationInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image, array $params = array()) {
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.sepia' => 'transform',
+        );
+    }
+
+    /**
+     */
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
+
         $threshold = !empty($params['threshold']) ? (float) $params['threshold'] : $this->threshold;
 
         try {

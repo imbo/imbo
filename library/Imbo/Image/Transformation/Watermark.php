@@ -15,6 +15,8 @@ use Imbo\Model\Image,
     Imbo\Storage\ImageReaderAwareTrait,
     Imbo\Exception\StorageException,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     Imagick,
     ImagickException;
 
@@ -24,7 +26,7 @@ use Imbo\Model\Image,
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
-class Watermark extends Transformation implements ImageReaderAware, TransformationInterface {
+class Watermark extends Transformation implements ImageReaderAware, ListenerInterface {
     use ImageReaderAwareTrait;
 
     /**
@@ -75,7 +77,18 @@ class Watermark extends Transformation implements ImageReaderAware, Transformati
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image, array $params = array()) {
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.watermark' => 'transform',
+        );
+    }
+
+    /**
+     */
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
+
         $width = !empty($params['width']) ? (int) $params['width'] : 0;
         $height = !empty($params['height']) ? (int) $params['height'] : 0;
         $imageIdentifier = !empty($params['img']) ? $params['img'] : $this->defaultImage;

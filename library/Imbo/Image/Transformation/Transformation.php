@@ -18,7 +18,7 @@ use Imagick;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-abstract class Transformation implements TransformationInterface {
+abstract class Transformation {
     /**
      * Imagick instance
      *

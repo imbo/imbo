@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -21,11 +23,22 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class MaxSize extends Transformation implements TransformationInterface {
+class MaxSize extends Transformation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image, array $params = array()) {
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.maxsize' => 'transform',
+        );
+    }
+
+    /**
+     */
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
+
         $maxWidth = !empty($params['width']) ? (int) $params['width'] : 0;
         $maxHeight = !empty($params['height']) ? (int) $params['height'] : 0;
 

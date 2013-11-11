@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException,
     ImagickPixelException,
     ImagickDraw;
@@ -22,7 +24,7 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Border extends Transformation implements TransformationInterface {
+class Border extends Transformation implements ListenerInterface {
     /**
      * Color of the border
      *
@@ -54,7 +56,18 @@ class Border extends Transformation implements TransformationInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image, array $params = array()) {
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.border' => 'transform',
+        );
+    }
+
+    /**
+     */
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
+
         $color = !empty($params['color']) ? $this->formatColor($params['color']) : $this->color;
         $width = !empty($params['width']) ? (int) $params['width'] : $this->width;
         $height = !empty($params['height']) ? (int) $params['height'] : $this->height;

@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     Imagick,
     ImagickException,
     ImagickPixelException;
@@ -22,7 +24,7 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Canvas extends Transformation implements TransformationInterface {
+class Canvas extends Transformation implements ListenerInterface {
     /**
      * Canvas mode
      *
@@ -63,7 +65,18 @@ class Canvas extends Transformation implements TransformationInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image, array $params = array()) {
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.canvas' => 'transform',
+        );
+    }
+
+    /**
+     */
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
+
         $width  = !empty($params['width']) ? (int) $params['width'] : $image->getWidth();
         $height = !empty($params['height']) ? (int) $params['height'] : $image->getHeight();
         $mode   = !empty($params['mode']) ? $params['mode'] : $this->mode;

@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -20,7 +22,7 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Crop extends Transformation implements TransformationInterface {
+class Crop extends Transformation implements ListenerInterface {
     /**
      * X coordinate of the top left corner of the crop
      *
@@ -38,7 +40,18 @@ class Crop extends Transformation implements TransformationInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image, array $params = array()) {
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.crop' => 'transform',
+        );
+    }
+
+    /**
+     */
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
+
         foreach (array('width', 'height') as $param) {
             if (!isset($params[$param])) {
                 throw new TransformationException('Missing required parameter: ' . $param, 400);
