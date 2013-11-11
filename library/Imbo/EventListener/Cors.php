@@ -73,7 +73,7 @@ class Cors implements ListenerInterface {
     public static function getSubscribedEvents() {
         return array(
             'route.match' => 'subscribe',
-            'response.send' => 'setExposedHeaders',
+            'response.send' => array('setExposedHeaders' => 5),
         );
     }
 
