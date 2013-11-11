@@ -49,6 +49,47 @@ Feature: Imbo enables dynamic transformations of images
             | transverse                             | 417   | 599    |
             | graythumb:width=40,height=40           | 40    | 40     |
 
+    Scenario Outline: Transform the image using HTTP HEAD
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I specify "<transformation>" as transformation
+        And I include an access token in the query
+        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.png" using HTTP "HEAD"
+        Then I should get a response with "200 OK"
+        And the "Content-Type" response header is "image/png"
+        And the "X-Imbo-Originalextension" response header is "png"
+        And the "X-Imbo-Originalfilesize" response header is "95576"
+        And the "X-Imbo-Originalheight" response header is "417"
+        And the "X-Imbo-Originalmimetype" response header is "image/png"
+        And the "X-Imbo-Originalwidth" response header is "599"
+
+        Examples:
+            | transformation                         |
+            | border                                 |
+            | border:width=4,height=5                |
+            | border:mode=inline,width=4,height=5    |
+            | canvas                                 |
+            | canvas:width=700,height=600            |
+            | crop:width=50,height=60,x=1,y=10       |
+            | crop:width=5000,height=6000,x=0,y=0    |
+            | desaturate                             |
+            | flipHorizontally                       |
+            | flipVertically                         |
+            | maxSize:width=200                      |
+            | maxSize:height=200                     |
+            | maxSize:width=100,height=100           |
+            | resize:width=100                       |
+            | resize:height=200                      |
+            | resize:width=100,height=100            |
+            | rotate:angle=90                        |
+            | sepia                                  |
+            | thumbnail                              |
+            | thumbnail:width=40,height=30           |
+            | thumbnail:width=40,height=40,fit=inset |
+            | thumbnail:width=10,height=70,fit=inset |
+            | transpose                              |
+            | transverse                             |
+            | graythumb:width=40,height=40           |
+
     Scenario Outline: Gracefully handle transformation errors
         Given I use "publickey" and "privatekey" for public and private keys
         And I specify "<transformation>" as transformation
