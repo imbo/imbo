@@ -80,13 +80,10 @@ class Application {
         // A date formatter helper
         $dateFormatter = new Helpers\DateFormatter();
 
-        // A response writer
+        // Response formatters
         $formatters = array(
             'json' => new Formatter\JSON($dateFormatter),
             'xml'  => new Formatter\XML($dateFormatter),
-            'gif'  => new Formatter\Gif(),
-            'png'  => new Formatter\Png(),
-            'jpeg' => new Formatter\Jpeg(),
         );
         $contentNegotiation = new Http\ContentNegotiation();
 
