@@ -251,13 +251,16 @@ class ResponseFormatter implements ListenerInterface {
         // If we are dealing with an image we want to trigger an event that handles a possible
         // conversion
         if ($model instanceof Model\Image) {
-            $eventManager = $event->getManager();
-            $eventManager->trigger('image.transformation.convert', array(
-                'image' => $model,
-                'params' => array(
-                    'type' => $this->formatter,
-                ),
-            ));
+            if ($this->extensionsToMimeType[$this->formatter] !== $model->getMimeType()) {
+                $eventManager = $event->getManager();
+                $eventManager->trigger('image.transformation.convert', array(
+                    'image' => $model,
+                    'params' => array(
+                        'type' => $this->formatter,
+                    ),
+                ));
+            }
+
             $formattedData = $model->getBlob();
             $contentType = $model->getMimeType();
         } else {
