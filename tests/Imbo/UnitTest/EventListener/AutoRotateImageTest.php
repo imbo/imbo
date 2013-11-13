@@ -8,15 +8,14 @@
  * distributed with this source code.
  */
 
-namespace Imbo\IntegrationTest\EventListener;
+namespace Imbo\UnitTest\EventListener;
 
-use Imbo\EventListener\AutoRotateImage,
-    Imbo\Model\Image,
-    Imagick;
+use Imbo\EventListener\AutoRotateImage;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\EventListener\AutoRotateImage
  */
 class AutoRotateImageTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -50,71 +49,21 @@ class AutoRotateImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @return array[]
-     */
-    public function getFilenames() {
-        $files = array();
-
-        for ($i = 1; $i <= 8; $i++) {
-            $filename = 'orientation' . $i . '.jpeg';
-            $files[$filename] = array(FIXTURES_DIR . '/autoRotate/' . $filename);
-        }
-
-        return $files;
-    }
-
-    /**
-     * @dataProvider getFilenames
      * @covers Imbo\EventListener\AutoRotateImage::autoRotate
      */
-    public function testWillAutoRotateImages($file) {
-        $colorValues = array(
-            array(
-                'x' => 0,
-                'y' => 0,
-                'color' => 'rgb(128,63,193)'
-            ),
-            array(
-                'x' => 0,
-                'y' => 1000,
-                'color' => 'rgb(254,57,126)'
-            ),
-            array(
-                'x' => 1000,
-                'y' => 0,
-                'color' => 'rgb(127,131,194)'
-            ),
-            array(
-                'x' => 1000,
-                'y' => 1000,
-                'color' => 'rgb(249,124,192)'
-            ),
-        );
-
-        /**
-         * Load the image, perform the auto rotate tranformation and check that the color codes in
-         * the four corner pixels match the known color values as defined in $colorValues
-         */
-        $image = new Image();
-        $image->setBlob(file_get_contents($file))
-              ->setTransformationHandler('autoRotate', 'Imbo\Image\Transformation\AutoRotate');
+    public function testTriggersAnEventForRotatingTheImage() {
+        $image = $this->getMock('Imbo\Model\Image');
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
+
+        $eventManager = $this->getMock('Imbo\EventManager\EventManager');
+        $eventManager->expects($this->once())->method('trigger')->with('image.transformation.autorotate', array('image' => $image));
+
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
+        $event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
 
         $this->listener->autoRotate($event);
-
-        // Do assertion comparison on the color values
-        $imagick = new Imagick();
-        $imagick->readImageBlob($image->getBlob());
-
-        foreach ($colorValues as $pixelInfo) {
-            $pixelValue = $imagick->getImagePixelColor($pixelInfo['x'], $pixelInfo['y'])
-                                  ->getColorAsString();
-
-            $this->assertStringEndsWith($pixelInfo['color'], $pixelValue);
-        }
     }
 }

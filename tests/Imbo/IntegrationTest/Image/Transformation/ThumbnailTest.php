@@ -64,17 +64,27 @@ class ThumbnailTest extends TransformationTests {
         return $image;
     }
 
-    public function testApplyToImageUsingInsetMode() {
+    public function testTransformImageUsingInsetMode() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setWidth')->with(20)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(13)->will($this->returnValue($image));
 
-        $this->getTransformation()->applyToImage($image, array(
-            'width' => 20,
-            'height' => 20,
-            'fit' => 'inset',
-        ));
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))
+              ->method('getArgument')
+              ->with('image')
+              ->will($this->returnValue($image));
+        $event->expects($this->at(1))
+              ->method('getArgument')
+              ->with('params')
+              ->will($this->returnValue(array(
+                  'width' => 20,
+                  'height' => 20,
+                  'fit' => 'inset',
+              )));
+
+        $this->getTransformation()->transform($event);
     }
 }

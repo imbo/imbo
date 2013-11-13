@@ -39,7 +39,7 @@ class AutoRotateTest extends TransformationTests {
      */
     protected function getImageMock() {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/autoRotate/orientation1.jpeg')));
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/autoRotate/orientation2.jpeg')));
         $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->any())->method('setWidth')->with(671)->will($this->returnValue($image));
         $image->expects($this->any())->method('setHeight')->with(471)->will($this->returnValue($image));
@@ -97,8 +97,11 @@ class AutoRotateTest extends TransformationTests {
         $image = new Image();
         $image->setBlob(file_get_contents($file));
 
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->once())->method('getArgument')->with('image')->will($this->returnValue($image));
+
         // Perform the auto rotate transformation on the image
-        $this->getTransformation()->applyToImage($image);
+        $this->getTransformation()->transform($event);
 
         // Do assertion comparison on the color values
         $imagick = new Imagick();

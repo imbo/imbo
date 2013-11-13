@@ -119,9 +119,13 @@ class WatermarkTest extends TransformationTests {
      * @expectedExceptionCode 400
      * @expectedExceptionMessage You must specify an image identifier to use for the watermark
      */
-    public function testApplyToImageThrowsExceptionIfNoImageSpecified() {
+    public function testTransformThrowsExceptionIfNoImageSpecified() {
         $image = $this->getImageInstance();
-        $this->transformation->applyToImage($image);
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array()));
+
+        $this->transformation->transform($event);
     }
 
     /**
@@ -138,16 +142,27 @@ class WatermarkTest extends TransformationTests {
                           ->with('non-existant')
                           ->will($this->throwException($e));
 
-        $this->transformation->applyToImage($image, array(
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
             'img' => 'non-existant',
-        ));
+        )));
+
+        $this->transformation->transform($event);
     }
 
     public function testApplyToImageTopLeftWithOnlyWidthAndDefaultWatermark() {
         $image = $this->getImageInstance();
 
         $this->transformation->setDefaultImage($this->watermarkImg);
-        $this->transformation->applyToImage($image, array('width' => 200));
+
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
+            'width' => 200,
+        )));
+
+        $this->transformation->transform($event);
 
         $this->verifyColor($image, 0, 0, array(89, 142, 4));
         $this->verifyColor($image, 200, 50, array(0, 0, 0));
@@ -157,7 +172,14 @@ class WatermarkTest extends TransformationTests {
         $image = $this->getImageInstance();
 
         $this->transformation->setDefaultImage($this->watermarkImg);
-        $this->transformation->applyToImage($image, array('height' => 50));
+
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
+            'height' => 50,
+        )));
+
+        $this->transformation->transform($event);
 
         $this->verifyColor($image, 0, 0, array(89, 142, 4));
         $this->verifyColor($image, 200, 50, array(0, 0, 0));
@@ -166,13 +188,17 @@ class WatermarkTest extends TransformationTests {
     public function testApplyToImageBottomRightWithOffsetAndSpecificWatermark() {
         $image = $this->getImageInstance();
 
-        $this->transformation->applyToImage($image, array(
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
             'height'   => 50,
             'img'      => $this->watermarkImg,
             'x'        => -5,
             'y'        => -5,
             'position' => 'bottom-right',
-        ));
+        )));
+
+        $this->transformation->transform($event);
 
         $this->verifyColor($image, 0, 0, array(255, 255, 255));
         $this->verifyColor($image, $this->width - 1, $this->height - 1, array(109, 106, 104));
@@ -182,13 +208,17 @@ class WatermarkTest extends TransformationTests {
     public function testApplyToImageBottomLeftWithOffsetAndSpecificWatermark() {
         $image = $this->getImageInstance();
 
-        $this->transformation->applyToImage($image, array(
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
             'height'   => 50,
             'img'      => $this->watermarkImg,
             'x'        => 5,
             'y'        => -5,
             'position' => 'bottom-left',
-        ));
+        )));
+
+        $this->transformation->transform($event);
 
         $this->verifyColor($image, 0, 0, array(255, 255, 255));
         $this->verifyColor($image, 0, $this->height - 1, array(109, 106, 104));
@@ -198,11 +228,15 @@ class WatermarkTest extends TransformationTests {
     public function testApplyToImageCenterWithSpecificWatermark() {
         $image = $this->getImageInstance();
 
-        $this->transformation->applyToImage($image, array(
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
             'height'   => 50,
             'img'      => $this->watermarkImg,
             'position' => 'center',
-        ));
+        )));
+
+        $this->transformation->transform($event);
 
         $centerX = floor($this->width / 2);
         $centerY = floor($this->height / 2);
@@ -216,9 +250,13 @@ class WatermarkTest extends TransformationTests {
     public function testApplyToImageWithoutWidthOrHeight() {
         $image = $this->getImageInstance();
 
-        $this->transformation->applyToImage($image, array(
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
             'img' => $this->watermarkImg,
-        ));
+        )));
+
+        $this->transformation->transform($event);
 
         $this->verifyColor($image, 0, 0, array(89, 142, 4));
         $this->verifyColor($image, $this->width - 1, 0, array(152, 196, 0));

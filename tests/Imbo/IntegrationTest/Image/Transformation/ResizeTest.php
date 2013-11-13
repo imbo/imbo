@@ -48,7 +48,7 @@ class ResizeTest extends TransformationTests {
         return $image;
     }
 
-    public function testApplyToImageWithOnlyWidth() {
+    public function testTransformImageWithOnlyWidth() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('getHeight')->will($this->returnValue(665));
@@ -57,10 +57,22 @@ class ResizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($this->isType('int'))->will($this->returnValue($image));
 
-        $this->getTransformation()->applyToImage($image, array('width' => 200));
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))
+              ->method('getArgument')
+              ->with('image')
+              ->will($this->returnValue($image));
+        $event->expects($this->at(1))
+              ->method('getArgument')
+              ->with('params')
+              ->will($this->returnValue(array(
+                  'width' => 200,
+              )));
+
+        $this->getTransformation()->transform($event);
     }
 
-    public function testApplyToImageWithOnlyHeight() {
+    public function testTransformImageWithOnlyHeight() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
         $image->expects($this->once())->method('getHeight')->will($this->returnValue(665));
@@ -69,6 +81,18 @@ class ResizeTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with($this->isType('int'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with(200)->will($this->returnValue($image));
 
-        $this->getTransformation()->applyToImage($image, array('height' => 200));
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))
+              ->method('getArgument')
+              ->with('image')
+              ->will($this->returnValue($image));
+        $event->expects($this->at(1))
+              ->method('getArgument')
+              ->with('params')
+              ->will($this->returnValue(array(
+                  'height' => 200,
+              )));
+
+        $this->getTransformation()->transform($event);
     }
 }

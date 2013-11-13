@@ -60,6 +60,21 @@ class BorderTest extends TransformationTests {
         $image->expects($this->once())->method('setWidth')->with($size[0])->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($size[1])->will($this->returnValue($image));
 
-        $this->getTransformation()->applyToImage($image, array('color' => 'white', 'width' => 3, 'height' => 4, 'mode' => 'inline'));
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))
+              ->method('getArgument')
+              ->with('image')
+              ->will($this->returnValue($image));
+        $event->expects($this->at(1))
+              ->method('getArgument')
+              ->with('params')
+              ->will($this->returnValue(array(
+                  'color' => 'white',
+                  'width' => 3,
+                  'height' => 4,
+                  'mode' => 'inline',
+              )));
+
+        $this->getTransformation()->transform($event);
     }
 }

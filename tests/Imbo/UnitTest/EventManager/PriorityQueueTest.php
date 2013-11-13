@@ -24,7 +24,7 @@ class PriorityQueueTest extends \PHPUnit_Framework_TestCase {
     private $queue;
 
     public function testUsesAPredictableOrder() {
-        $queue = new \SplPriorityQueue();
+        $queue = new PriorityQueue();
 
         for ($i = 0; $i < 10; $i++) {
             $queue->insert($i, 10);

@@ -28,7 +28,7 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     abstract protected function getTransformation();
 
     /**
-     * Get the image mock used in the simple testApplyToImage
+     * Get the image mock used in the simple transformation
      *
      * @return Image
      */
@@ -55,10 +55,17 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
      *
      * The transformation instance returned from getTransformation() will be used
      */
-    public function testSimpleApplyToImage() {
-        $this->getTransformation()->applyToImage(
-            $this->getImageMock(), $this->getDefaultParams()
-        );
+    public function testSimpleTransformation() {
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->any())->method('getArgument')->will($this->returnCallback(function($key) {
+            if ($key === 'image') {
+                return $this->getImageMock();
+            } else {
+                return $this->getDefaultParams();
+            }
+        }));
+
+        $this->getTransformation()->transform($event);
     }
 
     /**
@@ -70,6 +77,15 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
         $image->expects($this->any())->method('getWidth')->will($this->returnValue(1600));
         $image->expects($this->any())->method('getHeight')->will($this->returnValue(900));
 
-        $this->getTransformation()->applyToImage($image, $this->getDefaultParams());
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->any())->method('getArgument')->will($this->returnCallback(function($key) use ($image) {
+            if ($key === 'image') {
+                return $image;
+            } else {
+                return $this->getDefaultParams();
+            }
+        }));
+
+        $this->getTransformation()->transform($event);
     }
 }

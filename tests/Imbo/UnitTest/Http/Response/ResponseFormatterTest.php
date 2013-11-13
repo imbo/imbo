@@ -162,13 +162,13 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\ResponseFormatter::negotiate
      */
     public function testDoesNotDoContentNegotiationWhenTheRequestedPathIncludesAnExtension() {
-        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('jpg'));
-        $image = $this->getMock('Imbo\Model\Image');
-        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
+        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('json'));
+        $model = $this->getMock('Imbo\Model\Stats');
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($model));
         $this->contentNegotiation->expects($this->never())->method('isAcceptable');
 
         $this->responseFormatter->negotiate($this->event);
-        $this->assertSame('jpeg', $this->responseFormatter->getFormatter());
+        $this->assertSame('json', $this->responseFormatter->getFormatter());
     }
 
     /**
@@ -176,7 +176,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
      */
     public function testDoesNotSetAResponseContentWhenHttpMethodIsHead() {
         $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(200));
-        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->getMock('Imbo\Model\Image')));
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->getMock('Imbo\Model\Stats')));
         $this->response->expects($this->never())->method('setContent');
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('HEAD'));
 
@@ -235,7 +235,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
      */
     public function getOriginalMimeTypes() {
         return array(
-            'jpeg' => array('image/jpeg', 'jpeg'),
+            'jpg' => array('image/jpeg', 'jpg'),
             'gif' => array('image/gif', 'gif'),
             'png' => array('image/png', 'png'),
         );
@@ -297,5 +297,45 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
 
         $this->responseFormatter->negotiate($this->event);
         $this->assertSame('json', $this->responseFormatter->getFormatter());
+    }
+
+    /**
+     * @covers Imbo\Http\Response\ResponseFormatter::format
+     */
+    public function testTriggersAConversionTransformationIfNeededWhenTheModelIsAnImage() {
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->at(0))->method('getMimeType')->will($this->returnValue('image/jpeg'));
+
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
+        $this->responseFormatter->setFormatter('png');
+
+        $eventManager = $this->getMock('Imbo\EventManager\EventManager');
+        $eventManager->expects($this->once())
+                     ->method('trigger')
+                     ->with(
+                         'image.transformation.convert',
+                         array(
+                             'image' => $image,
+                             'params' => array('type' => 'png'),
+                         )
+                     );
+        $this->event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
+
+        $this->responseFormatter->format($this->event);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\ResponseFormatter::format
+     */
+    public function testDoesNotTriggerAnImageConversionWhenTheImageHasTheCorrectMimeType() {
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->at(0))->method('getMimeType')->will($this->returnValue('image/jpeg'));
+
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
+        $this->responseFormatter->setFormatter('jpg');
+
+        $this->event->expects($this->never())->method('getManager');
+
+        $this->responseFormatter->format($this->event);
     }
 }

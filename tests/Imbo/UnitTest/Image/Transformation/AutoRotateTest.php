@@ -15,11 +15,11 @@ use Imbo\Image\Transformation\AutoRotate;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
- * @covers Imbo\Image\Transformations\AutoRotate
+ * @covers Imbo\Image\Transformation\AutoRotate
  */
 class AutoRotateTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @covers Imbo\Image\Transformations\AutoRotate::transform
+     * @covers Imbo\Image\Transformation\AutoRotate::transform
      */
     public function testWillNotUpdateTheImageWhenNotNeeded() {
         $image = $this->getMock('Imbo\Model\Image');

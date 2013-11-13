@@ -32,11 +32,13 @@ class ImageTransformerTest extends ListenerTests {
     private $response;
     private $event;
     private $image;
+    private $eventManager;
 
     /**
      * Set up the listener
      */
     public function setUp() {
+        $this->eventManager = $this->getMock('Imbo\EventManager\EventManager');
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->image = $this->getMock('Imbo\Model\Image');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
@@ -44,6 +46,7 @@ class ImageTransformerTest extends ListenerTests {
         $this->event = $this->getMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->event->expects($this->any())->method('getManager')->will($this->returnValue($this->eventManager));
 
         $this->listener = new ImageTransformer();
     }
@@ -57,6 +60,7 @@ class ImageTransformerTest extends ListenerTests {
         $this->image = null;
         $this->event = null;
         $this->listener = null;
+        $this->eventManager = null;
     }
 
     /**
@@ -67,60 +71,10 @@ class ImageTransformerTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformer::initialize
-     */
-    public function testWillInitializeImageTransformationHandlers() {
-        $config = array(
-            'imageTransformations' => array(
-                'border' => 'Imbo\Image\Transformation\Border',
-                'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
-                'borderedThumbnail' => array(
-                    'border', 'thumbnail',
-                ),
-            ),
-        );
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('publickey'));
-        $this->event->expects($this->once())->method('getStorage')->will($this->returnValue($this->getMock('Imbo\Storage\StorageInterface')));
-        $this->image->expects($this->at(0))->method('setImageReader')->with($this->isInstanceOf('Imbo\Storage\ImageReader'));
-        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue($config));
-        $this->image->expects($this->at(1))->method('setTransformationHandler')->with('border', 'Imbo\Image\Transformation\Border');
-        $this->image->expects($this->at(2))->method('setTransformationHandler')->with('thumbnail', 'Imbo\Image\Transformation\Thumbnail');
-        $this->image->expects($this->at(3))->method('setTransformationHandler')->with('borderedThumbnail', array('border', 'thumbnail'));
-
-        $this->listener->initialize($this->event);
-    }
-
-    /**
-     * @covers Imbo\EventListener\ImageTransformer::initialize
-     */
-    public function testWillInitializeImageTransformationHandlersWhenImageIsLocatedInTheRequest() {
-        $config = array(
-            'imageTransformations' => array(
-                'border' => 'Imbo\Image\Transformation\Border',
-            ),
-        );
-
-        $response = $this->getMock('Imbo\Http\Response\Response');
-        $response->expects($this->once())->method('getModel')->will($this->returnValue(null));
-
-        $event = $this->getMock('Imbo\EventManager\EventInterface');
-        $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $event->expects($this->any())->method('getResponse')->will($this->returnValue($response));
-        $event->expects($this->once())->method('getStorage')->will($this->returnValue($this->getMock('Imbo\Storage\StorageInterface')));
-        $event->expects($this->once())->method('getConfig')->will($this->returnValue($config));
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('publickey'));
-        $this->request->expects($this->once())->method('getImage')->will($this->returnValue($this->image));
-        $this->image->expects($this->at(0))->method('setImageReader')->with($this->isInstanceOf('Imbo\Storage\ImageReader'));
-        $this->image->expects($this->at(1))->method('setTransformationHandler')->with('border', 'Imbo\Image\Transformation\Border');
-
-        $this->listener->initialize($event);
-    }
-
-    /**
      * @covers Imbo\EventListener\ImageTransformer::transform
      */
-    public function testCanApplyTransformationsToAnImage() {
+    public function testTriggersImageTransformationEvents() {
+        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue(array('transformationPresets' => array())));
         $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array(
             array(
                 'name' => 'resize',
@@ -136,8 +90,69 @@ class ImageTransformerTest extends ListenerTests {
             ),
         )));
 
-        $this->image->expects($this->at(0))->method('transform')->with('resize', array('width' => 100));
-        $this->image->expects($this->at(1))->method('transform')->with('thumbnail', array('some' => 'value'));
+        $this->eventManager->expects($this->at(0))
+                           ->method('trigger')
+                           ->with(
+                               'image.transformation.resize',
+                               array(
+                                   'image' => $this->image,
+                                   'params' => array(
+                                       'width' => 100,
+                                   ),
+                               )
+                           );
+        $this->eventManager->expects($this->at(1))
+                           ->method('trigger')
+                           ->with(
+                               'image.transformation.thumbnail',
+                               array(
+                                   'image' => $this->image,
+                                   'params' => array(
+                                       'some' => 'value',
+                                   ),
+                               )
+                           );
+
+        $this->listener->transform($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageTransformer::transform
+     */
+    public function testSupportsPresets() {
+        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue(array(
+            'transformationPresets' => array(
+                'preset' => array(
+                    'flipHorizontally',
+                    'flipVertically',
+                ),
+            )
+        )));
+        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array(
+            array(
+                'name' => 'preset',
+                'params' => array(),
+            ),
+        )));
+
+        $this->eventManager->expects($this->at(0))
+                           ->method('trigger')
+                           ->with(
+                               'image.transformation.fliphorizontally',
+                               array(
+                                   'image' => $this->image,
+                                   'params' => array(),
+                               )
+                           );
+        $this->eventManager->expects($this->at(1))
+                           ->method('trigger')
+                           ->with(
+                               'image.transformation.flipvertically',
+                               array(
+                                   'image' => $this->image,
+                                   'params' => array(),
+                               )
+                           );
 
         $this->listener->transform($this->event);
     }
