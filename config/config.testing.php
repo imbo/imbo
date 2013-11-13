@@ -227,8 +227,10 @@ return array(
             'params' => array('X-Imbo-HashTwo'),
         ),
         'exifMetadataListener' => 'Imbo\EventListener\ExifMetadata',
+        'autoRotateListener' => 'Imbo\EventListener\AutoRotateImage',
 
         // Image transformations
+        'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
         'border' => 'Imbo\Image\Transformation\Border',
         'canvas' => 'Imbo\Image\Transformation\Canvas',
         'compress' => 'Imbo\Image\Transformation\Compress',
