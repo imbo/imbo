@@ -10,8 +10,7 @@
 
 namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\TransformationInterface,
-    Imbo\Model\Image;
+use Imbo\Model\Image;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -23,7 +22,7 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
      * testing. This transformation instance will be used for the tests in this base test
      * case as well.
      *
-     * @return TransformationInterface
+     * @return mixed
      */
     abstract protected function getTransformation();
 
