@@ -312,16 +312,16 @@
         },
         {
             "name": "doctrine/cache",
-            "version": "v1.2.0",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/cache.git",
-                "reference": "d0e4447707a064a5814b18cb0dcc2f24185f6179"
+                "reference": "e16d7adf45664a50fa86f515b6d5e7f670130449"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/cache/zipball/d0e4447707a064a5814b18cb0dcc2f24185f6179",
-                "reference": "d0e4447707a064a5814b18cb0dcc2f24185f6179",
+                "url": "https://api.github.com/repos/doctrine/cache/zipball/e16d7adf45664a50fa86f515b6d5e7f670130449",
+                "reference": "e16d7adf45664a50fa86f515b6d5e7f670130449",
                 "shasum": ""
             },
             "require": {
@@ -329,6 +329,10 @@
             },
             "conflict": {
                 "doctrine/common": ">2.2,<2.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">=3.7",
+                "satooshi/php-coveralls": "~0.6"
             },
             "type": "library",
             "extra": {
@@ -349,7 +353,8 @@
                 {
                     "name": "Jonathan Wage",
                     "email": "jonwage@gmail.com",
-                    "homepage": "http://www.jwage.com/"
+                    "homepage": "http://www.jwage.com/",
+                    "role": "Creator"
                 },
                 {
                     "name": "Guilherme Blanco",
@@ -377,7 +382,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2013-09-26 19:23:25"
+            "time": "2013-10-25 19:04:14"
         },
         {
             "name": "doctrine/collections",
@@ -522,16 +527,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "v2.4.0",
+            "version": "v2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "3eb557f144ec41e6e84997e43acb1946c92fbc88"
+                "reference": "328357bd9eea9d671fe5fff0737f01953bfe66a0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/3eb557f144ec41e6e84997e43acb1946c92fbc88",
-                "reference": "3eb557f144ec41e6e84997e43acb1946c92fbc88",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/328357bd9eea9d671fe5fff0737f01953bfe66a0",
+                "reference": "328357bd9eea9d671fe5fff0737f01953bfe66a0",
                 "shasum": ""
             },
             "require": {
@@ -559,7 +564,8 @@
                 {
                     "name": "Jonathan Wage",
                     "email": "jonwage@gmail.com",
-                    "homepage": "http://www.jwage.com/"
+                    "homepage": "http://www.jwage.com/",
+                    "role": "Creator"
                 },
                 {
                     "name": "Guilherme Blanco",
@@ -583,7 +589,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2013-09-07 10:49:18"
+            "time": "2013-11-12 12:38:28"
         },
         {
             "name": "doctrine/inflector",
