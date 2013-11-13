@@ -72,6 +72,9 @@ class Canvas extends Transformation implements ListenerInterface {
     }
 
     /**
+     * Transform the image
+     *
+     * @param EventInterface $event The event instance
      */
     public function transform(EventInterface $event) {
         $image = $event->getArgument('image');

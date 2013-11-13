@@ -84,6 +84,9 @@ class Watermark extends Transformation implements ImageReaderAware, ListenerInte
     }
 
     /**
+     * Transform the image
+     *
+     * @param EventInterface $event The event instance
      */
     public function transform(EventInterface $event) {
         $image = $event->getArgument('image');
