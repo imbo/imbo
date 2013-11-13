@@ -39,7 +39,7 @@ class AutoRotate extends Transformation implements ListenerInterface {
      */
     public function transform(EventInterface $event) {
         $image = $event->getArgument('image');
-        $params = $event->getArgument('transformationParams');
+        $params = $event->getArgument('params');
 
         try {
             // Get orientation from exif data
@@ -104,11 +104,13 @@ class AutoRotate extends Transformation implements ListenerInterface {
                 if ($flipVertically) {
                     $imagick->flipImage();
                 }
-            }
 
-            // Set the image orientation so it reflects the transformation that's been done
-            $imagick->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
-            $image->setBlob($imagick->getImageBlob());
+                if ($rotate || $flipHorizontally || $flipVertically) {
+                    // Set the image orientation so it reflects the transformation that's been done
+                    $imagick->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
+                    $image->setBlob($imagick->getImageBlob());
+                }
+            }
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         } catch (ImagickPixelException $e) {
