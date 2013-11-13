@@ -39,7 +39,6 @@ class AutoRotate extends Transformation implements ListenerInterface {
      */
     public function transform(EventInterface $event) {
         $image = $event->getArgument('image');
-        $params = $event->getArgument('params');
 
         try {
             // Get orientation from exif data
