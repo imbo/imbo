@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
-    Imbo\Storage\ImageReaderAware,
-    Imbo\Storage\ImageReaderAwareTrait,
     Imbo\Exception\StorageException,
     Imbo\Exception\TransformationException,
     Imbo\EventListener\ListenerInterface,
@@ -26,9 +24,7 @@ use Imbo\Model\Image,
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
-class Watermark extends Transformation implements ImageReaderAware, ListenerInterface {
-    use ImageReaderAwareTrait;
-
+class Watermark extends Transformation implements ListenerInterface {
     /**
      * Default image identifier to use for watermarks
      *
@@ -108,7 +104,7 @@ class Watermark extends Transformation implements ImageReaderAware, ListenerInte
 
         // Try to load watermark image from storage
         try {
-            $watermarkData = $this->getImageReader()->getImage($imageIdentifier);
+            $watermarkData = $event->getStorage()->getImage($event->getRequest()->getPublicKey(), $imageIdentifier);
 
             $watermark = new Imagick();
             $watermark->readImageBlob($watermarkData);

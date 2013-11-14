@@ -13,6 +13,7 @@ namespace Imbo\IntegrationTest\Image\Transformation;
 use Imbo\Image\Transformation\Watermark,
     Imbo\Exception\StorageException,
     Imbo\Model\Image,
+    Imbo\EventManager\Event,
     Imagick;
 
 /**
@@ -20,7 +21,7 @@ use Imbo\Image\Transformation\Watermark,
  * @package Test suite\Integration tests
  * @covers Imbo\Image\Transformation\Watermark
  */
-class WatermarkTest extends TransformationTests {
+class WatermarkTest extends \PHPUnit_Framework_TestCase {
     /**
      * @var int
      */
@@ -40,19 +41,7 @@ class WatermarkTest extends TransformationTests {
      * Set up the transformation
      */
     public function setUp() {
-        parent::setUp();
-
-        $this->imageReader = $this->getMockBuilder('Imbo\Storage\ImageReader')
-                                  ->disableOriginalConstructor()
-                                  ->getMock();
-
-        $this->imageReader->expects($this->any())
-                          ->method('getImage')
-                          ->with($this->watermarkImg)
-                          ->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/logo-horizontal.png')));
-
         $this->transformation = new Watermark();
-        $this->transformation->setImageReader($this->imageReader);
     }
 
     /**
@@ -60,41 +49,6 @@ class WatermarkTest extends TransformationTests {
      */
     public function tearDown() {
         $this->transformation = null;
-        $this->imageReader = null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
-        return $this->transformation;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultParams() {
-        return array(
-            'width'    => $this->width,
-            'height'   => $this->height,
-            'position' => 'center',
-            'x'        => 10,
-            'y'        => 20,
-            'img'      => $this->watermarkImg,
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getImageMock() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
-        $image->expects($this->once())->method('getHeight')->will($this->returnValue(463));
-
-        return $image;
     }
 
     /**
@@ -121,9 +75,11 @@ class WatermarkTest extends TransformationTests {
      */
     public function testTransformThrowsExceptionIfNoImageSpecified() {
         $image = $this->getImageInstance();
-        $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array()));
+        $event = new Event();
+        $event->setArguments(array(
+            'image' => $image,
+            'params' => array(),
+        ));
 
         $this->transformation->transform($event);
     }
@@ -137,131 +93,138 @@ class WatermarkTest extends TransformationTests {
         $image = $this->getImageInstance();
         $e = new StorageException('File not found', 404);
 
-        $this->imageReader->expects($this->once())
-                          ->method('getImage')
-                          ->with('non-existant')
-                          ->will($this->throwException($e));
+        $storage = $this->getMock('Imbo\Storage\StorageInterface');
+        $storage->expects($this->once())
+                ->method('getImage')
+                ->with('publickey', 'non-existant')
+                ->will($this->throwException($e));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
-            'img' => 'non-existant',
-        )));
+        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue('publickey'));
+
+        $event = new Event();
+        $event->setArguments(array(
+            'image' => $image,
+            'params' => array(
+                'img' => 'non-existant',
+            ),
+            'storage' => $storage,
+            'request' => $request,
+        ));
 
         $this->transformation->transform($event);
     }
 
-    public function testApplyToImageTopLeftWithOnlyWidthAndDefaultWatermark() {
+    public function getParamsForWatermarks() {
+        return array(
+            'top left with default watermark and width' => array(
+                array(
+                    'width' => 200,
+                ),
+                array(
+                    array('x' => 0, 'y' => 0, 'colors' => array(89, 142, 4)),
+                    array('x' => 200, 'y' => 50, 'colors' => array(0, 0, 0)),
+                ),
+            ),
+            'top left with default watermark and height' => array(
+                array(
+                    'height' => 50,
+                ),
+                array(
+                    array('x' => 0, 'y' => 0, 'colors' => array(89, 142, 4)),
+                    array('x' => 200, 'y' => 50, 'colors' => array(0, 0, 0)),
+                ),
+            ),
+            'bottom right with custom watermark and offset' => array(
+                array(
+                    'height' => 50,
+                    'img' => $this->watermarkImg,
+                    'x' => -5,
+                    'y' => -5,
+                    'position' => 'bottom-right',
+                ),
+                array(
+                    array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(109, 106, 104)),
+                    array('x' => $this->width - 6, 'y' => $this->height - 6, 'colors' => array(37, 93, 14)),
+                ),
+            ),
+            'bottom left with custom watermark and offset' => array(
+                array(
+                    'height' => 50,
+                    'img' => $this->watermarkImg,
+                    'x' => 5,
+                    'y' => -5,
+                    'position' => 'bottom-left',
+                ),
+                array(
+                    array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    array('x' => 0, 'y' => $this->height - 1, 'colors' => array(109, 106, 104)),
+                    array('x' => 0 + 6, 'y' => $this->height - 6, 'colors' => array(89, 142, 4)),
+                ),
+            ),
+            'center with custom watermark' => array(
+                array(
+                    'height' => 50,
+                    'img' => $this->watermarkImg,
+                    'position' => 'center',
+                ),
+                array(
+                    array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    array('x' => 0, 'y' => $this->height - 1, 'colors' => array(109, 106, 104)),
+                    array('x' => floor($this->width / 2) - 84, 'y' => floor($this->height / 2) - 18, 'colors' => array(89, 142, 4)),
+                ),
+            ),
+            'custom watermark with no params' => array(
+                array(
+                    'img' => $this->watermarkImg,
+                ),
+                array(
+                    array('x' => 0, 'y' => 0, 'colors' => array(89, 142, 4)),
+                    array('x' => $this->width - 1, 'y' => 0, 'colors' => array(152, 196, 0)),
+                    array('x' => 0, 'y' => $this->height - 1, 'colors' => array(109, 106, 104)),
+                    array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(109, 106, 104)),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getParamsForWatermarks
+     */
+    public function testApplyToImageTopLeftWithOnlyWidthAndDefaultWatermark($params, $colors) {
         $image = $this->getImageInstance();
 
         $this->transformation->setDefaultImage($this->watermarkImg);
 
-        $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
-            'width' => 200,
-        )));
+        $expectedWatermark = $this->watermarkImg;
+
+        if (isset($params['img'])) {
+            $expectedWatermark = $params['img'];
+        }
+
+        $storage = $this->getMock('Imbo\Storage\StorageInterface');
+        $storage->expects($this->once())
+                ->method('getImage')
+                ->with('publickey', $expectedWatermark)
+                ->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/logo-horizontal.png')));
+
+        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue('publickey'));
+
+        $event = new Event();
+        $event->setArguments(array(
+            'image' => $image,
+            'params' => $params,
+            'storage' => $storage,
+            'request' => $request,
+        ));
 
         $this->transformation->transform($event);
 
-        $this->verifyColor($image, 0, 0, array(89, 142, 4));
-        $this->verifyColor($image, 200, 50, array(0, 0, 0));
-    }
-
-    public function testApplyToImageTopLeftWithOnlyHeightAndDefaultWatermark() {
-        $image = $this->getImageInstance();
-
-        $this->transformation->setDefaultImage($this->watermarkImg);
-
-        $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
-            'height' => 50,
-        )));
-
-        $this->transformation->transform($event);
-
-        $this->verifyColor($image, 0, 0, array(89, 142, 4));
-        $this->verifyColor($image, 200, 50, array(0, 0, 0));
-    }
-
-    public function testApplyToImageBottomRightWithOffsetAndSpecificWatermark() {
-        $image = $this->getImageInstance();
-
-        $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
-            'height'   => 50,
-            'img'      => $this->watermarkImg,
-            'x'        => -5,
-            'y'        => -5,
-            'position' => 'bottom-right',
-        )));
-
-        $this->transformation->transform($event);
-
-        $this->verifyColor($image, 0, 0, array(255, 255, 255));
-        $this->verifyColor($image, $this->width - 1, $this->height - 1, array(109, 106, 104));
-        $this->verifyColor($image, $this->width - 6, $this->height - 6, array(37, 93, 14));
-    }
-
-    public function testApplyToImageBottomLeftWithOffsetAndSpecificWatermark() {
-        $image = $this->getImageInstance();
-
-        $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
-            'height'   => 50,
-            'img'      => $this->watermarkImg,
-            'x'        => 5,
-            'y'        => -5,
-            'position' => 'bottom-left',
-        )));
-
-        $this->transformation->transform($event);
-
-        $this->verifyColor($image, 0, 0, array(255, 255, 255));
-        $this->verifyColor($image, 0, $this->height - 1, array(109, 106, 104));
-        $this->verifyColor($image, 0 + 6, $this->height - 6, array(89, 142, 4));
-    }
-
-    public function testApplyToImageCenterWithSpecificWatermark() {
-        $image = $this->getImageInstance();
-
-        $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
-            'height'   => 50,
-            'img'      => $this->watermarkImg,
-            'position' => 'center',
-        )));
-
-        $this->transformation->transform($event);
-
-        $centerX = floor($this->width / 2);
-        $centerY = floor($this->height / 2);
-
-        $this->verifyColor($image, 0, 0, array(255, 255, 255));
-        $this->verifyColor($image, 0, $this->height - 1, array(109, 106, 104));
-
-        $this->verifyColor($image, $centerX - 84, $centerY - 18, array(89, 142, 4));
-    }
-
-    public function testApplyToImageWithoutWidthOrHeight() {
-        $image = $this->getImageInstance();
-
-        $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
-            'img' => $this->watermarkImg,
-        )));
-
-        $this->transformation->transform($event);
-
-        $this->verifyColor($image, 0, 0, array(89, 142, 4));
-        $this->verifyColor($image, $this->width - 1, 0, array(152, 196, 0));
-        $this->verifyColor($image, 0, $this->height - 1, array(109, 106, 104));
-        $this->verifyColor($image, $this->width - 1, $this->height - 1, array(109, 106, 104));
+        foreach ($colors as $c) {
+            $this->verifyColor($image, $c['x'], $c['y'], $c['colors']);
+        }
     }
 
     /**
