@@ -199,41 +199,30 @@ $config = array(
     ),
 
     /**
-     * Image transformations
+     * Transformation presets
      *
-     * This array includes all supported image transformations. The keys are the names of the
-     * transformations that is used in the URL, and the values are class names of a class
-     * implementing the Imbo\Image\Transformation\TransformationInterface interface, or a closure
-     * that will return an instance of such a class. When the value is a closure, it will receive
-     * a single parameter: $params, which is the parameters found in the URL associated with the
-     * transformation.
-     *
-     * When the transformation is specified as a string, the parameters will be passed to the
-     * constructor of the transformation class.
+     * If you want to make custom transformation presets (or transformation collections) you can do
+     * so here. The keys used will be the name of the transformation as used in the URI, and the
+     * value is an array containing the names of the transformations in the collection.
      *
      * Example:
      *
-     * t[]=border:width=2,height=3
+     * 'transformationPresets' => array(
+     *     'graythumb' => array(
+     *         'thumbnail,
+     *         'desaturate',
+     *     ),
+     *     'flipflop' => array(
+     *         'flipHorizontally',
+     *         'flipVertically',
+     *     ),
+     * ),
      *
-     * will end up doing the following:
-     *
-     * new Imbo\Image\Transformation\Border(array('width' => '2', 'height' => '3'))
-     *
-     * All image transformations shipped by Imbo uses imagick, and if you want to use something
-     * else, simply supply your own classes in the array below.
+     * The above to examples can be triggered by ?t[]=graythumb and ?t[]=flipflop respectively
      *
      * @var array
      */
-    'transformationPresets' => array(
-        'graythumb' => array(
-            'thumbnail',
-            'desaturate',
-            'border' => array(
-                'width' => 3,
-                'height' => 3,
-            ),
-        ),
-    ),
+    'transformationPresets' => array(),
 
     /**
      * Custom resources for Imbo
