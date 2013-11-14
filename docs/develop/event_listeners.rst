@@ -41,6 +41,13 @@ Some other notable events:
 * ``db.metadata.delete``
 * ``response.send``
 
+Image transformations also use the event dispatcher when triggering events. The events triggered for this is prefixed with ``image.transformation.`` and ends with the transformation as specified in the URL, lowercased. If you specify ``t[]=thumbnail&t[]=flipHorizontally`` as a query parameter when requesting an image the following events will be triggered:
+
+* ``image.transformation.thumbnail``
+* ``image.transformation.fliphorizontally``
+
+All image transformation events adds the image and parameters for the transformation as arguments to the event, which can be fetched by the transformation via the ``$event`` object passed to the methods which subscribe to the transformation events.
+
 .. _custom-event-listeners:
 
 Writing an event listener
@@ -179,12 +186,15 @@ The object passed to the event listeners is an instance of the ``Imbo\EventManag
 ``isPropagationStopped()``
     This method is used by Imbo to check if a listener wants the propagation to stop. Your listener will most likely never need to use this method.
 
-With these methods you have access to most parts of Imbo that is worth working with. Be careful when using the database and storage adapters as these grant you access to all data stored in Imbo, with both read and write permissions.
+``getArgument()``
+    This method can be used to fetch arguments given to the event. This method is used by all image transformation event listeners as the image itself and the parameters for the transformation is stored as arguments to the event.
+
+With these methods you have access to most parts of Imbo. Be careful when using the database and storage adapters as these grant you access to all data stored in Imbo, with both read and write permissions.
 
 Event listeners shipped with Imbo
 ---------------------------------
 
-Imbo ships with a collection of event listeners for you to use. Some of them are enabled in the default configuration file.
+Imbo ships with a collection of event listeners for you to use. Some of them are enabled in the default configuration file. Image transformations are also technically event listeners, but will not be covered in this section. Read the :doc:`../usage/image-transformations` chapter for more information regarding the image transformations.
 
 .. contents::
     :local:
@@ -302,7 +312,7 @@ The listener does not support any parameters and can be enabled like this:
         // ...
 
         'eventListeners' => array(
-            'autoRotate' => 'Imbo\EventListener\AutoRotateImage',
+            'autoRotateListener' => 'Imbo\EventListener\AutoRotateImage',
         ),
 
         // ...
@@ -355,7 +365,7 @@ Here is an example on how to enable the CORS listener:
 ``maxAge``
     specifies how long the response of an OPTIONS-request can be cached for, in seconds. Defaults to 3600 (one hour).
 
-Exif metadata
+EXIF metadata
 +++++++++++++
 
 This event listener can be used to fetch the EXIF-tags from uploaded images and adding them as metadata. Enabling this event listener will not populate metadata for images already added to Imbo.
@@ -468,7 +478,7 @@ and is enabled like this:
         // ...
 
         'eventListeners' => array(
-            'maxImageSize' => array(
+            'maxImageSizeListener' => array(
                 'listener' => 'Imbo\EventListener\MaxImageSize',
                 'params' => array(1024, 768),
             ),

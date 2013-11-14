@@ -558,7 +558,27 @@ The default configuration file includes some event listeners by default:
 * :ref:`authenticate-event-listener`
 * :ref:`stats-access-event-listener`
 
-Read more about these listeners in the :doc:`../develop/event_listeners` chapter. If you want to disable any of these you could do so in your configuration file in the following way:
+as well as event listeners for image transformations:
+
+* :ref:`autoRotate <auto-rotate-transformation>`
+* :ref:`border <border-transformation>`
+* :ref:`canvas <canvas-transformation>`
+* :ref:`compress <compress-transformation>`
+* :ref:`convert <convert-transformation>`
+* :ref:`crop <crop-transformation>`
+* :ref:`desaturate <desaturate-transformation>`
+* :ref:`flipHorizontally <flip-horizontally-transformation>`
+* :ref:`flipVertically <flip-vertically-transformation>`
+* :ref:`maxSize <max-size-transformation>`
+* :ref:`resize <resize-transformation>`
+* :ref:`rotate <rotate-transformation>`
+* :ref:`sepia <sepia-transformation>`
+* :ref:`thumbnail <thumbnail-transformation>`
+* :ref:`transpose <transpose-transformation>`
+* :ref:`transverse <transverse-transformation>`
+* :ref:`watermark <watermark-transformation>`
+
+Read more about these listeners in the :doc:`../develop/event_listeners` and :doc:`../usage/image-transformations` chapters. If you want to disable any of these you could do so in your configuration file in the following way:
 
 .. code-block:: php
 
@@ -575,18 +595,15 @@ Read more about these listeners in the :doc:`../develop/event_listeners` chapter
         // ...
     );
 
-.. warning:: Do not disable these event listeners unless you are absolutely sure about the consequences. Your images can potentially be deleted by anyone.
+.. warning:: Do not disable the event listeners used in the example above unless you are absolutely sure about the consequences. Your images can potentially be deleted by anyone.
+.. warning:: Disabling image transformation event listeners is not recommended.
 
 .. _image-transformations-config:
 
-Image transformations - ``imageTransformations``
-------------------------------------------------
+Image transformation presets - ``transformationPresets``
+--------------------------------------------------------
 
-Imbo supports a set of image transformations out of the box using the `Imagick PHP extension <http://pecl.php.net/package/imagick>`_. All supported image transformations are included in the configuration, and you can easily add your own custom transformations or create presets using a combination of existing transformations.
-
-Transformations are triggered using the ``t`` query parameter together with the image resource (read more about the image resource and the included transformations and their parameters in the :ref:`Image resource <image-resource>` section). This query parameter is used as an array so that multiple transformations can be applied. The transformations are applied in the order they are specified in the URL.
-
-All transformations are registered in the configuration array under the ``imageTransformations`` key:
+Through the configuration you can also combine image transformations to make presets (transformation chains). This is done via the ``transformationPresets`` key:
 
 .. code-block:: php
 
@@ -594,34 +611,18 @@ All transformations are registered in the configuration array under the ``imageT
     return array(
         // ...
 
-        'imageTransformations' => array(
-            'border' => 'Imbo\Image\Transformation\Border',
-            'canvas' => 'Imbo\Image\Transformation\Canvas',
+        'transformationPresets' => array(
+            'graythumb' => array(
+                'thumbnail',
+                'desaturate',
+            ),
             // ...
         ),
 
         // ...
     );
 
-where the keys are the names of the transformations as specified in the URL, and the values are strings representing class names of classes implementing the ``Imbo\Image\Transformation\TransformationInterface`` interface. You can also specify a closure that, when executed, returns a class implementing said interface. The classes specified as a string will be instantiated with a single argument, and the closures specified will be executed with the same argument. This argument is an array that matches the parameters for the transformation as specified in the URL. If you use the following query parameter:
-
-``t[]=border:width=1,height=2,color=f00``
-
-the ``$params`` array given to the constructor of the transformation class or as an argument to the closure will look like this:
-
-.. code-block:: php
-
-    <?php
-    array(
-        'width' => '1',
-        'height' => '1',
-        'color' => 'f00'
-    )
-
-Presets
-+++++++
-
-Imbo supports transformation presets by using the ``Imbo\Image\Transformation\Collection`` transformation. The constructor of this transformation takes an array containing other transformations.
+where the keys are the names of the transformations as specified in the URL, and the values are arrays containing other transformation names (as used in the ``eventListeners`` part of the configuration). You can also specify hard coded parameters for the presets if some of the transformations in the chain supports parameters:
 
 .. code-block:: php
 
@@ -629,23 +630,23 @@ Imbo supports transformation presets by using the ``Imbo\Image\Transformation\Co
     return array(
         // ...
 
-        'imageTransformations' => array(
-            'graythumb' => function ($params) {
-                return new Imbo\Image\Transformation\Collection(array(
-                    new Imbo\Image\Transformation\Desaturate(),
-                    new Imbo\Image\Transformation\Thumbnail($params),
-                ));
-            },
+        'transformationPresets' => array(
+            'fixedGraythumb' => array(
+                'thumbnail' => array(
+                    'width' => 50,
+                    'height' => 50,
+                ),
+                'desaturate',
+            ),
+            // ...
         ),
 
         // ...
     );
 
-which can be triggered using the following query parameter:
+By doing this the ``thumbnail`` part of the ``fixedGraythumb`` preset will ignore the parameters present in the URL.
 
-``t[]=graythumb``
-
-If you want to implement your own set of image transformations you can see how in the :doc:`../develop/image_transformations` chapter.
+.. note:: The URL's will stay the same if you change the transformation chain in a preset. Keep this in mind if you use for instance Varnish.
 
 Custom resources and routes - ``resources`` and ``routes``
 ----------------------------------------------------------

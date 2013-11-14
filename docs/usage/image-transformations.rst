@@ -5,6 +5,19 @@ Transforming images on the fly
 
 What you as an end-user of an Imbo installation will be doing most of the time, is working with images. This is what Imbo was originally made for, and this chapter includes details about all the different image transformations Imbo supports.
 
+All image transformations can be triggered by specifying the ``t`` query parameter. This parameter must be used as an array so that you can provide several image transformations. The transformations will be applied to the image in the same order as they appear in the URL.
+
+.. _auto-rotate-transformation:
+
+Auto rotate image based on EXIF data - ``t[]=autoRotate``
+---------------------------------------------------------
+
+This transformation will auto rotate the image based on EXIF data stored in the image. This transformation is rarely used per request, but is typically used by the :ref:`auto-rotate-image-event-listener` event listener when adding images to Imbo.
+
+**Examples:**
+
+* ``t[]=autoRotate``
+
 .. _border-transformation:
 
 Add an image border - ``t[]=border``
@@ -32,6 +45,8 @@ This transformation will apply a border around the image.
 * ``t[]=border:mode=inline``
 * ``t[]=border:color=000``
 * ``t[]=border:color=f00,width=2,height=2``
+
+.. _canvas-transformation:
 
 Expand the image canvas - ``t[]=canvas``
 ----------------------------------------
@@ -65,6 +80,8 @@ This transformation can be used to change the canvas of the original image.
 * ``t[]=canvas:width=200,height=200,x=10,mode=center-y``
 * ``t[]=canvas:width=200,height=200,y=10,mode=center-x``
 
+.. _compress-transformation:
+
 Compress the image - ``t[]=compress``
 -------------------------------------
 
@@ -82,6 +99,8 @@ This transformation compresses images on the fly resulting in a smaller payload.
 .. warning::
     This transformation currently only works as expected for ``image/jpeg`` images.
 
+.. _convert-transformation:
+
 Convert the image type - ``.jpg/.gif/.png``
 -------------------------------------------
 
@@ -97,7 +116,7 @@ This transformation can be used to change the image type. It is not applied like
 * ``curl http://imbo/users/<user>/images/<image>.jpg``
 * ``curl http://imbo/users/<user>/images/<image>.png``
 
-It is not possible to explicitly trigger this transformation via the ``t[]`` query parameter.
+.. _crop-transformation:
 
 Crop the image - ``t[]=crop``
 -----------------------------
@@ -122,6 +141,8 @@ This transformation is used to crop the image.
 
 * ``t[]=crop:x=10,y=25,width=250,height=150``
 
+.. _desaturate-transformation:
+
 Make a gray scaled image - ``t[]=desaturate``
 ---------------------------------------------
 
@@ -130,6 +151,8 @@ This transformation desaturates the image (in practice, gray scales it).
 **Examples:**
 
 * ``t[]=desaturate``
+
+.. _flip-horizontally-transformation:
 
 Make a mirror image - ``t[]=flipHorizontally``
 ----------------------------------------------
@@ -140,6 +163,8 @@ This transformation flips the image horizontally.
 
 * ``t[]=flipHorizontally``
 
+.. _flip-vertically-transformation:
+
 Flip the image upside down - ``t[]=flipVertically``
 ---------------------------------------------------
 
@@ -149,12 +174,14 @@ This transformation flips the image vertically.
 
 * ``t[]=flipVertically``
 
+.. _max-size-transformation:
+
 Enforce a max size of an image - ``t[]=maxSize``
 ------------------------------------------------
 
 This transformation will resize the image using the original aspect ratio. Two parameters are supported and at least one of them must be supplied to apply the transformation.
 
-Note the difference from the :ref:`resize <resize>` transformation: given both ``width`` and ``height``, the resulting image will not be the same width and height as specified unless the aspect ratio is the same.
+Note the difference from the :ref:`resize <resize-transformation>` transformation: given both ``width`` and ``height``, the resulting image will not be the same width and height as specified unless the aspect ratio is the same.
 
 **Parameters:**
 
@@ -170,7 +197,7 @@ Note the difference from the :ref:`resize <resize>` transformation: given both `
 * ``t[]=maxSize:height=100``
 * ``t[]=maxSize:width=100,height=50``
 
-.. _resize:
+.. _resize-transformation:
 
 Resize the image - ``t[]=resize``
 ---------------------------------
@@ -191,6 +218,8 @@ This transformation will resize the image. Two parameters are supported and at l
 * ``t[]=resize:height=100``
 * ``t[]=resize:width=100,height=50``
 
+.. _rotate-transformation:
+
 Rotate the image - ``t[]=rotate``
 ---------------------------------
 
@@ -209,6 +238,8 @@ This transformation will rotate the image clock-wise.
 * ``t[]=rotate:angle=90``
 * ``t[]=rotate:angle=45,bg=fff``
 
+.. _sepia-transformation:
+
 Apply a sepia color tone - ``t[]=sepia``
 ----------------------------------------
 
@@ -223,6 +254,8 @@ This transformation will apply a sepia color tone transformation to the image.
 
 * ``t[]=sepia``
 * ``t[]=sepia:threshold=70``
+
+.. _thumbnail-transformation:
 
 Create a thumbnail of the image - ``t[]=thumbnail``
 ---------------------------------------------------
@@ -245,6 +278,8 @@ This transformation creates a thumbnail of ``<image>``.
 * ``t[]=thumbnail``
 * ``t[]=thumbnail:width=20,height=20,fit=inset``
 
+.. _transpose-transformation:
+
 Create a vertical mirror image - ``t[]=transpose``
 --------------------------------------------------
 
@@ -254,6 +289,8 @@ This transformation transposes the image.
 
 * ``t[]=transpose``
 
+.. _transverse-transformation:
+
 Create a horizontal mirror image - ``t[]=transverse``
 -----------------------------------------------------
 
@@ -262,6 +299,8 @@ This transformation transverses the image.
 **Examples:**
 
 * ``t[]=transverse``
+
+.. _watermark-transformation:
 
 Add a watermark to the image - ``t[]=watermark``
 ------------------------------------------------
@@ -302,9 +341,9 @@ If you want to set the default watermark image you will have to do so in the con
     return array(
         // ...
 
-        'imageTransformations' => array(
-            'watermark' => function (array $params) {
-                $transformation = new Imbo\Image\Transformation\Watermark($params);
+        'eventListeners' => array(
+            'watermark' => function() {
+                $transformation = new Imbo\Image\Transformation\Watermark();
                 $transformation->setDefaultImage('some image identifier');
 
                 return $transformation;

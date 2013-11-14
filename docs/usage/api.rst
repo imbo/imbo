@@ -670,7 +670,7 @@ When an error occurs Imbo will respond with a fitting HTTP response code along w
 
 .. code-block:: bash
 
-    curl -g "http://imbo/users/<user>/images/<image>.jpg?t[]=foobar"
+    curl -g "http://imbo/users/<user>/foobar"
 
 results in:
 
@@ -678,33 +678,13 @@ results in:
 
     {
       "error": {
-        "code": 400,
-        "message": "Unknown transformation: foobar",
+        "imboErrorCode": 0,
         "date": "Wed, 12 Dec 2012 21:15:01 GMT",
-        "imboErrorCode": 0
-      },
-      "imageIdentifier": "<image>"
+        "message": "Not Found",
+        "code": 404
+      }
     }
 
 The ``code`` is the HTTP response code, ``message`` is a human readable error message, ``date`` is when the error occurred on the server, and ``imboErrorCode`` is an internal error code that can be used by the user agent to distinguish between similar errors (such as ``400 Bad Request``).
 
 The JSON object will also include ``imageIdentifier`` if the request was made against the image or the metadata resource.
-
-If the user agent specifies a nonexistent username the following occurs:
-
-.. code-block:: bash
-
-    curl http://imbo/users/<non-existing-user>.json
-
-results in:
-
-.. code-block:: javascript
-
-    {
-      "error": {
-        "code": 404,
-        "message": "Public key not found",
-        "date": "Mon, 13 Aug 2012 17:22:37 GMT",
-        "imboErrorCode": 100
-      }
-    }

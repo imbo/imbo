@@ -3,54 +3,41 @@
 Implement your own image transformations
 ========================================
 
-Imbo also supports custom image transformations. All you need to do is to implement the ``Imbo\Image\Transformation\TransformationInterface`` interface, and configure your transformation:
+Imbo also supports custom image transformations. All you need to do is to create an event listener, and configure your transformation:
 
 .. code-block:: php
 
     <?php
+    class My\Custom\Transformation implements Imbo\EventListener\ListenerInterface {
+        public static function getSubscribedEvents() {
+            return array('image.transformation.cooltransformation' => 'transform');
+        }
+
+        public function transform($event) {
+            $image = $event->getArgument('image');
+            $params = $event->getArgument('params'); // If the transformation allows params in the URL
+
+            // ...
+        }
+    }
+
     return array(
         // ..
 
-        'imageTransformations' => array(
-            'border' => 'My\Custom\BorderTransformation',
+        'eventListeners' => array(
+            'coolTransformation' => 'My\Custom\Transformation',
         ),
 
         // ...
     );
 
-where ``My\Custom\BorderTransformation`` implements ``Imbo\Image\Transformation\TransformationInterface``.
-
-Image transformation presets/collections
-----------------------------------------
-
-If you want to combine some of the existing image transformations you can use the ``Imbo\Image\Transformation\Collection`` transformation for this purpose. The constructor takes an array of other transformations:
+Whenever someone requests an image using ``?t[]=coolTransformation:width=100,height=200`` Imbo will trigger the ``image.transformation.cooltransformation`` event, and assign the following value to the ``params`` argument of the event:
 
 .. code-block:: php
 
-    <?php
-    use Imbo\Image\Transformation;
+    array(
+        'width' => '100',
+        'height' => '200',
+    )
 
-    return array(
-        // ...
-
-        'imageTransformations' => array(
-            'thumb' => function ($params) {
-                return new Transformation\Collection(array(
-                    new Transformation\Desaturate(),
-                    new Transformation\Thumbnail(array(
-                        'width' => 60,
-                        'height' => 60,
-                    )),
-                    new Transformation\Border(array(
-                        'width' => 2,
-                        'height' => 2,
-                        'mode' => 'inline',
-                    )),
-                ));
-            },
-        ),
-
-        // ...
-    );
-
-When images are requested with the ``t[]=thumb`` query parameter they will first be desaturated, then made into a 60 x 60 pixel thumbnail and last they will get a 2 pixel border painted inside of the thumbnail, maintaining the 60 x 60 pixel size.
+Take a look at the existing transformations included with Imbo for more information.
