@@ -10,10 +10,7 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\TransformationException,
-    Imbo\Storage\ImageReader,
-    Imbo\Model\Image;
+use Imbo\EventManager\EventInterface;
 
 /**
  * Image transformer listener

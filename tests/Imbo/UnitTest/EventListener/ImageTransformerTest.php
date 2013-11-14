@@ -10,11 +10,7 @@
 
 namespace Imbo\UnitTest\EventListener;
 
-use Imbo\EventListener\ImageTransformer,
-    Imbo\Image\Transformation\Transformation,
-    Imbo\Storage\ImageReaderAware,
-    Imbo\Storage\ImageReaderAwareTrait,
-    Imbo\Model\Image;
+use Imbo\EventListener\ImageTransformer;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
