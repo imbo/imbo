@@ -247,3 +247,8 @@ htmlhelp_basename = 'Imbodoc'
 
 spelling_word_list_filename='spelling_wordlist.txt'
 spelling_show_suggestions=True
+
+# Allow php syntax highlighting without prepending <?php
+from sphinx.highlighting import lexers
+from pygments.lexers.web import PhpLexer
+lexers['php'] = PhpLexer(startinline=True)
