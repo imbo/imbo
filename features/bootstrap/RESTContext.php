@@ -133,10 +133,30 @@ class RESTContext extends BehatContext {
             $params['router']
         );
 
-        sleep(1);
+        if (!self::$pid) {
+            // Could not start the httpd for some reason
+            throw new RuntimeException('Could not start the web server');
+        }
 
-        if (!self::canConnectToHttpd($url['host'], $port)) {
-            throw new RuntimeException('Could not start the built in httpd');
+        // Try to connect
+        $start = microtime(true);
+        $connected = false;
+
+        while (microtime(true) - $start <= (int) $params['timeout']) {
+            if (self::canConnectToHttpd($url['host'], $port)) {
+                $connected = true;
+                break;
+            }
+        }
+
+        if (!$connected) {
+            self::killProcess(self::$pid);
+            throw new RuntimeException(
+                sprintf(
+                    'Could not connect to the web server within the given timeframe (%d second(s))',
+                    $params['timeout']
+                )
+            );
         }
 
         self::$testSessionId = uniqid('', true);
