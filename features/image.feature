@@ -78,15 +78,15 @@ Feature: Imbo provides an image endpoint
         And I sign the request
         And I attach "tests/Imbo/Fixtures/broken-image.jpg" to the request body
         When I request "/users/publickey/images/72e38ded1b41eda0c1701e6ff270eaf8" using HTTP "PUT"
-        Then I should get a response with "415 Broken image"
+        Then I should get a response with "415 Invalid image"
         And the "Content-Type" response header is "application/json"
-        And the Imbo error message is "Broken image" and the error code is "204"
+        And the Imbo error message is "Invalid image" and the error code is "205"
 
     Scenario: Add a broken image with identifiable size
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         And I attach "tests/Imbo/Fixtures/slightly-broken-image.png" to the request body
         When I request "/users/publickey/images/3e492f6c8f37b5c3cc3d138d09be0eee" using HTTP "PUT"
-        Then I should get a response with "415 Broken image"
+        Then I should get a response with "415 Invalid image"
         And the "Content-Type" response header is "application/json"
-        And the Imbo error message is "Broken image" and the error code is "204"
+        And the Imbo error message is "Invalid image" and the error code is "205"
