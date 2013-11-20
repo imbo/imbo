@@ -115,6 +115,13 @@ class Image implements ModelInterface {
     private $imageIdentifier;
 
     /**
+     * Flag informing us if the image has been transformed by any image transformations
+     *
+     * @var boolean
+     */
+    private $hasBeenTransformed = false;
+
+    /**
      * Get the size of the image data in bytes
      *
      * @return int
@@ -364,6 +371,22 @@ class Image implements ModelInterface {
      */
     public function setChecksum($checksum) {
         $this->checksum = $checksum;
+
+        return $this;
+    }
+
+    /**
+     * Set or get the hasBeenTransformed flag
+     *
+     * @param boolean|null $flag Skip the argument to get the current value
+     * @return boolean|self
+     */
+    public function hasBeenTransformed($flag = null) {
+        if ($flag === null) {
+            return $this->hasBeenTransformed;
+        }
+
+        $this->hasBeenTransformed = (bool) $flag;
 
         return $this;
     }

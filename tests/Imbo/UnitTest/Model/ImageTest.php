@@ -201,4 +201,15 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     public function testCanGetAFileExtensionBasedOnAMimeType($type, $extension) {
         $this->assertSame($extension, Image::getFileExtension($type));
     }
+
+    /**
+     * @covers Imbo\Model\Image::hasBeenTransformed
+     */
+    public function testCanUpdateTransformationFlag() {
+        $this->assertFalse($this->image->hasBeenTransformed());
+        $this->assertSame($this->image, $this->image->hasBeenTransformed(true));
+        $this->assertTrue($this->image->hasBeenTransformed());
+        $this->assertSame($this->image, $this->image->hasBeenTransformed(false));
+        $this->assertFalse($this->image->hasBeenTransformed());
+    }
 }
