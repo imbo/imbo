@@ -174,7 +174,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Http\Response\ResponseFormatter::format
      */
-    public function testDoesNotSetAResponseContentWhenHttpMethodIsHead() {
+    public function testDoesNotSetResponseContentWhenHttpMethodIsHead() {
         $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(200));
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->getMock('Imbo\Model\Stats')));
         $this->response->expects($this->never())->method('setContent');
@@ -304,13 +304,14 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
      */
     public function testTriggersAConversionTransformationIfNeededWhenTheModelIsAnImage() {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->at(0))->method('getMimeType')->will($this->returnValue('image/jpeg'));
+        $image->expects($this->exactly(2))->method('getMimeType')->will($this->returnValue('image/jpeg'));
+        $image->expects($this->once())->method('getBlob')->will($this->returnValue('image blob'));
 
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
         $this->responseFormatter->setFormatter('png');
 
         $eventManager = $this->getMock('Imbo\EventManager\EventManager');
-        $eventManager->expects($this->once())
+        $eventManager->expects($this->at(0))
                      ->method('trigger')
                      ->with(
                          'image.transformation.convert',
@@ -319,6 +320,10 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
                              'params' => array('type' => 'png'),
                          )
                      );
+        $eventManager->expects($this->at(1))
+                     ->method('trigger')
+                     ->with('image.transformed', array('image' => $image));
+
         $this->event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
 
         $this->responseFormatter->format($this->event);
@@ -334,7 +339,12 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
         $this->responseFormatter->setFormatter('jpg');
 
-        $this->event->expects($this->never())->method('getManager');
+        $eventManager = $this->getMock('Imbo\EventManager\EventManager');
+        $eventManager->expects($this->once())
+                     ->method('trigger')
+                     ->with('image.transformed', array('image' => $image));
+
+        $this->event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
 
         $this->responseFormatter->format($this->event);
     }
