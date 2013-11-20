@@ -247,6 +247,13 @@ return array(
         'transpose' => 'Imbo\Image\Transformation\Transpose',
         'transverse' => 'Imbo\Image\Transformation\Transverse',
         'watermark' => 'Imbo\Image\Transformation\Watermark',
+
+        // Imagick-specific event listener for the built in image transformations
+        'imagick' => 'Imbo\EventListener\Imagick',
+    ),
+
+    'eventListenerInitializers' => array(
+        'imagick' => 'Imbo\EventListener\Initializer\Imagick',
     ),
 
     'transformationPresets' => array(

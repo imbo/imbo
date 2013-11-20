@@ -196,6 +196,22 @@ $config = array(
         'transpose' => 'Imbo\Image\Transformation\Transpose',
         'transverse' => 'Imbo\Image\Transformation\Transverse',
         'watermark' => 'Imbo\Image\Transformation\Watermark',
+
+        // Imagick-specific event listener for the built in image transformations
+        'imagick' => 'Imbo\EventListener\Imagick',
+    ),
+
+    /**
+     * Initializers for event listeners
+     *
+     * If some of your event handlers requires extra initializing you can create initializer
+     * classes. These classes must implement the Imbo\EventListener\Initializer\InitializerInterface
+     * interface, and will be instantiated by Imbo.
+     *
+     * @var array
+     */
+    'eventListenerInitializers' => array(
+        'imagick' => 'Imbo\EventListener\Initializer\Imagick',
     ),
 
     /**
