@@ -11,6 +11,8 @@
 namespace Imbo\EventManager;
 
 use Imbo\EventListener\ListenerInterface,
+    Imbo\EventListener\Initializer\InitializerInterface,
+    Imbo\Exception\InvalidArgumentException,
     ReflectionClass;
 
 /**
@@ -40,6 +42,13 @@ class EventManager {
      * @var array
      */
     private $callbacks = array();
+
+    /**
+     * Event listener initializers
+     *
+     * @var InitializerInterface[]
+     */
+    private $initializers = array();
 
     /**
      * Register an event handler
@@ -109,7 +118,7 @@ class EventManager {
                     'publicKeys' => $publicKeys,
                 ), $callback);
             } else {
-                throw new InvalidArgumentException('Invalid event definition for listener: ' . $name);
+                throw new InvalidArgumentException('Invalid event definition for listener: ' . $name, 500);
             }
         }
 
@@ -139,10 +148,27 @@ class EventManager {
                 // </ghetto>
             }
 
+            // Run initializers
+            foreach ($this->initializers as $initializer) {
+                $initializer->initialize($handler);
+            }
+
             $this->eventHandlers[$name] = $handler;
         }
 
         return $this->eventHandlers[$name];
+    }
+
+    /**
+     * Add an event listener initializer
+     *
+     * @param InitializerInterface $initializer An initializer instance
+     * @return self
+     */
+    public function addInitializer(InitializerInterface $initializer) {
+        $this->initializers[] = $initializer;
+
+        return $this;
     }
 
     /**
