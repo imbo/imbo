@@ -22,7 +22,8 @@ use Imbo\Http\Request\Request,
     Imbo\Storage\StorageInterface,
     Imbo\Http\Response\Formatter,
     Imbo\Image\Transformation,
-    Imbo\Resource\ResourceInterface;
+    Imbo\Resource\ResourceInterface,
+    Imbo\EventListener\Initializer\InitializerInterface;
 
 /**
  * Imbo application
@@ -114,6 +115,26 @@ class Application {
 
             $eventManager->addEventHandler($listener, $listener, $params)
                          ->addCallbacks($listener, $listener::getSubscribedEvents());
+        }
+
+        // Event listener initializers
+        foreach ($config['eventListenerInitializers'] as $name => $initializer) {
+            if (!$initializer) {
+                // The initializer has been disabled via config
+                continue;
+            }
+
+            if (is_string($initializer)) {
+                // The initializer has been specified as a string, representing a class name. Create
+                // an instance
+                $initializer = new $initializer();
+            }
+
+            if (!($initializer instanceof InitializerInterface)) {
+                throw new InvalidArgumentException('Invalid event listener initializer: ' . $name, 500);
+            }
+
+            $eventManager->addInitializer($initializer);
         }
 
         // Listeners from configuration
