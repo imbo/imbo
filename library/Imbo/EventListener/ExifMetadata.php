@@ -13,8 +13,7 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\RuntimeException,
-    Imbo\Exception\DatabaseException,
-    Imagick;
+    Imbo\Exception\DatabaseException;
 
 /**
  * Exif metadata event listener
@@ -45,7 +44,7 @@ class ExifMetadata implements ListenerInterface {
     /**
      * Imagick instance
      *
-     * @var Imagick
+     * @var \Imagick
      */
     private $imagick;
 
@@ -76,10 +75,10 @@ class ExifMetadata implements ListenerInterface {
     /**
      * Set an Imagick instance
      *
-     * @param Imagick $imagick An instance of Imagick
+     * @param \Imagick $imagick An instance of Imagick
      * @return self
      */
-    public function setImagick(Imagick $imagick) {
+    public function setImagick(\Imagick $imagick) {
         $this->imagick = $imagick;
 
         return $this;
@@ -88,11 +87,11 @@ class ExifMetadata implements ListenerInterface {
     /**
      * Get an Imagick instance
      *
-     * @return Imagick
+     * @return \Imagick
      */
     public function getImagick() {
         if ($this->imagick === null) {
-            $this->imagick = new Imagick();
+            $this->imagick = new \Imagick();
         }
 
         return $this->imagick;
