@@ -40,23 +40,6 @@ class TransformationTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Transformation::setImagick
-     * @covers Imbo\Image\Transformation\Transformation::getImagick
-     */
-    public function testCanSetAndGetImagick() {
-        $imagick = new Imagick();
-        $this->assertSame($this->transformation, $this->transformation->setImagick($imagick));
-        $this->assertEquals($imagick, $this->transformation->getImagick());
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\Transformation::getImagick
-     */
-    public function testCanCreateAnImagickInstanceItself() {
-        $this->assertInstanceOf('Imagick', $this->transformation->getImagick());
-    }
-
-    /**
      * Get different colors and their formatted version
      *
      * @return array[]

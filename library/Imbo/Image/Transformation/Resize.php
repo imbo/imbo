@@ -48,25 +48,30 @@ class Resize extends Transformation implements ListenerInterface {
         $width = !empty($params['width']) ? (int) $params['width'] : 0;
         $height = !empty($params['height']) ? (int) $params['height'] : 0;
 
+        $originalWidth = $image->getWidth();
+        $originalHeight = $image->getHeight();
+
+        if ($width === $originalWidth && $height === $originalHeight) {
+            // Resize params match the current image size, no need for any resizing
+            return;
+        }
+
         // Calculate width or height if not both have been specified
         if (!$height) {
-            $height = ($image->getHeight() / $image->getWidth()) * $width;
+            $height = ($originalHeight / $originalWidth) * $width;
         } else if (!$width) {
-            $width = ($image->getWidth() / $image->getHeight()) * $height;
+            $width = ($originalWidth / $originalHeight) * $height;
         }
 
         try {
+            $this->imagick->setOption('jpeg:size', $width . 'x' . $height);
+            $this->imagick->thumbnailImage($width, $height);
 
-            $imagick = $this->getImagick();
-            $imagick->setOption('jpeg:size', $width . 'x' . $height);
-            $imagick->readImageBlob($image->getBlob());
-            $imagick->thumbnailImage($width, $height);
+            $size = $this->imagick->getImageGeometry();
 
-            $size = $imagick->getImageGeometry();
-
-            $image->setBlob($imagick->getImageBlob())
-                  ->setWidth($size['width'])
-                  ->setHeight($size['height']);
+            $image->setWidth($size['width'])
+                  ->setHeight($size['height'])
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

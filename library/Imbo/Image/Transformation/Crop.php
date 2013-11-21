@@ -78,15 +78,12 @@ class Crop extends Transformation implements ListenerInterface {
         }
 
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-            $imagick->cropImage($width, $height, $x, $y);
+            $this->imagick->cropImage($width, $height, $x, $y);
+            $size = $this->imagick->getImageGeometry();
 
-            $size = $imagick->getImageGeometry();
-
-            $image->setBlob($imagick->getImageBlob())
-                  ->setWidth($size['width'])
-                  ->setHeight($size['height']);
+            $image->setWidth($size['width'])
+                  ->setHeight($size['height'])
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

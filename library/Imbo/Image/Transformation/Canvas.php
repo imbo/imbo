@@ -74,7 +74,7 @@ class Canvas extends Transformation implements ListenerInterface {
     /**
      * Transform the image
      *
-     * @param EventInterface $event The event instance
+     * @param EventInterface $event
      */
     public function transform(EventInterface $event) {
         $image = $event->getArgument('image');
@@ -88,15 +88,14 @@ class Canvas extends Transformation implements ListenerInterface {
         $bg     = !empty($params['bg']) ? $this->formatColor($params['bg']) : $this->bg;
 
         try {
+            // Clone the original that we will move back onto the canvas
+            $original = clone $this->imagick;
 
-            // Create a new canvas
-            $canvas = new Imagick();
-            $canvas->newImage($width, $height, $bg);
-            $canvas->setImageFormat($image->getExtension());
+            // Clear the original and make the canvas
+            $this->imagick->clear();
 
-            // Load existing image
-            $existingImage = $this->getImagick();
-            $existingImage->readImageBlob($image->getBlob());
+            $this->imagick->newImage($width, $height, $bg);
+            $this->imagick->setImageFormat($image->getExtension());
 
             $existingWidth = $image->getWidth();
             $existingHeight = $image->getHeight();
@@ -124,13 +123,14 @@ class Canvas extends Transformation implements ListenerInterface {
                     $cropHeight = $existingHeight;
                 }
 
-                $existingImage->cropImage($cropWidth, $cropHeight, $cropX, $cropY);
+                // Crop the original
+                $original->cropImage($cropWidth, $cropHeight, $cropX, $cropY);
             }
 
             // Figure out the correct placement of the image based on the placement mode. Use the
             // size from the imagick image when calculating since the image may have been cropped
             // above.
-            $existingSize = $existingImage->getImageGeometry();
+            $existingSize = $original->getImageGeometry();
 
             if ($mode === 'center') {
                 $x = ($width - $existingSize['width']) / 2;
@@ -142,18 +142,18 @@ class Canvas extends Transformation implements ListenerInterface {
             }
 
             // Paste existing image into the new canvas at the given position
-            $canvas->compositeImage(
-                $existingImage,
+            $this->imagick->compositeImage(
+                $original,
                 Imagick::COMPOSITE_DEFAULT,
                 $x,
                 $y
             );
 
             // Store the new image
-            $size = $canvas->getImageGeometry();
-            $image->setBlob($canvas->getImageBlob())
-                  ->setWidth($size['width'])
-                  ->setHeight($size['height']);
+            $size = $this->imagick->getImageGeometry();
+            $image->setWidth($size['width'])
+                  ->setHeight($size['height'])
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         } catch (ImagickPixelException $e) {

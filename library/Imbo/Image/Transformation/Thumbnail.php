@@ -69,21 +69,19 @@ class Thumbnail extends Transformation implements ListenerInterface {
         $fit = !empty($params['fit']) ? $params['fit'] : $this->fit;
 
         try {
-            $imagick = $this->getImagick();
-            $imagick->setOption('jpeg:size', $width . 'x' . $height);
-            $imagick->readImageBlob($image->getBlob());
+            $this->imagick->setOption('jpeg:size', $width . 'x' . $height);
 
             if ($fit === 'inset') {
-                $imagick->thumbnailimage($width, $height, true);
+                $this->imagick->thumbnailimage($width, $height, true);
             } else {
-                $imagick->cropThumbnailImage($width, $height);
+                $this->imagick->cropThumbnailImage($width, $height);
             }
 
-            $size = $imagick->getImageGeometry();
+            $size = $this->imagick->getImageGeometry();
 
-            $image->setBlob($imagick->getImageBlob())
-                  ->setWidth($size['width'])
-                  ->setHeight($size['height']);
+            $image->setWidth($size['width'])
+                  ->setHeight($size['height'])
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

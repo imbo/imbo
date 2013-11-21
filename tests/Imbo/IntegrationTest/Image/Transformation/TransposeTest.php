@@ -10,7 +10,8 @@
 
 namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Transpose;
+use Imbo\Image\Transformation\Transpose,
+    Imagick;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -26,20 +27,18 @@ class TransposeTest extends TransformationTests {
     }
 
     /**
-     * {@inheritdoc}
+     * @covers Imbo\Image\Transformation\Transpose::transform
      */
-    protected function getDefaultParams() {
-        return array();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getImageMock() {
+    public function testCanTransformImage() {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 
-        return $image;
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->once())->method('getArgument')->with('image')->will($this->returnValue($image));
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+
+        $this->getTransformation()->setImagick($imagick)->transform($event);
     }
 }

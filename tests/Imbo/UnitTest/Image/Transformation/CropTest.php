@@ -74,14 +74,10 @@ class CropTest extends \PHPUnit_Framework_TestCase {
         $image->expects($this->any())->method('getHeight')->will($this->returnValue($height));
 
         if ($shouldCrop) {
-            $image->expects($this->once())->method('getBlob')->will($this->returnValue('originalimage'));
-            $image->expects($this->once())->method('setBlob')->with('newimage')->will($this->returnSelf());
             $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnSelf());
             $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnSelf());
 
-            $imagick->expects($this->once())->method('readImageBlob')->with('originalimage');
             $imagick->expects($this->once())->method('cropImage')->with($width, $height, $x, $y);
-            $imagick->expects($this->once())->method('getImageBlob')->will($this->returnValue('newimage'));
             $imagick->expects($this->once())->method('getImageGeometry')->will($this->returnValue(array('width' => $width, 'height' => $height)));
         } else {
             $imagick->expects($this->never())->method('cropImage');

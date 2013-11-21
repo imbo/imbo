@@ -57,16 +57,13 @@ class Rotate extends Transformation implements ListenerInterface {
         $bg = !empty($params['bg']) ? $this->formatColor($params['bg']) : $this->bg;
 
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
+            $this->imagick->rotateImage($bg, $angle);
 
-            $imagick->rotateImage($bg, $angle);
+            $size = $this->imagick->getImageGeometry();
 
-            $size = $imagick->getImageGeometry();
-
-            $image->setBlob($imagick->getImageBlob())
-                  ->setWidth($size['width'])
-                  ->setHeight($size['height']);
+            $image->setWidth($size['width'])
+                  ->setHeight($size['height'])
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         } catch (ImagickPixelException $e) {

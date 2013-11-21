@@ -55,15 +55,12 @@ class Convert extends Transformation implements ListenerInterface {
         }
 
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-
-            $imagick->setImageFormat($type);
+            $this->imagick->setImageFormat($type);
             $mimeType = array_search($type, Image::$mimeTypes);
 
-            $image->setBlob($imagick->getImageBlob());
-            $image->setMimeType($mimeType);
-            $image->setExtension($type);
+            $image->setMimeType($mimeType)
+                  ->setExtension($type)
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

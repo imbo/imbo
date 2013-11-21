@@ -38,7 +38,6 @@ class Compress extends Transformation implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
         $params = $event->getArgument('params');
 
         if (empty($params['quality'])) {
@@ -48,11 +47,9 @@ class Compress extends Transformation implements ListenerInterface {
         $quality = (int) $params['quality'];
 
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-            $imagick->setImageCompressionQuality($quality);
+            $this->imagick->setImageCompressionQuality($quality);
+            $event->getArgument('image')->hasBeenTransformed(true);
 
-            $image->setBlob($imagick->getImageBlob());
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

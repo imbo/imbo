@@ -104,7 +104,10 @@ class Watermark extends Transformation implements ListenerInterface {
 
         // Try to load watermark image from storage
         try {
-            $watermarkData = $event->getStorage()->getImage($event->getRequest()->getPublicKey(), $imageIdentifier);
+            $watermarkData = $event->getStorage()->getImage(
+                $event->getRequest()->getPublicKey(),
+                $imageIdentifier
+            );
 
             $watermark = new Imagick();
             $watermark->readImageBlob($watermarkData);
@@ -147,12 +150,8 @@ class Watermark extends Transformation implements ListenerInterface {
 
         // Now make a composite
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-
-            $imagick->compositeImage($watermark, Imagick::COMPOSITE_OVER, $x, $y);
-
-            $image->setBlob($imagick->getImageBlob());
+            $this->imagick->compositeImage($watermark, Imagick::COMPOSITE_OVER, $x, $y);
+            $image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

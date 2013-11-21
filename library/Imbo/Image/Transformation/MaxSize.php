@@ -67,16 +67,14 @@ class MaxSize extends Transformation implements ListenerInterface {
                 return;
             }
 
-            $imagick = $this->getImagick();
-            $imagick->setOption('jpeg:size', $width . 'x' . $height);
-            $imagick->readImageBlob($image->getBlob());
-            $imagick->thumbnailImage($width, $height);
+            $this->imagick->setOption('jpeg:size', $width . 'x' . $height);
+            $this->imagick->thumbnailImage($width, $height);
 
-            $size = $imagick->getImageGeometry();
+            $size = $this->imagick->getImageGeometry();
 
-            $image->setBlob($imagick->getImageBlob())
-                  ->setWidth($size['width'])
-                  ->setHeight($size['height']);
+            $image->setWidth($size['width'])
+                  ->setHeight($size['height'])
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

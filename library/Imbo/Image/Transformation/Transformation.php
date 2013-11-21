@@ -24,22 +24,13 @@ abstract class Transformation {
      *
      * @var Imagick
      */
-    private $imagick;
+    protected $imagick;
 
     /**
-     * {@inheritdoc}
-     */
-    public function getImagick() {
-        if ($this->imagick === null) {
-            $this->imagick = new Imagick();
-            $this->imagick->setOption('png:exclude-chunks', 'all');
-        }
-
-        return clone $this->imagick;
-    }
-
-    /**
-     * {@inheritdoc}
+     * Set the Imagick instance
+     *
+     * @param Imagick $imagick An Imagick instance
+     * @return self
      */
     public function setImagick(Imagick $imagick) {
         $this->imagick = $imagick;

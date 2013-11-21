@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\Canvas,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Canvas
  */
 class CanvasTest extends TransformationTests {
     /**
@@ -33,36 +34,6 @@ class CanvasTest extends TransformationTests {
      */
     protected function getTransformation() {
         return new Canvas();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultParams() {
-        return array(
-            'width' => $this->width,
-            'height' => $this->height,
-            'mode' => 'free',
-            'x' => 10,
-            'y' => 20,
-            'bg' => 'bf1942',
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getImageMock() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
-        $image->expects($this->once())->method('getHeight')->will($this->returnValue(463));
-        $image->expects($this->once())->method('setWidth')->with($this->width)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with($this->height)->will($this->returnValue($image));
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
-
-        return $image;
     }
 
     /**
@@ -110,14 +81,16 @@ class CanvasTest extends TransformationTests {
      * @dataProvider getCanvasParameters
      */
     public function testTransformWithDifferentParameters($width, $height, $mode = 'free', $resultingWidth = 665, $resultingHeight = 463) {
+        $blob = file_get_contents(FIXTURES_DIR . '/image.png');
+
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
+        $image->expects($this->any())->method('getBlob')->will($this->returnValue($blob));
         $image->expects($this->any())->method('getWidth')->will($this->returnValue(665));
         $image->expects($this->any())->method('getHeight')->will($this->returnValue(463));
         $image->expects($this->any())->method('getExtension')->will($this->returnValue('png'));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
         $image->expects($this->once())->method('setWidth')->with($resultingWidth)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($resultingHeight)->will($this->returnValue($image));
+        $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))
@@ -133,6 +106,9 @@ class CanvasTest extends TransformationTests {
                   'mode' => $mode,
               )));
 
-        $this->getTransformation()->transform($event);
+        $imagick = new Imagick();
+        $imagick->readImageBlob($blob);
+
+        $this->getTransformation()->setImagick($imagick)->transform($event);
     }
 }

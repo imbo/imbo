@@ -10,10 +10,11 @@
 
 namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Sepia;
+use Imbo\Image\Transformation\Sepia,
+    Imagick;
 
 /**
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
+ * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
  * @covers Imbo\Image\Transformation\Sepia
  */
@@ -26,20 +27,36 @@ class SepiaTest extends TransformationTests {
     }
 
     /**
-     * {@inheritdoc}
+     * @covers Imbo\Image\Transformation\Sepia::transform
      */
-    protected function getDefaultParams() {
-        return array('threshold' => 90);
+    public function testCanTransformImageWithoutParams() {
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->once())->method('hasBeenTransformed')->with(true);
+
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(array()));
+        $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+
+        $this->getTransformation()->setImagick($imagick)->transform($event);
     }
 
     /**
-     * {@inheritdoc}
+     * @covers Imbo\Image\Transformation\Sepia::transform
      */
-    protected function getImageMock() {
+    public function testCanTransformImageWithParams() {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
+        $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        return $image;
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(array('threshold' => 10)));
+        $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+
+        $this->getTransformation()->setImagick($imagick)->transform($event);
     }
 }

@@ -45,18 +45,13 @@ class Sepia extends Transformation implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
         $params = $event->getArgument('params');
 
         $threshold = !empty($params['threshold']) ? (float) $params['threshold'] : $this->threshold;
 
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-
-            $imagick->sepiaToneImage($threshold);
-
-            $image->setBlob($imagick->getImageBlob());
+            $this->imagick->sepiaToneImage($threshold);
+            $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

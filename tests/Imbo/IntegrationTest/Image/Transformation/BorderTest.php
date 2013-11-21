@@ -10,7 +10,8 @@
 
 namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Border;
+use Imbo\Image\Transformation\Border,
+    Imagick;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
@@ -26,39 +27,25 @@ class BorderTest extends TransformationTests {
     }
 
     /**
-     * {@inheritdoc}
+     * Data provider
+     *
+     * @return array[]
      */
-    protected function getDefaultParams() {
+    public function getBorderParams() {
         return array(
-            'color' => 'ffffff',
-            'width' => 3,
-            'height' => 4,
+            'inline border' => array(665, 463, 3, 4, 'inset'),
+            'outbound border' => array(671, 471, 3, 4, 'outbound'),
         );
     }
 
     /**
-     * {@inheritdoc}
+     * @dataProvider getBorderParams
      */
-    protected function getImageMock() {
+    public function testTransformationSupportsDifferentModes($expectedWidth, $expectedHeight, $borderWidth, $borderHeight, $borderMode) {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with(671)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with(471)->will($this->returnValue($image));
-
-        return $image;
-    }
-
-    public function testTransformationSupportsDifferentModes() {
-        $imagePath = FIXTURES_DIR . '/image.png';
-
-        $size = getimagesize($imagePath);
-
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents($imagePath)));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with($size[0])->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with($size[1])->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with($expectedWidth)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with($expectedHeight)->will($this->returnValue($image));
+        $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))
@@ -70,11 +57,16 @@ class BorderTest extends TransformationTests {
               ->with('params')
               ->will($this->returnValue(array(
                   'color' => 'white',
-                  'width' => 3,
-                  'height' => 4,
-                  'mode' => 'inline',
+                  'width' => $borderWidth,
+                  'height' => $borderHeight,
+                  'mode' => $borderMode,
               )));
 
-        $this->getTransformation()->transform($event);
+        $blob = file_get_contents(FIXTURES_DIR . '/image.png');
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob($blob);
+
+        $this->getTransformation()->setImagick($imagick)->transform($event);
     }
 }

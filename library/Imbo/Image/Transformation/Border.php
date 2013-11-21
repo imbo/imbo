@@ -77,12 +77,9 @@ class Border extends Transformation implements ListenerInterface {
         $mode = !empty($params['mode']) ? $params['mode'] : $this->mode;
 
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-
             if ($mode === 'outbound') {
                 // Paint the border outside of the image, increasing the width/height
-                $imagick->borderImage($color, $width, $height);
+                $this->imagick->borderImage($color, $width, $height);
             } else {
                 // Paint the border inside of the image, keeping the orignal width/height
                 $imageWidth = $image->getWidth();
@@ -106,14 +103,14 @@ class Border extends Transformation implements ListenerInterface {
                 $rect->rectangle(0, $imageHeight - $height, $imageWidth, $imageHeight);
 
                 // Draw the border
-                $imagick->drawImage($rect);
+                $this->imagick->drawImage($rect);
             }
 
-            $size = $imagick->getImageGeometry();
+            $size = $this->imagick->getImageGeometry();
 
-            $image->setBlob($imagick->getImageBlob())
-                  ->setWidth($size['width'])
-                  ->setHeight($size['height']);
+            $image->setWidth($size['width'])
+                  ->setHeight($size['height'])
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         } catch (ImagickPixelException $e) {

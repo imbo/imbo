@@ -39,16 +39,9 @@ class Desaturate extends Transformation implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-        $params = $event->getArgument('params');
-
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-
-            $imagick->modulateImage(100, 0, 100);
-
-            $image->setBlob($imagick->getImageBlob());
+            $this->imagick->modulateImage(100, 0, 100);
+            $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

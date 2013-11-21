@@ -45,9 +45,7 @@ class AutoRotate extends Transformation implements ListenerInterface {
 
         try {
             // Get orientation from exif data
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-            $orientation = $imagick->getImageOrientation();
+            $orientation = $this->imagick->getImageOrientation();
 
             /**
              * Transform image if orientation is set and greater than 1
@@ -85,14 +83,14 @@ class AutoRotate extends Transformation implements ListenerInterface {
                 }
 
                 if ($rotate) {
-                    $imagick->rotateImage('#000', $rotate);
+                    $this->imagick->rotateImage('#000', $rotate);
 
                     /**
                      * Recalculate width and height if number of degrees are not
                      * dividable by 180, meaning height and width is changed.
                      */
                     if ($rotate % 180) {
-                        $size = $imagick->getImageGeometry();
+                        $size = $this->imagick->getImageGeometry();
 
                         $image->setWidth($size['width'])
                               ->setHeight($size['height']);
@@ -100,17 +98,17 @@ class AutoRotate extends Transformation implements ListenerInterface {
                 }
 
                 if ($flipHorizontally) {
-                    $imagick->flopImage();
+                    $this->imagick->flopImage();
                 }
 
                 if ($flipVertically) {
-                    $imagick->flipImage();
+                    $this->imagick->flipImage();
                 }
 
                 if ($rotate || $flipHorizontally || $flipVertically) {
                     // Set the image orientation so it reflects the transformation that's been done
-                    $imagick->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
-                    $image->setBlob($imagick->getImageBlob());
+                    $this->imagick->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
+                    $image->hasBeenTransformed(true);
                 }
             }
         } catch (ImagickException $e) {
