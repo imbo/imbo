@@ -15,6 +15,7 @@ use Imbo\Application;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @covers Imbo\Application
  */
 class ApplicationTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -59,5 +60,21 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
             'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
             'storage' => function() { return new \stdClass(); },
         ));
+    }
+
+    /**
+     * @covers Imbo\Application::run
+     */
+    public function testCanRunWithDefaultConfiguration() {
+        $this->expectOutputRegex('|{"version":"dev",.*}|');
+        $this->application->run(require __DIR__ . '/../../../config/config.default.php');
+    }
+
+    /**
+     * @covers Imbo\Application::run
+     */
+    public function testCanRunWithTestingConfiguration() {
+        $this->expectOutputRegex('|{"version":"dev",.*}|');
+        $this->application->run(require __DIR__ . '/../../../config/config.testing.php');
     }
 }
