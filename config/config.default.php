@@ -225,7 +225,7 @@ $config = array(
      *
      * 'transformationPresets' => array(
      *     'graythumb' => array(
-     *         'thumbnail,
+     *         'thumbnail',
      *         'desaturate',
      *     ),
      *     'flipflop' => array(
