@@ -450,6 +450,13 @@ and is enabled like this:
 
     The above command will delete all files in ``/path/to/cache`` older than 7 days and can be used with for instance `crontab <http://en.wikipedia.org/wiki/Cron>`_.
 
+.. _imagick-event-listener:
+
+Imagick
++++++++
+
+This event listener is required by the image transformations that is included in Imbo, and there is no configuration options for it. Unless you plan on exchanging all the internal image transformations with your own (for instance implemented using Gmagick or GD) you are better off leaving this as-is.
+
 .. _max-image-size-event-listener:
 
 Max image size

@@ -557,6 +557,7 @@ The default configuration file includes some event listeners by default:
 * :ref:`access-token-event-listener`
 * :ref:`authenticate-event-listener`
 * :ref:`stats-access-event-listener`
+* :ref:`imagick-event-listener`
 
 as well as event listeners for image transformations:
 
@@ -599,6 +600,90 @@ Read more about these listeners in the :doc:`../develop/event_listeners` and :do
 .. warning:: Disabling image transformation event listeners is not recommended.
 
 .. _image-transformations-config:
+
+.. _configuration-event-listener-initializers:
+
+Event listener initializers - ``eventListenerInitializers``
+-----------------------------------------------------------
+
+Some event listeners might require custom initialization, and if you don't want to do this in-line in the configuration, Imbo supports event initializer classes. This is handled via the ``eventListenerInitializers`` key. The value of this element is an associative array where the keys identify the initializers (only used in the configuration itself), and the values are strings representing class names, or implementations of the ``Imbo\EventListener\Initializer\InitializerInterface`` interface. If you specify strings the classes you refer to must also implement this interface.
+
+The interface has a single method called ``initialize`` and receives instances of event listeners implementing the ``Imbo\EventListener\ListenerInterface`` interface. This method is called once for each event listener instantiated by Imbo's event manager. Example:
+
+.. code-block:: php
+
+    <?php
+    // Some event listener
+    class Listener implements Imbo\EventListener\ListenerInterface {
+        public function setDependency($dependency) {
+            // ...
+        }
+
+        // ...
+    }
+
+    class OtherListener implements Imbo\EventListener\ListenerInterface {
+        public function setDependency($dependency) {
+            // ...
+        }
+
+        // ...
+    }
+
+    // Event listener initializer
+    class Initializer implements Imbo\EventListener\Initializer\InitializerInterface {
+        private $dependency;
+
+        public function __construct() {
+            $this->dependency = new SomeDependency();
+        }
+
+        public function initialize(Imbo\EventListener\ListenerInterface $listener) {
+            if ($listener instanceof Listener || $listener instanceof OtherListener) {
+                $listener->setDependency($this->dependency);
+            }
+        }
+    }
+
+    // Configuration
+    return array(
+        'eventListeners' => array(
+            'customListener' => 'Listener',
+            'otherCustomListener' => 'OtherListener',
+        ),
+
+        'eventListenerInitializers' => array(
+            'initializerForCustomListener' => 'Initializer',
+        ),
+    );
+
+In the above example the ``Initializer`` class will be instantiated by Imbo, and in the ``__construct`` method it will create an instance of some dependency. When the event manager creates the instances of the two event listeners these will in turn be sent to the ``initialize`` method, and the same dependency will be injected into both listeners. An alternative way to accomplish this by using Closures in the configuration could look something like this:
+
+.. code-block:: php
+
+    <?php
+    $dependency = new SomeDependency();
+
+    return array(
+        'eventListeners' => array(
+            'customListener' => function() use ($dependency) {
+                $listener = new Listener();
+                $listener->setDependency($dependency);
+
+                return $listener;
+            },
+            'otherCustomListener' => function() use ($dependency) {
+                $listener = new OtherListener();
+                $listener->setDependency($dependency);
+
+                return $listener;
+            },
+        ),
+    );
+
+Imbo itself includes an event listener initializer in the default configuration that is used to inject the same instance of Imagick to all image transformations.
+
+.. note:: Only event listeners specified as strings (class names) in the configuration will be instantiated by Imbo, so event listeners created by Closure will not be initialized by the configured event listener initializers.
 
 Image transformation presets - ``transformationPresets``
 --------------------------------------------------------
@@ -646,7 +731,7 @@ where the keys are the names of the transformations as specified in the URL, and
 
 By doing this the ``thumbnail`` part of the ``fixedGraythumb`` preset will ignore the parameters present in the URL.
 
-.. note:: The URL's will stay the same if you change the transformation chain in a preset. Keep this in mind if you use for instance Varnish.
+.. note:: The URL's will stay the same if you change the transformation chain in a preset. Keep this in mind if you use for instance Varnish or some other HTTP accelerator in front of your web server(s).
 
 Custom resources and routes - ``resources`` and ``routes``
 ----------------------------------------------------------
