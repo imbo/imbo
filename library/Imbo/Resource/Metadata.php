@@ -69,12 +69,17 @@ class Metadata implements ResourceInterface {
      * @param EventInterface $event The current event
      */
     public function put(EventInterface $event) {
-        $event->getManager()->trigger('db.metadata.delete')
-                            ->trigger('db.metadata.update');
+        $request = $event->getRequest();
+
+        $event->getManager()
+            ->trigger('db.metadata.delete')
+            ->trigger('db.metadata.update', array(
+                'metadata' => json_decode($request->getContent(), true),
+            ));
 
         $model = new Model\ArrayModel();
         $model->setData(array(
-            'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
+            'imageIdentifier' => $request->getImageIdentifier(),
         ));
 
         $event->getResponse()->setModel($model);
@@ -86,11 +91,15 @@ class Metadata implements ResourceInterface {
      * @param EventInterface $event The current event
      */
     public function post(EventInterface $event) {
-        $event->getManager()->trigger('db.metadata.update');
+        $request = $event->getRequest();
+
+        $event->getManager()->trigger('db.metadata.update', array(
+            'metadata' => json_decode($request->getContent(), true),
+        ));
 
         $model = new Model\ArrayModel();
         $model->setData(array(
-            'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
+            'imageIdentifier' => $request->getImageIdentifier(),
         ));
 
         $event->getResponse()->setModel($model);
