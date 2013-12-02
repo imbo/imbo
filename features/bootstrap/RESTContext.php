@@ -72,11 +72,11 @@ class RESTContext extends BehatContext {
     private $prevRequestedPath;
 
     /**
-     * The current coverage session id
+     * The current test session id
      *
      * @var string
      */
-    private static $coverageSession;
+    private static $testSessionId;
 
     /**
      * Parameters from the configuration
@@ -101,12 +101,15 @@ class RESTContext extends BehatContext {
     private function createClient() {
         $this->client = new Client($this->params['url']);
 
+        $defaultHeaders = array(
+            'X-Test-Session-Id' => self::$testSessionId,
+        );
+
         if ($this->params['enableCodeCoverage']) {
-            $this->client->setDefaultHeaders(array(
-                'X-Enable-Coverage' => 1,
-                'X-Coverage-Session' => self::$coverageSession,
-            ));
+            $defaultHeaders['X-Enable-Coverage'] = 1;
         }
+
+        $this->client->setDefaultHeaders($defaultHeaders);
     }
 
     /**
@@ -136,7 +139,7 @@ class RESTContext extends BehatContext {
             throw new RuntimeException('Could not start the built in httpd');
         }
 
-        self::$coverageSession = uniqid('', true);
+        self::$testSessionId = uniqid('', true);
     }
 
     /**
@@ -151,7 +154,7 @@ class RESTContext extends BehatContext {
             $client = new Client($parameters['url']);
             $response = $client->get('/', array(
                 'X-Enable-Coverage' => 1,
-                'X-Coverage-Session' => self::$coverageSession,
+                'X-Test-Session-Id' => self::$testSessionId,
                 'X-Collect-Coverage' => 1,
             ))->send();
 

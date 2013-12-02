@@ -142,7 +142,7 @@ class DatabaseOperations implements ListenerInterface {
         $event->getDatabase()->updateMetadata(
             $request->getPublicKey(),
             $request->getImageIdentifier(),
-            json_decode($request->getContent(), true)
+            $event->getArgument('metadata')
         );
     }
 

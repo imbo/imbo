@@ -18,7 +18,7 @@
  * @package Test suite
  */
 
-if (isset($_SERVER['HTTP_X_COLLECT_COVERAGE']) && isset($_SERVER['HTTP_X_COVERAGE_SESSION'])) {
+if (isset($_SERVER['HTTP_X_COLLECT_COVERAGE']) && isset($_SERVER['HTTP_X_TEST_SESSION_ID'])) {
     require __DIR__ . '/../vendor/autoload.php';
 
     // Output code coverage stored in the .cov files
@@ -34,7 +34,7 @@ if (isset($_SERVER['HTTP_X_COLLECT_COVERAGE']) && isset($_SERVER['HTTP_X_COVERAG
         FilesystemIterator::CURRENT_AS_PATHNAME | FilesystemIterator::SKIP_DOTS
     );
     $data = array();
-    $suffix = $_SERVER['HTTP_X_COVERAGE_SESSION'] . '.cov';
+    $suffix = $_SERVER['HTTP_X_TEST_SESSION_ID'] . '.cov';
 
     foreach ($files as $filename) {
         if (!preg_match('/' . preg_quote($suffix, '/') . '$/', $filename)) {
@@ -63,7 +63,7 @@ if (isset($_SERVER['HTTP_X_COLLECT_COVERAGE']) && isset($_SERVER['HTTP_X_COVERAG
     exit;
 }
 
-if (isset($_SERVER['HTTP_X_ENABLE_COVERAGE']) && isset($_SERVER['HTTP_X_COVERAGE_SESSION']) && extension_loaded('xdebug')) {
+if (isset($_SERVER['HTTP_X_ENABLE_COVERAGE']) && isset($_SERVER['HTTP_X_TEST_SESSION_ID']) && extension_loaded('xdebug')) {
     // Register a shutdown function that stops code coverage and stores the coverage of the current
     // request
     register_shutdown_function(function() {
@@ -77,7 +77,7 @@ if (isset($_SERVER['HTTP_X_ENABLE_COVERAGE']) && isset($_SERVER['HTTP_X_COVERAGE
                 '%s/%s.%s.cov',
                 $coverageDir,
                 md5(uniqid('', true)),
-                $_SERVER['HTTP_X_COVERAGE_SESSION']
+                $_SERVER['HTTP_X_TEST_SESSION_ID']
             );
 
             file_put_contents($filename, serialize($data));

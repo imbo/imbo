@@ -69,6 +69,13 @@ class Doctrine implements DatabaseInterface {
     private $connection;
 
     /**
+     * Separator used when (de)normalizing metadata
+     *
+     * @var string
+     */
+    private $metadataNamespaceSeparator = '::';
+
+    /**
      * Class constructor
      *
      * @param array $params Parameters for the driver
@@ -158,8 +165,12 @@ class Doctrine implements DatabaseInterface {
         // Delete existing metadata
         $this->deleteMetadata($publicKey, $imageIdentifier);
 
-        // Insert merged metadata
-        foreach ($metadata as $key => $value) {
+        // Normalize metadata
+        $normalizedMetadata = array();
+        $this->normalizeMetadata($metadata, $normalizedMetadata);
+
+        // Insert merged and normalized metadata
+        foreach ($normalizedMetadata as $key => $value) {
             $connection->insert($this->tableNames['metadata'], array(
                 'imageId'  => $imageId,
                 'tagName'  => $key,
@@ -192,7 +203,7 @@ class Doctrine implements DatabaseInterface {
             $metadata[$row['tagName']] = $row['tagValue'];
         }
 
-        return $metadata;
+        return $this->denormalizeMetadata($metadata);
     }
 
     /**
@@ -586,5 +597,57 @@ class Doctrine implements DatabaseInterface {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return (int) $row['id'];
+    }
+
+    /**
+     * Normalize metadata
+     *
+     * @param array $metadata Metadata
+     * @param array $normalized Normalized metadata
+     * @param string $namespace Namespace for keys
+     * @return array Returns an associative array with only one level
+     */
+    private function normalizeMetadata(array &$metadata, array &$normalized, $namespace = '') {
+        foreach ($metadata as $key => $value) {
+            if (strstr($key, $this->metadataNamespaceSeparator) !== false) {
+                throw new DatabaseException('Invalid metadata', 400);
+            }
+
+            $ns = $namespace . ($namespace ? $this->metadataNamespaceSeparator : '') . $key;
+
+            if (is_array($value)) {
+                $this->normalizeMetadata($value, $normalized, $ns);
+            } else {
+                $normalized[$ns] = $value;
+            }
+        }
+    }
+
+    /**
+     * De-normalize metadata
+     *
+     * @param array $data Metadata
+     * @return array
+     */
+    private function denormalizeMetadata(array $data) {
+        $result = array();
+
+        foreach ($data as $key => $value) {
+            $keys = explode($this->metadataNamespaceSeparator, $key);
+            $numKeys = count($keys);
+            $tmp = &$result;
+
+            foreach ($keys as $i => $key) {
+                if (!isset($tmp[$key])) {
+                    $tmp[$key] = null;
+                }
+
+                $tmp = &$tmp[$key];
+            }
+
+            $tmp = $value;
+        }
+
+        return $result;
     }
 }

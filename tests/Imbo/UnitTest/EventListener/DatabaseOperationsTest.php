@@ -10,11 +10,14 @@
 
 namespace Imbo\UnitTest\EventListener;
 
-use Imbo\EventListener\DatabaseOperations;
+use Imbo\EventListener\DatabaseOperations,
+    Imbo\EventManager\Event,
+    Imbo\Http\Response\Response;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @covers Imbo\EventListener\DatabaseOperations
  */
 class DatabaseOperationsTest extends ListenerTests {
     /**
@@ -112,7 +115,7 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::updateMetadata
      */
     public function testCanUpdateMetadata() {
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"key":"value"}'));
+        $this->event->expects($this->once())->method('getArgument')->with('metadata')->will($this->returnValue(array('key' => 'value')));
         $this->database->expects($this->once())->method('updateMetadata')->with($this->publicKey, $this->imageIdentifier, array('key' => 'value'));
 
         $this->listener->updateMetadata($this->event);
@@ -219,6 +222,10 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->listener->loadUser($this->event);
     }
 
+    /**
+     * @covers Imbo\EventListener\DatabaseOperations::getImagesQuery
+     * @covers Imbo\EventListener\DatabaseOperations::setImagesQuery
+     */
     public function testCanCreateItsOwnImagesQuery() {
         $query = $this->getMock('Imbo\Resource\Images\Query');
         $this->assertInstanceOf('Imbo\Resource\Images\Query', $this->listener->getImagesQuery());
