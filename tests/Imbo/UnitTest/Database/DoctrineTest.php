@@ -168,7 +168,7 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionMessage Metadata keys can not contain "::"
+     * @expectedExceptionMessage Invalid metadata
      * @expectedExceptionCode 400
      * @covers Imbo\Database\Doctrine::normalizeMetadata
      */
