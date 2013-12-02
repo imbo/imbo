@@ -452,10 +452,13 @@ results in:
 
 where ``<image>`` is the image that just got updated.
 
+.. note:: When using the :ref:`Doctrine database adapter <doctrine-database-adapter>`, metadata keys can not contain ``::``.
+
 **Typical response codes:**
 
 * 200 OK
 * 400 Bad Request
+* 400 Invalid metadata (when using the :ref:`Doctrine <doctrine-database-adapter>` adapter, and keys contain ``::``)
 * 404 Image not found
 
 Partially updating metadata
@@ -480,10 +483,13 @@ results in:
 
 where ``<image>`` is the image that just got updated.
 
+.. note:: When using the :ref:`Doctrine database adapter <doctrine-database-adapter>`, metadata keys can not contain ``::``.
+
 **Typical response codes:**
 
 * 200 OK
 * 400 Bad Request
+* 400 Invalid metadata (when using the :ref:`Doctrine <doctrine-database-adapter>` adapter, and keys contain ``::``)
 * 404 Image not found
 
 Fetch metadata

@@ -135,6 +135,8 @@ Here are some examples on how to use the Doctrine adapter in the configuration f
         // ...
     );
 
+.. note:: Since clients can send nested arrays as metadata to Imbo, the Doctrine adapter needs to pack the metadata on input, and unpack it on output because of how the data is stored. When normalizing the data Imbo uses ``::`` as a separator in the metadata keys. If you set up Imbo with the Doctrine adapter, and a client sends metadata where one or more keys contain ``::``, Imbo will respond with ``400 Bad Request``.
+
 .. _mongodb-database-adapter:
 .. _default-database-adapter:
 
