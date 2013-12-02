@@ -11,11 +11,13 @@
 namespace Imbo\UnitTest\Database;
 
 use Imbo\Database\Doctrine,
-    Doctrine\DBAL\Connection;
+    Doctrine\DBAL\Connection,
+    ReflectionMethod;
 
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @covers Imbo\Database\Doctrine
  */
 class DoctrineTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -72,5 +74,95 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
         $this->connection->expects($this->once())->method('isConnected')->will($this->returnValue(false));
         $this->connection->expects($this->once())->method('connect')->will($this->returnValue(false));
         $this->assertFalse($this->driver->getStatus());
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getMetadata() {
+        return array(
+            'simple key/value' => array(
+                array('key' => 'value', 'key2' => 'value2'),
+                array('key' => 'value', 'key2' => 'value2'),
+            ),
+            'numeric array' => array(
+                array('key' => array(1, 2, 3)),
+                array(
+                    'key::0' => 1,
+                    'key::1' => 2,
+                    'key::2' => 3,
+                ),
+            ),
+            'nested array' => array(
+                array('some' => array('key' => array('with' => array('a' => 'value')))),
+                array('some::key::with::a' => 'value'),
+            ),
+            'all sorts of stuff' => array(
+                array(
+                    'place' => 'Bar & Cigar',
+                    'people' => array(
+                        array(
+                            'name' => 'christer',
+                            'beers' => array(
+                                array(
+                                    'brewery' => 'Nøgne Ø',
+                                    'name' => 'Pils',
+                                ),
+                                array(
+                                    'brewery' => 'HaandBryggeriet',
+                                    'name' => 'Fyr & Flamme',
+                                ),
+                            ),
+                        ),
+                        array(
+                            'name' => 'espen',
+                            'beers' => array(
+                                array(
+                                    'brewery' => 'AleSmith',
+                                    'name' => 'Speedway Stout',
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                array(
+                    'place' => 'Bar & Cigar',
+                    'people::0::name' => 'christer',
+                    'people::0::beers::0::brewery' => 'Nøgne Ø',
+                    'people::0::beers::0::name' => 'Pils',
+                    'people::0::beers::1::brewery' => 'HaandBryggeriet',
+                    'people::0::beers::1::name' => 'Fyr & Flamme',
+                    'people::1::name' => 'espen',
+                    'people::1::beers::0::brewery' => 'AleSmith',
+                    'people::1::beers::0::name' => 'Speedway Stout',
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @covers Imbo\Database\Doctrine::normalizeMetadata
+     * @dataProvider getMetadata
+     */
+    public function testCanNormalizeMetadata($denormalizedMetadata, $normalizedMetadata) {
+        $method = new ReflectionMethod($this->driver, 'normalizeMetadata');
+        $method->setAccessible(true);
+
+        $result = array();
+        $method->invokeArgs($this->driver, array(&$denormalizedMetadata, &$result));
+        $this->assertSame($result, $normalizedMetadata);
+    }
+
+    /**
+     * @covers Imbo\Database\Doctrine::denormalizeMetadata
+     * @dataProvider getMetadata
+     */
+    public function testCanDenormalizeMetadata($denormalizedMetadata, $normalizedMetadata) {
+        $method = new ReflectionMethod($this->driver, 'denormalizeMetadata');
+        $method->setAccessible(true);
+
+        $this->assertSame($denormalizedMetadata, $method->invoke($this->driver, $normalizedMetadata));
     }
 }
