@@ -609,6 +609,10 @@ class Doctrine implements DatabaseInterface {
      */
     private function normalizeMetadata(array &$metadata, array &$normalized, $namespace = '') {
         foreach ($metadata as $key => $value) {
+            if (strstr($key, $this->metadataNamespaceSeparator) !== false) {
+                throw new DatabaseException('Invalid metadata', 400);
+            }
+
             $ns = $namespace . ($namespace ? $this->metadataNamespaceSeparator : '') . $key;
 
             if (is_array($value)) {

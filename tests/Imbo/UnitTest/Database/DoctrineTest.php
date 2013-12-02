@@ -165,4 +165,22 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame($denormalizedMetadata, $method->invoke($this->driver, $normalizedMetadata));
     }
+
+    /**
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionMessage Metadata keys can not contain "::"
+     * @expectedExceptionCode 400
+     * @covers Imbo\Database\Doctrine::normalizeMetadata
+     */
+    public function testThrowsExceptionWhenKeysContainTheSeparator() {
+        $method = new ReflectionMethod($this->driver, 'normalizeMetadata');
+        $method->setAccessible(true);
+
+        $result = array();
+        $metadata = array(
+            'some::key' => 'value',
+        );
+        $method->invokeArgs($this->driver, array(&$metadata, &$result));
+        $this->assertSame($result, $normalizedMetadata);
+    }
 }
