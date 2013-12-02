@@ -175,7 +175,11 @@ return array(
             $memcached = new PeclMemcached();
             $memcached->addServer('localhost', 11211);
 
-            return new EventListener\MetadataCache(new Cache\Memcached($memcached));
+            $namespace = $_SERVER['HTTP_X_TEST_SESSION_ID'];
+
+            $adapter = new Cache\Memcached($memcached, $namespace);
+
+            return new EventListener\MetadataCache($adapter);
         },
         'someHandler' => array(
             'events' => array(
