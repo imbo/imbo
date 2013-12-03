@@ -32,3 +32,11 @@ Feature: Imbo provides an event listener for turning EXIF data into metadata
         """
         "exif:GPSLongitude":"9\/1, 5\/1, 38109\/12500"
         """
+        And the response body contains:
+        """
+        "gps:location":[9.0841802,63.680437300003]
+        """
+        And the response body contains:
+        """
+        "gps:altitude":50.8
+        """
