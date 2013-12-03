@@ -240,6 +240,7 @@ return array(
         'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
         'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
         'maxSize' => 'Imbo\Image\Transformation\MaxSize',
+        'progressive' => 'Imbo\Image\Transformation\Progressive',
         'resize' => 'Imbo\Image\Transformation\Resize',
         'rotate' => 'Imbo\Image\Transformation\Rotate',
         'sepia' => 'Imbo\Image\Transformation\Sepia',
