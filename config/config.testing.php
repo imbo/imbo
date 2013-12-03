@@ -226,6 +226,7 @@ return array(
             'listener' => 'Imbo\EventListener\VarnishHashTwo',
             'params' => array('X-Imbo-HashTwo'),
         ),
+        'exifMetadataListener' => 'Imbo\EventListener\ExifMetadata',
     ),
 
     'imageTransformations' => array(

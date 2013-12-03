@@ -368,7 +368,7 @@ The event listener subscribes to the following events:
 and has the following parameters:
 
 ``$allowedTags``
-    The tags you want to be populated as metadata, if present. Optional - by default all tags are added.
+    The tags you want to be populated as metadata. Defaults to ``exif:*``. When specified it will override the default value, so if you want to register all ``exif`` and ``date`` tags for example, you will need to specify them both.
 
 and is enabled like this:
 
@@ -382,7 +382,7 @@ and is enabled like this:
             'exifMetadata' => array(
                 'listener' => 'Imbo\EventListener\ExifMetadata',
                 'params' => array(
-                    array('exif:Make', 'exif:Model'),
+                    array('exif:*', 'date:*', 'png:gAMA'),
                 ),
             ),
         ),
@@ -390,7 +390,7 @@ and is enabled like this:
         // ...
     );
 
-which would allow only ``exif:Make`` and ``exif:Model`` as metadata tags. Not passing an array to the constructor will allow all tags.
+which would allow all ``exif`` and ``date`` properties as well as the ``png:gAMA`` property. If you want to store **all** tags as metadata, use ``array('*')`` as filter.
 
 Image transformation cache
 ++++++++++++++++++++++++++
