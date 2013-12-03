@@ -5,6 +5,7 @@ Imbo-0.4.0
 ----------
 __N/A__
 
+* #228: Added support for wildcards in the ExifMetadata listener
 * #218: Support custom parameters when triggering events
 * #210: Image transformations must implement the image transformation interface
 * #205: Added a Varnish HashTwo event listener
