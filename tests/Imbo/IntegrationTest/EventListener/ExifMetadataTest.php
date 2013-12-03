@@ -16,9 +16,9 @@ use Imbo\EventListener\ExifMetadata,
 /**
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Test suite\Integration tests
+ * @covers Imbo\EventListener\ExifMetadata
  */
 class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
-
     /**
      * @covers Imbo\EventListener\ExifMetadata::__construct
      * @covers Imbo\EventListener\ExifMetadata::populate
@@ -126,6 +126,5 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame('GT-I9100', $properties['exif:Model']);
 
         $listener->save($event);
-
     }
 }
