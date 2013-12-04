@@ -32,3 +32,11 @@ CREATE TABLE IF NOT EXISTS `shorturl` (
     PRIMARY KEY (`shortUrlId`),
     KEY `params` (`publicKey`,`imageIdentifier`,`extension`,`query`(255))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+
+CREATE TABLE IF NOT EXISTS `storage_images` (
+    `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
+    `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
+    `data` blob NOT NULL,
+    `updated` int(10) unsigned NOT NULL,
+    PRIMARY KEY (`publicKey`,`imageIdentifier`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
