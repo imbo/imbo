@@ -13,6 +13,7 @@ Installation guide
     installation/requirements
     installation/installation
     installation/configuration
+    installation/event_listeners
 
 End user guide
 --------------
@@ -30,3 +31,5 @@ Extending/customizing Imbo
     develop/event_listeners
     develop/custom_adapters
     develop/image_transformations
+    develop/cache_adapters
+    develop/contributing

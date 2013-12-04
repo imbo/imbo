@@ -14,7 +14,7 @@ $data = implode("|", array($method, $uri, $publicKey, $timestamp));
 // Generate the token
 $signature = hash_hmac("sha256", $data, $privateKey);
 
-# Request the URI
+// Request the URI
 $response = file_get_contents($uri, false, stream_context_create(array(
     "http" => array(
         "method" => $method,

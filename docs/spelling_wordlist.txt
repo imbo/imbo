@@ -32,3 +32,4 @@ freenode
 IPv
 Gmagick
 Imagick
+Behat
