@@ -15,13 +15,9 @@ services:
   - mongodb
   - memcached
 before_install:
-  - sudo apt-get -y update
-  - sudo apt-get -y install php5-imagick
-  - sudo updatedb
-  - locate imagick.so
+  - printf "\n" | pecl install imagick-3.1.2
 before_script:
   - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - echo "extension = imagick.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - gem install json
 script: rake travis
