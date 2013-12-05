@@ -15,9 +15,10 @@ services:
   - mongodb
   - memcached
 before_install:
-  - printf "\n" | pecl install imagick-3.1.2
+  - printf "\n" | pecl install imagick-beta
 before_script:
   - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "extension = imagick.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - gem install json
 script: rake travis
