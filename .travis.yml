@@ -17,6 +17,8 @@ services:
 before_install:
   - sudo apt-get -y update
   - sudo apt-get -y install php5-imagick
+  - sudo updatedb
+  - locate imagick.so
 before_script:
   - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
