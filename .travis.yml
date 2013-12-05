@@ -15,8 +15,6 @@ services:
   - mongodb
   - memcached
 before_install:
-  - sudo apt-get -y update
-  - sudo apt-get -y upgrade
   - printf "\n" | pecl install imagick-beta
 before_script:
   - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
