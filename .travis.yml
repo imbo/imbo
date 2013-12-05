@@ -14,9 +14,11 @@ branches:
 services:
   - mongodb
   - memcached
+before_install:
+  - sudo apt-get -y update
+  - sudo apt-get -y install php5-imagick
 before_script:
   - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - gem install json
-  - sudo apt-get install php5-imagick
 script: rake travis
