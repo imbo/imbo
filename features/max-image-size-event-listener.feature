@@ -10,9 +10,9 @@ Feature: Imbo provides an event listener for enforcing a max image size
         When I request "/users/publickey/images/b60df41830245ee8f278e3ddfe5238a3" using HTTP "PUT"
         Then I should get a response with "201 Created"
         And the "Content-Type" response header is "application/json"
-        And the response body is:
+        And the response body matches:
           """
-          {"imageIdentifier":"a9f9255591e4f808718bbf80a53dc926","width":1000,"height":250,"extension":"png"}
+          /{"imageIdentifier":"[a-z0-9]{32}","width":1000,"height":250,"extension":"png"}/
           """
 
     Scenario: Add an image that is above the maximum height
@@ -22,9 +22,9 @@ Feature: Imbo provides an event listener for enforcing a max image size
         When I request "/users/publickey/images/8ffe8d6b7176f4f670d39daaaeb7c62e" using HTTP "PUT"
         Then I should get a response with "201 Created"
         And the "Content-Type" response header is "application/json"
-        And the response body is:
+        And the response body matches:
           """
-          {"imageIdentifier":"506e75dd0b5a005966aac4bf2745ac2b","width":250,"height":1000,"extension":"png"}
+          /{"imageIdentifier":"[a-z0-9]{32}","width":250,"height":1000,"extension":"png"}/
           """
 
     Scenario: Add an image that is above the maximum width and height
@@ -34,7 +34,7 @@ Feature: Imbo provides an event listener for enforcing a max image size
         When I request "/users/publickey/images/aba3edebe8a68c8f0613648e993b2fb4" using HTTP "PUT"
         Then I should get a response with "201 Created"
         And the "Content-Type" response header is "application/json"
-        And the response body is:
+        And the response body matches:
           """
-          {"imageIdentifier":"d081c7daf13b09c5345731f446063ea5","width":1000,"height":1000,"extension":"png"}
+          /{"imageIdentifier":"[a-z0-9]{32}","width":1000,"height":1000,"extension":"png"}/
           """
