@@ -149,13 +149,13 @@ task :travis_bootstrap do
   if ENV["TRAVIS"] == "true"
     ini_file = Hash[`php --ini`.split("\n").map {|l| l.split(/:\s+/)}]["Loaded Configuration File"]
 
-    {"imagick" => "3.1.2"}.each { |package, version|
-      filename = "#{package}-#{version}.tgz"
-      system "wget http://pecl.php.net/get/#{filename}"
-      system "tar -xzf #{filename}"
-      system "sh -c \"cd #{filename[0..-5]} && phpize && ./configure && make && sudo make install\""
-      system "sudo sh -c \"echo 'extension=#{package.downcase}.so' >> #{ini_file}\""
-    }
+    #{"imagick" => "3.1.2"}.each { |package, version|
+      #filename = "#{package}-#{version}.tgz"
+      #system "wget http://pecl.php.net/get/#{filename}"
+      #system "tar -xzf #{filename}"
+      #system "sh -c \"cd #{filename[0..-5]} && phpize && ./configure && make && sudo make install\""
+      #system "sudo sh -c \"echo 'extension=#{package.downcase}.so' >> #{ini_file}\""
+    #}
   else
    puts "Will only be used by Travis-CI"
    exit 1
