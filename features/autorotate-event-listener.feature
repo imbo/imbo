@@ -9,8 +9,8 @@ Feature: Imbo provides an event listener for auto rotating images based on EXIF-
     Scenario: Fetch the auto rotated image
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images/ef711eaec64a98be988bf62d6d22d903.jpg"
+        When I request the added image as a "png"
         Then I should get a response with "200 OK"
-        And the "Content-Type" response header is "image/jpeg"
+        And the "Content-Type" response header is "image/png"
         And the width of the image is "640"
         And the height of the image is "160"

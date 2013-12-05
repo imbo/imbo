@@ -257,6 +257,14 @@ class ImboContext extends RESTContext {
     }
 
     /**
+     * @When /^I request the added image as a "(jpg|png|gif)"$/
+     */
+    public function requestTheAddedImage($extension) {
+        $identifier = $this->getLastResponse()->json()['imageIdentifier'];
+        $this->request('/users/' . $this->publicKey . '/images/' . $identifier . '.' . $extension);
+    }
+
+    /**
      * @Given /^the image is deleted$/
      */
     public function deleteImage() {
