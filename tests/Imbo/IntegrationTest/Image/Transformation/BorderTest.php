@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\Border,
 /**
  * @covers Imbo\Image\Transformation\Border
  * @group integration
+ * @group transformations
  */
 class BorderTest extends TransformationTests {
     /**

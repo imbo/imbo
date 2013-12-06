@@ -15,6 +15,7 @@ use Imbo\EventListener\Cors;
 /**
  * @covers Imbo\EventListener\Cors
  * @group unit
+ * @group listeners
  */
 class CorsTest extends ListenerTests {
     /**

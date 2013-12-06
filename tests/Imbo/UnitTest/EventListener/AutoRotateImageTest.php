@@ -15,6 +15,7 @@ use Imbo\EventListener\AutoRotateImage;
 /**
  * @covers Imbo\EventListener\AutoRotateImage
  * @group unit
+ * @group listeners
  */
 class AutoRotateImageTest extends \PHPUnit_Framework_TestCase {
     /**

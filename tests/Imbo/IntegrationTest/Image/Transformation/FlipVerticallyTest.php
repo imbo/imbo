@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\FlipVertically,
 /**
  * @covers Imbo\Image\Transformation\FlipVertically
  * @group integration
+ * @group transformations
  */
 class FlipVerticallyTest extends TransformationTests {
     /**

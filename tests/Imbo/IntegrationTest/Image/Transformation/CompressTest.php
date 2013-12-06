@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\Compress,
 /**
  * @covers Imbo\Image\Transformation\Compress
  * @group integration
+ * @group transformations
  */
 class CompressTest extends TransformationTests {
     /**

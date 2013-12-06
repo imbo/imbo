@@ -14,6 +14,7 @@ use Imbo\EventListener\AccessToken;
 
 /**
  * @group unit
+ * @group listeners
  */
 class AccessTokenTest extends ListenerTests {
     /**

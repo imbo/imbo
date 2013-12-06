@@ -15,6 +15,7 @@ use Imbo\EventListener\VarnishHashTwo;
 /**
  * @covers Imbo\EventListener\VarnishHashTwo
  * @group unit
+ * @group listeners
  */
 class VarnishHashTwoTest extends ListenerTests {
     /**

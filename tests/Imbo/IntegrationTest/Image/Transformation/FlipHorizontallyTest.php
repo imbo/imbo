@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\FlipHorizontally,
 /**
  * @covers Imbo\Image\Transformation\FlipHorizontally
  * @group integration
+ * @group transformations
  */
 class FlipHorizontallyTest extends TransformationTests {
     /**

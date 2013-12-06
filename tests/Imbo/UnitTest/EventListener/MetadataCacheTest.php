@@ -14,6 +14,7 @@ use Imbo\EventListener\MetadataCache;
 
 /**
  * @group unit
+ * @group listeners
  */
 class MetadataCacheTest extends ListenerTests {
     /**

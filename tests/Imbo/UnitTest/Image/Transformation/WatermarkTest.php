@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\Watermark,
 /**
  * @covers Imbo\Image\Transformation\Watermark
  * @group unit
+ * @group transformations
  */
 class WatermarkTest extends \PHPUnit_Framework_TestCase {
     /**

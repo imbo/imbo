@@ -14,6 +14,7 @@ use Imbo\EventListener\ResponseSender;
 
 /**
  * @group unit
+ * @group listeners
  */
 class ResponseSenderTest extends ListenerTests {
     /**

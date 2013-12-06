@@ -15,6 +15,7 @@ use Imbo\EventListener\ExifMetadata;
 /**
  * @covers Imbo\EventListener\ExifMetadata
  * @group unit
+ * @group listeners
  */
 class ExifMetadataTest extends ListenerTests {
     /**

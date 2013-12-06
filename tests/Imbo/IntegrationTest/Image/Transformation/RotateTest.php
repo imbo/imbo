@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\Rotate,
 /**
  * @covers Imbo\Image\Transformation\Rotate
  * @group integration
+ * @group transformations
  */
 class RotateTest extends TransformationTests {
     /**

@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\Convert,
 /**
  * @covers Imbo\Image\Transformation\Convert
  * @group integration
+ * @group transformations
  */
 class ConvertTest extends TransformationTests {
     /**

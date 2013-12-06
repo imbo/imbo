@@ -15,6 +15,7 @@ use Imbo\EventListener\Imagick;
 /**
  * @covers Imbo\EventListener\Imagick
  * @group unit
+ * @group listeners
  */
 class ImagickTest extends ListenerTests {
     /**

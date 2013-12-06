@@ -18,6 +18,7 @@ use Imbo\Image\Transformation\Watermark,
 /**
  * @covers Imbo\Image\Transformation\Watermark
  * @group integration
+ * @group transformations
  */
 class WatermarkTest extends TransformationTests {
      /**

@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\Canvas,
 /**
  * @covers Imbo\Image\Transformation\Canvas
  * @group integration
+ * @group transformations
  */
 class CanvasTest extends TransformationTests {
     /**

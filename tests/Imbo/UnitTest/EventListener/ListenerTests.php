@@ -14,6 +14,7 @@ use Imbo\EventListener\ListenerInterface;
 
 /**
  * @group unit
+ * @group listeners
  */
 abstract class ListenerTests extends \PHPUnit_Framework_TestCase {
     /**

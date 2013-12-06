@@ -14,6 +14,7 @@ use Imbo\EventListener\StatsAccess;
 
 /**
  * @group unit
+ * @group listeners
  */
 class StatsAccessTest extends ListenerTests {
     /**

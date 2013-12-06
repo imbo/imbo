@@ -17,6 +17,7 @@ use Imbo\Image\Transformation\Transformation,
 
 /**
  * @group unit
+ * @group transformations
  */
 class TransformationTest extends \PHPUnit_Framework_TestCase {
     /**

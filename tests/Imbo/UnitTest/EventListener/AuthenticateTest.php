@@ -14,6 +14,7 @@ use Imbo\EventListener\Authenticate;
 
 /**
  * @group unit
+ * @group listeners
  */
 class AuthenticateTest extends ListenerTests {
     /**

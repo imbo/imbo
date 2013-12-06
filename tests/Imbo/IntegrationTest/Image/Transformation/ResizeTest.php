@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\Resize,
 /**
  * @covers Imbo\Image\Transformation\Resize
  * @group integration
+ * @group transformations
  */
 class ResizeTest extends TransformationTests {
     /**

@@ -15,6 +15,7 @@ use Imbo\EventListener\StorageOperations,
 
 /**
  * @group unit
+ * @group listeners
  */
 class StorageOperationsTest extends ListenerTests {
     /**

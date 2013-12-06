@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\MaxSize,
 /**
  * @covers Imbo\Image\Transformation\MaxSize
  * @group integration
+ * @group transformations
  */
 class MaxSizeTest extends TransformationTests {
     /**

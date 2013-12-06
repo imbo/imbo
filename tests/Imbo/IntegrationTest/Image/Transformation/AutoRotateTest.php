@@ -17,6 +17,7 @@ use Imbo\Model\Image,
 /**
  * @covers Imbo\Image\Transformation\AutoRotate
  * @group integration
+ * @group transformations
  */
 class AutoRotateTest extends TransformationTests {
     /**

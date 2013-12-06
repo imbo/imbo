@@ -15,6 +15,7 @@ use Imbo\EventListener\ImageTransformer;
 /**
  * @covers Imbo\EventListener\ImageTransformer
  * @group unit
+ * @group listeners
  */
 class ImageTransformerTest extends ListenerTests {
     /**

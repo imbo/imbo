@@ -14,6 +14,7 @@ use Imbo\Model\Image;
 
 /**
  * @group integration
+ * @group transformations
  */
 abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     /**

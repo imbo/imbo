@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\Transverse,
 /**
  * @covers Imbo\Image\Transformation\Transverse
  * @group integration
+ * @group transformations
  */
 class TransverseTest extends TransformationTests {
     /**

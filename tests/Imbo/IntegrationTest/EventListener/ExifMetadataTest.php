@@ -16,6 +16,7 @@ use Imbo\EventListener\ExifMetadata,
 /**
  * @covers Imbo\EventListener\ExifMetadata
  * @group integration
+ * @group listeners
  */
 class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
     /**

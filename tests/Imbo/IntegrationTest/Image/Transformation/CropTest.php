@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\Crop,
 /**
  * @covers Imbo\Image\Transformation\Crop
  * @group integration
+ * @group transformations
  */
 class CropTest extends TransformationTests {
     /**
