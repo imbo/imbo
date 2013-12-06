@@ -15,7 +15,9 @@ use Imbo\Helpers\DateFormatter,
     DateTimeZone;
 
 /**
+ * @covers Imbo\Helpers\DateFormatter
  * @group unit
+ * @group helpers
  */
 class DateFormatterTest extends \PHPUnit_Framework_TestCase {
     /**

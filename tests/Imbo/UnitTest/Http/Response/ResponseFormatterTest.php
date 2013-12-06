@@ -20,6 +20,8 @@ use Imbo\Http\Response\ResponseFormatter,
 /**
  * @covers Imbo\Http\Response\ResponseFormatter
  * @group unit
+ * @group http
+ * @group formatters
  */
 class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
     /**

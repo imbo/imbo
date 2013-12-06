@@ -13,7 +13,9 @@ namespace Imbo\IntegrationTest\Cache;
 use Imbo\Cache\APC;
 
 /**
+ * @covers Imbo\Cache\APC
  * @group integration
+ * @group cache
  */
 class APCTest extends CacheTests {
     protected function getDriver() {

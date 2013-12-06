@@ -17,8 +17,10 @@ use Imbo\Storage\GridFS,
     MongoGridFSFile;
 
 /**
+ * @covers Imbo\Storage\GridFS
  * @group unit
  * @group storage
+ * @group mongodb
  */
 class GridFSTest extends \PHPUnit_Framework_TestCase {
     /**

@@ -15,6 +15,7 @@ use Imbo\EventListener\ImageTransformationCache,
     org\bovigo\vfs\vfsStreamDirectory;
 
 /**
+ * @covers Imbo\EventListener\ImageTransformationCache
  * @group unit
  * @group listeners
  */

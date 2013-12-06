@@ -14,7 +14,9 @@ use Imbo\Model\User,
     DateTime;
 
 /**
+ * @covers Imbo\Model\User
  * @group unit
+ * @group models
  */
 class UserTest extends \PHPUnit_Framework_TestCase {
     /**

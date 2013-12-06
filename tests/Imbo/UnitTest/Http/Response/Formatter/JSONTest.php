@@ -13,7 +13,10 @@ namespace Imbo\UnitTest\Http\Response\Formatter;
 use Imbo\Http\Response\Formatter\JSON;
 
 /**
+ * @covers Imbo\Http\Response\Formatter\JSON
  * @group unit
+ * @group http
+ * @group formatters
  */
 class JSONTest extends \PHPUnit_Framework_TestCase {
     /**

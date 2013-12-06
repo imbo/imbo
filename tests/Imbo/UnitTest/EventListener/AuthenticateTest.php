@@ -13,6 +13,7 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\Authenticate;
 
 /**
+ * @covers Imbo\EventListener\Authenticate
  * @group unit
  * @group listeners
  */

@@ -13,7 +13,9 @@ namespace Imbo\UnitTest\Model;
 use Imbo\Model\Images;
 
 /**
+ * @covers Imbo\Model\Images
  * @group unit
+ * @group models
  */
 class ImagesTest extends \PHPUnit_Framework_TestCase {
     /**

@@ -14,8 +14,10 @@ use Imbo\Storage\Doctrine,
     PDO;
 
 /**
+ * @covers Imbo\Storage\Doctrine
  * @group integration
  * @group storage
+ * @group doctrine
  */
 class DoctrineTest extends StorageTests {
     /**

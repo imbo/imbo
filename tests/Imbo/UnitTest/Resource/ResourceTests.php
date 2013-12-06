@@ -15,6 +15,7 @@ use ReflectionClass,
 
 /**
  * @group unit
+ * @group resources
  */
 abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
     /**

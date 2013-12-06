@@ -18,6 +18,7 @@ use Imbo\EventManager\EventManager,
 /**
  * @covers Imbo\EventManager\EventManager
  * @group unit
+ * @group eventmanager
  */
 class EventManagerTest extends \PHPUnit_Framework_TestCase {
     /**

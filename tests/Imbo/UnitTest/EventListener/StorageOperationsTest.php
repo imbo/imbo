@@ -14,6 +14,7 @@ use Imbo\EventListener\StorageOperations,
     Imbo\Exception\StorageException;
 
 /**
+ * @covers Imbo\EventListener\StorageOperations
  * @group unit
  * @group listeners
  */

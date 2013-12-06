@@ -13,7 +13,9 @@ namespace Imbo\UnitTest\Resource;
 use Imbo\Resource\Stats;
 
 /**
+ * @covers Imbo\Resource\Stats
  * @group unit
+ * @group resources
  */
 class StatsTest extends ResourceTests {
     /**

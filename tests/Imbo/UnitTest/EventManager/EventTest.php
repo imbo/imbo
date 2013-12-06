@@ -20,6 +20,7 @@ use Imbo\EventManager\Event,
 /**
  * @covers Imbo\EventManager\Event
  * @group unit
+ * @group eventmanager
  */
 class EventTest extends \PHPUnit_Framework_TestCase {
     /**

@@ -15,6 +15,7 @@ use Imbo\EventListener\Initializer\Imagick;
 /**
  * @covers Imbo\EventListener\Initializer\Imagick
  * @group unit
+ * @group listeners
  */
 class ImagickTest extends \PHPUnit_Framework_TestCase {
     /**

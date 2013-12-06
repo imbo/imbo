@@ -13,7 +13,9 @@ namespace Imbo\UnitTest\Resource;
 use Imbo\Resource\Image;
 
 /**
+ * @covers Imbo\Resource\Image
  * @group unit
+ * @group resources
  */
 class ImageTest extends ResourceTests {
     /**

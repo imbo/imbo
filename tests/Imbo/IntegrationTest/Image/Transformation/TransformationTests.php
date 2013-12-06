@@ -10,8 +10,6 @@
 
 namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Model\Image;
-
 /**
  * @group integration
  * @group transformations

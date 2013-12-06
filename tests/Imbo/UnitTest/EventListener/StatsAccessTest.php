@@ -13,6 +13,7 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\StatsAccess;
 
 /**
+ * @covers Imbo\EventListener\StatsAccess
  * @group unit
  * @group listeners
  */

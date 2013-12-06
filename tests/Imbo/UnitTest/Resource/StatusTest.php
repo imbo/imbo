@@ -13,7 +13,9 @@ namespace Imbo\UnitTest\Resource;
 use Imbo\Resource\Status;
 
 /**
+ * @covers Imbo\Resource\Status
  * @group unit
+ * @group resources
  */
 class StatusTest extends ResourceTests {
     /**

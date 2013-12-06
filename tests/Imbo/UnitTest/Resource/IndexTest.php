@@ -13,7 +13,9 @@ namespace Imbo\UnitTest\Resource;
 use Imbo\Resource\Index;
 
 /**
+ * @covers Imbo\Resource\Index
  * @group unit
+ * @group resources
  */
 class IndexTest extends ResourceTests {
     /**

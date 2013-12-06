@@ -17,6 +17,7 @@ use Imbo\Resource\Metadata,
 /**
  * @covers Imbo\Resource\Metadata
  * @group unit
+ * @group resources
  */
 class MetadataTest extends ResourceTests {
     /**

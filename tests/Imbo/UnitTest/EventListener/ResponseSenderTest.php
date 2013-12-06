@@ -13,6 +13,7 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\ResponseSender;
 
 /**
+ * @covers Imbo\EventListener\ResponseSender
  * @group unit
  * @group listeners
  */

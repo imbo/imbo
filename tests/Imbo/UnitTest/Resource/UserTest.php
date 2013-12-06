@@ -15,7 +15,9 @@ use Imbo\Resource\User,
     DateTimeZone;
 
 /**
+ * @covers Imbo\Resource\User
  * @group unit
+ * @group resources
  */
 class UserTest extends ResourceTests {
     /**

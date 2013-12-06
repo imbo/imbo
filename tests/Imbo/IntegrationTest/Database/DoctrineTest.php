@@ -14,8 +14,10 @@ use Imbo\Database\Doctrine,
     PDO;
 
 /**
+ * @covers Imbo\Database\Doctrine
  * @group integration
  * @group database
+ * @group doctrine
  */
 class DoctrineTest extends DatabaseTests {
     /**

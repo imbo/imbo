@@ -13,7 +13,9 @@ namespace Imbo\UnitTest\Exception;
 use Imbo\Exception\InvalidArgumentException;
 
 /**
+ * @covers Imbo\Exception\InvalidArgumentException
  * @group unit
+ * @group exceptions
  */
 class InvalidArgumentExceptionTest extends \PHPUnit_Framework_TestCase {
     /**

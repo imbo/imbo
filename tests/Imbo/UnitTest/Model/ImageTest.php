@@ -16,6 +16,7 @@ use Imbo\Model\Image,
 /**
  * @covers Imbo\Model\Image
  * @group unit
+ * @group models
  */
 class ImageTest extends \PHPUnit_Framework_TestCase {
     /**

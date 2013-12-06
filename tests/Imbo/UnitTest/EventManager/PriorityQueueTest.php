@@ -15,6 +15,7 @@ use Imbo\EventManager\PriorityQueue;
 /**
  * @covers Imbo\EventManager\PriorityQueue
  * @group unit
+ * @group eventmanager
  */
 class PriorityQueueTest extends \PHPUnit_Framework_TestCase {
     /**

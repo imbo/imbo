@@ -14,7 +14,9 @@ use Imbo\Model\Status,
     DateTime;
 
 /**
+ * @covers Imbo\Model\Status
  * @group unit
+ * @group models
  */
 class StatusTest extends \PHPUnit_Framework_TestCase {
     /**

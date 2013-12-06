@@ -13,6 +13,7 @@ namespace Imbo\IntegrationTest\Storage;
 use Imbo\Storage\Filesystem;
 
 /**
+ * @covers Imbo\Storage\Filesystem
  * @group integration
  * @group storage
  */

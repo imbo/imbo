@@ -13,7 +13,9 @@ namespace Imbo\UnitTest\Resource;
 use Imbo\Resource\ShortUrl;
 
 /**
+ * @covers Imbo\Resource\ShortUrl
  * @group unit
+ * @group resources
  */
 class ShortUrlTest extends ResourceTests {
     /**

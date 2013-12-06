@@ -15,8 +15,10 @@ use Imbo\Database\MongoDB,
     ReflectionMethod;
 
 /**
+ * @covers Imbo\Database\MongoDB
  * @group unit
  * @group database
+ * @group mongodb
  */
 class MongoDBTest extends \PHPUnit_Framework_TestCase {
     /**

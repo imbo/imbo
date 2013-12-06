@@ -14,8 +14,10 @@ use Imbo\Database\MongoDB,
     MongoClient;
 
 /**
+ * @covers Imbo\Database\MongoDB
  * @group integration
  * @group database
+ * @group mongodb
  */
 class MongoDBTest extends DatabaseTests {
     /**

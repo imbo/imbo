@@ -13,6 +13,7 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\MetadataCache;
 
 /**
+ * @covers Imbo\EventListener\MetadataCache
  * @group unit
  * @group listeners
  */

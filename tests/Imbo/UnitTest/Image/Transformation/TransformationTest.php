@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\Transformation,
     ReflectionMethod;
 
 /**
+ * @covers Imbo\Image\Transformation\Transformation
  * @group unit
  * @group transformations
  */

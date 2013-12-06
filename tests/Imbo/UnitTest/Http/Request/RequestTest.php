@@ -14,7 +14,9 @@ use Imbo\Http\Request\Request,
     Imbo\Router\Route;
 
 /**
+ * @covers Imbo\Http\Request\Request
  * @group unit
+ * @group http
  */
 class RequestTest extends \PHPUnit_Framework_TestCase {
     /**

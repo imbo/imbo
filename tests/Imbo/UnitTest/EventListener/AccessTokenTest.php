@@ -13,6 +13,7 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\AccessToken;
 
 /**
+ * @covers Imbo\EventListener\AccessToken
  * @group unit
  * @group listeners
  */

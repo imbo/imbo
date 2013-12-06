@@ -16,7 +16,9 @@ use Imbo\Model\Error,
     DateTime;
 
 /**
+ * @covers Imbo\Model\Error
  * @group unit
+ * @group models
  */
 class ErrorTest extends \PHPUnit_Framework_TestCase {
     /**

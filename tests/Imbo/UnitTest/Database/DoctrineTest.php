@@ -18,6 +18,7 @@ use Imbo\Database\Doctrine,
  * @covers Imbo\Database\Doctrine
  * @group unit
  * @group database
+ * @group doctrine
  */
 class DoctrineTest extends \PHPUnit_Framework_TestCase {
     /**

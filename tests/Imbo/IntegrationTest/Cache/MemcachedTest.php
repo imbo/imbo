@@ -14,7 +14,9 @@ use Imbo\Cache\Memcached,
     Memcached as PeclMemcached;
 
 /**
+ * @covers Imbo\Cache\Memcached
  * @group integration
+ * @group cache
  */
 class MemcachedTest extends CacheTests {
     protected function getDriver() {

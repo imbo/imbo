@@ -15,6 +15,7 @@ use Imbo\Storage\Filesystem,
     org\bovigo\vfs\vfsStreamWrapper;
 
 /**
+ * @covers Imbo\Storage\Filesystem
  * @group unit
  * @group storage
  */

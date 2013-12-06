@@ -14,8 +14,10 @@ use Imbo\Storage\GridFS,
     MongoClient;
 
 /**
+ * @covers Imbo\Storage\GridFS
  * @group integration
  * @group storage
+ * @group mongodb
  */
 class GridFSTest extends StorageTests {
     /**
