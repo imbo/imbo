@@ -12,7 +12,7 @@ desc "Task used by Jenkins-CI"
 task :jenkins => [:prepare, :lint, :installdep, :test, :apidocs, :phploc, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
 
 desc "Task used by Travis-CI"
-task :travis => [:travis_bootstrap, :installdep, :test]
+task :travis => [:installdep, :test]
 
 desc "Default task"
 task :default => [:lint, :installdep, :test, :phpcs, :apidocs, :readthedocs]
@@ -47,13 +47,8 @@ end
 
 desc "Install dependencies"
 task :installdep do
-  if ENV["TRAVIS"] == "true"
-    system "composer self-update"
-    system "composer -n --no-ansi install --dev --prefer-source"
-  else
-    Rake::Task["install_composer"].invoke
-    system "php -d \"apc.enable_cli=0\" composer.phar -n install --dev --prefer-source"
-  end
+  Rake::Task["install_composer"].invoke
+  system "php -d \"apc.enable_cli=0\" composer.phar -n install --dev --prefer-source"
 end
 
 desc "Update dependencies"
@@ -142,24 +137,6 @@ task :lint do
   end
 
   IO.write(lintCache, JSON.dump(sums))
-end
-
-desc "Bootstrap Travis-CI"
-task :travis_bootstrap do
-  if ENV["TRAVIS"] == "true"
-    ini_file = Hash[`php --ini`.split("\n").map {|l| l.split(/:\s+/)}]["Loaded Configuration File"]
-
-    #{"imagick" => "3.1.2"}.each { |package, version|
-      #filename = "#{package}-#{version}.tgz"
-      #system "wget http://pecl.php.net/get/#{filename}"
-      #system "tar -xzf #{filename}"
-      #system "sh -c \"cd #{filename[0..-5]} && phpize && ./configure && make && sudo make install\""
-      #system "sudo sh -c \"echo 'extension=#{package.downcase}.so' >> #{ini_file}\""
-    #}
-  else
-   puts "Will only be used by Travis-CI"
-   exit 1
-  end
 end
 
 desc "Run PHPUnit tests"
