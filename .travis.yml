@@ -23,4 +23,5 @@ before_script:
   - gem install json
   - composer self-update
   - composer -n --no-ansi install --dev --prefer-source
+  - php imagicktest.php
 script: rake test
