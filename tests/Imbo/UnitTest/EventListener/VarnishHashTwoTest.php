@@ -15,6 +15,7 @@ use Imbo\EventListener\VarnishHashTwo;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @covers Imbo\EventListener\VarnishHashTwo
  */
 class VarnishHashTwoTest extends ListenerTests {
     /**
@@ -73,5 +74,21 @@ class VarnishHashTwoTest extends ListenerTests {
         $this->responseHeaders->expects($this->once())->method('set')->with('X-HashTwo', 'key|id');
 
         $this->listener->addHeader($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\VarnishHashTwo::__construct
+     * @covers Imbo\EventListener\VarnishHashTwo::addHeader
+     */
+    public function testCanSpecifyACustomHeaderName() {
+        $listener = new VarnishHashTwo('X-CustomHeader');
+
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
+        $this->responseHeaders->expects($this->once())->method('set')->with('X-CustomHeader', 'key|id');
+
+        $listener->addHeader($this->event);
     }
 }

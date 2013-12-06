@@ -15,6 +15,7 @@ use Imbo\EventListener\Cors;
 /**
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Test suite\Unit tests
+ * @covers Imbo\EventListener\Cors
  */
 class CorsTest extends ListenerTests {
     /**
@@ -258,5 +259,82 @@ class CorsTest extends ListenerTests {
             'allowedOrigin' => 'http://imbo',
         ));
         $listener->invoke($event);
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getAllowedMethodsParams() {
+        return array(
+            'default' => array(
+                'params' => array(),
+                'events' => array(
+                    'index.get' => array('invoke' => 20),
+                    'index.head' => array('invoke' => 20),
+                    'index.options' => array('options' => 20),
+                    'image.get' => array('invoke' => 20),
+                    'image.head' => array('invoke' => 20),
+                    'image.options' => array('options' => 20),
+                    'images.get' => array('invoke' => 20),
+                    'images.head' => array('invoke' => 20),
+                    'images.options' => array('options' => 20),
+                    'metadata.get' => array('invoke' => 20),
+                    'metadata.head' => array('invoke' => 20),
+                    'metadata.options' => array('options' => 20),
+                    'status.get' => array('invoke' => 20),
+                    'status.head' => array('invoke' => 20),
+                    'status.options' => array('options' => 20),
+                    'stats.get' => array('invoke' => 20),
+                    'stats.head' => array('invoke' => 20),
+                    'stats.options' => array('options' => 20),
+                    'user.get' => array('invoke' => 20),
+                    'user.head' => array('invoke' => 20),
+                    'user.options' => array('options' => 20),
+                    'shorturl.get' => array('invoke' => 20),
+                    'shorturl.head' => array('invoke' => 20),
+                    'shorturl.options' => array('options' => 20),
+                ),
+            ),
+            'some endpoints' => array(
+                'params' => array(
+                    'allowedMethods' => array(
+                        'stats' => array('GET'),
+                        'image' => array('PUT'),
+                    ),
+                ),
+                'events' => array(
+                    'stats.get' => array('invoke' => 20),
+                    'stats.options' => array('options' => 20),
+                    'image.put' => array('invoke' => 20),
+                    'image.options' => array('options' => 20),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getAllowedMethodsParams
+     * @covers Imbo\EventListener\Cors::subscribe
+     */
+    public function testWillSubscribeToTheCorrectEventsBasedOnParams($params, $events) {
+        $listener = new Cors($params);
+
+        $headers = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $headers->expects($this->once())->method('set')->with('Allow', 'OPTIONS', false);
+
+        $response = $this->getMock('Imbo\Http\Response\Response');
+        $response->headers = $headers;
+
+        $manager = $this->getMock('Imbo\EventManager\EventManager');
+        $manager->expects($this->once())->method('addCallbacks')->with('handler', $events);
+
+        $event = $this->getMock('Imbo\EventManager\EventInterface');
+        $event->expects($this->once())->method('getManager')->will($this->returnValue($manager));
+        $event->expects($this->once())->method('getHandler')->will($this->returnValue('handler'));
+        $event->expects($this->once())->method('getResponse')->will($this->returnValue($response));
+
+        $listener->subscribe($event);
     }
 }
