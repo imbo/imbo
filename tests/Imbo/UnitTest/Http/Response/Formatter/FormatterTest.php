@@ -15,6 +15,7 @@ use Imbo\Http\Response\Formatter\JSON;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @group unit
  */
 class FormatterTest extends \PHPUnit_Framework_TestCase {
     /**

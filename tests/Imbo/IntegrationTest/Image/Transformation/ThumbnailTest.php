@@ -17,6 +17,7 @@ use Imbo\Image\Transformation\Thumbnail,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
  * @covers Imbo\Image\Transformation\Thumbnail
+ * @group integration
  */
 class ThumbnailTest extends TransformationTests {
     /**

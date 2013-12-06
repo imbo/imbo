@@ -15,6 +15,7 @@ use Imbo\Resource\Status;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @group unit
  */
 class StatusTest extends ResourceTests {
     /**

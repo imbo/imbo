@@ -16,6 +16,7 @@ use Imbo\Image\Transformation\AutoRotate;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
  * @covers Imbo\Image\Transformation\AutoRotate
+ * @group unit
  */
 class AutoRotateTest extends \PHPUnit_Framework_TestCase {
     /**

@@ -17,6 +17,8 @@ use Imbo\Storage\Filesystem,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @group unit
+ * @group storage
  */
 class FilesystemTest extends \PHPUnit_Framework_TestCase {
     /**

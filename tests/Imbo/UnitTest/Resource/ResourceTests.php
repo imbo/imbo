@@ -16,6 +16,7 @@ use ReflectionClass,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @group unit
  */
 abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
     /**

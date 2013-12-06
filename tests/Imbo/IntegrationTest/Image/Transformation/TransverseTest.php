@@ -17,6 +17,7 @@ use Imbo\Image\Transformation\Transverse,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
  * @covers Imbo\Image\Transformation\Transverse
+ * @group integration
  */
 class TransverseTest extends TransformationTests {
     /**

@@ -13,6 +13,8 @@ namespace Imbo\IntegrationTest\Storage;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @group integration
+ * @group storage
  */
 abstract class StorageTests extends \PHPUnit_Framework_TestCase {
     /**

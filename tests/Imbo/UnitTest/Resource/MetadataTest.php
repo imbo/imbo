@@ -18,6 +18,7 @@ use Imbo\Resource\Metadata,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
  * @covers Imbo\Resource\Metadata
+ * @group unit
  */
 class MetadataTest extends ResourceTests {
     /**

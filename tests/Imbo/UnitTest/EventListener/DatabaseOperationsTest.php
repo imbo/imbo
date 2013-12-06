@@ -18,6 +18,7 @@ use Imbo\EventListener\DatabaseOperations,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
  * @covers Imbo\EventListener\DatabaseOperations
+ * @group unit
  */
 class DatabaseOperationsTest extends ListenerTests {
     /**

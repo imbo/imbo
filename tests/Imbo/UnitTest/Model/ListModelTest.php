@@ -15,6 +15,7 @@ use Imbo\Model\ListModel;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @group unit
  */
 class ListModelTest extends \PHPUnit_Framework_TestCase {
     /**

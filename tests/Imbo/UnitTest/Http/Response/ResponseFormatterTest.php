@@ -21,6 +21,7 @@ use Imbo\Http\Response\ResponseFormatter,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
  * @covers Imbo\Http\Response\ResponseFormatter
+ * @group unit
  */
 class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
     /**

@@ -16,6 +16,8 @@ use Imbo\Storage\Doctrine,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @group unit
+ * @group storage
  */
 class DoctrineTest extends \PHPUnit_Framework_TestCase {
     /**

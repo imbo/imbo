@@ -16,6 +16,7 @@ use Imbo\EventListener\ImageTransformer;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
  * @covers Imbo\EventListener\ImageTransformer
+ * @group unit
  */
 class ImageTransformerTest extends ListenerTests {
     /**

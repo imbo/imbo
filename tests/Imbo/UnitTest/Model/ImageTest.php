@@ -17,6 +17,7 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
  * @covers Imbo\Model\Image
+ * @group unit
  */
 class ImageTest extends \PHPUnit_Framework_TestCase {
     /**

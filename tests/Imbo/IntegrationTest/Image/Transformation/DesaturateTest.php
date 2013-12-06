@@ -17,6 +17,7 @@ use Imbo\Image\Transformation\Desaturate,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
  * @covers Imbo\Image\Transformation\Desaturate
+ * @group integration
  */
 class DesaturateTest extends TransformationTests {
     /**

@@ -17,6 +17,7 @@ use Imbo\Image\Transformation\MaxSize,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
  * @covers Imbo\Image\Transformation\MaxSize
+ * @group integration
  */
 class MaxSizeTest extends TransformationTests {
     /**

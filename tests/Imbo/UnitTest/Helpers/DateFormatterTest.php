@@ -17,6 +17,7 @@ use Imbo\Helpers\DateFormatter,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @group unit
  */
 class DateFormatterTest extends \PHPUnit_Framework_TestCase {
     /**

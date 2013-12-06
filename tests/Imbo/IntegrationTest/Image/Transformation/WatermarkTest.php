@@ -19,6 +19,7 @@ use Imbo\Image\Transformation\Watermark,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
  * @covers Imbo\Image\Transformation\Watermark
+ * @group integration
  */
 class WatermarkTest extends TransformationTests {
      /**

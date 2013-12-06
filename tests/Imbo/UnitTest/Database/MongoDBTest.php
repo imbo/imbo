@@ -17,6 +17,8 @@ use Imbo\Database\MongoDB,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @group unit
+ * @group database
  */
 class MongoDBTest extends \PHPUnit_Framework_TestCase {
     /**

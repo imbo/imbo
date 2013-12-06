@@ -16,6 +16,7 @@ use Imbo\EventListener\ExifMetadata;
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Test suite\Unit tests
  * @covers Imbo\EventListener\ExifMetadata
+ * @group unit
  */
 class ExifMetadataTest extends ListenerTests {
     /**

@@ -17,6 +17,7 @@ use Imbo\Image\Transformation\Sepia,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
  * @covers Imbo\Image\Transformation\Sepia
+ * @group integration
  */
 class SepiaTest extends TransformationTests {
     /**

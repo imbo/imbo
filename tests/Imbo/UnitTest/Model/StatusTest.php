@@ -16,6 +16,7 @@ use Imbo\Model\Status,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @group unit
  */
 class StatusTest extends \PHPUnit_Framework_TestCase {
     /**

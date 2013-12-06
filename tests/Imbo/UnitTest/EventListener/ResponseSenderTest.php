@@ -15,6 +15,7 @@ use Imbo\EventListener\ResponseSender;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @group unit
  */
 class ResponseSenderTest extends ListenerTests {
     /**

@@ -16,6 +16,8 @@ use Imbo\Storage\Doctrine,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @group integration
+ * @group storage
  */
 class DoctrineTest extends StorageTests {
     /**

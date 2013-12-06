@@ -21,6 +21,7 @@ use Imbo\EventManager\Event,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
  * @covers Imbo\EventManager\Event
+ * @group unit
  */
 class EventTest extends \PHPUnit_Framework_TestCase {
     /**

@@ -17,6 +17,7 @@ use Imbo\Image\Transformation\Watermark,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
  * @covers Imbo\Image\Transformation\Watermark
+ * @group unit
  */
 class WatermarkTest extends \PHPUnit_Framework_TestCase {
     /**

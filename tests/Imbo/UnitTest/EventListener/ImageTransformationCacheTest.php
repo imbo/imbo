@@ -17,6 +17,7 @@ use Imbo\EventListener\ImageTransformationCache,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @group unit
  */
 class ImageTransformationCacheTest extends ListenerTests {
     /**

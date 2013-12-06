@@ -17,6 +17,7 @@ use Imbo\Image\Transformation\Border,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
  * @covers Imbo\Image\Transformation\Border
+ * @group integration
  */
 class BorderTest extends TransformationTests {
     /**

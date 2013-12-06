@@ -18,6 +18,8 @@ use Imbo\Model\Image,
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Integration tests
+ * @group integration
+ * @group database
  */
 abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     /**

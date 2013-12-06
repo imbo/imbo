@@ -15,6 +15,7 @@ use Imbo\Exception\RuntimeException;
 /**
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
+ * @group unit
  */
 class RuntimeExceptionTest extends \PHPUnit_Framework_TestCase {
     /**

@@ -16,6 +16,7 @@ use Imbo\EventListener\VarnishHashTwo;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Unit tests
  * @covers Imbo\EventListener\VarnishHashTwo
+ * @group unit
  */
 class VarnishHashTwoTest extends ListenerTests {
     /**

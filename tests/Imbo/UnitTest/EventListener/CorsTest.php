@@ -16,6 +16,7 @@ use Imbo\EventListener\Cors;
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Test suite\Unit tests
  * @covers Imbo\EventListener\Cors
+ * @group unit
  */
 class CorsTest extends ListenerTests {
     /**
