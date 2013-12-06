@@ -15,8 +15,6 @@ use Imbo\Database\Doctrine,
     ReflectionMethod;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\Database\Doctrine
  * @group unit
  * @group database

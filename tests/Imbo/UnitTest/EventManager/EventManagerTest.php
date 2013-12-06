@@ -16,8 +16,6 @@ use Imbo\EventManager\EventManager,
     Imbo\EventListener\Initializer\InitializerInterface;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\EventManager\EventManager
  * @group unit
  */

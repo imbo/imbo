@@ -13,8 +13,6 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\Imagick;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\EventListener\Imagick
  * @group unit
  */

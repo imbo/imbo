@@ -15,8 +15,6 @@ use Imbo\EventListener\DatabaseOperations,
     Imbo\Http\Response\Response;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\EventListener\DatabaseOperations
  * @group unit
  */

@@ -13,8 +13,6 @@ namespace Imbo\UnitTest\Http\Response\Formatter;
 use Imbo\Http\Response\Formatter\XML;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @group unit
  */
 class XMLTest extends \PHPUnit_Framework_TestCase {

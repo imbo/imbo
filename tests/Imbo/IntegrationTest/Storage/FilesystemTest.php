@@ -13,8 +13,6 @@ namespace Imbo\IntegrationTest\Storage;
 use Imbo\Storage\Filesystem;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
  * @group integration
  * @group storage
  */

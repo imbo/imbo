@@ -13,8 +13,6 @@ namespace Imbo\UnitTest;
 use Imbo\Application;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\Application
  * @group unit
  */

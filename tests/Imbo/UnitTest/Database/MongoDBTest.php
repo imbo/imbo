@@ -15,8 +15,6 @@ use Imbo\Database\MongoDB,
     ReflectionMethod;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @group unit
  * @group database
  */

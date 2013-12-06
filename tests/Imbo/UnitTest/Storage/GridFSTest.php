@@ -17,8 +17,6 @@ use Imbo\Storage\GridFS,
     MongoGridFSFile;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @group unit
  * @group storage
  */
@@ -213,10 +211,6 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
 }
 
 if (class_exists('MongoGridFSFile')) {
-    /**
-     * @author Christer Edvartsen <cogo@starzinger.net>
-     * @package Test suite\Unit tests
-     */
     class TestFile extends MongoGridFSFile {
         public $file = array(
             'updated' => 1334579830,

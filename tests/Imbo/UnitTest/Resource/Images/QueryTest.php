@@ -13,8 +13,6 @@ namespace Imbo\UnitTest\Resource\Images;
 use Imbo\Resource\Images\Query;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @group unit
  */
 class QueryTest extends \PHPUnit_Framework_TestCase {

@@ -13,8 +13,6 @@ namespace Imbo\UnitTest\Resource;
 use Imbo\Resource\Stats;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @group unit
  */
 class StatsTest extends ResourceTests {

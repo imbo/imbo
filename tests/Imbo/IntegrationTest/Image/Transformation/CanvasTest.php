@@ -14,8 +14,6 @@ use Imbo\Image\Transformation\Canvas,
     Imagick;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
  * @covers Imbo\Image\Transformation\Canvas
  * @group integration
  */

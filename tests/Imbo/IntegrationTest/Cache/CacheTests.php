@@ -11,8 +11,6 @@
 namespace Imbo\IntegrationTest\Cache;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
  * @group integration
  */
 abstract class CacheTests extends \PHPUnit_Framework_TestCase {

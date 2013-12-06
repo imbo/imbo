@@ -16,8 +16,6 @@ use Imbo\Model\Image,
     DateTimeZone;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
  * @group integration
  * @group database
  */

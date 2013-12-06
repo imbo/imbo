@@ -14,8 +14,6 @@ use Imbo\Storage\Doctrine,
     Doctrine\DBAL\Connection;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @group unit
  * @group storage
  */

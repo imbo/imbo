@@ -16,8 +16,6 @@ use Imbo\Image\Transformation\Transformation,
     ReflectionMethod;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @group unit
  */
 class TransformationTest extends \PHPUnit_Framework_TestCase {
@@ -70,10 +68,6 @@ class TransformationTest extends \PHPUnit_Framework_TestCase {
     }
 }
 
-/**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
- */
 class TransformationImpl extends Transformation {
     public function applyToImage(Image $image, array $params = array()) {}
 }

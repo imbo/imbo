@@ -14,8 +14,6 @@ use Imbo\Storage\Doctrine,
     PDO;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
  * @group integration
  * @group storage
  */

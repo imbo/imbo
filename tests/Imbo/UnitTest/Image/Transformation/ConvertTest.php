@@ -13,8 +13,6 @@ namespace Imbo\UnitTest\Image\Transformation;
 use Imbo\Image\Transformation\Convert;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\Image\Transformation\Convert
  * @group unit
  */

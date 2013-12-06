@@ -18,8 +18,6 @@ use Imbo\Http\Response\ResponseFormatter,
     Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\Http\Response\ResponseFormatter
  * @group unit
  */

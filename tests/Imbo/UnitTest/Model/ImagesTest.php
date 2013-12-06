@@ -13,8 +13,6 @@ namespace Imbo\UnitTest\Model;
 use Imbo\Model\Images;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @group unit
  */
 class ImagesTest extends \PHPUnit_Framework_TestCase {

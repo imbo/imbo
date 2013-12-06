@@ -13,8 +13,6 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\AutoRotateImage;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
  * @covers Imbo\EventListener\AutoRotateImage
  * @group unit
  */

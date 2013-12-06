@@ -13,8 +13,6 @@ namespace Imbo\UnitTest\Exception;
 use Imbo\Exception\InvalidArgumentException;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @group unit
  */
 class InvalidArgumentExceptionTest extends \PHPUnit_Framework_TestCase {

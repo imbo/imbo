@@ -18,8 +18,6 @@ use Imbo\EventManager\Event,
     Imbo\Storage\StorageInterface;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\EventManager\Event
  * @group unit
  */

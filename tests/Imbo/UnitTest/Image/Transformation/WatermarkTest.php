@@ -14,8 +14,6 @@ use Imbo\Image\Transformation\Watermark,
     Imbo\Exception\StorageException;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\Image\Transformation\Watermark
  * @group unit
  */

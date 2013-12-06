@@ -15,8 +15,6 @@ use Imbo\Resource\Images,
     DateTimeZone;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @group unit
  */
 class ImagesTest extends ResourceTests {

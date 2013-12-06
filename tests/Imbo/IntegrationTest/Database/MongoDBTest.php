@@ -14,8 +14,6 @@ use Imbo\Database\MongoDB,
     MongoClient;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
  * @group integration
  * @group database
  */

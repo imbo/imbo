@@ -15,8 +15,6 @@ use Imbo\Storage\Filesystem,
     org\bovigo\vfs\vfsStreamWrapper;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @group unit
  * @group storage
  */

@@ -14,8 +14,6 @@ use Imbo\Cache\Memcached,
     Memcached as PeclMemcached;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
  * @group integration
  */
 class MemcachedTest extends CacheTests {

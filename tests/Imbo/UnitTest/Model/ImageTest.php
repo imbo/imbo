@@ -14,8 +14,6 @@ use Imbo\Model\Image,
     Imbo\Image\Transformation\Transformation;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\Model\Image
  * @group unit
  */

@@ -17,8 +17,6 @@ use Imbo\Http\Response\Response,
     DateTimeZone;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @group unit
  */
 class ResponseTest extends \PHPUnit_Framework_TestCase {

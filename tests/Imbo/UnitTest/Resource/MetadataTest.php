@@ -15,8 +15,6 @@ use Imbo\Resource\Metadata,
     DateTimeZone;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\Resource\Metadata
  * @group unit
  */

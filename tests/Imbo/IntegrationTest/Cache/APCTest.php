@@ -13,8 +13,6 @@ namespace Imbo\IntegrationTest\Cache;
 use Imbo\Cache\APC;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
  * @group integration
  */
 class APCTest extends CacheTests {

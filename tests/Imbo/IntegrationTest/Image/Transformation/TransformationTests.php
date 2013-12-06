@@ -13,8 +13,6 @@ namespace Imbo\IntegrationTest\Image\Transformation;
 use Imbo\Model\Image;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
  * @group integration
  */
 abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
