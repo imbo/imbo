@@ -23,7 +23,6 @@ __N/A__
 Bug fixes:
 
 * #211: CORS event listener suppresses "405 Method not allowed" responses when enabled
-* #209: The Collection image transformation is not image-reader-aware
 
 Imbo-0.3.3
 ----------
