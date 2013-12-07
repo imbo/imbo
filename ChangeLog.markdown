@@ -15,6 +15,7 @@ __N/A__
 * #204: Images resource should be able to retrieve only specific fields
 * #201: Added an index resource
 * #199: Allow /metadata for the meta data resource
+* #196: Added Amazon Simple Storage Service (S3) storage adapter
 * #192: Images resource should allow sorting
 * #190: Added support for filtering images on one or more image identifiers
 * #189: Prioritize original image mime types when doing content negotiation
@@ -34,12 +35,6 @@ Imbo-0.3.3
 __2013-10-19__
 
 * Fixed #214: 0.3.2 is not installable without updating dependencies
-
-Imbo-0.4.0
-----------
-__N/A__
-
-* Added support for custom routes and resources through the constructor
 
 Imbo-0.3.2
 ----------
