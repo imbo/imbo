@@ -11,9 +11,6 @@ tests    = "#{basedir}/tests"
 desc "Task used by Jenkins-CI"
 task :jenkins => [:prepare, :lint, :installdep, :test, :apidocs, :phploc, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
 
-desc "Task used by Travis-CI"
-task :travis => [:installdep, :test]
-
 desc "Default task"
 task :default => [:lint, :installdep, :test, :phpcs, :apidocs, :readthedocs]
 
@@ -142,11 +139,7 @@ end
 desc "Run PHPUnit tests"
 task :phpunit do
   begin
-    if ENV["TRAVIS"] == "true"
-      sh %{vendor/bin/phpunit --verbose -c tests/phpunit.xml.travis}
-    else
-      sh %{vendor/bin/phpunit --verbose -c tests --coverage-html build/coverage --coverage-clover build/logs/clover.xml --log-junit build/logs/junit.xml}
-    end
+    sh %{vendor/bin/phpunit --verbose -c tests --coverage-html build/coverage --coverage-clover build/logs/clover.xml --log-junit build/logs/junit.xml}
   rescue Exception
     exit 1
   end
@@ -154,10 +147,8 @@ end
 
 desc "Run functional tests"
 task :behat do
-  profile = ENV["TRAVIS"] == "true" ? "travis" : "default"
-
   begin
-    sh %{vendor/bin/behat --strict --profile #{profile}}
+    sh %{vendor/bin/behat --strict}
   rescue Exception
     exit 1
   end

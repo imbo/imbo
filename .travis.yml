@@ -29,6 +29,6 @@ before_script:
   - gem install json
   - composer self-update
   - composer -n --no-ansi install --dev --prefer-source
-  - identify -verbose tests/Imbo/Fixtures/640x160_rotated.jpg
-  - php imagicktest.php
-script: rake test
+script:
+  - ./vendor/bin/phpunit --verbose -c tests/phpunit.xml.travis
+  - ./vendor/bin/behat --strict --profile travis
