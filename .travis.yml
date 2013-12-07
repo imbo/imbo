@@ -15,7 +15,7 @@ services:
   - mongodb
   - memcached
 before_install:
-  - sudo add-apt-repository ppa:moti-p/cc
+  - sudo add-apt-repository -y ppa:moti-p/cc
   - sudo apt-get update
   - sudo apt-get -y upgrade
   - printf "\n" | pecl install imagick-beta
