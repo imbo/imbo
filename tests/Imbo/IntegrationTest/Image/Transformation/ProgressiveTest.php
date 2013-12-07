@@ -14,9 +14,9 @@ use Imbo\Image\Transformation\Progressive,
     Imagick;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
  * @covers Imbo\Image\Transformation\Progressive
+ * @group integration
+ * @group transformations
  */
 class ProgressiveTest extends TransformationTests {
     /**
