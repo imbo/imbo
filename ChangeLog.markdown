@@ -24,6 +24,7 @@ __N/A__
 
 Bug fixes:
 
+* #222: Some images are not correctly identified
 * #211: CORS event listener suppresses "405 Method not allowed" responses when enabled
 
 Imbo-0.3.3
