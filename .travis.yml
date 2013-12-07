@@ -15,13 +15,9 @@ services:
   - mongodb
   - memcached
 before_install:
-  - wget http://www.imagemagick.org/download/ImageMagick.tar.gz
-  - tar xf ImageMagick.tar.gz
-  - cd ImageMagick*
-  - ./configure --prefix=/usr
-  - make
-  - sudo make install
-  - cd ..
+  - sudo add-apt-repository -y ppa:moti-p/cc
+  - sudo apt-get update
+  - sudo apt-get -y --reinstall install imagemagick
   - printf "\n" | pecl install imagick-beta
 before_script:
   - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
