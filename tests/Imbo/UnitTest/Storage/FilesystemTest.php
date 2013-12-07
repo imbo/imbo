@@ -15,8 +15,9 @@ use Imbo\Storage\Filesystem,
     org\bovigo\vfs\vfsStreamWrapper;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @covers Imbo\Storage\Filesystem
+ * @group unit
+ * @group storage
  */
 class FilesystemTest extends \PHPUnit_Framework_TestCase {
     /**

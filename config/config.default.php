@@ -177,38 +177,13 @@ $config = array(
                 )
             ),
         ),
-    ),
 
-    /**
-     * Image transformations
-     *
-     * This array includes all supported image transformations. The keys are the names of the
-     * transformations that is used in the URL, and the values are class names of a class
-     * implementing the Imbo\Image\Transformation\TransformationInterface interface, or a closure
-     * that will return an instance of such a class. When the value is a closure, it will receive
-     * a single parameter: $params, which is the parameters found in the URL associated with the
-     * transformation.
-     *
-     * When the transformation is specified as a string, the parameters will be passed to the
-     * constructor of the transformation class.
-     *
-     * Example:
-     *
-     * t[]=border:width=2,height=3
-     *
-     * will end up doing the following:
-     *
-     * new Imbo\Image\Transformation\Border(array('width' => '2', 'height' => '3'))
-     *
-     * All image transformations shipped by Imbo uses imagick, and if you want to use something
-     * else, simply supply your own classes in the array below.
-     *
-     * @var array
-     */
-    'imageTransformations' => array(
+        // Image transformations
+        'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
         'border' => 'Imbo\Image\Transformation\Border',
         'canvas' => 'Imbo\Image\Transformation\Canvas',
         'compress' => 'Imbo\Image\Transformation\Compress',
+        'convert' => 'Imbo\Image\Transformation\Convert',
         'crop' => 'Imbo\Image\Transformation\Crop',
         'desaturate' => 'Imbo\Image\Transformation\Desaturate',
         'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
@@ -221,8 +196,49 @@ $config = array(
         'transpose' => 'Imbo\Image\Transformation\Transpose',
         'transverse' => 'Imbo\Image\Transformation\Transverse',
         'watermark' => 'Imbo\Image\Transformation\Watermark',
+
+        // Imagick-specific event listener for the built in image transformations
+        'imagick' => 'Imbo\EventListener\Imagick',
     ),
 
+    /**
+     * Initializers for event listeners
+     *
+     * If some of your event handlers requires extra initializing you can create initializer
+     * classes. These classes must implement the Imbo\EventListener\Initializer\InitializerInterface
+     * interface, and will be instantiated by Imbo.
+     *
+     * @var array
+     */
+    'eventListenerInitializers' => array(
+        'imagick' => 'Imbo\EventListener\Initializer\Imagick',
+    ),
+
+    /**
+     * Transformation presets
+     *
+     * If you want to make custom transformation presets (or transformation collections) you can do
+     * so here. The keys used will be the name of the transformation as used in the URI, and the
+     * value is an array containing the names of the transformations in the collection.
+     *
+     * Example:
+     *
+     * 'transformationPresets' => array(
+     *     'graythumb' => array(
+     *         'thumbnail',
+     *         'desaturate',
+     *     ),
+     *     'flipflop' => array(
+     *         'flipHorizontally',
+     *         'flipVertically',
+     *     ),
+     * ),
+     *
+     * The above to examples can be triggered by ?t[]=graythumb and ?t[]=flipflop respectively
+     *
+     * @var array
+     */
+    'transformationPresets' => array(),
 
     /**
      * Custom resources for Imbo

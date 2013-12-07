@@ -13,11 +13,7 @@
  * base project directory, the command looks like this:
  *
  * php -S localhost:8888 -t public tests/router.php
- *
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite
  */
-
 if (isset($_SERVER['HTTP_X_COLLECT_COVERAGE']) && isset($_SERVER['HTTP_X_TEST_SESSION_ID'])) {
     require __DIR__ . '/../vendor/autoload.php';
 

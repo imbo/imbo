@@ -10,34 +10,17 @@
 
 namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\TransformationInterface,
-    Imbo\Model\Image;
-
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
+ * @group integration
+ * @group transformations
  */
 abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
     /**
-     * Test cases must implement this method and return a configured instande of the transformation
-     * they are testing. This transformation instance will be used for the tests in this base test
-     * case
+     * Get the transformation to test
      *
-     * @return TransformationInterface
+     * @return Imbo\Image\Transformation\Transformation
      */
     abstract protected function getTransformation();
-
-    /**
-     * @return string
-     */
-    abstract protected function getExpectedName();
-
-    /**
-     * Get the image mock used in the simple testApplyToImage
-     *
-     * @return Image
-     */
-    abstract protected function getImageMock();
 
     /**
      * Make sure we have Imagick available
@@ -48,35 +31,8 @@ abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    /**
-     * Make sure the transformation returns the expected name
-     *
-     * @covers Imbo\Image\Transformation\Transformation::getName
-     */
-    public function testGetName() {
-        $this->assertSame($this->getTransformation()->getName(), $this->getExpectedName());
-    }
-
-    /**
-     * Simply apply the current transformation to an image instance
-     *
-     * The transformation instance returned from getTransformation() will be used
-     */
-    public function testSimpleApplyToImage() {
-        $image = $this->getImageMock();
-
-        $this->getTransformation()->applyToImage($image);
-    }
-
-    /**
-     * @expectedException Imbo\Exception\TransformationException
-     */
-    public function testApplyToImageWithUnknownImageFormat() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue('some string'));
-        $image->expects($this->any())->method('getWidth')->will($this->returnValue(1600));
-        $image->expects($this->any())->method('getHeight')->will($this->returnValue(900));
-
-        $this->getTransformation()->applyToImage($image);
+    public function testReturnsACorrectEventSubscriptionArray() {
+        $transformation = $this->getTransformation();
+        $this->assertInternalType('array', $transformation::getSubscribedEvents());
     }
 }

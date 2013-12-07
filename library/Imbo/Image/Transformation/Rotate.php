@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException,
     ImagickPixelException;
 
@@ -21,14 +23,7 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Rotate extends Transformation implements TransformationInterface {
-    /**
-     * Angle of the rotation
-     *
-     * @var int
-     */
-    private $angle;
-
+class Rotate extends Transformation implements ListenerInterface {
     /**
      * Background color of the image
      *
@@ -37,38 +32,38 @@ class Rotate extends Transformation implements TransformationInterface {
     private $bg = '#000';
 
     /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     * @throws TransformationException
+     * {@inheritdoc}
      */
-    public function __construct(array $params) {
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.rotate' => 'transform',
+        );
+    }
+
+    /**
+     * Transform the image
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
+
         if (empty($params['angle'])) {
             throw new TransformationException('Missing required parameter: angle', 400);
         }
 
-        $this->angle = (int) $params['angle'];
+        $angle = (int) $params['angle'];
+        $bg = !empty($params['bg']) ? $this->formatColor($params['bg']) : $this->bg;
 
-        if (!empty($params['bg'])) {
-            $this->bg = $this->formatColor($params['bg']);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function applyToImage(Image $image) {
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
+            $this->imagick->rotateImage($bg, $angle);
 
-            $imagick->rotateImage($this->bg, $this->angle);
+            $size = $this->imagick->getImageGeometry();
 
-            $size = $imagick->getImageGeometry();
-
-            $image->setBlob($imagick->getImageBlob())
-                  ->setWidth($size['width'])
-                  ->setHeight($size['height']);
+            $image->setWidth($size['width'])
+                  ->setHeight($size['height'])
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         } catch (ImagickPixelException $e) {

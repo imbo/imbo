@@ -14,9 +14,9 @@ use Imbo\EventListener\ExifMetadata,
     Imbo\Model\Image;
 
 /**
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
- * @package Test suite\Integration tests
  * @covers Imbo\EventListener\ExifMetadata
+ * @group integration
+ * @group listeners
  */
 class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
     /**

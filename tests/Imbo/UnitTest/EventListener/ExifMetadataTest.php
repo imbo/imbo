@@ -13,9 +13,9 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\ExifMetadata;
 
 /**
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
- * @package Test suite\Unit tests
  * @covers Imbo\EventListener\ExifMetadata
+ * @group unit
+ * @group listeners
  */
 class ExifMetadataTest extends ListenerTests {
     /**

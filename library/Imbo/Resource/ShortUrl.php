@@ -14,7 +14,6 @@ use Imbo\EventManager\EventInterface,
     Imbo\Exception\ResourceException,
     Symfony\Component\HttpFoundation\ParameterBag;
 
-
 /**
  * Short URL resource
  *

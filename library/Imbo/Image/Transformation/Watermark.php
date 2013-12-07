@@ -11,10 +11,10 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
-    Imbo\Storage\ImageReaderAware,
-    Imbo\Storage\ImageReaderAwareTrait,
     Imbo\Exception\StorageException,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     Imagick,
     ImagickException;
 
@@ -24,36 +24,13 @@ use Imbo\Model\Image,
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
-class Watermark extends Transformation implements ImageReaderAware, TransformationInterface {
-    use ImageReaderAwareTrait;
-
+class Watermark extends Transformation implements ListenerInterface {
     /**
      * Default image identifier to use for watermarks
      *
      * @var string
      */
     private $defaultImage;
-
-    /**
-     * Image identifier to use as watermark image
-     *
-     * @var string
-     */
-    private $imageIdentifier;
-
-    /**
-     * Width of the watermark (defaults to size of watermark image)
-     *
-     * @var int
-     */
-    private $width;
-
-    /**
-     * Height of the watermark (defaults to size of watermark image)
-     *
-     * @var int
-     */
-    private $height;
 
     /**
      * X coordinate of watermark relative to position parameters
@@ -85,32 +62,6 @@ class Watermark extends Transformation implements ImageReaderAware, Transformati
     private $position = 'top-left';
 
     /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     */
-    public function __construct(array $params = array()) {
-        $this->width = !empty($params['width']) ? (int) $params['width'] : 0;
-        $this->height = !empty($params['height']) ? (int) $params['height'] : 0;
-
-        if (!empty($params['img'])) {
-            $this->imageIdentifier = $params['img'];
-        }
-
-        if (!empty($params['position'])) {
-            $this->position = $params['position'];
-        }
-
-        if (!empty($params['x'])) {
-            $this->x = (int) $params['x'];
-        }
-
-        if (!empty($params['y'])) {
-            $this->y = (int) $params['y'];
-        }
-    }
-
-    /**
      * Set default image identifier to use if no identifier has been specified
      *
      * @param string $imageIdentifier Image identifier for the default image
@@ -122,8 +73,29 @@ class Watermark extends Transformation implements ImageReaderAware, Transformati
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image) {
-        if (empty($this->imageIdentifier) && empty($this->defaultImage)) {
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.watermark' => 'transform',
+        );
+    }
+
+    /**
+     * Transform the image
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
+
+        $width = !empty($params['width']) ? (int) $params['width'] : 0;
+        $height = !empty($params['height']) ? (int) $params['height'] : 0;
+        $imageIdentifier = !empty($params['img']) ? $params['img'] : $this->defaultImage;
+        $position = !empty($params['position']) ? $params['position'] : $this->position;
+        $x = !empty($params['x']) ? (int) $params['x'] : $this->x;
+        $y = !empty($params['y']) ? (int) $params['y'] : $this->y;
+
+        if (empty($imageIdentifier)) {
             throw new TransformationException(
                 'You must specify an image identifier to use for the watermark',
                 400
@@ -132,8 +104,10 @@ class Watermark extends Transformation implements ImageReaderAware, Transformati
 
         // Try to load watermark image from storage
         try {
-            $watermarkIdentifier = $this->imageIdentifier ?: $this->defaultImage;
-            $watermarkData = $this->getImageReader()->getImage($watermarkIdentifier);
+            $watermarkData = $event->getStorage()->getImage(
+                $event->getRequest()->getPublicKey(),
+                $imageIdentifier
+            );
 
             $watermark = new Imagick();
             $watermark->readImageBlob($watermarkData);
@@ -147,9 +121,6 @@ class Watermark extends Transformation implements ImageReaderAware, Transformati
         }
 
         // Should we resize the watermark?
-        $width = $this->width ?: 0;
-        $height = $this->height ?: 0;
-
         if ($height || $width) {
             // Calculate width or height if not both have been specified
             if (!$height) {
@@ -165,29 +136,22 @@ class Watermark extends Transformation implements ImageReaderAware, Transformati
         }
 
         // Determine placement of the watermark
-        $x = $this->x;
-        $y = $this->y;
-
-        if ($this->position == 'top-right') {
+        if ($position === 'top-right') {
             $x = $image->getWidth() - $width + $x;
-        } else if ($this->position == 'bottom-left') {
+        } else if ($position === 'bottom-left') {
             $y = $image->getHeight() - $height + $y;
-        } else if ($this->position == 'bottom-right') {
+        } else if ($position === 'bottom-right') {
             $x = $image->getWidth() - $width + $x;
             $y = $image->getHeight() - $height + $y;
-        } else if ($this->position == 'center') {
+        } else if ($position === 'center') {
             $x = ($image->getWidth() / 2) - ($width / 2) + $x;
             $y = ($image->getHeight() / 2) - ($height / 2) + $y;
         }
 
         // Now make a composite
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-
-            $imagick->compositeImage($watermark, Imagick::COMPOSITE_OVER, $x, $y);
-
-            $image->setBlob($imagick->getImageBlob());
+            $this->imagick->compositeImage($watermark, Imagick::COMPOSITE_OVER, $x, $y);
+            $image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

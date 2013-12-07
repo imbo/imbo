@@ -15,8 +15,9 @@ use Imbo\Resource\User,
     DateTimeZone;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @covers Imbo\Resource\User
+ * @group unit
+ * @group resources
  */
 class UserTest extends ResourceTests {
     /**

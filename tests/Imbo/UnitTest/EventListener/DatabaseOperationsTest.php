@@ -15,9 +15,10 @@ use Imbo\EventListener\DatabaseOperations,
     Imbo\Http\Response\Response;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\EventListener\DatabaseOperations
+ * @group unit
+ * @group listeners
+ * @group database
  */
 class DatabaseOperationsTest extends ListenerTests {
     /**
@@ -180,20 +181,22 @@ class DatabaseOperationsTest extends ListenerTests {
         $date = $this->getMock('DateTime');
 
         $query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
-        $query->expects($this->at(0))->method('has')->will($this->returnValue(true));
+        $query->expects($this->at(0))->method('has')->with('page')->will($this->returnValue(true));
         $query->expects($this->at(1))->method('get')->with('page')->will($this->returnValue(1));
-        $query->expects($this->at(2))->method('has')->will($this->returnValue(true));
+        $query->expects($this->at(2))->method('has')->with('limit')->will($this->returnValue(true));
         $query->expects($this->at(3))->method('get')->with('limit')->will($this->returnValue(5));
-        $query->expects($this->at(4))->method('has')->will($this->returnValue(true));
+        $query->expects($this->at(4))->method('has')->with('metadata')->will($this->returnValue(true));
         $query->expects($this->at(5))->method('get')->with('metadata')->will($this->returnValue(true));
-        $query->expects($this->at(6))->method('has')->will($this->returnValue(true));
+        $query->expects($this->at(6))->method('has')->with('from')->will($this->returnValue(true));
         $query->expects($this->at(7))->method('get')->with('from')->will($this->returnValue(1355156488));
-        $query->expects($this->at(8))->method('has')->will($this->returnValue(true));
+        $query->expects($this->at(8))->method('has')->with('to')->will($this->returnValue(true));
         $query->expects($this->at(9))->method('get')->with('to')->will($this->returnValue(1355176488));
-        $query->expects($this->at(10))->method('has')->will($this->returnValue(true));
+        $query->expects($this->at(10))->method('has')->with('sort')->will($this->returnValue(true));
         $query->expects($this->at(11))->method('get')->with('sort')->will($this->returnValue('size:desc'));
-        $query->expects($this->at(12))->method('has')->will($this->returnValue(true));
+        $query->expects($this->at(12))->method('has')->with('query')->will($this->returnValue(true));
         $query->expects($this->at(13))->method('get')->with('query')->will($this->returnValue('{"key":"value"}'));
+        $query->expects($this->at(14))->method('has')->with('imageIdentifiers')->will($this->returnValue(true));
+        $query->expects($this->at(15))->method('get')->with('imageIdentifiers')->will($this->returnValue('identifier1,identifier2,identifier3'));
         $this->request->query = $query;
 
         $imagesQuery = $this->getMock('Imbo\Resource\Images\Query');
@@ -220,6 +223,23 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->response->expects($this->once())->method('setLastModified')->with($date);
 
         $this->listener->loadUser($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\DatabaseOperations::loadStats
+     */
+    public function testCanLoadStats() {
+        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue(array(
+            'auth' => array('user1' => 'key', 'user2' => 'key'),
+        )));
+
+        $this->database->expects($this->at(0))->method('getNumImages')->with('user1')->will($this->returnValue(1));
+        $this->database->expects($this->at(1))->method('getNumBytes')->with('user1')->will($this->returnValue(1));
+        $this->database->expects($this->at(2))->method('getNumImages')->with('user2')->will($this->returnValue(2));
+        $this->database->expects($this->at(3))->method('getNumBytes')->with('user2')->will($this->returnValue(2));
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Stats'))->will($this->returnSelf());
+
+        $this->listener->loadStats($this->event);
     }
 
     /**

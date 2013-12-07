@@ -13,8 +13,8 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\ListenerInterface;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @group unit
+ * @group listeners
  */
 abstract class ListenerTests extends \PHPUnit_Framework_TestCase {
     /**

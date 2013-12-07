@@ -34,3 +34,11 @@ CREATE INDEX shorturlparams ON shorturl (
     extension,
     query
 );
+
+CREATE TABLE IF NOT EXISTS storage_images (
+    publicKey TEXT NOT NULL,
+    imageIdentifier TEXT NOT NULL,
+    data BLOB NOT NULL,
+    updated INTEGER NOT NULL,
+    PRIMARY KEY (publicKey,imageIdentifier)
+);

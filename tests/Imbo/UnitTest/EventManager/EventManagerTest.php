@@ -11,12 +11,14 @@
 namespace Imbo\UnitTest\EventManager;
 
 use Imbo\EventManager\EventManager,
-    Imbo\EventManager\Event;
+    Imbo\EventManager\Event,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventListener\Initializer\InitializerInterface;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\EventManager\EventManager
+ * @group unit
+ * @group eventmanager
  */
 class EventManagerTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -154,5 +156,102 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
             'foo' => 'bar',
             'bar' => 'baz',
         ));
+    }
+
+    /**
+     * @covers Imbo\EventManager\EventManager::addInitializer
+     */
+    public function testCanInitializeListeners() {
+        $listenerClassName = __NAMESPACE__ . '\Listener';
+        $this->manager->addInitializer(new Initializer());
+        $this->manager->addEventHandler('someHandler', $listenerClassName);
+        $this->manager->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
+
+        $this->expectOutputString('initeventHandler');
+        $this->manager->trigger('event');
+    }
+
+    /**
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid event definition for listener: someName
+     * @expectedExceptionCode 500
+     * @covers Imbo\EventManager\EventManager::addCallbacks
+     */
+    public function testThrowsExceptionsWhenInvalidHandlersAreAdded() {
+        $this->manager->addCallbacks('someName', array('event' => function($event) {}));
+    }
+
+    /**
+     * @covers Imbo\EventManager\EventManager::addCallbacks
+     */
+    public function testCanAddMultipleHandlersAtOnce() {
+        $listenerClassName = __NAMESPACE__ . '\Listener';
+        $this->manager->addEventHandler('someHandler', $listenerClassName);
+        $this->manager->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
+
+        $this->expectOutputString('bazbarfoo');
+        $this->manager->trigger('someEvent');
+    }
+
+    /**
+     * @covers Imbo\EventManager\EventManager::getHandlerInstance
+     */
+    public function testCanInjectParamsInConstructor() {
+        $listenerClassName = __NAMESPACE__ . '\Listener';
+        $this->manager->addEventHandler('someHandler', $listenerClassName, array('param'));
+        $this->manager->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
+
+        $this->expectOutputString('param');
+        $this->manager->trigger('getParam');
+    }
+}
+
+class Listener implements ListenerInterface {
+    private $param;
+
+    public function __construct($param = null) {
+        $this->param = $param;
+    }
+
+    public static function getSubscribedEvents() {
+        return array(
+            'event' => 'method',
+            'someEvent' => array(
+                'foo',
+                'baz' => 2,
+                'bar' => 1,
+            ),
+            'getParam' => 'getParam',
+        );
+    }
+
+    public function getParam($event) {
+        echo $this->param;
+    }
+
+    public function foo($event) {
+        echo 'foo';
+    }
+
+    public function bar($event) {
+        echo 'bar';
+    }
+
+    public function baz($event) {
+        echo 'baz';
+    }
+
+    public function method($event) {
+        echo 'eventHandler';
+    }
+
+    public function init() {
+        echo 'init';
+    }
+}
+
+class Initializer implements InitializerInterface {
+    public function initialize(ListenerInterface $listener) {
+        $listener->init();
     }
 }

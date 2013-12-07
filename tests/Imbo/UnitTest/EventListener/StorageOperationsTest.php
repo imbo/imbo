@@ -14,8 +14,9 @@ use Imbo\EventListener\StorageOperations,
     Imbo\Exception\StorageException;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @covers Imbo\EventListener\StorageOperations
+ * @group unit
+ * @group listeners
  */
 class StorageOperationsTest extends ListenerTests {
     /**

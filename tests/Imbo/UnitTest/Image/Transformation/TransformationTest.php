@@ -16,8 +16,9 @@ use Imbo\Image\Transformation\Transformation,
     ReflectionMethod;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @covers Imbo\Image\Transformation\Transformation
+ * @group unit
+ * @group transformations
  */
 class TransformationTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -37,23 +38,6 @@ class TransformationTest extends \PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->transformation = null;
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\Transformation::setImagick
-     * @covers Imbo\Image\Transformation\Transformation::getImagick
-     */
-    public function testCanSetAndGetImagick() {
-        $imagick = new Imagick();
-        $this->assertSame($this->transformation, $this->transformation->setImagick($imagick));
-        $this->assertEquals($imagick, $this->transformation->getImagick());
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\Transformation::getImagick
-     */
-    public function testCanCreateAnImagickInstanceItself() {
-        $this->assertInstanceOf('Imagick', $this->transformation->getImagick());
     }
 
     /**
@@ -86,10 +70,6 @@ class TransformationTest extends \PHPUnit_Framework_TestCase {
     }
 }
 
-/**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
- */
 class TransformationImpl extends Transformation {
-    public function applyToImage(Image $image) {}
+    public function applyToImage(Image $image, array $params = array()) {}
 }

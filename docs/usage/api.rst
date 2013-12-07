@@ -182,7 +182,7 @@ results in:
 
 where ``timestamp`` is the current timestamp on the server, and ``database`` and ``storage`` are boolean values informing of the status of the current database and storage adapters respectively. If both are ``true`` the HTTP status code is ``200 OK``, and if one or both are ``false`` the status code is ``503``. When the status code is ``503`` the reason phrase will inform you whether it's the database or the storage adapter (or both) that is having issues. As soon as the status code does not equal ``200`` Imbo will no longer work as expected.
 
-The reason for adapter failures depends on what kind of adapter you are using. The :ref:`file system storage adapter <filesystem-storage-adapter>` will for instance return a failure if it can no longer write to the storage directory. The :ref:`MongoDB <mongodb-database-adapter>` and :ref:`Doctrine <doctrine-database-adapter>` database adapters will fail if they can no longer connect to the server they are configured to talk to.
+The reason for adapter failures depends on what kind of adapter you are using. The :ref:`file system storage adapter <filesystem-storage-adapter>` will for instance return a failure if it can no longer write to the storage directory. The :ref:`MongoDB <mongodb-database-adapter>` and :ref:`Doctrine <doctrine-database-adapter>` database adapters will fail if they can no longer connect to the server they are configured to communicate with.
 
 **Typical response codes:**
 
@@ -319,7 +319,7 @@ The ``<image>`` part of the URI is the `MD5 checksum <http://en.wikipedia.org/wi
 
 * 200 OK
 * 201 Created
-* 400 Bad Request
+* 400 Bad request
 
 Fetch images
 ~~~~~~~~~~~~
@@ -353,7 +353,7 @@ How to use this resource to generate image transformations is described in the :
 
 * 200 OK
 * 304 Not modified
-* 400 Bad Request
+* 400 Bad request
 * 404 Image not found
 
 Delete images
@@ -378,7 +378,7 @@ where ``<image>`` is the image identifier of the image that was just deleted (th
 **Typical response codes:**
 
 * 200 OK
-* 400 Bad Request
+* 400 Bad request
 * 404 Image not found
 
 .. _shorturl-resource:
@@ -386,7 +386,7 @@ where ``<image>`` is the image identifier of the image that was just deleted (th
 ShortURL resource - ``/s/<id>``
 +++++++++++++++++++++++++++++++
 
-Images in Imbo have short URLs associated with them, which are generated on request when you access an image (with or without image transformations) for the first time. These URLs do not take any query parameters and can be used in place for original image URLs. To fetch these URLs you can request an image using HTTP HEAD, then look for the `X-Imbo-ShortUrl` header in the response::
+Images in Imbo have short URLs associated with them, which are generated on request when you access an image (with or without image transformations) for the first time. These URLs do not take any query parameters and can be used in place for original image URLs. To fetch these URLs you can request an image using ``HTTP HEAD``, then look for the ``X-Imbo-ShortUrl`` header in the response::
 
     curl -Ig "http://imbo/users/<user>/images/<image>?t[]=thumbnail&t[]=desaturate&t[]=border&accessToken=f3fa1d9f0649cfad61e840a6e09b156e851858799364d1d8ee61b386e10b0c05"|grep Imbo
 
@@ -407,7 +407,7 @@ The value of the ``X-Imbo-ShortUrl`` can be used to request the image with the a
 
 The format of the random ID part of the short URL can be matched with the following `regular expression <http://en.wikipedia.org/wiki/Regular_expression>`_::
 
-    |^[a-zA-Z0-9]{7}$|
+    /^[a-zA-Z0-9]{7}$/
 
 There are some caveats regarding the short URLs:
 
@@ -429,6 +429,8 @@ Imbo can also be used to attach metadata to the stored images. The metadata is b
 * ``genre: Black metal``
 * ``country: Norway``
 
+Values can be nested ``key => value`` pairs.
+
 Adding/replacing metadata
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -437,9 +439,9 @@ To add (or replace all existing metadata) on an image a client should make a req
 .. code-block:: bash
 
     curl -XPUT http://imbo/users/<user>/images/<image>/metadata.json -d '{
-        "beer":"Dark Horizon First Edition",
-        "brewery":"Nøgne Ø",
-        "style":"Imperial Stout"
+      "beer":"Dark Horizon First Edition",
+      "brewery":"Nøgne Ø",
+      "style":"Imperial Stout"
     }'
 
 results in:
@@ -457,7 +459,7 @@ where ``<image>`` is the image that just got updated.
 **Typical response codes:**
 
 * 200 OK
-* 400 Bad Request
+* 400 Bad request
 * 400 Invalid metadata (when using the :ref:`Doctrine <doctrine-database-adapter>` adapter, and keys contain ``::``)
 * 404 Image not found
 
@@ -469,8 +471,8 @@ Partial updates to metadata attached to an image is done by making a request wit
 .. code-block:: bash
 
     curl -XPOST http://imbo/users/<user>/images/<image>/metadata.json -d '{
-        "ABV":"16%",
-        "score":"100/100"
+      "ABV":"16%",
+      "score":"100/100"
     }'
 
 results in:
@@ -488,7 +490,7 @@ where ``<image>`` is the image that just got updated.
 **Typical response codes:**
 
 * 200 OK
-* 400 Bad Request
+* 400 Bad request
 * 400 Invalid metadata (when using the :ref:`Doctrine <doctrine-database-adapter>` adapter, and keys contain ``::``)
 * 404 Image not found
 
@@ -548,7 +550,7 @@ where ``<image>`` is the image identifier of the image that just got all its met
 **Typical response codes:**
 
 * 200 OK
-* 400 Bad Request
+* 400 Bad request
 * 404 Image not found
 
 .. _access-tokens:
@@ -558,7 +560,7 @@ Access tokens
 
 Access tokens are enforced by an event listener that is enabled in the default configuration file. The access tokens are used to prevent `DoS <http://en.wikipedia.org/wiki/Denial-of-service_attack>`_ attacks so think twice before you disable the event listener.
 
-An access token, when enforced by the event listener, must be supplied in the URI using the ``accessToken`` query parameter and without it, most ``GET`` and ``HEAD`` requests will result in a ``400 Bad Request`` response. The value of the ``accessToken`` parameter is a `Hash-based Message Authentication Code <http://en.wikipedia.org/wiki/HMAC>`_ (HMAC). The code is a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of the URI itself using the private key of the user as the secret key. It is very important that the URI is not URL-encoded when generating the hash. Below is an example on how to generate a valid access token for a specific image using PHP:
+An access token, when enforced by the event listener, must be supplied in the URI using the ``accessToken`` query parameter and without it, most ``GET`` and ``HEAD`` requests will result in a ``400 Bad request`` response. The value of the ``accessToken`` parameter is a `Hash-based Message Authentication Code <http://en.wikipedia.org/wiki/HMAC>`_ (HMAC). The code is a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of the URI itself using the private key of the user as the secret key. It is very important that the URI is **not** URL-encoded when generating the hash. Below is an example on how to generate a valid access token for a specific image using PHP:
 
 .. literalinclude:: ../examples/generateAccessToken.php
     :language: php
@@ -670,7 +672,7 @@ When an error occurs Imbo will respond with a fitting HTTP response code along w
 
 .. code-block:: bash
 
-    curl -g "http://imbo/users/<user>/images/<image>.jpg?t[]=foobar"
+    curl -g "http://imbo/users/<user>/foobar"
 
 results in:
 
@@ -678,33 +680,13 @@ results in:
 
     {
       "error": {
-        "code": 400,
-        "message": "Unknown transformation: foobar",
+        "imboErrorCode": 0,
         "date": "Wed, 12 Dec 2012 21:15:01 GMT",
-        "imboErrorCode": 0
-      },
-      "imageIdentifier": "<image>"
-    }
-
-The ``code`` is the HTTP response code, ``message`` is a human readable error message, ``date`` is when the error occurred on the server, and ``imboErrorCode`` is an internal error code that can be used by the user agent to distinguish between similar errors (such as ``400 Bad Request``).
-
-The JSON object will also include ``imageIdentifier`` if the request was made against the image or the metadata resource.
-
-If the user agent specifies a nonexistent username the following occurs:
-
-.. code-block:: bash
-
-    curl http://imbo/users/<non-existing-user>.json
-
-results in:
-
-.. code-block:: javascript
-
-    {
-      "error": {
-        "code": 404,
-        "message": "Public key not found",
-        "date": "Mon, 13 Aug 2012 17:22:37 GMT",
-        "imboErrorCode": 100
+        "message": "Not Found",
+        "code": 404
       }
     }
+
+The ``code`` is the HTTP response code, ``message`` is a human readable error message, ``date`` is when the error occurred on the server, and ``imboErrorCode`` is an internal error code that can be used by the user agent to distinguish between similar errors (such as ``400 Bad request``).
+
+The JSON object will also include ``imageIdentifier`` if the request was made against the image or the metadata resource.

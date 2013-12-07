@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -20,34 +22,36 @@ use Imbo\Model\Image,
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
-class Sepia extends Transformation implements TransformationInterface {
+class Sepia extends Transformation implements ListenerInterface {
     /**
      * Extent of the sepia toning
      *
      * @var float
      */
-    private $threshold;
-
-    /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     */
-    public function __construct(array $params) {
-        $this->threshold = isset($params['threshold']) ? (float) $params['threshold'] : 80;
-    }
+    private $threshold = 80;
 
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image) {
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.sepia' => 'transform',
+        );
+    }
+
+    /**
+     * Transform the image
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function transform(EventInterface $event) {
+        $params = $event->getArgument('params');
+
+        $threshold = !empty($params['threshold']) ? (float) $params['threshold'] : $this->threshold;
+
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-
-            $imagick->sepiaToneImage($this->threshold);
-
-            $image->setBlob($imagick->getImageBlob());
+            $this->imagick->sepiaToneImage($threshold);
+            $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

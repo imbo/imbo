@@ -13,8 +13,9 @@ namespace Imbo\UnitTest\Router;
 use Imbo\Router\Route;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @covers Imbo\Router\Route
+ * @group unit
+ * @group router
  */
 class RouteTest extends \PHPUnit_Framework_TestCase {
     /**

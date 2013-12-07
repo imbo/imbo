@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -21,41 +23,34 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class MaxSize extends Transformation implements TransformationInterface {
-    /**
-     * Max width of the image
-     *
-     * @var int
-     */
-    private $maxWidth;
-
-    /**
-     * Max height of the image
-     *
-     * @var int
-     */
-    private $maxHeight;
-
-    /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     */
-    public function __construct(array $params) {
-        $this->maxWidth = !empty($params['width']) ? (int) $params['width'] : 0;
-        $this->maxHeight = !empty($params['height']) ? (int) $params['height'] : 0;
-    }
-
+class MaxSize extends Transformation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image) {
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.maxsize' => 'transform',
+        );
+    }
+
+    /**
+     * Transform the image
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
+
+        $maxWidth = !empty($params['width']) ? (int) $params['width'] : 0;
+        $maxHeight = !empty($params['height']) ? (int) $params['height'] : 0;
+
         try {
             $sourceWidth  = $image->getWidth();
             $sourceHeight = $image->getHeight();
 
-            $width  = $this->maxWidth  ?: $sourceWidth;
-            $height = $this->maxHeight ?: $sourceHeight;
+            $width  = $maxWidth  ?: $sourceWidth;
+            $height = $maxHeight ?: $sourceHeight;
 
             // Figure out original ratio
             $ratio = $sourceWidth / $sourceHeight;
@@ -72,16 +67,14 @@ class MaxSize extends Transformation implements TransformationInterface {
                 return;
             }
 
-            $imagick = $this->getImagick();
-            $imagick->setOption('jpeg:size', $width . 'x' . $height);
-            $imagick->readImageBlob($image->getBlob());
-            $imagick->thumbnailImage($width, $height);
+            $this->imagick->setOption('jpeg:size', $width . 'x' . $height);
+            $this->imagick->thumbnailImage($width, $height);
 
-            $size = $imagick->getImageGeometry();
+            $size = $this->imagick->getImageGeometry();
 
-            $image->setBlob($imagick->getImageBlob())
-                  ->setWidth($size['width'])
-                  ->setHeight($size['height']);
+            $image->setWidth($size['width'])
+                  ->setHeight($size['height'])
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

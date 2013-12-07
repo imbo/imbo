@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -20,38 +22,34 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Compress extends Transformation implements TransformationInterface {
+class Compress extends Transformation implements ListenerInterface {
     /**
-     * Quality of the resulting image
-     *
-     * @var int
+     * {@inheritdoc}
      */
-    private $quality;
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.compress' => 'transform',
+        );
+    }
 
     /**
-     * Class constructor
+     * Transform the image
      *
-     * @param array $params Parameters for this transformation
-     * @throws TransformationException
+     * @param EventInterface $event The event instance
      */
-    public function __construct(array $params) {
+    public function transform(EventInterface $event) {
+        $params = $event->getArgument('params');
+
         if (empty($params['quality'])) {
             throw new TransformationException('Missing required parameter: quality', 400);
         }
 
-        $this->quality = (int) $params['quality'];
-    }
+        $quality = (int) $params['quality'];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function applyToImage(Image $image) {
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-            $imagick->setImageCompressionQuality($this->quality);
+            $this->imagick->setImageCompressionQuality($quality);
+            $event->getArgument('image')->hasBeenTransformed(true);
 
-            $image->setBlob($imagick->getImageBlob());
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

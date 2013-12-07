@@ -10,37 +10,36 @@
 
 namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Convert;
+use Imbo\Image\Transformation\Convert,
+    Imagick;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Convert
+ * @group integration
+ * @group transformations
  */
 class ConvertTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Convert(array('type' => 'png'));
+        return new Convert();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getExpectedName() {
-        return 'convert';
-    }
-
-    /**
-     * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Convert::applyToImage
-     */
-    protected function getImageMock() {
+    public function testCanConvertAnImage() {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('setMimeType')->with('image/png');
-        $image->expects($this->once())->method('setExtension')->with('png');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
+        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
+        $image->expects($this->once())->method('setMimeType')->with('image/gif')->will($this->returnValue($image));
+        $image->expects($this->once())->method('setExtension')->with('gif')->will($this->returnValue($image));
+        $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 
-        return $image;
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array('type' => 'gif')));
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+
+        $this->getTransformation()->setImagick($imagick)->transform($event);
     }
 }

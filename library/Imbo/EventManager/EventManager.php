@@ -11,8 +11,9 @@
 namespace Imbo\EventManager;
 
 use Imbo\EventListener\ListenerInterface,
-    ReflectionClass,
-    SplPriorityQueue;
+    Imbo\EventListener\Initializer\InitializerInterface,
+    Imbo\Exception\InvalidArgumentException,
+    ReflectionClass;
 
 /**
  * Event manager
@@ -41,6 +42,13 @@ class EventManager {
      * @var array
      */
     private $callbacks = array();
+
+    /**
+     * Event listener initializers
+     *
+     * @var InitializerInterface[]
+     */
+    private $initializers = array();
 
     /**
      * Register an event handler
@@ -78,7 +86,7 @@ class EventManager {
         foreach ($events as $event => $callback) {
             if (!isset($this->callbacks[$event])) {
                 // Create a priority queue for this event
-                $this->callbacks[$event] = new SplPriorityQueue();
+                $this->callbacks[$event] = new PriorityQueue();
             }
 
             if (is_string($callback)) {
@@ -110,7 +118,7 @@ class EventManager {
                     'publicKeys' => $publicKeys,
                 ), $callback);
             } else {
-                throw new InvalidArgumentException('Invalid event definition for listener: ' . $name);
+                throw new InvalidArgumentException('Invalid event definition for listener: ' . $name, 500);
             }
         }
 
@@ -140,10 +148,27 @@ class EventManager {
                 // </ghetto>
             }
 
+            // Run initializers
+            foreach ($this->initializers as $initializer) {
+                $initializer->initialize($handler);
+            }
+
             $this->eventHandlers[$name] = $handler;
         }
 
         return $this->eventHandlers[$name];
+    }
+
+    /**
+     * Add an event listener initializer
+     *
+     * @param InitializerInterface $initializer An initializer instance
+     * @return self
+     */
+    public function addInitializer(InitializerInterface $initializer) {
+        $this->initializers[] = $initializer;
+
+        return $this;
     }
 
     /**
@@ -167,7 +192,7 @@ class EventManager {
             $publicKey = $event->getRequest()->getPublicKey();
 
             // Trigger all listeners for this event and pass in the event instance
-            foreach ($this->callbacks[$eventName] as $listener) {
+            foreach (clone $this->callbacks[$eventName] as $listener) {
                 $event->setArgument('handler', $listener['handler']);
                 $callback = $this->getHandlerInstance($listener['handler']);
 

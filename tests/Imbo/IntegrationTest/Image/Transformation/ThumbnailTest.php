@@ -10,75 +10,84 @@
 
 namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Thumbnail;
+use Imbo\Image\Transformation\Thumbnail,
+    Imagick;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Thumbnail
+ * @group integration
+ * @group transformations
  */
 class ThumbnailTest extends TransformationTests {
-    /**
-     * @var int
-     */
-    private $width = 80;
-
-    /**
-     * @var int
-     */
-    private $height = 90;
-
-    /**
-     * @var string
-     */
-    private $fit = 'outbound';
-
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Thumbnail(array(
-            'width' => $this->width,
-            'height' => $this->height,
-            'mode' => $this->fit,
-        ));
+        return new Thumbnail();
     }
 
     /**
-     * {@inheritdoc}
+     * Data provider
+     *
+     * @return array[]
      */
-    protected function getExpectedName() {
-        return 'thumbnail';
+    public function getThumbnailParams() {
+        return array(
+            'no params' => array(
+                'params' => array(),
+                'width'  => 50,
+                'height' => 50
+            ),
+            'only width' => array(
+                'params' => array('width' => 60),
+                'width'  => 60,
+                'height' => 50
+            ),
+            'only height' => array(
+                'params' => array('height' => 60),
+                'width'  => 50,
+                'height' => 60
+            ),
+            'only fit (inset)' => array(
+                'params' => array('fit' => 'inset'),
+                'width'  => 50,
+                'height' => 34
+            ),
+            'only fit (outbound)' => array(
+                'params' => array('fit' => 'outbound'),
+                'width'  => 50,
+                'height' => 50
+            ),
+            'all params (inset)' => array(
+                'params' => array('width' => 123, 'height' => 456, 'fit' => 'inset'),
+                'width'  => 123,
+                'height' => 85
+            ),
+            'all params (outbound)' => array(
+                'params' => array('width' => 123, 'height' => 456, 'fit' => 'outbound'),
+                'width'  => 123,
+                'height' => 456
+            ),
+        );
     }
 
     /**
-     * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Thumbnail::applyToImage
+     * @dataProvider getThumbnailParams
+     * @covers Imbo\Image\Transformation\Thumbnail::transform
      */
-    protected function getImageMock() {
+    public function testCanTransformImage($params, $width, $height) {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with($this->width)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with($this->height)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
+        $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 
-        return $image;
-    }
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
 
-    /**
-     * @covers Imbo\Image\Transformation\Thumbnail::applyToImage
-     */
-    public function testApplyToImageUsingInsetMode() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with(20)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with(13)->will($this->returnValue($image));
+        $imagick = new Imagick();
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
-        $transformation = new Thumbnail(array(
-            'width' => 20,
-            'height' => 20,
-            'fit' => 'inset',
-        ));
-        $transformation->applyToImage($image);
+        $this->getTransformation()->setImagick($imagick)->transform($event);
     }
 }

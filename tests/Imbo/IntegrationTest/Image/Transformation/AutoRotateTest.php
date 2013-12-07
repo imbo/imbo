@@ -8,38 +8,47 @@
  * distributed with this source code.
  */
 
-namespace Imbo\InitegrationTest\Image\Transformation;
+namespace Imbo\IntegrationTest\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Image\Transformation\AutoRotate,
     Imagick;
 
 /**
- * @author Kristoffer Brabrand <kristoffer@brabrand.no>
- * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\AutoRotate
+ * @group integration
+ * @group transformations
  */
-class AutoRotateTest extends \PHPUnit_Framework_TestCase {
+class AutoRotateTest extends TransformationTests {
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTransformation() {
+        return new AutoRotate();
+    }
+
     /**
      * Return different files to test with
      *
      * @return array[]
      */
     public function getFiles() {
-        $files = array();
-
-        for ($i = 1; $i <= 8; $i++) {
-            $filename = 'orientation' . $i . '.jpeg';
-            $files[$filename] = array(FIXTURES_DIR . '/autoRotate/' . $filename);
-        }
-
-        return $files;
+        return array(
+            'orientation1.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation1.jpeg', false, false),
+            'orientation2.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation2.jpeg', false, true),
+            'orientation3.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation3.jpeg', false, true),
+            'orientation4.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation4.jpeg', false, true),
+            'orientation5.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation5.jpeg', true, true),
+            'orientation6.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation6.jpeg', true, true),
+            'orientation7.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation7.jpeg', true, true),
+            'orientation8.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation8.jpeg', true, true),
+        );
     }
 
     /**
      * @dataProvider getFiles
-     * @covers Imbo\Image\Transformation\AutoRotate::applyToImage
      */
-    public function testAutoRotatesAllOrientations($file) {
+    public function testAutoRotatesAllOrientations($file, $changeDimensions, $transformed) {
         $colorValues = array(
             array(
                 'x' => 0,
@@ -67,17 +76,35 @@ class AutoRotateTest extends \PHPUnit_Framework_TestCase {
          * Load the image, perform the auto rotate tranformation and check that the color codes in
          * the four corner pixels match the known color values as defined in $colorValues
          */
-        $image = new Image();
-        $image->setBlob(file_get_contents($file));
+        $blob = file_get_contents($file);
+
+        $image = $this->getMock('Imbo\Model\Image');
+
+        if ($changeDimensions) {
+            $image->expects($this->once())->method('setWidth')->with(350)->will($this->returnValue($image));
+            $image->expects($this->once())->method('setHeight')->with(350)->will($this->returnValue($image));
+        } else {
+            $image->expects($this->never())->method('setWidth');
+            $image->expects($this->never())->method('setHeight');
+        }
+
+        if ($transformed) {
+            $image->expects($this->once())->method('hasBeenTransformed')->with(true);
+        } else {
+            $image->expects($this->never())->method('hasBeenTransformed');
+        }
+
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->once())->method('getArgument')->with('image')->will($this->returnValue($image));
 
         // Perform the auto rotate transformation on the image
-        $transformation = new AutoRotate();
-        $transformation->applyToImage($image);
+        $imagick = new Imagick();
+        $imagick->readImageBlob($blob);
+
+        $this->getTransformation()->setImagick($imagick)
+                                  ->transform($event);
 
         // Do assertion comparison on the color values
-        $imagick = new Imagick();
-        $imagick->readImageBlob($image->getBlob());
-
         foreach ($colorValues as $pixelInfo) {
             $pixelValue = $imagick->getImagePixelColor($pixelInfo['x'], $pixelInfo['y'])
                                   ->getColorAsString();

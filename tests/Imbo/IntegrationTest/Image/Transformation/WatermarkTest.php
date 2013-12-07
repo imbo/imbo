@@ -11,24 +11,25 @@
 namespace Imbo\IntegrationTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Watermark,
-    Imbo\Exception\StorageException,
     Imbo\Model\Image,
+    Imbo\EventManager\Event,
     Imagick;
 
 /**
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
- * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Watermark
+ * @group integration
+ * @group transformations
  */
 class WatermarkTest extends TransformationTests {
-    /**
-     * @var int
-     */
-    private $width = 665;
+     /**
+      * @var int
+      */
+    private $width = 500;
 
     /**
      * @var int
      */
-    private $height = 463;
+    private $height = 500;
 
     /**
      * @var string
@@ -39,251 +40,229 @@ class WatermarkTest extends TransformationTests {
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        $watermark = new Watermark(array(
-            'width'    => $this->width,
-            'height'   => $this->height,
-            'position' => 'center',
-            'x'        => 10,
-            'y'        => 20,
-            'img'      => $this->watermarkImg,
-        ));
-        $watermark->setImageReader($this->getImageReaderMock());
-
-        return $watermark;
+        return new Watermark();
     }
 
     /**
-     * {@inheritdoc}
+     * Data provider
+     *
+     * @return array[]
      */
-    protected function getExpectedName() {
-        return 'watermark';
+    public function getParamsForWatermarks() {
+        return array(
+            'top left with default watermark and width' => array(
+                array(
+                    'width' => 200,
+                ),
+                array(
+                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(0, 0, 0)),
+                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'edge of watermark (inside)' => array('x' => 199, 'y' => 0, 'colors' => array(0, 0, 0)),
+                    'edge of watermark (outside)' => array('x' => 200, 'y' => 0, 'colors' => array(255, 255, 255)),
+                ),
+            ),
+            'top left with default watermark and height' => array(
+                array(
+                    'height' => 200,
+                ),
+                array(
+                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(0, 0, 0)),
+                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'edge of watermark (inside)' => array('x' => 199, 'y' => 0, 'colors' => array(0, 0, 0)),
+                    'edge of watermark (outside)' => array('x' => 200, 'y' => 0, 'colors' => array(255, 255, 255)),
+                ),
+            ),
+            'top right with default watermark and width' => array(
+                array(
+                    'width' => 200,
+                    'position' => 'top-right',
+                ),
+                array(
+                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(0, 0, 0)),
+                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'edge of watermark (inside)' => array('x' => $this->width - 200, 'y' => 0, 'colors' => array(0, 0, 0)),
+                    'edge of watermark (outside)' => array('x' => $this->width - 201, 'y' => 0, 'colors' => array(255, 255, 255)),
+                ),
+            ),
+            'top right with default watermark and height' => array(
+                array(
+                    'height' => 200,
+                    'position' => 'top-right',
+                ),
+                array(
+                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(0, 0, 0)),
+                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'edge of watermark (inside)' => array('x' => $this->width - 200, 'y' => 0, 'colors' => array(0, 0, 0)),
+                    'edge of watermark (outside)' => array('x' => $this->width - 201, 'y' => 0, 'colors' => array(255, 255, 255)),
+                ),
+            ),
+            'bottom left with default watermark and width' => array(
+                array(
+                    'width' => 200,
+                    'position' => 'bottom-left',
+                ),
+                array(
+                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
+                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'edge of watermark (inside)' => array('x' => 199, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
+                    'edge of watermark (outside)' => array('x' => 200, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                ),
+            ),
+            'bottom left with default watermark and height' => array(
+                array(
+                    'height' => 200,
+                    'position' => 'bottom-left',
+                ),
+                array(
+                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
+                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'edge of watermark (inside)' => array('x' => 199, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
+                    'edge of watermark (outside)' => array('x' => 200, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                ),
+            ),
+            'bottom right with default watermark and width' => array(
+                array(
+                    'width' => 200,
+                    'position' => 'bottom-right',
+                ),
+                array(
+                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
+                    'edge of watermark (inside)' => array('x' => $this->width - 200, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
+                    'edge of watermark (outside)' => array('x' => $this->width - 201, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                ),
+            ),
+            'bottom right with default watermark and height' => array(
+                array(
+                    'height' => 200,
+                    'position' => 'bottom-right',
+                ),
+                array(
+                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
+                    'edge of watermark (inside)' => array('x' => $this->width - 200, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
+                    'edge of watermark (outside)' => array('x' => $this->width - 201, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                ),
+            ),
+            'center position' => array(
+                array(
+                    'width' => 50,
+                    'height' => 50,
+                    'position' => 'center',
+                ),
+                array(
+                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'left edge of watermark (inside)' => array('x' => 225, 'y' => 225, 'colors' => array(0, 0, 0)),
+                    'left edge of watermark (outside)' => array('x' => 224, 'y' => 225, 'colors' => array(255, 255, 255)),
+                    'right edge of watermark (inside)' => array('x' => 274, 'y' => 225, 'colors' => array(0, 0, 0)),
+                    'right edge of watermark (outside)' => array('x' => 275, 'y' => 225, 'colors' => array(255, 255, 255)),
+                    'top edge of watermark (inside)' => array('x' => 225, 'y' => 225, 'colors' => array(0, 0, 0)),
+                    'top edge of watermark (outside)' => array('x' => 225, 'y' => 224, 'colors' => array(255, 255, 255)),
+                    'bottom edge of watermark (inside)' => array('x' => 225, 'y' => 274, 'colors' => array(0, 0, 0)),
+                    'bottom edge of watermark (outside)' => array('x' => 225, 'y' => 275, 'colors' => array(255, 255, 255)),
+                ),
+            ),
+            'offset' => array(
+                array(
+                    'position' => 'top-left',
+                    'x' => 1,
+                    'y' => 1,
+                ),
+                array(
+                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
+                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
+                    'left edge of watermark (inside)' => array('x' => 1, 'y' => 1, 'colors' => array(0, 0, 0)),
+                    'left edge of watermark (outside)' => array('x' => 0, 'y' => 1, 'colors' => array(255, 255, 255)),
+                    'right edge of watermark (inside)' => array('x' => 100, 'y' => 1, 'colors' => array(0, 0, 0)),
+                    'right edge of watermark (outside)' => array('x' => 101, 'y' => 1, 'colors' => array(255, 255, 255)),
+                    'top edge of watermark (inside)' => array('x' => 1, 'y' => 1, 'colors' => array(0, 0, 0)),
+                    'top edge of watermark (outside)' => array('x' => 0, 'y' => 1, 'colors' => array(255, 255, 255)),
+                    'bottom edge of watermark (inside)' => array('x' => 1, 'y' => 100, 'colors' => array(0, 0, 0)),
+                    'bottom edge of watermark (outside)' => array('x' => 1, 'y' => 101, 'colors' => array(255, 255, 255)),
+                ),
+            ),
+        );
     }
 
     /**
-     * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Watermark::applyToImage
+     * @dataProvider getParamsForWatermarks
+     * @covers Imbo\Image\Transformation\Watermark::transform
      */
-    protected function getImageMock() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->any())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
-        $image->expects($this->once())->method('getHeight')->will($this->returnValue(463));
+    public function testApplyToImageTopLeftWithOnlyWidthAndDefaultWatermark($params, $colors) {
+        $blob = file_get_contents(FIXTURES_DIR . '/white.png');
 
-        return $image;
-    }
-
-    /**
-     * Get an actual image instance, populate with the binary contents of the given image
-     * 
-     * @param  string $file Filename of the image to load
-     * @param  integer $width Width of the image
-     * @param  integer $height Height of the image
-     * @return Image
-     */
-    protected function getImageInstance($file = null, $width = 665, $height = 463) {
         $image = new Image();
-        $image->setBlob(file_get_contents($file ?: (FIXTURES_DIR . '/image.png')));
-        $image->setWidth($width);
-        $image->setHeight($height);
+        $image->setBlob($blob);
+        $image->setWidth($this->width);
+        $image->setHeight($this->height);
 
-        return $image;
-    }
+        $transformation = $this->getTransformation();
+        $transformation->setDefaultImage($this->watermarkImg);
 
-    /**
-     * Get an image reader mock that returns the horizontal logo
-     * 
-     * @return ImageReader Image reader mock
-     */
-    protected function getImageReaderMock() {
-        $reader = $this->getMockBuilder('Imbo\Storage\ImageReader')
-                       ->disableOriginalConstructor()
-                       ->getMock();
+        $expectedWatermark = $this->watermarkImg;
 
-        $reader->expects($this->any())->method('getImage')->with($this->watermarkImg)->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/logo-horizontal.png')));
+        if (isset($params['img'])) {
+            $expectedWatermark = $params['img'];
+        }
 
-        return $reader;        
-    }
+        $storage = $this->getMock('Imbo\Storage\StorageInterface');
+        $storage->expects($this->once())
+                ->method('getImage')
+                ->with('publickey', $expectedWatermark)
+                ->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/black.png')));
 
-    /**
-     * @covers Imbo\Image\Transformation\Watermark::applyToImage
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage You must specify an image identifier to use for the watermark
-     */
-    public function testApplyToImageThrowsExceptionIfNoImageSpecified() {
-        $image = $this->getImageInstance();
+        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue('publickey'));
 
-        $watermark = new Watermark(array());
-        $watermark->applyToImage($image);
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\Watermark::applyToImage
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Watermark image not found
-     */
-    public function testApplyToImageThrowsExceptionIfSpecifiedImageIsNotFound() {
-        $image = $this->getImageInstance();
-
-        $e = new StorageException('File not found', 404);
-
-        $readerMock = $this->getImageReaderMock();
-        $readerMock->expects($this->once())->method('getImage')->with('non-existant')->will($this->throwException($e));
-
-        $watermark = new Watermark(array('img' => 'non-existant'));
-        $watermark->setImageReader($readerMock);
-        $watermark->applyToImage($image);
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\Watermark::applyToImage
-     */
-    public function testApplyToImageTopLeftWithOnlyWidthAndDefaultWatermark() {
-        $image = $this->getImageInstance();
-
-        $watermark = new Watermark(array('width' => 200));
-        $watermark->setDefaultImage($this->watermarkImg);
-        $watermark->setImageReader($this->getImageReaderMock());
-        $watermark->applyToImage($image);
-
-        $this->verifyColor($image, 0, 0, array(89, 142, 4));
-        $this->verifyColor($image, 200, 50, array(0, 0, 0));
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\Watermark::applyToImage
-     */
-    public function testApplyToImageTopLeftWithOnlyHeightAndDefaultWatermark() {
-        $image = $this->getImageInstance();
-
-        $watermark = new Watermark(array('height' => 50));
-        $watermark->setDefaultImage($this->watermarkImg);
-        $watermark->setImageReader($this->getImageReaderMock());
-        $watermark->applyToImage($image);
-
-        $this->verifyColor($image, 0, 0, array(89, 142, 4));
-        $this->verifyColor($image, 200, 50, array(0, 0, 0));
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\Watermark::applyToImage
-     */
-    public function testApplyToImageTopRightWithOffsetAndSpecificWatermark() {
-        $image = $this->getImageInstance();
-
-        $watermark = new Watermark(array(
-            'height'   => 50,
-            'img'      => $this->watermarkImg,
-            'x'        => -5,
-            'y'        => 5,
-            'position' => 'top-right',
+        $event = new Event();
+        $event->setArguments(array(
+            'image' => $image,
+            'params' => $params,
+            'storage' => $storage,
+            'request' => $request,
         ));
-        $watermark->setImageReader($this->getImageReaderMock());
-        $watermark->applyToImage($image);
 
-        $this->verifyColor($image, 0, 0, array(255, 255, 255));
-        $this->verifyColor($image, $this->width - 1, 0, array(255, 255, 255));
-        $this->verifyColor($image, $this->width - 6, 6, array(37, 93, 14));
-    }
+        $imagick = new Imagick();
+        $imagick->readImageBlob($blob);
 
-    /**
-     * @covers Imbo\Image\Transformation\Watermark::applyToImage
-     */
-    public function testApplyToImageBottomRightWithOffsetAndSpecificWatermark() {
-        $image = $this->getImageInstance();
+        $transformation->setImagick($imagick)->transform($event);
 
-        $watermark = new Watermark(array(
-            'height'   => 50,
-            'img'      => $this->watermarkImg,
-            'x'        => -5,
-            'y'        => -5,
-            'position' => 'bottom-right',
-        ));
-        $watermark->setImageReader($this->getImageReaderMock());
-        $watermark->applyToImage($image);
-
-        $this->verifyColor($image, 0, 0, array(255, 255, 255));
-        $this->verifyColor($image, $this->width - 1, $this->height - 1, array(109, 106, 104));
-        $this->verifyColor($image, $this->width - 6, $this->height - 6, array(37, 93, 14));
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\Watermark::applyToImage
-     */
-    public function testApplyToImageBottomLeftWithOffsetAndSpecificWatermark() {
-        $image = $this->getImageInstance();
-
-        $watermark = new Watermark(array(
-            'height'   => 50,
-            'img'      => $this->watermarkImg,
-            'x'        => 5,
-            'y'        => -5,
-            'position' => 'bottom-left',
-        ));
-        $watermark->setImageReader($this->getImageReaderMock());
-        $watermark->applyToImage($image);
-
-        $this->verifyColor($image, 0, 0, array(255, 255, 255));
-        $this->verifyColor($image, 0, $this->height - 1, array(109, 106, 104));
-        $this->verifyColor($image, 0 + 6, $this->height - 6, array(89, 142, 4));
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\Watermark::applyToImage
-     */
-    public function testApplyToImageCenterWithSpecificWatermark() {
-        $image = $this->getImageInstance();
-
-        $watermark = new Watermark(array(
-            'height'   => 50,
-            'img'      => $this->watermarkImg,
-            'position' => 'center',
-        ));
-        $watermark->setImageReader($this->getImageReaderMock());
-        $watermark->applyToImage($image);
-
-        $centerX = floor($this->width / 2);
-        $centerY = floor($this->height / 2);
-
-        $this->verifyColor($image, 0, 0, array(255, 255, 255));
-        $this->verifyColor($image, 0, $this->height - 1, array(109, 106, 104));
-        
-        $this->verifyColor($image, $centerX - 84, $centerY - 18, array(89, 142, 4));
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\Watermark::applyToImage
-     */
-    public function testApplyToImageWithoutWidthOrHeight() {
-        $image = $this->getImageInstance();
-
-        $watermark = new Watermark(array(
-            'img' => $this->watermarkImg,
-        ));
-        $watermark->setImageReader($this->getImageReaderMock());
-        $watermark->applyToImage($image);
-
-        $this->verifyColor($image, 0, 0, array(89, 142, 4));
-        $this->verifyColor($image, $this->width - 1, 0, array(152, 196, 0));
-        $this->verifyColor($image, 0, $this->height - 1, array(109, 106, 104));
-        $this->verifyColor($image, $this->width - 1, $this->height - 1, array(109, 106, 104));
+        foreach ($colors as $c) {
+            $this->verifyColor($imagick, $c['x'], $c['y'], $c['colors']);
+        }
     }
 
     /**
      * Verifies that the given image has a pixel with the given color value at the given position
-     * 
-     * @param Image $img Image to read contents from
+     *
+     * @param Imagick $imagick The imagick instance to verify
      * @param integer $x X position to check
      * @param integer $y Y position to check
      * @param array $expectedRgb Expected color value, in RGB format, as array
      */
-    protected function verifyColor($img, $x, $y, $expectedRgb) {
+    protected function verifyColor(Imagick $imagick, $x, $y, $expectedRgb) {
         // Do assertion comparison on the color values
-        $imagick = new Imagick();
-        $imagick->readImageBlob($img->getBlob());
-
         $pixelValue = $imagick->getImagePixelColor($x, $y)->getColorAsString();
 
         $this->assertStringEndsWith('rgb(' . implode(',', $expectedRgb) . ')', $pixelValue);

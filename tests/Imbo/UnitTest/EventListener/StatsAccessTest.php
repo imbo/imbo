@@ -13,8 +13,9 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\StatsAccess;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @covers Imbo\EventListener\StatsAccess
+ * @group unit
+ * @group listeners
  */
 class StatsAccessTest extends ListenerTests {
     /**

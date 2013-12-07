@@ -50,7 +50,7 @@ If some of the 3rd party plug-ins provide configuration files, you can link to t
 
 To be able to control the order that Imbo will use when loading the configuration files you should prefix them with a number, like ``01`` in the example above. Lower numbers will be loaded first, meaning that configuration files with higher numbers will override settings set in configuration files with a lower number.
 
-Regarding the Imbo version you are about to install you can use ``dev-master`` for the latest released version, or you can use a specific version if you want to. Head over to `Packagist <https://packagist.org/packages/imbo/imbo>`_ to see the available versions. If you're more of a YOLO type of person you can use ``dev-develop`` for the latest development version.
+Regarding the Imbo version you are about to install you can use ``dev-master`` for the latest released version, or you can use a specific version if you want to. Head over to `Packagist <https://packagist.org/packages/imbo/imbo>`_ to see the available versions. If you're more of a YOLO type of person you can use ``dev-develop`` for the latest development version. If you choose to use the ``dev-develop`` branch, expect things to break from time to time.
 
 When you have created the ``composer.json`` file you can install Imbo with Composer:
 
@@ -82,7 +82,9 @@ You can also install Imbo directly via git, and then use Composer to install the
     curl -s https://getcomposer.org/installer | php
     php composer.phar install -o --no-dev
 
-In this case the correct web server document root would be ``/path/to/install/imbo/public``. Remember to checkout the correct branch after cloning the repository to get the version you want, for instance ``git checkout master``. If you use this method of installation you will have to modify Imbo's ``composer.json`` to install 3rd party libraries. You will also have to place your own configuration file in the same directory as the default Imbo configuration file, which in the above example would be the ``/path/to/install/imbo/config`` directory.
+In this case the correct web server document root would be ``/path/to/install/imbo/public``. Remember to checkout the correct branch after cloning the repository to get the version you want, for instance ``git checkout master``. If you use this method of installation you will have to modify Imbo's ``composer.json`` to install 3rd party libraries. You will also have to place your own ``config.php`` configuration file in the same directory as the default Imbo configuration file, which in the above example would be the ``/path/to/install/imbo/config`` directory.
+
+If you want to contribute to Imbo, this is the obvious installation method. Read more about this in the :doc:`../develop/contributing` chapter.
 
 Web server configuration
 ------------------------
@@ -147,6 +149,8 @@ or, if you have Imbo installed in some path:
 
 if your Imbo installation is available on ``[www.]example.com/imbo``.
 
+.. _database-setup:
+
 Database setup
 --------------
 
@@ -155,106 +159,15 @@ If you choose to use a RDBMS to store data in, you will need to manually create 
 MySQL
 ~~~~~
 
-.. code-block:: sql
+.. literalinclude:: ../../setup/doctrine.mysql.sql
+    :language: sql
 
-    CREATE TABLE IF NOT EXISTS `imageinfo` (
-        `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-        `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-        `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
-        `size` int(10) unsigned NOT NULL,
-        `extension` varchar(5) COLLATE utf8_danish_ci NOT NULL,
-        `mime` varchar(20) COLLATE utf8_danish_ci NOT NULL,
-        `added` int(10) unsigned NOT NULL,
-        `updated` int(10) unsigned NOT NULL,
-        `width` int(10) unsigned NOT NULL,
-        `height` int(10) unsigned NOT NULL,
-        `checksum` char(32) COLLATE utf8_danish_ci NOT NULL,
-        PRIMARY KEY (`id`),
-        UNIQUE KEY `image` (`publicKey`,`imageIdentifier`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci AUTO_INCREMENT=1 ;
-
-    CREATE TABLE IF NOT EXISTS `metadata` (
-        `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-        `imageId` int(10) unsigned NOT NULL,
-        `tagName` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-        `tagValue` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-        PRIMARY KEY (`id`),
-        KEY `imageId` (`imageId`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci AUTO_INCREMENT=1 ;
-
-    CREATE TABLE IF NOT EXISTS `shorturl` (
-        `shortUrlId` char(7) COLLATE utf8_danish_ci NOT NULL,
-        `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-        `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
-        `extension` char(3) COLLATE utf8_danish_ci DEFAULT NULL,
-        `query` text COLLATE utf8_danish_ci NOT NULL,
-        PRIMARY KEY (`shortUrlId`),
-        KEY `params` (`publicKey`,`imageIdentifier`,`extension`,`query`(255))
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
-
-
-The following table is only needed if you plan on storing the actual images themselves in MySQL:
-
-.. code-block:: sql
-
-    CREATE TABLE IF NOT EXISTS `storage_images` (
-        `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-        `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
-        `data` blob NOT NULL,
-        `updated` int(10) unsigned NOT NULL,
-        PRIMARY KEY (`publicKey`,`imageIdentifier`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+The ``storage_images`` table is only needed if you plan on storing the actual images in the database as well.
 
 SQLite
 ~~~~~~
 
-.. code-block:: sql
+.. literalinclude:: ../../setup/doctrine.sqlite.sql
+    :language: sql
 
-    CREATE TABLE IF NOT EXISTS imageinfo (
-        id INTEGER PRIMARY KEY NOT NULL,
-        publicKey TEXT NOT NULL,
-        imageIdentifier TEXT NOT NULL,
-        size INTEGER NOT NULL,
-        extension TEXT NOT NULL,
-        mime TEXT NOT NULL,
-        added INTEGER NOT NULL,
-        updated INTEGER NOT NULL,
-        width INTEGER NOT NULL,
-        height INTEGER NOT NULL,
-        checksum TEXT NOT NULL,
-        UNIQUE (publicKey,imageIdentifier)
-    );
-
-    CREATE TABLE IF NOT EXISTS metadata (
-        id INTEGER PRIMARY KEY NOT NULL,
-        imageId KEY INTEGER NOT NULL,
-        tagName TEXT NOT NULL,
-        tagValue TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS shorturl (
-        shortUrlId TEXT PRIMARY KEY NOT NULL,
-        publicKey TEXT NOT NULL,
-        imageIdentifier TEXT NOT NULL,
-        extension TEXT,
-        query TEXT NOT NULL
-    );
-
-    CREATE INDEX shorturlparams ON shorturl (
-        publicKey,
-        imageIdentifier,
-        extension,
-        query
-    );
-
-The following table is only needed if you plan on storing the actual images themselves in SQLite:
-
-.. code-block:: sql
-
-    CREATE TABLE IF NOT EXISTS storage_images (
-        publicKey TEXT NOT NULL,
-        imageIdentifier TEXT NOT NULL,
-        data BLOB NOT NULL,
-        updated INTEGER NOT NULL,
-        PRIMARY KEY (publicKey,imageIdentifier)
-    );
+The ``storage_images`` table is only needed if you plan on storing the actual images in the database as well.

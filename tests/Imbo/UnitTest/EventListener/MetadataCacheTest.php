@@ -13,8 +13,9 @@ namespace Imbo\UnitTest\EventListener;
 use Imbo\EventListener\MetadataCache;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @covers Imbo\EventListener\MetadataCache
+ * @group unit
+ * @group listeners
  */
 class MetadataCacheTest extends ListenerTests {
     /**

@@ -18,57 +18,19 @@ use Imagick;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-abstract class Transformation implements TransformationInterface {
+abstract class Transformation {
     /**
      * Imagick instance
      *
      * @var Imagick
      */
-    private $imagick;
+    protected $imagick;
 
     /**
-     * The name of the current transformation
+     * Set the Imagick instance
      *
-     * @var string
-     */
-    private $name;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName() {
-        if ($this->name === null) {
-            $className = get_class($this);
-
-            $this->name = strtolower(substr($className, strrpos($className, '\\') + 1));
-        }
-
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setName($name) {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getImagick() {
-        if ($this->imagick === null) {
-            $this->imagick = new Imagick();
-            $this->imagick->setOption('png:exclude-chunks', 'all');
-        }
-
-        return clone $this->imagick;
-    }
-
-    /**
-     * {@inheritdoc}
+     * @param Imagick $imagick An Imagick instance
+     * @return self
      */
     public function setImagick(Imagick $imagick) {
         $this->imagick = $imagick;

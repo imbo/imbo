@@ -10,38 +10,50 @@
 
 namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Rotate;
+use Imbo\Image\Transformation\Rotate,
+    Imagick;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Rotate
+ * @group integration
+ * @group transformations
  */
 class RotateTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Rotate(array('angle' => 45, 'bg' => 'bd1349'));
+        return new Rotate();
+    }
+
+    public function getRotateParams() {
+        return array(
+            '90 angle' => array(90, 463, 665),
+            '180 angle' => array(180, 665, 463),
+        );
     }
 
     /**
-     * {@inheritdoc}
+     * @dataProvider getRotateParams
+     * @covers Imbo\Image\Transformation\Rotate::transform
      */
-    protected function getExpectedName() {
-        return 'rotate';
-    }
-
-    /**
-     * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Rotate::applyToImage
-     */
-    protected function getImageMock() {
+    public function testCanTransformImage($angle, $width, $height) {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with($this->isType('int'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with($this->isType('int'))->will($this->returnValue($image));
 
-        return $image;
+        $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
+        $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
+
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
+            'angle' => $angle,
+            'bg' => 'fff',
+        )));
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+
+        $this->getTransformation()->setImagick($imagick)->transform($event);
     }
 }

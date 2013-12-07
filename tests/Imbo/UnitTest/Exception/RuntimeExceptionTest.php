@@ -13,8 +13,9 @@ namespace Imbo\UnitTest\Exception;
 use Imbo\Exception\RuntimeException;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @covers Imbo\Exception\RuntimeException
+ * @group unit
+ * @group exceptions
  */
 class RuntimeExceptionTest extends \PHPUnit_Framework_TestCase {
     /**

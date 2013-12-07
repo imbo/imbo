@@ -13,8 +13,9 @@ namespace Imbo\UnitTest\Image\Transformation;
 use Imbo\Image\Transformation\Convert;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @covers Imbo\Image\Transformation\Convert
+ * @group unit
+ * @group transformations
  */
 class ConvertTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -23,17 +24,10 @@ class ConvertTest extends \PHPUnit_Framework_TestCase {
     private $transformation;
 
     /**
-     * The extension to use for testing
-     *
-     * @var string
-     */
-    private $extension = 'png';
-
-    /**
      * Set up the transformation instance
      */
     public function setUp() {
-        $this->transformation = new Convert(array('type' => $this->extension));
+        $this->transformation = new Convert();
     }
 
     /**
@@ -44,13 +38,17 @@ class ConvertTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Convert::applyToImage
+     * @covers Imbo\Image\Transformation\Convert::transform
      */
-    public function testConvertToSameTypeAsImage() {
+    public function testWillNotConvertImageIfNotNeeded() {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getExtension')->will($this->returnValue($this->extension));
+        $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
         $image->expects($this->never())->method('getBlob');
 
-        $this->transformation->applyToImage($image);
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array('type' => 'png')));
+
+        $this->transformation->transform($event);
     }
 }

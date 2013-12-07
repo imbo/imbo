@@ -30,3 +30,6 @@ memcached
 Freenode
 freenode
 IPv
+Gmagick
+Imagick
+Behat

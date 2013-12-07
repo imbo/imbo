@@ -18,9 +18,9 @@ use Imbo\EventManager\Event,
     Imbo\Storage\StorageInterface;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
  * @covers Imbo\EventManager\Event
+ * @group unit
+ * @group eventmanager
  */
 class EventTest extends \PHPUnit_Framework_TestCase {
     /**

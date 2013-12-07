@@ -14,8 +14,10 @@ use Imbo\Database\Doctrine,
     PDO;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
+ * @covers Imbo\Database\Doctrine
+ * @group integration
+ * @group database
+ * @group doctrine
  */
 class DoctrineTest extends DatabaseTests {
     /**

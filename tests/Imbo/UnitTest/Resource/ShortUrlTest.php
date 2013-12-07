@@ -13,8 +13,9 @@ namespace Imbo\UnitTest\Resource;
 use Imbo\Resource\ShortUrl;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @covers Imbo\Resource\ShortUrl
+ * @group unit
+ * @group resources
  */
 class ShortUrlTest extends ResourceTests {
     /**

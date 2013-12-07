@@ -10,11 +10,13 @@
 
 namespace Imbo\UnitTest\Model;
 
-use Imbo\Model\Image;
+use Imbo\Model\Image,
+    Imbo\Image\Transformation\Transformation;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @covers Imbo\Model\Image
+ * @group unit
+ * @group models
  */
 class ImageTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -203,7 +205,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Model\Image::hasBeenTransformed
      */
-    public function testCanMarkIfTheImageHasBeenTransformedOrNot() {
+    public function testCanUpdateTransformationFlag() {
         $this->assertFalse($this->image->hasBeenTransformed());
         $this->assertSame($this->image, $this->image->hasBeenTransformed(true));
         $this->assertTrue($this->image->hasBeenTransformed());

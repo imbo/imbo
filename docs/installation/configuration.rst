@@ -3,9 +3,9 @@
 Configuration
 =============
 
-Imbo ships with a default configuration file that it will load. You will have to create one or more configuration files of your own that will automatically be loaded and merged with the default configuration by Imbo. The location of these files depends on the :ref:`installation method <installation>` you choose. You should never have to edit the default configuration file provided by Imbo.
+Imbo ships with a default configuration file that will be automatically loaded. You will have to create one or more configuration files of your own that will be automatically merged with the default configuration by Imbo. The location of these files depends on the :ref:`installation method <installation>` you choose. You should never have to edit the default configuration file provided by Imbo.
 
-The configuration file(s) you need to create should simply return arrays with configuration data. All available configuration options is covered in this chapter.
+The configuration file(s) you need to create should simply return arrays with configuration data. All available configuration options are covered in this chapter.
 
 .. contents::
     :local:
@@ -38,7 +38,7 @@ The public keys can consist of the following characters:
 
 and must be at least 3 characters long.
 
-For the private keys you can for instance use a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images. Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want. The key itself will never be a part of the payload sent to the server.
+For the private keys you can for instance use a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images. Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want. The key itself will never be a part of the payload sent to/from the server.
 
 Imbo ships with a small command line tool that can be used to generate private keys for you using the `openssl_random_pseudo_bytes <http://php.net/openssl_random_pseudo_bytes>`_ function. The script is located in the ``scripts`` directory of the Imbo installation and does not require any arguments:
 
@@ -47,7 +47,7 @@ Imbo ships with a small command line tool that can be used to generate private k
     $ php scripts/generatePrivateKey.php
     3b98dde5f67989a878b8b268d82f81f0858d4f1954597cc713ae161cdffcc84a
 
-The private key can be changed whenever you want as long as you remember to change it in both the server configuration and in the client you use. The public key can not be changed easily as database and storage adapter use it when storing images and metadata.
+The private key can be changed whenever you want as long as you remember to change it in both the server configuration and in the client you use. The public key can not be changed easily as database and storage adapters use it when storing/fetching images and metadata.
 
 .. _database-configuration:
 
@@ -90,7 +90,7 @@ Below you will find documentation on the different database adapters Imbo ships 
 Doctrine
 ++++++++
 
-This adapter uses the `Doctrine Database Abstraction Layer <http://www.doctrine-project.org/projects/dbal.html>`_. The options you pass to the constructor of this adapter is passed to the underlying classes, so have a look at the Doctrine DBAL documentation over at `doctrine-project.org <http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html>`_. When using this adapter you need to create the required tables in the DBMS first, as specified in the :ref:`installation` chapter.
+This adapter uses the `Doctrine Database Abstraction Layer <http://www.doctrine-project.org/projects/dbal.html>`_. The options you pass to the constructor of this adapter is passed to the underlying classes, so have a look at the Doctrine DBAL documentation over at `doctrine-project.org <http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html>`_. When using this adapter you need to create the required tables in the RDBMS first, as specified in the :ref:`database-setup` section.
 
 Examples
 ^^^^^^^^
@@ -135,8 +135,6 @@ Here are some examples on how to use the Doctrine adapter in the configuration f
         // ...
     );
 
-.. note:: Since clients can send nested arrays as metadata to Imbo, the Doctrine adapter needs to pack the metadata on input, and unpack it on output because of how the data is stored. When normalizing the data Imbo uses ``::`` as a separator in the metadata keys. If you set up Imbo with the Doctrine adapter, and a client sends metadata where one or more keys contain ``::``, Imbo will respond with ``400 Bad Request``.
-
 .. _mongodb-database-adapter:
 .. _default-database-adapter:
 
@@ -152,7 +150,7 @@ This adapter uses PHP's `mongo extension <http://pecl.php.net/package/mongo>`_ t
     The server string to use when connecting. Defaults to ``mongodb://localhost:27017``.
 
 ``options``
-    Options passed to the underlying adapter. Defaults to ``array('connect' => true, 'timeout' => 1000)``. See the `manual for the Mongo constructor <http://php.net/manual/en/mongo.construct.php>`_ for available options.
+    Options passed to the underlying adapter. Defaults to ``array('connect' => true, 'timeout' => 1000)``. See the `manual for the MongoClient constructor <http://www.php.net/manual/en/mongoclient.construct.php>`_ for available options.
 
 Examples
 ^^^^^^^^
@@ -212,7 +210,7 @@ If you need to create your own database adapter you need to create a class that 
         // ...
     );
 
-More about how to achieve this in the :doc:`../develop/custom_adapters` chapter.
+You can read more about how to achieve this in the :doc:`../develop/custom_adapters` chapter.
 
 .. _storage-configuration:
 
@@ -253,7 +251,7 @@ Below you will find documentation on the different storage adapters Imbo ships w
 Doctrine
 ++++++++
 
-This adapter uses the `Doctrine Database Abstraction Layer <http://www.doctrine-project.org/projects/dbal.html>`_. The options you pass to the constructor of this adapter is passed to the underlying classes, so have a look at the Doctrine DBAL documentation over at `doctrine-project.org <http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html>`_. When using this adapter you need to create the required tables in the DBMS first, as specified in the :ref:`installation` chapter.
+This adapter uses the `Doctrine Database Abstraction Layer <http://www.doctrine-project.org/projects/dbal.html>`_. The options you pass to the constructor of this adapter is passed to the underlying classes, so have a look at the Doctrine DBAL documentation over at `doctrine-project.org <http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html>`_. When using this adapter you need to create the required tables in the RDBMS first, as specified in the :ref:`database-setup` section.
 
 Examples
 ^^^^^^^^
@@ -303,7 +301,7 @@ Here are some examples on how to use the Doctrine adapter in the configuration f
 Filesystem
 ++++++++++
 
-This adapter simply stores all images on the file system. It only has a single parameter, and that is the base directory of where you want your images stored:
+This adapter simply stores all images on the file system. It has a single parameter, and that is the base directory of where you want your images stored:
 
 ``dataDir``
     The base path where the images are stored.
@@ -313,7 +311,7 @@ This adapter is configured to create subdirectories inside of ``dataDir`` based 
 Examples
 ^^^^^^^^
 
-Default configuration:
+1) Store images in ``/path/to/images``:
 
 .. code-block:: php
 
@@ -345,7 +343,7 @@ The GridFS adapter is used to store the images in MongoDB using the `GridFS spec
     The server string to use when connecting to MongoDB. Defaults to ``mongodb://localhost:27017``
 
 ``options``
-    Options passed to the underlying adapter. Defaults to ``array('connect' => true, 'timeout' => 1000)``. See the `manual for the Mongo constructor <http://php.net/manual/en/mongo.construct.php>`_ for available options.
+    Options passed to the underlying adapter. Defaults to ``array('connect' => true, 'timeout' => 1000)``. See the `manual for the MongoClient constructor <http://www.php.net/manual/en/mongoclient.construct.php>`_ for available options.
 
 Examples
 ^^^^^^^^
@@ -405,18 +403,18 @@ If you need to create your own storage adapter you need to create a class that i
         // ...
     );
 
-More about how to achieve this in the :doc:`../develop/custom_adapters` chapter.
+You can read more about how to achieve this in the :doc:`../develop/custom_adapters` chapter.
 
 .. _configuration-event-listeners:
 
 Event listeners - ``eventListeners``
 ------------------------------------
 
-Imbo also supports event listeners that you can use to hook into Imbo at different phases without having to edit Imbo itself. An event listener is simply a piece of code that will be executed when a certain event is triggered from Imbo. Event listeners are added to the ``eventListeners`` part of the configuration array as associative arrays. If you want to disable some of the default event listeners simply specify the same key in your configuration file and set the value to ``null`` or ``false``.
+Imbo support event listeners that you can use to hook into Imbo at different phases without having to edit Imbo itself. An event listener is simply a piece of code that will be executed when a certain event is triggered from Imbo. Event listeners are added to the ``eventListeners`` part of the configuration array as associative arrays. If you want to disable some of the default event listeners simply specify the same key in your configuration file and set the value to ``null`` or ``false``. Keep in mind that not all event listeners should be disabled.
 
 Event listeners can be configured in the following ways:
 
-1) A string representing a class name of a class implementing the Imbo\EventListener\ListenerInteface interface:
+1) A string representing a class name of a class implementing the ``Imbo\EventListener\ListenerInteface`` interface:
 
 .. code-block:: php
 
@@ -557,8 +555,29 @@ The default configuration file includes some event listeners by default:
 * :ref:`access-token-event-listener`
 * :ref:`authenticate-event-listener`
 * :ref:`stats-access-event-listener`
+* :ref:`imagick-event-listener`
 
-Read more about these listeners in the :doc:`../develop/event_listeners` chapter. If you want to disable any of these you could do so in your configuration file in the following way:
+as well as event listeners for image transformations:
+
+* :ref:`autoRotate <auto-rotate-transformation>`
+* :ref:`border <border-transformation>`
+* :ref:`canvas <canvas-transformation>`
+* :ref:`compress <compress-transformation>`
+* :ref:`convert <convert-transformation>`
+* :ref:`crop <crop-transformation>`
+* :ref:`desaturate <desaturate-transformation>`
+* :ref:`flipHorizontally <flip-horizontally-transformation>`
+* :ref:`flipVertically <flip-vertically-transformation>`
+* :ref:`maxSize <max-size-transformation>`
+* :ref:`resize <resize-transformation>`
+* :ref:`rotate <rotate-transformation>`
+* :ref:`sepia <sepia-transformation>`
+* :ref:`thumbnail <thumbnail-transformation>`
+* :ref:`transpose <transpose-transformation>`
+* :ref:`transverse <transverse-transformation>`
+* :ref:`watermark <watermark-transformation>`
+
+Read more about these listeners (and more) in the :doc:`../installation/event_listeners` and :doc:`../usage/image-transformations` chapters. If you want to disable any of these you could do so in your configuration file in the following way:
 
 .. code-block:: php
 
@@ -575,18 +594,99 @@ Read more about these listeners in the :doc:`../develop/event_listeners` chapter
         // ...
     );
 
-.. warning:: Do not disable these event listeners unless you are absolutely sure about the consequences. Your images can potentially be deleted by anyone.
+.. warning:: Do not disable the event listeners used in the example above unless you are absolutely sure about the consequences. Your images can potentially be deleted by anyone.
+.. warning:: Disabling image transformation event listeners is not recommended.
 
 .. _image-transformations-config:
 
-Image transformations - ``imageTransformations``
-------------------------------------------------
+.. _configuration-event-listener-initializers:
 
-Imbo supports a set of image transformations out of the box using the `Imagick PHP extension <http://pecl.php.net/package/imagick>`_. All supported image transformations are included in the configuration, and you can easily add your own custom transformations or create presets using a combination of existing transformations.
+Event listener initializers - ``eventListenerInitializers``
+-----------------------------------------------------------
 
-Transformations are triggered using the ``t`` query parameter together with the image resource (read more about the image resource and the included transformations and their parameters in the :ref:`Image resource <image-resource>` section). This query parameter is used as an array so that multiple transformations can be applied. The transformations are applied in the order they are specified in the URL.
+Some event listeners might require custom initialization, and if you don't want to do this in-line in the configuration, Imbo supports event listener initializer classes. This is handled via the ``eventListenerInitializers`` key. The value of this element is an associative array where the keys identify the initializers (only used in the configuration itself), and the values are strings representing class names, or implementations of the ``Imbo\EventListener\Initializer\InitializerInterface`` interface. If you specify strings the classes you refer to must also implement this interface.
 
-All transformations are registered in the configuration array under the ``imageTransformations`` key:
+The interface has a single method called ``initialize`` and receives instances of event listeners implementing the ``Imbo\EventListener\ListenerInterface`` interface. This method is called once for each event listener instantiated by Imbo's event manager. Example:
+
+.. code-block:: php
+
+    <?php
+    // Some event listener
+    class Listener implements Imbo\EventListener\ListenerInterface {
+        public function setDependency($dependency) {
+            // ...
+        }
+
+        // ...
+    }
+
+    class OtherListener implements Imbo\EventListener\ListenerInterface {
+        public function setDependency($dependency) {
+            // ...
+        }
+
+        // ...
+    }
+
+    // Event listener initializer
+    class Initializer implements Imbo\EventListener\Initializer\InitializerInterface {
+        private $dependency;
+
+        public function __construct() {
+            $this->dependency = new SomeDependency();
+        }
+
+        public function initialize(Imbo\EventListener\ListenerInterface $listener) {
+            if ($listener instanceof Listener || $listener instanceof OtherListener) {
+                $listener->setDependency($this->dependency);
+            }
+        }
+    }
+
+    // Configuration
+    return array(
+        'eventListeners' => array(
+            'customListener' => 'Listener',
+            'otherCustomListener' => 'OtherListener',
+        ),
+
+        'eventListenerInitializers' => array(
+            'initializerForCustomListener' => 'Initializer',
+        ),
+    );
+
+In the above example the ``Initializer`` class will be instantiated by Imbo, and in the ``__construct`` method it will create an instance of some dependency. When the event manager creates the instances of the two event listeners these will in turn be sent to the ``initialize`` method, and the same dependency will be injected into both listeners. An alternative way to accomplish this by using Closures in the configuration could look something like this:
+
+.. code-block:: php
+
+    <?php
+    $dependency = new SomeDependency();
+
+    return array(
+        'eventListeners' => array(
+            'customListener' => function() use ($dependency) {
+                $listener = new Listener();
+                $listener->setDependency($dependency);
+
+                return $listener;
+            },
+            'otherCustomListener' => function() use ($dependency) {
+                $listener = new OtherListener();
+                $listener->setDependency($dependency);
+
+                return $listener;
+            },
+        ),
+    );
+
+Imbo itself includes an event listener initializer in the default configuration that is used to inject the same instance of Imagick to all image transformations.
+
+.. note:: Only event listeners specified as strings (class names) in the configuration will be instantiated by Imbo, so event listeners instantiated in the configuration array, either directly or via a Closures, will not be initialized by the configured event listener initializers.
+
+Image transformation presets - ``transformationPresets``
+--------------------------------------------------------
+
+Through the configuration you can also combine image transformations to make presets (transformation chains). This is done via the ``transformationPresets`` key:
 
 .. code-block:: php
 
@@ -594,34 +694,18 @@ All transformations are registered in the configuration array under the ``imageT
     return array(
         // ...
 
-        'imageTransformations' => array(
-            'border' => 'Imbo\Image\Transformation\Border',
-            'canvas' => 'Imbo\Image\Transformation\Canvas',
+        'transformationPresets' => array(
+            'graythumb' => array(
+                'thumbnail',
+                'desaturate',
+            ),
             // ...
         ),
 
         // ...
     );
 
-where the keys are the names of the transformations as specified in the URL, and the values are strings representing class names of classes implementing the ``Imbo\Image\Transformation\TransformationInterface`` interface. You can also specify a closure that, when executed, returns a class implementing said interface. The classes specified as a string will be instantiated with a single argument, and the closures specified will be executed with the same argument. This argument is an array that matches the parameters for the transformation as specified in the URL. If you use the following query parameter:
-
-``t[]=border:width=1,height=2,color=f00``
-
-the ``$params`` array given to the constructor of the transformation class or as an argument to the closure will look like this:
-
-.. code-block:: php
-
-    <?php
-    array(
-        'width' => '1',
-        'height' => '1',
-        'color' => 'f00'
-    )
-
-Presets
-+++++++
-
-Imbo supports transformation presets by using the ``Imbo\Image\Transformation\Collection`` transformation. The constructor of this transformation takes an array containing other transformations.
+where the keys are the names of the transformations as specified in the URL, and the values are arrays containing other transformation names (as used in the ``eventListeners`` part of the configuration). You can also specify hard coded parameters for the presets if some of the transformations in the chain supports parameters:
 
 .. code-block:: php
 
@@ -629,23 +713,23 @@ Imbo supports transformation presets by using the ``Imbo\Image\Transformation\Co
     return array(
         // ...
 
-        'imageTransformations' => array(
-            'graythumb' => function ($params) {
-                return new Imbo\Image\Transformation\Collection(array(
-                    new Imbo\Image\Transformation\Desaturate(),
-                    new Imbo\Image\Transformation\Thumbnail($params),
-                ));
-            },
+        'transformationPresets' => array(
+            'fixedGraythumb' => array(
+                'thumbnail' => array(
+                    'width' => 50,
+                    'height' => 50,
+                ),
+                'desaturate',
+            ),
+            // ...
         ),
 
         // ...
     );
 
-which can be triggered using the following query parameter:
+By doing this the ``thumbnail`` part of the ``fixedGraythumb`` preset will ignore the parameters present in the URL.
 
-``t[]=graythumb``
-
-If you want to implement your own set of image transformations you can see how in the :doc:`../develop/image_transformations` chapter.
+.. note:: The URL's will stay the same if you change the transformation chain in a preset. Keep this in mind if you use for instance Varnish or some other HTTP accelerator in front of your web server(s).
 
 Custom resources and routes - ``resources`` and ``routes``
 ----------------------------------------------------------

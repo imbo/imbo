@@ -11,8 +11,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\Image\Transformation\MaxSize;
+    Imbo\EventListener\ListenerInterface;
 
 /**
  * Max image size event listener
@@ -66,11 +65,13 @@ class MaxImageSize implements ListenerInterface {
         $height = $image->getHeight();
 
         if (($this->width && ($width > $this->width)) || ($this->height && ($height > $this->height))) {
-            $transformation = new MaxSize(array(
-                'width' => $this->width,
-                'height' => $this->height,
+            $event->getManager()->trigger('image.transformation.maxsize', array(
+                'image' => $image,
+                'params' => array(
+                    'width' => $this->width,
+                    'height' => $this->height,
+                ),
             ));
-            $transformation->applyToImage($image);
         }
     }
 }

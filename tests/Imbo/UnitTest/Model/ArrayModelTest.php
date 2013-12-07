@@ -13,8 +13,9 @@ namespace Imbo\UnitTest\Model;
 use Imbo\Model\ArrayModel;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Unit tests
+ * @covers Imbo\Model\ArrayModel
+ * @group unit
+ * @group models
  */
 class ArrayModelTest extends \PHPUnit_Framework_TestCase {
     /**

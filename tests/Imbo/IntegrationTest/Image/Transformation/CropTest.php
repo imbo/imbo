@@ -10,43 +10,57 @@
 
 namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Crop;
+use Imbo\Image\Transformation\Crop,
+    Imagick;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Crop
+ * @group integration
+ * @group transformations
  */
 class CropTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Crop(array(
-            'width' => 1,
-            'height' => 2,
-            'x' => 3,
-            'y' => 4,
-        ));
+        return new Crop();
     }
 
     /**
-     * {@inheritdoc}
+     * Data provider
+     *
+     * @return array[]
      */
-    protected function getExpectedName() {
-        return 'crop';
+    public function getCropParams() {
+        return array(
+            'cropped area larger than the image' => array(array('width' => 1000, 'height' => 1000), 665, 463, false),
+            'cropped area smaller than the image' => array(array('width' => 100, 'height' => 50), 100, 50, true),
+            'cropped area smaller than the image with x and y offset' => array(array('width' => 100, 'height' => 100, 'x' => 600, 'y' => 400), 65, 63, true),
+        );
     }
 
     /**
-     * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Crop::applyToImage
+     * @dataProvider getCropParams
      */
-    protected function getImageMock() {
+    public function testCanCropImages($params, $endWidth, $endHeight, $transformed) {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with(1)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with(2)->will($this->returnValue($image));
+        $image->expects($this->any())->method('getWidth')->will($this->returnValue(665));
+        $image->expects($this->any())->method('getHeight')->will($this->returnValue(463));
 
-        return $image;
+        if ($transformed) {
+            $image->expects($this->once())->method('setWidth')->with($endWidth)->will($this->returnValue($image));
+            $image->expects($this->once())->method('setHeight')->with($endHeight)->will($this->returnValue($image));
+            $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
+        }
+
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
+
+        $blob = file_get_contents(FIXTURES_DIR . '/image.png');
+        $imagick = new Imagick();
+        $imagick->readImageBlob($blob);
+
+        $this->getTransformation()->setImagick($imagick)->transform($event);
     }
 }

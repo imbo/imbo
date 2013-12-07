@@ -10,73 +10,80 @@
 
 namespace Imbo\IntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Resize;
+use Imbo\Image\Transformation\Resize,
+    Imagick;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
+ * @covers Imbo\Image\Transformation\Resize
+ * @group integration
+ * @group transformations
  */
 class ResizeTest extends TransformationTests {
     /**
      * {@inheritdoc}
      */
     protected function getTransformation() {
-        return new Resize(array(
-            'width' => 200,
-            'height' => 100,
-        ));
+        return new Resize();
     }
 
     /**
-     * {@inheritdoc}
+     * Data provider
+     *
+     * @return array[]
      */
-    protected function getExpectedName() {
-        return 'resize';
+    public function getResizeParams() {
+        return array(
+            'only width' => array(
+                'params'         => array('width' => 100),
+                'transformation' => true,
+                'resizedWidth'   => 100,
+                'resizedHeight'  => 69,
+            ),
+            'only height' => array(
+                'params'         => array('height' => 100),
+                'transformation' => true,
+                'resizedWidth'   => 143,
+                'resizedHeight'  => 100,
+            ),
+            'width and height' => array(
+                'params'         => array('width' => 100, 'height' => 200),
+                'transformation' => true,
+                'resizedWidth'   => 100,
+                'resizedHeight'  => 200,
+            ),
+            'params match image size' => array(
+                'params'         => array('width' => 665, 'height' => 463),
+                'transformation' => false
+            ),
+        );
     }
 
     /**
-     * {@inheritdoc}
-     * @covers Imbo\Image\Transformation\Resize::applyToImage
+     * @dataProvider getResizeParams
+     * @covers Imbo\Image\Transformation\Resize::transform
      */
-    protected function getImageMock() {
+    public function testCanTransformImage($params, $transformation, $resizedWidth = null, $resizedHeight = null) {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with(100)->will($this->returnValue($image));
+        $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
+        $image->expects($this->once())->method('getHeight')->will($this->returnValue(463));
 
-        return $image;
-    }
+        if ($transformation) {
+            $image->expects($this->once())->method('setWidth')->with($resizedWidth)->will($this->returnValue($image));
+            $image->expects($this->once())->method('setHeight')->with($resizedHeight)->will($this->returnValue($image));
+            $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
+        } else {
+            $image->expects($this->never())->method('setWidth');
+            $image->expects($this->never())->method('setHeight');
+            $image->expects($this->never())->method('hasBeenTransformed');
+        }
 
-    /**
-     * @covers Imbo\Image\Transformation\Resize::applyToImage
-     */
-    public function testApplyToImageWithOnlyWidth() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('getHeight')->will($this->returnValue(665));
-        $image->expects($this->once())->method('getWidth')->will($this->returnValue(463));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with(200)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with($this->isType('int'))->will($this->returnValue($image));
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
 
-        $transformation = new Resize(array('width' => 200));
-        $transformation->applyToImage($image);
-    }
+        $imagick = new Imagick();
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
-    /**
-     * @covers Imbo\Image\Transformation\Resize::applyToImage
-     */
-    public function testApplyToImageWithOnlyHeight() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $image->expects($this->once())->method('getHeight')->will($this->returnValue(665));
-        $image->expects($this->once())->method('getWidth')->will($this->returnValue(463));
-        $image->expects($this->once())->method('setBlob')->with($this->isType('string'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setWidth')->with($this->isType('int'))->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with(200)->will($this->returnValue($image));
-
-        $transformation = new Resize(array('height' => 200));
-        $transformation->applyToImage($image);
+        $this->getTransformation()->setImagick($imagick)->transform($event);
     }
 }

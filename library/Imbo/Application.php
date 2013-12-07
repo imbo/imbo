@@ -12,7 +12,6 @@ namespace Imbo;
 
 use Imbo\Http\Request\Request,
     Imbo\Http\Response\Response,
-    Imbo\Http\Response\ResponseWriter,
     Imbo\EventListener\ListenerInterface,
     Imbo\EventManager\Event,
     Imbo\EventManager\EventManager,
@@ -23,7 +22,8 @@ use Imbo\Http\Request\Request,
     Imbo\Storage\StorageInterface,
     Imbo\Http\Response\Formatter,
     Imbo\Image\Transformation,
-    Imbo\Resource\ResourceInterface;
+    Imbo\Resource\ResourceInterface,
+    Imbo\EventListener\Initializer\InitializerInterface;
 
 /**
  * Imbo application
@@ -81,14 +81,12 @@ class Application {
         // A date formatter helper
         $dateFormatter = new Helpers\DateFormatter();
 
-        // A response writer
-        $responseWriter = new ResponseWriter(array(
+        // Response formatters
+        $formatters = array(
             'json' => new Formatter\JSON($dateFormatter),
             'xml'  => new Formatter\XML($dateFormatter),
-            'gif'  => new Formatter\Gif(new Transformation\Convert(array('type' => 'gif'))),
-            'png'  => new Formatter\Png(new Transformation\Convert(array('type' => 'png'))),
-            'jpeg' => new Formatter\Jpeg(new Transformation\Convert(array('type' => 'jpg'))),
-        ), new Http\ContentNegotiation());
+        );
+        $contentNegotiation = new Http\ContentNegotiation();
 
         // Collect event listener data
         $eventListeners = array(
@@ -101,7 +99,7 @@ class Application {
             'Imbo\Resource\Images',
             'Imbo\Resource\Image',
             'Imbo\Resource\Metadata',
-            'Imbo\Http\Response\ResponseFormatter' => array($responseWriter),
+            'Imbo\Http\Response\ResponseFormatter' => array($formatters, $contentNegotiation),
             'Imbo\EventListener\DatabaseOperations',
             'Imbo\EventListener\StorageOperations',
             'Imbo\Image\ImagePreparation',
@@ -117,6 +115,26 @@ class Application {
 
             $eventManager->addEventHandler($listener, $listener, $params)
                          ->addCallbacks($listener, $listener::getSubscribedEvents());
+        }
+
+        // Event listener initializers
+        foreach ($config['eventListenerInitializers'] as $name => $initializer) {
+            if (!$initializer) {
+                // The initializer has been disabled via config
+                continue;
+            }
+
+            if (is_string($initializer)) {
+                // The initializer has been specified as a string, representing a class name. Create
+                // an instance
+                $initializer = new $initializer();
+            }
+
+            if (!($initializer instanceof InitializerInterface)) {
+                throw new InvalidArgumentException('Invalid event listener initializer: ' . $name, 500);
+            }
+
+            $eventManager->addInitializer($initializer);
         }
 
         // Listeners from configuration
@@ -250,11 +268,33 @@ class Application {
                 throw new RuntimeException('Method not allowed', 405);
             }
 
-            $eventManager->trigger($eventName);
+            $eventManager->trigger($eventName)
+                         ->trigger('response.negotiate');
         } catch (Exception $exception) {
-            // An error has occured. Create an error and send the response
+            $negotiated = false;
             $error = Error::createFromException($exception, $request);
             $response->setError($error);
+
+            // If the error is not from the previous attempt at doing content negotiation, force
+            // another round since the model has changed into an error model.
+            if ($exception->getCode() !== 406) {
+                try {
+                    $eventManager->trigger('response.negotiate');
+                    $negotiated = true;
+                } catch (Exception $exception) {
+                    // The client does not accept any of the content types. Generate a new error
+                    $error = Error::createFromException($exception, $request);
+                    $response->setError($error);
+                }
+            }
+
+            // Try to negotiate in a non-strict manner if the response format still has not been
+            // chosen
+            if (!$negotiated) {
+                $eventManager->trigger('response.negotiate', array(
+                    'noStrict' => true,
+                ));
+            }
         }
 
         // Send the response

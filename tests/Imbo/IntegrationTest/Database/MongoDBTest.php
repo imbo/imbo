@@ -14,8 +14,10 @@ use Imbo\Database\MongoDB,
     MongoClient;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
+ * @covers Imbo\Database\MongoDB
+ * @group integration
+ * @group database
+ * @group mongodb
  */
 class MongoDBTest extends DatabaseTests {
     /**
