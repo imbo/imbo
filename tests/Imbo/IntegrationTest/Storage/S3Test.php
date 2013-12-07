@@ -14,8 +14,9 @@ use Imbo\Storage\S3,
     Aws\S3\S3Client;
 
 /**
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Test suite\Integration tests
+ * @covers Imbo\Storage\S3
+ * @group integration
+ * @group storage
  */
 class S3Test extends StorageTests {
     /**
