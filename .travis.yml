@@ -21,6 +21,7 @@ before_install:
   - ./configure --prefix=/usr
   - make
   - sudo make install
+  - cd ..
   - printf "\n" | pecl install imagick-beta
 before_script:
   - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
