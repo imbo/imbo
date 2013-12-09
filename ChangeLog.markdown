@@ -5,6 +5,7 @@ Imbo-0.4.0
 ----------
 __N/A__
 
+* #232: New image transformation: strip
 * #228: Added support for wildcards in the ExifMetadata listener
 * #218: Support custom parameters when triggering events
 * #210: Image transformations must implement the image transformation interface
@@ -18,7 +19,7 @@ __N/A__
 * #188: Support an alternative installation method
 * #186: Added support for short image URL's
 * #185: Add support for custom resources and routes
-* #174: New image transformation: Watermark
+* #174: New image transformation: watermark
 
 Bug fixes:
 
