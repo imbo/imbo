@@ -42,6 +42,7 @@ Feature: Imbo enables dynamic transformations of images
             | resize:width=100,height=100                                                                       | 100   | 100    |
             | rotate:angle=90                                                                                   | 417   | 599    |
             | sepia                                                                                             | 599   | 417    |
+            | strip                                                                                             | 599   | 417    |
             | thumbnail                                                                                         | 50    | 50     |
             | thumbnail:width=40,height=30                                                                      | 40    | 30     |
             | thumbnail:width=40,height=40,fit=inset                                                            | 40    | 27     |
@@ -86,6 +87,7 @@ Feature: Imbo enables dynamic transformations of images
             | resize:width=100,height=100                                                                       |
             | rotate:angle=90                                                                                   |
             | sepia                                                                                             |
+            | strip                                                                                             |
             | thumbnail                                                                                         |
             | thumbnail:width=40,height=30                                                                      |
             | thumbnail:width=40,height=40,fit=inset                                                            |
@@ -131,6 +133,7 @@ Feature: Imbo enables dynamic transformations of images
           transpose
           transverse
           sepia
+          strip
           """
         And I include an access token in the query
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.png"

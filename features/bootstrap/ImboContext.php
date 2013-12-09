@@ -283,4 +283,16 @@ class ImboContext extends RESTContext {
             $request = $event['request']->setHeader('X-Client-Ip', $ip);
         });
     }
+
+    /**
+     * @Given /^the image should not have any "([^"]*)" properties$/
+     */
+    public function assertImageProperties($tag) {
+        $imagick = new \Imagick();
+        $imagick->readImageBlob((string) $this->getLastResponse()->getBody());
+
+        foreach ($imagick->getImageProperties() as $key => $value) {
+            assertStringStartsNotWith($tag, $key, 'Properties exist that should have been stripped');
+        }
+    }
 }
