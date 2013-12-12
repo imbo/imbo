@@ -255,6 +255,17 @@ This transformation will apply a sepia color tone transformation to the image.
 * ``t[]=sepia``
 * ``t[]=sepia:threshold=70``
 
+.. _strip-transformation:
+
+Strip image properties and comments - ``t[]=strip``
+---------------------------------------------------
+
+This transformation removes all properties and comments from the image. If you want to strip EXIF tags from the image for instance, this transformation will do that for you.
+
+**Examples:**
+
+* ``t[]=strip``
+
 .. _thumbnail-transformation:
 
 Create a thumbnail of the image - ``t[]=thumbnail``

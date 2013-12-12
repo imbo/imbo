@@ -243,6 +243,7 @@ return array(
         'resize' => 'Imbo\Image\Transformation\Resize',
         'rotate' => 'Imbo\Image\Transformation\Rotate',
         'sepia' => 'Imbo\Image\Transformation\Sepia',
+        'strip' => 'Imbo\Image\Transformation\Strip',
         'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
         'transpose' => 'Imbo\Image\Transformation\Transpose',
         'transverse' => 'Imbo\Image\Transformation\Transverse',

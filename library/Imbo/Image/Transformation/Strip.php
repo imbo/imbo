@@ -16,18 +16,18 @@ use Imbo\Exception\TransformationException,
     ImagickException;
 
 /**
- * Flip horizontally transformation
+ * Strip properties and comments from an image
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class FlipHorizontally extends Transformation implements ListenerInterface {
+class Strip extends Transformation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
         return array(
-            'image.transformation.fliphorizontally' => 'transform',
+            'image.transformation.strip' => 'transform',
         );
     }
 
@@ -38,7 +38,7 @@ class FlipHorizontally extends Transformation implements ListenerInterface {
      */
     public function transform(EventInterface $event) {
         try {
-            $this->imagick->flopImage();
+            $this->imagick->stripImage();
             $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
