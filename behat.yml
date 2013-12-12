@@ -9,6 +9,9 @@ default:
       documentRoot: public
       router: tests/router.php
 
+      # Timeout when trying to connect to the built in httpd
+      timeout: 5
+
       enableCodeCoverage: true
       coveragePath: 'build/behat-coverage'
       whitelist:

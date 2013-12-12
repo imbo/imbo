@@ -37,6 +37,7 @@ interface Exception {
     const IMAGE_HASH_MISMATCH        = 202;
     const IMAGE_UNSUPPORTED_MIMETYPE = 203;
     const IMAGE_BROKEN_IMAGE         = 204;
+    const IMAGE_INVALID_IMAGE        = 205;
     /**#@-*/
 
     /**

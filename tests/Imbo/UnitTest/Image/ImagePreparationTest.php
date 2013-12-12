@@ -81,7 +81,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
      * @expectedException Imbo\Exception\ImageException
-     * @expectedExceptionMessage Unsupported image type
+     * @expectedExceptionMessage Invalid image
      * @expectedExceptionCode 415
      */
     public function testThrowsExceptionWhenImageTypeIsNotSupported() {
@@ -94,7 +94,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
      * @expectedException Imbo\Exception\ImageException
-     * @expectedExceptionMessage Broken image
+     * @expectedExceptionMessage Invalid image
      * @expectedExceptionCode 415
      */
     public function testThrowsExceptionWhenImageIsBroken() {
@@ -109,7 +109,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
      * @expectedException Imbo\Exception\ImageException
-     * @expectedExceptionMessage Broken image
+     * @expectedExceptionMessage Invalid image
      * @expectedExceptionCode 415
      */
     public function testThrowsExceptionWhenImageIsBrokenButSizeIsReadable() {

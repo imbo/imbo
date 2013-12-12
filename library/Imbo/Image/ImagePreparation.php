@@ -70,9 +70,19 @@ class ImagePreparation implements ListenerInterface {
             throw $e;
         }
 
-        // Use the file info extension to fetch the mime type
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->buffer($imageBlob);
+        // Open the image with imagick to fetch the mime type
+        $imagick = new Imagick();
+
+        try {
+            $imagick->readImageBlob($imageBlob);
+            $mime = $imagick->getImageMimeType();
+            $size = $imagick->getImageGeometry();
+        } catch (ImagickException $e) {
+            $e = new ImageException('Invalid image', 415);
+            $e->setImboErrorCode(Exception::IMAGE_INVALID_IMAGE);
+
+            throw $e;
+        }
 
         if (!Image::supportedMimeType($mime)) {
             $e = new ImageException('Unsupported image type: ' . $mime, 415);
@@ -81,28 +91,10 @@ class ImagePreparation implements ListenerInterface {
             throw $e;
         }
 
-        $extension = Image::getFileExtension($mime);
-
-        try {
-            $imagick = new Imagick();
-            $imagick->readImageBlob($imageBlob);
-            $validImage = $imagick->valid();
-            $size = $imagick->getImageGeometry();
-        } catch (ImagickException $e) {
-            $validImage = false;
-        }
-
-        if (!$validImage) {
-            $e = new ImageException('Broken image', 415);
-            $e->setImboErrorCode(Exception::IMAGE_BROKEN_IMAGE);
-
-            throw $e;
-        }
-
         // Store relevant information in the image instance and attach it to the request
         $image = new Image();
         $image->setMimeType($mime)
-              ->setExtension($extension)
+              ->setExtension(Image::getFileExtension($mime))
               ->setBlob($imageBlob)
               ->setWidth($size['width'])
               ->setHeight($size['height']);
