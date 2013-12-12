@@ -1,7 +1,7 @@
 Changelog for Imbo
 ==================
 
-Imbo-0.4.0
+Imbo-1.0.0
 ----------
 __N/A__
 
