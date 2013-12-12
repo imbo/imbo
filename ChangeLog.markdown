@@ -6,6 +6,7 @@ Imbo-1.0.0
 __N/A__
 
 * #232: New image transformation: strip
+* #231: New image transformation: progressive
 * #228: Added support for wildcards in the ExifMetadata listener
 * #218: Support custom parameters when triggering events
 * #210: Image transformations must implement the image transformation interface

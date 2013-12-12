@@ -197,6 +197,17 @@ Note the difference from the :ref:`resize <resize-transformation>` transformatio
 * ``t[]=maxSize:height=100``
 * ``t[]=maxSize:width=100,height=50``
 
+.. _progressive-transformation:
+
+Make a progressive image - ``t[]=progressive``
+----------------------------------------------
+
+This transformation makes the image progressive.
+
+**Examples:**
+
+* ``t[]=progressive``
+
 .. _resize-transformation:
 
 Resize the image - ``t[]=resize``
