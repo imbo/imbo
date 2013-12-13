@@ -36,7 +36,9 @@
   },
   "autoload": {
     "psr-0": {
-      "Imbo": "library"
+      "Imbo\\": "library/",
+      "ImboUnitTest\\": "tests/",
+      "ImboIntegrationTest\\": "tests/"
     }
   }
 }
