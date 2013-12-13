@@ -4,7 +4,7 @@ Feature: Imbo enables client caching using related response headers
     I can make look at the cache-related response headers set by Imbo
 
     Background:
-        Given "tests/Imbo/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
+        Given "tests/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
 
     Scenario: Request status information (not cacheable)
         When I request "/status"

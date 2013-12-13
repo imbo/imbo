@@ -4,7 +4,7 @@ Feature: Imbo enables caching of metadata
     I will cache and re-use fetched metadata
 
     Background:
-        Given "tests/Imbo/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
+        Given "tests/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
 
     Scenario: Attach metadata to an image
         Given I use "publickey" and "privatekey" for public and private keys
