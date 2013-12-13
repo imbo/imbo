@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\IntegrationTest\Storage;
+namespace ImboIntegrationTest\Storage;
 
 /**
  * @group integration

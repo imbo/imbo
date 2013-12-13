@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Model;
+namespace ImboUnitTest\Model;
 
 use Imbo\Model\Stats;
 

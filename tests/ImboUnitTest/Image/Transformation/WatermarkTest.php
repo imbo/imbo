@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Image\Transformation;
+namespace ImboUnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Watermark,
     Imbo\Exception\StorageException;

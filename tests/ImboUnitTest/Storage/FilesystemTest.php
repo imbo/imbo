@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Storage;
+namespace ImboUnitTest\Storage;
 
 use Imbo\Storage\Filesystem,
     org\bovigo\vfs\vfsStream,

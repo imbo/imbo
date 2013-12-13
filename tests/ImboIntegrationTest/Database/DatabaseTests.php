@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\IntegrationTest\Database;
+namespace ImboIntegrationTest\Database;
 
 use Imbo\Model\Image,
     Imbo\Resource\Images\Query,

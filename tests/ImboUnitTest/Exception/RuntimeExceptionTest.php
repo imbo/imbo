@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Exception;
+namespace ImboUnitTest\Exception;
 
 use Imbo\Exception\RuntimeException;
 

@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\IntegrationTest\Cache;
+namespace ImboIntegrationTest\Cache;
 
 use Imbo\Cache\Memcached,
     Memcached as PeclMemcached;

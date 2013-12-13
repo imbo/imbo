@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\IntegrationTest\Database;
+namespace ImboIntegrationTest\Database;
 
 use Imbo\Database\MongoDB,
     MongoClient;
@@ -21,7 +21,7 @@ use Imbo\Database\MongoDB,
  */
 class MongoDBTest extends DatabaseTests {
     /**
-     * @see Imbo\IntegrationTest\Database\DatabaseTests::getDriver()
+     * @see ImboIntegrationTest\Database\DatabaseTests::getDriver()
      */
     protected function getDriver() {
         return new MongoDB(array(

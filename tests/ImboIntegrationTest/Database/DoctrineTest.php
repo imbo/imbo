@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\IntegrationTest\Database;
+namespace ImboIntegrationTest\Database;
 
 use Imbo\Database\Doctrine,
     PDO;
@@ -26,7 +26,7 @@ class DoctrineTest extends DatabaseTests {
     private $pdo;
 
     /**
-     * @see Imbo\IntegrationTest\Database\DatabaseTests::getDriver()
+     * @see ImboIntegrationTest\Database\DatabaseTests::getDriver()
      */
     protected function getDriver() {
         return new Doctrine(array(

@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\EventListener;
+namespace ImboUnitTest\EventListener;
 
 use Imbo\EventListener\ImageTransformationCache,
     org\bovigo\vfs\vfsStream,

@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Http\Request;
+namespace ImboUnitTest\Http\Request;
 
 use Imbo\Http\Request\Request,
     Imbo\Router\Route;

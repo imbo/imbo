@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Router;
+namespace ImboUnitTest\Router;
 
 use Imbo\Router\Route;
 

@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Resource;
+namespace ImboUnitTest\Resource;
 
 use Imbo\Resource\Stats;
 

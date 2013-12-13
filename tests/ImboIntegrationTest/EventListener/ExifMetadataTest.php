@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\IntegrationTest\EventListener;
+namespace ImboIntegrationTest\EventListener;
 
 use Imbo\EventListener\ExifMetadata,
     Imbo\Model\Image;

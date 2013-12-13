@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\EventManager;
+namespace ImboUnitTest\EventManager;
 
 use Imbo\EventManager\Event,
     Imbo\EventManager\EventManagerInterface,

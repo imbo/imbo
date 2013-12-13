@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Http;
+namespace ImboUnitTest\Http;
 
 use Imbo\Http\ContentNegotiation;
 

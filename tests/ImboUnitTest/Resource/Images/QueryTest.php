@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Resource\Images;
+namespace ImboUnitTest\Resource\Images;
 
 use Imbo\Resource\Images\Query;
 

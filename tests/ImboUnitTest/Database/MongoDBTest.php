@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Database;
+namespace ImboUnitTest\Database;
 
 use Imbo\Database\MongoDB,
     MongoException,

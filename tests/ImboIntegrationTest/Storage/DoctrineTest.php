@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\IntegrationTest\Storage;
+namespace ImboIntegrationTest\Storage;
 
 use Imbo\Storage\Doctrine,
     PDO;
@@ -26,7 +26,7 @@ class DoctrineTest extends StorageTests {
     private $pdo;
 
     /**
-     * @see Imbo\IntegrationTest\Storage\StorageTests::getDriver()
+     * @see ImboIntegrationTest\Storage\StorageTests::getDriver()
      */
     protected function getDriver() {
         return new Doctrine(array(

@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\IntegrationTest\Storage;
+namespace ImboIntegrationTest\Storage;
 
 use Imbo\Storage\GridFS,
     MongoClient;
@@ -28,7 +28,7 @@ class GridFSTest extends StorageTests {
     private $testDbName = 'imboGridFSIntegrationTest';
 
     /**
-     * @see Imbo\IntegrationTest\Storage\StorageTests::getDriver()
+     * @see ImboIntegrationTest\Storage\StorageTests::getDriver()
      */
     protected function getDriver() {
         return new GridFS(array(

@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Http\Response;
+namespace ImboUnitTest\Http\Response;
 
 use Imbo\Http\Response\Response,
     Imbo\Exception,

@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\EventListener\Initializer;
+namespace ImboUnitTest\EventListener\Initializer;
 
 use Imbo\EventListener\Initializer\Imagick;
 

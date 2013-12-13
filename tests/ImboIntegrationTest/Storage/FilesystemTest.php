@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\IntegrationTest\Storage;
+namespace ImboIntegrationTest\Storage;
 
 use Imbo\Storage\Filesystem;
 
@@ -24,7 +24,7 @@ class FilesystemTest extends StorageTests {
     private $path = '/tmp/imboFilesystemIntegrationTest';
 
     /**
-     * @see Imbo\IntegrationTest\Storage\StorageTests::getDriver()
+     * @see ImboIntegrationTest\Storage\StorageTests::getDriver()
      */
     protected function getDriver() {
         return new Filesystem(array(

@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\IntegrationTest\Image\Transformation;
+namespace ImboIntegrationTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Strip,
     Imagick;

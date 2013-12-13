@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest\Http\Response\Formatter;
+namespace ImboUnitTest\Http\Response\Formatter;
 
 use Imbo\Http\Response\Formatter\XML;
 

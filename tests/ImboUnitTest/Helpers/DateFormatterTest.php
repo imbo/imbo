@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\UnitTest;
+namespace ImboUnitTest;
 
 use Imbo\Helpers\DateFormatter,
     DateTime,
