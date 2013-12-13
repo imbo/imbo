@@ -4,7 +4,7 @@ Feature: Imbo provides short urls for images
     I will use the custom header provided by Imbo
 
     Background:
-        Given "tests/Imbo/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
+        Given "tests/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
 
     Scenario: Request an image to get the short URL
         Given I use "publickey" and "privatekey" for public and private keys

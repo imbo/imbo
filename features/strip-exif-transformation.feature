@@ -4,7 +4,7 @@ Feature: Imbo can strip EXIF data from images
     I can use the stripExif transformation
 
     Background:
-        Given "tests/Imbo/Fixtures/exif-logo.jpg" exists in Imbo with identifier "753e11e00522ff1e95600d8f91c74e8e"
+        Given "tests/Fixtures/exif-logo.jpg" exists in Imbo with identifier "753e11e00522ff1e95600d8f91c74e8e"
 
     Scenario: Use the stripExif transformation
         Given I use "publickey" and "privatekey" for public and private keys
