@@ -61,4 +61,48 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->model, $this->model->setFields(array('width', 'height')));
         $this->assertSame(array('width', 'height'), $this->model->getFields());
     }
+
+    /**
+     * @covers Imbo\Model\Images::setTotal
+     * @covers Imbo\Model\Images::getTotal
+     */
+    public function testCanSetAndGetTotal() {
+        $this->assertNull($this->model->getTotal());
+        $this->assertSame($this->model, $this->model->setTotal(10));
+        $this->assertSame(10, $this->model->getTotal());
+    }
+
+    /**
+     * @covers Imbo\Model\Images::setPage
+     * @covers Imbo\Model\Images::getPage
+     */
+    public function testCanSetAndGetPage() {
+        $this->assertNull($this->model->getPage());
+        $this->assertSame($this->model, $this->model->setPage(10));
+        $this->assertSame(10, $this->model->getPage());
+    }
+
+    /**
+     * @covers Imbo\Model\Images::setLimit
+     * @covers Imbo\Model\Images::getLimit
+     */
+    public function testCanSetAndGetLimit() {
+        $this->assertNull($this->model->getLimit());
+        $this->assertSame($this->model, $this->model->setLimit(10));
+        $this->assertSame(10, $this->model->getLimit());
+    }
+
+    /**
+     * @covers Imbo\Model\Images::getCount
+     */
+    public function testCanCountImages() {
+        $this->assertSame(0, $this->model->getCount());
+        $images = array(
+            $this->getMock('Imbo\Model\Image'),
+            $this->getMock('Imbo\Model\Image'),
+            $this->getMock('Imbo\Model\Image'),
+        );
+        $this->model->setImages($images);
+        $this->assertSame(3, $this->model->getCount());
+    }
 }
