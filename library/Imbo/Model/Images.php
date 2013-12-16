@@ -32,6 +32,27 @@ class Images implements ModelInterface {
     private $fields = array();
 
     /**
+     * Total number of images
+     *
+     * @var int
+     */
+    private $total;
+
+    /**
+     * Limit the number of images
+     *
+     * @var int
+     */
+    private $limit;
+
+    /**
+     * The page number
+     *
+     * @var int
+     */
+    private $page;
+
+    /**
      * Set the array of images
      *
      * @param Image[] $images An array of Image models
@@ -71,5 +92,77 @@ class Images implements ModelInterface {
      */
     public function getFields() {
         return $this->fields;
+    }
+
+    /**
+     * Get the number of images
+     *
+     * @return int
+     */
+    public function getCount() {
+        return count($this->images);
+    }
+
+    /**
+     * Set the total
+     *
+     * @param int $total The total
+     * @return self
+     */
+    public function setTotal($total) {
+        $this->total = (int) $total;
+
+        return $this;
+    }
+
+    /**
+     * Get the total
+     *
+     * @return int
+     */
+    public function getTotal() {
+        return $this->total;
+    }
+
+    /**
+     * Set the limit
+     *
+     * @param int $limit The limit
+     * @return self
+     */
+    public function setLimit($limit) {
+        $this->limit = (int) $limit;
+
+        return $this;
+    }
+
+    /**
+     * Get the limit
+     *
+     * @return int
+     */
+    public function getLimit() {
+        return $this->limit;
+    }
+
+    /**
+     * Set the page
+     *
+     * @param int $page The page
+     * @return self
+     */
+    public function setPage($page) {
+        $this->page = (int) $page;
+
+        return $this;
+    }
+
+    /**
+     * Get the page
+     *
+     * @return int
+     */
+    public function getPage() {
+        return $this->page;
     }
 }

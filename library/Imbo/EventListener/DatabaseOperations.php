@@ -244,7 +244,10 @@ class DatabaseOperations implements ListenerInterface {
         }
 
         $model = new Model\Images();
-        $model->setImages($modelImages);
+        $model->setTotal($database->getNumImages($publicKey))
+              ->setLimit($query->limit())
+              ->setPage($query->page())
+              ->setImages($modelImages);
 
         if ($params->has('fields')) {
             $fields = trim($params->get('fields'));

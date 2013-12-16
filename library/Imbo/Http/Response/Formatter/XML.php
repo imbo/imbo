@@ -156,6 +156,12 @@ USER;
         return <<<IMAGES
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
+  <search>
+    <total>{$model->getTotal()}</total>
+    <page>{$model->getPage()}</page>
+    <limit>{$model->getLimit()}</limit>
+    <count>{$model->getCount()}</count>
+  </search>
   <images>{$images}</images>
 </imbo>
 IMAGES;

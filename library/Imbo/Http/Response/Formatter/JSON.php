@@ -120,7 +120,15 @@ class JSON extends Formatter implements FormatterInterface {
             $data[] = $entry;
         }
 
-        return $this->encode($data);
+        return $this->encode(array(
+            'search' => array(
+                'total' => $model->getTotal(),
+                'page' => $model->getPage(),
+                'limit' => $model->getLimit(),
+                'count' => $model->getCount(),
+            ),
+            'images' => $data,
+        ));
     }
 
     /**
