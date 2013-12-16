@@ -174,11 +174,31 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $images = array($image);
         $model = $this->getMock('Imbo\Model\Images');
         $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
+        $model->expects($this->once())->method('getTotal')->will($this->returnValue(100));
+        $model->expects($this->once())->method('getPage')->will($this->returnValue(2));
+        $model->expects($this->once())->method('getLimit')->will($this->returnValue(20));
+        $model->expects($this->once())->method('getCount')->will($this->returnValue(1));
 
         $this->dateFormatter->expects($this->any())->method('formatDate')->with($this->isInstanceOf('DateTime'))->will($this->returnValue($formattedDate));
 
         $xml = $this->formatter->format($model);
 
+        // Check the search data
+        foreach (array('total' => 100, 'page' => 2, 'limit' => 20, 'count' => 1) as $tag => $value) {
+            $this->assertTag(
+                array(
+                    'tag' => $tag,
+                    'content' => (string) $value, // Need to cast to string since 100 !== "100"
+                    'parent' => array(
+                        'tag' => 'search',
+                        'parent' => array(
+                            'tag' => 'imbo',
+                        ),
+                    )
+                ), $xml, $tag . ' is not correct', false);
+        }
+
+        // Check image
         foreach (array(
             'publicKey' => $publicKey,
             'imageIdentifier' => $imageIdentifier,
@@ -187,7 +207,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
             'extension' => $extension,
             'added' => $formattedDate,
             'updated' => $formattedDate,
-            'size' => (string) $filesize,
+            'size' => (string) $filesize, // Need to case to string since 100 !== "100"
             'width' => (string) $width,
             'height' => (string) $height,
         ) as $tag => $value) {
@@ -199,11 +219,15 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
                         'tag' => 'image',
                         'parent' => array(
                             'tag' => 'images',
+                            'parent' => array(
+                                'tag' => 'imbo',
+                            ),
                         ),
                     ),
                 ), $xml, '', false);
         }
 
+        // Check metadata
         foreach ($metadata as $key => $value) {
             $this->assertTag(
                 array(

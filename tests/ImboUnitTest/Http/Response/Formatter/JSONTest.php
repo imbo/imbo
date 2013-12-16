@@ -179,14 +179,19 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $images = array($image);
         $model = $this->getMock('Imbo\Model\Images');
         $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
+        $model->expects($this->once())->method('getTotal')->will($this->returnValue(100));
+        $model->expects($this->once())->method('getPage')->will($this->returnValue(2));
+        $model->expects($this->once())->method('getLimit')->will($this->returnValue(20));
+        $model->expects($this->once())->method('getCount')->will($this->returnValue(1));
 
         $this->dateFormatter->expects($this->any())->method('formatDate')->with($this->isInstanceOf('DateTime'))->will($this->returnValue($formattedDate));
 
         $json = $this->formatter->format($model);
 
         $data = json_decode($json, true);
-        $this->assertCount(1, $data);
-        $image = $data[0];
+        $this->assertSame(array('total' => 100, 'page' => 2, 'limit' => 20, 'count' => 1), $data['search']);
+        $this->assertCount(1, $data['images']);
+        $image = $data['images'][0];
 
         $this->assertSame($formattedDate, $image['added']);
         $this->assertSame($formattedDate, $image['updated']);
@@ -218,8 +223,8 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $json = $this->formatter->format($model);
 
         $data = json_decode($json, true);
-        $this->assertCount(1, $data);
-        $image = $data[0];
+        $this->assertCount(1, $data['images']);
+        $image = $data['images'][0];
 
         $this->assertArrayNotHasKey('metadata', $image);
     }
@@ -241,8 +246,8 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $json = $this->formatter->format($model);
 
         $data = json_decode($json, true);
-        $this->assertCount(1, $data);
-        $image = $data[0];
+        $this->assertCount(1, $data['images']);
+        $image = $data['images'][0];
 
         $this->assertEmpty($image['metadata']);
     }
@@ -258,7 +263,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $json = $this->formatter->format($model);
 
         $data = json_decode($json, true);
-        $this->assertCount(0, $data);
+        $this->assertCount(0, $data['images']);
     }
 
     /**
