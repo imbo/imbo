@@ -5,6 +5,7 @@ Imbo-1.0.0
 ----------
 __N/A__
 
+* #234: Added pagination info to the images resource
 * #232: New image transformation: strip
 * #231: New image transformation: progressive
 * #228: Added support for wildcards in the ExifMetadata listener
