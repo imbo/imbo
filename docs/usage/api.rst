@@ -258,25 +258,35 @@ results in:
 
 .. code-block:: javascript
 
-    [
-      {
-        "added": "Mon, 10 Dec 2012 11:57:51 GMT",
-        "extension": "png",
-        "height": 77,
-        "imageIdentifier": "<image>",
-        "metadata": {
-          "key": "value",
-          "foo": "bar"
-        },
-        "mime": "image/png",
-        "publicKey": "<user>",
-        "size": 6791,
-        "updated": "Mon, 10 Dec 2012 11:57:51 GMT",
-        "width": 1306
-      }
-    ]
+    {
+      "search": {
+        "total": 10,
+        "page": 1,
+        "limit": 1,
+        "count": 1
+      },
+      "images": [
+        {
+          "added": "Mon, 10 Dec 2012 11:57:51 GMT",
+          "extension": "png",
+          "height": 77,
+          "imageIdentifier": "<image>",
+          "metadata": {
+            "key": "value",
+            "foo": "bar"
+          },
+          "mime": "image/png",
+          "publicKey": "<user>",
+          "size": 6791,
+          "updated": "Mon, 10 Dec 2012 11:57:51 GMT",
+          "width": 1306
+        }
+      ]
+    }
 
-where ``added`` is a formatted date of when the image was added to Imbo, ``extension`` is the original image extension, ``height`` is the height of the image in pixels, ``imageIdentifier`` is the image identifier (`MD5 checksum <http://en.wikipedia.org/wiki/MD5>`_ of the file itself), ``metadata`` is a JSON object containing metadata attached to the image, ``mime`` is the mime type of the image, ``publicKey`` is the public key of the user who owns the image, ``size`` is the size of the image in bytes, ``updated`` is a formatted date of when the image was last updated (read: when metadata attached to the image was last updated, as the image itself never changes), and ``width`` is the width of the image in pixels.
+The ``search`` object is data related to pagination, where ``total`` is the total amount of images owned by ``<user>``, ``page`` is the current page, ``limit`` is the current limit, and ``count`` is the number of images in the visible collection.
+
+The ``images`` list contains image objects, where ``added`` is a formatted date of when the image was added to Imbo, ``extension`` is the original image extension, ``height`` is the height of the image in pixels, ``imageIdentifier`` is the image identifier (`MD5 checksum <http://en.wikipedia.org/wiki/MD5>`_ of the file itself), ``metadata`` is a JSON object containing metadata attached to the image, ``mime`` is the mime type of the image, ``publicKey`` is the public key of the user who owns the image, ``size`` is the size of the image in bytes, ``updated`` is a formatted date of when the image was last updated (read: when metadata attached to the image was last updated, as the image itself never changes), and ``width`` is the width of the image in pixels.
 
 The ``metadata`` field is only available if you used the ``metadata`` query parameter described above.
 
