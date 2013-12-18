@@ -4,9 +4,9 @@ Feature: Imbo provides an images endpoint
     I want to make requests against the images endpoint
 
     Background:
-        Given "tests/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
-        And "tests/Fixtures/image.jpg" exists in Imbo with identifier "f3210f1bb34bfbfa432cc3560be40761"
-        And "tests/Fixtures/image.gif" exists in Imbo with identifier "b5426b4c008e378c201526d2baaec599"
+        Given "tests/Fixtures/image1.png" exists in Imbo
+        And "tests/Fixtures/image.jpg" exists in Imbo
+        And "tests/Fixtures/image.gif" exists in Imbo
 
     Scenario Outline: Fetch images with no filter
         Given I use "publickey" and "privatekey" for public and private keys

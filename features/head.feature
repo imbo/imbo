@@ -4,7 +4,7 @@ Feature: Imbo supports HTTP HEAD for all resources
     I can make requests using HTTP HEAD and get the same headers as if I did a GET
 
     Background:
-        Given "tests/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
+        Given "tests/Fixtures/image1.png" exists in Imbo
 
     Scenario: Request status information
         When I request "/status" using HTTP "HEAD"

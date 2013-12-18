@@ -7,7 +7,7 @@ Feature: Imbo provides an image endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         And I attach "tests/Fixtures/image1.png" to the request body
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "PUT"
+        When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "201 Created"
         And the "Content-Type" response header is "application/json"
         And the response body is:
@@ -19,7 +19,7 @@ Feature: Imbo provides an image endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         And I attach "tests/Fixtures/image1.png" to the request body
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "PUT"
+        When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body is:
@@ -77,7 +77,7 @@ Feature: Imbo provides an image endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         And I attach "tests/Fixtures/broken-image.jpg" to the request body
-        When I request "/users/publickey/images/72e38ded1b41eda0c1701e6ff270eaf8" using HTTP "PUT"
+        When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "415 Invalid image"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Invalid image" and the error code is "205"
@@ -86,7 +86,7 @@ Feature: Imbo provides an image endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         And I attach "tests/Fixtures/slightly-broken-image.png" to the request body
-        When I request "/users/publickey/images/3e492f6c8f37b5c3cc3d138d09be0eee" using HTTP "PUT"
+        When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "415 Invalid image"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Invalid image" and the error code is "205"

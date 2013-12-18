@@ -31,7 +31,7 @@ class ImagePreparation implements ListenerInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            'image.post' => array('prepareImage' => 50),
+            'images.post' => array('prepareImage' => 50),
         );
     }
 

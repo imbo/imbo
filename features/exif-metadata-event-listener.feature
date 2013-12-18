@@ -4,7 +4,7 @@ Feature: Imbo provides an event listener for turning EXIF data into metadata
     I must enable the ExifMetadata  event listener
 
     Background:
-        Given "tests/Fixtures/exif-logo.jpg" exists in Imbo with identifier "753e11e00522ff1e95600d8f91c74e8e"
+        Given "tests/Fixtures/exif-logo.jpg" exists in Imbo
 
     Scenario: Fetch the added metadata
         Given I use "publickey" and "privatekey" for public and private keys

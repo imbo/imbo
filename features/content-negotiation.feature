@@ -4,9 +4,9 @@ Feature: Imbo supports content negotiation
     I can specify the type I want in the Accept request header
 
     Background:
-        Given "tests/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
-        And "tests/Fixtures/image.jpg" exists in Imbo with identifier "f3210f1bb34bfbfa432cc3560be40761"
-        And "tests/Fixtures/image.gif" exists in Imbo with identifier "b5426b4c008e378c201526d2baaec599"
+        Given "tests/Fixtures/image1.png" exists in Imbo
+        And "tests/Fixtures/image.jpg" exists in Imbo
+        And "tests/Fixtures/image.gif" exists in Imbo
 
     Scenario Outline: Imbo's resources can respond with different content types using content negotiation
         Given the "Accept" request header is "<accept>"

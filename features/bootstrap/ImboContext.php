@@ -205,14 +205,14 @@ class ImboContext extends RESTContext {
     }
 
     /**
-     * @Given /^"([^"]*)" exists in Imbo with identifier "([^"]*)"$/
+     * @Given /^"([^"]*)" exists in Imbo$/
      */
-    public function addImageToImbo($imagePath, $imageIdentifier) {
+    public function addImageToImbo($imagePath) {
         return array(
             new Given('I use "publickey" and "privatekey" for public and private keys'),
             new Given('I sign the request'),
             new Given('I attach "' . $imagePath . '" to the request body'),
-            new Given('I request "/users/publickey/images/' . $imageIdentifier . '" using HTTP "PUT"'),
+            new Given('I request "/users/publickey/images" using HTTP "POST"'),
         );
     }
 

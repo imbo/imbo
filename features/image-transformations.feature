@@ -4,8 +4,8 @@ Feature: Imbo enables dynamic transformations of images
     I can specify image transformations as query parameters
 
     Background:
-        Given "tests/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
-        And "tests/Fixtures/image.png" exists in Imbo with identifier "929db9c5fc3099f7576f5655207eba47"
+        Given "tests/Fixtures/image1.png" exists in Imbo
+        And "tests/Fixtures/image.png" exists in Imbo
 
     Scenario Outline: Transform the image
         Given I use "publickey" and "privatekey" for public and private keys
