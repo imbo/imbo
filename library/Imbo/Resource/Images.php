@@ -10,7 +10,8 @@
 
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface;
+use Imbo\EventManager\EventInterface,
+    Imbo\Model;
 
 /**
  * Images resource
@@ -33,7 +34,7 @@ class Images implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD');
+        return array('GET', 'HEAD', 'POST');
     }
 
     /**
@@ -41,20 +42,46 @@ class Images implements ResourceInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            'images.get' => 'get',
-            'images.head' => 'get',
+            'images.get' => 'getImage',
+            'images.head' => 'getImage',
+            'images.post' => 'addImage',
         );
     }
 
     /**
-     * Handle GET requests
+     * Handle GET and HEAD requests
      *
      * @param EventInterface $event The current event
      */
-    public function get(EventInterface $event) {
+    public function getImage(EventInterface $event) {
         $event->getManager()->trigger('db.images.load');
 
         $response = $event->getResponse();
         $response->setEtag('"' . md5($response->getLastModified()->format('D, d M Y H:i:s') . ' GMT') . '"');
     }
+
+    /**
+     * Handle PUT requests
+     *
+     * @param EventInterface
+     */
+    public function addImage(EventInterface $event) {
+        $event->getManager()->trigger('db.image.insert');
+        $event->getManager()->trigger('storage.image.insert');
+
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        $image = $request->getImage();
+
+        $model = new Model\ArrayModel();
+        $model->setData(array(
+            'imageIdentifier' => $image->getChecksum(),
+            'width' => $image->getWidth(),
+            'height' => $image->getHeight(),
+            'extension' => $image->getExtension(),
+        ));
+
+        $response->setModel($model);
+    }
+
 }

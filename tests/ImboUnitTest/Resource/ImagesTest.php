@@ -71,7 +71,21 @@ class ImagesTest extends ResourceTests {
     }
 
     /**
-     * @covers Imbo\Resource\Images::get
+     * @covers Imbo\Resource\Images::addImage
+     */
+    public function testSupportsHttpPost() {
+        $this->manager->expects($this->at(0))->method('trigger')->with('db.image.insert');
+        $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.insert');
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->once())->method('getChecksum')->will($this->returnValue('id'));
+        $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
+
+        $this->resource->addImage($this->event);
+    }
+
+    /**
+     * @covers Imbo\Resource\Images::getImage
      */
     public function testSupportsHttpGet() {
         $date = new DateTime('@1361630937', new DateTimeZone('UTC'));
@@ -79,6 +93,6 @@ class ImagesTest extends ResourceTests {
         $this->response->expects($this->once())->method('getLastModified')->will($this->returnValue($date));
         $this->response->expects($this->once())->method('setEtag')->with('"ff9b1b83dc89567bb1c2186b56739db8"');
 
-        $this->resource->get($this->event);
+        $this->resource->getImage($this->event);
     }
 }
