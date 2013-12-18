@@ -26,7 +26,7 @@ where the ``composer.json`` file can contain:
       }
     }
 
-and the ``config/`` directory contains one or more configuration files that will be merged with the :ref:`default configuration <configuration>`.
+and the ``config/`` directory contains one or more configuration files that will be merged with the :ref:`default configuration <configuration>`. Imbo will load **all** ``.php`` files in this directory, and the ones returning an array will be used as configuration.
 
 If you want to install 3rd party plug-ins and/or for instance the Doctrine DBAL library simply add these to the ``require`` object in your ``composer.json``:
 
@@ -51,6 +51,8 @@ If some of the 3rd party plug-ins provide configuration files, you can link to t
 To be able to control the order that Imbo will use when loading the configuration files you should prefix them with a number, like ``01`` in the example above. Lower numbers will be loaded first, meaning that configuration files with higher numbers will override settings set in configuration files with a lower number.
 
 Regarding the Imbo version you are about to install you can use ``dev-master`` for the latest released version, or you can use a specific version if you want to. Head over to `Packagist <https://packagist.org/packages/imbo/imbo>`_ to see the available versions. If you're more of a YOLO type of person you can use ``dev-develop`` for the latest development version. If you choose to use the ``dev-develop`` branch, expect things to break from time to time.
+
+Imbo strives to keep full BC in minor and patch releases, so you should be able to use Composer's `Next Significant Release <http://getcomposer.org/doc/01-basic-usage.md#next-significant-release-tilde-operator->`_ feature when specifying which Imbo version you want to install. Reading the ChangeLog and other related sources of information before upgrading an installation is always recommended.
 
 When you have created the ``composer.json`` file you can install Imbo with Composer:
 

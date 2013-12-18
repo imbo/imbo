@@ -79,10 +79,9 @@ Authenticate
 
 This event listener enforces the usage of signatures on all write requests against user-specific resources. You can read more about how the actual signature check works in the :ref:`signing-write-requests` section in the :doc:`../usage/api` chapter.
 
-To enforce the signature check for all write requests this event listener subscribes to the following events:
+To enforce the signature check for all write requests supported by Imbo this event listener subscribes to the following events:
 
-* ``image.put``
-* ``image.post``
+* ``images.post``
 * ``image.delete``
 * ``metadata.put``
 * ``metadata.post``
@@ -153,8 +152,8 @@ Here is an example on how to enable the CORS listener:
                     array(
                         'allowedOrigins' => array('http://some.origin'),
                         'allowedMethods' => array(
-                            'image'  => array('GET', 'HEAD', 'PUT'),
-                            'images' => array('GET', 'HEAD'),
+                            'image'  => array('GET', 'HEAD'),
+                            'images' => array('GET', 'HEAD', 'POST'),
                         ),
                         'maxAge' => 3600,
                     ),
@@ -181,7 +180,7 @@ This event listener can be used to fetch the EXIF-tags from uploaded images and 
 
 The event listener subscribes to the following events:
 
-* ``image.put``
+* ``images.post``
 * ``db.image.insert``
 
 and has the following parameters:
@@ -275,7 +274,7 @@ This event listener can be used to enforce a maximum size (height and width, not
 
 The event listener subscribes to the following event:
 
-* ``image.put``
+* ``images.post``
 
 and has the following parameters:
 

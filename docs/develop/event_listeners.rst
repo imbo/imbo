@@ -20,7 +20,7 @@ When implementing an event listener you need to know about the events that Imbo 
 Examples of events that are triggered:
 
 * ``image.get``
-* ``image.put``
+* ``images.post``
 * ``image.delete``
 * ``metadata.get``
 * ``status.head``
@@ -86,8 +86,11 @@ Below is an example of how the :ref:`authenticate-event-listener` event listener
     public static function getSubscribedEvents() {
         $callbacks = array();
         $events = array(
-            'image.put', 'image.post', 'image.delete',
-            'metadata.put', 'metadata.post', 'metadata.delete'
+            'images.post',
+            'image.delete',
+            'metadata.put',
+            'metadata.post',
+            'metadata.delete'
         );
 
         foreach ($events as $event) {
