@@ -50,7 +50,7 @@ class Imagick implements ListenerInterface {
             // Update the model after all transformations have been applied
             'image.transformed' => 'updateModel',
 
-            'image.put' => array(
+            'images.post' => array(
                 // Update the model before storing the image data in case an event listener has
                 // changed the incoming image
                 'updateModelBeforeStoring' => 1,
@@ -71,7 +71,7 @@ class Imagick implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function readImageBlob(EventInterface $event) {
-        if ($event->getName() === 'image.put') {
+        if ($event->getName() === 'images.post') {
             // The image is found in the request
             $image = $event->getRequest()->getImage();
         } else {

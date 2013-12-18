@@ -301,14 +301,14 @@ class CorsTest extends ListenerTests {
                 'params' => array(
                     'allowedMethods' => array(
                         'stats' => array('GET'),
-                        'image' => array('PUT'),
+                        'images' => array('POST'),
                     ),
                 ),
                 'events' => array(
                     'stats.get' => array('invoke' => 20),
                     'stats.options' => array('options' => 20),
-                    'image.put' => array('invoke' => 20),
-                    'image.options' => array('options' => 20),
+                    'images.post' => array('invoke' => 20),
+                    'images.options' => array('options' => 20),
                 ),
             ),
         );

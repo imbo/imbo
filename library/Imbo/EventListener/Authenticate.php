@@ -44,8 +44,11 @@ class Authenticate implements ListenerInterface {
     public static function getSubscribedEvents() {
         $callbacks = array();
         $events = array(
-            'image.put', 'image.post', 'image.delete',
-            'metadata.put', 'metadata.post', 'metadata.delete'
+            'images.post',  // When adding images
+            'image.delete', // When deleting images
+            'metadata.put', // When adding/replacing metadata
+            'metadata.post',  // When adding/patching metadata
+            'metadata.delete' // When deleting metadata
         );
 
         foreach ($events as $event) {

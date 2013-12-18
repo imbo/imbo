@@ -71,7 +71,7 @@ class ImagickTest extends ListenerTests {
         $imagick = $this->getMock('Imagick');
         $imagick->expects($this->once())->method('readImageBlob')->with('image');
 
-        $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.put'));
+        $this->event->expects($this->once())->method('getName')->will($this->returnValue('images.post'));
 
         $this->listener->setImagick($imagick)->readImageBlob($this->event);
     }

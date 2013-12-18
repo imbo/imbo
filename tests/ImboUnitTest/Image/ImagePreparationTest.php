@@ -68,26 +68,11 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
      * @expectedException Imbo\Exception\ImageException
-     * @expectedExceptionMessage Hash mismatch
-     * @expectedExceptionCode 400
-     */
-    public function testThrowsExceptionWhenImageInRequestDoesNotMatchImageIdentifierInUrl() {
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/image.png')));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('asd'));
-
-        $this->prepare->prepareImage($this->event);
-    }
-
-    /**
-     * @covers Imbo\Image\ImagePreparation::prepareImage
-     * @expectedException Imbo\Exception\ImageException
      * @expectedExceptionMessage Invalid image
      * @expectedExceptionCode 415
      */
     public function testThrowsExceptionWhenImageTypeIsNotSupported() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents(__FILE__)));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(md5_file(__FILE__)));
-
         $this->prepare->prepareImage($this->event);
     }
 
@@ -101,8 +86,6 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
         $filePath = FIXTURES_DIR . '/broken-image.jpg';
 
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents($filePath)));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(md5_file($filePath)));
-
         $this->prepare->prepareImage($this->event);
     }
 
@@ -116,8 +99,6 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
         $filePath = FIXTURES_DIR . '/slightly-broken-image.png';
 
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents($filePath)));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(md5_file($filePath)));
-
         $this->prepare->prepareImage($this->event);
     }
 
@@ -130,9 +111,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
         $imageIdentifier = md5($imageData);
 
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue($imageData));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
         $this->request->expects($this->once())->method('setImage')->with($this->isInstanceOf('Imbo\Model\Image'));
-
         $this->prepare->prepareImage($this->event);
     }
 }
