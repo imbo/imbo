@@ -59,7 +59,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $request = new Request($query);
         $transformations = $request->getTransformations();
         $this->assertEquals('flipHorizontally', $transformations[0]['name']);
-        $this->assertEquals('flipVertically',   $transformations[1]['name']);
+        $this->assertEquals('flipVertically', $transformations[1]['name']);
     }
 
     /**
@@ -171,5 +171,38 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $route = $this->getMockBuilder('Imbo\Router\Route')->disableOriginalConstructor()->getMock();
         $this->assertSame($this->request, $this->request->setRoute($route));
         $this->assertSame($route, $this->request->getRoute());
+    }
+
+    /**
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Transformations must be specifed as an array
+     * @expectedExceptionCode 400
+     * @covers Imbo\Http\Request\Request::getTransformations
+     */
+    public function testRequiresTransformationsToBeSpecifiedAsAnArray() {
+        $request = new Request(array(
+            't' => 'desaturate',
+        ));
+        $request->getTransformations();
+    }
+
+    /**
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid transformation
+     * @expectedExceptionCode 400
+     * @covers Imbo\Http\Request\Request::getTransformations
+     */
+    public function testDoesNotGenerateWarningWhenTransformationIsNotAString() {
+        $query = array(
+            't' => array(
+                array(
+                    'flipHorizontally',
+                    'flipVertically',
+                ),
+            ),
+        );
+
+        $request = new Request($query);
+        $request->getTransformations();
     }
 }

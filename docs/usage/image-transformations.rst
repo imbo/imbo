@@ -5,7 +5,9 @@ Transforming images on the fly
 
 What you as an end-user of an Imbo installation will be doing most of the time, is working with images. This is what Imbo was originally made for, and this chapter includes details about all the different image transformations Imbo supports.
 
-All image transformations can be triggered by specifying the ``t`` query parameter. This parameter must be used as an array so that you can provide several image transformations. The transformations will be applied to the image in the same order as they appear in the URL.
+All image transformations can be triggered by specifying the ``t`` query parameter. This parameter must be used as an array so that you can provide several image transformations. The transformations will be applied to the image in the same order as they appear in the URL. Each element in this array represents a single transformation with optional parameters, specified as a string. If the ``t`` query parameter is not an array or if any of its elements are not strings, Imbo will respond with ``HTTP 400``.
+
+Below you will find all image transformations supported "out of the box", along with their parameters. Some transformations are rarely used with ``HTTP GET``, but are instead used by event listeners that transform images when they are added to Imbo (``HTTP POST``). If this is the case it will be mentioned in the description of the transformation.
 
 .. _auto-rotate-transformation:
 
