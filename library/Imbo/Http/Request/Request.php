@@ -115,7 +115,15 @@ class Request extends SymfonyRequest {
 
             $transformations = $this->query->get('t', array());
 
+            if (!is_array($transformations)) {
+                throw new InvalidArgumentException('Transformations must be specifed as an array', 400);
+            }
+
             foreach ($transformations as $transformation) {
+                if (!is_string($transformation)) {
+                    throw new InvalidArgumentException('Invalid transformation', 400);
+                }
+
                 // See if the transformation has any parameters
                 $pos = strpos($transformation, ':');
                 $urlParams = '';
