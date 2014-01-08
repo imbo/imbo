@@ -61,7 +61,7 @@ class Images implements ResourceInterface {
     }
 
     /**
-     * Handle PUT requests
+     * Handle POST requests
      *
      * @param EventInterface
      */
