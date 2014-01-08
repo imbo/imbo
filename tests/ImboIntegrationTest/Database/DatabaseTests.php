@@ -502,7 +502,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
                 ),
             ),
             'default sort on size' => array(
-                'size',
+                array('size'),
                 'size',
                 array(
                     41423,
@@ -514,7 +514,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
                 ),
             ),
             'desc sort on size' => array(
-                'size:desc',
+                array('size:desc'),
                 'size',
                 array(
                     95576,
@@ -526,7 +526,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
                 ),
             ),
             'sort on multiple fields' => array(
-                'width:asc,size:desc',
+                array('width:asc', 'size:desc'),
                 'size',
                 array(
                     74337,
@@ -543,7 +543,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     /**
      * @dataProvider getSortData
      */
-    public function testCanSortImages($sort = null, $field, array $values) {
+    public function testCanSortImages(array $sort = null, $field, array $values) {
         $this->insertImages();
 
         $query = new Query();

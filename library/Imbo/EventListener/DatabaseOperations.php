@@ -197,7 +197,11 @@ class DatabaseOperations implements ListenerInterface {
         }
 
         if ($params->has('sort')) {
-            $query->sort($params->get('sort'));
+            $sort = $params->get('sort');
+
+            if (is_array($sort)) {
+                $query->sort($sort);
+            }
         }
 
         if ($params->has('query')) {
@@ -208,11 +212,19 @@ class DatabaseOperations implements ListenerInterface {
             }
         }
 
-        if ($params->has('imageIdentifiers')) {
-            $imageIdentifiers = trim($params->get('imageIdentifiers'));
+        if ($params->has('ids')) {
+            $ids = $params->get('ids');
 
-            if (!empty($imageIdentifiers)) {
-                $query->imageIdentifiers(explode(',', $imageIdentifiers));
+            if (is_array($ids)) {
+                $query->imageIdentifiers($ids);
+            }
+        }
+
+        if ($params->has('checksums')) {
+            $checksums = $params->get('checksums');
+
+            if (is_array($checksums)) {
+                $query->checksums($checksums);
             }
         }
 
@@ -250,10 +262,10 @@ class DatabaseOperations implements ListenerInterface {
               ->setImages($modelImages);
 
         if ($params->has('fields')) {
-            $fields = trim($params->get('fields'));
+            $fields = $params->get('fields');
 
-            if (!empty($fields)) {
-                $model->setFields(explode(',', $fields));
+            if (is_array($fields)) {
+                $model->setFields($fields);
             }
         }
 

@@ -279,6 +279,12 @@ class MongoDB implements DatabaseInterface {
             $queryData['imageIdentifier']['$in'] = $imageIdentifiers;
         }
 
+        $checksums = $query->checksums();
+
+        if (!empty($checksums)) {
+            $queryData['checksum']['$in'] = $checksums;
+        }
+
         // Sorting
         $sort = array('added' => -1);
 
