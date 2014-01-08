@@ -17,6 +17,7 @@ use Imbo\Storage\S3,
  * @covers Imbo\Storage\S3
  * @group integration
  * @group storage
+ * @group aws
  */
 class S3Test extends StorageTests {
     /**
