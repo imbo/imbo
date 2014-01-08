@@ -19,4 +19,11 @@
     <var name="AWS_S3_SECRET" value="" />
     <var name="AWS_S3_BUCKET" value="" />
   </php>
+
+  <groups>
+    <exclude>
+      <!-- Exclude the aws group per default -->
+      <group>aws</group>
+    </exclude>
+  </groups>
 </phpunit>
