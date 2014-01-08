@@ -30,4 +30,11 @@
       </exclude>
     </whitelist>
   </filter>
+
+  <groups>
+    <exclude>
+      <!-- Exclude the aws group per default -->
+      <group>aws</group>
+    </exclude>
+  </groups>
 </phpunit>

@@ -69,11 +69,18 @@ class Query {
     private $imageIdentifiers = array();
 
     /**
+     * Checksums filter
+     *
+     * @var array
+     */
+    private $checksums = array();
+
+    /**
      * Sort
      *
      * @var array
      */
-    private $sort;
+    private $sort = array();
 
     /**
      * Set or get the page property
@@ -188,31 +195,46 @@ class Query {
     }
 
     /**
-     * Set or get the sort data
+     * Set or get the checksums filter
      *
-     * @param string $sortString Specify a value to set the sort method
+     * @param array $checksums Give this a value to set the property
      * @return array|self
      */
-    public function sort($sortString = null) {
-        if ($sortString === null) {
+    public function checksums(array $checksums = null) {
+        if ($checksums === null) {
+            return $this->checksums;
+        }
+
+        $this->checksums = $checksums;
+
+        return $this;
+    }
+
+    /**
+     * Set or get the sort data
+     *
+     * @param array $sort Specify a value to set the sort property
+     * @return array|self
+     */
+    public function sort(array $sort = null) {
+        if ($sort === null) {
             return $this->sort;
         }
 
-        $fields = explode(',', trim($sortString));
         $sortData = array();
 
-        foreach ($fields as $field) {
+        foreach ($sort as $field) {
             $field = trim($field);
-            $sort = 'asc';
+            $dir = 'asc';
 
             if (empty($field)) {
                 throw new RuntimeException('Badly formatted sort', 400);
             }
 
             if (strpos($field, ':') !== false) {
-                list($fieldName, $sort) = explode(':', $field);
+                list($fieldName, $dir) = explode(':', $field);
 
-                if ($sort !== 'asc' && $sort !== 'desc') {
+                if ($dir !== 'asc' && $dir !== 'desc') {
                     throw new RuntimeException('Invalid sort value: ' . $field, 400);
                 }
 
@@ -221,7 +243,7 @@ class Query {
 
             $sortData[] = array(
                 'field' => $field,
-                'sort' => $sort,
+                'sort' => $dir,
             );
         }
 

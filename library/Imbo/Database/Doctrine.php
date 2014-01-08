@@ -311,6 +311,18 @@ class Doctrine implements DatabaseInterface {
             $qb->andWhere($composite);
         }
 
+        if ($checksums = $query->checksums()) {
+            $expr = $qb->expr();
+            $composite = $expr->orX();
+
+            foreach ($checksums as $i => $id) {
+                $composite->add($expr->eq('i.checksum', ':checksum' . $i));
+                $qb->setParameter(':checksum' . $i, $id);
+            }
+
+            $qb->andWhere($composite);
+        }
+
         $stmt = $qb->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $returnMetadata = $query->returnMetadata();

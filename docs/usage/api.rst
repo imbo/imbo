@@ -277,11 +277,17 @@ The images resource can also be used to gather information on which images a use
 ``to``
     Fetch images up until this timestamp.
 
-``fields``
-    A comma separated list of fields to display. When not specified all fields will be displayed.
+``fields[]``
+    An array with fields to display. When not specified all fields will be displayed.
 
-``sort``
-    A comma separated list of fields to sort by. The direction of the sort is specified by appending ``asc`` or ``desc`` to the field, delimited by ``:``. If no direction is specified ``asc`` will be used. Example: ``?sort=size,width:desc`` is the same as ``?sort=size:asc,width:desc``. If no ``sort`` is specified Imbo will sort by the date the images was added, in a descending fashion.
+``sort[]``
+    An array with fields to sort by. The direction of the sort is specified by appending ``asc`` or ``desc`` to the field, delimited by ``:``. If no direction is specified ``asc`` will be used. Example: ``?sort[]=size&sort[]=width:desc`` is the same as ``?sort[]=size:asc&sort[]=width:desc``. If no ``sort`` is specified Imbo will sort by the date the images was added, in a descending fashion.
+
+``ids[]``
+    An array of image identifiers to filter the results by.
+
+``checksums[]``
+    An array of image checksums to filter the results by.
 
 .. code-block:: bash
 

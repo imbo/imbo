@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\IntegrationTest\Storage;
+namespace ImboIntegrationTest\Storage;
 
 use Imbo\Storage\S3,
     Aws\S3\S3Client;
@@ -17,10 +17,11 @@ use Imbo\Storage\S3,
  * @covers Imbo\Storage\S3
  * @group integration
  * @group storage
+ * @group aws
  */
 class S3Test extends StorageTests {
     /**
-     * @see Imbo\IntegrationTest\Storage\StorageTests::getDriver()
+     * @see ImboIntegrationTest\Storage\StorageTests::getDriver()
      */
     protected function getDriver() {
         return new S3(array(
