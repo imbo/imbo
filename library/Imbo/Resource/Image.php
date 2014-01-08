@@ -25,7 +25,7 @@ class Image implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD', 'DELETE', 'PUT');
+        return array('GET', 'HEAD', 'DELETE');
     }
 
     /**
@@ -33,35 +33,10 @@ class Image implements ResourceInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            'image.get' => 'get',
-            'image.head' => 'get',
-            'image.delete' => 'delete',
-            'image.put' => 'put',
+            'image.get' => 'getImage',
+            'image.head' => 'getImage',
+            'image.delete' => 'deleteImage',
         );
-    }
-
-    /**
-     * Handle PUT requests
-     *
-     * @param EventInterface
-     */
-    public function put(EventInterface $event) {
-        $event->getManager()->trigger('db.image.insert');
-        $event->getManager()->trigger('storage.image.insert');
-
-        $request = $event->getRequest();
-        $response = $event->getResponse();
-        $image = $request->getImage();
-
-        $model = new Model\ArrayModel();
-        $model->setData(array(
-            'imageIdentifier' => $image->getChecksum(),
-            'width' => $image->getWidth(),
-            'height' => $image->getHeight(),
-            'extension' => $image->getExtension(),
-        ));
-
-        $response->setModel($model);
     }
 
     /**
@@ -69,7 +44,7 @@ class Image implements ResourceInterface {
      *
      * @param EventInterface
      */
-    public function delete(EventInterface $event) {
+    public function deleteImage(EventInterface $event) {
         $event->getManager()->trigger('db.image.delete');
         $event->getManager()->trigger('storage.image.delete');
 
@@ -82,11 +57,11 @@ class Image implements ResourceInterface {
     }
 
     /**
-     * Handle GET requests
+     * Handle GET and HEAD requests
      *
      * @param EventInterface
      */
-    public function get(EventInterface $event) {
+    public function getImage(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $eventManager = $event->getManager();

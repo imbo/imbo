@@ -31,7 +31,7 @@ class ImagePreparation implements ListenerInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            'image.put' => array('prepareImage' => 50),
+            'images.post' => array('prepareImage' => 50),
         );
     }
 
@@ -53,19 +53,6 @@ class ImagePreparation implements ListenerInterface {
         if (empty($imageBlob)) {
             $e = new ImageException('No image attached', 400);
             $e->setImboErrorCode(Exception::IMAGE_NO_IMAGE_ATTACHED);
-
-            throw $e;
-        }
-
-        // Calculate hash
-        $actualHash = md5($imageBlob);
-
-        // Get image identifier from request
-        $imageIdentifier = $request->getImageIdentifier();
-
-        if ($actualHash !== $imageIdentifier) {
-            $e = new ImageException('Hash mismatch', 400);
-            $e->setImboErrorCode(Exception::IMAGE_HASH_MISMATCH);
 
             throw $e;
         }

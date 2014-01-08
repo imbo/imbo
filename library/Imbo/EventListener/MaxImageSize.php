@@ -51,7 +51,7 @@ class MaxImageSize implements ListenerInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            'image.put' => array('enforceMaxSize' => 25),
+            'images.post' => array('enforceMaxSize' => 25),
         );
     }
 

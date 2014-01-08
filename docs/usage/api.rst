@@ -227,7 +227,40 @@ where ``publicKey`` is the public key of the user (the same used in the URI of t
 Images resource - ``/users/<user>/images``
 ++++++++++++++++++++++++++++++++++++++++++
 
-The images resource represents a collection of images owned by a specific user. Supported query parameters are:
+The images resource is the collection of images owned by a specific user. This resource can be used to search added images, and is also used to add new images to a collection.
+
+Add an image
+~~~~~~~~~~~~
+
+To be able to display images stored in Imbo you will first need to add one or more images. This is done by requesting this endpoint with an image attached to the request body, and changing the HTTP METHOD to ``POST``. The body of the response for such a request contains a JSON object containing the image identifier of the added image:
+
+.. code-block:: bash
+
+    curl -XPOST http://imbo/users/<user>/images --data-binary @<file to add>
+
+results in:
+
+.. code-block:: javascript
+
+    {
+      "imageIdentifier": "<imageIdentifier>",
+      "width": <width>,
+      "height": <height>,
+      "extension": "<extension>"
+    }
+
+The ``<imageIdentifier>`` in the response is the identifier of the added image. This is used with the `image resource<>`. The response body also contains the ``width``, ``height`` and ``extension`` of the image that was just added.
+
+**Typical response codes:**
+
+* 200 OK
+* 201 Created
+* 400 Bad request
+
+Get image collections
+~~~~~~~~~~~~~~~~~~~~~
+
+The images resource can also be used to gather information on which images a user owns. This is done by requesting this resource using ``HTTP GET``. Supported query parameters are:
 
 ``page``
     The page number. Defaults to ``1``.
@@ -286,7 +319,7 @@ results in:
 
 The ``search`` object is data related to pagination, where ``total`` is the total amount of images owned by ``<user>``, ``page`` is the current page, ``limit`` is the current limit, and ``count`` is the number of images in the visible collection.
 
-The ``images`` list contains image objects, where ``added`` is a formatted date of when the image was added to Imbo, ``extension`` is the original image extension, ``height`` is the height of the image in pixels, ``imageIdentifier`` is the image identifier (`MD5 checksum <http://en.wikipedia.org/wiki/MD5>`_ of the file itself), ``metadata`` is a JSON object containing metadata attached to the image, ``mime`` is the mime type of the image, ``publicKey`` is the public key of the user who owns the image, ``size`` is the size of the image in bytes, ``updated`` is a formatted date of when the image was last updated (read: when metadata attached to the image was last updated, as the image itself never changes), and ``width`` is the width of the image in pixels.
+The ``images`` list contains image objects, where ``added`` is a formatted date of when the image was added to Imbo, ``extension`` is the original image extension, ``height`` is the height of the image in pixels, ``imageIdentifier`` is the image identifier (`MD5 checksum <http://en.wikipedia.org/wiki/MD5>`_ of the file itself), ``metadata`` is a JSON object containing metadata attached to the image, ``mime`` is the mime type of the image, ``publicKey`` is the public key of the user who owns the image, ``size`` is the size of the image in bytes, ``updated`` is a formatted date of when the image was last updated (read: when metadata attached to the image was last updated, as the image itself never changes), and ``width`` is the width of the image in pixels. The fact that the image identifier is the MD5 checksum of the image is an implementation detail and might change in the future.
 
 The ``metadata`` field is only available if you used the ``metadata`` query parameter described above.
 
@@ -301,35 +334,7 @@ The ``metadata`` field is only available if you used the ``metadata`` query para
 Image resource - ``/users/<user>/images/<image>``
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
-The image resource represents specific images owned by a user. This resource is used to add, retrieve and remove images. It's also responsible for transforming the images based on the transformation parameters in the query.
-
-Add an image
-~~~~~~~~~~~~
-
-To be able to display images stored in Imbo you will first need to add one or more images. This is done by requesting this endpoint with an image attached to the request body, and changing the HTTP METHOD to ``PUT``. The body of the response for such a request contains a JSON object containing the image identifier of the added image:
-
-.. code-block:: bash
-
-    curl -XPUT http://imbo/users/<user>/images/<image> --data-binary @<file to add>
-
-results in:
-
-.. code-block:: javascript
-
-    {
-      "imageIdentifier": "<imageIdentifier>",
-      "width": <width>,
-      "height": <height>,
-      "extension": "<extension>"
-    }
-
-The ``<image>`` part of the URI is the `MD5 checksum <http://en.wikipedia.org/wiki/MD5>`_ of the file itself. The ``<imageIdentifier>`` in the response can be used to fetch the added image and apply transformations to it. The output from this method is important as the ``<imageIdentifier>`` in the response might not be the same as the one used in the URI when adding the image (which might occur if for instance event listeners transform the image in some way before Imbo stores it, like the :ref:`auto-rotate-image-event-listener` and :ref:`max-image-size-event-listener` event listeners). The response body also contains the width, height and extension of the image that was just added.
-
-**Typical response codes:**
-
-* 200 OK
-* 201 Created
-* 400 Bad request
+The image resource represents specific images owned by a user. This resource is used to retrieve and remove images. It's also responsible for transforming the images based on the transformation parameters in the query.
 
 Fetch images
 ~~~~~~~~~~~~

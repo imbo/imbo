@@ -63,7 +63,7 @@ class Request extends SymfonyRequest {
     }
 
     /**
-     * Get an image model attached to the request (on PUT)
+     * Get an image model attached to the request (on POST)
      *
      * @return null|Image
      */

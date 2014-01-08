@@ -4,7 +4,7 @@ Feature: Imbo provides an event listener for the hashtwo Varnish module
     I must send correct headers
 
     Background:
-        Given "tests/Fixtures/image1.png" exists in Imbo with identifier "fc7d2d06993047a0b5056e8fac4462a2"
+        Given "tests/Fixtures/image1.png" exists in Imbo
 
     Scenario Outline: The hashtwo header is the same for all image variations
         Given I use "publickey" and "privatekey" for public and private keys

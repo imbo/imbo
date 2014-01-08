@@ -65,7 +65,7 @@ class ExifMetadata implements ListenerInterface {
     public static function getSubscribedEvents() {
         return array(
             // High priority to prevent other listeners from stripping EXIF-data
-            'image.put' => array('populate' => 45),
+            'images.post' => array('populate' => 45),
 
             // When image has been inserted to database, insert metadata
             'db.image.insert' => array('save' => -100),

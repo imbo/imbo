@@ -69,21 +69,7 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * @covers Imbo\Resource\Image::put
-     */
-    public function testSupportsHttpPut() {
-        $this->manager->expects($this->at(0))->method('trigger')->with('db.image.insert');
-        $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.insert');
-        $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getChecksum')->will($this->returnValue('id'));
-        $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
-
-        $this->resource->put($this->event);
-    }
-
-    /**
-     * @covers Imbo\Resource\Image::delete
+     * @covers Imbo\Resource\Image::deleteImage
      */
     public function testSupportsHttpDelete() {
         $this->manager->expects($this->at(0))->method('trigger')->with('db.image.delete');
@@ -91,11 +77,11 @@ class ImageTest extends ResourceTests {
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
 
-        $this->resource->delete($this->event);
+        $this->resource->deleteImage($this->event);
     }
 
     /**
-     * @covers Imbo\Resource\Image::get
+     * @covers Imbo\Resource\Image::getImage
      */
     public function testSupportsHttpGet() {
         $publicKey = 'christer';
@@ -130,6 +116,6 @@ class ImageTest extends ResourceTests {
                    array_key_exists('X-Imbo-OriginalExtension', $headers);
         }));
 
-        $this->resource->get($this->event);
+        $this->resource->getImage($this->event);
     }
 }

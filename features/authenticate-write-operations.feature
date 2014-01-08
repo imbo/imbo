@@ -7,7 +7,7 @@ Feature: Imbo requires write operations to be signed
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request using HTTP headers
         And I attach "tests/Fixtures/image1.png" to the request body
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "PUT"
+        When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "201 Created"
 
     Scenario: Authenticate using query parameters
@@ -19,7 +19,7 @@ Feature: Imbo requires write operations to be signed
     Scenario: Add an image with no authentication information
         Given I use "publickey" and "privatekey" for public and private keys
         And I attach "tests/Fixtures/image1.png" to the request body
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "PUT"
+        When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "400 Missing authentication timestamp"
         And the Imbo error message is "Missing authentication timestamp" and the error code is "101"
 
@@ -27,7 +27,7 @@ Feature: Imbo requires write operations to be signed
         Given I use "publickey" and "privatekey" for public and private keys
         And the "X-Imbo-Authenticate-Timestamp" request header is "foobar"
         And I attach "tests/Fixtures/image1.png" to the request body
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "PUT"
+        When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "400 Invalid timestamp: foobar"
         And the Imbo error message is "Invalid timestamp: foobar" and the error code is "102"
 
@@ -35,7 +35,7 @@ Feature: Imbo requires write operations to be signed
         Given I use "publickey" and "privatekey" for public and private keys
         And the "X-Imbo-Authenticate-Timestamp" request header is "2010-02-03T01:02:03Z"
         And I attach "tests/Fixtures/image1.png" to the request body
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "PUT"
+        When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "400 Timestamp has expired: 2010-02-03T01:02:03Z"
         And the Imbo error message is "Timestamp has expired: 2010-02-03T01:02:03Z" and the error code is "104"
 
@@ -43,7 +43,7 @@ Feature: Imbo requires write operations to be signed
         Given I use "publickey" and "privatekey" for public and private keys
         And the "X-Imbo-Authenticate-Timestamp" request header is "current-timestamp"
         And I attach "tests/Fixtures/image1.png" to the request body
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "PUT"
+        When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "400 Missing authentication signature"
         And the Imbo error message is "Missing authentication signature" and the error code is "101"
 
@@ -52,6 +52,6 @@ Feature: Imbo requires write operations to be signed
         And the "X-Imbo-Authenticate-Timestamp" request header is "current-timestamp"
         And the "X-Imbo-Authenticate-Signature" request header is "foobar"
         And I attach "tests/Fixtures/image1.png" to the request body
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "PUT"
+        When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "400 Signature mismatch"
         And the Imbo error message is "Signature mismatch" and the error code is "103"

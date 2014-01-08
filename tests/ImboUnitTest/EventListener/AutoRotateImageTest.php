@@ -44,7 +44,7 @@ class AutoRotateImageTest extends \PHPUnit_Framework_TestCase {
         $className = get_class($this->listener);
         $events = $className::getSubscribedEvents();
 
-        $this->assertTrue(isset($events['image.put']['autoRotate']));
+        $this->assertTrue(isset($events['images.post']['autoRotate']));
 
     }
 

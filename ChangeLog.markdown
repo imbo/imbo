@@ -23,6 +23,7 @@ __N/A__
 * #186: Added support for short image URL's
 * #185: Add support for custom resources and routes
 * #174: New image transformation: watermark
+* #161: Images can now only be added by requesting the images resource using HTTP POST
 
 Bug fixes:
 
