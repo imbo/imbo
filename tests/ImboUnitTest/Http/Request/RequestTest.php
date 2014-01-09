@@ -205,4 +205,31 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $request = new Request($query);
         $request->getTransformations();
     }
+
+    public function getQueryStrings() {
+        return array(
+            'transformation with params' => array(
+                't[]=thumbnail:width=100',
+                't[]=thumbnail:width=100',
+            ),
+            'transformation with params, encoded' => array(
+                't%5B0%5D%3Dthumbnail%3Awidth%3D100',
+                't[0]=thumbnail:width=100',
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getQueryStrings
+     */
+    public function testGetRawUriDecodesUri($queryString, $expectedQueryString) {
+        $request = new Request(array(), array(), array(), array(), array(), array(
+            'SERVER_NAME' => 'imbo',
+            'SERVER_PORT' => 80,
+            'QUERY_STRING' => $queryString,
+        ));
+
+        $uri = $request->getRawUri();
+        $this->assertSame($expectedQueryString, substr($uri, strpos($uri, '?') + 1));
+    }
 }

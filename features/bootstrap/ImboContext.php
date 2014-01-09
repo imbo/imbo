@@ -110,7 +110,7 @@ class ImboContext extends RESTContext {
         $this->client->getEventDispatcher()->addListener('request.before_send', function($event) {
             $request = $event['request'];
             $request->getQuery()->remove('accessToken');
-            $accessToken = hash_hmac('sha256', $request->getUrl(), $this->privateKey);
+            $accessToken = hash_hmac('sha256', urldecode($request->getUrl()), $this->privateKey);
             $request->getQuery()->set('accessToken', $accessToken);
         }, -100);
     }
@@ -133,7 +133,7 @@ class ImboContext extends RESTContext {
             $query->remove('timestamp');
 
             $timestamp = gmdate('Y-m-d\TH:i:s\Z');
-            $data = $request->getMethod() . '|' . $request->getUrl() . '|' . $this->publicKey . '|' . $timestamp;
+            $data = $request->getMethod() . '|' . urldecode($request->getUrl()) . '|' . $this->publicKey . '|' . $timestamp;
 
             // Generate signature
             $signature = hash_hmac('sha256', $data, $this->privateKey);
