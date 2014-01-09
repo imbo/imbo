@@ -41,13 +41,6 @@ class Query {
     private $returnMetadata = false;
 
     /**
-     * Metadata query
-     *
-     * @var array
-     */
-    private $metadataQuery = array();
-
-    /**
      * Timestamp to start fetching from
      *
      * @var int
@@ -126,22 +119,6 @@ class Query {
         }
 
         $this->returnMetadata = (bool) $returnMetadata;
-
-        return $this;
-    }
-
-    /**
-     * Set or get the metadataQuery property
-     *
-     * @param array $metadataQuery Give this a value to set the property
-     * @return array|self
-     */
-    public function metadataQuery(array $metadataQuery = null) {
-        if ($metadataQuery === null) {
-            return $this->metadataQuery;
-        }
-
-        $this->metadataQuery = $metadataQuery;
 
         return $this;
     }

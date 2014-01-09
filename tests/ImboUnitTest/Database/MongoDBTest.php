@@ -82,34 +82,6 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Database\MongoDB::getStatus
-     */
-    public function testDottedNotationForMetadataQuery() {
-        $publicKey = 'key';
-
-        $query = $this->getMock('Imbo\Resource\Images\Query');
-        $query->expects($this->once())->method('from')->will($this->returnValue(null));
-        $query->expects($this->once())->method('to')->will($this->returnValue(null));
-        $query->expects($this->once())->method('metadataQuery')->will($this->returnValue(array(
-            'style' => 'IPA',
-            'brewery' => 'Nøgne Ø',
-        )));
-        $query->expects($this->any())->method('limit')->will($this->returnValue(10));
-
-        $cursor = $this->getMockBuilder('MongoCursor')->disableOriginalConstructor()->getMock();
-        $cursor->expects($this->once())->method('limit')->with(10)->will($this->returnSelf());
-        $cursor->expects($this->once())->method('sort')->will($this->returnSelf());
-
-        $this->imageCollection->expects($this->once())->method('find')->with(array(
-            'publicKey' => $publicKey,
-            'metadata.style' => 'IPA',
-            'metadata.brewery' => 'Nøgne Ø',
-        ), $this->isType('array'))->will($this->returnValue($cursor));
-
-        $this->assertSame(array(), $this->driver->getImages($publicKey, $query, $this->getMock('Imbo\Model\Images')));
-    }
-
-    /**
      * @covers Imbo\Database\MongoDB::insertImage
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionMessage Unable to save image data
