@@ -99,7 +99,6 @@ Apache
 You will need to enable `mod_rewrite <http://httpd.apache.org/docs/current/mod/mod_rewrite.html>`_ if you want to use Imbo with Apache. Below is an example on how to configure Apache for Imbo:
 
 .. literalinclude:: ../../config/imbo.apache.conf.dist
-    :language: console
 
 You will need to update ``ServerName`` to match the host name you will use for Imbo. If you want to use several host names you can update the ``ServerAlias`` line as well. You must also update ``DocumentRoot`` and ``Directory`` to point to the ``public`` directory in the Imbo installation. If you want to enable logging update the ``CustomLog`` and ``ErrorLog`` lines. ``RewriteCond`` and ``RewriteRule`` should be left alone.
 
@@ -109,9 +108,19 @@ Nginx
 Below is an example on how to configure Nginx for Imbo. This example uses PHP via `FastCGI <http://www.fastcgi.com/>`_:
 
 .. literalinclude:: ../../config/imbo.nginx.conf.dist
-    :language: console
 
 You will need to update ``server_name`` to match the host name you will use for Imbo. If you want to use several host names simply put several host names on that line. ``root`` must point to the ``public`` directory in the Imbo installation. If you want to enable logging update the ``error_log`` and ``access_log`` lines. You must also update the ``fastcgi_param SCRIPT_FILENAME`` line to point to the ``public/index.php`` file in the Imbo installation.
+
+Lighttpd
+~~~~~~~~
+
+Below is an example on how to configure Lighttpd for Imbo. Running PHP through FastCGI is recommended (not covered here).
+
+.. literalinclude:: ../../config/imbo.lighttpd.conf.dist
+
+You will need to set the correct host name(s) used with ``$HTTP["host"]`` and update the ``server.document-root`` to point to the correct path. If you want to enable logging remove the comments on the lines with ``server.errorlog`` and ``accesslog.filename`` and set the correct paths. If you want to specify a custom access log path you will need to enable the ``mod_accesslog`` module.
+
+This example requires the ``mod_rewrite`` module to be loaded.
 
 Varnish
 ~~~~~~~

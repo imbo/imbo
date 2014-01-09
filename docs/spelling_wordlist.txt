@@ -34,3 +34,4 @@ IPv
 Gmagick
 Imagick
 Behat
+Lighttpd

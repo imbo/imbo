@@ -1,3 +1,4 @@
 imbo.apache.conf
 imbo.nginx.conf
+imbo.lighttpd.conf
 config.php
