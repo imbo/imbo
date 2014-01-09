@@ -45,8 +45,13 @@ class ImageTransformer implements ListenerInterface {
                 // Preset
                 foreach ($presets[$transformation['name']] as $name => $params) {
                     if (is_int($name)) {
+                        // No hardcoded params, use the ones from the request
                         $name = $params;
                         $params = $transformation['params'];
+                    } else {
+                        // Some hardcoded params. Merge with the ones from the request, making the
+                        // hardcoded params overwrite the ones from the request
+                        $params = array_replace($transformation['params'], $params);
                     }
 
                     $eventManager->trigger(
