@@ -390,17 +390,6 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    public function testGetImagesWithMetadataQuery() {
-        $this->insertImages();
-
-        $query = new Query();
-        $query->metadataQuery(array('key2' => 'value2'));
-        $images = $this->adapter->getImages('publickey', $query, $this->getMock('Imbo\Model\Images'));
-
-        $this->assertCount(1, $images);
-        $this->assertSame('fc7d2d06993047a0b5056e8fac4462a2', $images[0]['imageIdentifier']);
-    }
-
     public function testGetImageMimeType() {
         $images = array();
         $publicKey = 'publickey';

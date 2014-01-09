@@ -204,14 +204,6 @@ class DatabaseOperations implements ListenerInterface {
             }
         }
 
-        if ($params->has('query')) {
-            $data = json_decode($params->get('query'), true);
-
-            if (is_array($data)) {
-                $query->metadataQuery($data);
-            }
-        }
-
         if ($params->has('ids')) {
             $ids = $params->get('ids');
 

@@ -266,14 +266,6 @@ class MongoDB implements DatabaseInterface {
             $queryData['added'] = $tmp;
         }
 
-        $metadataQuery = $query->metadataQuery();
-
-        if (!empty($metadataQuery)) {
-            foreach ($metadataQuery as $key => $value) {
-                $queryData['metadata.' . $key] = $value;
-            }
-        }
-
         $imageIdentifiers = $query->imageIdentifiers();
 
         if (!empty($imageIdentifiers)) {

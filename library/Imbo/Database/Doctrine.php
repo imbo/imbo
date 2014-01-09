@@ -274,23 +274,6 @@ class Doctrine implements DatabaseInterface {
             }
         }
 
-        if ($metadataQuery = $query->metadataQuery()) {
-            $qb->leftJoin('i', 'metadata', 'm', 'i.id = m.imageId');
-            $tmp = 0;
-
-            foreach ($metadataQuery as $key => $value) {
-                $qb->andWhere($qb->expr()->andx(
-                    $qb->expr()->eq('m.tagName', ':tagName' . $tmp),
-                    $qb->expr()->eq('m.tagValue', ':tagValue' . $tmp)
-                ));
-                $qb->setParameters(array(
-                    ':tagName' . $tmp => $key,
-                    ':tagValue' . $tmp => $value,
-                ));
-                $tmp++;
-            }
-        }
-
         if ($imageIdentifiers = $query->imageIdentifiers()) {
             $expr = $qb->expr();
             $composite = $expr->orX();

@@ -67,16 +67,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Resource\Images\Query::metadataQuery
-     */
-    public function testMetadataQuery() {
-        $value = array('category' => 'some category');
-        $this->assertSame(array(), $this->query->metadataQuery());
-        $this->assertSame($this->query, $this->query->metadataQuery($value));
-        $this->assertSame($value, $this->query->metadataQuery());
-    }
-
-    /**
      * @covers Imbo\Resource\Images\Query::from
      */
     public function testFrom() {
