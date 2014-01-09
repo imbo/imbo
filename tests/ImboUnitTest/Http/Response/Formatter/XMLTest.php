@@ -174,7 +174,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $images = array($image);
         $model = $this->getMock('Imbo\Model\Images');
         $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
-        $model->expects($this->once())->method('getTotal')->will($this->returnValue(100));
+        $model->expects($this->once())->method('getHits')->will($this->returnValue(100));
         $model->expects($this->once())->method('getPage')->will($this->returnValue(2));
         $model->expects($this->once())->method('getLimit')->will($this->returnValue(20));
         $model->expects($this->once())->method('getCount')->will($this->returnValue(1));
@@ -184,7 +184,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $xml = $this->formatter->format($model);
 
         // Check the search data
-        foreach (array('total' => 100, 'page' => 2, 'limit' => 20, 'count' => 1) as $tag => $value) {
+        foreach (array('hits' => 100, 'page' => 2, 'limit' => 20, 'count' => 1) as $tag => $value) {
             $this->assertTag(
                 array(
                     'tag' => $tag,

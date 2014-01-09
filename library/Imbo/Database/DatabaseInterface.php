@@ -11,6 +11,7 @@
 namespace Imbo\Database;
 
 use Imbo\Model\Image,
+    Imbo\Model\Images,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     DateTime;
@@ -82,12 +83,15 @@ interface DatabaseInterface {
     /**
      * Get images based on some query parameters
      *
+     * This method is also responsible for setting a correct "hits" number in the images model.
+     *
      * @param string $publicKey The public key of the user
      * @param Query $query A query instance
+     * @param Images $model The images model
      * @return array
      * @throws DatabaseException
      */
-    function getImages($publicKey, Query $query);
+    function getImages($publicKey, Query $query, Images $model);
 
     /**
      * Load information from database into the image object

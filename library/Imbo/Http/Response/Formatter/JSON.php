@@ -122,7 +122,7 @@ class JSON extends Formatter implements FormatterInterface {
 
         return $this->encode(array(
             'search' => array(
-                'total' => $model->getTotal(),
+                'hits' => $model->getHits(),
                 'page' => $model->getPage(),
                 'limit' => $model->getLimit(),
                 'count' => $model->getCount(),

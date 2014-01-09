@@ -11,6 +11,7 @@
 namespace Imbo\Database;
 
 use Imbo\Model\Image,
+    Imbo\Model\Images,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     Imbo\Exception\InvalidArgumentException,
@@ -227,7 +228,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImages($publicKey, Query $query) {
+    public function getImages($publicKey, Query $query, Images $model) {
         $images = array();
 
         $qb = $this->getConnection()->createQueryBuilder();
@@ -273,15 +274,6 @@ class Doctrine implements DatabaseInterface {
             }
         }
 
-        if ($limit = $query->limit()) {
-            $qb->setMaxResults($limit);
-        }
-
-        if ($page = $query->page()) {
-            $offset = (int) $query->limit() * ($page - 1);
-            $qb->setFirstResult($offset);
-        }
-
         if ($metadataQuery = $query->metadataQuery()) {
             $qb->leftJoin('i', 'metadata', 'm', 'i.id = m.imageId');
             $tmp = 0;
@@ -321,6 +313,21 @@ class Doctrine implements DatabaseInterface {
             }
 
             $qb->andWhere($composite);
+        }
+
+        // Create a querybuilder that will be used to fetch the hits number, and update the model
+        $hitsQb = clone $qb;
+        $hitsQb->select('COUNT(i.id)');
+        $stmt = $hitsQb->execute();
+        $model->setHits((int) $stmt->fetchColumn());
+
+        if ($limit = $query->limit()) {
+            $qb->setMaxResults($limit);
+        }
+
+        if ($page = $query->page()) {
+            $offset = (int) $query->limit() * ($page - 1);
+            $qb->setFirstResult($offset);
         }
 
         $stmt = $qb->execute();

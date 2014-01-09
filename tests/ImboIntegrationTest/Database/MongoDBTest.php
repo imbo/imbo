@@ -21,9 +21,9 @@ use Imbo\Database\MongoDB,
  */
 class MongoDBTest extends DatabaseTests {
     /**
-     * @see ImboIntegrationTest\Database\DatabaseTests::getDriver()
+     * @see ImboIntegrationTest\Database\DatabaseTests::getAdapter()
      */
-    protected function getDriver() {
+    protected function getAdapter() {
         return new MongoDB(array(
             'databaseName' => 'imboIntegrationTestDatabase',
         ));

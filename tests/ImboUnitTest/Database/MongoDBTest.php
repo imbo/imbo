@@ -106,7 +106,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             'metadata.brewery' => 'Nøgne Ø',
         ), $this->isType('array'))->will($this->returnValue($cursor));
 
-        $this->assertSame(array(), $this->driver->getImages($publicKey, $query));
+        $this->assertSame(array(), $this->driver->getImages($publicKey, $query, $this->getMock('Imbo\Model\Images')));
     }
 
     /**
@@ -214,7 +214,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                               ->method('find')
                               ->will($this->throwException(new MongoException()));
 
-        $this->driver->getImages('key', $this->getMock('Imbo\Resource\Images\Query'));
+        $this->driver->getImages('key', $this->getMock('Imbo\Resource\Images\Query'), $this->getMock('Imbo\Model\Images'));
     }
 
     /**

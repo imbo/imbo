@@ -157,7 +157,7 @@ USER;
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   <search>
-    <total>{$model->getTotal()}</total>
+    <hits>{$model->getHits()}</hits>
     <page>{$model->getPage()}</page>
     <limit>{$model->getLimit()}</limit>
     <count>{$model->getCount()}</count>

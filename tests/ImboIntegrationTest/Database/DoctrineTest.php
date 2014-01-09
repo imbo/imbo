@@ -26,9 +26,9 @@ class DoctrineTest extends DatabaseTests {
     private $pdo;
 
     /**
-     * @see ImboIntegrationTest\Database\DatabaseTests::getDriver()
+     * @see ImboIntegrationTest\Database\DatabaseTests::getAdapter()
      */
-    protected function getDriver() {
+    protected function getAdapter() {
         return new Doctrine(array(
             'pdo' => $this->pdo,
         ));
@@ -95,6 +95,10 @@ class DoctrineTest extends DatabaseTests {
     }
 
     public function tearDown() {
+        $this->pdo->query("DROP TABLE IF EXISTS imageinfo");
+        $this->pdo->query("DROP TABLE IF EXISTS metadata");
+        $this->pdo->query("DROP TABLE IF EXISTS shorturl");
+        $this->pdo->query("DROP INDEX IF EXISTS shorturlparams");
         $this->pdo = null;
 
         parent::tearDown();

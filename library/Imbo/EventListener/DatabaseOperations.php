@@ -232,7 +232,12 @@ class DatabaseOperations implements ListenerInterface {
         $response = $event->getResponse();
         $database = $event->getDatabase();
 
-        $images = $database->getImages($publicKey, $query);
+        // Create the model and set some pagination values
+        $model = new Model\Images();
+        $model->setLimit($query->limit())
+              ->setPage($query->page());
+
+        $images = $database->getImages($publicKey, $query, $model);
         $modelImages = array();
 
         foreach ($images as $image) {
@@ -255,11 +260,8 @@ class DatabaseOperations implements ListenerInterface {
             $modelImages[] = $entry;
         }
 
-        $model = new Model\Images();
-        $model->setTotal($database->getNumImages($publicKey))
-              ->setLimit($query->limit())
-              ->setPage($query->page())
-              ->setImages($modelImages);
+        // Add images to the model
+        $model->setImages($modelImages);
 
         if ($params->has('fields')) {
             $fields = $params->get('fields');
