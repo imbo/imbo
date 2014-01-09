@@ -11,6 +11,7 @@
 namespace ImboIntegrationTest\Database;
 
 use Imbo\Model\Image,
+    Imbo\Model\Images,
     Imbo\Resource\Images\Query,
     DateTime,
     DateTimeZone;
@@ -23,75 +24,70 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     /**
      * @var Imbo\Database\DatabaseInterface
      */
-    private $driver;
+    private $adapter;
 
     /**
-     * @var string
-     */
-    private $publicKey = 'key';
-
-    /**
-     * @var string
-     */
-    private $imageIdentifier = '9cb263819af35064af0b6665a1b0fddd';
-
-    /**
-     * @var Image
-     */
-    private $image;
-
-    /**
-     * Get the driver we want to test
+     * Get the adapter we want to test
      *
      * @return Imbo\Database\DatabaseInterface
      */
-    abstract protected function getDriver();
+    abstract protected function getAdapter();
 
     /**
      * Set up
      */
     public function setUp() {
-        $filePath = FIXTURES_DIR . '/image.png';
-        $imageInfo = getimagesize($filePath);
-
-        $this->image = new Image();
-        $this->image->setBlob(file_get_contents($filePath))
-                    ->setExtension('png')
-                    ->setMimeType($imageInfo['mime'])
-                    ->setWidth($imageInfo[0])
-                    ->setHeight($imageInfo[1]);
-
-        $this->driver = $this->getDriver();
+        $this->adapter = $this->getAdapter();
     }
 
     /**
      * Tear down
      */
     public function tearDown() {
-        $this->image = null;
-        $this->driver = null;
+        $this->adapter = null;
+    }
+
+    /**
+     * Fetch an image model
+     *
+     * @return Image
+     */
+    protected function getImage() {
+        return (new Image())->setBlob('imageblob')
+                            ->setWidth(123)
+                            ->setHeight(234)
+                            ->setMimeType('image/jpeg')
+                            ->setExtension('jpg');
     }
 
     public function testInsertAndGetImage() {
-        $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
+        $publicKey = 'key';
+        $imageIdentifier = 'id';
+        $originalImage = $this->getImage();
+
+        $this->assertTrue($this->adapter->insertImage($publicKey, $imageIdentifier, $originalImage));
 
         $image = new Image();
-        $this->assertTrue($this->driver->load($this->publicKey, $this->imageIdentifier, $image));
+        $this->assertTrue($this->adapter->load($publicKey, $imageIdentifier, $image));
 
-        $this->assertSame($image->getWidth(), $this->image->getWidth());
-        $this->assertSame($image->getHeight(), $this->image->getHeight());
-        $this->assertSame($image->getMimeType(), $this->image->getMimeType());
-        $this->assertSame($image->getExtension(), $this->image->getExtension());
+        $this->assertSame($originalImage->getWidth(), $image->getWidth());
+        $this->assertSame($originalImage->getHeight(), $image->getHeight());
+        $this->assertSame($originalImage->getMimeType(), $image->getMimeType());
+        $this->assertSame($originalImage->getExtension(), $image->getExtension());
     }
 
     public function testStoreSameImageTwice() {
-        $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
-        $lastModified1 = $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+        $publicKey = 'key';
+        $imageIdentifier = 'id';
+        $image = $this->getImage();
+
+        $this->assertTrue($this->adapter->insertImage($publicKey, $imageIdentifier, $image));
+        $lastModified1 = $this->adapter->getLastModified($publicKey, $imageIdentifier);
 
         sleep(1);
 
-        $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
-        $lastModified2 = $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+        $this->assertTrue($this->adapter->insertImage($publicKey, $imageIdentifier, $image));
+        $lastModified2 = $this->adapter->getLastModified($publicKey, $imageIdentifier);
 
         $this->assertTrue($lastModified2 > $lastModified1);
     }
@@ -102,9 +98,13 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Image not found
      */
     public function testStoreDeleteAndGetImage() {
-        $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
-        $this->assertTrue($this->driver->deleteImage($this->publicKey, $this->imageIdentifier));
-        $this->driver->load($this->publicKey, $this->imageIdentifier, $this->getMock('Imbo\Model\Image'));
+        $publicKey = 'key';
+        $imageIdentifier = 'id';
+
+        $this->assertTrue($this->adapter->insertImage($publicKey, $imageIdentifier, $this->getImage()));
+        $this->assertTrue($this->adapter->deleteImage($publicKey, $imageIdentifier));
+
+        $this->adapter->load($publicKey, $imageIdentifier, $this->getMock('Imbo\Model\Image'));
     }
 
     /**
@@ -113,7 +113,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Image not found
      */
     public function testDeleteImageThatDoesNotExist() {
-        $this->driver->deleteImage($this->publicKey, $this->imageIdentifier);
+        $this->adapter->deleteImage('publickey', 'id');
     }
 
     /**
@@ -122,7 +122,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Image not found
      */
     public function testLoadImageThatDoesNotExist() {
-        $this->driver->load($this->publicKey, $this->imageIdentifier, $this->getMock('Imbo\Model\Image'));
+        $this->adapter->load('publickey', 'id', $this->getMock('Imbo\Model\Image'));
     }
 
     /**
@@ -131,22 +131,39 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Image not found
      */
     public function testGetLastModifiedOfImageThatDoesNotExist() {
-        $this->driver->getLastModified($this->publicKey, 'foobar');
+        $this->adapter->getLastModified('publickey', 'id');
     }
 
     public function testGetLastModified() {
-        $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
-        $this->assertInstanceOf('DateTime', $this->driver->getLastModified($this->publicKey, $this->imageIdentifier));
+        $publicKey = 'publickey';
+        $imageIdentifier = 'id';
+        $image = $this->getImage();
+
+        $this->assertTrue($this->adapter->insertImage($publicKey, $imageIdentifier, $image));
+        $this->assertInstanceOf('DateTime', $this->adapter->getLastModified($publicKey, $imageIdentifier));
     }
 
     public function testGetLastModifiedWhenUserHasNoImages() {
-        $this->assertInstanceOf('DateTime', $this->driver->getLastModified($this->publicKey));
+        $this->assertInstanceOf('DateTime', $this->adapter->getLastModified('publickey'));
     }
 
     public function testGetNumImages() {
-        $this->assertSame(0, $this->driver->getNumImages($this->publicKey));
-        $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
-        $this->assertSame(1, $this->driver->getNumImages($this->publicKey));
+        $publicKey = 'publickey';
+        $image = $this->getImage();
+
+        $this->assertSame(0, $this->adapter->getNumImages($publicKey));
+
+        // Insert first image
+        $this->assertTrue($this->adapter->insertImage($publicKey, 'id1', $image));
+        $this->assertSame(1, $this->adapter->getNumImages($publicKey));
+
+        // Insert same image
+        $this->assertTrue($this->adapter->insertImage($publicKey, 'id1', $image));
+        $this->assertSame(1, $this->adapter->getNumImages($publicKey));
+
+        // Insert with a new ID
+        $this->assertTrue($this->adapter->insertImage($publicKey, 'id2', $image));
+        $this->assertSame(2, $this->adapter->getNumImages($publicKey));
     }
 
     /**
@@ -155,28 +172,37 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Image not found
      */
     public function testGetMetadataWhenImageDoesNotExist() {
-        $this->driver->getMetadata($this->publicKey, $this->imageIdentifier);
+        $this->adapter->getMetadata('publickey', 'id');
     }
 
     public function testGetMetadataWhenImageHasNone() {
-        $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
-        $this->assertSame(array(), $this->driver->getMetadata($this->publicKey, $this->imageIdentifier));
+        $publicKey = 'publickey';
+        $imageIdentifier = 'id';
+
+        $this->assertTrue($this->adapter->insertImage($publicKey, $imageIdentifier, $this->getImage()));
+        $this->assertSame(array(), $this->adapter->getMetadata($publicKey, $imageIdentifier));
     }
 
     public function testUpdateAndGetMetadata() {
-        $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
-        $this->assertTrue($this->driver->updateMetadata($this->publicKey, $this->imageIdentifier, array('foo' => 'bar')));
-        $this->assertSame(array('foo' => 'bar'), $this->driver->getMetadata($this->publicKey, $this->imageIdentifier));
-        $this->assertTrue($this->driver->updateMetadata($this->publicKey, $this->imageIdentifier, array('foo' => 'foo', 'bar' => 'foo')));
-        $this->assertSame(array('foo' => 'foo', 'bar' => 'foo'), $this->driver->getMetadata($this->publicKey, $this->imageIdentifier));
+        $publicKey = 'publickey';
+        $imageIdentifier = 'id';
+
+        $this->assertTrue($this->adapter->insertImage($publicKey, $imageIdentifier, $this->getImage()));
+        $this->assertTrue($this->adapter->updateMetadata($publicKey, $imageIdentifier, array('foo' => 'bar')));
+        $this->assertSame(array('foo' => 'bar'), $this->adapter->getMetadata($publicKey, $imageIdentifier));
+        $this->assertTrue($this->adapter->updateMetadata($publicKey, $imageIdentifier, array('foo' => 'foo', 'bar' => 'foo')));
+        $this->assertSame(array('foo' => 'foo', 'bar' => 'foo'), $this->adapter->getMetadata($publicKey, $imageIdentifier));
     }
 
     public function testUpdateDeleteAndGetMetadata() {
-        $this->assertTrue($this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image));
-        $this->assertTrue($this->driver->updateMetadata($this->publicKey, $this->imageIdentifier, array('foo' => 'bar')));
-        $this->assertSame(array('foo' => 'bar'), $this->driver->getMetadata($this->publicKey, $this->imageIdentifier));
-        $this->assertTrue($this->driver->deleteMetadata($this->publicKey, $this->imageIdentifier));
-        $this->assertSame(array(), $this->driver->getMetadata($this->publicKey, $this->imageIdentifier));
+        $publicKey = 'publickey';
+        $imageIdentifier = 'id';
+
+        $this->assertTrue($this->adapter->insertImage($publicKey, $imageIdentifier, $this->getImage()));
+        $this->assertTrue($this->adapter->updateMetadata($publicKey, $imageIdentifier, array('foo' => 'bar')));
+        $this->assertSame(array('foo' => 'bar'), $this->adapter->getMetadata($publicKey, $imageIdentifier));
+        $this->assertTrue($this->adapter->deleteMetadata($publicKey, $imageIdentifier));
+        $this->assertSame(array(), $this->adapter->getMetadata($publicKey, $imageIdentifier));
     }
 
     /**
@@ -185,9 +211,18 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Image not found
      */
     public function testDeleteMetataFromImageThatDoesNotExist() {
-        $this->driver->deleteMetadata($this->publicKey, $this->imageIdentifier);
+        $this->adapter->deleteMetadata('publickey', 'id');
     }
 
+    /**
+     * Insert some images to test the query functionality
+     *
+     * All images added is owned by "publickey"
+     *
+     * @return array Returns an array with two elements where the first is the timestamp of when
+     *               the first image was added, and the second is the timestamp of when the last
+     *               image was added
+     */
     private function insertImages() {
         $now = time();
         $start = $now;
@@ -197,21 +232,23 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
             $path = FIXTURES_DIR . '/' . $fileName;
             $info = getimagesize($path);
 
-            $images[$i] = new Image();
-            $images[$i]->setMimeType($info['mime'])
-                       ->setExtension(substr($fileName, strrpos($fileName, '.') + 1))
-                       ->setWidth($info[0])
-                       ->setHeight($info[1])
-                       ->setBlob(file_get_contents($path))
-                       ->setAddedDate(new DateTime('@' . $now++, new DateTimeZone('UTC')));
-        }
+            $image = new Image();
+            $image->setMimeType($info['mime'])
+                  ->setExtension(substr($fileName, strrpos($fileName, '.') + 1))
+                  ->setWidth($info[0])
+                  ->setHeight($info[1])
+                  ->setBlob(file_get_contents($path))
+                  ->setAddedDate(new DateTime('@' . $now++, new DateTimeZone('UTC')));
 
-        foreach ($images as $index => $image) {
             $imageIdentifier = md5($image->getBlob());
 
-            $this->driver->insertImage($this->publicKey, $imageIdentifier, $image);
-            $metadata = array('key' . $index => 'value' . $index);
-            $this->driver->updateMetadata($this->publicKey, $imageIdentifier, $metadata);
+            // Add the image
+            $this->adapter->insertImage('publickey', $imageIdentifier, $image);
+
+            // Insert some metadata
+            $this->adapter->updateMetadata('publickey', $imageIdentifier, array(
+                'key' . $i => 'value' . $i,
+            ));
         }
 
         // Remove the last increment to get the timestamp for when the last image was added
@@ -225,32 +262,41 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
 
         // Empty query
         $query = new Query();
-        $images = $this->driver->getImages($this->publicKey, $query);
+        $model = $this->getMock('Imbo\Model\Images');
+        $model->expects($this->once())->method('setHits')->with(6);
+        $images = $this->adapter->getImages('publickey', $query, $model);
         $this->assertCount(6, $images);
     }
 
     public function testGetImagesWithStartAndEndTimestamps() {
         list($start, $end) = $this->insertImages();
 
+        $model = new Images();
+        $publicKey = 'publickey';
+
         // Fetch to the timestamp of when the last image was added
         $query = new Query();
         $query->to($end);
-        $this->assertCount(6, $this->driver->getImages($this->publicKey, $query));
+        $this->assertCount(6, $this->adapter->getImages($publicKey, $query, $model));
+        $this->assertSame(6, $model->getHits());
 
         // Fetch until the second the first image was added
         $query = new Query();
         $query->to($start);
-        $this->assertCount(1, $this->driver->getImages($this->publicKey, $query));
+        $this->assertCount(1, $this->adapter->getImages($publicKey, $query, $model));
+        $this->assertSame(1, $model->getHits());
 
         // Fetch from the second the first image was added
         $query = new Query();
         $query->from($start);
-        $this->assertCount(6, $this->driver->getImages($this->publicKey, $query));
+        $this->assertCount(6, $this->adapter->getImages($publicKey, $query, $model));
+        $this->assertSame(6, $model->getHits());
 
         // Fetch from the second the last image was added
         $query = new Query();
         $query->from($end);
-        $this->assertCount(1, $this->driver->getImages($this->publicKey, $query));
+        $this->assertCount(1, $this->adapter->getImages($publicKey, $query, $model));
+        $this->assertSame(1, $model->getHits());
     }
 
     public function testGetImagesAndReturnMetadata() {
@@ -259,7 +305,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $query = new Query();
         $query->returnMetadata(true);
 
-        $images = $this->driver->getImages($this->publicKey, $query);
+        $images = $this->adapter->getImages('publickey', $query, $this->getMock('Imbo\Model\Images'));
 
         foreach ($images as $image) {
             $this->assertArrayHasKey('metadata', $image);
@@ -277,7 +323,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     public function testGetImagesReturnsImagesWithDateTimeInstances() {
         $this->insertImages();
 
-        $images = $this->driver->getImages($this->publicKey, new Query());
+        $images = $this->adapter->getImages('publickey', new Query(), $this->getMock('Imbo\Model\Images'));
 
         foreach (array('added', 'updated') as $dateField) {
             foreach ($images as $image) {
@@ -333,7 +379,10 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
             $query->limit($limit);
         }
 
-        $images = $this->driver->getImages($this->publicKey, $query);
+        $model = $this->getMock('Imbo\Model\Images');
+        $model->expects($this->once())->method('setHits')->with(6);
+
+        $images = $this->adapter->getImages('publickey', $query, $model);
         $this->assertCount(count($imageIdentifiers), $images);
 
         foreach ($images as $i => $image) {
@@ -346,7 +395,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
 
         $query = new Query();
         $query->metadataQuery(array('key2' => 'value2'));
-        $images = $this->driver->getImages($this->publicKey, $query);
+        $images = $this->adapter->getImages('publickey', $query, $this->getMock('Imbo\Model\Images'));
 
         $this->assertCount(1, $images);
         $this->assertSame('fc7d2d06993047a0b5056e8fac4462a2', $images[0]['imageIdentifier']);
@@ -354,21 +403,30 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
 
     public function testGetImageMimeType() {
         $images = array();
+        $publicKey = 'publickey';
 
         $images[0] = new Image();
-        $images[0]->setMimeType('image/png')->setExtension('png')->setWidth(665)->setHeight(463)->setBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+        $images[0]->setMimeType('image/png')
+                  ->setExtension('png')
+                  ->setWidth(665)
+                  ->setHeight(463)
+                  ->setBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
         $images[1] = new Image();
-        $images[1]->setMimeType('image/jpeg')->setExtension('jpg')->setWidth(665)->setHeight(463)->setBlob(file_get_contents(FIXTURES_DIR . '/image.jpg'));
+        $images[1]->setMimeType('image/jpeg')
+                  ->setExtension('jpg')
+                  ->setWidth(665)
+                  ->setHeight(463)
+                  ->setBlob(file_get_contents(FIXTURES_DIR . '/image.jpg'));
 
         foreach ($images as $image) {
             $imageIdentifier = md5($image->getBlob());
 
-            $this->driver->insertImage($this->publicKey, $imageIdentifier, $image);
+            $this->adapter->insertImage($publicKey, $imageIdentifier, $image);
         }
 
-        $this->assertSame('image/png', $this->driver->getImageMimeType($this->publicKey, md5($images[0]->getBlob())));
-        $this->assertSame('image/jpeg', $this->driver->getImageMimeType($this->publicKey, md5($images[1]->getBlob())));
+        $this->assertSame('image/png', $this->adapter->getImageMimeType($publicKey, md5($images[0]->getBlob())));
+        $this->assertSame('image/jpeg', $this->adapter->getImageMimeType($publicKey, md5($images[1]->getBlob())));
     }
 
     /**
@@ -377,13 +435,16 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Image not found
      */
     public function testGetMimeTypeWhenImageDoesNotExist() {
-        $this->driver->getImageMimeType($this->publicKey, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+        $this->adapter->getImageMimeType('publickey', 'id');
     }
 
     public function testCanCheckIfImageAlreadyExists() {
-        $this->assertFalse($this->driver->imageExists($this->publicKey, $this->imageIdentifier));
-        $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image);
-        $this->assertTrue($this->driver->imageExists($this->publicKey, $this->imageIdentifier));
+        $publicKey = 'publickey';
+        $imageIdentifier = 'id';
+
+        $this->assertFalse($this->adapter->imageExists($publicKey, $imageIdentifier));
+        $this->adapter->insertImage($publicKey, $imageIdentifier, $this->getImage());
+        $this->assertTrue($this->adapter->imageExists($publicKey, $imageIdentifier));
     }
 
     /**
@@ -427,64 +488,76 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @dataProvider getShortUrlVariations
      */
     public function testCanInsertAndGetParametersForAShortUrl($shortUrlId, array $query = array(), $extension = null) {
-        $this->assertTrue($this->driver->insertShortUrl($shortUrlId, $this->publicKey, $this->imageIdentifier, $extension, $query));
+        $publicKey = 'publickey';
+        $imageIdentifier = 'id';
+        $this->assertTrue($this->adapter->insertShortUrl($shortUrlId, $publicKey, $imageIdentifier, $extension, $query));
 
-        $params = $this->driver->getShortUrlParams($shortUrlId);
+        $params = $this->adapter->getShortUrlParams($shortUrlId);
 
-        $this->assertSame($this->publicKey, $params['publicKey']);
-        $this->assertSame($this->imageIdentifier, $params['imageIdentifier']);
+        $this->assertSame($publicKey, $params['publicKey']);
+        $this->assertSame($imageIdentifier, $params['imageIdentifier']);
         $this->assertSame($extension, $params['extension']);
         $this->assertSame($query, $params['query']);
 
-        $this->assertSame($shortUrlId, $this->driver->getShortUrlId($this->publicKey, $this->imageIdentifier, $extension, $query));
+        $this->assertSame($shortUrlId, $this->adapter->getShortUrlId($publicKey, $imageIdentifier, $extension, $query));
     }
 
     public function testCanDeleteShortUrls() {
         $shortUrlId = 'aaaaaaa';
+        $publicKey = 'publickey';
+        $imageIdentifier = 'id';
 
-        $this->assertTrue($this->driver->insertShortUrl($shortUrlId, $this->publicKey, $this->imageIdentifier));
-        $this->assertTrue($this->driver->deleteShortUrls($this->publicKey, $this->imageIdentifier));
-        $this->assertNull($this->driver->getShortUrlParams($shortUrlId));
+        $this->assertTrue($this->adapter->insertShortUrl($shortUrlId, $publicKey, $imageIdentifier));
+        $this->assertTrue($this->adapter->deleteShortUrls($publicKey, $imageIdentifier));
+        $this->assertNull($this->adapter->getShortUrlParams($shortUrlId));
     }
 
     public function testCanFilterOnImageIdentifiers() {
         $publicKey = 'christer';
-        $id1 = str_repeat('a', 32);
-        $id2 = str_repeat('b', 32);
-        $id3 = str_repeat('c', 32);
-        $id4 = str_repeat('d', 32);
-        $id5 = str_repeat('e', 32);
+        $id1 = 'id1';
+        $id2 = 'id2';
+        $id3 = 'id3';
+        $id4 = 'id4';
+        $id5 = 'id5';
+        $image = $this->getImage();
 
-        $this->assertTrue($this->driver->insertImage($publicKey, $id1, $this->image));
-        $this->assertTrue($this->driver->insertImage($publicKey, $id2, $this->image));
-        $this->assertTrue($this->driver->insertImage($publicKey, $id3, $this->image));
-        $this->assertTrue($this->driver->insertImage($publicKey, $id4, $this->image));
-        $this->assertTrue($this->driver->insertImage($publicKey, $id5, $this->image));
+        $this->assertTrue($this->adapter->insertImage($publicKey, $id1, $image));
+        $this->assertTrue($this->adapter->insertImage($publicKey, $id2, $image));
+        $this->assertTrue($this->adapter->insertImage($publicKey, $id3, $image));
+        $this->assertTrue($this->adapter->insertImage($publicKey, $id4, $image));
+        $this->assertTrue($this->adapter->insertImage($publicKey, $id5, $image));
 
         $query = new Query();
+        $model = new Images();
 
         $query->imageIdentifiers(array($id1));
-        $this->assertCount(1, $this->driver->getImages($publicKey, $query));
+        $this->assertCount(1, $this->adapter->getImages($publicKey, $query, $model));
+        $this->assertSame(1, $model->getHits());
 
         $query->imageIdentifiers(array($id1, $id2));
-        $this->assertCount(2, $this->driver->getImages($publicKey, $query));
+        $this->assertCount(2, $this->adapter->getImages($publicKey, $query, $model));
+        $this->assertSame(2, $model->getHits());
 
         $query->imageIdentifiers(array($id1, $id2, $id3));
-        $this->assertCount(3, $this->driver->getImages($publicKey, $query));
+        $this->assertCount(3, $this->adapter->getImages($publicKey, $query, $model));
+        $this->assertSame(3, $model->getHits());
 
         $query->imageIdentifiers(array($id1, $id2, $id3, $id4));
-        $this->assertCount(4, $this->driver->getImages($publicKey, $query));
+        $this->assertCount(4, $this->adapter->getImages($publicKey, $query, $model));
+        $this->assertSame(4, $model->getHits());
 
         $query->imageIdentifiers(array($id1, $id2, $id3, $id4, $id5));
-        $this->assertCount(5, $this->driver->getImages($publicKey, $query));
+        $this->assertCount(5, $this->adapter->getImages($publicKey, $query, $model));
+        $this->assertSame(5, $model->getHits());
 
         $query->imageIdentifiers(array($id1, $id2, $id3, $id4, $id5, str_repeat('f', 32)));
-        $this->assertCount(5, $this->driver->getImages($publicKey, $query));
+        $this->assertCount(5, $this->adapter->getImages($publicKey, $query, $model));
+        $this->assertSame(5, $model->getHits());
     }
 
     public function testCanGetNumberOfBytes() {
-        $this->driver->insertImage($this->publicKey, $this->imageIdentifier, $this->image);
-        $this->assertSame(41423, $this->driver->getNumBytes($this->publicKey));
+        $this->adapter->insertImage('publickey', 'id', $this->getImage());
+        $this->assertSame($this->getImage()->getFilesize(), $this->adapter->getNumBytes('publickey'));
     }
 
     public function getSortData() {
@@ -552,7 +625,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
             $query->sort($sort);
         }
 
-        $images = $this->driver->getImages($this->publicKey, $query);
+        $images = $this->adapter->getImages('publickey', $query, $this->getMock('Imbo\Model\Images'));
 
         foreach ($images as $i => $image) {
             $this->assertSame($values[$i], $image[$field]);

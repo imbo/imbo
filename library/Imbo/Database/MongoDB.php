@@ -11,6 +11,7 @@
 namespace Imbo\Database;
 
 use Imbo\Model\Image,
+    Imbo\Model\Images,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     MongoClient,
@@ -239,7 +240,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImages($publicKey, Query $query) {
+    public function getImages($publicKey, Query $query, Images $model) {
         // Initialize return value
         $images = array();
 
@@ -320,6 +321,9 @@ class MongoDB implements DatabaseInterface {
                 $image['updated'] = new DateTime('@' . $image['updated'], new DateTimeZone('UTC'));
                 $images[] = $image;
             }
+
+            // Update model
+            $model->setHits($cursor->count());
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to search for images', 500, $e);
         }

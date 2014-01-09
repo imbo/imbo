@@ -32,11 +32,11 @@ class Images implements ModelInterface {
     private $fields = array();
 
     /**
-     * Total number of images
+     * Query hits
      *
      * @var int
      */
-    private $total;
+    private $hits;
 
     /**
      * Limit the number of images
@@ -104,24 +104,24 @@ class Images implements ModelInterface {
     }
 
     /**
-     * Set the total
+     * Set the hits property
      *
-     * @param int $total The total
+     * @param int $hits The amount of query hits
      * @return self
      */
-    public function setTotal($total) {
-        $this->total = (int) $total;
+    public function setHits($hits) {
+        $this->hits = (int) $hits;
 
         return $this;
     }
 
     /**
-     * Get the total
+     * Get the hits property
      *
      * @return int
      */
-    public function getTotal() {
-        return $this->total;
+    public function getHits() {
+        return $this->hits;
     }
 
     /**

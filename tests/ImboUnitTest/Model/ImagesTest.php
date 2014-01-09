@@ -63,13 +63,13 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Images::setTotal
-     * @covers Imbo\Model\Images::getTotal
+     * @covers Imbo\Model\Images::setHits
+     * @covers Imbo\Model\Images::getHits
      */
-    public function testCanSetAndGetTotal() {
-        $this->assertNull($this->model->getTotal());
-        $this->assertSame($this->model, $this->model->setTotal(10));
-        $this->assertSame(10, $this->model->getTotal());
+    public function testCanSetAndGetHits() {
+        $this->assertNull($this->model->getHits());
+        $this->assertSame($this->model, $this->model->setHits(10));
+        $this->assertSame(10, $this->model->getHits());
     }
 
     /**

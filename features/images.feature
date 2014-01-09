@@ -20,8 +20,8 @@ Feature: Imbo provides an images endpoint
         """
         Examples:
             | extension | content-type     | response |
-            | json      | application/json | #^{"search":{"total":3,"page":1,"limit":20,"count":3},"images":\[{.*?},{.*?},{.*?}\]}$# |
-            | xml       | application/xml  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>\s*<total>3</total>\s*<page>1</page>\s*<limit>20</limit>\s*<count>3</count>\s*</search>\s*<images>\s*(<image>.*?</image>\s*){3}\s*</images>\s*</imbo>$#ms |
+            | json      | application/json | #^{"search":{"hits":3,"page":1,"limit":20,"count":3},"images":\[{.*?},{.*?},{.*?}\]}$# |
+            | xml       | application/xml  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>\s*<hits>3</hits>\s*<page>1</page>\s*<limit>20</limit>\s*<count>3</count>\s*</search>\s*<images>\s*(<image>.*?</image>\s*){3}\s*</images>\s*</imbo>$#ms |
 
     Scenario Outline: Fetch images using limit
         Given I use "publickey" and "privatekey" for public and private keys
@@ -35,8 +35,8 @@ Feature: Imbo provides an images endpoint
         """
         Examples:
             | extension | content-type     | response |
-            | json      | application/json | #^{"search":{"total":3,"page":1,"limit":2,"count":2},"images":\[{.*?},{.*?}\]}$# |
-            | xml       | application/xml  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>\s*<total>3</total>\s*<page>1</page>\s*<limit>2</limit>\s*<count>2</count>\s*</search>\s*<images>\s*(<image>.*?</image>\s*){2}\s*</images>\s*</imbo>$#ms |
+            | json      | application/json | #^{"search":{"hits":3,"page":1,"limit":2,"count":2},"images":\[{.*?},{.*?}\]}$# |
+            | xml       | application/xml  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>\s*<hits>3</hits>\s*<page>1</page>\s*<limit>2</limit>\s*<count>2</count>\s*</search>\s*<images>\s*(<image>.*?</image>\s*){2}\s*</images>\s*</imbo>$#ms |
 
     Scenario Outline: Fetch images with a filter on image identifiers
         Given I use "publickey" and "privatekey" for public and private keys
@@ -124,3 +124,13 @@ Feature: Imbo provides an images endpoint
             | fields[]=size                 | sort[]=size:desc              | #^{"search":{.*?},"images":\[{"size":95576},{"size":66020},{"size":64828}\]}$# |
             | fields[]=size&fields[]=width  | sort[]=width&sort[]=size:desc | #^{"search":{.*?},"images":\[{"size":95576,"width":599},{"size":66020,"width":665},{"size":64828,"width":665}\]}$# |
             | fields[]=size&fields[]=width  | sort[]=width&sort[]=size      | #^{"search":{.*?},"images":\[{"size":95576,"width":599},{"size":64828,"width":665},{"size":66020,"width":665}\]}$# |
+
+    Scenario: The hits number has the number of hits in the query
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        When I request "/users/publickey/images.json?limit=1&page=1&ids[]=fc7d2d06993047a0b5056e8fac4462a2&ids[]=b5426b4c008e378c201526d2baaec599"
+        Then I should get a response with "200 OK"
+        And the response body matches:
+        """
+        #^{"search":{"hits":2,"page":1,"limit":1,"count":1},"images":\[{.*}\]}$#
+        """
