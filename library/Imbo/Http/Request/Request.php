@@ -182,7 +182,7 @@ class Request extends SymfonyRequest {
     }
 
     /**
-     * Get the URI without the Symfony normalization applied to the query string
+     * Get the URI without the Symfony normalization applied to the query string, un-encoded
      *
      * @return string
      */
@@ -190,7 +190,7 @@ class Request extends SymfonyRequest {
         $query = $this->server->get('QUERY_STRING');
 
         if (!empty($query)) {
-            $query = '?' . $query;
+            $query = '?' . urldecode($query);
         }
 
         return $this->getSchemeAndHttpHost() . $this->getBaseUrl() . $this->getPathInfo() . $query;
