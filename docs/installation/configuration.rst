@@ -766,7 +766,7 @@ where the keys are the names of the transformations as specified in the URL, and
         // ...
     );
 
-By doing this the ``thumbnail`` part of the ``fixedGraythumb`` preset will ignore the parameters present in the URL.
+By doing this the ``thumbnail`` part of the ``fixedGraythumb`` preset will ignore the ``width`` and ``height`` query parameters, if present. By only specifying for instance ``'width' => 50`` in the configuration the height of the thumbnail can be adjusted via the query parameter, but the ``width`` is fixed.
 
 .. note:: The URL's will stay the same if you change the transformation chain in a preset. Keep this in mind if you use for instance Varnish or some other HTTP accelerator in front of your web server(s).
 
