@@ -12,6 +12,7 @@
 # serve to show the default.
 
 import sys, os
+from datetime import date
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -45,7 +46,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Imbo'
-copyright = u'2011-2014, Christer Edvartsen'
+copyright = u'2011-' + str(date.today().year) + ', Christer Edvartsen'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
