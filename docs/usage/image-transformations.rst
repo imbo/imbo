@@ -87,19 +87,16 @@ This transformation can be used to change the canvas of the original image.
 Compress the image - ``t[]=compress``
 -------------------------------------
 
-This transformation compresses images on the fly resulting in a smaller payload.
+This transformation compresses images on the fly resulting in a smaller payload. It is advisable to only use this transformation in combination with an image type in the URL (for instance ``.jpg`` or ``.png``). This transformation is not applied to images of type ``image/gif``.
 
 **Parameters:**
 
-``quality``
-    Quality of the resulting image. 100 is maximum quality (lowest compression rate).
+``level``
+    The level of the compression applied to the image. The effect this parameter has on the image depends on the type of the image. If the image in the response is an ``image/jpeg`` a high ``level`` means high quality, usually resulting in larger files. If the image in the response is an ``image/png`` a high ``level`` means high compression, usually resulting in smaller files. If you do not specify an image type in the URL the result of this transformation is not deterministic as clients have different preferences with regards to the type of images they want to receive (via the ``Accept`` request header).
 
 **Examples:**
 
-* ``t[]=compress:quality=40``
-
-.. warning::
-    This transformation currently only works as expected for ``image/jpeg`` images.
+* ``t[]=compress:level=40``
 
 .. _convert-transformation:
 
