@@ -70,7 +70,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
             't' => array(
                 // Valid transformations with all options
                 'border:color=fff,width=2,height=2',
-                'compress:quality=90',
+                'compress:level=90',
                 'crop:x=1,y=2,width=3,height=4',
                 'resize:width=100,height=100',
 
@@ -89,7 +89,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(7, count($transformations));
 
         $this->assertEquals(array('color' => 'fff', 'width' => 2, 'height' => 2), $transformations[0]['params']);
-        $this->assertEquals(array('quality' => '90'), $transformations[1]['params']);
+        $this->assertEquals(array('level' => '90'), $transformations[1]['params']);
         $this->assertEquals(array('x' => 1, 'y' => 2, 'width' => 3, 'height' => 4), $transformations[2]['params']);
         $this->assertEquals(array('width' => 100, 'height' => 100), $transformations[3]['params']);
         $this->assertEquals(array(), $transformations[4]['params']);

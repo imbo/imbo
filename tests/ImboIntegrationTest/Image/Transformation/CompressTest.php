@@ -26,28 +26,21 @@ class CompressTest extends TransformationTests {
         return new Compress();
     }
 
-    /**
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionMessage Missing required parameter: quality
-     * @expectedExceptionCode 400
-     */
-    public function testThrowsExceptionOnMissingParam() {
-        $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->once())->method('getArgument')->with('params')->will($this->returnValue(array()));
-        $this->getTransformation()->transform($event);
-    }
-
     public function testCanTransformTheImage() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
+        $image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/jpeg'));
 
         $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(array('quality' => 50)));
+        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(array('level' => 50)));
         $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
 
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
-        $this->getTransformation()->setImagick($imagick)->transform($event);
+        $transformation = $this->getTransformation();
+        $transformation->setImagick($imagick);
+        $transformation->transform($event); // Set the correct level parameter
+        $transformation->compress($event); // Perform the actual compression
     }
 }
