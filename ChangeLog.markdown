@@ -31,6 +31,7 @@ Bug fixes:
 * #237: Fixed possible PHP Warnings when the transformation query parameter is invalid
 * #222: Some images are not correctly identified
 * #211: CORS event listener suppresses "405 Method not allowed" responses when enabled
+* #103: Compress transformation only works as expected with image/jpeg
 
 Imbo-0.3.3
 ----------
