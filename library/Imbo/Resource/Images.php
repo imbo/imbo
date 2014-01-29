@@ -11,8 +11,7 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
-    Imbo\EventListener\ListenerInterface;
+    Imbo\Model;
 
 /**
  * Images resource
@@ -30,33 +29,59 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-class Images implements ResourceInterface, ListenerInterface {
+class Images implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD');
+        return array('GET', 'HEAD', 'POST');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('images.get', array($this, 'get')),
-            new ListenerDefinition('images.head', array($this, 'get')),
+            'images.get' => 'getImage',
+            'images.head' => 'getImage',
+            'images.post' => 'addImage',
         );
     }
 
     /**
-     * Handle GET requests
+     * Handle GET and HEAD requests
      *
      * @param EventInterface $event The current event
      */
-    public function get(EventInterface $event) {
+    public function getImage(EventInterface $event) {
         $event->getManager()->trigger('db.images.load');
 
         $response = $event->getResponse();
         $response->setEtag('"' . md5($response->getLastModified()->format('D, d M Y H:i:s') . ' GMT') . '"');
     }
+
+    /**
+     * Handle POST requests
+     *
+     * @param EventInterface
+     */
+    public function addImage(EventInterface $event) {
+        $event->getManager()->trigger('db.image.insert');
+        $event->getManager()->trigger('storage.image.insert');
+
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        $image = $request->getImage();
+
+        $model = new Model\ArrayModel();
+        $model->setData(array(
+            'imageIdentifier' => $image->getChecksum(),
+            'width' => $image->getWidth(),
+            'height' => $image->getHeight(),
+            'extension' => $image->getExtension(),
+        ));
+
+        $response->setModel($model);
+    }
+
 }

@@ -15,6 +15,5 @@ namespace Imbo\Model;
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
- * @codeCoverageIgnore
  */
 class Metadata extends ArrayModel {}

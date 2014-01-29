@@ -11,8 +11,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\Image\Transformation\MaxSize;
+    Imbo\EventListener\ListenerInterface;
 
 /**
  * Max image size event listener
@@ -39,38 +38,39 @@ class MaxImageSize implements ListenerInterface {
     /**
      * Class constructor
      *
-     * @param int $width Max width
-     * @param int $height Max height
+     * @param array $params Parameters for the event listener
      */
-    public function __construct($width = null, $height = null) {
-        $this->width = (int) $width;
-        $this->height = (int) $height;
+    public function __construct(array $params) {
+        $this->width = isset($params['width']) ? (int) $params['width'] : 0;
+        $this->height = isset($params['height']) ? (int) $params['height'] : 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('image.put', array($this, 'invoke'), 25),
+            'images.post' => array('enforceMaxSize' => 25),
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function invoke(EventInterface $event) {
+    public function enforceMaxSize(EventInterface $event) {
         $image = $event->getRequest()->getImage();
 
         $width = $image->getWidth();
         $height = $image->getHeight();
 
         if (($this->width && ($width > $this->width)) || ($this->height && ($height > $this->height))) {
-            $transformation = new MaxSize(array(
-                'width' => $this->width,
-                'height' => $this->height,
+            $event->getManager()->trigger('image.transformation.maxsize', array(
+                'image' => $image,
+                'params' => array(
+                    'width' => $this->width,
+                    'height' => $this->height,
+                ),
             ));
-            $transformation->applyToImage($image);
         }
     }
 }

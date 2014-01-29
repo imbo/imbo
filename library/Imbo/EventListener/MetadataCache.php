@@ -13,6 +13,7 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface,
     Imbo\Cache\CacheInterface,
     Imbo\Model,
+    Imbo\Exception\InvalidArgumentException,
     DateTime;
 
 /**
@@ -32,27 +33,33 @@ class MetadataCache implements ListenerInterface {
     /**
      * Class constructor
      *
-     * @param CacheInterface $cache Cache implementation
+     * @param array $params Parameters for the event listener
      */
-    public function __construct(CacheInterface $cache) {
-        $this->cache = $cache;
+    public function __construct(array $params) {
+        if (!isset($params['cache']) || !($params['cache'] instanceof CacheInterface)) {
+            throw new InvalidArgumentException('The cache parameter is missing or not valid', 500);
+        }
+
+        $this->cache = $params['cache'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            // Load from cache
-            new ListenerDefinition('db.metadata.load', array($this, 'loadFromCache'), 10),
+            // Load and store in cache
+            'db.metadata.load' => array(
+                'loadFromCache' => 10,
+                'storeInCache' => -10,
+            ),
 
             // Delete from cache
-            new ListenerDefinition('db.metadata.delete', array($this, 'deleteFromCache'), -10),
-            new ListenerDefinition('db.image.delete', array($this, 'deleteFromCache'), -10),
+            'db.metadata.delete' => array('deleteFromCache' => -10),
+            'db.image.delete' => array('deleteFromCache' => -10),
 
-            // Store in cache
-            new ListenerDefinition('db.metadata.load', array($this, 'storeInCache'), -10),
-            new ListenerDefinition('db.metadata.update', array($this, 'storeInCache'), -10),
+            // Store updated data in cache
+            'db.metadata.update' => array('storeInCache' => -10),
         );
     }
 
@@ -82,7 +89,7 @@ class MetadataCache implements ListenerInterface {
             $response->headers->set('X-Imbo-MetadataCache', 'Hit');
 
             // Stop propagation of listeners for this event
-            $event->stopPropagation(true);
+            $event->stopPropagation();
             return;
         } else if ($result) {
             // Invalid result stored in the cache. Delete

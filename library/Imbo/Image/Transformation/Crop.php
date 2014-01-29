@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -20,7 +22,7 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Crop extends Transformation implements TransformationInterface {
+class Crop extends Transformation implements ListenerInterface {
     /**
      * X coordinate of the top left corner of the crop
      *
@@ -36,58 +38,52 @@ class Crop extends Transformation implements TransformationInterface {
     private $y = 0;
 
     /**
-     * Width of the crop
-     *
-     * @var int
+     * {@inheritdoc}
      */
-    private $width;
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.crop' => 'transform',
+        );
+    }
 
     /**
-     * Height of the crop
+     * Transform the image
      *
-     * @var int
+     * @param EventInterface $event The event instance
      */
-    private $height;
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
 
-    /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     * @throws TransformationException
-     */
-    public function __construct(array $params) {
         foreach (array('width', 'height') as $param) {
             if (!isset($params[$param])) {
                 throw new TransformationException('Missing required parameter: ' . $param, 400);
             }
         }
 
-        $this->width = (int) $params['width'];
-        $this->height = (int) $params['height'];
+        // Fetch the x, y, width and height of the resulting image
+        $x = !empty($params['x']) ? (int) $params['x'] : $this->x;
+        $y = !empty($params['y']) ? (int) $params['y'] : $this->y;
 
-        if (!empty($params['x'])) {
-            $this->x = (int) $params['x'];
+        $width = (int) $params['width'];
+        $height = (int) $params['height'];
+
+        // Return if there is no need for cropping
+        if (
+            $x === 0 && $y === 0 &&
+            $image->getWidth() <= $width &&
+            $image->getHeight() <= $height
+        ) {
+            return;
         }
 
-        if (!empty($params['y'])) {
-            $this->y = (int) $params['y'];
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function applyToImage(Image $image) {
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-            $imagick->cropImage($this->width, $this->height, $this->x, $this->y);
+            $this->imagick->cropImage($width, $height, $x, $y);
+            $size = $this->imagick->getImageGeometry();
 
-            $size = $imagick->getImageGeometry();
-
-            $image->setBlob($imagick->getImageBlob())
-                  ->setWidth($size['width'])
-                  ->setHeight($size['height']);
+            $image->setWidth($size['width'])
+                  ->setHeight($size['height'])
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

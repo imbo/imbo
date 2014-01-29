@@ -1,6 +1,7 @@
 language: php
 php:
   - 5.4
+  - 5.5
 notifications:
   irc:
     use_notice: true
@@ -13,8 +14,16 @@ branches:
 services:
   - mongodb
   - memcached
+before_install:
+  - sudo add-apt-repository -y ppa:moti-p/cc
+  - sudo apt-get update
+  - sudo apt-get -y --reinstall install imagemagick
+  - printf "\n" | pecl install imagick-beta
 before_script:
-  - echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-script: rake travis
+  - composer self-update
+  - composer -n --no-ansi install --dev --prefer-source
+script:
+  - ./vendor/bin/phpunit --verbose -c tests/phpunit.xml.travis
+  - ./vendor/bin/behat --strict --profile travis

@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -22,47 +24,43 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Convert extends Transformation implements TransformationInterface {
+class Convert extends Transformation implements ListenerInterface {
     /**
-     * Type we want to convert to
-     *
-     * @var string
+     * {@inheritdoc}
      */
-    private $type;
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.convert' => 'transform',
+        );
+    }
 
     /**
-     * Class constructor
+     * Transform the image
      *
-     * @param array $params Parameters for this transformation
-     * @throws TransformationException
+     * @param EventInterface $event The event instance
      */
-    public function __construct(array $params) {
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
+
         if (empty($params['type'])) {
             throw new TransformationException('Missing required parameter: type', 400);
         }
 
-        $this->type = $params['type'];
-    }
+        $type = $params['type'];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function applyToImage(Image $image) {
-        if ($image->getExtension() === $this->type) {
+        if ($image->getExtension() === $type) {
             // The requested extension is the same as the image, no conversion is needed
             return;
         }
 
         try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
+            $this->imagick->setImageFormat($type);
+            $mimeType = array_search($type, Image::$mimeTypes);
 
-            $imagick->setImageFormat($this->type);
-            $mimeType = array_search($this->type, Image::$mimeTypes);
-
-            $image->setBlob($imagick->getImageBlob());
-            $image->setMimeType($mimeType);
-            $image->setExtension($this->type);
+            $image->setMimeType($mimeType)
+                  ->setExtension($type)
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

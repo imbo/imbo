@@ -10,11 +10,9 @@
 
 namespace Imbo;
 
-use Imbo\Resource\ResourceInterface,
-    Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\RuntimeException;
+use Imbo\Http\Request\Request,
+    Imbo\Exception\RuntimeException,
+    Imbo\Router\Route;
 
 /**
  * Router class containing supported routes
@@ -22,7 +20,7 @@ use Imbo\Resource\ResourceInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Router
  */
-class Router implements ListenerInterface {
+class Router {
     /**
      * HTTP methods supported one way or another in Imbo
      *
@@ -34,7 +32,6 @@ class Router implements ListenerInterface {
         'PUT'     => true,
         'HEAD'    => true,
         'DELETE'  => true,
-        'BREW'    => true,
         'OPTIONS' => true,
     );
 
@@ -43,30 +40,32 @@ class Router implements ListenerInterface {
      *
      * @var array
      */
-    public $routes = array(
-        ResourceInterface::IMAGE    => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(.(?<extension>gif|jpg|png))?$#',
-        ResourceInterface::STATUS   => '#^/status(/|(\.(?<extension>json|xml)))?$#',
-        ResourceInterface::IMAGES   => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images(/|(\.(?<extension>json|xml)))?$#',
-        ResourceInterface::METADATA => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(/|\.(?<extension>json|xml))?$#',
-        ResourceInterface::USER     => '#^/users/(?<publicKey>[a-z0-9_-]{3,})(/|\.(?<extension>json|xml))?$#',
+    private $routes = array(
+        'image'    => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(\.(?<extension>gif|jpg|png))?$#',
+        'shorturl' => '#^/s/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
+        'status'   => '#^/status(/|(\.(?<extension>json|xml)))?$#',
+        'images'   => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images(/|(\.(?<extension>json|xml)))?$#',
+        'metadata' => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(?:data)?(/|\.(?<extension>json|xml))?$#',
+        'user'     => '#^/users/(?<publicKey>[a-z0-9_-]{3,})(/|\.(?<extension>json|xml))?$#',
+        'stats'    => '#^/stats(/|(\.(?<extension>json|xml)))?$#',
+        'index'    => '#^/?$#',
     );
 
     /**
-     * {@inheritdoc}
+     * Class constructor
+     *
+     * @param array $extraRoutes Extra routes passed in from configuration
      */
-    public function getDefinition() {
-        return array(
-            new ListenerDefinition('route', array($this, 'route')),
-        );
+    public function __construct(array $extraRoutes = array()) {
+        $this->routes = array_merge($this->routes, $extraRoutes);
     }
 
     /**
-     * Resolve the current route
+     * Route the current request
      *
-     * @param EventInterface $event An event instance
+     * @param Request $request The current request
      */
-    public function route(EventInterface $event) {
-        $request = $event->getRequest();
+    public function route(Request $request) {
         $httpMethod = $request->getMethod();
 
         if ($httpMethod === 'BREW') {
@@ -91,19 +90,18 @@ class Router implements ListenerInterface {
             throw new RuntimeException('Not Found', 404);
         }
 
-        // Set the resource name
-        $request->setResource($resourceName);
+        // Create and populate a route instance that we want to inject into the request
+        $route = new Route();
+        $route->setName($resourceName);
 
-        if (!empty($matches['publicKey'])) {
-            $request->setPublicKey($matches['publicKey']);
+        // Inject all matches into the route as parameters
+        foreach ($matches as $key => $value) {
+            if (is_string($key)) {
+                $route->set($key, $value);
+            }
         }
 
-        if (isset($matches['imageIdentifier'])) {
-            $request->setImageIdentifier($matches['imageIdentifier']);
-        }
-
-        if (isset($matches['extension'])) {
-            $request->setExtension($matches['extension']);
-        }
+        // Store the route in the request
+        $request->setRoute($route);
     }
 }

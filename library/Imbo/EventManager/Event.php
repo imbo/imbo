@@ -10,8 +10,11 @@
 
 namespace Imbo\EventManager;
 
-use Imbo\Container,
-    Imbo\ContainerAware;
+use Imbo\Http\Request\Request,
+    Imbo\Http\Response\Response,
+    Imbo\Database\DatabaseInterface,
+    Imbo\Storage\StorageInterface,
+    Symfony\Component\EventDispatcher\GenericEvent;
 
 /**
  * Event class
@@ -19,117 +22,53 @@ use Imbo\Container,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event
  */
-class Event implements ContainerAware, EventInterface {
-    /**
-     * Name of the current event
-     *
-     * @var string
-     */
-    private $name;
-
-    /**
-     * Container instance
-     *
-     * @var Container
-     */
-    private $container;
-
-    /**
-     * Propagation flag
-     *
-     * @var boolean
-     */
-    private $propagationIsStopped = false;
-
-    /**
-     * Class contsructor
-     *
-     * @param string $name The name of the current event
-     */
-    public function __construct($name = null) {
-        if ($name !== null) {
-            $this->setName($name);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setName($name) {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName() {
-        return $this->name;
-    }
-
+class Event extends GenericEvent implements EventInterface {
     /**
      * {@inheritdoc}
      */
     public function getRequest() {
-        return $this->container->get('request');
+        return $this->getArgument('request');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getResponse() {
-        return $this->container->get('response');
+        return $this->getArgument('response');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getDatabase() {
-        return $this->container->get('database');
+        return $this->getArgument('database');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getStorage() {
-        return $this->container->get('storage');
+        return $this->getArgument('storage');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getManager() {
-        return $this->container->get('eventManager');
+        return $this->getArgument('manager');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getConfig() {
-        return $this->container->get('config');
+        return $this->getArgument('config');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function stopPropagation($flag) {
-        $this->propagationIsStopped = $flag;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function propagationIsStopped() {
-        return $this->propagationIsStopped;
+    public function getHandler() {
+        return $this->getArgument('handler');
     }
 }

@@ -11,14 +11,15 @@
 namespace Imbo\Database;
 
 use Imbo\Model\Image,
+    Imbo\Model\Images,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     DateTime;
 
 /**
- * Database driver interface
+ * Database adapter interface
  *
- * This is an interface for different database drivers.
+ * This is an interface for storage adapters in Imbo.
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
@@ -82,12 +83,15 @@ interface DatabaseInterface {
     /**
      * Get images based on some query parameters
      *
+     * This method is also responsible for setting a correct "hits" number in the images model.
+     *
      * @param string $publicKey The public key of the user
      * @param Query $query A query instance
+     * @param Images $model The images model
      * @return array
      * @throws DatabaseException
      */
-    function getImages($publicKey, Query $query);
+    function getImages($publicKey, Query $query, Images $model);
 
     /**
      * Load information from database into the image object
@@ -124,6 +128,15 @@ interface DatabaseInterface {
     function getNumImages($publicKey);
 
     /**
+     * Fetch the number of bytes stored by a user
+     *
+     * @param string $publicKey The public key of the user
+     * @return int Returns the number of bytes
+     * @throws DatabaseException
+     */
+    function getNumBytes($publicKey);
+
+    /**
      * Get the current status of the database connection
      *
      * This method is used with the status resource.
@@ -151,4 +164,45 @@ interface DatabaseInterface {
      * @throws DatabaseException
      */
     function imageExists($publicKey, $imageIdentifier);
+
+    /**
+     * Insert a short URL
+     *
+     * @param string $shortUrlId The ID of the URL
+     * @param string $publicKey The public key attached to the URL
+     * @param string $imageIdentifier The image identifier attached to the URL
+     * @param string $extension Optionl image extension
+     * @param array $query Optional query parameters
+     * @return boolean
+     */
+    function insertShortUrl($shortUrlId, $publicKey, $imageIdentifier, $extension = null, array $query = array());
+
+    /**
+     * Fetch the short URL identifier
+     *
+     * @param string $publicKey The public key attached to the URL
+     * @param string $imageIdentifier The image identifier attached to the URL
+     * @param string $extension Optionl image extension
+     * @param array $query Optional query parameters
+     * @return string|null
+     */
+    function getShortUrlId($publicKey, $imageIdentifier, $extension = null, array $query = array());
+
+    /**
+     * Fetch parameters for a short URL
+     *
+     * @param string $shortUrlId The ID of the short URL
+     * @return array|null Returns an array with information regarding the short URL, or null if the
+     *                    short URL is not found
+     */
+    function getShortUrlParams($shortUrlId);
+
+    /**
+     * Delete short URLs attached to a specific image
+     *
+     * @param string $publicKey The public key attached to the URL
+     * @param string $imageIdentifier The image identifier attached to the URL
+     * @return boolean
+     */
+    function deleteShortUrls($publicKey, $imageIdentifier);
 }

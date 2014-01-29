@@ -1,0 +1,155 @@
+<?php
+/**
+ * This file is part of the Imbo package
+ *
+ * (c) Christer Edvartsen <cogo@starzinger.net>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was
+ * distributed with this source code.
+ */
+
+namespace ImboUnitTest\Model;
+
+use Imbo\Model\Stats;
+
+/**
+ * @covers Imbo\Model\Stats
+ * @group unit
+ * @group models
+ */
+class StatsTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * @var Stats
+     */
+    private $model;
+
+    /**
+     * Set up the model
+     */
+    public function setUp() {
+        $this->model = new Stats();
+    }
+
+    /**
+     * Tear down the model
+     */
+    public function tearDown() {
+        $this->model = null;
+    }
+
+    /**
+     * Get users
+     *
+     * @return array[]
+     */
+    public function getUsers() {
+        return array(
+            array(
+                array(),
+                0,
+                0,
+                0
+            ),
+            array(
+                array(
+                    'user' => array('numImages' => 2, 'numBytes' => 1349),
+                ),
+                1,
+                2,
+                1349
+            ),
+            array(
+                array(
+                    'user1' => array('numImages' => 2, 'numBytes' => 1349),
+                    'user2' => array('numImages' => 42, 'numBytes' => 98765),
+                ),
+                2,
+                44,
+                100114
+            ),
+            array(
+                array(
+                    'user1' => array('numImages' => 2, 'numBytes' => 100),
+                    'user2' => array('numImages' => 3, 'numBytes' => 200),
+                    'user3' => array('numImages' => 4, 'numBytes' => 300),
+                    'user4' => array('numImages' => 5, 'numBytes' => 400),
+                ),
+                4,
+                14,
+                1000
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getUsers
+     * @covers Imbo\Model\Stats::getUsers
+     * @covers Imbo\Model\Stats::setUsers
+     */
+    public function testCanSetAndGetUsers(array $users, $numUsers, $images, $bytes) {
+        $this->assertSame(array(), $this->model->getUsers());
+        $this->assertSame($this->model, $this->model->setUsers($users));
+        $this->assertSame($users, $this->model->getUsers());
+    }
+
+    /**
+     * @dataProvider getUsers
+     * @covers Imbo\Model\Stats::getNumUsers
+     */
+    public function testCanGetNumberOfUsers(array $users, $numUsers, $images, $bytes) {
+        $this->assertSame(0, $this->model->getNumUsers());
+        $this->model->setUsers($users);
+        $this->assertSame($numUsers, $this->model->getNumUsers());
+    }
+
+    /**
+     * @dataProvider getUsers
+     * @covers Imbo\Model\Stats::getNumImages
+     */
+    public function testCanGetTotalAmountOfImages(array $users, $numUsers, $images, $bytes) {
+        $this->model->setUsers($users);
+        $this->assertSame($images, $this->model->getNumImages());
+    }
+
+    /**
+     * @dataProvider getUsers
+     * @covers Imbo\Model\Stats::getNumBytes
+     */
+    public function testCanGetTotalAmountOfBytes(array $users, $numUsers, $images, $bytes) {
+        $this->model->setUsers($users);
+        $this->assertSame($bytes, $this->model->getNumBytes());
+    }
+
+    /**
+     * @covers Imbo\Model\Stats::getCustomStats
+     * @covers Imbo\Model\Stats::offsetExists
+     * @covers Imbo\Model\Stats::offsetSet
+     * @covers Imbo\Model\Stats::offsetGet
+     * @covers Imbo\Model\Stats::offsetUnset
+     */
+    public function testSupportsCustomStats() {
+        $this->assertSame(array(), $this->model->getCustomStats());
+
+        $this->model['foo'] = 'bar';
+        $this->model['bar'] = 'foo';
+
+        $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $this->model->getCustomStats());
+
+        $this->assertTrue(isset($this->model['bar']));
+        $this->assertSame('foo', $this->model['bar']);
+        unset($this->model['bar']);
+        $this->assertFalse(isset($this->model['bar']));
+
+        $this->assertSame(array('foo' => 'bar'), $this->model->getCustomStats());
+    }
+
+    /**
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Custom statistics requires a key to be set
+     * @expectedExceptionCode 500
+     * @covers Imbo\Model\Stats::offsetSet
+     */
+    public function testThrowsExceptionWhenUsedAsArrayWithoutAKey() {
+        $this->model[] = 'foobar';
+    }
+}

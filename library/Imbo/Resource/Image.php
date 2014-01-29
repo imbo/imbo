@@ -10,10 +10,8 @@
 
 namespace Imbo\Resource;
 
-use Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\ResourceException,
+use Imbo\Exception\ResourceException,
     Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
     Imbo\Model;
 
 /**
@@ -22,48 +20,23 @@ use Imbo\EventListener\ListenerInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-class Image implements ResourceInterface, ListenerInterface {
+class Image implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD', 'DELETE', 'PUT');
+        return array('GET', 'HEAD', 'DELETE');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('image.get', array($this, 'get')),
-            new ListenerDefinition('image.head', array($this, 'get')),
-            new ListenerDefinition('image.delete', array($this, 'delete')),
-            new ListenerDefinition('image.put', array($this, 'put')),
+            'image.get' => 'getImage',
+            'image.head' => 'getImage',
+            'image.delete' => 'deleteImage',
         );
-    }
-
-    /**
-     * Handle PUT requests
-     *
-     * @param EventInterface
-     */
-    public function put(EventInterface $event) {
-        $event->getManager()->trigger('db.image.insert');
-        $event->getManager()->trigger('storage.image.insert');
-
-        $request = $event->getRequest();
-        $response = $event->getResponse();
-        $image = $request->getImage();
-
-        $model = new Model\ArrayModel();
-        $model->setData(array(
-            'imageIdentifier' => $image->getChecksum(),
-            'width' => $image->getWidth(),
-            'height' => $image->getHeight(),
-            'extension' => $image->getExtension(),
-        ));
-
-        $response->setModel($model);
     }
 
     /**
@@ -71,7 +44,7 @@ class Image implements ResourceInterface, ListenerInterface {
      *
      * @param EventInterface
      */
-    public function delete(EventInterface $event) {
+    public function deleteImage(EventInterface $event) {
         $event->getManager()->trigger('db.image.delete');
         $event->getManager()->trigger('storage.image.delete');
 
@@ -84,11 +57,11 @@ class Image implements ResourceInterface, ListenerInterface {
     }
 
     /**
-     * Handle GET requests
+     * Handle GET and HEAD requests
      *
      * @param EventInterface
      */
-    public function get(EventInterface $event) {
+    public function getImage(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $eventManager = $event->getManager();
@@ -96,9 +69,11 @@ class Image implements ResourceInterface, ListenerInterface {
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
 
-        $image = $response->getImage();
+        $image = new Model\Image();
         $image->setImageIdentifier($imageIdentifier)
               ->setPublicKey($publicKey);
+
+        $response->setModel($image);
 
         $eventManager->trigger('db.image.load');
         $eventManager->trigger('storage.image.load');
@@ -127,9 +102,5 @@ class Image implements ResourceInterface, ListenerInterface {
 
         // Trigger possible image transformations
         $eventManager->trigger('image.transform');
-
-        // Fetch the image once more as event listeners might have set a new instance during the
-        // transformation phase
-        $response->setModel($response->getImage());
     }
 }

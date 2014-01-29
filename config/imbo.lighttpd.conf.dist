@@ -1,0 +1,17 @@
+# Use the line below instead of the next one if you want to use multiple host names
+# $HTTP["host"] =~ "^(imbo|imbo1|imbo2|imbo3)$" {
+
+$HTTP["host"] == "imbo" {
+    # Listen on port 80
+    server.port = 80
+
+    # Path to the public directory where index.php is located
+    server.document-root = "/path/to/install/vendor/imbo/imbo/public"
+
+    # Logs
+    # server.errorlog = "/var/log/lighttpd/imbo.error_log"
+    # accesslog.filename = "/var/log/lighttpd/imbo.access_log"
+
+    # Rewrite all to index.php
+    url.rewrite-if-not-file = ("^/[^\?]*(\?.*)?$" => "index.php/$1")
+}

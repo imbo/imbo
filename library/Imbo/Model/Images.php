@@ -25,6 +25,34 @@ class Images implements ModelInterface {
     private $images = array();
 
     /**
+     * Which fields to display
+     *
+     * @var string[]
+     */
+    private $fields = array();
+
+    /**
+     * Query hits
+     *
+     * @var int
+     */
+    private $hits;
+
+    /**
+     * Limit the number of images
+     *
+     * @var int
+     */
+    private $limit;
+
+    /**
+     * The page number
+     *
+     * @var int
+     */
+    private $page;
+
+    /**
      * Set the array of images
      *
      * @param Image[] $images An array of Image models
@@ -43,5 +71,98 @@ class Images implements ModelInterface {
      */
     public function getImages() {
         return $this->images;
+    }
+
+    /**
+     * Set the fields to display
+     *
+     * @param string[]
+     * @return self
+     */
+    public function setFields(array $fields) {
+        $this->fields = $fields;
+
+        return $this;
+    }
+
+    /**
+     * Get the fields to display
+     *
+     * @return string[]
+     */
+    public function getFields() {
+        return $this->fields;
+    }
+
+    /**
+     * Get the number of images
+     *
+     * @return int
+     */
+    public function getCount() {
+        return count($this->images);
+    }
+
+    /**
+     * Set the hits property
+     *
+     * @param int $hits The amount of query hits
+     * @return self
+     */
+    public function setHits($hits) {
+        $this->hits = (int) $hits;
+
+        return $this;
+    }
+
+    /**
+     * Get the hits property
+     *
+     * @return int
+     */
+    public function getHits() {
+        return $this->hits;
+    }
+
+    /**
+     * Set the limit
+     *
+     * @param int $limit The limit
+     * @return self
+     */
+    public function setLimit($limit) {
+        $this->limit = (int) $limit;
+
+        return $this;
+    }
+
+    /**
+     * Get the limit
+     *
+     * @return int
+     */
+    public function getLimit() {
+        return $this->limit;
+    }
+
+    /**
+     * Set the page
+     *
+     * @param int $page The page
+     * @return self
+     */
+    public function setPage($page) {
+        $this->page = (int) $page;
+
+        return $this;
+    }
+
+    /**
+     * Get the page
+     *
+     * @return int
+     */
+    public function getPage() {
+        return $this->page;
     }
 }

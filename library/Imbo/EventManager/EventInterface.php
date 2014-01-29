@@ -23,29 +23,14 @@ use Imbo\Http\Request\Request,
  */
 interface EventInterface {
     /**
-     * Set the name of the event
-     *
-     * @param string $name The name of the event
-     * @return EventInterface
-     */
-    function setName($name);
-
-    /**
-     * Get the name of the event
-     *
-     * @return string
-     */
-    function getName();
-
-    /**
-     * Get the request instance
+     * Get the request parameter
      *
      * @return Request
      */
     function getRequest();
 
     /**
-     * Get the response instance
+     * Get the response parameter
      *
      * @return Response
      */
@@ -80,17 +65,9 @@ interface EventInterface {
     function getConfig();
 
     /**
-     * Whether or not to stop the execution of more listeners for the current event
+     * Get the handler for the current event
      *
-     * @param boolean $flag True to stop, false to continue
-     * @return EventInterface
+     * @return string
      */
-    function stopPropagation($flag);
-
-    /**
-     * Return whether or not the propagation should stop
-     *
-     * @return boolean
-     */
-    function propagationIsStopped();
+    function getHandler();
 }

@@ -68,7 +68,7 @@ class AccessToken implements ListenerInterface {
      *
      * @param array $params Parameters for the listener
      */
-    public function __construct(array $params = array()) {
+    public function __construct(array $params = null) {
         if ($params) {
             $this->params = array_replace_recursive($this->params, $params);
         }
@@ -77,28 +77,26 @@ class AccessToken implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
-        $callback = array($this, 'invoke');
-        $priority = 100;
+    public static function getSubscribedEvents() {
+        $callbacks = array();
         $events = array(
             'user.get', 'images.get', 'image.get', 'metadata.get',
             'user.head', 'images.head', 'image.head', 'metadata.head'
         );
 
-        $definition = array();
-
-        foreach($events as $eventName) {
-            $definition[] = new ListenerDefinition($eventName, $callback, $priority);
+        foreach ($events as $event) {
+            $callbacks[$event] = array('checkAccessToken' => 100);
         }
 
-        return $definition;
+        return $callbacks;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function invoke(EventInterface $event) {
+    public function checkAccessToken(EventInterface $event) {
         $request = $event->getRequest();
+        $response = $event->getResponse();
         $query = $request->query;
         $eventName = $event->getName();
 
@@ -107,17 +105,22 @@ class AccessToken implements ListenerInterface {
             return;
         }
 
+        // If the response has a short URL header, we can skip the access token check
+        if ($response->headers->has('X-Imbo-ShortUrl')) {
+            return;
+        }
+
         if (!$query->has('accessToken')) {
             throw new RuntimeException('Missing access token', 400);
         }
 
         $token = $query->get('accessToken');
-        $url = $request->getRawUri();
+        $uri = $request->getRawUri();
 
         // Remove the access token from the query string as it's not used to generate the HMAC
-        $url = rtrim(preg_replace('/(?<=(\?|&))accessToken=[^&]+&?/', '', $url), '&?');
+        $uri = rtrim(preg_replace('/(?<=(\?|&))accessToken=[^&]+&?/', '', $uri), '&?');
 
-        $correctToken = hash_hmac('sha256', $url, $request->getPrivateKey());
+        $correctToken = hash_hmac('sha256', $uri, $request->getPrivateKey());
 
         if ($correctToken !== $token) {
             throw new RuntimeException('Incorrect access token', 400);

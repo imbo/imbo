@@ -31,14 +31,24 @@ class Cors implements ListenerInterface {
     private $params = array(
         'allowedOrigins' => array(),
         'allowedMethods' => array(
+            'index'    => array('GET', 'HEAD'),
             'image'    => array('GET', 'HEAD'),
             'images'   => array('GET', 'HEAD'),
             'metadata' => array('GET', 'HEAD'),
             'status'   => array('GET', 'HEAD'),
+            'stats'    => array('GET', 'HEAD'),
             'user'     => array('GET', 'HEAD'),
+            'shorturl' => array('GET', 'HEAD'),
         ),
         'maxAge'         => 3600,
     );
+
+    /**
+     * Whether the request matched an allowed method + origin
+     *
+     * @var boolean
+     */
+    private $requestAllowed = false;
 
     /**
      * Class constructor
@@ -60,23 +70,67 @@ class Cors implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
-        $definition = array();
-        $priority = 20;
+    public static function getSubscribedEvents() {
+        return array(
+            'route.match' => 'subscribe',
+            'response.send' => array('setExposedHeaders' => 5),
+        );
+    }
+
+    /**
+     * Subscribe to events based on configuration parameters
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function subscribe(EventInterface $event) {
+        $events = array();
 
         // Enable the event listener only for resources and methods specified
         foreach ($this->params['allowedMethods'] as $resource => $methods) {
             foreach ($methods as $method) {
-                $event = $resource . '.' . strtolower($method);
-                $definition[] = new ListenerDefinition($event, array($this, 'invoke'), 20);
+                $eventName = $resource . '.' . strtolower($method);
+                $events[$eventName] = array('invoke' => 20);
             }
 
             // Always enable the listener for the OPTIONS method
-            $event = $resource . '.options';
-            $definition[] = new ListenerDefinition($event, array($this, 'options'), 20);
+            $eventName = $resource . '.options';
+            $events[$eventName] = array('options' => 20);
         }
 
-        return $definition;
+        $manager = $event->getManager();
+        $manager->addCallbacks($event->getHandler(), $events);
+
+        // Add OPTIONS to the Allow header
+        $event->getResponse()->headers->set('Allow', 'OPTIONS', false);
+    }
+
+    /**
+     * Right before the response is sent to the client, whitelist all included Imbo-headers in the
+     * "Access-Control-Expose-Headers"-header
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function setExposedHeaders(EventInterface $event) {
+        // If this request was disallowed, don't expose any headers
+        if (!$this->requestAllowed) {
+            return;
+        }
+
+        $headers = array(
+            // The ResponseSender-listener will add this header and send the response,
+            // so we have no way to pick it up - instead we'll always whitelist it
+            'X-Imbo-ImageIdentifier'
+        );
+
+        foreach ($event->getResponse()->headers as $header => $value) {
+            if (strpos($header, 'x-imbo') === 0) {
+                $headers[] = implode('-', array_map('ucfirst', explode('-', $header)));;
+            }
+        }
+
+        $event->getResponse()->headers->add(array(
+            'Access-Control-Expose-Headers' => implode(', ', $headers)
+        ));
     }
 
     /**
@@ -86,15 +140,18 @@ class Cors implements ListenerInterface {
      */
     public function options(EventInterface $event) {
         $request = $event->getRequest();
+        $response = $event->getResponse();
         $origin = $request->headers->get('Origin', '*');
+
+        // This is an OPTIONS request, send 204 since no more content will follow
+        $response->setStatusCode(204);
 
         // Fall back if the passed origin is not allowed
         if (!$this->originIsAllowed($origin)) {
             return;
         }
 
-        $response = $event->getResponse();
-        $resource = $request->getResource();
+        $resource = (string) $request->getRoute();
 
         $allowedMethods = array('OPTIONS');
 
@@ -110,8 +167,7 @@ class Cors implements ListenerInterface {
         ));
 
         // Since this is an OPTIONS-request, there is no need for further parsing
-        $response->setStatusCode(204);
-        $event->stopPropagation(true);
+        $event->stopPropagation();
     }
 
     /**
@@ -120,16 +176,28 @@ class Cors implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function invoke(EventInterface $event) {
-        $origin = $event->getRequest()->headers->get('Origin', '*');
+        $request = $event->getRequest();
+        $resource = (string) $request->getRoute();
+        $method = $request->getMethod();
+        $allowed = $this->params['allowedMethods'];
+
+        if (!isset($allowed[$resource]) || !in_array($method, $allowed[$resource])) {
+            // The listener is not configured for the current method/resource combination
+            return;
+        }
+
+        $origin = $request->headers->get('Origin', '*');
 
         // Fall back if the passed origin is not allowed
         if (!$this->originIsAllowed($origin)) {
             return;
         }
 
+        // Flag this as an allowed request
+        $this->requestAllowed = true;
+
         $event->getResponse()->headers->add(array(
             'Access-Control-Allow-Origin' => $origin,
-            'Access-Control-Expose-Headers' => 'X-Imbo-Error-Internalcode'
         ));
     }
 

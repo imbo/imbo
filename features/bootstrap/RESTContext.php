@@ -72,11 +72,18 @@ class RESTContext extends BehatContext {
     private $prevRequestedPath;
 
     /**
-     * The current coverage session id
+     * The current test session id
      *
      * @var string
      */
-    private static $coverageSession;
+    private static $testSessionId;
+
+    /**
+     * Parameters from the configuration
+     *
+     * @var array
+     */
+    private $params;
 
     /**
      * Class constructor
@@ -84,14 +91,25 @@ class RESTContext extends BehatContext {
      * @param array $parameters Context parameters
      */
     public function __construct(array $parameters) {
-        $this->client = new Client($parameters['url']);
+        $this->params = $parameters;
+        $this->createClient();
+    }
 
-        if ($parameters['enableCodeCoverage']) {
-            $this->client->setDefaultHeaders(array(
-                'X-Enable-Coverage' => 1,
-                'X-Coverage-Session' => self::$coverageSession,
-            ));
+    /**
+     * Create a new HTTP client
+     */
+    private function createClient() {
+        $this->client = new Client($this->params['url']);
+
+        $defaultHeaders = array(
+            'X-Test-Session-Id' => self::$testSessionId,
+        );
+
+        if ($this->params['enableCodeCoverage']) {
+            $defaultHeaders['X-Enable-Coverage'] = 1;
         }
+
+        $this->client->setDefaultHeaders($defaultHeaders);
     }
 
     /**
@@ -115,13 +133,33 @@ class RESTContext extends BehatContext {
             $params['router']
         );
 
-        sleep(1);
-
-        if (!self::canConnectToHttpd($url['host'], $port)) {
-            throw new RuntimeException('Could not start the built in httpd');
+        if (!self::$pid) {
+            // Could not start the httpd for some reason
+            throw new RuntimeException('Could not start the web server');
         }
 
-        self::$coverageSession = uniqid('', true);
+        // Try to connect
+        $start = microtime(true);
+        $connected = false;
+
+        while (microtime(true) - $start <= (int) $params['timeout']) {
+            if (self::canConnectToHttpd($url['host'], $port)) {
+                $connected = true;
+                break;
+            }
+        }
+
+        if (!$connected) {
+            self::killProcess(self::$pid);
+            throw new RuntimeException(
+                sprintf(
+                    'Could not connect to the web server within the given timeframe (%d second(s))',
+                    $params['timeout']
+                )
+            );
+        }
+
+        self::$testSessionId = uniqid('', true);
     }
 
     /**
@@ -136,7 +174,7 @@ class RESTContext extends BehatContext {
             $client = new Client($parameters['url']);
             $response = $client->get('/', array(
                 'X-Enable-Coverage' => 1,
-                'X-Coverage-Session' => self::$coverageSession,
+                'X-Test-Session-Id' => self::$testSessionId,
                 'X-Collect-Coverage' => 1,
             ))->send();
 
@@ -192,12 +230,16 @@ class RESTContext extends BehatContext {
         }
 
         $this->responses[] = $response;
+
+        // Create a fresh client
+        $this->createClient();
     }
 
     /**
      * @Given /^make the same request using HTTP "([^"]*)"$/
      */
     public function makeSameRequest($method) {
+        $this->appendAccessToken();
         $this->request($this->prevRequestedPath, $method);
     }
 
@@ -242,7 +284,7 @@ class RESTContext extends BehatContext {
             $cacheable = false;
         }
 
-        assertSame($cacheable, $this->responses[count($this->responses) - 1]->canCache());
+        assertSame($cacheable, $this->getLastResponse()->canCache());
     }
 
     /**
@@ -255,12 +297,27 @@ class RESTContext extends BehatContext {
     }
 
     /**
-     * @Given /^the "([^"]*)" response header is "([^"]*)"$/
+     * @Given /^the "([^"]*)" response header (is|contains|matches) "([^"]*)"$/
      */
-    public function assertResponseHeader($header, $value) {
+    public function assertResponseHeader($header, $match, $value) {
         $response = $this->getLastResponse();
         $actual = (string) $response->getHeader($header);
-        assertSame($value, $actual, 'Expected "' . $value . '", got "' . $actual . '"');
+
+        if ($match === 'is') {
+            assertSame($value, $actual, 'Expected "' . $value . '", got "' . $actual . '"');
+        } else if ($match === 'matches') {
+            assertRegExp('#^' . $value . '$#', $actual, $actual . ' does not match ' . $value);
+        } else {
+            assertContains($value, $actual, $actual . ' does not contain ' . $value);
+        }
+    }
+
+    /**
+     * @Then /^the "([^"]*)" response header does not exist$/
+     */
+    public function assertHeaderDoesNotExist($header) {
+        $response = $this->getLastResponse();
+        assertFalse($response->hasHeader($header), 'The "' . $header . '" response header should not exist');
     }
 
     /**
@@ -305,6 +362,13 @@ class RESTContext extends BehatContext {
             assertContains($expected, $actual);
         }
 
+    }
+
+    /**
+     * @Given /^the response body length is "([^"]*)"$/
+     */
+    public function assertResponseBodyLength($length) {
+        assertSame(strlen((string) $this->getLastResponse()->getBody()), (int) $length);
     }
 
     /**

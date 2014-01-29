@@ -12,6 +12,7 @@ namespace Imbo\Http\Request;
 
 use Imbo\Exception\InvalidArgumentException,
     Imbo\Model\Image,
+    Imbo\Router\Route,
     Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 /**
@@ -21,13 +22,6 @@ use Imbo\Exception\InvalidArgumentException,
  * @package Http
  */
 class Request extends SymfonyRequest {
-    /**
-     * The public key from the request
-     *
-     * @var string
-     */
-    private $publicKey;
-
     /**
      * The private key
      *
@@ -43,33 +37,18 @@ class Request extends SymfonyRequest {
     private $image;
 
     /**
-     * The current image identifier (if any)
-     *
-     * @var string
-     */
-    private $imageIdentifier;
-
-    /**
-     * The current extension (if any)
-     *
-     * @var string
-     */
-    private $extension;
-
-    /**
-     * The currently requested resource name (as defined by the constants in
-     * Imbo\Resource\ResourceInterface).
-     *
-     * @var string
-     */
-    private $resource;
-
-    /**
      * Array of transformations
      *
      * @var array
      */
     private $transformations;
+
+    /**
+     * The current route
+     *
+     * @param Route
+     */
+    private $route;
 
     /**
      * Set an image model
@@ -84,7 +63,7 @@ class Request extends SymfonyRequest {
     }
 
     /**
-     * Get an image model attached to the request (on PUT)
+     * Get an image model attached to the request (on POST)
      *
      * @return null|Image
      */
@@ -98,19 +77,7 @@ class Request extends SymfonyRequest {
      * @return string
      */
     public function getPublicKey() {
-        return $this->publicKey;
-    }
-
-    /**
-     * Set the public key
-     *
-     * @param string $key The key to set
-     * @return Request
-     */
-    public function setPublicKey($key) {
-        $this->publicKey = $key;
-
-        return $this;
+        return $this->route ? $this->route->get('publicKey') : null;
     }
 
     /**
@@ -148,7 +115,15 @@ class Request extends SymfonyRequest {
 
             $transformations = $this->query->get('t', array());
 
+            if (!is_array($transformations)) {
+                throw new InvalidArgumentException('Transformations must be specifed as an array', 400);
+            }
+
             foreach ($transformations as $transformation) {
+                if (!is_string($transformation)) {
+                    throw new InvalidArgumentException('Invalid transformation', 400);
+                }
+
                 // See if the transformation has any parameters
                 $pos = strpos($transformation, ':');
                 $urlParams = '';
@@ -189,33 +164,12 @@ class Request extends SymfonyRequest {
     }
 
     /**
-     * Check whether or not the request includes image transformations
-     *
-     * @return boolean
-     */
-    public function hasTransformations() {
-        return $this->getExtension() || $this->query->has('t');
-    }
-
-    /**
      * Get the image identifier from the URL
      *
      * @return string|null
      */
     public function getImageIdentifier() {
-        return $this->imageIdentifier;
-    }
-
-    /**
-     * Set the image identifier
-     *
-     * @param string $imageIdentifier The image identifier to set
-     * @return Request
-     */
-    public function setImageIdentifier($imageIdentifier) {
-        $this->imageIdentifier = $imageIdentifier;
-
-        return $this;
+        return $this->route ? $this->route->get('imageIdentifier') : null;
     }
 
     /**
@@ -224,44 +178,11 @@ class Request extends SymfonyRequest {
      * @return string|null
      */
     public function getExtension() {
-        return $this->extension;
+        return $this->route ? $this->route->get('extension') : null;
     }
 
     /**
-     * Set the extension requested
-     *
-     * @param string $extension The extension to set
-     * @return Request
-     */
-    public function setExtension($extension) {
-        $this->extension = $extension;
-
-        return $this;
-    }
-
-    /**
-     * Set the resource name (one of the constants defined in Imbo\Resource\ResourceInterface)
-     *
-     * @param string $resource The name of the resource
-     * @return Request
-     */
-    public function setResource($resource) {
-        $this->resource = $resource;
-
-        return $this;
-    }
-
-    /**
-     * Get the resource name
-     *
-     * @return string
-     */
-    public function getResource() {
-        return $this->resource;
-    }
-
-    /**
-     * Get the URI without the Symfony normalization applied to the query string
+     * Get the URI without the Symfony normalization applied to the query string, un-encoded
      *
      * @return string
      */
@@ -269,9 +190,30 @@ class Request extends SymfonyRequest {
         $query = $this->server->get('QUERY_STRING');
 
         if (!empty($query)) {
-            $query = '?' . $query;
+            $query = '?' . urldecode($query);
         }
 
         return $this->getSchemeAndHttpHost() . $this->getBaseUrl() . $this->getPathInfo() . $query;
+    }
+
+    /**
+     * Get the current route
+     *
+     * @return Route
+     */
+    public function getRoute() {
+        return $this->route;
+    }
+
+    /**
+     * Set the route
+     *
+     * @param Route $route The current route
+     * @return self
+     */
+    public function setRoute(Route $route) {
+        $this->route = $route;
+
+        return $this;
     }
 }

@@ -10,10 +10,7 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\TransformationException,
-    Imbo\Image\Transformation\TransformationInterface,
-    Imbo\Model\Image;
+use Imbo\EventManager\EventInterface;
 
 /**
  * Image transformer listener
@@ -23,18 +20,11 @@ use Imbo\EventManager\EventInterface,
  */
 class ImageTransformer implements ListenerInterface {
     /**
-     * An array of registered transformation handlers
-     *
-     * @var array
-     */
-    private $transformationHandlers = array();
-
-    /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('image.transform', array($this, 'transform')),
+            'image.transform' => 'transform',
         );
     }
 
@@ -45,45 +35,43 @@ class ImageTransformer implements ListenerInterface {
      */
     public function transform(EventInterface $event) {
         $request = $event->getRequest();
-        $image = $event->getResponse()->getImage();
-        $transformed = false;
+        $image = $event->getResponse()->getModel();
+        $eventManager = $event->getManager();
+        $presets = $event->getConfig()['transformationPresets'];
 
-        // Fetch and apply transformations
+        // Fetch transformations specifed in the query and transform the image
         foreach ($request->getTransformations() as $transformation) {
-            $name = $transformation['name'];
+            if (isset($presets[$transformation['name']])) {
+                // Preset
+                foreach ($presets[$transformation['name']] as $name => $params) {
+                    if (is_int($name)) {
+                        // No hardcoded params, use the ones from the request
+                        $name = $params;
+                        $params = $transformation['params'];
+                    } else {
+                        // Some hardcoded params. Merge with the ones from the request, making the
+                        // hardcoded params overwrite the ones from the request
+                        $params = array_replace($transformation['params'], $params);
+                    }
 
-            if (!isset($this->transformationHandlers[$name])) {
-                throw new TransformationException('Unknown transformation: ' . $name, 400);
+                    $eventManager->trigger(
+                        'image.transformation.' . strtolower($name),
+                        array(
+                            'image' => $image,
+                            'params' => $params,
+                        )
+                    );
+                }
+            } else {
+                // Regular transformation
+                $eventManager->trigger(
+                    'image.transformation.' . strtolower($transformation['name']),
+                    array(
+                        'image' => $image,
+                        'params' => $transformation['params'],
+                    )
+                );
             }
-
-            $callback = $this->transformationHandlers[$name];
-            $transformation = $callback($transformation['params']);
-
-            if ($transformation instanceof TransformationInterface) {
-                $transformation->applyToImage($image);
-            } else if (is_callable($transformation)) {
-                $transformation($image);
-            }
-
-            $transformed = true;
         }
-
-        $image->hasBeenTransformed($transformed);
-    }
-
-    /**
-     * Register an image transformation handler
-     *
-     * @param string $name The name of the transformation, as used in the query parameters
-     * @param callable $callback A piece of code that can be executed. The callback will receive a
-     *                           single parameter: $params, which is an array with parameters
-     *                           associated with the transformation. The callable must return an
-     *                           instance of Imbo\Image\Transformation\TransformationInterface
-     * @return ImageTransformer
-     */
-    public function registerTransformationHandler($name, $callback) {
-        $this->transformationHandlers[$name] = $callback;
-
-        return $this;
     }
 }

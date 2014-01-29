@@ -13,13 +13,15 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\RuntimeException,
-    Imbo\Exception\DatabaseException,
-    Imagick;
+    Imbo\Exception\DatabaseException;
 
 /**
  * Exif metadata event listener
  *
+ * This listener will look for properties stored in the image, and store them as metadata in Imbo.
+ *
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
+ * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
 class ExifMetadata implements ListenerInterface {
@@ -28,7 +30,9 @@ class ExifMetadata implements ListenerInterface {
      *
      * @var array
      */
-    protected $allowedTags = array();
+    protected $allowedTags = array(
+        'exif:*',
+    );
 
     /**
      * Exif properties
@@ -38,39 +42,80 @@ class ExifMetadata implements ListenerInterface {
     protected $properties = array();
 
     /**
+     * Imagick instance
+     *
+     * @var \Imagick
+     */
+    private $imagick;
+
+    /**
      * Class constructor
      *
-     * @param array $allowedTags An array of tags to use as metadata, if present
+     * @param array $params Parameters for the event listener
      */
-    public function __construct(array $allowedTags = array()) {
-        $this->allowedTags = $allowedTags;
+    public function __construct(array $params = null) {
+        if ($params && isset($params['allowedTags'])) {
+            $this->allowedTags = $params['allowedTags'];
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
             // High priority to prevent other listeners from stripping EXIF-data
-            new ListenerDefinition('image.put', array($this, 'populate'), 45),
+            'images.post' => array('populate' => 45),
 
             // When image has been inserted to database, insert metadata
-            new ListenerDefinition('db.image.insert', array($this, 'save'), -100),
+            'db.image.insert' => array('save' => -100),
         );
+    }
+
+    /**
+     * Set an Imagick instance
+     *
+     * @param \Imagick $imagick An instance of Imagick
+     * @return self
+     */
+    public function setImagick(\Imagick $imagick) {
+        $this->imagick = $imagick;
+
+        return $this;
+    }
+
+    /**
+     * Get an Imagick instance
+     *
+     * @return \Imagick
+     */
+    public function getImagick() {
+        if ($this->imagick === null) {
+            $this->imagick = new \Imagick();
+        }
+
+        return $this->imagick;
     }
 
     /**
      * Read exif data from incoming image
      *
      * @param EventInterface $event The triggered event
+     * @return array
      */
     public function populate(EventInterface $event) {
         $image = $event->getRequest()->getImage();
 
         // Get EXIF-properties from image
-        $imagick = new Imagick();
+        $imagick = $this->getImagick();
         $imagick->readImageBlob($image->getBlob());
         $properties = $imagick->getImageProperties();
+
+        // Fix trailing spaces
+        foreach ($properties as $key => $value) {
+            unset($properties[$key]);
+            $properties[trim($key)] = $value;
+        }
 
         // Filter and parse properties
         $properties = $this->filterProperties($properties);
@@ -92,14 +137,19 @@ class ExifMetadata implements ListenerInterface {
         $request = $event->getRequest();
         $database = $event->getDatabase();
 
+        $publicKey = $request->getPublicKey();
+        $imageIdentifier = $request->getImage()->getChecksum();
+
         try {
-            $success = $database->updateMetadata(
-                $request->getPublicKey(),
-                $request->getImage()->getChecksum(),
+            $database->updateMetadata(
+                $publicKey,
+                $imageIdentifier,
                 $this->properties
             );
         } catch (DatabaseException $e) {
-            throw new RuntimeException('Could not store EXIF-metadata: ' . $e->getMessage(), 500);
+            $database->deleteImage($publicKey, $imageIdentifier);
+
+            throw new RuntimeException('Could not store EXIF-metadata', 500);
         }
     }
 
@@ -110,14 +160,31 @@ class ExifMetadata implements ListenerInterface {
      * @return array A filtered array of properties
      */
     protected function filterProperties(array $properties) {
-        if (empty($this->allowedTags)) {
+        $tags = array_fill_keys($this->allowedTags, 1);
+
+        if (empty($tags) || isset($tags['*'])) {
             return $properties;
         }
 
-        return array_intersect_key(
-            $properties,
-            array_flip($this->allowedTags)
-        );
+        $filtered = array();
+
+        foreach ($properties as $key => $value) {
+            if (isset($tags[$key])) {
+                $filtered[$key] = $value;
+                continue;
+            }
+
+            if (($pos = strpos($key, ':')) !== false) {
+                $namespace = substr($key, 0, $pos);
+
+                if (isset($tags[$namespace . ':*'])) {
+                    $filtered[$key] = $value;
+                    continue;
+                }
+            }
+        }
+
+        return $filtered;
     }
 
     /**
@@ -154,8 +221,8 @@ class ExifMetadata implements ListenerInterface {
     /**
      * Parse GPS coordinates in hours/minutes/seconds-format to decimal degrees
      *
-     * @param  string $coordinate Coordinate in hours/minutes/seconds format
-     * @param  string $hemisphere Hemisphere identifier (N, E, S, W)
+     * @param string $coordinate Coordinate in hours/minutes/seconds format
+     * @param string $hemisphere Hemisphere identifier (N, E, S, W)
      * @return float
      */
     protected function parseGpsCoordinate($coordinate, $hemisphere) {
@@ -163,16 +230,18 @@ class ExifMetadata implements ListenerInterface {
 
         for ($i = 0; $i < 3; $i++) {
             $part = explode('/', $coordinates[$i]);
-            if (count($part) == 1) {
+            $parts = count($part);
+
+            if ($parts === 1) {
                 $coordinates[$i] = $part[0];
-            } else if (count($part) == 2) {
+            } else if ($parts === 2) {
                 $coordinates[$i] = floatval($part[0]) / floatval($part[1]);
             } else {
                 $coordinates[$i] = 0;
             }
         }
 
-        $sign = ($hemisphere == 'W' || $hemisphere == 'S') ? -1 : 1;
+        $sign = ($hemisphere === 'W' || $hemisphere === 'S') ? -1 : 1;
         $degrees = ($coordinates[0] + ($coordinates[1] / 60) + ($coordinates[2] / 3600));
 
         return $sign * $degrees;

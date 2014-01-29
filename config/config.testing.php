@@ -12,6 +12,11 @@ namespace Imbo;
 
 use Imbo\Image\Transformation,
     Imbo\Cache,
+    Imbo\Resource\ResourceInterface,
+    Imbo\EventManager\EventInterface,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\Model\ArrayModel,
+    Memcached as PeclMemcached,
     PHPUnit_Framework_MockObject_Generator,
     PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount,
     PHPUnit_Framework_MockObject_Stub_Return;
@@ -19,8 +24,97 @@ use Imbo\Image\Transformation,
 // Require composer autoloader
 require __DIR__ . '/../vendor/autoload.php';
 
+class CustomResource implements ResourceInterface {
+    public function getAllowedMethods() {
+        return array('GET');
+    }
+
+    public static function getSubscribedEvents() {
+        return array(
+            'custom1.get' => 'get',
+        );
+    }
+
+    public function get(EventInterface $event) {
+        $model = new ArrayModel();
+        $model->setData(array(
+            'event' => $event->getName(),
+            'id' => $event->getRequest()->getRoute()->get('id'),
+        ));
+        $event->getResponse()->setModel($model);
+    }
+}
+
+class CustomResource2 implements ResourceInterface {
+    public function getAllowedMethods() {
+        return array('GET', 'PUT');
+    }
+
+    public static function getSubscribedEvents() {
+        return array(
+            'custom2.get' => 'get',
+            'custom2.put' => 'put',
+        );
+    }
+
+    public function get(EventInterface $event) {
+        $model = new ArrayModel();
+        $model->setData(array(
+            'event' => $event->getName(),
+        ));
+        $event->getResponse()->setModel($model);
+    }
+
+    public function put(EventInterface $event) {
+        $model = new ArrayModel();
+        $model->setData(array('event' => $event->getName()));
+        $event->getResponse()->setModel($model);
+    }
+}
+
+class CustomEventListener implements ListenerInterface {
+    private $value1;
+    private $value2;
+
+    public function __construct(array $params) {
+        $this->value1 = $params['key1'];
+        $this->value2 = $params['key2'];
+    }
+
+    public static function getSubscribedEvents() {
+        return array(
+            'index.get' => 'getIndex',
+            'user.get' => 'getUser',
+        );
+    }
+
+    public function getIndex(EventManager\EventInterface $event) {
+        $event->getResponse()->headers->add(array(
+            'X-Imbo-Value1' => $this->value1,
+            'X-Imbo-Value2' => $this->value2,
+        ));
+    }
+
+    public function getUser(EventManager\EventInterface $event) {
+        $event->getResponse()->headers->set('X-Imbo-CurrentUser', $event->getRequest()->getPublicKey());
+    }
+}
+
+$statsAllow = array();
+
+if (!empty($_GET['statsAllow'])) {
+    $statsAllow = explode(',', $_GET['statsAllow']);
+}
+
+if (isset($_SERVER['HTTP_X_CLIENT_IP'])) {
+    $_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_X_CLIENT_IP'];
+}
+
 return array(
-    'auth' => array('publickey' => 'privatekey'),
+    'auth' => array(
+        'publickey' => 'privatekey',
+        'user' => 'key',
+    ),
 
     'database' => function() {
         $adapter = PHPUnit_Framework_MockObject_Generator::getMock(
@@ -51,73 +145,115 @@ return array(
     },
 
     'eventListeners' => array(
-        'auth' => function() {
-            return new EventListener\Authenticate();
-        },
-        'accessToken' => function() {
-            return new EventListener\AccessToken();
-        },
-        'imageTransformationCache' => function() {
-            return new EventListener\ImageTransformationCache('/tmp/imbo-behat-image-transformation-cache');
-        },
+        'auth' => 'Imbo\EventListener\Authenticate',
+        'accessToken' => 'Imbo\EventListener\AccessToken',
+        'statsAccess' => array(
+            'listener' => 'Imbo\EventListener\StatsAccess',
+            'params' => array('allow' => $statsAllow),
+        ),
+        'imageTransformationCache' => array(
+            'listener' => 'Imbo\EventListener\ImageTransformationCache',
+            'params' => array('path' => '/tmp/imbo-behat-image-transformation-cache'),
+        ),
         'metadataCache' => function() {
-            return new EventListener\MetadataCache(new Cache\APC('behat'));
+            $memcached = new PeclMemcached();
+            $memcached->addServer('localhost', 11211);
+
+            $namespace = $_SERVER['HTTP_X_TEST_SESSION_ID'];
+
+            $adapter = new Cache\Memcached($memcached, $namespace);
+
+            return new EventListener\MetadataCache(array('cache' => $adapter));
         },
+        'someHandler' => array(
+            'events' => array(
+                'index.get' => 1000,
+            ),
+            'callback' => function(EventManager\EventInterface $event) {
+                $event->getResponse()->headers->set('X-Imbo-SomeHandler', microtime(true));
+            }
+        ),
+        'someOtherHandler' => array(
+            'events' => array(
+                'index.get',
+                'index.head',
+            ),
+            'callback' => function(EventManager\EventInterface $event) {
+                $event->getResponse()->headers->set('X-Imbo-SomeOtherHandler', microtime(true));
+            },
+            'priority' => 10,
+        ),
+        'someEventListener' => array(
+            'listener' => __NAMESPACE__ . '\CustomEventListener',
+            'params' => array('key1' => 'value1', 'key2' => 'value2'),
+            'publicKeys' => array(
+                'whitelist' => array('publickey'),
+            ),
+        ),
+        'cors' => array(
+            'listener' => 'Imbo\EventListener\Cors',
+            'params' => array(
+                'allowedOrigins' => array('http://allowedhost'),
+                'maxAge' => 1349,
+            ),
+        ),
+        'maxImageSize' => array(
+            'listener' => 'Imbo\EventListener\MaxImageSize',
+            'params' => array('width' => 1000, 'height' => 1000),
+        ),
+        'varnishHashTwo' => 'Imbo\EventListener\VarnishHashTwo',
+        'customVarnishHashTwo' => array(
+            'listener' => 'Imbo\EventListener\VarnishHashTwo',
+            'params' => array('headerName' => 'X-Imbo-HashTwo'),
+        ),
+        'exifMetadataListener' => 'Imbo\EventListener\ExifMetadata',
+        'autoRotateListener' => 'Imbo\EventListener\AutoRotateImage',
+
+        // Image transformations
+        'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
+        'border' => 'Imbo\Image\Transformation\Border',
+        'canvas' => 'Imbo\Image\Transformation\Canvas',
+        'compress' => 'Imbo\Image\Transformation\Compress',
+        'convert' => 'Imbo\Image\Transformation\Convert',
+        'crop' => 'Imbo\Image\Transformation\Crop',
+        'desaturate' => 'Imbo\Image\Transformation\Desaturate',
+        'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
+        'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
+        'maxSize' => 'Imbo\Image\Transformation\MaxSize',
+        'progressive' => 'Imbo\Image\Transformation\Progressive',
+        'resize' => 'Imbo\Image\Transformation\Resize',
+        'rotate' => 'Imbo\Image\Transformation\Rotate',
+        'sepia' => 'Imbo\Image\Transformation\Sepia',
+        'strip' => 'Imbo\Image\Transformation\Strip',
+        'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
+        'transpose' => 'Imbo\Image\Transformation\Transpose',
+        'transverse' => 'Imbo\Image\Transformation\Transverse',
+        'watermark' => 'Imbo\Image\Transformation\Watermark',
+
+        // Imagick-specific event listener for the built in image transformations
+        'imagick' => 'Imbo\EventListener\Imagick',
     ),
 
-    'imageTransformations' => array(
-        'border' => function (array $params) {
-            return new Transformation\Border($params);
-        },
-        'canvas' => function (array $params) {
-            return new Transformation\Canvas($params);
-        },
-        'compress' => function (array $params) {
-            return new Transformation\Compress($params);
-        },
-        'convert' => function (array $params) {
-            return new Transformation\Convert($params);
-        },
-        'crop' => function (array $params) {
-            return new Transformation\Crop($params);
-        },
-        'desaturate' => function (array $params) {
-            return new Transformation\Desaturate();
-        },
-        'flipHorizontally' => function (array $params) {
-            return new Transformation\FlipHorizontally();
-        },
-        'flipVertically' => function (array $params) {
-            return new Transformation\FlipVertically();
-        },
-        'maxSize' => function (array $params) {
-            return new Transformation\MaxSize($params);
-        },
-        'resize' => function (array $params) {
-            return new Transformation\Resize($params);
-        },
-        'rotate' => function (array $params) {
-            return new Transformation\Rotate($params);
-        },
-        'sepia' => function (array $params) {
-            return new Transformation\Sepia($params);
-        },
-        'thumbnail' => function (array $params) {
-            return new Transformation\Thumbnail($params);
-        },
-        'transpose' => function (array $params) {
-            return new Transformation\Transpose();
-        },
-        'transverse' => function (array $params) {
-            return new Transformation\Transverse();
-        },
+    'eventListenerInitializers' => array(
+        'imagick' => 'Imbo\EventListener\Initializer\Imagick',
+    ),
 
-        // collection
-        'graythumb' => function (array $params) {
-            return new Transformation\Collection(array(
-                new Transformation\Thumbnail($params),
-                new Transformation\Desaturate(),
-            ));
+    'transformationPresets' => array(
+        'graythumb' => array(
+            'thumbnail',
+            'desaturate',
+        ),
+    ),
+
+    'routes' => array(
+        'custom1' => '#^/custom/(?<id>[a-zA-Z0-9]{7})$#',
+        'custom2' => '#^/custom(?:\.(?<extension>json|xml))?$#',
+    ),
+
+    'resources' => array(
+        'custom1' => __NAMESPACE__ . '\CustomResource',
+        'custom2' => function() {
+            return new CustomResource2();
         }
     ),
 );

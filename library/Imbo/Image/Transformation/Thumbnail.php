@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -20,7 +22,7 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Thumbnail extends Transformation implements TransformationInterface {
+class Thumbnail extends Transformation implements ListenerInterface {
     /**
      * Width of the thumbnail
      *
@@ -45,44 +47,41 @@ class Thumbnail extends Transformation implements TransformationInterface {
     private $fit = 'outbound';
 
     /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
+     * {@inheritdoc}
      */
-    public function __construct(array $params = array()) {
-        if (!empty($params['width'])) {
-            $this->width = (int) $params['width'];
-        }
-
-        if (!empty($params['height'])) {
-            $this->height = (int) $params['height'];
-        }
-
-        if (!empty($params['fit'])) {
-            $this->fit = $params['fit'];
-        }
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.thumbnail' => 'transform',
+        );
     }
 
     /**
-     * {@inheritdoc}
+     * Transform the image
+     *
+     * @param EventInterface $event The event instance
      */
-    public function applyToImage(Image $image) {
-        try {
-            $imagick = $this->getImagick();
-            $imagick->setOption('jpeg:size', $this->width . 'x' . $this->height);
-            $imagick->readImageBlob($image->getBlob());
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
 
-            if ($this->fit == 'inset') {
-                $imagick->thumbnailimage($this->width, $this->height, true);
+        $width = !empty($params['width']) ? (int) $params['width'] : $this->width;
+        $height = !empty($params['height']) ? (int) $params['height'] : $this->height;
+        $fit = !empty($params['fit']) ? $params['fit'] : $this->fit;
+
+        try {
+            $this->imagick->setOption('jpeg:size', $width . 'x' . $height);
+
+            if ($fit === 'inset') {
+                $this->imagick->thumbnailimage($width, $height, true);
             } else {
-                $imagick->cropThumbnailImage($this->width, $this->height);
+                $this->imagick->cropThumbnailImage($width, $height);
             }
 
-            $size = $imagick->getImageGeometry();
+            $size = $this->imagick->getImageGeometry();
 
-            $image->setBlob($imagick->getImageBlob())
-                  ->setWidth($size['width'])
-                  ->setHeight($size['height']);
+            $image->setWidth($size['width'])
+                  ->setHeight($size['height'])
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

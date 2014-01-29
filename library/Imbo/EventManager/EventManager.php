@@ -10,12 +10,9 @@
 
 namespace Imbo\EventManager;
 
-use Imbo\Container,
-    Imbo\ContainerAware,
-    Imbo\EventListener\ListenerDefinition,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\InvalidArgumentException,
-    SplPriorityQueue;
+use Imbo\EventListener\ListenerInterface,
+    Imbo\EventListener\Initializer\InitializerInterface,
+    Imbo\Exception\InvalidArgumentException;
 
 /**
  * Event manager
@@ -23,80 +20,142 @@ use Imbo\Container,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Manager
  */
-class EventManager implements ContainerAware {
+class EventManager {
     /**
-     * Callbacks that can be triggered
+     * The event handlers
      *
      * @var array
      */
-    private $callbacks;
+    private $eventHandlers = array();
 
     /**
-     * Service container
+     * Event template
      *
-     * @var Container
+     * @var EventInterface
      */
-    private $container;
+    private $event;
 
     /**
-     * {@inheritdoc}
-     */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-    }
-
-    /**
-     * Attach a callable to an event
+     * Map of events and callbacks
      *
-     * @param string $eventName The event to attach to
-     * @param callback $callback Code that will be called when the event is triggered
-     * @param int $priority Priority of the callback
-     * @param array $publicKeys Filter using "include" or "exclude"
-     * @throws InvalidArgumentException
-     * @return EventManager
+     * @var array
      */
-    public function attach($eventName, $callback, $priority = 1, $publicKeys = array()) {
-        if (!is_callable($callback)) {
-            throw new InvalidArgumentException('Callback for event ' . $eventName . ' is not callable');
-        }
+    private $callbacks = array();
 
-        if (empty($this->callbacks[$eventName])) {
-            $this->callbacks[$eventName] = new SplPriorityQueue();
-        }
+    /**
+     * Event listener initializers
+     *
+     * @var InitializerInterface[]
+     */
+    private $initializers = array();
 
-        $this->callbacks[$eventName]->insert(array(
-            'callback' => $callback,
-            'publicKeys' => $publicKeys,
-        ), $priority);
+    /**
+     * Register an event handler
+     *
+     * @param string $name The name of the handler
+     * @param mixed $handler The handler itself
+     * @param array $params Parameters for the handler if $handler is a string
+     * @return self
+     */
+    public function addEventHandler($name, $handler, array $params = array()) {
+        if (is_string($handler)) {
+            $this->eventHandlers[$name] = array(
+                'handler' => $handler,
+                'params' => $params,
+            );
+        } else {
+            $this->eventHandlers[$name] = $handler;
+        }
 
         return $this;
     }
 
     /**
-     * Attach a listener definition
+     * Add one or more callbacks
      *
-     * @param ListenerDefinition $definition An instance of a listener definition
-     * @return EventManager
+     * @param string $name The name of the handler that owns the callback
+     * @param array $events Which events the callback will trigger for
+     * @param array $publicKeys Public key filter for the events
+     * @return self
      */
-    public function attachDefinition(ListenerDefinition $definition) {
-        return $this->attach(
-            $definition->getEventName(),
-            $definition->getCallback(),
-            $definition->getPriority(),
-            $definition->getPublicKeys()
-        );
+    public function addCallbacks($name, array $events, array $publicKeys = array()) {
+        // Default priority
+        $defaultPriority = 0;
+
+        foreach ($events as $event => $callback) {
+            if (!isset($this->callbacks[$event])) {
+                // Create a priority queue for this event
+                $this->callbacks[$event] = new PriorityQueue();
+            }
+
+            if (is_string($callback)) {
+                // 'eventName' => 'someMethod'
+                $this->callbacks[$event]->insert(array(
+                    'handler' => $name,
+                    'method' => $callback,
+                    'publicKeys' => $publicKeys,
+                ), $defaultPriority);
+            } else if (is_array($callback)) {
+                // 'eventName' => array( ... )
+                foreach ($callback as $method => $priority) {
+                    if (is_int($method)) {
+                        // 'eventName' => array('someMethod', ...)
+                        $method = $priority;
+                        $priority = $defaultPriority;
+                    }
+
+                    $this->callbacks[$event]->insert(array(
+                        'handler' => $name,
+                        'method' => $method,
+                        'publicKeys' => $publicKeys,
+                    ), $priority);
+                }
+            } else if (is_int($callback)) {
+                // We have a closure as a callback, so $callback is the actual priority
+                $this->callbacks[$event]->insert(array(
+                    'handler' => $name,
+                    'publicKeys' => $publicKeys,
+                ), $callback);
+            } else {
+                throw new InvalidArgumentException('Invalid event definition for listener: ' . $name, 500);
+            }
+        }
+
+        return $this;
     }
 
     /**
-     * Attach a listener
+     * Get a handler instance
      *
-     * @param ListenerInterface $listener An instance of an event listener
-     * @return EventManager
+     * @param string $name The name of the handler
+     * @return ListenerInterface
      */
-    public function attachListener(ListenerInterface $listener) {
-        foreach ($listener->getDefinition() as $definition) {
-            $this->attachDefinition($definition);
+    public function getHandlerInstance($name) {
+        if (is_array($this->eventHandlers[$name])) {
+            // The listener has not been initialized
+            $className = $this->eventHandlers[$name]['handler'];
+            $params = $this->eventHandlers[$name]['params'];
+            $handler = new $className($params ?: null);
+
+            // Run initializers
+            foreach ($this->initializers as $initializer) {
+                $initializer->initialize($handler);
+            }
+
+            $this->eventHandlers[$name] = $handler;
         }
+
+        return $this->eventHandlers[$name];
+    }
+
+    /**
+     * Add an event listener initializer
+     *
+     * @param InitializerInterface $initializer An initializer instance
+     * @return self
+     */
+    public function addInitializer(InitializerInterface $initializer) {
+        $this->initializers[] = $initializer;
 
         return $this;
     }
@@ -105,29 +164,40 @@ class EventManager implements ContainerAware {
      * Trigger a given event
      *
      * @param string $eventName The name of the event to trigger
+     * @param array $params Extra parameters for the event
      * @return EventManager
      */
-    public function trigger($eventName) {
+    public function trigger($eventName, array $params = array()) {
         if (!empty($this->callbacks[$eventName])) {
-            // Fetch current public key
-            $publicKey = $this->container->get('request')->getPublicKey();
-
-            // Fetch and configure a new event
-            $event = $this->container->get('event');
+            $event = clone $this->event;
             $event->setName($eventName);
 
+            // Add optional extra arguments
+            foreach ($params as $key => $value) {
+                $event->setArgument($key, $value);
+            }
+
+            // Fetch current public key
+            $publicKey = $event->getRequest()->getPublicKey();
+
             // Trigger all listeners for this event and pass in the event instance
-            foreach ($this->callbacks[$eventName] as $listener) {
-                $callback = $listener['callback'];
+            foreach (clone $this->callbacks[$eventName] as $listener) {
+                $event->setArgument('handler', $listener['handler']);
+                $callback = $this->getHandlerInstance($listener['handler']);
+
+                if ($callback instanceof ListenerInterface) {
+                    $callback = array($callback, $listener['method']);
+                }
+
                 $publicKeys = $listener['publicKeys'];
 
                 if (!$this->triggersFor($publicKey, $publicKeys)) {
                     continue;
                 }
 
-                call_user_func($callback, $event);
+                $callback($event);
 
-                if ($event->propagationIsStopped()) {
+                if ($event->isPropagationStopped()) {
                     break;
                 }
             }
@@ -147,24 +217,49 @@ class EventManager implements ContainerAware {
     }
 
     /**
+     * Set the event template
+     *
+     * This event instance will be cloned for each use of the trigger method
+     *
+     * @param EventInterface $event A configured event instance
+     * @return self
+     */
+    public function setEventTemplate(EventInterface $event) {
+        $this->event = $event;
+
+        return $this;
+    }
+
+    /**
      * Check if a listener will trigger for a given public key
      *
      * @param string $publicKey The public key to check for, can be null
-     * @param array $publicKeys The array from the listener with "include" and "exclude"
+     * @param array $filter The array from the listener with "whitelist" and "blacklist"
      * @return boolean
      */
-    private function triggersFor($publicKey, array $publicKeys) {
-        if (empty($publicKey) || empty($publicKeys)) {
+    private function triggersFor($publicKey = null, array $filter = array()) {
+        if (empty($publicKey) || empty($filter)) {
             return true;
         }
 
+        $filter = array_merge(array('whitelist' => array(), 'blacklist' => array()),  $filter);
+
+        $whitelist = array_flip($filter['whitelist']);
+        $blacklist = array_flip($filter['blacklist']);
+
         if (
-            (isset($publicKeys['include']) && !in_array($publicKey, $publicKeys['include'])) ||
-            (isset($publicKeys['exclude']) && in_array($publicKey, $publicKeys['exclude']))
+            // Both lists are empty
+            empty($whitelist) && empty($blacklist) ||
+
+            // Whitelist is empty, and the public key is not blacklisted
+            empty($whitelist) && !isset($blacklist[$publicKey]) ||
+
+            // Blacklist is empty, and the public key is whitelisted
+            empty($blacklist) && isset($whitelist[$publicKey])
         ) {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

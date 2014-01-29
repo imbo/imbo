@@ -47,10 +47,19 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Class constructor
      *
-     * @param string $path Path to store the cached images
+     * @param array $params Parameters for the cache
      * @throws InvalidArgumentException Throws an exception if the specified path is not writable
      */
-    public function __construct($path) {
+    public function __construct(array $params) {
+        if (!isset($params['path'])) {
+            throw new InvalidArgumentException(
+                'The image transformation cache path is missing from the configuration',
+                500
+            );
+        }
+
+        $path = $params['path'];
+
         if (!$this->isWritable($path)) {
             throw new InvalidArgumentException(
                 'Image transformation cache path is not writable by the webserver: ' . $path,
@@ -64,16 +73,16 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
             // Look for images in the cache before transformations occur
-            new ListenerDefinition('image.get', array($this, 'loadFromCache'), 20),
+            'image.get' => array('loadFromCache' => 20),
 
             // Store images in the cache before they are sent to the user agent
-            new ListenerDefinition('response.send', array($this, 'storeInCache'), 10),
+            'response.send' => array('storeInCache' => 10),
 
             // Remove from the cache when an image is deleted from Imbo
-            new ListenerDefinition('image.delete', array($this, 'deleteFromCache'), 10),
+            'image.delete' => array('deleteFromCache' => 10),
         );
     }
 
@@ -102,13 +111,14 @@ class ImageTransformationCache implements ListenerInterface {
             ) {
                 // Mark as cache hit
                 $data['headers']->set('X-Imbo-TransformationCache', 'Hit');
+                $data['image']->hasBeenTransformed(false);
 
                 // Replace all headers and set the image model
                 $response->headers = $data['headers'];
                 $response->setModel($data['image']);
 
                 // Stop other listeners on this event
-                $event->stopPropagation(true);
+                $event->stopPropagation();
 
                 return;
             } else {

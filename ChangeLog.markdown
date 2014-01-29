@@ -1,9 +1,43 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.0.0
+----------
+__N/A__
+
+* #248: Changed format of the parameters for event listeners
+* #238: Added ids[] and checksums[] as filters for the images resource
+* #234: Added pagination info to the images resource
+* #232: New image transformation: strip
+* #231: New image transformation: progressive
+* #228: Added support for wildcards in the ExifMetadata listener
+* #218: Support custom parameters when triggering events
+* #210: Image transformations must implement the image transformation interface
+* #205: Added a Varnish HashTwo event listener
+* #204: Images resource should be able to retrieve only specific fields
+* #201: Added an index resource
+* #199: Allow /metadata for the meta data resource
+* #196: Added Amazon Simple Storage Service (S3) storage adapter
+* #192: Images resource should allow sorting
+* #190: Added support for filtering images on one or more image identifiers
+* #189: Prioritize original image mime types when doing content negotiation
+* #188: Support an alternative installation method
+* #186: Added support for short image URL's
+* #185: Add support for custom resources and routes
+* #174: New image transformation: watermark
+* #161: Images can now only be added by requesting the images resource using HTTP POST
+
+Bug fixes:
+
+* #237: Fixed possible PHP Warnings when the transformation query parameter is invalid
+* #222: Some images are not correctly identified
+* #220: Incorrect IP matching in the stats access event listener
+* #211: CORS event listener suppresses "405 Method not allowed" responses when enabled
+* #103: Compress transformation only works as expected with image/jpeg
+
 Imbo-0.3.3
 ----------
-__2013-06-06__
+__2013-10-19__
 
 * Fixed #214: 0.3.2 is not installable without updating dependencies
 

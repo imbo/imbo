@@ -10,8 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface;
+use Imbo\EventListener\ListenerInterface;
 
 /**
  * Resource interface
@@ -22,19 +21,7 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-interface ResourceInterface {
-    /**#@+
-     * Resource types
-     *
-     * @var string
-     */
-    const STATUS   = 'status';
-    const USER     = 'user';
-    const IMAGES   = 'images';
-    const IMAGE    = 'image';
-    const METADATA = 'metadata';
-    /**#@-*/
-
+interface ResourceInterface extends ListenerInterface {
     /**
      * Return an array with the allowed (implemented) HTTP methods for the current resource
      *

@@ -10,14 +10,11 @@
 
 namespace Imbo\Image;
 
-use Imbo\EventListener\ListenerDefinition,
-    Imbo\EventManager\EventInterface,
+use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Exception\ImageException,
     Imbo\Exception,
     Imbo\Model\Image,
-    Imbo\Container,
-    Imbo\ContainerAware,
     Imagick,
     ImagickException,
     finfo;
@@ -28,27 +25,13 @@ use Imbo\EventListener\ListenerDefinition,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image
  */
-class ImagePreparation implements ContainerAware, ListenerInterface {
-    /**
-     * Service container
-     *
-     * @var Container
-     */
-    private $container;
-
+class ImagePreparation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('image.put', array($this, 'prepareImage'), 50),
+            'images.post' => array('prepareImage' => 50),
         );
     }
 
@@ -74,22 +57,19 @@ class ImagePreparation implements ContainerAware, ListenerInterface {
             throw $e;
         }
 
-        // Calculate hash
-        $actualHash = md5($imageBlob);
+        // Open the image with imagick to fetch the mime type
+        $imagick = new Imagick();
 
-        // Get image identifier from request
-        $imageIdentifier = $request->getImageIdentifier();
-
-        if ($actualHash !== $imageIdentifier) {
-            $e = new ImageException('Hash mismatch', 400);
-            $e->setImboErrorCode(Exception::IMAGE_HASH_MISMATCH);
+        try {
+            $imagick->readImageBlob($imageBlob);
+            $mime = $imagick->getImageMimeType();
+            $size = $imagick->getImageGeometry();
+        } catch (ImagickException $e) {
+            $e = new ImageException('Invalid image', 415);
+            $e->setImboErrorCode(Exception::IMAGE_INVALID_IMAGE);
 
             throw $e;
         }
-
-        // Use the file info extension to fetch the mime type
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->buffer($imageBlob);
 
         if (!Image::supportedMimeType($mime)) {
             $e = new ImageException('Unsupported image type: ' . $mime, 415);
@@ -98,28 +78,10 @@ class ImagePreparation implements ContainerAware, ListenerInterface {
             throw $e;
         }
 
-        $extension = Image::getFileExtension($mime);
-
-        try {
-            $imagick = new Imagick();
-            $imagick->readImageBlob($imageBlob);
-            $validImage = $imagick->valid();
-            $size = $imagick->getImageGeometry();
-        } catch (ImagickException $e) {
-            $validImage = false;
-        }
-
-        if (!$validImage) {
-            $e = new ImageException('Broken image', 415);
-            $e->setImboErrorCode(Exception::IMAGE_BROKEN_IMAGE);
-
-            throw $e;
-        }
-
         // Store relevant information in the image instance and attach it to the request
-        $image = $this->container->get('image');
+        $image = new Image();
         $image->setMimeType($mime)
-              ->setExtension($extension)
+              ->setExtension(Image::getFileExtension($mime))
               ->setBlob($imageBlob)
               ->setWidth($size['width'])
               ->setHeight($size['height']);

@@ -11,8 +11,6 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
-    Imbo\EventListener\ListenerInterface,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Model;
 
@@ -22,7 +20,7 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-class Metadata implements ResourceInterface, ListenerInterface {
+class Metadata implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
@@ -33,15 +31,19 @@ class Metadata implements ResourceInterface, ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('metadata.get', array($this, 'get')),
-            new ListenerDefinition('metadata.post', array($this, 'post')),
-            new ListenerDefinition('metadata.put', array($this, 'put')),
-            new ListenerDefinition('metadata.delete', array($this, 'delete')),
-            new ListenerDefinition('metadata.head', array($this, 'get')),
-            new ListenerDefinition('metadata.post', array($this, 'validateMetadata'), 10),
-            new ListenerDefinition('metadata.put', array($this, 'validateMetadata'), 10),
+            'metadata.head' => 'get',
+            'metadata.get' => 'get',
+            'metadata.post' => array(
+                'post',
+                'validateMetadata' => 10,
+            ),
+            'metadata.put' => array(
+                'put',
+                'validateMetadata' => 10,
+            ),
+            'metadata.delete' => 'delete',
         );
     }
 
@@ -67,12 +69,17 @@ class Metadata implements ResourceInterface, ListenerInterface {
      * @param EventInterface $event The current event
      */
     public function put(EventInterface $event) {
-        $event->getManager()->trigger('db.metadata.delete')
-                            ->trigger('db.metadata.update');
+        $request = $event->getRequest();
+
+        $event->getManager()
+            ->trigger('db.metadata.delete')
+            ->trigger('db.metadata.update', array(
+                'metadata' => json_decode($request->getContent(), true),
+            ));
 
         $model = new Model\ArrayModel();
         $model->setData(array(
-            'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
+            'imageIdentifier' => $request->getImageIdentifier(),
         ));
 
         $event->getResponse()->setModel($model);
@@ -84,11 +91,15 @@ class Metadata implements ResourceInterface, ListenerInterface {
      * @param EventInterface $event The current event
      */
     public function post(EventInterface $event) {
-        $event->getManager()->trigger('db.metadata.update');
+        $request = $event->getRequest();
+
+        $event->getManager()->trigger('db.metadata.update', array(
+            'metadata' => json_decode($request->getContent(), true),
+        ));
 
         $model = new Model\ArrayModel();
         $model->setData(array(
-            'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
+            'imageIdentifier' => $request->getImageIdentifier(),
         ));
 
         $event->getResponse()->setModel($model);

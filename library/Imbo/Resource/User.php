@@ -10,9 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerDefinition,
-    Imbo\EventListener\ListenerInterface;
+use Imbo\EventManager\EventInterface;
 
 /**
  * User resource
@@ -20,7 +18,7 @@ use Imbo\EventManager\EventInterface,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-class User implements ResourceInterface, ListenerInterface {
+class User implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
@@ -31,10 +29,10 @@ class User implements ResourceInterface, ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function getDefinition() {
+    public static function getSubscribedEvents() {
         return array(
-            new ListenerDefinition('user.get', array($this, 'get')),
-            new ListenerDefinition('user.head', array($this, 'get')),
+            'user.get' => 'get',
+            'user.head' => 'get',
         );
     }
 

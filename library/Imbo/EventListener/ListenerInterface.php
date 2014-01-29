@@ -18,9 +18,27 @@ namespace Imbo\EventListener;
  */
 interface ListenerInterface {
     /**
-     * Return a list of listener definitions
+     * Return an array with events to subscribe to
      *
-     * @return ListenerDefinition[]
+     * Single callbacks can use the simplest method, defaulting to a priority of 0
+     *
+     * return array(
+     *     'event' => 'someMethod',
+     *     'event2' => 'someOtherMethod',
+     * );
+     *
+     * If you want to specify multiple callbacks and/or a priority for the callback(s):
+     *
+     * return array(
+     *     'event' => array(
+     *         'someMethod', // Defaults to priority 0, same as 'someMethod' => 0
+     *         'someOtherMethod' => 10, // Will trigger before "someMethod"
+     *         'someThirdMethod' => -10, // Will trigger after "someMethod"
+     *     ),
+     *     'event2' => 'someOtherMethod',
+     * );
+     *
+     * @return array
      */
-    function getDefinition();
+    static function getSubscribedEvents();
 }

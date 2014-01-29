@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException,
     ImagickPixelException,
     ImagickDraw;
@@ -22,7 +24,7 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Border extends Transformation implements TransformationInterface {
+class Border extends Transformation implements ListenerInterface {
     /**
      * Color of the border
      *
@@ -52,70 +54,63 @@ class Border extends Transformation implements TransformationInterface {
     private $mode = 'outbound';
 
     /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
+     * {@inheritdoc}
      */
-    public function __construct(array $params = array()) {
-        if (!empty($params['color'])) {
-            $this->color = $this->formatColor($params['color']);
-        }
-
-        if (!empty($params['width'])) {
-            $this->width = (int) $params['width'];
-        }
-
-        if (!empty($params['height'])) {
-            $this->height = (int) $params['height'];
-        }
-
-        if (!empty($params['mode'])) {
-            $this->mode = $params['mode'];
-        }
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.border' => 'transform',
+        );
     }
 
     /**
-     * {@inheritdoc}
+     * Transform the image
+     *
+     * @param EventInterface $event The event instance
      */
-    public function applyToImage(Image $image) {
-        try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
+    public function transform(EventInterface $event) {
+        $image = $event->getArgument('image');
+        $params = $event->getArgument('params');
 
-            if ($this->mode === 'outbound') {
+        $color = !empty($params['color']) ? $this->formatColor($params['color']) : $this->color;
+        $width = !empty($params['width']) ? (int) $params['width'] : $this->width;
+        $height = !empty($params['height']) ? (int) $params['height'] : $this->height;
+        $mode = !empty($params['mode']) ? $params['mode'] : $this->mode;
+
+        try {
+            if ($mode === 'outbound') {
                 // Paint the border outside of the image, increasing the width/height
-                $imagick->borderImage($this->color, $this->width, $this->height);
+                $this->imagick->borderImage($color, $width, $height);
             } else {
                 // Paint the border inside of the image, keeping the orignal width/height
                 $imageWidth = $image->getWidth();
                 $imageHeight = $image->getHeight();
 
                 $rect = new ImagickDraw();
-                $rect->setStrokeColor($this->color);
-                $rect->setFillColor($this->color);
+                $rect->setStrokeColor($color);
+                $rect->setFillColor($color);
                 $rect->setStrokeAntialias(false);
 
                 // Left
-                $rect->rectangle(0, 0, $this->width - 1, $imageHeight);
+                $rect->rectangle(0, 0, $width - 1, $imageHeight);
 
                 // Right
-                $rect->rectangle($imageWidth - $this->width, 0, $imageWidth, $imageHeight);
+                $rect->rectangle($imageWidth - $width, 0, $imageWidth, $imageHeight);
 
                 // Top
-                $rect->rectangle(0, 0, $imageWidth, $this->height - 1);
+                $rect->rectangle(0, 0, $imageWidth, $height - 1);
 
                 // Bottom
-                $rect->rectangle(0, $imageHeight - $this->height, $imageWidth, $imageHeight);
+                $rect->rectangle(0, $imageHeight - $height, $imageWidth, $imageHeight);
 
                 // Draw the border
-                $imagick->drawImage($rect);
+                $this->imagick->drawImage($rect);
             }
 
-            $size = $imagick->getImageGeometry();
+            $size = $this->imagick->getImageGeometry();
 
-            $image->setBlob($imagick->getImageBlob())
-                  ->setWidth($size['width'])
-                  ->setHeight($size['height']);
+            $image->setWidth($size['width'])
+                  ->setHeight($size['height'])
+                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         } catch (ImagickPixelException $e) {

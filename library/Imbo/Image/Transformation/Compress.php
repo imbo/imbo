@@ -12,6 +12,8 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
+    Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -20,40 +22,68 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Compress extends Transformation implements TransformationInterface {
+class Compress extends Transformation implements ListenerInterface {
     /**
-     * Quality of the resulting image
-     *
      * @var int
      */
-    private $quality;
-
-    /**
-     * Class constructor
-     *
-     * @param array $params Parameters for this transformation
-     * @throws TransformationException
-     */
-    public function __construct(array $params) {
-        if (empty($params['quality'])) {
-            throw new TransformationException('Missing required parameter: quality', 400);
-        }
-
-        $this->quality = (int) $params['quality'];
-    }
+    private $level;
 
     /**
      * {@inheritdoc}
      */
-    public function applyToImage(Image $image) {
-        try {
-            $imagick = $this->getImagick();
-            $imagick->readImageBlob($image->getBlob());
-            $imagick->setImageCompressionQuality($this->quality);
+    public static function getSubscribedEvents() {
+        return array(
+            'image.transformation.compress' => 'transform',
+            'image.transformed' => 'compress',
+        );
+    }
 
-            $image->setBlob($imagick->getImageBlob());
+    /**
+     * Apply the compression
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function compress(EventInterface $event) {
+        if ($this->level === null) {
+            return;
+        }
+
+        $image = $event->getArgument('image');
+        $mimeType = $image->getMimeType();
+
+        if ($mimeType === 'image/gif') {
+            // No need to do anything if the image is a GIF
+            return;
+        }
+
+        try {
+            // Levels from 0 - 100 will work for both JPEG and PNG, although the level has different
+            // meaning for these two image types. For PNG's a high level will mean more compression,
+            // which usually results in a smaller file size, as for JPEG's, a high level means a
+            // higher quality, resulting in a larger file size.
+            $this->imagick->setImageCompressionQuality($this->level);
+            $image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
+        }
+    }
+
+    /**
+     * Transform the image
+     *
+     * @param EventInterface $event The event instance
+     */
+    public function transform(EventInterface $event) {
+        $params = $event->getArgument('params');
+
+        if (empty($params['level'])) {
+            throw new TransformationException('Missing required parameter: level', 400);
+        }
+
+        $this->level = (int) $params['level'];
+
+        if ($this->level < 0 || $this->level > 100) {
+            throw new TransformationException('level must be between 0 and 100', 400);
         }
     }
 }
