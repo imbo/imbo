@@ -33,11 +33,11 @@ class VarnishHashTwo implements ListenerInterface {
     /**
      * Class constructor
      *
-     * @param string $header
+     * @param array $params Parameters for the event listener
      */
-    public function __construct($header = null) {
-        if ($header !== null) {
-            $this->header = $header;
+    public function __construct(array $params = null) {
+        if ($params && isset($params['headerName'])) {
+            $this->header = $params['headerName'];
         }
     }
 

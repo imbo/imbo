@@ -27,7 +27,7 @@ class MaxImageSizeTest extends ListenerTests {
      * Set up the listener
      */
     public function setUp() {
-        $this->listener = new MaxImageSize();
+        $this->listener = new MaxImageSize(array());
     }
 
     /**
@@ -79,7 +79,7 @@ class MaxImageSizeTest extends ListenerTests {
             $event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
         }
 
-        $listener = new MaxImageSize($maxWidth, $maxHeight);
+        $listener = new MaxImageSize(array('width' => $maxWidth, 'height' => $maxHeight));
         $listener->enforceMaxSize($event);
     }
 }

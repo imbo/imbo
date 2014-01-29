@@ -46,7 +46,7 @@ class MetadataCacheTest extends ListenerTests {
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
-        $this->listener = new MetadataCache($this->cache);
+        $this->listener = new MetadataCache(array('cache' => $this->cache));
     }
 
     /**

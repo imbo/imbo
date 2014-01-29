@@ -99,7 +99,10 @@ class Application {
             'Imbo\Resource\Images',
             'Imbo\Resource\Image',
             'Imbo\Resource\Metadata',
-            'Imbo\Http\Response\ResponseFormatter' => array($formatters, $contentNegotiation),
+            'Imbo\Http\Response\ResponseFormatter' => array(
+                'formatters' => $formatters,
+                'contentNegotiation' => $contentNegotiation,
+            ),
             'Imbo\EventListener\DatabaseOperations',
             'Imbo\EventListener\StorageOperations',
             'Imbo\Image\ImagePreparation',

@@ -201,16 +201,16 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $this->manager->addEventHandler('someHandler', $listenerClassName, array('param'));
         $this->manager->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
 
-        $this->expectOutputString('param');
-        $this->manager->trigger('getParam');
+        $this->expectOutputString('a:1:{i:0;s:5:"param";}');
+        $this->manager->trigger('getParams');
     }
 }
 
 class Listener implements ListenerInterface {
-    private $param;
+    private $params;
 
-    public function __construct($param = null) {
-        $this->param = $param;
+    public function __construct(array $params = null) {
+        $this->params = $params;
     }
 
     public static function getSubscribedEvents() {
@@ -221,12 +221,12 @@ class Listener implements ListenerInterface {
                 'baz' => 2,
                 'bar' => 1,
             ),
-            'getParam' => 'getParam',
+            'getParams' => 'getParams',
         );
     }
 
-    public function getParam($event) {
-        echo $this->param;
+    public function getParams($event) {
+        echo serialize($this->params);
     }
 
     public function foo($event) {

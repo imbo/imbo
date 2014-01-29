@@ -106,12 +106,11 @@ class ResponseFormatter implements ListenerInterface {
     /**
      * Class constructor
      *
-     * @param array $formatter An array of valid formatters
-     * @param ContentNegotiation $contentNegotiation An instance of the content negotiation class
+     * @param array $param Parameters for the event listener
      */
-    public function __construct(array $formatters, ContentNegotiation $contentNegotiation) {
-        $this->formatters = $formatters;
-        $this->contentNegotiation = $contentNegotiation;
+    public function __construct(array $params) {
+        $this->formatters = $params['formatters'];
+        $this->contentNegotiation = $params['contentNegotiation'];
     }
 
     /**

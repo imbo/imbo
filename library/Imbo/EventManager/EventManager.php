@@ -12,8 +12,7 @@ namespace Imbo\EventManager;
 
 use Imbo\EventListener\ListenerInterface,
     Imbo\EventListener\Initializer\InitializerInterface,
-    Imbo\Exception\InvalidArgumentException,
-    ReflectionClass;
+    Imbo\Exception\InvalidArgumentException;
 
 /**
  * Event manager
@@ -136,17 +135,7 @@ class EventManager {
             // The listener has not been initialized
             $className = $this->eventHandlers[$name]['handler'];
             $params = $this->eventHandlers[$name]['params'];
-
-            if (empty($params)) {
-                // No params
-                $handler = new $className();
-            } else {
-                // Params, need to use reflection.
-                // <ghetto>
-                $reflection = new ReflectionClass($className);
-                $handler = $reflection->newInstanceArgs($params);
-                // </ghetto>
-            }
+            $handler = new $className($params ?: null);
 
             // Run initializers
             foreach ($this->initializers as $initializer) {

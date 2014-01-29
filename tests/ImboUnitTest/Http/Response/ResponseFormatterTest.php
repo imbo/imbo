@@ -50,7 +50,10 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
             'format' => $this->formatter,
         );
         $this->contentNegotiation = $this->getMock('Imbo\Http\ContentNegotiation');
-        $this->responseFormatter = new ResponseFormatter($this->formatters, $this->contentNegotiation);
+        $this->responseFormatter = new ResponseFormatter(array(
+            'formatters' => $this->formatters,
+            'contentNegotiation' => $this->contentNegotiation,
+        ));
         $this->responseFormatter->setFormatter('format');
     }
 
