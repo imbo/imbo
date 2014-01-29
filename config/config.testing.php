@@ -76,9 +76,9 @@ class CustomEventListener implements ListenerInterface {
     private $value1;
     private $value2;
 
-    public function __construct($value1, $value2) {
-        $this->value1 = $value1;
-        $this->value2 = $value2;
+    public function __construct(array $params) {
+        $this->value1 = $params['key1'];
+        $this->value2 = $params['key2'];
     }
 
     public static function getSubscribedEvents() {
@@ -149,15 +149,11 @@ return array(
         'accessToken' => 'Imbo\EventListener\AccessToken',
         'statsAccess' => array(
             'listener' => 'Imbo\EventListener\StatsAccess',
-            'params' => array(
-                array(
-                    'allow' => $statsAllow,
-                )
-            ),
+            'params' => array('allow' => $statsAllow),
         ),
         'imageTransformationCache' => array(
             'listener' => 'Imbo\EventListener\ImageTransformationCache',
-            'params' => array('/tmp/imbo-behat-image-transformation-cache'),
+            'params' => array('path' => '/tmp/imbo-behat-image-transformation-cache'),
         ),
         'metadataCache' => function() {
             $memcached = new PeclMemcached();
@@ -167,7 +163,7 @@ return array(
 
             $adapter = new Cache\Memcached($memcached, $namespace);
 
-            return new EventListener\MetadataCache($adapter);
+            return new EventListener\MetadataCache(array('cache' => $adapter));
         },
         'someHandler' => array(
             'events' => array(
@@ -189,9 +185,7 @@ return array(
         ),
         'someEventListener' => array(
             'listener' => __NAMESPACE__ . '\CustomEventListener',
-            'params' => array(
-                'value1', 'value2'
-            ),
+            'params' => array('key1' => 'value1', 'key2' => 'value2'),
             'publicKeys' => array(
                 'whitelist' => array('publickey'),
             ),
@@ -199,20 +193,18 @@ return array(
         'cors' => array(
             'listener' => 'Imbo\EventListener\Cors',
             'params' => array(
-                array(
-                    'allowedOrigins' => array('http://allowedhost'),
-                    'maxAge' => 1349,
-                ),
+                'allowedOrigins' => array('http://allowedhost'),
+                'maxAge' => 1349,
             ),
         ),
         'maxImageSize' => array(
             'listener' => 'Imbo\EventListener\MaxImageSize',
-            'params' => array(1000, 1000),
+            'params' => array('width' => 1000, 'height' => 1000),
         ),
         'varnishHashTwo' => 'Imbo\EventListener\VarnishHashTwo',
         'customVarnishHashTwo' => array(
             'listener' => 'Imbo\EventListener\VarnishHashTwo',
-            'params' => array('X-Imbo-HashTwo'),
+            'params' => array('headerName' => 'X-Imbo-HashTwo'),
         ),
         'exifMetadataListener' => 'Imbo\EventListener\ExifMetadata',
         'autoRotateListener' => 'Imbo\EventListener\AutoRotateImage',
