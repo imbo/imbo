@@ -192,7 +192,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $query->expects($this->at(8))->method('has')->with('to')->will($this->returnValue(true));
         $query->expects($this->at(9))->method('get')->with('to')->will($this->returnValue(1355176488));
         $query->expects($this->at(10))->method('has')->with('sort')->will($this->returnValue(true));
-        $query->expects($this->at(11))->method('get')->with('sort')->will($this->returnValue('size:desc'));
+        $query->expects($this->at(11))->method('get')->with('sort')->will($this->returnValue(array('size:desc')));
         $query->expects($this->at(12))->method('has')->with('ids')->will($this->returnValue(true));
         $query->expects($this->at(13))->method('get')->with('ids')->will($this->returnValue(array('identifier1', 'identifier2', 'identifier3')));
         $query->expects($this->at(14))->method('has')->with('checksums')->will($this->returnValue(true));
