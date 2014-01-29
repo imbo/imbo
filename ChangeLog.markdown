@@ -5,6 +5,7 @@ Imbo-1.0.0
 ----------
 __N/A__
 
+* #248: Changed format of the parameters for event listeners
 * #238: Added ids[] and checksums[] as filters for the images resource
 * #234: Added pagination info to the images resource
 * #232: New image transformation: strip

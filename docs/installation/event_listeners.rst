@@ -149,20 +149,20 @@ Here is an example on how to enable the CORS listener:
             'cors' => array(
                 'listener' => 'Imbo\EventListener\Cors',
                 'params' => array(
-                    array(
-                        'allowedOrigins' => array('http://some.origin'),
-                        'allowedMethods' => array(
-                            'image'  => array('GET', 'HEAD'),
-                            'images' => array('GET', 'HEAD', 'POST'),
-                        ),
-                        'maxAge' => 3600,
+                    'allowedOrigins' => array('http://some.origin'),
+                    'allowedMethods' => array(
+                        'image'  => array('GET', 'HEAD'),
+                        'images' => array('GET', 'HEAD', 'POST'),
                     ),
+                    'maxAge' => 3600,
                 ),
             ),
         ),
 
         // ...
     );
+
+Below all supported parameters are listed:
 
 ``allowedOrigins``
     is an array of allowed origins. Specifying ``*`` as a value in the array will allow any origin.
@@ -183,9 +183,9 @@ The event listener subscribes to the following events:
 * ``images.post``
 * ``db.image.insert``
 
-and has the following parameters:
+and the parameters given to the event listener supports a single element:
 
-``$allowedTags``
+``allowedTags``
     The tags you want to be populated as metadata. Defaults to ``exif:*``. When specified it will override the default value, so if you want to register all ``exif`` and ``date`` tags for example, you will need to specify them both.
 
 and is enabled like this:
@@ -200,7 +200,7 @@ and is enabled like this:
             'exifMetadata' => array(
                 'listener' => 'Imbo\EventListener\ExifMetadata',
                 'params' => array(
-                    array('exif:*', 'date:*', 'png:gAMA'),
+                    'allowedTags' => array('exif:*', 'date:*', 'png:gAMA'),
                 ),
             ),
         ),
@@ -221,9 +221,9 @@ To achieve this the listener subscribes to the following events:
 * ``response.send``
 * ``image.delete``
 
-The event listener has one parameter:
+The parameters for the event listener supports a single element:
 
-``$path``
+``path``
     Root path where the cached images will be stored.
 
 and is enabled like this:
@@ -237,7 +237,9 @@ and is enabled like this:
         'eventListeners' => array(
             'imageTransformationCache' => array(
                 'listener' => 'Imbo\EventListener\ImageTransformationCache',
-                'params' => array('/path/to/cache'),
+                'params' => array(
+                    'path' => '/path/to/cache',
+                ),
             ),
         ),
 
@@ -276,12 +278,12 @@ The event listener subscribes to the following event:
 
 * ``images.post``
 
-and has the following parameters:
+and the parameters includes the following elements:
 
-``$width``
+``width``
     The max width in pixels of new images. If a new image exceeds this limit it will be downsized.
 
-``$height``
+``height``
     The max height in pixels of new images. If a new image exceeds this limit it will be downsized.
 
 and is enabled like this:
@@ -295,7 +297,10 @@ and is enabled like this:
         'eventListeners' => array(
             'maxImageSizeListener' => array(
                 'listener' => 'Imbo\EventListener\MaxImageSize',
-                'params' => array(1024, 768),
+                'params' => array(
+                    'width' => 1024,
+                    'height' => 768,
+                ),
             ),
         ),
 
@@ -307,16 +312,16 @@ which would effectively downsize all images exceeding a ``width`` of ``1024`` or
 Metadata cache
 ++++++++++++++
 
-This event listener enables caching of metadata fetched from the backend so other requests won't need to go all the way to the backend to fetch it. To achieve this the listener subscribes to the following events:
+This event listener enables caching of metadata fetched from the backend so other requests won't need to go all the way to the metadata backend to fetch it. To achieve this the listener subscribes to the following events:
 
 * ``db.metadata.load``
 * ``db.metadata.delete``
 * ``db.metadata.update``
 * ``db.image.delete``
 
-and has the following parameters:
+and the parameters supports a single element:
 
-``Imbo\Cache\CacheInterface $cache``
+``cache``
     An instance of a cache adapter. Imbo ships with :ref:`apc-cache` and :ref:`memcached-cache` adapters, and both can be used for this event listener. If you want to use another form of caching you can simply implement the ``Imbo\Cache\CacheInterface`` interface and pass an instance of the custom adapter to the constructor of the event listener. See the :ref:`custom-cache-adapter` section for more information regarding this. Here is an example that uses the APC adapter for caching:
 
 .. code-block:: php
@@ -329,7 +334,7 @@ and has the following parameters:
             'metadataCache' => array(
                 'listener' => 'Imbo\EventListener\MetadataCache',
                 'params' => array(
-                    new Imbo\Cache\APC('imbo'),
+                    'cache' => new Imbo\Cache\APC('imbo'),
                 ),
             ),
         ),
@@ -357,9 +362,7 @@ This listener is enabled per default, and only allows ``127.0.0.1`` and ``::1`` 
             'statsAccess' => array(
                 'listener' => 'Imbo\EventListener\StatsAccess',
                 'params' => array(
-                    array(
-                        'allow' => array('127.0.0.1', '::1'),
-                    )
+                    'allow' => array('127.0.0.1', '::1'),
                 ),
             ),
         ),
@@ -367,7 +370,7 @@ This listener is enabled per default, and only allows ``127.0.0.1`` and ``::1`` 
         // ...
     );
 
-The event listener also supports a notation for "allowing all", by placing ``'*'`` in the list:
+The event listener also supports a notation for "allowing all", simply by placing ``'*'`` somewhere in the list:
 
 .. code-block:: php
 
@@ -400,9 +403,9 @@ This event listener can be enabled if you want Imbo to send a `HashTwo header <h
 
 * ``image.get``
 
-The event listener has the following parameters:
+The parameters supports a single element:
 
-``$header`` (optional)
+``headerName``
     Set the header name to use. Defaults to ``X-HashTwo``.
 
 .. code-block:: php
@@ -413,6 +416,26 @@ The event listener has the following parameters:
 
         'eventListeners' => array(
             'hashTwo' => 'Imbo\EventListener\VarnishHashTwo',
+        ),
+
+        // ...
+    );
+
+or, if you want to use a non-default header name:
+
+.. code-block:: php
+
+    <?php
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            'hashTwo' => array(
+                'listener' => 'Imbo\EventListener\VarnishHashTwo',
+                'params' => array(
+                    'headerName' => 'X-Custom-HashTwo-Header-Name',
+                ),
+            ),
         ),
 
         // ...

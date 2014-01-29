@@ -158,7 +158,7 @@ class ExifMetadataTest extends ListenerTests {
         $event->expects($this->exactly(2))->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
 
-        $listener = new ExifMetadata($tags);
+        $listener = new ExifMetadata(array('allowedTags' => $tags));
         $listener->setImagick($imagick);
         $listener->populate($event);
         $listener->save($event);

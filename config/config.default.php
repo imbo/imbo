@@ -145,9 +145,7 @@ $config = array(
      *   'statsAccess' => array(
      *       'listener' => 'Imbo\EventListener\StatsAccess',
      *       'params' => array(
-     *           array(
-     *               'allow' => array('127.0.0.1', '::1'),
-     *           )
+     *           'allow' => array('127.0.0.1', '::1'),
      *       ),
      *   ),
      *
@@ -170,9 +168,7 @@ $config = array(
         'statsAccess' => array(
             'listener' => 'Imbo\EventListener\StatsAccess',
             'params' => array(
-                array(
-                    'allow' => array('127.0.0.1', '::1'),
-                )
+                'allow' => array('127.0.0.1', '::1'),
             ),
         ),
 

@@ -43,7 +43,7 @@ class StatsAccess implements ListenerInterface {
      * @param array $params Parameters for the listener
      */
     public function __construct(array $params = array()) {
-        if ($params) {
+        if (isset($params['allow'])) {
             $this->params = array_replace_recursive($this->params, $params);
 
             // Exand all IPv6 addresses in the filters

@@ -68,7 +68,7 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
         $this->cacheDir = vfsStream::setup($this->path);
-        $this->listener = new ImageTransformationCache(vfsStream::url($this->path));
+        $this->listener = new ImageTransformationCache(array('path' => vfsStream::url($this->path)));
     }
 
     /**
@@ -243,6 +243,16 @@ class ImageTransformationCacheTest extends ListenerTests {
 
     /**
      * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The image transformation cache path is missing from the configuration
+     * @expectedExceptionCode 500
+     * @covers Imbo\EventListener\ImageTransformationCache::__construct
+     */
+    public function testThrowsAnExceptionWhenPathIsMissingFromTheParameters() {
+        $listener = new ImageTransformationCache(array());
+    }
+
+    /**
+     * @expectedException Imbo\Exception\InvalidArgumentException
      * @expectedExceptionMessage Image transformation cache path is not writable by the webserver: vfs://cacheDir/dir
      * @expectedExceptionCode 500
      * @covers Imbo\EventListener\ImageTransformationCache::__construct
@@ -251,13 +261,13 @@ class ImageTransformationCacheTest extends ListenerTests {
         $dir = new vfsStreamDirectory('dir', 0);
         $this->cacheDir->addChild($dir);
 
-        $listener = new ImageTransformationCache('vfs://cacheDir/dir');
+        $listener = new ImageTransformationCache(array('path' => 'vfs://cacheDir/dir'));
     }
 
     /**
      * @covers Imbo\EventListener\ImageTransformationCache::__construct
      */
     public function testDoesNotTriggerWarningIfCachePathDoesNotExistAndParentIsWritable() {
-        $listener = new ImageTransformationCache('vfs://cacheDir/some/dir/that/does/not/exist');
+        $listener = new ImageTransformationCache(array('path' => 'vfs://cacheDir/some/dir/that/does/not/exist'));
     }
 }

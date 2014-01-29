@@ -51,11 +51,11 @@ class ExifMetadata implements ListenerInterface {
     /**
      * Class constructor
      *
-     * @param array $allowedTags An array of tags to use as metadata, if present
+     * @param array $params Parameters for the event listener
      */
-    public function __construct(array $allowedTags = null) {
-        if ($allowedTags !== null) {
-            $this->allowedTags = $allowedTags;
+    public function __construct(array $params = null) {
+        if ($params && isset($params['allowedTags'])) {
+            $this->allowedTags = $params['allowedTags'];
         }
     }
 

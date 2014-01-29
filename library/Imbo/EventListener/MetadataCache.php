@@ -13,6 +13,7 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface,
     Imbo\Cache\CacheInterface,
     Imbo\Model,
+    Imbo\Exception\InvalidArgumentException,
     DateTime;
 
 /**
@@ -32,10 +33,14 @@ class MetadataCache implements ListenerInterface {
     /**
      * Class constructor
      *
-     * @param CacheInterface $cache Cache implementation
+     * @param array $params Parameters for the event listener
      */
-    public function __construct(CacheInterface $cache) {
-        $this->cache = $cache;
+    public function __construct(array $params) {
+        if (!isset($params['cache']) || !($params['cache'] instanceof CacheInterface)) {
+            throw new InvalidArgumentException('The cache parameter is missing or not valid', 500);
+        }
+
+        $this->cache = $params['cache'];
     }
 
     /**

@@ -47,10 +47,19 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Class constructor
      *
-     * @param string $path Path to store the cached images
+     * @param array $params Parameters for the cache
      * @throws InvalidArgumentException Throws an exception if the specified path is not writable
      */
-    public function __construct($path) {
+    public function __construct(array $params) {
+        if (!isset($params['path'])) {
+            throw new InvalidArgumentException(
+                'The image transformation cache path is missing from the configuration',
+                500
+            );
+        }
+
+        $path = $params['path'];
+
         if (!$this->isWritable($path)) {
             throw new InvalidArgumentException(
                 'Image transformation cache path is not writable by the webserver: ' . $path,

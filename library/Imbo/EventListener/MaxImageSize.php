@@ -38,12 +38,11 @@ class MaxImageSize implements ListenerInterface {
     /**
      * Class constructor
      *
-     * @param int $width Max width
-     * @param int $height Max height
+     * @param array $params Parameters for the event listener
      */
-    public function __construct($width = null, $height = null) {
-        $this->width = (int) $width;
-        $this->height = (int) $height;
+    public function __construct(array $params) {
+        $this->width = isset($params['width']) ? (int) $params['width'] : 0;
+        $this->height = isset($params['height']) ? (int) $params['height'] : 0;
     }
 
     /**

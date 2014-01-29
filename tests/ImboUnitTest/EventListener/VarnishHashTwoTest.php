@@ -81,7 +81,7 @@ class VarnishHashTwoTest extends ListenerTests {
      * @covers Imbo\EventListener\VarnishHashTwo::addHeader
      */
     public function testCanSpecifyACustomHeaderName() {
-        $listener = new VarnishHashTwo('X-CustomHeader');
+        $listener = new VarnishHashTwo(array('headerName' => 'X-CustomHeader'));
 
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
         $image = $this->getMock('Imbo\Model\Image');

@@ -545,8 +545,8 @@ There also exists a ``params`` key that can be used to specify parameters for th
                     // 'blacklist' => array('someotheruser'),
                 ),
                 'params' => array(
-                    1024,
-                    768
+                    'width' => 1024,
+                    'height' => 768,
                 )
             ),
         ),
@@ -554,7 +554,7 @@ There also exists a ``params`` key that can be used to specify parameters for th
         // ...
     );
 
-The parameters will be passed to the event listener as separate arguments, and not as an array.
+The value of the ``params`` array will be sent to the constructor of the event listener class.
 
 5) Use a closure directly:
 
