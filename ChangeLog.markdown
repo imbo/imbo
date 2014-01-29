@@ -3,7 +3,7 @@ Changelog for Imbo
 
 Imbo-1.0.0
 ----------
-__N/A__
+__2014-01-30__
 
 * #248: Changed format of the parameters for event listeners
 * #238: Added ids[] and checksums[] as filters for the images resource
