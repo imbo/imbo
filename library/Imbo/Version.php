@@ -22,5 +22,5 @@ class Version {
      *
      * @var string
      */
-    const VERSION = '0.3.3';
+    const VERSION = '1.0.0';
 }
