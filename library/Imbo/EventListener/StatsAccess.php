@@ -118,7 +118,14 @@ class StatsAccess implements ListenerInterface {
      * @return boolean
      */
     private function filter($ip, $filter) {
-        foreach ($this->params[$filter] as $range) {
+        // Remove IP's from the filter which is not of the same type as $ip
+        if ($this->isIPv6($ip)) {
+            $list = array_filter($this->params[$filter], array($this, 'isIPv6'));
+        } else {
+            $list = array_filter($this->params[$filter], array($this, 'isIPv4'));
+        }
+
+        foreach ($list as $range) {
             if ((strpos($range, '/') !== false && $this->cidrMatch($ip, $range)) || $ip === $range) {
                 return true;
             }
@@ -224,6 +231,16 @@ class StatsAccess implements ListenerInterface {
      */
     private function isIPv6($ip) {
         return strpos($ip, ':') !== false;
+    }
+
+    /**
+     * Check if an IP address ia an IPv4 address or not
+     *
+     * @param string $ip The address to check
+     * @return boolean True if the ip address looks like an IPv4 address
+     */
+    private function isIPv4($ip) {
+        return !$this->isIPv6($ip);
     }
 
     /**
