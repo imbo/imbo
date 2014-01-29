@@ -167,6 +167,18 @@ class StatsAccessTest extends ListenerTests {
                 array(),
                 true
             ),
+            'Mixed IPv4 and IPv6 with client IPv4' => array(
+                '192.168.1.1',
+                array(),
+                array('1.2.3.4', '2001:db8::/48'),
+                true
+            ),
+            'Mixed IPv4 and IPv6 with client IPv6' => array(
+                '2a00:1b60:1011::1338',
+                array(),
+                array('1.2.3.4', '2001:db8::/48'),
+                true
+            ),
         );
     }
 
