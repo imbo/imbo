@@ -50,8 +50,10 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanGetPropertiesFromImageFiltered() {
         $listener = new ExifMetadata(array(
-            'exif:Flash',
-            'exif:Compression'
+            'allowedTags' => array(
+                'exif:Flash',
+                'exif:Compression',
+            ),
         ));
 
         $image = new Image();
