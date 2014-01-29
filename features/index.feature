@@ -14,8 +14,8 @@ Feature: Imbo provides an index endpoint
 
         Examples:
             | accept           | response |
-            | application/json | #^{"version":"dev".*?}$#    |
-            | application/xml  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo><version>dev</version>.*?</imbo>$#ms |
+            | application/json | #^{"version":"[^"]+".*?}$#    |
+            | application/xml  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo><version>[^>]+</version>.*?</imbo>$#ms |
 
     Scenario Outline: The index endpoint only supports HTTP GET and HEAD
         When I request "/" using HTTP "<method>"
