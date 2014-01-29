@@ -100,21 +100,10 @@ class CustomEventListener implements ListenerInterface {
     }
 }
 
-$statsWhitelist = array('127.0.0.1', '::1');
-$statsBlacklist = array();
+$statsAllow = array();
 
-if (!empty($_GET['statsWhitelist'])) {
-    // The scenario has specified a whitelist to use
-    $statsWhitelist = explode(',', $_GET['statsWhitelist']);
-}
-
-if (!empty($_GET['statsBlacklist'])) {
-    // The scenario has specified a blacklist to use
-    $statsBlacklist = explode(',', $_GET['statsBlacklist']);
-
-    if (empty($_GET['statsWhitelist'])) {
-        $statsWhitelist = array();
-    }
+if (!empty($_GET['statsAllow'])) {
+    $statsAllow = explode(',', $_GET['statsAllow']);
 }
 
 if (isset($_SERVER['HTTP_X_CLIENT_IP'])) {
@@ -162,8 +151,7 @@ return array(
             'listener' => 'Imbo\EventListener\StatsAccess',
             'params' => array(
                 array(
-                    'whitelist' => $statsWhitelist,
-                    'blacklist' => $statsBlacklist,
+                    'allow' => $statsAllow,
                 )
             ),
         ),
