@@ -10,7 +10,8 @@
 
 namespace ImboUnitTest;
 
-use Imbo\Application;
+use Imbo\Application,
+    Imbo\Version;
 
 /**
  * @covers Imbo\Application
@@ -65,7 +66,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Application::run
      */
     public function testCanRunWithDefaultConfiguration() {
-        $this->expectOutputRegex('|{"version":"dev",.*}|');
+        $this->expectOutputRegex('|{"version":"' . preg_quote(Version::VERSION, '|') . '",.*}|');
         $this->application->run(require __DIR__ . '/../../config/config.default.php');
     }
 
@@ -74,7 +75,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanRunWithTestingConfiguration() {
         $_SERVER['HTTP_X_TEST_SESSION_ID'] = 'test_namespace';
-        $this->expectOutputRegex('|{"version":"dev",.*}|');
+        $this->expectOutputRegex('|{"version":"' . preg_quote(Version::VERSION, '|') . '",.*}|');
         $this->application->run(require __DIR__ . '/../../config/config.testing.php');
     }
 }
