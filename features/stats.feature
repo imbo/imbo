@@ -9,7 +9,7 @@ Feature: Imbo provides a stats endpoint
         And "tests/Fixtures/image.gif" exists in Imbo
 
     Scenario Outline: Fetch stats
-        When I request "/stats.<extension>"
+        When I request "/stats.<extension>?statsAllow=*"
         Then I should get a response with "200 OK"
         And the response body <match>:
             """
@@ -22,7 +22,7 @@ Feature: Imbo provides a stats endpoint
             | xml       | matches | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<stats>\s*<users>\s*<user publicKey="publickey">\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*</user>\s*<user publicKey="user">\s*<numImages>0</numImages>\s*<numBytes>0</numBytes>\s*</user>\s*</users>\s*<total>\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*<numUsers>2</numUsers>\s*</total>\s*<custom></custom>\s*</stats>\s*</imbo>$#ms |
 
     Scenario Outline: The stats endpoint only supports HTTP GET and HEAD
-        When I request "/stats.json" using HTTP "<method>"
+        When I request "/stats.json?statsAllow=*" using HTTP "<method>"
         Then I should get a response with "<status>"
 
         Examples:
@@ -34,8 +34,8 @@ Feature: Imbo provides a stats endpoint
             | DELETE | 405 Method not allowed |
 
     Scenario Outline: Stats access event listener decides the access level for the stats endpoint
-        Given the client IP is "<ip>"
-        When I request "/stats.json?statsWhitelist=<whitelist>&statsBlacklist=<blacklist>"
+        Given the client IP is "<client-ip>"
+        When I request "/stats.json?statsAllow=<allow>"
         Then I should get a response with "<status>"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
@@ -44,11 +44,11 @@ Feature: Imbo provides a stats endpoint
             """
 
         Examples:
-            | ip        | whitelist     | blacklist     | status            |
-            | 127.0.0.1 |               |               | 200 OK            |
-            | 127.0.0.1 | 10.0.0.0      |               | 403 Access denied |
-            | 127.0.0.1 |               | 127.0.0.0/24  | 403 Access denied |
-            | ::1       |               | 2001:db8::/48 | 200 OK            |
-            | ::1       | 2001:db8::/48 |               | 403 Access denied |
-            | 127.0.0.1 | 127.0.0.1,::1 |               | 200 OK            |
-            | ::1       | 127.0.0.1,::1 |               | 200 OK            |
+            | client-ip | allow             | status            |
+            | 127.0.0.1 | 10.0.0.0          | 403 Access denied |
+            | 127.0.0.1 | 2001:db8::/48     | 403 Access denied |
+            | ::1       | 2001:db8::/48     | 403 Access denied |
+            | ::1       | 127.0.0.1         | 403 Access denied |
+            | 127.0.0.1 | 127.0.0.1,::1     | 200 OK            |
+            | ::1       | 127.0.0.1,::1     | 200 OK            |
+            | ::1       | *                 | 200 OK            |

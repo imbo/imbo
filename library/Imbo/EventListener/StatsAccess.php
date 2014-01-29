@@ -28,17 +28,13 @@ class StatsAccess implements ListenerInterface {
     /**
      * Parameters for the listener
      *
-     * If the whitelist is populated with one or more ip addresses, all others will automatically
-     * be blacklisted. If the blacklist is populated with one or more ip addresses, all other will
-     * automatically be whitelisted. If both filters contain values, the current ip must be in the
-     * whitelist to gain access. If the current ip is located in both filters, it will not gain
-     * access as the blacklist is checked last.
+     * The only supported parameter is "allow" which is an array of IP addresses/subnets that is
+     * allowed access. If one of the entries in the array is "*", all clients are allowed.
      *
      * @var array
      */
     private $params = array(
-        'whitelist' => array(),
-        'blacklist' => array(),
+        'allow' => array(),
     );
 
     /**
@@ -51,8 +47,7 @@ class StatsAccess implements ListenerInterface {
             $this->params = array_replace_recursive($this->params, $params);
 
             // Exand all IPv6 addresses in the filters
-            array_walk($this->params['whitelist'], array($this, 'expandIPv6InFilters'));
-            array_walk($this->params['blacklist'], array($this, 'expandIPv6InFilters'));
+            array_walk($this->params['allow'], array($this, 'expandIPv6InFilters'));
         }
     }
 
@@ -69,7 +64,6 @@ class StatsAccess implements ListenerInterface {
      * {@inheritdoc}
      */
     public function checkAccess(EventInterface $event) {
-        $access = false;
         $request = $event->getRequest();
         $ip = $request->getClientIp();
 
@@ -77,13 +71,7 @@ class StatsAccess implements ListenerInterface {
             $ip = $this->expandIPv6($ip);
         }
 
-        if (empty($this->params['whitelist']) && !empty($this->params['blacklist'])) {
-            $access = !$this->isBlacklisted($ip);
-        } else if (empty($this->params['blacklist']) && !empty($this->params['whitelist'])) {
-            $access = $this->isWhitelisted($ip);
-        } else {
-            $access = $this->isWhitelisted($ip) && !$this->isBlacklisted($ip);
-        }
+        $access = $this->isAllowed($ip);
 
         if (!$access) {
             throw new RuntimeException('Access denied', 403);
@@ -91,34 +79,26 @@ class StatsAccess implements ListenerInterface {
     }
 
     /**
-     * Check if an ip address is white listed
+     * See if an IP address is allowed
      *
-     * @param string $ip The IP address
+     * @param string $ip An IP address
      * @return boolean
      */
-    private function isWhitelisted($ip) {
-        return $this->filter($ip, 'whitelist');
-    }
+    private function isAllowed($ip) {
+        // Look for a wildcard
+        if (in_array('*', $this->params['allow'])) {
+            // There is a wildcard in the list, all IP's are allowed
+            return true;
+        }
 
-    /**
-     * Check if an ip address is black listed
-     *
-     * @param string $ip The IP address
-     * @return boolean
-     */
-    private function isBlacklisted($ip) {
-        return $this->filter($ip, 'blacklist');
-    }
+        // Remove IP's which is not of the same type as $ip before matching
+        if ($this->isIPv6($ip)) {
+            $list = array_filter($this->params['allow'], array($this, 'isIPv6'));
+        } else {
+            $list = array_filter($this->params['allow'], array($this, 'isIPv4'));
+        }
 
-    /**
-     * Filter an IP address
-     *
-     * @param string $ip An IPv4 address
-     * @param string $filter "whitelist" or "blacklist"
-     * @return boolean
-     */
-    private function filter($ip, $filter) {
-        foreach ($this->params[$filter] as $range) {
+        foreach ($list as $range) {
             if ((strpos($range, '/') !== false && $this->cidrMatch($ip, $range)) || $ip === $range) {
                 return true;
             }
@@ -224,6 +204,16 @@ class StatsAccess implements ListenerInterface {
      */
     private function isIPv6($ip) {
         return strpos($ip, ':') !== false;
+    }
+
+    /**
+     * Check if an IP address ia an IPv4 address or not
+     *
+     * @param string $ip The address to check
+     * @return boolean True if the ip address looks like an IPv4 address
+     */
+    private function isIPv4($ip) {
+        return !$this->isIPv6($ip);
     }
 
     /**

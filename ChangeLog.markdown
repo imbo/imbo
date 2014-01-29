@@ -30,6 +30,7 @@ Bug fixes:
 
 * #237: Fixed possible PHP Warnings when the transformation query parameter is invalid
 * #222: Some images are not correctly identified
+* #220: Incorrect IP matching in the stats access event listener
 * #211: CORS event listener suppresses "405 Method not allowed" responses when enabled
 * #103: Compress transformation only works as expected with image/jpeg
 

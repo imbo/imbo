@@ -143,7 +143,7 @@ class EventManager {
             } else {
                 // Params, need to use reflection.
                 // <ghetto>
-                $reflection = new ReflectionClass($this->eventHandlers[$name]['handler']);
+                $reflection = new ReflectionClass($className);
                 $handler = $reflection->newInstanceArgs($params);
                 // </ghetto>
             }
