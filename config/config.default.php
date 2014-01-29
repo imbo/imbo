@@ -146,8 +146,7 @@ $config = array(
      *       'listener' => 'Imbo\EventListener\StatsAccess',
      *       'params' => array(
      *           array(
-     *               'whitelist' => array('127.0.0.1', '::1'),
-     *               'blacklist' => array(),
+     *               'allow' => array('127.0.0.1', '::1'),
      *           )
      *       ),
      *   ),
@@ -172,8 +171,7 @@ $config = array(
             'listener' => 'Imbo\EventListener\StatsAccess',
             'params' => array(
                 array(
-                    'whitelist' => array('127.0.0.1', '::1'),
-                    'blacklist' => array(),
+                    'allow' => array('127.0.0.1', '::1'),
                 )
             ),
         ),

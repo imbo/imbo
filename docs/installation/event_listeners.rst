@@ -343,7 +343,7 @@ and has the following parameters:
 Stats access
 ++++++++++++
 
-This event listener controls the access to the :ref:`stats resource <stats-resource>` by using simple white-/blacklists containing IPv4 and/or IPv6 addresses. `CIDR-notations <http://en.wikipedia.org/wiki/CIDR#CIDR_notation>`_ are also supported.
+This event listener controls the access to the :ref:`stats resource <stats-resource>` by using white listing of IPv4 and/or IPv6 addresses. `CIDR-notations <http://en.wikipedia.org/wiki/CIDR#CIDR_notation>`_ are also supported.
 
 This listener is enabled per default, and only allows ``127.0.0.1`` and ``::1`` to access the statistics:
 
@@ -358,8 +358,7 @@ This listener is enabled per default, and only allows ``127.0.0.1`` and ``::1`` 
                 'listener' => 'Imbo\EventListener\StatsAccess',
                 'params' => array(
                     array(
-                        'whitelist' => array('127.0.0.1', '::1'),
-                        'blacklist' => array(),
+                        'allow' => array('127.0.0.1', '::1'),
                     )
                 ),
             ),
@@ -368,7 +367,31 @@ This listener is enabled per default, and only allows ``127.0.0.1`` and ``::1`` 
         // ...
     );
 
-If the whitelist is populated, only the listed IP addresses/subnets will gain access. If the blacklist is populated only the listed IP addresses/subnets will be denied access. If both lists are populated the IP address of the client must be present in the whitelist to gain access. If an IP address is present in both lists, it will not gain access.
+The event listener also supports a notation for "allowing all", by placing ``'*'`` in the list:
+
+.. code-block:: php
+
+    <?php
+    return array(
+        // ...
+
+        'eventListeners' => array(
+            'statsAccess' => array(
+                'listener' => 'Imbo\EventListener\StatsAccess',
+                'params' => array(
+                    array(
+                        'allow' => array('*'),
+                    )
+                ),
+            ),
+        ),
+
+        // ...
+    );
+
+The above example will allow all clients access to the statistics.
+
+.. note: If you choose to override the configuration, remember to add the default values if you also want them, as your configuration will override the default configuration completely.
 
 Varnish HashTwo
 +++++++++++++++
