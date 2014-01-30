@@ -52,3 +52,19 @@ Feature: Imbo provides a stats endpoint
             | 127.0.0.1 | 127.0.0.1,::1     | 200 OK            |
             | ::1       | 127.0.0.1,::1     | 200 OK            |
             | ::1       | *                 | 200 OK            |
+
+    Scenario Outline: Stats access event listener authenticates HEAD requests as well
+        Given the client IP is "<client-ip>"
+        When I request "/stats.json?statsAllow=<allow>" using HTTP "HEAD"
+        Then I should get a response with "<status>"
+        And the "Content-Type" response header is "application/json"
+
+        Examples:
+            | client-ip | allow             | status            |
+            | 127.0.0.1 | 10.0.0.0          | 403 Access denied |
+            | 127.0.0.1 | 2001:db8::/48     | 403 Access denied |
+            | ::1       | 2001:db8::/48     | 403 Access denied |
+            | ::1       | 127.0.0.1         | 403 Access denied |
+            | 127.0.0.1 | 127.0.0.1,::1     | 200 OK            |
+            | ::1       | 127.0.0.1,::1     | 200 OK            |
+            | ::1       | *                 | 200 OK            |

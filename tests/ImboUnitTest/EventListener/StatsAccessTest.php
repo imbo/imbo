@@ -10,7 +10,8 @@
 
 namespace ImboUnitTest\EventListener;
 
-use Imbo\EventListener\StatsAccess;
+use Imbo\EventListener\StatsAccess,
+    Imbo\Resource\Stats as StatsResource;
 
 /**
  * @covers Imbo\EventListener\StatsAccess
@@ -151,5 +152,16 @@ class StatsAccessTest extends ListenerTests {
         }
 
         $listener->checkAccess($this->event);
+    }
+
+    /**
+     * @see https://github.com/imbo/imbo/issues/249
+     */
+    public function testListensToTheSameEventsAsTheStatsResource() {
+        $this->assertSame(
+            array_keys(StatsAccess::getSubscribedEvents()),
+            array_keys(StatsResource::getSubscribedEvents()),
+            'The stats access event listener does not listen to the same events as the stats resource, which it should'
+        );
     }
 }
