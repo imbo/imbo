@@ -57,6 +57,7 @@ class StatsAccess implements ListenerInterface {
     public static function getSubscribedEvents() {
         return array(
             'stats.get' => 'checkAccess',
+            'stats.head' => 'checkAccess',
         );
     }
 
