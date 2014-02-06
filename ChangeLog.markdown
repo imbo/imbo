@@ -1,6 +1,15 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.0.1
+----------
+__2014-02-06__
+
+Bug fixes:
+
+* #251: Stats access event listener is triggered after the stats have been generated
+* #249: Stats access event listener does not authenticate HTTP HEAD requests
+
 Imbo-1.0.0
 ----------
 __2014-01-30__
