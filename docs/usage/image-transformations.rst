@@ -196,6 +196,29 @@ Note the difference from the :ref:`resize <resize-transformation>` transformatio
 * ``t[]=maxSize:height=100``
 * ``t[]=maxSize:width=100,height=50``
 
+.. _modulate-transformation:
+
+Modulate the image - ``t[]=modulate``
+-------------------------------------
+
+This transformation can be used to control the brightness, saturation and hue of the image.
+
+**Parameters:**
+
+``b``
+    Brightness of the image in percent. Defaults to 100.
+
+``s``
+    Saturation of the image in percent. Defaults to 100.
+
+``h``
+    Hue percentage. Defaults to 100.
+
+**Examples:**
+
+* ``t[]=modulate:b=150``
+* ``t[]=modulate:b=120,s=130,h=90``
+
 .. _progressive-transformation:
 
 Make a progressive image - ``t[]=progressive``

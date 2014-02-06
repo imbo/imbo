@@ -37,6 +37,9 @@ Feature: Imbo enables dynamic transformations of images
             | maxSize:width=200                                                                                 | 200   | 139    |
             | maxSize:height=200                                                                                | 287   | 200    |
             | maxSize:width=100,height=100                                                                      | 100   | 70     |
+            | modulate                                                                                          | 599   | 417    |
+            | modulate:b=1,s=2                                                                                  | 599   | 417    |
+            | modulate:b=1,s=2,h=3                                                                              | 599   | 417    |
             | progressive                                                                                       | 599   | 417    |
             | resize:width=100                                                                                  | 100   | 69     |
             | resize:height=200                                                                                 | 287   | 200    |
@@ -83,6 +86,9 @@ Feature: Imbo enables dynamic transformations of images
             | maxSize:width=200                                                                                 |
             | maxSize:height=200                                                                                |
             | maxSize:width=100,height=100                                                                      |
+            | modulate                                                                                          |
+            | modulate:b=1,s=2                                                                                  |
+            | modulate:b=1,s=2,h=3                                                                              |
             | progressive                                                                                       |
             | resize:width=100                                                                                  |
             | resize:height=200                                                                                 |
