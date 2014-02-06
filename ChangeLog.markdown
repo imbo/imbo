@@ -3,7 +3,7 @@ Changelog for Imbo
 
 Imbo-1.0.1
 ----------
-__N/A__
+__2014-02-06__
 
 Bug fixes:
 
