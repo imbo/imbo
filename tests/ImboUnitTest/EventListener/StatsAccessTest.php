@@ -11,7 +11,9 @@
 namespace ImboUnitTest\EventListener;
 
 use Imbo\EventListener\StatsAccess,
-    Imbo\Resource\Stats as StatsResource;
+    Imbo\Resource\Stats as StatsResource,
+    Imbo\EventManager\EventManager,
+    ReflectionProperty;
 
 /**
  * @covers Imbo\EventListener\StatsAccess
@@ -163,5 +165,33 @@ class StatsAccessTest extends ListenerTests {
             array_keys(StatsResource::getSubscribedEvents()),
             'The stats access event listener does not listen to the same events as the stats resource, which it should'
         );
+    }
+
+    /**
+     * @see https://github.com/imbo/imbo/issues/251
+     *
+     * This test is best run with "In the Ghetto" blasting on the stereo
+     */
+    public function testHasHigherPriorityThanTheStatsResource() {
+        $statsAccess = new StatsAccess();
+        $statsResource = new StatsResource();
+
+        $eventManager = new EventManager();
+        $eventManager->addEventHandler('statsAccess', $statsAccess);
+        $eventManager->addCallbacks('statsAccess', StatsAccess::getSubscribedEvents());
+        $eventManager->addEventHandler('statsResource', $statsResource);
+        $eventManager->addCallbacks('statsResource', StatsResource::getSubscribedEvents());
+
+        $callbacks = new ReflectionProperty($eventManager, 'callbacks');
+        $callbacks->setAccessible(true);
+
+        $handlersForGet = $callbacks->getValue($eventManager)['stats.get'];
+        $handlersForHead = $callbacks->getValue($eventManager)['stats.head'];
+
+        $this->assertSame($statsAccess, $eventManager->getHandlerInstance($handlersForGet->extract()['handler']));
+        $this->assertSame($statsResource, $eventManager->getHandlerInstance($handlersForGet->extract()['handler']));
+
+        $this->assertSame($statsAccess, $eventManager->getHandlerInstance($handlersForHead->extract()['handler']));
+        $this->assertSame($statsResource, $eventManager->getHandlerInstance($handlersForHead->extract()['handler']));
     }
 }
