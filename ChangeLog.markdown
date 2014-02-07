@@ -1,6 +1,12 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.1.0
+----------
+__N/A__
+
+* #252: New image transformation: modulate
+
 Imbo-1.0.1
 ----------
 __2014-02-06__
