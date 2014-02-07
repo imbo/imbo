@@ -12,4 +12,4 @@ Copyright (c) 2011-2014, Christer Edvartsen <cogo@starzinger.net>
 Licensed under the MIT License
 
 ## Community
-Feel free to join `#imbo` on the Freenode IRC network (`chat.freenode.net`) if you have any questions.
+If you have any questions feel free to join `#imbo` on the Freenode IRC network (`chat.freenode.net`), or ask them on the [forum](https://groups.google.com/forum/#!forum/imbo-project).
