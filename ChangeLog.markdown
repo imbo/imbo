@@ -6,7 +6,7 @@ Imbo-1.1.0
 __N/A__
 
 * #252: New image transformation: modulate
-* #250: The Varnish HashTwo event listener now includes some extra headers
+* #250: The Varnish HashTwo event listener sends multiple headers
 
 Imbo-1.0.1
 ----------

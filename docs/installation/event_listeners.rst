@@ -444,6 +444,5 @@ or, if you want to use a non-default header name:
 
 The header appears multiple times in the response, with slightly different values::
 
-    X-HashTwo: <publicKey>|<imageIdentifier>
-    X-HashTwo: imbo|image|<publicKey>|<imageIdentifier>
-    X-HashTwo: imbo|user|<publicKey>
+    X-HashTwo: imbo;image;<publicKey>;<imageIdentifier>
+    X-HashTwo: imbo;user;<publicKey>

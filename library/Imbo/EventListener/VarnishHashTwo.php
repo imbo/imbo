@@ -66,9 +66,8 @@ class VarnishHashTwo implements ListenerInterface {
         $response->headers->set(
             $this->header,
             array(
-                $publicKey . '|' . $imageIdentifier,
-                'imbo|image|' . $publicKey . '|' . $imageIdentifier,
-                'imbo|user|' . $publicKey,
+                'imbo;image;' . $publicKey . ';' . $imageIdentifier,
+                'imbo;user;' . $publicKey,
             )
         );
     }
