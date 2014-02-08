@@ -71,7 +71,10 @@ class VarnishHashTwoTest extends ListenerTests {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
-        $this->responseHeaders->expects($this->once())->method('set')->with('X-HashTwo', 'key|id');
+        $this->responseHeaders->expects($this->once())->method('set')->with('X-HashTwo', array(
+            'imbo;image;key;id',
+            'imbo;user;key',
+        ));
 
         $this->listener->addHeader($this->event);
     }
@@ -87,7 +90,10 @@ class VarnishHashTwoTest extends ListenerTests {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
-        $this->responseHeaders->expects($this->once())->method('set')->with('X-CustomHeader', 'key|id');
+        $this->responseHeaders->expects($this->once())->method('set')->with('X-CustomHeader', array(
+            'imbo;image;key;id',
+            'imbo;user;key',
+        ));
 
         $listener->addHeader($this->event);
     }

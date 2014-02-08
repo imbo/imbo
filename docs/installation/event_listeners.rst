@@ -399,9 +399,10 @@ The above example will allow all clients access to the statistics.
 Varnish HashTwo
 +++++++++++++++
 
-This event listener can be enabled if you want Imbo to send a `HashTwo header <https://www.varnish-software.com/blog/advanced-cache-invalidation-strategies>`_ optionally used by `Varnish <https://www.varnish-software.com/>`_. The listener when enabled subscribes to the following event:
+This event listener can be enabled if you want Imbo to include `HashTwo headers <https://www.varnish-software.com/blog/advanced-cache-invalidation-strategies>`_ in responses to image requests. These headers can be used by `Varnish <https://www.varnish-software.com/>`_ for more effective cache invalidation strategies. The listener, when enabled, subscribes to the following events:
 
 * ``image.get``
+* ``image.head``
 
 The parameters supports a single element:
 
@@ -441,4 +442,7 @@ or, if you want to use a non-default header name:
         // ...
     );
 
-The value of the header is a combination of the public key and the current image identifier, separated by ``|``.
+The header appears multiple times in the response, with slightly different values::
+
+    X-HashTwo: imbo;image;<publicKey>;<imageIdentifier>
+    X-HashTwo: imbo;user;<publicKey>
