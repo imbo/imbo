@@ -30,6 +30,9 @@ Feature: Imbo enables dynamic transformations of images
             | border:mode=inline,width=4,height=5                                                               | 599   | 417    |
             | canvas                                                                                            | 599   | 417    |
             | canvas:width=700,height=600                                                                       | 700   | 600    |
+            | contrast                                                                                          | 599   | 417    |
+            | contrast:sharpen:-1                                                                               | 599   | 417    |
+            | contrast:sharpen:1                                                                                | 599   | 417    |
             | crop:width=50,height=60,x=1,y=10                                                                  | 50    | 60     |
             | crop:width=5000,height=6000,x=0,y=0                                                               | 599   | 417    |
             | crop:mode=center,width=100,height=100                                                             | 100   | 100    |
@@ -54,6 +57,9 @@ Feature: Imbo enables dynamic transformations of images
             | resize:width=100,height=100                                                                       | 100   | 100    |
             | rotate:angle=90                                                                                   | 417   | 599    |
             | sepia                                                                                             | 599   | 417    |
+            | sharpen                                                                                           | 599   | 417    |
+            | sharpen:radius=2,sigma=1                                                                          | 599   | 417    |
+            | sharpen:radius=0,sigma=2                                                                          | 599   | 417    |
             | strip                                                                                             | 599   | 417    |
             | thumbnail                                                                                         | 50    | 50     |
             | thumbnail:width=40,height=30                                                                      | 40    | 30     |
@@ -87,6 +93,7 @@ Feature: Imbo enables dynamic transformations of images
             | border:mode=inline,width=4,height=5                                                               |
             | canvas                                                                                            |
             | canvas:width=700,height=600                                                                       |
+            | contrast:sharpen=1                                                                                |
             | crop:width=50,height=60,x=1,y=10                                                                  |
             | crop:width=5000,height=6000,x=0,y=0                                                               |
             | desaturate                                                                                        |
@@ -107,6 +114,7 @@ Feature: Imbo enables dynamic transformations of images
             | resize:width=100,height=100                                                                       |
             | rotate:angle=90                                                                                   |
             | sepia                                                                                             |
+            | sharpen:radius=2,sigma=1                                                                          |
             | strip                                                                                             |
             | thumbnail                                                                                         |
             | thumbnail:width=40,height=30                                                                      |
