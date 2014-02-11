@@ -297,7 +297,7 @@ class RESTContext extends BehatContext {
     }
 
     /**
-     * @Given /^the "([^"]*)" response header (is|contains|matches) "([^"]*)"$/
+     * @Given /^the "([^"]*)" response header (is|contains|matches) "(.*?)"$/
      */
     public function assertResponseHeader($header, $match, $value) {
         $response = $this->getLastResponse();
