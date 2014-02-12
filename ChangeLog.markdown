@@ -5,6 +5,7 @@ Imbo-1.1.0
 ----------
 __N/A__
 
+* #256: Improved crop functionality
 * #255: Index resource is no longer cache-able
 * #254: Improved handling of the ETag response header
 * #252: New image transformation: modulate

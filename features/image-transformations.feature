@@ -31,6 +31,10 @@ Feature: Imbo enables dynamic transformations of images
             | canvas:width=700,height=600                                                                       | 700   | 600    |
             | crop:width=50,height=60,x=1,y=10                                                                  | 50    | 60     |
             | crop:width=5000,height=6000,x=0,y=0                                                               | 599   | 417    |
+            | crop:mode=center,width=100,height=100                                                             | 100   | 100    |
+            | crop:mode=center,width=6000,height=5000                                                           | 599   | 417    |
+            | crop:mode=center-x,y=10,width=123,height=20                                                       | 123   | 20     |
+            | crop:mode=center-y,x=10,width=234,height=30                                                       | 234   | 30     |
             | desaturate                                                                                        | 599   | 417    |
             | flipHorizontally                                                                                  | 599   | 417    |
             | flipVertically                                                                                    | 599   | 417    |
