@@ -6,8 +6,26 @@ Feature: Imbo enables client caching using related response headers
     Background:
         Given "tests/Fixtures/image1.png" exists in Imbo
 
+    Scenario: Request index page (not cacheable)
+        When I request "/"
+        Then the response is not cacheable
+        And the following response headers should not be present:
+        """
+        last-modified
+        etag
+        """
+
     Scenario: Request status information (not cacheable)
         When I request "/status"
+        Then the response is not cacheable
+        And the following response headers should not be present:
+        """
+        last-modified
+        etag
+        """
+
+    Scenario: Request stats information (not cacheable)
+        When I request "/stats=statsAllow=*"
         Then the response is not cacheable
         And the following response headers should not be present:
         """

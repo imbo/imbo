@@ -60,10 +60,17 @@ class IndexTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Index::get
      */
-    public function testUsesAnArrayModel() {
+    public function testSupportsHttpGet() {
         $this->request->expects($this->once())->method('getSchemeAndHttpHost')->will($this->returnValue('http://imbo'));
         $this->request->expects($this->once())->method('getBaseUrl')->will($this->returnValue(''));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
+        $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
+        $this->response->expects($this->once())->method('setPrivate');
+
+        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
+
+        $this->response->headers = $responseHeaders;
 
         $this->resource->get($this->event);
     }
