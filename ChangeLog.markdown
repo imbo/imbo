@@ -5,7 +5,7 @@ Imbo-1.1.0
 ----------
 __N/A__
 
-* #254: Don't use the Accept header when generating ETag's for image URI's that contains file extensions
+* #254: Improved handling of the ETag response header
 * #252: New image transformation: modulate
 * #250: The Varnish HashTwo event listener sends multiple headers
 
