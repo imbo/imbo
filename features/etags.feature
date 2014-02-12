@@ -1,12 +1,41 @@
-Feature: Imbo add ETag's to responses
+Feature: Imbo adds ETag's to some responses
     In order to improve client side performance
     As an image server
-    I can specify ETag's in all responses
+    I can specify ETag's in some responses
 
     Background:
         Given "tests/Fixtures/image.png" exists in Imbo
 
-    Scenario Outline: Take the Accept header into consideration when generating an ETag for an image URI without an extension
+    Scenario: Index resource does not contain any Etag header
+        When I request "/"
+        Then I should get a response with "200 Hell Yeah"
+        And the "ETag" response header does not exist
+
+    Scenario: Stats resource does not contain any Etag header
+        When I request "/stats?statsAllow=*"
+        Then I should get a response with "200 OK"
+        And the "ETag" response header does not exist
+
+    Scenario: Status resource does not contain any Etag header
+        When I request "/status"
+        Then I should get a response with "200 OK"
+        And the "ETag" response header does not exist
+
+    Scenario: User resource includes an Etag
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        When I request "/users/publickey"
+        Then I should get a response with "200 OK"
+        And the "ETag" response header matches ""[a-z0-9]{32}""
+
+    Scenario: Images resource includes an Etag
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        When I request "/users/publickey/images"
+        Then I should get a response with "200 OK"
+        And the "ETag" response header matches ""[a-z0-9]{32}""
+
+    Scenario Outline: Different image formats result in different ETag's
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         And the "Accept" request header is "<acceptHeader>"
@@ -16,25 +45,28 @@ Feature: Imbo add ETag's to responses
 
         Examples:
             | acceptHeader | etag  |
-            | */*          | "8fd1bf3c31be219e1fe4bc19f7fa8f39" |
-            | image/*      | "473d84adfa3b3f2a982bfed814810f23" |
-            | image/jpeg   | "812f2331e768b55139b572a83550def8" |
-            | image/gif    | "879728b55ce073e49779b4a1bac27280" |
-            | image/png    | "f420cf294318e4d37b1b87da3d840ba6" |
+            | */*          | "929db9c5fc3099f7576f5655207eba47" |
+            | image/*      | "929db9c5fc3099f7576f5655207eba47" |
+            | image/png    | "929db9c5fc3099f7576f5655207eba47" |
+            | image/jpeg   | "1500190f1aca23117c53490e856e209c" |
+            | image/gif    | "44a80402ab32b74593721053541dfb9f" |
 
-
-    Scenario Outline: Don't take the Accept header into consideration when generating an ETag for an image URI with an extension
+    Scenario: Metadata resource includes an ETag
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        And the "Accept" request header is "<acceptHeader>"
-        When I request "/users/publickey/images/929db9c5fc3099f7576f5655207eba47.png"
+        When I request "/users/publickey/images/929db9c5fc3099f7576f5655207eba47/metadata"
         Then I should get a response with "200 OK"
-        And the "ETag" response header is "<etag>"
+        And the "ETag" response header matches ""[a-z0-9]{32}""
 
-        Examples:
-            | acceptHeader | etag  |
-            | */*          | "2e06bf38756520604152772271f3afca" |
-            | image/*      | "2e06bf38756520604152772271f3afca" |
-            | image/jpeg   | "2e06bf38756520604152772271f3afca" |
-            | image/gif    | "2e06bf38756520604152772271f3afca" |
-            | image/png    | "2e06bf38756520604152772271f3afca" |
+    Scenario: Short URL resource includes an ETag
+        Given I fetch the short URL of "/users/publickey/images/929db9c5fc3099f7576f5655207eba47.gif?t[]=thumbnail&t[]=border"
+        And the "ETag" response header is ""c33ca397c520edd1827f2c8f59d95190""
+        When I request the image using the short URL
+        Then I should get a response with "200 OK"
+        And the "ETag" response header is ""c33ca397c520edd1827f2c8f59d95190""
+
+    Scenario: Responses that is not 200 OK does not get ETags
+        Given I use "publickey" and "privatekey" for public and private keys
+        When I request "/users/publickey"
+        Then I should get a response with "400 Missing access token"
+        And the "ETag" response header does not exist
