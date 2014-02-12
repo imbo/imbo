@@ -38,19 +38,6 @@ class Crop extends Transformation implements ListenerInterface {
     private $y = 0;
 
     /**
-     * The crop mode
-     *
-     * Possible values are:
-     *
-     * - center
-     * - center-x
-     * - center-y
-     *
-     * @var string
-     */
-    private $mode;
-
-    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
