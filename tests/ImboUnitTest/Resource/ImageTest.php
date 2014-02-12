@@ -87,16 +87,10 @@ class ImageTest extends ResourceTests {
         $publicKey = 'christer';
         $imageIdentifier = 'imageIdentifier';
 
-        $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $requestHeaders->expects($this->once())->method('get')->with('Accept')->will($this->returnValue('image/*'));
-
         $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-
-        $this->request->headers = $requestHeaders;
 
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-        $this->request->expects($this->once())->method('getRequestUri')->will($this->returnValue('/users/christer/images/id'));
 
         $this->response->headers = $responseHeaders;
 
@@ -105,7 +99,6 @@ class ImageTest extends ResourceTests {
         $this->manager->expects($this->at(0))->method('trigger')->with('db.image.load');
         $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.load');
 
-        $this->response->expects($this->once())->method('setEtag')->with('"429b62d23e395c2e3567018712e8924e"')->will($this->returnSelf());
         $this->response->expects($this->once())->method('setMaxAge')->with(31536000)->will($this->returnSelf());
 
         $responseHeaders->expects($this->once())->method('add')->with($this->callback(function($headers) {

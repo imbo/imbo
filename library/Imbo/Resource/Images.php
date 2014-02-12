@@ -42,8 +42,8 @@ class Images implements ResourceInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            'images.get' => 'getImage',
-            'images.head' => 'getImage',
+            'images.get' => 'getImages',
+            'images.head' => 'getImages',
             'images.post' => 'addImage',
         );
     }
@@ -53,11 +53,8 @@ class Images implements ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function getImage(EventInterface $event) {
+    public function getImages(EventInterface $event) {
         $event->getManager()->trigger('db.images.load');
-
-        $response = $event->getResponse();
-        $response->setEtag('"' . md5($response->getLastModified()->format('D, d M Y H:i:s') . ' GMT') . '"');
     }
 
     /**

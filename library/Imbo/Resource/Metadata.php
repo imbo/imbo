@@ -111,16 +111,7 @@ class Metadata implements ResourceInterface {
      * @param EventInterface $event The current event
      */
     public function get(EventInterface $event) {
-        $request = $event->getRequest();
-        $response = $event->getResponse();
-
         $event->getManager()->trigger('db.metadata.load');
-
-        $lastModified = $response->getLastModified()->format('D, d M Y H:i:s') . ' GMT';
-
-        $hash = md5($request->getPublicKey() . $request->getImageIdentifier() . $lastModified);
-
-        $response->setEtag('"' . $hash . '"');
     }
 
     /**

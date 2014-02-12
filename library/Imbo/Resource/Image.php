@@ -78,24 +78,8 @@ class Image implements ResourceInterface {
         $eventManager->trigger('db.image.load');
         $eventManager->trigger('storage.image.load');
 
-        // Generate ETag using public key, image identifier, optionally Accept headers of the user
-        // agent and the requested URI. If the URI has an extension, ignore the Accept header when
-        // generating
-        $etagData = array(
-            $publicKey,
-            $imageIdentifier,
-            $request->getRequestUri(),
-        );
-
-        if (!$request->getExtension()) {
-            $etagData[] = $request->headers->get('Accept', '*/*');
-        }
-
-        $etag = '"' . md5(implode('', $etagData)) . '"';
-
-        // Set some response headers before we apply optional transformations
-        $response->setEtag($etag)
-                 ->setMaxAge(31536000);
+        // Set a long max age as the image itself won't change
+        $response->setMaxAge(31536000);
 
         // Custom Imbo headers
         $response->headers->add(array(
