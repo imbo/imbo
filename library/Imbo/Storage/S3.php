@@ -10,8 +10,7 @@
 
 namespace Imbo\Storage;
 
-use Imbo\Model\Image,
-    Imbo\Exception\StorageException,
+use Imbo\Exception\StorageException,
     Aws\S3\S3Client,
     Aws\S3\Exception\NoSuchKeyException,
     Aws\S3\Exception\S3Exception,

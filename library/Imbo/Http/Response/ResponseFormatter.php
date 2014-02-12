@@ -14,7 +14,6 @@ use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Model,
     Imbo\Exception,
-    Imbo\Http\ContentNegotiation,
     Symfony\Component\HttpFoundation\AcceptHeader;
 
 /**

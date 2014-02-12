@@ -10,8 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Exception\ResourceException,
-    Imbo\EventManager\EventInterface,
+use Imbo\EventManager\EventInterface,
     Imbo\Model;
 
 /**

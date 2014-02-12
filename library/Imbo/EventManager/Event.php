@@ -10,11 +10,7 @@
 
 namespace Imbo\EventManager;
 
-use Imbo\Http\Request\Request,
-    Imbo\Http\Response\Response,
-    Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface,
-    Symfony\Component\EventDispatcher\GenericEvent;
+use Symfony\Component\EventDispatcher\GenericEvent;
 
 /**
  * Event class

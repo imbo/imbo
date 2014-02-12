@@ -636,7 +636,6 @@ class Doctrine implements DatabaseInterface {
 
         foreach ($data as $key => $value) {
             $keys = explode($this->metadataNamespaceSeparator, $key);
-            $numKeys = count($keys);
             $tmp = &$result;
 
             foreach ($keys as $i => $key) {

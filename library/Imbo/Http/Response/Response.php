@@ -10,12 +10,8 @@
 
 namespace Imbo\Http\Response;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception,
-    Imbo\Model,
-    Symfony\Component\HttpFoundation\Response as SymfonyResponse,
-    DateTime,
-    DateTimeZone;
+use Imbo\Model,
+    Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * Response object from the server to the client
