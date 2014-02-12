@@ -109,31 +109,10 @@ class MetadataTest extends ResourceTests {
     }
 
     /**
-     * Return data used in the GET test
-     *
-     * @return array[]
-     */
-    public function getData() {
-        return array(
-            array('key', 'id', new DateTime('@1361628772', new DateTimeZone('UTC')), '"a69f7f6c12a8fb5557afefe03ca29f91"'),
-            array('key', 'id2', new DateTime('@1361628772', new DateTimeZone('UTC')), '"3e973107af60e3d6da827016b2572144"'),
-            array('key2', 'id', new DateTime('@1361628772', new DateTimeZone('UTC')), '"0a7e131bb8e56db498b3a3a6f2c3c74b"'),
-            array('key2', 'id2', new DateTime('@1361628772', new DateTimeZone('UTC')), '"50f886483a65680dc5ece85953d85562"'),
-        );
-    }
-
-    /**
-     * @dataProvider getData
      * @covers Imbo\Resource\Metadata::get
      */
-    public function testSupportsHttpGet($publicKey, $imageIdentifier, $lastModified, $etag) {
+    public function testSupportsHttpGet() {
         $this->manager->expects($this->once())->method('trigger')->with('db.metadata.load');
-        $this->response->expects($this->once())->method('getLastModified')->will($this->returnValue($lastModified));
-        $this->response->expects($this->once())->method('setEtag')->with($etag);
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-
         $this->resource->get($this->event);
     }
 

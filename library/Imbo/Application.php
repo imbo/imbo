@@ -108,6 +108,7 @@ class Application {
             'Imbo\Image\ImagePreparation',
             'Imbo\EventListener\ImageTransformer',
             'Imbo\EventListener\ResponseSender',
+            'Imbo\EventListener\ResponseETag',
         );
 
         foreach ($eventListeners as $listener => $params) {

@@ -43,8 +43,5 @@ class User implements ResourceInterface {
      */
     public function get(EventInterface $event) {
         $event->getManager()->trigger('db.user.load');
-
-        $response = $event->getResponse();
-        $response->setEtag('"' . md5($response->getLastModified()->format('D, d M Y H:i:s') . ' GMT') . '"');
     }
 }

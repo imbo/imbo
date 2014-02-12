@@ -5,6 +5,7 @@ Imbo-1.1.0
 ----------
 __N/A__
 
+* #254: Improved handling of the ETag response header
 * #252: New image transformation: modulate
 * #250: The Varnish HashTwo event listener sends multiple headers
 
