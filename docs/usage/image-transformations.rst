@@ -136,9 +136,24 @@ This transformation is used to crop the image.
 ``height``
     The height of the crop in pixels.
 
+``mode``
+    The crop mode (optional). Possible values are:
+
+    ``center``
+        When using the center mode the ``x`` and ``y`` parameters are ignored, and the center of the cropped area is placed in the center of the original image.
+
+    ``center-x``
+        Center the crop on the x-axis. Use the ``y`` parameter to control the upper edge of the crop.
+
+    ``center-y``
+        Center the crop on the y-axis. Use the ``x`` parameter to control the left edge of the crop.
+
 **Examples:**
 
 * ``t[]=crop:x=10,y=25,width=250,height=150``
+* ``t[]=crop:width=100,height=100,mode=center``
+* ``t[]=crop:width=50,height=50,mode=center-x,y=15``
+* ``t[]=crop:width=50,height=50,mode=center-y,x=15``
 
 .. _desaturate-transformation:
 
