@@ -54,9 +54,7 @@ class ResponseETag implements ListenerInterface {
     }
 
     /**
-     * Set the correct ETag for the response, and clean up a possible tainted If-None-Match request
-     * header. Apache for instance can add -gzip to the ETag response header, causing the matching
-     * in Imbo to fail.
+     * Set the correct ETag for the response
      *
      * @param EventInterface $event The current event
      */
