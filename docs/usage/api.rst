@@ -54,6 +54,8 @@ The index resource does not require any authentication per default.
 
 * 200 Hell Yeah
 
+.. note:: The index resource is not cache-able.
+
 .. _stats-resource:
 
 Stats resource - ``/stats``
@@ -696,6 +698,7 @@ Cache-Control
 
 Some responses from Imbo are not cache-able. These will typically include ``Cache-Control: max-age=0, no-store, private``. The following resources are not cache-able:
 
+* :ref:`index-resource`
 * :ref:`stats-resource`
 * :ref:`status-resource`
 

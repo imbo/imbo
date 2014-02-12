@@ -71,5 +71,10 @@ class Index implements ResourceInterface {
         ));
 
         $response->setModel($model);
+
+        // Prevent caching
+        $response->setMaxAge(0)
+                 ->setPrivate();
+        $response->headers->addCacheControlDirective('no-store');
     }
 }
