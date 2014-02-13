@@ -3,7 +3,7 @@ Changelog for Imbo
 
 Imbo-1.1.0
 ----------
-__N/A__
+__2014-02-13__
 
 * #256: Improved crop functionality
 * #255: Index resource is no longer cache-able
