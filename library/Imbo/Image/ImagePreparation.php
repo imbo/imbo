@@ -16,8 +16,7 @@ use Imbo\EventManager\EventInterface,
     Imbo\Exception,
     Imbo\Model\Image,
     Imagick,
-    ImagickException,
-    finfo;
+    ImagickException;
 
 /**
  * Image preparation

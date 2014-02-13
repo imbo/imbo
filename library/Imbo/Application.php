@@ -21,7 +21,6 @@ use Imbo\Http\Request\Request,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface,
     Imbo\Http\Response\Formatter,
-    Imbo\Image\Transformation,
     Imbo\Resource\ResourceInterface,
     Imbo\EventListener\Initializer\InitializerInterface;
 

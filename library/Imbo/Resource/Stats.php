@@ -10,10 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Model,
-    DateTime,
-    DateTimeZone;
+use Imbo\EventManager\EventInterface;
 
 /**
  * Stats resource

@@ -11,10 +11,8 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Database\DatabaseInterface,
     Imbo\Resource\Images\Query as ImagesQuery,
-    Imbo\Model,
-    DateTime;
+    Imbo\Model;
 
 /**
  * Database operations event listener

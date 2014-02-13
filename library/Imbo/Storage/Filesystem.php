@@ -10,8 +10,7 @@
 
 namespace Imbo\Storage;
 
-use Imbo\Model\Image,
-    Imbo\Exception\StorageException,
+use Imbo\Exception\StorageException,
     Imbo\Exception,
     DateTime,
     DateTimeZone;
