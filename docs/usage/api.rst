@@ -54,6 +54,8 @@ The index resource does not require any authentication per default.
 
 * 200 Hell Yeah
 
+.. note:: The index resource is not cache-able.
+
 .. _stats-resource:
 
 Stats resource - ``/stats``
@@ -685,6 +687,50 @@ will result in:
     )
 
 For images the default mime-type is the original mime-type of the image. If you add an ``image/gif`` image and fetch that image with ``Accept: */*`` or ``Accept: image/*`` the mime-type of the image returned will be ``image/gif``. To choose a different mime type either change the ``Accept`` header, or use ``.jpg`` or ``.png`` (for ``image/jpeg`` and ``image/png`` respectively).
+
+Cache headers
+-------------
+
+Most responses from Imbo includes a set of cache-related headers that enables shared caches and user agents to cache content.
+
+Cache-Control
++++++++++++++
+
+Some responses from Imbo are not cache-able. These will typically include ``Cache-Control: max-age=0, no-store, private``. The following resources are not cache-able:
+
+* :ref:`index-resource`
+* :ref:`stats-resource`
+* :ref:`status-resource`
+
+All other resources will include ``Cache-Control: public``. The :ref:`image <image-resource>` and :ref:`short url <shorturl-resource>` resources will also set a ``max-age``, resulting in the following header: ``Cache-Control: max-age=31536000, public``.
+
+ETag
+++++
+
+Imbo provides `entity tags <http://en.wikipedia.org/wiki/HTTP_ETag>`_ for cache validation mechanisms. User agents can use the ``ETag`` response header to do conditional requests further down the road (by specifying the original ``ETag`` value in the ``If-None-Match`` request header). This results in saved bandwidth as web caches and Imbo servers no longer need to send the response body, as the one cached by the user agent can be re-used. This is achieved by sending ``304 Not Modified`` back to the user agent, instead of ``200 OK``.
+
+The following resources in Imbo will include an ETag:
+
+* :ref:`user-resource`
+* :ref:`images-resource`
+* :ref:`image-resource`
+* :ref:`metadata-resource`
+* :ref:`shorturl-resource`
+
+The value of the ``ETag`` header is simply the MD5 sum of the content in the response body, enclosed in quotes. For instance ``ETag: "fd2fd87a2f5288be31c289e70e916123"``.
+
+Last-Modified
++++++++++++++
+
+Imbo also includes a ``Last-Modified`` response header for resources that has a know last modification date, and these resources are:
+
+* :ref:`user-resource`: The date of when the user last added or deleted an image, or manipulated the metadata of an image. If the user don't have any images yet, the value of this date will be the current timestamp.
+* :ref:`images-resource`: The date of when the user last modified an image in the collection (either the image itself, or metadata attached to the image).
+* :ref:`image-resource`: The date of when the image was added (or replaced), or when the metadata of the image was last modified.
+* :ref:`metadata-resource`: The date of when the metadata of the image was last modified.
+* :ref:`shorturl-resource`: Same as the date of the original image.
+
+User agents can use the value of the ``Last-Modified`` header in the ``If-Modified-Since`` request header to make a conditional request. The value of the ``Last-Modified`` header is an `HTTP-date <http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.3.1>`_, for instance ``Last-Modified: Wed, 12 Feb 2014 09:46:02 GMT``.
 
 Errors
 ------

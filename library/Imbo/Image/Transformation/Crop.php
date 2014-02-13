@@ -64,15 +64,36 @@ class Crop extends Transformation implements ListenerInterface {
         // Fetch the x, y, width and height of the resulting image
         $x = !empty($params['x']) ? (int) $params['x'] : $this->x;
         $y = !empty($params['y']) ? (int) $params['y'] : $this->y;
+        $mode = !empty($params['mode']) ? $params['mode'] : null;
 
         $width = (int) $params['width'];
         $height = (int) $params['height'];
+        $imageWidth = $image->getWidth();
+        $imageHeight = $image->getHeight();
+
+        // Fix too large values for width and/or height
+        if ($width > $imageWidth) {
+            $width = $imageWidth;
+        }
+
+        if ($height > $imageHeight) {
+            $height = $imageHeight;
+        }
+
+        // Set correct x and/or y values based on the crop mode
+        if ($mode === 'center' || $mode === 'center-x') {
+            $x = (int) ($imageWidth - $width) / 2;
+        }
+
+        if ($mode === 'center' || $mode === 'center-y') {
+            $y = (int) ($imageHeight - $height) / 2;
+        }
 
         // Return if there is no need for cropping
         if (
             $x === 0 && $y === 0 &&
-            $image->getWidth() <= $width &&
-            $image->getHeight() <= $height
+            $imageWidth <= $width &&
+            $imageHeight <= $height
         ) {
             return;
         }

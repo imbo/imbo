@@ -75,8 +75,6 @@ class UserTest extends ResourceTests {
         $manager = $this->getMockBuilder('Imbo\EventManager\EventManager')->disableOriginalConstructor()->getMock();
         $manager->expects($this->once())->method('trigger')->with('db.user.load');
         $this->event->expects($this->once())->method('getManager')->will($this->returnValue($manager));
-        $this->response->expects($this->once())->method('getLastModified')->will($this->returnValue($date));
-        $this->response->expects($this->once())->method('setEtag')->with('"9a15cbd487fa803ac2be151b1a77649a"');
 
         $this->resource->get($this->event);
     }

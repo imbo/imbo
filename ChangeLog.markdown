@@ -1,6 +1,16 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.1.0
+----------
+__2014-02-13__
+
+* #256: Improved crop functionality
+* #255: Index resource is no longer cache-able
+* #254: Improved handling of the ETag response header
+* #252: New image transformation: modulate
+* #250: The Varnish HashTwo event listener sends multiple headers
+
 Imbo-1.0.1
 ----------
 __2014-02-06__

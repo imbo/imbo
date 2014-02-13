@@ -183,6 +183,7 @@ $config = array(
         'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
         'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
         'maxSize' => 'Imbo\Image\Transformation\MaxSize',
+        'modulate' => 'Imbo\Image\Transformation\Modulate',
         'progressive' => 'Imbo\Image\Transformation\Progressive',
         'resize' => 'Imbo\Image\Transformation\Resize',
         'rotate' => 'Imbo\Image\Transformation\Rotate',

@@ -85,14 +85,10 @@ class ImagesTest extends ResourceTests {
     }
 
     /**
-     * @covers Imbo\Resource\Images::getImage
+     * @covers Imbo\Resource\Images::getImages
      */
     public function testSupportsHttpGet() {
-        $date = new DateTime('@1361630937', new DateTimeZone('UTC'));
         $this->manager->expects($this->once())->method('trigger')->with('db.images.load');
-        $this->response->expects($this->once())->method('getLastModified')->will($this->returnValue($date));
-        $this->response->expects($this->once())->method('setEtag')->with('"ff9b1b83dc89567bb1c2186b56739db8"');
-
-        $this->resource->getImage($this->event);
+        $this->resource->getImages($this->event);
     }
 }

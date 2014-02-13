@@ -11,8 +11,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Exception\StorageException,
-    Imbo\Storage\StorageInterface;
+    Imbo\Exception\StorageException;
 
 /**
  * Storage operations event listener

@@ -10,8 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\Exception\ResourceException,
-    Imbo\EventManager\EventInterface,
+use Imbo\EventManager\EventInterface,
     Imbo\Model;
 
 /**
@@ -78,18 +77,8 @@ class Image implements ResourceInterface {
         $eventManager->trigger('db.image.load');
         $eventManager->trigger('storage.image.load');
 
-        // Generate ETag using public key, image identifier, Accept headers of the user agent and
-        // the requested URI
-        $etag = '"' . md5(
-            $publicKey .
-            $imageIdentifier .
-            $request->headers->get('Accept', '*/*') .
-            $request->getRequestUri()
-        ) . '"';
-
-        // Set some response headers before we apply optional transformations
-        $response->setEtag($etag)
-                 ->setMaxAge(31536000);
+        // Set a long max age as the image itself won't change
+        $response->setMaxAge(31536000);
 
         // Custom Imbo headers
         $response->headers->add(array(

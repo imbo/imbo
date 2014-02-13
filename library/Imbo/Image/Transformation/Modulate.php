@@ -16,25 +16,18 @@ use Imbo\Exception\TransformationException,
     ImagickException;
 
 /**
- * Sepia transformation
+ * Modulate transformation
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
+ * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Sepia extends Transformation implements ListenerInterface {
-    /**
-     * Extent of the sepia toning
-     *
-     * @var float
-     */
-    private $threshold = 80;
-
+class Modulate extends Transformation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
         return array(
-            'image.transformation.sepia' => 'transform',
+            'image.transformation.modulate' => 'transform',
         );
     }
 
@@ -46,10 +39,12 @@ class Sepia extends Transformation implements ListenerInterface {
     public function transform(EventInterface $event) {
         $params = $event->getArgument('params');
 
-        $threshold = !empty($params['threshold']) ? (float) $params['threshold'] : $this->threshold;
+        $brightness = isset($params['b']) ? (int) $params['b'] : 100;
+        $saturation = isset($params['s']) ? (int) $params['s'] : 100;
+        $hue = isset($params['h']) ? (int) $params['h'] : 100;
 
         try {
-            $this->imagick->sepiaToneImage($threshold);
+            $this->imagick->modulateImage($brightness, $saturation, $hue);
             $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);

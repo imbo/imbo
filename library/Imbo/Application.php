@@ -21,7 +21,6 @@ use Imbo\Http\Request\Request,
     Imbo\Database\DatabaseInterface,
     Imbo\Storage\StorageInterface,
     Imbo\Http\Response\Formatter,
-    Imbo\Image\Transformation,
     Imbo\Resource\ResourceInterface,
     Imbo\EventListener\Initializer\InitializerInterface;
 
@@ -108,6 +107,7 @@ class Application {
             'Imbo\Image\ImagePreparation',
             'Imbo\EventListener\ImageTransformer',
             'Imbo\EventListener\ResponseSender',
+            'Imbo\EventListener\ResponseETag',
         );
 
         foreach ($eventListeners as $listener => $params) {

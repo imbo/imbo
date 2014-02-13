@@ -31,12 +31,19 @@ Feature: Imbo enables dynamic transformations of images
             | canvas:width=700,height=600                                                                       | 700   | 600    |
             | crop:width=50,height=60,x=1,y=10                                                                  | 50    | 60     |
             | crop:width=5000,height=6000,x=0,y=0                                                               | 599   | 417    |
+            | crop:mode=center,width=100,height=100                                                             | 100   | 100    |
+            | crop:mode=center,width=6000,height=5000                                                           | 599   | 417    |
+            | crop:mode=center-x,y=10,width=123,height=20                                                       | 123   | 20     |
+            | crop:mode=center-y,x=10,width=234,height=30                                                       | 234   | 30     |
             | desaturate                                                                                        | 599   | 417    |
             | flipHorizontally                                                                                  | 599   | 417    |
             | flipVertically                                                                                    | 599   | 417    |
             | maxSize:width=200                                                                                 | 200   | 139    |
             | maxSize:height=200                                                                                | 287   | 200    |
             | maxSize:width=100,height=100                                                                      | 100   | 70     |
+            | modulate                                                                                          | 599   | 417    |
+            | modulate:b=1,s=2                                                                                  | 599   | 417    |
+            | modulate:b=1,s=2,h=3                                                                              | 599   | 417    |
             | progressive                                                                                       | 599   | 417    |
             | resize:width=100                                                                                  | 100   | 69     |
             | resize:height=200                                                                                 | 287   | 200    |
@@ -83,6 +90,9 @@ Feature: Imbo enables dynamic transformations of images
             | maxSize:width=200                                                                                 |
             | maxSize:height=200                                                                                |
             | maxSize:width=100,height=100                                                                      |
+            | modulate                                                                                          |
+            | modulate:b=1,s=2                                                                                  |
+            | modulate:b=1,s=2,h=3                                                                              |
             | progressive                                                                                       |
             | resize:width=100                                                                                  |
             | resize:height=200                                                                                 |

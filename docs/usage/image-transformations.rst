@@ -136,9 +136,24 @@ This transformation is used to crop the image.
 ``height``
     The height of the crop in pixels.
 
+``mode``
+    The crop mode (optional). Possible values are:
+
+    ``center``
+        When using the center mode the ``x`` and ``y`` parameters are ignored, and the center of the cropped area is placed in the center of the original image.
+
+    ``center-x``
+        Center the crop on the x-axis. Use the ``y`` parameter to control the upper edge of the crop.
+
+    ``center-y``
+        Center the crop on the y-axis. Use the ``x`` parameter to control the left edge of the crop.
+
 **Examples:**
 
 * ``t[]=crop:x=10,y=25,width=250,height=150``
+* ``t[]=crop:width=100,height=100,mode=center``
+* ``t[]=crop:width=50,height=50,mode=center-x,y=15``
+* ``t[]=crop:width=50,height=50,mode=center-y,x=15``
 
 .. _desaturate-transformation:
 
@@ -195,6 +210,29 @@ Note the difference from the :ref:`resize <resize-transformation>` transformatio
 * ``t[]=maxSize:width=100``
 * ``t[]=maxSize:height=100``
 * ``t[]=maxSize:width=100,height=50``
+
+.. _modulate-transformation:
+
+Modulate the image - ``t[]=modulate``
+-------------------------------------
+
+This transformation can be used to control the brightness, saturation and hue of the image.
+
+**Parameters:**
+
+``b``
+    Brightness of the image in percent. Defaults to 100.
+
+``s``
+    Saturation of the image in percent. Defaults to 100.
+
+``h``
+    Hue percentage. Defaults to 100.
+
+**Examples:**
+
+* ``t[]=modulate:b=150``
+* ``t[]=modulate:b=120,s=130,h=90``
 
 .. _progressive-transformation:
 
