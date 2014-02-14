@@ -101,8 +101,14 @@ class AccessTokenTest extends ListenerTests {
      */
     public function getFilterData() {
         return array(
-            array(
+            'no filter and no transformations' => array(
                 $filter = array(),
+                $transformations = array(),
+                $whitelisted = false,
+            ),
+            // @see https://github.com/imbo/imbo/issues/258
+            'configured filters, but no transformations in the request' => array(
+                $filter = array('transformations' => array('whitelist' => array('border'))),
                 $transformations = array(),
                 $whitelisted = false,
             ),
