@@ -1,6 +1,14 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.1.1
+----------
+__2014-02-14__
+
+Bug fixes:
+
+* #258: In special cases, images can be accessed without access tokens
+
 Imbo-1.1.0
 ----------
 __2014-02-13__
@@ -10,6 +18,14 @@ __2014-02-13__
 * #254: Improved handling of the ETag response header
 * #252: New image transformation: modulate
 * #250: The Varnish HashTwo event listener sends multiple headers
+
+Imbo-1.0.2
+----------
+__2014-02-14__
+
+Bug fixes:
+
+* #258: In special cases, images can be accessed without access tokens
 
 Imbo-1.0.1
 ----------
