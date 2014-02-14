@@ -146,7 +146,16 @@ return array(
 
     'eventListeners' => array(
         'auth' => 'Imbo\EventListener\Authenticate',
-        'accessToken' => 'Imbo\EventListener\AccessToken',
+        'accessToken' => array(
+            'listener' => 'Imbo\EventListener\AccessToken',
+            'params' => array(
+                'transformations' => array(
+                   'whitelist' => array(
+                        'whitelisted',
+                    ),
+                ),
+            ),
+        ),
         'statsAccess' => array(
             'listener' => 'Imbo\EventListener\StatsAccess',
             'params' => array('allow' => $statsAllow),
@@ -242,6 +251,13 @@ return array(
         'graythumb' => array(
             'thumbnail',
             'desaturate',
+        ),
+        'whitelisted' => array(
+            'crop' => array(
+                'width' => 100,
+                'height' => 50,
+                'mode' => 'center',
+            )
         ),
     ),
 

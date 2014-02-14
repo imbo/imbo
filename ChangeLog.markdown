@@ -1,6 +1,14 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.0.2
+----------
+__2014-02-14__
+
+Bug fixes:
+
+* #258: In special cases, images can be accessed without access tokens
+
 Imbo-1.0.1
 ----------
 __2014-02-06__

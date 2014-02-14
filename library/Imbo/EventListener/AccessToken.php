@@ -130,6 +130,11 @@ class AccessToken implements ListenerInterface {
     /**
      * Check if the request is whitelisted
      *
+     * This method will whitelist a request only if all the transformations present in the request
+     * are listed in the whitelist filter OR if the whitelist filter is empty, and the blacklist
+     * filter has enties, but none of the transformations in the request are present in the
+     * blacklist.
+     *
      * @param Request $request The request instance
      * @return boolean
      */
@@ -137,36 +142,35 @@ class AccessToken implements ListenerInterface {
         $filter = $this->params['transformations'];
 
         if (empty($filter['whitelist']) && empty($filter['blacklist'])) {
+            // No filter has been configured
+            return false;
+        }
+
+        // Fetch transformations from the request
+        $transformations = $request->getTransformations();
+
+        if (empty($transformations)) {
+            // No transformations are present in the request, no need to check
             return false;
         }
 
         $whitelist = array_flip($filter['whitelist']);
         $blacklist = array_flip($filter['blacklist']);
-        $blacklisted = false;
 
-        $transformations = array();
-
-        foreach ($request->getTransformations() as $transformation) {
-            $name = $transformation['name'];
-            $flag = false;
-
-            if (isset($blacklist[$name])) {
-                $blacklisted = true;
-                break;
+        foreach ($transformations as $transformation) {
+            if (isset($blacklist[$transformation['name']])) {
+                // Transformation is explicitly blacklisted
+                return false;
             }
 
-            if (isset($whitelist[$name]) || (empty($whitelist) && !empty($blacklist))) {
-                $flag = true;
+            if (!empty($whitelist) && !isset($whitelist[$transformation['name']])) {
+                // We have a whitelist, but the transformation is not listed in it, so we must deny
+                // the request
+                return false;
             }
-
-            $transformations[$name] = $flag;
         }
 
-        if ($blacklisted) {
-            // Some of the transformations in the chain are blacklisted
-            return false;
-        }
-
-        return count($transformations) === count(array_filter($transformations));
+        // All transformations in the request are whitelisted
+        return true;
     }
 }
