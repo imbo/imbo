@@ -295,6 +295,9 @@ class CorsTest extends ListenerTests {
                     'shorturl.get' => array('invoke' => 100),
                     'shorturl.head' => array('invoke' => 100),
                     'shorturl.options' => array('options' => 20),
+                    'globalshorturl.get' => array('invoke' => 100),
+                    'globalshorturl.head' => array('invoke' => 100),
+                    'globalshorturl.options' => array('options' => 20),
                 ),
             ),
             'some endpoints' => array(

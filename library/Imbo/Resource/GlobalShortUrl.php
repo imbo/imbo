@@ -15,12 +15,12 @@ use Imbo\EventManager\EventInterface,
     Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
- * Short URL resource
+ * Global short URL resource
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
-class ShortUrl implements ResourceInterface {
+class GlobalShortUrl implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
@@ -34,8 +34,8 @@ class ShortUrl implements ResourceInterface {
     public static function getSubscribedEvents() {
         return array(
             // Generate and/or fetch short URL
-            'shorturl.get' => 'get',
-            'shorturl.head' => 'get',
+            'globalshorturl.get' => 'get',
+            'globalshorturl.head' => 'get',
 
             // Add a short URL header to the response
             'image.get' => 'addShortUrlHeader',

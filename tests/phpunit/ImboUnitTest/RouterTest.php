@@ -107,9 +107,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     public function getValidRoutes() {
         return array(
             // Short URL resource
-            array('/s/asdfghj', 'shorturl'),
-            array('/s/1234567', 'shorturl'),
-            array('/s/1234asd', 'shorturl'),
+            array('/s/asdfghj', 'globalshorturl'),
+            array('/s/1234567', 'globalshorturl'),
+            array('/s/1234asd', 'globalshorturl'),
 
             // Status resource
             array('/status', 'status'),

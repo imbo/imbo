@@ -93,7 +93,7 @@ class Application {
             'Imbo\Resource\Index',
             'Imbo\Resource\Status',
             'Imbo\Resource\Stats',
-            'Imbo\Resource\ShortUrl',
+            'Imbo\Resource\GlobalShortUrl',
             'Imbo\Resource\User',
             'Imbo\Resource\Images',
             'Imbo\Resource\Image',
