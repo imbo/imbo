@@ -82,7 +82,7 @@ class Sharpen extends Transformation implements ListenerInterface {
         }
 
         if (isset($params['gain'])) {
-           $gain = (float) $params['gain'];
+            $gain = (float) $params['gain'];
         }
 
         if (isset($params['threshold'])) {
