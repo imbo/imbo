@@ -60,6 +60,10 @@ Feature: Imbo enables dynamic transformations of images
             | sharpen                                                                                           | 599   | 417    |
             | sharpen:radius=2,sigma=1                                                                          | 599   | 417    |
             | sharpen:radius=0,sigma=2                                                                          | 599   | 417    |
+            | sharpen:preset=light                                                                              | 599   | 417    |
+            | sharpen:preset=moderate                                                                           | 599   | 417    |
+            | sharpen:preset=strong                                                                             | 599   | 417    |
+            | sharpen:preset=extreme                                                                            | 599   | 417    |
             | strip                                                                                             | 599   | 417    |
             | thumbnail                                                                                         | 50    | 50     |
             | thumbnail:width=40,height=30                                                                      | 40    | 30     |
@@ -114,7 +118,13 @@ Feature: Imbo enables dynamic transformations of images
             | resize:width=100,height=100                                                                       |
             | rotate:angle=90                                                                                   |
             | sepia                                                                                             |
+            | sharpen                                                                                           |
             | sharpen:radius=2,sigma=1                                                                          |
+            | sharpen:radius=0,sigma=2                                                                          |
+            | sharpen:preset=light                                                                              |
+            | sharpen:preset=moderate                                                                           |
+            | sharpen:preset=strong                                                                             |
+            | sharpen:preset=extreme                                                                            |
             | strip                                                                                             |
             | thumbnail                                                                                         |
             | thumbnail:width=40,height=30                                                                      |
