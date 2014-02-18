@@ -44,21 +44,21 @@ class Sharpen extends Transformation implements ListenerInterface {
 
         switch ($preset) {
             case 'moderate':
-                $radius = 0.65;
-                $sigma = 0.65;
+                $radius = 2;
+                $sigma = 1;
                 $gain = 2;
-                $threshold = 0.05;
+                $threshold = .05;
                 break;
 
             case 'strong':
-                $radius = 0.8;
-                $sigma = 0.8;
+                $radius = 2;
+                $sigma = 1;
                 $gain = 3;
-                $threshold = 0.05;
+                $threshold = .025;
                 break;
 
             case 'extreme':
-                $radius = 1;
+                $radius = 2;
                 $sigma = 1;
                 $gain = 4;
                 $threshold = 0;
@@ -67,10 +67,10 @@ class Sharpen extends Transformation implements ListenerInterface {
             case 'light':
             default:
                 // Default values (with only adding ?t[]=sharpen)
-                $radius = 0.5;
-                $sigma = 0.5;
+                $radius = 2;
+                $sigma = 1;
                 $gain = 1;
-                $threshold = 0.05;
+                $threshold = .05;
         }
 
         if (isset($params['radius'])) {
