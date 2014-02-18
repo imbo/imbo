@@ -106,10 +106,20 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      */
     public function getValidRoutes() {
         return array(
-            // Short URL resource
+            // Global short URL resource
             array('/s/asdfghj', 'globalshorturl'),
             array('/s/1234567', 'globalshorturl'),
             array('/s/1234asd', 'globalshorturl'),
+            array('/s/aAbB012', 'globalshorturl'),
+
+            // Short URLs
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
+
+            // Short URL
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/asdfghj', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/1234567', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/1234asd', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/aAbB012', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
 
             // Status resource
             array('/status', 'status'),
