@@ -31,6 +31,8 @@ __2014-04-08__
 * #282: Added robots.txt and humans.txt
 * #276: Support checking if the `accessToken` matches the URI "as is" (Peter Rudolfsen)
 * #269: Return metadata on write requests against the metadata resource
+* #265: New image transformation: sharpen
+* #264: New image transformation: contrast
 * #260: Generate short URLs on demand
 * #253: Store the original checksum of added images
 
