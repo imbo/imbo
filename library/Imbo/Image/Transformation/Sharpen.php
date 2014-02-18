@@ -42,9 +42,11 @@ class Sharpen extends Transformation implements ListenerInterface {
 
         $radius = isset($params['radius']) ? (int) $params['radius'] : 2;
         $sigma = isset($params['sigma']) ? (int) $params['sigma'] : 1;
+        $gain = isset($params['gain']) ? (int) $params['gain'] : 0;
+        $threshold = isset($params['threshold']) ? (int) $params['threshold'] : 0;
 
         try {
-            $this->imagick->sharpenImage($radius, $sigma);
+            $this->imagick->unsharpMaskImage($radius, $sigma, $gain, $threshold);
             $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
