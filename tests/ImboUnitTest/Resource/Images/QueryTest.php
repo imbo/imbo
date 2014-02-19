@@ -107,6 +107,16 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Resource\Images\Query::originalChecksums
+     */
+    public function testOriginalChecksums() {
+        $value = array('sum1', 'sum2');
+        $this->assertSame(array(), $this->query->originalChecksums());
+        $this->assertSame($this->query, $this->query->originalChecksums($value));
+        $this->assertSame($value, $this->query->originalChecksums());
+    }
+
+    /**
      * Data provider
      *
      * @return array[]
