@@ -291,6 +291,9 @@ The images resource can also be used to gather information on which images a use
 ``checksums[]``
     An array of image checksums to filter the results by.
 
+``originalChecksums[]``
+    An array of the original image checksums to filter the results by.
+
 .. code-block:: bash
 
     curl "http://imbo/users/<user>/images.json?limit=1&metadata=1"
@@ -309,27 +312,40 @@ results in:
       "images": [
         {
           "added": "Mon, 10 Dec 2012 11:57:51 GMT",
+          "updated": "Mon, 10 Dec 2012 11:57:51 GMT",
+          "checksum": "<checksum>",
+          "originalChecksum": "<originalChecksum>",
           "extension": "png",
+          "size": 6791,
+          "width": 1306,
           "height": 77,
+          "mime": "image/png",
           "imageIdentifier": "<image>",
+          "publicKey": "<user>",
           "metadata": {
             "key": "value",
             "foo": "bar"
-          },
-          "mime": "image/png",
-          "publicKey": "<user>",
-          "size": 6791,
-          "updated": "Mon, 10 Dec 2012 11:57:51 GMT",
-          "width": 1306
+          }
         }
       ]
     }
 
-The ``search`` object is data related to pagination, where ``hits`` is the number of images found by your query, ``page`` is the current page, ``limit`` is the current limit, and ``count`` is the number of images in the visible collection.
+The ``search`` object is data related to pagination, where ``hits`` is the number of images found by the query, ``page`` is the current page, ``limit`` is the current limit, and ``count`` is the number of images in the visible collection.
 
-The ``images`` list contains image objects, where ``added`` is a formatted date of when the image was added to Imbo, ``extension`` is the original image extension, ``height`` is the height of the image in pixels, ``imageIdentifier`` is the image identifier (`MD5 checksum <http://en.wikipedia.org/wiki/MD5>`_ of the file itself), ``metadata`` is a JSON object containing metadata attached to the image, ``mime`` is the mime type of the image, ``publicKey`` is the public key of the user who owns the image, ``size`` is the size of the image in bytes, ``updated`` is a formatted date of when the image was last updated (read: when metadata attached to the image was last updated, as the image itself never changes), and ``width`` is the width of the image in pixels. The fact that the image identifier is the MD5 checksum of the image is an implementation detail and might change in the future.
+The ``images`` list contains image objects. Each object has the following fields:
 
-The ``metadata`` field is only available if you used the ``metadata`` query parameter described above.
+* ``added``: A formatted date of when the image was added to Imbo.
+* ``updated``: The formatted date of when the image was last updated (read: when metadata attached to the image was last updated, as the image itself never changes).
+* ``checksum``: The MD5 checksum of the image blob stored in Imbo.
+* ``originalChecksum``: The MD5 checksum of the original image. Might differ from ``<checksum>`` if event listeners that might change incoming images have been enabled. This field was added to Imbo in version ``1.2.0``. If this field is ``null`` when you query the images resource, you will need to manually update the database. If you have event listeners changing incoming images you might not want to simply set the original checksum to ``<checksum>`` as that might not be true.
+* ``extension``: The original image extension.
+* ``size``: The size of the image in bytes.
+* ``width``: The width of the image in pixels.
+* ``height``: The height of the image in pixels.
+* ``mime``: The mime type of the image.
+* ``imageIdentifier``: The image identifier stored in Imbo.
+* ``publicKey``: The public key of the user who owns the image.
+* ``metadata``: A JSON object containing metadata attached to the image. This field is only available if the ``metadata`` query parameter described above is used.
 
 **Typical response codes:**
 
@@ -347,7 +363,7 @@ The image resource represents specific images owned by a user. This resource is 
 Fetch images
 ~~~~~~~~~~~~
 
-Fetching images added to Imbo is done by requesting the image identifiers (checksum) of the images.
+Fetching images added to Imbo is done by requesting the image identifiers of the images.
 
 .. code-block:: bash
 
