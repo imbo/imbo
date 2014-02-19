@@ -37,6 +37,7 @@ class ShortUrls implements ResourceInterface {
             'shorturls.post' => 'createShortUrl',
 
             // Remove short URLs for a given image
+            'shorturls.delete' => 'deleteImageShortUrls',
             'image.delete' => 'deleteImageShortUrls',
         );
     }
@@ -113,10 +114,25 @@ class ShortUrls implements ResourceInterface {
      */
     public function deleteImageShortUrls(EventInterface $event) {
         $request = $event->getRequest();
+        $publicKey = $request->getPublicKey();
+        $imageIdentifier = $request->getImageIdentifier();
+
         $event->getDatabase()->deleteShortUrls(
-            $request->getPublicKey(),
-            $request->getImageIdentifier()
+            $publicKey,
+            $imageIdentifier
         );
+
+        if ($event->getName() === 'shorturls.delete') {
+            // If the request is against the shorturls resource directly we need to supply a
+            // response model. If this method is triggered because of an image has been deleted
+            // the image resource will supply the response model
+            $model = new ArrayModel();
+            $model->setData(array(
+                'imageIdentifier' => $imageIdentifier,
+            ));
+
+            $event->getResponse()->setModel($model);
+        }
     }
 
     /**
