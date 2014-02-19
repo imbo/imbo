@@ -33,65 +33,9 @@ class GlobalShortUrl implements ResourceInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            // Generate and/or fetch short URL
-            'globalshorturl.get' => 'get',
-            'globalshorturl.head' => 'get',
-
-            // Add a short URL header to the response
-            'image.get' => 'addShortUrlHeader',
-            'image.head' => 'addShortUrlHeader',
-
-            // Remove short URLs
-            'image.delete' => 'deleteShortUrls',
-        );
-    }
-
-    /**
-     * Add a short URL header to the current image request (unless the request was originally a
-     * shorturl request, in which case the response already has a short URL header)
-     *
-     * @param EventInterface $event
-     */
-    public function addShortUrlHeader(EventInterface $event) {
-        $response = $event->getResponse();
-
-        if ($response->headers->has('X-Imbo-ShortUrl')) {
-            return;
-        }
-
-        $database = $event->getDatabase();
-        $request = $event->getRequest();
-
-        $publicKey = $request->getPublicKey();
-        $imageIdentifier = $request->getImageIdentifier();
-        $extension = $request->getExtension();
-        $query = $request->query->all();
-
-        $shortUrlId = $database->getShortUrlId($publicKey, $imageIdentifier, $extension, $query);
-
-        if (!$shortUrlId) {
-            do {
-                // No short URL exists, generate an ID and insert
-                $shortUrlId = $this->getShortUrlId();
-            } while($database->getShortUrlParams($shortUrlId));
-
-            $database->insertShortUrl($shortUrlId, $publicKey, $imageIdentifier, $extension, $query);
-        }
-
-        // Attach the header
-        $response->headers->set('X-Imbo-ShortUrl', $request->getSchemeAndHttpHost(). '/s/' . $shortUrlId);
-    }
-
-    /**
-     * Delete short URLs registered to the image that was just deleted
-     *
-     * @param EventInterface $event
-     */
-    public function deleteShortUrls(EventInterface $event) {
-        $request = $event->getRequest();
-        $event->getDatabase()->deleteShortUrls(
-            $request->getPublicKey(),
-            $request->getImageIdentifier()
+            // Fetch an image using the short URL
+            'globalshorturl.get' => 'getImage',
+            'globalshorturl.head' => 'getImage',
         );
     }
 
@@ -100,9 +44,8 @@ class GlobalShortUrl implements ResourceInterface {
      *
      * @param EventInterface $event
      */
-    public function get(EventInterface $event) {
+    public function getImage(EventInterface $event) {
         $request = $event->getRequest();
-        $response = $event->getResponse();
         $route = $request->getRoute();
 
         $params = $event->getDatabase()->getShortUrlParams($route->get('shortUrlId'));
@@ -116,25 +59,7 @@ class GlobalShortUrl implements ResourceInterface {
         $route->set('extension', $params['extension']);
 
         $request->query = new ParameterBag($params['query']);
-        $response->headers->set('X-Imbo-ShortUrl', $request->getUri());
-
+        $event->getResponse()->headers->set('X-Imbo-ShortUrl', $request->getUri());
         $event->getManager()->trigger('image.get');
-    }
-
-    /**
-     * Method for generating short URL keys
-     *
-     * @return string
-     */
-    private function getShortUrlId($len = 7) {
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-        $charsLen = 62;
-        $key = '';
-
-        for ($i = 0; $i < $len; $i++) {
-            $key .= $chars[mt_rand() % $charsLen];
-        }
-
-        return $key;
     }
 }
