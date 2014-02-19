@@ -239,24 +239,6 @@ class ImboContext extends RESTContext {
     }
 
     /**
-     * @Given /^I fetch the short URL of "([^"]*)"$/
-     */
-    public function fetchShortURL($path) {
-        $this->setClientAuth('publickey', 'privatekey');
-        $this->appendAccessToken();
-        $this->request($path);
-
-        $this->shortUrl = (string) $this->getLastResponse()->getHeader('X-Imbo-ShortUrl');
-    }
-
-    /**
-     * @When /^I request the image using the short URL$/
-     */
-    public function requestImageUsingShortUrl() {
-        $this->request($this->shortUrl);
-    }
-
-    /**
      * @When /^I request the added image as a "(jpg|png|gif)"$/
      */
     public function requestTheAddedImage($extension) {
