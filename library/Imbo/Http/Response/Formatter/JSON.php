@@ -86,6 +86,7 @@ class JSON extends Formatter implements FormatterInterface {
                 'added' => $this->dateFormatter->formatDate($image->getAddedDate()),
                 'updated' => $this->dateFormatter->formatDate($image->getUpdatedDate()),
                 'checksum' => $image->getChecksum(),
+                'originalChecksum' => $image->getOriginalChecksum(),
                 'extension' => $image->getExtension(),
                 'size' => $image->getFilesize(),
                 'width' => $image->getWidth(),
