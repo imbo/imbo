@@ -113,16 +113,17 @@ class Doctrine implements DatabaseInterface {
         }
 
         return (boolean) $this->getConnection()->insert($this->tableNames['imageinfo'], array(
-            'size'            => $image->getFilesize(),
-            'publicKey'       => $publicKey,
-            'imageIdentifier' => $imageIdentifier,
-            'extension'       => $image->getExtension(),
-            'mime'            => $image->getMimeType(),
-            'added'           => $added ?: $now,
-            'updated'         => $updated ?: $now,
-            'width'           => $image->getWidth(),
-            'height'          => $image->getHeight(),
-            'checksum'        => md5($image->getBlob()),
+            'size'             => $image->getFilesize(),
+            'publicKey'        => $publicKey,
+            'imageIdentifier'  => $imageIdentifier,
+            'extension'        => $image->getExtension(),
+            'mime'             => $image->getMimeType(),
+            'added'            => $added ?: $now,
+            'updated'          => $updated ?: $now,
+            'width'            => $image->getWidth(),
+            'height'           => $image->getHeight(),
+            'checksum'         => $image->getChecksum(),
+            'originalChecksum' => $image->getOriginalChecksum(),
         ));
     }
 
@@ -238,16 +239,17 @@ class Doctrine implements DatabaseInterface {
         if ($sort = $query->sort()) {
             // Fields valid for sorting
             $validFields = array(
-                'size'            => true,
-                'publicKey'       => true,
-                'imageIdentifier' => true,
-                'extension'       => true,
-                'mime'            => true,
-                'added'           => true,
-                'updated'         => true,
-                'width'           => true,
-                'height'          => true,
-                'checksum'        => true,
+                'size'             => true,
+                'publicKey'        => true,
+                'imageIdentifier'  => true,
+                'extension'        => true,
+                'mime'             => true,
+                'added'            => true,
+                'updated'          => true,
+                'width'            => true,
+                'height'           => true,
+                'checksum'         => true,
+                'originalChecksum' => true,
             );
 
             foreach ($sort as $f) {
@@ -298,6 +300,18 @@ class Doctrine implements DatabaseInterface {
             $qb->andWhere($composite);
         }
 
+        if ($originalChecksums = $query->originalChecksums()) {
+            $expr = $qb->expr();
+            $composite = $expr->orX();
+
+            foreach ($originalChecksums as $i => $id) {
+                $composite->add($expr->eq('i.originalChecksum', ':originalChecksum' . $i));
+                $qb->setParameter(':originalChecksum' . $i, $id);
+            }
+
+            $qb->andWhere($composite);
+        }
+
         // Create a querybuilder that will be used to fetch the hits number, and update the model
         $hitsQb = clone $qb;
         $hitsQb->select('COUNT(i.id)');
@@ -319,16 +333,17 @@ class Doctrine implements DatabaseInterface {
 
         foreach ($rows as $row) {
             $image = array(
-                'extension'       => $row['extension'],
-                'added'           => new DateTime('@' . $row['added'], new DateTimeZone('UTC')),
-                'updated'         => new DateTime('@' . $row['updated'], new DateTimeZone('UTC')),
-                'checksum'        => $row['checksum'],
-                'publicKey'       => $publicKey,
-                'imageIdentifier' => $row['imageIdentifier'],
-                'mime'            => $row['mime'],
-                'size'            => (int) $row['size'],
-                'width'           => (int) $row['width'],
-                'height'          => (int) $row['height']
+                'extension'        => $row['extension'],
+                'added'            => new DateTime('@' . $row['added'], new DateTimeZone('UTC')),
+                'updated'          => new DateTime('@' . $row['updated'], new DateTimeZone('UTC')),
+                'checksum'         => $row['checksum'],
+                'originalChecksum' => isset($row['originalChecksum']) ? $row['originalChecksum'] : null,
+                'publicKey'        => $publicKey,
+                'imageIdentifier'  => $row['imageIdentifier'],
+                'mime'             => $row['mime'],
+                'size'             => (int) $row['size'],
+                'width'            => (int) $row['width'],
+                'height'           => (int) $row['height']
             );
 
             if ($returnMetadata) {
