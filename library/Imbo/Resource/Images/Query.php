@@ -83,6 +83,13 @@ class Query {
     private $sort = array();
 
     /**
+     * Metadata query
+     *
+     * @var array
+     */
+    private $metadataQuery = array();
+
+    /**
      * Set or get the page property
      *
      * @param int $page Give this a value to set the page property
@@ -248,6 +255,22 @@ class Query {
         }
 
         $this->sort = $sortData;
+
+        return $this;
+    }
+
+    /**
+     * Set or get the metadata query
+     *
+     * @param array $query Give this a value to set the metadataQuery property
+     * @return array|self
+     */
+    public function metadataQuery(array $query = null) {
+        if ($query === null) {
+            return $this->metadataQuery;
+        }
+
+        $this->metadataQuery = $query;
 
         return $this;
     }

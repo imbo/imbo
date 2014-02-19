@@ -189,4 +189,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
     public function testSortThrowsExceptionWhenTheStortStringIsBadlyFormatted() {
         $this->query->sort(array('field:asc', ''));
     }
+
+    /**
+     * @covers Imbo\Resource\Images\Query::metadataQuery
+     */
+    public function testMetadataQuery() {
+        $query = array('name' => array('$in' => array('christer', 'espen')));
+        $this->assertSame(array(), $this->query->metadataQuery());
+        $this->assertSame($this->query, $this->query->metadataQuery($query));
+        $this->assertSame($query, $this->query->metadataQuery());
+    }
 }
