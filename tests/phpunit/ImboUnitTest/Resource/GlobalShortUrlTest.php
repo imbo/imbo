@@ -66,77 +66,7 @@ class GlobalShortUrlTest extends ResourceTests {
     }
 
     /**
-     * @covers Imbo\Resource\GlobalShortUrl::addShortUrlHeader
-     */
-    public function testDoesNotAddShortUrlIfResponseAlreadyHasOne() {
-        $headers = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
-        $headers->expects($this->once())->method('has')->with('X-Imbo-ShortUrl')->will($this->returnValue(true));
-        $this->response->headers = $headers;
-
-        $this->resource->addShortUrlHeader($this->event);
-    }
-
-    /**
-     * @covers Imbo\Resource\GlobalShortUrl::addShortUrlHeader
-     * @covers Imbo\Resource\GlobalShortUrl::getShortUrlId
-     */
-    public function testWillGenerateAShortUrlIdUntilItFindsAValidOne() {
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
-        $responseHeaders->expects($this->once())->method('has')->with('X-Imbo-ShortUrl')->will($this->returnValue(false));
-        $this->response->headers = $responseHeaders;
-
-        $publicKey = 'christer';
-        $imageIdentifier = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-        $extension = null;
-        $query = array();
-
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-        $this->request->expects($this->once())->method('getExtension')->will($this->returnValue($extension));
-        $requestQuery = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
-        $requestQuery->expects($this->once())->method('all')->will($this->returnValue($query));
-        $this->request->query = $requestQuery;
-
-        $this->database->expects($this->at(0))
-                       ->method('getShortUrlId')
-                       ->with($publicKey, $imageIdentifier, $extension, $query)
-                       ->will($this->returnValue(null));
-        $this->database->expects($this->at(1))
-                       ->method('getShortUrlParams')
-                       ->with($this->isType('string'))
-                       ->will($this->returnValue(array('publicKey' => 'some key')));
-        $this->database->expects($this->at(2))
-                       ->method('getShortUrlParams')
-                       ->with($this->isType('string'))
-                       ->will($this->returnValue(array('publicKey' => 'some other key')));
-        $this->database->expects($this->at(3))
-                       ->method('getShortUrlParams')
-                       ->with($this->isType('string'))
-                       ->will($this->returnValue(null));
-        $this->database->expects($this->at(4))
-                       ->method('insertShortUrl')
-                       ->with($this->isType('string'), $publicKey, $imageIdentifier, $extension, $query)
-                       ->will($this->returnValue(null));
-
-        $responseHeaders->expects($this->once())->method('set')->with('X-Imbo-ShortUrl', $this->isType('string'));
-
-        $this->resource->addShortUrlHeader($this->event);
-    }
-
-    /**
-     * @covers Imbo\Resource\GlobalShortUrl::deleteShortUrls
-     */
-    public function testCanDeleteShortUrls() {
-        $publicKey = 'christer';
-        $imageIdentifier = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-        $this->database->expects($this->once())->method('deleteShortUrls')->with($publicKey, $imageIdentifier);
-        $this->resource->deleteShortUrls($this->event);
-    }
-
-    /**
-     * @covers Imbo\Resource\GlobalShortUrl::get
+     * @covers Imbo\Resource\GlobalShortUrl::getImage
      */
     public function testCanTriggerAnImageGetEventWhenRequestedWithAValidShortUrl() {
         $id = 'aaaaaaa';
@@ -169,11 +99,11 @@ class GlobalShortUrlTest extends ResourceTests {
 
         $this->manager->expects($this->once())->method('trigger')->with('image.get');
 
-        $this->resource->get($this->event);
+        $this->resource->getImage($this->event);
     }
 
     /**
-     * @covers Imbo\Resource\GlobalShortUrl::get
+     * @covers Imbo\Resource\GlobalShortUrl::getImage
      * @expectedException Imbo\Exception\ResourceException
      * @expectedExceptionMessage Image not found
      * @expectedExceptionCode 404
@@ -183,6 +113,6 @@ class GlobalShortUrlTest extends ResourceTests {
         $route->expects($this->once())->method('get')->with('shortUrlId')->will($this->returnValue('aaaaaaa'));
         $this->request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
         $this->database->expects($this->once())->method('getShortUrlParams')->with('aaaaaaa')->will($this->returnValue(null));
-        $this->resource->get($this->event);
+        $this->resource->getImage($this->event);
     }
 }
