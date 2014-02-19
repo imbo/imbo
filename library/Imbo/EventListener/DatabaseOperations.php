@@ -218,6 +218,14 @@ class DatabaseOperations implements ListenerInterface {
             }
         }
 
+        if ($params->has('originalChecksums')) {
+            $checksums = $params->get('originalChecksums');
+
+            if (is_array($checksums)) {
+                $query->originalChecksums($checksums);
+            }
+        }
+
         $publicKey = $event->getRequest()->getPublicKey();
         $response = $event->getResponse();
         $database = $event->getDatabase();
@@ -238,6 +246,7 @@ class DatabaseOperations implements ListenerInterface {
                   ->setPublicKey($publicKey)
                   ->setImageIdentifier($image['imageIdentifier'])
                   ->setChecksum($image['checksum'])
+                  ->setOriginalChecksum(isset($image['originalChecksum']) ? $image['originalChecksum'] : null)
                   ->setMimeType($image['mime'])
                   ->setExtension($image['extension'])
                   ->setAddedDate($image['added'])
