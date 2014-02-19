@@ -198,11 +198,13 @@ interface DatabaseInterface {
     function getShortUrlParams($shortUrlId);
 
     /**
-     * Delete short URLs attached to a specific image
+     * Delete short URLs attached to a specific image, or a single short URL
      *
      * @param string $publicKey The public key attached to the URL
      * @param string $imageIdentifier The image identifier attached to the URL
+     * @param string $shortUrlId Specify to delete a single short URL for a specific image owned by
+     *                           a user
      * @return boolean
      */
-    function deleteShortUrls($publicKey, $imageIdentifier);
+    function deleteShortUrls($publicKey, $imageIdentifier, $shortUrlId = null);
 }

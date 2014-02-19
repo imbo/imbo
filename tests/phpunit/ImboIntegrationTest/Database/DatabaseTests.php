@@ -505,6 +505,19 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertNull($this->adapter->getShortUrlParams($shortUrlId));
     }
 
+    public function testCanDeleteASingleShortUrl() {
+        $publicKey = 'publickey';
+        $imageIdentifier = 'id';
+        $this->assertTrue($this->adapter->insertShortUrl('aaaaaaa', $publicKey, $imageIdentifier));
+        $this->assertTrue($this->adapter->insertShortUrl('bbbbbbb', $publicKey, $imageIdentifier));
+        $this->assertTrue($this->adapter->insertShortUrl('ccccccc', $publicKey, $imageIdentifier));
+
+        $this->assertTrue($this->adapter->deleteShortUrls($publicKey, $imageIdentifier, 'aaaaaaa'));
+        $this->assertNull($this->adapter->getShortUrlParams('aaaaaaa'));
+        $this->assertNotNull($this->adapter->getShortUrlParams('bbbbbbb'));
+        $this->assertNotNull($this->adapter->getShortUrlParams('ccccccc'));
+    }
+
     public function testCanFilterOnImageIdentifiers() {
         $publicKey = 'christer';
         $id1 = 'id1';
