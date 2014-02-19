@@ -94,6 +94,8 @@ class Application {
             'Imbo\Resource\Status',
             'Imbo\Resource\Stats',
             'Imbo\Resource\GlobalShortUrl',
+            'Imbo\Resource\ShortUrls',
+            'Imbo\Resource\ShortUrl',
             'Imbo\Resource\User',
             'Imbo\Resource\Images',
             'Imbo\Resource\Image',
