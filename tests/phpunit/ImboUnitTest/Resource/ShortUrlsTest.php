@@ -10,16 +10,16 @@
 
 namespace ImboUnitTest\Resource;
 
-use Imbo\Resource\ShortUrl;
+use Imbo\Resource\ShortUrls;
 
 /**
- * @covers Imbo\Resource\ShortUrl
+ * @covers Imbo\Resource\ShortUrls
  * @group unit
  * @group resources
  */
-class ShortUrlTest extends ResourceTests {
+class ShortUrlsTest extends ResourceTests {
     /**
-     * @var ShortUrl
+     * @var ShortUrls
      */
     private $resource;
 
@@ -27,7 +27,7 @@ class ShortUrlTest extends ResourceTests {
      * {@inheritdoc}
      */
     protected function getNewResource() {
-        return new ShortUrl();
+        return new ShortUrls();
     }
 
     /**
