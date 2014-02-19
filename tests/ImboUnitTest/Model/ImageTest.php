@@ -212,4 +212,10 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->image, $this->image->hasBeenTransformed(false));
         $this->assertFalse($this->image->hasBeenTransformed());
     }
+
+    public function testCanSetAndGetTheOriginalChecksum() {
+        $checksum = md5(__FILE__);
+        $this->assertSame($this->image, $this->image->setOriginalChecksum($checksum));
+        $this->assertSame($checksum, $this->image->getOriginalChecksum());
+    }
 }
