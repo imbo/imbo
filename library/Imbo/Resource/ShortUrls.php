@@ -73,7 +73,7 @@ class ShortUrls implements ResourceInterface {
         $queryString = isset($image['query']) ? $image['query'] : null;
 
         if ($queryString) {
-            parse_str($queryString, $query);
+            parse_str(ltrim($queryString, '?'), $query);
         } else {
             $query = array();
         }
