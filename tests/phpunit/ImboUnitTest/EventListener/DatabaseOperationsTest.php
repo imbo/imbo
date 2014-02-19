@@ -202,6 +202,8 @@ class DatabaseOperationsTest extends ListenerTests {
         $query->expects($this->at(15))->method('get')->with('checksums')->will($this->returnValue(array('checksum1', 'checksum2', 'checksum3')));
         $query->expects($this->at(16))->method('has')->with('originalChecksums')->will($this->returnValue(true));
         $query->expects($this->at(17))->method('get')->with('originalChecksums')->will($this->returnValue(array('checksum1', 'checksum2', 'checksum3')));
+        $query->expects($this->at(18))->method('has')->with('q')->will($this->returnValue(true));
+        $query->expects($this->at(19))->method('get')->with('q')->will($this->returnValue('{"foo":"bar"}'));
         $this->request->query = $query;
 
         $imagesQuery = $this->getMock('Imbo\Resource\Images\Query');
