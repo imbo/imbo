@@ -57,7 +57,8 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
                             ->setWidth(123)
                             ->setHeight(234)
                             ->setMimeType('image/jpeg')
-                            ->setExtension('jpg');
+                            ->setExtension('jpg')
+                            ->setOriginalChecksum(md5(__FILE__));
     }
 
     public function testInsertAndGetImage() {
@@ -238,7 +239,8 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
                   ->setWidth($info[0])
                   ->setHeight($info[1])
                   ->setBlob(file_get_contents($path))
-                  ->setAddedDate(new DateTime('@' . $now++, new DateTimeZone('UTC')));
+                  ->setAddedDate(new DateTime('@' . $now++, new DateTimeZone('UTC')))
+                  ->setOriginalChecksum(md5_file($path));
 
             $imageIdentifier = md5($image->getBlob());
 
@@ -399,14 +401,16 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
                   ->setExtension('png')
                   ->setWidth(665)
                   ->setHeight(463)
-                  ->setBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+                  ->setBlob(file_get_contents(FIXTURES_DIR . '/image.png'))
+                  ->setOriginalChecksum(md5_file(FIXTURES_DIR . '/image.png'));
 
         $images[1] = new Image();
         $images[1]->setMimeType('image/jpeg')
                   ->setExtension('jpg')
                   ->setWidth(665)
                   ->setHeight(463)
-                  ->setBlob(file_get_contents(FIXTURES_DIR . '/image.jpg'));
+                  ->setBlob(file_get_contents(FIXTURES_DIR . '/image.jpg'))
+                  ->setOriginalChecksum(md5_file(FIXTURES_DIR . '/image.jpg'));
 
         foreach ($images as $image) {
             $imageIdentifier = md5($image->getBlob());
