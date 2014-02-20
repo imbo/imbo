@@ -1,6 +1,14 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.2.0
+----------
+__N/A__
+
+Bug fixes:
+
+* #270: Access-Control-Allow-Origin header not included when CORS is enabled and Imbo generates an error
+
 Imbo-1.1.1
 ----------
 __2014-02-14__
