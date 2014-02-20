@@ -18,7 +18,7 @@ Feature: Imbo enables caching of metadata
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """
-           {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}
+           {"foo":"bar"}
            """
 
     Scenario: Fetch metadata for image when metadata is not cached
@@ -65,7 +65,7 @@ Feature: Imbo enables caching of metadata
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """
-           {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}
+           {}
            """
 
     Scenario: Fetch metadata for image when metadata was just deleted
