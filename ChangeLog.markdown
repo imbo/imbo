@@ -6,6 +6,7 @@ Imbo-1.2.0
 __N/A__
 
 * #269: Return metadata on write requests against the metadata resource
+* #260: Generate short URLs on demand
 * #253: Store the original checksum of added images
 
 Bug fixes:
@@ -68,7 +69,7 @@ __2014-01-30__
 * #190: Added support for filtering images on one or more image identifiers
 * #189: Prioritize original image mime types when doing content negotiation
 * #188: Support an alternative installation method
-* #186: Added support for short image URL's
+* #186: Added support for short image URLs
 * #185: Add support for custom resources and routes
 * #174: New image transformation: watermark
 * #161: Images can now only be added by requesting the images resource using HTTP POST
