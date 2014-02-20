@@ -89,7 +89,7 @@ class Cors implements ListenerInterface {
         foreach ($this->params['allowedMethods'] as $resource => $methods) {
             foreach ($methods as $method) {
                 $eventName = $resource . '.' . strtolower($method);
-                $events[$eventName] = array('invoke' => 20);
+                $events[$eventName] = array('invoke' => 100);
             }
 
             // Always enable the listener for the OPTIONS method
