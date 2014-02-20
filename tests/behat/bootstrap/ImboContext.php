@@ -289,4 +289,30 @@ class ImboContext extends RESTContext {
     public function assertImageChecksum($checksum) {
         assertSame($checksum, md5((string) $this->getLastResponse()->getBody()), 'Checksum of the image in the last response did not match the expected checksum');
     }
+
+    /**
+     * @Given /^I generate a short URL with the following parameters:$/
+     */
+    public function generateShortImageUrl(PyStringNode $params) {
+        $imageIdentifier = $this->getLastResponse()->json()['imageIdentifier'];
+
+        return array(
+            new Given('I use "publickey" and "privatekey" for public and private keys'),
+            new Given('I sign the request'),
+            new Given('the request body contains:', $params),
+            new Given('I request "/users/publickey/images/' . $imageIdentifier . '/shorturls" using HTTP "POST"'),
+        );
+    }
+
+    /**
+     * @When /^I request the image using the generated short URL$/
+     */
+    public function requestImageUsingShortUrl() {
+        $shortUrlId = $this->getLastResponse()->json()['id'];
+
+        return array(
+            new Given('the "Accept" request header is "image/*"'),
+            new Given('I request "/s/' . $shortUrlId . '"'),
+        );
+    }
 }
