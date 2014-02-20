@@ -5,6 +5,7 @@ Imbo-1.2.0
 ----------
 __N/A__
 
+* #269: Return metadata on write requests against the metadata resource
 * #253: Store the original checksum of added images
 
 Bug fixes:
