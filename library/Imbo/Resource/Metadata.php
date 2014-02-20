@@ -54,7 +54,7 @@ class Metadata implements ResourceInterface {
      */
     public function delete(EventInterface $event) {
         $event->getManager()->trigger('db.metadata.delete');
-        $event->getResponse()->setModel(new Model\ArrayModel());
+        $event->getResponse()->setModel(new Model\Metadata());
     }
 
     /**
@@ -72,7 +72,7 @@ class Metadata implements ResourceInterface {
                 'metadata' => $metadata,
             ));
 
-        $model = new Model\ArrayModel();
+        $model = new Model\Metadata();
         $model->setData($metadata);
 
         $event->getResponse()->setModel($model);
@@ -90,7 +90,7 @@ class Metadata implements ResourceInterface {
             'metadata' => json_decode($request->getContent(), true),
         ));
 
-        $model = new Model\ArrayModel();
+        $model = new Model\Metadata();
         $model->setData($event->getDatabase()->getMetadata($request->getPublicKey(), $request->getImageIdentifier()));
 
         $event->getResponse()->setModel($model);
