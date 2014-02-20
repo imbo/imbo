@@ -129,6 +129,7 @@ class MongoDB implements DatabaseInterface {
             'extension'        => $image->getExtension(),
             'mime'             => $image->getMimeType(),
             'metadata'         => array(),
+            'metadata_n'       => array(),
             'added'            => $added ?: $now,
             'updated'          => $updated ?: $now,
             'width'            => $image->getWidth(),
@@ -182,7 +183,11 @@ class MongoDB implements DatabaseInterface {
 
             $this->getImageCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('$set' => array('updated' => time(), 'metadata' => $updatedMetadata)),
+                array('$set' => array(
+                    'updated' => time(),
+                    'metadata' => $updatedMetadata,
+                    'metadata_n' => $this->lowercaseArray($updatedMetadata),
+                )),
                 array('multiple' => false)
             );
         } catch (MongoException $e) {
@@ -228,7 +233,7 @@ class MongoDB implements DatabaseInterface {
 
             $this->getImageCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('$set' => array('metadata' => array())),
+                array('$set' => array('metadata' => array(), 'metadata_n' => array())),
                 array('multiple' => false)
             );
         } catch (MongoException $e) {
@@ -283,6 +288,10 @@ class MongoDB implements DatabaseInterface {
 
         if (!empty($originalChecksums)) {
             $queryData['originalChecksum']['$in'] = $originalChecksums;
+        }
+
+        if ($metadataQuery = $query->metadataQuery()) {
+            $queryData = array_merge($queryData, $this->prepareMetadataQuery($metadataQuery));
         }
 
         // Sorting
@@ -618,5 +627,56 @@ class MongoDB implements DatabaseInterface {
         }
 
         return $this->mongoClient;
+    }
+
+    /**
+     * Prepare a metadata query for the MongoDB adapter
+     *
+     * This method will prefix all field names with "metadata_n.", and will translate the custom
+     * $wildcard operator to $regex
+     *
+     * @param array $query The metadata query from the query string
+     * @return array
+     */
+    private function prepareMetadataQuery(array $query) {
+        $result = array();
+
+        foreach ($query as $key => $value) {
+            if (!is_numeric($key) && substr($key, 0, 1) !== '$') {
+                $key = 'metadata_n.' . $key;
+            } else if ($key === '$wildcard') {
+                $key = '$regex';
+            }
+
+            if (is_array($value)) {
+                $value = $this->prepareMetadataQuery($value);
+            }
+
+            $result[$key] = $value;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Lowercase an array, both keys and values
+     *
+     * @param array $data The data to lowercase
+     * @return array
+     */
+    private function lowercaseArray(array $data) {
+        $result = array();
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->lowercaseArray($value);
+            } else if (is_string($value)) {
+                $value = strtolower($value);
+            }
+
+            $result[strtolower($key)] = $value;
+        }
+
+        return $result;
     }
 }
