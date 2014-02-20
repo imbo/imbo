@@ -270,9 +270,19 @@ class RESTContext extends BehatContext {
     public function assertMissingHeaders(PyStringNode $list) {
         $headers = $list->getLines();
 
-
         foreach ($headers as $header) {
             assertFalse($this->responses[count($this->responses) - 1]->hasHeader($header), 'Header "' . $header . '" should not be present');
+        }
+    }
+
+    /**
+     * @Given /^the following response headers should be present:$/
+     */
+    public function assertExistingHeaders(PyStringNode $list) {
+        $headers = $list->getLines();
+
+        foreach ($headers as $header) {
+            assertTrue($this->getLastResponse()->hasHeader($header), 'Header "' . $header . '" should be present');
         }
     }
 

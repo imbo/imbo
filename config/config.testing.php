@@ -203,6 +203,16 @@ return array(
             'listener' => 'Imbo\EventListener\Cors',
             'params' => array(
                 'allowedOrigins' => array('http://allowedhost'),
+                'allowedMethods' => array(
+                    'index'    => array('GET', 'HEAD'),
+                    'image'    => array('GET', 'HEAD'),
+                    'images'   => array('GET', 'HEAD', 'POST'),
+                    'metadata' => array('GET', 'HEAD'),
+                    'status'   => array('GET', 'HEAD'),
+                    'stats'    => array('GET', 'HEAD'),
+                    'user'     => array('GET', 'HEAD'),
+                    'shorturl' => array('GET', 'HEAD'),
+                ),
                 'maxAge' => 1349,
             ),
         ),

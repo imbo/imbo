@@ -56,3 +56,15 @@ Feature: Imbo provides an event listener for CORS
         Access-Control-Allow-Headers
         Access-Control-Max-Age
         """
+
+    Scenario: Provides CORS headers when applications fails
+        Given I use "publickey" and "privatekey" for public and private keys
+        And the "Origin" request header is "http://allowedhost"
+        And I sign the request
+        And I attach "ChangeLog.markdown" to the request body
+        When I request "/users/publickey/images" using HTTP "POST"
+        Then I should get a response with "415 Invalid image"
+        And the following response headers should be present:
+        """
+        Access-Control-Allow-Origin
+        """
