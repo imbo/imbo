@@ -473,7 +473,7 @@ Values can be nested ``key => value`` pairs.
 Adding/replacing metadata
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To add (or replace all existing metadata) on an image a client should make a request against this resource using ``HTTP PUT`` with the metadata attached in the request body as a JSON object.
+To add (or replace all existing metadata) on an image a client should make a request against this resource using ``HTTP PUT`` with the metadata attached in the request body as a JSON object. The response body will contain the added metadata.
 
 .. code-block:: bash
 
@@ -488,10 +488,10 @@ results in:
 .. code-block:: javascript
 
     {
-      "imageIdentifier": "<image>"
+      "beer": "Dark Horizon First Edition",
+      "brewery": "Nøgne Ø",
+      "style": "Imperial Stout"
     }
-
-where ``<image>`` is the image that just got updated.
 
 .. note:: When using the :ref:`Doctrine database adapter <doctrine-database-adapter>`, metadata keys can not contain ``::``.
 
@@ -505,7 +505,7 @@ where ``<image>`` is the image that just got updated.
 Partially updating metadata
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Partial updates to metadata attached to an image is done by making a request with ``HTTP POST`` and attaching metadata to the request body as a JSON object. If the object contains keys that already exists in the metadata on the server the old values will be replaced by the ones found in the request body. New keys will be added to the metadata.
+Partial updates to metadata attached to an image is done by making a request with ``HTTP POST`` and attaching metadata to the request body as a JSON object. If the object contains keys that already exists in the metadata on the server the old values will be replaced by the ones found in the request body. New keys will be added to the metadata. The response will contain all metadata attached to the image after the update.
 
 .. code-block:: bash
 
@@ -519,10 +519,14 @@ results in:
 .. code-block:: javascript
 
     {
-      "imageIdentifier": "<image>"
+      "beer": "Dark Horizon First Edition",
+      "brewery": "Nøgne Ø",
+      "style": "Imperial Stout",
+      "ABV":"16%",
+      "score":"100/100"
     }
 
-where ``<image>`` is the image that just got updated.
+if the image already included the first three keys as metadata.
 
 .. note:: When using the :ref:`Doctrine database adapter <doctrine-database-adapter>`, metadata keys can not contain ``::``.
 
@@ -580,11 +584,7 @@ results in:
 
 .. code-block:: javascript
 
-    {
-      "imageIdentifier":"<image>"
-    }
-
-where ``<image>`` is the image identifier of the image that just got all its metadata deleted.
+    {}
 
 **Typical response codes:**
 
