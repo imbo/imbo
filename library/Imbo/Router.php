@@ -49,7 +49,7 @@ class Router {
         'user'           => '#^/users/(?<publicKey>[a-z0-9_-]{3,})(/|\.(?<extension>json|xml))?$#',
         'stats'          => '#^/stats(/|(\.(?<extension>json|xml)))?$#',
         'index'          => '#^/?$#',
-        'shorturls'      => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/shorturls/?$#',
+        'shorturls'      => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/shorturls(/|\.(?<extension>json|xml))?$#',
         'shorturl'       => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/shorturls/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
     );
 

@@ -114,6 +114,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
             // Short URLs
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls.json', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'json'),
+            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls.xml', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'xml'),
 
             // Short URL
             array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/asdfghj', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
