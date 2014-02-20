@@ -13,6 +13,7 @@ namespace ImboIntegrationTest\Database;
 use Imbo\Model\Image,
     Imbo\Model\Images,
     Imbo\Resource\Images\Query,
+    Imbo\Database\Doctrine,
     DateTime,
     DateTimeZone;
 
@@ -636,5 +637,60 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         foreach ($images as $i => $image) {
             $this->assertSame($values[$i], $image[$field]);
         }
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getMetadataQueries() {
+        return array(
+            'key => value match' => array(
+                'metadata' => array('Name' => 'Christer'),
+                'query' => '{"name": "christer"}',
+                'hits' => 1,
+                'updatedMetadata' => array('Name' => 'Espen'),
+                'newHits' => 0,
+            ),
+            '$in operator' => array(
+                'metadata' => array('Name' => 'Christer'),
+                'query' => '{"name": {"$in": ["christer", "espen"]}}',
+                'hits' => 1,
+                'updatedMetadata' => array('Name' => 'michael'),
+                'newHits' => 0,
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getMetadataQueries
+     */
+    public function testCanSearchForImagesUsingAMetadataQuery($metadata, $metadataQuery, $hits, $updatedMetadata, $newHits) {
+        if ($this->adapter instanceof Doctrine) {
+            $this->markTestSkipped('The Doctrine does not yet support metadata searches');
+        }
+
+        $model = new Images();
+        $publicKey = 'publickey';
+        $imageIdentifier = 'id';
+
+        $query = new Query();
+        $query->metadataQuery(json_decode($metadataQuery, true));
+
+        // Add the image
+        $this->adapter->insertImage($publicKey, $imageIdentifier, $this->getImage());
+
+        $this->adapter->updateMetadata($publicKey, $imageIdentifier, $metadata);
+        $this->adapter->getImages($publicKey, $query, $model);
+        $this->assertSame($hits, $model->getHits(), 'Wrong hit count after initial metadata has been set');
+
+        $this->adapter->updateMetadata($publicKey, $imageIdentifier, $updatedMetadata);
+        $this->adapter->getImages($publicKey, $query, $model);
+        $this->assertSame($newHits, $model->getHits(), 'Wrong hit count after metadata has been updated');
+
+        $this->adapter->deleteMetadata($publicKey, $imageIdentifier);
+        $this->adapter->getImages($publicKey, $query, $model);
+        $this->assertSame(0, $model->getHits(), 'Should not get any search hits after metadata has been deleted');
     }
 }
