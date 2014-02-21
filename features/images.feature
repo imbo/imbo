@@ -7,6 +7,7 @@ Feature: Imbo provides an images endpoint
         Given "tests/Fixtures/image1.png" exists in Imbo
         And "tests/Fixtures/image.jpg" exists in Imbo
         And "tests/Fixtures/image.gif" exists in Imbo
+        And "tests/Fixtures/1024x256.png" exists in Imbo
 
     Scenario Outline: Fetch images with no filter
         Given I use "publickey" and "privatekey" for public and private keys
@@ -20,8 +21,8 @@ Feature: Imbo provides an images endpoint
         """
         Examples:
             | extension | content-type     | response |
-            | json      | application/json | #^{"search":{"hits":3,"page":1,"limit":20,"count":3},"images":\[{.*?},{.*?},{.*?}\]}$# |
-            | xml       | application/xml  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>\s*<hits>3</hits>\s*<page>1</page>\s*<limit>20</limit>\s*<count>3</count>\s*</search>\s*<images>\s*(<image>.*?</image>\s*){3}\s*</images>\s*</imbo>$#ms |
+            | json      | application/json | #^{"search":{"hits":4,"page":1,"limit":20,"count":4},"images":\[{.*?},{.*?},{.*?},{.*?}\]}$# |
+            | xml       | application/xml  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>\s*<hits>4</hits>\s*<page>1</page>\s*<limit>20</limit>\s*<count>4</count>\s*</search>\s*<images>\s*(<image>.*?</image>\s*){4}\s*</images>\s*</imbo>$#ms |
 
     Scenario Outline: Fetch images using limit
         Given I use "publickey" and "privatekey" for public and private keys
@@ -35,8 +36,8 @@ Feature: Imbo provides an images endpoint
         """
         Examples:
             | extension | content-type     | response |
-            | json      | application/json | #^{"search":{"hits":3,"page":1,"limit":2,"count":2},"images":\[{.*?},{.*?}\]}$# |
-            | xml       | application/xml  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>\s*<hits>3</hits>\s*<page>1</page>\s*<limit>2</limit>\s*<count>2</count>\s*</search>\s*<images>\s*(<image>.*?</image>\s*){2}\s*</images>\s*</imbo>$#ms |
+            | json      | application/json | #^{"search":{"hits":4,"page":1,"limit":2,"count":2},"images":\[{.*?},{.*?}\]}$# |
+            | xml       | application/xml  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>\s*<hits>4</hits>\s*<page>1</page>\s*<limit>2</limit>\s*<count>2</count>\s*</search>\s*<images>\s*(<image>.*?</image>\s*){2}\s*</images>\s*</imbo>$#ms |
 
     Scenario Outline: Fetch images with a filter on image identifiers
         Given I use "publickey" and "privatekey" for public and private keys
@@ -86,10 +87,10 @@ Feature: Imbo provides an images endpoint
 
         Examples:
             | extension | fields                         | response |
-            | json      | fields[]=size                  | #^{"search":{.*?},"images":\[{"size":\d+},{"size":\d+},{"size":\d+}\]}$# |
-            | xml       | fields[]=size                  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>.*?</search>\s*<images><image><size>\d+</size></image><image><size>\d+</size></image><image><size>\d+</size></image></images>\s*</imbo>$#ms |
-            | json      | fields[]=width&fields[]=height | #^{"search":{.*?},"images":\[{"width":\d+,"height":\d+},{"width":\d+,"height":\d+},{"width":\d+,"height":\d+}\]}$# |
-            | xml       | fields[]=width&fields[]=height | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>.*?</search>\s*<images><image><width>\d+</width><height>\d+</height></image><image><width>\d+</width><height>\d+</height></image><image><width>\d+</width><height>\d+</height></image></images>\s*</imbo>$#ms |
+            | json      | fields[]=size                  | #^{"search":{.*?},"images":\[{"size":\d+},{"size":\d+},{"size":\d+},{"size":\d+}\]}$# |
+            | xml       | fields[]=size                  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>.*?</search>\s*<images>(<image><size>\d+</size></image>){4}</images>\s*</imbo>$#ms |
+            | json      | fields[]=width&fields[]=height | #^{"search":{.*?},"images":\[{"width":\d+,"height":\d+},{"width":\d+,"height":\d+},{"width":\d+,"height":\d+},{"width":\d+,"height":\d+}\]}$# |
+            | xml       | fields[]=width&fields[]=height | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>.*?</search>\s*<images>(<image><width>\d+</width><height>\d+</height></image>){4}</images>\s*</imbo>$#ms |
 
     Scenario Outline: Fetch images with metadata
         Given I use "publickey" and "privatekey" for public and private keys
@@ -103,10 +104,10 @@ Feature: Imbo provides an images endpoint
 
         Examples:
             | extension | fields       | response |
-            | json      | size         | #^{"search":{.*?},"images":\[{"size":\d+},{"size":\d+},{"size":\d+}\]}$# |
-            | xml       | size         | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>.*?</search>\s*<images><image><size>\d+</size></image><image><size>\d+</size></image><image><size>\d+</size></image></images>\s*</imbo>$#ms |
-            | json      | metadata     | #^{"search":{.*?},"images":\[{"metadata":{}},{"metadata":{}},{"metadata":{}}\]}$# |
-            | xml       | metadata     | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>.*?</search>\s*<images><image><metadata></metadata></image><image><metadata></metadata></image><image><metadata></metadata></image></images>\s*</imbo>$#ms |
+            | json      | size         | #^{"search":{.*?},"images":\[{"size":\d+},{"size":\d+},{"size":\d+},{"size":\d+}\]}$# |
+            | xml       | size         | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>.*?</search>\s*<images>(<image><size>\d+</size></image>){4}</images>\s*</imbo>$#ms |
+            | json      | metadata     | #^{"search":{.*?},"images":\[{"metadata":{}},{"metadata":{}},{"metadata":{}},{"metadata":{}}\]}$# |
+            | xml       | metadata     | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>.*?</search>\s*<images>(<image><metadata></metadata></image>){4}</images>\s*</imbo>$#ms |
 
     Scenario Outline: Fetch images and use custom sorting
         Given I use "publickey" and "privatekey" for public and private keys
@@ -120,10 +121,10 @@ Feature: Imbo provides an images endpoint
 
         Examples:
             | fields                        | sort                          | response |
-            | fields[]=size                 | sort[]=size                   | #^{"search":{.*?},"images":\[{"size":64828},{"size":66020},{"size":95576}\]}$# |
-            | fields[]=size                 | sort[]=size:desc              | #^{"search":{.*?},"images":\[{"size":95576},{"size":66020},{"size":64828}\]}$# |
-            | fields[]=size&fields[]=width  | sort[]=width&sort[]=size:desc | #^{"search":{.*?},"images":\[{"size":95576,"width":599},{"size":66020,"width":665},{"size":64828,"width":665}\]}$# |
-            | fields[]=size&fields[]=width  | sort[]=width&sort[]=size      | #^{"search":{.*?},"images":\[{"size":95576,"width":599},{"size":64828,"width":665},{"size":66020,"width":665}\]}$# |
+            | fields[]=size                 | sort[]=size                   | #^{"search":{.*?},"images":\[{"size":19928},{"size":64828},{"size":66020},{"size":95576}\]}$# |
+            | fields[]=size                 | sort[]=size:desc              | #^{"search":{.*?},"images":\[{"size":95576},{"size":66020},{"size":64828},{"size":19928}\]}$# |
+            | fields[]=size&fields[]=width  | sort[]=width&sort[]=size:desc | #^{"search":{.*?},"images":\[{"size":95576,"width":599},{"size":66020,"width":665},{"size":64828,"width":665},{"size":19928,"width":1000}\]}$# |
+            | fields[]=size&fields[]=width  | sort[]=width&sort[]=size      | #^{"search":{.*?},"images":\[{"size":95576,"width":599},{"size":64828,"width":665},{"size":66020,"width":665},{"size":19928,"width":1000}\]}$# |
 
     Scenario: The hits number has the number of hits in the query
         Given I use "publickey" and "privatekey" for public and private keys
@@ -134,3 +135,18 @@ Feature: Imbo provides an images endpoint
         """
         #^{"search":{"hits":2,"page":1,"limit":1,"count":1},"images":\[{.*}\]}$#
         """
+
+    Scenario Outline: Fetch images with a filter on original checksums
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        When I request "/users/publickey/images.json?<filter>"
+        Then I should get a response with "200 OK"
+        And the "Content-Type" response header is "application/json"
+        And the response body matches:
+        """
+        <response>
+        """
+
+        Examples:
+            | filter                                               | response |
+            | originalChecksums[]=b60df41830245ee8f278e3ddfe5238a3 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"a9f9255591e4f808718bbf80a53dc926","originalChecksum":"b60df41830245ee8f278e3ddfe5238a3","extension":"png","size":19928,"width":1000,"height":250,"mime":"image\\/png","imageIdentifier":"a9f9255591e4f808718bbf80a53dc926","publicKey":"publickey"}\]}$# |
