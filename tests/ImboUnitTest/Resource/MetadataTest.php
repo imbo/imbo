@@ -76,7 +76,6 @@ class MetadataTest extends ResourceTests {
     public function testSupportsHttpDelete() {
         $this->manager->expects($this->once())->method('trigger')->with('db.metadata.delete');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
 
         $this->resource->delete($this->event);
     }
@@ -90,7 +89,6 @@ class MetadataTest extends ResourceTests {
         $this->manager->expects($this->at(0))->method('trigger')->with('db.metadata.delete')->will($this->returnSelf());
         $this->manager->expects($this->at(1))->method('trigger')->with('db.metadata.update', array('metadata' => $metadata))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
 
         $this->resource->put($this->event);
     }
@@ -103,6 +101,8 @@ class MetadataTest extends ResourceTests {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"foo":"bar"}'));
         $this->manager->expects($this->once())->method('trigger')->with('db.metadata.update', array('metadata' => $metadata));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ModelInterface'));
+        $this->database->expects($this->once())->method('getMetadata')->with('key', 'id')->will($this->returnValue(array('foo' => 'bar')));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
 
         $this->resource->post($this->event);

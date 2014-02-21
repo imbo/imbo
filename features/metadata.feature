@@ -33,7 +33,7 @@ Feature: Imbo provides a metadata endpoint
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """
-           {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}
+           {"foo":"bar"}
            """
 
     Scenario Outline: Get metadata
@@ -63,7 +63,7 @@ Feature: Imbo provides a metadata endpoint
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """
-           {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}
+           {"foo":"bar","bar":"foo"}
            """
 
     Scenario Outline: Get updated metadata
@@ -93,7 +93,7 @@ Feature: Imbo provides a metadata endpoint
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """
-           {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}
+           {"key":"value"}
            """
 
     Scenario Outline: Get replaced metadata
@@ -119,7 +119,7 @@ Feature: Imbo provides a metadata endpoint
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """
-           {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}
+           {}
            """
 
     Scenario Outline: Get deleted metadata
