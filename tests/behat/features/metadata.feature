@@ -136,3 +136,50 @@ Feature: Imbo provides a metadata endpoint
             | extension | response |
             | json      | #^{}$# |
             | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<metadata></metadata>\s*</imbo>$#ms |
+
+    Scenario: Add invalid metadata
+        Given I use "publickey" and "privatekey" for public and private keys
+        And the request body contains:
+          """
+          foobar
+          """
+        And I sign the request
+        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/metadata" using HTTP "PUT"
+        Then I should get a response with "400 Invalid JSON data"
+        And the "Content-Type" response header is "application/json"
+        And the response body matches:
+           """
+           #^{"error":{"code":400,"message":"Invalid JSON data","date":"[^"]+","imboErrorCode":0},"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}$#
+           """
+
+    Scenario: Add empty metadata
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I sign the request
+        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/metadata" using HTTP "PUT"
+        Then I should get a response with "400 Missing JSON data"
+        And the "Content-Type" response header is "application/json"
+        And the response body matches:
+           """
+           #^{"error":{"code":400,"message":"Missing JSON data","date":"[^"]+","imboErrorCode":0},"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}$#
+           """
+
+    Scenario Outline: Add metadata with invalid keys
+        Given I use "publickey" and "privatekey" for public and private keys
+        And the request body contains:
+          """
+          <metadata>
+          """
+        And I sign the request
+        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/metadata" using HTTP "PUT"
+        Then I should get a response with "400 Invalid metadata key: <key>"
+        And the "Content-Type" response header is "application/json"
+        And the response body matches:
+           """
+           #^{"error":{"code":400,"message":"Invalid metadata key: <regexkey>","date":"[^"]+","imboErrorCode":0},"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}$#
+           """
+
+        Examples:
+            | metadata              | key       | regexkey |
+            | {"foo.bar": "value"}  | foo.bar   | foo\.bar |
+            | {"foo::bar": "value"} | foo::bar  | foo::bar |
+            | {"$foo": "value"}     | $foo      | \$foo    |
