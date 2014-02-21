@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `imageinfo` (
     `width` int(10) unsigned NOT NULL,
     `height` int(10) unsigned NOT NULL,
     `checksum` char(32) COLLATE utf8_danish_ci NOT NULL,
+    `originalChecksum` char(32) COLLATE utf8_danish_ci NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `image` (`publicKey`,`imageIdentifier`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci AUTO_INCREMENT=1 ;

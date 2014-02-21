@@ -62,6 +62,7 @@ class DoctrineTest extends DatabaseTests {
                 width INTEGER NOT NULL,
                 height INTEGER NOT NULL,
                 checksum TEXT NOT NULL,
+                originalChecksum TEXT NOT NULL,
                 UNIQUE (publicKey,imageIdentifier)
             )
         ");

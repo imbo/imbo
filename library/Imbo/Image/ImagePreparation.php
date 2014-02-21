@@ -83,7 +83,8 @@ class ImagePreparation implements ListenerInterface {
               ->setExtension(Image::getFileExtension($mime))
               ->setBlob($imageBlob)
               ->setWidth($size['width'])
-              ->setHeight($size['height']);
+              ->setHeight($size['height'])
+              ->setOriginalChecksum(md5($imageBlob));
 
         $request->setImage($image);
     }

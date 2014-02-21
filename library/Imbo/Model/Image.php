@@ -87,6 +87,13 @@ class Image implements ModelInterface {
     private $checksum;
 
     /**
+     * MD5 checksum of the original image
+     *
+     * @var string
+     */
+    private $originalChecksum;
+
+    /**
      * Added date
      *
      * @var DateTime
@@ -371,6 +378,27 @@ class Image implements ModelInterface {
      */
     public function setChecksum($checksum) {
         $this->checksum = $checksum;
+
+        return $this;
+    }
+
+    /**
+     * Get the original checksum of the current image data
+     *
+     * @return string
+     */
+    public function getOriginalChecksum() {
+        return $this->originalChecksum;
+    }
+
+    /**
+     * Set the original checksum
+     *
+     * @param string $originalChecksum The original checksum to set
+     * @return Image
+     */
+    public function setOriginalChecksum($checksum) {
+        $this->originalChecksum = $checksum;
 
         return $this;
     }

@@ -148,6 +148,7 @@ class DatabaseOperationsTest extends ListenerTests {
                 'height' => 50,
                 'imageIdentifier' => 'identifier1',
                 'checksum' => 'checksum1',
+                'originalChecksum' => 'checksum1',
                 'mime' => 'image/png',
                 'extension' => 'png',
                 'metadata' => array(),
@@ -160,6 +161,7 @@ class DatabaseOperationsTest extends ListenerTests {
                 'height' => 60,
                 'imageIdentifier' => 'identifier2',
                 'checksum' => 'checksum2',
+                'originalChecksum' => 'checksum2',
                 'mime' => 'image/png',
                 'extension' => 'png',
                 'metadata' => array(),
@@ -172,6 +174,7 @@ class DatabaseOperationsTest extends ListenerTests {
                 'height' => 70,
                 'imageIdentifier' => 'identifier3',
                 'checksum' => 'checksum3',
+                'originalChecksum' => 'checksum3',
                 'mime' => 'image/png',
                 'extension' => 'png',
                 'metadata' => array(),
@@ -197,6 +200,8 @@ class DatabaseOperationsTest extends ListenerTests {
         $query->expects($this->at(13))->method('get')->with('ids')->will($this->returnValue(array('identifier1', 'identifier2', 'identifier3')));
         $query->expects($this->at(14))->method('has')->with('checksums')->will($this->returnValue(true));
         $query->expects($this->at(15))->method('get')->with('checksums')->will($this->returnValue(array('checksum1', 'checksum2', 'checksum3')));
+        $query->expects($this->at(16))->method('has')->with('originalChecksums')->will($this->returnValue(true));
+        $query->expects($this->at(17))->method('get')->with('originalChecksums')->will($this->returnValue(array('checksum1', 'checksum2', 'checksum3')));
         $this->request->query = $query;
 
         $imagesQuery = $this->getMock('Imbo\Resource\Images\Query');

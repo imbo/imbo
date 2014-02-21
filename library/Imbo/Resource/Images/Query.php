@@ -69,6 +69,13 @@ class Query {
     private $checksums = array();
 
     /**
+     * Original checksums filter
+     *
+     * @var array
+     */
+    private $originalChecksums = array();
+
+    /**
      * Sort
      *
      * @var array
@@ -183,6 +190,22 @@ class Query {
         }
 
         $this->checksums = $checksums;
+
+        return $this;
+    }
+
+    /**
+     * Set or get the original checksums filter
+     *
+     * @param array $checksums Give this a value to set the property
+     * @return array|self
+     */
+    public function originalChecksums(array $checksums = null) {
+        if ($checksums === null) {
+            return $this->originalChecksums;
+        }
+
+        $this->originalChecksums = $checksums;
 
         return $this;
     }

@@ -5,6 +5,8 @@ Imbo-1.2.0
 ----------
 __N/A__
 
+* #253: Store the original checksum of added images
+
 Bug fixes:
 
 * #270: Access-Control-Allow-Origin header not included when CORS is enabled and Imbo generates an error
