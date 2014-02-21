@@ -23,6 +23,16 @@ Response to metadata write operations
 
 Versions prior to 1.2.0 contained the image identifier in the response to ``HTTP POST/PUT/DELETE`` against the :ref:`metadata resource <metadata-resource>`. Starting from Imbo-1.2.0 the response to these requests will contain the metadata attached to the image instead. Read more about the different responses in the :ref:`metadata resource <metadata-resource>` section.
 
+Metadata keys
++++++++++++++
+
+Prior to Imbo-1.2.0 metadata keys could not contain ``::`` if you used the :ref:`Doctrine database adapter <doctrine-database-adapter>`. From Imbo-1.2.0 this is now true regardless of the adapter you are using. Two other rules have also been added:
+
+* Keys can not contain ``.`` (``foo.bar`` for instance). This is a limitation in MongoDB, and to make it easier for users of Imbo to port data between back-ends it will deny this for all adapters.
+* Keys can not start with ``$`` (``$foo`` for instance). This is because of the DSL used by the metadata queries, added to Imbo-1.2.0.
+
+If you are using the MongoDB adapter, and have keys that contain ``::`` you are encouraged to change these into something else. Likewise, if you are using the Doctrine adapter, and have keys that start with ``$`` or contain a ``.`` you should change these as well for metadata search compatibility.
+
 Original checksum
 +++++++++++++++++
 
