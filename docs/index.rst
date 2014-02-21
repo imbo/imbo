@@ -12,6 +12,7 @@ Installation guide
 
     installation/requirements
     installation/installation
+    installation/upgrading
     installation/configuration
     installation/event_listeners
 
