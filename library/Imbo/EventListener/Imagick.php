@@ -61,7 +61,7 @@ class Imagick implements ListenerInterface {
             ),
 
             // Inject the image blob into the image model after loading it from the database
-            'storage.image.load' => array('readImageBlob' => -10),
+            'image.loaded' => array('readImageBlob' => -10),
         );
     }
 

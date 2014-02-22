@@ -58,6 +58,8 @@ class StorageOperations implements ListenerInterface {
 
         $response->setLastModified($lastModified)
                  ->getModel()->setBlob($imageData);
+
+        $event->getManager()->trigger('image.loaded');
     }
 
     /**
