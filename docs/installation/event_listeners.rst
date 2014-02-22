@@ -260,6 +260,121 @@ and is enabled like this:
 
     The above command will delete all files in ``/path/to/cache`` older than 7 days and can be used with for instance `crontab <http://en.wikipedia.org/wiki/Cron>`_.
 
+.. _image-variations-listener:
+
+Image variations
+++++++++++++++++
+
+This event listener can be used to generate multiple variations of incoming images so that a more suitable image can be used for some transformations. This will increase the amount of data stored by Imbo, but it will also improve performance, drastically so if the difference between the original images and the transformed ones is big.
+
+The event listener has two roles, one is to generate the variations when new images are added, and the other is to pick the most fitting image variation when clients request an image with a set of transformations applied that will alter the dimensions of the image, for instance :ref:`resize <resize-transformation>` or :ref:`thumbnail <thumbnail-transformation>`.
+
+The event listener supports for following configuration parameters:
+
+``(boolean) autoScale``
+    Have Imbo automatically figure out the widths of the image variations (based on other parameters). Defaults to ``true``.
+
+``(float) scaleFactor``
+    The factor to use when scaling. Defaults to ``0.5`` which basically generates variants half the size of the previous one.
+
+``(int) minDiff``
+    When the difference of the width in pixels between two image variations fall below this limit, no more variants will be generated. Defaults to ``100``.
+
+``(int) minWidth``
+    Do not generate image variations that ends up with a width in pixels below this level. Defaults to ``100``.
+
+``(int) maxWidth``
+    Don't start to generate image variations before the width of the variation falls below this limit. Defaults to ``1024``.
+
+``(array) widths``
+    An array of widths to use when generating variations. This can be used together with the auto generation, and will ignore the rules related to auto generation. Defaults to ``array()``.
+
+``(array) database``
+    The database adapter to use. This array has two elements:
+
+    * ``(string) adapter``: The class name of the adapter. The class must implement the ``Imbo\EventListener\ImageVariations\Database\DatabaseInterface`` interface.
+    * ``(array) params``: Parameters for the adapter (optional).
+
+``(array) storage``
+    The storage adapter to use. This array has two elements:
+
+    * ``(string) adapter``: The class name of the adapter. The class must implement the ``Imbo\EventListener\ImageVariations\Storage\StorageInterface`` interface.
+    * ``(array) params``: Parameters for the adapter (optional).
+
+**Examples:**
+
+1)  Automatically generate image variations
+
+    Given the following configuration:
+
+    .. code-block:: php
+
+        return array(
+            // ...
+
+            'eventListeners' => array(
+                'imageVariations' => array(
+                    'listener' => 'Imbo\EventListener\ImageVariations',
+                    'params' => array(
+                        'database' => array(
+                            'adapter' => 'Imbo\EventListener\ImageVariations\Database\MongoDB',
+                        ),
+                        'storage' => array(
+                            'adapter' => 'Imbo\EventListener\ImageVariations\Storage\GridFS',
+                        ),
+                    ),
+                ),
+            ),
+
+            // ...
+        );
+
+    when adding an image with dimensions 3082 x 2259, the following variations will be generated:
+
+    * 770 x 564
+    * 385 x 282
+    * 192 x 140
+
+    When later requesting this image with for instance ``?t[]=resize:width=500`` as transformation (read more about image transformations in the :doc:`../usage/image-transformations` chapter), Imbo will choose the image which is 770 x 564 pixels.
+
+2)  Specify image widths:
+
+    Given the following configuration:
+
+    .. code-block:: php
+
+        return array(
+            // ...
+
+            'eventListeners' => array(
+                'imageVariations' => array(
+                    'listener' => 'Imbo\EventListener\ImageVariations',
+                    'params' => array(
+                        'database' => array(
+                            'adapter' => 'Imbo\EventListener\ImageVariations\Database\MongoDB',
+                        ),
+                        'storage' => array(
+                            'adapter' => 'Imbo\EventListener\ImageVariations\Storage\GridFS',
+                        ),
+                        'autoScale' => false,
+                        'widths' => array(1000, 500, 200, 100, 50),
+                    ),
+                ),
+            ),
+
+            // ...
+        );
+
+    when adding an image with dimensions 3082 x 2259, the following variations will be generated:
+
+    * 1000 x 732
+    * 500 x 366
+    * 200 x 146
+    * 100 x 73
+    * 50 x 36
+
+    As you can see the ``minDiff`` and ``minWidth`` parameters are ignored when using the ``width`` parameter.
+
 .. _imagick-event-listener:
 
 Imagick
