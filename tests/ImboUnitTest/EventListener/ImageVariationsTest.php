@@ -27,7 +27,14 @@ class ImageVariationsTest extends ListenerTests {
      * {@inheritdoc}
      */
     protected function getListener() {
-        return new ImageVariations();
+        return new ImageVariations(array(
+            'database' => array(
+                'adapter' => $this->getMock('Imbo\EventListener\ImageVariations\Database\DatabaseInterface'),
+            ),
+            'storage' => array(
+                'adapter' => $this->getMock('Imbo\EventListener\ImageVariations\Storage\StorageInterface'),
+            ),
+        ));
     }
 
     /**
