@@ -14,6 +14,11 @@ Imbo-1.2.0
 
 Below are changes you need to perform when upgrading to Imbo-1.2.0.
 
+Response to metadata write operations
++++++++++++++++++++++++++++++++++++++
+
+Versions prior to 1.2.0 contained the image identifier in the response to ``HTTP POST/PUT/DELETE`` against the :ref:`metadata resource <metadata-resource>`. Starting from Imbo-1.2.0 the response to these requests will contain the metadata attached to the image instead. Read more about the different responses in the :ref:`metadata resource <metadata-resource>` section.
+
 Original checksum
 +++++++++++++++++
 
