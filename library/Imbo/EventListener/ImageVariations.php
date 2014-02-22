@@ -76,7 +76,14 @@ class ImageVariations implements ListenerInterface {
 
         $dbConfig = $this->params['database'];
         $dbParams = isset($dbConfig['params']) ? $dbConfig['params'] : null;
-        $this->database = new $dbConfig['adapter']($dbParams);
+
+        if (is_callable($dbConfig['adapter'])) {
+            $this->database = $dbConfig['adapter']();
+        } else if (is_string($dbConfig['adapter'])) {
+            $this->database = new $dbConfig['adapter']($dbParams);
+        } else {
+            $this->database = $dbConfig['adapter'];
+        }
 
         if (!($this->database instanceof DatabaseInterface)) {
             throw new InvalidArgumentException('Invalid database adapter for the image variations event listener', 500);
@@ -88,7 +95,14 @@ class ImageVariations implements ListenerInterface {
 
         $storageConfig = $this->params['storage'];
         $storageParams = isset($storageConfig['params']) ? $storageConfig['params'] : null;
-        $this->storage = new $storageConfig['adapter']($storageParams);
+
+        if (is_callable($storageConfig['adapter'])) {
+            $this->storage = $storageConfig['adapter']();
+        } else if (is_string($storageConfig['adapter'])) {
+            $this->storage = new $storageConfig['adapter']($storageParams);
+        } else {
+            $this->storage = $storageConfig['adapter'];
+        }
 
         if (!($this->storage instanceof StorageInterface)) {
             throw new InvalidArgumentException('Invalid storage adapter for the image variations event listener', 500);
