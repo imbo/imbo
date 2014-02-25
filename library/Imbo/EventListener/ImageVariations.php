@@ -41,17 +41,16 @@ class ImageVariations implements ListenerInterface {
      * @var array
      */
     private $params = array(
-        // Flip to false to turn off autoscaling
+        // Flip to false to turn off auto scaling
         'autoScale' => true,
 
-        // The scale factor
+        // The scale factor to use when auto scaling
         'scaleFactor' => .5,
 
-        // If the diff between two images falls below this value no more variations will be
-        // generated
+        // If the diff between two images falls below this value the auto scaling will stop
         'minDiff' => 100,
 
-        // When the width of the image falls below this, don't generate any more variations
+        // When the width of the image variation falls below this the auto scaling will stop
         'minWidth' => 100,
 
         // Don't start resizing until the size falls below this limit
@@ -70,43 +69,13 @@ class ImageVariations implements ListenerInterface {
     public function __construct(array $params = array()) {
         $this->params = array_replace($this->params, $params);
 
-        if (!isset($this->params['database']) || !isset($this->params['database']['adapter'])) {
-            throw new InvalidArgumentException('Missing database adapter for the image variations event listener', 500);
+        // Make sure the scale factor is a negative number if it exists
+        if (isset($this->params['scaleFactor']) && $this->params['scaleFactor'] >= 1) {
+            throw new InvalidArgumentException('Scale factor must be below 1', 503);
         }
 
-        $dbConfig = $this->params['database'];
-        $dbParams = isset($dbConfig['params']) ? $dbConfig['params'] : null;
-
-        if (is_callable($dbConfig['adapter'])) {
-            $this->database = $dbConfig['adapter']();
-        } else if (is_string($dbConfig['adapter'])) {
-            $this->database = new $dbConfig['adapter']($dbParams);
-        } else {
-            $this->database = $dbConfig['adapter'];
-        }
-
-        if (!($this->database instanceof DatabaseInterface)) {
-            throw new InvalidArgumentException('Invalid database adapter for the image variations event listener', 500);
-        }
-
-        if (!isset($this->params['storage']) || !isset($this->params['storage']['adapter'])) {
-            throw new InvalidArgumentException('Missing storage adapter for the image variations event listener', 500);
-        }
-
-        $storageConfig = $this->params['storage'];
-        $storageParams = isset($storageConfig['params']) ? $storageConfig['params'] : null;
-
-        if (is_callable($storageConfig['adapter'])) {
-            $this->storage = $storageConfig['adapter']();
-        } else if (is_string($storageConfig['adapter'])) {
-            $this->storage = new $storageConfig['adapter']($storageParams);
-        } else {
-            $this->storage = $storageConfig['adapter'];
-        }
-
-        if (!($this->storage instanceof StorageInterface)) {
-            throw new InvalidArgumentException('Invalid storage adapter for the image variations event listener', 500);
-        }
+        $this->configureDatabase($this->params);
+        $this->configureStorage($this->params);
     }
 
     /**
@@ -114,9 +83,19 @@ class ImageVariations implements ListenerInterface {
      */
     public static function getSubscribedEvents() {
         return array(
+            // Generate image variations that can be used in resize operations later on
             'images.post' => array('generateVariations' => -10),
+
+            // Choose a more suitable variation that can be used for resizing
             'storage.image.load' => array('chooseVariation' => 10),
+
+            // Delete variations of an image when the image itself is deleted
             'image.delete' => array('deleteVariations' => -10),
+
+            // Adjust transformations so that crop coordinates (and other stuff) works on the image
+            // variation, which will be smaller than the image the coordintates where meant to work
+            // with in the first place
+            'image.transformations.adjust' => 'adjustImageTransformations',
         );
     }
 
@@ -137,53 +116,150 @@ class ImageVariations implements ListenerInterface {
         $imageWidth = $image->getWidth();
         $imageHeight = $image->getHeight();
 
+        // Fetch the transformations from the request and find the max width used in the set
         $transformations = $request->getTransformations();
-        $width = $this->getMinWidth($imageWidth, $imageHeight, $transformations);
 
-        if ($width === $imageWidth) {
-            // The minimum width is the same as the original, use the original
+        if (!$transformations) {
+            // No transformations in the request
             return;
         }
 
-        // WE HAVE A WINNER! Find a fitting image
-        $variation = $this->database->getBestMatch($publicKey, $imageIdentifier, $width);
+        $maxWidth = $this->getMaxWidth($imageWidth, $imageHeight, $transformations);
+
+        if (!$maxWidth) {
+            // No need to use a variation based on the set of transformations
+            return;
+        }
+
+        // Fetch the index of the transformation that decided the max width, and the width itself
+        list($transformationIndex, $maxWidth) = each($maxWidth);
+
+        if ($maxWidth >= $imageWidth) {
+            // The width is the same or above the original, use the original
+            return;
+        }
+
+        // WE HAVE A WINNER! Find the best variation. The width of the variation is the first
+        // available one above the $maxWidth value
+        $variation = $this->database->getBestMatch($publicKey, $imageIdentifier, $maxWidth);
 
         if (!$variation) {
+            // Could not find any :(
             return;
         }
 
-        $width = $variation['width'];
-        $height = $variation['height'];
+        // Now that we have a variation we can use we need to adjust some of the transformation
+        // parameters.
+        $event->getManager()->trigger('image.transformations.adjust', array(
+            'transformationIndex' => $transformationIndex,
+            'ratio' => $imageWidth / $variation['width'],
+        ));
 
-        $imageBlob = $this->storage->getImageVariation($publicKey, $imageIdentifier, $width);
+        // Fetch the image variation blob from the storage adapter
+        $imageBlob = $this->storage->getImageVariation($publicKey, $imageIdentifier, $variation['width']);
 
+        if (!$imageBlob) {
+            // The image blob does not exist in the storage, which it should. Trigger an error and
+            // return
+            trigger_error('Image variation storage is not in sync with the image variation database', E_USER_WARNING);
+            return;
+        }
+
+        // Set some data that the database operations listener usually sets, since that will be
+        // skipped since we have an image variation
         $lastModified = $event->getStorage()->getLastModified($publicKey, $imageIdentifier);
-
         $response->setLastModified($lastModified);
+
+        // Update the model
         $model = $response->getModel();
-        $model->setBlob($imageBlob)->setWidth($width)->setHeight($height);
+        $model->setBlob($imageBlob)
+              ->setWidth($variation['width'])
+              ->setHeight($variation['height']);
 
-        $response->headers->set('X-Imbo-ImageVariation', $width . 'x' . $height);
+        // Set a HTTP header that informs the user agent on which image variation that was used in
+        // the transformations
+        $response->headers->set('X-Imbo-ImageVariation', $variation['width'] . 'x' . $variation['height']);
 
+        // Stop the propagation of this event
         $event->stopPropagation();
         $event->getManager()->trigger('image.loaded');
     }
 
     /**
-     * Fetch the minimum width of an image and a set of transformations
+     * Adjust image transformations
+     *
+     * This method will adjust transformation parameters based on the ration between the original
+     * image and the image variation used.
+     *
+     * @param EventInterface $event The current event
+     */
+    public function adjustImageTransformations(EventInterface $event) {
+        $request = $event->getRequest();
+        $transformations = $request->getTransformations();
+
+        $transformationIndex = $event->getArgument('transformationIndex');
+        $ratio = $event->getArgument('ratio');
+
+        // Adjust coordinates according to the ratio between the original and the variation
+        for ($i = 0; $i < $transformationIndex; $i++) {
+            $name = $transformations[$i]['name'];
+            $params = $transformations[$i]['params'];
+
+            if ($name === 'crop') {
+                foreach (array('x', 'y', 'width', 'height') as $param) {
+                    if (isset($params[$param])) {
+                        $params[$param] = round($params[$param] / $ratio);
+                    }
+                }
+
+                $transformations[$i]['params'] = $params;
+            } else if ($name === 'border') {
+                foreach (array('width', 'height') as $param) {
+                    if (isset($params[$param])) {
+                        $params[$param] = round($params[$param] / $ratio);
+                    }
+                }
+
+                $transformations[$i]['params'] = $params;
+            } else if ($name === 'canvas') {
+                foreach (array('x', 'y', 'width', 'height') as $param) {
+                    if (isset($params[$param])) {
+                        $params[$param] = round($params[$param] / $ratio);
+                    }
+                }
+
+                $transformations[$i]['params'] = $params;
+            } else if ($name === 'watermark') {
+                foreach (array('x', 'y', 'width', 'height') as $param) {
+                    if (isset($params[$param])) {
+                        $params[$param] = round($params[$param] / $ratio);
+                    }
+                }
+
+                $transformations[$i]['params'] = $params;
+            }
+        }
+
+        $request->setTransformations($transformations);
+    }
+
+    /**
+     * Fetch the maximum width present in the set of transformations
      *
      * @param int $width The width of the existing image
      * @param int $height The height of the existing image
      * @param array $transformations Transformations from the URL
-     * @return int Returns the minimum width
+     * @return array|null Returns an array with a single element where the index is the index of the
+     *                    transformation that has the maximum width, and the value of the width
      */
-    public function getMinWidth($width, $height, array $transformations) {
-        $minWidth = $width;
+    public function getMaxWidth($width, $height, array $transformations) {
+        // Possible widths to use
+        $widths = array();
 
-        // Calculate the aspect ratio
-        $ratio = $width / $height;
+        // Calculate the aspect ratio in case some transformations only specify height
+        $ratio = (int) ($width / $height);
 
-        foreach ($transformations as $transformation) {
+        foreach ($transformations as $i => $transformation) {
             $name = $transformation['name'];
             $params = $transformation['params'];
 
@@ -191,79 +267,109 @@ class ImageVariations implements ListenerInterface {
                 // MaxSize transformation
                 if (isset($params['width'])) {
                     // width detected
-                    $width = min((int) $params['width'], $width);
+                    $widths[$i] = (int) $params['width'];
                 } else if (isset($params['height'])) {
                     // height detected, calculate ratio
-                    $width = min((int) $params['height'] * $ratio, $width);
+                    $widths[$i] = (int) $params['height'] * $ratio;
                 }
             } else if ($name === 'resize') {
                 // Resize transformation
                 if (isset($params['width'])) {
                     // width detected
-                    $width = min((int) $params['width'], $width);
+                    $widths[$i] = (int) $params['width'];
                 } else if (isset($params['height'])) {
                     // height detected, calculate ratio
-                    $width = min((int) $params['height'] * $ratio, $width);
+                    $widths[$i] = (int) $params['height'] * $ratio;
                 }
             } else if ($name === 'thumbnail') {
                 if (isset($params['width'])) {
                     // Width have been specified
-                    $width = min((int) $params['width'], $width);
+                    $widths[$i] = (int) $params['width'];
                 } else if (isset($params['height']) && isset($params['fit']) && $params['fit'] === 'inset') {
                     // Height have been specified, and the fit mode is inset, calculate width
-                    $width = min((int) $params['height'] * $ratio, $width);
+                    $widths[$i] = (int) $params['height'] * $ratio;
                 } else {
                     // No width or height/inset fit combo. Use default width for thumbnails
-                    $width = 50;
+                    $widths[$i] = 50;
                 }
             }
         }
 
-        return $width;
+        if ($widths) {
+            // Find the max width in the set, and return it along with the index of the
+            // transformation that first referenced it
+            $maxWidth = max($widths);
+
+            return array(array_search($maxWidth, $widths) => $maxWidth);
+        }
+
+        return null;
     }
 
     /**
      * Generate multiple variations based on the configuration
      *
+     * If any of the operations fail Imbo will trigger errors
+     *
      * @param EventInterface $event
      */
     public function generateVariations(EventInterface $event) {
+        // Fetch the event manager to trigger events
         $eventManager = $event->getManager();
+
         $request = $event->getRequest();
-        $image = $event->getRequest()->getImage();
         $publicKey = $request->getPublicKey();
-        $imageIdentifier = $image->getChecksum();
-        $width = $variationWidth = $previousWidth = $image->getWidth();
+        $originalImage = $request->getImage();
+        $imageIdentifier = $originalImage->getChecksum();
+        $originalWidth = $originalImage->getWidth();
+
+        // Fetch parameters specified in the Imbo configuration related to what sort of variations
+        // should be generated
         $minWidth = $this->params['minWidth'];
         $maxWidth = $this->params['maxWidth'];
         $minDiff = $this->params['minDiff'];
         $scaleFactor = $this->params['scaleFactor'];
-        $widths = array_filter($this->params['widths'], function($value) use ($width) {
-            return $value < $width;
+
+        // Remove widths which are larger than the original image
+        $widths = array_filter($this->params['widths'], function($value) use ($originalWidth) {
+            return $value < $originalWidth;
         });
 
         if ($this->params['autoScale'] === true) {
+            // Have Imbo figure out the widths to generate in addition to the ones in the "width"
+            // configuration parameter
+            $variationWidth = $previousWidth = $originalWidth;
+
             while ($variationWidth > $minWidth) {
-                $variationWidth = floor($variationWidth * $scaleFactor);
-
-                if ((($previousWidth - $variationWidth) < $minDiff) || ($variationWidth < $minWidth)) {
-                    // The diff is too small, or the variation is too small
-                    break;
-                }
-
-                $previousWidth = $variationWidth;
+                $variationWidth = round($variationWidth * $scaleFactor);
 
                 if ($variationWidth > $maxWidth) {
                     // Width too big, try again (twss)
                     continue;
                 }
 
+                if ((($previousWidth - $variationWidth) < $minDiff) || ($variationWidth < $minWidth)) {
+                    // The diff is too small, or the variation is too small, stop generating more
+                    // widths
+                    break;
+                }
+
+                $previousWidth = $variationWidth;
+
                 $widths[] = $variationWidth;
             }
         }
 
         foreach ($widths as $width) {
+            // Clone the image so that the resize operation will happen on the original every time
+            $image = clone $originalImage;
+
             try {
+                // Trigger a loading of the image, using the clone of the original as an argument
+                $eventManager->trigger('image.loaded', array(
+                    'image' => $image,
+                ));
+
                 // Trigger a resize of the image (the transformation handles aspect ratio)
                 $eventManager->trigger('image.transformation.resize', array(
                     'image' => $image,
@@ -295,7 +401,6 @@ class ImageVariations implements ListenerInterface {
                 try {
                     $this->storage->deleteImageVariations($publicKey, $imageIdentifier, $width);
                 } catch (StorageException $e) {
-                    // Whatevah
                     trigger_error('Could not remove the stored variation', E_USER_WARNING);
                 }
             }
@@ -304,6 +409,8 @@ class ImageVariations implements ListenerInterface {
 
     /**
      * Delete all image variations attached to an image
+     *
+     * If any of the delete operations fail Imbo will trigger an error
      *
      * @param EventInterface $event The current event
      */
@@ -323,5 +430,61 @@ class ImageVariations implements ListenerInterface {
         } catch (StorageException $e) {
             trigger_error(sprintf('Could not delete image variations for %s (%s)', $publicKey, $imageIdentifier), E_USER_WARNING);
         }
+    }
+
+    /**
+     * Configure the database adapter
+     *
+     * @param array $config The event listener configuration
+     * @throws InvalidArgumentException
+     */
+    private function configureDatabase(array $config) {
+        if (!isset($config['database']) || !isset($config['database']['adapter'])) {
+            throw new InvalidArgumentException('Missing database adapter configuration for the image variations event listener', 500);
+        }
+
+        $config = $config['database'];
+
+        if (is_callable($config['adapter'])) {
+            $databaseAdapter = $config['adapter']();
+        } else if (is_string($config['adapter'])) {
+            $databaseAdapter = new $config['adapter'](isset($config['params']) ? $config['params'] : null);
+        } else {
+            $databaseAdapter = $config['adapter'];
+        }
+
+        if (!($databaseAdapter instanceof DatabaseInterface)) {
+            throw new InvalidArgumentException('Invalid database adapter for the image variations event listener', 500);
+        }
+
+        $this->database = $databaseAdapter;
+    }
+
+    /**
+     * Configure the storage adapter
+     *
+     * @param array $config The event listener configuration
+     * @throws InvalidArgumentException
+     */
+    private function configureStorage(array $config) {
+        if (!isset($config['storage']) || !isset($config['storage']['adapter'])) {
+            throw new InvalidArgumentException('Missing storage adapter configuration for the image variations event listener', 500);
+        }
+
+        $config = $config['storage'];
+
+        if (is_callable($config['adapter'])) {
+            $storageAdapter = $config['adapter']();
+        } else if (is_string($config['adapter'])) {
+            $storageAdapter = new $config['adapter'](isset($config['params']) ? $config['params'] : null);
+        } else {
+            $storageAdapter = $config['adapter'];
+        }
+
+        if (!($storageAdapter instanceof storageInterface)) {
+            throw new InvalidArgumentException('Invalid storage adapter for the image variations event listener', 500);
+        }
+
+        $this->storage = $storageAdapter;
     }
 }
