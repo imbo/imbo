@@ -71,7 +71,10 @@ class Imagick implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function readImageBlob(EventInterface $event) {
-        if ($event->getName() === 'images.post') {
+        if ($event->hasArgument('image')) {
+            // The image has been specified as an argument to the event
+            $image = $event->getArgument('image');
+        } else if ($event->getName() === 'images.post') {
             // The image is found in the request
             $image = $event->getRequest()->getImage();
         } else {
