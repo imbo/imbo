@@ -16,7 +16,7 @@ default:
       # Timeout when trying to connect to the built in httpd
       timeout: 5
 
-      enableCodeCoverage: false
+      enableCodeCoverage: true
       coveragePath: %behat.paths.base%/../../build/behat-coverage
       whitelist:
         - %behat.paths.base%/../../library
