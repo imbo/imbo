@@ -8,9 +8,6 @@
  * distributed with this source code.
  */
 
-// Require the Composer autoloader
-require __DIR__ . '/../../vendor/autoload.php';
-
 /**
  * Router for the built in httpd in php-5.4. Route everything through index.php. When ran from the
  * base project directory, the command looks like this:
