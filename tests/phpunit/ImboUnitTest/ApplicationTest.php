@@ -69,13 +69,4 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $this->expectOutputRegex('|{"version":"' . preg_quote(Version::VERSION, '|') . '",.*}|');
         $this->application->run(require __DIR__ . '/../../../config/config.default.php');
     }
-
-    /**
-     * @covers Imbo\Application::run
-     */
-    public function testCanRunWithTestingConfiguration() {
-        $_SERVER['HTTP_X_TEST_SESSION_ID'] = 'test_namespace';
-        $this->expectOutputRegex('|{"version":"' . preg_quote(Version::VERSION, '|') . '",.*}|');
-        $this->application->run(require __DIR__ . '/../../../config/config.testing.php');
-    }
 }
