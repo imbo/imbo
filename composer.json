@@ -39,8 +39,8 @@
   "autoload": {
     "psr-0": {
       "Imbo\\": "library/",
-      "ImboUnitTest\\": "tests/",
-      "ImboIntegrationTest\\": "tests/"
+      "ImboUnitTest\\": "tests/phpunit",
+      "ImboIntegrationTest\\": "tests/phpunit"
     }
   }
 }

@@ -22,11 +22,11 @@
 
   <filter>
     <whitelist addUncoveredFilesFromWhitelist="true">
-      <directory suffix=".php">../library/Imbo</directory>
+      <directory suffix=".php">../../library/Imbo</directory>
       <exclude>
-        <directory suffix="Interface.php">../library/Imbo</directory>
-        <file>../library/Imbo/Exception.php</file>
-        <file>../library/Imbo/Version.php</file>
+        <directory suffix="Interface.php">../../library/Imbo</directory>
+        <file>../../library/Imbo/Exception.php</file>
+        <file>../../library/Imbo/Version.php</file>
       </exclude>
     </whitelist>
   </filter>
