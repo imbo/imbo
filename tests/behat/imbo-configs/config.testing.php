@@ -21,6 +21,9 @@ use Imbo\Image\Transformation,
     PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount,
     PHPUnit_Framework_MockObject_Stub_Return;
 
+// Load the default configuration file so we can override some stuff related to testing
+$defaultConfig = require __DIR__ . '/../../../config/config.default.php';
+
 class CustomResource implements ResourceInterface {
     public function getAllowedMethods() {
         return array('GET');
@@ -107,7 +110,11 @@ if (isset($_SERVER['HTTP_X_CLIENT_IP'])) {
     $_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_X_CLIENT_IP'];
 }
 
-return array(
+// Remove some elements from the default array that can't be replaced/merged the way we want during
+// testing
+unset($defaultConfig['eventListeners']['statsAccess']);
+
+return array_replace_recursive($defaultConfig, array(
     'auth' => array(
         'publickey' => 'privatekey',
         'user' => 'key',
@@ -142,7 +149,6 @@ return array(
     },
 
     'eventListeners' => array(
-        'auth' => 'Imbo\EventListener\Authenticate',
         'accessToken' => array(
             'listener' => 'Imbo\EventListener\AccessToken',
             'params' => array(
@@ -224,35 +230,6 @@ return array(
         ),
         'exifMetadataListener' => 'Imbo\EventListener\ExifMetadata',
         'autoRotateListener' => 'Imbo\EventListener\AutoRotateImage',
-
-        // Image transformations
-        'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
-        'border' => 'Imbo\Image\Transformation\Border',
-        'canvas' => 'Imbo\Image\Transformation\Canvas',
-        'compress' => 'Imbo\Image\Transformation\Compress',
-        'convert' => 'Imbo\Image\Transformation\Convert',
-        'crop' => 'Imbo\Image\Transformation\Crop',
-        'desaturate' => 'Imbo\Image\Transformation\Desaturate',
-        'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
-        'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
-        'maxSize' => 'Imbo\Image\Transformation\MaxSize',
-        'modulate' => 'Imbo\Image\Transformation\Modulate',
-        'progressive' => 'Imbo\Image\Transformation\Progressive',
-        'resize' => 'Imbo\Image\Transformation\Resize',
-        'rotate' => 'Imbo\Image\Transformation\Rotate',
-        'sepia' => 'Imbo\Image\Transformation\Sepia',
-        'strip' => 'Imbo\Image\Transformation\Strip',
-        'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
-        'transpose' => 'Imbo\Image\Transformation\Transpose',
-        'transverse' => 'Imbo\Image\Transformation\Transverse',
-        'watermark' => 'Imbo\Image\Transformation\Watermark',
-
-        // Imagick-specific event listener for the built in image transformations
-        'imagick' => 'Imbo\EventListener\Imagick',
-    ),
-
-    'eventListenerInitializers' => array(
-        'imagick' => 'Imbo\EventListener\Initializer\Imagick',
     ),
 
     'transformationPresets' => array(
@@ -280,4 +257,4 @@ return array(
             return new CustomResource2();
         }
     ),
-);
+));
