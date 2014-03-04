@@ -21,9 +21,6 @@ use Imbo\Image\Transformation,
     PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount,
     PHPUnit_Framework_MockObject_Stub_Return;
 
-// Require composer autoloader
-require __DIR__ . '/../vendor/autoload.php';
-
 class CustomResource implements ResourceInterface {
     public function getAllowedMethods() {
         return array('GET');

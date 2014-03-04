@@ -4,7 +4,7 @@ Feature: Imbo requires an access token for read operations
     I must specify an access token in the URI
 
     Background:
-        Given "tests/Fixtures/image.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image.png" exists in Imbo
 
     Scenario: Request user information using the correct private key
         Given I use "publickey" and "privatekey" for public and private keys

@@ -4,7 +4,7 @@ Feature: Imbo adds ETag's to some responses
     I can specify ETag's in some responses
 
     Background:
-        Given "tests/Fixtures/image.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image.png" exists in Imbo
 
     Scenario: Index resource does not contain any Etag header
         When I request "/"

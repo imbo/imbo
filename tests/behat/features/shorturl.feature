@@ -4,7 +4,7 @@ Feature: Imbo provides short urls for images
     I will use the custom header provided by Imbo
 
     Background:
-        Given "tests/Fixtures/image1.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
 
     Scenario: Request an image to get the short URL
         Given I use "publickey" and "privatekey" for public and private keys

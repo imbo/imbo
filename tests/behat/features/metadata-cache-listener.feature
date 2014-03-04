@@ -4,7 +4,7 @@ Feature: Imbo enables caching of metadata
     I will cache and re-use fetched metadata
 
     Background:
-        Given "tests/Fixtures/image1.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
 
     Scenario: Attach metadata to an image
         Given I use "publickey" and "privatekey" for public and private keys

@@ -4,9 +4,9 @@ Feature: Imbo provides a stats endpoint
     I want to make requests against the stats endpoint
 
     Background:
-        Given "tests/Fixtures/image1.png" exists in Imbo
-        And "tests/Fixtures/image.jpg" exists in Imbo
-        And "tests/Fixtures/image.gif" exists in Imbo
+        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
+        And "tests/phpunit/Fixtures/image.jpg" exists in Imbo
+        And "tests/phpunit/Fixtures/image.gif" exists in Imbo
 
     Scenario Outline: Fetch stats
         When I request "/stats.<extension>?statsAllow=*"

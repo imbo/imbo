@@ -4,7 +4,7 @@ Feature: Imbo provides an event listener for auto rotating images based on EXIF-
     I must enable the AutoRotate event listener
 
     Background:
-        Given "tests/Fixtures/640x160_rotated.jpg" exists in Imbo
+        Given "tests/phpunit/Fixtures/640x160_rotated.jpg" exists in Imbo
 
     Scenario: Fetch the auto rotated image
         Given I use "publickey" and "privatekey" for public and private keys

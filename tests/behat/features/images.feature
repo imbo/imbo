@@ -4,10 +4,10 @@ Feature: Imbo provides an images endpoint
     I want to make requests against the images endpoint
 
     Background:
-        Given "tests/Fixtures/image1.png" exists in Imbo
-        And "tests/Fixtures/image.jpg" exists in Imbo
-        And "tests/Fixtures/image.gif" exists in Imbo
-        And "tests/Fixtures/1024x256.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
+        And "tests/phpunit/Fixtures/image.jpg" exists in Imbo
+        And "tests/phpunit/Fixtures/image.gif" exists in Imbo
+        And "tests/phpunit/Fixtures/1024x256.png" exists in Imbo
 
     Scenario Outline: Fetch images with no filter
         Given I use "publickey" and "privatekey" for public and private keys

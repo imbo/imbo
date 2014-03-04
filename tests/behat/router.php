@@ -8,6 +8,9 @@
  * distributed with this source code.
  */
 
+// Require the Composer autoloader
+require __DIR__ . '/../../vendor/autoload.php';
+
 /**
  * Router for the built in httpd in php-5.4. Route everything through index.php. When ran from the
  * base project directory, the command looks like this:
@@ -15,8 +18,6 @@
  * php -S localhost:8888 -t public tests/router.php
  */
 if (isset($_SERVER['HTTP_X_COLLECT_COVERAGE']) && isset($_SERVER['HTTP_X_TEST_SESSION_ID'])) {
-    require __DIR__ . '/../vendor/autoload.php';
-
     // Output code coverage stored in the .cov files
     $coverageDir = sys_get_temp_dir() . '/behat-coverage';
 
@@ -85,7 +86,7 @@ if (isset($_SERVER['HTTP_X_ENABLE_COVERAGE']) && isset($_SERVER['HTTP_X_TEST_SES
 }
 
 // Define a custom configuration file
-define('IMBO_CONFIG_PATH', __DIR__ . '/../config/config.testing.php');
+define('IMBO_CONFIG_PATH', __DIR__ . '/imbo-configs/config.testing.php');
 
 if (file_exists($_SERVER['DOCUMENT_ROOT'] . $_SERVER['SCRIPT_NAME'])) {
     // The file exists, serve the file as is

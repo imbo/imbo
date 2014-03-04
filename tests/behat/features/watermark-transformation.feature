@@ -4,7 +4,7 @@ Feature: Imbo can apply watermarks to images
     I can use the watermark transformation
 
     Background:
-        Given "tests/Fixtures/image1.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
 
     Scenario: Apply a non-existing watermark
         Given I use "publickey" and "privatekey" for public and private keys

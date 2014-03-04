@@ -1,4 +1,8 @@
 default:
+  paths:
+    features: features
+    bootstrap: bootstrap
+
   context:
     class: ImboContext
     parameters:
@@ -7,20 +11,16 @@ default:
 
       # Document root and router used by the httpd
       documentRoot: public
-      router: tests/router.php
+      router: %behat.paths.base%/router.php
 
       # Timeout when trying to connect to the built in httpd
       timeout: 5
 
-      enableCodeCoverage: true
-      coveragePath: 'build/behat-coverage'
+      enableCodeCoverage: false
+      coveragePath: %behat.paths.base%/../../build/behat-coverage
       whitelist:
-        - library
-        - public
-
-  paths:
-    features:   'features'
-    bootstrap:  '%behat.paths.features%/bootstrap'
+        - %behat.paths.base%/../../library
+        - %behat.paths.base%/../../public
 
 travis:
   context:

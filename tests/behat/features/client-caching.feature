@@ -4,7 +4,7 @@ Feature: Imbo enables client caching using related response headers
     I can make look at the cache-related response headers set by Imbo
 
     Background:
-        Given "tests/Fixtures/image1.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
 
     Scenario: Request index page (not cacheable)
         When I request "/"

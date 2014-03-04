@@ -4,7 +4,7 @@ Feature: Imbo enables caching of transformations
     I will cache and re-use transformed images
 
     Scenario: Fetch an image not present in the cache
-        Given "tests/Fixtures/image1.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
         And I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.jpg"
@@ -21,7 +21,7 @@ Feature: Imbo enables caching of transformations
         And the "X-Imbo-TransformationCache" response header is "Hit"
 
     Scenario: Fetch the same image, but with a different extension
-        Given "tests/Fixtures/image1.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
         And I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.png"
@@ -45,7 +45,7 @@ Feature: Imbo enables caching of transformations
         Then I should get a response with "200 OK"
 
     Scenario: Fetch the same image, which is no longer in the cache
-        Given "tests/Fixtures/image1.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
         And I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.png"
