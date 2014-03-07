@@ -184,4 +184,20 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
         $method->invokeArgs($this->driver, array(&$metadata, &$result));
         $this->assertSame($result, $normalizedMetadata);
     }
+
+    public function testCanInstantiateAMetadataQueryParserByItself() {
+        $this->assertInstanceOf('Imbo\Database\Doctrine\MetadataQueryParser', $this->driver->getMetadataQueryParser());
+    }
+
+    public function testCanInjectAMetadataQueryParser() {
+        $mqp = $this->getMock('Imbo\Database\Doctrine\MetadataQueryParser');
+        $this->assertSame($this->driver, $this->driver->setMetadataQueryParser($mqp));
+        $this->assertSame($mqp, $this->driver->getMetadataQueryParser());
+    }
+
+    public function testCanInjectAMetadataQueryParserInTheConstructor() {
+        $mqp = $this->getMock('Imbo\Database\Doctrine\MetadataQueryParser');
+        $driver = new Doctrine(array(), null, $mqp);
+        $this->assertSame($mqp, $driver->getMetadataQueryParser());
+    }
 }

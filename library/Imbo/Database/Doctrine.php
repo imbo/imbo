@@ -16,6 +16,7 @@ use Imbo\Model\Image,
     Imbo\Exception\DatabaseException,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Exception,
+    Imbo\Database\Doctrine\MetadataQueryParser,
     Doctrine\DBAL\Configuration,
     Doctrine\DBAL\DriverManager,
     Doctrine\DBAL\Connection,
@@ -38,6 +39,13 @@ use Imbo\Model\Image,
  * @package Database
  */
 class Doctrine implements DatabaseInterface {
+    /**
+     * Metadata query parser
+     *
+     * @var MetadataQueryParser
+     */
+    private $metadataQueryParser;
+
     /**
      * Parameters for the Doctrine connection
      *
@@ -81,12 +89,17 @@ class Doctrine implements DatabaseInterface {
      *
      * @param array $params Parameters for the driver
      * @param Connection $connection Optional connection instance. Primarily used for testing
+     * @param MetadataQueryParser $parser A parser for the metadata queries
      */
-    public function __construct(array $params, Connection $connection = null) {
+    public function __construct(array $params, Connection $connection = null, MetadataQueryParser $parser = null) {
         $this->params = array_merge($this->params, $params);
 
         if ($connection !== null) {
             $this->setConnection($connection);
+        }
+
+        if ($parser !== null) {
+            $this->setMetadataQueryParser($parser);
         }
     }
 
@@ -310,6 +323,10 @@ class Doctrine implements DatabaseInterface {
             }
 
             $qb->andWhere($composite);
+        }
+
+        if ($metadataQuery = $query->metadataQuery()) {
+            $this->getMetadataQueryParser()->parseMetadataQuery($metadataQuery, $qb);
         }
 
         // Create a querybuilder that will be used to fetch the hits number, and update the model
@@ -672,5 +689,30 @@ class Doctrine implements DatabaseInterface {
         }
 
         return $result;
+    }
+
+    /**
+     * Set the metadata query parser
+     *
+     * @param MetadataQueryParser $parser
+     * @return self
+     */
+    public function setMetadataQueryParser(MetadataQueryParser $parser) {
+        $this->metadataQueryParser = $parser;
+
+        return $this;
+    }
+
+    /**
+     * Get the metadata query parser
+     *
+     * @return MetadataQueryParser
+     */
+    public function getMetadataQueryParser() {
+        if ($this->metadataQueryParser === null) {
+            $this->metadataQueryParser = new MetadataQueryParser();
+        }
+
+        return $this->metadataQueryParser;
     }
 }
