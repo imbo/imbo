@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace ImboUnitTest\Database\Doctrine;
+namespace ImboIntegrationTest\Database\Doctrine;
 
 use Imbo\Database\Doctrine\MetadataQueryParser,
     Doctrine\DBAL\Query\QueryBuilder,
@@ -18,7 +18,7 @@ use Imbo\Database\Doctrine\MetadataQueryParser,
 
 /**
  * @covers Imbo\Database\Doctrine\MetadataQueryParser
- * @group unit
+ * @group integration
  * @group database
  * @group doctrine
  */
