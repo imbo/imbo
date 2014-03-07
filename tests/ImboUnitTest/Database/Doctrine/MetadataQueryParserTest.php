@@ -11,7 +11,10 @@
 namespace ImboUnitTest\Database\Doctrine;
 
 use Imbo\Database\Doctrine\MetadataQueryParser,
-    Doctrine\DBAL\Query\QueryBuilder;
+    Doctrine\DBAL\Query\QueryBuilder,
+    Doctrine\DBAL\Configuration,
+    Doctrine\DBAL\DriverManager,
+    PDO;
 
 /**
  * @covers Imbo\Database\Doctrine\MetadataQueryParser
@@ -33,8 +36,13 @@ class MetadataQueryParserTest extends \PHPUnit_Framework_TestCase {
             $this->markTestSkipped('Doctrine is required to run this test');
         }
 
-        $this->queryBuilder = new QueryBuilder($this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock());
+        $connection = DriverManager::getConnection(
+            array('pdo' => new PDO('sqlite::memory:')),
+            new Configuration()
+        );
+        $this->queryBuilder = new QueryBuilder($connection);
         $this->queryBuilder->select('*')->from('image', 'i');
+
         $this->parser = new MetadataQueryParser();
     }
 
@@ -55,59 +63,79 @@ class MetadataQueryParserTest extends \PHPUnit_Framework_TestCase {
         return array(
             'regular match' => array(
                 array('field' => 'value'),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field = :value',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` = ?',
             ),
             'regular match, implicit and' => array(
                 array('field' => 'value', 'field2' => 'value2'),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field = :value AND field2 = :value2',
-            ),
-            'not equals' => array(
-                array('field' => array('$ne' => 'value')),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field != :value',
-            ),
-            'greater than' => array(
-                array('field' => array('$gt' => 123)),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field > 123',
-            ),
-            'greather than or equal' => array(
-                array('field' => array('$gte' => 123)),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field >= 123',
-            ),
-            'less than' => array(
-                array('field' => array('$lt' => 123)),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field < 123',
-            ),
-            'less than or equal' => array(
-                array('field' => array('$lte' => 123)),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field <= 123',
-            ),
-            'in' => array(
-                array('field' => array('$in' => array(1, 2, 3))),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field IN (1, 2, 3)',
-            ),
-            'not in' => array(
-                array('field' => array('$nin' => array(1, 2, 3))),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field NOT IN (1, 2, 3)',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (`m.field` = ?) AND (`m.field2` = ?)',
             ),
             'explicit and' => array(
-                array('$and' => array(array('field' => 123), array('field' => 456))),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field = 123 AND field = 456',
+                array('$and' => array(array('field' => 123))),
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` = ?',
+            ),
+            'explicit and, multiple fields' => array(
+                array('$and' => array(array('field1' => 123), array('field2' => 456))),
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (`m.field1` = ?) AND (`m.field2` = ?)',
             ),
             'or' => array(
                 array('$or' => array(array('field' => 123), array('field' => 456))),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field = 123 OR field = 456',
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (`m.field` = ?) OR (`m.field` = ?)',
             ),
             'multiple and/or' => array(
-                array('field' => 'value', '$or' => array(array('field2' => 123), array('field3' => 456))),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field = value AND ( field2 = 123 OR field3 = 456 )',
+                array('field1' => 'value', '$or' => array(array('field2' => 123), array('field2' => 456)), 'field3' => 789),
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (`m.field1` = ?) AND ((`m.field2` = ?) OR (`m.field2` = ?)) AND (`m.field3` = ?)',
+            ),
+            'not equals' => array(
+                array('field' => array('$ne' => 'value')),
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` <> ?',
+            ),
+            'greater than' => array(
+                array('field' => array('$gt' => 123)),
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` > ?',
+            ),
+            'greather than or equal' => array(
+                array('field' => array('$gte' => 123)),
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` >= ?',
+            ),
+            'less than' => array(
+                array('field' => array('$lt' => 123)),
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` < ?',
+            ),
+            'less than or equal' => array(
+                array('field' => array('$lte' => 123)),
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` <= ?',
+            ),
+            'in' => array(
+                array('field' => array('$in' => array(1, 2, 3))),
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` IN (?)',
+            ),
+            'not in' => array(
+                array('field' => array('$nin' => array(1, 2, 3))),
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` NOT IN (?)',
             ),
             'wildcard search' => array(
                 array('field' => array('$wildcard' => '*value*')),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE field LIKE %value%',
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` LIKE ?',
             ),
-            //'ALL THE OPERATORS!!1' => array(
-
-            //),
+            'complex query with many different operators' => array(
+                array(
+                    'field' => 'value',
+                    'field2' => array(
+                        '$in' => array(1, 2, 3),
+                    ),
+                    'field3' => array(
+                        '$ne' => 'foo',
+                    ),
+                    '$or' => array(
+                        array('field' => 'foo'),
+                        array('field2' => array('$nin' => array(1, 2, 3))),
+                        array('field3' => array(
+                            '$wildcard' => '*hey*',
+                        )),
+                    ),
+                ),
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (`m.field` = ?) AND (`m.field2` IN (?)) AND (`m.field3` <> ?) AND ((`m.field` = ?) OR (`m.field2` NOT IN (?)) OR (`m.field3` LIKE ?))',
+            ),
         );
     }
 
