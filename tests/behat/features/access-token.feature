@@ -5,6 +5,7 @@ Feature: Imbo requires an access token for read operations
 
     Background:
         Given "tests/phpunit/Fixtures/image.png" exists in Imbo
+        And Imbo uses the "access-token.php" configuration
 
     Scenario: Request user information using the correct private key
         Given I use "publickey" and "privatekey" for public and private keys
