@@ -295,4 +295,13 @@ class ImboContext extends RESTContext {
             assertStringStartsNotWith($tag, $key, 'Properties exist that should have been stripped');
         }
     }
+
+    /**
+     * @Given /^Imbo uses the "([^"]*)" configuration$/
+     */
+    public function setImboConfigHeader($config) {
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($config) {
+            $event['request']->setHeader('X-Imbo-Test-Config', $config);
+        });
+    }
 }
