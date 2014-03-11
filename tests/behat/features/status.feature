@@ -29,16 +29,19 @@ Feature: Imbo provides a status endpoint
             | DELETE | 405 Method not allowed |
 
     Scenario: The status endpoint reports errors when there are issues with the database
-        Given the database is down
+        Given Imbo uses the "status.php" configuration
+        And the database is down
         When I request "/status"
         Then I should get a response with "503 Database error"
 
     Scenario: The status endpoint reports errors when there are issues with the storage
-        Given the storage is down
+        Given Imbo uses the "status.php" configuration
+        And the storage is down
         When I request "/status"
         Then I should get a response with "503 Storage error"
 
     Scenario: The status endpoint reports errors when there are issues with both database and storage
-        Given the database and the storage is down
+        Given Imbo uses the "status.php" configuration
+        And the database and the storage is down
         When I request "/status"
         Then I should get a response with "503 Database and storage error"
