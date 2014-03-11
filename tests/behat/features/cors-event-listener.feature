@@ -5,6 +5,7 @@ Feature: Imbo provides an event listener for CORS
 
     Scenario: Request a resource using an allowed host
         Given the "Origin" request header is "http://allowedhost"
+        And Imbo uses the "cors.php" configuration
         When I request "/" using HTTP "HEAD"
         Then I should get a response with "200 Hell Yeah"
         And the "Access-Control-Allow-Origin" response header is "http://allowedhost"
@@ -16,6 +17,7 @@ Feature: Imbo provides an event listener for CORS
 
     Scenario: Request a resource using a non-allowed host
         Given the "Origin" request header is "http://imbo"
+        And Imbo uses the "cors.php" configuration
         When I request "/" using HTTP "HEAD"
         Then I should get a response with "200 Hell Yeah"
         And the "Allow" response header contains "GET"
@@ -29,6 +31,7 @@ Feature: Imbo provides an event listener for CORS
 
     Scenario: Request a resource using HTTP OPTIONS using an allowed host
         Given the "Origin" request header is "http://allowedhost"
+        And Imbo uses the "cors.php" configuration
         When I request "/" using HTTP "OPTIONS"
         Then I should get a response with "204 No Content"
         And the "Access-Control-Allow-Origin" response header is "http://allowedhost"
@@ -44,6 +47,7 @@ Feature: Imbo provides an event listener for CORS
 
     Scenario: Request a resource using HTTP OPTIONS using a non-allowed host
         Given the "Origin" request header is "http://imbo"
+        And Imbo uses the "cors.php" configuration
         When I request "/" using HTTP "OPTIONS"
         Then I should get a response with "204 No Content"
         And the "Allow" response header contains "GET"
@@ -59,6 +63,7 @@ Feature: Imbo provides an event listener for CORS
 
     Scenario: Provides CORS headers when applications fails
         Given I use "publickey" and "privatekey" for public and private keys
+        And Imbo uses the "cors.php" configuration
         And the "Origin" request header is "http://allowedhost"
         And I sign the request
         And I attach "ChangeLog.markdown" to the request body
