@@ -304,4 +304,11 @@ class ImboContext extends RESTContext {
             $event['request']->setHeader('X-Imbo-Test-Config', $config);
         });
     }
+
+    /**
+     * @Given /^the checksum of the image is "([^"]*)"$/
+     */
+    public function assertImageChecksum($checksum) {
+        assertSame($checksum, md5((string) $this->getLastResponse()->getBody()), 'Checksum of the image in the last response did not match the expected checksum');
+    }
 }
