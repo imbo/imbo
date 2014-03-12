@@ -254,20 +254,24 @@ $config = array(
     'routes' => array(),
 );
 
-if (is_dir(__DIR__ . '/../../../../config')) {
-    // Someone has installed Imbo via a custom composer.json, so the custom config is outside of
-    // the vendor dir. Loop through all available php files in the config dir
-    foreach (glob(__DIR__ . '/../../../../config/*.php') as $file) {
-        $extraConfig = require $file;
+// See if a custom config path has been defined. If so, don't require the custom one as this is
+// most likely a Behat test run
+if (!defined('IMBO_CONFIG_PATH')) {
+    if (is_dir(__DIR__ . '/../../../../config')) {
+        // Someone has installed Imbo via a custom composer.json, so the custom config is outside of
+        // the vendor dir. Loop through all available php files in the config dir
+        foreach (glob(__DIR__ . '/../../../../config/*.php') as $file) {
+            $extraConfig = require $file;
 
-        if (!is_array($extraConfig)) {
-            continue;
+            if (!is_array($extraConfig)) {
+                continue;
+            }
+
+            $config = array_replace_recursive($config, $extraConfig);
         }
-
-        $config = array_replace_recursive($config, $extraConfig);
+    } else if (file_exists(__DIR__ . '/config.php')) {
+        $config = array_replace_recursive($config, require __DIR__ . '/config.php');
     }
-} else if (file_exists(__DIR__ . '/config.php')) {
-    $config = array_replace_recursive($config, require __DIR__ . '/config.php');
 }
 
 return $config;
