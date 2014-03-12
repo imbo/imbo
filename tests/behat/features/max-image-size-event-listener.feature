@@ -7,7 +7,7 @@ Feature: Imbo provides an event listener for enforcing a max image size
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         And I attach "tests/phpunit/Fixtures/1024x256.png" to the request body
-        And Imbo uses the "max-image-size.php" configuration
+        And Imbo uses the "enforce-max-image-size.php" configuration
         When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "201 Created"
         And the "Content-Type" response header is "application/json"
@@ -20,7 +20,7 @@ Feature: Imbo provides an event listener for enforcing a max image size
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         And I attach "tests/phpunit/Fixtures/256x1024.png" to the request body
-        And Imbo uses the "max-image-size.php" configuration
+        And Imbo uses the "enforce-max-image-size.php" configuration
         When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "201 Created"
         And the "Content-Type" response header is "application/json"
@@ -33,7 +33,7 @@ Feature: Imbo provides an event listener for enforcing a max image size
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         And I attach "tests/phpunit/Fixtures/1024x1024.png" to the request body
-        And Imbo uses the "max-image-size.php" configuration
+        And Imbo uses the "enforce-max-image-size.php" configuration
         When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "201 Created"
         And the "Content-Type" response header is "application/json"
