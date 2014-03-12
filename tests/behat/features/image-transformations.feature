@@ -11,6 +11,7 @@ Feature: Imbo enables dynamic transformations of images
         Given I use "publickey" and "privatekey" for public and private keys
         And I specify "<transformation>" as transformation
         And I include an access token in the query
+        And Imbo uses the "transformation-presets.php" configuration
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.png"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "image/png"
@@ -66,6 +67,7 @@ Feature: Imbo enables dynamic transformations of images
         Given I use "publickey" and "privatekey" for public and private keys
         And I specify "<transformation>" as transformation
         And I include an access token in the query
+        And Imbo uses the "transformation-presets.php" configuration
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.png" using HTTP "HEAD"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "image/png"
