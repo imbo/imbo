@@ -121,10 +121,10 @@ Feature: Imbo provides an images endpoint
 
         Examples:
             | fields                        | sort                          | response |
-            | fields[]=size                 | sort[]=size                   | #^{"search":{.*?},"images":\[{"size":19928},{"size":64828},{"size":66020},{"size":95576}\]}$# |
-            | fields[]=size                 | sort[]=size:desc              | #^{"search":{.*?},"images":\[{"size":95576},{"size":66020},{"size":64828},{"size":19928}\]}$# |
-            | fields[]=size&fields[]=width  | sort[]=width&sort[]=size:desc | #^{"search":{.*?},"images":\[{"size":95576,"width":599},{"size":66020,"width":665},{"size":64828,"width":665},{"size":19928,"width":1000}\]}$# |
-            | fields[]=size&fields[]=width  | sort[]=width&sort[]=size      | #^{"search":{.*?},"images":\[{"size":95576,"width":599},{"size":64828,"width":665},{"size":66020,"width":665},{"size":19928,"width":1000}\]}$# |
+            | fields[]=size                 | sort[]=size                   | #^{"search":{.*?},"images":\[{"size":12505},{"size":64828},{"size":66020},{"size":95576}\]}$# |
+            | fields[]=size                 | sort[]=size:desc              | #^{"search":{.*?},"images":\[{"size":95576},{"size":66020},{"size":64828},{"size":12505}\]}$# |
+            | fields[]=size&fields[]=width  | sort[]=width&sort[]=size:desc | #^{"search":{.*?},"images":\[{"size":95576,"width":599},{"size":66020,"width":665},{"size":64828,"width":665},{"size":12505,"width":1024}\]}$# |
+            | fields[]=size&fields[]=width  | sort[]=width&sort[]=size      | #^{"search":{.*?},"images":\[{"size":95576,"width":599},{"size":64828,"width":665},{"size":66020,"width":665},{"size":12505,"width":1024}\]}$# |
 
     Scenario: The hits number has the number of hits in the query
         Given I use "publickey" and "privatekey" for public and private keys
@@ -149,4 +149,4 @@ Feature: Imbo provides an images endpoint
 
         Examples:
             | filter                                               | response |
-            | originalChecksums[]=b60df41830245ee8f278e3ddfe5238a3 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"a9f9255591e4f808718bbf80a53dc926","originalChecksum":"b60df41830245ee8f278e3ddfe5238a3","extension":"png","size":19928,"width":1000,"height":250,"mime":"image\\/png","imageIdentifier":"a9f9255591e4f808718bbf80a53dc926","publicKey":"publickey"}\]}$# |
+            | originalChecksums[]=b60df41830245ee8f278e3ddfe5238a3 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"b60df41830245ee8f278e3ddfe5238a3","originalChecksum":"b60df41830245ee8f278e3ddfe5238a3","extension":"png","size":12505,"width":1024,"height":256,"mime":"image\\/png","imageIdentifier":"b60df41830245ee8f278e3ddfe5238a3","publicKey":"publickey"}\]}$# |
