@@ -4,7 +4,8 @@ Feature: Imbo provides an event listener for turning EXIF data into metadata
     I must enable the ExifMetadata  event listener
 
     Background:
-        Given "tests/phpunit/Fixtures/exif-logo.jpg" exists in Imbo
+        Given Imbo uses the "exif-metadata-listener.php" configuration
+        And "tests/phpunit/Fixtures/exif-logo.jpg" exists in Imbo
 
     Scenario: Fetch the added metadata
         Given I use "publickey" and "privatekey" for public and private keys
