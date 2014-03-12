@@ -30,13 +30,6 @@ require 'PHP/CodeCoverage/Report/HTML.php';
  */
 class RESTContext extends BehatContext {
     /**
-     * Pid for the built-in httpd in php-5.4
-     *
-     * @var int
-     */
-    private static $pid;
-
-    /**
      * Guzzle client used to make requests against the httpd
      *
      * @var Client
@@ -126,14 +119,14 @@ class RESTContext extends BehatContext {
             throw new RuntimeException('Something is already running on ' . $params['url'] . '. Aborting tests.');
         }
 
-        self::$pid = self::startBuiltInHttpd(
+        $pid = self::startBuiltInHttpd(
             $url['host'],
             $port,
             $params['documentRoot'],
             $params['router']
         );
 
-        if (!self::$pid) {
+        if (!$pid) {
             // Could not start the httpd for some reason
             throw new RuntimeException('Could not start the web server');
         }
@@ -150,7 +143,6 @@ class RESTContext extends BehatContext {
         }
 
         if (!$connected) {
-            self::killProcess(self::$pid);
             throw new RuntimeException(
                 sprintf(
                     'Could not connect to the web server within the given timeframe (%d second(s))',
@@ -159,11 +151,16 @@ class RESTContext extends BehatContext {
             );
         }
 
+        // Register a shutdown function that will automatically shut down the httpd
+        register_shutdown_function(function() use ($pid) {
+            exec('kill ' . $pid);
+        });
+
         self::$testSessionId = uniqid('', true);
     }
 
     /**
-     * Kill the httpd process if it has been started
+     * Collect code coverage after the suite has been run
      *
      * @AfterSuite
      */
@@ -191,11 +188,6 @@ class RESTContext extends BehatContext {
 
             $report = new PHP_CodeCoverage_Report_HTML();
             $report->process($coverage, $parameters['coveragePath']);
-        }
-
-        if (self::$pid) {
-            exec('kill ' . self::$pid);
-            self::$pid = null;
         }
     }
 
@@ -271,7 +263,7 @@ class RESTContext extends BehatContext {
         $headers = $list->getLines();
 
         foreach ($headers as $header) {
-            assertFalse($this->responses[count($this->responses) - 1]->hasHeader($header), 'Header "' . $header . '" should not be present');
+            assertFalse($this->getLastResponse()->hasHeader($header), 'Header "' . $header . '" should not be present');
         }
     }
 
@@ -432,5 +424,17 @@ class RESTContext extends BehatContext {
      */
     protected function getLastResponse() {
         return $this->responses[count($this->responses) - 1];
+    }
+
+    /**
+     * Add a request header for the next request
+     *
+     * @param string $key The name of the header
+     * @param mixed $value The value of the header
+     */
+    protected function addHeaderToNextRequest($key, $value) {
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($key, $value) {
+            $event['request']->setHeader($key, $value);
+        });
     }
 }

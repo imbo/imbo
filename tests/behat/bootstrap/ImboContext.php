@@ -279,9 +279,7 @@ class ImboContext extends RESTContext {
      * @Given /^the client IP is "([^"]*)"$/
      */
     public function setClientIp($ip) {
-        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($ip) {
-            $request = $event['request']->setHeader('X-Client-Ip', $ip);
-        });
+        $this->addHeaderToNextRequest('X-Client-Ip', $ip);
     }
 
     /**
@@ -300,9 +298,7 @@ class ImboContext extends RESTContext {
      * @Given /^Imbo uses the "([^"]*)" configuration$/
      */
     public function setImboConfigHeader($config) {
-        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($config) {
-            $event['request']->setHeader('X-Imbo-Test-Config', $config);
-        });
+        $this->addHeaderToNextRequest('X-Imbo-Test-Config', $config);
     }
 
     /**
