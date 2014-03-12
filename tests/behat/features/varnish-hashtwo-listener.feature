@@ -10,6 +10,7 @@ Feature: Imbo provides an event listener for the hashtwo Varnish module
         Given I use "publickey" and "privatekey" for public and private keys
         And I specify "<transformation>" as transformation
         And I include an access token in the query
+        And Imbo uses the "varnish-hashtwo.php" configuration
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.png"
         Then I should get a response with "200 OK"
         And the "X-HashTwo" response header is "imbo;image;publickey;fc7d2d06993047a0b5056e8fac4462a2, imbo;user;publickey"
@@ -27,6 +28,7 @@ Feature: Imbo provides an event listener for the hashtwo Varnish module
         Given I use "publickey" and "privatekey" for public and private keys
         And I specify "<transformation>" as transformation
         And I include an access token in the query
+        And Imbo uses the "varnish-hashtwo.php" configuration
         When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.png"
         Then I should get a response with "200 OK"
         And the "X-Imbo-HashTwo" response header is "imbo;image;publickey;fc7d2d06993047a0b5056e8fac4462a2, imbo;user;publickey"
