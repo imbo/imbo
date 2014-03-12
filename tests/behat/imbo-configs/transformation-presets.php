@@ -8,18 +8,14 @@
  * distributed with this source code.
  */
 
+/**
+ * Add an image transformation preset
+ */
 return array(
     'transformationPresets' => array(
         'graythumb' => array(
             'thumbnail',
             'desaturate',
-        ),
-        'whitelisted' => array(
-            'crop' => array(
-                'width' => 100,
-                'height' => 50,
-                'mode' => 'center',
-            )
         ),
     ),
 );

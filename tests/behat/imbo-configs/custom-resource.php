@@ -8,9 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo;
-
-class CustomResource implements Resource\ResourceInterface {
+class CustomResource implements Imbo\Resource\ResourceInterface {
     /**
      * {@inheritdoc}
      */
@@ -30,10 +28,10 @@ class CustomResource implements Resource\ResourceInterface {
     /**
      * Send a response
      *
-     * @param EventManager\EventInterface $event The current event
+     * @param Imbo\EventManager\EventInterface $event The current event
      */
-    public function get(EventManager\EventInterface $event) {
-        $model = new Model\ArrayModel();
+    public function get(Imbo\EventManager\EventInterface $event) {
+        $model = new Imbo\Model\ArrayModel();
         $model->setData(array(
             'event' => $event->getName(),
             'id' => $event->getRequest()->getRoute()->get('id'),
@@ -45,7 +43,7 @@ class CustomResource implements Resource\ResourceInterface {
 /**
  * Attach a couple of custom resources
  */
-class CustomResource2 implements Resource\ResourceInterface {
+class CustomResource2 implements Imbo\Resource\ResourceInterface {
     /**
      * {@inheritdoc}
      */
@@ -66,10 +64,10 @@ class CustomResource2 implements Resource\ResourceInterface {
     /**
      * Send a response
      *
-     * @param EventManager\EventInterface $event The current event
+     * @param Imbo\EventManager\EventInterface $event The current event
      */
-    public function get(EventManager\EventInterface $event) {
-        $model = new Model\ArrayModel();
+    public function get(Imbo\EventManager\EventInterface $event) {
+        $model = new Imbo\Model\ArrayModel();
         $model->setData(array(
             'event' => $event->getName(),
         ));
@@ -79,10 +77,10 @@ class CustomResource2 implements Resource\ResourceInterface {
     /**
      * Send a response to PUT requests
      *
-     * @param EventManager\EventInterface $event The current event
+     * @param Imbo\EventManager\EventInterface $event The current event
      */
-    public function put(EventManager\EventInterface $event) {
-        $model = new Model\ArrayModel();
+    public function put(Imbo\EventManager\EventInterface $event) {
+        $model = new Imbo\Model\ArrayModel();
         $model->setData(array(
             'event' => $event->getName(),
         ));
@@ -90,16 +88,16 @@ class CustomResource2 implements Resource\ResourceInterface {
     }
 }
 
+/**
+ * Add a couple of resources and routes
+ */
 return array(
-    // Add a couple of routes for the two custom resources
     'routes' => array(
         'custom1' => '#^/custom/(?<id>[a-zA-Z0-9]{7})$#',
         'custom2' => '#^/custom(?:\.(?<extension>json|xml))?$#',
     ),
-
-    // Attach the two resources in two different ways
     'resources' => array(
-        'custom1' => __NAMESPACE__ . '\CustomResource',
+        'custom1' => 'CustomResource',
         'custom2' => function() {
             return new CustomResource2();
         }

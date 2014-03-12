@@ -8,9 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo;
-
-class CustomEventListener implements EventListener\ListenerInterface {
+class CustomEventListener implements Imbo\EventListener\ListenerInterface {
     /**
      * @var string
      */
@@ -44,9 +42,9 @@ class CustomEventListener implements EventListener\ListenerInterface {
     /**
      * Set a couple of headers
      *
-     * @param EventManager\EventInterface $event The current event
+     * @param Imbo\EventManager\EventInterface $event The current event
      */
-    public function getIndex(EventManager\EventInterface $event) {
+    public function getIndex(Imbo\EventManager\EventInterface $event) {
         $event->getResponse()->headers->add(array(
             'X-Imbo-Value1' => $this->value1,
             'X-Imbo-Value2' => $this->value2,
@@ -56,9 +54,9 @@ class CustomEventListener implements EventListener\ListenerInterface {
     /**
      * Set a custom header containing the current public key
      *
-     * @param EventManager\EventInterface $event The current event
+     * @param Imbo\EventManager\EventInterface $event The current event
      */
-    public function getUser(EventManager\EventInterface $event) {
+    public function getUser(Imbo\EventManager\EventInterface $event) {
         $event->getResponse()->headers->set('X-Imbo-CurrentUser', $event->getRequest()->getPublicKey());
     }
 }
@@ -72,7 +70,7 @@ return array(
             'events' => array(
                 'index.get' => 1000,
             ),
-            'callback' => function(EventManager\EventInterface $event) {
+            'callback' => function(Imbo\EventManager\EventInterface $event) {
                 $event->getResponse()->headers->set('X-Imbo-SomeHandler', microtime(true));
             }
         ),
@@ -81,13 +79,13 @@ return array(
                 'index.get',
                 'index.head',
             ),
-            'callback' => function(EventManager\EventInterface $event) {
+            'callback' => function(Imbo\EventManager\EventInterface $event) {
                 $event->getResponse()->headers->set('X-Imbo-SomeOtherHandler', microtime(true));
             },
             'priority' => 10,
         ),
         'someEventListener' => array(
-            'listener' => __NAMESPACE__ . '\CustomEventListener',
+            'listener' => 'CustomEventListener',
             'params' => array('key1' => 'value1', 'key2' => 'value2'),
             'publicKeys' => array(
                 'whitelist' => array('publickey'),

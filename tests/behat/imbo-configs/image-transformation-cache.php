@@ -8,8 +8,6 @@
  * distributed with this source code.
  */
 
-namespace Imbo;
-
 /**
  * Enable the image transformation metadata cache listener, and store the cached images to a
  * directory in /tmp

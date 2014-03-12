@@ -8,12 +8,6 @@
  * distributed with this source code.
  */
 
-namespace Imbo;
-
-use PHPUnit_Framework_MockObject_Generator,
-    PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount,
-    PHPUnit_Framework_MockObject_Stub_Return;
-
 /**
  * Set a database and storage adapter that has some behaviour determined via request headers
  */
