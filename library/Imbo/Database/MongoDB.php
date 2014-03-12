@@ -17,6 +17,7 @@ use Imbo\Model\Image,
     MongoClient,
     MongoCollection,
     MongoException,
+    MongoRegex,
     DateTime,
     DateTimeZone;
 
@@ -67,6 +68,14 @@ class MongoDB implements DatabaseInterface {
         'server'  => 'mongodb://localhost:27017',
         'options' => array('connect' => true, 'connectTimeoutMS' => 1000),
     );
+
+    /**
+     * The string that will replace wildcards (*) in a metadata query $wildcard search, only to be
+     * replaced with .* after quoting
+     *
+     * @var string
+     */
+    protected $regexWildcardReplacement = 'WILDCARDREPLACEMENT';
 
     /**
      * Class constructor
@@ -646,6 +655,7 @@ class MongoDB implements DatabaseInterface {
                 $key = 'metadata_n.' . $key;
             } else if ($key === '$wildcard') {
                 $key = '$regex';
+                $value = $this->getWildcardRegex($value);
             }
 
             if (is_array($value)) {
@@ -678,5 +688,26 @@ class MongoDB implements DatabaseInterface {
         }
 
         return $result;
+    }
+
+    /**
+     * Get a regex search
+     *
+     * @param string $query A query string with possible wildcards represented as '*'
+     * @return MongoRegex
+     */
+    private function getWildcardRegex($query) {
+        // Replace any * with something that will not be quoted
+        $query = str_replace('*', $this->regexWildcardReplacement, $query);
+        $query = '/^' . preg_quote($query, '/') . '$/';
+        $query = str_replace(array(
+            $this->regexWildcardReplacement,
+            '_'
+        ), array(
+            '.*',
+            '.'
+        ), $query);
+
+        return new MongoRegex($query);
     }
 }
