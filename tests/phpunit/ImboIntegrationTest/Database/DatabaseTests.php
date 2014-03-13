@@ -660,6 +660,27 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
                 'updatedMetadata' => array('Name' => 'michael'),
                 'newHits' => 0,
             ),
+            '$wildcard with *' => array(
+                'metadata' => array('Name' => 'Christer'),
+                'query' => '{"name": {"$wildcard": "*ter"}}',
+                'hits' => 1,
+                'updatedMetadata' => array('Name' => 'Christine'),
+                'newHits' => 0,
+            ),
+            '$wildcard with _' => array(
+                'metadata' => array('username' => 'christer'),
+                'query' => '{"username": {"$wildcard": "christe_"}}',
+                'hits' => 1,
+                'updatedMetadata' => array('username' => 'christere'),
+                'newHits' => 0,
+            ),
+            '$wildcard with * and _' => array(
+                'metadata' => array('username' => 'christer'),
+                'query' => '{"username": {"$wildcard": "*ist_*"}}',
+                'hits' => 1,
+                'updatedMetadata' => array('username' => 'christ'),
+                'newHits' => 0,
+            ),
         );
     }
 
@@ -667,10 +688,6 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @dataProvider getMetadataQueries
      */
     public function testCanSearchForImagesUsingAMetadataQuery($metadata, $metadataQuery, $hits, $updatedMetadata, $newHits) {
-        if ($this->adapter instanceof Doctrine) {
-            $this->markTestSkipped('The Doctrine does not yet support metadata searches');
-        }
-
         $model = new Images();
         $publicKey = 'publickey';
         $imageIdentifier = 'id';
