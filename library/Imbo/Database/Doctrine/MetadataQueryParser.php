@@ -41,9 +41,9 @@ class MetadataQueryParser {
         if ($field === '$or') {
             $expression = $this->createExpression($query[$field], $qb, 'orX');
         } else if ($field === '$and') {
-            $expression = $this->createExpression($query[$field], $qb, 'andX');
+            $expression = $this->createExpression($query[$field], $qb);
         } else {
-            $expression = $this->createExpression(array_chunk($query, 1, true), $qb, 'andX');
+            $expression = $this->createExpression(array_chunk($query, 1, true), $qb);
         }
 
         // Add the expression as a WHERE clause in the query builder
@@ -56,10 +56,10 @@ class MetadataQueryParser {
      * @param array $queryParts A numerical array with query parts
      * @param QueryBuilder $qb The Doctrine query builder
      * @param string $callback The callback to use when creating composite expressions, 'andX' or
-     *                         'orX'
+     *                         'orX'. Defaults to 'andX'
      * @return CompositeExpression
      */
-    private function createExpression(array $queryParts, QueryBuilder $qb, $callback) {
+    private function createExpression(array $queryParts, QueryBuilder $qb, $callback = 'andX') {
         $expr = $qb->expr();
         $composite = $expr->$callback();
 
@@ -132,6 +132,9 @@ class MetadataQueryParser {
                     $pair->add($expr->like('m.tagValue', $qb->createPositionalParameter(str_replace('*', '%', $param))));
 
                     $composite->add($pair);
+                } else if ($operation === '$exists') {
+                    $method = $param ? 'eq' : 'neq';
+                    $composite->add($expr->$method('m.tagName', $qb->createPositionalParameter($key)));
                 }
             } else {
                 // We have a regular key => value query, match the key and value columns

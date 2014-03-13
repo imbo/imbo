@@ -681,6 +681,13 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
                 'updatedMetadata' => array('username' => 'christ'),
                 'newHits' => 0,
             ),
+            'field exists' => array(
+                'metadata' => array('username' => 'christer'),
+                'query' => '{"username": {"$exists": true}}',
+                'hits' => 1,
+                'updatedMetadata' => array('usernames' => 'christer'),
+                'newHits' => 0,
+            ),
         );
     }
 
@@ -702,6 +709,8 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->adapter->getImages($publicKey, $query, $model);
         $this->assertSame($hits, $model->getHits(), 'Wrong hit count after initial metadata has been set');
 
+        // Replace metadata
+        $this->adapter->deleteMetadata($publicKey, $imageIdentifier);
         $this->adapter->updateMetadata($publicKey, $imageIdentifier, $updatedMetadata);
         $this->adapter->getImages($publicKey, $query, $model);
         $this->assertSame($newHits, $model->getHits(), 'Wrong hit count after metadata has been updated');

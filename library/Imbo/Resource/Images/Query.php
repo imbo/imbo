@@ -105,6 +105,7 @@ class Query {
         '$or'       => true,
         '$and'      => true,
         '$wildcard' => true,
+        '$exists'   => true,
     );
 
     /**

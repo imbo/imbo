@@ -71,19 +71,19 @@ class MetadataQueryParserTest extends \PHPUnit_Framework_TestCase {
             ),
             'explicit and' => array(
                 array('$and' => array(array('field' => 123))),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagValue = ?)',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagValue = ?)',
             ),
             'explicit and, multiple fields' => array(
                 array('$and' => array(array('field1' => 123), array('field2' => 456))),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) AND (m.tagValue = ?)) AND ((m.tagName = ?) AND (m.tagValue = ?))',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) AND (m.tagValue = ?)) AND ((m.tagName = ?) AND (m.tagValue = ?))',
             ),
             'or' => array(
                 array('$or' => array(array('field' => 123), array('field' => 456))),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) AND (m.tagValue = ?)) OR ((m.tagName = ?) AND (m.tagValue = ?))',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) AND (m.tagValue = ?)) OR ((m.tagName = ?) AND (m.tagValue = ?))',
             ),
             'multiple and/or' => array(
                 array('field1' => 'value', '$or' => array(array('field2' => 123), array('field2' => 456)), 'field3' => 789),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) AND (m.tagValue = ?)) AND (((m.tagName = ?) AND (m.tagValue = ?)) OR ((m.tagName = ?) AND (m.tagValue = ?))) AND ((m.tagName = ?) AND (m.tagValue = ?))',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) AND (m.tagValue = ?)) AND (((m.tagName = ?) AND (m.tagValue = ?)) OR ((m.tagName = ?) AND (m.tagValue = ?))) AND ((m.tagName = ?) AND (m.tagValue = ?))',
             ),
             'not equals' => array(
                 array('field' => array('$ne' => 'value')),
@@ -110,11 +110,29 @@ class MetadataQueryParserTest extends \PHPUnit_Framework_TestCase {
                 'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) OR (m.tagName LIKE ?)) AND ((m.tagValue = ?) OR (m.tagValue = ?) OR (m.tagValue = ?))',
             ),
             'wildcard search' => array(
-                array('field' => array('$wildcard' => '*value*')),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagValue LIKE ?)',
+                 array('field' => array('$wildcard' => '*value*')),
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagValue LIKE ?)',
+            ),
+            'field exists' => array(
+                array('field' => array('$exists' => true)),
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE m.tagName = ?',
+            ),
+            'field does not exist' => array(
+                array('field' => array('$exists' => false)),
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE m.tagName <> ?',
+            ),
+            'multiple exists' => array(
+                array('field' => array('$exists' => true), 'field2' => array('$exists' => false)),
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagName <> ?)',
+            ),
+            'exists with $or' => array(
+                array('$or' => array(array('gps' => array('$exists' => true)), array('name' => 'christer'))),
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) OR ((m.tagName = ?) AND (m.tagValue = ?))',
             ),
             'complex query with many different operators' => array(
                 array(
+                    'gps' => array('$exists' => true),
+                    'foo' => array('$exists' => false),
                     'field' => 'value',
                     'field2' => array(
                         '$in' => array(1, 2, 3),
@@ -130,7 +148,7 @@ class MetadataQueryParserTest extends \PHPUnit_Framework_TestCase {
                         )),
                     ),
                 ),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) AND (m.tagValue = ?)) AND (((m.tagName = ?) OR (m.tagName LIKE ?)) AND ((m.tagValue = ?) OR (m.tagValue = ?) OR (m.tagValue = ?))) AND ((m.tagName = ?) AND (m.tagValue <> ?)) AND (((m.tagName = ?) AND (m.tagValue = ?)) OR ((m.tagName = ?) AND (m.tagValue LIKE ?)))',
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagName <> ?) AND ((m.tagName = ?) AND (m.tagValue = ?)) AND (((m.tagName = ?) OR (m.tagName LIKE ?)) AND ((m.tagValue = ?) OR (m.tagValue = ?) OR (m.tagValue = ?))) AND ((m.tagName = ?) AND (m.tagValue <> ?)) AND (((m.tagName = ?) AND (m.tagValue = ?)) OR ((m.tagName = ?) AND (m.tagValue LIKE ?)))',
             ),
         );
     }
