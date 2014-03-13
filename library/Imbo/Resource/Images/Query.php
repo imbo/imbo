@@ -102,7 +102,6 @@ class Query {
         '$lt'       => true,
         '$lte'      => true,
         '$ne'       => true,
-        '$nin'      => true,
         '$or'       => true,
         '$and'      => true,
         '$wildcard' => true,
