@@ -66,11 +66,6 @@ class MetadataQueryParser {
         foreach ($queryParts as $query) {
             list($key, $value) = each($query);
 
-            if ($key[0] !== '$') {
-                // Quote and add the namespace to the key if we are not dealing with an operation
-                $key = '`m.' . $key . '`';
-            }
-
             if ($key === '$or') {
                 // Add an OR expression
                 $composite->add($this->createExpression($value, $qb, 'orX'));
@@ -84,25 +79,67 @@ class MetadataQueryParser {
 
                 // Handle all the supported operations
                 if ($operation === '$ne') {
-                    $composite->add($expr->neq($key, $qb->createPositionalParameter($param)));
+                    // Not equals
+                    $pair = $expr->andX();
+                    $pair->add($expr->eq('m.tagName', $qb->createPositionalParameter($key)));
+                    $pair->add($expr->neq('m.tagValue', $qb->createPositionalParameter($param)));
+
+                    $composite->add($pair);
                 } else if ($operation === '$gt') {
-                    $composite->add($expr->gt($key, $qb->createPositionalParameter($param)));
+                    $pair = $expr->andX();
+                    $pair->add($expr->eq('m.tagName', $qb->createPositionalParameter($key)));
+                    $pair->add($expr->gt('m.tagValue', $qb->createPositionalParameter($param)));
+
+                    $composite->add($pair);
                 } else if ($operation === '$gte') {
-                    $composite->add($expr->gte($key, $qb->createPositionalParameter($param)));
+                    $pair = $expr->andX();
+                    $pair->add($expr->eq('m.tagName', $qb->createPositionalParameter($key)));
+                    $pair->add($expr->gte('m.tagValue', $qb->createPositionalParameter($param)));
+
+                    $composite->add($pair);
                 } else if ($operation === '$lt') {
-                    $composite->add($expr->lt($key, $qb->createPositionalParameter($param)));
+                    $pair = $expr->andX();
+                    $pair->add($expr->eq('m.tagName', $qb->createPositionalParameter($key)));
+                    $pair->add($expr->lt('m.tagValue', $qb->createPositionalParameter($param)));
+
+                    $composite->add($pair);
                 } else if ($operation === '$lte') {
-                    $composite->add($expr->lte($key, $qb->createPositionalParameter($param)));
+                    $pair = $expr->andX();
+                    $pair->add($expr->eq('m.tagName', $qb->createPositionalParameter($key)));
+                    $pair->add($expr->lte('m.tagValue', $qb->createPositionalParameter($param)));
+
+                    $composite->add($pair);
                 } else if ($operation === '$in') {
-                    $composite->add($key . ' IN (' . $qb->createPositionalParameter($param, Connection::PARAM_STR_ARRAY) . ')');
-                } else if ($operation === '$nin') {
-                    $composite->add($key . ' NOT IN (' . $qb->createPositionalParameter($param, Connection::PARAM_STR_ARRAY) . ')');
+                    $pair = $expr->andX();
+
+                    $keys = $expr->orX();
+                    $values = $expr->orX();
+
+                    $keys->add($expr->eq('m.tagName', $qb->createPositionalParameter($key)));
+                    $keys->add($expr->like('m.tagName', $qb->createPositionalParameter($key . '::%')));
+
+                    foreach ($param as $inValue) {
+                        $values->add($expr->eq('m.tagValue', $qb->createPositionalParameter($inValue)));
+                    }
+
+                    $pair->add($keys);
+                    $pair->add($values);
+
+                    $composite->add($pair);
                 } else if ($operation === '$wildcard') {
-                    $composite->add($expr->like($key, $qb->createPositionalParameter(str_replace('*', '%', $param))));
+                    $pair = $expr->andX();
+                    $pair->add($expr->eq('m.tagName', $qb->createPositionalParameter($key)));
+                    $pair->add($expr->like('m.tagValue', $qb->createPositionalParameter(str_replace('*', '%', $param))));
+
+                    $composite->add($pair);
                 }
             } else {
-                // We have a regular key => value query
-                $composite->add($expr->eq($key, $qb->createPositionalParameter($value)));
+                // We have a regular key => value query, match the key and value columns
+                $pair = $expr->andX();
+                $pair->add($expr->eq('m.tagName', $qb->createPositionalParameter($key)));
+                $pair->add($expr->eq('m.tagValue', $qb->createPositionalParameter($value)));
+
+                $composite->add($pair);
             }
         }
 

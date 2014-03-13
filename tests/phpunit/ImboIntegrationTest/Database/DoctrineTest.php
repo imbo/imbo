@@ -70,8 +70,8 @@ class DoctrineTest extends DatabaseTests {
             CREATE TABLE IF NOT EXISTS metadata (
                 id INTEGER PRIMARY KEY NOT NULL,
                 imageId KEY INTEGER NOT NULL,
-                tagName TEXT NOT NULL,
-                tagValue TEXT NOT NULL
+                tagName TEXT NOT NULL COLLATE NOCASE,
+                tagValue TEXT NOT NULL COLLATE NOCASE
             )
         ");
         $this->pdo->query("
@@ -90,6 +90,12 @@ class DoctrineTest extends DatabaseTests {
                 extension,
                 query
             )
+        ");
+        $this->pdo->query("
+            CREATE INDEX metadatatagname ON metadata (tagName)
+        ");
+        $this->pdo->query("
+            CREATE INDEX metadatatagvalue ON metadata (tagValue)
         ");
 
         parent::setUp();

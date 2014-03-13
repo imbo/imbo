@@ -63,59 +63,55 @@ class MetadataQueryParserTest extends \PHPUnit_Framework_TestCase {
         return array(
             'regular match' => array(
                 array('field' => 'value'),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` = ?',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagValue = ?)',
             ),
             'regular match, implicit and' => array(
                 array('field' => 'value', 'field2' => 'value2'),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (`m.field` = ?) AND (`m.field2` = ?)',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) AND (m.tagValue = ?)) AND ((m.tagName = ?) AND (m.tagValue = ?))',
             ),
             'explicit and' => array(
                 array('$and' => array(array('field' => 123))),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` = ?',
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagValue = ?)',
             ),
             'explicit and, multiple fields' => array(
                 array('$and' => array(array('field1' => 123), array('field2' => 456))),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (`m.field1` = ?) AND (`m.field2` = ?)',
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) AND (m.tagValue = ?)) AND ((m.tagName = ?) AND (m.tagValue = ?))',
             ),
             'or' => array(
                 array('$or' => array(array('field' => 123), array('field' => 456))),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (`m.field` = ?) OR (`m.field` = ?)',
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) AND (m.tagValue = ?)) OR ((m.tagName = ?) AND (m.tagValue = ?))',
             ),
             'multiple and/or' => array(
                 array('field1' => 'value', '$or' => array(array('field2' => 123), array('field2' => 456)), 'field3' => 789),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (`m.field1` = ?) AND ((`m.field2` = ?) OR (`m.field2` = ?)) AND (`m.field3` = ?)',
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) AND (m.tagValue = ?)) AND (((m.tagName = ?) AND (m.tagValue = ?)) OR ((m.tagName = ?) AND (m.tagValue = ?))) AND ((m.tagName = ?) AND (m.tagValue = ?))',
             ),
             'not equals' => array(
                 array('field' => array('$ne' => 'value')),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` <> ?',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagValue <> ?)',
             ),
             'greater than' => array(
                 array('field' => array('$gt' => 123)),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` > ?',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagValue > ?)',
             ),
             'greather than or equal' => array(
                 array('field' => array('$gte' => 123)),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` >= ?',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagValue >= ?)',
             ),
             'less than' => array(
                 array('field' => array('$lt' => 123)),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` < ?',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagValue < ?)',
             ),
             'less than or equal' => array(
                 array('field' => array('$lte' => 123)),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` <= ?',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagValue <= ?)',
             ),
             'in' => array(
                 array('field' => array('$in' => array(1, 2, 3))),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` IN (?)',
-            ),
-            'not in' => array(
-                array('field' => array('$nin' => array(1, 2, 3))),
-                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` NOT IN (?)',
+                'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) OR (m.tagName LIKE ?)) AND ((m.tagValue = ?) OR (m.tagValue = ?) OR (m.tagValue = ?))',
             ),
             'wildcard search' => array(
                 array('field' => array('$wildcard' => '*value*')),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE `m.field` LIKE ?',
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (m.tagName = ?) AND (m.tagValue LIKE ?)',
             ),
             'complex query with many different operators' => array(
                 array(
@@ -134,7 +130,7 @@ class MetadataQueryParserTest extends \PHPUnit_Framework_TestCase {
                         )),
                     ),
                 ),
-               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE (`m.field` = ?) AND (`m.field2` IN (?)) AND (`m.field3` <> ?) AND ((`m.field` = ?) OR (`m.field2` NOT IN (?)) OR (`m.field3` LIKE ?))',
+               'SELECT * FROM image i LEFT JOIN metadata m ON i.id = m.imageId WHERE ((m.tagName = ?) AND (m.tagValue = ?)) AND (((m.tagName = ?) OR (m.tagName LIKE ?)) AND ((m.tagValue = ?) OR (m.tagValue = ?) OR (m.tagValue = ?))) AND ((m.tagName = ?) AND (m.tagValue <> ?)) AND (((m.tagName = ?) AND (m.tagValue = ?)) OR ((m.tagName = ?) AND (m.tagValue LIKE ?)))',
             ),
         );
     }
