@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+/**
+ * This file is part of the Imbo package
+ *
+ * (c) Christer Edvartsen <cogo@starzinger.net>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was
+ * distributed with this source code.
+ */
+
+chdir(dirname(__DIR__));
+
+// Autoloader
+require 'vendor/autoload.php';
+
+// Run the application
+$cli = new ImboCli\Application();
+$cli->run();

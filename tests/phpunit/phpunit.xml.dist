@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit colors="false" bootstrap="bootstrap.php">
   <testsuites>
-    <testsuite name="imbo">
+    <testsuite name="imbo-unit">
       <directory>ImboUnitTest</directory>
     </testsuite>
     <testsuite name="imbo-integration">
       <directory>ImboIntegrationTest</directory>
+    </testsuite>
+    <testsuite name="imbocli-unit">
+      <directory>ImboCliUnitTest</directory>
     </testsuite>
   </testsuites>
 
@@ -22,7 +25,7 @@
 
   <filter>
     <whitelist addUncoveredFilesFromWhitelist="true">
-      <directory suffix=".php">../../library/Imbo</directory>
+      <directory suffix=".php">../../library</directory>
       <exclude>
         <directory suffix="Interface.php">../../library/Imbo</directory>
         <file>../../library/Imbo/Exception.php</file>
