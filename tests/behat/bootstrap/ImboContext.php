@@ -205,15 +205,30 @@ class ImboContext extends RESTContext {
     }
 
     /**
-     * @Given /^"([^"]*)" exists in Imbo$/
+     * @Given /^"([^"]*)" exists in Imbo(?: with the following metadata:)?$/
      */
-    public function addImageToImbo($imagePath) {
-        return array(
+    public function addImageToImbo($imagePath, PyStringNode $metadata = null) {
+        $steps = array(
             new Given('I use "publickey" and "privatekey" for public and private keys'),
             new Given('I sign the request'),
             new Given('I attach "' . $imagePath . '" to the request body'),
             new Given('I request "/users/publickey/images" using HTTP "POST"'),
         );
+
+        if ($metadata) {
+            $steps[] = function() use ($metadata) {
+                $imageIdentifier = json_decode((string) $this->getLastResponse()->getBody(), true)['imageIdentifier'];
+
+                return array(
+                    new Given('I use "publickey" and "privatekey" for public and private keys'),
+                    new Given('the request body contains:', $metadata),
+                    new Given('I sign the request'),
+                    new Given('I request "/users/publickey/images/' . $imageIdentifier . '/metadata" using HTTP "PUT"'),
+                );
+            };
+        }
+
+        return $steps;
     }
 
     /**
@@ -314,5 +329,14 @@ class ImboContext extends RESTContext {
             new Given('the "Accept" request header is "image/*"'),
             new Given('I request "/s/' . $shortUrlId . '"'),
         );
+    }
+
+    /**
+     * @Given /^specify "(.*)" as metadata query$/
+     */
+    public function addMetadataQuery($query) {
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($query) {
+            $event['request']->getQuery()->add('q', $query);
+        });
     }
 }
