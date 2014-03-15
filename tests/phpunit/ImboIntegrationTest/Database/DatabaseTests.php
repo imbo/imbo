@@ -646,47 +646,104 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      */
     public function getMetadataQueries() {
         return array(
-            'key => value match' => array(
-                'metadata' => array('Name' => 'Christer'),
-                'query' => '{"name": "christer"}',
-                'hits' => 1,
-                'updatedMetadata' => array('Name' => 'Espen'),
-                'newHits' => 0,
+            'single key => value' => array(
+                '{"beer":"Dark Force"}',
+                array(
+                    'b914b28f4d5faa516e2049b9a6a2577c',
+                ),
+            ),
+            'multiple key => value' => array(
+                '{"brewery":"Nøgne Ø","beer":"Dark Horizon"}',
+                array(
+                    'f3210f1bb34bfbfa432cc3560be40761',
+                ),
+            ),
+            '$or operator' => array(
+                '{"$or":[{"brewery":"Lervig"},{"brewery":"Ægir"}]}',
+                array(
+                    '1d5b88aec8a3e1c4c57071307b2dae3a',
+                    'a501051db16e3cbf88ea50bfb0138a47',
+                ),
+            ),
+            '$gt operator' => array(
+                '{"abv":{"$gt":9}}',
+                array(
+                    'f3210f1bb34bfbfa432cc3560be40761',
+                ),
+            ),
+            '$gte operator' => array(
+                '{"abv":{"$gte":9}}',
+                array(
+                    'b914b28f4d5faa516e2049b9a6a2577c',
+                    'f3210f1bb34bfbfa432cc3560be40761',
+                ),
+            ),
+            '$lt operator' => array(
+                '{"abv":{"$lt":4.7}}',
+                array(
+                    'a501051db16e3cbf88ea50bfb0138a47',
+                ),
+            ),
+            '$lte operator' => array(
+                '{"abv":{"$lte":4.7}}',
+                array(
+                    '1d5b88aec8a3e1c4c57071307b2dae3a',
+                    'a501051db16e3cbf88ea50bfb0138a47',
+                ),
             ),
             '$in operator' => array(
-                'metadata' => array('Name' => 'Christer'),
-                'query' => '{"name": {"$in": ["christer", "espen"]}}',
-                'hits' => 1,
-                'updatedMetadata' => array('Name' => 'michael'),
-                'newHits' => 0,
+                '{"style":{"$in":["IPA","Witbier"]}}',
+                array(
+                    '1d5b88aec8a3e1c4c57071307b2dae3a',
+                    '929db9c5fc3099f7576f5655207eba47',
+                    'fc7d2d06993047a0b5056e8fac4462a2',
+                ),
             ),
-            '$wildcard with *' => array(
-                'metadata' => array('Name' => 'Christer'),
-                'query' => '{"name": {"$wildcard": "*ter"}}',
-                'hits' => 1,
-                'updatedMetadata' => array('Name' => 'Christine'),
-                'newHits' => 0,
+            '$wildcard operator' => array(
+                '{"beer":{"$wildcard":"Dark*"}}',
+                array(
+                    'b914b28f4d5faa516e2049b9a6a2577c',
+                    'f3210f1bb34bfbfa432cc3560be40761',
+                ),
             ),
-            '$wildcard with _' => array(
-                'metadata' => array('username' => 'christer'),
-                'query' => '{"username": {"$wildcard": "christe_"}}',
-                'hits' => 1,
-                'updatedMetadata' => array('username' => 'christere'),
-                'newHits' => 0,
+            '$and operator' => array(
+                '{"$and":[{"brewery":"Nøgne Ø"},{"beer":"Dark Horizon"}]}',
+                array(
+                    'f3210f1bb34bfbfa432cc3560be40761',
+                ),
             ),
-            '$wildcard with * and _' => array(
-                'metadata' => array('username' => 'christer'),
-                'query' => '{"username": {"$wildcard": "*ist_*"}}',
-                'hits' => 1,
-                'updatedMetadata' => array('username' => 'christ'),
-                'newHits' => 0,
+            '$or operator with multiple fields' => array(
+                '{"$or":[{"brewery":"Nøgne Ø"},{"beer":"Dark Force"}]}',
+                array(
+                    'b914b28f4d5faa516e2049b9a6a2577c',
+                    'f3210f1bb34bfbfa432cc3560be40761',
+                    'fc7d2d06993047a0b5056e8fac4462a2',
+                ),
             ),
-            'field exists' => array(
-                'metadata' => array('username' => 'christer'),
-                'query' => '{"username": {"$exists": true}}',
-                'hits' => 1,
-                'updatedMetadata' => array('usernames' => 'christer'),
-                'newHits' => 0,
+            '$exists operator with existing fields' => array(
+                '{"review":{"$exists":true}}',
+                array(
+                    'b914b28f4d5faa516e2049b9a6a2577c',
+                    'f3210f1bb34bfbfa432cc3560be40761',
+                    'fc7d2d06993047a0b5056e8fac4462a2',
+                ),
+            ),
+            '$exists operator with non-existing fields' => array(
+                '{"review":{"$exists":false}}',
+                array(
+                    '1d5b88aec8a3e1c4c57071307b2dae3a',
+                    '929db9c5fc3099f7576f5655207eba47',
+                    'a501051db16e3cbf88ea50bfb0138a47',
+                ),
+            ),
+            'complex query' => array(
+                '{"beer":{"$ne":"Witbier"},"$or":[{"brewery":"Nøgne Ø"},{"$and":[{"abv":{"$gte":5.5}},{"style":{"$in":["IPA","Imperial Stout"]}},{"brewery":{"$in":["HaandBryggeriet","Ægir","Lervig","Kinn"]}}]}]}',
+                array(
+                    '929db9c5fc3099f7576f5655207eba47',
+                    'b914b28f4d5faa516e2049b9a6a2577c',
+                    'f3210f1bb34bfbfa432cc3560be40761',
+                    'fc7d2d06993047a0b5056e8fac4462a2',
+                ),
             ),
         );
     }
@@ -694,29 +751,61 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     /**
      * @dataProvider getMetadataQueries
      */
-    public function testCanSearchForImagesUsingAMetadataQuery($metadata, $metadataQuery, $hits, $updatedMetadata, $newHits) {
-        $model = new Images();
-        $publicKey = 'publickey';
-        $imageIdentifier = 'id';
+    public function testCanSearchForImagesUsingAMetadataQuery($metadataQuery, array $images) {
+        $publicKey = 'key';
+        $files = array(
+            // fc7d2d06993047a0b5056e8fac4462a2
+            FIXTURES_DIR . '/image1.png' => '{"brewery":"Nøgne Ø","beer":"India Pale Ale","style":"IPA","abv":7.5,"review":"url"}',
 
+            // f3210f1bb34bfbfa432cc3560be40761
+            FIXTURES_DIR . '/image.jpg' => '{"brewery":"Nøgne Ø","beer":"Dark Horizon","style":"Imperial Stout","abv":16,"review":"url"}',
+
+            // b914b28f4d5faa516e2049b9a6a2577c
+            FIXTURES_DIR . '/image2.png' => '{"brewery":"HaandBryggeriet","beer":"Dark Force","style":"Imperial Stout","abv":9,"review":"url"}',
+
+            // 1d5b88aec8a3e1c4c57071307b2dae3a
+            FIXTURES_DIR . '/image3.png' => '{"brewery":"Ægir","beer":"Witbier","style":"Witbier","abv":4.7}',
+
+            // a501051db16e3cbf88ea50bfb0138a47
+            FIXTURES_DIR . '/image4.png' => '{"brewery":"Lervig","beer":"Johnny Low","style":"Session IPA","abv":2.5}',
+
+            // 929db9c5fc3099f7576f5655207eba47
+            FIXTURES_DIR . '/image.png' => '{"brewery":"Kinn","beer":"Vestkyst","style":"IPA","abv":7}',
+        );
+
+        foreach ($files as $path => $metadata) {
+            $imageIdentifier = md5_file($path);
+            $size = getimagesize($path);
+            $image = (new Image())
+                ->setBlob(file_get_contents($path))
+                ->setWidth($size[0])
+                ->setHeight($size[1])
+                ->setMimeType($size['mime'])
+                ->setExtension(substr($path, strrpos($path, '.') + 1))
+                ->setOriginalChecksum($imageIdentifier);
+
+            $this->adapter->insertImage($publicKey, $imageIdentifier, $image);
+            $this->adapter->updateMetadata($publicKey, $imageIdentifier, json_decode($metadata, true));
+        }
+
+        // Create a model that will be populated with the hit number
+        $model = new Images();
+
+        // Create a query object
         $query = new Query();
         $query->metadataQuery(json_decode($metadataQuery, true));
+        $query->sort(array('imageIdentifier'));
 
-        // Add the image
-        $this->adapter->insertImage($publicKey, $imageIdentifier, $this->getImage());
+        $hits = $this->adapter->getImages($publicKey, $query, $model);
 
-        $this->adapter->updateMetadata($publicKey, $imageIdentifier, $metadata);
-        $this->adapter->getImages($publicKey, $query, $model);
-        $this->assertSame($hits, $model->getHits(), 'Wrong hit count after initial metadata has been set');
+        $this->assertSame(count($images), $model->getHits(), 'Wrong hitcount in the model');
 
-        // Replace metadata
-        $this->adapter->deleteMetadata($publicKey, $imageIdentifier);
-        $this->adapter->updateMetadata($publicKey, $imageIdentifier, $updatedMetadata);
-        $this->adapter->getImages($publicKey, $query, $model);
-        $this->assertSame($newHits, $model->getHits(), 'Wrong hit count after metadata has been updated');
+        $imageIdentifiers = array();
 
-        $this->adapter->deleteMetadata($publicKey, $imageIdentifier);
-        $this->adapter->getImages($publicKey, $query, $model);
-        $this->assertSame(0, $model->getHits(), 'Should not get any search hits after metadata has been deleted');
+        foreach ($hits as $hit) {
+            $imageIdentifiers[] = $hit['imageIdentifier'];
+        }
+
+        $this->assertSame($images, $imageIdentifiers, 'Wrong search response');
     }
 }
