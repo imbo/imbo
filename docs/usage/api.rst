@@ -10,7 +10,7 @@ In this section you will find information on the different resources Imbo's REST
 
 .. contents:: Available resources
     :local:
-    :depth: 1
+    :depth: 3
 
 .. _index-resource:
 
@@ -317,6 +317,9 @@ The images resource can also be used to gather information on which images a use
 ``originalChecksums[]``
     An array of the original image checksums to filter the results by.
 
+``q``
+    Perform a metadata query.
+
 .. code-block:: bash
 
     curl "http://imbo/users/<user>/images.json?limit=1&metadata=1"
@@ -374,7 +377,211 @@ The ``images`` list contains image objects. Each object has the following fields
 
 * 200 OK
 * 304 Not modified
+* 400 Invalid metadata query
 * 404 Public key not found
+
+Metadata query
+``````````````
+
+When searching for images you might want to do this by querying the metadata attached to the images. Imbo's metadata DSL is quite similar to MongoDB's, but it only supports a subset of the features supported by MongoDB (and other DBMSs). The query is a JSON-encoded object including ``key => value`` matches and/or a combination of the supported operators, sent to Imbo in the ``q`` query parameter. This section lists all operators and includes a number of examples showing you how to find images using the metadata query.
+
+.. note:: The results of the different queries **might** end up with slightly different results depending on the backend you use the for metadata.
+.. warning:: When a malformed metadata query is specified Imbo will respond with ``400 Invalid metadata query``.
+
+.. contents:: Supported operators and query types
+    :local:
+    :depth: 1
+
+Key/value match
+_______________
+
+The simplest form of a metadata query is a simple ``key => value`` match, where the expressions are AND-ed together if there is more than one key/value match in the query.
+
+.. code-block:: json
+
+    {"key":"value","otherkey":"othervalue"}
+
+The above search would result in images that have the metadata key ``key`` set to ``value`` **and** ``otherkey`` set to ``othervalue``.
+
+
+Greater than - ``$gt``
+______________________
+
+This operator can be used to check for values greater than the value specified.
+
+.. code-block:: json
+
+    {"age":{"$gt":35}}
+
+Greater than or equal - ``$gte``
+________________________________
+
+Check for values greater than or equal to the value specified.
+
+.. code-block:: json
+
+    {"age":{"$gte":35}}
+
+Less than - ``$lt``
+___________________
+
+This operator can be used to check for values less than the value specified.
+
+.. code-block:: json
+
+    {"age":{"$lt":35}}
+
+Less than or equal - ``$lte``
+_____________________________
+
+Check for values less than or equal to the value specified.
+
+.. code-block:: json
+
+    {"age":{"$lte":35}}
+
+Not equal - ``$ne``
+___________________
+
+Matches values that are not equal to the value specified.
+
+.. code-block:: json
+
+    {"name":{"$ne":"christer"}}
+
+In - ``$in``
+____________
+
+Look for values that appear in the specified set.
+
+.. code-block:: json
+
+    {"styles":{"$in":["IPA","Imperial Stout","Lambic"]}}
+
+Wild card - ``$wildcard``
+_________________________
+
+Perform a wild card search. The ``*`` is used to match zero or more characters, and ``_`` is used to match a single character.
+
+.. code-block:: json
+
+    {"style":{"$wildcard":"_PA"}}
+
+would match "IPA" and "APA", but not "DIPA" nor "PA".
+
+.. code-block:: json
+
+    {"style":{"$wildcard":"*_PA"}}
+
+would match "IPA", "APA" and "DIPA" but not "PA".
+
+.. code-block:: json
+
+    {"style":{"$wildcard":"*PA"}}
+
+would match "IPA", "APA", "DIPA" and "PA".
+
+Wild cards can appear multiple times in the expression.
+
+
+Exists - ``$exists``
+____________________
+
+Returns images where a specific metadata **key** exists.
+
+.. code-block:: json
+
+    {"author":{"$exists":true}}
+
+would return images that has a metadata key called ``author``.
+
+.. code-block:: json
+
+    {"author":{"$exists":false}}
+
+would return images that does not have a metadata key called ``author``.
+
+And - ``$and``
+______________
+
+This operator can be used to AND expressions together. This is used per default when specifying several clauses in the query.
+
+.. code-block:: json
+
+   {"key":"value","otherkey":"othervalue"}
+
+is the same as:
+
+.. code-block:: json
+
+   {"$and":[{"key":"value"},{"otherkey":"othervalue"}]}
+
+Or - ``$or``
+____________
+
+This operator can be used to OR expressions together.
+
+.. code-block:: json
+
+   {"$or":[{"key":"value"},{"otherkey":"othervalue"}]}
+
+would fetch images that have a key named ``age`` with the value ``value`` and/or a key named ``otherkey`` which has the value of ``othervalue``.
+
+Using several operators in one query
+____________________________________
+
+All the above operators can be combined into one query. Consider a collection of images of beers which have all been tagged with the name of the brewery, the name of the beer, the style of the beer and the ABV. If we wanted to find all images of beers within a set of styles, above a specific ABV, from two different breweries, and all images of beers from Nøgne Ø, regardless of style and ABV, but not beers called Wit, regardless of brewery, style or ABV, the query could look like this (formatted for easier reading):
+
+.. code-block:: json
+
+    {
+        "name":
+        {
+            "$ne": "Wit"
+        },
+        "$or":
+        [
+            {
+                "brewery": "Nøgne Ø"
+            },
+
+            {
+                "$and":
+                [
+                    {
+                        "abv":
+                        {
+                            "$gte": 5.5
+                        }
+                    },
+
+                    {
+                        "style":
+                        {
+                            "$in":
+                            [
+                                "IPA",
+                                "Imperial Stout"
+                            ]
+                        }
+                    },
+
+                    {
+                        "brewery":
+                        {
+                            "$in":
+                            [
+                                "HaandBryggeriet",
+                                "Ægir"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+
+Keep in mind that large complex queries against large image collections can take a while to finish, and might cause performance issues on the Imbo server(s).
 
 .. _image-resource:
 
@@ -802,7 +1009,7 @@ The value of the ``ETag`` header is simply the MD5 sum of the content in the res
 Last-Modified
 +++++++++++++
 
-Imbo also includes a ``Last-Modified`` response header for resources that has a know last modification date, and these resources are:
+Imbo also includes a ``Last-Modified`` response header for resources that have a known last modification date, and these resources are:
 
 * :ref:`user-resource`: The date of when the user last added or deleted an image, or manipulated the metadata of an image. If the user don't have any images yet, the value of this date will be the current timestamp.
 * :ref:`images-resource`: The date of when the user last modified an image in the collection (either the image itself, or metadata attached to the image).
