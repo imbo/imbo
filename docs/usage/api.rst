@@ -380,6 +380,8 @@ The ``images`` list contains image objects. Each object has the following fields
 * 400 Invalid metadata query
 * 404 Public key not found
 
+.. _metadata-query:
+
 Metadata query
 ``````````````
 
