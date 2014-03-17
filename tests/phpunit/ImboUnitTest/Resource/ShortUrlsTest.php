@@ -125,6 +125,18 @@ class ShortUrlsTest extends ResourceTests {
         $this->getNewResource()->createShortUrl($this->event);
     }
 
+    /**
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Extension provided is not a recognized format
+     * @expectedExceptionCode 400
+     */
+    public function testWillThrowAnExceptionWhenExtensionIsNotRecognized() {
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"publicKey": "key", "imageIdentifier": "id", "extension": "foo"}'));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
+        $this->getNewResource()->createShortUrl($this->event);
+    }
+
     public function createShortUrlParams() {
         return array(
             'no extension, no query' => array(
