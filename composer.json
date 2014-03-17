@@ -25,7 +25,7 @@
   },
   "require-dev": {
     "mikey179/vfsStream": "~1.0",
-    "phpunit/phpunit": "~3.0",
+    "phpunit/phpunit": "~4.0",
     "behat/behat": "~2.0",
     "guzzle/guzzle": "~3.0",
     "doctrine/dbal": "~2.0",

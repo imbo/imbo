@@ -13,7 +13,7 @@
  */
 return array(
     'database' => function() {
-        $adapter = PHPUnit_Framework_MockObject_Generator::getMock(
+        $adapter = (new PHPUnit_Framework_MockObject_Generator())->getMock(
             'Imbo\Database\MongoDB',
             array('getStatus'),
             array(array('databaseName' => 'imbo_testing'))
@@ -27,7 +27,7 @@ return array(
     },
 
     'storage' => function() {
-        $adapter = PHPUnit_Framework_MockObject_Generator::getMock(
+        $adapter = (new PHPUnit_Framework_MockObject_Generator())->getMock(
             'Imbo\Storage\GridFS',
             array('getStatus'),
             array(array('databaseName' => 'imbo_testing'))
