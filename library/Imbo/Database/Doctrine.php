@@ -555,16 +555,23 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteShortUrls($publicKey, $imageIdentifier) {
+    public function deleteShortUrls($publicKey, $imageIdentifier, $shortUrlId = null) {
         $qb = $this->getConnection()->createQueryBuilder();
 
-        return (boolean) $qb->delete($this->tableNames['shorturl'])
-                            ->where('publicKey = :publicKey')
-                            ->andWhere('imageIdentifier = :imageIdentifier')
-                            ->setParameters(array(
-                                ':publicKey' => $publicKey,
-                                ':imageIdentifier' => $imageIdentifier,
-                            ))->execute();
+        $qb->delete($this->tableNames['shorturl'])
+           ->where('publicKey = :publicKey')
+           ->andWhere('imageIdentifier = :imageIdentifier')
+           ->setParameters(array(
+               ':publicKey' => $publicKey,
+               ':imageIdentifier' => $imageIdentifier,
+           ));
+
+        if ($shortUrlId) {
+            $qb->andWhere('shortUrlId = :shortUrlId')
+               ->setParameter(':shortUrlId', $shortUrlId);
+        }
+
+        return (boolean) $qb->execute();
     }
 
     /**

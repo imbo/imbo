@@ -58,13 +58,6 @@ Feature: Imbo adds ETag's to some responses
         Then I should get a response with "200 OK"
         And the "ETag" response header matches ""[a-z0-9]{32}""
 
-    Scenario: Short URL resource includes an ETag
-        Given I fetch the short URL of "/users/publickey/images/929db9c5fc3099f7576f5655207eba47.gif?t[]=thumbnail&t[]=border"
-        And the "ETag" response header is ""c33ca397c520edd1827f2c8f59d95190""
-        When I request the image using the short URL
-        Then I should get a response with "200 OK"
-        And the "ETag" response header is ""c33ca397c520edd1827f2c8f59d95190""
-
     Scenario: Responses that is not 200 OK does not get ETags
         Given I use "publickey" and "privatekey" for public and private keys
         When I request "/users/publickey"

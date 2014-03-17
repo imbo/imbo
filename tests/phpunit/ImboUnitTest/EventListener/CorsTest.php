@@ -274,27 +274,42 @@ class CorsTest extends ListenerTests {
                     'index.get' => array('invoke' => 100),
                     'index.head' => array('invoke' => 100),
                     'index.options' => array('options' => 20),
+
                     'image.get' => array('invoke' => 100),
                     'image.head' => array('invoke' => 100),
                     'image.options' => array('options' => 20),
+
                     'images.get' => array('invoke' => 100),
                     'images.head' => array('invoke' => 100),
                     'images.options' => array('options' => 20),
+
                     'metadata.get' => array('invoke' => 100),
                     'metadata.head' => array('invoke' => 100),
                     'metadata.options' => array('options' => 20),
+
                     'status.get' => array('invoke' => 100),
                     'status.head' => array('invoke' => 100),
                     'status.options' => array('options' => 20),
+
                     'stats.get' => array('invoke' => 100),
                     'stats.head' => array('invoke' => 100),
                     'stats.options' => array('options' => 20),
+
                     'user.get' => array('invoke' => 100),
                     'user.head' => array('invoke' => 100),
                     'user.options' => array('options' => 20),
+
+                    'globalshorturl.get' => array('invoke' => 100),
+                    'globalshorturl.head' => array('invoke' => 100),
+                    'globalshorturl.options' => array('options' => 20),
+
                     'shorturl.get' => array('invoke' => 100),
                     'shorturl.head' => array('invoke' => 100),
                     'shorturl.options' => array('options' => 20),
+
+                    'shorturls.get' => array('invoke' => 100),
+                    'shorturls.head' => array('invoke' => 100),
+                    'shorturls.options' => array('options' => 20),
                 ),
             ),
             'some endpoints' => array(

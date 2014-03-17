@@ -41,14 +41,16 @@ class Router {
      * @var array
      */
     private $routes = array(
-        'image'    => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(\.(?<extension>gif|jpg|png))?$#',
-        'shorturl' => '#^/s/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
-        'status'   => '#^/status(/|(\.(?<extension>json|xml)))?$#',
-        'images'   => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images(/|(\.(?<extension>json|xml)))?$#',
-        'metadata' => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(?:data)?(/|\.(?<extension>json|xml))?$#',
-        'user'     => '#^/users/(?<publicKey>[a-z0-9_-]{3,})(/|\.(?<extension>json|xml))?$#',
-        'stats'    => '#^/stats(/|(\.(?<extension>json|xml)))?$#',
-        'index'    => '#^/?$#',
+        'image'          => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(\.(?<extension>gif|jpg|png))?$#',
+        'globalshorturl' => '#^/s/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
+        'status'         => '#^/status(/|(\.(?<extension>json|xml)))?$#',
+        'images'         => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images(/|(\.(?<extension>json|xml)))?$#',
+        'metadata'       => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(?:data)?(/|\.(?<extension>json|xml))?$#',
+        'user'           => '#^/users/(?<publicKey>[a-z0-9_-]{3,})(/|\.(?<extension>json|xml))?$#',
+        'stats'          => '#^/stats(/|(\.(?<extension>json|xml)))?$#',
+        'index'          => '#^/?$#',
+        'shorturls'      => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/shorturls(/|\.(?<extension>json|xml))?$#',
+        'shorturl'       => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/shorturls/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
     );
 
     /**

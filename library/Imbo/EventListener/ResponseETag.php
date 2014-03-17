@@ -67,7 +67,7 @@ class ResponseETag implements ListenerInterface {
             'images' => true,
             'image' => true,
             'metadata' => true,
-            'shorturl' => true,
+            'globalshorturl' => true,
         );
         $currentRoute = (string) $request->getRoute();
 

@@ -12,7 +12,11 @@ From time to time Imbo will introduce new features or fix bugs that might requir
 Imbo-1.2.0
 ----------
 
-Below are changes you need to perform when upgrading to Imbo-1.2.0.
+Below are the changes you need to be aware of when upgrading to Imbo-1.2.0.
+
+.. contents::
+    :local:
+    :depth: 2
 
 Response to metadata write operations
 +++++++++++++++++++++++++++++++++++++
@@ -50,3 +54,8 @@ If you use the MongoDB adapter all you need to do is to update all entries in th
             );
         }
     )
+
+Short image URLs
+++++++++++++++++
+
+In versions prior to Imbo-1.2.0 short image URLs were created automatically whenever a user agent requested the image resource (with or without transformations), and sent in the response as the ``X-Imbo-ShortUrl`` header. This no longer done automatically. Refer to the :ref:`shorturls-resource` section for more information on how to generate short URLs from this version on.

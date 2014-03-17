@@ -31,16 +31,18 @@ class Cors implements ListenerInterface {
     private $params = array(
         'allowedOrigins' => array(),
         'allowedMethods' => array(
-            'index'    => array('GET', 'HEAD'),
-            'image'    => array('GET', 'HEAD'),
-            'images'   => array('GET', 'HEAD'),
-            'metadata' => array('GET', 'HEAD'),
-            'status'   => array('GET', 'HEAD'),
-            'stats'    => array('GET', 'HEAD'),
-            'user'     => array('GET', 'HEAD'),
-            'shorturl' => array('GET', 'HEAD'),
+            'index'          => array('GET', 'HEAD'),
+            'image'          => array('GET', 'HEAD'),
+            'images'         => array('GET', 'HEAD'),
+            'metadata'       => array('GET', 'HEAD'),
+            'status'         => array('GET', 'HEAD'),
+            'stats'          => array('GET', 'HEAD'),
+            'user'           => array('GET', 'HEAD'),
+            'globalshorturl' => array('GET', 'HEAD'),
+            'shorturl'       => array('GET', 'HEAD'),
+            'shorturls'      => array('GET', 'HEAD'),
         ),
-        'maxAge'         => 3600,
+        'maxAge' => 3600,
     );
 
     /**
