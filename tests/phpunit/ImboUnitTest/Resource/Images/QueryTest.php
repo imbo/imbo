@@ -180,4 +180,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
     public function testSortThrowsExceptionOnInvalidSortValues() {
         $this->query->sort(array('field:foo'));
     }
+
+    /**
+     * @expectedException Imbo\Exception\RuntimeException
+     * @expectedExceptionMessage Badly formatted sort
+     * @expectedExceptionCode 400
+     */
+    public function testSortThrowsExceptionWhenTheStortStringIsBadlyFormatted() {
+        $this->query->sort(array('field:asc', ''));
+    }
 }
