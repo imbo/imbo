@@ -182,6 +182,21 @@ class Request extends SymfonyRequest {
     }
 
     /**
+     * Get the URI with no changes to the incoming formatting ("as is")
+     *
+     * @return string
+     */
+    public function getUriAsIs() {
+        $query = $this->server->get('QUERY_STRING');
+
+        if (!empty($query)) {
+            $query = '?' . $query;
+        }
+
+        return $this->getSchemeAndHttpHost() . $this->getBaseUrl() . $this->getPathInfo() . $query;
+    }
+
+    /**
      * Get the URI without the Symfony normalization applied to the query string, un-encoded
      *
      * @return string

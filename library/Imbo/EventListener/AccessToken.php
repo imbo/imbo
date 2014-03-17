@@ -115,16 +115,23 @@ class AccessToken implements ListenerInterface {
         }
 
         $token = $query->get('accessToken');
-        $uri = $request->getRawUri();
 
-        // Remove the access token from the query string as it's not used to generate the HMAC
-        $uri = rtrim(preg_replace('/(?<=(\?|&))accessToken=[^&]+&?/', '', $uri), '&?');
+        // First the the raw un-encoded URI, then the URI as is
+        $uris = array($request->getRawUri(), $request->getUriAsIs());
+        $privateKey = $request->getPrivateKey();
 
-        $correctToken = hash_hmac('sha256', $uri, $request->getPrivateKey());
+        foreach ($uris as $uri) {
+            // Remove the access token from the query string as it's not used to generate the HMAC
+            $uri = rtrim(preg_replace('/(?<=(\?|&))accessToken=[^&]+&?/', '', $uri), '&?');
 
-        if ($correctToken !== $token) {
-            throw new RuntimeException('Incorrect access token', 400);
+            $correctToken = hash_hmac('sha256', $uri, $privateKey);
+
+            if ($correctToken === $token) {
+                return;
+            }
         }
+
+        throw new RuntimeException('Incorrect access token', 400);
     }
 
     /**

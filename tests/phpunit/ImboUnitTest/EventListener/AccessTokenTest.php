@@ -217,6 +217,13 @@ class AccessTokenTest extends ListenerTests {
                 'other private key',
                 false
             ),
+            // Test that checking URL "as is" works properly. This is for backwards compatibility.
+            array(
+                'http://imbo/users/christer?t[]=thumbnail%3Awidth%3D40%2Cheight%3D40%2Cfit%3Doutbound',
+                'f0166cb4f7c8eabbe82c5d753f681ed53bcfa10391d4966afcfff5806cc2bff4',
+                'some random private key',
+                true
+            ),
         );
     }
 
@@ -231,7 +238,8 @@ class AccessTokenTest extends ListenerTests {
 
         $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(true));
         $this->query->expects($this->once())->method('get')->with('accessToken')->will($this->returnValue($token));
-        $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue($url));
+        $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue(urldecode($url)));
+        $this->request->expects($this->once())->method('getUriAsIs')->will($this->returnValue($url));
         $this->request->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
 
         $this->listener->checkAccessToken($this->event);
