@@ -257,7 +257,7 @@ class ImageVariations implements ListenerInterface {
         $widths = array();
 
         // Calculate the aspect ratio in case some transformations only specify height
-        $ratio = (int) ($width / $height);
+        $ratio = $width / $height;
 
         foreach ($transformations as $i => $transformation) {
             $name = $transformation['name'];
