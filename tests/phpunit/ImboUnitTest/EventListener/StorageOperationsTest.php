@@ -11,7 +11,8 @@
 namespace ImboUnitTest\EventListener;
 
 use Imbo\EventListener\StorageOperations,
-    Imbo\Exception\StorageException;
+    Imbo\Exception\StorageException,
+    DateTime;
 
 /**
  * @covers Imbo\EventListener\StorageOperations
@@ -78,7 +79,7 @@ class StorageOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\StorageOperations::loadImage
      */
     public function testCanLoadImage() {
-        $date = $this->getMock('DateTime');
+        $date = new DateTime();
         $this->storage->expects($this->once())->method('getImage')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue('image data'));
         $this->storage->expects($this->once())->method('getLastModified')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($date));
         $this->response->expects($this->once())->method('setLastModified')->with($date)->will($this->returnSelf());

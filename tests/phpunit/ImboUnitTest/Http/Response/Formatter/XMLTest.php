@@ -10,7 +10,8 @@
 
 namespace ImboUnitTest\Http\Response\Formatter;
 
-use Imbo\Http\Response\Formatter\XML;
+use Imbo\Http\Response\Formatter\XML,
+    DateTime;
 
 /**
  * @covers Imbo\Http\Response\Formatter\XML
@@ -57,7 +58,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanFormatAnErrorModel() {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
-        $date = $this->getMock('DateTime');
+        $date = new DateTime($formattedDate);
 
         $model = $this->getMock('Imbo\Model\Error');
         $model->expects($this->once())->method('getHttpCode')->will($this->returnValue(404));
@@ -81,7 +82,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\XML::formatError
      */
     public function testCanFormatAnErrorModelWhenNoImageIdentifierExists() {
-        $date = $this->getMock('DateTime');
+        $date = new DateTime();
 
         $model = $this->getMock('Imbo\Model\Error');
         $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
@@ -98,7 +99,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanFormatAStatusModel() {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
-        $date = $this->getMock('DateTime');
+        $date = new DateTime($formattedDate);
 
         $model = $this->getMock('Imbo\Model\Status');
         $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
@@ -120,7 +121,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanFormatAUserModel() {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
-        $date = $this->getMock('DateTime');
+        $date = new DateTime($formattedDate);
 
         $model = $this->getMock('Imbo\Model\User');
         $model->expects($this->once())->method('getLastModified')->will($this->returnValue($date));
@@ -143,8 +144,10 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
     public function testCanFormatAnImagesModel() {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
 
-        $addedDate = $this->getMock('DateTime');
-        $updatedDate = $this->getMock('DateTime');
+        $date = new DateTime();
+
+        $addedDate = $date;
+        $updatedDate = $date;
         $publicKey = 'christer';
         $imageIdentifier = 'identifier';
         $checksum = 'checksum';
@@ -256,8 +259,8 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
     public function testCanFormatAnImagesModelWithNoMetadataSet() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMetadata')->will($this->returnValue(null));
-        $image->expects($this->once())->method('getAddedDate')->will($this->returnValue($this->getMock('DateTime')));
-        $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue($this->getMock('DateTime')));
+        $image->expects($this->once())->method('getAddedDate')->will($this->returnValue(new DateTime()));
+        $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue(new DateTime()));
 
         $images = array($image);
         $model = $this->getMock('Imbo\Model\Images');
@@ -275,8 +278,8 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
     public function testCanFormatAnImagesModelWithNoMetadata() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMetadata')->will($this->returnValue(array()));
-        $image->expects($this->once())->method('getAddedDate')->will($this->returnValue($this->getMock('DateTime')));
-        $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue($this->getMock('DateTime')));
+        $image->expects($this->once())->method('getAddedDate')->will($this->returnValue(new DateTime()));
+        $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue(new DateTime()));
 
         $images = array($image);
         $model = $this->getMock('Imbo\Model\Images');

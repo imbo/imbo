@@ -12,7 +12,8 @@ namespace ImboUnitTest\EventListener;
 
 use Imbo\EventListener\DatabaseOperations,
     Imbo\EventManager\Event,
-    Imbo\Http\Response\Response;
+    Imbo\Http\Response\Response,
+    DateTime;
 
 /**
  * @covers Imbo\EventListener\DatabaseOperations
@@ -126,7 +127,7 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::loadMetadata
      */
     public function testCanLoadMetadata() {
-        $date = $this->getMock('DateTime');
+        $date = new DateTime();
         $this->database->expects($this->once())->method('getMetadata')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue(array('key' => 'value')));
         $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($date));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Metadata'))->will($this->returnSelf());
@@ -141,8 +142,8 @@ class DatabaseOperationsTest extends ListenerTests {
     public function testCanLoadImages() {
         $images = array(
             array(
-                'added' => $this->getMock('DateTime'),
-                'updated' => $this->getMock('DateTime'),
+                'added' => new DateTime(),
+                'updated' => new DateTime(),
                 'size' => 123,
                 'width' => 50,
                 'height' => 50,
@@ -154,8 +155,8 @@ class DatabaseOperationsTest extends ListenerTests {
                 'metadata' => array(),
             ),
             array(
-                'added' => $this->getMock('DateTime'),
-                'updated' => $this->getMock('DateTime'),
+                'added' => new DateTime(),
+                'updated' => new DateTime(),
                 'size' => 456,
                 'width' => 60,
                 'height' => 60,
@@ -167,8 +168,8 @@ class DatabaseOperationsTest extends ListenerTests {
                 'metadata' => array(),
             ),
             array(
-                'added' => $this->getMock('DateTime'),
-                'updated' => $this->getMock('DateTime'),
+                'added' => new DateTime(),
+                'updated' => new DateTime(),
                 'size' => 789,
                 'width' => 70,
                 'height' => 70,
@@ -181,7 +182,7 @@ class DatabaseOperationsTest extends ListenerTests {
             ),
         );
 
-        $date = $this->getMock('DateTime');
+        $date = new DateTime();
 
         $query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
         $query->expects($this->at(0))->method('has')->with('page')->will($this->returnValue(true));
@@ -221,7 +222,7 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::loadUser
      */
     public function testCanLoadUser() {
-        $date = $this->getMock('DateTime');
+        $date = new DateTime();
         $this->database->expects($this->once())->method('getNumImages')->with($this->publicKey)->will($this->returnValue(123));
         $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey)->will($this->returnValue($date));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\User'))->will($this->returnSelf());

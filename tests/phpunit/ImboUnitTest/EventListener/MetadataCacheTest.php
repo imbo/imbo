@@ -10,7 +10,8 @@
 
 namespace ImboUnitTest\EventListener;
 
-use Imbo\EventListener\MetadataCache;
+use Imbo\EventListener\MetadataCache,
+    DateTime;
 
 /**
  * @covers Imbo\EventListener\MetadataCache
@@ -71,7 +72,7 @@ class MetadataCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\MetadataCache::loadFromCache
      */
     public function testUpdatesResponseOnCacheHit() {
-        $date = $this->getMock('DateTime');
+        $date = new DateTime();
 
         $this->cache->expects($this->once())->method('get')->with($this->isType('string'))->will($this->returnValue(array(
             'lastModified' => $date,
@@ -105,7 +106,7 @@ class MetadataCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\MetadataCache::storeInCache
      */
     public function testStoresDataInCacheWhenResponseCodeIs200() {
-        $lastModified = $this->getMock('DateTime');
+        $lastModified = new DateTime();
         $data = array('some' => 'value');
 
         $this->cache->expects($this->once())->method('set')->with($this->isType('string'), array(
@@ -127,7 +128,7 @@ class MetadataCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\MetadataCache::storeInCache
      */
     public function testStoresDataInCacheWhenResponseCodeIs200AndHasNoModel() {
-        $lastModified = $this->getMock('DateTime');
+        $lastModified = new DateTime();
 
         $this->cache->expects($this->once())->method('set')->with($this->isType('string'), array(
             'lastModified' => $lastModified,
