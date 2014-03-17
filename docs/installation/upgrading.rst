@@ -12,11 +12,11 @@ From time to time Imbo will introduce new features or fix bugs that might requir
 Imbo-1.2.0
 ----------
 
-Below are changes you need to perform when upgrading to Imbo-1.2.0.
+Below are the changes you need to be aware of when upgrading to Imbo-1.2.0.
 
 .. contents::
     :local:
-    :depth: 1
+    :depth: 2
 
 Response to metadata write operations
 +++++++++++++++++++++++++++++++++++++
