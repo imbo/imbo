@@ -794,6 +794,9 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         // Create a query object
         $query = new Query();
         $query->metadataQuery(json_decode($metadataQuery, true));
+
+        // Sort by image identifier so we can more easily match the expected values from the data
+        // provider
         $query->sort(array('imageIdentifier'));
 
         $hits = $this->adapter->getImages($publicKey, $query, $model);
