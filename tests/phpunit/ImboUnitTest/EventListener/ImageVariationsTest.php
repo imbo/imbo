@@ -62,7 +62,7 @@ class ImageVariationsTest extends ListenerTests {
                 800,
                 600,
                 array(),
-                800,
+                null,
             ),
             'resize with width' => array(
                 800,
@@ -75,7 +75,7 @@ class ImageVariationsTest extends ListenerTests {
                         ),
                     ),
                 ),
-                200,
+                array(200),
             ),
             'resize with height' => array(
                 800,
@@ -88,7 +88,7 @@ class ImageVariationsTest extends ListenerTests {
                         ),
                     ),
                 ),
-                200 * (800 / 600), // height * aspect ratio
+                array(200 * (800 / 600)), // height * aspect ratio
             ),
             'maxSize with width' => array(
                 1024,
@@ -101,7 +101,7 @@ class ImageVariationsTest extends ListenerTests {
                         ),
                     ),
                 ),
-                150,
+                array(150),
             ),
             'maxSize with height' => array(
                 1024,
@@ -114,7 +114,7 @@ class ImageVariationsTest extends ListenerTests {
                         ),
                     ),
                 ),
-                150 * (1024 / 768), // height * aspect ratio
+                array(150 * (1024 / 768)), // height * aspect ratio
             ),
             'thumbnail with width' => array(
                 500,
@@ -127,7 +127,7 @@ class ImageVariationsTest extends ListenerTests {
                         ),
                     ),
                 ),
-                25,
+                array(25),
             ),
             'thumbnail with height' => array(
                 500,
@@ -140,7 +140,7 @@ class ImageVariationsTest extends ListenerTests {
                         ),
                     ),
                 ),
-                50, // default for thumbnail
+                array(50), // default for thumbnail
             ),
             'thumbnail with height and inset fit' => array(
                 500,
@@ -154,7 +154,7 @@ class ImageVariationsTest extends ListenerTests {
                         ),
                     ),
                 ),
-                25 * (500 / 500), // height * aspect ratio
+                array(25 * (500 / 500)), // height * aspect ratio
             ),
             'thumbnail with no params' => array(
                 500,
@@ -165,7 +165,30 @@ class ImageVariationsTest extends ListenerTests {
                         'params' => array(),
                     ),
                 ),
-                50, // default for thumbnail
+                array(50), // default for thumbnail
+            ),
+            'pick a value that is not in the first index' => array(
+                800,
+                600,
+                array(
+                    array(
+                        'name' => 'thumbnail',
+                        'params' => array(),
+                    ),
+                    array(
+                        'name' => 'resize',
+                        'params' => array(
+                            'width' => 250,
+                        ),
+                    ),
+                    array(
+                        'name' => 'maxSize',
+                        'params' => array(
+                            'width' => 100,
+                        ),
+                    ),
+                ),
+                array(1 => 250),
             ),
         );
     }
@@ -173,7 +196,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @dataProvider getTransformations
      */
-    public function testCanGetTheMinWidthFromASetOfTransformations($width, $height, array $transformations, $minWidth) {
-        $this->assertSame($minWidth, $this->listener->getMinWidth($width, $height, $transformations), 'Could not figure out the minimum width');
+    public function testCanGetTheMinWidthFromASetOfTransformations($width, $height, array $transformations, $maxWidth) {
+        $this->assertSame($maxWidth, $this->listener->getMaxWidth($width, $height, $transformations), 'Could not figure out the minimum width');
     }
 }
