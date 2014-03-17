@@ -4,7 +4,7 @@ Feature: Imbo can generate short URLs for images on demand
     I can request the short URLs resource
 
     Background:
-        Given "tests/Fixtures/image.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image.png" exists in Imbo
 
     Scenario: Generate a short URL
         Given I use "publickey" and "privatekey" for public and private keys
