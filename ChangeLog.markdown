@@ -5,6 +5,7 @@ Imbo-1.2.0
 ----------
 __N/A__
 
+* #282: Added robots.txt and humans.txt
 * #276: Support checking if the `accessToken` matches the URI "as is" (Peter Rudolfsen)
 * #269: Return metadata on write requests against the metadata resource
 * #260: Generate short URLs on demand
