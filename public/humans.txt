@@ -5,6 +5,11 @@ Site: https://github.com/christeredvartsen
 Twitter: @cogocogo
 Location: Fredrikstad, Norway
 
+Developer / General complaints: Mats Lindh
+Site: https://github.com/matslindh
+Twitter: @matslindh
+Location: Hvaler, Norway
+
 /* THANKS */
 
 VG: http://www.vg.no
