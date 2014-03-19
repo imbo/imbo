@@ -5,6 +5,16 @@ Site: https://github.com/christeredvartsen
 Twitter: @cogocogo
 Location: Fredrikstad, Norway
 
+Developer: Espen Hovlandsdal
+Site: https://github.com/rexxars
+Twitter: @rexxars
+Location: Oslo, Norway
+
+Rubberduck: André Roaldseth
+Site: https://github.com/androa
+Twitter: @androa
+Location: Oslo, Norway
+
 Developer / General complaints: Mats Lindh
 Site: https://github.com/matslindh
 Twitter: @matslindh
