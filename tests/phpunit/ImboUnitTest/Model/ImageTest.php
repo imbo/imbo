@@ -166,8 +166,11 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     public function getMimeTypes() {
         return array(
             array('image/png', true),
+            array('image/x-png', true),
             array('image/jpeg', true),
+            array('image/x-jpeg', true),
             array('image/gif', true),
+            array('image/x-gif', true),
             array('image/jpg', false),
         );
     }
