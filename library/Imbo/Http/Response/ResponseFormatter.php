@@ -61,8 +61,11 @@ class ResponseFormatter implements ListenerInterface {
         'application/json' => 'json',
         'application/xml'  => 'xml',
         'image/gif'        => 'gif',
+        'image/x-gif'      => 'gif',
         'image/png'        => 'png',
+        'image/x-png'      => 'png',
         'image/jpeg'       => 'jpg',
+        'image/x-jpeg'     => 'jpg',
     );
 
     /**
