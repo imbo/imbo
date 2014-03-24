@@ -1,12 +1,12 @@
 <?php
 /**
-* This file is part of the Imbo package
-*
-* (c) Mats Lindh <mats@lindh.no>
-*
-* For the full copyright and license information, please view the LICENSE file that was
-* distributed with this source code.
-*/
+ * This file is part of the Imbo package
+ *
+ * (c) Christer Edvartsen <cogo@starzinger.net>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was
+ * distributed with this source code.
+ */
 
 namespace Imbo\Image\Transformation;
 
@@ -20,11 +20,11 @@ use Imbo\Exception\TransformationException,
     ImagickPixelException;
 
 /**
-* Canvas transformation
-*
-* @author Mats Lindh <mats@lindh.no>
-* @package Image\Transformations
-*/
+ * Histogram transformation
+ *
+ * @author Mats Lindh <mats@lindh.no>
+ * @package Image\Transformations
+ */
 class Histogram extends Transformation implements ListenerInterface {
     /**
      * Generated histogram scale factor.
@@ -36,7 +36,7 @@ class Histogram extends Transformation implements ListenerInterface {
      * Only unsigned, positive integers are allowed.
      *
      * @var integer
-     **/
+     */
     private $scale = 1;
     
     /**
@@ -70,10 +70,10 @@ class Histogram extends Transformation implements ListenerInterface {
     }
     
     /**
-    * Transform the image into a histogram
-    *
-    * @param EventInterface $event
-    */
+     * Transform the image into a histogram
+     *
+     * @param EventInterface $event
+     */
     public function transform(EventInterface $event) {
         $image = $event->getArgument('image');
         $params = $event->getArgument('params');
@@ -144,7 +144,8 @@ class Histogram extends Transformation implements ListenerInterface {
                 foreach ($counts[$val] as $x => $y) {
                     // draw one vertical line for each value in our bucket
                     // if we want to do a scale factor for AA, we repeat it horizontally
-                    $x = $x*$scale;
+                    $x = $x * $scale;
+                    
                     for ($i = 0; $i < $scale; $i++) {
                         $draw->line($x + $i, $height, $x + $i, $height - $y);
                     }
