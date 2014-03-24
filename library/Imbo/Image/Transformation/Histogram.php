@@ -61,6 +61,13 @@ class Histogram extends Transformation implements ListenerInterface {
     private $blue = '#3767BF';
     
     /**
+     * Ratio between width / height. Defaults to the golden ratio.
+     *
+     * @var double
+     */
+    private $ratio = 1.618;
+    
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
@@ -79,6 +86,7 @@ class Histogram extends Transformation implements ListenerInterface {
         $params = $event->getArgument('params');
 
         $scale = !empty($params['scale']) ? max(1, min(8, (int) $params['scale'])) : $this->scale;
+        $ratio = !empty($params['ratio']) ? max(0.1, min(8, (double) $params['ratio'])) : $this->ratio;
 
         // colors to use for each channel when drawing the histogram
         $colors = array(
@@ -111,9 +119,9 @@ class Histogram extends Transformation implements ListenerInterface {
 
             // let's draw a histogram
             $origwidth = 256;
-            $origheight = floor($origwidth / 1.618);
+            $origheight = floor($origwidth / $ratio);
             $width = $origwidth * $scale;
-            $height = floor($width / 1.618);
+            $height = floor($width / $ratio);
 
             // drawing surface for the histogram
             $this->imagick->clear();
