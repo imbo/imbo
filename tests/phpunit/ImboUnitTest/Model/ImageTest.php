@@ -163,7 +163,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      *
      * @return array
      */
-    public function getMimeTypes() {
+    public function getSupportedMimeTypes() {
         return array(
             array('image/png', true),
             array('image/x-png', true),
@@ -177,7 +177,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\Model\Image::supportedMimeType
-     * @dataProvider getMimeTypes
+     * @dataProvider getSupportedMimeTypes
      */
     public function testCanInformAboutSupportedMimeType($type, $result) {
         $this->assertSame($result, Image::supportedMimeType($type));
@@ -193,6 +193,9 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
             array('image/png', 'png'),
             array('image/jpeg', 'jpg'),
             array('image/gif', 'gif'),
+            array('image/x-png', 'png'),
+            array('image/x-jpeg', 'jpg'),
+            array('image/x-gif', 'gif'),
             array('image/jpg', false),
         );
     }
@@ -220,5 +223,29 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
         $checksum = md5(__FILE__);
         $this->assertSame($this->image, $this->image->setOriginalChecksum($checksum));
         $this->assertSame($checksum, $this->image->getOriginalChecksum());
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getMimeTypes() {
+        return array(
+            array('image/jpeg', 'image/jpeg'),
+            array('image/png', 'image/png'),
+            array('image/gif', 'image/gif'),
+            array('image/x-jpeg', 'image/jpeg'),
+            array('image/x-png', 'image/png'),
+            array('image/x-gif', 'image/gif'),
+        );
+    }
+
+    /**
+     * @dataProvider getMimeTypes
+     */
+    public function testSetsTheCorrectMimeTypeWhenAMappedOneIsUsed($set, $get) {
+        $this->image->setMimeType($set);
+        $this->assertSame($get, $this->image->getMimeType());
     }
 }

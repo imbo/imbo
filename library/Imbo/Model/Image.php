@@ -26,11 +26,19 @@ class Image implements ModelInterface {
      */
     static public $mimeTypes = array(
         'image/png'  => 'png',
-        'image/x-png' => 'png',
         'image/jpeg' => 'jpg',
-        'image/x-jpeg' => 'jpg',
         'image/gif'  => 'gif',
-        'image/x-gif' => 'gif',
+    );
+
+    /**
+     * Mapping for some mime types
+     *
+     * @var array
+     */
+    static public $mimeTypeMapping = array(
+        'image/x-png'  => 'image/png',
+        'image/x-jpeg' => 'image/jpeg',
+        'image/x-gif'  => 'image/gif',
     );
 
     /**
@@ -168,6 +176,11 @@ class Image implements ModelInterface {
      * @return Image
      */
     public function setMimeType($mimeType) {
+        if (isset(self::$mimeTypeMapping[$mimeType])) {
+            // The mime type has a mapping, use that instead
+            $mimeType = self::$mimeTypeMapping[$mimeType];
+        }
+
         $this->mimeType = $mimeType;
 
         return $this;
@@ -429,7 +442,7 @@ class Image implements ModelInterface {
      * @return boolean
      */
     static public function supportedMimeType($mime) {
-        return isset(self::$mimeTypes[$mime]);
+        return isset(self::$mimeTypeMapping[$mime]) || isset(self::$mimeTypes[$mime]);
     }
 
     /**
@@ -440,6 +453,10 @@ class Image implements ModelInterface {
      *                        if the mime type is not supported.
      */
     static public function getFileExtension($mime) {
+        if (isset(self::$mimeTypeMapping[$mime])) {
+            $mime = self::$mimeTypeMapping[$mime];
+        }
+
         return isset(self::$mimeTypes[$mime]) ? self::$mimeTypes[$mime] : false;
     }
 }
