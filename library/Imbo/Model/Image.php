@@ -26,11 +26,8 @@ class Image implements ModelInterface {
      */
     static public $mimeTypes = array(
         'image/png'  => 'png',
-        'image/x-png' => 'png',
         'image/jpeg' => 'jpg',
-        'image/x-jpeg' => 'jpg',
         'image/gif'  => 'gif',
-        'image/x-gif' => 'gif',
     );
 
     /**

@@ -61,7 +61,7 @@ class ImagePreparation implements ListenerInterface {
 
         try {
             $imagick->readImageBlob($imageBlob);
-            $mime = $imagick->getImageMimeType();
+            $mime = str_replace('x-', '', $imagick->getImageMimeType());
             $size = $imagick->getImageGeometry();
         } catch (ImagickException $e) {
             $e = new ImageException('Invalid image', 415);
