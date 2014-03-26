@@ -5,7 +5,7 @@ Imbo-1.2.0
 ----------
 __N/A__
 
-* #283: Support images with image/x-jpeg, image/x-png and image/x-gif as mime types, which can occur with ImageMagick on Windows (Mats Lindh)
+* #286: Store images with mime types image/x-jpeg, image/x-png and image/x-gif as image/jpeg, image/png and image/gif respectively
 * #282: Added robots.txt and humans.txt
 * #276: Support checking if the `accessToken` matches the URI "as is" (Peter Rudolfsen)
 * #269: Return metadata on write requests against the metadata resource
