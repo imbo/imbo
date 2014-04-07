@@ -188,6 +188,37 @@ This transformation flips the image vertically.
 
 * ``t[]=flipVertically``
 
+.. _histogram-transformation:
+
+Generate a histogram of the image - ``t[]=histogram``
+-----------------------------------------------------
+
+This transformation will convert the image into a histogram of the image itself, with a size of 256x158 pixels. The size of the generated image can be overridden by using one or more of the supported parameters.
+
+**Parameters:**
+
+``scale``
+    The amount to scale the histogram. Defaults to ``1``.
+
+``ratio``
+    The ratio to use when calculating the height of the image. Defaults to ``1.618``.
+
+``red``
+    The color to use when drawing the graph for the red channel. Defaults to ``#D93333``.
+
+``green``
+    The color to use when drawing the graph for the green channel. Defaults to ``#58C458``.
+
+``blue``
+    The color to use when drawing the graph for the blue channel. Defaults to ``#3767BF``.
+
+
+**Examples:**
+
+* ``t[]=histogram``
+* ``t[]=histogram:scale=2``
+* ``t[]=histogram:red=f00,green=0f0lue=00f``
+
 .. _max-size-transformation:
 
 Enforce a max size of an image - ``t[]=maxSize``

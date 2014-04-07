@@ -6,6 +6,7 @@ Imbo-1.2.0
 __N/A__
 
 * #286: Store images with mime types image/x-jpeg, image/x-png and image/x-gif as image/jpeg, image/png and image/gif respectively
+* #285: New image transformation: histogram (Mats Lindh)
 * #282: Added robots.txt and humans.txt
 * #276: Support checking if the `accessToken` matches the URI "as is" (Peter Rudolfsen)
 * #269: Return metadata on write requests against the metadata resource

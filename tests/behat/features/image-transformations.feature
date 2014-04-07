@@ -39,6 +39,9 @@ Feature: Imbo enables dynamic transformations of images
             | desaturate                                                                                        | 599   | 417    |
             | flipHorizontally                                                                                  | 599   | 417    |
             | flipVertically                                                                                    | 599   | 417    |
+            | histogram                                                                                         | 256   | 158    |
+            | histogram:scale=2                                                                                 | 512   | 316    |
+            | histogram:scale=2,ratio=2                                                                         | 512   | 256    |
             | maxSize:width=200                                                                                 | 200   | 139    |
             | maxSize:height=200                                                                                | 287   | 200    |
             | maxSize:width=100,height=100                                                                      | 100   | 70     |
@@ -89,6 +92,9 @@ Feature: Imbo enables dynamic transformations of images
             | desaturate                                                                                        |
             | flipHorizontally                                                                                  |
             | flipVertically                                                                                    |
+            | histogram                                                                                         |
+            | histogram:scale=2                                                                                 |
+            | histogram:scale=2,ratio=2                                                                         |
             | maxSize:width=200                                                                                 |
             | maxSize:height=200                                                                                |
             | maxSize:width=100,height=100                                                                      |

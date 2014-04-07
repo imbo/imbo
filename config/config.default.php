@@ -182,6 +182,7 @@ $config = array(
         'desaturate' => 'Imbo\Image\Transformation\Desaturate',
         'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
         'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
+        'histogram' => 'Imbo\Image\Transformation\Histogram',
         'maxSize' => 'Imbo\Image\Transformation\MaxSize',
         'modulate' => 'Imbo\Image\Transformation\Modulate',
         'progressive' => 'Imbo\Image\Transformation\Progressive',
