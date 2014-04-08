@@ -212,7 +212,6 @@ This transformation will convert the image into a histogram of the image itself,
 ``blue``
     The color to use when drawing the graph for the blue channel. Defaults to ``#3767BF``.
 
-
 **Examples:**
 
 * ``t[]=histogram``
