@@ -123,17 +123,18 @@ class MongoDB implements DatabaseInterface {
         }
 
         $data = array(
-            'size'            => $image->getFilesize(),
-            'publicKey'       => $publicKey,
-            'imageIdentifier' => $imageIdentifier,
-            'extension'       => $image->getExtension(),
-            'mime'            => $image->getMimeType(),
-            'metadata'        => array(),
-            'added'           => $added ?: $now,
-            'updated'         => $updated ?: $now,
-            'width'           => $image->getWidth(),
-            'height'          => $image->getHeight(),
-            'checksum'        => $image->getChecksum(),
+            'size'             => $image->getFilesize(),
+            'publicKey'        => $publicKey,
+            'imageIdentifier'  => $imageIdentifier,
+            'extension'        => $image->getExtension(),
+            'mime'             => $image->getMimeType(),
+            'metadata'         => array(),
+            'added'            => $added ?: $now,
+            'updated'          => $updated ?: $now,
+            'width'            => $image->getWidth(),
+            'height'           => $image->getHeight(),
+            'checksum'         => $image->getChecksum(),
+            'originalChecksum' => $image->getOriginalChecksum(),
         );
 
         try {
@@ -278,6 +279,12 @@ class MongoDB implements DatabaseInterface {
             $queryData['checksum']['$in'] = $checksums;
         }
 
+        $originalChecksums = $query->originalChecksums();
+
+        if (!empty($originalChecksums)) {
+            $queryData['originalChecksum']['$in'] = $originalChecksums;
+        }
+
         // Sorting
         $sort = array('added' => -1);
 
@@ -290,7 +297,7 @@ class MongoDB implements DatabaseInterface {
         }
 
         // Fields to fetch
-        $fields = array('extension', 'added', 'checksum', 'updated', 'publicKey', 'imageIdentifier', 'mime', 'size', 'width', 'height');
+        $fields = array('extension', 'added', 'checksum', 'originalChecksum', 'updated', 'publicKey', 'imageIdentifier', 'mime', 'size', 'width', 'height');
 
         if ($query->returnMetadata()) {
             $fields[] = 'metadata';
@@ -516,6 +523,7 @@ class MongoDB implements DatabaseInterface {
             $result = $this->getShortUrlCollection()->findOne(array(
                 'shortUrlId' => $shortUrlId,
             ), array(
+                '_id' => null,
                 'publicKey',
                 'imageIdentifier',
                 'extension',
@@ -537,12 +545,18 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteShortUrls($publicKey, $imageIdentifier) {
+    public function deleteShortUrls($publicKey, $imageIdentifier, $shortUrlId = null) {
+        $query = array(
+            'publicKey' => $publicKey,
+            'imageIdentifier' => $imageIdentifier,
+        );
+
+        if ($shortUrlId) {
+            $query['shortUrlId'] = $shortUrlId;
+        }
+
         try {
-            $this->getShortUrlCollection()->remove(array(
-                'publicKey' => $publicKey,
-                'imageIdentifier' => $imageIdentifier,
-            ));
+            $this->getShortUrlCollection()->remove($query);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to delete short URLs', 500, $e);
         }

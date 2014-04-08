@@ -1,6 +1,22 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.2.0
+----------
+__2014-04-08__
+
+* #286: Store images with mime types image/x-jpeg, image/x-png and image/x-gif as image/jpeg, image/png and image/gif respectively
+* #285: New image transformation: histogram (Mats Lindh)
+* #282: Added robots.txt and humans.txt
+* #276: Support checking if the `accessToken` matches the URI "as is" (Peter Rudolfsen)
+* #269: Return metadata on write requests against the metadata resource
+* #260: Generate short URLs on demand
+* #253: Store the original checksum of added images
+
+Bug fixes:
+
+* #270: Access-Control-Allow-Origin header not included when CORS is enabled and Imbo generates an error
+
 Imbo-1.1.1
 ----------
 __2014-02-14__
@@ -57,7 +73,7 @@ __2014-01-30__
 * #190: Added support for filtering images on one or more image identifiers
 * #189: Prioritize original image mime types when doing content negotiation
 * #188: Support an alternative installation method
-* #186: Added support for short image URL's
+* #186: Added support for short image URLs
 * #185: Add support for custom resources and routes
 * #174: New image transformation: watermark
 * #161: Images can now only be added by requesting the images resource using HTTP POST

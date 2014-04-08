@@ -110,6 +110,10 @@ USER;
                 $images .= '<checksum>' . $image->getChecksum() . '</checksum>';
             }
 
+            if (empty($fields) || isset($fields['originalChecksum'])) {
+                $images .= '<originalChecksum>' . $image->getOriginalChecksum() . '</originalChecksum>';
+            }
+
             if (empty($fields) || isset($fields['mime'])) {
                 $images .= '<mime>' . $image->getMimeType() . '</mime>';
             }

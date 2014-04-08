@@ -31,6 +31,17 @@ class Image implements ModelInterface {
     );
 
     /**
+     * Mapping for some mime types
+     *
+     * @var array
+     */
+    static public $mimeTypeMapping = array(
+        'image/x-png'  => 'image/png',
+        'image/x-jpeg' => 'image/jpeg',
+        'image/x-gif'  => 'image/gif',
+    );
+
+    /**
      * Size of the file
      *
      * @var int
@@ -85,6 +96,13 @@ class Image implements ModelInterface {
      * @var string
      */
     private $checksum;
+
+    /**
+     * MD5 checksum of the original image
+     *
+     * @var string
+     */
+    private $originalChecksum;
 
     /**
      * Added date
@@ -158,6 +176,11 @@ class Image implements ModelInterface {
      * @return Image
      */
     public function setMimeType($mimeType) {
+        if (isset(self::$mimeTypeMapping[$mimeType])) {
+            // The mime type has a mapping, use that instead
+            $mimeType = self::$mimeTypeMapping[$mimeType];
+        }
+
         $this->mimeType = $mimeType;
 
         return $this;
@@ -376,6 +399,27 @@ class Image implements ModelInterface {
     }
 
     /**
+     * Get the original checksum of the current image data
+     *
+     * @return string
+     */
+    public function getOriginalChecksum() {
+        return $this->originalChecksum;
+    }
+
+    /**
+     * Set the original checksum
+     *
+     * @param string $originalChecksum The original checksum to set
+     * @return Image
+     */
+    public function setOriginalChecksum($checksum) {
+        $this->originalChecksum = $checksum;
+
+        return $this;
+    }
+
+    /**
      * Set or get the hasBeenTransformed flag
      *
      * @param boolean|null $flag Skip the argument to get the current value
@@ -398,7 +442,7 @@ class Image implements ModelInterface {
      * @return boolean
      */
     static public function supportedMimeType($mime) {
-        return isset(self::$mimeTypes[$mime]);
+        return isset(self::$mimeTypeMapping[$mime]) || isset(self::$mimeTypes[$mime]);
     }
 
     /**
@@ -409,6 +453,10 @@ class Image implements ModelInterface {
      *                        if the mime type is not supported.
      */
     static public function getFileExtension($mime) {
+        if (isset(self::$mimeTypeMapping[$mime])) {
+            $mime = self::$mimeTypeMapping[$mime];
+        }
+
         return isset(self::$mimeTypes[$mime]) ? self::$mimeTypes[$mime] : false;
     }
 }

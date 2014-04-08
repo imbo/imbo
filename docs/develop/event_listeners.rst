@@ -14,7 +14,7 @@ When implementing an event listener you need to know about the events that Imbo 
 * :ref:`user <user-resource>`
 * :ref:`images <images-resource>`
 * :ref:`image <image-resource>`
-* :ref:`shorturl <shorturl-resource>`
+* :ref:`globalshorturl <global-shorturl-resource>`
 * :ref:`metadata <metadata-resource>`
 
 Examples of events that are triggered:

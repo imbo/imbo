@@ -54,13 +54,7 @@ class Metadata implements ResourceInterface {
      */
     public function delete(EventInterface $event) {
         $event->getManager()->trigger('db.metadata.delete');
-
-        $model = new Model\ArrayModel();
-        $model->setData(array(
-            'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
-        ));
-
-        $event->getResponse()->setModel($model);
+        $event->getResponse()->setModel(new Model\Metadata());
     }
 
     /**
@@ -70,17 +64,16 @@ class Metadata implements ResourceInterface {
      */
     public function put(EventInterface $event) {
         $request = $event->getRequest();
+        $metadata = json_decode($request->getContent(), true);
 
         $event->getManager()
             ->trigger('db.metadata.delete')
             ->trigger('db.metadata.update', array(
-                'metadata' => json_decode($request->getContent(), true),
+                'metadata' => $metadata,
             ));
 
-        $model = new Model\ArrayModel();
-        $model->setData(array(
-            'imageIdentifier' => $request->getImageIdentifier(),
-        ));
+        $model = new Model\Metadata();
+        $model->setData($metadata);
 
         $event->getResponse()->setModel($model);
     }
@@ -97,10 +90,8 @@ class Metadata implements ResourceInterface {
             'metadata' => json_decode($request->getContent(), true),
         ));
 
-        $model = new Model\ArrayModel();
-        $model->setData(array(
-            'imageIdentifier' => $request->getImageIdentifier(),
-        ));
+        $model = new Model\Metadata();
+        $model->setData($event->getDatabase()->getMetadata($request->getPublicKey(), $request->getImageIdentifier()));
 
         $event->getResponse()->setModel($model);
     }

@@ -31,16 +31,18 @@ class Cors implements ListenerInterface {
     private $params = array(
         'allowedOrigins' => array(),
         'allowedMethods' => array(
-            'index'    => array('GET', 'HEAD'),
-            'image'    => array('GET', 'HEAD'),
-            'images'   => array('GET', 'HEAD'),
-            'metadata' => array('GET', 'HEAD'),
-            'status'   => array('GET', 'HEAD'),
-            'stats'    => array('GET', 'HEAD'),
-            'user'     => array('GET', 'HEAD'),
-            'shorturl' => array('GET', 'HEAD'),
+            'index'          => array('GET', 'HEAD'),
+            'image'          => array('GET', 'HEAD'),
+            'images'         => array('GET', 'HEAD'),
+            'metadata'       => array('GET', 'HEAD'),
+            'status'         => array('GET', 'HEAD'),
+            'stats'          => array('GET', 'HEAD'),
+            'user'           => array('GET', 'HEAD'),
+            'globalshorturl' => array('GET', 'HEAD'),
+            'shorturl'       => array('GET', 'HEAD'),
+            'shorturls'      => array('GET', 'HEAD'),
         ),
-        'maxAge'         => 3600,
+        'maxAge' => 3600,
     );
 
     /**
@@ -89,7 +91,7 @@ class Cors implements ListenerInterface {
         foreach ($this->params['allowedMethods'] as $resource => $methods) {
             foreach ($methods as $method) {
                 $eventName = $resource . '.' . strtolower($method);
-                $events[$eventName] = array('invoke' => 20);
+                $events[$eventName] = array('invoke' => 100);
             }
 
             // Always enable the listener for the OPTIONS method

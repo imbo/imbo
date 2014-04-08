@@ -12,10 +12,10 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Exception\ResourceException,
-    Symfony\Component\HttpFoundation\ParameterBag;
+    Imbo\Model\ArrayModel;
 
 /**
- * Short URL resource
+ * Short URL collection
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
@@ -25,7 +25,7 @@ class ShortUrl implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD');
+        return array('DELETE');
     }
 
     /**
@@ -33,108 +33,41 @@ class ShortUrl implements ResourceInterface {
      */
     public static function getSubscribedEvents() {
         return array(
-            // Generate and/or fetch short URL
-            'shorturl.get' => 'get',
-            'shorturl.head' => 'get',
-
-            // Add a short URL header to the response
-            'image.get' => 'addShortUrlHeader',
-            'image.head' => 'addShortUrlHeader',
-
-            // Remove short URLs
-            'image.delete' => 'deleteShortUrls',
+            'shorturl.delete' => 'deleteShortUrl',
         );
     }
 
     /**
-     * Add a short URL header to the current image request (unless the request was originally a
-     * shorturl request, in which case the response already has a short URL header)
+     * Delete a single short URL
      *
      * @param EventInterface $event
      */
-    public function addShortUrlHeader(EventInterface $event) {
-        $response = $event->getResponse();
-
-        if ($response->headers->has('X-Imbo-ShortUrl')) {
-            return;
-        }
-
+    public function deleteShortUrl(EventInterface $event) {
         $database = $event->getDatabase();
         $request = $event->getRequest();
-
         $publicKey = $request->getPublicKey();
         $imageIdentifier = $request->getImageIdentifier();
-        $extension = $request->getExtension();
-        $query = $request->query->all();
+        $shortUrlId = $request->getRoute()->get('shortUrlId');
 
-        $shortUrlId = $database->getShortUrlId($publicKey, $imageIdentifier, $extension, $query);
-
-        if (!$shortUrlId) {
-            do {
-                // No short URL exists, generate an ID and insert
-                $shortUrlId = $this->getShortUrlId();
-            } while($database->getShortUrlParams($shortUrlId));
-
-            $database->insertShortUrl($shortUrlId, $publicKey, $imageIdentifier, $extension, $query);
+        if (!$params = $database->getShortUrlParams($shortUrlId)) {
+            throw new ResourceException('ShortURL not found', 404);
         }
 
-        // Attach the header
-        $response->headers->set('X-Imbo-ShortUrl', $request->getSchemeAndHttpHost(). '/s/' . $shortUrlId);
-    }
+        if ($params['publicKey'] !== $publicKey || $params['imageIdentifier'] !== $imageIdentifier) {
+            throw new ResourceException('ShortURL not found', 404);
+        }
 
-    /**
-     * Delete short URLs registered to the image that was just deleted
-     *
-     * @param EventInterface $event
-     */
-    public function deleteShortUrls(EventInterface $event) {
-        $request = $event->getRequest();
-        $event->getDatabase()->deleteShortUrls(
-            $request->getPublicKey(),
-            $request->getImageIdentifier()
+        $database->deleteShortUrls(
+            $publicKey,
+            $imageIdentifier,
+            $shortUrlId
         );
-    }
 
-    /**
-     * Fetch an image via a short URL
-     *
-     * @param EventInterface $event
-     */
-    public function get(EventInterface $event) {
-        $request = $event->getRequest();
-        $response = $event->getResponse();
-        $route = $request->getRoute();
+        $model = new ArrayModel();
+        $model->setData(array(
+            'id' => $shortUrlId,
+        ));
 
-        $params = $event->getDatabase()->getShortUrlParams($route->get('shortUrlId'));
-
-        if (!$params) {
-            throw new ResourceException('Image not found', 404);
-        }
-
-        $route->set('publicKey', $params['publicKey']);
-        $route->set('imageIdentifier', $params['imageIdentifier']);
-        $route->set('extension', $params['extension']);
-
-        $request->query = new ParameterBag($params['query']);
-        $response->headers->set('X-Imbo-ShortUrl', $request->getUri());
-
-        $event->getManager()->trigger('image.get');
-    }
-
-    /**
-     * Method for generating short URL keys
-     *
-     * @return string
-     */
-    private function getShortUrlId($len = 7) {
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-        $charsLen = 62;
-        $key = '';
-
-        for ($i = 0; $i < $len; $i++) {
-            $key .= $chars[mt_rand() % $charsLen];
-        }
-
-        return $key;
+        $event->getResponse()->setModel($model);
     }
 }

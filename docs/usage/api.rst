@@ -17,7 +17,7 @@ In this section you will find information on the different resources Imbo's REST
 Index resource - ``/``
 ++++++++++++++++++++++
 
-The index resource shows the version of the Imbo installation along with some external URL's for Imbo-related information, and some internal URL's for the available endpoints.
+The index resource shows the version of the Imbo installation along with some external URLs for Imbo-related information, and some internal URLs for the available endpoints.
 
 .. code-block:: bash
 
@@ -41,8 +41,10 @@ results in:
         "user": "http://imbo/users/{publicKey}",
         "images": "http://imbo/users/{publicKey}/images",
         "image": "http://imbo/users/{publicKey}/images/{imageIdentifier}",
-        "shortImageUrl": "http://imbo/s/{id}",
-        "metadata": "http://imbo/users/{publicKey}/images/{imageIdentifier}/metadata"
+        "globalShortImageUrl": "http://imbo/s/{id}",
+        "metadata": "http://imbo/users/{publicKey}/images/{imageIdentifier}/metadata",
+        "shortImageUrls": "http://imbo/users/{publicKey}/images/{imageIdentifier}/shorturls",
+        "shortImageUrl": "http://imbo/users/{publicKey}/images/{imageIdentifier}/shorturls/{id}"
       }
     }
 
@@ -195,6 +197,27 @@ The reason for adapter failures depends on what kind of adapter you are using. T
 
 .. note:: The status resource is not cache-able.
 
+.. _global-shorturl-resource:
+
+Global short URL resource - ``/s/<id>``
++++++++++++++++++++++++++++++++++++++++
+
+Images in Imbo can have short URLs associated with them, which are generated on demand when interacting with the :ref:`short URLs resource <shorturls-resource>`. These URLs can be used in place of the rather long original URLs which includes both access tokens and transformations.
+
+The format of the random ID part of the short URL can be matched with the following `regular expression <http://en.wikipedia.org/wiki/Regular_expression>`_::
+
+    /^[a-zA-Z0-9]{7}$/
+
+There are some caveats regarding the short URLs:
+
+1) If the data used to generate the short URL contained an image extension, content negotiation will not be applied to the short URL. You will always get the mime type associated with the extension used to generate the short URL.
+2) If the data used to generate the short URL did not contain an image extension you can use the ``Accept`` header to decide the mime type of the generated image when requesting the short URL.
+3) Short URLs do not support extensions, so you can not append ``.jpg`` to force ``image/jpeg``. If you need to make sure the image is always a JPEG, simply add ``jpg`` as an extension when generating the short URL.
+
+You can read more about how to generate these URLs in the :ref:`short URLs section <shorturls-resource>`.
+
+.. note:: In Imbo only images have short URLs
+
 .. _user-resource:
 
 User resource - ``/users/<user>``
@@ -291,6 +314,9 @@ The images resource can also be used to gather information on which images a use
 ``checksums[]``
     An array of image checksums to filter the results by.
 
+``originalChecksums[]``
+    An array of the original image checksums to filter the results by.
+
 .. code-block:: bash
 
     curl "http://imbo/users/<user>/images.json?limit=1&metadata=1"
@@ -309,27 +335,40 @@ results in:
       "images": [
         {
           "added": "Mon, 10 Dec 2012 11:57:51 GMT",
+          "updated": "Mon, 10 Dec 2012 11:57:51 GMT",
+          "checksum": "<checksum>",
+          "originalChecksum": "<originalChecksum>",
           "extension": "png",
+          "size": 6791,
+          "width": 1306,
           "height": 77,
+          "mime": "image/png",
           "imageIdentifier": "<image>",
+          "publicKey": "<user>",
           "metadata": {
             "key": "value",
             "foo": "bar"
-          },
-          "mime": "image/png",
-          "publicKey": "<user>",
-          "size": 6791,
-          "updated": "Mon, 10 Dec 2012 11:57:51 GMT",
-          "width": 1306
+          }
         }
       ]
     }
 
-The ``search`` object is data related to pagination, where ``hits`` is the number of images found by your query, ``page`` is the current page, ``limit`` is the current limit, and ``count`` is the number of images in the visible collection.
+The ``search`` object is data related to pagination, where ``hits`` is the number of images found by the query, ``page`` is the current page, ``limit`` is the current limit, and ``count`` is the number of images in the visible collection.
 
-The ``images`` list contains image objects, where ``added`` is a formatted date of when the image was added to Imbo, ``extension`` is the original image extension, ``height`` is the height of the image in pixels, ``imageIdentifier`` is the image identifier (`MD5 checksum <http://en.wikipedia.org/wiki/MD5>`_ of the file itself), ``metadata`` is a JSON object containing metadata attached to the image, ``mime`` is the mime type of the image, ``publicKey`` is the public key of the user who owns the image, ``size`` is the size of the image in bytes, ``updated`` is a formatted date of when the image was last updated (read: when metadata attached to the image was last updated, as the image itself never changes), and ``width`` is the width of the image in pixels. The fact that the image identifier is the MD5 checksum of the image is an implementation detail and might change in the future.
+The ``images`` list contains image objects. Each object has the following fields:
 
-The ``metadata`` field is only available if you used the ``metadata`` query parameter described above.
+* ``added``: A formatted date of when the image was added to Imbo.
+* ``updated``: The formatted date of when the image was last updated (read: when metadata attached to the image was last updated, as the image itself never changes).
+* ``checksum``: The MD5 checksum of the image blob stored in Imbo.
+* ``originalChecksum``: The MD5 checksum of the original image. Might differ from ``<checksum>`` if event listeners that might change incoming images have been enabled. This field was added to Imbo in version ``1.2.0``. If this field is ``null`` when you query the images resource, you will need to manually update the database. If you have event listeners changing incoming images you might not want to simply set the original checksum to ``<checksum>`` as that might not be true.
+* ``extension``: The original image extension.
+* ``size``: The size of the image in bytes.
+* ``width``: The width of the image in pixels.
+* ``height``: The height of the image in pixels.
+* ``mime``: The mime type of the image.
+* ``imageIdentifier``: The image identifier stored in Imbo.
+* ``publicKey``: The public key of the user who owns the image.
+* ``metadata``: A JSON object containing metadata attached to the image. This field is only available if the ``metadata`` query parameter described above is used.
 
 **Typical response codes:**
 
@@ -347,7 +386,7 @@ The image resource represents specific images owned by a user. This resource is 
 Fetch images
 ~~~~~~~~~~~~
 
-Fetching images added to Imbo is done by requesting the image identifiers (checksum) of the images.
+Fetching images added to Imbo is done by requesting the image identifiers of the images.
 
 .. code-block:: bash
 
@@ -366,7 +405,6 @@ When fetching images Imbo also sends a set of custom HTTP response headers relat
     X-Imbo-Originalfilesize: 45826
     X-Imbo-Originalheight: 390
     X-Imbo-Originalwidth: 380
-    X-Imbo-ShortUrl: http://imbo/s/w7CiqDM
 
 These are all related to the image that was just requested.
 
@@ -404,41 +442,81 @@ where ``<image>`` is the image identifier of the image that was just deleted (th
 * 400 Bad request
 * 404 Image not found
 
+.. _shorturls-resource:
+
+Short URLs resource - ``/users/<user>/images/<image>/shorturls``
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+This resource is used to create short URLs for images on demand, as well as removing all short URLs associated with a single image.
+
+Create a short URL
+~~~~~~~~~~~~~~~~~~
+
+Creating a short URL is done by requesting this resource using ``HTTP POST`` while including some parameters for the short URL in the request body. The parameters must be specified as a JSON object, and the object supports the following fields:
+
+* ``imageIdentfier``: The same image identifier as the one in the requested URI.
+* ``publicKey``: The same public key as the one in the requested URI.
+* ``extension``: An optional extension to the image, for instance ``jpg`` or ``png``.
+* ``query``: The query string with transformations that will be applied. The format is the same as when requesting the image resource with one or more transformations. See the :doc:`image-transformations` chapter for more information regarding the transformation of images.
+
+The generated ID of the short URL can be found in the response:
+
+.. code-block:: bash
+
+    curl -XPOST http://imbo/users/<user>/images/<image>/shorturls.json -d '{
+      "imageIdentifier": "<image>",
+      "publicKey": "<user>",
+      "extension": "jpg",
+      "query": "t[]=thumbnail:width=75,height=75&t[]=desaturate"
+    }'
+
+results in:
+
+.. code-block:: javascript
+
+    {
+      "id": "<id>"
+    }
+
+where ``<id>`` can be used with the :ref:`global short URL resource <global-shorturl-resource>` for requesting the image with the configured extension / transformations applied.
+
+Delete all short URLs associated with an image
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to remove all short URLs associated with an image, you can request this resource using ``HTTP DELETE``:
+
+.. code-block:: bash
+
+    curl -XDELETE http://imbo/users/<user>/images/<image>/shorturls.json
+
+results in:
+
+.. code-block:: javascript
+
+    {
+      "imageIdentifier": "<image>"
+    }
+
 .. _shorturl-resource:
 
-ShortURL resource - ``/s/<id>``
-+++++++++++++++++++++++++++++++
+Short URL resource - ``/users/<user>/images/<image>/shorturls/<id>``
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Images in Imbo have short URLs associated with them, which are generated on request when you access an image (with or without image transformations) for the first time. These URLs do not take any query parameters and can be used in place for original image URLs. To fetch these URLs you can request an image using ``HTTP HEAD``, then look for the ``X-Imbo-ShortUrl`` header in the response::
+This resource can be used to remove a single short URL for a specific image variation.
 
-    curl -Ig "http://imbo/users/<user>/images/<image>?t[]=thumbnail&t[]=desaturate&t[]=border&accessToken=f3fa1d9f0649cfad61e840a6e09b156e851858799364d1d8ee61b386e10b0c05"|grep Imbo
+This is achieved by simply requesting the resource with ``HTTP DELETE``, specifying the ID of the short URL in the URI:
 
-results in (some headers omitted):
+.. code-block:: bash
 
-.. code-block:: none
-    :emphasize-lines: 6
+    curl -XDELETE http://imbo/users/<user>/images/<image>/shorturls/<id>
 
-    X-Imbo-OriginalMimeType: image/gif
-    X-Imbo-OriginalWidth: 771
-    X-Imbo-OriginalHeight: 771
-    X-Imbo-OriginalFileSize: 152066
-    X-Imbo-OriginalExtension: gif
-    X-Imbo-ShortUrl: http://imbo/s/3VEFrpB
-    X-Imbo-ImageIdentifier: 4492acb937a1f056ae43509bc7f85d21
+results in:
 
-The value of the ``X-Imbo-ShortUrl`` can be used to request the image with the applied transformations, and does not require an access token query parameter.
+.. code-block:: javascript
 
-The format of the random ID part of the short URL can be matched with the following `regular expression <http://en.wikipedia.org/wiki/Regular_expression>`_::
-
-    /^[a-zA-Z0-9]{7}$/
-
-There are some caveats regarding the short URLs:
-
-1) If the URL used to generate the short URL contained an image extension, content negotiation will not be applied to the short URL. You will always get the mime type associated with the extension used to generate the short URL.
-2) If the URL used to generate the short URL did not contain an image extension you can use the ``Accept`` header to decide the mime type of the generated image when requesting the short URL.
-3) Short URLs do not support extensions, so you can not append ``.jpg`` to force ``image/jpeg``. If you need to make sure the image is always a JPEG, simply append ``.jpg`` to the URL when generating the short URL.
-
-.. note:: In Imbo only images have short URL's
+    {
+      "id": "<id>"
+    }
 
 .. _metadata-resource:
 
@@ -457,7 +535,7 @@ Values can be nested ``key => value`` pairs.
 Adding/replacing metadata
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To add (or replace all existing metadata) on an image a client should make a request against this resource using ``HTTP PUT`` with the metadata attached in the request body as a JSON object.
+To add (or replace all existing metadata) on an image a client should make a request against this resource using ``HTTP PUT`` with the metadata attached in the request body as a JSON object. The response body will contain the added metadata.
 
 .. code-block:: bash
 
@@ -472,10 +550,10 @@ results in:
 .. code-block:: javascript
 
     {
-      "imageIdentifier": "<image>"
+      "beer": "Dark Horizon First Edition",
+      "brewery": "Nøgne Ø",
+      "style": "Imperial Stout"
     }
-
-where ``<image>`` is the image that just got updated.
 
 .. note:: When using the :ref:`Doctrine database adapter <doctrine-database-adapter>`, metadata keys can not contain ``::``.
 
@@ -489,7 +567,7 @@ where ``<image>`` is the image that just got updated.
 Partially updating metadata
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Partial updates to metadata attached to an image is done by making a request with ``HTTP POST`` and attaching metadata to the request body as a JSON object. If the object contains keys that already exists in the metadata on the server the old values will be replaced by the ones found in the request body. New keys will be added to the metadata.
+Partial updates to metadata attached to an image is done by making a request with ``HTTP POST`` and attaching metadata to the request body as a JSON object. If the object contains keys that already exists in the metadata on the server the old values will be replaced by the ones found in the request body. New keys will be added to the metadata. The response will contain all metadata attached to the image after the update.
 
 .. code-block:: bash
 
@@ -503,10 +581,14 @@ results in:
 .. code-block:: javascript
 
     {
-      "imageIdentifier": "<image>"
+      "beer": "Dark Horizon First Edition",
+      "brewery": "Nøgne Ø",
+      "style": "Imperial Stout",
+      "ABV":"16%",
+      "score":"100/100"
     }
 
-where ``<image>`` is the image that just got updated.
+if the image already included the first three keys as metadata.
 
 .. note:: When using the :ref:`Doctrine database adapter <doctrine-database-adapter>`, metadata keys can not contain ``::``.
 
@@ -564,11 +646,7 @@ results in:
 
 .. code-block:: javascript
 
-    {
-      "imageIdentifier":"<image>"
-    }
-
-where ``<image>`` is the image identifier of the image that just got all its metadata deleted.
+    {}
 
 **Typical response codes:**
 
@@ -602,6 +680,8 @@ and Ruby:
     :linenos:
 
 If the event listener enforcing the access token check is removed, Imbo will ignore the ``accessToken`` query parameter completely. If you wish to implement your own form of access token you can do this by implementing an event listener of your own (see :ref:`custom-event-listeners` for more information).
+
+Prior to Imbo-1.0.0 there was no rule that the URL had to be completely URL-decoded prior to generating the access token in the clients. Because of this Imbo will also try to re-generate the access token server side by using the URL as-is. This feature has been added to ease the transition to Imbo >= 1.0.0, and will be removed some time in the future.
 
 .. _signing-write-requests:
 
@@ -702,7 +782,7 @@ Some responses from Imbo are not cache-able. These will typically include ``Cach
 * :ref:`stats-resource`
 * :ref:`status-resource`
 
-All other resources will include ``Cache-Control: public``. The :ref:`image <image-resource>` and :ref:`short url <shorturl-resource>` resources will also set a ``max-age``, resulting in the following header: ``Cache-Control: max-age=31536000, public``.
+All other resources will include ``Cache-Control: public``. The :ref:`image <image-resource>` and :ref:`short url <global-shorturl-resource>` resources will also set a ``max-age``, resulting in the following header: ``Cache-Control: max-age=31536000, public``.
 
 ETag
 ++++
@@ -715,7 +795,7 @@ The following resources in Imbo will include an ETag:
 * :ref:`images-resource`
 * :ref:`image-resource`
 * :ref:`metadata-resource`
-* :ref:`shorturl-resource`
+* :ref:`global-shorturl-resource`
 
 The value of the ``ETag`` header is simply the MD5 sum of the content in the response body, enclosed in quotes. For instance ``ETag: "fd2fd87a2f5288be31c289e70e916123"``.
 
@@ -728,7 +808,7 @@ Imbo also includes a ``Last-Modified`` response header for resources that has a 
 * :ref:`images-resource`: The date of when the user last modified an image in the collection (either the image itself, or metadata attached to the image).
 * :ref:`image-resource`: The date of when the image was added (or replaced), or when the metadata of the image was last modified.
 * :ref:`metadata-resource`: The date of when the metadata of the image was last modified.
-* :ref:`shorturl-resource`: Same as the date of the original image.
+* :ref:`global-shorturl-resource`: Same as the date of the original image.
 
 User agents can use the value of the ``Last-Modified`` header in the ``If-Modified-Since`` request header to make a conditional request. The value of the ``Last-Modified`` header is an `HTTP-date <http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.3.1>`_, for instance ``Last-Modified: Wed, 12 Feb 2014 09:46:02 GMT``.
 

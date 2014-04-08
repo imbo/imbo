@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="false" bootstrap="bootstrap.php">
+  <testsuites>
+    <testsuite name="imbo-unit">
+      <directory>ImboUnitTest</directory>
+    </testsuite>
+    <testsuite name="imbo-integration">
+      <directory>ImboIntegrationTest</directory>
+    </testsuite>
+    <testsuite name="imbocli-unit">
+      <directory>ImboCliUnitTest</directory>
+    </testsuite>
+  </testsuites>
+
+  <php>
+    <!-- Memcached cache driver integration tests -->
+    <var name="MEMCACHED_HOST" value="127.0.0.1" />
+    <var name="MEMCACHED_PORT" value="11211" />
+
+    <!-- AWS S3 tests -->
+    <var name="AWS_S3_KEY" value="" />
+    <var name="AWS_S3_SECRET" value="" />
+    <var name="AWS_S3_BUCKET" value="" />
+  </php>
+
+  <groups>
+    <exclude>
+      <!-- Exclude the aws group per default -->
+      <group>aws</group>
+    </exclude>
+  </groups>
+</phpunit>

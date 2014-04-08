@@ -19,12 +19,13 @@
   "require": {
     "php": ">=5.4.0",
     "ext-imagick": ">=3.0.1",
-    "symfony/http-foundation": "~2.0",
-    "symfony/event-dispatcher": "~2.0"
+    "symfony/http-foundation": "~2.4.0",
+    "symfony/event-dispatcher": "~2.4.0",
+    "symfony/console": "~2.4.0"
   },
   "require-dev": {
     "mikey179/vfsStream": "~1.0",
-    "phpunit/phpunit": "~3.0",
+    "phpunit/phpunit": "~4.0",
     "behat/behat": "~2.0",
     "guzzle/guzzle": "~3.0",
     "doctrine/dbal": "~2.0",
@@ -39,8 +40,13 @@
   "autoload": {
     "psr-0": {
       "Imbo\\": "library/",
-      "ImboUnitTest\\": "tests/",
-      "ImboIntegrationTest\\": "tests/"
+      "ImboCli\\": "library/",
+      "ImboUnitTest\\": "tests/phpunit",
+      "ImboIntegrationTest\\": "tests/phpunit",
+      "ImboCliUnitTest\\": "tests/phpunit"
     }
-  }
+  },
+  "bin": [
+    "bin/imbo"
+  ]
 }

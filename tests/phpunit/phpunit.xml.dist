@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="false" bootstrap="bootstrap.php">
+  <testsuites>
+    <testsuite name="imbo-unit">
+      <directory>ImboUnitTest</directory>
+    </testsuite>
+    <testsuite name="imbo-integration">
+      <directory>ImboIntegrationTest</directory>
+    </testsuite>
+    <testsuite name="imbocli-unit">
+      <directory>ImboCliUnitTest</directory>
+    </testsuite>
+  </testsuites>
+
+  <php>
+    <!-- Memcached cache driver integration tests -->
+    <var name="MEMCACHED_HOST" value="" />
+    <var name="MEMCACHED_PORT" value="" />
+
+    <!-- AWS S3 tests -->
+    <var name="AWS_S3_KEY" value="" />
+    <var name="AWS_S3_SECRET" value="" />
+    <var name="AWS_S3_BUCKET" value="" />
+  </php>
+
+  <filter>
+    <whitelist addUncoveredFilesFromWhitelist="true">
+      <directory suffix=".php">../../library</directory>
+      <exclude>
+        <directory suffix="Interface.php">../../library/Imbo</directory>
+        <file>../../library/Imbo/Exception.php</file>
+        <file>../../library/Imbo/Version.php</file>
+      </exclude>
+    </whitelist>
+  </filter>
+
+  <groups>
+    <exclude>
+      <!-- Exclude the aws group per default -->
+      <group>aws</group>
+    </exclude>
+  </groups>
+</phpunit>
