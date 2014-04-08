@@ -3,7 +3,7 @@ Changelog for Imbo
 
 Imbo-1.2.0
 ----------
-__N/A__
+__2014-04-08__
 
 * #286: Store images with mime types image/x-jpeg, image/x-png and image/x-gif as image/jpeg, image/png and image/gif respectively
 * #285: New image transformation: histogram (Mats Lindh)
