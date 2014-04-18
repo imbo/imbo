@@ -24,15 +24,17 @@ $config = array(
     /**
      * Authentication
      *
-     * This value must be set to an array with key => value pairs mapping to public and private keys
-     * of the users of this installation. The public keys must match the following case sensitive
-     * expression:
+     * This value must be set to either 1) an array with key => value pairs mapping to public and
+     * private keys of the users of this installation, or 2) an instance of the
+     * Imbo\Auth\UserLookupInterface interface.
+     *
+     * Public keys must match the following case sensitive regular expression:
      *
      * ^[a-z0-9_-]{3,}$
      *
-     * @var array
+     * @var array|Auth\UserLookupInterface
      */
-    'auth' => array(),
+    'auth' => null,
 
     /**
      * Database adapter
