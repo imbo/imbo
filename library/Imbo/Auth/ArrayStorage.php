@@ -41,37 +41,9 @@ class ArrayStorage implements UserLookupInterface {
     }
 
     /**
-     * @see http://www.php.net/manual/en/class.iterator.php
+     * {@inheritdoc}
      */
-    public function rewind() {
-        reset($this->users);
-    }
-
-    /**
-     * @see http://www.php.net/manual/en/class.iterator.php
-     */
-    public function current() {
-        return current($this->users);
-    }
-
-    /**
-     * @see http://www.php.net/manual/en/class.iterator.php
-     */
-    public function key() {
-        return key($this->users);
-    }
-
-    /**
-     * @see http://www.php.net/manual/en/class.iterator.php
-     */
-    public function next() {
-        return next($this->users);
-    }
-
-    /**
-     * @see http://www.php.net/manual/en/class.iterator.php
-     */
-    public function valid() {
-        return key($this->users) !== null;
+    public function getPublicKeys(UserLookup\Query $query = null) {
+        return array_slice($this->users, $query->offset() ?: 0, $query->limit());
     }
 }

@@ -10,15 +10,13 @@
 
 namespace Imbo\Auth;
 
-use Iterator;
-
 /**
  * Imbo user lookup interface
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Core\Auth
  */
-interface UserLookupInterface extends Iterator {
+interface UserLookupInterface {
     /**
      * Fetch the private key of a user
      *
@@ -26,4 +24,12 @@ interface UserLookupInterface extends Iterator {
      * @return null|string Returns null if the user does not exist, or the private key otherwise
      */
     function getPrivateKey($publicKey);
+
+    /**
+     * Fetch one or more public keys
+     *
+     * @param UserLookup\Query $query A query object used to filter the public keys returned
+     * @return string[] Returns a list of public keys
+     */
+    function getPublicKeys(UserLookup\Query $query = null);
 }

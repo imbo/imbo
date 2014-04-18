@@ -10,7 +10,8 @@
 
 namespace ImboUnitTest\Auth;
 
-use Imbo\Auth\ArrayStorage;
+use Imbo\Auth\ArrayStorage,
+    Imbo\Auth\UserLookup\Query;
 
 /**
  * @covers Imbo\Auth\ArrayStorage
@@ -38,27 +39,55 @@ class ArrayStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($privateKey, $storage->getPrivateKey($publicKey));
     }
 
-    public function testCanIterateOverUsers() {
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getUsersAndQuery() {
         $users = array(
             'user1' => 'key1',
             'user2' => 'key2',
             'user3' => 'key3',
+            'user4' => 'key4',
+            'user5' => 'key5',
+            'user6' => 'key6',
         );
 
+        return array(
+            'empty query' => array(
+                $users,
+                new Query(),
+                $users,
+            ),
+            'query with limit and offset' => array(
+                $users,
+                (new Query())->limit(2)->offset(3),
+                array(
+                    'user4' => 'key4',
+                    'user5' => 'key5',
+                ),
+            ),
+            'query with limit out of bounds' => array(
+                $users,
+                (new Query())->limit(4)->offset(5),
+                array(
+                    'user6' => 'key6',
+                ),
+            ),
+            'query with offset out of bounds' => array(
+                $users,
+                (new Query())->limit(4)->offset(10),
+                array(),
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getUsersAndQuery
+     */
+    public function testCanGetPublicKeys(array $users, Query $query, array $expectedUsers = array()) {
         $storage = new ArrayStorage($users);
-        $keys = array();
-        $both = array();
-
-        foreach ($storage as $value) {
-            $keys[] = $value;
-        }
-
-        $this->assertSame($keys, array('key1', 'key2', 'key3'));
-
-        foreach ($storage as $key => $value) {
-            $both[$key] = $value;
-        }
-
-        $this->assertSame($both, $users);
+        $this->assertSame($expectedUsers, $storage->getPublicKeys($query));
     }
 }
