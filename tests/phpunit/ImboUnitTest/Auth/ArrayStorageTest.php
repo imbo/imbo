@@ -58,22 +58,17 @@ class ArrayStorageTest extends \PHPUnit_Framework_TestCase {
             'empty query' => array(
                 $users,
                 new Query(),
-                $users,
+                array_keys($users),
             ),
             'query with limit and offset' => array(
                 $users,
                 (new Query())->limit(2)->offset(3),
-                array(
-                    'user4' => 'key4',
-                    'user5' => 'key5',
-                ),
+                array('user4', 'user5'),
             ),
             'query with limit out of bounds' => array(
                 $users,
                 (new Query())->limit(4)->offset(5),
-                array(
-                    'user6' => 'key6',
-                ),
+                array('user6'),
             ),
             'query with offset out of bounds' => array(
                 $users,

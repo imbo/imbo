@@ -44,6 +44,10 @@ class ArrayStorage implements UserLookupInterface {
      * {@inheritdoc}
      */
     public function getPublicKeys(UserLookup\Query $query = null) {
-        return array_slice($this->users, $query->offset() ?: 0, $query->limit());
+        if (!$query) {
+            $query = new UserLookup\Query();
+        }
+
+        return array_slice(array_keys($this->users), $query->offset() ?: 0, $query->limit());
     }
 }
