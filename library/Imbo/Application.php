@@ -22,7 +22,8 @@ use Imbo\Http\Request\Request,
     Imbo\Storage\StorageInterface,
     Imbo\Http\Response\Formatter,
     Imbo\Resource\ResourceInterface,
-    Imbo\EventListener\Initializer\InitializerInterface;
+    Imbo\EventListener\Initializer\InitializerInterface,
+    Imbo\Auth;
 
 /**
  * Imbo application
@@ -62,7 +63,18 @@ class Application {
             throw new InvalidArgumentException('Invalid storage adapter', 500);
         }
 
+        // Create a router based on the routes in the configuration and internal routes
         $router = new Router($config['routes']);
+
+        // Make sure the "auth" part of the configuration is an instance of the user lookup
+        // interface
+        if (is_array($config['auth'])) {
+            $config['auth'] = new Auth\ArrayStorage($config['auth']);
+        }
+
+        if (!($config['auth'] instanceof Auth\UserLookupInterface)) {
+            throw new InvalidArgumentException('Invalid auth configuration', 500);
+        }
 
         // Create the event manager and the event template
         $eventManager = new EventManager();
@@ -253,7 +265,7 @@ class Application {
             $response->headers->set('Allow', $resource->getAllowedMethods(), false);
 
             if ($publicKey = $request->getPublicKey()) {
-                if (!isset($config['auth'][$publicKey])) {
+                if (!$privateKey = $config['auth']->getPrivateKey($publicKey)) {
                     $e = new RuntimeException('Public key not found', 404);
                     $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
 
@@ -261,7 +273,8 @@ class Application {
                 }
 
                 // Fetch the private key from the config and store it in the request
-                $request->setPrivateKey($config['auth'][$publicKey]);
+                $request->setPrivateKey($privateKey);
+                unset($privateKey);
             }
 
             $methodName = strtolower($request->getMethod());
