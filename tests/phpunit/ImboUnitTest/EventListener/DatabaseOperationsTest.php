@@ -13,6 +13,7 @@ namespace ImboUnitTest\EventListener;
 use Imbo\EventListener\DatabaseOperations,
     Imbo\EventManager\Event,
     Imbo\Http\Response\Response,
+    Imbo\Auth,
     DateTime;
 
 /**
@@ -236,7 +237,7 @@ class DatabaseOperationsTest extends ListenerTests {
      */
     public function testCanLoadStats() {
         $this->event->expects($this->once())->method('getConfig')->will($this->returnValue(array(
-            'auth' => array('user1' => 'key', 'user2' => 'key'),
+            'auth' => new Auth\ArrayStorage(array('user1' => 'key', 'user2' => 'key')),
         )));
 
         $this->database->expects($this->at(0))->method('getNumImages')->with('user1')->will($this->returnValue(1));
