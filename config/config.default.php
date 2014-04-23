@@ -34,7 +34,7 @@ $config = array(
      *
      * @var array|Auth\UserLookupInterface
      */
-    'auth' => null,
+    'auth' => array(),
 
     /**
      * Database adapter
