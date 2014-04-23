@@ -13,7 +13,7 @@ namespace Imbo\Resource;
 use Imbo\EventManager\EventInterface,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Model\ArrayModel,
-    Imbo\Model\Image;
+    Imbo\Model\Image as ImageModel;
 
 /**
  * Short URL collection
@@ -72,7 +72,7 @@ class ShortUrls implements ResourceInterface {
 
         $extension = isset($image['extension']) ? strtolower($image['extension']) : null;
 
-        if ($extension !== null && !in_array($extension, Image::$mimeTypes)) {
+        if ($extension !== null && !in_array($extension, ImageModel::$mimeTypes)) {
             throw new InvalidArgumentException('Extension provided is not a recognized format', 400);
         }
 
