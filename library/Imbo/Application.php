@@ -263,9 +263,13 @@ class Application {
 
             // Inform the user agent of which methods are allowed against this resource
             $response->headers->set('Allow', $resource->getAllowedMethods(), false);
+            $publicKey = $request->getPublicKey();
 
-            if ($publicKey = $request->getPublicKey()) {
-                if (!$privateKey = $config['auth']->getPrivateKey($publicKey)) {
+            if ($publicKey) {
+                // Fetch the private key
+                $privateKey = $config['auth']->getPrivateKey($publicKey);
+
+                if (!$privateKey) {
                     $e = new RuntimeException('Public key not found', 404);
                     $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
 
