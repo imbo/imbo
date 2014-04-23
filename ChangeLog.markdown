@@ -1,6 +1,12 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.3.0
+----------
+__N/A__
+
+* #289: Support alternative ways of specifying public / private keys in the configuration
+
 Imbo-1.2.0
 ----------
 __2014-04-08__
