@@ -20,12 +20,13 @@ before_install:
   - sudo add-apt-repository -y ppa:moti-p/cc
   - sudo apt-get update
   - sudo apt-get -y --reinstall install imagemagick
-  - printf "\n" | pecl install imagick-beta
+  - if [ $(phpenv version-name) != "hhvm" ]; then printf "\n" | pecl install imagick-beta; fi
 before_script:
   - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - composer self-update
   - composer -n --no-ansi install --dev --prefer-source
+  - if [ $(phpenv version-name) == "hhvm" ]; then composer require "mongofill/mongofill dev-master" -n --no-ansi --prefer-source; fi
 script:
   - ./vendor/bin/phpunit --verbose -c tests/phpunit/phpunit.xml.travis
   - ./vendor/bin/behat --strict --profile travis --config tests/behat/behat.yml
