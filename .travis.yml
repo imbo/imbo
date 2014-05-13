@@ -21,7 +21,7 @@ before_install:
   - sudo add-apt-repository -y ppa:moti-p/cc
   - sudo apt-get update
   - sudo apt-get -y --reinstall install imagemagick
-  - if [ $IS_HHVM ]; then printf "\n" | pecl install imagick-beta; fi
+  - if [ -z $IS_HHVM ]; then printf "\n" | pecl install imagick-beta; fi
 before_script:
   - if [ -z $IS_HHVM ]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
   - if [ -z $IS_HHVM ]; then echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
