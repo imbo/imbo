@@ -190,6 +190,9 @@ class Cors implements ListenerInterface {
 
         $origin = $request->headers->get('Origin', '*');
 
+        // Vary on Origin to prevent caching allowed/disallowed requests
+        $event->getResponse()->setVary('Origin', false);
+
         // Fall back if the passed origin is not allowed
         if (!$this->originIsAllowed($origin)) {
             return;
