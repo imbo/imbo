@@ -1,6 +1,12 @@
 Changelog for Imbo
 ==================
 
+Imbo-x.x.x
+----------
+__N/A__
+
+* #291: Fixed issue with cli-tool not being able to find the autoloader
+
 Imbo-1.2.0
 ----------
 __2014-04-08__
