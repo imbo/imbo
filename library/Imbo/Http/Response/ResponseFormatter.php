@@ -170,7 +170,7 @@ class ResponseFormatter implements ListenerInterface {
             $formatter = $this->supportedTypes[$mime];
         } else {
             // Set Vary to Accept since we are doing content negotiation based on Accept
-            $response->setVary('Accept');
+            $response->setVary('Accept', false);
 
             // No extension have been provided
             $acceptableTypes = array();

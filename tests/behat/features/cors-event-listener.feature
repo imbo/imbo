@@ -11,6 +11,7 @@ Feature: Imbo provides an event listener for CORS
         And the "Access-Control-Allow-Origin" response header is "http://allowedhost"
         And the "Access-Control-Expose-Headers" response header contains "X-Imbo-ImageIdentifier"
         And the "Access-Control-Expose-Headers" response header contains "X-Imbo-Version"
+        And the "Vary" response header contains "Origin"
         And the "Allow" response header contains "GET"
         And the "Allow" response header contains "HEAD"
         And the "Allow" response header contains "OPTIONS"
@@ -20,6 +21,7 @@ Feature: Imbo provides an event listener for CORS
         And Imbo uses the "cors.php" configuration
         When I request "/" using HTTP "HEAD"
         Then I should get a response with "200 Hell Yeah"
+        And the "Vary" response header contains "Origin"
         And the "Allow" response header contains "GET"
         And the "Allow" response header contains "HEAD"
         And the "Allow" response header contains "OPTIONS"
@@ -69,6 +71,7 @@ Feature: Imbo provides an event listener for CORS
         And I attach "ChangeLog.markdown" to the request body
         When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "415 Invalid image"
+        And the "Vary" response header contains "Origin"
         And the following response headers should be present:
         """
         Access-Control-Allow-Origin
