@@ -523,11 +523,7 @@ class MongoDB implements DatabaseInterface {
             $result = $this->getShortUrlCollection()->findOne(array(
                 'shortUrlId' => $shortUrlId,
             ), array(
-                '_id' => null,
-                'publicKey',
-                'imageIdentifier',
-                'extension',
-                'query',
+                '_id' => false
             ));
 
             if (!$result) {
