@@ -1,11 +1,18 @@
 Changelog for Imbo
 ==================
 
-Imbo-x.x.x
+Imbo-1.2.1
 ----------
-__N/A__
+__2014-08-01__
 
+* #295: Added PHP-5.6 to build matrix at Travis-CI (Espen Hovlandsdal)
+* #293: Improved documentation (Mats Lindh)
 * #291: Fixed issue with cli-tool not being able to find the autoloader
+
+Bug fixes:
+
+* #294: ShortUrls cannot be retrieved with latest MongoDB driver (Espen Hovlandsdal)
+* #290: Vary on Origin when Cors-listener is enabled (Espen Hovlandsdal)
 
 Imbo-1.2.0
 ----------
