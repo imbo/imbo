@@ -31,7 +31,13 @@ Imbo-1.2.0 includes a new feature that lets you filter images based on the origi
 Doctrine
 ~~~~~~~~
 
-If you use the :ref:`Doctrine database adapter <doctrine-database-adapter>` a definition of the ``originalChecksum`` field can be found in the :ref:`database-setup` section. When you have added the field to your database you can run the following query to update all rows in the database:
+If you use the :ref:`Doctrine database adapter <doctrine-database-adapter>` you'll need to add the new ``originalChecksum`` field to the table. The field has also been added to the :ref:`database-setup` section. The field should be added while there are no write operations pending, as a write could fail before upgrading Imbo itself.
+
+.. code-block:: sql
+
+    ALTER TABLE imageinfo ADD COLUMN `originalChecksum` char(32) COLLATE utf8_danish_ci NOT NULL;
+
+When you have added the field to your database you can run the following query to update all rows in the database:
 
 .. code-block:: sql
 
