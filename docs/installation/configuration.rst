@@ -276,8 +276,8 @@ Examples
         // ...
 
         'storage' => function() {
-            new Imbo\Storage\S3(array(
-                'key' => '<aws access key>'
+            return new Imbo\Storage\S3(array(
+                'key' => '<aws access key>',
                 'secret' => '<aws secret key>',
                 'bucket' => 'my-imbo-bucket',
             ));
