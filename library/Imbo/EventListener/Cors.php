@@ -161,10 +161,22 @@ class Cors implements ListenerInterface {
             $allowedMethods = array_merge($allowedMethods, $this->params['allowedMethods'][$resource]);
         }
 
+        $allowedHeaders = array('Content-Type', 'Accept');
+
+        $requestHeaders = '';
+        $requestHeaders = $request->headers->get('Access-Control-Request-Headers', '');
+        $requestHeaders = array_map('trim', explode(',', $requestHeaders));
+
+        foreach ($requestHeaders as $header) {
+            if (strpos($header, 'x-imbo') === 0) {
+                $allowedHeaders[] = implode('-', array_map('ucfirst', explode('-', $header)));;
+            }
+        }
+
         $response->headers->add(array(
             'Access-Control-Allow-Origin' => $origin,
             'Access-Control-Allow-Methods' => implode(', ', $allowedMethods),
-            'Access-Control-Allow-Headers' => 'Content-Type, Accept',
+            'Access-Control-Allow-Headers' => implode(', ', $allowedHeaders),
             'Access-Control-Max-Age' => (int) $this->params['maxAge'],
         ));
 
