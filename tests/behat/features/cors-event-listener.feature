@@ -79,3 +79,14 @@ Feature: Imbo provides an event listener for CORS
         """
         Access-Control-Allow-Origin
         """
+
+    Scenario: Provides CORS headers when authentication fails
+        Given I use "invalid-pubkey" and "invalid-privkey" for public and private keys
+        And Imbo uses the "cors.php" configuration
+        And the "Origin" request header is "http://allowedhost"
+        When I request "/users/publickey/images" using HTTP "GET"
+        Then I should get a response with "400 Missing access token"
+        And the following response headers should be present:
+        """
+        Access-Control-Allow-Origin
+        """

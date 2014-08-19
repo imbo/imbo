@@ -91,7 +91,7 @@ class Cors implements ListenerInterface {
         foreach ($this->params['allowedMethods'] as $resource => $methods) {
             foreach ($methods as $method) {
                 $eventName = $resource . '.' . strtolower($method);
-                $events[$eventName] = array('invoke' => 100);
+                $events[$eventName] = array('invoke' => 1000);
             }
 
             // Always enable the listener for the OPTIONS method
@@ -163,7 +163,6 @@ class Cors implements ListenerInterface {
 
         $allowedHeaders = array('Content-Type', 'Accept');
 
-        $requestHeaders = '';
         $requestHeaders = $request->headers->get('Access-Control-Request-Headers', '');
         $requestHeaders = array_map('trim', explode(',', $requestHeaders));
 
