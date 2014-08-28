@@ -61,6 +61,16 @@ $config = array(
     },
 
     /**
+     * Whether to content negotiate images. If set to true, Imbo will try to find a suitable
+     * image format based on the Accept-header received. If set to false, it will deliver the
+     * image in the format it was originally added as. Note that this does not affect images
+     * requested with a specific extension (.jpg/.png/.gif etc).
+     *
+     * @var boolean
+     */
+    'contentNegotiateImages' => true,
+
+    /**
      * Event listeners
      *
      * An associative array where the keys are short names for the event listeners (not really used

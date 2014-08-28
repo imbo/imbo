@@ -155,9 +155,16 @@ class ResponseFormatter implements ListenerInterface {
         $formatter = null;
         $extension = $request->getExtension();
         $routeName = (string) $request->getRoute();
+        $config = $event->getConfig();
+        $contentNegotiateImages = $config['contentNegotiateImages'];
         $model = $response->getModel();
 
-        if ($extension && !($model instanceof Model\Error && $routeName === 'image')) {
+        if (!$extension && !$contentNegotiateImages && $model instanceof Model\Image) {
+            // Configuration is telling us not to use content negotiation for images,
+            // instead we want to use the original format of the image
+            $mime = $model->getMimeType();
+            $formatter = $this->supportedTypes[$mime];
+        } else if ($extension && !($model instanceof Model\Error && $routeName === 'image')) {
             // The user agent wants a specific type. Skip content negotiation completely, but not
             // if the request is against the image resource, and ended up as an error, because then
             // Imbo would try to render the error as an image.
