@@ -5,6 +5,7 @@ Imbo-x.x.x
 ----------
 __N/A__
 
+* #300: Added configuration option to enable/disable content negotiation for images (`contentNegotiateImages`). Will behave as earlier versions by default (Espen Hovlandsdal)
 * #298: Fixed issue where browsers could not send `X-Imbo-*`-headers across origins (Espen Hovlandsdal)
 * #298: Fixed issue where CORS-requests would not have the `Access-Control-Allow-Origin`-header present in the response if the request was incorrectly signed or missing the accessToken (Espen Hovlandsdal)
 
