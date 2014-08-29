@@ -1,6 +1,13 @@
 Changelog for Imbo
 ==================
 
+Imbo-x.x.x
+----------
+__N/A__
+
+* #298: Fixed issue where browsers could not send `X-Imbo-*`-headers across origins (Espen Hovlandsdal)
+* #298: Fixed issue where CORS-requests would not have the `Access-Control-Allow-Origin`-header present in the response if the request was incorrectly signed or missing the accessToken (Espen Hovlandsdal)
+
 Imbo-1.2.1
 ----------
 __2014-08-01__

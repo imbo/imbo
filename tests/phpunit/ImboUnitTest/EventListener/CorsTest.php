@@ -215,11 +215,24 @@ class CorsTest extends ListenerTests {
         $route->expects($this->once())->method('__toString')->will($this->returnValue('image'));
         $this->request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
 
+        $this->request->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $this->request->headers
+            ->expects($this->at(0))
+            ->method('get')
+            ->with('Origin', '*')
+            ->will($this->returnValue('http://imbo-project.org'));
+
+        $this->request->headers
+            ->expects($this->at(1))
+            ->method('get')
+            ->with('Access-Control-Request-Headers', '')
+            ->will($this->returnValue('x-imbo-signature,something-else'));
+
         $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $headers->expects($this->once())->method('add')->with(array(
             'Access-Control-Allow-Origin' => 'http://imbo-project.org',
             'Access-Control-Allow-Methods' => 'OPTIONS, HEAD',
-            'Access-Control-Allow-Headers' => 'Content-Type, Accept',
+            'Access-Control-Allow-Headers' => 'Content-Type, Accept, X-Imbo-Signature',
             'Access-Control-Max-Age' => 60,
         ));
 
@@ -272,44 +285,44 @@ class CorsTest extends ListenerTests {
             'default' => array(
                 'params' => array(),
                 'events' => array(
-                    'index.get' => array('invoke' => 100),
-                    'index.head' => array('invoke' => 100),
+                    'index.get' => array('invoke' => 1000),
+                    'index.head' => array('invoke' => 1000),
                     'index.options' => array('options' => 20),
 
-                    'image.get' => array('invoke' => 100),
-                    'image.head' => array('invoke' => 100),
+                    'image.get' => array('invoke' => 1000),
+                    'image.head' => array('invoke' => 1000),
                     'image.options' => array('options' => 20),
 
-                    'images.get' => array('invoke' => 100),
-                    'images.head' => array('invoke' => 100),
+                    'images.get' => array('invoke' => 1000),
+                    'images.head' => array('invoke' => 1000),
                     'images.options' => array('options' => 20),
 
-                    'metadata.get' => array('invoke' => 100),
-                    'metadata.head' => array('invoke' => 100),
+                    'metadata.get' => array('invoke' => 1000),
+                    'metadata.head' => array('invoke' => 1000),
                     'metadata.options' => array('options' => 20),
 
-                    'status.get' => array('invoke' => 100),
-                    'status.head' => array('invoke' => 100),
+                    'status.get' => array('invoke' => 1000),
+                    'status.head' => array('invoke' => 1000),
                     'status.options' => array('options' => 20),
 
-                    'stats.get' => array('invoke' => 100),
-                    'stats.head' => array('invoke' => 100),
+                    'stats.get' => array('invoke' => 1000),
+                    'stats.head' => array('invoke' => 1000),
                     'stats.options' => array('options' => 20),
 
-                    'user.get' => array('invoke' => 100),
-                    'user.head' => array('invoke' => 100),
+                    'user.get' => array('invoke' => 1000),
+                    'user.head' => array('invoke' => 1000),
                     'user.options' => array('options' => 20),
 
-                    'globalshorturl.get' => array('invoke' => 100),
-                    'globalshorturl.head' => array('invoke' => 100),
+                    'globalshorturl.get' => array('invoke' => 1000),
+                    'globalshorturl.head' => array('invoke' => 1000),
                     'globalshorturl.options' => array('options' => 20),
 
-                    'shorturl.get' => array('invoke' => 100),
-                    'shorturl.head' => array('invoke' => 100),
+                    'shorturl.get' => array('invoke' => 1000),
+                    'shorturl.head' => array('invoke' => 1000),
                     'shorturl.options' => array('options' => 20),
 
-                    'shorturls.get' => array('invoke' => 100),
-                    'shorturls.head' => array('invoke' => 100),
+                    'shorturls.get' => array('invoke' => 1000),
+                    'shorturls.head' => array('invoke' => 1000),
                     'shorturls.options' => array('options' => 20),
                 ),
             ),
@@ -321,9 +334,9 @@ class CorsTest extends ListenerTests {
                     ),
                 ),
                 'events' => array(
-                    'stats.get' => array('invoke' => 100),
+                    'stats.get' => array('invoke' => 1000),
                     'stats.options' => array('options' => 20),
-                    'images.post' => array('invoke' => 100),
+                    'images.post' => array('invoke' => 1000),
                     'images.options' => array('options' => 20),
                 ),
             ),
