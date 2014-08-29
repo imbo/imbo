@@ -443,6 +443,17 @@ If you need to create your own storage adapter you need to create a class that i
 
 You can read more about how to achieve this in the :doc:`../develop/custom_adapters` chapter.
 
+.. _configuration-content-negotiation:
+
+Content negotiation for images - ``contentNegotiateImages``
+-----------------------------------------------------------
+
+By default, Imbo will do content negotiation for images. In other words, if a request is sent for an image with the ``Accept``-header ``image/jpeg``, it will try to deliver the image in JPEG-format.
+
+If what you want is for images to be delivered in the format they were uploaded in, you can set ``contentNegotiateImages`` to ``false`` in the configuration. This will also ensure Imbo does not include ``Accept`` in the ``Vary``-header for image requests, which will make caching behind reverse proxies more efficient.
+
+You are still able to convert between formats by specifying an extension when requesting the image (`.jpg`, `.png`, `.gif` etc).
+
 .. _configuration-event-listeners:
 
 Event listeners - ``eventListeners``
