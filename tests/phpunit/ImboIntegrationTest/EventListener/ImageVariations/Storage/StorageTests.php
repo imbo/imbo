@@ -45,7 +45,7 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
 
     public function testCanStoreAndFetchImageVariations() {
         $key = 'key';
-        $id  = 'id';
+        $id  = 'imageId';
         $width = 200;
 
         $this->assertNull($this->adapter->getImageVariation($key, $id, $width));
@@ -55,7 +55,7 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
 
     public function testCanDeleteOneOrMoreImageVariations() {
         $key = 'key';
-        $id  = 'id';
+        $id  = 'imageId';
 
         $this->assertTrue($this->adapter->storeImageVariation($key, $id, 'blob1', 100));
         $this->assertTrue($this->adapter->storeImageVariation($key, $id, 'blob2', 200));
