@@ -205,24 +205,8 @@ class ImageVariations implements ListenerInterface {
             $name = $transformations[$i]['name'];
             $params = $transformations[$i]['params'];
 
-            if ($name === 'crop') {
-                foreach (array('x', 'y', 'width', 'height') as $param) {
-                    if (isset($params[$param])) {
-                        $params[$param] = round($params[$param] / $ratio);
-                    }
-                }
-
-                $transformations[$i]['params'] = $params;
-            } else if ($name === 'border') {
+            if ($name === 'border') {
                 foreach (array('width', 'height') as $param) {
-                    if (isset($params[$param])) {
-                        $params[$param] = round($params[$param] / $ratio);
-                    }
-                }
-
-                $transformations[$i]['params'] = $params;
-            } else if ($name === 'canvas') {
-                foreach (array('x', 'y', 'width', 'height') as $param) {
                     if (isset($params[$param])) {
                         $params[$param] = round($params[$param] / $ratio);
                     }
@@ -282,6 +266,7 @@ class ImageVariations implements ListenerInterface {
                     $widths[$i] = (int) $params['height'] * $ratio;
                 }
             } else if ($name === 'thumbnail') {
+                // Thumbnail transformation
                 if (isset($params['width'])) {
                     // Width have been specified
                     $widths[$i] = (int) $params['width'];
@@ -292,6 +277,10 @@ class ImageVariations implements ListenerInterface {
                     // No width or height/inset fit combo. Use default width for thumbnails
                     $widths[$i] = 50;
                 }
+            } else if (($name === 'crop' || $name === 'canvas') && empty($widths)) {
+                // If the crop transformation is the first transformation in the chain which modifies
+                // the size of the image, we'll need the original, therefore, add the original width
+                $widths[$i] = $width;
             }
         }
 
