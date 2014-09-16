@@ -271,6 +271,9 @@ The event listener has two roles, one is to generate the variations when new ima
 
 The event listener supports for following configuration parameters:
 
+``(boolean) lossless``
+    Have Imbo use a lossless format to store the image variations. This results in better quality images, but converting between formats can be slower and will use more disk space. Defaults to ``false``.
+
 ``(boolean) autoScale``
     Have Imbo automatically figure out the widths of the image variations (based on other parameters). Defaults to ``true``.
 

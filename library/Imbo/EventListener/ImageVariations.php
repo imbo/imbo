@@ -41,6 +41,9 @@ class ImageVariations implements ListenerInterface {
      * @var array
      */
     private $params = array(
+        // Flip to true to converts variations to a lossless format (PNG) before saving
+        'lossless' => false,
+
         // Flip to false to turn off auto scaling
         'autoScale' => true,
 
@@ -390,6 +393,16 @@ class ImageVariations implements ListenerInterface {
                 $eventManager->trigger('image.loaded', array(
                     'image' => $image,
                 ));
+
+                // If configured, use a lossless variation format
+                if ($this->params['lossless'] === true) {
+                    $eventManager->trigger('image.transformation.convert', array(
+                        'image' => $image,
+                        'params' => array(
+                            'type' => 'png',
+                        )
+                    ));
+                }
 
                 // Trigger a resize of the image (the transformation handles aspect ratio)
                 $eventManager->trigger('image.transformation.resize', array(
