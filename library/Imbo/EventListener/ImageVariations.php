@@ -201,12 +201,28 @@ class ImageVariations implements ListenerInterface {
         $ratio = $event->getArgument('ratio');
 
         // Adjust coordinates according to the ratio between the original and the variation
-        for ($i = 0; $i < $transformationIndex; $i++) {
+        for ($i = 0; $i <= $transformationIndex; $i++) {
             $name = $transformations[$i]['name'];
             $params = $transformations[$i]['params'];
 
-            if ($name === 'border') {
+            if ($name === 'crop') {
+                foreach (array('x', 'y', 'width', 'height') as $param) {
+                    if (isset($params[$param])) {
+                        $params[$param] = round($params[$param] / $ratio);
+                    }
+                }
+
+                $transformations[$i]['params'] = $params;
+            } else if ($name === 'border') {
                 foreach (array('width', 'height') as $param) {
+                    if (isset($params[$param])) {
+                        $params[$param] = round($params[$param] / $ratio);
+                    }
+                }
+
+                $transformations[$i]['params'] = $params;
+            }  else if ($name === 'canvas') {
+                foreach (array('x', 'y', 'width', 'height') as $param) {
                     if (isset($params[$param])) {
                         $params[$param] = round($params[$param] / $ratio);
                     }
@@ -239,6 +255,9 @@ class ImageVariations implements ListenerInterface {
     public function getMaxWidth($width, $height, array $transformations) {
         // Possible widths to use
         $widths = array();
+
+        // Extracts from the image
+        $extracts = array();
 
         // Calculate the aspect ratio in case some transformations only specify height
         $ratio = $width / $height;
@@ -277,11 +296,24 @@ class ImageVariations implements ListenerInterface {
                     // No width or height/inset fit combo. Use default width for thumbnails
                     $widths[$i] = 50;
                 }
-            } else if (($name === 'crop' || $name === 'canvas') && empty($widths)) {
-                // If the crop transformation is the first transformation in the chain which modifies
-                // the size of the image, we'll need the original, therefore, add the original width
-                $widths[$i] = $width;
+            } else if ($name === 'crop') {
+                // Crop transformation
+                $extracts[$i] = $params;
             }
+        }
+
+        if ($widths && !empty($extracts)) {
+            // If we are fetching extracts, we need a larger version of the image
+            $extract = $extracts[0];
+
+            // Find the correct scaling factor for the extract
+            $extractFactor = $width / $extract['width'];
+            $maxWidth = max($widths);
+
+            // Find the new max width
+            $maxWidth = $maxWidth * $extractFactor;
+
+            return array(array_search($maxWidth, $extracts) => $maxWidth);
         }
 
         if ($widths) {

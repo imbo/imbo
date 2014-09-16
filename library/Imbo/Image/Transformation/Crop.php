@@ -100,6 +100,7 @@ class Crop extends Transformation implements ListenerInterface {
 
         try {
             $this->imagick->cropImage($width, $height, $x, $y);
+            $this->imagick->setImagePage(0, 0, 0, 0);
             $size = $this->imagick->getImageGeometry();
 
             $image->setWidth($size['width'])
