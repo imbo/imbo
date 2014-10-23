@@ -124,5 +124,28 @@ class Metadata implements ResourceInterface {
                 throw new InvalidArgumentException('Invalid JSON data', 400);
             }
         }
+
+        // Validate the keys of the metadata
+        $this->validateKeys($metadata);
+    }
+
+    /**
+     * Validate the keys of the metadata
+     *
+     * Keys can not contain ".", "::" and can not start with "$"
+     *
+     * @param array $metadata The metadata
+     * @throws InvalidArgumentException
+     */
+    private function validateKeys(array $metadata) {
+        foreach ($metadata as $key => $value) {
+            if ($key[0] === '$' || strpos($key, '.') !== false || strpos($key, '::') !== false) {
+                throw new InvalidArgumentException('Invalid metadata key: ' . $key, 400);
+            }
+
+            if (is_array($value)) {
+                $this->validateKeys($value);
+            }
+        }
     }
 }

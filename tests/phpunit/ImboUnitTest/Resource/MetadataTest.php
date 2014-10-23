@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Resource;
 
 use Imbo\Resource\Metadata,
+    Imbo\Exception\InvalidArgumentException,
     DateTime,
     DateTimeZone;
 
@@ -144,5 +145,60 @@ class MetadataTest extends ResourceTests {
     public function testAllowsValidJsonData() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"foo":"bar"}'));
         $this->resource->validateMetadata($this->event);
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getMetadataKeys() {
+        return array(
+            'valid data' => array(
+                'metadata' => '{"key": "value"}',
+                'fail'     => false,
+            ),
+            'key with dot' => array(
+                'metadata'   => '{"foo.bar": "value"}',
+                'fail'       => true,
+                'invalidKey' => 'foo.bar',
+            ),
+            'key with double colon' => array(
+                'metadata'   => '{"foo::bar": "value"}',
+                'fail'       => true,
+                'invalidKey' => 'foo::bar',
+            ),
+            'key that starts with a dollar sign' => array(
+                'metadata'   => '{"$foo": "value"}',
+                'fail'       => true,
+                'invalidKey' => '$foo',
+            ),
+            'key that contains a dollar sign' => array(
+                'metadata' => '{"foo$bar": "value"}',
+                'fail'     => false,
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getMetadataKeys
+     */
+    public function testThrowsAnExceptionIfAMetadataKeyContainsAnInvalidCharacter($metadata, $fail, $invalidKey = null) {
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue($metadata));
+
+        try {
+            $this->resource->validateMetadata($this->event);
+
+            if ($fail) {
+                $this->fail('Expected exception, got none');
+            }
+        } catch (InvalidArgumentException $e) {
+            if (!$fail) {
+                $this->fail('Did not expect an exception, got one');
+            }
+
+            $this->assertSame('Invalid metadata key: ' . $invalidKey, $e->getMessage());
+            $this->assertSame(400, $e->getCode());
+        }
     }
 }

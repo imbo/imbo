@@ -28,6 +28,7 @@ class Application extends BaseApplication {
 
         // Register commands
         $this->addCommands(array(
+            new Command\GenerateNormalizedMetadata(),
             new Command\GeneratePrivateKey(),
         ));
     }

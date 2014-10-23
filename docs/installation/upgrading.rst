@@ -18,10 +18,22 @@ Below are the changes you need to be aware of when upgrading to Imbo-1.2.0.
     :local:
     :depth: 2
 
-Response to metadata write operations
-+++++++++++++++++++++++++++++++++++++
+Metadata keys
++++++++++++++
 
-Versions prior to 1.2.0 contained the image identifier in the response to ``HTTP POST/PUT/DELETE`` against the :ref:`metadata resource <metadata-resource>`. Starting from Imbo-1.2.0 the response to these requests will contain the metadata attached to the image instead. Read more about the different responses in the :ref:`metadata resource <metadata-resource>` section.
+Prior to Imbo-1.2.0 metadata keys could not contain ``::`` if you used the :ref:`Doctrine database adapter <doctrine-database-adapter>`. From Imbo-1.2.0 this is now true regardless of the adapter you are using. Two other rules have also been added:
+
+* Keys can not contain ``.`` (``foo.bar`` for instance). This is a limitation in MongoDB, and to make it easier for users of Imbo to port data between back-ends it will deny this for all adapters.
+* Keys can not start with ``$`` (``$foo`` for instance). This is because of the DSL used by the :ref:`metadata queries <metadata-query>`, added to Imbo-1.2.0.
+
+If you are using the MongoDB adapter, and have keys that contain ``::`` you are encouraged to change these into something else. Likewise, if you are using the Doctrine adapter, and have keys that start with ``$`` or contain a ``.`` you should change these as well for metadata search compatibility.
+
+Metadata queries
+++++++++++++++++
+
+Imbo-1.2.0 introduces a new metadata query feature that lets you search for images by querying the metadata attached to the images. Read more about the feature in the :ref:`metadata-query` section about the feature itself.
+
+If you have added metadata to images prior to upgrading to Imbo-1.2.0 **and** use the :ref:`MongoDB database adapter <mongodb-database-adapter>` you will need to update some metadata in the collection used by Imbo. The :doc:`command line script <cli>` that ships with Imbo can be used to convert the data for you, more specifically the :ref:`generate-normalized-metadata <cli-generate-normalized-metadata>` command. If you use the :ref:`Doctrine database adapter <doctrine-database-adapter>` you do not need to worry about this.
 
 Original checksum
 +++++++++++++++++
@@ -65,3 +77,8 @@ Short image URLs
 ++++++++++++++++
 
 In versions prior to Imbo-1.2.0 short image URLs were created automatically whenever a user agent requested the image resource (with or without transformations), and sent in the response as the ``X-Imbo-ShortUrl`` header. This no longer done automatically. Refer to the :ref:`shorturls-resource` section for more information on how to generate short URLs from this version on.
+
+Response to metadata write operations
++++++++++++++++++++++++++++++++++++++
+
+Versions prior to 1.2.0 contained the image identifier in the response to ``HTTP POST/PUT/DELETE`` against the :ref:`metadata resource <metadata-resource>`. Starting from Imbo-1.2.0 the response to these requests will contain the metadata attached to the image instead. Read more about the different responses in the :ref:`metadata resource <metadata-resource>` section.

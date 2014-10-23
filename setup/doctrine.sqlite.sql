@@ -17,9 +17,12 @@ CREATE TABLE IF NOT EXISTS imageinfo (
 CREATE TABLE IF NOT EXISTS metadata (
     id INTEGER PRIMARY KEY NOT NULL,
     imageId KEY INTEGER NOT NULL,
-    tagName TEXT NOT NULL,
-    tagValue TEXT NOT NULL
+    tagName TEXT NOT NULL COLLATE NOCASE,
+    tagValue TEXT NOT NULL COLLATE NOCASE
 );
+
+CREATE INDEX metadatatagname ON metadata (tagName);
+CREATE INDEX metadatatagvalue ON metadata (tagValue);
 
 CREATE TABLE IF NOT EXISTS shorturl (
     shortUrlId TEXT PRIMARY KEY NOT NULL,

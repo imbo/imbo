@@ -29,6 +29,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $applicationTester->run(array('command' => 'list'));
         $output = $applicationTester->getDisplay();
 
+        $this->assertContains('generate-normalized-metadata', $output);
         $this->assertContains('generate-private-key', $output);
     }
 }

@@ -10,7 +10,8 @@
 
 namespace Imbo\Resource\Images;
 
-use Imbo\Exception\RuntimeException;
+use Imbo\Exception\RuntimeException,
+    Imbo\Exception\InvalidArgumentException;
 
 /**
  * Query object for the images resource
@@ -81,6 +82,31 @@ class Query {
      * @var array
      */
     private $sort = array();
+
+    /**
+     * Metadata query
+     *
+     * @var array
+     */
+    private $metadataQuery = array();
+
+    /**
+     * Valid operators for metadata queries
+     *
+     * @var array
+     */
+    private $validMetadataQueryOperators = array(
+        '$gt'       => true,
+        '$gte'      => true,
+        '$in'       => true,
+        '$lt'       => true,
+        '$lte'      => true,
+        '$ne'       => true,
+        '$or'       => true,
+        '$and'      => true,
+        '$wildcard' => true,
+        '$exists'   => true,
+    );
 
     /**
      * Set or get the page property
@@ -250,5 +276,53 @@ class Query {
         $this->sort = $sortData;
 
         return $this;
+    }
+
+    /**
+     * Set or get the metadata query
+     *
+     * @param array $query Give this a value to set the metadataQuery property
+     * @return array|self
+     */
+    public function metadataQuery(array $query = null) {
+        if ($query === null) {
+            return $this->metadataQuery;
+        }
+
+        $this->metadataQuery = $this->prepareMetadataQuery($query);
+
+        return $this;
+    }
+
+    /**
+     * Prepare a metadata query
+     *
+     * This method will lowercase all field names and values to make the search case insensitive. If
+     * an operator that is not supported is found, the method will throw an exception.
+     *
+     * @param array $query The metadata query from the query string
+     * @throws InvalidArgumentException
+     * @return array
+     */
+    private function prepareMetadataQuery(array $query) {
+        $result = array();
+
+        foreach ($query as $key => $value) {
+            $key = strtolower($key);
+
+            if (substr($key, 0, 1) === '$' && !isset($this->validMetadataQueryOperators[$key])) {
+                throw new InvalidArgumentException('Query operator ' . $key . ' is not supported', 400);
+            }
+
+            if (is_array($value)) {
+                $value = $this->prepareMetadataQuery($value);
+            } else if (is_string($value)) {
+                $value = strtolower($value);
+            }
+
+            $result[$key] = $value;
+        }
+
+        return $result;
     }
 }

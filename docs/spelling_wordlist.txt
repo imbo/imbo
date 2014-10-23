@@ -36,3 +36,4 @@ Imagick
 Behat
 Lighttpd
 ETag
+Nøgne

@@ -17,6 +17,7 @@ use Imbo\Model\Image,
     MongoClient,
     MongoCollection,
     MongoException,
+    MongoRegex,
     DateTime,
     DateTimeZone;
 
@@ -67,6 +68,14 @@ class MongoDB implements DatabaseInterface {
         'server'  => 'mongodb://localhost:27017',
         'options' => array('connect' => true, 'connectTimeoutMS' => 1000),
     );
+
+    /**
+     * The string that will replace wildcards (*) in a metadata query $wildcard search, only to be
+     * replaced with .* after quoting
+     *
+     * @var string
+     */
+    protected $regexWildcardReplacement = 'WILDCARDREPLACEMENT';
 
     /**
      * Class constructor
@@ -129,6 +138,7 @@ class MongoDB implements DatabaseInterface {
             'extension'        => $image->getExtension(),
             'mime'             => $image->getMimeType(),
             'metadata'         => array(),
+            'metadata_n'       => array(),
             'added'            => $added ?: $now,
             'updated'          => $updated ?: $now,
             'width'            => $image->getWidth(),
@@ -182,7 +192,11 @@ class MongoDB implements DatabaseInterface {
 
             $this->getImageCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('$set' => array('updated' => time(), 'metadata' => $updatedMetadata)),
+                array('$set' => array(
+                    'updated' => time(),
+                    'metadata' => $updatedMetadata,
+                    'metadata_n' => $this->lowercaseArray($updatedMetadata),
+                )),
                 array('multiple' => false)
             );
         } catch (MongoException $e) {
@@ -228,7 +242,7 @@ class MongoDB implements DatabaseInterface {
 
             $this->getImageCollection()->update(
                 array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('$set' => array('metadata' => array())),
+                array('$set' => array('metadata' => array(), 'metadata_n' => array())),
                 array('multiple' => false)
             );
         } catch (MongoException $e) {
@@ -283,6 +297,10 @@ class MongoDB implements DatabaseInterface {
 
         if (!empty($originalChecksums)) {
             $queryData['originalChecksum']['$in'] = $originalChecksums;
+        }
+
+        if ($metadataQuery = $query->metadataQuery()) {
+            $queryData = array_merge($queryData, $this->prepareMetadataQuery($metadataQuery));
         }
 
         // Sorting
@@ -614,5 +632,78 @@ class MongoDB implements DatabaseInterface {
         }
 
         return $this->mongoClient;
+    }
+
+    /**
+     * Prepare a metadata query for the MongoDB adapter
+     *
+     * This method will prefix all field names with "metadata_n.", and will translate the custom
+     * $wildcard operator to $regex
+     *
+     * @param array $query The metadata query from the query string
+     * @return array
+     */
+    private function prepareMetadataQuery(array $query) {
+        $result = array();
+
+        foreach ($query as $key => $value) {
+            if (!is_numeric($key) && substr($key, 0, 1) !== '$') {
+                $key = 'metadata_n.' . $key;
+            } else if ($key === '$wildcard') {
+                $key = '$regex';
+                $value = $this->getWildcardRegex($value);
+            }
+
+            if (is_array($value)) {
+                $value = $this->prepareMetadataQuery($value);
+            }
+
+            $result[$key] = $value;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Lowercase an array, both keys and values
+     *
+     * @param array $data The data to lowercase
+     * @return array
+     */
+    private function lowercaseArray(array $data) {
+        $result = array();
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->lowercaseArray($value);
+            } else if (is_string($value)) {
+                $value = strtolower($value);
+            }
+
+            $result[strtolower($key)] = $value;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get a regex search
+     *
+     * @param string $query A query string with possible wildcards represented as '*'
+     * @return MongoRegex
+     */
+    private function getWildcardRegex($query) {
+        // Replace any * with something that will not be quoted
+        $query = str_replace('*', $this->regexWildcardReplacement, $query);
+        $query = '/^' . preg_quote($query, '/') . '$/';
+        $query = str_replace(array(
+            $this->regexWildcardReplacement,
+            '_'
+        ), array(
+            '.*',
+            '.'
+        ), $query);
+
+        return new MongoRegex($query);
     }
 }

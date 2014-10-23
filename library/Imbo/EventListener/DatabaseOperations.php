@@ -12,6 +12,7 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Resource\Images\Query as ImagesQuery,
+    Imbo\Exception\InvalidArgumentException,
     Imbo\Model;
 
 /**
@@ -224,6 +225,16 @@ class DatabaseOperations implements ListenerInterface {
             if (is_array($checksums)) {
                 $query->originalChecksums($checksums);
             }
+        }
+
+        if ($params->has('q')) {
+            $metadataQuery = json_decode($params->get('q'), true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new InvalidArgumentException('Invalid metadata query', 400);
+            }
+
+            $query->metadataQuery($metadataQuery);
         }
 
         $publicKey = $event->getRequest()->getPublicKey();

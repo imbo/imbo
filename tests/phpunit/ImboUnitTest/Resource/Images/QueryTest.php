@@ -189,4 +189,62 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
     public function testSortThrowsExceptionWhenTheStortStringIsBadlyFormatted() {
         $this->query->sort(array('field:asc', ''));
     }
+
+    /**
+     * @expectedException Imbo\Exception\RuntimeException
+     * @expectedExceptionMessage Badly formatted sort
+     * @expectedExceptionCode 400
+     */
+    public function testThrowsAnExceptionOnBadlyFormattedSortData() {
+        $this->query->sort(array(''));
+    }
+
+    /**
+     * @covers Imbo\Resource\Images\Query::metadataQuery
+     */
+    public function testMetadataQuery() {
+        $query = array('name' => array('$in' => array('christer', 'espen')));
+        $this->assertSame(array(), $this->query->metadataQuery());
+        $this->assertSame($this->query, $this->query->metadataQuery($query));
+        $this->assertSame($query, $this->query->metadataQuery());
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getMetadataQueries() {
+        return array(
+            'already lowercased' => array(
+                'original' => array('foo' => 'bar'),
+                'expected' => array('foo' => 'bar'),
+            ),
+            'mixed case' => array(
+                'original' => array('Foo' => 'Bar'),
+                'expected' => array('foo' => 'bar'),
+            ),
+            'mixed case, deep array' => array(
+                'original' => array('FOO' => 'bar', 'Bar' => array('Key' => array(1, 2, 3, 'ASD', 1.123))),
+                'expected' => array('foo' => 'bar', 'bar' => array('key' => array(1, 2, 3, 'asd', 1.123))),
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getMetadataQueries
+     */
+    public function testLowercasesMetadataQueries($original, $expected) {
+        $this->assertSame($this->query, $this->query->metadataQuery($original));
+        $this->assertSame($expected, $this->query->metadataQuery());
+    }
+
+    /**
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Query operator $regex is not supported
+     * @expectedExceptionCode 400
+     */
+    public function testThrowsAnExceptionIfAMetadataQueryContainsAnUnsupportedOperator() {
+        $this->query->metadataQuery(array('category' => array('$regex' => '(foo|bar|baz)')));
+    }
 }
