@@ -8,6 +8,8 @@ __N/A__
 * #300: Added configuration option to enable/disable content negotiation for images (`contentNegotiateImages`). Will behave as earlier versions by default (Espen Hovlandsdal)
 * #298: Fixed issue where browsers could not send `X-Imbo-*`-headers across origins (Espen Hovlandsdal)
 * #298: Fixed issue where CORS-requests would not have the `Access-Control-Allow-Origin`-header present in the response if the request was incorrectly signed or missing the accessToken (Espen Hovlandsdal)
+* #265: New image transformation: sharpen (Christer Edvartsen)
+* #264: New image transformation: contrast (Christer Edvartsen)
 
 Imbo-1.2.1
 ----------
@@ -31,8 +33,6 @@ __2014-04-08__
 * #282: Added robots.txt and humans.txt
 * #276: Support checking if the `accessToken` matches the URI "as is" (Peter Rudolfsen)
 * #269: Return metadata on write requests against the metadata resource
-* #265: New image transformation: sharpen
-* #264: New image transformation: contrast
 * #260: Generate short URLs on demand
 * #253: Store the original checksum of added images
 
