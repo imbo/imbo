@@ -98,6 +98,22 @@ This transformation compresses images on the fly resulting in a smaller payload.
 
 * ``t[]=compress:level=40``
 
+.. _contrast-transformation:
+
+Change image contrast - ``t[]=contrast``
+----------------------------------------
+
+This transformation can be used to change the contrast of the colors in the image.
+
+**Parameters:**
+
+``sharpen``
+    Used to adjust the intensity differences between the lighter and darker elements of the image. Can also be negative.
+
+**Examples:**
+
+* ``t[]=contrast:sharpen=3``
+
 .. _convert-transformation:
 
 Convert the image type - ``.jpg/.gif/.png``
@@ -332,6 +348,44 @@ This transformation will apply a sepia color tone transformation to the image.
 
 * ``t[]=sepia``
 * ``t[]=sepia:threshold=70``
+
+.. _sharpen-transformation:
+
+Sharpen the image - ``t[]=sharpen``
+-----------------------------------
+
+This transformation can be used to change the sharpness in the image.
+
+**Parameters:**
+
+``radius``
+    The radius of the Gaussian operator in pixels. Defaults to ``2``.
+
+``sigma``
+    The standard deviation of the Gaussian, in pixels. Defaults to ``1``.
+
+``gain``
+    The percentage of the difference between the original and the blur image that is added back into the original. Defaults to ``1``.
+
+``threshold``
+    The threshold in pixels needed to apply the difference gain. Defaults to ``0.05``.
+
+``preset``
+    Different presets that can be used. The presets are:
+
+    * ``light`` (radius = 2, sigma = 1, gain = 1, threshold = 0.05)
+    * ``moderate`` (radius = 2, sigma = 1, gain = 2, threshold = 0.05)
+    * ``strong`` (radius = 2, sigma = 1, gain = 3, threshold = 0.025)
+    * ``extreme`` (radius = 2, sigma = 1, gain = 4, threshold = 0)
+
+When using any of the presets the different parameters can be overridden by specifying ``radius``, ``sigma``, ``gain`` and/or ``threshold``. Not specifying any parameters at all is the same as using the ``light`` preset.
+
+**Examples:**
+
+* ``t[]=sharpen``
+* ``t[]=sharpen:preset=light`` (same as above)
+* ``t[]=sharpen:preset=extrene,gain=10`` (use the ``extreme`` preset, but use a gain value of 10 instead of 4)
+* ``t[]=sharpen:radius=2,sigma=1,gain=1,threshold= 0.05`` (same as using ``t[]=sharpen:preset=light``, or simply ``t[]=sharpen``)
 
 .. _strip-transformation:
 
