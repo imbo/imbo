@@ -24,6 +24,7 @@ class AccessTokenTest extends ListenerTests {
     private $listener;
 
     private $event;
+    private $userLookup;
     private $request;
     private $response;
     private $responseHeaders;
@@ -35,6 +36,8 @@ class AccessTokenTest extends ListenerTests {
     public function setUp() {
         $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
 
+        $this->userLookup = $this->getMock('Imbo\Auth\UserLookupInterface');
+
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->query = $this->query;
 
@@ -43,6 +46,7 @@ class AccessTokenTest extends ListenerTests {
         $this->response->headers = $this->responseHeaders;
 
         $this->event = $this->getMock('Imbo\EventManager\Event');
+        $this->event->expects($this->any())->method('getUserLookup')->will($this->returnValue($this->userLookup));
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
@@ -240,7 +244,8 @@ class AccessTokenTest extends ListenerTests {
         $this->query->expects($this->once())->method('get')->with('accessToken')->will($this->returnValue($token));
         $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue(urldecode($url)));
         $this->request->expects($this->once())->method('getUriAsIs')->will($this->returnValue($url));
-        $this->request->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
+
+        $this->userLookup->expects($this->once())->method('getPrivateKeys')->will($this->returnValue([$privateKey]));
 
         $this->listener->checkAccessToken($this->event);
     }

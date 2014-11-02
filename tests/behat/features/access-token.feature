@@ -19,6 +19,20 @@ Feature: Imbo requires an access token for read operations
         Then I should get a response with "400 Incorrect access token"
         And the Imbo error message is "Incorrect access token" and the error code is "0"
 
+    Scenario: Request user information when Imbo uses an alternative user lookup
+        Given I use "public" and "private" for public and private keys
+        And I include an access token in the query
+        And Imbo uses the "custom-user-lookup.php" configuration
+        When I request "/users/public"
+        Then I should get a response with "200 OK"
+
+    Scenario: Request user information using a correct read-only private key
+        Given I use "publickey" and "read-only-key" for public and private keys
+        And I include an access token in the query
+        And Imbo uses the "ro-rw-auth.php" configuration
+        When I request "/users/publickey"
+        Then I should get a response with "200 OK"
+
     Scenario: Request user information without a valid access token
         Given I use "publickey" and "foobar" for public and private keys
         When I request "/users/publickey"

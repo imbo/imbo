@@ -18,12 +18,22 @@ namespace Imbo\Auth;
  */
 interface UserLookupInterface {
     /**
-     * Fetch the private key of a user
+     * The different private-key modes
+     *
+     * @var string
+     */
+    const MODE_READ_ONLY = 'ro';
+    const MODE_READ_WRITE = 'rw';
+
+    /**
+     * Fetch the private keys for a user
      *
      * @param string $publicKey The public key
-     * @return null|string Returns null if the user does not exist, or the private key otherwise
+     * @param string $mode Optional access control mode (read-only/read+write).
+     *                     Will return all keys (read-only AND read+write by default.
+     * @return null|array Returns null if the user does not exist, or the private keys otherwise
      */
-    function getPrivateKey($publicKey);
+    function getPrivateKeys($publicKey, $mode = null);
 
     /**
      * Fetch one or more public keys
@@ -32,4 +42,12 @@ interface UserLookupInterface {
      * @return string[] Returns a list of public keys
      */
     function getPublicKeys(UserLookup\Query $query = null);
+
+    /**
+     * Return whether the public key given exists or not
+     *
+     * @param  string $publicKey The public key to check
+     * @return boolean
+     */
+    function publicKeyExists($publicKey);
 }

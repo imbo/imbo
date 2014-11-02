@@ -22,7 +22,21 @@ class ArrayStorage implements UserLookupInterface {
      *
      * @var array
      */
-    private $users = array();
+    private $users = [];
+
+    /**
+     * Read-only private keys
+     *
+     * @var array
+     */
+    private $roPrivateKeys = [];
+
+    /**
+     * Read+write private keys
+     *
+     * @var array
+     */
+    private $rwPrivateKeys = [];
 
     /**
      * Class constructor
@@ -30,20 +44,69 @@ class ArrayStorage implements UserLookupInterface {
      * @param array $users The users
      */
     public function __construct(array $users) {
-        $this->users = $users;
+        $this->users = array_keys($users);
+
+        foreach ($users as $publicKey => $privateKeys) {
+            $this->setPrivateKeysForUser($publicKey, $privateKeys);
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPrivateKey($publicKey) {
-        return isset($this->users[$publicKey]) ? $this->users[$publicKey] : null;
+    public function getPrivateKeys($publicKey, $mode = null) {
+        $roKeys = isset($this->roPrivateKeys[$publicKey]) ? $this->roPrivateKeys[$publicKey] : [];
+        $rwKeys = isset($this->rwPrivateKeys[$publicKey]) ? $this->rwPrivateKeys[$publicKey] : [];
+        $keys   = [];
+
+        if ($mode === null) {
+            $keys = array_unique(array_merge($roKeys, $rwKeys));
+        } else {
+            $keys = $mode === UserLookupInterface::MODE_READ_ONLY ? $roKeys : $rwKeys;
+        }
+
+        return empty($keys) ? null : $keys;
     }
 
     /**
      * {@inheritdoc}
      */
     public function getPublicKeys(UserLookup\Query $query = null) {
+        if ($query === null) {
+            $query = new UserLookup\Query();
+        }
+
         return array_slice($this->users, $query->offset() ?: 0, $query->limit());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function publicKeyExists($publicKey) {
+        return in_array($publicKey, $this->users);
+    }
+
+    /**
+     * Set private keys for a given public key
+     *
+     * @param string $publicKey Public key to assign private keys to
+     * @param string|array $keys One or more private keys
+     */
+    protected function setPrivateKeysForUser($publicKey, $keys) {
+        $roKeys = [];
+        $rwKeys = [];
+
+        if (is_string($keys)) {
+            // Only one key specified, treat it as a read+write key
+            $roKeys[] = $keys;
+            $rwKeys[] = $keys;
+        } else if (is_array($keys)) {
+            // Individual read-only/read+write keys specified
+            $rwKeys = isset($keys['rw']) ? $keys['rw'] : [];
+            $roKeys = isset($keys['ro']) ? $keys['ro'] : [];
+        }
+
+        $this->roPrivateKeys[$publicKey] = (array) $roKeys;
+        $this->rwPrivateKeys[$publicKey] = (array) $rwKeys;
     }
 }

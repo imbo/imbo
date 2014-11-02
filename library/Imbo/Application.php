@@ -16,6 +16,7 @@ use Imbo\Http\Request\Request,
     Imbo\EventManager\Event,
     Imbo\EventManager\EventManager,
     Imbo\Model\Error,
+    Imbo\Auth\ArrayStorage,
     Imbo\Exception\RuntimeException,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Database\DatabaseInterface,
@@ -64,6 +65,14 @@ class Application {
 
         $router = new Router($config['routes']);
 
+        // User lookup adapters
+        $userLookup = $config['auth'];
+
+        // Construct an ArrayStorage instance if the auth details is an array
+        if (is_array($userLookup)) {
+            $userLookup = new ArrayStorage($userLookup);
+        }
+
         // Create the event manager and the event template
         $eventManager = new EventManager();
         $event = new Event();
@@ -72,6 +81,7 @@ class Application {
             'response' => $response,
             'database' => $database,
             'storage' => $storage,
+            'userLookup' => $userLookup,
             'config' => $config,
             'manager' => $eventManager,
         ));
@@ -253,15 +263,13 @@ class Application {
             $response->headers->set('Allow', $resource->getAllowedMethods(), false);
 
             if ($publicKey = $request->getPublicKey()) {
-                if (!isset($config['auth'][$publicKey])) {
+                // Ensure that the public key actually exists
+                if (!$userLookup->publicKeyExists($publicKey)) {
                     $e = new RuntimeException('Public key not found', 404);
                     $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
 
                     throw $e;
                 }
-
-                // Fetch the private key from the config and store it in the request
-                $request->setPrivateKey($config['auth'][$publicKey]);
             }
 
             $methodName = strtolower($request->getMethod());
