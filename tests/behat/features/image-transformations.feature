@@ -72,6 +72,9 @@ Feature: Imbo enables dynamic transformations of images
             | transpose                                                                                         | 417   | 599    |
             | transverse                                                                                        | 417   | 599    |
             | graythumb:width=40,height=40                                                                      | 40    | 40     |
+            | vignette                                                                                          | 599   | 417    |
+            | vignette:color1=bf1942,color2=ccc                                                                 | 599   | 417    |
+            | vignette:color1=f00baa,color2=f0f0f0,crop=2.4                                                     | 599   | 417    |
             | watermark:img=929db9c5fc3099f7576f5655207eba47                                                    | 599   | 417    |
             | watermark:img=929db9c5fc3099f7576f5655207eba47,position=center                                    | 599   | 417    |
             | watermark:img=929db9c5fc3099f7576f5655207eba47,x=10,y=20,position=bottom-right,width=10,height=40 | 599   | 417    |
@@ -133,6 +136,9 @@ Feature: Imbo enables dynamic transformations of images
             | transpose                                                                                         |
             | transverse                                                                                        |
             | graythumb:width=40,height=40                                                                      |
+            | vignette                                                                                          |
+            | vignette:color1=bf1942,color2=ccc                                                                 |
+            | vignette:color1=f00baa,color2=f0f0f0,crop=2.4                                                     |
             | watermark:img=929db9c5fc3099f7576f5655207eba47                                                    |
             | watermark:img=929db9c5fc3099f7576f5655207eba47,position=center                                    |
             | watermark:img=929db9c5fc3099f7576f5655207eba47,x=10,y=20,position=bottom-right,width=10,height=40 |
