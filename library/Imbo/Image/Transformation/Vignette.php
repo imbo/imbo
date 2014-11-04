@@ -38,24 +38,24 @@ class Vignette extends Transformation implements ListenerInterface {
      */
     public function transform(EventInterface $event) {
         $params = $event->getArgument('params');
-        $color1 = $this->formatColor(isset($params['color1']) ? $params['color1'] : 'none');
-        $color2 = $this->formatColor(isset($params['color2']) ? $params['color2'] : 'black');
-        $crop   = isset($params['crop']) ? $params['crop'] : 1.5;
+        $inner  = $this->formatColor(isset($params['inner']) ? $params['inner'] : 'none');
+        $outer  = $this->formatColor(isset($params['outer']) ? $params['outer'] : '000');
+        $scale  = max(isset($params['scale']) ? (float) $params['scale'] : 1.5, 1);
 
         $image  = $event->getArgument('image');
         $width  = $image->getWidth();
         $height = $image->getHeight();
 
-        $cropX = floor($width  * $crop);
-        $cropY = floor($height * $crop);
+        $scaleX = floor($width  * $scale);
+        $scaleY = floor($height * $scale);
 
         $vignette = new Imagick();
-        $vignette->newPseudoImage($cropX, $cropY, 'radial-gradient:' . $color1 . '-' . $color2);
+        $vignette->newPseudoImage($scaleX, $scaleY, 'radial-gradient:' . $inner . '-' . $outer);
         $vignette->cropImage(
             $width,
             $height,
-            floor(($cropX - $width)  / 2),
-            floor(($cropY - $height) / 2)
+            floor(($scaleX - $width)  / 2),
+            floor(($scaleY - $height) / 2)
         );
 
         try {
