@@ -40,7 +40,7 @@ class Vignette extends Transformation implements ListenerInterface {
         $params = $event->getArgument('params');
         $inner  = $this->formatColor(isset($params['inner']) ? $params['inner'] : 'none');
         $outer  = $this->formatColor(isset($params['outer']) ? $params['outer'] : '000');
-        $scale  = max(isset($params['scale']) ? (float) $params['scale'] : 1.5, 1);
+        $scale  = (float) max(isset($params['scale']) ? $params['scale'] : 1.5, 1);
 
         $image  = $event->getArgument('image');
         $width  = $image->getWidth();
