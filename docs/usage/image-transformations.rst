@@ -443,6 +443,30 @@ This transformation transverses the image.
 
 * ``t[]=transverse``
 
+.. _vignette-transformation:
+
+Add a vignette to the image - ``t[]=vignette``
+----------------------------------------------
+
+This transformation can be used to add a vignette to the image.
+
+**Parameters:**
+
+``inner``
+    Color at the center of the image, in hexadecimal. Defaults to ``none``, which means transparent. (You can also specify short values like ``f00`` (``ff0000``)).
+
+``outer``
+    Color at the edge of the image, in hexadecimal. Defaults to ``000``.
+
+``scale``
+    Scale factor of the vignette. ``2`` will create a vignette twice the size of the original image. Defaults to ``1.5``.
+
+**Examples:**
+
+* ``t[]=vignette``
+* ``t[]=vignette:outer=ccc``
+* ``t[]=vignette:scale=1,outer=333``
+
 .. _watermark-transformation:
 
 Add a watermark to the image - ``t[]=watermark``

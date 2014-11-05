@@ -205,6 +205,7 @@ $config = array(
         'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
         'transpose' => 'Imbo\Image\Transformation\Transpose',
         'transverse' => 'Imbo\Image\Transformation\Transverse',
+        'vignette' => 'Imbo\Image\Transformation\Vignette',
         'watermark' => 'Imbo\Image\Transformation\Watermark',
 
         // Imagick-specific event listener for the built in image transformations

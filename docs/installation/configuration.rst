@@ -629,6 +629,7 @@ as well as event listeners for image transformations:
 * :ref:`thumbnail <thumbnail-transformation>`
 * :ref:`transpose <transpose-transformation>`
 * :ref:`transverse <transverse-transformation>`
+* :ref:`vignette <vignette-transformation>`
 * :ref:`watermark <watermark-transformation>`
 
 Read more about these listeners (and more) in the :doc:`../installation/event_listeners` and :doc:`../usage/image-transformations` chapters. If you want to disable any of these you could do so in your configuration file in the following way:
