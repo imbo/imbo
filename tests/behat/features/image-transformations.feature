@@ -45,6 +45,9 @@ Feature: Imbo enables dynamic transformations of images
             | histogram                                                                                         | 256   | 158    |
             | histogram:scale=2                                                                                 | 512   | 316    |
             | histogram:scale=2,ratio=2                                                                         | 512   | 256    |
+            | level                                                                                             | 599   | 417    |
+            | level:channel=r,amount=40                                                                         | 599   | 417    |
+            | level:channel=cm,amount=-30                                                                       | 599   | 417    |
             | maxSize:width=200                                                                                 | 200   | 139    |
             | maxSize:height=200                                                                                | 287   | 200    |
             | maxSize:width=100,height=100                                                                      | 100   | 70     |
@@ -109,6 +112,9 @@ Feature: Imbo enables dynamic transformations of images
             | histogram                                                                                         |
             | histogram:scale=2                                                                                 |
             | histogram:scale=2,ratio=2                                                                         |
+            | level                                                                                             |
+            | level:channel=r                                                                                   |
+            | level:channel=cm,amount=-30                                                                       |
             | maxSize:width=200                                                                                 |
             | maxSize:height=200                                                                                |
             | maxSize:width=100,height=100                                                                      |

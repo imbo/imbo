@@ -194,6 +194,7 @@ $config = array(
         'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
         'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
         'histogram' => 'Imbo\Image\Transformation\Histogram',
+        'level' => 'Imbo\Image\Transformation\Level',
         'maxSize' => 'Imbo\Image\Transformation\MaxSize',
         'modulate' => 'Imbo\Image\Transformation\Modulate',
         'progressive' => 'Imbo\Image\Transformation\Progressive',

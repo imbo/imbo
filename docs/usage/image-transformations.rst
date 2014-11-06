@@ -234,6 +234,27 @@ This transformation will convert the image into a histogram of the image itself,
 * ``t[]=histogram:scale=2``
 * ``t[]=histogram:red=f00,green=0f0lue=00f``
 
+.. _levels-transformation:
+
+Adjust levels of the image - ``t[]=level``
+-----------------------------------------------------
+
+This transformation will adjust the levels of an image. You are able to specify individual channels to adjust - by default it will apply to all channels.
+
+**Parameters:**
+
+``channel``
+    The channel to adjust. ``r`` (red), ``g`` (green), ``b`` (blue), ``c`` (cyan), ``m`` (magenta), ``y`` (yellow), ``k`` (black) and ``all`` (all channels) are available values. These channels can also be combined, if multiple channels should be adjusted. Defaults to ``all``.
+
+``amount``
+    The amount to adjust by. Range is from ``-100`` to ``100``. Defaults to ``1``.
+
+**Examples:**
+
+* ``t[]=level``
+* ``t[]=level:channel=r,amount=30``
+* ``t[]=level:channel=rg,amount=-45``
+
 .. _max-size-transformation:
 
 Enforce a max size of an image - ``t[]=maxSize``
