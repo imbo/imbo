@@ -277,6 +277,35 @@ class ImboContext extends RESTContext {
     }
 
     /**
+     * @Given /^The pixel at coordinate "([^"]*)" should have a color of "#([^"]*)"$/
+     */
+    public function assertImagePixelColor($coordinates, $expectedColor) {
+        $coordinates = array_map('trim', explode(',', $coordinates));
+        $coordinates = array_map('intval', $coordinates);
+
+        $expectedColor = strtolower($expectedColor);
+
+        $imagick = new \Imagick();
+        $imagick->readImageBlob((string) $this->getLastResponse()->getBody());
+
+        $pixel = $imagick->getImagePixelColor($coordinates[0], $coordinates[1]);
+        $color = $pixel->getColor();
+
+        $toHex = function($col) {
+            return str_pad(dechex($col), 2, '0', STR_PAD_LEFT);
+        };
+
+        $hexColor = $toHex($color['r']) . $toHex($color['g']) . $toHex($color['b']);
+
+        assertSame(
+            $expectedColor,
+            $hexColor,
+            'Incorrect color at coordinate ' . implode(', ', $coordinates) .
+            ', expected ' . $expectedColor . ', got ' . $hexColor
+        );
+    }
+
+    /**
      * @Given /^Imbo uses the "([^"]*)" configuration$/
      */
     public function setImboConfigHeader($config) {
