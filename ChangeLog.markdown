@@ -5,6 +5,8 @@ Imbo-x.x.x
 ----------
 __N/A__
 
+* #307: Added ability to have multiple private keys per user + RO/RW access level (Espen Hovlandsdal)
+* #289: Added support for alternative ways of specifying public / private keys (Christer Edvartsen)
 * #305: Added [MongoFill](https://github.com/mongofill/mongofill) compatiblity (Espen Hovlandsdal)
 * #300: Added configuration option to enable/disable content negotiation for images (`contentNegotiateImages`). Will behave as earlier versions by default (Espen Hovlandsdal)
 * #298: Fixed issue where browsers could not send `X-Imbo-*`-headers across origins (Espen Hovlandsdal)
