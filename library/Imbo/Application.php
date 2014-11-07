@@ -16,7 +16,7 @@ use Imbo\Http\Request\Request,
     Imbo\EventManager\Event,
     Imbo\EventManager\EventManager,
     Imbo\Model\Error,
-    Imbo\Auth\ArrayStorage,
+    Imbo\Auth,
     Imbo\Exception\RuntimeException,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Database\DatabaseInterface,
@@ -63,15 +63,22 @@ class Application {
             throw new InvalidArgumentException('Invalid storage adapter', 500);
         }
 
-        $router = new Router($config['routes']);
-
         // User lookup adapters
         $userLookup = $config['auth'];
 
         // Construct an ArrayStorage instance if the auth details is an array
         if (is_array($userLookup)) {
-            $userLookup = new ArrayStorage($userLookup);
+            $userLookup = new Auth\ArrayStorage($userLookup);
         }
+
+        // Make sure the "auth" part of the configuration is an instance of the user lookup
+        // interface
+        if (!($userLookup instanceof Auth\UserLookupInterface)) {
+            throw new InvalidArgumentException('Invalid auth configuration', 500);
+        }
+
+        // Create a router based on the routes in the configuration and internal routes
+        $router = new Router($config['routes']);
 
         // Create the event manager and the event template
         $eventManager = new EventManager();

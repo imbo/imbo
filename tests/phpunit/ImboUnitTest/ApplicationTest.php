@@ -63,6 +63,21 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid auth configuration
+     * @expectedExceptionCode 500
+     * @covers Imbo\Application::run
+     */
+    public function testThrowsExceptionWhenConfigurationHasInvalidUserLookupAdapter() {
+        $this->application->run(array(
+            'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
+            'storage' => $this->getMock('Imbo\Storage\StorageInterface'),
+            'routes' => [],
+            'auth' => function() { return new \stdClass(); },
+        ));
+    }
+
+    /**
      * @covers Imbo\Application::run
      */
     public function testCanRunWithDefaultConfiguration() {
