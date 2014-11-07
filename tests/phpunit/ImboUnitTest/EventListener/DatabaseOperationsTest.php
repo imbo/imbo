@@ -42,6 +42,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $this->userLookup = $this->getMock('Imbo\Auth\UserLookupInterface');
         $this->image = $this->getMock('Imbo\Model\Image');
 
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
@@ -51,6 +52,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
+        $this->event->expects($this->any())->method('getUserLookup')->will($this->returnValue($this->userLookup));
 
         $this->listener = new DatabaseOperations();
     }
@@ -235,9 +237,9 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::loadStats
      */
     public function testCanLoadStats() {
-        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue(array(
-            'auth' => array('user1' => 'key', 'user2' => 'key'),
-        )));
+        $this->userLookup->expects($this->once())->method('getPublicKeys')->will(
+            $this->returnValue(array('user1', 'user2'))
+        );
 
         $this->database->expects($this->at(0))->method('getNumImages')->with('user1')->will($this->returnValue(1));
         $this->database->expects($this->at(1))->method('getNumBytes')->with('user1')->will($this->returnValue(1));

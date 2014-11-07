@@ -24,15 +24,41 @@ $config = array(
     /**
      * Authentication
      *
-     * This value must be set to an array with key => value pairs mapping to public and private keys
-     * of the users of this installation. The public keys must match the following case sensitive
-     * expression:
+     * This value must be set to either:
+     * 1) An array mapping public and private keys of the users of this installation.
+     *    The array can take two different forms:
+     *
+     * 'auth' => [
+     *     '<publicKey>' => '<read+write private key>',
+     *     '<differentPublicKey>' => '<different read+write private key>'
+     * ]
+     *
+     * Or:
+     * 'auth' => [
+     *     '<publicKey>' => [
+     *         'ro' => '<read-only private key>',
+     *         'rw' => '<read-write private key>',
+     *     ]
+     * ]
+     *
+     * You can also specify multiple private keys for both read-only and read+write:
+     *
+     * 'auth' => [
+     *     '<publicKey>' => [
+     *         'ro' => ['<readKey1>', '<readKey2>'],
+     *         'rw' => ['<readWriteKey1>', '<readWriteKey2>']
+     *     ]
+     * ]
+     *
+     * 2) An instance of the Imbo\Auth\UserLookupInterface interface.
+     *
+     * Public keys must match the following case sensitive regular expression:
      *
      * ^[a-z0-9_-]{3,}$
      *
-     * @var array
+     * @var array|Auth\UserLookupInterface
      */
-    'auth' => array(),
+    'auth' => null,
 
     /**
      * Database adapter
