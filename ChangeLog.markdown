@@ -5,6 +5,7 @@ Imbo-x.x.x
 ----------
 __N/A__
 
+* #310: Added `trustedProxies` configuration option (Espen Hovlandsdal)
 * #307: Added ability to have multiple private keys per user + RO/RW access level (Espen Hovlandsdal)
 * #289: Added support for alternative ways of specifying public / private keys (Christer Edvartsen)
 * #305: Added [MongoFill](https://github.com/mongofill/mongofill) compatiblity (Espen Hovlandsdal)
