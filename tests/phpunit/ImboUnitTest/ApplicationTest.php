@@ -11,7 +11,8 @@
 namespace ImboUnitTest;
 
 use Imbo\Application,
-    Imbo\Version;
+    Imbo\Version,
+    Imbo\Http\Request\Request;
 
 /**
  * @covers Imbo\Application
@@ -46,6 +47,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
     public function testThrowsExceptionWhenConfigurationHasInvalidDatabaseAdapter() {
         $this->application->run(array(
             'database' => function() { return new \stdClass(); },
+            'trustedProxies' => [],
         ));
     }
 
@@ -59,6 +61,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $this->application->run(array(
             'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
             'storage' => function() { return new \stdClass(); },
+            'trustedProxies' => [],
         ));
     }
 
@@ -73,8 +76,30 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
             'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
             'storage' => $this->getMock('Imbo\Storage\StorageInterface'),
             'routes' => [],
+            'trustedProxies' => [],
             'auth' => function() { return new \stdClass(); },
         ));
+    }
+
+    /**
+     * @covers Imbo\Application::run
+     */
+    public function testApplicationSetsTrustedProxies() {
+        $this->expectOutputRegex('|{"version":"' . preg_quote(Version::VERSION, '|') . '",.*}|');
+
+        $this->assertEmpty(Request::getTrustedProxies());
+        $this->application->run(array(
+            'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
+            'storage' => $this->getMock('Imbo\Storage\StorageInterface'),
+            'eventListenerInitializers' => [],
+            'eventListeners' => [],
+            'contentNegotiateImages' => false,
+            'resources' => [],
+            'routes' => [],
+            'auth' => [],
+            'trustedProxies' => ['10.0.0.77'],
+        ));
+        $this->assertSame(['10.0.0.77'], Request::getTrustedProxies());
     }
 
     /**
