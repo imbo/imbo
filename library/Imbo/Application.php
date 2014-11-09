@@ -38,6 +38,8 @@ class Application {
     public function run(array $config) {
         // Request and response objects
         $request = Request::createFromGlobals();
+        Request::setTrustedProxies($config['trustedProxies']);
+
         $response = new Response();
         $response->setPublic();
         $response->headers->set('X-Imbo-Version', Version::VERSION);

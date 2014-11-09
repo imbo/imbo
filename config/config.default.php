@@ -20,7 +20,7 @@ if (is_file(__DIR__ . '/../../../autoload.php')) {
     require __DIR__ . '/../vendor/autoload.php';
 }
 
-$config = array(
+$config = [
     /**
      * Authentication
      *
@@ -160,7 +160,7 @@ $config = array(
      *
      * Examples of how to add listeners:
      *
-     * 'eventListeners' => array(
+     * 'eventListeners' => [
      *   // 1) A class name in a string
      *   'accessToken' => 'Imbo\EventListener\ListenerInterface',
      *
@@ -168,45 +168,45 @@ $config = array(
      *   'auth' => new EventListener\Authenticate(),
      *
      *   // 3) Implementation of a listener interface with a public key filter
-     *   'maxImageSize' => array(
+     *   'maxImageSize' => [
      *     'listener' => EventListener\MaxImageSize(1024, 768),
-     *     'publicKeys' => array(
-     *       'whitelist' => array( ... ),
-     *       // 'blacklist' => array( ... ),
+     *     'publicKeys' => [
+     *       'whitelist' => [ ... ],
+     *       // 'blacklist' => [ ... ],
      *       )
      *     )
      *   ),
      *
      *   // 4) A class name in a string with custom parameters for the listener
-     *   'statsAccess' => array(
+     *   'statsAccess' => [
      *       'listener' => 'Imbo\EventListener\StatsAccess',
-     *       'params' => array(
-     *           'allow' => array('127.0.0.1', '::1'),
-     *       ),
-     *   ),
+     *       'params' => [
+     *           'allow' => ['127.0.0.1', '::1'],
+     *       ],
+     *   ],
      *
      *   // 5) A closure that will subscribe to two events with different priorities
-     *   'anotherCustomCallback' => array(
+     *   'anotherCustomCallback' => [
      *       'callback' => function($event) {
      *           // Some code
      *       },
-     *       'events' => array(
+     *       'events' => [
      *           'image.get' => 20, // Trigger BEFORE the internal handler for "image.get"
      *           'image.post' => -20, // Trigger AFTER the internal handler for "image.post"
-     *       ),
+     *       ],
      *   ),
      *
      * @var array
      */
-    'eventListeners' => array(
+    'eventListeners' => [
         'accessToken' => 'Imbo\EventListener\AccessToken',
         'auth' => 'Imbo\EventListener\Authenticate',
-        'statsAccess' => array(
+        'statsAccess' => [
             'listener' => 'Imbo\EventListener\StatsAccess',
-            'params' => array(
-                'allow' => array('127.0.0.1', '::1'),
-            ),
-        ),
+            'params' => [
+                'allow' => ['127.0.0.1', '::1'],
+            ],
+        ],
 
         // Image transformations
         'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
@@ -237,7 +237,7 @@ $config = array(
 
         // Imagick-specific event listener for the built in image transformations
         'imagick' => 'Imbo\EventListener\Imagick',
-    ),
+    ],
 
     /**
      * Initializers for event listeners
@@ -248,9 +248,9 @@ $config = array(
      *
      * @var array
      */
-    'eventListenerInitializers' => array(
+    'eventListenerInitializers' => [
         'imagick' => 'Imbo\EventListener\Initializer\Imagick',
-    ),
+    ],
 
     /**
      * Transformation presets
@@ -261,22 +261,22 @@ $config = array(
      *
      * Example:
      *
-     * 'transformationPresets' => array(
-     *     'graythumb' => array(
+     * 'transformationPresets' => [
+     *     'graythumb' => [
      *         'thumbnail',
      *         'desaturate',
-     *     ),
-     *     'flipflop' => array(
+     *     ],
+     *     'flipflop' => [
      *         'flipHorizontally',
      *         'flipVertically',
-     *     ),
-     * ),
+     *     ],
+     * ],
      *
      * The above to examples can be triggered by ?t[]=graythumb and ?t[]=flipflop respectively
      *
      * @var array
      */
-    'transformationPresets' => array(),
+    'transformationPresets' => [],
 
     /**
      * Custom resources for Imbo
@@ -284,7 +284,7 @@ $config = array(
      * @link http://docs.imbo-project.org
      * @var array
      */
-    'resources' => array(),
+    'resources' => [],
 
     /**
      * Custom routes for Imbo
@@ -292,8 +292,31 @@ $config = array(
      * @link http://docs.imbo-project.org
      * @var array
      */
-    'routes' => array(),
-);
+    'routes' => [],
+
+    /**
+     * Trusted proxies
+     *
+     * If you find yourself behind some sort of proxy - like a load balancer - then certain header
+     * information may be sent to you using special X-Forwarded-* headers. For example, the Host
+     * HTTP header is usually used to return the requested host. But when you're behind a proxy,
+     * the true host may be stored in a X-Forwarded-Host header.
+     *
+     * Since HTTP headers can be spoofed, Imbo does not trust these proxy headers by default.
+     * If you are behind a proxy, you should manually whitelist your proxy.
+     *
+     * Note: Not all proxies set the required X-Forwarded-* headers by default. A search for
+     *       "X-Forwarded-Proto <your proxy here>" usually gives helpful answers to how you can
+     *       add them to incoming requests.
+     *
+     * Example:
+     *
+     * 'trustedProxies' => ['192.0.0.1', '10.0.0.0/8']
+     *
+     * @var array
+     */
+    'trustedProxies' => [],
+];
 
 // See if a custom config path has been defined. If so, don't require the custom one as this is
 // most likely a Behat test run
