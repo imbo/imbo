@@ -232,7 +232,7 @@ This transformation will convert the image into a histogram of the image itself,
 
 * ``t[]=histogram``
 * ``t[]=histogram:scale=2``
-* ``t[]=histogram:red=f00,green=0f0lue=00f``
+* ``t[]=histogram:red=f00,green=0f0,blue=00f``
 
 .. _levels-transformation:
 
