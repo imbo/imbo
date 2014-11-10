@@ -30,6 +30,9 @@ Feature: Imbo enables dynamic transformations of images
             | border:mode=inline,width=4,height=5                                                               | 599   | 417    |
             | canvas                                                                                            | 599   | 417    |
             | canvas:width=700,height=600                                                                       | 700   | 600    |
+            | contrast                                                                                          | 599   | 417    |
+            | contrast:sharpen:-1                                                                               | 599   | 417    |
+            | contrast:sharpen:1                                                                                | 599   | 417    |
             | crop:width=50,height=60,x=1,y=10                                                                  | 50    | 60     |
             | crop:width=5000,height=6000,x=0,y=0                                                               | 599   | 417    |
             | crop:mode=center,width=100,height=100                                                             | 100   | 100    |
@@ -42,6 +45,9 @@ Feature: Imbo enables dynamic transformations of images
             | histogram                                                                                         | 256   | 158    |
             | histogram:scale=2                                                                                 | 512   | 316    |
             | histogram:scale=2,ratio=2                                                                         | 512   | 256    |
+            | level                                                                                             | 599   | 417    |
+            | level:channel=r,amount=40                                                                         | 599   | 417    |
+            | level:channel=cm,amount=-30                                                                       | 599   | 417    |
             | maxSize:width=200                                                                                 | 200   | 139    |
             | maxSize:height=200                                                                                | 287   | 200    |
             | maxSize:width=100,height=100                                                                      | 100   | 70     |
@@ -54,6 +60,13 @@ Feature: Imbo enables dynamic transformations of images
             | resize:width=100,height=100                                                                       | 100   | 100    |
             | rotate:angle=90                                                                                   | 417   | 599    |
             | sepia                                                                                             | 599   | 417    |
+            | sharpen                                                                                           | 599   | 417    |
+            | sharpen:radius=2,sigma=1                                                                          | 599   | 417    |
+            | sharpen:radius=0,sigma=2                                                                          | 599   | 417    |
+            | sharpen:preset=light                                                                              | 599   | 417    |
+            | sharpen:preset=moderate                                                                           | 599   | 417    |
+            | sharpen:preset=strong                                                                             | 599   | 417    |
+            | sharpen:preset=extreme                                                                            | 599   | 417    |
             | strip                                                                                             | 599   | 417    |
             | thumbnail                                                                                         | 50    | 50     |
             | thumbnail:width=40,height=30                                                                      | 40    | 30     |
@@ -62,6 +75,9 @@ Feature: Imbo enables dynamic transformations of images
             | transpose                                                                                         | 417   | 599    |
             | transverse                                                                                        | 417   | 599    |
             | graythumb:width=40,height=40                                                                      | 40    | 40     |
+            | vignette                                                                                          | 599   | 417    |
+            | vignette:inner=bf1942,outer=ccc                                                                   | 599   | 417    |
+            | vignette:inner=f00baa,outer=f0f0f0,scale=2.4                                                      | 599   | 417    |
             | watermark:img=929db9c5fc3099f7576f5655207eba47                                                    | 599   | 417    |
             | watermark:img=929db9c5fc3099f7576f5655207eba47,position=center                                    | 599   | 417    |
             | watermark:img=929db9c5fc3099f7576f5655207eba47,x=10,y=20,position=bottom-right,width=10,height=40 | 599   | 417    |
@@ -87,6 +103,7 @@ Feature: Imbo enables dynamic transformations of images
             | border:mode=inline,width=4,height=5                                                               |
             | canvas                                                                                            |
             | canvas:width=700,height=600                                                                       |
+            | contrast:sharpen=1                                                                                |
             | crop:width=50,height=60,x=1,y=10                                                                  |
             | crop:width=5000,height=6000,x=0,y=0                                                               |
             | desaturate                                                                                        |
@@ -95,6 +112,9 @@ Feature: Imbo enables dynamic transformations of images
             | histogram                                                                                         |
             | histogram:scale=2                                                                                 |
             | histogram:scale=2,ratio=2                                                                         |
+            | level                                                                                             |
+            | level:channel=r                                                                                   |
+            | level:channel=cm,amount=-30                                                                       |
             | maxSize:width=200                                                                                 |
             | maxSize:height=200                                                                                |
             | maxSize:width=100,height=100                                                                      |
@@ -107,6 +127,13 @@ Feature: Imbo enables dynamic transformations of images
             | resize:width=100,height=100                                                                       |
             | rotate:angle=90                                                                                   |
             | sepia                                                                                             |
+            | sharpen                                                                                           |
+            | sharpen:radius=2,sigma=1                                                                          |
+            | sharpen:radius=0,sigma=2                                                                          |
+            | sharpen:preset=light                                                                              |
+            | sharpen:preset=moderate                                                                           |
+            | sharpen:preset=strong                                                                             |
+            | sharpen:preset=extreme                                                                            |
             | strip                                                                                             |
             | thumbnail                                                                                         |
             | thumbnail:width=40,height=30                                                                      |
@@ -115,6 +142,9 @@ Feature: Imbo enables dynamic transformations of images
             | transpose                                                                                         |
             | transverse                                                                                        |
             | graythumb:width=40,height=40                                                                      |
+            | vignette                                                                                          |
+            | vignette:inner=bf1942,outer=ccc                                                                   |
+            | vignette:inner=f00baa,outer=f0f0f0,scale=2.4                                                      |
             | watermark:img=929db9c5fc3099f7576f5655207eba47                                                    |
             | watermark:img=929db9c5fc3099f7576f5655207eba47,position=center                                    |
             | watermark:img=929db9c5fc3099f7576f5655207eba47,x=10,y=20,position=bottom-right,width=10,height=40 |

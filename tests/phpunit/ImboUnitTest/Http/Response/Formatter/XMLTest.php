@@ -11,6 +11,8 @@
 namespace ImboUnitTest\Http\Response\Formatter;
 
 use Imbo\Http\Response\Formatter\XML,
+    DOMDocument,
+    DOMXpath,
     DateTime;
 
 /**
@@ -25,6 +27,9 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      */
     private $formatter;
 
+    /**
+     * @var Imbo\Helpers\DateFormatter
+     */
     private $dateFormatter;
 
     /**
@@ -71,11 +76,11 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $xml = $this->formatter->format($model);
 
-        $this->assertTag(array('tag' => 'code', 'content' => '404', 'parent' => array('tag' => 'error')), $xml, 'Missing HTTP status code', false);
-        $this->assertTag(array('tag' => 'message', 'content' => 'Public key not found', 'parent' => array('tag' => 'error')), $xml, 'Missing error message', false);
-        $this->assertTag(array('tag' => 'date', 'content' => $formattedDate, 'parent' => array('tag' => 'error')), $xml, 'Missing date', false);
-        $this->assertTag(array('tag' => 'imboErrorCode', 'content' => '100', 'parent' => array('tag' => 'error')), $xml, 'Missing imbo error code', false);
-        $this->assertTag(array('tag' => 'imageIdentifier', 'content' => 'identifier', 'parent' => array('tag' => 'imbo')), $xml, 'Missing image identifier', false);
+        $this->assertXPathMatches('//error/code[.=404]', $xml, 'Missing HTTP status code');
+        $this->assertXPathMatches('//error/message[.="Public key not found"]', $xml, 'Missing error message');
+        $this->assertXPathMatches('//error/date[.="' . $formattedDate . '"]', $xml, 'Missing date');
+        $this->assertXPathMatches('//error/imboErrorCode[.=100]', $xml, 'Missing imbo error code');
+        $this->assertXPathMatches('/imbo/imageIdentifier[.="identifier"]', $xml, 'Missing image identifier');
     }
 
     /**
@@ -90,7 +95,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $xml = $this->formatter->format($model);
 
-        $this->assertNotTag(array('tag' => 'imageIdentifier'), $xml, 'Image identifier should not be present', false);
+        $this->assertXPathDoesNotMatch('//imageIdentifier', $xml, 'Image identifier should not be present');
     }
 
     /**
@@ -110,9 +115,9 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $xml = $this->formatter->format($model);
 
-        $this->assertTag(array('tag' => 'database', 'content' => '1', 'parent' => array('tag' => 'status')), $xml, 'Missing database status', false);
-        $this->assertTag(array('tag' => 'storage', 'content' => '0', 'parent' => array('tag' => 'status')), $xml, 'Missing storage status', false);
-        $this->assertTag(array('tag' => 'date', 'content' => $formattedDate, 'parent' => array('tag' => 'status')), $xml, 'Missing date', false);
+        $this->assertXPathMatches('//status/database[.=1]', $xml, 'Missing database status');
+        $this->assertXPathMatches('//status/storage[.=0]', $xml, 'Missing storage status');
+        $this->assertXPathMatches('//status/date[.="' . $formattedDate . '"]', $xml, 'Missing date');
     }
 
     /**
@@ -132,9 +137,9 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $xml = $this->formatter->format($model);
 
-        $this->assertTag(array('tag' => 'publicKey', 'content' => 'christer', 'parent' => array('tag' => 'user')), $xml, 'Missing public key', false);
-        $this->assertTag(array('tag' => 'numImages', 'content' => '123', 'parent' => array('tag' => 'user')), $xml, 'Missing num images', false);
-        $this->assertTag(array('tag' => 'lastModified', 'content' => $formattedDate, 'parent' => array('tag' => 'user')), $xml, 'Missing date', false);
+        $this->assertXPathMatches('//user/publicKey[.="christer"]', $xml, 'Missing public key');
+        $this->assertXPathMatches('//user/numImages[.="123"]', $xml, 'Missing num key');
+        $this->assertXPathMatches('//user/lastModified[.="' . $formattedDate . '"]', $xml, 'Missing date');
     }
 
     /**
@@ -188,17 +193,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         // Check the search data
         foreach (array('hits' => 100, 'page' => 2, 'limit' => 20, 'count' => 1) as $tag => $value) {
-            $this->assertTag(
-                array(
-                    'tag' => $tag,
-                    'content' => (string) $value, // Need to cast to string since 100 !== "100"
-                    'parent' => array(
-                        'tag' => 'search',
-                        'parent' => array(
-                            'tag' => 'imbo',
-                        ),
-                    )
-                ), $xml, $tag . ' is not correct', false);
+            $this->assertXPathMatches('/imbo/search/'. $tag . '[.="' . $value . '"]', $xml, $tag . ' is not correct');
         }
 
         // Check image
@@ -214,41 +209,16 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
             'width' => (string) $width,
             'height' => (string) $height,
         ) as $tag => $value) {
-            $this->assertTag(
-                array(
-                    'tag' => $tag,
-                    'content' => $value,
-                    'parent' => array(
-                        'tag' => 'image',
-                        'parent' => array(
-                            'tag' => 'images',
-                            'parent' => array(
-                                'tag' => 'imbo',
-                            ),
-                        ),
-                    ),
-                ), $xml, '', false);
+            $this->assertXPathMatches('/imbo/images/image/'. $tag . '[.="' . $value . '"]', $xml);
         }
 
         // Check metadata
         foreach ($metadata as $key => $value) {
-            $this->assertTag(
-                array(
-                    'tag' => 'tag',
-                    'attributes' => array(
-                        'key' => $key,
-                    ),
-                    'content' => $value,
-                    'parent' => array(
-                        'tag' => 'metadata',
-                        'parent' => array(
-                            'tag' => 'image',
-                            'parent' => array(
-                                'tag' => 'images',
-                            ),
-                        ),
-                    ),
-                ), $xml, '', false);
+            $this->assertXPathMatches(
+                '//images/image/metadata/tag[@key="' . $key . '" and .="' . $value . '"]',
+                $xml,
+                'element "tag" with value "' . $value . '" and attr key="' . $key . '" not found'
+            );
         }
     }
 
@@ -268,7 +238,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $xml = $this->formatter->format($model);
 
-        $this->assertNotTag(array('tag' => 'metadata'), $xml, '', false);
+        $this->assertXPathDoesNotMatch('//metadata', $xml, 'Image model without metadata contained metadata');
     }
 
     /**
@@ -287,7 +257,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $xml = $this->formatter->format($model);
 
-        $this->assertTag(array('tag' => 'metadata', 'content' => ''), $xml, '', false);
+        $this->assertXPathMatches('//metadata[.=""]', $xml);
     }
 
     /**
@@ -300,7 +270,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $xml = $this->formatter->format($model);
 
-        $this->assertNotTag(array('tag' => 'image'), $xml, '', false);
+        $this->assertXPathDoesNotMatch('//image', $xml);
     }
 
     /**
@@ -318,20 +288,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $xml = $this->formatter->format($model);
 
         foreach ($metadata as $key => $value) {
-            $this->assertTag(
-                array(
-                    'tag' => 'tag',
-                    'attributes' => array(
-                        'key' => $key,
-                    ),
-                    'content' => $value,
-                    'parent' => array(
-                        'tag' => 'metadata',
-                        'parent' => array(
-                            'tag' => 'imbo',
-                        ),
-                    ),
-                ), $xml, '', false);
+            $this->assertXPathMatches('/imbo/metadata/tag[@key="' . $key . '" and .="' . $value . '"]', $xml);
         }
     }
 
@@ -345,7 +302,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $xml = $this->formatter->format($model);
 
-        $this->assertTag(array('tag' => 'metadata', 'content' => ''), $xml, '', false);
+        $this->assertXPathMatches('//metadata[.=""]', $xml);
     }
 
     /**
@@ -363,14 +320,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $xml = $this->formatter->format($model);
 
         foreach ($data as $key => $value) {
-            $this->assertTag(
-                array(
-                    'tag' => $key,
-                    'content' => $value,
-                    'parent' => array(
-                        'tag' => 'imbo',
-                    ),
-                ), $xml, '', false);
+            $this->assertXPathMatches('/imbo/' . $key . '[.="' . $value . '"]', $xml);
         }
     }
 
@@ -410,27 +360,8 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $xml = $this->formatter->format($model);
 
-        $this->assertTag(array(
-            'tag' => 'subsub',
-            'content' => 'value',
-            'parent' => array(
-                'tag' => 'sub',
-                'parent' => array(
-                    'tag' => 'key',
-                    'parent' => array(
-                        'tag' => 'imbo',
-                    ),
-                ),
-            ),
-        ), $xml, '', false);
-
-        $this->assertTag(array(
-            'tag' => 'key2',
-            'content' => 'value',
-            'parent' => array(
-                'tag' => 'imbo',
-            ),
-        ), $xml, '', false);
+        $this->assertXPathMatches('/imbo/key/sub/subsub[.="value"]', $xml);
+        $this->assertXPathMatches('/imbo/key2[.="value"]', $xml);
     }
 
     /**
@@ -443,7 +374,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $xml = $this->formatter->format($model);
 
-        $this->assertTag(array('tag' => 'imbo', 'content' => ''), $xml, '', false);
+        $this->assertXPathMatches('//imbo[.=""]', $xml);
     }
 
     /**
@@ -478,5 +409,47 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $model->expects($this->once())->method('getEntry')->will($this->returnValue($entry));
 
         $this->assertContains('<imbo><users></users></imbo>', $this->formatter->format($model));
+    }
+
+    /**
+     * Assert that an xpath query have matches for the given XML tree
+     *
+     * @param  string $query XPath query
+     * @param  string $xml XML document
+     * @param  string $message
+     */
+    protected function assertXPathMatches($query, $xml, $message = '') {
+        $matches = $this->queryXPath($query, $xml);
+        $this->assertNotNull($matches->item(0), $message);
+    }
+
+    /**
+     * Assert that an xpath query have no matches for the given XML tree
+     *
+     * @param  string $query XPath query
+     * @param  string $xml XML document
+     * @param  string $message
+     */
+    protected function assertXPathDoesNotMatch($query, $xml, $message = '') {
+        $matches = $this->queryXPath($query, $xml);
+
+        $this->assertNull($matches->item(0), $message);
+    }
+
+    /**
+     * Run an XPath query on the given DOM document, returning matched elements
+     *
+     * @param  string $query XPath query
+     * @param  string $xml XML document
+     * @return DOMNodeList|null
+     */
+    protected function queryXPath($query, $xml) {
+        $doc = new DOMDocument();
+        $doc->loadXML($xml);
+
+        $xpath = new DOMXpath($doc);
+        $elements = $xpath->query($query);
+
+        return $elements;
     }
 }

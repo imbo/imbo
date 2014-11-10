@@ -768,6 +768,8 @@ will result in:
 
 For images the default mime-type is the original mime-type of the image. If you add an ``image/gif`` image and fetch that image with ``Accept: */*`` or ``Accept: image/*`` the mime-type of the image returned will be ``image/gif``. To choose a different mime type either change the ``Accept`` header, or use ``.jpg`` or ``.png`` (for ``image/jpeg`` and ``image/png`` respectively).
 
+An exception to this is if the configuration option  :ref:`contentNegotiateImages <configuration-content-negotiation>` is set to ``false``, in which case Imbo will not convert the image to a different format than the original, unless explicitly told to do so by specifying an extension (``.jpg``, ``.png``, ``.gif`` etc).
+
 Cache headers
 -------------
 

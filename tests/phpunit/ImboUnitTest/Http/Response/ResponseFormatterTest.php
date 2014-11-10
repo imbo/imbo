@@ -45,6 +45,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->event->expects($this->any())->method('getConfig')->will($this->returnValue(array('contentNegotiateImages' => true)));
         $this->formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
         $this->formatters = array(
             'format' => $this->formatter,
@@ -263,6 +264,31 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
 
         $this->responseFormatter->negotiate($this->event);
+        $this->assertSame($expectedFormatter, $this->responseFormatter->getFormatter());
+    }
+
+    /**
+     * @dataProvider getOriginalMimeTypes
+     * @covers Imbo\Http\Response\ResponseFormatter::negotiate
+     */
+    public function testUsesTheOriginalMimeTypeOfTheImageIfConfigDisablesContentNegotiationForImages($originalMimeType, $expectedFormatter) {
+        // Use a real object since the code we are testing uses get_class(), which won't work as
+        // expected when the object used is a mock
+        $image = new Image();
+        $image->setMimeType($originalMimeType);
+
+        $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $this->request->headers = $requestHeaders;
+        $this->contentNegotiation->expects($this->any())->method('isAcceptable')->will($this->returnValue(1));
+        $this->response->expects($this->never())->method('setVary');
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
+
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
+        $event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $event->expects($this->any())->method('getConfig')->will($this->returnValue(array('contentNegotiateImages' => false)));
+
+        $this->responseFormatter->negotiate($event);
         $this->assertSame($expectedFormatter, $this->responseFormatter->getFormatter());
     }
 

@@ -31,7 +31,7 @@ use Imbo\Model\Image,
  * - (string) server The server string to use when connecting to MongoDB. Defaults to
  *                   'mongodb://localhost:27017'
  * - (array) options Options to use when creating the MongoClient instance. Defaults to
- *                   array('connect' => true, 'connectTimeoutMS' => 1000).
+ *                   ['connect' => true, 'connectTimeoutMS' => 1000].
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
@@ -49,24 +49,24 @@ class MongoDB implements DatabaseInterface {
      *
      * @var array
      */
-    private $collections = array(
+    private $collections = [
         'image' => null,
         'shortUrl' => null,
-    );
+    ];
 
     /**
      * Parameters for the driver
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         // Database name
         'databaseName' => 'imbo',
 
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
-        'options' => array('connect' => true, 'connectTimeoutMS' => 1000),
-    );
+        'options' => ['connect' => true, 'connectTimeoutMS' => 1000],
+    ];
 
     /**
      * Class constructor
@@ -111,9 +111,9 @@ class MongoDB implements DatabaseInterface {
         if ($this->imageExists($publicKey, $imageIdentifier)) {
             try {
                 $this->getImageCollection()->update(
-                    array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                    array('$set' => array('updated' => $now)),
-                    array('multiple' => false)
+                    ['publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier],
+                    ['$set' => ['updated' => $now]],
+                    ['multiple' => false]
                 );
 
                 return true;
@@ -122,20 +122,20 @@ class MongoDB implements DatabaseInterface {
             }
         }
 
-        $data = array(
+        $data = [
             'size'             => $image->getFilesize(),
             'publicKey'        => $publicKey,
             'imageIdentifier'  => $imageIdentifier,
             'extension'        => $image->getExtension(),
             'mime'             => $image->getMimeType(),
-            'metadata'         => array(),
+            'metadata'         => [],
             'added'            => $added ?: $now,
             'updated'          => $updated ?: $now,
             'width'            => $image->getWidth(),
             'height'           => $image->getHeight(),
             'checksum'         => $image->getChecksum(),
             'originalChecksum' => $image->getOriginalChecksum(),
-        );
+        ];
 
         try {
             $this->getImageCollection()->insert($data);
@@ -151,18 +151,18 @@ class MongoDB implements DatabaseInterface {
      */
     public function deleteImage($publicKey, $imageIdentifier) {
         try {
-            $data = $this->getImageCollection()->findOne(array(
+            $data = $this->getImageCollection()->findOne([
                 'publicKey' => $publicKey,
                 'imageIdentifier' => $imageIdentifier,
-            ));
+            ]);
 
             if ($data === null) {
                 throw new DatabaseException('Image not found', 404);
             }
 
             $this->getImageCollection()->remove(
-                array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('justOne' => true)
+                ['publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier],
+                ['justOne' => true]
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to delete image data', 500, $e);
@@ -181,9 +181,9 @@ class MongoDB implements DatabaseInterface {
             $updatedMetadata = array_merge($existing, $metadata);
 
             $this->getImageCollection()->update(
-                array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('$set' => array('updated' => time(), 'metadata' => $updatedMetadata)),
-                array('multiple' => false)
+                ['publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier],
+                ['$set' => ['updated' => time(), 'metadata' => $updatedMetadata]],
+                ['multiple' => false]
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to update meta data', 500, $e);
@@ -197,10 +197,10 @@ class MongoDB implements DatabaseInterface {
      */
     public function getMetadata($publicKey, $imageIdentifier) {
         try {
-            $data = $this->getImageCollection()->findOne(array(
+            $data = $this->getImageCollection()->findOne([
                 'publicKey' => $publicKey,
                 'imageIdentifier' => $imageIdentifier,
-            ));
+            ]);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch meta data', 500, $e);
         }
@@ -209,7 +209,7 @@ class MongoDB implements DatabaseInterface {
             throw new DatabaseException('Image not found', 404);
         }
 
-        return isset($data['metadata']) ? $data['metadata'] : array();
+        return isset($data['metadata']) ? $data['metadata'] : [];
     }
 
     /**
@@ -217,19 +217,19 @@ class MongoDB implements DatabaseInterface {
      */
     public function deleteMetadata($publicKey, $imageIdentifier) {
         try {
-            $data = $this->getImageCollection()->findOne(array(
+            $data = $this->getImageCollection()->findOne([
                 'publicKey' => $publicKey,
                 'imageIdentifier' => $imageIdentifier,
-            ));
+            ]);
 
             if ($data === null) {
                 throw new DatabaseException('Image not found', 404);
             }
 
             $this->getImageCollection()->update(
-                array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('$set' => array('metadata' => array())),
-                array('multiple' => false)
+                ['publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier],
+                ['$set' => ['metadata' => []]],
+                ['multiple' => false]
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to delete meta data', 500, $e);
@@ -243,18 +243,18 @@ class MongoDB implements DatabaseInterface {
      */
     public function getImages($publicKey, Query $query, Images $model) {
         // Initialize return value
-        $images = array();
+        $images = [];
 
         // Query data
-        $queryData = array(
+        $queryData = [
             'publicKey' => $publicKey,
-        );
+        ];
 
         $from = $query->from();
         $to = $query->to();
 
         if ($from || $to) {
-            $tmp = array();
+            $tmp = [];
 
             if ($from !== null) {
                 $tmp['$gte'] = $from;
@@ -286,10 +286,10 @@ class MongoDB implements DatabaseInterface {
         }
 
         // Sorting
-        $sort = array('added' => -1);
+        $sort = ['added' => -1];
 
         if ($querySort = $query->sort()) {
-            $sort = array();
+            $sort = [];
 
             foreach ($querySort as $s) {
                 $sort[$s['field']] = ($s['sort'] === 'asc' ? 1 : -1);
@@ -297,10 +297,13 @@ class MongoDB implements DatabaseInterface {
         }
 
         // Fields to fetch
-        $fields = array('extension', 'added', 'checksum', 'originalChecksum', 'updated', 'publicKey', 'imageIdentifier', 'mime', 'size', 'width', 'height');
+        $fields = array_fill_keys([
+            'extension', 'added', 'checksum', 'originalChecksum', 'updated',
+            'publicKey', 'imageIdentifier', 'mime', 'size', 'width', 'height'
+        ], true);
 
         if ($query->returnMetadata()) {
-            $fields[] = 'metadata';
+            $fields['metadata'] = true;
         }
 
         try {
@@ -336,8 +339,8 @@ class MongoDB implements DatabaseInterface {
     public function load($publicKey, $imageIdentifier, Image $image) {
         try {
             $data = $this->getImageCollection()->findOne(
-                array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('size', 'width', 'height', 'mime', 'extension', 'added', 'updated')
+                ['publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier],
+                array_fill_keys(['size', 'width', 'height', 'mime', 'extension', 'added', 'updated'], true)
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch image data', 500, $e);
@@ -363,7 +366,7 @@ class MongoDB implements DatabaseInterface {
     public function getLastModified($publicKey, $imageIdentifier = null) {
         try {
             // Query on the public key
-            $query = array('publicKey' => $publicKey);
+            $query = ['publicKey' => $publicKey];
 
             if ($imageIdentifier) {
                 // We want information about a single image. Add the identifier to the query
@@ -371,11 +374,11 @@ class MongoDB implements DatabaseInterface {
             }
 
             // Create the cursor
-            $cursor = $this->getImageCollection()->find($query, array('updated'))
+            $cursor = $this->getImageCollection()->find($query, ['updated' => true])
                                                  ->limit(1)
-                                                 ->sort(array(
-                                                     'updated' => MongoCollection::DESCENDING,
-                                                 ));
+                                                 ->sort([
+                                                     'updated' => -1,
+                                                 ]);
 
             // Fetch the next row
             $data = $cursor->getNext();
@@ -386,7 +389,7 @@ class MongoDB implements DatabaseInterface {
         if ($data === null && $imageIdentifier) {
             throw new DatabaseException('Image not found', 404);
         } else if ($data === null) {
-            $data = array('updated' => time());
+            $data = ['updated' => time()];
         }
 
         return new DateTime('@' . $data['updated'], new DateTimeZone('UTC'));
@@ -397,9 +400,9 @@ class MongoDB implements DatabaseInterface {
      */
     public function getNumImages($publicKey) {
         try {
-            $query = array(
+            $query = [
                 'publicKey' => $publicKey,
-            );
+            ];
 
             $result = (int) $this->getImageCollection()->find($query)->count();
 
@@ -415,8 +418,8 @@ class MongoDB implements DatabaseInterface {
     public function getNumBytes($publicKey) {
         try {
             $result = $this->getImageCollection()->aggregate(
-                array('$match' => array('publicKey' => $publicKey)),
-                array('$group' => array('_id' => null, 'numBytes' => array('$sum' => '$size')))
+                ['$match' => ['publicKey' => $publicKey]],
+                ['$group' => ['_id' => null, 'numBytes' => ['$sum' => '$size']]]
             )['result'];
 
             if (empty($result)) {
@@ -445,10 +448,10 @@ class MongoDB implements DatabaseInterface {
      */
     public function getImageMimeType($publicKey, $imageIdentifier) {
         try {
-            $data = $this->getImageCollection()->findOne(array(
+            $data = $this->getImageCollection()->findOne([
                 'publicKey' => $publicKey,
                 'imageIdentifier' => $imageIdentifier,
-            ));
+            ]);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch image meta data', 500, $e);
         }
@@ -464,10 +467,10 @@ class MongoDB implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function imageExists($publicKey, $imageIdentifier) {
-        $data = $this->getImageCollection()->findOne(array(
+        $data = $this->getImageCollection()->findOne([
             'publicKey' => $publicKey,
             'imageIdentifier' => $imageIdentifier,
-        ));
+        ]);
 
         return $data !== null;
     }
@@ -477,13 +480,15 @@ class MongoDB implements DatabaseInterface {
      */
     public function insertShortUrl($shortUrlId, $publicKey, $imageIdentifier, $extension = null, array $query = array()) {
         try {
-            $this->getShortUrlCollection()->insert(array(
+            $data = [
                 'shortUrlId' => $shortUrlId,
                 'publicKey' => $publicKey,
                 'imageIdentifier' => $imageIdentifier,
                 'extension' => $extension,
                 'query' => serialize($query),
-            ));
+            ];
+
+            $this->getShortUrlCollection()->insert($data);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to create short URL', 500, $e);
         }
@@ -496,14 +501,14 @@ class MongoDB implements DatabaseInterface {
      */
     public function getShortUrlId($publicKey, $imageIdentifier, $extension = null, array $query = array()) {
         try {
-            $result = $this->getShortUrlCollection()->findOne(array(
+            $result = $this->getShortUrlCollection()->findOne([
                 'publicKey' => $publicKey,
                 'imageIdentifier' => $imageIdentifier,
                 'extension' => $extension,
                 'query' => serialize($query),
-            ), array(
-                'shortUrlId',
-            ));
+            ], [
+                'shortUrlId' => true,
+            ]);
 
             if (!$result) {
                 return null;
@@ -520,11 +525,11 @@ class MongoDB implements DatabaseInterface {
      */
     public function getShortUrlParams($shortUrlId) {
         try {
-            $result = $this->getShortUrlCollection()->findOne(array(
+            $result = $this->getShortUrlCollection()->findOne([
                 'shortUrlId' => $shortUrlId,
-            ), array(
+            ], [
                 '_id' => false
-            ));
+            ]);
 
             if (!$result) {
                 return null;
@@ -542,10 +547,10 @@ class MongoDB implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function deleteShortUrls($publicKey, $imageIdentifier, $shortUrlId = null) {
-        $query = array(
+        $query = [
             'publicKey' => $publicKey,
             'imageIdentifier' => $imageIdentifier,
-        );
+        ];
 
         if ($shortUrlId) {
             $query['shortUrlId'] = $shortUrlId;

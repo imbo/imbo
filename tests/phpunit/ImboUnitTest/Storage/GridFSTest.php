@@ -56,7 +56,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      * Set up the driver
      */
     public function setUp() {
-        if (!extension_loaded('mongo') || !class_exists('MongoClient')) {
+        if (!class_exists('MongoClient')) {
             $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
         }
 

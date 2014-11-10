@@ -20,19 +20,45 @@ if (is_file(__DIR__ . '/../../../autoload.php')) {
     require __DIR__ . '/../vendor/autoload.php';
 }
 
-$config = array(
+$config = [
     /**
      * Authentication
      *
-     * This value must be set to an array with key => value pairs mapping to public and private keys
-     * of the users of this installation. The public keys must match the following case sensitive
-     * expression:
+     * This value must be set to either:
+     * 1) An array mapping public and private keys of the users of this installation.
+     *    The array can take two different forms:
+     *
+     * 'auth' => [
+     *     '<publicKey>' => '<read+write private key>',
+     *     '<differentPublicKey>' => '<different read+write private key>'
+     * ]
+     *
+     * Or:
+     * 'auth' => [
+     *     '<publicKey>' => [
+     *         'ro' => '<read-only private key>',
+     *         'rw' => '<read-write private key>',
+     *     ]
+     * ]
+     *
+     * You can also specify multiple private keys for both read-only and read+write:
+     *
+     * 'auth' => [
+     *     '<publicKey>' => [
+     *         'ro' => ['<readKey1>', '<readKey2>'],
+     *         'rw' => ['<readWriteKey1>', '<readWriteKey2>']
+     *     ]
+     * ]
+     *
+     * 2) An instance of the Imbo\Auth\UserLookupInterface interface.
+     *
+     * Public keys must match the following case sensitive regular expression:
      *
      * ^[a-z0-9_-]{3,}$
      *
-     * @var array
+     * @var array|Auth\UserLookupInterface
      */
-    'auth' => array(),
+    'auth' => [],
 
     /**
      * Database adapter
@@ -59,6 +85,16 @@ $config = array(
     'storage' => function() {
         return new Storage\GridFS();
     },
+
+    /**
+     * Whether to content negotiate images or not. If set to true, Imbo will try to find a
+     * suitable image format based on the Accept-header received. If set to false, it will
+     * deliver the image in the format it was originally added as. Note that this does not
+     * affect images requested with a specific extension (.jpg/.png/.gif etc).
+     *
+     * @var boolean
+     */
+    'contentNegotiateImages' => true,
 
     /**
      * Event listeners
@@ -124,7 +160,7 @@ $config = array(
      *
      * Examples of how to add listeners:
      *
-     * 'eventListeners' => array(
+     * 'eventListeners' => [
      *   // 1) A class name in a string
      *   'accessToken' => 'Imbo\EventListener\ListenerInterface',
      *
@@ -132,72 +168,76 @@ $config = array(
      *   'auth' => new EventListener\Authenticate(),
      *
      *   // 3) Implementation of a listener interface with a public key filter
-     *   'maxImageSize' => array(
+     *   'maxImageSize' => [
      *     'listener' => EventListener\MaxImageSize(1024, 768),
-     *     'publicKeys' => array(
-     *       'whitelist' => array( ... ),
-     *       // 'blacklist' => array( ... ),
+     *     'publicKeys' => [
+     *       'whitelist' => [ ... ],
+     *       // 'blacklist' => [ ... ],
      *       )
      *     )
      *   ),
      *
      *   // 4) A class name in a string with custom parameters for the listener
-     *   'statsAccess' => array(
+     *   'statsAccess' => [
      *       'listener' => 'Imbo\EventListener\StatsAccess',
-     *       'params' => array(
-     *           'allow' => array('127.0.0.1', '::1'),
-     *       ),
-     *   ),
+     *       'params' => [
+     *           'allow' => ['127.0.0.1', '::1'],
+     *       ],
+     *   ],
      *
      *   // 5) A closure that will subscribe to two events with different priorities
-     *   'anotherCustomCallback' => array(
+     *   'anotherCustomCallback' => [
      *       'callback' => function($event) {
      *           // Some code
      *       },
-     *       'events' => array(
+     *       'events' => [
      *           'image.get' => 20, // Trigger BEFORE the internal handler for "image.get"
      *           'image.post' => -20, // Trigger AFTER the internal handler for "image.post"
-     *       ),
+     *       ],
      *   ),
      *
      * @var array
      */
-    'eventListeners' => array(
+    'eventListeners' => [
         'accessToken' => 'Imbo\EventListener\AccessToken',
         'auth' => 'Imbo\EventListener\Authenticate',
-        'statsAccess' => array(
+        'statsAccess' => [
             'listener' => 'Imbo\EventListener\StatsAccess',
-            'params' => array(
-                'allow' => array('127.0.0.1', '::1'),
-            ),
-        ),
+            'params' => [
+                'allow' => ['127.0.0.1', '::1'],
+            ],
+        ],
 
         // Image transformations
         'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
         'border' => 'Imbo\Image\Transformation\Border',
         'canvas' => 'Imbo\Image\Transformation\Canvas',
         'compress' => 'Imbo\Image\Transformation\Compress',
+        'contrast' => 'Imbo\Image\Transformation\Contrast',
         'convert' => 'Imbo\Image\Transformation\Convert',
         'crop' => 'Imbo\Image\Transformation\Crop',
         'desaturate' => 'Imbo\Image\Transformation\Desaturate',
         'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
         'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
         'histogram' => 'Imbo\Image\Transformation\Histogram',
+        'level' => 'Imbo\Image\Transformation\Level',
         'maxSize' => 'Imbo\Image\Transformation\MaxSize',
         'modulate' => 'Imbo\Image\Transformation\Modulate',
         'progressive' => 'Imbo\Image\Transformation\Progressive',
         'resize' => 'Imbo\Image\Transformation\Resize',
         'rotate' => 'Imbo\Image\Transformation\Rotate',
         'sepia' => 'Imbo\Image\Transformation\Sepia',
+        'sharpen' => 'Imbo\Image\Transformation\Sharpen',
         'strip' => 'Imbo\Image\Transformation\Strip',
         'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
         'transpose' => 'Imbo\Image\Transformation\Transpose',
         'transverse' => 'Imbo\Image\Transformation\Transverse',
+        'vignette' => 'Imbo\Image\Transformation\Vignette',
         'watermark' => 'Imbo\Image\Transformation\Watermark',
 
         // Imagick-specific event listener for the built in image transformations
         'imagick' => 'Imbo\EventListener\Imagick',
-    ),
+    ],
 
     /**
      * Initializers for event listeners
@@ -208,9 +248,9 @@ $config = array(
      *
      * @var array
      */
-    'eventListenerInitializers' => array(
+    'eventListenerInitializers' => [
         'imagick' => 'Imbo\EventListener\Initializer\Imagick',
-    ),
+    ],
 
     /**
      * Transformation presets
@@ -221,22 +261,22 @@ $config = array(
      *
      * Example:
      *
-     * 'transformationPresets' => array(
-     *     'graythumb' => array(
+     * 'transformationPresets' => [
+     *     'graythumb' => [
      *         'thumbnail',
      *         'desaturate',
-     *     ),
-     *     'flipflop' => array(
+     *     ],
+     *     'flipflop' => [
      *         'flipHorizontally',
      *         'flipVertically',
-     *     ),
-     * ),
+     *     ],
+     * ],
      *
      * The above to examples can be triggered by ?t[]=graythumb and ?t[]=flipflop respectively
      *
      * @var array
      */
-    'transformationPresets' => array(),
+    'transformationPresets' => [],
 
     /**
      * Custom resources for Imbo
@@ -244,7 +284,7 @@ $config = array(
      * @link http://docs.imbo-project.org
      * @var array
      */
-    'resources' => array(),
+    'resources' => [],
 
     /**
      * Custom routes for Imbo
@@ -252,8 +292,31 @@ $config = array(
      * @link http://docs.imbo-project.org
      * @var array
      */
-    'routes' => array(),
-);
+    'routes' => [],
+
+    /**
+     * Trusted proxies
+     *
+     * If you find yourself behind some sort of proxy - like a load balancer - then certain header
+     * information may be sent to you using special X-Forwarded-* headers. For example, the Host
+     * HTTP header is usually used to return the requested host. But when you're behind a proxy,
+     * the true host may be stored in a X-Forwarded-Host header.
+     *
+     * Since HTTP headers can be spoofed, Imbo does not trust these proxy headers by default.
+     * If you are behind a proxy, you should manually whitelist your proxy.
+     *
+     * Note: Not all proxies set the required X-Forwarded-* headers by default. A search for
+     *       "X-Forwarded-Proto <your proxy here>" usually gives helpful answers to how you can
+     *       add them to incoming requests.
+     *
+     * Example:
+     *
+     * 'trustedProxies' => ['192.0.0.1', '10.0.0.0/8']
+     *
+     * @var array
+     */
+    'trustedProxies' => [],
+];
 
 // See if a custom config path has been defined. If so, don't require the custom one as this is
 // most likely a Behat test run

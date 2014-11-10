@@ -96,10 +96,13 @@ class DoctrineTest extends DatabaseTests {
     }
 
     public function tearDown() {
-        $this->pdo->query("DROP TABLE IF EXISTS imageinfo");
-        $this->pdo->query("DROP TABLE IF EXISTS metadata");
-        $this->pdo->query("DROP TABLE IF EXISTS shorturl");
-        $this->pdo->query("DROP INDEX IF EXISTS shorturlparams");
+        if ($this->pdo instanceof PDO) {
+            $this->pdo->query("DROP TABLE IF EXISTS imageinfo");
+            $this->pdo->query("DROP TABLE IF EXISTS metadata");
+            $this->pdo->query("DROP TABLE IF EXISTS shorturl");
+            $this->pdo->query("DROP INDEX IF EXISTS shorturlparams");
+        }
+
         $this->pdo = null;
 
         parent::tearDown();

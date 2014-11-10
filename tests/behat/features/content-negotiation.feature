@@ -92,3 +92,17 @@ Feature: Imbo supports content negotiation
             | f3210f1bb34bfbfa432cc3560be40761 | image/jpeg   |
             | b5426b4c008e378c201526d2baaec599 | image/gif    |
 
+    Scenario Outline: Imbo uses the original mime type of the image if configuration has disabled content negotiation for images
+        Given I use "publickey" and "privatekey" for public and private keys
+        And Imbo uses the "image-content-negotiation-disabled.php" configuration
+        And I include an access token in the query
+        And the "Accept" request header is "<requested-content-type>"
+        When I request "/users/publickey/images/<image-identifier>"
+        Then I should get a response with "200 OK"
+        And the "Content-Type" response header is "<original-content-type>"
+
+        Examples:
+            | image-identifier                 | requested-content-type | original-content-type |
+            | fc7d2d06993047a0b5056e8fac4462a2 | image/gif              | image/png             |
+            | f3210f1bb34bfbfa432cc3560be40761 | image/png              | image/jpeg            |
+            | b5426b4c008e378c201526d2baaec599 | image/jpeg             | image/gif             |

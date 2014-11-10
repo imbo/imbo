@@ -13,6 +13,7 @@ namespace Imbo\EventManager;
 use Imbo\Http\Request\Request,
     Imbo\Http\Response\Response,
     Imbo\Database\DatabaseInterface,
+    Imbo\Auth\UserLookupInterface,
     Imbo\Storage\StorageInterface;
 
 /**
@@ -49,6 +50,13 @@ interface EventInterface {
      * @return StorageInterface
      */
     function getStorage();
+
+    /**
+     * Get the user lookup adapter
+     *
+     * @return UserLookupInterface
+     */
+    function getUserLookup();
 
     /**
      * Get the event manager that triggered the event

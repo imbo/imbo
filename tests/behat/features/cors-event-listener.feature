@@ -33,6 +33,7 @@ Feature: Imbo provides an event listener for CORS
 
     Scenario: Request a resource using HTTP OPTIONS using an allowed host
         Given the "Origin" request header is "http://allowedhost"
+        And the "Access-Control-Request-Headers" request header is "x-imbo-something, x-imbo-signature"
         And Imbo uses the "cors.php" configuration
         When I request "/" using HTTP "OPTIONS"
         Then I should get a response with "204 No Content"
@@ -42,6 +43,8 @@ Feature: Imbo provides an event listener for CORS
         And the "Access-Control-Allow-Methods" response header contains "OPTIONS"
         And the "Access-Control-Allow-Headers" response header contains "Accept"
         And the "Access-Control-Allow-Headers" response header contains "Content-Type"
+        And the "Access-Control-Allow-Headers" response header contains "X-Imbo-Signature"
+        And the "Access-Control-Allow-Headers" response header contains "X-Imbo-Something"
         And the "Access-Control-Max-Age" response header is "1349"
         And the "Allow" response header contains "GET"
         And the "Allow" response header contains "HEAD"
@@ -72,6 +75,17 @@ Feature: Imbo provides an event listener for CORS
         When I request "/users/publickey/images" using HTTP "POST"
         Then I should get a response with "415 Invalid image"
         And the "Vary" response header contains "Origin"
+        And the following response headers should be present:
+        """
+        Access-Control-Allow-Origin
+        """
+
+    Scenario: Provides CORS headers when authentication fails
+        Given I use "invalid-pubkey" and "invalid-privkey" for public and private keys
+        And Imbo uses the "cors.php" configuration
+        And the "Origin" request header is "http://allowedhost"
+        When I request "/users/publickey/images" using HTTP "GET"
+        Then I should get a response with "400 Missing access token"
         And the following response headers should be present:
         """
         Access-Control-Allow-Origin

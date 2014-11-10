@@ -307,7 +307,8 @@ class DatabaseOperations implements ListenerInterface {
     public function loadStats(EventInterface $event) {
         $response = $event->getResponse();
         $database = $event->getDatabase();
-        $publicKeys = array_keys($event->getConfig()['auth']);
+        $userLookup = $event->getUserLookup();
+        $publicKeys = $userLookup->getPublicKeys();
         $users = array();
 
         foreach ($publicKeys as $key) {

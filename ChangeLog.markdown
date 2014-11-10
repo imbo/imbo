@@ -1,6 +1,24 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.2.2
+----------
+__2014-11-10__
+
+* #310: Added `trustedProxies` configuration option (Espen Hovlandsdal)
+* #307: Added ability to have multiple private keys per user + RO/RW access level (Espen Hovlandsdal)
+* #289: Added support for alternative ways of specifying public / private keys (Christer Edvartsen)
+* #305: Added [MongoFill](https://github.com/mongofill/mongofill) compatiblity (Espen Hovlandsdal)
+* #300: Added configuration option to enable/disable content negotiation for images (`contentNegotiateImages`). Will behave as earlier versions by default (Espen Hovlandsdal)
+* #308: New image transformation: vignette (Espen Hovlandsdal)
+* #265: New image transformation: sharpen (Christer Edvartsen)
+* #264: New image transformation: contrast (Christer Edvartsen)
+
+Bug fixes:
+
+* #298: Browsers could not send `X-Imbo-*`-headers across origins (Espen Hovlandsdal)
+* #298: CORS-requests would not have the `Access-Control-Allow-Origin`-header present in the response if the request was incorrectly signed or missing the accessToken (Espen Hovlandsdal)
+
 Imbo-1.2.1
 ----------
 __2014-08-01__

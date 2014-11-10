@@ -143,16 +143,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::setPrivateKey
-     * @covers Imbo\Http\Request\Request::getPrivateKey
-     */
-    public function testSetGetPrivateKey() {
-        $privateKey = '55b90a334854ac17b91f5c5690944f31';
-        $this->assertSame($this->request, $this->request->setPrivateKey($privateKey));
-        $this->assertSame($privateKey, $this->request->getPrivateKey());
-    }
-
-    /**
      * @covers Imbo\Http\Request\Request::getImage
      * @covers Imbo\Http\Request\Request::setImage
      */

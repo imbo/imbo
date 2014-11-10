@@ -37,7 +37,7 @@ class GridFSTest extends StorageTests {
     }
 
     public function setUp() {
-        if (!extension_loaded('mongo') || !class_exists('MongoClient')) {
+        if (!class_exists('MongoClient')) {
             $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
         }
 
@@ -48,7 +48,7 @@ class GridFSTest extends StorageTests {
     }
 
     public function tearDown() {
-        if (extension_loaded('mongo') && class_exists('MongoClient')) {
+        if (class_exists('MongoClient')) {
             $client = new MongoClient();
             $client->selectDB($this->testDbName)->drop();
         }
