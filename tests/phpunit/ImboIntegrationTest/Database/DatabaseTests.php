@@ -218,13 +218,15 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     /**
      * Insert some images to test the query functionality
      *
-     * All images added is owned by "publickey"
+     * All images added is owned by "publickey", unless $alternatePublicKey is set to true
      *
+     * @param  boolean $alternatePublicKey Whether to alternate between 'publickey' and
+     *                                     'publickey2' when inserting images
      * @return array Returns an array with two elements where the first is the timestamp of when
      *               the first image was added, and the second is the timestamp of when the last
      *               image was added
      */
-    private function insertImages() {
+    private function insertImages($alternatePublicKey = false) {
         $now = time();
         $start = $now;
         $images = array();
@@ -232,6 +234,11 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         foreach (array('image.jpg', 'image.png', 'image1.png', 'image2.png', 'image3.png', 'image4.png') as $i => $fileName) {
             $path = FIXTURES_DIR . '/' . $fileName;
             $info = getimagesize($path);
+
+            $publicKey = 'publickey';
+            if ($alternatePublicKey && $i % 2 === 0) {
+                $publickey2 = 'publickey2';
+            }
 
             $image = new Image();
             $image->setMimeType($info['mime'])
@@ -245,10 +252,10 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
             $imageIdentifier = md5($image->getBlob());
 
             // Add the image
-            $this->adapter->insertImage('publickey', $imageIdentifier, $image);
+            $this->adapter->insertImage($publicKey, $imageIdentifier, $image);
 
             // Insert some metadata
-            $this->adapter->updateMetadata('publickey', $imageIdentifier, array(
+            $this->adapter->updateMetadata($publicKey, $imageIdentifier, array(
                 'key' . $i => 'value' . $i,
             ));
         }
@@ -320,6 +327,20 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertSame(array('key1' => 'value1'), $images[4]['metadata']);
         $this->assertSame(array('key0' => 'value0'), $images[5]['metadata']);
 
+    }
+
+    public function testGetImagesReturnsImagesOnlyForSpecifiedPublicKeys() {
+        $this->insertImages(true);
+
+        $model = new Images();
+        $query = new Query();
+        $images = $this->adapter->getImages('publickey', $query, $model);
+
+        foreach ($images as $image) {
+            $this->assertSame('publickey', $image['publicKey']);
+        }
+
+        $this->assertSame(count($images), $model->getHits());
     }
 
     public function testGetImagesReturnsImagesWithDateTimeInstances() {

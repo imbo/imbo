@@ -234,7 +234,8 @@ class Doctrine implements DatabaseInterface {
 
         $qb = $this->getConnection()->createQueryBuilder();
         $qb->select('*')
-           ->from($this->tableNames['imageinfo'], 'i');
+           ->from($this->tableNames['imageinfo'], 'i')
+           ->where('i.publicKey = :publicKey')->setParameter(':publicKey', $publicKey);
 
         if ($sort = $query->sort()) {
             // Fields valid for sorting
@@ -268,7 +269,7 @@ class Doctrine implements DatabaseInterface {
 
         if ($from || $to) {
             if ($from !== null) {
-                $qb->where('added >= :from')->setParameter(':from', $from);
+                $qb->andWhere('added >= :from')->setParameter(':from', $from);
             }
 
             if ($to !== null) {
@@ -338,7 +339,7 @@ class Doctrine implements DatabaseInterface {
                 'updated'          => new DateTime('@' . $row['updated'], new DateTimeZone('UTC')),
                 'checksum'         => $row['checksum'],
                 'originalChecksum' => isset($row['originalChecksum']) ? $row['originalChecksum'] : null,
-                'publicKey'        => $publicKey,
+                'publicKey'        => $row['publicKey'],
                 'imageIdentifier'  => $row['imageIdentifier'],
                 'mime'             => $row['mime'],
                 'size'             => (int) $row['size'],
