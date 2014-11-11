@@ -1,6 +1,14 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.2.3
+----------
+__2014-11-11__
+
+Bug fixes:
+
+* #311: Doctrine database driver would not respect public key when listing images (Espen Hovlandsdal)
+
 Imbo-1.2.2
 ----------
 __2014-11-10__
