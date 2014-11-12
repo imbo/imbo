@@ -22,7 +22,7 @@ default:
         - %behat.paths.base%/../../library
         - %behat.paths.base%/../../public
 
-travis:
+no-cc:
   context:
     parameters:
       enableCodeCoverage: false
