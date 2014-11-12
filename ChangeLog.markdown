@@ -1,6 +1,14 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.x.x
+----------
+__N/A__
+
+Bug fixes:
+
+* #313: Doctrine database driver would throw an exception when it could not connect, making the status endpoint return bogus information (Morten Fangel)
+
 Imbo-1.2.3
 ----------
 __2014-11-11__
