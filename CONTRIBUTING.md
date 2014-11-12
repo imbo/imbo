@@ -1,7 +1,11 @@
 # Contributing to Imbo
 ## Running tests
 
-Imbo has both [Behat](http://docs.behat.org/en/v2.5/) and [PHPUnit](https://phpunit.de/) tests, and when adding new features or fixing bugs you are required to add relevant test cases.
+Imbo has both [Behat](http://docs.behat.org/en/v2.5/) and [PHPUnit](https://phpunit.de/) tests, and when adding new features or fixing bugs you are required to add relevant test cases. Remember to install the development requirements using [Composer](https://getcomposer.org/) before running the tests:
+
+```
+composer install --dev
+```
 
 ### Behat
 
