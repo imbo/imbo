@@ -21,4 +21,4 @@ Include `--coverage-html <path>` if you want to generate code coverage report of
 
 ## Writing documentation
 
-Imbo uses [Read the docs](https://readthedocs.org/projects/imbo/) for documentation, and all docs are located in the `docs` dir. The docs are written using Sphinx, and if you are contributing new features please add relevant docs.
+Imbo uses [Read the docs](https://readthedocs.org/projects/imbo/) for documentation, and all docs are located in the `docs` dir. The docs are written using [Sphinx](http://sphinx-doc.org/), and if you are contributing new features please add relevant docs.
