@@ -83,7 +83,7 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
      */
     public function testGetStatusWhenDatabaseIsNotConnectedAndConnectThrowsAnException() {
         $this->connection->expects($this->once())->method('isConnected')->will($this->returnValue(false));
-        $this->connection->expects($this->once())->method('connect')->will($this->throwException(new PDOException));
+        $this->connection->expects($this->once())->method('connect')->will($this->throwException(new PDOException()));
         $this->assertFalse($this->driver->getStatus());
     }
 
