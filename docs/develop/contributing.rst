@@ -38,7 +38,7 @@ When introducing new features you are required to add tests. Unit/integration te
 
 .. code-block:: console
 
-    ./vendor/bin/phpunit -c tests
+    ./vendor/bin/phpunit -c tests/phpunit
 
 If you want to generate code coverage as well you can run the test suite by using a Rake task:
 
@@ -50,7 +50,7 @@ For the Behat test suite you can run similar commands:
 
 .. code-block:: console
 
-    ./vendor/bin/behat --profile travis
+    ./vendor/bin/behat --strict --profile no-cc --config tests/behat/behat.yml
 
 to skip code coverage, or
 
@@ -84,3 +84,8 @@ End user documentation (the ones you are reading now) is written using `Sphinx <
     rake readthedocs
 
 This task also includes a spell checking stage.
+
+Pull requests on GitHub
++++++++++++++++++++++++
+
+If you want to send a pull request, please do so from a publicly available fork of Imbo, using a feature branch with a self descriptive name. The pull request should be sent to the ``develop`` branch. If your pull request is fixing an open issue from `the issue tracker <https://github.com/imbo/imbo/issues>`_ your branch can be named after the issue number, for instance ``issue-312``.
