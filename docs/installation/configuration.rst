@@ -14,21 +14,33 @@ The configuration file(s) you need to create should simply return arrays with co
 Imbo users - ``auth``
 ---------------------
 
-Every user that wants to store images in Imbo needs a public and private key pair. These keys are stored in the ``auth`` part of your configuration file:
+Every user that wants to store images in Imbo needs a public and one or more private key. Imbo supports both read+write and read-only private keys. These keys can either be stored in the configuration file, or they can be fetched using a custom adapter. The configuration is done in the ``auth`` part of your configuration file:
 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'auth' => array(
+        'auth' => [
+            // Read+write private key:
             'username'  => '95f02d701b8dc19ee7d3710c477fd5f4633cec32087f562264e4975659029af7',
-            'otheruser' => 'b312ff29d5da23dcd230b61ff4db1e2515c862b9fb0bb59e7dd54ce1e4e94a53',
-        ),
+
+            // Or, specify individual read-only and read+write keys:
+            'otheruser' => [
+                'ro' => 'b312ff29d5da23dcd230b61ff4db1e2515c862b9fb0bb59e7dd54ce1e4e94a53',
+                'rw' => 'd5da23dcd2e2515c862b9fb0bb59e7dd54cb312ff29d594a53b11b8dc87f5622',
+            ],
+
+            // There is also support for multiple private keys:
+            'someuser' => [
+                'ro' => ['multiple', 'different', 'keys'],
+                'rw' => ['different', 'read+write'],
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 The public keys can consist of the following characters:
 
@@ -38,7 +50,7 @@ The public keys can consist of the following characters:
 
 and must be at least 3 characters long.
 
-For the private keys you can for instance use a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images. Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want. The key itself will never be a part of the payload sent to/from the server.
+For the private keys you can for instance use a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images (given it's a read+write key). Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want. The key itself will never be a part of the payload sent to/from the server.
 
 Imbo ships with a small command line tool that can be used to generate private keys for you using the `openssl_random_pseudo_bytes <http://php.net/openssl_random_pseudo_bytes>`_ function. The script is located in the ``scripts`` directory of the Imbo installation and does not require any arguments:
 
@@ -48,6 +60,24 @@ Imbo ships with a small command line tool that can be used to generate private k
     3b98dde5f67989a878b8b268d82f81f0858d4f1954597cc713ae161cdffcc84a
 
 The private key can be changed whenever you want as long as you remember to change it in both the server configuration and in the client you use. The public key can not be changed easily as database and storage adapters use it when storing/fetching images and metadata.
+
+Custom user lookup adapter
+++++++++++++++++++++++++++
+
+You can also use a custom adapter to fetch the public and private keys. The adapter must implement the ``Imbo\Auth\UserLookupInterface``, and be specified in the configuration under the ``auth`` key:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'auth' => new My\Custom\UserLookupAdapter([
+            'some' => 'option',
+        ]),
+
+        // ...
+    ];
 
 .. _database-configuration:
 
@@ -61,20 +91,20 @@ In the default configuration file the :ref:`default-database-adapter` database a
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'database' => function() {
-            return new Imbo\Database\MongoDB(array(
+            return new Imbo\Database\MongoDB([
                 'databaseName' => 'imbo',
-            ));
+            ]);
         },
 
         // or
 
-        'database' => new Imbo\Database\MongoDB(array(
+        'database' => new Imbo\Database\MongoDB([
             'databaseName' => 'imbo',
-        )),
+        ]),
 
         // ...
     );
@@ -102,38 +132,38 @@ Here are some examples on how to use the Doctrine adapter in the configuration f
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'database' => function() {
-            return new Imbo\Database\Doctrine(array(
+            return new Imbo\Database\Doctrine([
                 'pdo' => new PDO('sqlite:/path/to/database'),
-            ));
+            ]);
         },
 
         // ...
-    );
+    ];
 
 2) Connect to a MySQL database using PDO:
 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'database' => function() {
-            return new Imbo\Database\Doctrine(array(
+            return new Imbo\Database\Doctrine([
                 'dbname'   => 'database',
                 'user'     => 'username',
                 'password' => 'password',
                 'host'     => 'hostname',
                 'driver'   => 'pdo_mysql',
-            ));
+            ]);
         },
 
         // ...
-    );
+    ];
 
 .. _mongodb-database-adapter:
 .. _default-database-adapter:
@@ -150,7 +180,7 @@ This adapter uses PHP's `mongo extension <http://pecl.php.net/package/mongo>`_ t
     The server string to use when connecting. Defaults to ``mongodb://localhost:27017``.
 
 ``options``
-    Options passed to the underlying adapter. Defaults to ``array('connect' => true, 'timeout' => 1000)``. See the `manual for the MongoClient constructor <http://www.php.net/manual/en/mongoclient.construct.php>`_ for available options.
+    Options passed to the underlying adapter. Defaults to ``['connect' => true, 'timeout' => 1000]``. See the `manual for the MongoClient constructor <http://www.php.net/manual/en/mongoclient.construct.php>`_ for available options.
 
 Examples
 ^^^^^^^^
@@ -160,7 +190,7 @@ Examples
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'database' => function() {
@@ -168,27 +198,27 @@ Examples
         },
 
         // ...
-    );
+    ];
 
 2) Connect to a `replica set <http://www.mongodb.org/display/DOCS/Replica+Sets>`_:
 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'database' => function() {
-            return new Imbo\Database\MongoDB(array(
+            return new Imbo\Database\MongoDB([
                 'server' => 'mongodb://server1,server2,server3',
-                'options' => array(
+                'options' => [
                     'replicaSet' => 'nameOfReplicaSet',
-                ),
-            ));
+                ],
+            ]);
         },
 
         // ...
-    );
+    ];
 
 Custom database adapter
 +++++++++++++++++++++++
@@ -198,17 +228,17 @@ If you need to create your own database adapter you need to create a class that 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'database' => function() {
-            return new My\Custom\Adapter(array(
+            return new My\Custom\Adapter([
                 'some' => 'option',
-            ));
+            ]);
         },
 
         // ...
-    );
+    ];
 
 You can read more about how to achieve this in the :doc:`../develop/custom_adapters` chapter.
 
@@ -224,23 +254,23 @@ In the default configuration file the :ref:`default-storage-adapter` storage ada
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'storage' => function() {
-            return new Imbo\Storage\Filesystem(array(
+            return new Imbo\Storage\Filesystem([
                 'dataDir' => '/path/to/images',
-            ));
+            ]);
         },
 
         // or
 
-        'storage' => new Imbo\Storage\Filesystem(array(
+        'storage' => new Imbo\Storage\Filesystem([
             'dataDir' => '/path/to/images',
-        )),
+        ]),
 
         // ...
-    );
+    ];
 
 Below you will find documentation on the different storage adapters Imbo ships with.
 
@@ -272,19 +302,19 @@ Examples
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'storage' => function() {
-            new Imbo\Storage\S3(array(
+            new Imbo\Storage\S3([
                 'key' => '<aws access key>'
                 'secret' => '<aws secret key>',
                 'bucket' => 'my-imbo-bucket',
-            ));
+            ]);
         },
 
         // ...
-    );
+    ];
 
 Doctrine
 ++++++++
@@ -301,38 +331,38 @@ Here are some examples on how to use the Doctrine adapter in the configuration f
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'storage' => function() {
-            return new Imbo\Storage\Doctrine(array(
+            return new Imbo\Storage\Doctrine([
                 'pdo' => new PDO('sqlite:/path/to/database'),
-            ));
+            ]);
         },
 
         // ...
-    );
+    ];
 
 2) Connect to a MySQL database using PDO:
 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'storage' => function() {
-            return new Imbo\Storage\Doctrine(array(
+            return new Imbo\Storage\Doctrine([
                 'dbname'   => 'database',
                 'user'     => 'username',
                 'password' => 'password',
                 'host'     => 'hostname',
                 'driver'   => 'pdo_mysql',
-            ));
+            ]);
         },
 
         // ...
-    );
+    ];
 
 .. _filesystem-storage-adapter:
 
@@ -354,17 +384,17 @@ Examples
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'storage' => function() {
-            new Imbo\Storage\Filesystem(array(
+            new Imbo\Storage\Filesystem([
                 'dataDir' => '/path/to/images',
-            ));
+            ]);
         },
 
         // ...
-    );
+    ];
 
 .. _gridfs-storage-adapter:
 .. _default-storage-adapter:
@@ -381,7 +411,7 @@ The GridFS adapter is used to store the images in MongoDB using the `GridFS spec
     The server string to use when connecting to MongoDB. Defaults to ``mongodb://localhost:27017``
 
 ``options``
-    Options passed to the underlying adapter. Defaults to ``array('connect' => true, 'timeout' => 1000)``. See the `manual for the MongoClient constructor <http://www.php.net/manual/en/mongoclient.construct.php>`_ for available options.
+    Options passed to the underlying adapter. Defaults to ``['connect' => true, 'timeout' => 1000]``. See the `manual for the MongoClient constructor <http://www.php.net/manual/en/mongoclient.construct.php>`_ for available options.
 
 Examples
 ^^^^^^^^
@@ -391,7 +421,7 @@ Examples
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'storage' => function() {
@@ -399,27 +429,27 @@ Examples
         },
 
         // ...
-    );
+    ];
 
 2) Connect to a replica set:
 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'storage' => function() {
-            return new Imbo\Storage\GridFS(array(
+            return new Imbo\Storage\GridFS([
                 'server' => 'mongodb://server1,server2,server3',
-                'options' => array(
+                'options' => [
                     'replicaSet' => 'nameOfReplicaSet',
-                ),
-            ));
+                ],
+            ]);
         },
 
         // ...
-    );
+    ];
 
 Custom storage adapter
 ++++++++++++++++++++++
@@ -429,17 +459,17 @@ If you need to create your own storage adapter you need to create a class that i
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
         'storage' => function() {
-            return new My\Custom\Adapter(array(
+            return new My\Custom\Adapter([
                 'some' => 'option',
-            ));
+            ]);
         },
 
         // ...
-    );
+    ];
 
 You can read more about how to achieve this in the :doc:`../develop/custom_adapters` chapter.
 
@@ -468,69 +498,69 @@ Event listeners can be configured in the following ways:
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
+        'eventListeners' => [
             'accessToken' => 'Imbo\EventListener\AccessToken',
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 2) Use an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface:
 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
+        'eventListeners' => [
             'accessToken' => new Imbo\EventListener\AccessToken(),
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 3) A closure returning an instance of a class implementing the ``Imbo\EventListener\ListenerInterface`` interface:
 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
+        'eventListeners' => [
             'accessToken' => function() {
                 return new Imbo\EventListener\AccessToken();
             },
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 4) Use a class implementing the ``Imbo\EventListener\ListenerInterface`` interface together with an optional public key filter:
 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'maxImageSize' => array(
+        'eventListeners' => [
+            'maxImageSize' => [
                 'listener' => new Imbo\EventListener\MaxImageSize(1024, 768),
-                'publicKeys' => array(
-                    'whitelist' => array('user'),
-                    // 'blacklist' => array('someotheruser'),
-                ),
-                // 'params' => array( ... )
-            ),
-        ),
+                'publicKeys' => [
+                    'whitelist' => ['user'],
+                    // 'blacklist' => ['someotheruser'],
+                ],
+                // 'params' => [ ... ]
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 where ``listener`` is one of the following:
 
@@ -545,25 +575,25 @@ There also exists a ``params`` key that can be used to specify parameters for th
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'maxImageSize' => array(
+        'eventListeners' => [
+            'maxImageSize' => [
                 'listener' => 'Imbo\EventListener\MaxImageSize',
-                'publicKeys' => array(
-                    'whitelist' => array('user'),
-                    // 'blacklist' => array('someotheruser'),
-                ),
-                'params' => array(
+                'publicKeys' => [
+                    'whitelist' => ['user'],
+                    // 'blacklist' => ['someotheruser'],
+                ],
+                'params' => [
                     'width' => 1024,
                     'height' => 768,
-                )
-            ),
-        ),
+                ]
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 The value of the ``params`` array will be sent to the constructor of the event listener class.
 
@@ -572,25 +602,25 @@ The value of the ``params`` array will be sent to the constructor of the event l
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'customListener' => array(
+        'eventListeners' => [
+            'customListener' => [
                 'callback' => function(Imbo\EventManager\EventInterface $event) {
                     // Custom code
                 },
-                'events' => array('image.get'),
+                'events' => ['image.get'],
                 'priority' => 1,
-                'publicKeys' => array(
-                    'whitelist' => array('user'),
-                    // 'blacklist' => array('someotheruser'),
-                ),
-            ),
-        ),
+                'publicKeys' => [
+                    'whitelist' => ['user'],
+                    // 'blacklist' => ['someotheruser'],
+                ],
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 where ``callback`` is the code you want executed, and ``events`` is an array of the events you want it triggered for. ``priority`` is the priority of the listener and defaults to 0. The higher the number, the earlier in the chain your listener will be triggered. This number can also be negative. Imbo's internal event listeners uses numbers between 0 and 100. ``publicKeys`` uses the same format as described above. If you use this method, and want your callback to trigger for multiple events with different priorities, specify an associative array in the ``events`` element, where the keys are the event names, and the values are the priorities for the different events. This way of attaching event listeners should mostly be used for quick and temporary solutions.
 
@@ -637,17 +667,17 @@ Read more about these listeners (and more) in the :doc:`../installation/event_li
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
+        'eventListeners' => [
             'accessToken' => null,
             'auth' => null,
             'statsAccess' => null,
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 .. warning:: Do not disable the event listeners used in the example above unless you are absolutely sure about the consequences. Your images can potentially be deleted by anyone.
 .. warning:: Disabling image transformation event listeners is not recommended.
@@ -699,16 +729,16 @@ The interface has a single method called ``initialize`` and receives instances o
     }
 
     // Configuration
-    return array(
-        'eventListeners' => array(
+    return [
+        'eventListeners' => [
             'customListener' => 'Listener',
             'otherCustomListener' => 'OtherListener',
-        ),
+        ],
 
-        'eventListenerInitializers' => array(
+        'eventListenerInitializers' => [
             'initializerForCustomListener' => 'Initializer',
-        ),
-    );
+        ],
+    ];
 
 In the above example the ``Initializer`` class will be instantiated by Imbo, and in the ``__construct`` method it will create an instance of some dependency. When the event manager creates the instances of the two event listeners these will in turn be sent to the ``initialize`` method, and the same dependency will be injected into both listeners. An alternative way to accomplish this by using Closures in the configuration could look something like this:
 
@@ -717,8 +747,8 @@ In the above example the ``Initializer`` class will be instantiated by Imbo, and
     <?php
     $dependency = new SomeDependency();
 
-    return array(
-        'eventListeners' => array(
+    return [
+        'eventListeners' => [
             'customListener' => function() use ($dependency) {
                 $listener = new Listener();
                 $listener->setDependency($dependency);
@@ -731,8 +761,8 @@ In the above example the ``Initializer`` class will be instantiated by Imbo, and
 
                 return $listener;
             },
-        ),
-    );
+        ],
+    ];
 
 Imbo itself includes an event listener initializer in the default configuration that is used to inject the same instance of Imagick to all image transformations.
 
@@ -746,41 +776,41 @@ Through the configuration you can also combine image transformations to make pre
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'transformationPresets' => array(
-            'graythumb' => array(
+        'transformationPresets' => [
+            'graythumb' => [
                 'thumbnail',
                 'desaturate',
-            ),
+            ],
             // ...
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 where the keys are the names of the transformations as specified in the URL, and the values are arrays containing other transformation names (as used in the ``eventListeners`` part of the configuration). You can also specify hard coded parameters for the presets if some of the transformations in the chain supports parameters:
 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'transformationPresets' => array(
-            'fixedGraythumb' => array(
-                'thumbnail' => array(
+        'transformationPresets' => [
+            'fixedGraythumb' => [
+                'thumbnail' => [
                     'width' => 50,
                     'height' => 50,
-                ),
+                ],
                 'desaturate',
-            ),
+            ],
             // ...
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 By doing this the ``thumbnail`` part of the ``fixedGraythumb`` preset will ignore the ``width`` and ``height`` query parameters, if present. By only specifying for instance ``'width' => 50`` in the configuration the height of the thumbnail can be adjusted via the query parameter, but the ``width`` is fixed.
 
@@ -796,10 +826,10 @@ If you need to create a custom route you can attach a route and a custom resourc
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'resources' => array(
+        'resources' => [
             'users' => new ImboUsers();
 
             // or
@@ -811,14 +841,14 @@ If you need to create a custom route you can attach a route and a custom resourc
             // or
 
             'users' => 'ImboUsers',
-        ),
+        ],
 
-        'routes' => array(
+        'routes' => [
             'users' => '#^/users(\.(?<extension>json|xml))?$#',
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 In the above example we are creating a route for Imbo using a regular expression, called ``users``. The route itself will match the following three requests:
 
@@ -845,13 +875,13 @@ Below is an example implementation of the ``ImboUsers`` resource used in the abo
 
     class ImboUsers implements ResourceInterface {
         public function getAllowedMethods() {
-            return array('GET');
+            return ['GET'];
         }
 
         public static function getSubscribedEvents() {
-            return array(
+            return [
                 'users.get' => 'get',
-            );
+            ];
         }
 
         public function get(EventInterface $event) {
