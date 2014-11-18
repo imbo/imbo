@@ -51,3 +51,12 @@ CREATE TABLE IF NOT EXISTS storage_image_variations (
     data BLOB NOT NULL,
     PRIMARY KEY (publicKey,imageIdentifier,width)
 );
+
+CREATE TABLE IF NOT EXISTS imagevariations (
+    publicKey TEXT NOT NULL,
+    imageIdentifier TEXT NOT NULL,
+    width INTEGER NOT NULL,
+    height INTEGER NOT NULL,
+    added INTEGER NOT NULL,
+    PRIMARY KEY (publicKey,imageIdentifier,width)
+);

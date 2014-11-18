@@ -49,3 +49,12 @@ CREATE TABLE IF NOT EXISTS `storage_image_variations` (
     `data` blob NOT NULL,
     PRIMARY KEY (`publicKey`,`imageIdentifier`,`width`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+
+CREATE TABLE IF NOT EXISTS `imagevariations` (
+    `publicKey` varchar(255) COLLATE utf8_danish_ci NOT NULL,
+    `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
+    `width` int(10) unsigned NOT NULL,
+    `height` int(10) unsigned NOT NULL,
+    `added` int(10) unsigned NOT NULL,
+    PRIMARY KEY (`publicKey`,`imageIdentifier`,`width`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
