@@ -359,6 +359,7 @@ class MongoDB implements DatabaseInterface {
 
         $image->setWidth($data['width'])
               ->setHeight($data['height'])
+              ->setFilesize($data['size'])
               ->setMimeType($data['mime'])
               ->setExtension($data['extension'])
               ->setAddedDate(new DateTime('@' . $data['added'], new DateTimeZone('UTC')))

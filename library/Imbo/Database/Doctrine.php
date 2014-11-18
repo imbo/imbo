@@ -387,6 +387,7 @@ class Doctrine implements DatabaseInterface {
 
         $image->setWidth($row['width'])
               ->setHeight($row['height'])
+              ->setFilesize($row['size'])
               ->setMimeType($row['mime'])
               ->setExtension($row['extension'])
               ->setAddedDate(new DateTime('@' . $row['added'], new DateTimeZone('UTC')))
