@@ -41,14 +41,14 @@ class Doctrine implements DatabaseInterface {
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         'dbname'    => null,
         'user'      => null,
         'password'  => null,
         'host'      => null,
         'driver'    => null,
         'tableName' => 'imagevariations',
-    );
+    ];
 
     /**
      * Doctrine connection
@@ -77,13 +77,13 @@ class Doctrine implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function storeImageVariationMetadata($publicKey, $imageIdentifier, $width, $height) {
-        return (boolean) $this->getConnection()->insert($this->params->tableName, array(
+        return (boolean) $this->getConnection()->insert($this->params->tableName, [
             'added'           => time(),
             'publicKey'       => $publicKey,
             'imageIdentifier' => $imageIdentifier,
             'width'           => $width,
             'height'          => $height,
-        ));
+        ]);
     }
 
     /**
@@ -98,11 +98,11 @@ class Doctrine implements DatabaseInterface {
               ->andWhere('iv.width >= :width')
               ->limit(1)
               ->orderBy('iv.width', 'ASC')
-              ->setParameters(array(
+              ->setParameters([
                   ':publicKey'       => $publicKey,
                   ':imageIdentifier' => $imageIdentifier,
                   ':width'           => $width,
-              ));
+              ]);
 
         $stmt = $qb->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -117,10 +117,10 @@ class Doctrine implements DatabaseInterface {
         $qb->delete($this->params['tableName'])
            ->where('publicKey = :publicKey')
            ->andWhere('imageIdentifier = :imageIdentifier')
-           ->setParameters(array(
+           ->setParameters([
                ':publicKey' => $publicKey,
                ':imageIdentifier' => $imageIdentifier,
-           ));
+           ]);
 
         if ($width) {
             $qb->andWhere('width = :width')
