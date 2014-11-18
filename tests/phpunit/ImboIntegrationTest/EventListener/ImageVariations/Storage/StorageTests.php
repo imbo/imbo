@@ -47,21 +47,23 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
         $key = 'key';
         $id  = 'imageId';
         $width = 200;
+        $blob = file_get_contents(FIXTURES_DIR . '/colors.png');
 
         $this->assertNull($this->adapter->getImageVariation($key, $id, $width));
-        $this->assertTrue($this->adapter->storeImageVariation($key, $id, 'blob', $width));
-        $this->assertSame('blob', $this->adapter->getImageVariation($key, $id, $width));
+        $this->assertTrue($this->adapter->storeImageVariation($key, $id, $blob, $width));
+        $this->assertSame($blob, $this->adapter->getImageVariation($key, $id, $width));
     }
 
     public function testCanDeleteOneOrMoreImageVariations() {
         $key = 'key';
         $id  = 'imageId';
+        $blob = file_get_contents(FIXTURES_DIR . '/colors.png');
 
-        $this->assertTrue($this->adapter->storeImageVariation($key, $id, 'blob1', 100));
+        $this->assertTrue($this->adapter->storeImageVariation($key, $id, $blob, 100));
         $this->assertTrue($this->adapter->storeImageVariation($key, $id, 'blob2', 200));
         $this->assertTrue($this->adapter->storeImageVariation($key, $id, 'blob3', 300));
 
-        $this->assertSame('blob1', $this->adapter->getImageVariation($key, $id, 100));
+        $this->assertSame($blob, $this->adapter->getImageVariation($key, $id, 100));
         $this->assertSame('blob2', $this->adapter->getImageVariation($key, $id, 200));
         $this->assertSame('blob3', $this->adapter->getImageVariation($key, $id, 300));
 
