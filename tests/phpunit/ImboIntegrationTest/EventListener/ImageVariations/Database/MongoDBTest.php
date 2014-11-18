@@ -11,6 +11,7 @@
 namespace ImboIntegrationTest\EventListener\ImageVariations\Database;
 
 use Imbo\EventListener\ImageVariations\Database\MongoDB,
+    MongoException,
     MongoClient;
 
 /**
@@ -22,10 +23,13 @@ use Imbo\EventListener\ImageVariations\Database\MongoDB,
 class MongoDBTest extends DatabaseTests {
     private $databaseName = 'imboIntegrationTestDatabase';
 
+    /**
+     * @see ImboIntegrationTest\EventListener\ImageVariations\Database\DatabaseTests::getAdapter()
+     */
     protected function getAdapter() {
-        return new MongoDB(array(
+        return new MongoDB([
             'databaseName' => $this->databaseName,
-        ));
+        ]);
     }
 
     /**

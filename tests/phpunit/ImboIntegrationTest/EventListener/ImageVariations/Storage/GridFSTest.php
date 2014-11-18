@@ -11,7 +11,8 @@
 namespace ImboIntegrationTest\EventListener\ImageVariations\Storage;
 
 use Imbo\EventListener\ImageVariations\Storage\GridFS,
-    MongoClient;
+    MongoClient,
+    MongoException;
 
 /**
  * @covers Imbo\EventListener\ImageVariations\Storage\GridFS
@@ -26,9 +27,9 @@ class GridFSTest extends StorageTests {
      * @see ImboIntegrationTest\EventListener\ImageVariations\Storage\StorageTests::getAdapter()
      */
     protected function getAdapter() {
-        return new GridFS(array(
+        return new GridFS([
             'databaseName' => $this->databaseName,
-        ));
+        ]);
     }
 
     /**

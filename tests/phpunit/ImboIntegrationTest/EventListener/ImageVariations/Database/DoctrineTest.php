@@ -76,20 +76,4 @@ class DoctrineTest extends DatabaseTests {
 
         parent::tearDown();
     }
-
-    /**
-     * @covers Imbo\EventListener\ImageVariations\Database\Doctrine::__construct
-     * @covers Imbo\EventListener\ImageVariations\Database\Doctrine::setConnection
-     */
-    public function testCanSetConnection() {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
-        $connection->expects($this->once())->method('insert')->will($this->returnValue(false));
-
-        $adapter = new Doctrine([
-            'pdo' => $this->pdo,
-        ], $connection);
-
-        $this->assertFalse($adapter->storeImageVariationMetadata('key', 'img', 1337, 1942));
-    }
-
 }
