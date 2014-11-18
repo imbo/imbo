@@ -27,7 +27,7 @@ use Imbo\Model\Image,
  * - (string) server The server string to use when connecting to MongoDB. Defaults to
  *                   'mongodb://localhost:27017'
  * - (array) options Options to use when creating the MongoClient instance. Defaults to
- *                   array('connect' => true, 'connectTimeoutMS' => 1000).
+ *                   ['connect' => true, 'connectTimeoutMS' => 1000].
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
@@ -52,14 +52,14 @@ class MongoDB implements DatabaseInterface {
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         // Database name
         'databaseName' => 'imbo',
 
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
-        'options' => array('connect' => true, 'connectTimeoutMS' => 1000),
-    );
+        'options' => ['connect' => true, 'connectTimeoutMS' => 1000],
+    ];
 
     /**
      * Class constructor
@@ -87,13 +87,13 @@ class MongoDB implements DatabaseInterface {
      */
     public function storeImageVariationMetadata($publicKey, $imageIdentifier, $width, $height) {
         try {
-            $this->getCollection()->insert(array(
+            $this->getCollection()->insert([
                 'added' => time(),
                 'publicKey' => $publicKey,
                 'imageIdentifier'  => $imageIdentifier,
                 'width' => $width,
                 'height' => $height,
-            ));
+            ]);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to save image variation data', 500, $e);
         }
@@ -105,17 +105,17 @@ class MongoDB implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function getBestMatch($publicKey, $imageIdentifier, $width) {
-        $query = array(
+        $query = [
             'publicKey' => $publicKey,
             'imageIdentifier' => $imageIdentifier,
-            'width' => array(
+            'width' => [
                 '$gte' => $width,
-            ),
-        );
+            ],
+        ];
 
-        $cursor = $this->getCollection()->find($query, array('_id' => false, 'width', 'height'))
+        $cursor = $this->getCollection()->find($query, ['_id' => false, 'width', 'height'])
                                         ->limit(1)
-                                        ->sort(array('width' => 1));
+                                        ->sort(['width' => 1]);
 
         return $cursor->getNext();
     }
@@ -124,10 +124,10 @@ class MongoDB implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function deleteImageVariations($publicKey, $imageIdentifier, $width = null) {
-        $query = array(
+        $query = [
             'publicKey' => $publicKey,
             'imageIdentifier' => $imageIdentifier,
-        );
+        ];
 
         if ($width !== null) {
             $query['width'] = $width;
