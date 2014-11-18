@@ -22,6 +22,9 @@ use Imbo\EventListener\ImageVariations\Storage\GridFS,
 class GridFSTest extends StorageTests {
     private $databaseName = 'imboGridFSIntegrationTest';
 
+    /**
+     * @see ImboIntegrationTest\EventListener\ImageVariations\Storage\StorageTests::getAdapter()
+     */
     protected function getAdapter() {
         return new GridFS(array(
             'databaseName' => $this->databaseName,
