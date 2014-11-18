@@ -77,7 +77,7 @@ class Doctrine implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function storeImageVariationMetadata($publicKey, $imageIdentifier, $width, $height) {
-        return (boolean) $this->getConnection()->insert($this->params->tableName, [
+        return (boolean) $this->getConnection()->insert($this->params['tableName'], [
             'added'           => time(),
             'publicKey'       => $publicKey,
             'imageIdentifier' => $imageIdentifier,
@@ -90,22 +90,24 @@ class Doctrine implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function getBestMatch($publicKey, $imageIdentifier, $width) {
-        $query = $this->getConnection()->createQueryBuilder();
-        $query->select('width', 'height')
-              ->from($this->params['tableName'], 'iv')
-              ->where('iv.publicKey = :publicKey')
-              ->andWhere('iv.imageIdentifier = :imageIdentifier')
-              ->andWhere('iv.width >= :width')
-              ->limit(1)
-              ->orderBy('iv.width', 'ASC')
-              ->setParameters([
-                  ':publicKey'       => $publicKey,
-                  ':imageIdentifier' => $imageIdentifier,
-                  ':width'           => $width,
-              ]);
+        $qb = $this->getConnection()->createQueryBuilder();
+        $qb->select('width', 'height')
+           ->from($this->params['tableName'], 'iv')
+           ->where('iv.publicKey = :publicKey')
+           ->andWhere('iv.imageIdentifier = :imageIdentifier')
+           ->andWhere('iv.width >= :width')
+           ->setMaxResults(1)
+           ->orderBy('iv.width', 'ASC')
+           ->setParameters([
+               ':publicKey'       => $publicKey,
+               ':imageIdentifier' => $imageIdentifier,
+               ':width'           => $width,
+           ]);
 
         $stmt = $qb->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? array_map('intval', $row) : null;
     }
 
     /**

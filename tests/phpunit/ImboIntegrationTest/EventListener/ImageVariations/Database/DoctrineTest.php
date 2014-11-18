@@ -10,7 +10,8 @@
 
 namespace ImboIntegrationTest\EventListener\ImageVariations\Database;
 
-use Imbo\EventListener\ImageVariations\Database\Doctrine;
+use Imbo\EventListener\ImageVariations\Database\Doctrine,
+    PDO;
 
 /**
  * @covers Imbo\EventListener\ImageVariations\Database\Doctrine
@@ -28,11 +29,15 @@ class DoctrineTest extends DatabaseTests {
      * @see ImboIntegrationTest\EventListener\ImageVariations\Database\DatabaseTests::getAdapter()
      */
     protected function getAdapter() {
-        return new Doctrine(array(
+        return new Doctrine([
             'pdo' => $this->pdo,
-        ));
+        ]);
     }
 
+    /**
+     * Make sure we have the PDO and pdo_sqlite extension available and create a new in-memory
+     * table for every test
+     */
     public function setUp() {
         if (!extension_loaded('PDO')) {
             $this->markTestSkipped('PDO is required to run this test');
@@ -48,26 +53,43 @@ class DoctrineTest extends DatabaseTests {
 
         // Create tmp tables
         $this->pdo = new PDO('sqlite::memory:');
-        $this->pdo->query("
+        $this->pdo->query('
             CREATE TABLE IF NOT EXISTS imagevariations (
-                id INTEGER PRIMARY KEY NOT NULL,
                 publicKey TEXT NOT NULL,
                 imageIdentifier TEXT NOT NULL,
                 width INTEGER NOT NULL,
                 height INTEGER NOT NULL,
                 added INTEGER NOT NULL,
-                UNIQUE (publicKey,imageIdentifier)
+                PRIMARY KEY (publicKey,imageIdentifier,width)
             )
-        ");
+        ');
 
         parent::setUp();
     }
 
+    /**
+     * Clean up after each run
+     */
     public function tearDown() {
-        $this->pdo->query("DROP TABLE IF EXISTS imagevariations");
+        $this->pdo->query('DROP TABLE IF EXISTS imagevariations');
         $this->pdo = null;
 
         parent::tearDown();
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageVariations\Database\Doctrine::__construct
+     * @covers Imbo\EventListener\ImageVariations\Database\Doctrine::setConnection
+     */
+    public function testCanSetConnection() {
+        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
+        $connection->expects($this->once())->method('insert')->will($this->returnValue(false));
+
+        $adapter = new Doctrine([
+            'pdo' => $this->pdo,
+        ], $connection);
+
+        $this->assertFalse($adapter->storeImageVariationMetadata('key', 'img', 1337, 1942));
     }
 
 }

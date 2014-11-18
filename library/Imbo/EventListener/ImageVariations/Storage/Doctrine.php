@@ -60,8 +60,7 @@ class Doctrine implements StorageInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param \Doctrine\DBAL\Connection $connection Optional connection instance. Primarily used
-     *                                              for testing
+     * @param \Doctrine\DBAL\Connection $connection Optional connection instance
      */
     public function __construct(array $params, Connection $connection = null) {
         $this->params = array_merge($this->params, $params);
