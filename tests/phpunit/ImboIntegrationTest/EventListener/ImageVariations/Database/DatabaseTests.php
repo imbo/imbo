@@ -49,32 +49,32 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getVariationData() {
-        return array(
-            'image larger than all variations' => array(1000, null),
-            'pick the largest variation' => array(500, array('width' => 770, 'height' => 564)),
-            'pick the next largest variation' => array(385, array('width' => 385, 'height' => 282)),
-            'pick the smallest variation' => array(150, array('width' => 192, 'height' => 140)),
-        );
+        return [
+            'image larger than all variations' => [1000, null],
+            'pick the largest variation' => [500, ['width' => 770, 'height' => 564]],
+            'pick the next largest variation' => [385, ['width' => 385, 'height' => 282]],
+            'pick the smallest variation' => [150, ['width' => 192, 'height' => 140]],
+        ];
     }
 
     /**
      * @dataProvider getVariationData
      */
     public function testCanFetchTheBestMatch($imageWidth, $bestMatch) {
-        $variations = array(
-            array(
+        $variations = [
+            [
                 'width' => 770,
                 'height' => 564,
-            ),
-            array(
+            ],
+            [
                 'width' => 385,
                 'height' => 282,
-            ),
-            array(
+            ],
+            [
                 'width' => 192,
                 'height' => 140,
-            ),
-        );
+            ],
+        ];
 
         foreach ($variations as $variation) {
             $this->assertTrue($this->adapter->storeImageVariationMetadata('key', 'id', $variation['width'], $variation['height']));
@@ -84,20 +84,20 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     }
 
     public function testCanDeleteOneOrMoreVariations() {
-        $variations = array(
-            array(
+        $variations = [
+            [
                 'width' => 770,
                 'height' => 564,
-            ),
-            array(
+            ],
+            [
                 'width' => 385,
                 'height' => 282,
-            ),
-            array(
+            ],
+            [
                 'width' => 192,
                 'height' => 140,
-            ),
-        );
+            ],
+        ];
 
         foreach ($variations as $variation) {
             $this->assertTrue($this->adapter->storeImageVariationMetadata('key', 'id', $variation['width'], $variation['height']));
@@ -116,20 +116,20 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     }
 
     public function testCanDeleteAllTransformations() {
-        $variations = array(
-            array(
+        $variations = [
+            [
                 'width' => 770,
                 'height' => 564,
-            ),
-            array(
+            ],
+            [
                 'width' => 385,
                 'height' => 282,
-            ),
-            array(
+            ],
+            [
                 'width' => 192,
                 'height' => 140,
-            ),
-        );
+            ],
+        ];
 
         foreach ($variations as $variation) {
             $this->assertTrue($this->adapter->storeImageVariationMetadata('key', 'id', $variation['width'], $variation['height']));

@@ -113,9 +113,14 @@ class MongoDB implements DatabaseInterface {
             ],
         ];
 
-        $cursor = $this->getCollection()->find($query, ['_id' => false, 'width', 'height'])
-                                        ->limit(1)
-                                        ->sort(['width' => 1]);
+        $cursor = $this->getCollection()
+            ->find($query, [
+                '_id' => false,
+                'width' => true,
+                'height' => true,
+            ])
+            ->limit(1)
+            ->sort(['width' => 1]);
 
         return $cursor->getNext();
     }
