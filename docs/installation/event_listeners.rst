@@ -31,25 +31,25 @@ Use ``whitelist`` if you want the listener to skip the access token check for ce
 
 .. code-block:: php
 
-    array(
-        'transformations' => array(
-            'whitelist' => array(
+    [
+        'transformations' => [
+            'whitelist' => [
                 'border',
-            ),
-        ),
-    )
+            ],
+        ],
+    ]
 
 means that the access token will **not** be enforced for the :ref:`border <border-transformation>` transformation.
 
 .. code-block:: php
 
-    array(
-        'transformations' => array(
-            'blacklist' => array(
+    [
+        'transformations' => [
+            'blacklist' => [
                 'border',
-            ),
-        ),
-    )
+            ],
+        ],
+    ]
 
 means that the access token will be enforced **only** for the :ref:`border <border-transformation>` transformation.
 
@@ -60,15 +60,15 @@ This event listener is included in the default configuration file without specif
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
+        'eventListeners' => [
             'accessToken' => 'Imbo\EventListener\AccessToken',
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 Disable this event listener with care. Installations with no access token check is open for `DoS <http://en.wikipedia.org/wiki/Denial-of-service_attack>`_ attacks.
 
@@ -92,15 +92,15 @@ This event listener does not support any parameters and is enabled per default l
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
+        'eventListeners' => [
             'authenticate' => 'Imbo\EventListener\Authenticate',
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 Disable this event listener with care. User agents can delete all your images and metadata if this listener is disabled.
 
@@ -116,15 +116,15 @@ The listener does not support any parameters and can be enabled like this:
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
+        'eventListeners' => [
             'autoRotateListener' => 'Imbo\EventListener\AutoRotateImage',
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 If you enable this listener all new images added to Imbo will be auto rotated based on the EXIF data. This might also cause the image identifier sent in the response to be different from the one used in the URI when storing the image. This can happen with all event listeners which can possibly modify the image before storing it.
 
@@ -142,25 +142,25 @@ Here is an example on how to enable the CORS listener:
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'cors' => array(
+        'eventListeners' => [
+            'cors' => [
                 'listener' => 'Imbo\EventListener\Cors',
-                'params' => array(
-                    'allowedOrigins' => array('http://some.origin'),
-                    'allowedMethods' => array(
-                        'image'  => array('GET', 'HEAD'),
-                        'images' => array('GET', 'HEAD', 'POST'),
-                    ),
+                'params' => [
+                    'allowedOrigins' => ['http://some.origin'],
+                    'allowedMethods' => [
+                        'image'  => ['GET', 'HEAD'],
+                        'images' => ['GET', 'HEAD', 'POST'],
+                    ],
                     'maxAge' => 3600,
-                ),
-            ),
-        ),
+                ],
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 Below all supported parameters are listed:
 
@@ -193,22 +193,22 @@ and is enabled like this:
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'exifMetadata' => array(
+        'eventListeners' => [
+            'exifMetadata' => [
                 'listener' => 'Imbo\EventListener\ExifMetadata',
-                'params' => array(
-                    'allowedTags' => array('exif:*', 'date:*', 'png:gAMA'),
-                ),
-            ),
-        ),
+                'params' => [
+                    'allowedTags' => ['exif:*', 'date:*', 'png:gAMA'],
+                ],
+            ],
+        ],
 
         // ...
-    );
+    ];
 
-which would allow all ``exif`` and ``date`` properties as well as the ``png:gAMA`` property. If you want to store **all** tags as metadata, use ``array('*')`` as filter.
+which would allow all ``exif`` and ``date`` properties as well as the ``png:gAMA`` property. If you want to store **all** tags as metadata, use ``['*']`` as filter.
 
 Image transformation cache
 ++++++++++++++++++++++++++
@@ -231,20 +231,20 @@ and is enabled like this:
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'imageTransformationCache' => array(
+        'eventListeners' => [
+            'imageTransformationCache' => [
                 'listener' => 'Imbo\EventListener\ImageTransformationCache',
-                'params' => array(
+                'params' => [
                     'path' => '/path/to/cache',
-                ),
-            ),
-        ),
+                ],
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 .. note::
     This event listener uses a similar algorithm when generating file names as the :ref:`filesystem-storage-adapter` storage adapter.
@@ -265,9 +265,13 @@ and is enabled like this:
 Image variations
 ++++++++++++++++
 
-This event listener can be used to generate multiple variations of incoming images so that a more suitable image can be used for some transformations. This will increase the amount of data stored by Imbo, but it will also improve performance, drastically so if the difference between the original images and the transformed ones is big.
+This event listener can be used to generate multiple variations of incoming images so that a more suitable size can be used when performing scaling transformations. This will increase the amount of data stored by Imbo, but it will also improve performance. In cases where the original images are very large and the requested transformed images are significantly smaller, the difference will be quite drastic.
 
 The event listener has two roles, one is to generate the variations when new images are added, and the other is to pick the most fitting image variation when clients request an image with a set of transformations applied that will alter the dimensions of the image, for instance :ref:`resize <resize-transformation>` or :ref:`thumbnail <thumbnail-transformation>`.
+
+Imbo ships with MongoDB and Doctrine adapters for storing metadata about these variations. If you want to use a different database, you can implement the ``Imbo\EventListener\ImageVariations\Database\DatabaseInterface`` interface and set the name of the class in the configuration of the event listener.
+
+In the same way, Imbo ships three different adapters for storing the actual image variation data (the downscaled images): GridFS, Doctrine and Filesystem. See examples of their configuration below.
 
 The event listener supports for following configuration parameters:
 
@@ -290,7 +294,7 @@ The event listener supports for following configuration parameters:
     Don't start to generate image variations before the width of the variation falls below this limit. Defaults to ``1024``.
 
 ``(array) widths``
-    An array of widths to use when generating variations. This can be used together with the auto generation, and will ignore the rules related to auto generation. Defaults to ``array()``.
+    An array of widths to use when generating variations. This can be used together with the auto generation, and will ignore the rules related to auto generation. If you often request images with the same dimensions, you can significantly speed up the process by specifying the width here. Defaults to ``[]``.
 
 ``(array) database``
     The database adapter to use. This array has two elements:
@@ -312,25 +316,25 @@ The event listener supports for following configuration parameters:
 
     .. code-block:: php
 
-        return array(
+        return [
             // ...
 
-            'eventListeners' => array(
-                'imageVariations' => array(
+            'eventListeners' => [
+                'imageVariations' => [
                     'listener' => 'Imbo\EventListener\ImageVariations',
-                    'params' => array(
-                        'database' => array(
+                    'params' => [
+                        'database' => [
                             'adapter' => 'Imbo\EventListener\ImageVariations\Database\MongoDB',
-                        ),
-                        'storage' => array(
+                        ],
+                        'storage' => [
                             'adapter' => 'Imbo\EventListener\ImageVariations\Storage\GridFS',
-                        ),
-                    ),
-                ),
-            ),
+                        ],
+                    ],
+                ],
+            ],
 
             // ...
-        );
+        ];
 
     when adding an image with dimensions 3082 x 2259, the following variations will be generated:
 
@@ -338,7 +342,7 @@ The event listener supports for following configuration parameters:
     * 385 x 282
     * 192 x 140
 
-    When later requesting this image with for instance ``?t[]=resize:width=500`` as transformation (read more about image transformations in the :doc:`../usage/image-transformations` chapter), Imbo will choose the image which is 770 x 564 pixels.
+    When later requesting this image with for instance ``?t[]=resize:width=500`` as transformation (read more about image transformations in the :doc:`../usage/image-transformations` chapter), Imbo will choose the image which is 770 x 564 pixels and downscale it to 500 pixels in width.
 
 2)  Specify image widths:
 
@@ -346,27 +350,27 @@ The event listener supports for following configuration parameters:
 
     .. code-block:: php
 
-        return array(
+        return [
             // ...
 
-            'eventListeners' => array(
-                'imageVariations' => array(
+            'eventListeners' => [
+                'imageVariations' => [
                     'listener' => 'Imbo\EventListener\ImageVariations',
-                    'params' => array(
-                        'database' => array(
+                    'params' => [
+                        'database' => [
                             'adapter' => 'Imbo\EventListener\ImageVariations\Database\MongoDB',
-                        ),
-                        'storage' => array(
+                        ],
+                        'storage' => [
                             'adapter' => 'Imbo\EventListener\ImageVariations\Storage\GridFS',
-                        ),
+                        ],
                         'autoScale' => false,
-                        'widths' => array(1000, 500, 200, 100, 50),
-                    ),
-                ),
-            ),
+                        'widths' => [1000, 500, 200, 100, 50],
+                    ],
+                ],
+            ],
 
             // ...
-        );
+        ];
 
     when adding an image with dimensions 3082 x 2259, the following variations will be generated:
 
@@ -377,6 +381,111 @@ The event listener supports for following configuration parameters:
     * 50 x 36
 
     As you can see the ``minDiff`` and ``minWidth`` parameters are ignored when using the ``width`` parameter.
+
+3)  Configuring database and storage adapters:
+
+    As stated earlier, there are several different adapters to choose from when storing the variations metadata as well as the actual variation image files.
+
+    The default adapter for the metadata database is MongoDB, and the default storage adapter is GridFS. They have the same configuration parameters:
+
+    .. code-block:: php
+
+        return [
+            // ...
+
+            'eventListeners' => [
+                'imageVariations' => [
+                    'listener' => 'Imbo\EventListener\ImageVariations',
+                    'params' => [
+                        'database' => [
+                            'adapter' => 'Imbo\EventListener\ImageVariations\Database\MongoDB',
+                            'params' => [
+                                'databaseName' => 'imbo',
+                                'server'  => 'mongodb://localhost:27017',
+                                'options' => ['connect' => true, 'connectTimeoutMS' => 1000],
+                            ]
+                        ],
+                        'storage' => [
+                            'adapter' => 'Imbo\EventListener\ImageVariations\Storage\GridFS',
+                            'params' => [
+                                'databaseName' => 'imbo_storage',
+                                'server'  => 'mongodb://localhost:27017',
+                                'options' => ['connect' => true, 'connectTimeoutMS' => 1000],
+                            ]
+                        ],
+                    ],
+                ],
+            ],
+
+            // ...
+        ];
+
+    The Doctrine adapter is an alternative for storing both metadata and variation data. This adapter uses the `Doctrine Database Abstraction Layer <http://www.doctrine-project.org/projects/dbal.html>`_. When using this adapter you need to create the required tables in the RDBMS first, as specified in the :ref:`database-setup` section. Note that you can either pass a PDO instance (as the ``pdo`` parameter) or specify connection details. Example usage:
+
+    .. code-block:: php
+
+        return [
+            // ...
+
+            'eventListeners' => [
+                'imageVariations' => [
+                    'listener' => 'Imbo\EventListener\ImageVariations',
+                    'params' => [
+                        'database' => [
+                            'adapter' => 'Imbo\EventListener\ImageVariations\Database\Doctrine',
+                            'params' => [
+                                'dbname'    => 'imbo',
+                                'user'      => 'imbo_rw',
+                                'password'  => 'imbo_password',
+                                'host'      => 'localhost',
+                                'driver'    => 'mysql',
+                                'tableName' => 'imagevariations',
+
+                                // OR, pass a PDO instance
+                                'pdo'       => null,
+                            ]
+                        ],
+                        'storage' => [
+                            'adapter' => 'Imbo\EventListener\ImageVariations\Storage\Doctrine',
+                            'params' => [] // Same as above
+                        ],
+                    ],
+                ],
+            ],
+
+            // ...
+        ];
+
+    The third option for the storage adapter is the Filesystem adapter. It's fairly straightforward and uses a similar algorithm when generating file names as the :ref:`filesystem-storage-adapter` storage adapter. Example usage:
+
+    .. code-block:: php
+
+        return [
+            // ...
+
+            'eventListeners' => [
+                'imageVariations' => [
+                    'listener' => 'Imbo\EventListener\ImageVariations',
+                    'params' => [
+                        'storage' => [
+                            'adapter' => 'Imbo\EventListener\ImageVariations\Storage\Filesystem',
+                            'params' => [
+                                'dataDir' => '/path/to/image-variation-storage'
+                            ]
+                        ],
+
+                        // Use any database adapter you want
+                        'database' => [
+                            'adapter' => 'Imbo\EventListener\ImageVariations\Database\Doctrine',
+                        ],
+                    ],
+                ],
+            ],
+
+            // ...
+        ];
+
+    .. note:: When using the Filesystem adapter, the ``dataDir`` **must** be specified, and **must** be writable by the web server.
 
 .. _imagick-event-listener:
 
@@ -409,21 +518,21 @@ and is enabled like this:
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'maxImageSizeListener' => array(
+        'eventListeners' => [
+            'maxImageSizeListener' => [
                 'listener' => 'Imbo\EventListener\MaxImageSize',
-                'params' => array(
+                'params' => [
                     'width' => 1024,
                     'height' => 768,
-                ),
-            ),
-        ),
+                ],
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 which would effectively downsize all images exceeding a ``width`` of ``1024`` or a ``height`` of ``768``. The aspect ratio will be kept.
 
@@ -445,20 +554,20 @@ and the parameters supports a single element:
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'metadataCache' => array(
+        'eventListeners' => [
+            'metadataCache' => [
                 'listener' => 'Imbo\EventListener\MetadataCache',
-                'params' => array(
+                'params' => [
                     'cache' => new Imbo\Cache\APC('imbo'),
-                ),
-            ),
-        ),
+                ],
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 
 .. _stats-access-event-listener:
@@ -473,42 +582,42 @@ This listener is enabled per default, and only allows ``127.0.0.1`` and ``::1`` 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'statsAccess' => array(
+        'eventListeners' => [
+            'statsAccess' => [
                 'listener' => 'Imbo\EventListener\StatsAccess',
-                'params' => array(
-                    'allow' => array('127.0.0.1', '::1'),
-                ),
-            ),
-        ),
+                'params' => [
+                    'allow' => ['127.0.0.1', '::1'],
+                ],
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 The event listener also supports a notation for "allowing all", simply by placing ``'*'`` somewhere in the list:
 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'statsAccess' => array(
+        'eventListeners' => [
+            'statsAccess' => [
                 'listener' => 'Imbo\EventListener\StatsAccess',
-                'params' => array(
-                    array(
-                        'allow' => array('*'),
-                    )
-                ),
-            ),
-        ),
+                'params' => [
+                    [
+                        'allow' => ['*'],
+                    ]
+                ],
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 The above example will allow all clients access to the statistics.
 
@@ -530,35 +639,35 @@ The parameters supports a single element:
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
+        'eventListeners' => [
             'hashTwo' => 'Imbo\EventListener\VarnishHashTwo',
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 or, if you want to use a non-default header name:
 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'hashTwo' => array(
+        'eventListeners' => [
+            'hashTwo' => [
                 'listener' => 'Imbo\EventListener\VarnishHashTwo',
-                'params' => array(
+                'params' => [
                     'headerName' => 'X-Custom-HashTwo-Header-Name',
-                ),
-            ),
-        ),
+                ],
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 The header appears multiple times in the response, with slightly different values::
 

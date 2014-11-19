@@ -31,6 +31,7 @@ use Imbo\Model\Image,
  * - <pre>(string) password</pre> Password to use when connecting
  * - <pre>(string) host</pre> Hostname to use when connecting
  * - <pre>(string) driver</pre> Which driver to use
+ * - <pre>(PDO) pdo</pre> PDO adapter to use, as an alternative to specifying the above
  *
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Database
@@ -47,6 +48,7 @@ class Doctrine implements DatabaseInterface {
         'password'  => null,
         'host'      => null,
         'driver'    => null,
+        'pdo'       => null,
         'tableName' => 'imagevariations',
     ];
 
