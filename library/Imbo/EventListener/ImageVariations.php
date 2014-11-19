@@ -322,7 +322,7 @@ class ImageVariations implements ListenerInterface {
         $request = $event->getRequest();
         $publicKey = $request->getPublicKey();
         $originalImage = $request->getImage();
-        $imageIdentifier = $originalImage->getChecksum();
+        $imageIdentifier = $originalImage->getImageIdentifier();
         $originalWidth = $originalImage->getWidth();
 
         // Fetch parameters specified in the Imbo configuration related to what sort of variations
@@ -396,7 +396,7 @@ class ImageVariations implements ListenerInterface {
                 ]);
 
                 // Store the image
-                $this->storage->storeImageVariation($publicKey, $imageIdentifier, $image->getBlob(), $image->getWidth());
+                $this->storage->storeImageVariation($publicKey, $imageIdentifier, $image->getBlob(), $width);
 
                 // Store some data about the variation
                 $this->database->storeImageVariationMetadata($publicKey, $imageIdentifier, $image->getWidth(), $image->getHeight());

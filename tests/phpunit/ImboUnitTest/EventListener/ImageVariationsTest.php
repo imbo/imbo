@@ -13,6 +13,7 @@ namespace ImboUnitTest\EventListener;
 use Imbo\EventListener\ImageVariations,
     Imbo\Exception\DatabaseException,
     Imbo\Exception\StorageException,
+    Imbo\Exception\TransformationException,
     DateTime;
 
 /**
@@ -62,15 +63,17 @@ class ImageVariationsTest extends ListenerTests {
         $this->storage = $this->getMock('Imbo\EventListener\ImageVariations\Storage\StorageInterface');
 
         $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+        $this->imageModel = $this->getMock('Imbo\Model\Image');
+        $this->eventManager = $this->getMock('Imbo\EventManager\EventManager');
+        $this->imageStorage = $this->getMock('Imbo\Storage\StorageInterface');
+
+        $this->imageModel->method('getImageIdentifier')->willReturn($this->imageIdentifier);
 
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
+        $this->request->expects($this->any())->method('getImage')->will($this->returnValue($this->imageModel));
         $this->request->query = $this->query;
-
-        $this->imageModel = $this->getMock('Imbo\Model\Image');
-        $this->eventManager = $this->getMock('Imbo\EventManager\EventManager');
-        $this->imageStorage = $this->getMock('Imbo\Storage\StorageInterface');
 
         $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
@@ -478,6 +481,157 @@ class ImageVariationsTest extends ListenerTests {
         );
 
         $this->listener->deleteVariations($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     */
+    public function testGenerateVariationsCallsStoreImageVariationForEveryWidth() {
+        $listener = new ImageVariations([
+            'database'  => [ 'adapter' => $this->db ],
+            'storage'   => [ 'adapter' => $this->storage ],
+
+            /**
+             * With autoScale on, it should filter out the first and last two widths,
+             * but as we have turned autoScale off, it should only remove the last width,
+             * which is larger than our original.
+             */
+            'widths'    => [25, 100, 400, 800, 1024, 1700, 3000],
+            'autoScale' => false,
+        ]);
+
+        $this->imageModel->method('getWidth')->willReturn(2048);
+
+        $this->storage
+             ->expects($this->exactly(6))
+             ->method('storeImageVariation')
+             ->with($this->publicKey, $this->imageIdentifier, $this->anything(), $this->greaterThan(0));
+
+        $listener->generateVariations($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     */
+    public function testGenerateVariationsWithLosslessParamTriggersPngConversion() {
+        $listener = new ImageVariations([
+            'database'  => [ 'adapter' => $this->db ],
+            'storage'   => [ 'adapter' => $this->storage ],
+            'widths'    => [500],
+            'autoScale' => false,
+            'lossless'  => true,
+        ]);
+
+        $this->imageModel->method('getWidth')->willReturn(2048);
+
+        $this->eventManager
+            ->expects($this->at(1))
+            ->method('trigger')
+            ->with('image.transformation.convert', [
+                'image'  => $this->imageModel,
+                'params' => [
+                    'type' => 'png'
+                ]
+            ]);
+
+        $listener->generateVariations($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     */
+    public function testGenerateVariationsAutoScalesRespectingMaxMinWidth() {
+        $listener = new ImageVariations([
+            'database'    => [ 'adapter' => $this->db ],
+            'storage'     => [ 'adapter' => $this->storage ],
+            'minDiff'     => 100,
+            'minWidth'    => 320,
+            'maxWidth'    => 1300,
+            'scaleFactor' => .65,
+        ]);
+
+        $this->imageModel->method('getWidth')->willReturn(2048);
+
+        $this->storage
+            ->expects($this->exactly(3))
+            ->method('storeImageVariation')
+            ->withConsecutive(
+                [$this->publicKey, $this->imageIdentifier, $this->anything(), 865],
+                [$this->publicKey, $this->imageIdentifier, $this->anything(), 562],
+                [$this->publicKey, $this->imageIdentifier, $this->anything(), 365]
+            );
+
+        $listener->generateVariations($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     */
+    public function testGenerateVariationsIncludesSpecifiedWidths() {
+        $listener = new ImageVariations([
+            'database'    => [ 'adapter' => $this->db ],
+            'storage'     => [ 'adapter' => $this->storage ],
+            'widths'      => [ 1337 ],
+            'scaleFactor' => .2,
+        ]);
+
+        $this->imageModel->method('getWidth')->willReturn(2048);
+
+        $this->storage
+            ->expects($this->exactly(2))
+            ->method('storeImageVariation')
+            ->withConsecutive(
+                [$this->publicKey, $this->imageIdentifier, $this->anything(), 1337],
+                [$this->publicKey, $this->imageIdentifier, $this->anything(), 410]
+            );
+
+        $listener->generateVariations($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     * @expectedException PHPUnit_Framework_Error
+     * @expectedExceptionMessage Could not generate image variation for pubkey (imgid), width: 512
+     */
+    public function testGenerateVariationsTriggersWarningOnTransformationException() {
+        $this->imageModel->method('getWidth')->willReturn(1024);
+
+        $this->eventManager->expects($this->at(1))
+            ->method('trigger')
+            ->with('image.transformation.resize', $this->anything())
+            ->will($this->throwException(new TransformationException()));
+
+        $this->listener->generateVariations($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     * @expectedException PHPUnit_Framework_Error
+     * @expectedExceptionMessage Could not store image variation for pubkey (imgid), width: 512
+     */
+    public function testGenerateVariationsTriggersWarningOnStorageException() {
+        $this->imageModel->method('getWidth')->willReturn(1024);
+
+        $this->storage->expects($this->once())
+            ->method('storeImageVariation')
+            ->will($this->throwException(new StorageException()));
+
+        $this->listener->generateVariations($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     * @expectedException PHPUnit_Framework_Error
+     * @expectedExceptionMessage Could not store image variation metadata for pubkey (imgid), width: 512
+     */
+    public function testGenerateVariationsTriggersWarningOnDatabaseException() {
+        $this->imageModel->method('getWidth')->willReturn(1024);
+
+        $this->db->expects($this->once())
+            ->method('storeImageVariationMetadata')
+            ->will($this->throwException(new DatabaseException()));
+
+        $this->listener->generateVariations($this->event);
     }
 
     /**
