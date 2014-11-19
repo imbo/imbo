@@ -38,6 +38,7 @@ Feature: Imbo provides an event listener that generates variations when adding i
         And I include an access token in the query
         When I request "/users/publickey/images/b60df41830245ee8f278e3ddfe5238a3.png"
         Then the "X-Imbo-ImageVariation" response header matches "320x80"
+        And the "X-Imbo-ImageIdentifier" response header matches "b60df41830245ee8f278e3ddfe5238a3"
         And the width of the image is "320"
 
     Scenario: Request an image with a maxSize transformation which only slightly downscales the original

@@ -18,11 +18,11 @@ return [
             'params' => [
                 'database' => [
                     'adapter' => 'Imbo\EventListener\ImageVariations\Database\MongoDB',
-                    'params'  => ['databaseName' => 'imbo_testing_variations'],
+                    'params'  => ['databaseName' => 'imbo_testing'],
                 ],
                 'storage' => [
                     'adapter' => 'Imbo\EventListener\ImageVariations\Storage\GridFS',
-                    'params'  => ['databaseName' => 'imbo_testing_variations'],
+                    'params'  => ['databaseName' => 'imbo_testing'],
                 ],
                 'widths'    => [320],
                 'minWidth'  => 100,
