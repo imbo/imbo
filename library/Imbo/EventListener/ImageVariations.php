@@ -40,7 +40,7 @@ class ImageVariations implements ListenerInterface {
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         // Flip to true to converts variations to a lossless format (PNG) before saving
         'lossless' => false,
 
@@ -60,8 +60,8 @@ class ImageVariations implements ListenerInterface {
         'maxWidth' => 1024,
 
         // Specific widths to generate, in addition to the auto scaling
-        'widths' => array(),
-    );
+        'widths' => [],
+    ];
 
     /**
      * Class constructor
@@ -69,7 +69,7 @@ class ImageVariations implements ListenerInterface {
      * @param array $params Parameters for the event listener
      * @throws InvalidArgumentException
      */
-    public function __construct(array $params = array()) {
+    public function __construct(array $params = []) {
         $this->params = array_replace($this->params, $params);
 
         // Make sure the scale factor is a negative number if it exists
@@ -85,21 +85,21 @@ class ImageVariations implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             // Generate image variations that can be used in resize operations later on
-            'images.post' => array('generateVariations' => -10),
+            'images.post' => ['generateVariations' => -10],
 
             // Choose a more suitable variation that can be used for resizing
-            'storage.image.load' => array('chooseVariation' => 10),
+            'storage.image.load' => ['chooseVariation' => 10],
 
             // Delete variations of an image when the image itself is deleted
-            'image.delete' => array('deleteVariations' => -10),
+            'image.delete' => ['deleteVariations' => -10],
 
             // Adjust transformations so that crop coordinates (and other stuff) works on the image
             // variation, which will be smaller than the image the coordintates where meant to work
             // with in the first place
             'image.transformations.adjust' => 'adjustImageTransformations',
-        );
+        ];
     }
 
     /**
@@ -153,10 +153,10 @@ class ImageVariations implements ListenerInterface {
 
         // Now that we have a variation we can use we need to adjust some of the transformation
         // parameters.
-        $event->getManager()->trigger('image.transformations.adjust', array(
+        $event->getManager()->trigger('image.transformations.adjust', [
             'transformationIndex' => $transformationIndex,
             'ratio' => $imageWidth / $variation['width'],
-        ));
+        ]);
 
         // Fetch the image variation blob from the storage adapter
         $imageBlob = $this->storage->getImageVariation($publicKey, $imageIdentifier, $variation['width']);
@@ -168,7 +168,7 @@ class ImageVariations implements ListenerInterface {
             return;
         }
 
-        // Set some data that the database operations listener usually sets, since that will be
+        // Set some data that the storage operations listener usually sets, since that will be
         // skipped since we have an image variation
         $lastModified = $event->getStorage()->getLastModified($publicKey, $imageIdentifier);
         $response->setLastModified($lastModified);
@@ -203,37 +203,15 @@ class ImageVariations implements ListenerInterface {
         $transformationIndex = $event->getArgument('transformationIndex');
         $ratio = $event->getArgument('ratio');
 
+        $transformationNames = ['crop', 'border', 'canvas', 'watermark'];
+
         // Adjust coordinates according to the ratio between the original and the variation
         for ($i = 0; $i <= $transformationIndex; $i++) {
             $name = $transformations[$i]['name'];
             $params = $transformations[$i]['params'];
 
-            if ($name === 'crop') {
-                foreach (array('x', 'y', 'width', 'height') as $param) {
-                    if (isset($params[$param])) {
-                        $params[$param] = round($params[$param] / $ratio);
-                    }
-                }
-
-                $transformations[$i]['params'] = $params;
-            } else if ($name === 'border') {
-                foreach (array('width', 'height') as $param) {
-                    if (isset($params[$param])) {
-                        $params[$param] = round($params[$param] / $ratio);
-                    }
-                }
-
-                $transformations[$i]['params'] = $params;
-            }  else if ($name === 'canvas') {
-                foreach (array('x', 'y', 'width', 'height') as $param) {
-                    if (isset($params[$param])) {
-                        $params[$param] = round($params[$param] / $ratio);
-                    }
-                }
-
-                $transformations[$i]['params'] = $params;
-            } else if ($name === 'watermark') {
-                foreach (array('x', 'y', 'width', 'height') as $param) {
+            if (in_array($name, $transformationNames)) {
+                foreach (['x', 'y', 'width', 'height'] as $param) {
                     if (isset($params[$param])) {
                         $params[$param] = round($params[$param] / $ratio);
                     }
@@ -257,10 +235,10 @@ class ImageVariations implements ListenerInterface {
      */
     public function getMaxWidth($width, $height, array $transformations) {
         // Possible widths to use
-        $widths = array();
+        $widths = [];
 
         // Extracts from the image
-        $extracts = array();
+        $extracts = [];
 
         // Calculate the aspect ratio in case some transformations only specify height
         $ratio = $width / $height;
@@ -299,7 +277,7 @@ class ImageVariations implements ListenerInterface {
                     // No width or height/inset fit combo. Use default width for thumbnails
                     $widths[$i] = 50;
                 }
-            } else if ($name === 'crop') {
+            } else if ($name === 'crop' && empty($widths)) {
                 // Crop transformation
                 $extracts[$i] = $params;
             }
@@ -307,7 +285,7 @@ class ImageVariations implements ListenerInterface {
 
         if ($widths && !empty($extracts)) {
             // If we are fetching extracts, we need a larger version of the image
-            $extract = $extracts[0];
+            $extract = reset($extracts);
 
             // Find the correct scaling factor for the extract
             $extractFactor = $width / $extract['width'];
@@ -316,7 +294,7 @@ class ImageVariations implements ListenerInterface {
             // Find the new max width
             $maxWidth = $maxWidth * $extractFactor;
 
-            return array(array_search($maxWidth, $extracts) => $maxWidth);
+            return [array_search($maxWidth, $extracts) => $maxWidth];
         }
 
         if ($widths) {
@@ -324,7 +302,7 @@ class ImageVariations implements ListenerInterface {
             // transformation that first referenced it
             $maxWidth = max($widths);
 
-            return array(array_search($maxWidth, $widths) => $maxWidth);
+            return [array_search($maxWidth, $widths) => $maxWidth];
         }
 
         return null;
@@ -390,32 +368,32 @@ class ImageVariations implements ListenerInterface {
 
             try {
                 // Trigger a loading of the image, using the clone of the original as an argument
-                $eventManager->trigger('image.loaded', array(
+                $eventManager->trigger('image.loaded', [
                     'image' => $image,
-                ));
+                ]);
 
                 // If configured, use a lossless variation format
                 if ($this->params['lossless'] === true) {
-                    $eventManager->trigger('image.transformation.convert', array(
+                    $eventManager->trigger('image.transformation.convert', [
                         'image' => $image,
-                        'params' => array(
+                        'params' => [
                             'type' => 'png',
-                        )
-                    ));
+                        ]
+                    ]);
                 }
 
                 // Trigger a resize of the image (the transformation handles aspect ratio)
-                $eventManager->trigger('image.transformation.resize', array(
+                $eventManager->trigger('image.transformation.resize', [
                     'image' => $image,
-                    'params' => array(
+                    'params' => [
                         'width' => $width,
-                    ),
-                ));
+                    ],
+                ]);
 
                 // Trigger an update of the model
-                $eventManager->trigger('image.transformed', array(
+                $eventManager->trigger('image.transformed', [
                     'image' => $image,
-                ));
+                ]);
 
                 // Store the image
                 $this->storage->storeImageVariation($publicKey, $imageIdentifier, $image->getBlob(), $image->getWidth());
@@ -456,13 +434,13 @@ class ImageVariations implements ListenerInterface {
         try {
             $this->database->deleteImageVariations($publicKey, $imageIdentifier);
         } catch (DatabaseException $e) {
-            trigger_error(sprintf('Could not delete image variation meadata for %s (%s)', $publicKey, $imageIdentifier), E_USER_WARNING);
+            trigger_error(sprintf('Could not delete image variation metadata for %s (%s)', $publicKey, $imageIdentifier), E_USER_WARNING);
         }
 
         try {
             $this->storage->deleteImageVariations($publicKey, $imageIdentifier);
         } catch (StorageException $e) {
-            trigger_error(sprintf('Could not delete image variations for %s (%s)', $publicKey, $imageIdentifier), E_USER_WARNING);
+            trigger_error(sprintf('Could not delete image variations from storage for %s (%s)', $publicKey, $imageIdentifier), E_USER_WARNING);
         }
     }
 
@@ -515,7 +493,7 @@ class ImageVariations implements ListenerInterface {
             $storageAdapter = $config['adapter'];
         }
 
-        if (!($storageAdapter instanceof storageInterface)) {
+        if (!($storageAdapter instanceof StorageInterface)) {
             throw new InvalidArgumentException('Invalid storage adapter for the image variations event listener', 500);
         }
 
