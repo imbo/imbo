@@ -322,7 +322,7 @@ class ImageVariations implements ListenerInterface {
         $request = $event->getRequest();
         $publicKey = $request->getPublicKey();
         $originalImage = $request->getImage();
-        $imageIdentifier = $originalImage->getImageIdentifier();
+        $imageIdentifier = $originalImage->getChecksum();
         $originalWidth = $originalImage->getWidth();
 
         // Fetch parameters specified in the Imbo configuration related to what sort of variations
