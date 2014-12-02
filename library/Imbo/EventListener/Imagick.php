@@ -61,7 +61,7 @@ class Imagick implements ListenerInterface {
             ),
 
             // Inject the image blob into the image model after loading it from the database
-            'storage.image.load' => array('readImageBlob' => -10),
+            'image.loaded' => array('readImageBlob' => -10),
         );
     }
 
@@ -71,7 +71,10 @@ class Imagick implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function readImageBlob(EventInterface $event) {
-        if ($event->getName() === 'images.post') {
+        if ($event->hasArgument('image')) {
+            // The image has been specified as an argument to the event
+            $image = $event->getArgument('image');
+        } else if ($event->getName() === 'images.post') {
             // The image is found in the request
             $image = $event->getRequest()->getImage();
         } else {

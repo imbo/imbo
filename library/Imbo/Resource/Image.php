@@ -24,18 +24,18 @@ class Image implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD', 'DELETE');
+        return ['GET', 'HEAD', 'DELETE'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.get' => 'getImage',
             'image.head' => 'getImage',
             'image.delete' => 'deleteImage',
-        );
+        ];
     }
 
     /**
@@ -48,9 +48,9 @@ class Image implements ResourceInterface {
         $event->getManager()->trigger('storage.image.delete');
 
         $model = new Model\ArrayModel();
-        $model->setData(array(
+        $model->setData([
             'imageIdentifier' => $event->getRequest()->getImageIdentifier(),
-        ));
+        ]);
 
         $event->getResponse()->setModel($model);
     }
@@ -74,20 +74,23 @@ class Image implements ResourceInterface {
 
         $response->setModel($image);
 
+        // Load image details from database
         $eventManager->trigger('db.image.load');
-        $eventManager->trigger('storage.image.load');
 
         // Set a long max age as the image itself won't change
         $response->setMaxAge(31536000);
 
-        // Custom Imbo headers
-        $response->headers->add(array(
+        // Custom Imbo headers, based on original
+        $response->headers->add([
             'X-Imbo-OriginalMimeType' => $image->getMimeType(),
             'X-Imbo-OriginalWidth' => $image->getWidth(),
             'X-Imbo-OriginalHeight' => $image->getHeight(),
             'X-Imbo-OriginalFileSize' => $image->getFilesize(),
             'X-Imbo-OriginalExtension' => $image->getExtension(),
-        ));
+        ]);
+
+        // Trigger loading of the image
+        $eventManager->trigger('storage.image.load');
 
         // Trigger possible image transformations
         $eventManager->trigger('image.transform');

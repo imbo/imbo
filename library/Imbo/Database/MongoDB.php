@@ -336,7 +336,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function load($publicKey, $imageIdentifier, Image $image) {
+    public function getImageProperties($publicKey, $imageIdentifier) {
         try {
             $data = $this->getImageCollection()->findOne(
                 ['publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier],
@@ -345,13 +345,21 @@ class MongoDB implements DatabaseInterface {
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch image data', 500, $e);
         }
-
         if ($data === null) {
             throw new DatabaseException('Image not found', 404);
         }
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function load($publicKey, $imageIdentifier, Image $image) {
+        $data = $this->getImageProperties($publicKey, $imageIdentifier);
 
         $image->setWidth($data['width'])
               ->setHeight($data['height'])
+              ->setFilesize($data['size'])
               ->setMimeType($data['mime'])
               ->setExtension($data['extension'])
               ->setAddedDate(new DateTime('@' . $data['added'], new DateTimeZone('UTC')))

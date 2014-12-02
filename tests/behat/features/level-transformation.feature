@@ -12,7 +12,7 @@ Feature: Imbo can adjust color levels of images
         And I include an access token in the query
         When I request "/users/publickey/images/7e798b6f4773ea7d2eec5f484db4fbff.png"
         Then I should get a response with "200 OK"
-        And The pixel at coordinate "5, 55" should have a color of "#de3f3f"
+        And the pixel at coordinate "5, 55" should have a color of "#de3f3f"
 
     Scenario: Apply a transformation that increases level for all channels
         Given I use "publickey" and "privatekey" for public and private keys
@@ -20,4 +20,4 @@ Feature: Imbo can adjust color levels of images
         And I include an access token in the query
         When I request "/users/publickey/images/7e798b6f4773ea7d2eec5f484db4fbff.png"
         Then I should get a response with "200 OK"
-        And The pixel at coordinate "22, 32" should have a color of "#ffed00"
+        And the pixel at coordinate "22, 32" should have a color of "#ffed00"
