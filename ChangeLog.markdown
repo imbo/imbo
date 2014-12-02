@@ -5,6 +5,8 @@ Imbo-1.x.x
 ----------
 __N/A__
 
+* #202: Added an event listener for generating multiple different image variations on upload, speeding up scaling transformations by loading the image variation closest in dimensions before scaling (Christer Edvartsen, Espen Hovlandsdal)
+
 Bug fixes:
 
 * #313: Doctrine database driver would throw an exception when it could not connect, making the status endpoint return bogus information (Morten Fangel)
