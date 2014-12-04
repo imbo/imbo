@@ -105,6 +105,15 @@ interface DatabaseInterface {
     function load($publicKey, $imageIdentifier, Image $image);
 
     /**
+     * Fetch image properties from the database
+     *
+     * @param string $publicKey The public key
+     * @param string $imageIdentifier The image identifier
+     * @return array
+     */
+    function getImageProperties($publicKey, $imageIdentifier);
+
+    /**
      * Get the last modified timestamp of a user
      *
      * If the $imageIdentifier parameter is set, return when that image was last updated. If not

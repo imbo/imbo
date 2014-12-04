@@ -87,6 +87,10 @@ class StorageOperationsTest extends ListenerTests {
         $image->expects($this->once())->method('setBlob')->with('image data');
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
 
+        $eventManager = $this->getMock('Imbo\EventManager\EventManager');
+        $eventManager->expects($this->once())->method('trigger')->with('image.loaded');
+        $this->event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
+
         $this->listener->loadImage($this->event);
     }
 

@@ -12,6 +12,7 @@ namespace ImboUnitTest\Database;
 
 use Imbo\Database\Doctrine,
     Doctrine\DBAL\Connection,
+    PDOException,
     ReflectionMethod;
 
 /**
@@ -74,6 +75,15 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
     public function testGetStatusWhenDatabaseIsNotConnectedAndCanNotConnect() {
         $this->connection->expects($this->once())->method('isConnected')->will($this->returnValue(false));
         $this->connection->expects($this->once())->method('connect')->will($this->returnValue(false));
+        $this->assertFalse($this->driver->getStatus());
+    }
+
+    /**
+     * @covers Imbo\Database\Doctrine::getStatus
+     */
+    public function testGetStatusWhenDatabaseIsNotConnectedAndConnectThrowsAnException() {
+        $this->connection->expects($this->once())->method('isConnected')->will($this->returnValue(false));
+        $this->connection->expects($this->once())->method('connect')->will($this->throwException(new PDOException()));
         $this->assertFalse($this->driver->getStatus());
     }
 

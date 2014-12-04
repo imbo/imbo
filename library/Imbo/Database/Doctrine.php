@@ -20,6 +20,7 @@ use Imbo\Model\Image,
     Doctrine\DBAL\DriverManager,
     Doctrine\DBAL\Connection,
     PDO,
+    PDOException,
     DateTime,
     DateTimeZone;
 
@@ -360,7 +361,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function load($publicKey, $imageIdentifier, Image $image) {
+    public function getImageProperties($publicKey, $imageIdentifier) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('*')
               ->from($this->tableNames['imageinfo'], 'i')
@@ -370,16 +371,23 @@ class Doctrine implements DatabaseInterface {
                   ':publicKey'       => $publicKey,
                   ':imageIdentifier' => $imageIdentifier,
         ));
-
         $stmt = $query->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if (!$row) {
             throw new DatabaseException('Image not found', 404);
         }
+        return $row;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function load($publicKey, $imageIdentifier, Image $image) {
+        $row = $this->getImageProperties($publicKey, $imageIdentifier);
 
         $image->setWidth($row['width'])
               ->setHeight($row['height'])
+              ->setFilesize($row['size'])
               ->setMimeType($row['mime'])
               ->setExtension($row['extension'])
               ->setAddedDate(new DateTime('@' . $row['added'], new DateTimeZone('UTC')))
@@ -449,9 +457,13 @@ class Doctrine implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function getStatus() {
-        $connection = $this->getConnection();
+        try {
+            $connection = $this->getConnection();
 
-        return $connection->isConnected() || $connection->connect();
+            return $connection->isConnected() || $connection->connect();
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     /**

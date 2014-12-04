@@ -277,7 +277,7 @@ class ImboContext extends RESTContext {
     }
 
     /**
-     * @Given /^The pixel at coordinate "([^"]*)" should have a color of "#([^"]*)"$/
+     * @Given /^the pixel at coordinate "([^"]*)" should have a color of "#([^"]*)"$/
      */
     public function assertImagePixelColor($coordinates, $expectedColor) {
         $coordinates = array_map('trim', explode(',', $coordinates));

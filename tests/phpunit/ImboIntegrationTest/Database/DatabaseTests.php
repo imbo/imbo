@@ -56,6 +56,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         return (new Image())->setBlob('imageblob')
                             ->setWidth(123)
                             ->setHeight(234)
+                            ->setFilesize(3456)
                             ->setMimeType('image/jpeg')
                             ->setExtension('jpg')
                             ->setOriginalChecksum(md5(__FILE__));
@@ -74,6 +75,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertSame($originalImage->getWidth(), $image->getWidth());
         $this->assertSame($originalImage->getHeight(), $image->getHeight());
         $this->assertSame($originalImage->getMimeType(), $image->getMimeType());
+        $this->assertSame($originalImage->getFilesize(), $image->getFilesize());
         $this->assertSame($originalImage->getExtension(), $image->getExtension());
     }
 

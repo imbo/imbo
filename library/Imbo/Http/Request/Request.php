@@ -133,6 +133,18 @@ class Request extends SymfonyRequest {
     }
 
     /**
+     * Set the transformation chain
+     *
+     * @param array $transformations The image transformations
+     * @return self
+     */
+    public function setTransformations(array $transformations) {
+        $this->transformations = $transformations;
+
+        return $this;
+    }
+
+    /**
      * Get the image identifier from the URL
      *
      * @return string|null

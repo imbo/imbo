@@ -29,4 +29,4 @@ before_script:
   - composer -n --no-ansi install --dev --prefer-source
 script:
   - ./vendor/bin/phpunit --verbose -c tests/phpunit/phpunit.xml.travis
-  - ./vendor/bin/behat --strict --profile travis --config tests/behat/behat.yml
+  - ./vendor/bin/behat --strict --profile no-cc --config tests/behat/behat.yml
