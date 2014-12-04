@@ -1,9 +1,9 @@
 Changelog for Imbo
 ==================
 
-Imbo-1.x.x
+Imbo-1.2.4
 ----------
-__N/A__
+__2014-12-04__
 
 * #202: Added an event listener for generating multiple different image variations on upload, speeding up scaling transformations by loading the image variation closest in dimensions before scaling (Christer Edvartsen, Espen Hovlandsdal)
 
