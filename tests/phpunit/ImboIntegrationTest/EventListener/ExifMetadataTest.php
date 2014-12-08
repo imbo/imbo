@@ -102,18 +102,18 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanGetAndSaveProperties() {
         $listener = new ExifMetadata();
-        $publicKey = 'foobar';
+        $user = 'foobar';
 
         $image = new Image();
         $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->exactly(2))->method('getImage')->will($this->returnValue($image));
-        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $request->expects($this->once())->method('getUser')->will($this->returnValue($user));
 
         $database = $this->getMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('updateMetadata')->with(
-            $this->equalTo($publicKey),
+            $this->equalTo($user),
             $this->equalTo('753e11e00522ff1e95600d8f91c74e8e'),
             $this->arrayHasKey('gps:location')
         );

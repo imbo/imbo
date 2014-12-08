@@ -79,7 +79,7 @@ class DatabaseOperations implements ListenerInterface {
         $request = $event->getRequest();
 
         $event->getDatabase()->insertImage(
-            $request->getPublicKey(),
+            $request->getUser(),
             $request->getImage()->getChecksum(),
             $request->getImage()
         );
@@ -94,7 +94,7 @@ class DatabaseOperations implements ListenerInterface {
         $request = $event->getRequest();
 
         $event->getDatabase()->deleteImage(
-            $request->getPublicKey(),
+            $request->getUser(),
             $request->getImageIdentifier()
         );
     }
@@ -109,7 +109,7 @@ class DatabaseOperations implements ListenerInterface {
         $response = $event->getResponse();
 
         $event->getDatabase()->load(
-            $request->getPublicKey(),
+            $request->getUser(),
             $request->getImageIdentifier(),
             $response->getModel()
         );
@@ -124,7 +124,7 @@ class DatabaseOperations implements ListenerInterface {
         $request = $event->getRequest();
 
         $event->getDatabase()->deleteMetadata(
-            $request->getPublicKey(),
+            $request->getUser(),
             $request->getImageIdentifier()
         );
     }
@@ -138,7 +138,7 @@ class DatabaseOperations implements ListenerInterface {
         $request = $event->getRequest();
 
         $event->getDatabase()->updateMetadata(
-            $request->getPublicKey(),
+            $request->getUser(),
             $request->getImageIdentifier(),
             $event->getArgument('metadata')
         );
@@ -152,15 +152,15 @@ class DatabaseOperations implements ListenerInterface {
     public function loadMetadata(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
         $database = $event->getDatabase();
 
         $model = new Model\Metadata();
-        $model->setData($database->getMetadata($publicKey, $imageIdentifier));
+        $model->setData($database->getMetadata($user, $imageIdentifier));
 
         $response->setModel($model)
-                 ->setLastModified($database->getLastModified($publicKey, $imageIdentifier));
+                 ->setLastModified($database->getLastModified($user, $imageIdentifier));
     }
 
     /**
@@ -226,7 +226,7 @@ class DatabaseOperations implements ListenerInterface {
             }
         }
 
-        $publicKey = $event->getRequest()->getPublicKey();
+        $user = $event->getRequest()->getUser();
         $response = $event->getResponse();
         $database = $event->getDatabase();
 
@@ -235,7 +235,7 @@ class DatabaseOperations implements ListenerInterface {
         $model->setLimit($query->limit())
               ->setPage($query->page());
 
-        $images = $database->getImages($publicKey, $query, $model);
+        $images = $database->getImages($user, $query, $model);
         $modelImages = array();
 
         foreach ($images as $image) {
@@ -243,7 +243,7 @@ class DatabaseOperations implements ListenerInterface {
             $entry->setFilesize($image['size'])
                   ->setWidth($image['width'])
                   ->setHeight($image['height'])
-                  ->setPublicKey($publicKey)
+                  ->setUser($user)
                   ->setImageIdentifier($image['imageIdentifier'])
                   ->setChecksum($image['checksum'])
                   ->setOriginalChecksum(isset($image['originalChecksum']) ? $image['originalChecksum'] : null)
@@ -270,7 +270,7 @@ class DatabaseOperations implements ListenerInterface {
             }
         }
 
-        $lastModified = $database->getLastModified($publicKey);
+        $lastModified = $database->getLastModified($user);
 
         $response->setModel($model)
                  ->setLastModified($lastModified);
@@ -284,14 +284,14 @@ class DatabaseOperations implements ListenerInterface {
     public function loadUser(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $database = $event->getDatabase();
 
-        $numImages = $database->getNumImages($publicKey);
-        $lastModified = $database->getLastModified($publicKey);
+        $numImages = $database->getNumImages($user);
+        $lastModified = $database->getLastModified($user);
 
         $userModel = new Model\User();
-        $userModel->setPublicKey($publicKey)
+        $userModel->setUserId($user)
                   ->setNumImages($numImages)
                   ->setLastModified($lastModified);
 
@@ -308,10 +308,10 @@ class DatabaseOperations implements ListenerInterface {
         $response = $event->getResponse();
         $database = $event->getDatabase();
         $userLookup = $event->getUserLookup();
-        $publicKeys = $userLookup->getPublicKeys();
+        $userIds = $userLookup->getUsers();
         $users = array();
 
-        foreach ($publicKeys as $key) {
+        foreach ($userIds as $key) {
             $users[$key] = array(
                 'numImages' => $database->getNumImages($key),
                 'numBytes' => $database->getNumBytes($key),

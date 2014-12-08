@@ -49,16 +49,16 @@ class Filesystem implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function store($publicKey, $imageIdentifier, $imageData) {
+    public function store($user, $imageIdentifier, $imageData) {
         if (!is_writable($this->params['dataDir'])) {
             throw new StorageException('Could not store image', 500);
         }
 
-        if ($this->imageExists($publicKey, $imageIdentifier)) {
-            return touch($this->getImagePath($publicKey, $imageIdentifier));
+        if ($this->imageExists($user, $imageIdentifier)) {
+            return touch($this->getImagePath($user, $imageIdentifier));
         }
 
-        $imageDir = $this->getImagePath($publicKey, $imageIdentifier, false);
+        $imageDir = $this->getImagePath($user, $imageIdentifier, false);
         $oldUmask = umask(0);
 
         if (!is_dir($imageDir)) {
@@ -75,12 +75,12 @@ class Filesystem implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete($publicKey, $imageIdentifier) {
-        if (!$this->imageExists($publicKey, $imageIdentifier)) {
+    public function delete($user, $imageIdentifier) {
+        if (!$this->imageExists($user, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
 
-        $path = $this->getImagePath($publicKey, $imageIdentifier);
+        $path = $this->getImagePath($user, $imageIdentifier);
 
         return unlink($path);
     }
@@ -88,12 +88,12 @@ class Filesystem implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImage($publicKey, $imageIdentifier) {
-        if (!$this->imageExists($publicKey, $imageIdentifier)) {
+    public function getImage($user, $imageIdentifier) {
+        if (!$this->imageExists($user, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
 
-        $path = $this->getImagePath($publicKey, $imageIdentifier);
+        $path = $this->getImagePath($user, $imageIdentifier);
 
         return file_get_contents($path);
     }
@@ -101,12 +101,12 @@ class Filesystem implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getLastModified($publicKey, $imageIdentifier) {
-        if (!$this->imageExists($publicKey, $imageIdentifier)) {
+    public function getLastModified($user, $imageIdentifier) {
+        if (!$this->imageExists($user, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
 
-        $path = $this->getImagePath($publicKey, $imageIdentifier);
+        $path = $this->getImagePath($user, $imageIdentifier);
 
         // Get the unix timestamp
         $timestamp = filemtime($path);
@@ -125,8 +125,8 @@ class Filesystem implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function imageExists($publicKey, $imageIdentifier) {
-        $path = $this->getImagePath($publicKey, $imageIdentifier);
+    public function imageExists($user, $imageIdentifier) {
+        $path = $this->getImagePath($user, $imageIdentifier);
 
         return file_exists($path);
     }
@@ -134,19 +134,20 @@ class Filesystem implements StorageInterface {
     /**
      * Get the path to an image
      *
-     * @param string $publicKey The key
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier Image identifier
      * @param boolean $includeFilename Whether or not to include the last part of the path (the
      *                                 filename itself)
      * @return string
      */
-    private function getImagePath($publicKey, $imageIdentifier, $includeFilename = true) {
+    private function getImagePath($user, $imageIdentifier, $includeFilename = true) {
+        $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         $parts = array(
             $this->params['dataDir'],
-            $publicKey[0],
-            $publicKey[1],
-            $publicKey[2],
-            $publicKey,
+            $userPath[0],
+            $userPath[1],
+            $userPath[2],
+            $user,
             $imageIdentifier[0],
             $imageIdentifier[1],
             $imageIdentifier[2],

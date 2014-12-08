@@ -189,7 +189,7 @@ class Application {
             if (is_array($definition) && !empty($definition['listener'])) {
                 $listener = $definition['listener'];
                 $params = is_string($listener) && isset($definition['params']) ? $definition['params'] : array();
-                $publicKeys = isset($definition['publicKeys']) ? $definition['publicKeys'] : array();
+                $users = isset($definition['users']) ? $definition['users'] : array();
 
                 if (is_callable($listener) && !($listener instanceof ListenerInterface)) {
                     $listener = $listener();
@@ -200,18 +200,18 @@ class Application {
                 }
 
                 $eventManager->addEventHandler($name, $listener, $params)
-                             ->addCallbacks($name, $listener::getSubscribedEvents(), $publicKeys);
+                             ->addCallbacks($name, $listener::getSubscribedEvents(), $users);
             } else if (is_array($definition) && !empty($definition['callback']) && !empty($definition['events'])) {
                 $priority = 0;
                 $events = array();
-                $publicKeys = array();
+                $users = array();
 
                 if (isset($definition['priority'])) {
                     $priority = (int) $definition['priority'];
                 }
 
-                if (isset($definition['publicKeys'])) {
-                    $publicKeys = $definition['publicKeys'];
+                if (isset($definition['users'])) {
+                    $users = $definition['users'];
                 }
 
                 foreach ($definition['events'] as $event => $p) {
@@ -224,7 +224,7 @@ class Application {
                 }
 
                 $eventManager->addEventHandler($name, $definition['callback'])
-                             ->addCallbacks($name, $events, $publicKeys);
+                             ->addCallbacks($name, $events, $users);
             } else {
                 throw new InvalidArgumentException('Invalid event listener definition', 500);
             }
@@ -271,11 +271,11 @@ class Application {
             // Inform the user agent of which methods are allowed against this resource
             $response->headers->set('Allow', $resource->getAllowedMethods(), false);
 
-            if ($publicKey = $request->getPublicKey()) {
-                // Ensure that the public key actually exists
-                if (!$userLookup->publicKeyExists($publicKey)) {
-                    $e = new RuntimeException('Public key not found', 404);
-                    $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
+            if ($user = $request->getUser()) {
+                // Ensure that the user actually exists
+                if (!$userLookup->userExists($user)) {
+                    $e = new RuntimeException('User not found', 404);
+                    $e->setImboErrorCode(Exception::AUTH_UNKNOWN_USER);
 
                     throw $e;
                 }

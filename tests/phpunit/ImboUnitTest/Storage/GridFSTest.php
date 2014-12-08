@@ -39,11 +39,11 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     private $mongoClient;
 
     /**
-     * Public key that can be used in tests
+     * User that can be used in tests
      *
      * @var string
      */
-    private $publicKey = 'key';
+    private $user = 'user';
 
     /**
      * Image identifier that can be used in tests
@@ -87,13 +87,13 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
         $this->grid->expects($this->at(0))
                    ->method('find')
                    ->with(array(
-                       'publicKey' => $this->publicKey,
+                       'user' => $this->user,
                        'imageIdentifier' => $this->imageIdentifier
                    ))
                    ->will($this->returnValue($cursor));
         $this->grid->expects($this->once())->method('storeBytes')->with($data, $this->isType('array'));
 
-        $this->assertTrue($this->driver->store($this->publicKey, $this->imageIdentifier, $data));
+        $this->assertTrue($this->driver->store($this->user, $this->imageIdentifier, $data));
     }
 
     /**
@@ -108,7 +108,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
 
         $this->grid->expects($this->once())->method('find')->will($this->returnValue($cursor));
 
-        $this->driver->delete($this->publicKey, $this->imageIdentifier);
+        $this->driver->delete($this->user, $this->imageIdentifier);
     }
 
     /**
@@ -125,7 +125,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
         $this->grid->expects($this->once())->method('find')->will($this->returnValue($cursor));
         $this->grid->expects($this->once())->method('delete');
 
-        $this->driver->delete($this->publicKey, $this->imageIdentifier);
+        $this->driver->delete($this->user, $this->imageIdentifier);
     }
 
     /**
@@ -140,7 +140,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
 
         $this->grid->expects($this->once())->method('find')->will($this->returnValue($cursor));
 
-        $this->driver->getImage($this->publicKey, $this->imageIdentifier);
+        $this->driver->getImage($this->user, $this->imageIdentifier);
     }
 
     /**
@@ -159,7 +159,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
 
         $this->grid->expects($this->once())->method('find')->will($this->returnValue($cursor));
 
-        $this->assertSame($data, $this->driver->getImage($this->publicKey, $this->imageIdentifier));
+        $this->assertSame($data, $this->driver->getImage($this->user, $this->imageIdentifier));
     }
 
     /**
@@ -174,7 +174,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
 
         $this->grid->expects($this->once())->method('find')->will($this->returnValue($cursor));
 
-        $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+        $this->driver->getLastModified($this->user, $this->imageIdentifier);
     }
 
     /**
@@ -190,7 +190,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
 
         $this->grid->expects($this->once())->method('find')->will($this->returnValue($cursor));
 
-        $this->assertInstanceOf('DateTime', ($date = $this->driver->getLastModified($this->publicKey, $this->imageIdentifier)));
+        $this->assertInstanceOf('DateTime', ($date = $this->driver->getLastModified($this->user, $this->imageIdentifier)));
         $this->assertSame(1334579830, $date->getTimestamp());
 
     }

@@ -110,11 +110,11 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Fetch public keys to test filtering
+     * Fetch users to test filtering
      *
      * @return array[]
      */
-    public function getPublicKeys() {
+    public function getUsers() {
         return array(
             array(null, array(), '1'),
             array(null, array('christer'), '1'),
@@ -126,16 +126,16 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @dataProvider getPublicKeys
+     * @dataProvider getUsers
      * @covers Imbo\EventManager\EventManager::hasListenersForEvent
      * @covers Imbo\EventManager\EventManager::triggersFor
      */
-    public function testCanIncludeAndExcludePublicKeys($publicKey, $publicKeys, $output = '') {
+    public function testCanIncludeAndExcludeUsers($user, $users, $output = '') {
         $callback = function ($event) { echo '1'; };
 
-        $this->manager->addEventHandler('handler', $callback)->addCallbacks('handler', array('event' => 0), $publicKeys);
+        $this->manager->addEventHandler('handler', $callback)->addCallbacks('handler', array('event' => 0), $users);
 
-        $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($user));
 
         $this->expectOutputString($output);
         $this->manager->trigger('event');

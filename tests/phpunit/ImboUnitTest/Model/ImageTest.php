@@ -139,13 +139,13 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Image::setPublicKey
-     * @covers Imbo\Model\Image::getPublicKey
+     * @covers Imbo\Model\Image::setUser
+     * @covers Imbo\Model\Image::getUser
      */
-    public function testCanSetAndGetThePublicKey() {
-        $this->assertNull($this->image->getPublicKey());
-        $this->assertSame($this->image, $this->image->setPublicKey('christer'));
-        $this->assertSame('christer', $this->image->getPublicKey());
+    public function testCanSetAndGetTheUser() {
+        $this->assertNull($this->image->getUser());
+        $this->assertSame($this->image, $this->image->setUser('christer'));
+        $this->assertSame('christer', $this->image->getUser());
     }
 
     /**

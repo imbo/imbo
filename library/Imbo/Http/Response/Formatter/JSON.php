@@ -63,7 +63,7 @@ class JSON extends Formatter implements FormatterInterface {
      */
     public function formatUser(Model\User $model) {
         return $this->encode(array(
-            'publicKey' => $model->getPublicKey(),
+            'id' => $model->getUserId(),
             'numImages' => $model->getNumImages(),
             'lastModified' => $this->dateFormatter->formatDate($model->getLastModified()),
         ));
@@ -93,7 +93,7 @@ class JSON extends Formatter implements FormatterInterface {
                 'height' => $image->getHeight(),
                 'mime' => $image->getMimeType(),
                 'imageIdentifier' => $image->getImageIdentifier(),
-                'publicKey' => $image->getPublicKey(),
+                'user' => $image->getUser(),
             );
 
             // Add metadata if the field is to be displayed

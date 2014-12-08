@@ -87,12 +87,12 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function store($publicKey, $imageIdentifier, $imageData) {
+    public function store($user, $imageIdentifier, $imageData) {
         $now = time();
 
-        if ($this->imageExists($publicKey, $imageIdentifier)) {
+        if ($this->imageExists($user, $imageIdentifier)) {
             $this->getGrid()->update(
-                array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
+                array('user' => $user, 'imageIdentifier' => $imageIdentifier),
                 array('$set' => array('updated' => $now))
             );
 
@@ -100,7 +100,7 @@ class GridFS implements StorageInterface {
         }
 
         $metadata = array(
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
             'updated' => $now,
         );
@@ -113,8 +113,8 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete($publicKey, $imageIdentifier) {
-        if (($file = $this->getImageObject($publicKey, $imageIdentifier)) === false) {
+    public function delete($user, $imageIdentifier) {
+        if (($file = $this->getImageObject($user, $imageIdentifier)) === false) {
             throw new StorageException('File not found', 404);
         }
 
@@ -126,8 +126,8 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImage($publicKey, $imageIdentifier) {
-        if (($file = $this->getImageObject($publicKey, $imageIdentifier)) === false) {
+    public function getImage($user, $imageIdentifier) {
+        if (($file = $this->getImageObject($user, $imageIdentifier)) === false) {
             throw new StorageException('File not found', 404);
         }
 
@@ -137,8 +137,8 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getLastModified($publicKey, $imageIdentifier) {
-        if (($file = $this->getImageObject($publicKey, $imageIdentifier)) === false) {
+    public function getLastModified($user, $imageIdentifier) {
+        if (($file = $this->getImageObject($user, $imageIdentifier)) === false) {
             throw new StorageException('File not found', 404);
         }
 
@@ -161,9 +161,9 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function imageExists($publicKey, $imageIdentifier) {
+    public function imageExists($user, $imageIdentifier) {
         $cursor = $this->getGrid()->find(array(
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier
         ));
 
@@ -208,14 +208,14 @@ class GridFS implements StorageInterface {
     /**
      * Get an image object
      *
-     * @param string $publicKey The public key of the user
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier
      * @return boolean|MongoGridFSFile Returns false if the file does not exist or an instance of
      *                                 MongoGridFSFile if the file exists
      */
-    private function getImageObject($publicKey, $imageIdentifier) {
+    private function getImageObject($user, $imageIdentifier) {
         $cursor = $this->getGrid()->find(array(
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier
         ));
 

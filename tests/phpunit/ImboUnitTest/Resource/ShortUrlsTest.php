@@ -83,22 +83,22 @@ class ShortUrlsTest extends ResourceTests {
 
     /**
      * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Missing or invalid public key
+     * @expectedExceptionMessage Missing or invalid user
      * @expectedExceptionCode 400
      */
-    public function testWillThrowAnExceptionWhenPublicKeyIsMissing() {
+    public function testWillThrowAnExceptionWhenUserMissing() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{}'));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
     /**
      * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Missing or invalid public key
+     * @expectedExceptionMessage Missing or invalid user
      * @expectedExceptionCode 400
      */
-    public function testWillThrowAnExceptionWhenPublicKeyDoesNotMatch() {
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"publicKey": "key"}'));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('otherkey'));
+    public function testWillThrowAnExceptionWhenUserDoesNotMatch() {
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user"}'));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('otheruser'));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
@@ -108,8 +108,8 @@ class ShortUrlsTest extends ResourceTests {
      * @expectedExceptionCode 400
      */
     public function testWillThrowAnExceptionWhenImageIdentifierIsMissing() {
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"publicKey": "key"}'));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user"}'));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
@@ -119,8 +119,8 @@ class ShortUrlsTest extends ResourceTests {
      * @expectedExceptionCode 400
      */
     public function testWillThrowAnExceptionWhenImageIdentifierDoesNotMatch() {
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"publicKey": "key", "imageIdentifier": "id"}'));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user", "imageIdentifier": "id"}'));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('other id'));
         $this->getNewResource()->createShortUrl($this->event);
     }
@@ -131,8 +131,8 @@ class ShortUrlsTest extends ResourceTests {
      * @expectedExceptionCode 400
      */
     public function testWillThrowAnExceptionWhenExtensionIsNotRecognized() {
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"publicKey": "key", "imageIdentifier": "id", "extension": "foo"}'));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user", "imageIdentifier": "id", "extension": "foo"}'));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->getNewResource()->createShortUrl($this->event);
     }
@@ -170,17 +170,17 @@ class ShortUrlsTest extends ResourceTests {
     public function testCanCreateShortUrls($extension = null, $queryString = null, array $query = array()) {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('
             {
-                "publicKey": "key",
+                "user": "user",
                 "imageIdentifier": "id",
                 "extension": ' . ($extension ? '"' . $extension . '"' : 'null') . ',
                 "query": ' . ($queryString ? '"' . $queryString . '"' : 'null') . '
             }
         '));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
-        $this->database->expects($this->once())->method('getShortUrlId')->with('key', 'id', $extension, $query)->will($this->returnValue(null));
+        $this->database->expects($this->once())->method('getShortUrlId')->with('user', 'id', $extension, $query)->will($this->returnValue(null));
         $this->database->expects($this->once())->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(null));
-        $this->database->expects($this->once())->method('insertShortUrl')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'), 'key', 'id', $extension, $query);
+        $this->database->expects($this->once())->method('insertShortUrl')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'), 'user', 'id', $extension, $query);
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setStatusCode')->with(201);
 
@@ -190,15 +190,15 @@ class ShortUrlsTest extends ResourceTests {
     public function testWillReturn200OKIfTheShortUrlAlreadyExists() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('
             {
-                "publicKey": "key",
+                "user": "user",
                 "imageIdentifier": "id",
                 "extension": null,
                 "query": null
             }
         '));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
-        $this->database->expects($this->once())->method('getShortUrlId')->with('key', 'id', null, array())->will($this->returnValue('aaaaaaa'));
+        $this->database->expects($this->once())->method('getShortUrlId')->with('user', 'id', null, array())->will($this->returnValue('aaaaaaa'));
         $this->database->expects($this->never())->method('insertShortUrl');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setStatusCode')->with(200);
@@ -207,15 +207,15 @@ class ShortUrlsTest extends ResourceTests {
     }
 
     public function testWillGenerateANewIdIfTheGeneratedOneExists() {
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"publicKey": "key", "imageIdentifier": "id"}'));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user", "imageIdentifier": "id"}'));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
 
-        $this->database->expects($this->at(0))->method('getShortUrlId')->with('key', 'id', null, array())->will($this->returnValue(null));
-        $this->database->expects($this->at(1))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(array('key' => 'value')));
-        $this->database->expects($this->at(2))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(array('key' => 'value')));
+        $this->database->expects($this->at(0))->method('getShortUrlId')->with('user', 'id', null, array())->will($this->returnValue(null));
+        $this->database->expects($this->at(1))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(array('user' => 'value')));
+        $this->database->expects($this->at(2))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(array('user' => 'value')));
         $this->database->expects($this->at(3))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(null));
-        $this->database->expects($this->at(4))->method('insertShortUrl')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'), 'key', 'id', null, array());
+        $this->database->expects($this->at(4))->method('insertShortUrl')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'), 'user', 'id', null, array());
 
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setStatusCode')->with(201);
@@ -224,9 +224,9 @@ class ShortUrlsTest extends ResourceTests {
     }
 
     public function testWillNotAddAModelIfTheEventIsNotAShortUrlsEvent() {
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
-        $this->database->expects($this->once())->method('deleteShortUrls')->with('key', 'id');
+        $this->database->expects($this->once())->method('deleteShortUrls')->with('user', 'id');
         $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.delete'));
         $this->response->expects($this->never())->method('setModel');
 
@@ -234,9 +234,9 @@ class ShortUrlsTest extends ResourceTests {
     }
 
     public function testWillAddAModelIfTheEventIsAShortUrlsEvent() {
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
-        $this->database->expects($this->once())->method('deleteShortUrls')->with('key', 'id');
+        $this->database->expects($this->once())->method('deleteShortUrls')->with('user', 'id');
         $this->event->expects($this->once())->method('getName')->will($this->returnValue('shorturls.delete'));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
 

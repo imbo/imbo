@@ -31,7 +31,7 @@ class DatabaseOperationsTest extends ListenerTests {
     private $request;
     private $response;
     private $database;
-    private $publicKey = 'key';
+    private $user = 'user';
     private $imageIdentifier = 'id';
     private $image;
 
@@ -45,7 +45,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->userLookup = $this->getMock('Imbo\Auth\UserLookupInterface');
         $this->image = $this->getMock('Imbo\Model\Image');
 
-        $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
         $this->event = $this->getMock('Imbo\EventManager\Event');
@@ -82,7 +82,7 @@ class DatabaseOperationsTest extends ListenerTests {
     public function testCanInsertImage() {
         $this->image->expects($this->once())->method('getChecksum')->will($this->returnValue($this->imageIdentifier));
         $this->request->expects($this->any())->method('getImage')->will($this->returnValue($this->image));
-        $this->database->expects($this->once())->method('insertImage')->with($this->publicKey, $this->imageIdentifier, $this->image);
+        $this->database->expects($this->once())->method('insertImage')->with($this->user, $this->imageIdentifier, $this->image);
 
         $this->listener->insertImage($this->event);
     }
@@ -91,7 +91,7 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::deleteImage
      */
     public function testCanDeleteImage() {
-        $this->database->expects($this->once())->method('deleteImage')->with($this->publicKey, $this->imageIdentifier);
+        $this->database->expects($this->once())->method('deleteImage')->with($this->user, $this->imageIdentifier);
 
         $this->listener->deleteImage($this->event);
     }
@@ -101,7 +101,7 @@ class DatabaseOperationsTest extends ListenerTests {
      */
     public function testCanLoadImage() {
         $this->response->expects($this->any())->method('getModel')->will($this->returnValue($this->image));
-        $this->database->expects($this->once())->method('load')->with($this->publicKey, $this->imageIdentifier, $this->image);
+        $this->database->expects($this->once())->method('load')->with($this->user, $this->imageIdentifier, $this->image);
 
         $this->listener->loadImage($this->event);
     }
@@ -110,7 +110,7 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::deleteMetadata
      */
     public function testCanDeleteMetadata() {
-        $this->database->expects($this->once())->method('deleteMetadata')->with($this->publicKey, $this->imageIdentifier);
+        $this->database->expects($this->once())->method('deleteMetadata')->with($this->user, $this->imageIdentifier);
 
         $this->listener->deleteMetadata($this->event);
     }
@@ -120,7 +120,7 @@ class DatabaseOperationsTest extends ListenerTests {
      */
     public function testCanUpdateMetadata() {
         $this->event->expects($this->once())->method('getArgument')->with('metadata')->will($this->returnValue(array('key' => 'value')));
-        $this->database->expects($this->once())->method('updateMetadata')->with($this->publicKey, $this->imageIdentifier, array('key' => 'value'));
+        $this->database->expects($this->once())->method('updateMetadata')->with($this->user, $this->imageIdentifier, array('key' => 'value'));
 
         $this->listener->updateMetadata($this->event);
     }
@@ -130,8 +130,8 @@ class DatabaseOperationsTest extends ListenerTests {
      */
     public function testCanLoadMetadata() {
         $date = new DateTime();
-        $this->database->expects($this->once())->method('getMetadata')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue(array('key' => 'value')));
-        $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($date));
+        $this->database->expects($this->once())->method('getMetadata')->with($this->user, $this->imageIdentifier)->will($this->returnValue(array('key' => 'value')));
+        $this->database->expects($this->once())->method('getLastModified')->with($this->user, $this->imageIdentifier)->will($this->returnValue($date));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Metadata'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setLastModified')->with($date);
 
@@ -210,8 +210,8 @@ class DatabaseOperationsTest extends ListenerTests {
         $imagesQuery = $this->getMock('Imbo\Resource\Images\Query');
         $this->listener->setImagesQuery($imagesQuery);
 
-        $this->database->expects($this->once())->method('getImages')->with($this->publicKey, $imagesQuery)->will($this->returnValue($images));
-        $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey)->will($this->returnValue($date));
+        $this->database->expects($this->once())->method('getImages')->with($this->user, $imagesQuery)->will($this->returnValue($images));
+        $this->database->expects($this->once())->method('getLastModified')->with($this->user)->will($this->returnValue($date));
 
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Images'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setLastModified')->with($date);
@@ -225,8 +225,8 @@ class DatabaseOperationsTest extends ListenerTests {
      */
     public function testCanLoadUser() {
         $date = new DateTime();
-        $this->database->expects($this->once())->method('getNumImages')->with($this->publicKey)->will($this->returnValue(123));
-        $this->database->expects($this->once())->method('getLastModified')->with($this->publicKey)->will($this->returnValue($date));
+        $this->database->expects($this->once())->method('getNumImages')->with($this->user)->will($this->returnValue(123));
+        $this->database->expects($this->once())->method('getLastModified')->with($this->user)->will($this->returnValue($date));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\User'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setLastModified')->with($date);
 
@@ -237,7 +237,7 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::loadStats
      */
     public function testCanLoadStats() {
-        $this->userLookup->expects($this->once())->method('getPublicKeys')->will(
+        $this->userLookup->expects($this->once())->method('getUsers')->will(
             $this->returnValue(array('user1', 'user2'))
         );
 

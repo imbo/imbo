@@ -77,7 +77,7 @@ STATUS;
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   <user>
-    <publicKey>{$model->getPublicKey()}</publicKey>
+    <id>{$model->getUserId()}</id>
     <numImages>{$model->getNumImages()}</numImages>
     <lastModified>{$this->dateFormatter->formatDate($model->getLastModified())}</lastModified>
   </user>
@@ -98,8 +98,8 @@ USER;
         foreach ($model->getImages() as $image) {
             $images .= '<image>';
 
-            if (empty($fields) || isset($fields['publicKey'])) {
-                $images .= '<publicKey>' . $image->getPublicKey() . '</publicKey>';
+            if (empty($fields) || isset($fields['user'])) {
+                $images .= '<user>' . $image->getUser() . '</user>';
             }
 
             if (empty($fields) || isset($fields['imageIdentifier'])) {
@@ -232,7 +232,7 @@ DATA;
         $numUsers = 0;
 
         foreach ($model->getUsers() as $user => $stats) {
-            $users .= '<user publicKey="' . $user . '">' . $this->formatArray($stats) . '</user>';
+            $users .= '<user id="' . $user . '">' . $this->formatArray($stats) . '</user>';
             $numUsers++;
         }
 

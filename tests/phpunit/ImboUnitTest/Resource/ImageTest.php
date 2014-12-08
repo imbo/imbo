@@ -84,12 +84,12 @@ class ImageTest extends ResourceTests {
      * @covers Imbo\Resource\Image::getImage
      */
     public function testSupportsHttpGet() {
-        $publicKey = 'christer';
+        $user = 'christer';
         $imageIdentifier = 'imageIdentifier';
 
         $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
 
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue($user));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
 
         $this->response->headers = $responseHeaders;

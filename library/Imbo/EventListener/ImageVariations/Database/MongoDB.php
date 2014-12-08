@@ -85,11 +85,11 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function storeImageVariationMetadata($publicKey, $imageIdentifier, $width, $height) {
+    public function storeImageVariationMetadata($user, $imageIdentifier, $width, $height) {
         try {
             $this->getCollection()->insert([
                 'added' => time(),
-                'publicKey' => $publicKey,
+                'user' => $user,
                 'imageIdentifier'  => $imageIdentifier,
                 'width' => $width,
                 'height' => $height,
@@ -104,9 +104,9 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getBestMatch($publicKey, $imageIdentifier, $width) {
+    public function getBestMatch($user, $imageIdentifier, $width) {
         $query = [
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
             'width' => [
                 '$gte' => $width,
@@ -128,9 +128,9 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteImageVariations($publicKey, $imageIdentifier, $width = null) {
+    public function deleteImageVariations($user, $imageIdentifier, $width = null) {
         $query = [
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
         ];
 

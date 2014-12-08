@@ -53,9 +53,9 @@ Feature: Imbo provides an images endpoint
         Examples:
             | filter                           | response |
             | foobar                           | #^{"search":{.*?},"images":\[\]}$# |
-            | fc7d2d06993047a0b5056e8fac4462a2 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"fc7d2d06993047a0b5056e8fac4462a2","originalChecksum":"fc7d2d06993047a0b5056e8fac4462a2","extension":"png","size":95576,"width":599,"height":417,"mime":"image\\/png","imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2","publicKey":"publickey"}\]}$# |
-            | f3210f1bb34bfbfa432cc3560be40761 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"f3210f1bb34bfbfa432cc3560be40761","originalChecksum":"f3210f1bb34bfbfa432cc3560be40761","extension":"jpg","size":64828,"width":665,"height":463,"mime":"image\\/jpeg","imageIdentifier":"f3210f1bb34bfbfa432cc3560be40761","publicKey":"publickey"}\]}$# |
-            | b5426b4c008e378c201526d2baaec599 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"b5426b4c008e378c201526d2baaec599","originalChecksum":"b5426b4c008e378c201526d2baaec599","extension":"gif","size":66020,"width":665,"height":463,"mime":"image\\/gif","imageIdentifier":"b5426b4c008e378c201526d2baaec599","publicKey":"publickey"}\]}$# |
+            | fc7d2d06993047a0b5056e8fac4462a2 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"fc7d2d06993047a0b5056e8fac4462a2","originalChecksum":"fc7d2d06993047a0b5056e8fac4462a2","extension":"png","size":95576,"width":599,"height":417,"mime":"image\\/png","imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2","user":"publickey"}\]}$# |
+            | f3210f1bb34bfbfa432cc3560be40761 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"f3210f1bb34bfbfa432cc3560be40761","originalChecksum":"f3210f1bb34bfbfa432cc3560be40761","extension":"jpg","size":64828,"width":665,"height":463,"mime":"image\\/jpeg","imageIdentifier":"f3210f1bb34bfbfa432cc3560be40761","user":"publickey"}\]}$# |
+            | b5426b4c008e378c201526d2baaec599 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"b5426b4c008e378c201526d2baaec599","originalChecksum":"b5426b4c008e378c201526d2baaec599","extension":"gif","size":66020,"width":665,"height":463,"mime":"image\\/gif","imageIdentifier":"b5426b4c008e378c201526d2baaec599","user":"publickey"}\]}$# |
 
     Scenario Outline: Fetch images with a filter on checksums
         Given I use "publickey" and "privatekey" for public and private keys
@@ -71,9 +71,9 @@ Feature: Imbo provides an images endpoint
         Examples:
             | filter                           | response |
             | foobar                           | #^{"search":{.*?},"images":\[\]}$# |
-            | fc7d2d06993047a0b5056e8fac4462a2 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"fc7d2d06993047a0b5056e8fac4462a2","originalChecksum":"fc7d2d06993047a0b5056e8fac4462a2","extension":"png","size":95576,"width":599,"height":417,"mime":"image\\/png","imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2","publicKey":"publickey"}\]}$# |
-            | f3210f1bb34bfbfa432cc3560be40761 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"f3210f1bb34bfbfa432cc3560be40761","originalChecksum":"f3210f1bb34bfbfa432cc3560be40761","extension":"jpg","size":64828,"width":665,"height":463,"mime":"image\\/jpeg","imageIdentifier":"f3210f1bb34bfbfa432cc3560be40761","publicKey":"publickey"}\]}$# |
-            | b5426b4c008e378c201526d2baaec599 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"b5426b4c008e378c201526d2baaec599","originalChecksum":"b5426b4c008e378c201526d2baaec599","extension":"gif","size":66020,"width":665,"height":463,"mime":"image\\/gif","imageIdentifier":"b5426b4c008e378c201526d2baaec599","publicKey":"publickey"}\]}$# |
+            | fc7d2d06993047a0b5056e8fac4462a2 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"fc7d2d06993047a0b5056e8fac4462a2","originalChecksum":"fc7d2d06993047a0b5056e8fac4462a2","extension":"png","size":95576,"width":599,"height":417,"mime":"image\\/png","imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2","user":"publickey"}\]}$# |
+            | f3210f1bb34bfbfa432cc3560be40761 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"f3210f1bb34bfbfa432cc3560be40761","originalChecksum":"f3210f1bb34bfbfa432cc3560be40761","extension":"jpg","size":64828,"width":665,"height":463,"mime":"image\\/jpeg","imageIdentifier":"f3210f1bb34bfbfa432cc3560be40761","user":"publickey"}\]}$# |
+            | b5426b4c008e378c201526d2baaec599 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"b5426b4c008e378c201526d2baaec599","originalChecksum":"b5426b4c008e378c201526d2baaec599","extension":"gif","size":66020,"width":665,"height":463,"mime":"image\\/gif","imageIdentifier":"b5426b4c008e378c201526d2baaec599","user":"publickey"}\]}$# |
 
     Scenario Outline: Fetch images only displaying certain fields
         Given I use "publickey" and "privatekey" for public and private keys
@@ -149,4 +149,4 @@ Feature: Imbo provides an images endpoint
 
         Examples:
             | filter                                               | response |
-            | originalChecksums[]=b60df41830245ee8f278e3ddfe5238a3 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"b60df41830245ee8f278e3ddfe5238a3","originalChecksum":"b60df41830245ee8f278e3ddfe5238a3","extension":"png","size":12505,"width":1024,"height":256,"mime":"image\\/png","imageIdentifier":"b60df41830245ee8f278e3ddfe5238a3","publicKey":"publickey"}\]}$# |
+            | originalChecksums[]=b60df41830245ee8f278e3ddfe5238a3 | #^{"search":{.*?},"images":\[{"added":"[^"]+","updated":"[^"]+","checksum":"b60df41830245ee8f278e3ddfe5238a3","originalChecksum":"b60df41830245ee8f278e3ddfe5238a3","extension":"png","size":12505,"width":1024,"height":256,"mime":"image\\/png","imageIdentifier":"b60df41830245ee8f278e3ddfe5238a3","user":"publickey"}\]}$# |

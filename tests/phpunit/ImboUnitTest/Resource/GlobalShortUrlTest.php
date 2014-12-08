@@ -70,7 +70,7 @@ class GlobalShortUrlTest extends ResourceTests {
      */
     public function testCanTriggerAnImageGetEventWhenRequestedWithAValidShortUrl() {
         $id = 'aaaaaaa';
-        $publicKey = 'christer';
+        $user = 'christer';
         $imageIdentifier = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         $extension = 'png';
         $query = array(
@@ -82,13 +82,13 @@ class GlobalShortUrlTest extends ResourceTests {
 
         $route = $this->getMock('Imbo\Router\Route');
         $route->expects($this->at(0))->method('get')->with('shortUrlId')->will($this->returnValue($id));
-        $route->expects($this->at(1))->method('set')->with('publicKey', $publicKey);
+        $route->expects($this->at(1))->method('set')->with('user', $user);
         $route->expects($this->at(2))->method('set')->with('imageIdentifier', $imageIdentifier);
         $route->expects($this->at(3))->method('set')->with('extension', $extension);
         $this->request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
         $this->request->expects($this->once())->method('getUri')->will($this->returnValue('http://imbo/s/' . $id));
         $this->database->expects($this->once())->method('getShortUrlParams')->with($id)->will($this->returnValue(array(
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
             'extension' => $extension,
             'query' => $query,

@@ -55,12 +55,12 @@ class DoctrineTest extends DatabaseTests {
         $this->pdo = new PDO('sqlite::memory:');
         $this->pdo->query('
             CREATE TABLE IF NOT EXISTS imagevariations (
-                publicKey TEXT NOT NULL,
+                user TEXT NOT NULL,
                 imageIdentifier TEXT NOT NULL,
                 width INTEGER NOT NULL,
                 height INTEGER NOT NULL,
                 added INTEGER NOT NULL,
-                PRIMARY KEY (publicKey,imageIdentifier,width)
+                PRIMARY KEY (user,imageIdentifier,width)
             )
         ');
 

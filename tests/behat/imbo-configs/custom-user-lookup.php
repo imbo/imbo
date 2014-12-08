@@ -19,11 +19,15 @@ class StaticUserLookup implements UserLookupInterface {
         return ['private'];
     }
 
-    public function getPublicKeys(Query $query = null) {
+    public function getUsers(Query $query = null) {
         return ['public'];
     }
 
     public function publicKeyExists($publicKey) {
+        return $publicKey === 'public';
+    }
+
+    public function userExists($publicKey) {
         return $publicKey === 'public';
     }
 }
