@@ -37,6 +37,10 @@ class ResponseSender implements ListenerInterface {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
+        // Vary on public key header. Public key specified in query and URL path doesn't have to be
+        // taken into consideration, since they will have varying URLs
+        $response->setVary('X-Imbo-PublicKey', false);
+
         // Optionally mark this response as not modified
         $response->isNotModified($request);
 
