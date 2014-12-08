@@ -38,7 +38,7 @@ class ImageVariationsTest extends ListenerTests {
     private $imageModel;
     private $imageStorage;
     private $eventManager;
-    private $publicKey = 'pubkey';
+    private $user = 'user';
     private $imageIdentifier = 'imgid';
 
     /**
@@ -70,7 +70,7 @@ class ImageVariationsTest extends ListenerTests {
         $this->imageModel->method('getChecksum')->willReturn($this->imageIdentifier);
 
         $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->request->expects($this->any())->method('getImage')->will($this->returnValue($this->imageModel));
         $this->request->query = $this->query;
@@ -321,7 +321,7 @@ class ImageVariationsTest extends ListenerTests {
         $this->imageModel->expects($this->once())->method('getHeight')->will($this->returnValue($height));
         $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue($transformations));
         $this->db->expects($this->once())->method('getBestMatch')->with(
-            $this->publicKey,
+            $this->user,
             $this->imageIdentifier,
             512
         )->will($this->returnValue(null));
@@ -352,7 +352,7 @@ class ImageVariationsTest extends ListenerTests {
         $this->imageModel->expects($this->atLeastOnce())->method('getHeight')->will($this->returnValue($height));
         $this->request->expects($this->atLeastOnce())->method('getTransformations')->will($this->returnValue($transformations));
         $this->db->expects($this->atLeastOnce())->method('getBestMatch')->with(
-            $this->publicKey,
+            $this->user,
             $this->imageIdentifier,
             $transformationWidth
         )->will($this->returnValue(['width' => $variationWidth, 'height' => 600]));
@@ -363,7 +363,7 @@ class ImageVariationsTest extends ListenerTests {
         ]);
 
         $this->storage->expects($this->atLeastOnce())->method('getImageVariation')->with(
-            $this->publicKey,
+            $this->user,
             $this->imageIdentifier,
             $variationWidth
         )->will($this->returnValue(false));
@@ -400,7 +400,7 @@ class ImageVariationsTest extends ListenerTests {
         $this->imageModel->expects($this->once())->method('getHeight')->will($this->returnValue($height));
         $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue($transformations));
         $this->db->expects($this->once())->method('getBestMatch')->with(
-            $this->publicKey,
+            $this->user,
             $this->imageIdentifier,
             $transformationWidth
         )->will($this->returnValue(['width' => $variationWidth, 'height' => $variationHeight]));
@@ -411,13 +411,13 @@ class ImageVariationsTest extends ListenerTests {
         ]);
 
         $this->storage->expects($this->once())->method('getImageVariation')->with(
-            $this->publicKey,
+            $this->user,
             $this->imageIdentifier,
             $variationWidth
         )->will($this->returnValue($variationBlob));
 
         $this->imageStorage->expects($this->once())->method('getLastModified')->with(
-            $this->publicKey,
+            $this->user,
             $this->imageIdentifier
         )->will($this->returnValue($lastModified));
 
@@ -441,11 +441,11 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\ImageVariations::deleteVariations
      * @expectedException PHPUnit_Framework_Error
-     * @expectedExceptionMessage Could not delete image variation metadata for pubkey (imgid)
+     * @expectedExceptionMessage Could not delete image variation metadata for user (imgid)
      */
     public function testTriggersWarningOnFailedDeleteFromDatabase() {
         $this->db->expects($this->once())->method('deleteImageVariations')->with(
-            $this->publicKey,
+            $this->user,
             $this->imageIdentifier
         )->will($this->throwException(new DatabaseException()));
 
@@ -455,11 +455,11 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\ImageVariations::deleteVariations
      * @expectedException PHPUnit_Framework_Error
-     * @expectedExceptionMessage Could not delete image variations from storage for pubkey (imgid)
+     * @expectedExceptionMessage Could not delete image variations from storage for user (imgid)
      */
     public function testTriggersWarningOnFailedDeleteFromStorage() {
         $this->storage->expects($this->once())->method('deleteImageVariations')->with(
-            $this->publicKey,
+            $this->user,
             $this->imageIdentifier
         )->will($this->throwException(new StorageException()));
 
@@ -471,12 +471,12 @@ class ImageVariationsTest extends ListenerTests {
      */
     public function testDoesNotTriggerWarningsOnSuccessfulVariationsDelete() {
         $this->db->expects($this->once())->method('deleteImageVariations')->with(
-            $this->publicKey,
+            $this->user,
             $this->imageIdentifier
         );
 
         $this->storage->expects($this->once())->method('deleteImageVariations')->with(
-            $this->publicKey,
+            $this->user,
             $this->imageIdentifier
         );
 
@@ -505,7 +505,7 @@ class ImageVariationsTest extends ListenerTests {
         $this->storage
              ->expects($this->exactly(6))
              ->method('storeImageVariation')
-             ->with($this->publicKey, $this->imageIdentifier, $this->anything(), $this->greaterThan(0));
+             ->with($this->user, $this->imageIdentifier, $this->anything(), $this->greaterThan(0));
 
         $listener->generateVariations($this->event);
     }
@@ -556,9 +556,9 @@ class ImageVariationsTest extends ListenerTests {
             ->expects($this->exactly(3))
             ->method('storeImageVariation')
             ->withConsecutive(
-                [$this->publicKey, $this->imageIdentifier, $this->anything(), 865],
-                [$this->publicKey, $this->imageIdentifier, $this->anything(), 562],
-                [$this->publicKey, $this->imageIdentifier, $this->anything(), 365]
+                [$this->user, $this->imageIdentifier, $this->anything(), 865],
+                [$this->user, $this->imageIdentifier, $this->anything(), 562],
+                [$this->user, $this->imageIdentifier, $this->anything(), 365]
             );
 
         $listener->generateVariations($this->event);
@@ -581,8 +581,8 @@ class ImageVariationsTest extends ListenerTests {
             ->expects($this->exactly(2))
             ->method('storeImageVariation')
             ->withConsecutive(
-                [$this->publicKey, $this->imageIdentifier, $this->anything(), 1337],
-                [$this->publicKey, $this->imageIdentifier, $this->anything(), 410]
+                [$this->user, $this->imageIdentifier, $this->anything(), 1337],
+                [$this->user, $this->imageIdentifier, $this->anything(), 410]
             );
 
         $listener->generateVariations($this->event);
@@ -591,7 +591,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\ImageVariations::generateVariations
      * @expectedException PHPUnit_Framework_Error
-     * @expectedExceptionMessage Could not generate image variation for pubkey (imgid), width: 512
+     * @expectedExceptionMessage Could not generate image variation for user (imgid), width: 512
      */
     public function testGenerateVariationsTriggersWarningOnTransformationException() {
         $this->imageModel->method('getWidth')->willReturn(1024);
@@ -607,7 +607,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\ImageVariations::generateVariations
      * @expectedException PHPUnit_Framework_Error
-     * @expectedExceptionMessage Could not store image variation for pubkey (imgid), width: 512
+     * @expectedExceptionMessage Could not store image variation for user (imgid), width: 512
      */
     public function testGenerateVariationsTriggersWarningOnStorageException() {
         $this->imageModel->method('getWidth')->willReturn(1024);
@@ -622,7 +622,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\ImageVariations::generateVariations
      * @expectedException PHPUnit_Framework_Error
-     * @expectedExceptionMessage Could not store image variation metadata for pubkey (imgid), width: 512
+     * @expectedExceptionMessage Could not store image variation metadata for user (imgid), width: 512
      */
     public function testGenerateVariationsTriggersWarningOnDatabaseException() {
         $this->imageModel->method('getWidth')->willReturn(1024);

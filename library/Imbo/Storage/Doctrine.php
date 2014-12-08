@@ -78,20 +78,20 @@ class Doctrine implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function store($publicKey, $imageIdentifier, $imageData) {
+    public function store($user, $imageIdentifier, $imageData) {
         $now = time();
 
-        if ($this->imageExists($publicKey, $imageIdentifier)) {
-            return (boolean) $this->getConnection()->update($this->getTableName($publicKey, $imageIdentifier), array(
+        if ($this->imageExists($user, $imageIdentifier)) {
+            return (boolean) $this->getConnection()->update($this->getTableName($user, $imageIdentifier), array(
                 'updated' => $now,
             ), array(
-                'publicKey' => $publicKey,
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
             ));
         }
 
-        return (boolean) $this->getConnection()->insert($this->getTableName($publicKey, $imageIdentifier), array(
-            'publicKey'       => $publicKey,
+        return (boolean) $this->getConnection()->insert($this->getTableName($user, $imageIdentifier), array(
+            'user'            => $user,
             'imageIdentifier' => $imageIdentifier,
             'data'            => $imageData,
             'updated'         => $now,
@@ -101,13 +101,13 @@ class Doctrine implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete($publicKey, $imageIdentifier) {
-        if (!$this->imageExists($publicKey, $imageIdentifier)) {
+    public function delete($user, $imageIdentifier) {
+        if (!$this->imageExists($user, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
 
-        return (boolean) $this->getConnection()->delete($this->getTableName($publicKey, $imageIdentifier), array(
-            'publicKey' => $publicKey,
+        return (boolean) $this->getConnection()->delete($this->getTableName($user, $imageIdentifier), array(
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
         ));
     }
@@ -115,15 +115,15 @@ class Doctrine implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImage($publicKey, $imageIdentifier) {
-        return $this->getField($publicKey, $imageIdentifier, 'data');
+    public function getImage($user, $imageIdentifier) {
+        return $this->getField($user, $imageIdentifier, 'data');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLastModified($publicKey, $imageIdentifier) {
-        $timestamp = (int) $this->getField($publicKey, $imageIdentifier, 'updated');
+    public function getLastModified($user, $imageIdentifier) {
+        $timestamp = (int) $this->getField($user, $imageIdentifier, 'updated');
 
         return new DateTime('@' . $timestamp, new DateTimeZone('UTC'));
     }
@@ -140,9 +140,9 @@ class Doctrine implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function imageExists($publicKey, $imageIdentifier) {
+    public function imageExists($user, $imageIdentifier) {
         try {
-            return (boolean) $this->getField($publicKey, $imageIdentifier, 'publicKey');
+            return (boolean) $this->getField($user, $imageIdentifier, 'user');
         } catch (StorageException $e) {
             return false;
         }
@@ -151,18 +151,18 @@ class Doctrine implements StorageInterface {
     /**
      * Fetch a field from the image table
      *
-     * @param string $publicKey The public key
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier
      * @param string $field The field to fetch
      */
-    private function getField($publicKey, $imageIdentifier, $field) {
+    private function getField($user, $imageIdentifier, $field) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select($field)
-              ->from($this->getTableName($publicKey, $imageIdentifier), 'i')
-              ->where('publicKey = :publicKey')
+              ->from($this->getTableName($user, $imageIdentifier), 'i')
+              ->where('user = :user')
               ->andWhere('imageIdentifier = :imageIdentifier')
               ->setParameters(array(
-                  ':publicKey'       => $publicKey,
+                  ':user'            => $user,
                   ':imageIdentifier' => $imageIdentifier,
               ));
 
@@ -206,11 +206,11 @@ class Doctrine implements StorageInterface {
      * the image identifier. The default implementation does not use them for anything, and simply
      * returns the default table name.
      *
-     * @param string $publicKey The public key of the user
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier to fetch
      * @return string Returns a table name where the image is located
      */
-    protected function getTableName($publicKey, $imageIdentifier) {
+    protected function getTableName($user, $imageIdentifier) {
         return $this->tableName;
     }
 }

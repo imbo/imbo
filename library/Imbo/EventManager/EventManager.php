@@ -75,10 +75,10 @@ class EventManager {
      *
      * @param string $name The name of the handler that owns the callback
      * @param array $events Which events the callback will trigger for
-     * @param array $publicKeys Public key filter for the events
+     * @param array $users User filter for the events
      * @return self
      */
-    public function addCallbacks($name, array $events, array $publicKeys = array()) {
+    public function addCallbacks($name, array $events, array $users = array()) {
         // Default priority
         $defaultPriority = 0;
 
@@ -93,7 +93,7 @@ class EventManager {
                 $this->callbacks[$event]->insert(array(
                     'handler' => $name,
                     'method' => $callback,
-                    'publicKeys' => $publicKeys,
+                    'users' => $users,
                 ), $defaultPriority);
             } else if (is_array($callback)) {
                 // 'eventName' => array( ... )
@@ -107,14 +107,14 @@ class EventManager {
                     $this->callbacks[$event]->insert(array(
                         'handler' => $name,
                         'method' => $method,
-                        'publicKeys' => $publicKeys,
+                        'users' => $users,
                     ), $priority);
                 }
             } else if (is_int($callback)) {
                 // We have a closure as a callback, so $callback is the actual priority
                 $this->callbacks[$event]->insert(array(
                     'handler' => $name,
-                    'publicKeys' => $publicKeys,
+                    'users' => $users,
                 ), $callback);
             } else {
                 throw new InvalidArgumentException('Invalid event definition for listener: ' . $name, 500);
@@ -177,8 +177,8 @@ class EventManager {
                 $event->setArgument($key, $value);
             }
 
-            // Fetch current public key
-            $publicKey = $event->getRequest()->getPublicKey();
+            // Fetch current user
+            $user = $event->getRequest()->getUser();
 
             // Trigger all listeners for this event and pass in the event instance
             foreach (clone $this->callbacks[$eventName] as $listener) {
@@ -189,9 +189,9 @@ class EventManager {
                     $callback = array($callback, $listener['method']);
                 }
 
-                $publicKeys = $listener['publicKeys'];
+                $users = $listener['users'];
 
-                if (!$this->triggersFor($publicKey, $publicKeys)) {
+                if (!$this->triggersFor($user, $users)) {
                     continue;
                 }
 
@@ -233,12 +233,12 @@ class EventManager {
     /**
      * Check if a listener will trigger for a given public key
      *
-     * @param string $publicKey The public key to check for, can be null
+     * @param string $user The user to check for, can be null
      * @param array $filter The array from the listener with "whitelist" and "blacklist"
      * @return boolean
      */
-    private function triggersFor($publicKey = null, array $filter = array()) {
-        if (empty($publicKey) || empty($filter)) {
+    private function triggersFor($user = null, array $filter = array()) {
+        if (empty($user) || empty($filter)) {
             return true;
         }
 
@@ -252,10 +252,10 @@ class EventManager {
             empty($whitelist) && empty($blacklist) ||
 
             // Whitelist is empty, and the public key is not blacklisted
-            empty($whitelist) && !isset($blacklist[$publicKey]) ||
+            empty($whitelist) && !isset($blacklist[$user]) ||
 
             // Blacklist is empty, and the public key is whitelisted
-            empty($blacklist) && isset($whitelist[$publicKey])
+            empty($blacklist) && isset($whitelist[$user])
         ) {
             return true;
         }

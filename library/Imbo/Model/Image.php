@@ -119,11 +119,11 @@ class Image implements ModelInterface {
     private $updated;
 
     /**
-     * Public key
+     * User
      *
      * @var string
      */
-    private $publicKey;
+    private $user;
 
     /**
      * Image identifier
@@ -336,22 +336,22 @@ class Image implements ModelInterface {
     }
 
     /**
-     * Get the public key
+     * Get the user
      *
      * @return string
      */
-    public function getPublicKey() {
-        return $this->publicKey;
+    public function getUser() {
+        return $this->user;
     }
 
     /**
-     * Set the public key
+     * Set the user
      *
-     * @param string $publicKey The public key
+     * @param string $user The user
      * @return Image
      */
-    public function setPublicKey($publicKey) {
-        $this->publicKey = $publicKey;
+    public function setUser($user) {
+        $this->user = $user;
 
         return $this;
     }

@@ -52,7 +52,7 @@ class DoctrineTest extends DatabaseTests {
         $this->pdo->query("
             CREATE TABLE IF NOT EXISTS imageinfo (
                 id INTEGER PRIMARY KEY NOT NULL,
-                publicKey TEXT NOT NULL,
+                user TEXT NOT NULL,
                 imageIdentifier TEXT NOT NULL,
                 size INTEGER NOT NULL,
                 extension TEXT NOT NULL,
@@ -63,7 +63,7 @@ class DoctrineTest extends DatabaseTests {
                 height INTEGER NOT NULL,
                 checksum TEXT NOT NULL,
                 originalChecksum TEXT NOT NULL,
-                UNIQUE (publicKey,imageIdentifier)
+                UNIQUE (user,imageIdentifier)
             )
         ");
         $this->pdo->query("
@@ -77,7 +77,7 @@ class DoctrineTest extends DatabaseTests {
         $this->pdo->query("
             CREATE TABLE IF NOT EXISTS shorturl (
                 shortUrlId TEXT PRIMARY KEY NOT NULL,
-                publicKey TEXT NOT NULL,
+                user TEXT NOT NULL,
                 imageIdentifier TEXT NOT NULL,
                 extension TEXT,
                 query TEXT NOT NULL
@@ -85,7 +85,7 @@ class DoctrineTest extends DatabaseTests {
         ");
         $this->pdo->query("
             CREATE INDEX shorturlparams ON shorturl (
-                publicKey,
+                user,
                 imageIdentifier,
                 extension,
                 query

@@ -73,8 +73,17 @@ class Request extends SymfonyRequest {
         return (
             $this->headers->get('X-Imbo-PublicKey', null) ?:
             $this->query->get('publicKey', null) ?:
-            ($this->route ? $this->route->get('publicKey') : null)
+            ($this->route ? $this->route->get('user') : null)
         );
+    }
+
+    /**
+     * Get the user found in the request
+     *
+     * @return string
+     */
+    public function getUser() {
+        return $this->route ? $this->route->get('user') : null;
     }
 
     /**

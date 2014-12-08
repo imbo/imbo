@@ -57,7 +57,7 @@ class CustomEventListener implements Imbo\EventListener\ListenerInterface {
      * @param Imbo\EventManager\EventInterface $event The current event
      */
     public function getUser(Imbo\EventManager\EventInterface $event) {
-        $event->getResponse()->headers->set('X-Imbo-CurrentUser', $event->getRequest()->getPublicKey());
+        $event->getResponse()->headers->set('X-Imbo-CurrentUser', $event->getRequest()->getUser());
     }
 }
 
@@ -87,7 +87,7 @@ return array(
         'someEventListener' => array(
             'listener' => 'CustomEventListener',
             'params' => array('key1' => 'value1', 'key2' => 'value2'),
-            'publicKeys' => array(
+            'users' => array(
                 'whitelist' => array('publickey'),
             ),
         ),

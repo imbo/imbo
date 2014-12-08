@@ -97,7 +97,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($publicKey, $imageIdentifier, Image $image) {
+    public function insertImage($user, $imageIdentifier, Image $image) {
         $now = time();
 
         if ($added = $image->getAddedDate()) {
@@ -108,10 +108,10 @@ class MongoDB implements DatabaseInterface {
             $updated = $updated->getTimestamp();
         }
 
-        if ($this->imageExists($publicKey, $imageIdentifier)) {
+        if ($this->imageExists($user, $imageIdentifier)) {
             try {
                 $this->getImageCollection()->update(
-                    ['publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier],
+                    ['user' => $user, 'imageIdentifier' => $imageIdentifier],
                     ['$set' => ['updated' => $now]],
                     ['multiple' => false]
                 );
@@ -124,7 +124,7 @@ class MongoDB implements DatabaseInterface {
 
         $data = [
             'size'             => $image->getFilesize(),
-            'publicKey'        => $publicKey,
+            'user'             => $user,
             'imageIdentifier'  => $imageIdentifier,
             'extension'        => $image->getExtension(),
             'mime'             => $image->getMimeType(),
@@ -149,10 +149,10 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteImage($publicKey, $imageIdentifier) {
+    public function deleteImage($user, $imageIdentifier) {
         try {
             $data = $this->getImageCollection()->findOne([
-                'publicKey' => $publicKey,
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
             ]);
 
@@ -161,7 +161,7 @@ class MongoDB implements DatabaseInterface {
             }
 
             $this->getImageCollection()->remove(
-                ['publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier],
+                ['user' => $user, 'imageIdentifier' => $imageIdentifier],
                 ['justOne' => true]
             );
         } catch (MongoException $e) {
@@ -174,14 +174,14 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function updateMetadata($publicKey, $imageIdentifier, array $metadata) {
+    public function updateMetadata($user, $imageIdentifier, array $metadata) {
         try {
             // Fetch existing metadata and merge with the incoming data
-            $existing = $this->getMetadata($publicKey, $imageIdentifier);
+            $existing = $this->getMetadata($user, $imageIdentifier);
             $updatedMetadata = array_merge($existing, $metadata);
 
             $this->getImageCollection()->update(
-                ['publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier],
+                ['user' => $user, 'imageIdentifier' => $imageIdentifier],
                 ['$set' => ['updated' => time(), 'metadata' => $updatedMetadata]],
                 ['multiple' => false]
             );
@@ -195,10 +195,10 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getMetadata($publicKey, $imageIdentifier) {
+    public function getMetadata($user, $imageIdentifier) {
         try {
             $data = $this->getImageCollection()->findOne([
-                'publicKey' => $publicKey,
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
             ]);
         } catch (MongoException $e) {
@@ -215,10 +215,10 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteMetadata($publicKey, $imageIdentifier) {
+    public function deleteMetadata($user, $imageIdentifier) {
         try {
             $data = $this->getImageCollection()->findOne([
-                'publicKey' => $publicKey,
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
             ]);
 
@@ -227,7 +227,7 @@ class MongoDB implements DatabaseInterface {
             }
 
             $this->getImageCollection()->update(
-                ['publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier],
+                ['user' => $user, 'imageIdentifier' => $imageIdentifier],
                 ['$set' => ['metadata' => []]],
                 ['multiple' => false]
             );
@@ -241,13 +241,13 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImages($publicKey, Query $query, Images $model) {
+    public function getImages($user, Query $query, Images $model) {
         // Initialize return value
         $images = [];
 
         // Query data
         $queryData = [
-            'publicKey' => $publicKey,
+            'user' => $user,
         ];
 
         $from = $query->from();
@@ -299,7 +299,7 @@ class MongoDB implements DatabaseInterface {
         // Fields to fetch
         $fields = array_fill_keys([
             'extension', 'added', 'checksum', 'originalChecksum', 'updated',
-            'publicKey', 'imageIdentifier', 'mime', 'size', 'width', 'height'
+            'user', 'imageIdentifier', 'mime', 'size', 'width', 'height'
         ], true);
 
         if ($query->returnMetadata()) {
@@ -336,10 +336,10 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImageProperties($publicKey, $imageIdentifier) {
+    public function getImageProperties($user, $imageIdentifier) {
         try {
             $data = $this->getImageCollection()->findOne(
-                ['publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier],
+                ['user' => $user, 'imageIdentifier' => $imageIdentifier],
                 array_fill_keys(['size', 'width', 'height', 'mime', 'extension', 'added', 'updated'], true)
             );
         } catch (MongoException $e) {
@@ -354,8 +354,8 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function load($publicKey, $imageIdentifier, Image $image) {
-        $data = $this->getImageProperties($publicKey, $imageIdentifier);
+    public function load($user, $imageIdentifier, Image $image) {
+        $data = $this->getImageProperties($user, $imageIdentifier);
 
         $image->setWidth($data['width'])
               ->setHeight($data['height'])
@@ -371,10 +371,10 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getLastModified($publicKey, $imageIdentifier = null) {
+    public function getLastModified($user, $imageIdentifier = null) {
         try {
-            // Query on the public key
-            $query = ['publicKey' => $publicKey];
+            // Query on the user
+            $query = ['user' => $user];
 
             if ($imageIdentifier) {
                 // We want information about a single image. Add the identifier to the query
@@ -406,10 +406,10 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNumImages($publicKey) {
+    public function getNumImages($user) {
         try {
             $query = [
-                'publicKey' => $publicKey,
+                'user' => $user,
             ];
 
             $result = (int) $this->getImageCollection()->find($query)->count();
@@ -423,10 +423,10 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNumBytes($publicKey) {
+    public function getNumBytes($user) {
         try {
             $result = $this->getImageCollection()->aggregate(
-                ['$match' => ['publicKey' => $publicKey]],
+                ['$match' => ['user' => $user]],
                 ['$group' => ['_id' => null, 'numBytes' => ['$sum' => '$size']]]
             )['result'];
 
@@ -454,10 +454,10 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImageMimeType($publicKey, $imageIdentifier) {
+    public function getImageMimeType($user, $imageIdentifier) {
         try {
             $data = $this->getImageCollection()->findOne([
-                'publicKey' => $publicKey,
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
             ]);
         } catch (MongoException $e) {
@@ -474,9 +474,9 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function imageExists($publicKey, $imageIdentifier) {
+    public function imageExists($user, $imageIdentifier) {
         $data = $this->getImageCollection()->findOne([
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
         ]);
 
@@ -486,11 +486,11 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertShortUrl($shortUrlId, $publicKey, $imageIdentifier, $extension = null, array $query = array()) {
+    public function insertShortUrl($shortUrlId, $user, $imageIdentifier, $extension = null, array $query = array()) {
         try {
             $data = [
                 'shortUrlId' => $shortUrlId,
-                'publicKey' => $publicKey,
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
                 'extension' => $extension,
                 'query' => serialize($query),
@@ -507,10 +507,10 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getShortUrlId($publicKey, $imageIdentifier, $extension = null, array $query = array()) {
+    public function getShortUrlId($user, $imageIdentifier, $extension = null, array $query = array()) {
         try {
             $result = $this->getShortUrlCollection()->findOne([
-                'publicKey' => $publicKey,
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
                 'extension' => $extension,
                 'query' => serialize($query),
@@ -554,9 +554,9 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteShortUrls($publicKey, $imageIdentifier, $shortUrlId = null) {
+    public function deleteShortUrls($user, $imageIdentifier, $shortUrlId = null) {
         $query = [
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
         ];
 

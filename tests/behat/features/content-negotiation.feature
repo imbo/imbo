@@ -43,7 +43,7 @@ Feature: Imbo supports content negotiation
     Scenario: If the server responds with an error, and the client included a valid extension, that type should be returned
         Given the "Accept" request header is "application/xml"
         When I request "/users/foobar.json"
-        Then I should get a response with "404 Public key not found"
+        Then I should get a response with "404 User not found"
         And the "Content-Type" response header is "application/json"
 
     Scenario Outline: Imbo uses the Accept header when encountering errors to choose the error format

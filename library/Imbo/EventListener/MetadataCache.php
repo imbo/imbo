@@ -73,7 +73,7 @@ class MetadataCache implements ListenerInterface {
         $response = $event->getResponse();
 
         $cacheKey = $this->getCacheKey(
-            $request->getPublicKey(),
+            $request->getUser(),
             $request->getImageIdentifier()
         );
 
@@ -109,7 +109,7 @@ class MetadataCache implements ListenerInterface {
         $response = $event->getResponse();
 
         $cacheKey = $this->getCacheKey(
-            $request->getPublicKey(),
+            $request->getUser(),
             $request->getImageIdentifier()
         );
 
@@ -137,7 +137,7 @@ class MetadataCache implements ListenerInterface {
         $request = $event->getRequest();
 
         $cacheKey = $this->getCacheKey(
-            $request->getPublicKey(),
+            $request->getUser(),
             $request->getImageIdentifier()
         );
 
@@ -147,11 +147,11 @@ class MetadataCache implements ListenerInterface {
     /**
      * Generate a cache key
      *
-     * @param string $publicKey The current public key
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The current image identifier
      * @return string Returns a cache key
      */
-    private function getCacheKey($publicKey, $imageIdentifier) {
-        return 'metadata:' . $publicKey . '|' . $imageIdentifier;
+    private function getCacheKey($user, $imageIdentifier) {
+        return 'metadata:' . $user . '|' . $imageIdentifier;
     }
 }

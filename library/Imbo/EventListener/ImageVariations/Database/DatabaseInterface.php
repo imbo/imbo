@@ -22,32 +22,32 @@ interface DatabaseInterface {
     /**
      * Store an image variation
      *
-     * @param string $publicKey The public key
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier of the original
      * @param int $width The width of the variation
      * @param int $height The height of the variation
      * @throws DatabaseException
      * @return boolean
      */
-    function storeImageVariationMetadata($publicKey, $imageIdentifier, $width, $height);
+    function storeImageVariationMetadata($user, $imageIdentifier, $width, $height);
 
     /**
      * Fetch the best match of an image
      *
-     * @param string $publicKey The public key
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier of the original
      * @param int $width The width we want to resize the image to
      * @return int|null Returns the closest width, or null
      */
-    function getBestMatch($publicKey, $imageIdentifier, $width);
+    function getBestMatch($user, $imageIdentifier, $width);
 
     /**
      * Remove all metadata about image variations for an image
      *
-     * @param string $publicKey The public key
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier
      * @param int $width Only delete the variation with this width
      * @return boolean
      */
-    function deleteImageVariations($publicKey, $imageIdentifier, $width = null);
+    function deleteImageVariations($user, $imageIdentifier, $width = null);
 }

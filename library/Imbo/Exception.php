@@ -25,11 +25,12 @@ interface Exception {
     const ERR_UNSPECIFIED = 0;
 
     // Auth errors
-    const AUTH_UNKNOWN_PUBLIC_KEY = 100;
+    const AUTH_UNKNOWN_USER       = 100;
     const AUTH_MISSING_PARAM      = 101;
     const AUTH_INVALID_TIMESTAMP  = 102;
     const AUTH_SIGNATURE_MISMATCH = 103;
     const AUTH_TIMESTAMP_EXPIRED  = 104;
+    const AUTH_UNKNOWN_PUBLIC_KEY = 105;
 
     // Image resource errors
     const IMAGE_ALREADY_EXISTS       = 200;

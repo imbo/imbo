@@ -38,7 +38,7 @@ class StorageOperations implements ListenerInterface {
      */
     public function deleteImage(EventInterface $event) {
         $request = $event->getRequest();
-        $event->getStorage()->delete($request->getPublicKey(), $request->getImageIdentifier());
+        $event->getStorage()->delete($request->getUser(), $request->getImageIdentifier());
     }
 
     /**
@@ -50,11 +50,11 @@ class StorageOperations implements ListenerInterface {
         $storage = $event->getStorage();
         $request = $event->getRequest();
         $response = $event->getResponse();
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
 
-        $imageData = $storage->getImage($publicKey, $imageIdentifier);
-        $lastModified = $storage->getLastModified($publicKey, $imageIdentifier);
+        $imageData = $storage->getImage($user, $imageIdentifier);
+        $lastModified = $storage->getLastModified($user, $imageIdentifier);
 
         $response->setLastModified($lastModified)
                  ->getModel()->setBlob($imageData);
@@ -69,21 +69,21 @@ class StorageOperations implements ListenerInterface {
      */
     public function insertImage(EventInterface $event) {
         $request = $event->getRequest();
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $image = $request->getImage();
         $imageIdentifier = $image->getChecksum();
         $blob = $image->getBlob();
 
         try {
-            $exists = $event->getStorage()->imageExists($publicKey, $imageIdentifier);
+            $exists = $event->getStorage()->imageExists($user, $imageIdentifier);
             $event->getStorage()->store(
-                $publicKey,
+                $user,
                 $imageIdentifier,
                 $blob
             );
         } catch (StorageException $e) {
             $event->getDatabase()->deleteImage(
-                $publicKey,
+                $user,
                 $imageIdentifier
             );
 

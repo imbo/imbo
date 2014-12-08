@@ -28,7 +28,7 @@ class StorageOperationsTest extends ListenerTests {
     private $event;
     private $request;
     private $response;
-    private $publicKey = 'key';
+    private $user = 'user';
     private $imageIdentifier = 'id';
     private $storage;
 
@@ -38,7 +38,7 @@ class StorageOperationsTest extends ListenerTests {
     public function setUp() {
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
         $this->event = $this->getMock('Imbo\EventManager\Event');
@@ -70,8 +70,8 @@ class StorageOperationsTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\StorageOperations::deleteImage
      */
-    public function testCanDeleteanImage() {
-        $this->storage->expects($this->once())->method('delete')->with($this->publicKey, $this->imageIdentifier);
+    public function testCanDeleteAnImage() {
+        $this->storage->expects($this->once())->method('delete')->with($this->user, $this->imageIdentifier);
         $this->listener->deleteImage($this->event);
     }
 
@@ -80,8 +80,8 @@ class StorageOperationsTest extends ListenerTests {
      */
     public function testCanLoadImage() {
         $date = new DateTime();
-        $this->storage->expects($this->once())->method('getImage')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue('image data'));
-        $this->storage->expects($this->once())->method('getLastModified')->with($this->publicKey, $this->imageIdentifier)->will($this->returnValue($date));
+        $this->storage->expects($this->once())->method('getImage')->with($this->user, $this->imageIdentifier)->will($this->returnValue('image data'));
+        $this->storage->expects($this->once())->method('getLastModified')->with($this->user, $this->imageIdentifier)->will($this->returnValue($date));
         $this->response->expects($this->once())->method('setLastModified')->with($date)->will($this->returnSelf());
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('setBlob')->with('image data');
@@ -103,8 +103,8 @@ class StorageOperationsTest extends ListenerTests {
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $this->response->expects($this->once())->method('setStatusCode')->with(201);
-        $this->storage->expects($this->once())->method('store')->with($this->publicKey, 'checksum', 'image data');
-        $this->storage->expects($this->once())->method('imageExists')->with($this->publicKey, 'checksum')->will($this->returnValue(false));
+        $this->storage->expects($this->once())->method('store')->with($this->user, 'checksum', 'image data');
+        $this->storage->expects($this->once())->method('imageExists')->with($this->user, 'checksum')->will($this->returnValue(false));
 
         $this->listener->insertImage($this->event);
     }
@@ -118,8 +118,8 @@ class StorageOperationsTest extends ListenerTests {
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $this->response->expects($this->once())->method('setStatusCode')->with(200);
-        $this->storage->expects($this->once())->method('store')->with($this->publicKey, 'checksum', 'image data');
-        $this->storage->expects($this->once())->method('imageExists')->with($this->publicKey, 'checksum')->will($this->returnValue(true));
+        $this->storage->expects($this->once())->method('store')->with($this->user, 'checksum', 'image data');
+        $this->storage->expects($this->once())->method('imageExists')->with($this->user, 'checksum')->will($this->returnValue(true));
 
         $this->listener->insertImage($this->event);
     }
@@ -135,11 +135,11 @@ class StorageOperationsTest extends ListenerTests {
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->storage->expects($this->once())->method('store')->with($this->publicKey, 'checksum', 'image data')->will($this->throwException(
+        $this->storage->expects($this->once())->method('store')->with($this->user, 'checksum', 'image data')->will($this->throwException(
             new StorageException('Could not store image', 500)
         ));
         $database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $database->expects($this->once())->method('deleteImage')->with($this->publicKey, 'checksum');
+        $database->expects($this->once())->method('deleteImage')->with($this->user, 'checksum');
         $this->event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
 
         $this->listener->insertImage($this->event);

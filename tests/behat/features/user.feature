@@ -4,9 +4,9 @@ Feature: Imbo provides a user endpoint
     I want to make requests against the user endpoint
 
     Scenario Outline: Request user information
-        Given I use "publickey" and "privatekey" for public and private keys
+        Given I use "user" and "key" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey.<extension>"
+        When I request "/users/user.<extension>"
         Then I should get a response with "200 OK"
         And the response body matches:
            """
@@ -15,14 +15,14 @@ Feature: Imbo provides a user endpoint
 
         Examples:
             | extension | response |
-            | json      | #^{"publicKey":"publickey","numImages":0,"lastModified":"[^"]+"}$# |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<user>\s*<publicKey>publickey</publicKey>\s*<numImages>0</numImages>\s*<lastModified>[^<]+</lastModified>\s*</user>\s*</imbo>$#ms |
+            | json      | #^{"id":"user","numImages":0,"lastModified":"[^"]+"}$# |
+            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<user>\s*<id>user</id>\s*<numImages>0</numImages>\s*<lastModified>[^<]+</lastModified>\s*</user>\s*</imbo>$#ms |
 
     Scenario: Request user that does not exist
         Given I use "foo" and "bar" for public and private keys
         When I request "/users/foo.json"
-        Then I should get a response with "404 Public key not found"
-        And the Imbo error message is "Public key not found" and the error code is "100"
+        Then I should get a response with "404 User not found"
+        And the Imbo error message is "User not found" and the error code is "100"
 
     Scenario Outline: The user endpoint only supports HTTP GET and HEAD
         Given I use "publickey" and "privatekey" for public and private keys

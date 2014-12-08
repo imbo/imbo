@@ -29,7 +29,7 @@ class MetadataCacheTest extends ListenerTests {
     private $cache;
     private $response;
     private $responseHeaders;
-    private $publicKey = 'key';
+    private $user = 'user';
     private $imageIdentifier = 'imageid';
 
     /**
@@ -38,7 +38,7 @@ class MetadataCacheTest extends ListenerTests {
     public function setUp() {
         $this->cache = $this->getMock('Imbo\Cache\CacheInterface');
         $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
@@ -157,7 +157,7 @@ class MetadataCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\MetadataCache::getCacheKey
      */
     public function testCanDeleteContentFromCache() {
-        $this->cache->expects($this->once())->method('delete')->with('metadata:' . $this->publicKey . '|' . $this->imageIdentifier);
+        $this->cache->expects($this->once())->method('delete')->with('metadata:' . $this->user . '|' . $this->imageIdentifier);
         $this->listener->deleteFromCache($this->event);
     }
 }

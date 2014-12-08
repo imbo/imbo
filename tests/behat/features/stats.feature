@@ -20,7 +20,7 @@ Feature: Imbo provides a stats endpoint
         Examples:
             | extension | response |
             | json      | {"users":{"publickey":{"numImages":3,"numBytes":226424},"user":{"numImages":0,"numBytes":0}},"total":{"numImages":3,"numUsers":2,"numBytes":226424},"custom":{.*}} |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<stats>\s*<users>\s*<user publicKey="publickey">\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*</user>\s*<user publicKey="user">\s*<numImages>0</numImages>\s*<numBytes>0</numBytes>\s*</user>\s*</users>\s*<total>\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*<numUsers>2</numUsers>\s*</total>\s*<custom>.*</custom>\s*</stats>\s*</imbo>$#ms |
+            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<stats>\s*<users>\s*<user id="publickey">\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*</user>\s*<user id="user">\s*<numImages>0</numImages>\s*<numBytes>0</numBytes>\s*</user>\s*</users>\s*<total>\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*<numUsers>2</numUsers>\s*</total>\s*<custom>.*</custom>\s*</stats>\s*</imbo>$#ms |
 
     Scenario Outline: The stats endpoint only supports HTTP GET and HEAD
         Given Imbo uses the "stats-access-and-custom-stats.php" configuration

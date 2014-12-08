@@ -45,7 +45,7 @@ class ShortUrl implements ResourceInterface {
     public function deleteShortUrl(EventInterface $event) {
         $database = $event->getDatabase();
         $request = $event->getRequest();
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
         $shortUrlId = $request->getRoute()->get('shortUrlId');
 
@@ -53,12 +53,12 @@ class ShortUrl implements ResourceInterface {
             throw new ResourceException('ShortURL not found', 404);
         }
 
-        if ($params['publicKey'] !== $publicKey || $params['imageIdentifier'] !== $imageIdentifier) {
+        if ($params['user'] !== $user || $params['imageIdentifier'] !== $imageIdentifier) {
             throw new ResourceException('ShortURL not found', 404);
         }
 
         $database->deleteShortUrls(
-            $publicKey,
+            $user,
             $imageIdentifier,
             $shortUrlId
         );

@@ -54,7 +54,7 @@ class GlobalShortUrl implements ResourceInterface {
             throw new ResourceException('Image not found', 404);
         }
 
-        $route->set('publicKey', $params['publicKey']);
+        $route->set('user', $params['user']);
         $route->set('imageIdentifier', $params['imageIdentifier']);
         $route->set('extension', $params['extension']);
 

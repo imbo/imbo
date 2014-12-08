@@ -71,7 +71,7 @@ class ArrayStorage implements UserLookupInterface {
     /**
      * {@inheritdoc}
      */
-    public function getPublicKeys(UserLookup\Query $query = null) {
+    public function getUsers(UserLookup\Query $query = null) {
         if ($query === null) {
             $query = new UserLookup\Query();
         }
@@ -84,6 +84,13 @@ class ArrayStorage implements UserLookupInterface {
      */
     public function publicKeyExists($publicKey) {
         return in_array($publicKey, $this->users);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function userExists($user) {
+        return in_array($user, $this->users);
     }
 
     /**

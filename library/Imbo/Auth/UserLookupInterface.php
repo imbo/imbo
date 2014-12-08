@@ -36,12 +36,12 @@ interface UserLookupInterface {
     function getPrivateKeys($publicKey, $mode = null);
 
     /**
-     * Fetch one or more public keys
+     * Fetch one or more users
      *
-     * @param UserLookup\Query $query A query object used to filter the public keys returned
-     * @return string[] Returns a list of public keys
+     * @param UserLookup\Query $query A query object used to filter the users returned
+     * @return string[] Returns a list of users
      */
-    function getPublicKeys(UserLookup\Query $query = null);
+    function getUsers(UserLookup\Query $query = null);
 
     /**
      * Return whether the public key given exists or not
@@ -50,4 +50,12 @@ interface UserLookupInterface {
      * @return boolean
      */
     function publicKeyExists($publicKey);
+
+    /**
+     * Return whether the user given exists or not
+     *
+     * @param  string $user The user to check
+     * @return boolean
+     */
+    function userExists($user);
 }

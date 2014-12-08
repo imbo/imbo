@@ -125,9 +125,9 @@ class ArrayStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @dataProvider getUsersAndQuery
      */
-    public function testCanGetPublicKeys(array $users, Query $query, array $expectedUsers = array()) {
+    public function testCanGetUsers(array $users, Query $query, array $expectedUsers = array()) {
         $storage = new ArrayStorage($users);
-        $this->assertSame($expectedUsers, $storage->getPublicKeys($query));
+        $this->assertSame($expectedUsers, $storage->getUsers($query));
     }
 
     public function testPublicKeyExists() {

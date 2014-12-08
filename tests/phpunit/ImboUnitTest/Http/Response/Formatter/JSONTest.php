@@ -130,7 +130,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $model = $this->getMock('Imbo\Model\User');
         $model->expects($this->once())->method('getLastModified')->will($this->returnValue($date));
         $model->expects($this->once())->method('getNumImages')->will($this->returnValue(123));
-        $model->expects($this->once())->method('getPublicKey')->will($this->returnValue('christer'));
+        $model->expects($this->once())->method('getUserId')->will($this->returnValue('christer'));
 
         $this->dateFormatter->expects($this->once())->method('formatDate')->with($date)->will($this->returnValue($formattedDate));
 
@@ -138,7 +138,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
 
         $data = json_decode($json, true);
         $this->assertSame($formattedDate, $data['lastModified']);
-        $this->assertSame('christer', $data['publicKey']);
+        $this->assertSame('christer', $data['id']);
         $this->assertSame(123, $data['numImages']);
     }
 
@@ -153,7 +153,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
 
         $addedDate = $date;
         $updatedDate = $date;
-        $publicKey = 'christer';
+        $user = 'christer';
         $imageIdentifier = 'identifier';
         $checksum = 'checksum';
         $extension = 'png';
@@ -167,7 +167,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         );
 
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $image->expects($this->once())->method('getUser')->will($this->returnValue($user));
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue($checksum));
         $image->expects($this->once())->method('getExtension')->will($this->returnValue($extension));
@@ -198,7 +198,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame($formattedDate, $image['added']);
         $this->assertSame($formattedDate, $image['updated']);
-        $this->assertSame($publicKey, $image['publicKey']);
+        $this->assertSame($user, $image['user']);
         $this->assertSame($filesize, $image['size']);
         $this->assertSame($width, $image['width']);
         $this->assertSame($height, $image['height']);

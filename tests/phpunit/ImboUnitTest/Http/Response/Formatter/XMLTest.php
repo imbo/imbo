@@ -131,13 +131,13 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $model = $this->getMock('Imbo\Model\User');
         $model->expects($this->once())->method('getLastModified')->will($this->returnValue($date));
         $model->expects($this->once())->method('getNumImages')->will($this->returnValue(123));
-        $model->expects($this->once())->method('getPublicKey')->will($this->returnValue('christer'));
+        $model->expects($this->once())->method('getUserId')->will($this->returnValue('christer'));
 
         $this->dateFormatter->expects($this->once())->method('formatDate')->with($date)->will($this->returnValue($formattedDate));
 
         $xml = $this->formatter->format($model);
 
-        $this->assertXPathMatches('//user/publicKey[.="christer"]', $xml, 'Missing public key');
+        $this->assertXPathMatches('//user/id[.="christer"]', $xml, 'Missing user');
         $this->assertXPathMatches('//user/numImages[.="123"]', $xml, 'Missing num key');
         $this->assertXPathMatches('//user/lastModified[.="' . $formattedDate . '"]', $xml, 'Missing date');
     }
@@ -153,7 +153,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $addedDate = $date;
         $updatedDate = $date;
-        $publicKey = 'christer';
+        $user = 'christer';
         $imageIdentifier = 'identifier';
         $checksum = 'checksum';
         $extension = 'png';
@@ -167,7 +167,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         );
 
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $image->expects($this->once())->method('getUser')->will($this->returnValue($user));
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue($checksum));
         $image->expects($this->once())->method('getExtension')->will($this->returnValue($extension));
@@ -198,7 +198,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         // Check image
         foreach (array(
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
             'checksum' => $checksum,
             'mime' => $mimeType,
