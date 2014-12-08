@@ -59,3 +59,16 @@ Feature: Imbo requires an access token for read operations
         And the "Accept" request header is "*/*"
         When I request "/users/publickey/images/929db9c5fc3099f7576f5655207eba47?t[]=thumbnail"
         Then I should get a response with "400 Missing access token"
+
+    Scenario: Request user information using the correct private key and a superfluous public key query parameter
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        When I request "/users/publickey?publicKey=publickey"
+        Then I should get a response with "200 OK"
+
+    Scenario: Request user information for a user with an incorrect public key specified as query parameter
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        When I request "/users/publickey?publicKey=user"
+        Then I should get a response with "400 Incorrect access token"
+        And the Imbo error message is "Incorrect access token" and the error code is "0"

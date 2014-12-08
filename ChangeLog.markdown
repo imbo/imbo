@@ -1,6 +1,11 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.x.x
+----------
+
+* #320: Allow setting public key in headers and/or query (Espen Hovlandsdal)
+
 Imbo-1.2.4
 ----------
 __2014-12-04__
