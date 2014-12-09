@@ -30,7 +30,7 @@ class Stats implements ModelInterface, ArrayAccess {
     /**
      * User stats
      *
-     * Keys are the public keys of the users , and the values is an array with two elements:
+     * Keys are the users, and the values is an array with two elements:
      *
      * (int) 'numImages' Number of images stored by this user
      * (int) 'numBytes' Number of bytes stored by this user
