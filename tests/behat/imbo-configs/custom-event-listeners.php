@@ -52,7 +52,7 @@ class CustomEventListener implements Imbo\EventListener\ListenerInterface {
     }
 
     /**
-     * Set a custom header containing the current public key
+     * Set a custom header containing the current user
      *
      * @param Imbo\EventManager\EventInterface $event The current event
      */

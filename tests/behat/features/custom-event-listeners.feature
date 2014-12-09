@@ -24,14 +24,14 @@ Feature: Imbo supports custom event handlers in the configuration
         Then the "X-Imbo-Value1" response header is "value1"
         And the "X-Imbo-Value2" response header is "value2"
 
-    Scenario: Register an event listener that will only trigger for some public keys
+    Scenario: Register an event listener that will only trigger for some users
         Given I use "publickey" and "privatekey" for public and private keys
         And Imbo uses the "custom-event-listeners.php" configuration
         And I include an access token in the query
         When I request "/users/publickey.json"
         Then the "X-Imbo-CurrentUser" response header is "publickey"
 
-    Scenario: Register an event listener that will only trigger for a given public key and make a request to another key
+    Scenario: Register an event listener that will only trigger for a given user and make a request to another key
         Given I use "user" and "key" for public and private keys
         And Imbo uses the "custom-event-listeners.php" configuration
         And I include an access token in the query
