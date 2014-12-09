@@ -9,6 +9,71 @@ If you did a :ref:`git clone <git-clone>` you could simply do a ``git pull`` to 
 
 From time to time Imbo will introduce new features or fix bugs that might require you to update the contents of the database you choose to use. This chapter will contain all information you need to keep your installation up to date. Each of the following sections include the necessary steps you need to execute when upgrading to the different versions.
 
+Imbo-2.0.0
+----------
+
+Below are the changes you need to be aware of when upgrading to Imbo-2.0.0.
+
+.. contents::
+    :local:
+    :depth: 2
+
+Public key is an authentication detail
+++++++++++++++++++++++++++++++++++++++
+
+Versions prior to 2.0.0 had a 1:1 correlation between what a ``user`` and a ``public key``. In 2.0.0, a ``user`` is the entity which images belong to, while a ``public key`` is one part of the authentication scheme. ``Public keys`` each has their own set of permissions, which can grant them access to different resources within different users.
+
+Prior to 2.0.0, both the database and endpoints worked with a field name of ``publicKey`` to identify the user. Going forward, apart from when working with authentication, ``user`` will be the new field name. This requires some database changes - see below.
+
+Doctrine
+~~~~~~~~
+
+If you use the :ref:`Doctrine database adapter <doctrine-database-adapter>` you'll need to rename the ``publicKey`` fields to ``user``. The field has been updated in the :ref:`database-setup` section. The field should be renamed while there are no write operations pending, as a write could fail before upgrading Imbo itself.
+
+.. code-block:: sql
+
+    ALTER TABLE imageinfo RENAME COLUMN publicKey to user;
+    ALTER TABLE shorturl RENAME COLUMN publicKey to user;
+    ALTER TABLE imagevariations RENAME COLUMN publicKey to user;
+
+If you use the Doctrine storage adapter for images and/or image variations, you will have to rename fields in those databases too:
+
+.. code-block:: sql
+
+    ALTER TABLE storage_images RENAME COLUMN publicKey to user;
+    ALTER TABLE storage_image_variations RENAME COLUMN publicKey to user;
+
+.. note:: The ``imagevariations`` and ``storage_image_variations`` table might not be present in your database unless you previously upgraded to 1.2.4. In this case, skip the queries affecting those tables and instead follow the instructions specified in the :ref:`database-setup` section.
+
+MongoDB
+~~~~~~~
+
+If you use the MongoDB adapter, you will need to rename the ``publicKey`` field with the following queries:
+
+.. code-block:: javascript
+
+    db.image.update({}, { $rename: { 'publicKey': 'user' } )
+    db.shortUrl.update({}, { $rename: { 'publicKey': 'user' } )
+    db.imagevariation.update({}, { $rename: { 'publicKey': 'user' } )
+
+.. note:: The ``imagevariation`` collection might not be present in your database unless you previously upgraded to 1.2.4. In this case, skip the last query and instead follow the instructions specified in the :ref:`database-setup` section.
+
+GridFS
+~~~~~~
+
+If you use the GridFS adapter, you will need to rename the ``publicKey`` field with the following query:
+
+.. code-block:: javascript
+
+    db.fs.files.update({}, { $rename: { 'publicKey': 'user' } )
+
+.. note:: The default database names for the GridFS adapters are ``imbo_storage`` and ``imbo_imagevariation_storage``. The query specified should be run on both databases. If the ``imbo_imagevariation_storage`` database does not exist, run the query on ``imbo_storage`` and follow the instructions specified in the :ref:`database-setup` section to create the appropriate indexes for the ``imbo_imagevariation_storage`` database.
+
+Imbo-1.2.4
+----------
+
+A new :ref:`Image Variations <image-variations-listener>` event listener was introduced. It is disabled by default, and to use it you will have to configure a database and storage adapter for it - depending on your choice of adapters, you might need to modify your database. See the :ref:`database-setup` section.
+
 Imbo-1.2.0
 ----------
 
