@@ -231,7 +231,7 @@ class EventManager {
     }
 
     /**
-     * Check if a listener will trigger for a given public key
+     * Check if a listener will trigger for a given user
      *
      * @param string $user The user to check for, can be null
      * @param array $filter The array from the listener with "whitelist" and "blacklist"
@@ -251,10 +251,10 @@ class EventManager {
             // Both lists are empty
             empty($whitelist) && empty($blacklist) ||
 
-            // Whitelist is empty, and the public key is not blacklisted
+            // Whitelist is empty, and the user is not blacklisted
             empty($whitelist) && !isset($blacklist[$user]) ||
 
-            // Blacklist is empty, and the public key is whitelisted
+            // Blacklist is empty, and the user is whitelisted
             empty($blacklist) && isset($whitelist[$user])
         ) {
             return true;

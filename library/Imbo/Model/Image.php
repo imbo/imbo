@@ -366,9 +366,9 @@ class Image implements ModelInterface {
     }
 
     /**
-     * Set the public key
+     * Set the image identifier
      *
-     * @param string $imageIdentifier The public key
+     * @param string $imageIdentifier The image identifier
      * @return Image
      */
     public function setImageIdentifier($imageIdentifier) {
