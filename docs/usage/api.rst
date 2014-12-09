@@ -38,13 +38,13 @@ results in:
       "endpoints": {
         "status": "http://imbo/status",
         "stats": "http://imbo/stats",
-        "user": "http://imbo/users/{publicKey}",
-        "images": "http://imbo/users/{publicKey}/images",
-        "image": "http://imbo/users/{publicKey}/images/{imageIdentifier}",
+        "user": "http://imbo/users/{user}",
+        "images": "http://imbo/users/{user}/images",
+        "image": "http://imbo/users/{user}/images/{imageIdentifier}",
         "globalShortImageUrl": "http://imbo/s/{id}",
-        "metadata": "http://imbo/users/{publicKey}/images/{imageIdentifier}/metadata",
-        "shortImageUrls": "http://imbo/users/{publicKey}/images/{imageIdentifier}/shorturls",
-        "shortImageUrl": "http://imbo/users/{publicKey}/images/{imageIdentifier}/shorturls/{id}"
+        "metadata": "http://imbo/users/{user}/images/{imageIdentifier}/metadata",
+        "shortImageUrls": "http://imbo/users/{user}/images/{imageIdentifier}/shorturls",
+        "shortImageUrl": "http://imbo/users/{user}/images/{imageIdentifier}/shorturls/{id}"
       }
     }
 
@@ -344,7 +344,7 @@ results in:
           "height": 77,
           "mime": "image/png",
           "imageIdentifier": "<image>",
-          "publicKey": "<user>",
+          "user": "<user>",
           "metadata": {
             "key": "value",
             "foo": "bar"
@@ -465,7 +465,7 @@ The generated ID of the short URL can be found in the response:
 
     curl -XPOST http://imbo/users/<user>/images/<image>/shorturls.json -d '{
       "imageIdentifier": "<image>",
-      "publicKey": "<user>",
+      "user": "<user>",
       "extension": "jpg",
       "query": "t[]=thumbnail:width=75,height=75&t[]=desaturate"
     }'
