@@ -88,7 +88,7 @@ class ResponseETagTest extends ListenerTests {
             'index route has no ETag' => array('index', false),
             'stats route has no ETag' => array('stats', false),
             'status route has no ETag' => array('status', false),
-            'user route has ETag' => array('user', true, true, '{"publicKey":"christer"}'),
+            'user route has ETag' => array('user', true, true, '{"user":"christer"}'),
             'images route has ETag' => array('images', true, true, '{"search":{"hits":0,"page":1,"limit":20,"count":0},"images":[]}'),
             'image route has ETag' => array('image', true, true, file_get_contents(FIXTURES_DIR . '/image.png')),
             'metadata route has ETag' => array('metadata', true, true, '{"foo":"bar"}'),
