@@ -59,7 +59,7 @@ Imbo ships with a small command line tool that can be used to generate private k
     $ php scripts/generatePrivateKey.php
     3b98dde5f67989a878b8b268d82f81f0858d4f1954597cc713ae161cdffcc84a
 
-The private key can be changed whenever you want as long as you remember to change it in both the server configuration and in the client you use. The public key can not be changed easily as database and storage adapters use it when storing/fetching images and metadata.
+The private key can be changed whenever you want as long as you remember to change it in both the server configuration and in the client you use. The user can not be changed easily as database and storage adapters use it when storing/fetching images and metadata.
 
 Custom user lookup adapter
 ++++++++++++++++++++++++++
@@ -374,7 +374,7 @@ This adapter simply stores all images on the file system. It has a single parame
 ``dataDir``
     The base path where the images are stored.
 
-This adapter is configured to create subdirectories inside of ``dataDir`` based on the public key of the user and the checksum of the images added to Imbo. The algorithm that generates the path simply takes the three first characters of the public key and creates directories for each of them, then the full public key, then a directory of each of the first characters in the image identifier, and lastly it stores the image in a file with a filename equal to the image identifier itself.
+This adapter is configured to create subdirectories inside of ``dataDir`` based on the user and the checksum of the images added to Imbo. The algorithm that generates the path simply takes the three first characters of the user and creates directories for each of them, then the full user, then a directory of each of the first characters in the image identifier, and lastly it stores the image in a file with a filename equal to the image identifier itself.
 
 Examples
 ^^^^^^^^
@@ -540,7 +540,7 @@ Event listeners can be configured in the following ways:
         // ...
     ];
 
-4) Use a class implementing the ``Imbo\EventListener\ListenerInterface`` interface together with an optional public key filter:
+4) Use a class implementing the ``Imbo\EventListener\ListenerInterface`` interface together with an optional user filter:
 
 .. code-block:: php
 
@@ -551,7 +551,7 @@ Event listeners can be configured in the following ways:
         'eventListeners' => [
             'maxImageSize' => [
                 'listener' => new Imbo\EventListener\MaxImageSize(1024, 768),
-                'publicKeys' => [
+                'users' => [
                     'whitelist' => ['user'],
                     // 'blacklist' => ['someotheruser'],
                 ],
@@ -568,7 +568,7 @@ a) a string representing a class name of a class implementing the ``Imbo\EventLi
 b) an instance of the ``Imbo\EventListener\ListenerInterface`` interface
 c) a closure returning an instance ``Imbo\EventListener\ListenerInterface``
 
-The ``publicKeys`` element is an array that you can use if you want your listener to only be triggered for some users (public keys). The value of this is an array with two elements, ``whitelist`` and ``blacklist``, where ``whitelist`` is an array of public keys you **want** your listener to trigger for, and ``blacklist`` is an array of public keys you **don't want** your listener to trigger for. ``publicKeys`` is optional, and per default the listener will trigger for all users.
+The ``users`` element is an array that you can use if you want your listener to only be triggered for some users. The value of this is an array with two elements, ``whitelist`` and ``blacklist``, where ``whitelist`` is an array of users you **want** your listener to trigger for, and ``blacklist`` is an array of users you **don't want** your listener to trigger for. ``users`` is optional, and per default the listener will trigger for all users.
 
 There also exists a ``params`` key that can be used to specify parameters for the event listener, if you choose to specify the listener as a string in the ``listener`` key:
 
@@ -581,7 +581,7 @@ There also exists a ``params`` key that can be used to specify parameters for th
         'eventListeners' => [
             'maxImageSize' => [
                 'listener' => 'Imbo\EventListener\MaxImageSize',
-                'publicKeys' => [
+                'users' => [
                     'whitelist' => ['user'],
                     // 'blacklist' => ['someotheruser'],
                 ],
@@ -612,7 +612,7 @@ The value of the ``params`` array will be sent to the constructor of the event l
                 },
                 'events' => ['image.get'],
                 'priority' => 1,
-                'publicKeys' => [
+                'users' => [
                     'whitelist' => ['user'],
                     // 'blacklist' => ['someotheruser'],
                 ],
@@ -622,7 +622,7 @@ The value of the ``params`` array will be sent to the constructor of the event l
         // ...
     ];
 
-where ``callback`` is the code you want executed, and ``events`` is an array of the events you want it triggered for. ``priority`` is the priority of the listener and defaults to 0. The higher the number, the earlier in the chain your listener will be triggered. This number can also be negative. Imbo's internal event listeners uses numbers between 0 and 100. ``publicKeys`` uses the same format as described above. If you use this method, and want your callback to trigger for multiple events with different priorities, specify an associative array in the ``events`` element, where the keys are the event names, and the values are the priorities for the different events. This way of attaching event listeners should mostly be used for quick and temporary solutions.
+where ``callback`` is the code you want executed, and ``events`` is an array of the events you want it triggered for. ``priority`` is the priority of the listener and defaults to 0. The higher the number, the earlier in the chain your listener will be triggered. This number can also be negative. Imbo's internal event listeners uses numbers between 0 and 100. ``users`` uses the same format as described above. If you use this method, and want your callback to trigger for multiple events with different priorities, specify an associative array in the ``events`` element, where the keys are the event names, and the values are the priorities for the different events. This way of attaching event listeners should mostly be used for quick and temporary solutions.
 
 All event listeners will receive an event object (which implements ``Imbo\EventManager\EventInterface``), that is described in detail in the :ref:`the-event-object` section.
 

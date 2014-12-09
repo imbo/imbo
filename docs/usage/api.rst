@@ -234,18 +234,18 @@ results in:
 .. code-block:: javascript
 
     {
-      "publicKey": "<user>",
+      "id": "<user>",
       "numImages": 42,
       "lastModified": "Wed, 18 Apr 2012 15:12:52 GMT"
     }
 
-where ``publicKey`` is the public key of the user (the same used in the URI of the request), ``numImages`` is the number of images the user has stored in Imbo and ``lastModified`` is when the user last uploaded or deleted an image, or when the user last updated metadata of an image. If the user has not added any images yet, the ``lastModified`` value will be set to the current time on the server.
+where ``id`` is the user (the same used in the URI of the request), ``numImages`` is the number of images the user has stored in Imbo and ``lastModified`` is when the user last uploaded or deleted an image, or when the user last updated metadata of an image. If the user has not added any images yet, the ``lastModified`` value will be set to the current time on the server.
 
 **Typical response codes:**
 
 * 200 OK
 * 304 Not modified
-* 404 Public key not found
+* 404 User not found
 
 .. _images-resource:
 
@@ -367,14 +367,14 @@ The ``images`` list contains image objects. Each object has the following fields
 * ``height``: The height of the image in pixels.
 * ``mime``: The mime type of the image.
 * ``imageIdentifier``: The image identifier stored in Imbo.
-* ``publicKey``: The public key of the user who owns the image.
+* ``user``: The user who owns the image.
 * ``metadata``: A JSON object containing metadata attached to the image. This field is only available if the ``metadata`` query parameter described above is used.
 
 **Typical response codes:**
 
 * 200 OK
 * 304 Not modified
-* 404 Public key not found
+* 404 User not found
 
 .. _image-resource:
 
@@ -455,7 +455,7 @@ Create a short URL
 Creating a short URL is done by requesting this resource using ``HTTP POST`` while including some parameters for the short URL in the request body. The parameters must be specified as a JSON object, and the object supports the following fields:
 
 * ``imageIdentfier``: The same image identifier as the one in the requested URI.
-* ``publicKey``: The same public key as the one in the requested URI.
+* ``user``: The same user as the one in the requested URI.
 * ``extension``: An optional extension to the image, for instance ``jpg`` or ``png``.
 * ``query``: The query string with transformations that will be applied. The format is the same as when requesting the image resource with one or more transformations. See the :doc:`image-transformations` chapter for more information regarding the transformation of images.
 
@@ -696,7 +696,7 @@ The data for the hash is generated using the following elements:
 
 * HTTP method (``PUT``, ``POST`` or ``DELETE``)
 * The URI
-* Public key of the user
+* Public key
 * GMT timestamp (``YYYY-MM-DDTHH:MM:SSZ``, for instance: ``2011-02-01T14:33:03Z``)
 
 These elements are concatenated in the above order with ``|`` as a delimiter character, and a hash is generated using the private key of the user. The following snippet shows how this can be accomplished in PHP when deleting an image:
