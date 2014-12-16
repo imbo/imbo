@@ -60,6 +60,10 @@ $config = [
      */
     'auth' => [],
 
+    'accessControl' => function() {
+        return new Auth\AccessControl\ArrayAdapter();
+    },
+
     /**
      * Database adapter
      *
