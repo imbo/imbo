@@ -11,6 +11,7 @@
 namespace Imbo\Auth\AccessControl;
 
 use Imbo\Auth\AccessControl\AccessControlAdapter as Adapter;
+use Imbo\Exception\InvalidArgumentException;
 
 /**
  * Array-backed access control adapter
@@ -41,6 +42,18 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
      * {@inheritdoc}
      */
     public function hasAccess($publicKey, $resource, $user = null) {
+        if (!isset($this->accessList[$publicKey])) {
+            return false;
+        }
+
+        foreach ($this->accessList[$publicKey] as $access) {
+            $userAccess = !$user || in_array($user, $access['users']);
+
+            if ($userAccess && in_array($resource, $access['resources'])) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -59,7 +72,7 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
      * {@inheritdoc}
      */
     public function userExists($user) {
-        return in_array($user, $this->accessList);
+        return in_array($user, $this->users);
     }
 
     /**
@@ -75,9 +88,14 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
                 $this->users[] = $publicKey;
             }
 
-            $this->accessList[] = [
+            if (is_array($privateKey)) {
+                throw new InvalidArgumentException('A public key can only have a single private key (as of 2.0.0)');
+            }
 
-            ];
+            $this->accessList[$publicKey] = [[
+                'resources' => $this->getReadWriteResources(),
+                'users' => [$publicKey]
+            ]];
         }
     }
 }
