@@ -203,6 +203,7 @@ $config = [
      * @var array
      */
     'eventListeners' => [
+        'accessControl' => 'Imbo\EventListener\AccessControl',
         'accessToken' => 'Imbo\EventListener\AccessToken',
         'auth' => 'Imbo\EventListener\Authenticate',
         'statsAccess' => [
