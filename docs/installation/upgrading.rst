@@ -52,9 +52,9 @@ If you use the MongoDB adapter, you will need to rename the ``publicKey`` field 
 
 .. code-block:: javascript
 
-    db.image.update({}, { $rename: { 'publicKey': 'user' } )
-    db.shortUrl.update({}, { $rename: { 'publicKey': 'user' } )
-    db.imagevariation.update({}, { $rename: { 'publicKey': 'user' } )
+    db.image.update({}, { $rename: { 'publicKey': 'user' } }, { multi: true })
+    db.shortUrl.update({}, { $rename: { 'publicKey': 'user' } }, { multi: true })
+    db.imagevariation.update({}, { $rename: { 'publicKey': 'user' } }, { multi: true })
 
 .. note:: The ``imagevariation`` collection might not be present in your database unless you previously upgraded to 1.2.4. In this case, skip the last query and instead follow the instructions specified in the :ref:`database-setup` section.
 
