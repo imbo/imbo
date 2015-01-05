@@ -23,47 +23,37 @@ abstract class AccessControlAdapter implements AccessControlInterface {
     /**
      * {@inheritdoc}
      */
-    public function hasAccess($publicKey, $resource, $user = null) {
-
-    }
+    abstract public function hasAccess($publicKey, $resource, $user = null);
 
     /**
      * {@inheritdoc}
      */
-    public function getUsers(UserLookup\Query $query = null) {
-
-    }
+    abstract public function getUsers(UserQuery $query = null);
 
     /**
      * {@inheritdoc}
      */
-    public function userExists($user) {
-
-    }
+    abstract public function userExists($user);
 
     /**
      * {@inheritdoc}
      */
-    final public function getReadOnlyResources() {
+    final public static function getReadOnlyResources() {
         return [
             ACI::RESOURCE_USER_GET,     ACI::RESOURCE_USER_HEAD,     ACI::RESOURCE_USER_OPTIONS,
             ACI::RESOURCE_IMAGE_GET,    ACI::RESOURCE_IMAGE_HEAD,    ACI::RESOURCE_IMAGE_OPTIONS,
             ACI::RESOURCE_IMAGES_GET,   ACI::RESOURCE_IMAGES_HEAD,   ACI::RESOURCE_IMAGES_OPTIONS,
             ACI::RESOURCE_METADATA_GET, ACI::RESOURCE_METADATA_HEAD, ACI::RESOURCE_METADATA_OPTIONS,
-            ACI::RESOURCE_SHORTURL_GET, ACI::RESOURCE_SHORTURL_HEAD, ACI::RESOURCE_SHORTURL_OPTIONS,
-
-            ACI::RESOURCE_GLOBAL_SHORTURL_GET,
-            ACI::RESOURCE_GLOBAL_SHORTURL_HEAD,
-            ACI::RESOURCE_GLOBAL_SHORTURL_OPTIONS
+            ACI::RESOURCE_SHORTURL_GET, ACI::RESOURCE_SHORTURL_HEAD, ACI::RESOURCE_SHORTURL_OPTIONS
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    final public function getReadWriteResources() {
+    final public static function getReadWriteResources() {
         return array_merge(
-            $this->getReadOnlyResources(), [
+            self::getReadOnlyResources(), [
                 ACI::RESOURCE_IMAGE_DELETE,
                 ACI::RESOURCE_IMAGES_POST,
                 ACI::RESOURCE_METADATA_POST, ACI::RESOURCE_METADATA_DELETE,

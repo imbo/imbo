@@ -49,10 +49,6 @@ interface AccessControlInterface {
     const RESOURCE_SHORTURLS_POST          = 'shorturls.post';
     const RESOURCE_SHORTURLS_DELETE        = 'shorturls.delete';
 
-    const RESOURCE_GLOBAL_SHORTURL_GET     = 'globalshorturl.get';
-    const RESOURCE_GLOBAL_SHORTURL_HEAD    = 'globalshorturl.head';
-    const RESOURCE_GLOBAL_SHORTURL_OPTIONS = 'globalshorturl.options';
-
     /**
      * Check if a given public key has access to a given resource
      *
@@ -66,10 +62,10 @@ interface AccessControlInterface {
     /**
      * Fetch one or more users
      *
-     * @param UserLookup\Query $query A query object used to filter the users returned
+     * @param UserQuery $query A query object used to filter the users returned
      * @return string[] Returns a list of users
      */
-    function getUsers(UserLookup\Query $query = null);
+    function getUsers(UserQuery $query = null);
 
     /**
      * Return whether the user given exists or not
@@ -80,16 +76,24 @@ interface AccessControlInterface {
     function userExists($user);
 
     /**
+     * Return the private key for a given public key
+     *
+     * @param  string $publicKey The public key to fetch matching private key for
+     * @return string Returns the private key for the public key
+     */
+    function getPrivateKey($publicKey);
+
+    /**
      * Returns a list of resources which should be accessible for read-only public keys
      *
      * @return array
      */
-    function getReadOnlyResources();
+    static function getReadOnlyResources();
 
     /**
      * Returns a list of resources which should be accessible for read+write public keys
      *
      * @return array
      */
-    function getReadWriteResources();
+    static function getReadWriteResources();
 }
