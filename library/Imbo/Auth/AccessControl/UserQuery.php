@@ -8,15 +8,15 @@
  * distributed with this source code.
  */
 
-namespace Imbo\Auth\UserLookup;
+namespace Imbo\Auth\AccessControl;
 
 /**
- * Query for public keys
+ * Query for users
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Core\Auth
+ * @package Core\Auth\AccessControl
  */
-class Query {
+class UserQuery {
     /**
      * Limit
      *
