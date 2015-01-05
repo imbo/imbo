@@ -111,10 +111,7 @@ class Authenticate implements ListenerInterface {
         }
 
         $publicKey = $request->getPublicKey();
-        $privateKeys = $event->getUserLookup()->getPrivateKeys(
-            $publicKey,
-            UserLookupInterface::MODE_READ_WRITE
-        ) ?: [];
+        $privateKey = $event->getAccessControl()->getPrivateKey($publicKey);
 
         $url = $request->getRawUri();
 
@@ -127,7 +124,7 @@ class Authenticate implements ListenerInterface {
         // Add the URL used for auth to the response headers
         $response->headers->set('X-Imbo-AuthUrl', $url);
 
-        if (!$this->signatureIsValid($request->getMethod(), $url, $publicKey, $privateKeys, $timestamp, $signature)) {
+        if (!$this->signatureIsValid($request->getMethod(), $url, $publicKey, $privateKey, $timestamp, $signature)) {
             $exception = new RuntimeException('Signature mismatch', 400);
             $exception->setImboErrorCode(Exception::AUTH_SIGNATURE_MISMATCH);
 
@@ -141,20 +138,18 @@ class Authenticate implements ListenerInterface {
      * @param string $httpMethod The current HTTP method
      * @param string $url The accessed URL
      * @param string $publicKey The current public key
-     * @param array  $privateKeys The private keys to sign the hash with
+     * @param array  $privateKey The private key to sign the hash with
      * @param string $timestamp A valid timestamp
      * @param string $signature The signature to compare with
      * @return boolean
      */
-    private function signatureIsValid($httpMethod, $url, $publicKey, $privateKeys, $timestamp, $signature) {
-        foreach ($privateKeys as $privateKey) {
-            // Generate data for the HMAC
-            $data = $httpMethod . '|' . $url . '|' . $publicKey . '|' . $timestamp;
+    private function signatureIsValid($httpMethod, $url, $publicKey, $privateKey, $timestamp, $signature) {
+        // Generate data for the HMAC
+        $data = $httpMethod . '|' . $url . '|' . $publicKey . '|' . $timestamp;
 
-            // Compare
-            if ($signature === hash_hmac($this->algorithm, $data, $privateKey)) {
-                return true;
-            }
+        // Compare
+        if ($signature === hash_hmac($this->algorithm, $data, $privateKey)) {
+            return true;
         }
 
         return false;

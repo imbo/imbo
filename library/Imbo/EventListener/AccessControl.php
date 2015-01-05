@@ -12,7 +12,8 @@ namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Http\Request\Request,
-    Imbo\Exception\RuntimeException;
+    Imbo\Exception\RuntimeException,
+    Imbo\Auth\AccessControl\AccessControlAdapter;
 
 /**
  * Access control event listener

@@ -8,23 +8,24 @@
  * distributed with this source code.
  */
 
-use Imbo\Auth\UserLookupInterface,
-    Imbo\Auth\UserLookup\Query;
+use Imbo\Auth\AccessControl\AccessControlInterface,
+    Imbo\Auth\AccessControl\AccessControlAdapter,
+    Imbo\Auth\AccessControl\UserQuery;
 
 /**
  * Use a custom user lookup implementation
  */
-class StaticUserLookup implements UserLookupInterface {
-    public function getPrivateKeys($publicKey, $mode = null) {
-        return ['private'];
-    }
-
-    public function getUsers(Query $query = null) {
-        return ['public'];
-    }
-
-    public function publicKeyExists($publicKey) {
+class StaticAccessControl extends AccessControlAdapter implements AccessControlInterface {
+    public function hasAccess($publicKey, $resource, $user = null) {
         return $publicKey === 'public';
+    }
+
+    public function getPrivateKey($publicKey) {
+        return 'private';
+    }
+
+    public function getUsers(UserQuery $query = null) {
+        return ['public'];
     }
 
     public function userExists($publicKey) {
@@ -33,5 +34,5 @@ class StaticUserLookup implements UserLookupInterface {
 }
 
 return [
-    'auth' => new StaticUserLookup(),
+    'accessControl' => new StaticAccessControl(),
 ];
