@@ -27,6 +27,18 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
      */
     private $accessList = [];
 
+    /**
+     * Public => private key pairs
+     *
+     * @var array
+     */
+    private $keys = [];
+
+    /**
+     * Users
+     *
+     * @var array
+     */
     private $users = [];
 
     /**
@@ -36,21 +48,25 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
      */
     public function __construct(array $accessList = []) {
         $this->accessList = $accessList;
+        $this->users = array_unique($this->getUsersFromAcl());
+        $this->keys = $this->getKeysFromAcl();
     }
 
     /**
      * {@inheritdoc}
      */
     public function hasAccess($publicKey, $resource, $user = null) {
-        if (!isset($this->accessList[$publicKey])) {
-            return false;
-        }
+        foreach ($this->accessList as $access) {
+            if ($access['publicKey'] !== $publicKey) {
+                continue;
+            }
 
-        foreach ($this->accessList[$publicKey] as $access) {
-            $userAccess = !$user || in_array($user, $access['users']);
+            foreach ($access['acl'] as $acl) {
+                $userAccess = !$user || in_array($user, $acl['users']);
 
-            if ($userAccess && in_array($resource, $access['resources'])) {
-                return true;
+                if ($userAccess && in_array($resource, $acl['resources'])) {
+                    return true;
+                }
             }
         }
 
@@ -60,9 +76,9 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
     /**
      * {@inheritdoc}
      */
-    public function getUsers(UserLookup\Query $query = null) {
+    public function getUsers(UserQuery $query = null) {
         if ($query === null) {
-            $query = new UserLookup\Query();
+            $query = new UserQuery();
         }
 
         return array_slice($this->users, $query->offset() ?: 0, $query->limit());
@@ -73,6 +89,17 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
      */
     public function userExists($user) {
         return in_array($user, $this->users);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPrivateKey($publicKey) {
+        if (isset($this->keys[$publicKey])) {
+            return $this->keys[$publicKey];
+        }
+
+        return null;
     }
 
     /**
@@ -92,10 +119,46 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
                 throw new InvalidArgumentException('A public key can only have a single private key (as of 2.0.0)');
             }
 
-            $this->accessList[$publicKey] = [[
-                'resources' => $this->getReadWriteResources(),
-                'users' => [$publicKey]
-            ]];
+            $this->accessList[] = [
+                'publicKey'  => $publicKey,
+                'privateKey' => $privateKey,
+                'acl' => [[
+                    'resources' => $this->getReadWriteResources(),
+                    'users' => [$publicKey]
+                ]]
+            ];
+
+            $this->keys[$publicKey] = $privateKey;
         }
+    }
+
+    /**
+     * Get an array of users defined in the ACL
+     *
+     * @return array
+     */
+    private function getUsersFromAcl() {
+        $users = [];
+        foreach ($this->accessList as $access) {
+            foreach ($access['acl'] as $acl) {
+                $users = array_merge($users, $acl['users']);
+            }
+        }
+
+        return $users;
+    }
+
+    /**
+     * Get an array of public => private key pairs defined in the ACL
+     *
+     * @return array
+     */
+    private function getKeysFromAcl() {
+        $keys = [];
+        foreach ($this->accessList as $access) {
+            $keys[$access['publicKey']] = $access['privateKey'];
+        }
+
+        return $keys;
     }
 }
