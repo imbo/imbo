@@ -75,7 +75,7 @@ class Application {
         }
 
         if (!$accessControl instanceof AccessControlInterface) {
-            throw new InvalidArgumentException('Invalid access control adapter');
+            throw new InvalidArgumentException('Invalid access control adapter', 500);
         }
 
         // Check if we have an auth array present in the configuration
