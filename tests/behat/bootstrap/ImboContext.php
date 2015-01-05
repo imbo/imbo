@@ -109,9 +109,15 @@ class ImboContext extends RESTContext {
     public function appendAccessToken() {
         $this->client->getEventDispatcher()->addListener('request.before_send', function($event) {
             $request = $event['request'];
-            $request->getQuery()->remove('accessToken');
+            $query = $request->getQuery();
+
+            if (!$query->get('publicKey')) {
+                $query->set('publicKey', $this->publicKey);
+            }
+
+            $query->remove('accessToken');
             $accessToken = hash_hmac('sha256', urldecode($request->getUrl()), $this->privateKey);
-            $request->getQuery()->set('accessToken', $accessToken);
+            $query->set('accessToken', $accessToken);
         }, -100);
     }
 

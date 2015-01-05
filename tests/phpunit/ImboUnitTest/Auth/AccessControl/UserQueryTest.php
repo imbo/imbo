@@ -8,17 +8,17 @@
  * distributed with this source code.
  */
 
-namespace ImboUnitTest\Auth\UserLookup;
+namespace ImboUnitTest\Auth\AccessControl;
 
-use Imbo\Auth\UserLookup\Query;
+use Imbo\Auth\AccessControl\UserQuery;
 
 /**
- * @covers Imbo\Auth\UserLookup\Query
+ * @covers Imbo\Auth\AccessControl\UserQuery
  * @group unit
  */
 class QueryTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var Query
+     * @var UserQuery
      */
     private $query;
 
@@ -26,7 +26,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
      * Set up the query
      */
     public function setUp() {
-        $this->query = new Query();
+        $this->query = new UserQuery();
     }
 
     /**

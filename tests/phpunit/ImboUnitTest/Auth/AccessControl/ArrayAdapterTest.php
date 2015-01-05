@@ -10,134 +10,158 @@
 
 namespace ImboUnitTest\Auth;
 
-use Imbo\Auth\ArrayStorage,
-    Imbo\Auth\UserLookupInterface,
-    Imbo\Auth\UserLookup\Query;
+use Imbo\Auth\AccessControl\ArrayAdapter,
+    Imbo\Auth\AccessControl\AccessControlInterface,
+    Imbo\Auth\AccessControl\UserQuery;
 
 /**
- * @covers Imbo\Auth\ArrayStorage
+ * @covers Imbo\Auth\AccessControl\ArrayAdapter
  * @group unit
  */
-class ArrayStorageTest extends \PHPUnit_Framework_TestCase {
-    public function getUsers() {
-        $users = array(
-            'user1' => 'key1',
-            'user2' => 'key2',
-            'user3' => [
-                'ro' => 'rokey',
-                'rw' => ['rwkey1', 'rwkey2']
-            ]
-        );
-
-        return array(
-            'no users exists' => array(array(), 'public', null),
-            'user exists' => array($users, 'user2', ['key2']),
-            'user does not exist' => array($users, 'user4', null),
-            'user has ro and rw keys' => array($users, 'user3', ['rokey', 'rwkey1', 'rwkey2'])
-        );
-    }
-
+class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @dataProvider getUsers
+     * @dataProvider getAuthConfig
      */
-    public function testCanLookupAUser(array $users, $publicKey, $privateKeys) {
-        $storage = new ArrayStorage($users);
-        $this->assertSame($privateKeys, $storage->getPrivateKeys($publicKey));
-    }
+    public function testCanSetKeysFromLegacyConfig(array $users, $publicKey, $privateKey) {
+        $accessControl = new ArrayAdapter();
+        $accessControl->setAccessListFromAuth($users);
 
-    public function testCanGetReadOnlyPrivateKeys() {
-        $storage = new ArrayStorage([
-            'user'  => ['ro' => 'read-only'],
-            'user2' => ['ro' => ['ro1', 'ro2']]
-        ]);
-
-        $mode = UserLookupInterface::MODE_READ_ONLY;
-        $this->assertSame(['read-only'], $storage->getPrivateKeys('user', $mode));
-        $this->assertSame(['ro1', 'ro2'], $storage->getPrivateKeys('user2', $mode));
-    }
-
-    public function testCanGetReadWritePrivateKeys() {
-        $storage = new ArrayStorage([
-            'user'  => ['rw' => 'read+write'],
-            'user2' => ['rw' => ['rw1', 'rw2']],
-        ]);
-
-        $mode = UserLookupInterface::MODE_READ_WRITE;
-        $this->assertSame(['read+write'], $storage->getPrivateKeys('user', $mode));
-        $this->assertSame(['rw1', 'rw2'], $storage->getPrivateKeys('user2', $mode));
-        $this->assertSame(null, $storage->getPrivateKeys('user', UserLookupInterface::MODE_READ_ONLY));
-    }
-
-    public function testCanGetAllPrivateKeysForUser() {
-        $storage = new ArrayStorage([
-            'user'  => [
-                'rw' => 'read+write',
-                'ro' => ['ro1', 'ro2']
-            ]
-        ]);
-
-        $this->assertSame(['ro1', 'ro2', 'read+write'], $storage->getPrivateKeys('user'));
+        $this->assertSame($privateKey, $accessControl->getPrivateKey($publicKey));
     }
 
     /**
-     * Data provider
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage A public key can only have a single private key (as of 2.0.0)
+     */
+    public function testThrowsOnMultiplePrivateKeysPerPublicKey() {
+        $accessControl = new ArrayAdapter();
+        $accessControl->setAccessListFromAuth([
+            'publicKey' => ['key1', 'key2']
+        ]);
+    }
+
+    public function testLegacyConfigKeysHaveWriteAccess() {
+        $accessControl = new ArrayAdapter();
+        $accessControl->setAccessListFromAuth([
+            'publicKey' => 'privateKey',
+        ]);
+
+        $this->assertTrue(
+            $accessControl->hasAccess(
+                'publicKey',
+                AccessControlInterface::RESOURCE_IMAGES_POST
+            )
+        );
+    }
+
+    public function testUserExists() {
+        $accessControl = new ArrayAdapter([
+            [
+                'publicKey' => 'aPubKey',
+                'privateKey' => 'privateKey',
+                'acl' => [
+                    [
+                        'resources' => [AccessControlInterface::RESOURCE_IMAGES_POST],
+                        'users' => ['user1']
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertTrue($accessControl->userExists('user1'));
+        $this->assertFalse($accessControl->userExists('user2'));
+    }
+
+    public function testGetPrivateKey() {
+        $accessControl = new ArrayAdapter([
+            [
+                'publicKey' => 'pubKey1',
+                'privateKey' => 'privateKey1',
+                'acl' => [[
+                    'resources' => [AccessControlInterface::RESOURCE_IMAGES_POST],
+                    'users' => ['user1'],
+                ]]
+            ],
+            [
+                'publicKey' => 'pubKey2',
+                'privateKey' => 'privateKey2',
+                'acl' => [[
+                    'resources' => [AccessControlInterface::RESOURCE_IMAGES_POST],
+                    'users' => ['user2'],
+                ]]
+            ]
+        ]);
+
+        $this->assertSame('privateKey1', $accessControl->getPrivateKey('pubKey1'));
+        $this->assertSame('privateKey2', $accessControl->getPrivateKey('pubKey2'));
+    }
+
+    /**
+     * @dataProvider getAclAndQuery
+     */
+    public function testCanGetUsers(array $acl, UserQuery $query, array $expectedUsers = []) {
+        $accessControl = new ArrayAdapter($acl);
+        $this->assertSame($expectedUsers, $accessControl->getUsers($query));
+    }
+
+    /**
+     * Data provider for testing the legacy auth compatibility
+     *
+     * @return array
+     */
+    public function getAuthConfig() {
+        $users = [
+            'publicKey1' => 'key1',
+            'publicKey2' => 'key2',
+        ];
+
+        return [
+            'no public keys exists' => [[], 'public', null],
+            'public key exists' => [$users, 'publicKey2', 'key2'],
+            'public key does not exist' => [$users, 'publicKey3', null],
+        ];
+    }
+
+    /**
+     * Data provider for user querying
      *
      * @return array[]
      */
-    public function getUsersAndQuery() {
-        $users = array(
-            'user1' => 'key1',
-            'user2' => 'key2',
-            'user3' => 'key3',
-            'user4' => 'key4',
-            'user5' => 'key5',
-            'user6' => 'key6',
-        );
+    public function getAclAndQuery() {
+        $acl = [
+            ['publicKey' => 'pubKey1', 'privateKey' => '', 'acl' => [['users' => ['user1', 'user2']]]],
+            ['publicKey' => 'pubKey2', 'privateKey' => '', 'acl' => [['users' => ['user1']]]],
+            ['publicKey' => 'pubKey3', 'privateKey' => '', 'acl' => [['users' => ['user3']]]],
+            ['publicKey' => 'pubKey4', 'privateKey' => '', 'acl' => [['users' => []]]],
+            ['publicKey' => 'pubKey5', 'privateKey' => '', 'acl' => [['users' => ['user4', 'user5']]]],
+            ['publicKey' => 'pubKey6', 'privateKey' => '', 'acl' => [['users' => ['user6']]]]
+        ];
 
-        return array(
-            'empty query' => array(
-                $users,
-                new Query(),
-                array_keys($users),
-            ),
-            'query with limit and offset' => array(
-                $users,
-                (new Query())->limit(2)->offset(3),
-                array(
+        return [
+            'empty query' => [
+                $acl,
+                new UserQuery(),
+                ['user1', 'user2', 'user3', 'user4', 'user5', 'user6'],
+            ],
+            'query with limit and offset' => [
+                $acl,
+                (new UserQuery())->limit(2)->offset(3),
+                [
                     'user4', 'user5',
-                ),
-            ),
-            'query with limit out of bounds' => array(
-                $users,
-                (new Query())->limit(4)->offset(5),
-                array(
+                ],
+            ],
+            'query with limit out of bounds' => [
+                $acl,
+                (new UserQuery())->limit(4)->offset(5),
+                [
                     'user6',
-                ),
-            ),
-            'query with offset out of bounds' => array(
-                $users,
-                (new Query())->limit(4)->offset(10),
-                array(),
-            ),
-        );
-    }
-
-    /**
-     * @dataProvider getUsersAndQuery
-     */
-    public function testCanGetUsers(array $users, Query $query, array $expectedUsers = array()) {
-        $storage = new ArrayStorage($users);
-        $this->assertSame($expectedUsers, $storage->getUsers($query));
-    }
-
-    public function testPublicKeyExists() {
-        $storage = new ArrayStorage([
-            'user'  => 'key',
-            'user2' => ['ro' => 'key', 'rw' => 'key2']
-        ]);
-
-        $this->assertTrue($storage->publicKeyExists('user'));
-        $this->assertTrue($storage->publicKeyExists('user2'));
-        $this->assertFalse($storage->publicKeyExists('user3'));
+                ],
+            ],
+            'query with offset out of bounds' => [
+                $acl,
+                (new UserQuery())->limit(4)->offset(10),
+                [],
+            ],
+        ];
     }
 }

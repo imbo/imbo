@@ -66,9 +66,9 @@ Feature: Imbo requires write operations to be signed
         And the Imbo error message is "Signature mismatch" and the error code is "103"
 
     Scenario: Authenticate using a read+write private key
-        Given I use "publickey" and "read+write-key" for public and private keys
+        Given I use "rw-pubkey" and "read+write-key" for public and private keys
         And I sign the request using HTTP headers
         And I attach "tests/phpunit/Fixtures/image1.png" to the request body
         And Imbo uses the "ro-rw-auth.php" configuration
-        When I request "/users/publickey/images" using HTTP "POST"
+        When I request "/users/someuser/images" using HTTP "POST"
         Then I should get a response with "201 Created"
