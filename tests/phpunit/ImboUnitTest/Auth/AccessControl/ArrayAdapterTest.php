@@ -11,7 +11,7 @@
 namespace ImboUnitTest\Auth;
 
 use Imbo\Auth\AccessControl\ArrayAdapter,
-    Imbo\Auth\AccessControl\AccessControlInterface,
+    Imbo\Auth\AccessControl\AccessControlInterface as ACI,
     Imbo\Auth\AccessControl\UserQuery;
 
 /**
@@ -49,7 +49,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue(
             $accessControl->hasAccess(
                 'publicKey',
-                AccessControlInterface::RESOURCE_IMAGES_POST
+                ACI::RESOURCE_IMAGES_POST
             )
         );
     }
@@ -61,7 +61,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
                 'privateKey' => 'privateKey',
                 'acl' => [
                     [
-                        'resources' => [AccessControlInterface::RESOURCE_IMAGES_POST],
+                        'resources' => [ACI::RESOURCE_IMAGES_POST],
                         'users' => ['user1']
                     ]
                 ]
@@ -78,7 +78,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
                 'publicKey' => 'pubKey1',
                 'privateKey' => 'privateKey1',
                 'acl' => [[
-                    'resources' => [AccessControlInterface::RESOURCE_IMAGES_POST],
+                    'resources' => [ACI::RESOURCE_IMAGES_POST],
                     'users' => ['user1'],
                 ]]
             ],
@@ -86,7 +86,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
                 'publicKey' => 'pubKey2',
                 'privateKey' => 'privateKey2',
                 'acl' => [[
-                    'resources' => [AccessControlInterface::RESOURCE_IMAGES_POST],
+                    'resources' => [ACI::RESOURCE_IMAGES_POST],
                     'users' => ['user2'],
                 ]]
             ]
@@ -102,6 +102,36 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
     public function testCanGetUsers(array $acl, UserQuery $query, array $expectedUsers = []) {
         $accessControl = new ArrayAdapter($acl);
         $this->assertSame($expectedUsers, $accessControl->getUsers($query));
+    }
+
+    public function testCanReadResourcesFromGroups() {
+        $acl = [
+            [
+                'publicKey'  => 'pubkey',
+                'privateKey' => 'privkey',
+                'acl' => [
+                    [
+                        'group' => 'user-stats',
+                        'users' => ['user1']
+                    ]
+                ]
+            ]
+        ];
+
+        $groups = [
+            'user-stats' => [
+                ACI::RESOURCE_USER_GET,
+                ACI::RESOURCE_USER_HEAD
+            ]
+        ];
+
+        $ac = new ArrayAdapter($acl, $groups);
+
+        $this->assertFalse($ac->hasAccess('pubkey', ACI::RESOURCE_IMAGES_POST, 'user1'));
+        $this->assertFalse($ac->hasAccess('pubkey', ACI::RESOURCE_IMAGES_POST));
+        $this->assertFalse($ac->hasAccess('pubkey', ACI::RESOURCE_USER_GET, 'user2'));
+        $this->assertTrue($ac->hasAccess('pubkey', ACI::RESOURCE_USER_HEAD, 'user1'));
+        $this->assertTrue($ac->hasAccess('pubkey', ACI::RESOURCE_USER_GET, 'user1'));
     }
 
     /**

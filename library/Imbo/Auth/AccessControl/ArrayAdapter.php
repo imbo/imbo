@@ -42,13 +42,23 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
     private $users = [];
 
     /**
+     * Resource groups
+     *
+     * @var array
+     */
+    private $groups;
+
+    /**
      * Class constructor
      *
-     * @param array $accessList
+     * @param array $accessList Array defining the available public/private keys, along with the
+     *                          associated ACL rules for each public key.
+     * @param array $groups     Array of group => resources combinations
      */
-    public function __construct(array $accessList = []) {
+    public function __construct(array $accessList = [], $groups = []) {
         $this->accessList = $accessList;
-        $this->users = array_unique($this->getUsersFromAcl());
+        $this->users  = array_unique($this->getUsersFromAcl());
+        $this->groups = $groups;
         $this->keys = $this->getKeysFromAcl();
     }
 
@@ -62,9 +72,28 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
             }
 
             foreach ($access['acl'] as $acl) {
+                // If a user is specified, ensure the public key has access to the user
                 $userAccess = !$user || in_array($user, $acl['users']);
+                if (!$userAccess) {
+                    continue;
+                }
 
-                if ($userAccess && in_array($resource, $acl['resources'])) {
+                // Figure out which resources the public key has access to, based on group or
+                // explicit definition
+                $resources = isset($acl['resources']) ? $acl['resources'] : [];
+                $group = isset($acl['group']) ? $acl['group'] : false;
+
+                // If the group specified has not been defined, throw an exception to help the user
+                if ($group && !isset($this->groups[$group])) {
+                    throw new InvalidArgumentException('Group "' . $group . '" is not defined');
+                }
+
+                // If a group is specified, fetch resources belonging to that group
+                if ($group) {
+                    $resources = $this->groups[$group];
+                }
+
+                if (in_array($resource, $resources)) {
                     return true;
                 }
             }

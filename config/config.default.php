@@ -54,9 +54,24 @@ $config = [
      *             [
      *                 'resources' => ArrayAdapter::getReadWriteResources(),
      *                 'users' => ['different-users'],
+     *             ],
+     *
+     *             // You can also specify resource groups instead of explicitly setting them like
+     *             // in the above examples. Note that you cannot specify both resources and group
+     *             // in the same rule.
+     *             [
+     *                 'group' => 'read-stats',
+     *                 'users' => ['user1', 'user2']
      *             ]
      *         ]
      *     ]
+     * ]
+     *
+     * The second argument to ArrayAdapter specifies the available resource groups. For example:
+     *
+     * [
+     *     'group-name' => ['image.get', 'image.head'],
+     *     'read-stats' => ['user.get', 'user.head', 'user.options'],
      * ]
      *
      * @var Auth\AccessControl\AccessControlInterface|Closure
