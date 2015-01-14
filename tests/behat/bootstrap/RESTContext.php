@@ -123,7 +123,8 @@ class RESTContext extends BehatContext {
             $url['host'],
             $port,
             $params['documentRoot'],
-            $params['router']
+            $params['router'],
+            $params['httpdLog']
         );
 
         if (!$pid) {
@@ -401,15 +402,17 @@ class RESTContext extends BehatContext {
      * @param int $port The port to use
      * @param string $documentRoot The document root
      * @param string $router Path to an optional router
+     * @param string $httpdLog Path the httpd log should be written to
      * @return int Returns the PID of the httpd
      * @throws RuntimeException
      */
-    private static function startBuiltInHttpd($host, $port, $documentRoot, $router = null) {
-        $command = sprintf('php -S %s:%d -t %s %s >/dev/null 2>&1 & echo $!',
+    private static function startBuiltInHttpd($host, $port, $documentRoot, $router, $httpdLog) {
+        $command = sprintf('php -S %s:%d -t %s %s >%s 2>&1 & echo $!',
                             $host,
                             $port,
                             $documentRoot,
-                            $router);
+                            $router,
+                            $httpdLog);
 
         $output = array();
         exec($command, $output);

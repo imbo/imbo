@@ -13,6 +13,9 @@ default:
       documentRoot: public
       router: %behat.paths.base%/router.php
 
+      # httpd log file location
+      httpdLog: /dev/null
+
       # Timeout when trying to connect to the built in httpd
       timeout: 5
 
