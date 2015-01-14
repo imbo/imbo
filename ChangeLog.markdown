@@ -5,6 +5,7 @@ Imbo-1.x.x
 ----------
 
 * #320: Allow setting public key in headers and/or query (Espen Hovlandsdal)
+* #321: Behat config option for path of internal httpd log location (Espen Hovlandsdal)
 
 Imbo-1.2.4
 ----------
