@@ -28,6 +28,10 @@ class StaticAccessControl extends AccessControlAdapter implements AccessControlI
         return ['public'];
     }
 
+    public function getGroups() {
+        return [];
+    }
+
     public function userExists($publicKey) {
         return $publicKey === 'public';
     }

@@ -17,9 +17,12 @@ namespace Imbo\Auth\AccessControl;
  * @package Core\Auth\AccessControl
  */
 interface AccessControlInterface {
-
     const PERMISSION_READ                  = 'permission.read';
     const PERMISSION_WRITE                 = 'permission.write';
+
+    const RESOURCE_GROUPS_GET              = 'groups.get';
+    const RESOURCE_GROUPS_HEAD             = 'groups.head';
+    const RESOURCE_GROUPS_OPTIONS          = 'groups.options';
 
     const RESOURCE_USER_GET                = 'user.get';
     const RESOURCE_USER_HEAD               = 'user.header';
@@ -74,6 +77,13 @@ interface AccessControlInterface {
      * @return boolean
      */
     function userExists($user);
+
+    /**
+     * Fetch a list of available resource groups
+     *
+     * @return array
+     */
+    function getGroups();
 
     /**
      * Return the private key for a given public key

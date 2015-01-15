@@ -227,6 +227,30 @@ DATA;
     /**
      * {@inheritdoc}
      */
+    public function formatGroups(Model\Groups $model) {
+        $data = $model->getData();
+
+        $entries = '';
+        foreach ($data['groups'] as $group) {
+            $entries .= '<group>';
+            $entries .= '  <name>' . $group['name'] . '</name>';
+            $entries .= '  <resources>';
+            $entries .= '    <resource>' . implode($group['resources'], '</resource><resource>') . '</resource>';
+            $entries .= '  </resources>';
+            $entries .= '</group>';
+        }
+
+        return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <groups>{$entries}</groups>
+</imbo>
+DATA;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function formatStats(Model\Stats $model) {
         $users = '';
         $numUsers = 0;
