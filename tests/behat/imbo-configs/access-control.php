@@ -52,10 +52,16 @@ return [
                 'acl' => [[
                     'group' => 'images-read',
                     'users' => ['user', 'user2']
+                ], [
+                    'group' => 'groups-read'
                 ]]
             ]
         ], [
-            'images-read' => [AccessControlInterface::RESOURCE_IMAGES_GET]
+            'images-read' => [AccessControlInterface::RESOURCE_IMAGES_GET],
+            'groups-read' => [
+                AccessControlInterface::RESOURCE_GROUPS_GET,
+                AccessControlInterface::RESOURCE_GROUPS_HEAD
+            ],
         ]);
     },
 

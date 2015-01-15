@@ -46,7 +46,7 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
      *
      * @var array
      */
-    private $groups;
+    private $groups = [];
 
     /**
      * Class constructor
@@ -73,7 +73,7 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
 
             foreach ($access['acl'] as $acl) {
                 // If a user is specified, ensure the public key has access to the user
-                $userAccess = !$user || in_array($user, $acl['users']);
+                $userAccess = !$user || isset($acl['users']) && in_array($user, $acl['users']);
                 if (!$userAccess) {
                     continue;
                 }
@@ -118,6 +118,13 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
      */
     public function userExists($user) {
         return in_array($user, $this->users);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGroups() {
+        return $this->groups;
     }
 
     /**
@@ -170,7 +177,7 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
         $users = [];
         foreach ($this->accessList as $access) {
             foreach ($access['acl'] as $acl) {
-                $users = array_merge($users, $acl['users']);
+                $users = array_merge($users, isset($acl['users']) ? $acl['users'] : []);
             }
         }
 

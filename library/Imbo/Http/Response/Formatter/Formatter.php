@@ -55,6 +55,8 @@ abstract class Formatter implements FormatterInterface {
             return $this->formatImages($model);
         } else if ($model instanceof Model\Metadata) {
             return $this->formatMetadata($model);
+        } else if ($model instanceof Model\Groups) {
+            return $this->formatGroups($model);
         } else if ($model instanceof Model\ArrayModel) {
             return $this->formatArrayModel($model);
         } else if ($model instanceof Model\ListModel) {
