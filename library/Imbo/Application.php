@@ -124,6 +124,7 @@ class Application {
             'Imbo\Resource\Image',
             'Imbo\Resource\Metadata',
             'Imbo\Resource\Groups',
+            'Imbo\Resource\Group',
             'Imbo\Http\Response\ResponseFormatter' => [
                 'formatters' => $formatters,
                 'contentNegotiation' => $contentNegotiation,
