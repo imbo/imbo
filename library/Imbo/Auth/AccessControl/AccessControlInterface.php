@@ -24,6 +24,12 @@ interface AccessControlInterface {
     const RESOURCE_GROUPS_HEAD             = 'groups.head';
     const RESOURCE_GROUPS_OPTIONS          = 'groups.options';
 
+    const RESOURCE_GROUP_GET               = 'group.get';
+    const RESOURCE_GROUP_HEAD              = 'group.head';
+    const RESOURCE_GROUP_PUT               = 'group.put';
+    const RESOURCE_GROUP_DELETE            = 'group.delete';
+    const RESOURCE_GROUP_OPTIONS           = 'group.options';
+
     const RESOURCE_USER_GET                = 'user.get';
     const RESOURCE_USER_HEAD               = 'user.header';
     const RESOURCE_USER_OPTIONS            = 'user.options';

@@ -251,6 +251,25 @@ DATA;
     /**
      * {@inheritdoc}
      */
+    public function formatGroup(Model\Group $model) {
+        $data = $model->getData();
+
+        $entries = '';
+        foreach ($data['resources'] as $resource) {
+            $entries .= '<resource>' . $resource . '</resource>';
+        }
+
+        return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <resources>{$entries}</resources>
+</imbo>
+DATA;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function formatStats(Model\Stats $model) {
         $users = '';
         $numUsers = 0;

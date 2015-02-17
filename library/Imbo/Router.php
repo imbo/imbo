@@ -53,6 +53,7 @@ class Router {
         'shorturls'      => '#^/users/(?<user>[a-z0-9_-]{1,})/images/(?<imageIdentifier>[a-f0-9]{32})/shorturls(/|\.(?<extension>json|xml))?$#',
         'shorturl'       => '#^/users/(?<user>[a-z0-9_-]{1,})/images/(?<imageIdentifier>[a-f0-9]{32})/shorturls/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
         'groups'         => '#^/groups(/|(\.(?<extension>json|xml)))?$#',
+        'group'          => '#^/groups/(?<group>[a-z0-9_-]{1,})(/|\.(?<extension>json|xml))?$#',
     );
 
     /**
