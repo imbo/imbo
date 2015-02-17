@@ -104,6 +104,14 @@ class ImboContext extends RESTContext {
     }
 
     /**
+     * @Given /^I do not specify a public and private key$/
+     */
+    public function removeClientAuth() {
+        $this->publicKey = null;
+        $this->privateKey = null;
+    }
+
+    /**
      * @Given /^I include an access token in the query$/
      */
     public function appendAccessToken() {

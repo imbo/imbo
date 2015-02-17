@@ -20,3 +20,8 @@ Feature: Imbo provides a groups endpoint
             | extension | content-type     | response |
             | json      | application/json | #^{"groups":\[{"name":"images-read","resources":\["images\.get"]},{"name":"groups-read","resources":\["groups\.get","groups\.head"]}]}$# |
             | xml       | application/xml  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<groups>\s*<group>\s*<name>images-read</name>\s*<resources>\s*<resource>images\.get</resource>\s*</resources>\s*</group>\s*<group>\s*<name>groups-read</name>\s*<resources>\s*<resource>groups\.get</resource>\s*<resource>groups\.head</resource>\s*</resources>\s*</group>\s*</groups>\s*</imbo>$#ms |
+
+    Scenario: Fetch list of groups without specifying a public key
+        Given I do not specify a public and private key
+        When I request "/groups.json"
+        Then I should get a response with "400 Permission denied (public key)"
