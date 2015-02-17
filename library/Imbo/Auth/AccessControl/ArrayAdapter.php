@@ -130,6 +130,13 @@ class ArrayAdapter extends Adapter implements AccessControlInterface {
     /**
      * {@inheritdoc}
      */
+    public function getGroup($groupName) {
+        return isset($this->groups[$groupName]) ? $this->groups[$groupName] : false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getPrivateKey($publicKey) {
         if (isset($this->keys[$publicKey])) {
             return $this->keys[$publicKey];

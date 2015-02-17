@@ -86,6 +86,13 @@ interface AccessControlInterface {
     function getGroups();
 
     /**
+     * Fetch a resource group with the given name
+     *
+     * @return array Array of resources the group consists of
+     */
+    function getGroup($groupName);
+
+    /**
      * Return the private key for a given public key
      *
      * @param  string $publicKey The public key to fetch matching private key for

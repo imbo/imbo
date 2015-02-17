@@ -33,6 +33,16 @@ abstract class AccessControlAdapter implements AccessControlInterface {
     /**
      * {@inheritdoc}
      */
+    abstract public function getGroups();
+
+    /**
+     * {@inheritdoc}
+     */
+    abstract public function getGroup($groupName);
+
+    /**
+     * {@inheritdoc}
+     */
     abstract public function userExists($user);
 
     /**
