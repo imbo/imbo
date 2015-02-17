@@ -11,7 +11,6 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Exception\InvalidArgumentException,
     Imbo\Model\Groups as GroupsModel;
 
 /**
