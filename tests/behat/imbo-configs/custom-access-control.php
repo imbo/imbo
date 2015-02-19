@@ -8,14 +8,14 @@
  * distributed with this source code.
  */
 
-use Imbo\Auth\AccessControl\AccessControlInterface,
-    Imbo\Auth\AccessControl\AccessControlAdapter,
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface,
+    Imbo\Auth\AccessControl\Adapter\AbstractAdapter,
     Imbo\Auth\AccessControl\UserQuery;
 
 /**
  * Use a custom user lookup implementation
  */
-class StaticAccessControl extends AccessControlAdapter implements AccessControlInterface {
+class StaticAccessControl extends AbstractAdapter implements AdapterInterface {
     public function hasAccess($publicKey, $resource, $user = null) {
         return $publicKey === 'public';
     }
@@ -30,6 +30,10 @@ class StaticAccessControl extends AccessControlAdapter implements AccessControlI
 
     public function getGroups() {
         return [];
+    }
+
+    public function getGroup($groupName) {
+        return false;
     }
 
     public function userExists($publicKey) {

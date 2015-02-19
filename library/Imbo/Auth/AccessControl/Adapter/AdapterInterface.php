@@ -8,7 +8,9 @@
  * distributed with this source code.
  */
 
-namespace Imbo\Auth\AccessControl;
+namespace Imbo\Auth\AccessControl\Adapter;
+
+use Imbo\Auth\AccessControl\UserQuery;
 
 /**
  * Access control interface
@@ -16,7 +18,7 @@ namespace Imbo\Auth\AccessControl;
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Core\Auth\AccessControl
  */
-interface AccessControlInterface {
+interface AdapterInterface {
     const PERMISSION_READ                  = 'permission.read';
     const PERMISSION_WRITE                 = 'permission.write';
 

@@ -8,8 +8,8 @@
  * distributed with this source code.
  */
 
-use Imbo\Auth\AccessControl\AccessControlInterface,
-    Imbo\Auth\AccessControl\ArrayAdapter,
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface as ACI,
+    Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
     Imbo\Resource\ResourceInterface,
     Imbo\EventManager\EventInterface,
     Imbo\Model\ListModel;
@@ -41,7 +41,7 @@ return [
                 'publicKey' => 'valid-pubkey',
                 'privateKey' => 'foobar',
                 'acl' => [[
-                    'resources' => [AccessControlInterface::RESOURCE_USER_GET, 'foobar.get'],
+                    'resources' => [ACI::RESOURCE_USER_GET, 'foobar.get'],
                     'users' => ['user1'],
                 ]]
             ],
@@ -57,10 +57,10 @@ return [
                 ]]
             ]
         ], [
-            'images-read' => [AccessControlInterface::RESOURCE_IMAGES_GET],
+            'images-read' => [ACI::RESOURCE_IMAGES_GET],
             'groups-read' => [
-                AccessControlInterface::RESOURCE_GROUPS_GET,
-                AccessControlInterface::RESOURCE_GROUPS_HEAD
+                ACI::RESOURCE_GROUPS_GET,
+                ACI::RESOURCE_GROUPS_HEAD
             ],
         ]);
     },

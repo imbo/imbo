@@ -91,7 +91,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $this->application->run(array(
             'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
             'storage' => $this->getMock('Imbo\Storage\StorageInterface'),
-            'accessControl' => $this->getMock('Imbo\Auth\AccessControl\AccessControlInterface'),
+            'accessControl' => $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface'),
             'eventListenerInitializers' => [],
             'eventListeners' => [],
             'contentNegotiateImages' => false,

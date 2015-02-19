@@ -8,18 +8,18 @@
  * distributed with this source code.
  */
 
-namespace Imbo\Auth\AccessControl;
+namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Auth\AccessControl\AccessControlAdapter as Adapter;
-use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\InvalidArgumentException,
+    Imbo\Auth\AccessControl\UserQuery;
 
 /**
  * Array-backed access control adapter
  *
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
- * @package Core\Auth\AccessControl
+ * @package Core\Auth\AccessControl\Adapter
  */
-class ArrayAdapter extends Adapter implements AccessControlInterface {
+class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
     /**
      * Access control definitions
      *

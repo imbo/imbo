@@ -36,7 +36,7 @@ class AuthenticateTest extends ListenerTests {
     public function setUp() {
         $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
         $this->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $this->accessControl = $this->getMock('Imbo\Auth\AccessControl\AccessControlInterface');
+        $this->accessControl = $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
 
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->query = $this->query;

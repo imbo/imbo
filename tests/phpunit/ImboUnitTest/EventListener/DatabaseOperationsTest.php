@@ -42,7 +42,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->accessControl = $this->getMock('Imbo\Auth\AccessControl\AccessControlInterface');
+        $this->accessControl = $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
         $this->image = $this->getMock('Imbo\Model\Image');
 
         $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));

@@ -13,7 +13,7 @@ namespace Imbo\EventManager;
 use Imbo\Http\Request\Request,
     Imbo\Http\Response\Response,
     Imbo\Database\DatabaseInterface,
-    Imbo\Auth\AccessControl\AccessControlInterface,
+    Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlInterface,
     Imbo\Storage\StorageInterface;
 
 /**
