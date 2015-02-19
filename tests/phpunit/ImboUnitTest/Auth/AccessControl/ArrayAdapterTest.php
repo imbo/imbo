@@ -10,12 +10,12 @@
 
 namespace ImboUnitTest\Auth;
 
-use Imbo\Auth\AccessControl\ArrayAdapter,
-    Imbo\Auth\AccessControl\AccessControlInterface as ACI,
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
+    Imbo\Auth\AccessControl\Adapter\AdapterInterface as ACI,
     Imbo\Auth\AccessControl\UserQuery;
 
 /**
- * @covers Imbo\Auth\AccessControl\ArrayAdapter
+ * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter
  * @group unit
  */
 class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {

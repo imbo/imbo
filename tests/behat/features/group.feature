@@ -21,3 +21,22 @@ Feature: Imbo provides a group endpoint
             | json      | application/json | #^{"resources":\["groups\.get","groups\.head"]}$# |
             | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<resources>\s*<resource>groups\.get</resource>\s*<resource>groups\.head</resource>\s*</resources>\s*</imbo>$#ms |
 
+    Scenario: Delete a resource group with an immutable access control adapter
+        Given I use "valid-group-pubkey" and "foobar" for public and private keys
+        And I sign the request
+        When I request "/groups/groups-read" using HTTP "DELETE"
+        Then I should get a response with "405 Access control adapter is immutable"
+        And the "Content-Type" response header is "application/json"
+        And the Imbo error message is "Access control adapter is immutable" and the error code is "0"
+
+    Scenario: Update a resource group with an immutable access control adapter
+        Given I use "valid-group-pubkey" and "foobar" for public and private keys
+        And the request body contains:
+          """
+          ["images.get"]
+          """
+        And I sign the request
+        When I request "/groups/groups-read" using HTTP "PUT"
+        Then I should get a response with "405 Access control adapter is immutable"
+        And the "Content-Type" response header is "application/json"
+        And the Imbo error message is "Access control adapter is immutable" and the error code is "0"

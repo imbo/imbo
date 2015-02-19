@@ -11,7 +11,6 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Auth\AccessControl\AccessControlInterface,
     Imbo\Exception\RuntimeException,
     Imbo\Exception;
 

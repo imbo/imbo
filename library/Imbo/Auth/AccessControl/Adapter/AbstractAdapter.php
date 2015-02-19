@@ -8,17 +8,18 @@
  * distributed with this source code.
  */
 
-namespace Imbo\Auth\AccessControl;
+namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Auth\AccessControl\AccessControlInterface as ACI;
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface as ACI,
+    Imbo\Auth\AccessControl\UserQuery;
 
 /**
- * Access control abstract adapter
+ * Abstract access control adapter
  *
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Core\Auth\AccessControl
  */
-abstract class AccessControlAdapter implements AccessControlInterface {
+abstract class AbstractAdapter implements AdapterInterface {
 
     /**
      * {@inheritdoc}

@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-use Imbo\Auth\AccessControl\ArrayAdapter;
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 
 /**
  * Use individual read-only/read+write keys

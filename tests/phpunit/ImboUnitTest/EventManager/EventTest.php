@@ -57,7 +57,7 @@ class EventTest extends \PHPUnit_Framework_TestCase {
                 'getStorage', 'storage', $this->getMock('Imbo\Storage\StorageInterface'),
             ),
             'accessControl' => array(
-                'getAccessControl', 'accessControl', $this->getMock('Imbo\Auth\AccessControl\AccessControlInterface'),
+                'getAccessControl', 'accessControl', $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface'),
             ),
             'manager' => array(
                 'getManager', 'manager', $this->getMockBuilder('Imbo\EventManager\EventManager')->disableOriginalConstructor()->getMock(),

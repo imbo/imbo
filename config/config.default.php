@@ -25,7 +25,7 @@ $config = [
      * Access Control adapter
      *
      * See the different adapter implementations for possible configuration parameters. The value
-     * must be set to a closure returning an instance of Imbo\Auth\AccessControl\AccessControlInterface,
+     * must be set to a closure returning an instance of Imbo\Auth\AccessControl\Adapter\AdapterInterface,
      * or an implementation of said interface.
      *
      * The default ArrayAdapter takes an array of access control rules, in the following form:
@@ -42,7 +42,7 @@ $config = [
      *         'acl' => [
      *             [
      *                 // An array of different resource names that the public key should have
-     *                 // access to - see AccessControlInterface::RESOURCE_* for available options.
+     *                 // access to - see AdapterInterface::RESOURCE_* for available options.
      *                 'resources' => ArrayAdapter::getReadOnlyResources(),
      *
      *                 // Names of the users which the public key should have access to.
@@ -74,10 +74,10 @@ $config = [
      *     'read-stats' => ['user.get', 'user.head', 'user.options'],
      * ]
      *
-     * @var Auth\AccessControl\AccessControlInterface|Closure
+     * @var Auth\AccessControl\Adapter\AdapterInterface|Closure
      */
     'accessControl' => function() {
-        return new Auth\AccessControl\ArrayAdapter();
+        return new Auth\AccessControl\Adapter\ArrayAdapter();
     },
 
     /**
