@@ -13,6 +13,7 @@ namespace Imbo\Resource;
 use Imbo\EventManager\EventInterface,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Exception\ResourceException,
+    Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface,
     Imbo\Model\Group as GroupModel;
 
 /**
@@ -60,5 +61,29 @@ class Group implements ResourceInterface {
 
         $response = $event->getResponse();
         $response->setModel($model);
+    }
+
+    /**
+     * Add resources to a group
+     *
+     * @param EventInterface $event The current event
+     */
+    public function addGroup(EventInterface $event) {
+        $accessControl = $event->getAccessControl();
+        if (!($accessControl instanceof MutableAdapterInterface)) {
+            throw new ResourceException('Access control adapter is immutable', 405);
+        }
+    }
+
+    /**
+     * Delete a resource group
+     *
+     * @param EventInterface $event The current event
+     */
+    public function deleteGroup(EventInterface $event) {
+        $accessControl = $event->getAccessControl();
+        if (!($accessControl instanceof MutableAdapterInterface)) {
+            throw new ResourceException('Access control adapter is immutable', 405);
+        }
     }
 }
