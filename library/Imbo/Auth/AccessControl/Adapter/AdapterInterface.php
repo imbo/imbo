@@ -10,7 +10,8 @@
 
 namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Auth\AccessControl\UserQuery;
+use Imbo\Auth\AccessControl\UserQuery,
+    Imbo\Auth\AccessControl\GroupQuery;
 
 /**
  * Access control interface
@@ -89,9 +90,10 @@ interface AdapterInterface {
     /**
      * Fetch a list of available resource groups
      *
+     * @param GroupQuery $query A query object used to filter the groups returned
      * @return array
      */
-    function getGroups();
+    function getGroups(GroupQuery $query = null);
 
     /**
      * Fetch a resource group with the given name

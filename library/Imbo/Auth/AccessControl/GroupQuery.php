@@ -11,9 +11,9 @@
 namespace Imbo\Auth\AccessControl;
 
 /**
- * Query for users
+ * Query for groups
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
+ * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Core\Auth\AccessControl
  */
-class UserQuery extends AbstractQuery {}
+class GroupQuery extends AbstractQuery {}
