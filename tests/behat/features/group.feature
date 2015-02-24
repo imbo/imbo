@@ -21,6 +21,35 @@ Feature: Imbo provides a group endpoint
             | json      | application/json | #^{"resources":\["groups\.get","groups\.head"]}$# |
             | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<resources>\s*<resource>groups\.get</resource>\s*<resource>groups\.head</resource>\s*</resources>\s*</imbo>$#ms |
 
+    Scenario: Create a resource group
+        Given Imbo uses the "access-control-mutable.php" configuration
+        And I use "valid-group-pubkey" and "foobar" for public and private keys
+        And the request body contains:
+          """
+          ["images.get"]
+          """
+        And I sign the request
+        When I request "/groups/read-images" using HTTP "PUT"
+        Then I should get a response with "201 Created"
+
+    Scenario: Update a resource group
+        Given Imbo uses the "access-control-mutable.php" configuration
+        And I use "valid-group-pubkey" and "foobar" for public and private keys
+        And the request body contains:
+          """
+          ["images.get", "images.head"]
+          """
+        And I sign the request
+        When I request "/groups/read-images" using HTTP "PUT"
+        Then I should get a response with "200 OK"
+
+    Scenario: Delete a resource group
+        Given Imbo uses the "access-control-mutable.php" configuration
+        And I use "valid-group-pubkey" and "foobar" for public and private keys
+        And I sign the request
+        When I request "/groups/read-images" using HTTP "DELETE"
+        Then I should get a response with "200 OK"
+
     Scenario: Delete a resource group with an immutable access control adapter
         Given I use "valid-group-pubkey" and "foobar" for public and private keys
         And I sign the request
