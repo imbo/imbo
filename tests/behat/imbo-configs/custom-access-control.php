@@ -10,7 +10,8 @@
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface,
     Imbo\Auth\AccessControl\Adapter\AbstractAdapter,
-    Imbo\Auth\AccessControl\UserQuery;
+    Imbo\Auth\AccessControl\UserQuery,
+    Imbo\Auth\AccessControl\GroupQuery;
 
 /**
  * Use a custom user lookup implementation
@@ -28,7 +29,7 @@ class StaticAccessControl extends AbstractAdapter implements AdapterInterface {
         return ['public'];
     }
 
-    public function getGroups() {
+    public function getGroups(GroupQuery $query = null) {
         return [];
     }
 
