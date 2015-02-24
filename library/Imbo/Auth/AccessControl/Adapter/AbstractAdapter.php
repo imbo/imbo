@@ -11,7 +11,8 @@
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface as ACI,
-    Imbo\Auth\AccessControl\UserQuery;
+    Imbo\Auth\AccessControl\UserQuery,
+    Imbo\Auth\AccessControl\GroupQuery;
 
 /**
  * Abstract access control adapter
@@ -34,7 +35,7 @@ abstract class AbstractAdapter implements AdapterInterface {
     /**
      * {@inheritdoc}
      */
-    abstract public function getGroups();
+    abstract public function getGroups(GroupQuery $query = null);
 
     /**
      * {@inheritdoc}

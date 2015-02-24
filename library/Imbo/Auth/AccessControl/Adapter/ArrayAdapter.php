@@ -11,7 +11,8 @@
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Exception\InvalidArgumentException,
-    Imbo\Auth\AccessControl\UserQuery;
+    Imbo\Auth\AccessControl\UserQuery,
+    Imbo\Auth\AccessControl\GroupQuery;
 
 /**
  * Array-backed access control adapter
@@ -123,8 +124,12 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
     /**
      * {@inheritdoc}
      */
-    public function getGroups() {
-        return $this->groups;
+    public function getGroups(GroupQuery $query = null) {
+        if ($query === null) {
+            $query = new GroupQuery();
+        }
+
+        return array_slice($this->groups, $query->offset() ?: 0, $query->limit(), true);
     }
 
     /**
