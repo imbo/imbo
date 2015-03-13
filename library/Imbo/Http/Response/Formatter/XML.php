@@ -299,6 +299,47 @@ STATUS;
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function formatAccessList(Model\AccessList $model) {
+        $data = $model->getData();
+
+        $rules = '';
+        foreach ($data as $rule) {
+            $rules .= '<rule id="' . $rule['id'] . '">';
+
+            if (isset($rule['resources']) && !!$rule['resources']) {
+                $rules .= '<resources>';
+                foreach ($rule['resources'] as $resource) {
+                    $rules .= '<resource>' . $resource . '</resource>';
+                }
+                $rules .= '</resources>';
+            }
+
+            if (isset($rule['group'])) {
+                $rules .= '<group>' . $rule['group'] . '</group>';
+            }
+
+            if (isset($rule['users']) && !!$rule['users']) {
+                $rules .= '<users>';
+                foreach ($rule['users'] as $user) {
+                    $rules .= '<user>' . $user . '</user>';
+                }
+                $rules .= '</users>';
+            }
+
+            $rules .= '</rule>';
+        }
+
+        return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <access>{$rules}</access>
+</imbo>
+DATA;
+    }
+
+    /**
      * Format a nested dataset
      *
      * @param array $data A nested array

@@ -59,6 +59,8 @@ abstract class Formatter implements FormatterInterface {
             return $this->formatGroups($model);
         } else if ($model instanceof Model\Group) {
             return $this->formatGroup($model);
+        } else if ($model instanceof Model\AccessList) {
+            return $this->formatAccessList($model);
         } else if ($model instanceof Model\ArrayModel) {
             return $this->formatArrayModel($model);
         } else if ($model instanceof Model\ListModel) {

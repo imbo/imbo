@@ -256,12 +256,18 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * @param  string $publicKey
      * @return array
      */
-    private function getAccessListForPublicKey($publicKey) {
+    public function getAccessListForPublicKey($publicKey) {
         $info = $this->getPublicKeyDetails($publicKey);
 
         if (!$info || !isset($info['acl'])) {
             return null;
         }
+
+        return array_map(function($info) {
+            $info['id'] = (string) $info['id'];
+
+            return $info;
+        }, $info['acl']);
 
         return $info['acl'];
     }
