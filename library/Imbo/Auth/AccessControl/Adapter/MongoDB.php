@@ -206,9 +206,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * {@inheritdoc}
      */
     public function addKeyPair($publicKey, $privateKey) {
-        $publickeyExists = !!$this->getPublicKeyDetails($publicKey);
-
-        if ($publickeyExists) {
+        if (!$this->publicKeyExists($publicKey)) {
             throw new RuntimeException('Publickey already exist', 400);
         }
 
@@ -262,6 +260,13 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      */
     public function deleteResourceGroup($groupName) {
         throw new \Exception('NOT IMPLEMENTED YET');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function publicKeyExists($publicKey) {
+        return !!$this->getPublicKeyDetails($publicKey);
     }
 
     /**
