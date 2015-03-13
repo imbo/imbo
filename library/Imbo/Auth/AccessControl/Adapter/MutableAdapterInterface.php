@@ -35,6 +35,15 @@ interface MutableAdapterInterface extends AdapterInterface {
     function deletePublicKey($publicKey);
 
     /**
+     * Update the private key for a public key
+     *
+     * @param string $publicKey Public key to update
+     * @param string $privateKey Private key to set
+     * @return boolean
+     */
+    function updatePrivateKey($publicKey, $privateKey);
+
+    /**
      * Add a new access rule to the given public key
      *
      * @param  string $publicKey  Public key to add access rule to
