@@ -5,6 +5,7 @@ Feature: Imbo provides a keys endpoint
 
     Background:
         Given Imbo uses the "access-control-mutable.php" configuration
+        And I prime the database with "access-control-mutable.php"
 
     Scenario Outline: Fetch access control rules for a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
@@ -19,9 +20,7 @@ Feature: Imbo provides a keys endpoint
         Examples:
             | extension | content-type     | response |
             | json      | application/json | #^\[{"id":".*?","resources":\["access\.get","access\.head"],"users":\[]},{"id":".*?","group":"something","users":\["some-user"]}]$# |
-            | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<id>.*?</id>\s*<access>\s*<resources>\s*<resource>access\.get</resource>\s*<resource>access\.head</resource>\s*</resources>\s*</access>\s*<users\s*/>\s*</imbo>$#ms |
-
-        # I know, the XML here is broken. Find a proper format for it, plz?
+            | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<access>\s*<rule id=".*?">\s*<resources>\s*<resource>access\.get</resource>\s*<resource>access\.head</resource>\s*</resources>\s*</rule><rule id=".*?">\s*<group>something</group>\s*<users>\s*<user>some-user</user>\s*</users>\s*</rule>\s*</access>\s*</imbo>$#ms |
 
     Scenario: Create a public key
         Given Imbo uses the "access-control-mutable.php" configuration
