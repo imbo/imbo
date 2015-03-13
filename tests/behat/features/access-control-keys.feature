@@ -23,8 +23,7 @@ Feature: Imbo provides a keys endpoint
             | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<access>\s*<rule id=".*?">\s*<resources>\s*<resource>access\.get</resource>\s*<resource>access\.head</resource>\s*</resources>\s*</rule><rule id=".*?">\s*<group>something</group>\s*<users>\s*<user>some-user</user>\s*</users>\s*</rule>\s*</access>\s*</imbo>$#ms |
 
     Scenario: Create a public key
-        Given Imbo uses the "access-control-mutable.php" configuration
-        And I use "master-pubkey" and "master-privkey" for public and private keys
+        Given I use "master-pubkey" and "master-privkey" for public and private keys
         And the request body contains:
           """
           {"privateKey":"the-private-key"}
