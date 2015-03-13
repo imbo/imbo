@@ -151,6 +151,13 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function publicKeyExists($publicKey) {
+        return isset($this->keys[$publicKey]);
+    }
+
+    /**
      * For compatibility reasons, where the configuration for Imbo has a set of
      * 'public key' => 'private key' pairs - this method converts that config
      * to an AccessControl-compatible format. Public key will equal the user.

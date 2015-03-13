@@ -111,6 +111,14 @@ interface AdapterInterface {
     function getPrivateKey($publicKey);
 
     /**
+     * Get whether a public key exists or not
+     *
+     * @param string $publicKey Public key to check
+     * @return boolean
+     */
+    function publicKeyExists($publicKey);
+
+    /**
      * Returns a list of resources which should be accessible for read-only public keys
      *
      * @return array
