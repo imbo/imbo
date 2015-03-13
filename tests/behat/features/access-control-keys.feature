@@ -10,7 +10,7 @@ Feature: Imbo provides a keys endpoint
     Scenario Outline: Fetch access control rules for a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I include an access token in the query
-        When I request "/keys/master-pubkey.<extension>/access"
+        When I request "/keys/master-pubkey/access.<extension>"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "<content-type>"
         And the response body matches:

@@ -301,7 +301,7 @@ STATUS;
     /**
      * {@inheritdoc}
      */
-    public function formatAccessList(Model\AccessList $model) {
+    public function formatAccessRules(Model\AccessRules $model) {
         $data = $model->getData();
 
         $rules = '';

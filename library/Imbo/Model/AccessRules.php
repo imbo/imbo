@@ -11,9 +11,9 @@
 namespace Imbo\Model;
 
 /**
- * Access list model
+ * Access rules model
  *
  * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Models
  */
-class AccessList extends ArrayModel {}
+class AccessRules extends ArrayModel {}
