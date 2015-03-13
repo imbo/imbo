@@ -86,6 +86,14 @@ interface FormatterInterface {
     function formatGroup(Model\Group $model);
 
     /**
+     * Format an access list model
+     *
+     * @param  Model\AccessList $model The model to format
+     * @return string Formatted data
+     */
+    function formatAccessList(Model\AccessList $model);
+
+    /**
      * Format an array model
      *
      * @param Model\ArrayModel $model The model to format
