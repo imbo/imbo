@@ -54,6 +54,10 @@ class Authenticate implements ListenerInterface {
             'shorturl.delete',   // Delete a single short URL
             'group.put',         // Add/update resource group
             'group.delete',      // Delete a resource group
+            'access.post',       // Update access rules
+            'access.delete',     // Delete an access rule
+            'keys.put',          // Create a public key
+            'keys.delete',       // Delete a public key
             'auth.authenticate', // Authenticate event
         );
 
