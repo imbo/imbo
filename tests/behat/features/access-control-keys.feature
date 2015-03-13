@@ -33,14 +33,13 @@ Feature: Imbo provides a keys endpoint
         Then I should get a response with "201 Created"
 
     Scenario: Update the private key for an existing public key
-        Given Imbo uses the "access-control-mutable.php" configuration
-        And I use "master-pubkey" and "master-privkey" for public and private keys
+        Given I use "master-pubkey" and "master-privkey" for public and private keys
         And the request body contains:
           """
           {"privateKey":"new-private-key"}
           """
         And I sign the request
-        When I request "/keys/foobar" using HTTP "PUT"
+        When I request "/keys/master-pubkey" using HTTP "PUT"
         Then I should get a response with "200 OK"
         # Perhaps add a test to ensure new keys can't be added/updated without the pubkey used having access to the keys endpoint?
 
@@ -56,16 +55,13 @@ Feature: Imbo provides a keys endpoint
         Then I should get a response with "200 OK"
 
     Scenario: Delete an access-control rule
-        Given Imbo uses the "access-control-mutable.php" configuration
         And I use "master-pubkey" and "master-privkey" for public and private keys
         And I sign the request
-        When I request "/keys/foobar/access/someId" using HTTP "DELETE"
+        When I request "/keys/foobar/access/1337" using HTTP "DELETE"
         Then I should get a response with "200 OK"
-        # How do we get the ID of a rule we can test? Prime the database?
 
-  Scenario: Delete a public key
-        Given Imbo uses the "access-control-mutable.php" configuration
-        And I use "master-pubkey" and "master-privkey" for public and private keys
+    Scenario: Delete a public key
+        Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I sign the request
         When I request "/keys/foobar" using HTTP "DELETE"
         Then I should get a response with "200 OK"

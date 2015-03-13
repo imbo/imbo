@@ -11,7 +11,8 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Exception\RuntimeException\InvalidArgumentException;
+    Imbo\Exception\RuntimeException,
+    Imbo\Exception\InvalidArgumentException;
 
 /**
  * Keys resource
@@ -35,12 +36,12 @@ class Keys implements ResourceInterface {
      */
     public static function getSubscribedEvents() {
         return [
-            'keys.put' => 'createKey',
+            'keys.put' => 'setKey',
             'keys.delete' => 'deleteKey'
         ];
     }
 
-    public function createKey(EventInterface $event) {
+    public function setKey(EventInterface $event) {
         $request = $event->getRequest();
         $data = json_decode($request->getContent(), true);
 
@@ -51,14 +52,30 @@ class Keys implements ResourceInterface {
         $publicKey = $request->getRoute()->get('publickey');
         $privateKey = $data['privateKey'];
 
-        // Create key pair
-        $event->getAccessControl()->addKeyPair($publicKey, $privateKey);
+        $keyExists = $event->getAccessControl()->publicKeyExists($publicKey);
 
-        // Return a 201
-        $event->getResponse()->setStatusCode(201);
+        if ($keyExists) {
+            $event->getAccessControl()->updatePrivateKey($publicKey, $privateKey);
+        } else {
+            $event->getAccessControl()->addKeyPair($publicKey, $privateKey);
+        }
+
+        $event->getResponse()->setStatusCode($keyExists ? 200 : 201);
     }
 
     public function deleteKey(EventInterface $event) {
-        throw new \Imbo\Exception\RuntimeException('Not Implemented', 501);
+        $request = $event->getRequest();
+        $publicKey = $request->getRoute()->get('publickey');
+
+        $keyExists = $event->getAccessControl()->publicKeyExists($publicKey);
+
+        if (!$keyExists) {
+            throw new RuntimeException('Public key not found', 404);
+        }
+
+        $request = $event->getRequest();
+        $publicKey = $request->getRoute()->get('publickey');
+
+        $event->getAccessControl()->deletePublicKey($publicKey);
     }
 }

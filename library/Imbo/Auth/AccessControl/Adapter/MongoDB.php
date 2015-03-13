@@ -30,6 +30,7 @@ use Imbo\Exception\InvalidArgumentException,
  *                   ['connect' => true, 'connectTimeoutMS' => 1000].
  *
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
+ * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Core\Auth\AccessControl\Adapter
  */
 class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
@@ -206,17 +207,16 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * {@inheritdoc}
      */
     public function addKeyPair($publicKey, $privateKey) {
-        if (!$this->publicKeyExists($publicKey)) {
-            throw new RuntimeException('Publickey already exist', 400);
-        }
-
         try {
-            $this->getAclCollection()->insert([
+            $result = $this->getAclCollection()->insert([
                 'publicKey' => $publicKey,
                 'privateKey' => $privateKey
             ]);
+
+            return (bool) $result['ok'];
+
         } catch (MongoException $e) {
-            throw new DatabaseException('Could not insert data into database', 500, $e);
+            throw new DatabaseException('Could not insert key into database', 500, $e);
         }
     }
 
@@ -224,7 +224,37 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * {@inheritdoc}
      */
     public function deletePublicKey($publicKey) {
-        throw new \Exception('NOT IMPLEMENTED YET');
+        if (!$this->publicKeyExists($publicKey)) {
+            throw new RuntimeException('Publickey does not exist', 404);
+        }
+
+        try {
+            $result = $this->getAclCollection()->remove([
+                'publicKey' => $publicKey
+            ]);
+
+            return (bool) $result['ok'];
+
+        } catch (MongoException $e) {
+            throw new DatabaseException('Could not delete key from database', 500, $e);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updatePrivateKey($publicKey, $privateKey) {
+        try {
+            $result = $this->getAclCollection()->update(
+                ['publicKey' => $publicKey],
+                ['$set' => ['privateKey' => $privateKey]]
+            );
+
+            return (bool) $result['ok'];
+
+        } catch (MongoException $e) {
+            throw new DatabaseException('Could not update key in database', 500, $e);
+        }
     }
 
     /**
