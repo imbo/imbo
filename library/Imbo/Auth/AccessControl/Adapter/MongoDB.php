@@ -16,7 +16,8 @@ use Imbo\Exception\InvalidArgumentException,
     Imbo\Auth\AccessControl\GroupQuery,
     MongoClient,
     MongoCollection,
-    MongoException;
+    MongoException,
+    MongoId;
 
 /**
  * MongoDB access control adapter
@@ -210,7 +211,8 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         try {
             $result = $this->getAclCollection()->insert([
                 'publicKey' => $publicKey,
-                'privateKey' => $privateKey
+                'privateKey' => $privateKey,
+                'acl' => []
             ]);
 
             return (bool) $result['ok'];
@@ -224,10 +226,6 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * {@inheritdoc}
      */
     public function deletePublicKey($publicKey) {
-        if (!$this->publicKeyExists($publicKey)) {
-            throw new RuntimeException('Publickey does not exist', 404);
-        }
-
         try {
             $result = $this->getAclCollection()->remove([
                 'publicKey' => $publicKey
@@ -261,7 +259,20 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * {@inheritdoc}
      */
     public function addAccessRule($publicKey, array $accessRule) {
-        throw new \Exception('NOT IMPLEMENTED YET');
+        try {
+            $result = $this->getAclCollection()->update(
+                ['publicKey' => $publicKey],
+                ['$push' => ['acl' => array_merge(
+                    ['id' => new MongoId()],
+                    $accessRule
+                )]]
+            );
+
+            return (bool) $result['ok'];
+
+        } catch (MongoException $e) {
+            throw new DatabaseException('Could not update acl in database', 500, $e);
+        }
     }
 
     /**

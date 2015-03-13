@@ -11,6 +11,7 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
+    Imbo\Exception\RuntimeException,
     Imbo\Model\AccessRules as AccessRulesModel;
 
 /**
@@ -45,6 +46,12 @@ class AccessRules implements ResourceInterface {
     public function getRules(EventInterface $event) {
         $publicKey = $this->getPublicKey($event);
 
+        $keyExists = $event->getAccessControl()->publicKeyExists($publicKey);
+
+        if (!$keyExists) {
+            throw new RuntimeException('Public key not found', 404);
+        }
+
         $accessList = $event->getAccessControl()->getAccessListForPublicKey($publicKey);
 
         $model = new AccessRulesModel();
@@ -54,6 +61,17 @@ class AccessRules implements ResourceInterface {
     }
 
     public function updateRules(EventInterface $event) {
-        throw new \Imbo\Exception\RuntimeException('Not Implemented', 501);
+        $publicKey = $this->getPublicKey($event);
+
+        $request = $event->getRequest();
+        $data = json_decode($request->getContent(), true);
+
+        if (!is_array($data)) {
+            throw new InvalidArgumentException('No access rule data provided', 400);
+        }
+
+        foreach ($data as $rule) {
+            $event->getAccessControl()->addAccessRule($publicKey, $rule);
+        }
     }
 }

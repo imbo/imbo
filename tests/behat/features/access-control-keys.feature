@@ -44,8 +44,7 @@ Feature: Imbo provides a keys endpoint
         # Perhaps add a test to ensure new keys can't be added/updated without the pubkey used having access to the keys endpoint?
 
     Scenario: Update list of access rules for a public key
-        Given Imbo uses the "access-control-mutable.php" configuration
-        And I use "master-pubkey" and "master-privkey" for public and private keys
+        Given I use "master-pubkey" and "master-privkey" for public and private keys
         And the request body contains:
           """
           [{"resources":["images.get"],"users":["user1"]},{"group":"read-images","users":["user1", "user5"]}]
