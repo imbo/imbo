@@ -11,6 +11,7 @@
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Exception\InvalidArgumentException,
+    Imbo\Exception\RuntimeException,
     Imbo\Auth\AccessControl\UserQuery,
     Imbo\Auth\AccessControl\GroupQuery,
     MongoClient,
@@ -205,7 +206,20 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * {@inheritdoc}
      */
     public function addKeyPair($publicKey, $privateKey) {
-        throw new \Exception('NOT IMPLEMENTED YET');
+        $publickeyExists = !!$this->getPublicKeyDetails($publicKey);
+
+        if ($publickeyExists) {
+            throw new RuntimeException('Publickey already exist', 400);
+        }
+
+        try {
+            $this->getAclCollection()->insert([
+                'publicKey' => $publicKey,
+                'privateKey' => $privateKey
+            ]);
+        } catch (MongoException $e) {
+            throw new DatabaseException('Could not insert data into database', 500, $e);
+        }
     }
 
     /**

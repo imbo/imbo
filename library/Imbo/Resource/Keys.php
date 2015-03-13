@@ -10,7 +10,8 @@
 
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface;
+use Imbo\EventManager\EventInterface,
+    Imbo\Exception\RuntimeException\InvalidArgumentException;
 
 /**
  * Keys resource
@@ -40,7 +41,21 @@ class Keys implements ResourceInterface {
     }
 
     public function createKey(EventInterface $event) {
-        throw new \Imbo\Exception\RuntimeException('Not Implemented', 501);
+        $request = $event->getRequest();
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['privateKey'])) {
+            throw new InvalidArgumentException('No privateKey provided', 400);
+        }
+
+        $publicKey = $request->getRoute()->get('publickey');
+        $privateKey = $data['privateKey'];
+
+        // Create key pair
+        $event->getAccessControl()->addKeyPair($publicKey, $privateKey);
+
+        // Return a 201
+        $event->getResponse()->setStatusCode(201);
     }
 
     public function deleteKey(EventInterface $event) {
