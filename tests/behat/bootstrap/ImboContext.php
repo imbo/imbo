@@ -366,4 +366,31 @@ class ImboContext extends RESTContext {
             new Given('I request "/s/' . $shortUrlId . '"'),
         );
     }
+
+    /**
+     * @Given /^I prime the database with "([^"]*)"$/
+     */
+    public function iPrimeTheAccessControlProviderWith($fixture)
+    {
+        $fixturePath = implode(DIRECTORY_SEPARATOR, [
+            dirname(__DIR__),
+            'fixtures',
+            $fixture
+        ]);
+
+        if (!$fixturePath = realpath($fixturePath)) {
+            throw new RuntimeException('Path "' . $fixturePath . '" is invalid');
+        }
+
+        $mongo = (new MongoClient())->imbo_testing;
+
+        $fixtures = require $fixturePath;
+        foreach ($fixtures as $collection => $data) {
+            $mongo->$collection->drop();
+
+            if (!!$data) {
+                $mongo->$collection->batchInsert($data);
+            }
+        }
+    }
 }
