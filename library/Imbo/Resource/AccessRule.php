@@ -10,23 +10,21 @@
 
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface;
+use Imbo\EventManager\EventInterface,
+    Imbo\Model\AccessRules as AccessRulesModel;
 
 /**
- * Keys resource
- *
- * This resource can be used to manipulate the public keys for an instance,
- * given that a mutable access control adapter is used.
+ * Access rule resource
  *
  * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Resources
  */
-class Keys implements ResourceInterface {
+class AccessRule implements ResourceInterface {
     /**
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('PUT', 'DELETE');
+        return array('GET', 'HEAD', 'DELETE');
     }
 
     /**
@@ -34,16 +32,17 @@ class Keys implements ResourceInterface {
      */
     public static function getSubscribedEvents() {
         return [
-            'keys.put' => 'createKey',
-            'keys.delete' => 'deleteKey'
+            'accessrule.get' => 'getRule',
+            'accessrule.head' => 'getRule',
+            'accessrule.delete' => 'deleteRule'
         ];
     }
 
-    public function createKey(EventInterface $event) {
+    public function getRule(EventInterface $event) {
         throw new \Imbo\Exception\RuntimeException('Not Implemented', 501);
     }
 
-    public function deleteKey(EventInterface $event) {
+    public function updateAccessRules(EventInterface $event) {
         throw new \Imbo\Exception\RuntimeException('Not Implemented', 501);
     }
 }
