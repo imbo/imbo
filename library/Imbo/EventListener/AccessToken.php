@@ -83,7 +83,8 @@ class AccessToken implements ListenerInterface {
             'user.head', 'user.get', 'images.get', 'images.head',
             'image.get', 'image.head', 'metadata.get', 'metadata.head',
             'groups.get', 'groups.head', 'group.get', 'group.head',
-            'access.get', 'access.head', 'keys.get', 'keys.head',
+            'accessrules.get', 'accessrules.head', 'accessrule.head', 'accessrule.get',
+            'keys.get', 'keys.head',
             'auth.accesstoken'
         );
 
