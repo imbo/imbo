@@ -44,6 +44,15 @@ interface MutableAdapterInterface extends AdapterInterface {
     function updatePrivateKey($publicKey, $privateKey);
 
     /**
+     * Get an access rule by id
+     *
+     * @param  string $publicKey    Public key to add access rule to
+     * @param  array  $accessRuleId Access rule id
+     * @return array Access rule
+     */
+    function getAccessRule($publicKey, $accessRuleId);
+
+    /**
      * Add a new access rule to the given public key
      *
      * @param  string $publicKey  Public key to add access rule to

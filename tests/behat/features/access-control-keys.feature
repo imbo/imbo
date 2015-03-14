@@ -29,7 +29,7 @@ Feature: Imbo provides a keys endpoint
           {"privateKey":"the-private-key"}
           """
         And I sign the request
-        When I request "/keys/foobar" using HTTP "PUT"
+        When I request "/keys/the-public-key" using HTTP "PUT"
         Then I should get a response with "201 Created"
 
     Scenario: Update the private key for an existing public key

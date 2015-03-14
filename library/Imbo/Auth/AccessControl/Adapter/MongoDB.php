@@ -258,6 +258,21 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
     /**
      * {@inheritdoc}
      */
+    public function getAccessRule($publicKey, $accessId) {
+        $rules = $this->getAccessListForPublicKey($publicKey);
+
+        foreach ($rules as $rule) {
+            if ($rule['id'] == $accessId) {
+                return $rule;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addAccessRule($publicKey, array $accessRule) {
         try {
             $result = $this->getAclCollection()->update(
