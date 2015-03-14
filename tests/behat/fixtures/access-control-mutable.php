@@ -17,9 +17,18 @@ return [
                     'users' => ['some-user']
                 ]
             ]
+        ],
+        [
+            'publicKey' => 'foobar',
+            'privateKey' => 'barfoo',
+            'acl' => [
+                [
+                    'id' => new MongoId('100000000000000000001337'),
+                    'resources' => ['access.get', 'access.head'],
+                    'users' => []
+                ]
+            ]
         ]
     ],
-    'accesscontrolgroup' => [
-
-    ]
+    'accesscontrolgroup' => []
 ];

@@ -127,6 +127,7 @@ class Application {
             'Imbo\Resource\Group',
             'Imbo\Resource\Keys',
             'Imbo\Resource\AccessRules',
+            'Imbo\Resource\AccessRule',
             'Imbo\Http\Response\ResponseFormatter' => [
                 'formatters' => $formatters,
                 'contentNegotiation' => $contentNegotiation,

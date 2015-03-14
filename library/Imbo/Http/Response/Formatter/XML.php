@@ -301,34 +301,26 @@ STATUS;
     /**
      * {@inheritdoc}
      */
+    public function formatAccessRule(Model\AccessRule $model) {
+        $rule = $this->formatAccessRuleArray($model->getData());
+
+                return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  {$rule}
+</imbo>
+DATA;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function formatAccessRules(Model\AccessRules $model) {
         $data = $model->getData();
 
         $rules = '';
         foreach ($data as $rule) {
-            $rules .= '<rule id="' . $rule['id'] . '">';
-
-            if (isset($rule['resources']) && !!$rule['resources']) {
-                $rules .= '<resources>';
-                foreach ($rule['resources'] as $resource) {
-                    $rules .= '<resource>' . $resource . '</resource>';
-                }
-                $rules .= '</resources>';
-            }
-
-            if (isset($rule['group'])) {
-                $rules .= '<group>' . $rule['group'] . '</group>';
-            }
-
-            if (isset($rule['users']) && !!$rule['users']) {
-                $rules .= '<users>';
-                foreach ($rule['users'] as $user) {
-                    $rules .= '<user>' . $user . '</user>';
-                }
-                $rules .= '</users>';
-            }
-
-            $rules .= '</rule>';
+            $rules .= $this->formatAccessRuleArray($rule);
         }
 
         return <<<DATA
@@ -371,5 +363,39 @@ DATA;
         }
 
         return $xml;
+    }
+
+    /**
+     * Format access rule data array
+     *
+     * @param array $accessRule
+     * @return string
+     */
+    private function formatAccessRuleArray(array $accessRule) {
+        $rule = '<rule id="' . $accessRule['id'] . '">';
+
+        if (isset($accessRule['resources']) && !!$accessRule['resources']) {
+            $rule .= '<resources>';
+            foreach ($accessRule['resources'] as $resource) {
+                $rule .= '<resource>' . $resource . '</resource>';
+            }
+            $rule .= '</resources>';
+        }
+
+        if (isset($accessRule['group'])) {
+            $rule .= '<group>' . $accessRule['group'] . '</group>';
+        }
+
+        if (isset($accessRule['users']) && !!$accessRule['users']) {
+            $rule .= '<users>';
+            foreach ($accessRule['users'] as $user) {
+                $rule .= '<user>' . $user . '</user>';
+            }
+            $rule .= '</users>';
+        }
+
+        $rule .= '</rule>';
+
+        return $rule;
     }
 }

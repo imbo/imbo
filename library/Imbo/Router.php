@@ -56,7 +56,7 @@ class Router {
         'group'          => '#^/groups/(?<group>[a-z0-9_-]{1,})(/|\.(?<extension>json|xml))?$#',
         'keys'           => '#^/keys/(?<publickey>[a-z0-9_-]{1,})$#',
         'accessrules'    => '#^/keys/(?<publickey>[a-z0-9_-]{1,})/access(/|(\.(?<extension>json|xml)))?$#',
-        'accessrule'     => '#^/keys/(?<publickey>[a-z0-9_-]{1,})/access(/|(\.(?<extension>json|xml)))/(?<accessId>[a-f0-9]{1,})$#',
+        'accessrule'     => '#^/keys/(?<publickey>[a-z0-9_-]{1,})/access/(?<accessRuleId>[a-f0-9]{1,})(\.(?<extension>json|xml))?$#',
     );
 
     /**

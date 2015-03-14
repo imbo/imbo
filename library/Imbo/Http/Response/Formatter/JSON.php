@@ -170,6 +170,13 @@ class JSON extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
+    public function formatAccessRule(Model\AccessRule $model) {
+        return $this->encode($model->getData());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function formatAccessRules(Model\AccessRules $model) {
         return $this->encode($model->getData());
     }
