@@ -56,7 +56,7 @@ Feature: Imbo provides a keys endpoint
     Scenario: Delete an access-control rule
         And I use "master-pubkey" and "master-privkey" for public and private keys
         And I sign the request
-        When I request "/keys/foobar/access/1337" using HTTP "DELETE"
+        When I request "/keys/foobar/access/100000000000000000001337" using HTTP "DELETE"
         Then I should get a response with "200 OK"
 
     Scenario: Delete a public key
