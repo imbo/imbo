@@ -11,6 +11,7 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
+    Imbo\Exception\RuntimeException,
     Imbo\Model\AccessRule as AccessRuleModel;
 
 /**
@@ -39,17 +40,19 @@ class AccessRule implements ResourceInterface {
     }
 
     public function getRule(EventInterface $event) {
+        $acl = $event->getAccessControl();
+
         $request = $event->getRequest();
         $publicKey = $request->getRoute()->get('publickey');
         $accessRuleId = $request->getRoute()->get('accessRuleId');
 
-        $keyExists = $event->getAccessControl()->publicKeyExists($publicKey);
+        $keyExists = $acl->publicKeyExists($publicKey);
 
         if (!$keyExists) {
             throw new RuntimeException('Public key not found', 404);
         }
 
-        $accessRule = $event->getAccessControl()->getAccessRule($publicKey, $accessRuleId);
+        $accessRule = $acl->getAccessRule($publicKey, $accessRuleId);
 
         if (!$accessRule) {
             throw new RuntimeException('Access rule not found', 404);
@@ -62,6 +65,24 @@ class AccessRule implements ResourceInterface {
     }
 
     public function deleteRule(EventInterface $event) {
-        throw new \Imbo\Exception\RuntimeException('Not Implemented', 501);
+        $acl = $event->getAccessControl();
+
+        $request = $event->getRequest();
+        $publicKey = $request->getRoute()->get('publickey');
+        $accessRuleId = $request->getRoute()->get('accessRuleId');
+
+        $keyExists = $acl->publicKeyExists($publicKey);
+
+        if (!$keyExists) {
+            throw new RuntimeException('Public key not found', 404);
+        }
+
+        $accessRule = $acl->getAccessRule($publicKey, $accessRuleId);
+
+        if (!$accessRule) {
+            throw new RuntimeException('Access rule not found', 404);
+        }
+
+        $acl->deleteAccessRule($publicKey, $accessRuleId);
     }
 }

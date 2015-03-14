@@ -286,7 +286,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
             return (bool) $result['ok'];
 
         } catch (MongoException $e) {
-            throw new DatabaseException('Could not update acl in database', 500, $e);
+            throw new DatabaseException('Could not update rule in database', 500, $e);
         }
     }
 
@@ -294,7 +294,22 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * {@inheritdoc}
      */
     public function deleteAccessRule($publicKey, $accessId) {
-        throw new \Exception('NOT IMPLEMENTED YET');
+        try {
+            $result = $this->getAclCollection()->update(
+                ['publicKey' => $publicKey],
+                [
+                    '$pull' => [
+                        'acl' => [
+                            'id' => new MongoId($accessId)
+                        ]
+                    ]
+                ]
+            );
+
+            return (bool) $result['ok'];
+        } catch (MongoException $e) {
+            throw new DatabaseException('Could not delete rule from in database', 500, $e);
+        }
     }
 
     /**
