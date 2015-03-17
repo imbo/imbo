@@ -28,7 +28,28 @@ return [
                     'users' => []
                 ]
             ]
+        ],
+        [
+            'publicKey' => 'acl-creator',
+            'privateKey' => 'someprivkey',
+            'acl' => [
+                [
+                    'id' => new MongoId(),
+                    'resources' => [
+                        'group.get', 'group.head', 'group.put', 'group.delete',
+                        'accessrules.get', 'accessrules.head', 'accessrules.post',
+                        'keys.put', 'keys.delete',
+                    ],
+                    'users' => [],
+                ]
+            ]
         ]
     ],
-    'accesscontrolgroup' => []
+
+    'accesscontrolgroup' => [
+        [
+            'name' => 'existing-group',
+            'resources' => ['group.get', 'group.head'],
+        ]
+    ],
 ];

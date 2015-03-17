@@ -316,21 +316,44 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * {@inheritdoc}
      */
     public function addResourceGroup($groupName, array $resources = []) {
-        throw new \Exception('NOT IMPLEMENTED YET');
+        try {
+            $this->getGroupsCollection()->insert([
+                'name' => $groupName,
+                'resources' => $resources,
+            ]);
+        } catch (MongoException $e) {
+            throw new DatabaseException('Could not add resource group to database', 500, $e);
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addResourcesToGroup($groupName, array $resources) {
-        throw new \Exception('NOT IMPLEMENTED YET');
+    public function updateResourceGroup($groupName, array $resources) {
+        try {
+            $this->getGroupsCollection()->update([
+                'name' => $groupName
+            ], [
+                '$set' => ['resources' => $resources],
+            ]);
+        } catch (MongoException $e) {
+            throw new DatabaseException('Could not update resource group in database', 500, $e);
+        }
     }
 
     /**
      * {@inheritdoc}
      */
     public function deleteResourceGroup($groupName) {
-        throw new \Exception('NOT IMPLEMENTED YET');
+        try {
+            $result = $this->getGroupsCollection()->remove([
+                'name' => $groupName,
+            ]);
+
+            return (bool) $result['ok'];
+        } catch (MongoException $e) {
+            throw new DatabaseException('Could not delete resource group from database', 500, $e);
+        }
     }
 
     /**
@@ -415,7 +438,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
             try {
                 $this->aclGroupCollection = $this->getMongoClient()->selectCollection(
                     $this->params['databaseName'],
-                    'accesscontrolgroups'
+                    'accesscontrolgroup'
                 );
             } catch (MongoException $e) {
                 throw new DatabaseException('Could not select collection', 500, $e);

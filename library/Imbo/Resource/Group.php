@@ -73,6 +73,24 @@ class Group implements ResourceInterface {
         if (!($accessControl instanceof MutableAdapterInterface)) {
             throw new ResourceException('Access control adapter is immutable', 405);
         }
+
+        $request = $event->getRequest();
+        $route = $request->getRoute();
+        $groupName = $route->get('group');
+
+        $group = $accessControl->getGroup($groupName);
+        $groupExists = !empty($group);
+
+        $resources = json_decode($request->getContent(), true);
+
+        if ($groupExists) {
+            $accessControl->updateResourceGroup($groupName, $resources);
+        } else {
+            $accessControl->addResourceGroup($groupName, $resources);
+        }
+
+        $response = $event->getResponse();
+        $response->setStatusCode($groupExists ? 200 : 201);
     }
 
     /**
@@ -85,5 +103,15 @@ class Group implements ResourceInterface {
         if (!($accessControl instanceof MutableAdapterInterface)) {
             throw new ResourceException('Access control adapter is immutable', 405);
         }
-    }
+
+        $route = $event->getRequest()->getRoute();
+        $groupName = $route->get('group');
+        $group = $accessControl->getGroup($groupName);
+
+        if (!$group) {
+            throw new ResourceException('Resource group not found', 404);
+        }
+
+        $accessControl->deleteResourceGroup($groupName);
+   }
 }
