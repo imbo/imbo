@@ -23,7 +23,8 @@ Feature: Imbo provides a group endpoint
 
     Scenario: Create a resource group
         Given Imbo uses the "access-control-mutable.php" configuration
-        And I use "valid-group-pubkey" and "foobar" for public and private keys
+        And I prime the database with "access-control-mutable.php"
+        And I use "acl-creator" and "someprivkey" for public and private keys
         And the request body contains:
           """
           ["images.get"]
@@ -34,24 +35,27 @@ Feature: Imbo provides a group endpoint
 
     Scenario: Update a resource group
         Given Imbo uses the "access-control-mutable.php" configuration
-        And I use "valid-group-pubkey" and "foobar" for public and private keys
+        And I prime the database with "access-control-mutable.php"
+        And I use "acl-creator" and "someprivkey" for public and private keys
         And the request body contains:
           """
           ["images.get", "images.head"]
           """
         And I sign the request
-        When I request "/groups/read-images" using HTTP "PUT"
+        When I request "/groups/existing-group" using HTTP "PUT"
         Then I should get a response with "200 OK"
 
     Scenario: Delete a resource group
         Given Imbo uses the "access-control-mutable.php" configuration
-        And I use "valid-group-pubkey" and "foobar" for public and private keys
+        And I prime the database with "access-control-mutable.php"
+        And I use "acl-creator" and "someprivkey" for public and private keys
         And I sign the request
-        When I request "/groups/read-images" using HTTP "DELETE"
+        When I request "/groups/existing-group" using HTTP "DELETE"
         Then I should get a response with "200 OK"
 
     Scenario: Delete a resource group with an immutable access control adapter
         Given I use "valid-group-pubkey" and "foobar" for public and private keys
+        And I prime the database with "access-control-mutable.php"
         And I sign the request
         When I request "/groups/groups-read" using HTTP "DELETE"
         Then I should get a response with "405 Access control adapter is immutable"
@@ -60,6 +64,7 @@ Feature: Imbo provides a group endpoint
 
     Scenario: Update a resource group with an immutable access control adapter
         Given I use "valid-group-pubkey" and "foobar" for public and private keys
+        And I prime the database with "access-control-mutable.php"
         And the request body contains:
           """
           ["images.get"]

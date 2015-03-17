@@ -80,13 +80,13 @@ interface MutableAdapterInterface extends AdapterInterface {
     function addResourceGroup($groupName, array $resources = []);
 
     /**
-     * Add new resources to a resource group
+     * Update resources for an existing resource group
      *
      * @param string $groupName Group to add resources to
      * @param array $resources Array of resources (eg. 'image.get', 'user.head' etc)
      * @param boolean
      */
-    function addResourcesToGroup($groupName, array $resources);
+    function updateResourceGroup($groupName, array $resources);
 
     /**
      * Delete a resource group
