@@ -337,7 +337,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * {@inheritdoc}
      */
     public function publicKeyExists($publicKey) {
-        return !!$this->getPublicKeyDetails($publicKey);
+        return (bool) $this->getPublicKeyDetails($publicKey);
     }
 
     /**
