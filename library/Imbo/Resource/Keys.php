@@ -12,7 +12,9 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Exception\RuntimeException,
-    Imbo\Exception\InvalidArgumentException;
+    Imbo\Exception\ResourceException,
+    Imbo\Exception\InvalidArgumentException,
+    Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 
 /**
  * Keys resource
@@ -42,6 +44,12 @@ class Keys implements ResourceInterface {
     }
 
     public function setKey(EventInterface $event) {
+        $acl = $event->getAccessControl();
+
+        if (!($acl instanceof MutableAdapterInterface)) {
+            throw new ResourceException('Access control adapter is immutable', 405);
+        }
+
         $request = $event->getRequest();
         $data = json_decode($request->getContent(), true);
 
@@ -52,22 +60,28 @@ class Keys implements ResourceInterface {
         $publicKey = $request->getRoute()->get('publickey');
         $privateKey = $data['privateKey'];
 
-        $keyExists = $event->getAccessControl()->publicKeyExists($publicKey);
+        $keyExists = $acl->publicKeyExists($publicKey);
 
         if ($keyExists) {
-            $event->getAccessControl()->updatePrivateKey($publicKey, $privateKey);
+            $acl->updatePrivateKey($publicKey, $privateKey);
         } else {
-            $event->getAccessControl()->addKeyPair($publicKey, $privateKey);
+            $acl->addKeyPair($publicKey, $privateKey);
         }
 
         $event->getResponse()->setStatusCode($keyExists ? 200 : 201);
     }
 
     public function deleteKey(EventInterface $event) {
+        $acl = $event->getAccessControl();
+
+        if (!($acl instanceof MutableAdapterInterface)) {
+            throw new ResourceException('Access control adapter is immutable', 405);
+        }
+
         $request = $event->getRequest();
         $publicKey = $request->getRoute()->get('publickey');
 
-        $keyExists = $event->getAccessControl()->publicKeyExists($publicKey);
+        $keyExists = $acl->publicKeyExists($publicKey);
 
         if (!$keyExists) {
             throw new RuntimeException('Public key not found', 404);
@@ -76,6 +90,6 @@ class Keys implements ResourceInterface {
         $request = $event->getRequest();
         $publicKey = $request->getRoute()->get('publickey');
 
-        $event->getAccessControl()->deletePublicKey($publicKey);
+        $acl->deletePublicKey($publicKey);
     }
 }
