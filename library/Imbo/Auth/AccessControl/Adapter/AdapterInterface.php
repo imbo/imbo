@@ -127,6 +127,15 @@ interface AdapterInterface {
     function getAccessListForPublicKey($publicKey);
 
     /**
+     * Get an access rule by id
+     *
+     * @param  string $publicKey    Public key to add access rule to
+     * @param  array  $accessRuleId Access rule id
+     * @return array Access rule
+     */
+    function getAccessRule($publicKey, $accessRuleId);
+
+    /**
      * Returns a list of resources which should be accessible for read-only public keys
      *
      * @return array
