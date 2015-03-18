@@ -73,7 +73,7 @@ Feature: Imbo provides a keys endpoint
 
     Scenario Outline: The keys resource supports PUT and DELETE only
         Given I use "master-pubkey" and "master-privkey" for public and private keys
-        And I sign the request
+        And I authenticate using "<auth-method>"
         And the request body contains:
         """
         <body>
@@ -82,16 +82,16 @@ Feature: Imbo provides a keys endpoint
         Then I should get a response with "<status>"
 
         Examples:
-            | method | body                             | status                 |
-            | GET    |                                  | 405 Method not allowed |
-            | HEAD   |                                  | 405 Method not allowed |
-            | POST   |                                  | 405 Method not allowed |
-            | PUT    | {"privateKey":"the-private-key"} | 200 OK                 |
-            | DELETE |                                  | 200 OK                 |
+            | method | auth-method  | body                             | status                 |
+            | GET    | access-token |                                  | 405 Method not allowed |
+            | HEAD   | access-token |                                  | 405 Method not allowed |
+            | POST   | signature    |                                  | 405 Method not allowed |
+            | PUT    | signature    | {"privateKey":"the-private-key"} | 200 OK                 |
+            | DELETE | signature    |                                  | 200 OK                 |
 
     Scenario Outline: The access rules resource supports GET, HEAD and POST only
         Given I use "master-pubkey" and "master-privkey" for public and private keys
-        And I sign the request
+        And I authenticate using "<auth-method>"
         And the request body contains:
         """
         <body>
@@ -100,31 +100,31 @@ Feature: Imbo provides a keys endpoint
         Then I should get a response with "<status>"
 
         Examples:
-            | method | body                                             | status                 |
-            | GET    |                                                  | 200 OK                 |
-            | HEAD   |                                                  | 200 OK                 |
-            | POST   | [{"resources":["images.get"],"users":["user1"]}] | 200 OK                 |
-            | PUT    |                                                  | 405 Method not allowed |
-            | DELETE |                                                  | 405 Method not allowed |
+            | method | auth-method  | body                                             | status                 |
+            | GET    | access-token |                                                  | 200 OK                 |
+            | HEAD   | access-token |                                                  | 200 OK                 |
+            | POST   | signature    | [{"resources":["images.get"],"users":["user1"]}] | 200 OK                 |
+            | PUT    | signature    |                                                  | 405 Method not allowed |
+            | DELETE | signature    |                                                  | 405 Method not allowed |
 
     Scenario Outline: The access rule resource supports GET, HEAD and POST only
         Given I use "master-pubkey" and "master-privkey" for public and private keys
-        And I sign the request
+        And I authenticate using "<auth-method>"
         When I request "/keys/foobar/access/100000000000000000001337" using HTTP "<method>"
         Then I should get a response with "<status>"
 
         Examples:
-            | method | body                          | status                 |
-            | GET    |                               | 200 OK                 |
-            | HEAD   |                               | 200 OK                 |
-            | POST   | [{"resources":[],"users":[]}] | 405 Method not allowed |
-            | PUT    |                               | 405 Method not allowed |
-            | DELETE |                               | 200 OK                 |
+            | method | auth-method  | body                          | status                 |
+            | GET    | access-token |                               | 200 OK                 |
+            | HEAD   | access-token |                               | 200 OK                 |
+            | POST   | signature    | [{"resources":[],"users":[]}] | 405 Method not allowed |
+            | PUT    | signature    |                               | 405 Method not allowed |
+            | DELETE | signature    |                               | 200 OK                 |
 
     Scenario Outline: Operations on an immutable access control provider
         Given Imbo uses the "access-control.php" configuration
         And I use "valid-pubkey" and "foobar" for public and private keys
-        And I sign the request
+        And I authenticate using "<auth-method>"
         And the request body contains:
         """
         <body>
@@ -133,19 +133,19 @@ Feature: Imbo provides a keys endpoint
         Then I should get a response with "<status>"
 
         Examples:
-            | uri                         | method | body                          | status                                  |
-            | /keys/valid-pubkey          | GET    |                               | 405 Method not allowed                  |
-            | /keys/valid-pubkey          | HEAD   |                               | 405 Method not allowed                  |
-            | /keys/valid-pubkey          | POST   | {"privateKey": "secret"}      | 405 Method not allowed                  |
-            | /keys/valid-pubkey          | PUT    | {"privateKey": "secret"}      | 405 Access control adapter is immutable |
-            | /keys/valid-pubkey          | DELETE |                               | 405 Access control adapter is immutable |
-            | /keys/valid-pubkey/access   | GET    |                               | 200 OK                                  |
-            | /keys/valid-pubkey/access   | HEAD   |                               | 200 OK                                  |
-            | /keys/valid-pubkey/access   | POST   | [{"resources":[],"users":[]}] | 405 Access control adapter is immutable |
-            | /keys/valid-pubkey/access   | PUT    | [{"resources":[],"users":[]}] | 405 Method not allowed                  |
-            | /keys/valid-pubkey/access   | DELETE |                               | 405 Method not allowed                  |
-            | /keys/valid-pubkey/access/1 | GET    |                               | 200 OK                                  |
-            | /keys/valid-pubkey/access/1 | HEAD   |                               | 200 OK                                  |
-            | /keys/valid-pubkey/access/1 | POST   |                               | 405 Method not allowed                  |
-            | /keys/valid-pubkey/access/1 | PUT    |                               | 405 Method not allowed                  |
-            | /keys/valid-pubkey/access/1 | DELETE |                               | 405 Access control adapter is immutable |
+            | uri                         | method | auth-method  | body                          | status                                  |
+            | /keys/valid-pubkey          | GET    | access-token |                               | 405 Method not allowed                  |
+            | /keys/valid-pubkey          | HEAD   | access-token |                               | 405 Method not allowed                  |
+            | /keys/valid-pubkey          | POST   | signature    | {"privateKey": "secret"}      | 405 Method not allowed                  |
+            | /keys/valid-pubkey          | PUT    | signature    | {"privateKey": "secret"}      | 405 Access control adapter is immutable |
+            | /keys/valid-pubkey          | DELETE | signature    |                               | 405 Access control adapter is immutable |
+            | /keys/valid-pubkey/access   | GET    | access-token |                               | 200 OK                                  |
+            | /keys/valid-pubkey/access   | HEAD   | access-token |                               | 200 OK                                  |
+            | /keys/valid-pubkey/access   | POST   | signature    | [{"resources":[],"users":[]}] | 405 Access control adapter is immutable |
+            | /keys/valid-pubkey/access   | PUT    | signature    | [{"resources":[],"users":[]}] | 405 Method not allowed                  |
+            | /keys/valid-pubkey/access   | DELETE | signature    |                               | 405 Method not allowed                  |
+            | /keys/valid-pubkey/access/1 | GET    | access-token |                               | 200 OK                                  |
+            | /keys/valid-pubkey/access/1 | HEAD   | access-token |                               | 200 OK                                  |
+            | /keys/valid-pubkey/access/1 | POST   | signature    |                               | 405 Method not allowed                  |
+            | /keys/valid-pubkey/access/1 | PUT    | signature    |                               | 405 Method not allowed                  |
+            | /keys/valid-pubkey/access/1 | DELETE | signature    |                               | 405 Access control adapter is immutable |

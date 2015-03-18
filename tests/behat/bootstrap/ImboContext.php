@@ -112,6 +112,21 @@ class ImboContext extends RESTContext {
     }
 
     /**
+     * @Given /^I authenticate using "(.*?)"$/
+     */
+    public function authenticateRequest($method) {
+        if ($method == 'access-token') {
+            return new Given('I include an access token in the query');
+        }
+
+        if ($method == 'signature') {
+            return new Given('I sign the request');
+        }
+
+        throw new \Exception('Unknown authentication method: ' . $method);
+    }
+
+    /**
      * @Given /^I include an access token in the query$/
      */
     public function appendAccessToken() {
