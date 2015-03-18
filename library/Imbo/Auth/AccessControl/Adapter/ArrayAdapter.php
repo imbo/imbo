@@ -158,6 +158,27 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAccessListForPublicKey($publicKey) {
+        $accessList = [];
+
+        foreach ($this->accessList as $i => $access) {
+            if ($access['publicKey'] !== $publicKey) {
+                continue;
+            }
+
+            foreach ($access['acl'] as $index => $rule) {
+                // We can't modify or delete rules as this is an immutable adapter, but we still
+                // generate an ID for the rule to provide a consistent data structure
+                $accessList[] = array_merge(['id' => ($i + 1) * ($index + 1)], $rule);
+            }
+        }
+
+        return $accessList;
+    }
+
+    /**
      * For compatibility reasons, where the configuration for Imbo has a set of
      * 'public key' => 'private key' pairs - this method converts that config
      * to an AccessControl-compatible format. Public key will equal the user.
