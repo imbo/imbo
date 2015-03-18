@@ -119,6 +119,14 @@ interface AdapterInterface {
     function publicKeyExists($publicKey);
 
     /**
+     * Get the access control list for a given public key
+     *
+     * @param  string $publicKey
+     * @return array
+     */
+    function getAccessListForPublicKey($publicKey);
+
+    /**
      * Returns a list of resources which should be accessible for read-only public keys
      *
      * @return array

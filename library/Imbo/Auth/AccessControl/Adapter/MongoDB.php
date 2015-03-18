@@ -364,10 +364,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
     }
 
     /**
-     * Get the access control list for a given public key
-     *
-     * @param  string $publicKey
-     * @return array
+     * {@inheritdoc}
      */
     public function getAccessListForPublicKey($publicKey) {
         $info = $this->getPublicKeyDetails($publicKey);
