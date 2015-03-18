@@ -33,26 +33,29 @@ class AccessRules implements ResourceInterface {
      */
     public static function getSubscribedEvents() {
         return [
-            'accessrules.get' => 'getRules',
+            'accessrules.get'  => 'getRules',
             'accessrules.head' => 'getRules',
             'accessrules.post' => 'updateRules'
         ];
     }
 
-    public function getPublicKey(EventInterface $event) {
-        return $event->getRequest()->getRoute()->get('publickey');
-    }
-
+    /**
+     * Get access rules for the specified public key
+     *
+     * @param EventInterface $event The current event
+     */
     public function getRules(EventInterface $event) {
-        $publicKey = $this->getPublicKey($event);
+        $request = $event->getRequest();
+        $publicKey = $request->getRoute()->get('publickey');
 
-        $keyExists = $event->getAccessControl()->publicKeyExists($publicKey);
+        $accessControl = $event->getAccessControl();
+        $keyExists = $accessControl->publicKeyExists($publicKey);
 
         if (!$keyExists) {
             throw new RuntimeException('Public key not found', 404);
         }
 
-        $accessList = $event->getAccessControl()->getAccessListForPublicKey($publicKey);
+        $accessList = $accessControl->getAccessListForPublicKey($publicKey);
 
         $model = new AccessRulesModel();
         $model->setData($accessList);
@@ -60,18 +63,23 @@ class AccessRules implements ResourceInterface {
         $event->getResponse()->setModel($model);
     }
 
+    /**
+     * Update access rules for the specified public key
+     *
+     * @param EventInterface $event The current event
+     */
     public function updateRules(EventInterface $event) {
-        $publicKey = $this->getPublicKey($event);
-
         $request = $event->getRequest();
+        $publicKey = $request->getRoute()->get('publickey');
         $data = json_decode($request->getContent(), true);
 
         if (!is_array($data)) {
             throw new InvalidArgumentException('No access rule data provided', 400);
         }
 
+        $accessControl = $event->getAccessControl();
         foreach ($data as $rule) {
-            $event->getAccessControl()->addAccessRule($publicKey, $rule);
+            $accessControl->addAccessRule($publicKey, $rule);
         }
     }
 }
