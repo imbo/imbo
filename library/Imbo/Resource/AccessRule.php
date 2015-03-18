@@ -12,6 +12,7 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Exception\RuntimeException,
+    Imbo\Exception\ResourceException,
     Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface,
     Imbo\Model\AccessRule as AccessRuleModel;
 
