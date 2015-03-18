@@ -12,6 +12,8 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Exception\RuntimeException,
+    Imbo\Exception\ResourceException,
+    Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface,
     Imbo\Model\AccessRules as AccessRulesModel;
 
 /**
@@ -69,6 +71,11 @@ class AccessRules implements ResourceInterface {
      * @param EventInterface $event The current event
      */
     public function updateRules(EventInterface $event) {
+        $accessControl = $event->getAccessControl();
+        if (!($accessControl instanceof MutableAdapterInterface)) {
+            throw new ResourceException('Access control adapter is immutable', 405);
+        }
+
         $request = $event->getRequest();
         $publicKey = $request->getRoute()->get('publickey');
         $data = json_decode($request->getContent(), true);
