@@ -48,6 +48,10 @@ class StaticAccessControl extends AbstractAdapter implements AdapterInterface {
     public function getAccessListForPublicKey($publicKey) {
         return [];
     }
+
+    public function getAccessRule($publicKey, $accessRuleId) {
+        return null;
+    }
 }
 
 return [
