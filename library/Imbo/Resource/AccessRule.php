@@ -12,6 +12,7 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
     Imbo\Exception\RuntimeException,
+    Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface,
     Imbo\Model\AccessRule as AccessRuleModel;
 
 /**
@@ -39,6 +40,11 @@ class AccessRule implements ResourceInterface {
         ];
     }
 
+    /**
+     * Get an access control rule specified by ID
+     *
+     * @param EventInterface $event The current event
+     */
     public function getRule(EventInterface $event) {
         $acl = $event->getAccessControl();
 
@@ -64,8 +70,17 @@ class AccessRule implements ResourceInterface {
         $event->getResponse()->setModel($model);
     }
 
+    /**
+     * Delete the specified access control rule
+     *
+     * @param EventInterface $event The current event
+     */
     public function deleteRule(EventInterface $event) {
         $acl = $event->getAccessControl();
+
+        if (!($acl instanceof MutableAdapterInterface)) {
+            throw new ResourceException('Access control adapter is immutable', 405);
+        }
 
         $request = $event->getRequest();
         $publicKey = $request->getRoute()->get('publickey');
