@@ -193,6 +193,18 @@ class RESTContext extends BehatContext {
     }
 
     /**
+     * Set method override header used to fake non-standard HTTP verbs
+     */
+    public function setOverrideMethodHeader($method) {
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($method) {
+            $request = $event['request'];
+
+            // Remove headers and query params that should not be present at this time
+            $request->addHeader('X-Override-Method', $method);
+        }, -99);
+    }
+
+    /**
      * @Given /^the "([^"]*)" request header is "([^"]*)"$/
      */
     public function setRequestHeader($header, $value) {
@@ -207,6 +219,13 @@ class RESTContext extends BehatContext {
 
         if (empty($this->requestHeaders['Accept'])) {
             $this->requestHeaders['Accept'] = 'application/json';
+        }
+
+        // Add override method header if this is a SEARCH request
+        if ($method == 'SEARCH') {
+            $this->setOverrideMethodHeader($method);
+
+            $method = 'POST';
         }
 
         $request = $this->client->createRequest($method, $path, $this->requestHeaders);
