@@ -28,3 +28,4 @@ Feature: Imbo provides an index endpoint
             | POST   | 405 Method not allowed |
             | PUT    | 405 Method not allowed |
             | DELETE | 405 Method not allowed |
+            | SEARCH | 405 Method not allowed |

@@ -34,6 +34,7 @@ Feature: Imbo provides a stats endpoint
             | POST   | 405 Method not allowed |
             | PUT    | 405 Method not allowed |
             | DELETE | 405 Method not allowed |
+            | SEARCH | 405 Method not allowed |
 
     Scenario Outline: Stats access event listener decides the access level for the stats endpoint
         Given Imbo uses the "stats-access-and-custom-stats.php" configuration
