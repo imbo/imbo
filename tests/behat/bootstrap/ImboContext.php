@@ -137,7 +137,7 @@ class ImboContext extends RESTContext {
                 $query->set('publicKey', $this->publicKey);
             }
 
-            $method = ($request->getHeader('X-Override-Method') || $request->getMethod());
+            $method = $request->getHeader('X-Override-Method') ?: $request->getMethod();
 
             $timestamp = gmdate('Y-m-d\TH:i:s\Z');
             $data = $method . '|' . urldecode($request->getUrl()) . '|' . $this->publicKey . '|' . $timestamp;
