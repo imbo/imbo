@@ -211,7 +211,7 @@ class RESTContext extends BehatContext {
      * Set method override header used to fake non-standard HTTP verbs
      */
     public function setOverrideMethodHeader($method) {
-        $this->setRequestHeader('X-Override-Method', $method);
+        $this->setRequestHeader('X-Http-Method-Override', $method);
     }
 
     /**

@@ -14,14 +14,13 @@
  *
  * php -S localhost:8888 -t public tests/router.php
  */
-
 // Hack to bypass limited support for non-standard HTTP verbs in the built-in PHP sever
-if (isset($_SERVER['HTTP_X_OVERRIDE_METHOD'])) {
+if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
     // Set request method
-    $_SERVER['REQUEST_METHOD'] = strtoupper($_SERVER['HTTP_X_OVERRIDE_METHOD']);
+    $_SERVER['REQUEST_METHOD'] = strtoupper($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
 
     // Unset the header
-    unset($_SERVER['HTTP_X_OVERRIDE_METHOD']);
+    unset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
 }
 
 if (isset($_SERVER['HTTP_X_COLLECT_COVERAGE']) && isset($_SERVER['HTTP_X_TEST_SESSION_ID'])) {
