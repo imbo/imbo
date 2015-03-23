@@ -90,7 +90,7 @@ class RESTContext extends BehatContext {
 
     /**
      * Returns a list of HTTP verbs that we need to do an override of in order
-     * to bypass limitations in the built-in PHP server.
+     * to bypass limitations in the built-in PHP HTTP server.
      *
      * The returned list contains the verb to use override for, and what verb
      * to use when overriding. For instance POST could be used when we want to
