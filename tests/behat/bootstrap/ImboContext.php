@@ -137,8 +137,10 @@ class ImboContext extends RESTContext {
                 $query->set('publicKey', $this->publicKey);
             }
 
+            $method = $request->getHeader('X-Http-Method-Override') ?: $request->getMethod();
+
             $timestamp = gmdate('Y-m-d\TH:i:s\Z');
-            $data = $request->getMethod() . '|' . urldecode($request->getUrl()) . '|' . $this->publicKey . '|' . $timestamp;
+            $data = $method . '|' . urldecode($request->getUrl()) . '|' . $this->publicKey . '|' . $timestamp;
 
             // Generate signature
             $signature = hash_hmac('sha256', $data, $this->privateKey);

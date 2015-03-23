@@ -89,6 +89,21 @@ class RESTContext extends BehatContext {
     }
 
     /**
+     * Returns a list of HTTP verbs that we need to do an override of in order
+     * to bypass limitations in the built-in PHP HTTP server.
+     *
+     * The returned list contains the verb to use override for, and what verb
+     * to use when overriding. For instance POST could be used when we want to
+     * perform a SEARCH request as a payload is expected while GET could be used
+     * if we want to test something using the LINK method.
+     */
+    private function getOverrideVerbs() {
+        return [
+            'SEARCH' => 'POST'
+        ];
+    }
+
+    /**
      * Create a new HTTP client
      */
     private function createClient() {
@@ -193,6 +208,15 @@ class RESTContext extends BehatContext {
     }
 
     /**
+     * Set method override header used to fake non-standard HTTP verbs
+     *
+     * @param string $method Override method
+     */
+    public function setOverrideMethodHeader($method) {
+        $this->setRequestHeader('X-Http-Method-Override', $method);
+    }
+
+    /**
      * @Given /^the "([^"]*)" request header is "([^"]*)"$/
      */
     public function setRequestHeader($header, $value) {
@@ -207,6 +231,12 @@ class RESTContext extends BehatContext {
 
         if (empty($this->requestHeaders['Accept'])) {
             $this->requestHeaders['Accept'] = 'application/json';
+        }
+
+        // Add override method header if specified in the list of override verbs
+        if (array_key_exists($method, $this->getOverrideVerbs())) {
+            $this->setOverrideMethodHeader($method);
+            $method = $this->getOverrideVerbs()[$method];
         }
 
         $request = $this->client->createRequest($method, $path, $this->requestHeaders);

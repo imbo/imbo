@@ -33,6 +33,7 @@ class Router {
         'HEAD'    => true,
         'DELETE'  => true,
         'OPTIONS' => true,
+        'SEARCH'  => true,
     );
 
     /**
