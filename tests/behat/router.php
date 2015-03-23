@@ -14,7 +14,7 @@
  *
  * php -S localhost:8888 -t public tests/router.php
  */
-// Hack to bypass limited support for non-standard HTTP verbs in the built-in PHP sever
+// Hack to bypass limited support for non-standard HTTP verbs in the built-in PHP HTTP server
 if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
     // Set request method
     $_SERVER['REQUEST_METHOD'] = strtoupper($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
