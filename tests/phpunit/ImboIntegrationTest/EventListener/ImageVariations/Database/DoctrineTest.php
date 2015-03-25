@@ -71,8 +71,10 @@ class DoctrineTest extends DatabaseTests {
      * Clean up after each run
      */
     public function tearDown() {
-        $this->pdo->query('DROP TABLE IF EXISTS imagevariations');
-        $this->pdo = null;
+        if ($this->pdo) {
+            $this->pdo->query('DROP TABLE IF EXISTS imagevariations');
+            $this->pdo = null;
+        }
 
         parent::tearDown();
     }
