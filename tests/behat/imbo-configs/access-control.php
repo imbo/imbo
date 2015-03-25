@@ -47,13 +47,23 @@ return [
             ],
 
             [
+                'publicKey' => 'valid-pubkey-with-wildcard',
+                'privateKey' => 'foobar',
+                'acl' => [[
+                    'resources' => [ACI::RESOURCE_USER_GET, 'foobar.get'],
+                    'users' => '*',
+                ]]
+            ],
+
+            [
                 'publicKey' => 'valid-group-pubkey',
                 'privateKey' => 'foobar',
                 'acl' => [[
                     'group' => 'images-read',
                     'users' => ['user', 'user2']
                 ], [
-                    'group' => 'groups-read'
+                    'group' => 'groups-read',
+                    'users' => '*'
                 ]]
             ]
         ], [
