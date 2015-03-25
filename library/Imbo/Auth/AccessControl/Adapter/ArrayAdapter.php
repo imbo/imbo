@@ -73,8 +73,13 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
             }
 
             foreach ($access['acl'] as $acl) {
+                // If the group specified has not been defined, throw an exception to help the user
+                if (!isset($acl['users'])) {
+                    throw new InvalidArgumentException('Missing property "users" in access rule');
+                }
+
                 // If a user is specified, ensure the public key has access to the user
-                $userAccess = !$user || isset($acl['users']) && in_array($user, $acl['users']);
+                $userAccess = (!$user && $acl['users'] === '*') || in_array($user, $acl['users']);
                 if (!$userAccess) {
                     continue;
                 }
@@ -224,13 +229,15 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
     /**
      * Get an array of users defined in the ACL
      *
-     * @return array
+     * @return mixed
      */
     private function getUsersFromAcl() {
         $users = [];
         foreach ($this->accessList as $access) {
             foreach ($access['acl'] as $acl) {
-                $users = array_merge($users, isset($acl['users']) ? $acl['users'] : []);
+                if (is_array($acl['users'])) {
+                    $users = array_merge($users, isset($acl['users']) ? $acl['users'] : []);
+                }
             }
         }
 
