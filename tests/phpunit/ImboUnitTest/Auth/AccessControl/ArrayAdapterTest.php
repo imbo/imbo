@@ -49,7 +49,8 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue(
             $accessControl->hasAccess(
                 'publicKey',
-                ACI::RESOURCE_IMAGES_POST
+                ACI::RESOURCE_IMAGES_POST,
+                'publicKey'
             )
         );
     }
