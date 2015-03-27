@@ -80,7 +80,7 @@ class DatabaseOperations implements ListenerInterface {
 
         $event->getDatabase()->insertImage(
             $request->getUser(),
-            $request->getImage()->getChecksum(),
+            $request->getImage()->getImageIdentifier(),
             $request->getImage()
         );
     }

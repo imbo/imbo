@@ -136,11 +136,11 @@ class ExifMetadataTest extends ListenerTests {
      */
     public function testCanFilterData($data, $tags, $expectedData) {
         $user = 'user';
-        $checksum = 'checksum';
+        $imageIdentifier = 'imageIdentifier';
         $blob = 'blob';
 
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getChecksum')->will($this->returnValue($checksum));
+        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
         $image->expects($this->once())->method('getBlob')->will($this->returnValue($blob));
 
         $imagick = $this->getMock('Imagick');
@@ -149,10 +149,10 @@ class ExifMetadataTest extends ListenerTests {
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getUser')->will($this->returnValue($user));
-        $request->expects($this->exactly(2))->method('getImage')->will($this->returnValue($image));
+        $request->expects($this->any())->method('getImage')->will($this->returnValue($image));
 
         $database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $database->expects($this->once())->method('updateMetadata')->with($user, $checksum, $expectedData);
+        $database->expects($this->once())->method('updateMetadata')->with($user, $imageIdentifier, $expectedData);
 
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->exactly(2))->method('getRequest')->will($this->returnValue($request));
@@ -177,7 +177,7 @@ class ExifMetadataTest extends ListenerTests {
         $database->expects($this->once())->method('deleteImage')->with('user', 'imageidentifier');
 
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getChecksum')->will($this->returnValue('imageidentifier'));
+        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageidentifier'));
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getUser')->will($this->returnValue('user'));

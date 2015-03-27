@@ -179,7 +179,7 @@ class Error implements ModelInterface {
               ->setImboErrorCode($exception->getImboErrorCode() ?: Exception::ERR_UNSPECIFIED);
 
         if ($image = $request->getImage()) {
-            $model->setImageIdentifier($image->getChecksum());
+            $model->setImageIdentifier($image->getImageIdentifier());
         } else if ($identifier = $request->getImageIdentifier()) {
             $model->setImageIdentifier($identifier);
         }

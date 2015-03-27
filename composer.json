@@ -21,7 +21,8 @@
     "ext-imagick": ">=3.0.1",
     "symfony/http-foundation": "~2.7.3",
     "symfony/event-dispatcher": "~2.7.3",
-    "symfony/console": "~2.7.3"
+    "symfony/console": "~2.7.3",
+    "rhumsaa/uuid": "~2.8"
   },
   "require-dev": {
     "mikey179/vfsStream": "~1.5.0",

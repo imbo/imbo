@@ -100,11 +100,11 @@ class StorageOperationsTest extends ListenerTests {
     public function testCanInsertImage() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
-        $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
+        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $this->response->expects($this->once())->method('setStatusCode')->with(201);
-        $this->storage->expects($this->once())->method('store')->with($this->user, 'checksum', 'image data');
-        $this->storage->expects($this->once())->method('imageExists')->with($this->user, 'checksum')->will($this->returnValue(false));
+        $this->storage->expects($this->once())->method('store')->with($this->user, 'imageId', 'image data');
+        $this->storage->expects($this->once())->method('imageExists')->with($this->user, 'imageId')->will($this->returnValue(false));
 
         $this->listener->insertImage($this->event);
     }
@@ -115,11 +115,11 @@ class StorageOperationsTest extends ListenerTests {
     public function testCanInsertImageThatAlreadyExists() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
-        $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
+        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $this->response->expects($this->once())->method('setStatusCode')->with(200);
-        $this->storage->expects($this->once())->method('store')->with($this->user, 'checksum', 'image data');
-        $this->storage->expects($this->once())->method('imageExists')->with($this->user, 'checksum')->will($this->returnValue(true));
+        $this->storage->expects($this->once())->method('store')->with($this->user, 'imageId', 'image data');
+        $this->storage->expects($this->once())->method('imageExists')->with($this->user, 'imageId')->will($this->returnValue(true));
 
         $this->listener->insertImage($this->event);
     }
@@ -133,13 +133,13 @@ class StorageOperationsTest extends ListenerTests {
     public function testWillDeleteImageFromDatabaseAndThrowExceptionWhenStoringFails() {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
-        $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
+        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->storage->expects($this->once())->method('store')->with($this->user, 'checksum', 'image data')->will($this->throwException(
+        $this->storage->expects($this->once())->method('store')->with($this->user, 'imageId', 'image data')->will($this->throwException(
             new StorageException('Could not store image', 500)
         ));
         $database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $database->expects($this->once())->method('deleteImage')->with($this->user, 'checksum');
+        $database->expects($this->once())->method('deleteImage')->with($this->user, 'imageId');
         $this->event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
 
         $this->listener->insertImage($this->event);
