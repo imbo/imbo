@@ -119,7 +119,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
             }
 
             // If a user is specified, ensure the public key has access to the user
-            $userAccess = (!$user && $acl['users'] === '*') || in_array($user, $acl['users']);
+            $userAccess = !$user || $acl['users'] === '*' || in_array($user, $acl['users']);
             if (!$userAccess) {
                 continue;
             }
