@@ -72,7 +72,7 @@ class Images implements ResourceInterface {
 
         $model = new Model\ArrayModel();
         $model->setData(array(
-            'imageIdentifier' => $image->getChecksum(),
+            'imageIdentifier' => $image->getImageIdentifier(),
             'width' => $image->getWidth(),
             'height' => $image->getHeight(),
             'extension' => $image->getExtension(),

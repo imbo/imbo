@@ -138,7 +138,7 @@ class ExifMetadata implements ListenerInterface {
         $database = $event->getDatabase();
 
         $user = $request->getUser();
-        $imageIdentifier = $request->getImage()->getChecksum();
+        $imageIdentifier = $request->getImage()->getImageIdentifier();
 
         try {
             $database->updateMetadata(

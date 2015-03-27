@@ -103,9 +103,11 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
     public function testCanGetAndSaveProperties() {
         $listener = new ExifMetadata();
         $user = 'foobar';
+        $imageIdentifier = 'imageId';
 
         $image = new Image();
         $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
+        $image->setImageIdentifier($imageIdentifier);
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->exactly(2))->method('getImage')->will($this->returnValue($image));
@@ -114,7 +116,7 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
         $database = $this->getMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('updateMetadata')->with(
             $this->equalTo($user),
-            $this->equalTo('753e11e00522ff1e95600d8f91c74e8e'),
+            $this->equalTo($imageIdentifier),
             $this->arrayHasKey('gps:location')
         );
 
