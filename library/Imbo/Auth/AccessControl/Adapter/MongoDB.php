@@ -10,7 +10,8 @@
 
 namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Exception\InvalidArgumentException,
+use Imbo\Exception\DatabaseException,
+    Imbo\Exception\InvalidArgumentException,
     Imbo\Exception\RuntimeException,
     Imbo\Auth\AccessControl\UserQuery,
     Imbo\Auth\AccessControl\GroupQuery,
