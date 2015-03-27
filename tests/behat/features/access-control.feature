@@ -3,17 +3,17 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
     As an HTTP Client
     I must specify a public key in the URI or request headers
 
-    Scenario: Request an access-controlled resource under an unknown user
+    Scenario: Request a resource under an unknown user
         Given Imbo uses the "access-control.php" configuration
         When I request "/users/user1337.json"
         Then I should get a response with "404 User not found"
 
-    Scenario: Request an access-controlled resource with no public key specified
+    Scenario: Request a resource with no public key specified
         Given Imbo uses the "access-control.php" configuration
         When I request "/users/user1.json"
         Then I should get a response with "400 Permission denied (public key)"
 
-    Scenario: Request an access-controlled resource with invalid public key specified
+    Scenario: Request a resource with invalid public key specified
         Given I use "invalid" and "foobar" for public and private keys
         And I include an access token in the query
         And Imbo uses the "access-control.php" configuration
@@ -21,7 +21,7 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
         Then I should get a response with "400 Permission denied (public key)"
         And the Imbo error message is "Permission denied (public key)" and the error code is "0"
 
-    Scenario: Request an access-controlled resource with public key that does not have access to the user
+    Scenario: Request a resource with public key that does not have access to the user
         Given I use "valid-pubkey" and "foobar" for public and private keys
         And I include an access token in the query
         And Imbo uses the "access-control.php" configuration
@@ -29,21 +29,36 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
         Then I should get a response with "400 Permission denied (public key)"
         And the Imbo error message is "Permission denied (public key)" and the error code is "0"
 
-    Scenario: Request an access-controlled resource with valid public key specified
+    Scenario: Request a resource with valid public key specified
         Given I use "valid-pubkey" and "foobar" for public and private keys
         And I include an access token in the query
         And Imbo uses the "access-control.php" configuration
         When I request "/users/user1.json"
         Then I should get a response with "200 OK"
 
-    Scenario: Request an access-controlled resource with a public key that uses a resource group
+    Scenario: Request a resource with a public key that has access to all users and the resource
+        Given I use "valid-pubkey-with-wildcard" and "foobar" for public and private keys
+        And I include an access token in the query
+        And Imbo uses the "access-control.php" configuration
+        When I request "/users/some-user.json"
+        Then I should get a response with "200 OK"
+
+    Scenario: Request a resource with a public key that has access to all users but not requested resource
+        Given I use "valid-pubkey-with-wildcard" and "foobar" for public and private keys
+        And I include an access token in the query
+        And Imbo uses the "access-control.php" configuration
+        When I request "/users/some-user/images.json"
+        Then I should get a response with "400 Permission denied (public key)"
+        And the Imbo error message is "Permission denied (public key)" and the error code is "0"
+
+    Scenario: Request a resource with a public key that uses a resource group
         Given I use "valid-group-pubkey" and "foobar" for public and private keys
         And I include an access token in the query
         And Imbo uses the "access-control.php" configuration
         When I request "/users/user/images.json"
         Then I should get a response with "200 OK"
 
-    Scenario: Request an access-controlled resource with group that does not contain the resource
+    Scenario: Request a resource with group that does not contain the resource
         Given I use "valid-group-pubkey" and "foobar" for public and private keys
         And I include an access token in the query
         And Imbo uses the "access-control.php" configuration
@@ -57,8 +72,8 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
         When I request "/foobar"
         Then I should get a response with "400 Permission denied (public key)"
 
-    Scenario: Request custom access-controlled resource that some other public key has access to
-        Given I use "valid-pubkey" and "foobar" for public and private keys
+    Scenario: Request custom access-controlled resource that a different public key has access to
+        Given I use "valid-group-pubkey" and "foobar" for public and private keys
         And I include an access token in the query
         And Imbo uses the "access-control.php" configuration
         When I request "/foobar"

@@ -42,7 +42,7 @@ return [
                 'privateKey' => 'foobar',
                 'acl' => [[
                     'resources' => [ACI::RESOURCE_USER_GET, 'foobar.get'],
-                    'users' => ['user1'],
+                    'users' => ['user1', 'some-user'],
                 ]]
             ],
 
