@@ -25,6 +25,13 @@ require 'RESTContext.php';
  */
 class ImboContext extends RESTContext {
     /**
+     * The user used by the client
+     *
+     * @var string
+     */
+    private $user;
+
+    /**
      * The public key used by the client
      *
      * @var string
@@ -108,6 +115,7 @@ class ImboContext extends RESTContext {
     public function setClientAuth($publicKey, $privateKey) {
         $this->publicKey = $publicKey;
         $this->privateKey = $privateKey;
+        $this->user = $this->user ?: $publicKey;
     }
 
     /**
@@ -288,6 +296,22 @@ class ImboContext extends RESTContext {
         }
 
         parent::setRequestHeader($header, $value);
+    }
+
+    /**
+     * @When /^I request the (?:previously )?added image(?: with the query parameters "([^"]*)")?$/
+     */
+    public function requestPreviouslyAddedImage($queryParams = '') {
+        $response = $this->getLastResponse()->json();
+        if (!isset($response['imageIdentifier'])) {
+            throw new RuntimeException(
+                'Image identifier was not present in previous response, response: ' .
+                $this->getLastResponse()->getBody(true)
+            );
+        }
+
+        $identifier = $response['imageIdentifier'];
+        $this->request('/users/' . $this->user . '/images/' . $identifier . '.' . $queryParams);
     }
 
     /**
