@@ -92,3 +92,27 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
         And Imbo uses the "custom-access-control.php" configuration
         When I request "/users/public"
         Then I should get a response with "200 OK"
+
+    Scenario Outline: Request open resources with default configuration
+        Given the "Accept" request header is "application/json"
+        When I request "<url>"
+        Then I should get a response with "<status>"
+        And the response body matches:
+          """
+          <response>
+          """
+
+        Examples:
+            | url          | status           | response |
+            | /            | 200 Hell Yeah    | #^{"version":".*?",.*}$# |
+            | /status.json | 200 OK           | #^{"date":".*?","database":true,"storage":true}$# |
+
+    Scenario: Request shortUrl with no public key or access token provided
+        Given "tests/phpunit/Fixtures/1024x256.png" exists in Imbo
+        And I generate a short URL with the following parameters:
+            """
+            {"user": "user", "query": "t[]=thumbnail"}
+            """
+        When I request the image using the generated short URL
+        Then I should get a response with "200 OK"
+        And the "Content-Type" response header is "image/png"

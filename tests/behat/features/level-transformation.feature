@@ -10,7 +10,7 @@ Feature: Imbo can adjust color levels of images
         Given I use "publickey" and "privatekey" for public and private keys
         And I specify "level:channel=r,amount=100" as transformation
         And I include an access token in the query
-        When I request "/users/publickey/images/7e798b6f4773ea7d2eec5f484db4fbff.png"
+        When I request the previously added image as a "png"
         Then I should get a response with "200 OK"
         And the pixel at coordinate "5, 55" should have a color of "#de3f3f"
 
@@ -18,6 +18,6 @@ Feature: Imbo can adjust color levels of images
         Given I use "publickey" and "privatekey" for public and private keys
         And I specify "level:channel=rgb,amount=100" as transformation
         And I include an access token in the query
-        When I request "/users/publickey/images/7e798b6f4773ea7d2eec5f484db4fbff.png"
+        When I request the previously added image as a "png"
         Then I should get a response with "200 OK"
         And the pixel at coordinate "22, 32" should have a color of "#ffed00"
