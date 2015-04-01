@@ -91,7 +91,7 @@ class Metadata implements ResourceInterface {
         ));
 
         $model = new Model\Metadata();
-        $model->setData($event->getDatabase()->getMetadata($request->getPublicKey(), $request->getImageIdentifier()));
+        $model->setData($event->getDatabase()->getMetadata($request->getUser(), $request->getImageIdentifier()));
 
         $event->getResponse()->setModel($model);
     }
