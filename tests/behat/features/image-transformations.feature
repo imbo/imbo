@@ -12,7 +12,7 @@ Feature: Imbo enables dynamic transformations of images
         And I specify "<transformation>" as transformation
         And I include an access token in the query
         And Imbo uses the "image-transformation-presets.php" configuration
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.png"
+        When I request the image resource for "tests/phpunit/Fixtures/image1.png" as a "png"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "image/png"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -78,16 +78,13 @@ Feature: Imbo enables dynamic transformations of images
             | vignette                                                                                          | 599   | 417    |
             | vignette:inner=bf1942,outer=ccc                                                                   | 599   | 417    |
             | vignette:inner=f00baa,outer=f0f0f0,scale=2.4                                                      | 599   | 417    |
-            | watermark:img=929db9c5fc3099f7576f5655207eba47                                                    | 599   | 417    |
-            | watermark:img=929db9c5fc3099f7576f5655207eba47,position=center                                    | 599   | 417    |
-            | watermark:img=929db9c5fc3099f7576f5655207eba47,x=10,y=20,position=bottom-right,width=10,height=40 | 599   | 417    |
 
     Scenario Outline: Transform the image using HTTP HEAD
         Given I use "publickey" and "privatekey" for public and private keys
         And I specify "<transformation>" as transformation
         And I include an access token in the query
         And Imbo uses the "image-transformation-presets.php" configuration
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.png" using HTTP "HEAD"
+        When I request the image resource for "tests/phpunit/Fixtures/image1.png" as a "png" using HTTP "HEAD"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "image/png"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -145,15 +142,12 @@ Feature: Imbo enables dynamic transformations of images
             | vignette                                                                                          |
             | vignette:inner=bf1942,outer=ccc                                                                   |
             | vignette:inner=f00baa,outer=f0f0f0,scale=2.4                                                      |
-            | watermark:img=929db9c5fc3099f7576f5655207eba47                                                    |
-            | watermark:img=929db9c5fc3099f7576f5655207eba47,position=center                                    |
-            | watermark:img=929db9c5fc3099f7576f5655207eba47,x=10,y=20,position=bottom-right,width=10,height=40 |
 
     Scenario Outline: Gracefully handle transformation errors
         Given I use "publickey" and "privatekey" for public and private keys
         And I specify "<transformation>" as transformation
         And I include an access token in the query
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.png"
+        When I request the image resource for "tests/phpunit/Fixtures/image1.png" as a "png"
         Then I should get a response with "<reason-phrase>"
         And the "Content-Type" response header is "application/json"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -188,7 +182,7 @@ Feature: Imbo enables dynamic transformations of images
           strip
           """
         And I include an access token in the query
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.png"
+        When I request the image resource for "tests/phpunit/Fixtures/image1.png" as a "png"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "image/png"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -203,7 +197,7 @@ Feature: Imbo enables dynamic transformations of images
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         And the "Accept" request header is "<accept>"
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2"
+        When I request the image resource for "tests/phpunit/Fixtures/image1.png"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "<content-type>"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -221,7 +215,7 @@ Feature: Imbo enables dynamic transformations of images
     Scenario Outline: Fetch different formats of the image based on the image extension
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2.<extension>"
+        When I request the image resource for "tests/phpunit/Fixtures/image1.png" as a "<extension>"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "<content-type>"
         And the "X-Imbo-Originalextension" response header is "png"

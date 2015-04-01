@@ -10,7 +10,7 @@ Feature: Imbo provides an event listener for turning EXIF data into metadata
     Scenario: Fetch the added metadata
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images/753e11e00522ff1e95600d8f91c74e8e/metadata.json"
+        When I request the metadata of the previously added image
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body contains:

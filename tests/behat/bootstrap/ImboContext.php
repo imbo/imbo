@@ -29,7 +29,7 @@ class ImboContext extends RESTContext {
      *
      * @var string
      */
-    private $user;
+    private $user = 'user';
 
     /**
      * The public key used by the client
@@ -51,6 +51,42 @@ class ImboContext extends RESTContext {
      * @var string
      */
     private $currentConfig;
+
+    /**
+     * An array of urls for added images, keyed by local file path
+     *
+     * @var array
+     */
+    private $imageUrls = [];
+
+    /**
+     * An array of image identifiers for added images, keyed by local file path
+     *
+     * @var array
+     */
+    private $imageIdentifiers = [];
+
+    /**
+     * Holds the current image target URL - used when the same image is requested
+     * over several tests in the same feature
+     *
+     * @var string
+     */
+    private static $testImageUrl;
+
+    /**
+     * Holds the image identifier of the current testing target
+     *
+     * @var string
+     */
+    private static $testImageIdentifier;
+
+    /**
+     * Holds the path to the image currently used as the testing target
+     *
+     * @var string
+     */
+    private static $testImagePath;
 
     /**
      * @BeforeFeature
@@ -115,7 +151,13 @@ class ImboContext extends RESTContext {
     public function setClientAuth($publicKey, $privateKey) {
         $this->publicKey = $publicKey;
         $this->privateKey = $privateKey;
-        $this->user = $this->user ?: $publicKey;
+
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) {
+            $request = $event['request'];
+            $request->addHeaders([
+                'X-Imbo-PublicKey' => $this->publicKey
+            ]);
+        }, -100);
     }
 
     /**
@@ -169,6 +211,7 @@ class ImboContext extends RESTContext {
             $request = $event['request'];
 
             // Remove headers and query params that should not be present at this time
+            $request->removeHeader('X-Imbo-PublicKey');
             $request->removeHeader('X-Imbo-Authenticate-Signature');
             $request->removeHeader('X-Imbo-Authenticate-Timestamp');
             $query = $request->getQuery();
@@ -268,12 +311,12 @@ class ImboContext extends RESTContext {
      * @Given /^"([^"]*)" exists in Imbo$/
      */
     public function addImageToImbo($imagePath) {
-        return array(
-            new Given('I use "publickey" and "privatekey" for public and private keys'),
-            new Given('I sign the request'),
-            new Given('I attach "' . $imagePath . '" to the request body'),
-            new Given('I request "/users/publickey/images" using HTTP "POST"'),
-        );
+        $this->setClientAuth('publickey', 'privatekey');
+        $this->signRequest();
+        $this->attachFileToRequestBody($imagePath);
+        $this->request('/users/user/images/', 'POST');
+        $this->imageUrls[$imagePath] = $this->getPreviouslyAddedImageUrl();
+        $this->imageIdentifiers[$imagePath] = $this->getPreviouslyAddedImageIdentifier();
     }
 
     /**
@@ -299,27 +342,137 @@ class ImboContext extends RESTContext {
     }
 
     /**
-     * @When /^I request the (?:previously )?added image(?: with the query parameters "([^"]*)")?$/
+     * @Given /^"([^"]*)" is used as the test image$/
      */
-    public function requestPreviouslyAddedImage($queryParams = '') {
-        $response = $this->getLastResponse()->json();
-        if (!isset($response['imageIdentifier'])) {
-            throw new RuntimeException(
-                'Image identifier was not present in previous response, response: ' .
-                $this->getLastResponse()->getBody(true)
-            );
+    public function imageIsUsedAsTestImage($testImagePath) {
+        if (self::$testImagePath === $testImagePath) {
+            return;
         }
 
-        $identifier = $response['imageIdentifier'];
-        $this->request('/users/' . $this->user . '/images/' . $identifier . '.' . $queryParams);
+        $this->addImageToImbo($testImagePath);
+        self::$testImageIdentifier = $this->getPreviouslyAddedImageIdentifier();
+        self::$testImageUrl = $this->getPreviouslyAddedImageUrl();
+        self::$testImagePath = $testImagePath;
     }
 
     /**
-     * @When /^I request the added image as a "(jpg|png|gif)"$/
+     * @When /^I request the test image(?: as a "([^"]*)")?$/
+     */
+    public function requestTestImage($format = null) {
+        $url = self::$testImageUrl . ($format ? '.' . $format : '');
+        return [
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the test image using HTTP "([^"]*)"$/
+     */
+    public function requestTestImageUsingHttpMethod($method) {
+        $url = self::$testImageUrl;
+        return [
+            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the metadata of the test image(?: using HTTP "(.*?)")?$/
+     */
+    public function requestMetadataOfTestImage($method = 'GET') {
+        $url = self::$testImageUrl . '/meta';
+        return [
+            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the metadata of the test image as "(xml|json)"$/
+     */
+    public function requestMetadataOfTestImageInFormat($format = null) {
+        $url = self::$testImageUrl . '/meta' . ($format ? '.' . $format : '');
+        return [
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the (?:previously )?added image(?: with the query string "([^"]*)")?$/
+     */
+    public function requestPreviouslyAddedImage($queryParams = '') {
+        $url = $this->getPreviouslyAddedImageUrl() . $queryParams;
+        return [
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the (?:previously )?added image using HTTP "([^"]*)"$/
+     */
+    public function requestPreviouslyAddedImageWithHttpMethod($method) {
+        $url = $this->getPreviouslyAddedImageUrl();
+        return [
+            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
+        ];
+    }
+
+
+    /**
+     * @When /^I request the (?:previously )?added image as a "(jpg|png|gif)"$/
      */
     public function requestTheAddedImage($extension) {
-        $identifier = $this->getLastResponse()->json()['imageIdentifier'];
-        $this->request('/users/' . $this->publicKey . '/images/' . $identifier . '.' . $extension);
+        $url = $this->getPreviouslyAddedImageUrl() . '.' . $extension;
+        return [
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the metadata of the previously added image as "(xml|json)"$/
+     */
+    public function requestMetadataOfPreviouslyAddedImageInFormat($format = null) {
+        $url = $this->getPreviouslyAddedImageUrl() . '/meta' . ($format ? '.' . $format : '');
+        return [
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the metadata of the previously added image(?: using HTTP "(.*?)")?$/
+     */
+    public function requestMetadataOfPreviouslyAddedImage($method = 'GET') {
+        $url = $this->getPreviouslyAddedImageUrl() . '/meta';
+        return [
+            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the image resource for "([^"]*)"(?: as a "(png|gif|jpg)")?(?: using HTTP "([^"]*)")?$/
+     */
+    public function requestImageResourceForLocalImage($imagePath, $format = null, $method = 'GET') {
+        if (!isset($this->imageUrls[$imagePath])) {
+            throw new RuntimeException('Image URL for "' . $imagePath . '" not found');
+        }
+
+        $url = $this->imageUrls[$imagePath];
+        if ($format) {
+            $url .= '.' . $format;
+        }
+
+        return [
+            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
+        ];
+    }
+
+    /**
+     * @Given /^I append a query string parameter, "([^"]*)" with the image identifier of "([^"]*)"$/
+     */
+    public function appendQueryStringParamWithImageIdentifierForLocalImage($queryParam, $imagePath) {
+        if (!isset($this->imageIdentifiers[$imagePath])) {
+            throw new RuntimeException('Image identifier for "' . $imagePath . '" not found');
+        }
+
+        $this->appendQueryStringParameter($queryParam, $this->imageIdentifiers[$imagePath]);
     }
 
     /**
@@ -330,7 +483,7 @@ class ImboContext extends RESTContext {
 
         $this->setClientAuth('publickey', 'privatekey');
         $this->signRequest();
-        $this->request('/users/publickey/images/' . $identifier, 'DELETE');
+        $this->request('/users/user/images/' . $identifier, 'DELETE');
     }
 
     /**
@@ -401,12 +554,15 @@ class ImboContext extends RESTContext {
      */
     public function generateShortImageUrl(PyStringNode $params) {
         $imageIdentifier = $this->getLastResponse()->json()['imageIdentifier'];
+        $params = array_merge(json_decode((string) $params, true), [
+            'imageIdentifier' => $imageIdentifier,
+        ]);
 
         return array(
             new Given('I use "publickey" and "privatekey" for public and private keys'),
             new Given('I sign the request'),
-            new Given('the request body contains:', $params),
-            new Given('I request "/users/publickey/images/' . $imageIdentifier . '/shorturls" using HTTP "POST"'),
+            new Given('the request body contains:', new PyStringNode(json_encode($params))),
+            new Given('I request "/users/user/images/' . $imageIdentifier . '/shorturls" using HTTP "POST"'),
         );
     }
 
@@ -465,4 +621,40 @@ class ImboContext extends RESTContext {
         ];
     }
 
+    /**
+     * @Given /^Imbo starts with an empty database$/
+     */
+    public function imboStartsWithEmptyDatabase() {
+        $mongo = new MongoClient();
+        $mongo->imbo_testing->drop();
+    }
+
+    /**
+     * Get the previously added image identifier
+     *
+     * @throws RuntimeException If previous response did not include image identifier
+     * @return string
+     */
+    private function getPreviouslyAddedImageIdentifier() {
+        $response = $this->getLastResponse()->json();
+        if (!isset($response['imageIdentifier'])) {
+            throw new RuntimeException(
+                'Image identifier was not present in previous response, response: ' .
+                $this->getLastResponse()->getBody(true)
+            );
+        }
+
+        return $response['imageIdentifier'];
+    }
+
+    /**
+     * Get the previously added image URL
+     *
+     * @throws RuntimeException If previous response did not include image identifier
+     * @return string
+     */
+    private function getPreviouslyAddedImageUrl() {
+        $identifier = $this->getPreviouslyAddedImageIdentifier();
+        return '/users/' . $this->user . '/images/' . $identifier;
+    }
 }

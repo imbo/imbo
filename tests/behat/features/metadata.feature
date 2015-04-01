@@ -4,12 +4,12 @@ Feature: Imbo provides a metadata endpoint
     I want to make requests against the metadata endpoint
 
     Background:
-        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image1.png" is used as the test image
 
     Scenario Outline: Get metadata when image has no metadata attached
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/metadata.<extension>"
+        When I request the metadata of the test image as "<extension>"
         Then I should get a response with "200 OK"
         And the response body matches:
            """
@@ -28,7 +28,7 @@ Feature: Imbo provides a metadata endpoint
           {"foo": "bar"}
           """
         And I sign the request
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/metadata" using HTTP "PUT"
+        When I request the metadata of the test image using HTTP "PUT"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body is:
@@ -39,7 +39,7 @@ Feature: Imbo provides a metadata endpoint
     Scenario Outline: Get metadata
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/metadata.<extension>"
+        When I request the metadata of the test image as "<extension>"
         Then I should get a response with "200 OK"
         And the response body matches:
            """
@@ -55,10 +55,10 @@ Feature: Imbo provides a metadata endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And the request body contains:
           """
-          {"bar": "foo"}
+          {"bar":"foo"}
           """
         And I sign the request
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/metadata" using HTTP "POST"
+        When I request the metadata of the test image using HTTP "POST"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body is:
@@ -69,7 +69,7 @@ Feature: Imbo provides a metadata endpoint
     Scenario Outline: Get updated metadata
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/metadata.<extension>"
+        When I request the metadata of the test image as "<extension>"
         Then I should get a response with "200 OK"
         And the response body matches:
            """
@@ -88,7 +88,7 @@ Feature: Imbo provides a metadata endpoint
           {"key": "value"}
           """
         And I sign the request
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/metadata" using HTTP "PUT"
+        When I request the metadata of the test image using HTTP "PUT"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body is:
@@ -99,7 +99,7 @@ Feature: Imbo provides a metadata endpoint
     Scenario Outline: Get replaced metadata
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/metadata.<extension>"
+        When I request the metadata of the test image as "<extension>"
         Then I should get a response with "200 OK"
         And the response body matches:
            """
@@ -114,7 +114,7 @@ Feature: Imbo provides a metadata endpoint
     Scenario: Delete metadata
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/metadata" using HTTP "DELETE"
+        When I request the metadata of the test image using HTTP "DELETE"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body is:
@@ -125,7 +125,7 @@ Feature: Imbo provides a metadata endpoint
     Scenario Outline: Get deleted metadata
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/metadata.<extension>"
+        When I request the metadata of the test image as "<extension>"
         Then I should get a response with "200 OK"
         And the response body matches:
            """

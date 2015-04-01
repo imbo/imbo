@@ -11,23 +11,25 @@ Feature: Imbo provides an event listener that generates variations when adding i
         Given I use "publickey" and "privatekey" for public and private keys
         And Imbo uses the "image-variations.php" configuration
         And I include an access token in the query
-        When I request "/users/publickey/images/b60df41830245ee8f278e3ddfe5238a3.png"
-        Then the "X-Imbo-ImageVariation" response header does not exist
+        When I request the previously added image as a "png"
+        Then I should get a response with "200 OK"
+        And the "X-Imbo-ImageVariation" response header does not exist
 
     Scenario: Request an image with no scaling transformations
         Given I use "publickey" and "privatekey" for public and private keys
         And Imbo uses the "image-variations.php" configuration
         And I specify "desaturate" as transformation
         And I include an access token in the query
-        When I request "/users/publickey/images/b60df41830245ee8f278e3ddfe5238a3.png"
-        Then the "X-Imbo-ImageVariation" response header does not exist
+        When I request the previously added image as a "png"
+        Then I should get a response with "200 OK"
+        And the "X-Imbo-ImageVariation" response header does not exist
 
     Scenario: Request an image with a resize transformation which upscales the original
         Given I use "publickey" and "privatekey" for public and private keys
         And Imbo uses the "image-variations.php" configuration
         And I specify "resize:width=2048" as transformation
         And I include an access token in the query
-        When I request "/users/publickey/images/b60df41830245ee8f278e3ddfe5238a3.png"
+        When I request the previously added image as a "png"
         Then the "X-Imbo-ImageVariation" response header does not exist
         And the width of the image is "2048"
 
@@ -36,9 +38,9 @@ Feature: Imbo provides an event listener that generates variations when adding i
         And Imbo uses the "image-variations.php" configuration
         And I specify "maxSize:width=320" as transformation
         And I include an access token in the query
-        When I request "/users/publickey/images/b60df41830245ee8f278e3ddfe5238a3.png"
-        Then the "X-Imbo-ImageVariation" response header matches "320x80"
-        And the "X-Imbo-ImageIdentifier" response header matches "b60df41830245ee8f278e3ddfe5238a3"
+        When I request the previously added image as a "png"
+        Then I should get a response with "200 OK"
+        And the "X-Imbo-ImageVariation" response header matches "320x80"
         And the width of the image is "320"
 
     Scenario: Request an image with a maxSize transformation which only slightly downscales the original
@@ -46,8 +48,9 @@ Feature: Imbo provides an event listener that generates variations when adding i
         And Imbo uses the "image-variations.php" configuration
         And I specify "maxSize:width=1020" as transformation
         And I include an access token in the query
-        When I request "/users/publickey/images/b60df41830245ee8f278e3ddfe5238a3.png"
-        Then the "X-Imbo-ImageVariation" response header does not exist
+        When I request the previously added image as a "png"
+        Then I should get a response with "200 OK"
+        And the "X-Imbo-ImageVariation" response header does not exist
         And the width of the image is "1020"
 
     Scenario: Request an image with a thumbnail transformation using inset mode and no width
@@ -55,8 +58,9 @@ Feature: Imbo provides an event listener that generates variations when adding i
         And Imbo uses the "image-variations.php" configuration
         And I specify "thumbnail:height=128,fit=inset" as transformation
         And I include an access token in the query
-        When I request "/users/publickey/images/b60df41830245ee8f278e3ddfe5238a3.png"
-        Then the "X-Imbo-ImageVariation" response header matches "512x128"
+        When I request the previously added image as a "png"
+        Then I should get a response with "200 OK"
+        And the "X-Imbo-ImageVariation" response header matches "512x128"
         And the width of the image is "50"
 
     Scenario: Request an image with a maxSize and border transformation
@@ -68,8 +72,9 @@ Feature: Imbo provides an event listener that generates variations when adding i
           maxSize:width=100
           """
         And I include an access token in the query
-        When I request "/users/publickey/images/b60df41830245ee8f278e3ddfe5238a3.png"
-        Then the "X-Imbo-ImageVariation" response header matches "512x128"
+        When I request the previously added image as a "png"
+        Then I should get a response with "200 OK"
+        And the "X-Imbo-ImageVariation" response header matches "512x128"
         And the pixel at coordinate "5, 5" should have a color of "#215d10"
         And the width of the image is "100"
         And the height of the image is "100"

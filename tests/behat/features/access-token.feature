@@ -35,14 +35,14 @@ Feature: Imbo requires an access token for read operations
     Scenario: Request image using no access token
         Given I use "publickey" and "privatekey" for public and private keys
         And the "Accept" request header is "*/*"
-        When I request the previously added image
+        When I request "/users/user/images"
         Then I should get a response with "400 Missing access token"
 
     Scenario: Can request a whitelisted transformation without access tokens
         Given I use "publickey" and "privatekey" for public and private keys
         And the "Accept" request header is "*/*"
         And Imbo uses the "access-token-whitelist-transformation.php" configuration
-        When I request "/users/user/images/929db9c5fc3099f7576f5655207eba47?t[]=whitelisted"
+        When I request the previously added image with the query string "?t[]=whitelisted"
         Then I should get a response with "200 OK"
         And the width of the image is "100"
         And the height of the image is "50"

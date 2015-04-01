@@ -28,8 +28,8 @@ Feature: Imbo supports custom event handlers in the configuration
         Given I use "publickey" and "privatekey" for public and private keys
         And Imbo uses the "custom-event-listeners.php" configuration
         And I include an access token in the query
-        When I request "/users/publickey.json"
-        Then the "X-Imbo-CurrentUser" response header is "publickey"
+        When I request "/users/user.json"
+        Then the "X-Imbo-CurrentUser" response header is "user"
 
     Scenario: Register an event listener that will only trigger for a given user and make a request to another key
         Given I use "user" and "key" for public and private keys

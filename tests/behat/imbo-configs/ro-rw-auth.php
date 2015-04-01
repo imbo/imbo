@@ -33,6 +33,15 @@ return [
                     'users' => ['someuser'],
                 ]]
             ],
+
+            [
+                'publicKey'  => 'foo',
+                'privateKey' => 'bar',
+                'acl' => [[
+                    'resources' => ArrayAdapter::getReadOnlyResources(),
+                    'users' => ['user'],
+                ]]
+            ]
         ]);
     }
 ];

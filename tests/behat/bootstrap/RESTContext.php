@@ -48,6 +48,13 @@ class RESTContext extends BehatContext {
     protected $requestHeaders = array();
 
     /**
+     * Query parameters for the request
+     *
+     * @var array
+     */
+    protected $queryParams = array();
+
+    /**
      * Optional request body to add to the request
      *
      * @var string
@@ -218,6 +225,20 @@ class RESTContext extends BehatContext {
      */
     public function setRequestHeader($header, $value) {
         $this->requestHeaders[$header] = $value;
+    }
+
+     /**
+     * @Given /^I append a query string parameter, "([^"]*)" with the value "([^"]*)"$/
+     */
+    public function appendQueryStringParameter($queryParam, $value) {
+        $this->queryParams[] = $queryParam . '=' . $value;
+    }
+
+    /**
+     * @When /^I request "([^"]*)" with the given query string$/
+     */
+    public function performRequestWithGivenQueryString($path) {
+        $this->request($path . '?' . implode('&', $this->queryParams));
     }
 
     /**

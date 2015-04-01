@@ -88,7 +88,7 @@ return array(
             'listener' => 'CustomEventListener',
             'params' => array('key1' => 'value1', 'key2' => 'value2'),
             'users' => array(
-                'whitelist' => array('publickey'),
+                'whitelist' => array('user'),
             ),
         ),
     ),

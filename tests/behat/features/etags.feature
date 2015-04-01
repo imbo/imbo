@@ -24,14 +24,14 @@ Feature: Imbo adds ETag's to some responses
     Scenario: User resource includes an Etag
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey"
+        When I request "/users/user"
         Then I should get a response with "200 OK"
         And the "ETag" response header matches ""[a-z0-9]{32}""
 
     Scenario: Images resource includes an Etag
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images"
+        When I request "/users/user/images"
         Then I should get a response with "200 OK"
         And the "ETag" response header matches ""[a-z0-9]{32}""
 
@@ -39,7 +39,7 @@ Feature: Imbo adds ETag's to some responses
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         And the "Accept" request header is "<acceptHeader>"
-        When I request "/users/publickey/images/929db9c5fc3099f7576f5655207eba47"
+        When I request the previously added image
         Then I should get a response with "200 OK"
         And the "ETag" response header is "<etag>"
 
@@ -54,12 +54,12 @@ Feature: Imbo adds ETag's to some responses
     Scenario: Metadata resource includes an ETag
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images/929db9c5fc3099f7576f5655207eba47/metadata"
+        When I request the metadata of the previously added image
         Then I should get a response with "200 OK"
         And the "ETag" response header matches ""[a-z0-9]{32}""
 
     Scenario: Responses that is not 200 OK does not get ETags
         Given I use "publickey" and "privatekey" for public and private keys
-        When I request "/users/publickey"
+        When I request "/users/user"
         Then I should get a response with "400 Missing access token"
         And the "ETag" response header does not exist
