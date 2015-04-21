@@ -60,8 +60,6 @@ class StripTest extends TransformationTests {
 
         $this->getTransformation()->setImagick($imagick)->transform($event);
 
-        $imagick->stripImage();
-
         foreach ($imagick->getImageProperties() as $key => $value) {
             $this->assertStringStartsNotWith('exif', $key);
         }
