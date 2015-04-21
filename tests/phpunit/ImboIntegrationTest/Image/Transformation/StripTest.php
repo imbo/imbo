@@ -60,6 +60,14 @@ class StripTest extends TransformationTests {
 
         $this->getTransformation()->setImagick($imagick)->transform($event);
 
+        // we need to actually re-read the image data on Windows (or certain ImageMagick versions?)
+        // to see the change in image properties..
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $data = $imagick->getImagesBlob();
+            $imagick->clear();
+            $imagick->readImageBlob($data);
+        }
+
         foreach ($imagick->getImageProperties() as $key => $value) {
             $this->assertStringStartsNotWith('exif', $key);
         }
