@@ -22,7 +22,7 @@ class FilesystemTest extends StorageTests {
     /**
      * @var string
      */
-    private $path = '/tmp/imboVariationsFilesystemIntegrationTest';
+    private $path = null;
 
     /**
      * @see ImboIntegrationTest\Storage\StorageTests::getAdapter()
@@ -37,6 +37,8 @@ class FilesystemTest extends StorageTests {
      * Set up the directory for each test, ensuring it's empty
      */
     public function setUp() {
+        $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'imboVariationsFilesystemIntegrationTest';
+
         if (is_dir($this->path)) {
             $this->rmdir($this->path);
         }
