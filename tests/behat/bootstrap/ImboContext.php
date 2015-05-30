@@ -39,6 +39,13 @@ class ImboContext extends RESTContext {
     private $privateKey;
 
     /**
+     * Holds the configuration file specified in the current feature
+     *
+     * @var string
+     */
+    private $currentConfig;
+
+    /**
      * @BeforeFeature
      */
     public static function prepare(FeatureEvent $event) {
@@ -346,6 +353,7 @@ class ImboContext extends RESTContext {
      * @Given /^Imbo uses the "([^"]*)" configuration$/
      */
     public function setImboConfigHeader($config) {
+        $this->currentConfig = $config;
         $this->addHeaderToNextRequest('X-Imbo-Test-Config', $config);
     }
 
@@ -407,4 +415,22 @@ class ImboContext extends RESTContext {
             }
         }
     }
+
+    /**
+     * @Given /^the ACL rule under public key "([^"]*)" with ID "([^"]*)" should not exist( anymore)?$/
+     */
+    public function aclRuleWithIdShouldNotExist($publicKey, $aclId) {
+        if ($this->currentConfig) {
+            $this->addHeaderToNextRequest('X-Imbo-Test-Config', $this->currentConfig);
+        }
+
+        $url = '/keys/' . $publicKey . '/access/' . $aclId;
+        return [
+            new Given('I use "acl-checker" and "foobar" for public and private keys'),
+            new Given('I include an access token in the query'),
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+            new Given('I should get a response with "404 Access rule not found"')
+        ];
+    }
+
 }
