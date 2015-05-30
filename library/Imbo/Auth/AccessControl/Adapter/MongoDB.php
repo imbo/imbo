@@ -13,7 +13,6 @@ namespace Imbo\Auth\AccessControl\Adapter;
 use Imbo\Exception\DatabaseException,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Exception\RuntimeException,
-    Imbo\Auth\AccessControl\UserQuery,
     Imbo\Auth\AccessControl\GroupQuery,
     MongoClient,
     MongoCollection,
@@ -145,24 +144,6 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         }
 
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUsers(UserQuery $query = null) {
-        if ($query === null) {
-            $query = new UserQuery();
-        }
-
-        return array_slice($this->users, $query->offset() ?: 0, $query->limit());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function userExists($user) {
-        return in_array($user, $this->users);
     }
 
     /**
