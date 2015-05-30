@@ -731,7 +731,7 @@ if there are resource groups defined.
 
 * 200 OK
 
-.. _groups-resource:
+.. _group-resource:
 
 Group resource - ``/groups/<groupName>``
 ++++++++++++++++++++++++++++++++++++++++
@@ -786,6 +786,64 @@ Requests using HTTP DELETE on this resource will remove the entire resource grou
 * 200 OK
 * 201 Created
 * 404 Group not found
+* 405 Access control adapter is immutable
+
+.. _access-rules-resource:
+
+Access rules resource - ``/keys/<publicKey>/access``
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The access rules endpoint allows you to add rules that give a public key access to a specified set of resources. These rules can also be defined on a per-user basis. Instead of defining a list of resources, you also have the option to specify a :ref:`resource group <groups-resource>`.
+
+Listing access control rules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP GET on this resource returns all the access control rules defined for the given public key.
+
+.. code-block:: bash
+
+    curl http://imbo/keys/<publicKey>/access.json
+
+results in:
+
+.. code-block:: javascript
+
+    [
+      {
+        "id": 1,
+        "resources": ['images.get', 'image.get', 'images.post', 'image.delete'],
+        "users": [
+          "user1",
+          "user2"
+        ]
+      },
+      {
+        "id": 2,
+        "group": "read-stats",
+        "users": [
+          "user1",
+          "user2"
+        ]
+      }
+    ]
+
+Adding access control rules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP POST on this resource adds new rules to the given public key. The request body should contain an array of resources the group should consist of.
+
+.. code-block:: bash
+
+    curl -XPOST http://imbo/keys/<publicKey>/access -d '[{
+      "resources": ["user.get", "image.get", "images.get", "metadata.get"],
+      "users": "*"
+    }]'
+
+**Typical response codes:**
+
+* 200 OK
+* 400 No access rule data provided
+* 404 Public key not found
 * 405 Access control adapter is immutable
 
 .. _access-tokens:
