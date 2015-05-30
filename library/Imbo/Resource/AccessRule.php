@@ -27,7 +27,7 @@ class AccessRule implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD', 'DELETE');
+        return ['GET', 'HEAD', 'DELETE'];
     }
 
     /**

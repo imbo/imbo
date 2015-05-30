@@ -27,7 +27,7 @@ class AccessRules implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD', 'POST');
+        return ['GET', 'HEAD', 'POST'];
     }
 
     /**
@@ -35,7 +35,7 @@ class AccessRules implements ResourceInterface {
      */
     public static function getSubscribedEvents() {
         return [
-            'accessrules.get'  => 'getRules',
+            'accessrules.get' => 'getRules',
             'accessrules.head' => 'getRules',
             'accessrules.post' => 'updateRules'
         ];
