@@ -731,6 +731,63 @@ if there are resource groups defined.
 
 * 200 OK
 
+.. _groups-resource:
+
+Group resource - ``/groups/<groupName>``
+++++++++++++++++++++++++++++++++++++++++
+
+The group resource enables adding, modifying and deleting resource groups used in the access control routine. Not all access control adapters allow modification of groups - in this case the configuration is done through configuration files, and PUT/DELETE operations will result in an HTTP 405 response.
+
+List resources of a group
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP GET on this resource returns all the resources the group consists of.
+
+.. code-block:: bash
+
+    curl http://imbo/groups/<group>.json
+
+results in:
+
+.. code-block:: javascript
+
+    {
+      "resources": [
+        "user.get",
+        "user.head",
+        "user.options"
+      ]
+    }
+
+Add/modify resources for a group
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP PUT on this resource either adds a new group with the given name, or if it already exists, updates it. The request body should contain an array of resources the group should consist of.
+
+.. code-block:: bash
+
+    curl -XPUT http://imbo/groups/<group>.json -d '[
+      "user.get",
+      "stats.get"
+    ]'
+
+Delete a resource group
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP DELETE on this resource will remove the entire resource group.
+
+.. code-block:: bash
+
+    curl -XDELETE http://imbo/groups/<group>.json
+
+
+**Typical response codes:**
+
+* 200 OK
+* 201 Created
+* 404 Group not found
+* 405 Access control adapter is immutable
+
 .. _access-tokens:
 
 Access tokens
