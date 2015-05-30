@@ -138,7 +138,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
 
         $data = json_decode($json, true);
         $this->assertSame($formattedDate, $data['lastModified']);
-        $this->assertSame('christer', $data['id']);
+        $this->assertSame('christer', $data['user']);
         $this->assertSame(123, $data['numImages']);
     }
 
