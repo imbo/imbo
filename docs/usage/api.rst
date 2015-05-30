@@ -234,7 +234,7 @@ results in:
 .. code-block:: javascript
 
     {
-      "id": "<user>",
+      "user": "<user>",
       "numImages": 42,
       "lastModified": "Wed, 18 Apr 2012 15:12:52 GMT"
     }

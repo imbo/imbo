@@ -77,7 +77,7 @@ STATUS;
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   <user>
-    <id>{$model->getUserId()}</id>
+    <user>{$model->getUserId()}</user>
     <numImages>{$model->getNumImages()}</numImages>
     <lastModified>{$this->dateFormatter->formatDate($model->getLastModified())}</lastModified>
   </user>

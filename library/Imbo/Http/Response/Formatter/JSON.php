@@ -63,7 +63,7 @@ class JSON extends Formatter implements FormatterInterface {
      */
     public function formatUser(Model\User $model) {
         return $this->encode(array(
-            'id' => $model->getUserId(),
+            'user' => $model->getUserId(),
             'numImages' => $model->getNumImages(),
             'lastModified' => $this->dateFormatter->formatDate($model->getLastModified()),
         ));

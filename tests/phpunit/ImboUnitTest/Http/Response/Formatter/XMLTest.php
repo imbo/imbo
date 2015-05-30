@@ -137,7 +137,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
         $xml = $this->formatter->format($model);
 
-        $this->assertXPathMatches('//user/id[.="christer"]', $xml, 'Missing user');
+        $this->assertXPathMatches('//user/user[.="christer"]', $xml, 'Missing user');
         $this->assertXPathMatches('//user/numImages[.="123"]', $xml, 'Missing num key');
         $this->assertXPathMatches('//user/lastModified[.="' . $formattedDate . '"]', $xml, 'Missing date');
     }
