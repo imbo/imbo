@@ -59,7 +59,9 @@ abstract class AbstractAdapter implements AdapterInterface {
             self::getReadOnlyResources(), [
                 ACI::RESOURCE_IMAGE_DELETE,
                 ACI::RESOURCE_IMAGES_POST,
-                ACI::RESOURCE_METADATA_POST, ACI::RESOURCE_METADATA_DELETE,
+                ACI::RESOURCE_METADATA_POST,
+                ACI::RESOURCE_METADATA_DELETE,
+                ACI::RESOURCE_METADATA_PUT,
                 ACI::RESOURCE_SHORTURL_DELETE,
                 ACI::RESOURCE_SHORTURLS_DELETE,
             ]

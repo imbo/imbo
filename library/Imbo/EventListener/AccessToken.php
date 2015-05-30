@@ -80,11 +80,25 @@ class AccessToken implements ListenerInterface {
     public static function getSubscribedEvents() {
         $callbacks = array();
         $events = array(
-            'user.head', 'user.get', 'images.get', 'images.head',
-            'image.get', 'image.head', 'metadata.get', 'metadata.head',
-            'groups.get', 'groups.head', 'group.get', 'group.head',
-            'accessrules.get', 'accessrules.head', 'accessrule.head', 'accessrule.get',
-            'keys.get', 'keys.head',
+            'groups.get',
+            'groups.head',
+            'group.get',
+            'group.head',
+            'accessrule.get',
+            'accessrule.head',
+            'accessrules.get',
+            'accessrules.head',
+            'user.get',
+            'user.header',
+            'image.get',
+            'image.head',
+            'images.get',
+            'images.head',
+            'metadata.get',
+            'metadata.head',
+            'shorturl.get',
+            'shorturl.head',
+
             'auth.accesstoken'
         );
 
