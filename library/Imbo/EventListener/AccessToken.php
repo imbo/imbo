@@ -81,7 +81,8 @@ class AccessToken implements ListenerInterface {
         $callbacks = array();
         $events = array(
             'user.get', 'images.get', 'image.get', 'metadata.get',
-            'user.head', 'images.head', 'image.head', 'metadata.head'
+            'user.head', 'images.head', 'image.head', 'metadata.head',
+            'auth.accesstoken'
         );
 
         foreach ($events as $event) {
