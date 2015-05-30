@@ -341,11 +341,26 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      */
     public function deleteResourceGroup($groupName) {
         try {
-            $result = $this->getGroupsCollection()->remove([
+            $success = (bool) $this->getGroupsCollection()->remove([
                 'name' => $groupName,
-            ]);
+            ])['ok'];
 
-            return (bool) $result['ok'];
+            if ($success) {
+                // Also remove ACL rules that depended on this group
+                $this->getAclCollection()->update(
+                    ['acl.group' => $groupName],
+                    [
+                        '$pull' => [
+                            'acl' => [
+                                'group' => $groupName
+                            ]
+                        ]
+                    ],
+                    ['multiple' => true]
+                );
+            }
+
+            return $success;
         } catch (MongoException $e) {
             throw new DatabaseException('Could not delete resource group from database', 500, $e);
         }

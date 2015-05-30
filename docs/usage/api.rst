@@ -774,7 +774,7 @@ Requests using HTTP PUT on this resource either adds a new group with the given 
 Delete a resource group
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Requests using HTTP DELETE on this resource will remove the entire resource group.
+Requests using HTTP DELETE on this resource will remove the entire resource group. Note that any access control rules that are using this resource group will also be deleted, since they are now invalid.
 
 .. code-block:: bash
 

@@ -53,6 +53,15 @@ Feature: Imbo provides a group endpoint
         When I request "/groups/existing-group" using HTTP "DELETE"
         Then I should get a response with "200 OK"
 
+    Scenario: Delete a resource group that has access-control rules that depends on it
+        Given Imbo uses the "access-control-mutable.php" configuration
+        And I prime the database with "access-control-mutable.php"
+        And I use "acl-creator" and "someprivkey" for public and private keys
+        And I sign the request
+        When I request "/groups/user-stats" using HTTP "DELETE"
+        Then I should get a response with "200 OK"
+        And the ACL rule under public key "group-based" with ID "100000000000000000001942" should not exist anymore
+
     Scenario: Delete a resource group with an immutable access control adapter
         Given I use "valid-group-pubkey" and "foobar" for public and private keys
         And I prime the database with "access-control-mutable.php"
