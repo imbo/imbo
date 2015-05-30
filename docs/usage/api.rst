@@ -654,6 +654,50 @@ results in:
 * 400 Bad request
 * 404 Image not found
 
+.. _keys-resource:
+
+Keys resource - ``/keys/<publicKey>``
++++++++++++++++++++++++++++++++++++++
+
+The keys resource provides a way for clients to dynamically add, remove and update public keys to be used as part of the access control routines. Not all access control adapters implement this functionality - in this case the configuration is done through static configuration files.
+
+A private key does not have any specific requirements, while a public key must match the following `regular expression <http://en.wikipedia.org/wiki/Regular_expression>`_::
+
+    /^[a-zA-Z0-9_-]{1,}$/
+
+Add a public key
+~~~~~~~~~~~~~~~~
+
+Every public key must also have a private key, which is used to sign and generate access tokens for requests. This is the only required parameter in the request body.
+
+.. code-block:: bash
+
+    curl -XPUT http://imbo/keys/<publicKey>.json -d '{"privateKey":"<privateKey>"}'
+
+Change private key for a public key
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use the same method as when adding a public key to change the private key.
+
+Remove a public key
+~~~~~~~~~~~~~~~~~~~
+
+Public keys can be removed using a ``DELETE`` request. The public key used to sign the request must have access to the ``keys.delete`` resource.
+
+.. code-block:: bash
+
+    curl -XDELETE http://imbo/keys/<publicKey>.json
+
+**Typical response codes:**
+
+* 201 OK
+* 201 Created
+* 400 Bad request
+* 404 Public key not found
+* 405 Access control adapter is immutable
+
+.. note:: The keys resource is not cache-able.
+
 .. _access-tokens:
 
 Access tokens
