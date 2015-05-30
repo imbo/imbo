@@ -33,51 +33,53 @@ return [
         [
             'publicKey' => 'foobar',
             'privateKey' => 'barfoo',
-            'acl' => [
-                [
-                    'id' => new MongoId('100000000000000000001337'),
-                    'resources' => ['access.get', 'access.head'],
-                    'users' => []
-                ]
-            ]
+            'acl' => [[
+                'id' => new MongoId('100000000000000000001337'),
+                'resources' => ['access.get', 'access.head'],
+                'users' => []
+            ]]
         ],
         [
             'publicKey' => 'acl-creator',
             'privateKey' => 'someprivkey',
-            'acl' => [
-                [
-                    'id' => new MongoId(),
-                    'resources' => [
-                        'group.get', 'group.head', 'group.put', 'group.delete',
-                        'accessrules.get', 'accessrules.head', 'accessrules.post',
-                        'keys.put', 'keys.delete',
-                    ],
-                    'users' => [],
-                ]
-            ]
+            'acl' => [[
+                'id' => new MongoId(),
+                'resources' => [
+                    'group.get', 'group.head', 'group.put', 'group.delete',
+                    'accessrules.get', 'accessrules.head', 'accessrules.post',
+                    'keys.put', 'keys.delete',
+                ],
+                'users' => [],
+            ]]
         ],
         [
             'publicKey' => 'wildcarded',
             'privateKey' => 'foobar',
-            'acl' => [
-                [
-                    'id' => new MongoId(),
-                    'group' => 'user-stats',
-                    'users' => '*'
-                ]
-            ]
+            'acl' => [[
+                'id' => new MongoId(),
+                'group' => 'user-stats',
+                'users' => '*'
+            ]]
         ],
         [
             'publicKey' => 'group-based',
             'privateKey' => 'foobar',
-            'acl' => [
-                [
-                    'id' => new MongoId(),
-                    'group' => 'user-stats',
-                    'users' => ['user1']
-                ]
-            ]
+            'acl' => [[
+                'id' => new MongoId('100000000000000000001942'),
+                'group' => 'user-stats',
+                'users' => ['user1']
+            ]]
         ],
+
+        [
+            'publicKey' => 'acl-checker',
+            'privateKey' => 'foobar',
+            'acl' => [[
+                'id' => new MongoId(),
+                'resources' => [ACI::RESOURCE_ACCESS_RULE_GET],
+                'users' => [],
+            ]]
+        ]
     ],
 
     'accesscontrolgroup' => [

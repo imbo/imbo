@@ -385,8 +385,7 @@ class ImboContext extends RESTContext {
     /**
      * @Given /^I prime the database with "([^"]*)"$/
      */
-    public function iPrimeTheAccessControlProviderWith($fixture)
-    {
+    public function iPrimeTheDatabaseWith($fixture) {
         $fixturePath = implode(DIRECTORY_SEPARATOR, [
             dirname(__DIR__),
             'fixtures',
@@ -403,7 +402,7 @@ class ImboContext extends RESTContext {
         foreach ($fixtures as $collection => $data) {
             $mongo->$collection->drop();
 
-            if (!!$data) {
+            if ($data) {
                 $mongo->$collection->batchInsert($data);
             }
         }
