@@ -846,6 +846,49 @@ Requests using HTTP POST on this resource adds new rules to the given public key
 * 404 Public key not found
 * 405 Access control adapter is immutable
 
+.. _access-rule-resource:
+
+Access rule resource - ``/keys/<publicKey>/access/<ruleId>``
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The access rule endpoint allows you to see which resources and users a given access control rule contains. It also allows you to remove a specific access control rule.
+
+Get access rule details
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+    curl http://imbo/keys/<publicKey>/access/<ruleId>.json
+
+results in:
+
+.. code-block:: javascript
+
+    {
+      "id": 1,
+      "resources": ['images.get', 'image.get', 'images.post', 'image.delete'],
+      "users": [
+        "user1",
+        "user2"
+      ]
+    }
+
+Removing an access rule
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP DELETE on this resource removes the access control rule, given the access control adapter supports mutations.
+
+.. code-block:: bash
+
+    curl -XDELETE http://imbo/keys/<publicKey>/access/<ruleId>
+
+**Typical response codes:**
+
+* 200 OK
+* 404 Public key not found
+* 404 Access rule not found
+* 405 Access control adapter is immutable
+
 .. _access-tokens:
 
 Access tokens
