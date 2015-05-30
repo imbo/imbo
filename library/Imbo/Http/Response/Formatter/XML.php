@@ -271,27 +271,18 @@ DATA;
      * {@inheritdoc}
      */
     public function formatStats(Model\Stats $model) {
-        $users = '';
-        $numUsers = 0;
-
-        foreach ($model->getUsers() as $user => $stats) {
-            $users .= '<user user="' . $user . '">' . $this->formatArray($stats) . '</user>';
-            $numUsers++;
-        }
-
-        $total = $this->formatArray(array(
+        $total = $this->formatArray([
             'numImages' => $model->getNumImages(),
+            'numUsers' => $model->getNumUsers(),
             'numBytes' => $model->getNumBytes(),
-            'numUsers' => $numUsers,
-        ));
-        $custom = $this->formatArray($model->getCustomStats() ?: array());
+        ]);
+        $custom = $this->formatArray($model->getCustomStats() ?: []);
 
         return <<<STATUS
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   <stats>
-    <users>{$users}</users>
-    <total>{$total}</total>
+    {$total}
     <custom>{$custom}</custom>
   </stats>
 </imbo>

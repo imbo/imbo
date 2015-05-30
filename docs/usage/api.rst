@@ -74,21 +74,9 @@ results in:
 .. code-block:: javascript
 
     {
-      "users": {
-        "someuser": {
-          "numImages": 11,
-          "numBytes": 3817197
-        },
-        "someotheruser": {
-          "numImages": 1,
-          "numBytes": 81097
-        }
-      },
-      "total": {
-        "numImages": 12,
-        "numUsers": 2,
-        "numBytes": 3898294
-      },
+      "numImages": 12,
+      "numUsers": 2,
+      "numBytes": 3898294
       "custom": {}
     }
 

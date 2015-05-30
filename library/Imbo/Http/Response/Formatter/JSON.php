@@ -185,15 +185,12 @@ class JSON extends Formatter implements FormatterInterface {
      * {@inheritdoc}
      */
     public function formatStats(Model\Stats $model) {
-        $data = array(
-            'users' => $model->getUsers(),
-            'total' => array(
-                'numImages' => $model->getNumImages(),
-                'numUsers' => $model->getNumUsers(),
-                'numBytes' => $model->getNumBytes(),
-            ),
+        $data = [
+            'numImages' => $model->getNumImages(),
+            'numUsers' => $model->getNumUsers(),
+            'numBytes' => $model->getNumBytes(),
             'custom' => $model->getCustomStats() ?: new stdClass(),
-        );
+        ];
 
         return $this->encode($data);
     }
