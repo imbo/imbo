@@ -72,6 +72,7 @@ class AccessRules implements ResourceInterface {
      */
     public function updateRules(EventInterface $event) {
         $accessControl = $event->getAccessControl();
+
         if (!($accessControl instanceof MutableAdapterInterface)) {
             throw new ResourceException('Access control adapter is immutable', 405);
         }
@@ -85,6 +86,7 @@ class AccessRules implements ResourceInterface {
         }
 
         $accessControl = $event->getAccessControl();
+
         foreach ($data as $rule) {
             $accessControl->addAccessRule($publicKey, $rule);
         }
