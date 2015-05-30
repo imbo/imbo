@@ -275,7 +275,7 @@ DATA;
         $numUsers = 0;
 
         foreach ($model->getUsers() as $user => $stats) {
-            $users .= '<user id="' . $user . '">' . $this->formatArray($stats) . '</user>';
+            $users .= '<user user="' . $user . '">' . $this->formatArray($stats) . '</user>';
             $numUsers++;
         }
 
