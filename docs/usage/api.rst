@@ -647,7 +647,7 @@ results in:
 Public key resource - ``/keys/<publicKey>``
 +++++++++++++++++++++++++++++++++++++++++++
 
-The public key resource provides a way for clients to dynamically add, remove and update public keys to be used as part of the access control routines. Not all access control adapters implement this functionality - in this case the configuration is done through static configuration files.
+The public key resource provides a way for clients to dynamically add, remove and update public keys to be used as part of the access control routines. Not all access control adapters implement this functionality - in this case the configuration is done through configuration files.
 
 A private key does not have any specific requirements, while a public key must match the following `regular expression <http://en.wikipedia.org/wiki/Regular_expression>`_::
 
