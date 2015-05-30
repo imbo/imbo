@@ -374,7 +374,7 @@ This adapter simply stores all images on the file system. It has a single parame
 ``dataDir``
     The base path where the images are stored.
 
-This adapter is configured to create subdirectories inside of ``dataDir`` based on the user and the checksum of the images added to Imbo. The algorithm that generates the path simply takes the three first characters of the user and creates directories for each of them, then the full user, then a directory of each of the first characters in the image identifier, and lastly it stores the image in a file with a filename equal to the image identifier itself.
+This adapter is configured to create subdirectories inside of ``dataDir`` based on the user and the checksum of the images added to Imbo. The algorithm that generates the path simply takes the three first characters of the user and creates directories for each of them, then the complete user, then a directory of each of the first characters in the image identifier, and lastly it stores the image in a file with a filename equal to the image identifier itself. For instance, an image stored under the user ``foobar`` with the image identifier ``5c01e554-9fca-4231-bb95-a6eabf259b64`` would be stored as ``<dataDir>/f/o/o/foobar/5/c/0/5c01e554-9fca-4231-bb95-a6eabf259b64``.
 
 Examples
 ^^^^^^^^
