@@ -33,6 +33,20 @@ interface AdapterInterface {
     const RESOURCE_GROUP_DELETE            = 'group.delete';
     const RESOURCE_GROUP_OPTIONS           = 'group.options';
 
+    const RESOURCE_KEYS_PUT                = 'keys.put';
+    const RESOURCE_KEYS_DELETE             = 'keys.delete';
+    const RESOURCE_KEYS_OPTIONS            = 'keys.options';
+
+    const RESOURCE_ACCESS_RULE_GET         = 'accessrule.get';
+    const RESOURCE_ACCESS_RULE_HEAD        = 'accessrule.head';
+    const RESOURCE_ACCESS_RULE_DELETE      = 'accessrule.delete';
+    const RESOURCE_ACCESS_RULE_OPTIONS     = 'accessrule.options';
+
+    const RESOURCE_ACCESS_RULES_GET        = 'accessrules.get';
+    const RESOURCE_ACCESS_RULES_HEAD       = 'accessrules.head';
+    const RESOURCE_ACCESS_RULES_POST       = 'accessrules.post';
+    const RESOURCE_ACCESS_RULES_OPTIONS    = 'accessrules.options';
+
     const RESOURCE_USER_GET                = 'user.get';
     const RESOURCE_USER_HEAD               = 'user.header';
     const RESOURCE_USER_OPTIONS            = 'user.options';
@@ -148,4 +162,11 @@ interface AdapterInterface {
      * @return array
      */
     static function getReadWriteResources();
+
+    /**
+     * Returns a list of all resources available, including those which involves access control
+     *
+     * @return array
+     */
+    static function getAllResources();
 }

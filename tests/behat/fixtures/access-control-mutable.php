@@ -1,4 +1,5 @@
 <?php
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface as ACI;
 
 return [
     'accesscontrol' => [
@@ -8,7 +9,18 @@ return [
             'acl' => [
                 [
                     'id' => new MongoId(),
-                    'resources' => ['access.get', 'access.head'],
+                    'resources' => [
+                        ACI::RESOURCE_KEYS_PUT,
+                        ACI::RESOURCE_KEYS_DELETE,
+
+                        ACI::RESOURCE_ACCESS_RULE_GET,
+                        ACI::RESOURCE_ACCESS_RULE_HEAD,
+                        ACI::RESOURCE_ACCESS_RULE_DELETE,
+
+                        ACI::RESOURCE_ACCESS_RULES_GET,
+                        ACI::RESOURCE_ACCESS_RULES_HEAD,
+                        ACI::RESOURCE_ACCESS_RULES_POST,
+                    ],
                     'users' => []
                 ],
                 [
@@ -43,13 +55,43 @@ return [
                     'users' => [],
                 ]
             ]
-        ]
+        ],
+        [
+            'publicKey' => 'wildcarded',
+            'privateKey' => 'foobar',
+            'acl' => [
+                [
+                    'id' => new MongoId(),
+                    'group' => 'user-stats',
+                    'users' => '*'
+                ]
+            ]
+        ],
+        [
+            'publicKey' => 'group-based',
+            'privateKey' => 'foobar',
+            'acl' => [
+                [
+                    'id' => new MongoId(),
+                    'group' => 'user-stats',
+                    'users' => ['user1']
+                ]
+            ]
+        ],
     ],
 
     'accesscontrolgroup' => [
         [
             'name' => 'existing-group',
             'resources' => ['group.get', 'group.head'],
+        ],
+        [
+            'name' => 'user-stats',
+            'resources' => ['user.get', 'user.head'],
+        ],
+        [
+            'name' => 'something',
+            'resources' => []
         ]
     ],
 ];

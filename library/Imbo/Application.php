@@ -280,16 +280,6 @@ class Application {
             // Inform the user agent of which methods are allowed against this resource
             $response->headers->set('Allow', $resource->getAllowedMethods(), false);
 
-            if ($user = $request->getUser()) {
-                // Ensure that the user actually exists
-                if (!$accessControl->userExists($user)) {
-                    $e = new RuntimeException('User not found', 404);
-                    $e->setImboErrorCode(Exception::AUTH_UNKNOWN_USER);
-
-                    throw $e;
-                }
-            }
-
             $methodName = strtolower($request->getMethod());
 
             // Generate the event name based on the accessed resource and the HTTP method

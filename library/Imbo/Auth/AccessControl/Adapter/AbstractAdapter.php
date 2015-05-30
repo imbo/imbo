@@ -75,4 +75,19 @@ abstract class AbstractAdapter implements AdapterInterface {
             ]
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    final public static function getAllResources() {
+        return array_merge(
+            self::getReadWriteResources(), [
+                ACI::RESOURCE_KEYS_PUT, ACI::RESOURCE_KEYS_DELETE, ACI::RESOURCE_KEYS_OPTIONS,
+                ACI::RESOURCE_ACCESS_RULE_GET, ACI::RESOURCE_ACCESS_RULE_HEAD,
+                ACI::RESOURCE_ACCESS_RULE_DELETE, ACI::RESOURCE_ACCESS_RULE_OPTIONS,
+                ACI::RESOURCE_ACCESS_RULES_GET, ACI::RESOURCE_ACCESS_RULES_HEAD,
+                ACI::RESOURCE_ACCESS_RULES_POST, ACI::RESOURCE_ACCESS_RULES_OPTIONS,
+            ]
+        );
+    }
 }
