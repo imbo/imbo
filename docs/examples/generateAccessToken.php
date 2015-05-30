@@ -17,10 +17,10 @@ if ($user != $publicKey) {
 }
 
 // The URI
-$uri = sprintf("http://imbo/users/%s/images/%s?%s", $user, $publicKey, $image, implode('&', $query));
+$uri = sprintf("http://imbo/users/%s/images/%s?%s", $user, $image, implode('&', $query));
 
 // Generate the token
 $accessToken = hash_hmac("sha256", $uri, $privateKey);
 
 // Output the URI with the access token
-echo sprintf("%s&accessToken=%s", $uri, $accessToken);
+echo sprintf("%s&accessToken=%s", $uri, $accessToken) . PHP_EOL;
