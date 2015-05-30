@@ -21,9 +21,9 @@ Below are the changes you need to be aware of when upgrading to Imbo-2.0.0.
 Public key is an authentication detail
 ++++++++++++++++++++++++++++++++++++++
 
-Versions prior to 2.0.0 had a 1:1 correlation between what a ``user`` and a ``public key``. In 2.0.0, a ``user`` is the entity which images belong to, while a ``public key`` is one part of the authentication scheme. ``Public keys`` each has their own set of permissions, which can grant them access to different resources within different users.
+Versions prior to 2.0.0 had a 1:1 correlation between what a ``user`` and a ``public key`` was. In 2.0.0, a ``user`` is the entity which images belong to, while a ``public key`` is one part of the authentication scheme. ``Public keys`` each has their own set of permissions, which can grant them access to different resources within different users.
 
-Prior to 2.0.0, both the database and endpoints worked with a field name of ``publicKey`` to identify the user. Going forward, apart from when working with authentication, ``user`` will be the new field name. This requires some database changes - see below.
+Prior to 2.0.0, both the database and HTTP endpoints used a field name of ``publicKey`` to identify the user. Going forward, apart from when working with authentication, ``user`` will be the new field name. This requires some database changes - see below.
 
 Doctrine
 ~~~~~~~~
