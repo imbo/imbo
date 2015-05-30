@@ -25,39 +25,60 @@ class Stats implements ModelInterface, ArrayAccess {
      *
      * @var array
      */
-    private $customStats = array();
+    private $customStats = [];
 
     /**
-     * User stats
+     * Number of users in the system
      *
-     * Keys are the users, and the values is an array with two elements:
-     *
-     * (int) 'numImages' Number of images stored by this user
-     * (int) 'numBytes' Number of bytes stored by this user
-     *
-     * @var int
+     * @var integer
      */
-    private $users = array();
+    private $numUsers;
 
     /**
-     * Set the users information
+     * Number of bytes in the system
      *
-     * @param array $users The user info to set
+     * @var integer
+     */
+    private $numBytes;
+
+    /**
+     * Number of images in the system
+     *
+     * @var integer
+     */
+    private $numImages;
+
+    /**
+     * Set the number of users
+     *
+     * @param int $numUsers The number of users that has one or more images
      * @return Stats
      */
-    public function setUsers(array $users) {
-        $this->users = $users;
+    public function setNumUsers($numUsers) {
+        $this->numUsers = $numUsers;
 
         return $this;
     }
 
     /**
-     * Get the user information
+     * Get the number of users
      *
-     * @return array
+     * @return integer
      */
-    public function getUsers() {
-        return $this->users;
+    public function getNumUsers() {
+        return $this->numUsers;
+    }
+
+    /**
+     * Set the number of bytes stored in Imbo
+     *
+     * @param int $numBytes The number of bytes stored in Imbo
+     * @return Stats
+     */
+    public function setNumBytes($numBytes) {
+        $this->numBytes = $numBytes;
+
+        return $this;
     }
 
     /**
@@ -66,13 +87,19 @@ class Stats implements ModelInterface, ArrayAccess {
      * @return int
      */
     public function getNumBytes() {
-        $sum = 0;
+        return $this->numBytes;
+    }
 
-        foreach ($this->users as $user) {
-            $sum += $user['numBytes'];
-        }
+    /**
+     * Set the number of images stored in Imbo
+     *
+     * @param int $numImages The number of images stored in Imbo
+     * @return Stats
+     */
+    public function setNumImages($numImages) {
+        $this->numImages = $numImages;
 
-        return $sum;
+        return $this;
     }
 
     /**
@@ -81,22 +108,7 @@ class Stats implements ModelInterface, ArrayAccess {
      * @return int
      */
     public function getNumImages() {
-        $sum = 0;
-
-        foreach ($this->users as $user) {
-            $sum += $user['numImages'];
-        }
-
-        return $sum;
-    }
-
-    /**
-     * Get the amount of users
-     *
-     * @return int
-     */
-    public function getNumUsers() {
-        return count($this->users);
+        return $this->numImages;
     }
 
     /**

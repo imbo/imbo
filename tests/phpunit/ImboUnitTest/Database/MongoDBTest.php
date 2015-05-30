@@ -225,7 +225,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      */
     public function testThrowsExceptionWhenMongoFailsDuringGetNumImages() {
         $this->imageCollection->expects($this->once())
-                              ->method('find')
+                              ->method('count')
                               ->will($this->throwException(new MongoException()));
 
         $this->driver->getNumImages('key');

@@ -426,12 +426,15 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNumImages($user) {
+    public function getNumImages($user = null) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('COUNT(i.id)')
-              ->from($this->tableNames['imageinfo'], 'i')
-              ->where('i.user = :user')
-              ->setParameter(':user', $user);
+              ->from($this->tableNames['imageinfo'], 'i');
+
+        if ($user) {
+            $query->where('i.user = :user')
+                  ->setParameter(':user', $user);
+        }
 
         $stmt = $query->execute();
 
@@ -441,12 +444,28 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNumBytes($user) {
+    public function getNumBytes($user = null) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('SUM(i.size)')
-              ->from($this->tableNames['imageinfo'], 'i')
-              ->where('i.user = :user')
-              ->setParameter(':user', $user);
+              ->from($this->tableNames['imageinfo'], 'i');
+
+        if ($user) {
+            $query->where('i.user = :user')
+                  ->setParameter(':user', $user);
+        }
+
+        $stmt = $query->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNumUsers() {
+        $query = $this->getConnection()->createQueryBuilder();
+        $query->select('COUNT(DISTINCT(i.user))')
+              ->from($this->tableNames['imageinfo'], 'i');
 
         $stmt = $query->execute();
 

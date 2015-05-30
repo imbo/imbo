@@ -308,18 +308,11 @@ class DatabaseOperations implements ListenerInterface {
         $response = $event->getResponse();
         $database = $event->getDatabase();
         $accessControl = $event->getAccessControl();
-        $userIds = $accessControl->getUsers();
-        $users = array();
-
-        foreach ($userIds as $key) {
-            $users[$key] = array(
-                'numImages' => $database->getNumImages($key),
-                'numBytes' => $database->getNumBytes($key),
-            );
-        }
 
         $statsModel = new Model\Stats();
-        $statsModel->setUsers($users);
+        $statsModel->setNumUsers($database->getNumUsers());
+        $statsModel->setNumBytes($database->getNumBytes());
+        $statsModel->setNumImages($database->getNumImages());
 
         $response->setModel($statsModel);
     }

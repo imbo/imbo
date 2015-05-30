@@ -156,6 +156,10 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame(0, $this->adapter->getNumImages($user));
 
+        // Insert on a different user
+        $this->assertTrue($this->adapter->insertImage('user2', 'id0', $image));
+        $this->assertSame(1, $this->adapter->getNumImages());
+
         // Insert first image
         $this->assertTrue($this->adapter->insertImage($user, 'id1', $image));
         $this->assertSame(1, $this->adapter->getNumImages($user));
@@ -167,6 +171,9 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         // Insert with a new ID
         $this->assertTrue($this->adapter->insertImage($user, 'id2', $image));
         $this->assertSame(2, $this->adapter->getNumImages($user));
+
+        // Count total images, regardless of user
+        $this->assertSame(3, $this->adapter->getNumImages());
     }
 
     /**
@@ -587,6 +594,19 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     public function testCanGetNumberOfBytes() {
         $this->adapter->insertImage('user', 'id', $this->getImage());
         $this->assertSame($this->getImage()->getFilesize(), $this->adapter->getNumBytes('user'));
+
+        $this->adapter->insertImage('user2', 'id', $this->getImage());
+        $this->assertSame($this->getImage()->getFilesize(), $this->adapter->getNumBytes('user2'));
+
+        $this->assertSame($this->getImage()->getFilesize() * 2, $this->adapter->getNumBytes());
+    }
+
+    public function testCanGetNumberOfUsers() {
+        $this->adapter->insertImage('user', 'id', $this->getImage());
+        $this->assertSame(1, $this->adapter->getNumUsers());
+
+        $this->adapter->insertImage('user2', 'id', $this->getImage());
+        $this->assertSame(2, $this->adapter->getNumUsers());
     }
 
     public function getSortData() {

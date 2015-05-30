@@ -128,22 +128,30 @@ interface DatabaseInterface {
     function getLastModified($user, $imageIdentifier = null);
 
     /**
-     * Fetch the number of images owned by a given user
+     * Fetch the number of images, optionally filtered by a given user
      *
-     * @param string $user The user which the image belongs to
+     * @param string $user The user which the images belongs to (pass null to count for all users)
      * @return int Returns the number of images
      * @throws DatabaseException
      */
-    function getNumImages($user);
+    function getNumImages($user = null);
 
     /**
-     * Fetch the number of bytes stored by a user
+     * Fetch the number of bytes stored, optionally filtered by a given user
      *
-     * @param string $user The user which the image belongs to
+     * @param string $user The user which the images belongs to (pass null to count for all users)
      * @return int Returns the number of bytes
      * @throws DatabaseException
      */
-    function getNumBytes($user);
+    function getNumBytes($user = null);
+
+    /**
+     * Fetch the number of users which has one or more images
+     *
+     * @return int Returns the number of users
+     * @throws DatabaseException
+     */
+    function getNumUsers();
 
     /**
      * Get the current status of the database connection

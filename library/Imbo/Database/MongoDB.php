@@ -406,13 +406,15 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNumImages($user) {
+    public function getNumImages($user = null) {
         try {
-            $query = [
-                'user' => $user,
-            ];
+            $query = [];
 
-            $result = (int) $this->getImageCollection()->find($query)->count();
+            if ($user) {
+                $query['user'] = $user;
+            }
+
+            $result = (int) $this->getImageCollection()->count($query);
 
             return $result;
         } catch (MongoException $e) {
@@ -423,18 +425,37 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNumBytes($user) {
+    public function getNumBytes($user = null) {
         try {
-            $result = $this->getImageCollection()->aggregate(
-                ['$match' => ['user' => $user]],
-                ['$group' => ['_id' => null, 'numBytes' => ['$sum' => '$size']]]
-            )['result'];
+            $collection = $this->getImageCollection();
+            $group = ['$group' => ['_id' => null, 'numBytes' => ['$sum' => '$size']]];
+
+            if ($user) {
+                $results = $collection->aggregate(['$match' => ['user' => $user]], $group);
+            } else {
+                $results = $collection->aggregate($group);
+            }
+
+            $result = $results['result'];
 
             if (empty($result)) {
                 return 0;
             }
 
             return (int) $result[0]['numBytes'];
+        } catch (MongoException $e) {
+            throw new DatabaseException('Unable to fetch information from the database', 500, $e);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNumUsers() {
+        try {
+            $result = (int) count($this->getImageCollection()->distinct('user'));
+
+            return $result;
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch information from the database', 500, $e);
         }

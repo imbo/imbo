@@ -237,14 +237,9 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::loadStats
      */
     public function testCanLoadStats() {
-        $this->accessControl->expects($this->once())->method('getUsers')->will(
-            $this->returnValue(array('user1', 'user2'))
-        );
-
-        $this->database->expects($this->at(0))->method('getNumImages')->with('user1')->will($this->returnValue(1));
-        $this->database->expects($this->at(1))->method('getNumBytes')->with('user1')->will($this->returnValue(1));
-        $this->database->expects($this->at(2))->method('getNumImages')->with('user2')->will($this->returnValue(2));
-        $this->database->expects($this->at(3))->method('getNumBytes')->with('user2')->will($this->returnValue(2));
+        $this->database->expects($this->at(0))->method('getNumImages')->will($this->returnValue(1));
+        $this->database->expects($this->at(1))->method('getNumBytes')->will($this->returnValue(1));
+        $this->database->expects($this->at(2))->method('getNumImages')->will($this->returnValue(2));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Stats'))->will($this->returnSelf());
 
         $this->listener->loadStats($this->event);
