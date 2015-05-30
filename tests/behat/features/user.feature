@@ -21,8 +21,8 @@ Feature: Imbo provides a user endpoint
     Scenario: Request user that does not exist
         Given I use "foo" and "bar" for public and private keys
         When I request "/users/foo.json"
-        Then I should get a response with "404 User not found"
-        And the Imbo error message is "User not found" and the error code is "100"
+        Then I should get a response with "400 Permission denied (public key)"
+        And the Imbo error message is "Permission denied (public key)" and the error code is "0"
 
     Scenario Outline: The user endpoint only supports HTTP GET and HEAD
         Given I use "publickey" and "privatekey" for public and private keys

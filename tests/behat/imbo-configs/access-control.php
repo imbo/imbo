@@ -41,8 +41,20 @@ return [
                 'publicKey' => 'valid-pubkey',
                 'privateKey' => 'foobar',
                 'acl' => [[
-                    'resources' => [ACI::RESOURCE_USER_GET, 'foobar.get'],
                     'users' => ['user1', 'some-user'],
+                    'resources' => [
+                        'foobar.get',
+
+                        ACI::RESOURCE_USER_GET,
+                        ACI::RESOURCE_KEYS_PUT,
+                        ACI::RESOURCE_KEYS_DELETE,
+                        ACI::RESOURCE_ACCESS_RULE_GET,
+                        ACI::RESOURCE_ACCESS_RULE_HEAD,
+                        ACI::RESOURCE_ACCESS_RULE_DELETE,
+                        ACI::RESOURCE_ACCESS_RULES_GET,
+                        ACI::RESOURCE_ACCESS_RULES_HEAD,
+                        ACI::RESOURCE_ACCESS_RULES_POST
+                    ],
                 ]]
             ],
 

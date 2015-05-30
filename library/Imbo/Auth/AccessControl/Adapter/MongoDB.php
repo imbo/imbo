@@ -69,7 +69,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      *
      * @var array
      */
-    private $resourceGroups = [];
+    private $groups = [];
 
     /**
      * Parameters for the driver
@@ -115,7 +115,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         foreach ($accessList as $acl) {
             // If the group specified has not been defined, throw an exception to help the user
             if (!isset($acl['users'])) {
-                throw new InvalidArgumentException('Missing property "users" in access rule');
+                throw new InvalidArgumentException('Missing property "users" in access rule', 500);
             }
 
             // If a user is specified, ensure the public key has access to the user
@@ -129,14 +129,14 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
             $resources = isset($acl['resources']) ? $acl['resources'] : [];
             $group = isset($acl['group']) ? $acl['group'] : false;
 
-            // If the group specified has not been defined, throw an exception to help the user
-            if ($group && !isset($this->groups[$group])) {
-                throw new InvalidArgumentException('Group "' . $group . '" is not defined');
-            }
-
-            // If a group is specified, fetch resources belonging to that group
+            // If we the rule contains a group, get resource from it
             if ($group) {
-                $resources = $this->groups[$group];
+                $resources = $this->getGroup($group);
+
+                // If the group has not been defined, throw an exception to help debug the problem
+                if ($resources === false) {
+                    throw new InvalidArgumentException('Group "' . $group . '" is not defined', 500);
+                }
             }
 
             if (in_array($resource, $resources)) {
@@ -179,6 +179,9 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
             $groups[$group['name']] = $group['resources'];
         }
 
+        // Cache the retrieved groups
+        $this->groups = array_merge($this->groups, $groups);
+
         return $groups;
     }
 
@@ -186,11 +189,16 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * {@inheritdoc}
      */
     public function getGroup($groupName) {
+        if (isset($this->groups[$groupName])) {
+            return $this->groups[$groupName];
+        }
+
         $group = $this->getGroupsCollection()->findOne([
             'name' => $groupName
         ]);
 
         if (isset($group['resources'])) {
+            $this->groups[$groupName] = $group['resources'];
             return $group['resources'];
         }
 

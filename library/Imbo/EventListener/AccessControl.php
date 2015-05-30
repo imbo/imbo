@@ -56,7 +56,7 @@ class AccessControl implements ListenerInterface {
     }
 
     public function subscribe(EventInterface $event) {
-        $resources = $event->getAccessControl()->getReadWriteResources();
+        $resources = $event->getAccessControl()->getAllResources();
 
         if ($this->params['additionalResources']) {
             $resources = array_merge($resources, $this->params['additionalResources']);
