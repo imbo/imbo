@@ -86,22 +86,6 @@ interface AdapterInterface {
     function hasAccess($publicKey, $resource, $user = null);
 
     /**
-     * Fetch one or more users
-     *
-     * @param UserQuery $query A query object used to filter the users returned
-     * @return string[] Returns a list of users
-     */
-    function getUsers(UserQuery $query = null);
-
-    /**
-     * Return whether the user given exists or not
-     *
-     * @param  string $user The user to check
-     * @return boolean
-     */
-    function userExists($user);
-
-    /**
      * Fetch a list of available resource groups
      *
      * @param GroupQuery $query A query object used to filter the groups returned

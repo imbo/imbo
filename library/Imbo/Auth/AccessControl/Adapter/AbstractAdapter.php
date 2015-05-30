@@ -30,22 +30,12 @@ abstract class AbstractAdapter implements AdapterInterface {
     /**
      * {@inheritdoc}
      */
-    abstract public function getUsers(UserQuery $query = null);
-
-    /**
-     * {@inheritdoc}
-     */
     abstract public function getGroups(GroupQuery $query = null);
 
     /**
      * {@inheritdoc}
      */
     abstract public function getGroup($groupName);
-
-    /**
-     * {@inheritdoc}
-     */
-    abstract public function userExists($user);
 
     /**
      * {@inheritdoc}

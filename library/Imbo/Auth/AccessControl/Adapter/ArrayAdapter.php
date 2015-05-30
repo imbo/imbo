@@ -11,7 +11,6 @@
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Exception\InvalidArgumentException,
-    Imbo\Auth\AccessControl\UserQuery,
     Imbo\Auth\AccessControl\GroupQuery;
 
 /**
@@ -36,13 +35,6 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
     private $keys = [];
 
     /**
-     * Users
-     *
-     * @var array
-     */
-    private $users = [];
-
-    /**
      * Resource groups
      *
      * @var array
@@ -58,7 +50,6 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
      */
     public function __construct(array $accessList = [], $groups = []) {
         $this->accessList = $accessList;
-        $this->users  = array_unique($this->getUsersFromAcl());
         $this->groups = $groups;
         $this->keys = $this->getKeysFromAcl();
     }
@@ -106,24 +97,6 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
         }
 
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUsers(UserQuery $query = null) {
-        if ($query === null) {
-            $query = new UserQuery();
-        }
-
-        return array_slice($this->users, $query->offset() ?: 0, $query->limit());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function userExists($user) {
-        return in_array($user, $this->users);
     }
 
     /**
@@ -205,10 +178,6 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
      */
     public function setAccessListFromAuth(array $authDetails) {
         foreach ($authDetails as $publicKey => $privateKey) {
-            if (!in_array($publicKey, $this->users)) {
-                $this->users[] = $publicKey;
-            }
-
             if (is_array($privateKey)) {
                 throw new InvalidArgumentException('A public key can only have a single private key (as of 2.0.0)');
             }
@@ -224,24 +193,6 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
 
             $this->keys[$publicKey] = $privateKey;
         }
-    }
-
-    /**
-     * Get an array of users defined in the ACL
-     *
-     * @return mixed
-     */
-    private function getUsersFromAcl() {
-        $users = [];
-        foreach ($this->accessList as $access) {
-            foreach ($access['acl'] as $acl) {
-                if (is_array($acl['users'])) {
-                    $users = array_merge($users, isset($acl['users']) ? $acl['users'] : []);
-                }
-            }
-        }
-
-        return $users;
     }
 
     /**
