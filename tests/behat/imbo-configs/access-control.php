@@ -77,6 +77,15 @@ return [
                     'group' => 'groups-read',
                     'users' => '*'
                 ]]
+            ],
+
+            [
+                'publicKey' => 'acl-checker',
+                'privateKey' => 'foobar',
+                'acl' => [[
+                    'resources' => [ACI::RESOURCE_ACCESS_RULE_GET],
+                    'users' => [],
+                ]]
             ]
         ], [
             'images-read' => [ACI::RESOURCE_IMAGES_GET],
