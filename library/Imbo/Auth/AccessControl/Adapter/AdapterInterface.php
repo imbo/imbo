@@ -20,9 +20,6 @@ use Imbo\Auth\AccessControl\UserQuery,
  * @package Core\Auth\AccessControl
  */
 interface AdapterInterface {
-    const PERMISSION_READ                  = 'permission.read';
-    const PERMISSION_WRITE                 = 'permission.write';
-
     const RESOURCE_GROUPS_GET              = 'groups.get';
     const RESOURCE_GROUPS_HEAD             = 'groups.head';
     const RESOURCE_GROUPS_OPTIONS          = 'groups.options';
@@ -63,6 +60,7 @@ interface AdapterInterface {
 
     const RESOURCE_METADATA_GET            = 'metadata.get';
     const RESOURCE_METADATA_HEAD           = 'metadata.head';
+    const RESOURCE_METADATA_PUT            = 'metadata.put';
     const RESOURCE_METADATA_POST           = 'metadata.post';
     const RESOURCE_METADATA_DELETE         = 'metadata.delete';
     const RESOURCE_METADATA_OPTIONS        = 'metadata.options';

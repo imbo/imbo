@@ -44,20 +44,21 @@ class Authenticate implements ListenerInterface {
     public static function getSubscribedEvents() {
         $callbacks = array();
         $events = array(
-            'images.post',       // When adding images
+            'group.put',         // Add/update resource group
+            'group.delete',      // Delete a resource group
+            'keys.put',          // Create a public key
+            'keys.delete',       // Delete a public key
+            'accessrule.delete', // Delete an access rule
+            'accessrules.post',  // Update access rules
             'image.delete',      // When deleting images
+            'images.post',       // When adding images
             'metadata.put',      // When adding/replacing metadata
             'metadata.post',     // When adding/patching metadata
             'metadata.delete',   // When deleting metadata
+            'shorturl.delete',   // Delete a single short URL
             'shorturls.post',    // Add a short URL
             'shorturls.delete',  // Delete a collection of short URLs
-            'shorturl.delete',   // Delete a single short URL
-            'group.put',         // Add/update resource group
-            'group.delete',      // Delete a resource group
-            'accessrules.post',  // Update access rules
-            'accessrule.delete', // Delete an access rule
-            'keys.put',          // Create a public key
-            'keys.delete',       // Delete a public key
+
             'auth.authenticate', // Authenticate event
         );
 
