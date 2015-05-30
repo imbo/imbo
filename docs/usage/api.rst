@@ -690,13 +690,58 @@ Public keys can be removed using a ``DELETE`` request. The public key used to si
 
 **Typical response codes:**
 
-* 201 OK
+* 200 OK
 * 201 Created
 * 400 Bad request
 * 404 Public key not found
 * 405 Access control adapter is immutable
 
 .. note:: The keys resource is not cache-able.
+
+.. _groups-resource:
+
+Groups resource - ``/groups``
++++++++++++++++++++++++++++++++++++++
+
+The groups resource can list available resource groups, used in the access control routines.
+
+List resource groups
+~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP GET on this resource returns all available resource groups.
+
+.. code-block:: bash
+
+    curl http://imbo/groups.json
+
+results in:
+
+.. code-block:: javascript
+
+    {"groups":[]}
+
+when there are no resource groups defined, or for example
+
+.. code-block:: javascript
+
+    {
+      "groups": [
+        {
+          "name": "read-stats",
+          "resources": [
+            "user.get",
+            "user.head",
+            "user.options"
+          ]
+        }
+      ]
+    }
+
+if there are resource groups defined.
+
+**Typical response codes:**
+
+* 200 OK
 
 .. _access-tokens:
 
