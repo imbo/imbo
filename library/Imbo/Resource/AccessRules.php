@@ -37,7 +37,7 @@ class AccessRules implements ResourceInterface {
         return [
             'accessrules.get' => 'getRules',
             'accessrules.head' => 'getRules',
-            'accessrules.post' => 'updateRules'
+            'accessrules.post' => 'addRules'
         ];
     }
 
@@ -66,11 +66,11 @@ class AccessRules implements ResourceInterface {
     }
 
     /**
-     * Update access rules for the specified public key
+     * Add access rules for the specified public key
      *
      * @param EventInterface $event The current event
      */
-    public function updateRules(EventInterface $event) {
+    public function addRules(EventInterface $event) {
         $accessControl = $event->getAccessControl();
 
         if (!($accessControl instanceof MutableAdapterInterface)) {
