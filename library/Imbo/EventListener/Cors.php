@@ -148,6 +148,9 @@ class Cors implements ListenerInterface {
         // This is an OPTIONS request, send 204 since no more content will follow
         $response->setStatusCode(204);
 
+        // Vary on Origin to prevent caching allowed/disallowed requests
+        $event->getResponse()->setVary('Origin', false);
+
         // Fall back if the passed origin is not allowed
         if (!$this->originIsAllowed($origin)) {
             return;
