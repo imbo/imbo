@@ -29,7 +29,7 @@
     "behat/behat": "~2.0",
     "guzzle/guzzle": "~3.8.1",
     "doctrine/dbal": "~2.0",
-    "aws/aws-sdk-php": "~2.5.3"
+    "aws/aws-sdk-php": "~2.8"
   },
   "suggest": {
     "ext-mongo": "Enables usage of MongoDB and GridFS as database and store. Recommended version: >=1.4.0",
