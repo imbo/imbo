@@ -52,11 +52,11 @@ and must be at least 3 characters long.
 
 For the private keys you can for instance use a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images (given it's a read+write key). Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want. The key itself will never be a part of the payload sent to/from the server.
 
-Imbo ships with a small command line tool that can be used to generate private keys for you using the `openssl_random_pseudo_bytes <http://php.net/openssl_random_pseudo_bytes>`_ function. The script is located in the ``scripts`` directory of the Imbo installation and does not require any arguments:
+Imbo ships with a small command line tool that can be used to generate private keys for you using the `openssl_random_pseudo_bytes <http://php.net/openssl_random_pseudo_bytes>`_ function. The tool is located in the ``bin`` directory of the Imbo installation:
 
 .. code-block:: bash
 
-    $ php scripts/generatePrivateKey.php
+    $ ./bin/imbo generate-private-key
     3b98dde5f67989a878b8b268d82f81f0858d4f1954597cc713ae161cdffcc84a
 
 The private key can be changed whenever you want as long as you remember to change it in both the server configuration and in the client you use. The public key can not be changed easily as database and storage adapters use it when storing/fetching images and metadata.
