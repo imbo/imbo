@@ -51,7 +51,7 @@ class GeneratePrivateKeyTest extends \PHPUnit_Framework_TestCase {
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(array('command' => $this->command->getName()));
 
-        $this->assertRegExp('/^[a-f0-9]{64}$/', trim($commandTester->getDisplay()));
+        $this->assertRegExp('/^[a-zA-Z_\\-0-9]{8,}$/', trim($commandTester->getDisplay()));
     }
 
     /**
