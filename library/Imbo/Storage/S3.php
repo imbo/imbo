@@ -55,7 +55,7 @@ class S3 implements StorageInterface {
         'bucket' => null,
 
         // Region
-        'region' => 'us-east-1',
+        'region' => null,
     );
 
     /**
@@ -197,11 +197,16 @@ class S3 implements StorageInterface {
      */
     private function getClient() {
         if ($this->client === null) {
-            $this->client = S3Client::factory(array(
+            $params = array(
                 'key' => $this->params['key'],
                 'secret' => $this->params['secret'],
-                'region' => $this->params['region']
-            ));
+            );
+
+            if ($this->params['region']) {
+                $params['region'] = $this->params['region'];
+            }
+
+            $this->client = S3Client::factory($params);
         }
 
         return $this->client;
