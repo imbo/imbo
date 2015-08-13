@@ -53,6 +53,9 @@ class S3 implements StorageInterface {
 
         // Name of the bucket to store the files in
         'bucket' => null,
+
+        // Region
+        'region' => 'us-east-1',
     );
 
     /**
@@ -197,6 +200,7 @@ class S3 implements StorageInterface {
             $this->client = S3Client::factory(array(
                 'key' => $this->params['key'],
                 'secret' => $this->params['secret'],
+                'region' => $this->params['region']
             ));
         }
 

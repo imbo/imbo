@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "789961b48d79884feb8385706dd6b9b3",
+    "hash": "f4fdb5071e84961f0056fbec0f9905d6",
     "packages": [
         {
             "name": "symfony/console",
@@ -170,29 +170,29 @@
     "packages-dev": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "2.5.4",
+            "version": "2.8.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "dd8f78b8abde74245578dbfb930c29efff20f25a"
+                "reference": "69cf65438b99051ce4d599f1611dea5d50551b3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/dd8f78b8abde74245578dbfb930c29efff20f25a",
-                "reference": "dd8f78b8abde74245578dbfb930c29efff20f25a",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/69cf65438b99051ce4d599f1611dea5d50551b3f",
+                "reference": "69cf65438b99051ce4d599f1611dea5d50551b3f",
                 "shasum": ""
             },
             "require": {
-                "guzzle/guzzle": ">=3.7.0,<3.9.0",
+                "guzzle/guzzle": "~3.7",
                 "php": ">=5.3.3"
             },
             "require-dev": {
                 "doctrine/cache": "~1.0",
                 "ext-openssl": "*",
-                "monolog/monolog": "1.4.*",
-                "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "2.*",
-                "symfony/yaml": "2.*"
+                "monolog/monolog": "~1.4",
+                "phpunit/phpunit": "~4.0",
+                "phpunit/phpunit-mock-objects": "2.3.1",
+                "symfony/yaml": "~2.1"
             },
             "suggest": {
                 "doctrine/cache": "Adds support for caching of credentials and responses",
@@ -202,11 +202,6 @@
                 "symfony/yaml": "Eases the ability to write manifests for creating jobs in AWS Import/Export"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.5.x-dev"
-                }
-            },
             "autoload": {
                 "psr-0": {
                     "Aws": "src/"
@@ -234,7 +229,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2014-03-20 20:01:49"
+            "time": "2015-06-24 21:23:21"
         },
         {
             "name": "behat/behat",
@@ -1954,6 +1949,7 @@
     "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": false,
+    "prefer-lowest": false,
     "platform": {
         "php": ">=5.4.0",
         "ext-imagick": ">=3.0.1"
