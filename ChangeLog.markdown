@@ -1,8 +1,9 @@
 Changelog for Imbo
 ==================
 
-Imbo-1.x.x
+Imbo-1.2.5
 ----------
+__2015-08-14__
 
 * #342: Generate private keys with base64-encoded raw random bytes (Mats Lindh)
 * #341: Update documentation regarding private key generation script (Mats Lindh)
