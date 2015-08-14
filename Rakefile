@@ -45,13 +45,13 @@ end
 desc "Install dependencies"
 task :installdep do
   Rake::Task["install_composer"].invoke
-  system "php -d \"apc.enable_cli=0\" composer.phar -n install --dev --prefer-source"
+  system "php -d \"apc.enable_cli=0\" composer.phar -n install --prefer-source"
 end
 
 desc "Update dependencies"
 task :updatedep do
   Rake::Task["install_composer"].invoke
-  system "php -d \"apc.enable_cli=0\" composer.phar -n update --dev --prefer-source"
+  system "php -d \"apc.enable_cli=0\" composer.phar -n update --prefer-source"
 end
 
 desc "Install/update composer itself"

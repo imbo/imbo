@@ -17,10 +17,7 @@ use Behat\Behat\Context\BehatContext,
     Guzzle\Http\Message\Response;
 
 // PHPUnit related classes
-require 'src/Framework/Assert/Functions.php';
-require 'src/CodeCoverage.php';
-require 'src/CodeCoverage/Filter.php';
-require 'src/CodeCoverage/Report/HTML.php';
+require __DIR__ . '/../../../vendor/phpunit/phpunit/src/Framework/Assert/Functions.php';
 
 /**
  * REST context for Behat tests
