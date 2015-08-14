@@ -4,6 +4,9 @@ Changelog for Imbo
 Imbo-1.x.x
 ----------
 
+* #342: Generate private keys with base64-encoded raw random bytes (Mats Lindh)
+* #341: Update documentation regarding private key generation script (Mats Lindh)
+* #340: Add "region" parameter to S3 storage adapter (chrisitananese)
 * #339: Vary on Origin when responding to OPTIONS CORS-requests (Morten Fangel)
 * #336: Fix small typo for autoload locations (Christian Foster)
 * #333: Fix usage of hard coded temp directory in FileSystem-based tests (Mats Lindh)
