@@ -1,6 +1,23 @@
 Changelog for Imbo
 ==================
 
+Imbo-1.2.5
+----------
+__2015-08-14__
+
+* #342: Generate private keys with base64-encoded raw random bytes (Mats Lindh)
+* #341: Update documentation regarding private key generation script (Mats Lindh)
+* #340: Add "region" parameter to S3 storage adapter (chrisitananese)
+* #339: Vary on Origin when responding to OPTIONS CORS-requests (Morten Fangel)
+* #336: Fix small typo for autoload locations (Christian Foster)
+* #333: Fix usage of hard coded temp directory in FileSystem-based tests (Mats Lindh)
+* #332: Fix StripImageTest under Windows (Mats Lindh)
+* #331: Fix GeneratePrivateKeyTest and FileSystemTest under Windows (Mats Lindh)
+* #329: Add event hooks to accessToken and authenticate event listeners (Kristoffer Brabrand)
+* #327: Add support for SEARCH verb to router (Kristoffer Brabrand)
+* #320: Allow setting public key in headers and/or query (Espen Hovlandsdal)
+* #321: Behat config option for path of internal httpd log location (Espen Hovlandsdal)
+
 Imbo-1.2.4
 ----------
 __2014-12-04__

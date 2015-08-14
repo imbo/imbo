@@ -132,14 +132,22 @@ class ImboContext extends RESTContext {
             $query->remove('signature');
             $query->remove('timestamp');
 
+            // Add public key to query if we're told not to use headers
+            if (!$useHeaders) {
+                $query->set('publicKey', $this->publicKey);
+            }
+
+            $method = $request->getHeader('X-Http-Method-Override') ?: $request->getMethod();
+
             $timestamp = gmdate('Y-m-d\TH:i:s\Z');
-            $data = $request->getMethod() . '|' . urldecode($request->getUrl()) . '|' . $this->publicKey . '|' . $timestamp;
+            $data = $method . '|' . urldecode($request->getUrl()) . '|' . $this->publicKey . '|' . $timestamp;
 
             // Generate signature
             $signature = hash_hmac('sha256', $data, $this->privateKey);
 
             if ($useHeaders) {
                 $request->addHeaders(array(
+                    'X-Imbo-PublicKey'              => $this->publicKey,
                     'X-Imbo-Authenticate-Signature' => $signature,
                     'X-Imbo-Authenticate-Timestamp' => $timestamp,
                 ));

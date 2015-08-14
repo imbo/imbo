@@ -70,7 +70,11 @@ class Request extends SymfonyRequest {
      * @return string
      */
     public function getPublicKey() {
-        return $this->route ? $this->route->get('publicKey') : null;
+        return (
+            $this->headers->get('X-Imbo-PublicKey', null) ?:
+            $this->query->get('publicKey', null) ?:
+            ($this->route ? $this->route->get('publicKey') : null)
+        );
     }
 
     /**

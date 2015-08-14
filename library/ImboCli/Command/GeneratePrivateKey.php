@@ -47,13 +47,19 @@ class GeneratePrivateKey extends BaseCommand {
         $i = 0;
 
         while (!$strong && $this->maxTries > $i++) {
-            $data = openssl_random_pseudo_bytes(64, $strong);
+            $data = openssl_random_pseudo_bytes(32, $strong);
         }
 
         if (!$strong) {
             throw new RuntimeException('Could not generate private key');
         }
+        
+        // base64_encode to get a decent ascii compatible format, and trim ending ='s.
+        $key = rtrim(base64_encode($data), '=');
+        
+        // We change +/ into -_ to avoid any human confusion with paths
+        $key = strtr($key, '+/', '-_');
 
-        $output->writeln(hash('sha256', $data));
+        $output->writeln($key);
     }
 }

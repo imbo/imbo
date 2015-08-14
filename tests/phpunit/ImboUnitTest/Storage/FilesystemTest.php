@@ -121,18 +121,26 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Storage\Filesystem::getImagePath
      */
     public function testGetImagePath() {
-        $driver = new Filesystem(array('dataDir' => '/tmp'));
+        $driver = new Filesystem(array('dataDir' => DIRECTORY_SEPARATOR . 'tmp'));
 
         $reflection = new \ReflectionClass($driver);
         $method = $reflection->getMethod('getImagePath');
         $method->setAccessible(true);
 
+        $expectedFullPath = '/tmp/5/9/6/59632bc7a908b9cd47a35d03fc992aa7/9/6/d/96d08a5943ebf1c5635a2995c9408cdd.png';
+        $expectedDirPath = dirname($expectedFullPath);
+
+        if (DIRECTORY_SEPARATOR != '/') {
+            $expectedFullPath = str_replace('/', DIRECTORY_SEPARATOR, $expectedFullPath);
+            $expectedDirPath = str_replace('/', DIRECTORY_SEPARATOR, $expectedDirPath);
+        }
+
         $this->assertSame(
-            '/tmp/5/9/6/59632bc7a908b9cd47a35d03fc992aa7/9/6/d/96d08a5943ebf1c5635a2995c9408cdd.png',
+            $expectedFullPath,
             $method->invoke($driver, $this->publicKey, $this->imageIdentifier)
         );
         $this->assertSame(
-            '/tmp/5/9/6/59632bc7a908b9cd47a35d03fc992aa7/9/6/d',
+            $expectedDirPath,
             $method->invoke($driver, $this->publicKey, $this->imageIdentifier, false)
         );
     }

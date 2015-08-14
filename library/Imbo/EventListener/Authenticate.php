@@ -45,14 +45,15 @@ class Authenticate implements ListenerInterface {
     public static function getSubscribedEvents() {
         $callbacks = array();
         $events = array(
-            'images.post',      // When adding images
-            'image.delete',     // When deleting images
-            'metadata.put',     // When adding/replacing metadata
-            'metadata.post',    // When adding/patching metadata
-            'metadata.delete',  // When deleting metadata
-            'shorturls.post',   // Add a short URL
-            'shorturls.delete', // Delete a collection of short URLs
-            'shorturl.delete',  // Delete a single short URL
+            'images.post',       // When adding images
+            'image.delete',      // When deleting images
+            'metadata.put',      // When adding/replacing metadata
+            'metadata.post',     // When adding/patching metadata
+            'metadata.delete',   // When deleting metadata
+            'shorturls.post',    // Add a short URL
+            'shorturls.delete',  // Delete a collection of short URLs
+            'shorturl.delete',   // Delete a single short URL
+            'auth.authenticate', // Authenticate event
         );
 
         foreach ($events as $event) {
