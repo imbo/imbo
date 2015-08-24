@@ -92,30 +92,3 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
         And Imbo uses the "custom-access-control.php" configuration
         When I request "/users/public"
         Then I should get a response with "200 OK"
-
-    Scenario: Request user information when access is granted through a group
-        Given Imbo uses the "access-control-mutable.php" configuration
-        And I prime the database with "access-control-mutable.php"
-        And I use "group-based" and "foobar" for public and private keys
-        And I include an access token in the query
-        And Imbo uses the "access-control-mutable.php" configuration
-        When I request "/users/user1"
-        Then I should get a response with "200 OK"
-
-    Scenario: Request user information when resource is granted but not for the given user
-        Given Imbo uses the "access-control-mutable.php" configuration
-        And I prime the database with "access-control-mutable.php"
-        And I use "group-based" and "foobar" for public and private keys
-        And I include an access token in the query
-        And Imbo uses the "access-control-mutable.php" configuration
-        When I request "/users/other-user"
-        Then I should get a response with "400 Permission denied (public key)"
-
-    Scenario: Request user information when access is granted through a wildcard
-        Given Imbo uses the "access-control-mutable.php" configuration
-        And I prime the database with "access-control-mutable.php"
-        And I use "wildcarded" and "foobar" for public and private keys
-        And I include an access token in the query
-        And Imbo uses the "access-control-mutable.php" configuration
-        When I request "/users/random-user"
-        Then I should get a response with "200 OK"

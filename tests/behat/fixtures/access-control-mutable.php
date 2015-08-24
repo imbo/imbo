@@ -35,8 +35,8 @@ return [
             'privateKey' => 'barfoo',
             'acl' => [[
                 'id' => new MongoId('100000000000000000001337'),
-                'resources' => ['access.get', 'access.head'],
-                'users' => []
+                'resources' => ['access.get', 'access.head', 'images.get'],
+                'users' => ['foobar']
             ]]
         ],
         [
