@@ -101,8 +101,8 @@ class MetadataTest extends ResourceTests {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"foo":"bar"}'));
         $this->manager->expects($this->once())->method('trigger')->with('db.metadata.update', array('metadata' => $metadata));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ModelInterface'));
-        $this->database->expects($this->once())->method('getMetadata')->with('key', 'id')->will($this->returnValue(array('foo' => 'bar')));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->database->expects($this->once())->method('getMetadata')->with('user', 'id')->will($this->returnValue(array('foo' => 'bar')));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
 
         $this->resource->post($this->event);
