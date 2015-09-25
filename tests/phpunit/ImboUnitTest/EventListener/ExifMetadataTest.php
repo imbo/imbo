@@ -135,7 +135,7 @@ class ExifMetadataTest extends ListenerTests {
      * @covers Imbo\EventListener\ExifMetadata::parseProperties
      */
     public function testCanFilterData($data, $tags, $expectedData) {
-        $publicKey = 'publickey';
+        $user = 'user';
         $checksum = 'checksum';
         $blob = 'blob';
 
@@ -148,11 +148,11 @@ class ExifMetadataTest extends ListenerTests {
         $imagick->expects($this->once())->method('getImageProperties')->will($this->returnValue($data));
 
         $request = $this->getMock('Imbo\Http\Request\Request');
-        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $request->expects($this->once())->method('getUser')->will($this->returnValue($user));
         $request->expects($this->exactly(2))->method('getImage')->will($this->returnValue($image));
 
         $database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $database->expects($this->once())->method('updateMetadata')->with($publicKey, $checksum, $expectedData);
+        $database->expects($this->once())->method('updateMetadata')->with($user, $checksum, $expectedData);
 
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->exactly(2))->method('getRequest')->will($this->returnValue($request));
@@ -173,14 +173,14 @@ class ExifMetadataTest extends ListenerTests {
     public function testWillDeleteImageWhenUpdatingMetadataFails() {
         $databaseException = $this->getMock('Imbo\Exception\DatabaseException');
         $database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $database->expects($this->once())->method('updateMetadata')->with('publickey', 'imageidentifier', array())->will($this->throwException($databaseException));
-        $database->expects($this->once())->method('deleteImage')->with('publickey', 'imageidentifier');
+        $database->expects($this->once())->method('updateMetadata')->with('user', 'imageidentifier', array())->will($this->throwException($databaseException));
+        $database->expects($this->once())->method('deleteImage')->with('user', 'imageidentifier');
 
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue('imageidentifier'));
 
         $request = $this->getMock('Imbo\Http\Request\Request');
-        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue('publickey'));
+        $request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
 
         $event = $this->getMock('Imbo\EventManager\Event');

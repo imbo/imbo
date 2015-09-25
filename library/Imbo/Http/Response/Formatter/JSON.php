@@ -63,7 +63,7 @@ class JSON extends Formatter implements FormatterInterface {
      */
     public function formatUser(Model\User $model) {
         return $this->encode(array(
-            'publicKey' => $model->getPublicKey(),
+            'user' => $model->getUserId(),
             'numImages' => $model->getNumImages(),
             'lastModified' => $this->dateFormatter->formatDate($model->getLastModified()),
         ));
@@ -93,7 +93,7 @@ class JSON extends Formatter implements FormatterInterface {
                 'height' => $image->getHeight(),
                 'mime' => $image->getMimeType(),
                 'imageIdentifier' => $image->getImageIdentifier(),
-                'publicKey' => $image->getPublicKey(),
+                'user' => $image->getUser(),
             );
 
             // Add metadata if the field is to be displayed
@@ -156,16 +156,41 @@ class JSON extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
+    public function formatGroups(Model\Groups $model) {
+        return $this->encode($model->getData());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatGroup(Model\Group $model) {
+        return $this->encode($model->getData());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatAccessRule(Model\AccessRule $model) {
+        return $this->encode($model->getData());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatAccessRules(Model\AccessRules $model) {
+        return $this->encode($model->getData());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function formatStats(Model\Stats $model) {
-        $data = array(
-            'users' => $model->getUsers(),
-            'total' => array(
-                'numImages' => $model->getNumImages(),
-                'numUsers' => $model->getNumUsers(),
-                'numBytes' => $model->getNumBytes(),
-            ),
+        $data = [
+            'numImages' => $model->getNumImages(),
+            'numUsers' => $model->getNumUsers(),
+            'numBytes' => $model->getNumBytes(),
             'custom' => $model->getCustomStats() ?: new stdClass(),
-        );
+        ];
 
         return $this->encode($data);
     }

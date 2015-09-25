@@ -73,9 +73,9 @@ class Doctrine implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function storeImageVariation($publicKey, $imageIdentifier, $blob, $width) {
-        return (boolean) $this->getConnection()->insert($this->getTableName($publicKey, $imageIdentifier), [
-            'publicKey'       => $publicKey,
+    public function storeImageVariation($user, $imageIdentifier, $blob, $width) {
+        return (boolean) $this->getConnection()->insert($this->getTableName($user, $imageIdentifier), [
+            'user'            => $user,
             'imageIdentifier' => $imageIdentifier,
             'data'            => $blob,
             'width'           => (int) $width,
@@ -85,15 +85,15 @@ class Doctrine implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImageVariation($publicKey, $imageIdentifier, $width) {
+    public function getImageVariation($user, $imageIdentifier, $width) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('data')
-              ->from($this->getTableName($publicKey, $imageIdentifier), 'i')
-              ->where('publicKey = :publicKey')
+              ->from($this->getTableName($user, $imageIdentifier), 'i')
+              ->where('user = :user')
               ->andWhere('imageIdentifier = :imageIdentifier')
               ->andWhere('width = :width')
               ->setParameters(array(
-                  ':publicKey'       => $publicKey,
+                  ':user'            => $user,
                   ':imageIdentifier' => $imageIdentifier,
                   ':width'           => (int) $width,
               ));
@@ -107,9 +107,9 @@ class Doctrine implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteImageVariations($publicKey, $imageIdentifier, $width = null) {
+    public function deleteImageVariations($user, $imageIdentifier, $width = null) {
         $query = [
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier
         ];
 
@@ -117,7 +117,7 @@ class Doctrine implements StorageInterface {
             $query['width'] = $width;
         }
 
-        $tableName = $this->getTableName($publicKey, $imageIdentifier);
+        $tableName = $this->getTableName($user, $imageIdentifier);
         return (boolean) $this->getConnection()->delete($tableName, $query);
     }
 
@@ -147,15 +147,15 @@ class Doctrine implements StorageInterface {
     }
 
     /**
-     * Method that can be overridden to dynamically select table names based on the public key and
-     * the image identifier. The default implementation does not use them for anything, and simply
+     * Method that can be overridden to dynamically select table names based on the user and the
+     * image identifier. The default implementation does not use them for anything, and simply
      * returns the default table name.
      *
-     * @param string $publicKey The public key of the user
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier to fetch
      * @return string Returns a table name where the image is located
      */
-    protected function getTableName($publicKey, $imageIdentifier) {
+    protected function getTableName($user, $imageIdentifier) {
         return $this->tableName;
     }
 }

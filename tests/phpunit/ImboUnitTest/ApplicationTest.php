@@ -67,17 +67,17 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid auth configuration
+     * @expectedExceptionMessage Invalid access control adapter
      * @expectedExceptionCode 500
      * @covers Imbo\Application::run
      */
-    public function testThrowsExceptionWhenConfigurationHasInvalidUserLookupAdapter() {
+    public function testThrowsExceptionWhenConfigurationHasInvalidAccessControlAdapter() {
         $this->application->run(array(
             'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
             'storage' => $this->getMock('Imbo\Storage\StorageInterface'),
             'routes' => [],
             'trustedProxies' => [],
-            'auth' => function() { return new \stdClass(); },
+            'accessControl' => function() { return new \stdClass(); },
         ));
     }
 
@@ -91,6 +91,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $this->application->run(array(
             'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
             'storage' => $this->getMock('Imbo\Storage\StorageInterface'),
+            'accessControl' => $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface'),
             'eventListenerInitializers' => [],
             'eventListeners' => [],
             'contentNegotiateImages' => false,

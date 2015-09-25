@@ -82,10 +82,10 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function storeImageVariation($publicKey, $imageIdentifier, $blob, $width) {
+    public function storeImageVariation($user, $imageIdentifier, $blob, $width) {
         $this->getGrid()->storeBytes($blob, array(
             'added' => time(),
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
             'width' => (int) $width,
         ));
@@ -96,9 +96,9 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImageVariation($publicKey, $imageIdentifier, $width) {
+    public function getImageVariation($user, $imageIdentifier, $width) {
         $file = $this->getGrid()->findOne(array(
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
             'width' => (int) $width,
         ));
@@ -109,9 +109,9 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteImageVariations($publicKey, $imageIdentifier, $width = null) {
+    public function deleteImageVariations($user, $imageIdentifier, $width = null) {
         $query = array(
-            'publicKey' => $publicKey,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier
         );
 

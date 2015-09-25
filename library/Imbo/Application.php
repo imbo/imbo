@@ -16,7 +16,9 @@ use Imbo\Http\Request\Request,
     Imbo\EventManager\Event,
     Imbo\EventManager\EventManager,
     Imbo\Model\Error,
-    Imbo\Auth,
+    Imbo\Auth\AccessControl,
+    Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlInterface,
+    Imbo\Auth\AccessControl\Adapter\ArrayAdapter as AccessControlArrayAdapter,
     Imbo\Exception\RuntimeException,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Database\DatabaseInterface,
@@ -65,18 +67,20 @@ class Application {
             throw new InvalidArgumentException('Invalid storage adapter', 500);
         }
 
-        // User lookup adapters
-        $userLookup = $config['auth'];
+        // Access control adapter
+        $accessControl = $config['accessControl'];
 
-        // Construct an ArrayStorage instance if the auth details is an array
-        if (is_array($userLookup)) {
-            $userLookup = new Auth\ArrayStorage($userLookup);
+        if (is_callable($accessControl) && !($accessControl instanceof AccessControlInterface)) {
+            $accessControl = $accessControl();
         }
 
-        // Make sure the "auth" part of the configuration is an instance of the user lookup
-        // interface
-        if (!($userLookup instanceof Auth\UserLookupInterface)) {
-            throw new InvalidArgumentException('Invalid auth configuration', 500);
+        if (!$accessControl instanceof AccessControlInterface) {
+            throw new InvalidArgumentException('Invalid access control adapter', 500);
+        }
+
+        // Check if we have an auth array present in the configuration
+        if (isset($config['auth']) && is_array($config['auth']) && $accessControl instanceof AccessControlArrayAdapter) {
+            $accessControl->setAccessListFromAuth($config['auth']);
         }
 
         // Create a router based on the routes in the configuration and internal routes
@@ -85,29 +89,29 @@ class Application {
         // Create the event manager and the event template
         $eventManager = new EventManager();
         $event = new Event();
-        $event->setArguments(array(
+        $event->setArguments([
             'request' => $request,
             'response' => $response,
             'database' => $database,
             'storage' => $storage,
-            'userLookup' => $userLookup,
             'config' => $config,
             'manager' => $eventManager,
-        ));
+            'accessControl' => $accessControl,
+        ]);
         $eventManager->setEventTemplate($event);
 
         // A date formatter helper
         $dateFormatter = new Helpers\DateFormatter();
 
         // Response formatters
-        $formatters = array(
+        $formatters = [
             'json' => new Formatter\JSON($dateFormatter),
             'xml'  => new Formatter\XML($dateFormatter),
-        );
+        ];
         $contentNegotiation = new Http\ContentNegotiation();
 
         // Collect event listener data
-        $eventListeners = array(
+        $eventListeners = [
             // Resources
             'Imbo\Resource\Index',
             'Imbo\Resource\Status',
@@ -119,22 +123,27 @@ class Application {
             'Imbo\Resource\Images',
             'Imbo\Resource\Image',
             'Imbo\Resource\Metadata',
-            'Imbo\Http\Response\ResponseFormatter' => array(
+            'Imbo\Resource\Groups',
+            'Imbo\Resource\Group',
+            'Imbo\Resource\Keys',
+            'Imbo\Resource\AccessRules',
+            'Imbo\Resource\AccessRule',
+            'Imbo\Http\Response\ResponseFormatter' => [
                 'formatters' => $formatters,
                 'contentNegotiation' => $contentNegotiation,
-            ),
+            ],
             'Imbo\EventListener\DatabaseOperations',
             'Imbo\EventListener\StorageOperations',
             'Imbo\Image\ImagePreparation',
             'Imbo\EventListener\ImageTransformer',
             'Imbo\EventListener\ResponseSender',
             'Imbo\EventListener\ResponseETag',
-        );
+        ];
 
         foreach ($eventListeners as $listener => $params) {
             if (is_string($params)) {
                 $listener = $params;
-                $params = array();
+                $params = [];
             }
 
             $eventManager->addEventHandler($listener, $listener, $params)
@@ -188,8 +197,8 @@ class Application {
 
             if (is_array($definition) && !empty($definition['listener'])) {
                 $listener = $definition['listener'];
-                $params = is_string($listener) && isset($definition['params']) ? $definition['params'] : array();
-                $publicKeys = isset($definition['publicKeys']) ? $definition['publicKeys'] : array();
+                $params = is_string($listener) && isset($definition['params']) ? $definition['params'] : [];
+                $users = isset($definition['users']) ? $definition['users'] : [];
 
                 if (is_callable($listener) && !($listener instanceof ListenerInterface)) {
                     $listener = $listener();
@@ -200,18 +209,18 @@ class Application {
                 }
 
                 $eventManager->addEventHandler($name, $listener, $params)
-                             ->addCallbacks($name, $listener::getSubscribedEvents(), $publicKeys);
+                             ->addCallbacks($name, $listener::getSubscribedEvents(), $users);
             } else if (is_array($definition) && !empty($definition['callback']) && !empty($definition['events'])) {
                 $priority = 0;
-                $events = array();
-                $publicKeys = array();
+                $events = [];
+                $users = [];
 
                 if (isset($definition['priority'])) {
                     $priority = (int) $definition['priority'];
                 }
 
-                if (isset($definition['publicKeys'])) {
-                    $publicKeys = $definition['publicKeys'];
+                if (isset($definition['users'])) {
+                    $users = $definition['users'];
                 }
 
                 foreach ($definition['events'] as $event => $p) {
@@ -224,7 +233,7 @@ class Application {
                 }
 
                 $eventManager->addEventHandler($name, $definition['callback'])
-                             ->addCallbacks($name, $events, $publicKeys);
+                             ->addCallbacks($name, $events, $users);
             } else {
                 throw new InvalidArgumentException('Invalid event listener definition', 500);
             }
@@ -271,16 +280,6 @@ class Application {
             // Inform the user agent of which methods are allowed against this resource
             $response->headers->set('Allow', $resource->getAllowedMethods(), false);
 
-            if ($publicKey = $request->getPublicKey()) {
-                // Ensure that the public key actually exists
-                if (!$userLookup->publicKeyExists($publicKey)) {
-                    $e = new RuntimeException('Public key not found', 404);
-                    $e->setImboErrorCode(Exception::AUTH_UNKNOWN_PUBLIC_KEY);
-
-                    throw $e;
-                }
-            }
-
             $methodName = strtolower($request->getMethod());
 
             // Generate the event name based on the accessed resource and the HTTP method
@@ -313,9 +312,9 @@ class Application {
             // Try to negotiate in a non-strict manner if the response format still has not been
             // chosen
             if (!$negotiated) {
-                $eventManager->trigger('response.negotiate', array(
+                $eventManager->trigger('response.negotiate', [
                     'noStrict' => true,
-                ));
+                ]);
             }
         }
 

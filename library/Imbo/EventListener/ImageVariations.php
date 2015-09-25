@@ -111,7 +111,7 @@ class ImageVariations implements ListenerInterface {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
 
         // Fetch the original width / height of the image to use for ratio calculations
@@ -144,7 +144,7 @@ class ImageVariations implements ListenerInterface {
 
         // WE HAVE A WINNER! Find the best variation. The width of the variation is the first
         // available one above the $maxWidth value
-        $variation = $this->database->getBestMatch($publicKey, $imageIdentifier, $maxWidth);
+        $variation = $this->database->getBestMatch($user, $imageIdentifier, $maxWidth);
 
         if (!$variation) {
             // Could not find any :(
@@ -159,7 +159,7 @@ class ImageVariations implements ListenerInterface {
         ]);
 
         // Fetch the image variation blob from the storage adapter
-        $imageBlob = $this->storage->getImageVariation($publicKey, $imageIdentifier, $variation['width']);
+        $imageBlob = $this->storage->getImageVariation($user, $imageIdentifier, $variation['width']);
 
         if (!$imageBlob) {
             // The image blob does not exist in the storage, which it should. Trigger an error and
@@ -170,7 +170,7 @@ class ImageVariations implements ListenerInterface {
 
         // Set some data that the storage operations listener usually sets, since that will be
         // skipped since we have an image variation
-        $lastModified = $event->getStorage()->getLastModified($publicKey, $imageIdentifier);
+        $lastModified = $event->getStorage()->getLastModified($user, $imageIdentifier);
         $response->setLastModified($lastModified);
 
         // Update the model
@@ -320,7 +320,7 @@ class ImageVariations implements ListenerInterface {
         $eventManager = $event->getManager();
 
         $request = $event->getRequest();
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $originalImage = $request->getImage();
         $imageIdentifier = $originalImage->getChecksum();
         $originalWidth = $originalImage->getWidth();
@@ -396,22 +396,22 @@ class ImageVariations implements ListenerInterface {
                 ]);
 
                 // Store the image
-                $this->storage->storeImageVariation($publicKey, $imageIdentifier, $image->getBlob(), $width);
+                $this->storage->storeImageVariation($user, $imageIdentifier, $image->getBlob(), $width);
 
                 // Store some data about the variation
-                $this->database->storeImageVariationMetadata($publicKey, $imageIdentifier, $image->getWidth(), $image->getHeight());
+                $this->database->storeImageVariationMetadata($user, $imageIdentifier, $image->getWidth(), $image->getHeight());
             } catch (TransformationException $e) {
                 // Could not transform the image
-                trigger_error(sprintf('Could not generate image variation for %s (%s), width: %d', $publicKey, $imageIdentifier, $width), E_USER_WARNING);
+                trigger_error(sprintf('Could not generate image variation for %s (%s), width: %d', $user, $imageIdentifier, $width), E_USER_WARNING);
             } catch (StorageException $e) {
                 // Could not store the image
-                trigger_error(sprintf('Could not store image variation for %s (%s), width: %d', $publicKey, $imageIdentifier, $width), E_USER_WARNING);
+                trigger_error(sprintf('Could not store image variation for %s (%s), width: %d', $user, $imageIdentifier, $width), E_USER_WARNING);
             } catch (DatabaseException $e) {
                 // Could not store metadata about the variation
-                trigger_error(sprintf('Could not store image variation metadata for %s (%s), width: %d', $publicKey, $imageIdentifier, $width), E_USER_WARNING);
+                trigger_error(sprintf('Could not store image variation metadata for %s (%s), width: %d', $user, $imageIdentifier, $width), E_USER_WARNING);
 
                 try {
-                    $this->storage->deleteImageVariations($publicKey, $imageIdentifier, $width);
+                    $this->storage->deleteImageVariations($user, $imageIdentifier, $width);
                 } catch (StorageException $e) {
                     trigger_error('Could not remove the stored variation', E_USER_WARNING);
                 }
@@ -428,19 +428,19 @@ class ImageVariations implements ListenerInterface {
      */
     public function deleteVariations(EventInterface $event) {
         $request = $event->getRequest();
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
 
         try {
-            $this->database->deleteImageVariations($publicKey, $imageIdentifier);
+            $this->database->deleteImageVariations($user, $imageIdentifier);
         } catch (DatabaseException $e) {
-            trigger_error(sprintf('Could not delete image variation metadata for %s (%s)', $publicKey, $imageIdentifier), E_USER_WARNING);
+            trigger_error(sprintf('Could not delete image variation metadata for %s (%s)', $user, $imageIdentifier), E_USER_WARNING);
         }
 
         try {
-            $this->storage->deleteImageVariations($publicKey, $imageIdentifier);
+            $this->storage->deleteImageVariations($user, $imageIdentifier);
         } catch (StorageException $e) {
-            trigger_error(sprintf('Could not delete image variations from storage for %s (%s)', $publicKey, $imageIdentifier), E_USER_WARNING);
+            trigger_error(sprintf('Could not delete image variations from storage for %s (%s)', $user, $imageIdentifier), E_USER_WARNING);
         }
     }
 

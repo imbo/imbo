@@ -21,11 +21,11 @@ use Imbo\Storage\Filesystem,
  */
 class FilesystemTest extends \PHPUnit_Framework_TestCase {
     /**
-     * Public key that can be used in tests
+     * User that can be used in tests
      *
      * @var string
      */
-    private $publicKey = '59632bc7a908b9cd47a35d03fc992aa7';
+    private $user = '59632bc7a908b9cd47a35d03fc992aa7';
 
     /**
      * Image identifier that can be used in tests
@@ -50,7 +50,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      */
     public function testDeleteFileThatDoesNotExist() {
         $driver = new Filesystem(array('dataDir' => 'foobar'));
-        $driver->delete($this->publicKey, $this->imageIdentifier);
+        $driver->delete($this->user, $this->imageIdentifier);
     }
 
     /**
@@ -64,10 +64,10 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $last = $root;
 
         $parts = array(
-            $this->publicKey[0],
-            $this->publicKey[1],
-            $this->publicKey[2],
-            $this->publicKey,
+            $this->user[0],
+            $this->user[1],
+            $this->user[2],
+            $this->user,
             $this->imageIdentifier[0],
             $this->imageIdentifier[1],
             $this->imageIdentifier[2],
@@ -82,7 +82,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $last->addChild(vfsStream::newFile($this->imageIdentifier));
 
         $this->assertTrue($last->hasChild($this->imageIdentifier));
-        $driver->delete($this->publicKey, $this->imageIdentifier);
+        $driver->delete($this->user, $this->imageIdentifier);
         $this->assertFalse($last->hasChild($this->imageIdentifier));
     }
 
@@ -99,7 +99,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         vfsStream::setup($dir, 0);
 
         $driver = new Filesystem(array('dataDir' => vfsStream::url($dir)));
-        $driver->store($this->publicKey, $this->imageIdentifier, $image);
+        $driver->store($this->user, $this->imageIdentifier, $image);
     }
 
     /**
@@ -114,7 +114,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         vfsStream::setup($baseDir);
 
         $driver = new Filesystem(array('dataDir' => vfsStream::url($baseDir)));
-        $this->assertTrue($driver->store($this->publicKey, $this->imageIdentifier, $imageData));
+        $this->assertTrue($driver->store($this->user, $this->imageIdentifier, $imageData));
     }
 
     /**
@@ -137,11 +137,11 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame(
             $expectedFullPath,
-            $method->invoke($driver, $this->publicKey, $this->imageIdentifier)
+            $method->invoke($driver, $this->user, $this->imageIdentifier)
         );
         $this->assertSame(
             $expectedDirPath,
-            $method->invoke($driver, $this->publicKey, $this->imageIdentifier, false)
+            $method->invoke($driver, $this->user, $this->imageIdentifier, false)
         );
     }
 
@@ -152,7 +152,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      */
     public function testGetImageFileThatDoesNotExist() {
         $driver = new Filesystem(array('dataDir' => '/tmp'));
-        $driver->getImage($this->publicKey, $this->imageIdentifier);
+        $driver->getImage($this->user, $this->imageIdentifier);
     }
 
     /**
@@ -166,10 +166,10 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $last = $root;
 
         $parts = array(
-            $this->publicKey[0],
-            $this->publicKey[1],
-            $this->publicKey[2],
-            $this->publicKey,
+            $this->user[0],
+            $this->user[1],
+            $this->user[2],
+            $this->user,
             $this->imageIdentifier[0],
             $this->imageIdentifier[1],
             $this->imageIdentifier[2],
@@ -186,7 +186,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $file->setContent($content);
         $last->addChild($file);
 
-        $this->assertSame($content, $driver->getImage($this->publicKey, $this->imageIdentifier));
+        $this->assertSame($content, $driver->getImage($this->user, $this->imageIdentifier));
     }
 
     /**
@@ -197,7 +197,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      */
     public function testGetLastModifiedWithFileThatDoesNotExist() {
         $driver = new Filesystem(array('dataDir' => '/some/path'));
-        $driver->getLastModified($this->publicKey, $this->imageIdentifier);
+        $driver->getLastModified($this->user, $this->imageIdentifier);
     }
 
     /**
@@ -211,10 +211,10 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $last = $root;
 
         $parts = array(
-            $this->publicKey[0],
-            $this->publicKey[1],
-            $this->publicKey[2],
-            $this->publicKey,
+            $this->user[0],
+            $this->user[1],
+            $this->user[2],
+            $this->user,
             $this->imageIdentifier[0],
             $this->imageIdentifier[1],
             $this->imageIdentifier[2],
@@ -234,7 +234,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         $file->lastModified($now);
         $last->addChild($file);
 
-        $this->assertInstanceOf('DateTime', $driver->getLastModified($this->publicKey, $this->imageIdentifier));
+        $this->assertInstanceOf('DateTime', $driver->getLastModified($this->user, $this->imageIdentifier));
     }
 
     /**

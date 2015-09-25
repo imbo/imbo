@@ -62,8 +62,8 @@ class ShortUrls implements ResourceInterface {
             }
         }
 
-        if (!isset($image['publicKey']) || $image['publicKey'] !== $request->getPublicKey()) {
-            throw new InvalidArgumentException('Missing or invalid public key', 400);
+        if (!isset($image['user']) || $image['user'] !== $request->getUser()) {
+            throw new InvalidArgumentException('Missing or invalid user', 400);
         }
 
         if (!isset($image['imageIdentifier']) || $image['imageIdentifier'] !== $request->getImageIdentifier()) {
@@ -88,7 +88,7 @@ class ShortUrls implements ResourceInterface {
 
         // See if a short URL ID already exists the for given parameters
         $exists = true;
-        $shortUrlId = $database->getShortUrlId($image['publicKey'], $image['imageIdentifier'], $extension, $query);
+        $shortUrlId = $database->getShortUrlId($image['user'], $image['imageIdentifier'], $extension, $query);
 
         if (!$shortUrlId) {
             $exists = false;
@@ -100,7 +100,7 @@ class ShortUrls implements ResourceInterface {
             } while($database->getShortUrlParams($shortUrlId));
 
             // We have an ID that does not already exist
-            $database->insertShortUrl($shortUrlId, $image['publicKey'], $image['imageIdentifier'], $extension, $query);
+            $database->insertShortUrl($shortUrlId, $image['user'], $image['imageIdentifier'], $extension, $query);
         }
 
         // Attach the header
@@ -120,11 +120,11 @@ class ShortUrls implements ResourceInterface {
      */
     public function deleteImageShortUrls(EventInterface $event) {
         $request = $event->getRequest();
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
 
         $event->getDatabase()->deleteShortUrls(
-            $publicKey,
+            $user,
             $imageIdentifier
         );
 

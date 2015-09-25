@@ -54,11 +54,11 @@ class DoctrineTest extends StorageTests {
         $this->pdo = new PDO('sqlite::memory:');
         $this->pdo->query('
             CREATE TABLE storage_image_variations (
-                publicKey TEXT NOT NULL,
+                user TEXT NOT NULL,
                 imageIdentifier TEXT NOT NULL,
                 width INTEGER NOT NULL,
                 data BLOB NOT NULL,
-                PRIMARY KEY (publicKey,imageIdentifier,width)
+                PRIMARY KEY (user,imageIdentifier,width)
             )
         ');
 

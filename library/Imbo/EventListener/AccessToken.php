@@ -80,8 +80,25 @@ class AccessToken implements ListenerInterface {
     public static function getSubscribedEvents() {
         $callbacks = array();
         $events = array(
-            'user.get', 'images.get', 'image.get', 'metadata.get',
-            'user.head', 'images.head', 'image.head', 'metadata.head',
+            'groups.get',
+            'groups.head',
+            'group.get',
+            'group.head',
+            'accessrule.get',
+            'accessrule.head',
+            'accessrules.get',
+            'accessrules.head',
+            'user.get',
+            'user.header',
+            'image.get',
+            'image.head',
+            'images.get',
+            'images.head',
+            'metadata.get',
+            'metadata.head',
+            'shorturl.get',
+            'shorturl.head',
+
             'auth.accesstoken'
         );
 
@@ -119,20 +136,16 @@ class AccessToken implements ListenerInterface {
 
         // First the the raw un-encoded URI, then the URI as is
         $uris = array($request->getRawUri(), $request->getUriAsIs());
-        $privateKeys = $event->getUserLookup()->getPrivateKeys(
-            $request->getPublicKey()
-        ) ?: [];
+        $privateKey = $event->getAccessControl()->getPrivateKey($request->getPublicKey());
 
         foreach ($uris as $uri) {
             // Remove the access token from the query string as it's not used to generate the HMAC
             $uri = rtrim(preg_replace('/(?<=(\?|&))accessToken=[^&]+&?/', '', $uri), '&?');
 
-            foreach ($privateKeys as $privateKey) {
-                $correctToken = hash_hmac('sha256', $uri, $privateKey);
+            $correctToken = hash_hmac('sha256', $uri, $privateKey);
 
-                if ($correctToken === $token) {
-                    return;
-                }
+            if ($correctToken === $token) {
+                return;
             }
         }
 

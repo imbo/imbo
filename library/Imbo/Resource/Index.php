@@ -62,13 +62,13 @@ class Index implements ResourceInterface {
             'endpoints' => array(
                 'status' => $baseUrl . '/status',
                 'stats' => $baseUrl . '/stats',
-                'user' => $baseUrl . '/users/{publicKey}',
-                'images' => $baseUrl . '/users/{publicKey}/images',
-                'image' => $baseUrl . '/users/{publicKey}/images/{imageIdentifier}',
+                'user' => $baseUrl . '/users/{user}',
+                'images' => $baseUrl . '/users/{user}/images',
+                'image' => $baseUrl . '/users/{user}/images/{imageIdentifier}',
                 'globalShortImageUrl' => $baseUrl . '/s/{id}',
-                'metadata' => $baseUrl . '/users/{publicKey}/images/{imageIdentifier}/metadata',
-                'shortImageUrls' => $baseUrl . '/users/{publicKey}/images/{imageIdentifier}/shorturls',
-                'shortImageUrl' =>  $baseUrl . '/users/{publicKey}/images/{imageIdentifier}/shorturls/{id}',
+                'metadata' => $baseUrl . '/users/{user}/images/{imageIdentifier}/metadata',
+                'shortImageUrls' => $baseUrl . '/users/{user}/images/{imageIdentifier}/shorturls',
+                'shortImageUrl' =>  $baseUrl . '/users/{user}/images/{imageIdentifier}/shorturls/{id}',
             ),
         ));
 

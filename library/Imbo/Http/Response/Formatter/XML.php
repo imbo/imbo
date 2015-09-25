@@ -77,7 +77,7 @@ STATUS;
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   <user>
-    <publicKey>{$model->getPublicKey()}</publicKey>
+    <user>{$model->getUserId()}</user>
     <numImages>{$model->getNumImages()}</numImages>
     <lastModified>{$this->dateFormatter->formatDate($model->getLastModified())}</lastModified>
   </user>
@@ -98,8 +98,8 @@ USER;
         foreach ($model->getImages() as $image) {
             $images .= '<image>';
 
-            if (empty($fields) || isset($fields['publicKey'])) {
-                $images .= '<publicKey>' . $image->getPublicKey() . '</publicKey>';
+            if (empty($fields) || isset($fields['user'])) {
+                $images .= '<user>' . $image->getUser() . '</user>';
             }
 
             if (empty($fields) || isset($fields['imageIdentifier'])) {
@@ -227,32 +227,99 @@ DATA;
     /**
      * {@inheritdoc}
      */
-    public function formatStats(Model\Stats $model) {
-        $users = '';
-        $numUsers = 0;
+    public function formatGroups(Model\Groups $model) {
+        $data = $model->getData();
 
-        foreach ($model->getUsers() as $user => $stats) {
-            $users .= '<user publicKey="' . $user . '">' . $this->formatArray($stats) . '</user>';
-            $numUsers++;
+        $entries = '';
+        foreach ($data['groups'] as $group) {
+            $entries .= '<group>';
+            $entries .= '  <name>' . $group['name'] . '</name>';
+            $entries .= '  <resources>';
+            $entries .= '    <resource>' . implode($group['resources'], '</resource><resource>') . '</resource>';
+            $entries .= '  </resources>';
+            $entries .= '</group>';
         }
 
-        $total = $this->formatArray(array(
+        return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <groups>{$entries}</groups>
+</imbo>
+DATA;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatGroup(Model\Group $model) {
+        $data = $model->getData();
+
+        $entries = '';
+        foreach ($data['resources'] as $resource) {
+            $entries .= '<resource>' . $resource . '</resource>';
+        }
+
+        return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <resources>{$entries}</resources>
+</imbo>
+DATA;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatStats(Model\Stats $model) {
+        $total = $this->formatArray([
             'numImages' => $model->getNumImages(),
+            'numUsers' => $model->getNumUsers(),
             'numBytes' => $model->getNumBytes(),
-            'numUsers' => $numUsers,
-        ));
-        $custom = $this->formatArray($model->getCustomStats() ?: array());
+        ]);
+        $custom = $this->formatArray($model->getCustomStats() ?: []);
 
         return <<<STATUS
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   <stats>
-    <users>{$users}</users>
-    <total>{$total}</total>
+    {$total}
     <custom>{$custom}</custom>
   </stats>
 </imbo>
 STATUS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatAccessRule(Model\AccessRule $model) {
+        $rule = $this->formatAccessRuleArray($model->getData());
+
+                return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  {$rule}
+</imbo>
+DATA;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatAccessRules(Model\AccessRules $model) {
+        $data = $model->getData();
+
+        $rules = '';
+        foreach ($data as $rule) {
+            $rules .= $this->formatAccessRuleArray($rule);
+        }
+
+        return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <access>{$rules}</access>
+</imbo>
+DATA;
     }
 
     /**
@@ -287,5 +354,39 @@ STATUS;
         }
 
         return $xml;
+    }
+
+    /**
+     * Format access rule data array
+     *
+     * @param array $accessRule
+     * @return string
+     */
+    private function formatAccessRuleArray(array $accessRule) {
+        $rule = '<rule id="' . $accessRule['id'] . '">';
+
+        if (isset($accessRule['resources']) && !!$accessRule['resources']) {
+            $rule .= '<resources>';
+            foreach ($accessRule['resources'] as $resource) {
+                $rule .= '<resource>' . $resource . '</resource>';
+            }
+            $rule .= '</resources>';
+        }
+
+        if (isset($accessRule['group'])) {
+            $rule .= '<group>' . $accessRule['group'] . '</group>';
+        }
+
+        if (isset($accessRule['users']) && !!$accessRule['users']) {
+            $rule .= '<users>';
+            foreach ($accessRule['users'] as $user) {
+                $rule .= '<user>' . $user . '</user>';
+            }
+            $rule .= '</users>';
+        }
+
+        $rule .= '</rule>';
+
+        return $rule;
     }
 }

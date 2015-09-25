@@ -23,7 +23,7 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
     /**
      * @var string
      */
-    private $publicKey = 'key';
+    private $user = 'key';
 
     /**
      * @var string
@@ -60,17 +60,17 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
     }
 
     public function testStoreAndGetImage() {
-        $this->assertTrue($this->driver->store($this->publicKey, $this->imageIdentifier, $this->imageData));
-        $this->assertSame($this->imageData, $this->driver->getImage($this->publicKey, $this->imageIdentifier));
+        $this->assertTrue($this->driver->store($this->user, $this->imageIdentifier, $this->imageData));
+        $this->assertSame($this->imageData, $this->driver->getImage($this->user, $this->imageIdentifier));
     }
 
     public function testStoreSameImageTwice() {
-        $this->assertTrue($this->driver->store($this->publicKey, $this->imageIdentifier, $this->imageData));
-        $lastModified1 = $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+        $this->assertTrue($this->driver->store($this->user, $this->imageIdentifier, $this->imageData));
+        $lastModified1 = $this->driver->getLastModified($this->user, $this->imageIdentifier);
         clearstatcache();
         sleep(1);
-        $this->assertTrue($this->driver->store($this->publicKey, $this->imageIdentifier, $this->imageData));
-        $lastModified2 = $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+        $this->assertTrue($this->driver->store($this->user, $this->imageIdentifier, $this->imageData));
+        $lastModified2 = $this->driver->getLastModified($this->user, $this->imageIdentifier);
 
         $this->assertTrue($lastModified2 > $lastModified1);
     }
@@ -80,9 +80,9 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 404
      */
     public function testStoreDeleteAndGetImage() {
-        $this->assertTrue($this->driver->store($this->publicKey, $this->imageIdentifier, $this->imageData));
-        $this->assertTrue($this->driver->delete($this->publicKey, $this->imageIdentifier));
-        $this->driver->getImage($this->publicKey, $this->imageIdentifier);
+        $this->assertTrue($this->driver->store($this->user, $this->imageIdentifier, $this->imageData));
+        $this->assertTrue($this->driver->delete($this->user, $this->imageIdentifier));
+        $this->driver->getImage($this->user, $this->imageIdentifier);
     }
 
     /**
@@ -90,7 +90,7 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 404
      */
     public function testDeleteImageThatDoesNotExist() {
-        $this->driver->delete($this->publicKey, $this->imageIdentifier);
+        $this->driver->delete($this->user, $this->imageIdentifier);
     }
 
     /**
@@ -98,7 +98,7 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 404
      */
     public function testGetImageThatDoesNotExist() {
-        $this->driver->getImage($this->publicKey, $this->imageIdentifier);
+        $this->driver->getImage($this->user, $this->imageIdentifier);
     }
 
     /**
@@ -106,17 +106,17 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 404
      */
     public function testGetLastModifiedOfImageThatDoesNotExist() {
-        $this->driver->getLastModified($this->publicKey, $this->imageIdentifier);
+        $this->driver->getLastModified($this->user, $this->imageIdentifier);
     }
 
     public function testGetLastModified() {
-        $this->assertTrue($this->driver->store($this->publicKey, $this->imageIdentifier, $this->imageData));
-        $this->assertInstanceOf('DateTime', $this->driver->getLastModified($this->publicKey, $this->imageIdentifier));
+        $this->assertTrue($this->driver->store($this->user, $this->imageIdentifier, $this->imageData));
+        $this->assertInstanceOf('DateTime', $this->driver->getLastModified($this->user, $this->imageIdentifier));
     }
 
     public function testCanCheckIfImageAlreadyExists() {
-        $this->assertFalse($this->driver->imageExists($this->publicKey, $this->imageIdentifier));
-        $this->driver->store($this->publicKey, $this->imageIdentifier, $this->imageData);
-        $this->assertTrue($this->driver->imageExists($this->publicKey, $this->imageIdentifier));
+        $this->assertFalse($this->driver->imageExists($this->user, $this->imageIdentifier));
+        $this->driver->store($this->user, $this->imageIdentifier, $this->imageData);
+        $this->assertTrue($this->driver->imageExists($this->user, $this->imageIdentifier));
     }
 }

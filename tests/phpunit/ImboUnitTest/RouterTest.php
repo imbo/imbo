@@ -174,7 +174,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider getValidRoutes
      * @covers Imbo\Router::route
      */
-    public function testCanMatchValidRoutes($route, $resource, $publicKey = null, $imageIdentifier = null, $extension = null) {
+    public function testCanMatchValidRoutes($route, $resource, $user = null, $imageIdentifier = null, $extension = null) {
         $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
 
@@ -182,7 +182,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
         $route = $this->request->getRoute();
 
-        $this->assertSame($publicKey, $route->get('publicKey'));
+        $this->assertSame($user, $route->get('user'));
         $this->assertSame($imageIdentifier, $route->get('imageIdentifier'));
         $this->assertSame($extension, $route->get('extension'));
         $this->assertSame($resource, (string) $route);

@@ -22,43 +22,63 @@ if (is_file(__DIR__ . '/../../../autoload.php')) {
 
 $config = [
     /**
-     * Authentication
+     * Access Control adapter
      *
-     * This value must be set to either:
-     * 1) An array mapping public and private keys of the users of this installation.
-     *    The array can take two different forms:
+     * See the different adapter implementations for possible configuration parameters. The value
+     * must be set to a closure returning an instance of Imbo\Auth\AccessControl\Adapter\AdapterInterface,
+     * or an implementation of said interface.
      *
-     * 'auth' => [
-     *     '<publicKey>' => '<read+write private key>',
-     *     '<differentPublicKey>' => '<different read+write private key>'
-     * ]
+     * The default ArrayAdapter takes an array of access control rules, in the following form:
      *
-     * Or:
-     * 'auth' => [
-     *     '<publicKey>' => [
-     *         'ro' => '<read-only private key>',
-     *         'rw' => '<read-write private key>',
+     * [
+     *     [
+     *         // A unique public key matching the following regular expression: [A-Za-z0-9_-]{1,}
+     *         'publicKey'  => 'some-public-key',
+     *
+     *         // Some form of private key
+     *         'privateKey' => 'some-private-key',
+     *
+     *         // Array of rules for this public key
+     *         'acl' => [
+     *             [
+     *                 // An array of different resource names that the public key should have
+     *                 // access to - see AdapterInterface::RESOURCE_* for available options.
+     *                 'resources' => ArrayAdapter::getReadOnlyResources(),
+     *
+     *                 // Names of the users which the public key should have access to.
+     *                 'users' => ['some', 'users'],
+     *             ],
+     *
+     *             // Multiple rules can be applied in order to make a single public key have
+     *             // different access rights on different users
+     *             [
+     *                 'resources' => ArrayAdapter::getReadWriteResources(),
+     *                 'users' => ['different-users'],
+     *             ],
+     *
+     *             // You can also specify resource groups instead of explicitly setting them like
+     *             // in the above examples. Note that you cannot specify both resources and group
+     *             // in the same rule.
+     *             [
+     *                 'group' => 'read-stats',
+     *                 'users' => ['user1', 'user2']
+     *             ]
+     *         ]
      *     ]
      * ]
      *
-     * You can also specify multiple private keys for both read-only and read+write:
+     * The second argument to ArrayAdapter specifies the available resource groups. For example:
      *
-     * 'auth' => [
-     *     '<publicKey>' => [
-     *         'ro' => ['<readKey1>', '<readKey2>'],
-     *         'rw' => ['<readWriteKey1>', '<readWriteKey2>']
-     *     ]
+     * [
+     *     'group-name' => ['image.get', 'image.head'],
+     *     'read-stats' => ['user.get', 'user.head', 'user.options'],
      * ]
      *
-     * 2) An instance of the Imbo\Auth\UserLookupInterface interface.
-     *
-     * Public keys must match the following case sensitive regular expression:
-     *
-     * ^[a-z0-9_-]{3,}$
-     *
-     * @var array|Auth\UserLookupInterface
+     * @var Auth\AccessControl\Adapter\AdapterInterface|Closure
      */
-    'auth' => [],
+    'accessControl' => function() {
+        return new Auth\AccessControl\Adapter\ArrayAdapter();
+    },
 
     /**
      * Database adapter
@@ -199,6 +219,7 @@ $config = [
      * @var array
      */
     'eventListeners' => [
+        'accessControl' => 'Imbo\EventListener\AccessControl',
         'accessToken' => 'Imbo\EventListener\AccessToken',
         'auth' => 'Imbo\EventListener\Authenticate',
         'statsAccess' => [

@@ -70,6 +70,30 @@ interface FormatterInterface {
     function formatMetadata(Model\Metadata $model);
 
     /**
+     * Format a groups model
+     *
+     * @param  Model\Groups $model The model to format
+     * @return string Formatted data
+     */
+    function formatGroups(Model\Groups $model);
+
+    /**
+     * Format a group model
+     *
+     * @param  Model\Group $model The model to format
+     * @return string Formatted data
+     */
+    function formatGroup(Model\Group $model);
+
+    /**
+     * Format an access rules model
+     *
+     * @param  Model\AccessRules $model The model to format
+     * @return string Formatted data
+     */
+    function formatAccessRules(Model\AccessRules $model);
+
+    /**
      * Format an array model
      *
      * @param Model\ArrayModel $model The model to format

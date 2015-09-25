@@ -25,7 +25,6 @@ interface Exception {
     const ERR_UNSPECIFIED = 0;
 
     // Auth errors
-    const AUTH_UNKNOWN_PUBLIC_KEY = 100;
     const AUTH_MISSING_PARAM      = 101;
     const AUTH_INVALID_TIMESTAMP  = 102;
     const AUTH_SIGNATURE_MISMATCH = 103;

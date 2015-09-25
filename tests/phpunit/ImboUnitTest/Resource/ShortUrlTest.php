@@ -71,7 +71,7 @@ class ShortUrlTest extends ResourceTests {
      * @expectedExceptionCode 404
      */
     public function testThrowsAnExceptionWhenTheShortUrlDoesNotExist() {
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->route->expects($this->once())->method('get')->with('shortUrlId')->will($this->returnValue('aaaaaaa'));
         $this->database->expects($this->once())->method('getShortUrlParams')->with('aaaaaaa')->will($this->returnValue(null));
@@ -84,12 +84,12 @@ class ShortUrlTest extends ResourceTests {
      * @expectedExceptionMessage ShortURL not found
      * @expectedExceptionCode 404
      */
-    public function testThrowsAnExceptionWhenPublicKeyOrPrivateKeyDoesNotMatch() {
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+    public function testThrowsAnExceptionWhenUserOrPrivateKeyDoesNotMatch() {
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->route->expects($this->once())->method('get')->with('shortUrlId')->will($this->returnValue('aaaaaaa'));
         $this->database->expects($this->once())->method('getShortUrlParams')->with('aaaaaaa')->will($this->returnValue(array(
-            'publicKey' => 'otherkey',
+            'user' => 'otheruser',
             'imageIdentifier' => 'id',
         )));
 
@@ -97,14 +97,14 @@ class ShortUrlTest extends ResourceTests {
     }
 
     public function testCanDeleteAShortUrl() {
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->route->expects($this->once())->method('get')->with('shortUrlId')->will($this->returnValue('aaaaaaa'));
         $this->database->expects($this->once())->method('getShortUrlParams')->with('aaaaaaa')->will($this->returnValue(array(
-            'publicKey' => 'key',
+            'user' => 'user',
             'imageIdentifier' => 'id',
         )));
-        $this->database->expects($this->once())->method('deleteShortUrls')->with('key', 'id', 'aaaaaaa');
+        $this->database->expects($this->once())->method('deleteShortUrls')->with('user', 'id', 'aaaaaaa');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
 
         $this->getNewResource()->deleteShortUrl($this->event);

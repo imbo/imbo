@@ -137,17 +137,17 @@ class ExifMetadata implements ListenerInterface {
         $request = $event->getRequest();
         $database = $event->getDatabase();
 
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $imageIdentifier = $request->getImage()->getChecksum();
 
         try {
             $database->updateMetadata(
-                $publicKey,
+                $user,
                 $imageIdentifier,
                 $this->properties
             );
         } catch (DatabaseException $e) {
-            $database->deleteImage($publicKey, $imageIdentifier);
+            $database->deleteImage($user, $imageIdentifier);
 
             throw new RuntimeException('Could not store EXIF-metadata', 500);
         }

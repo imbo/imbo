@@ -39,6 +39,13 @@ class ImboContext extends RESTContext {
     private $privateKey;
 
     /**
+     * Holds the configuration file specified in the current feature
+     *
+     * @var string
+     */
+    private $currentConfig;
+
+    /**
      * @BeforeFeature
      */
     public static function prepare(FeatureEvent $event) {
@@ -104,14 +111,43 @@ class ImboContext extends RESTContext {
     }
 
     /**
+     * @Given /^I do not specify a public and private key$/
+     */
+    public function removeClientAuth() {
+        $this->publicKey = null;
+        $this->privateKey = null;
+    }
+
+    /**
+     * @Given /^I authenticate using "(.*?)"$/
+     */
+    public function authenticateRequest($method) {
+        if ($method == 'access-token') {
+            return new Given('I include an access token in the query');
+        }
+
+        if ($method == 'signature') {
+            return new Given('I sign the request');
+        }
+
+        throw new \Exception('Unknown authentication method: ' . $method);
+    }
+
+    /**
      * @Given /^I include an access token in the query$/
      */
     public function appendAccessToken() {
         $this->client->getEventDispatcher()->addListener('request.before_send', function($event) {
             $request = $event['request'];
-            $request->getQuery()->remove('accessToken');
+            $query = $request->getQuery();
+
+            if (!$query->get('publicKey')) {
+                $query->set('publicKey', $this->publicKey);
+            }
+
+            $query->remove('accessToken');
             $accessToken = hash_hmac('sha256', urldecode($request->getUrl()), $this->privateKey);
-            $request->getQuery()->set('accessToken', $accessToken);
+            $query->set('accessToken', $accessToken);
         }, -100);
     }
 
@@ -192,14 +228,22 @@ class ImboContext extends RESTContext {
         $response = $this->getLastResponse();
         $contentType = $response->getContentType();
 
-        if ($contentType === 'application/json') {
-            $data = $response->json();
-            $errorMessage = $data['error']['message'];
-            $errorCode = $data['error']['imboErrorCode'];
-        } else if ($contentType === 'application/xml') {
-            $data = $response->xml();
-            $errorMessage = (string) $data->error->message;
-            $errorCode = $data->error->imboErrorCode;
+        try {
+            if ($contentType === 'application/json') {
+                $data = $response->json();
+                $errorMessage = $data['error']['message'];
+                $errorCode = $data['error']['imboErrorCode'];
+            } else if ($contentType === 'application/xml') {
+                $data = $response->xml();
+                $errorMessage = (string) $data->error->message;
+                $errorCode = $data->error->imboErrorCode;
+            }
+        } catch (\Exception $e) {
+            throw new RuntimeException(
+                "Unable to parse response: \n" .
+                $response->getMessage() . "\n\n" .
+                $e->getMessage()
+            );
         }
 
         assertSame($message, $errorMessage, 'Expected "' . $message. '", got "' . $errorMessage . '"');
@@ -317,6 +361,7 @@ class ImboContext extends RESTContext {
      * @Given /^Imbo uses the "([^"]*)" configuration$/
      */
     public function setImboConfigHeader($config) {
+        $this->currentConfig = $config;
         $this->addHeaderToNextRequest('X-Imbo-Test-Config', $config);
     }
 
@@ -352,4 +397,48 @@ class ImboContext extends RESTContext {
             new Given('I request "/s/' . $shortUrlId . '"'),
         );
     }
+
+    /**
+     * @Given /^I prime the database with "([^"]*)"$/
+     */
+    public function iPrimeTheDatabaseWith($fixture) {
+        $fixturePath = implode(DIRECTORY_SEPARATOR, [
+            dirname(__DIR__),
+            'fixtures',
+            $fixture
+        ]);
+
+        if (!$fixturePath = realpath($fixturePath)) {
+            throw new RuntimeException('Path "' . $fixturePath . '" is invalid');
+        }
+
+        $mongo = (new MongoClient())->imbo_testing;
+
+        $fixtures = require $fixturePath;
+        foreach ($fixtures as $collection => $data) {
+            $mongo->$collection->drop();
+
+            if ($data) {
+                $mongo->$collection->batchInsert($data);
+            }
+        }
+    }
+
+    /**
+     * @Given /^the ACL rule under public key "([^"]*)" with ID "([^"]*)" should not exist( anymore)?$/
+     */
+    public function aclRuleWithIdShouldNotExist($publicKey, $aclId) {
+        if ($this->currentConfig) {
+            $this->addHeaderToNextRequest('X-Imbo-Test-Config', $this->currentConfig);
+        }
+
+        $url = '/keys/' . $publicKey . '/access/' . $aclId;
+        return [
+            new Given('I use "acl-checker" and "foobar" for public and private keys'),
+            new Given('I include an access token in the query'),
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+            new Given('I should get a response with "404 Access rule not found"')
+        ];
+    }
+
 }

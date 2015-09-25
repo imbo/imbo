@@ -128,18 +128,55 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers Imbo\Http\Request\Request::getUser
+     */
+    public function testSetGetUser() {
+        $user = 'christer';
+        $this->assertNull($this->request->getUser());
+
+        $route = new Route();
+        $this->request->setRoute($route);
+
+        $this->assertNull($this->request->getUser());
+        $route->set('user', $user);
+        $this->assertSame($user, $this->request->getUser());
+    }
+
+    /**
      * @covers Imbo\Http\Request\Request::getPublicKey
      */
-    public function testSetGetPublicKey() {
-        $publicKey = 'christer';
+    public function testSetGetPublicKeyThroughRoute() {
+        $pubkey = 'pubkey';
         $this->assertNull($this->request->getPublicKey());
 
         $route = new Route();
         $this->request->setRoute($route);
 
         $this->assertNull($this->request->getPublicKey());
-        $route->set('publicKey', $publicKey);
-        $this->assertSame($publicKey, $this->request->getPublicKey());
+        $route->set('user', $pubkey);
+        $this->assertSame($pubkey, $this->request->getPublicKey());
+    }
+
+    /**
+     * @covers Imbo\Http\Request\Request::getPublicKey
+     */
+    public function testSetGetPublicKeyThroughQuery() {
+        $pubkey = 'pubkey';
+        $this->assertNull($this->request->getPublicKey());
+
+        $this->request->query->set('publicKey', $pubkey);
+        $this->assertSame($pubkey, $this->request->getPublicKey());
+    }
+
+    /**
+     * @covers Imbo\Http\Request\Request::getPublicKey
+     */
+    public function testSetGetPublicKeyThroughHeader() {
+        $pubkey = 'pubkey';
+        $this->assertNull($this->request->getPublicKey());
+
+        $this->request->headers->set('X-Imbo-PublicKey', $pubkey);
+        $this->assertSame($pubkey, $this->request->getPublicKey());
     }
 
     /**

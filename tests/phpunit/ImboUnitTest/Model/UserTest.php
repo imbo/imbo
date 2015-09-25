@@ -39,13 +39,13 @@ class UserTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Model\User::getPublicKey
-     * @covers Imbo\Model\User::setPublicKey
+     * @covers Imbo\Model\User::getUserId
+     * @covers Imbo\Model\User::setUserId
      */
-    public function testCanSetAndGetPublicKey() {
-        $this->assertNull($this->model->getPublicKey());
-        $this->assertSame($this->model, $this->model->setPublicKey('key'));
-        $this->assertSame('key', $this->model->getPublicKey());
+    public function testCanSetAndGetUserId() {
+        $this->assertNull($this->model->getUserId());
+        $this->assertSame($this->model, $this->model->setUserId('key'));
+        $this->assertSame('key', $this->model->getUserId());
     }
 
     /**

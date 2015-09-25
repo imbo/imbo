@@ -24,7 +24,7 @@ class AuthenticateTest extends ListenerTests {
     private $listener;
 
     private $event;
-    private $userLookup;
+    private $accessControl;
     private $request;
     private $response;
     private $query;
@@ -36,7 +36,7 @@ class AuthenticateTest extends ListenerTests {
     public function setUp() {
         $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
         $this->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $this->userLookup = $this->getMock('Imbo\Auth\UserLookupInterface');
+        $this->accessControl = $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
 
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->query = $this->query;
@@ -47,7 +47,7 @@ class AuthenticateTest extends ListenerTests {
         $this->event = $this->getMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getUserLookup')->will($this->returnValue($this->userLookup));
+        $this->event->expects($this->any())->method('getAccessControl')->will($this->returnValue($this->accessControl));
 
         $this->listener = new Authenticate();
     }
@@ -158,7 +158,7 @@ class AuthenticateTest extends ListenerTests {
         $data = $httpMethod . '|' . $url . '|' . $publicKey . '|' . $timestamp;
         $signature = hash_hmac('sha256', $data, $privateKey);
 
-        $this->userLookup->expects($this->once())->method('getPrivateKeys')->will($this->returnValue([$privateKey]));
+        $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
 
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
         $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
@@ -193,7 +193,7 @@ class AuthenticateTest extends ListenerTests {
         $signature = hash_hmac('sha256', $data, $privateKey);
         $rawUrl = $url . '?signature=' . $signature . '&timestamp=' . $timestamp;
 
-        $this->userLookup->expects($this->once())->method('getPrivateKeys')->will($this->returnValue([$privateKey]));
+        $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
 
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(false));
         $this->headers->expects($this->at(1))->method('get')->with('x-imbo-authenticate-timestamp', $timestamp)->will($this->returnValue($timestamp));
