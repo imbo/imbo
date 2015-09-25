@@ -30,3 +30,7 @@ before_script:
 script:
   - ./vendor/bin/phpunit --verbose -c tests/phpunit/phpunit.xml.travis
   - ./vendor/bin/behat --strict --profile no-cc --config tests/behat/behat.yml
+after_failure:
+  - echo "Tests failed - httpd log follows"
+  - echo "================================"
+  - cat build/logs/httpd.log
