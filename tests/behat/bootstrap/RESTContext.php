@@ -437,7 +437,12 @@ class RESTContext extends BehatContext {
      * @throws RuntimeException
      */
     private static function startBuiltInHttpd($host, $port, $documentRoot, $router, $httpdLog) {
-        mkdir(dirname($httpdLog), 0777, true);
+        $logPath = dirname($httpdLog);
+
+        if (!is_dir($logPath)) {
+            mkdir($logPath, 0777, true);
+        }
+
         $command = sprintf('php -S %s:%d -t %s %s >%s 2>&1 & echo $!',
                             $host,
                             $port,
