@@ -228,14 +228,22 @@ class ImboContext extends RESTContext {
         $response = $this->getLastResponse();
         $contentType = $response->getContentType();
 
-        if ($contentType === 'application/json') {
-            $data = $response->json();
-            $errorMessage = $data['error']['message'];
-            $errorCode = $data['error']['imboErrorCode'];
-        } else if ($contentType === 'application/xml') {
-            $data = $response->xml();
-            $errorMessage = (string) $data->error->message;
-            $errorCode = $data->error->imboErrorCode;
+        try {
+            if ($contentType === 'application/json') {
+                $data = $response->json();
+                $errorMessage = $data['error']['message'];
+                $errorCode = $data['error']['imboErrorCode'];
+            } else if ($contentType === 'application/xml') {
+                $data = $response->xml();
+                $errorMessage = (string) $data->error->message;
+                $errorCode = $data->error->imboErrorCode;
+            }
+        } catch (\Exception $e) {
+            throw new RuntimeException(
+                "Unable to parse response: \n" .
+                $response->getMessage() . "\n\n" .
+                $e->getMessage()
+            );
         }
 
         assertSame($message, $errorMessage, 'Expected "' . $message. '", got "' . $errorMessage . '"');
