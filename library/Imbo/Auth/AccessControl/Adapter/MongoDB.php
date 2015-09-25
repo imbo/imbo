@@ -109,7 +109,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * {@inheritdoc}
      */
     public function hasAccess($publicKey, $resource, $user = null) {
-        $accessList = $this->getAccessListForPublicKey($publicKey);
+        $accessList = $this->getAccessListForPublicKey($publicKey) ?: [];
 
         foreach ($accessList as $acl) {
             // If the group specified has not been defined, throw an exception to help the user
