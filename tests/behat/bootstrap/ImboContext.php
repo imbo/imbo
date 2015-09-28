@@ -639,6 +639,20 @@ class ImboContext extends RESTContext {
     }
 
     /**
+     * @Given /^I use "([^"]*)" as the watermark image with "([^"]*)" as parameters$/
+     */
+    public function specifyAsTheWatermarkImage($watermarkPath, $parameters = '') {
+        $this->addImageToImbo($watermarkPath);
+        $imageIdentifier = $this->getPreviouslyAddedImageIdentifier();
+        $params = empty($parameters) ? '' : ',' . $parameters;
+        $transformation = 'watermark:img=' . $imageIdentifier . $params;
+
+        return [
+            new Given('I specify "' . $transformation . '" as transformation')
+        ];
+    }
+
+    /**
      * Get the previously added image identifier
      *
      * @throws RuntimeException If previous response did not include image identifier
