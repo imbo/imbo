@@ -4,7 +4,7 @@ Feature: Imbo enables caching of transformations
     I will cache and re-use transformed images
 
     Background:
-        Given "tests/phpunit/Fixtures/image1.png" is used as the test image
+        Given "tests/phpunit/Fixtures/image1.png" is used as the test image for the "transformation cache" feature
 
     Scenario: Fetch the image with a specific extension that is not in the cache
         Given I use "publickey" and "privatekey" for public and private keys
