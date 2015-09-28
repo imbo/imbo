@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `imageinfo` (
     `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `user` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-    `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
+    `imageIdentifier` char(36) COLLATE utf8_danish_ci NOT NULL,
     `size` int(10) unsigned NOT NULL,
     `extension` varchar(5) COLLATE utf8_danish_ci NOT NULL,
     `mime` varchar(20) COLLATE utf8_danish_ci NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `metadata` (
 CREATE TABLE IF NOT EXISTS `shorturl` (
     `shortUrlId` char(7) COLLATE utf8_danish_ci NOT NULL,
     `user` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-    `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
+    `imageIdentifier` char(36) COLLATE utf8_danish_ci NOT NULL,
     `extension` char(3) COLLATE utf8_danish_ci DEFAULT NULL,
     `query` text COLLATE utf8_danish_ci NOT NULL,
     PRIMARY KEY (`shortUrlId`),
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `shorturl` (
 
 CREATE TABLE IF NOT EXISTS `storage_images` (
     `user` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-    `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
+    `imageIdentifier` char(36) COLLATE utf8_danish_ci NOT NULL,
     `data` blob NOT NULL,
     `updated` int(10) unsigned NOT NULL,
     PRIMARY KEY (`user`,`imageIdentifier`)
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `storage_images` (
 
 CREATE TABLE IF NOT EXISTS `storage_image_variations` (
     `user` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-    `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
+    `imageIdentifier` char(36) COLLATE utf8_danish_ci NOT NULL,
     `width` int(10) unsigned NOT NULL,
     `data` blob NOT NULL,
     PRIMARY KEY (`user`,`imageIdentifier`,`width`)
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `storage_image_variations` (
 
 CREATE TABLE IF NOT EXISTS `imagevariations` (
     `user` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-    `imageIdentifier` char(32) COLLATE utf8_danish_ci NOT NULL,
+    `imageIdentifier` char(36) COLLATE utf8_danish_ci NOT NULL,
     `width` int(10) unsigned NOT NULL,
     `height` int(10) unsigned NOT NULL,
     `added` int(10) unsigned NOT NULL,
