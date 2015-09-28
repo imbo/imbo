@@ -3,17 +3,12 @@ Feature: Imbo can generate short URLs for images on demand
     As an HTTP Client
     I can request the short URLs resource
 
-    Background:
-        Given "tests/phpunit/Fixtures/image.png" exists in Imbo
-
     Scenario: Generate a short URL
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I sign the request
-        And the request body contains:
-          """
-          {"imageIdentifier": "<imageIdentifier>", "user": "user", "extension": "gif", "query": "t[]=thumbnail:width=45,height=55&t[]=desaturate"}
-          """
-        When I request the shorturls resource for the test image using HTTP "POST"
+        Given "tests/phpunit/Fixtures/image.png" exists in Imbo
+        And I generate a short URL with the following parameters:
+            """
+            {"user": "user", "extension": "gif"}
+            """
         Then I should get a response with "201 Created"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
@@ -22,7 +17,8 @@ Feature: Imbo can generate short URLs for images on demand
            """
 
     Scenario Outline: Request an image using the short URL
-        Given I generate a short URL with the following parameters:
+        Given "tests/phpunit/Fixtures/image.png" exists in Imbo
+        And I generate a short URL with the following parameters:
             """
             <params>
             """
