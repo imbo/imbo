@@ -4,7 +4,8 @@ Feature: Imbo provides a stats endpoint
     I want to make requests against the stats endpoint
 
     Background:
-        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
+        Given Imbo starts with an empty database
+        And "tests/phpunit/Fixtures/image1.png" exists in Imbo
         And "tests/phpunit/Fixtures/image.jpg" exists in Imbo
         And "tests/phpunit/Fixtures/image.gif" exists in Imbo
 
