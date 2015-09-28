@@ -21,7 +21,7 @@ Feature: Imbo supports HTTP HEAD for all resources
     Scenario: Request user information
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey" using HTTP "HEAD"
+        When I request "/users/user" using HTTP "HEAD"
         And make the same request using HTTP "GET"
         Then the following response headers should be the same:
         """
@@ -35,7 +35,7 @@ Feature: Imbo supports HTTP HEAD for all resources
     Scenario: Request user images using a valid access token
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images" using HTTP "HEAD"
+        When I request "/users/user/images" using HTTP "HEAD"
         And make the same request using HTTP "GET"
         Then the following response headers should be the same:
         """
@@ -50,7 +50,7 @@ Feature: Imbo supports HTTP HEAD for all resources
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         And the "Accept" request header is "image/png"
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "HEAD"
+        When I request the previously added image using HTTP "HEAD"
         And make the same request using HTTP "GET"
         Then the following response headers should be the same:
         """

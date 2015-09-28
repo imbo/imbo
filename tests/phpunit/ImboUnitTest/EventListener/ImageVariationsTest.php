@@ -67,7 +67,7 @@ class ImageVariationsTest extends ListenerTests {
         $this->eventManager = $this->getMock('Imbo\EventManager\EventManager');
         $this->imageStorage = $this->getMock('Imbo\Storage\StorageInterface');
 
-        $this->imageModel->method('getChecksum')->willReturn($this->imageIdentifier);
+        $this->imageModel->method('getImageIdentifier')->willReturn($this->imageIdentifier);
 
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));

@@ -77,7 +77,7 @@ class ImagesTest extends ResourceTests {
         $this->manager->expects($this->at(0))->method('trigger')->with('db.image.insert');
         $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.insert');
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getChecksum')->will($this->returnValue('id'));
+        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
 

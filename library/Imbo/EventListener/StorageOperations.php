@@ -71,7 +71,7 @@ class StorageOperations implements ListenerInterface {
         $request = $event->getRequest();
         $user = $request->getUser();
         $image = $request->getImage();
-        $imageIdentifier = $image->getChecksum();
+        $imageIdentifier = $image->getImageIdentifier();
         $blob = $image->getBlob();
 
         try {

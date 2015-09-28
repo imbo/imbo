@@ -16,7 +16,8 @@ use Imbo\EventManager\EventInterface,
     Imbo\Exception,
     Imbo\Model\Image,
     Imagick,
-    ImagickException;
+    ImagickException,
+    Rhumsaa\Uuid\Uuid;
 
 /**
  * Image preparation
@@ -84,7 +85,8 @@ class ImagePreparation implements ListenerInterface {
               ->setBlob($imageBlob)
               ->setWidth($size['width'])
               ->setHeight($size['height'])
-              ->setOriginalChecksum(md5($imageBlob));
+              ->setOriginalChecksum(md5($imageBlob))
+              ->setImageIdentifier((string) Uuid::uuid4());
 
         $request->setImage($image);
     }

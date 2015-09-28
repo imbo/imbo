@@ -4,7 +4,7 @@ Feature: Imbo provides a user endpoint
     I want to make requests against the user endpoint
 
     Scenario Outline: Request user information
-        Given I use "user" and "key" for public and private keys
+        Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/user.<extension>"
         Then I should get a response with "200 OK"
@@ -27,7 +27,7 @@ Feature: Imbo provides a user endpoint
     Scenario Outline: The user endpoint only supports HTTP GET and HEAD
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey.json" using HTTP "<method>"
+        When I request "/users/user.json" using HTTP "<method>"
         Then I should get a response with "<status>"
 
         Examples:

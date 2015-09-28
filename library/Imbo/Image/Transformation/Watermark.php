@@ -104,7 +104,7 @@ class Watermark extends Transformation implements ListenerInterface {
         // Try to load watermark image from storage
         try {
             $watermarkData = $event->getStorage()->getImage(
-                $event->getRequest()->getPublicKey(),
+                $event->getRequest()->getUser(),
                 $imageIdentifier
             );
 

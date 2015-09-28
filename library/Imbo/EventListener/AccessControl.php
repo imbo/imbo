@@ -75,6 +75,11 @@ class AccessControl implements ListenerInterface {
      * {@inheritdoc}
      */
     public function checkAccess(EventInterface $event) {
+        if ($event->hasArgument('skipAccessControl') &&
+            $event->getArgument('skipAccessControl') === true) {
+            return;
+        }
+
         $request = $event->getRequest();
         $response = $event->getResponse();
         $accessControl = $event->getAccessControl();

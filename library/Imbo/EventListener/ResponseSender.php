@@ -48,12 +48,11 @@ class ResponseSender implements ListenerInterface {
         $imageIdentifier = null;
 
         if ($image = $request->getImage()) {
-            // The request has an image. This means that an image was just added. Use the image's
-            // checksum
-            $imageIdentifier = $image->getChecksum();
+            // The request has an image. This means that an image was just added.
+            // Get the image identifier from the image model
+            $imageIdentifier = $image->getImageIdentifier();
         } else if ($identifier = $request->getImageIdentifier()) {
-            // An image identifier exists in the request, use that one (and not a possible image
-            // checksum for an image attached to the response)
+            // An image identifier exists in the request URI, use that
             $imageIdentifier = $identifier;
         }
 

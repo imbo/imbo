@@ -3,17 +3,12 @@ Feature: Imbo can generate short URLs for images on demand
     As an HTTP Client
     I can request the short URLs resource
 
-    Background:
-        Given "tests/phpunit/Fixtures/image.png" exists in Imbo
-
     Scenario: Generate a short URL
-        Given I use "user" and "key" for public and private keys
-        And I sign the request
-        And the request body contains:
-          """
-          {"imageIdentifier": "929db9c5fc3099f7576f5655207eba47", "user": "user", "extension": "gif", "query": "t[]=thumbnail:width=45,height=55&t[]=desaturate"}
-          """
-        When I request "/users/user/images/929db9c5fc3099f7576f5655207eba47/shorturls.json" using HTTP "POST"
+        Given "tests/phpunit/Fixtures/image.png" exists in Imbo
+        And I generate a short URL with the following parameters:
+            """
+            {"user": "user", "extension": "gif"}
+            """
         Then I should get a response with "201 Created"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
@@ -22,7 +17,8 @@ Feature: Imbo can generate short URLs for images on demand
            """
 
     Scenario Outline: Request an image using the short URL
-        Given I generate a short URL with the following parameters:
+        Given "tests/phpunit/Fixtures/image.png" exists in Imbo
+        And I generate a short URL with the following parameters:
             """
             <params>
             """
@@ -40,8 +36,8 @@ Feature: Imbo can generate short URLs for images on demand
 
         Examples:
             | params                                                                                                                                                       | mime       | width | height |
-            | {"imageIdentifier": "929db9c5fc3099f7576f5655207eba47", "user": "publickey"}                                                                                 | image/png  | 665   | 463    |
-            | {"imageIdentifier": "929db9c5fc3099f7576f5655207eba47", "user": "publickey", "extension": "gif"}                                                             | image/gif  | 665   | 463    |
-            | {"imageIdentifier": "929db9c5fc3099f7576f5655207eba47", "user": "publickey", "query": "t[]=thumbnail"}                                                       | image/png  | 50    | 50     |
-            | {"imageIdentifier": "929db9c5fc3099f7576f5655207eba47", "user": "publickey", "query": "t[]=thumbnail:width=45,height=55&t[]=desaturate"}                     | image/png  | 45    | 55     |
-            | {"imageIdentifier": "929db9c5fc3099f7576f5655207eba47", "user": "publickey", "extension": "jpg", "query": "t[]=thumbnail:width=45,height=55&t[]=desaturate"} | image/jpeg | 45    | 55     |
+            | {"user": "user"}                                                                                 | image/png  | 665   | 463    |
+            | {"user": "user", "extension": "gif"}                                                             | image/gif  | 665   | 463    |
+            | {"user": "user", "query": "t[]=thumbnail"}                                                       | image/png  | 50    | 50     |
+            | {"user": "user", "query": "t[]=thumbnail:width=45,height=55&t[]=desaturate"}                     | image/png  | 45    | 55     |
+            | {"user": "user", "extension": "jpg", "query": "t[]=thumbnail:width=45,height=55&t[]=desaturate"} | image/jpeg | 45    | 55     |

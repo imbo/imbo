@@ -80,7 +80,7 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::insertImage
      */
     public function testCanInsertImage() {
-        $this->image->expects($this->once())->method('getChecksum')->will($this->returnValue($this->imageIdentifier));
+        $this->image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->request->expects($this->any())->method('getImage')->will($this->returnValue($this->image));
         $this->database->expects($this->once())->method('insertImage')->with($this->user, $this->imageIdentifier, $this->image);
 

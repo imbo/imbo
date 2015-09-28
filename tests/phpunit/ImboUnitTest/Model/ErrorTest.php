@@ -127,19 +127,19 @@ class ErrorTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Model\Error::createFromException
      */
-    public function testWillUseImageChecksumAsImageIdentifierIfRequestHasAnImageWhenCreatingError() {
+    public function testWillUseImageIdentifierFromImageModelIfRequestHasAnImageWhenCreatingError() {
         $exception = new RuntimeException('You wronged', 400);
         $exception->setImboErrorCode(123);
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
+        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $request->expects($this->never())->method('checksum');
+        $request->expects($this->never())->method('imageId');
 
         $model = Error::createFromException($exception, $request);
 
         $this->assertSame(123, $model->getImboErrorCode());
-        $this->assertSame('checksum', $model->getImageIdentifier());
+        $this->assertSame('imageId', $model->getImageIdentifier());
     }
 }

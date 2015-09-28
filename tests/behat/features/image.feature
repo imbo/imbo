@@ -7,31 +7,32 @@ Feature: Imbo provides an image endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         And I attach "tests/phpunit/Fixtures/image1.png" to the request body
-        When I request "/users/publickey/images" using HTTP "POST"
+        When I request "/users/user/images" using HTTP "POST"
         Then I should get a response with "201 Created"
         And the "Content-Type" response header is "application/json"
-        And the response body is:
+        And the response body matches:
           """
-          {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2","width":599,"height":417,"extension":"png"}
+          /{"imageIdentifier":"[^"]+","width":599,"height":417,"extension":"png"}/
           """
 
     Scenario: Add an image that already exists
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         And I attach "tests/phpunit/Fixtures/image1.png" to the request body
-        When I request "/users/publickey/images" using HTTP "POST"
-        Then I should get a response with "200 OK"
+        When I request "/users/user/images" using HTTP "POST"
+        Then I should get a response with "201 Created"
         And the "Content-Type" response header is "application/json"
-        And the response body is:
+        And the response body matches:
           """
-          {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2","width":599,"height":417,"extension":"png"}
+          /{"imageIdentifier":"[^"]+","width":599,"height":417,"extension":"png"}/
           """
 
     Scenario: Fetch image
-        Given I use "publickey" and "privatekey" for public and private keys
+        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
+        And I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         And the "Accept" request header is "image/png"
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2"
+        When I request the previously added image
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "image/png"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -42,10 +43,11 @@ Feature: Imbo provides an image endpoint
         And the response body length is "95576"
 
     Scenario: Fetch image information when not accepting images
-        Given I use "publickey" and "privatekey" for public and private keys
+        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
+        And I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         And the "Accept" request header is "application/json"
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2"
+        When I request the previously added image
         Then I should get a response with "406 Not acceptable"
         And the "Content-Type" response header is "application/json"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -55,20 +57,21 @@ Feature: Imbo provides an image endpoint
         And the "X-Imbo-Originalwidth" response header is "599"
 
     Scenario: Delete an image
-        Given I use "publickey" and "privatekey" for public and private keys
+        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
+        And I use "publickey" and "privatekey" for public and private keys
         And I sign the request
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2" using HTTP "DELETE"
+        When I request the previously added image using HTTP "DELETE"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "application/json"
-        And the response body is:
+        And the response body matches:
           """
-          {"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2"}
+          /{"imageIdentifier":"[^"]+"}/
           """
 
     Scenario: Delete an image that does not exist
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
-        When I request "/users/publickey/images/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" using HTTP "DELETE"
+        When I request "/users/user/images/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" using HTTP "DELETE"
         Then I should get a response with "404 Image not found"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Image not found" and the error code is "0"
@@ -77,7 +80,7 @@ Feature: Imbo provides an image endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         And I attach "tests/phpunit/Fixtures/broken-image.jpg" to the request body
-        When I request "/users/publickey/images" using HTTP "POST"
+        When I request "/users/user/images" using HTTP "POST"
         Then I should get a response with "415 Invalid image"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Invalid image" and the error code is "205"
@@ -86,7 +89,7 @@ Feature: Imbo provides an image endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         And I attach "tests/phpunit/Fixtures/slightly-broken-image.png" to the request body
-        When I request "/users/publickey/images" using HTTP "POST"
+        When I request "/users/user/images" using HTTP "POST"
         Then I should get a response with "415 Invalid image"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Invalid image" and the error code is "205"
