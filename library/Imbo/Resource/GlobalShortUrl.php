@@ -60,6 +60,6 @@ class GlobalShortUrl implements ResourceInterface {
 
         $request->query = new ParameterBag($params['query']);
         $event->getResponse()->headers->set('X-Imbo-ShortUrl', $request->getUri());
-        $event->getManager()->trigger('image.get');
+        $event->getManager()->trigger('image.get', ['skipAccessControl' => true]);
     }
 }
