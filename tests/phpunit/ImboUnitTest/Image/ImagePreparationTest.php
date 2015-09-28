@@ -108,7 +108,6 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     public function testPopulatesRequestWhenImageIsValid() {
         $imagePath = FIXTURES_DIR . '/image.png';
         $imageData = file_get_contents($imagePath);
-        $imageIdentifier = md5($imageData);
 
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue($imageData));
         $this->request->expects($this->once())->method('setImage')->with($this->isInstanceOf('Imbo\Model\Image'));
