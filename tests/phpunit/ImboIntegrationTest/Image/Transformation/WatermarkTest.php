@@ -229,11 +229,11 @@ class WatermarkTest extends TransformationTests {
         $storage = $this->getMock('Imbo\Storage\StorageInterface');
         $storage->expects($this->once())
                 ->method('getImage')
-                ->with('publickey', $expectedWatermark)
+                ->with('someUser', $expectedWatermark)
                 ->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/black.png')));
 
         $request = $this->getMock('Imbo\Http\Request\Request');
-        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue('publickey'));
+        $request->expects($this->once())->method('getUser')->will($this->returnValue('someUser'));
 
         $event = new Event();
         $event->setArguments(array(
