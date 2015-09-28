@@ -89,6 +89,13 @@ class ImboContext extends RESTContext {
     private static $testImagePath;
 
     /**
+     * Holds the current feature for this test image
+     *
+     * @var string
+     */
+    private static $testImageFeature;
+
+    /**
      * @BeforeFeature
      */
     public static function prepare(FeatureEvent $event) {
@@ -342,10 +349,11 @@ class ImboContext extends RESTContext {
     }
 
     /**
-     * @Given /^"([^"]*)" is used as the test image$/
+     * @Given /^"([^"]*)" is used as the test image( for the "([^"]*)" feature)?$/
      */
-    public function imageIsUsedAsTestImage($testImagePath) {
-        if (self::$testImagePath === $testImagePath) {
+    public function imageIsUsedAsTestImage($testImagePath, $forFeature = null, $feature = null) {
+        if (self::$testImagePath === $testImagePath && $feature &&
+            self::$testImageFeature === $feature) {
             return;
         }
 
@@ -353,6 +361,7 @@ class ImboContext extends RESTContext {
         self::$testImageIdentifier = $this->getPreviouslyAddedImageIdentifier();
         self::$testImageUrl = $this->getPreviouslyAddedImageUrl();
         self::$testImagePath = $testImagePath;
+        self::$testImageFeature = $feature;
     }
 
     /**
