@@ -4,7 +4,7 @@ Feature: Imbo provides a user endpoint
     I want to make requests against the user endpoint
 
     Scenario Outline: Request user information
-        Given I use "user" and "key" for public and private keys
+        Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/user.<extension>"
         Then I should get a response with "200 OK"
