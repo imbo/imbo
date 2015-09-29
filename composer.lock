@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "02f1edfa8b15c46a1c53bc4007784488",
-    "content-hash": "8a5fc47f67d0ec5d3d24b280ca8ccb0e",
+    "hash": "127a7007449934d40c5bc137c1686318",
+    "content-hash": "2a13f8fe970e7fbccdaffeb5e642818e",
     "packages": [
         {
             "name": "ramsey/uuid",
@@ -83,36 +83,40 @@
         },
         {
             "name": "symfony/console",
-            "version": "v2.4.10",
-            "target-dir": "Symfony/Component/Console",
+            "version": "v2.7.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "39dd1c85ffdfc3c5fb008019dd027af05f64ec36"
+                "reference": "06cb17c013a82f94a3d840682b49425cd00a2161"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/39dd1c85ffdfc3c5fb008019dd027af05f64ec36",
-                "reference": "39dd1c85ffdfc3c5fb008019dd027af05f64ec36",
+                "url": "https://api.github.com/repos/symfony/console/zipball/06cb17c013a82f94a3d840682b49425cd00a2161",
+                "reference": "06cb17c013a82f94a3d840682b49425cd00a2161",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=5.3.9"
             },
             "require-dev": {
-                "symfony/event-dispatcher": "~2.1"
+                "psr/log": "~1.0",
+                "symfony/event-dispatcher": "~2.1",
+                "symfony/phpunit-bridge": "~2.7",
+                "symfony/process": "~2.1"
             },
             "suggest": {
-                "symfony/event-dispatcher": ""
+                "psr/log": "For using the console logger",
+                "symfony/event-dispatcher": "",
+                "symfony/process": ""
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.4-dev"
+                    "dev-master": "2.7-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
+                "psr-4": {
                     "Symfony\\Component\\Console\\": ""
                 }
             },
@@ -122,38 +126,42 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Console Component",
-            "homepage": "http://symfony.com",
-            "time": "2014-09-22 08:51:05"
+            "homepage": "https://symfony.com",
+            "time": "2015-09-25 08:32:23"
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v2.4.10",
-            "target-dir": "Symfony/Component/EventDispatcher",
+            "version": "v2.7.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "7362304b252f9303e037ab47e6330f24d7ebbf50"
+                "reference": "ae4dcc2a8d3de98bd794167a3ccda1311597c5d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/7362304b252f9303e037ab47e6330f24d7ebbf50",
-                "reference": "7362304b252f9303e037ab47e6330f24d7ebbf50",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/ae4dcc2a8d3de98bd794167a3ccda1311597c5d9",
+                "reference": "ae4dcc2a8d3de98bd794167a3ccda1311597c5d9",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=5.3.9"
             },
             "require-dev": {
-                "symfony/dependency-injection": "~2.0"
+                "psr/log": "~1.0",
+                "symfony/config": "~2.0,>=2.0.5",
+                "symfony/dependency-injection": "~2.6",
+                "symfony/expression-language": "~2.6",
+                "symfony/phpunit-bridge": "~2.7",
+                "symfony/stopwatch": "~2.3"
             },
             "suggest": {
                 "symfony/dependency-injection": "",
@@ -162,11 +170,11 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.4-dev"
+                    "dev-master": "2.7-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
+                "psr-4": {
                     "Symfony\\Component\\EventDispatcher\\": ""
                 }
             },
@@ -176,51 +184,51 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony EventDispatcher Component",
-            "homepage": "http://symfony.com",
-            "time": "2014-09-22 08:51:05"
+            "homepage": "https://symfony.com",
+            "time": "2015-09-22 13:49:29"
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v2.4.10",
-            "target-dir": "Symfony/Component/HttpFoundation",
+            "version": "v2.7.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "8e42d9536b5df05f37a9aae5761d3ee69ab95ddf"
+                "reference": "e1509119f164a0d0a940d7d924d693a7a28a5470"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/8e42d9536b5df05f37a9aae5761d3ee69ab95ddf",
-                "reference": "8e42d9536b5df05f37a9aae5761d3ee69ab95ddf",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/e1509119f164a0d0a940d7d924d693a7a28a5470",
+                "reference": "e1509119f164a0d0a940d7d924d693a7a28a5470",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=5.3.9"
             },
             "require-dev": {
-                "symfony/expression-language": "~2.4"
+                "symfony/expression-language": "~2.4",
+                "symfony/phpunit-bridge": "~2.7"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.4-dev"
+                    "dev-master": "2.7-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
+                "psr-4": {
                     "Symfony\\Component\\HttpFoundation\\": ""
                 },
                 "classmap": [
-                    "Symfony/Component/HttpFoundation/Resources/stubs"
+                    "Resources/stubs"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -229,45 +237,45 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony HttpFoundation Component",
-            "homepage": "http://symfony.com",
-            "time": "2014-09-25 08:51:47"
+            "homepage": "https://symfony.com",
+            "time": "2015-09-22 13:49:29"
         }
     ],
     "packages-dev": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "2.5.4",
+            "version": "2.8.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "dd8f78b8abde74245578dbfb930c29efff20f25a"
+                "reference": "92642ca4906e6681a1301971cf41500d7c68581c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/dd8f78b8abde74245578dbfb930c29efff20f25a",
-                "reference": "dd8f78b8abde74245578dbfb930c29efff20f25a",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/92642ca4906e6681a1301971cf41500d7c68581c",
+                "reference": "92642ca4906e6681a1301971cf41500d7c68581c",
                 "shasum": ""
             },
             "require": {
-                "guzzle/guzzle": ">=3.7.0,<3.9.0",
+                "guzzle/guzzle": "~3.7",
                 "php": ">=5.3.3"
             },
             "require-dev": {
                 "doctrine/cache": "~1.0",
                 "ext-openssl": "*",
-                "monolog/monolog": "1.4.*",
-                "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "2.*",
-                "symfony/yaml": "2.*"
+                "monolog/monolog": "~1.4",
+                "phpunit/phpunit": "~4.0",
+                "phpunit/phpunit-mock-objects": "2.3.1",
+                "symfony/yaml": "~2.1"
             },
             "suggest": {
                 "doctrine/cache": "Adds support for caching of credentials and responses",
@@ -277,11 +285,6 @@
                 "symfony/yaml": "Eases the ability to write manifests for creating jobs in AWS Import/Export"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.5.x-dev"
-                }
-            },
             "autoload": {
                 "psr-0": {
                     "Aws": "src/"
@@ -309,7 +312,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2014-03-20 20:01:49"
+            "time": "2015-09-17 00:17:24"
         },
         {
             "name": "behat/behat",
@@ -959,22 +962,22 @@
         },
         {
             "name": "guzzle/guzzle",
-            "version": "v3.8.1",
+            "version": "v3.9.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "4de0618a01b34aa1c8c33a3f13f396dcd3882eba"
+                "url": "https://github.com/guzzle/guzzle3.git",
+                "reference": "0645b70d953bc1c067bbc8d5bc53194706b628d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/4de0618a01b34aa1c8c33a3f13f396dcd3882eba",
-                "reference": "4de0618a01b34aa1c8c33a3f13f396dcd3882eba",
+                "url": "https://api.github.com/repos/guzzle/guzzle3/zipball/0645b70d953bc1c067bbc8d5bc53194706b628d9",
+                "reference": "0645b70d953bc1c067bbc8d5bc53194706b628d9",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "php": ">=5.3.3",
-                "symfony/event-dispatcher": ">=2.1"
+                "symfony/event-dispatcher": "~2.1"
             },
             "replace": {
                 "guzzle/batch": "self.version",
@@ -1001,18 +1004,21 @@
                 "guzzle/stream": "self.version"
             },
             "require-dev": {
-                "doctrine/cache": "*",
-                "monolog/monolog": "1.*",
+                "doctrine/cache": "~1.3",
+                "monolog/monolog": "~1.0",
                 "phpunit/phpunit": "3.7.*",
-                "psr/log": "1.0.*",
-                "symfony/class-loader": "*",
-                "zendframework/zend-cache": "<2.3",
-                "zendframework/zend-log": "<2.3"
+                "psr/log": "~1.0",
+                "symfony/class-loader": "~2.1",
+                "zendframework/zend-cache": "2.*,<2.3",
+                "zendframework/zend-log": "2.*,<2.3"
+            },
+            "suggest": {
+                "guzzlehttp/guzzle": "Guzzle 5 has moved to a new package name. The package you have installed, Guzzle 3, is deprecated."
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.8-dev"
+                    "dev-master": "3.9-dev"
                 }
             },
             "autoload": {
@@ -1036,7 +1042,7 @@
                     "homepage": "https://github.com/guzzle/guzzle/contributors"
                 }
             ],
-            "description": "Guzzle is a PHP HTTP client library and framework for building RESTful web service clients",
+            "description": "PHP HTTP client. This library is deprecated in favor of https://packagist.org/packages/guzzlehttp/guzzle",
             "homepage": "http://guzzlephp.org/",
             "keywords": [
                 "client",
@@ -1047,7 +1053,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2014-01-28 22:29:15"
+            "time": "2015-03-18 18:23:50"
         },
         {
             "name": "mikey179/vfsStream",
