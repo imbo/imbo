@@ -87,6 +87,26 @@ class Request extends SymfonyRequest {
     }
 
     /**
+     * Get users specified in the request
+     *
+     * @return array Users specified in the request
+     */
+    public function getUsers() {
+        $routeUser = $this->getUser();
+        $queryUsers = $this->query->get('user', null);
+
+        if (!$routeUser && !$queryUsers) {
+            return [];
+        } elseif (!$queryUsers) {
+            return [$routeUser];
+        } elseif (!$routeUser) {
+            return $queryUsers;
+        }
+
+        return array_merge([$routeUser], $queryUsers);
+    }
+
+    /**
      * Get image transformations from the request
      *
      * @return array
