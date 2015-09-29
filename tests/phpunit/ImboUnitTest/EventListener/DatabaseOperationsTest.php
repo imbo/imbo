@@ -46,6 +46,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->image = $this->getMock('Imbo\Model\Image');
 
         $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
+        $this->request->expects($this->any())->method('getUsers')->will($this->returnValue([$this->user]));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
         $this->event = $this->getMock('Imbo\EventManager\Event');
@@ -154,6 +155,7 @@ class DatabaseOperationsTest extends ListenerTests {
                 'originalChecksum' => 'checksum1',
                 'mime' => 'image/png',
                 'extension' => 'png',
+                'user' => $this->user,
                 'metadata' => array(),
             ),
             array(
@@ -167,6 +169,7 @@ class DatabaseOperationsTest extends ListenerTests {
                 'originalChecksum' => 'checksum2',
                 'mime' => 'image/png',
                 'extension' => 'png',
+                'user' => $this->user,
                 'metadata' => array(),
             ),
             array(
@@ -180,6 +183,7 @@ class DatabaseOperationsTest extends ListenerTests {
                 'originalChecksum' => 'checksum3',
                 'mime' => 'image/png',
                 'extension' => 'png',
+                'user' => $this->user,
                 'metadata' => array(),
             ),
         );
