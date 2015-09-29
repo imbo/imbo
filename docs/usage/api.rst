@@ -227,7 +227,7 @@ results in:
       "lastModified": "Wed, 18 Apr 2012 15:12:52 GMT"
     }
 
-where ``id`` is the user (the same used in the URI of the request), ``numImages`` is the number of images the user has stored in Imbo and ``lastModified`` is when the user last uploaded or deleted an image, or when the user last updated metadata of an image. If the user has not added any images yet, the ``lastModified`` value will be set to the current time on the server.
+where ``user`` is the user (the same used in the URI of the request), ``numImages`` is the number of images the user has stored in Imbo and ``lastModified`` is when the user last uploaded or deleted an image, or when the user last updated metadata of an image. If the user has not added any images yet, the ``lastModified`` value will be set to the current time on the server.
 
 **Typical response codes:**
 
