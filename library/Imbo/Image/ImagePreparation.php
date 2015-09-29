@@ -17,7 +17,7 @@ use Imbo\EventManager\EventInterface,
     Imbo\Model\Image,
     Imagick,
     ImagickException,
-    Rhumsaa\Uuid\Uuid;
+    Ramsey\Uuid\Uuid;
 
 /**
  * Image preparation

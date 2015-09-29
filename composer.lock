@@ -4,50 +4,53 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "92c9502e3dbbc3c169adbb24e3a2e9de",
-    "content-hash": "afa564fab5848fe0dbb74f219b4446a8",
+    "hash": "02f1edfa8b15c46a1c53bc4007784488",
+    "content-hash": "8a5fc47f67d0ec5d3d24b280ca8ccb0e",
     "packages": [
         {
-            "name": "rhumsaa/uuid",
-            "version": "2.8.2",
+            "name": "ramsey/uuid",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/ramsey/rhumsaa-uuid.git",
-                "reference": "9c1e2d34bdefd42608c612e08d6e1da1e13a3530"
+                "url": "https://github.com/ramsey/uuid.git",
+                "reference": "0c0ac34e867219bb9936cc5b823f8a5af840d7eb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/rhumsaa-uuid/zipball/9c1e2d34bdefd42608c612e08d6e1da1e13a3530",
-                "reference": "9c1e2d34bdefd42608c612e08d6e1da1e13a3530",
+                "url": "https://api.github.com/repos/ramsey/uuid/zipball/0c0ac34e867219bb9936cc5b823f8a5af840d7eb",
+                "reference": "0c0ac34e867219bb9936cc5b823f8a5af840d7eb",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=5.4"
             },
             "replace": {
                 "rhumsaa/uuid": "self.version"
             },
             "require-dev": {
-                "doctrine/dbal": ">=2.3",
+                "apigen/apigen": "^4.1",
+                "ircmaxell/random-lib": "^1.1",
                 "jakub-onderka/php-parallel-lint": "^0.9.0",
-                "moontoast/math": "~1.1",
-                "phpunit/phpunit": "~4.1",
-                "satooshi/php-coveralls": "~0.6",
-                "squizlabs/php_codesniffer": "^2.3",
-                "symfony/console": "~2.3"
+                "moontoast/math": "^1.1",
+                "phpunit/phpunit": "^4.7",
+                "satooshi/php-coveralls": "^0.6.1",
+                "squizlabs/php_codesniffer": "^2.3"
             },
             "suggest": {
-                "doctrine/dbal": "Allow the use of a UUID as doctrine field type.",
+                "ircmaxell/random-lib": "Provides RandomLib to use with the RandomLibAdapter",
                 "moontoast/math": "Support for converting UUID to 128-bit integer (in string form).",
-                "symfony/console": "Support for use of the bin/uuid command line tool."
+                "ramsey/uuid-console": "A console application for generating UUIDs with ramsey/uuid",
+                "ramsey/uuid-doctrine": "Allow the use of a UUID as Doctrine field type."
             },
-            "bin": [
-                "bin/uuid"
-            ],
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0.x-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
-                    "Rhumsaa\\Uuid\\": "src/"
+                    "Ramsey\\Uuid\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -60,19 +63,23 @@
                     "email": "marijn.huizendveld@gmail.com"
                 },
                 {
+                    "name": "Thibaud Fabre",
+                    "email": "thibaud@aztech.io"
+                },
+                {
                     "name": "Ben Ramsey",
-                    "homepage": "http://benramsey.com"
+                    "email": "ben@benramsey.com",
+                    "homepage": "https://benramsey.com"
                 }
             ],
-            "description": "NO LONGER MAINTAINED. Use ramsey/uuid instead. A PHP 5.3+ library for generating RFC 4122 version 1, 3, 4, and 5 universally unique identifiers (UUID).",
-            "homepage": "https://github.com/ramsey/rhumsaa-uuid",
+            "description": "Formerly rhumsaa/uuid. A PHP 5.4+ library for generating RFC 4122 version 1, 3, 4, and 5 universally unique identifiers (UUID).",
+            "homepage": "https://github.com/ramsey/uuid",
             "keywords": [
                 "guid",
                 "identifier",
                 "uuid"
             ],
-            "abandoned": "ramsey/uuid",
-            "time": "2015-07-23 19:00:41"
+            "time": "2015-09-28 16:27:51"
         },
         {
             "name": "symfony/console",
