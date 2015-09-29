@@ -186,7 +186,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                               ->method('find')
                               ->will($this->throwException(new MongoException()));
 
-        $this->driver->getImages('key', $this->getMock('Imbo\Resource\Images\Query'), $this->getMock('Imbo\Model\Images'));
+        $this->driver->getImages(['key'], $this->getMock('Imbo\Resource\Images\Query'), $this->getMock('Imbo\Model\Images'));
     }
 
     /**
@@ -214,7 +214,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                               ->method('find')
                               ->will($this->throwException(new MongoException()));
 
-        $this->driver->getLastModified('key');
+        $this->driver->getLastModified(['key']);
     }
 
     /**

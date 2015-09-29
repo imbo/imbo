@@ -160,7 +160,7 @@ class DatabaseOperations implements ListenerInterface {
         $model->setData($database->getMetadata($user, $imageIdentifier));
 
         $response->setModel($model)
-                 ->setLastModified($database->getLastModified($user, $imageIdentifier));
+                 ->setLastModified($database->getLastModified([$user], $imageIdentifier));
     }
 
     /**
@@ -226,7 +226,12 @@ class DatabaseOperations implements ListenerInterface {
             }
         }
 
-        $user = $event->getRequest()->getUser();
+        if ($event->hasArgument('users')) {
+            $users = $event->getArgument('users');
+        } else {
+            $users = $event->getRequest()->getUsers();
+        }
+
         $response = $event->getResponse();
         $database = $event->getDatabase();
 
@@ -235,7 +240,7 @@ class DatabaseOperations implements ListenerInterface {
         $model->setLimit($query->limit())
               ->setPage($query->page());
 
-        $images = $database->getImages($user, $query, $model);
+        $images = $database->getImages($users, $query, $model);
         $modelImages = array();
 
         foreach ($images as $image) {
@@ -243,7 +248,7 @@ class DatabaseOperations implements ListenerInterface {
             $entry->setFilesize($image['size'])
                   ->setWidth($image['width'])
                   ->setHeight($image['height'])
-                  ->setUser($user)
+                  ->setUser($image['user'])
                   ->setImageIdentifier($image['imageIdentifier'])
                   ->setChecksum($image['checksum'])
                   ->setOriginalChecksum(isset($image['originalChecksum']) ? $image['originalChecksum'] : null)
@@ -270,7 +275,7 @@ class DatabaseOperations implements ListenerInterface {
             }
         }
 
-        $lastModified = $database->getLastModified($user);
+        $lastModified = $database->getLastModified($users);
 
         $response->setModel($model)
                  ->setLastModified($lastModified);
@@ -288,7 +293,7 @@ class DatabaseOperations implements ListenerInterface {
         $database = $event->getDatabase();
 
         $numImages = $database->getNumImages($user);
-        $lastModified = $database->getLastModified($user);
+        $lastModified = $database->getLastModified([$user]);
 
         $userModel = new Model\User();
         $userModel->setUserId($user)

@@ -230,13 +230,22 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImages($user, Query $query, Images $model) {
+    public function getImages(array $users, Query $query, Images $model) {
         $images = array();
 
         $qb = $this->getConnection()->createQueryBuilder();
-        $qb->select('*')
-           ->from($this->tableNames['imageinfo'], 'i')
-           ->where('i.user = :user')->setParameter(':user', $user);
+        $qb->select('*')->from($this->tableNames['imageinfo'], 'i');
+
+        // Filter on users
+        $expr = $qb->expr();
+        $composite = $expr->orX();
+
+        foreach ($users as $i => $user) {
+            $composite->add($expr->eq('i.user', ':user' . $i));
+            $qb->setParameter(':user' . $i, $user);
+        }
+
+        $qb->where($composite);
 
         if ($sort = $query->sort()) {
             // Fields valid for sorting
@@ -399,12 +408,21 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getLastModified($user, $imageIdentifier = null) {
+    public function getLastModified(array $users, $imageIdentifier = null) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('updated')
-              ->from($this->tableNames['imageinfo'], 'i')
-              ->where('i.user = :user')
-              ->setParameter(':user', $user);
+              ->from($this->tableNames['imageinfo'], 'i');
+
+        // Filter on users
+        $expr = $query->expr();
+        $composite = $expr->orX();
+
+        foreach ($users as $i => $user) {
+            $composite->add($expr->eq('i.user', ':user' . $i));
+            $query->setParameter(':user' . $i, $user);
+        }
+
+        $query->where($composite);
 
         if ($imageIdentifier) {
             $query->andWhere('i.imageIdentifier = :imageIdentifier')

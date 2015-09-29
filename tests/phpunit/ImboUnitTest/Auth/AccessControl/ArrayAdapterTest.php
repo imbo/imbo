@@ -55,6 +55,29 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
+    public function testReturnsCorrectListOfAllowedUsersForResource() {
+        $accessControl = new ArrayAdapter([
+            [
+                'publicKey' => 'pubKey1',
+                'privateKey' => 'privateKey1',
+                'acl' => [[
+                    'resources' => [ACI::RESOURCE_IMAGES_POST],
+                    'users' => ['user1'],
+                ]]
+            ],
+            [
+                'publicKey' => 'pubKey2',
+                'privateKey' => 'privateKey2',
+                'acl' => [[
+                    'resources' => [ACI::RESOURCE_IMAGES_POST],
+                    'users' => ['user2'],
+                ]]
+            ]
+        ]);
+
+        // Test stuff
+    }
+
     public function testGetPrivateKey() {
         $accessControl = new ArrayAdapter([
             [
