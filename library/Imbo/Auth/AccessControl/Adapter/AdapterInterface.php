@@ -74,6 +74,15 @@ interface AdapterInterface {
     const RESOURCE_SHORTURLS_DELETE        = 'shorturls.delete';
 
     /**
+     * Get a list of users the public key has access for on a given resource
+     *
+     * @param  string $publicKey Public key to check access for
+     * @param  string $resource  Resource identifier (e.g. image.get, images.post)
+     * @return array             List of users the public key kan access the given resource for
+     */
+    function getUsersForResource($publicKey, $resource);
+
+    /**
      * Check if a given public key has access to a given resource
      *
      * @param  string  $publicKey Public key to check access for

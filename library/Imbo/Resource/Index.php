@@ -66,6 +66,7 @@ class Index implements ResourceInterface {
                 'images' => $baseUrl . '/users/{user}/images',
                 'image' => $baseUrl . '/users/{user}/images/{imageIdentifier}',
                 'globalShortImageUrl' => $baseUrl . '/s/{id}',
+                'globalImages' => $baseUrl . '/images',
                 'metadata' => $baseUrl . '/users/{user}/images/{imageIdentifier}/metadata',
                 'shortImageUrls' => $baseUrl . '/users/{user}/images/{imageIdentifier}/shorturls',
                 'shortImageUrl' =>  $baseUrl . '/users/{user}/images/{imageIdentifier}/shorturls/{id}',
