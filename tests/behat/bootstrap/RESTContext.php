@@ -16,7 +16,7 @@ use Behat\Behat\Context\BehatContext,
     Guzzle\Http\Message\Request,
     Guzzle\Http\Message\Response;
 
-// PHPUnit related classes
+// Require PHPUnit assertions manually since we're using it outside of PHPUnit
 require __DIR__ . '/../../../vendor/phpunit/phpunit/src/Framework/Assert/Functions.php';
 
 /**
