@@ -241,14 +241,12 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImages($user, Query $query, Images $model) {
+    public function getImages(array $users, Query $query, Images $model) {
         // Initialize return value
         $images = [];
 
         // Query data
-        $queryData = [
-            'user' => $user,
-        ];
+        $queryData = ['user' => ['$in' => $users]];
 
         $from = $query->from();
         $to = $query->to();
@@ -371,10 +369,10 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getLastModified($user, $imageIdentifier = null) {
+    public function getLastModified(array $users, $imageIdentifier = null) {
         try {
             // Query on the user
-            $query = ['user' => $user];
+            $query = ['user' => ['$in' => $users]];
 
             if ($imageIdentifier) {
                 // We want information about a single image. Add the identifier to the query

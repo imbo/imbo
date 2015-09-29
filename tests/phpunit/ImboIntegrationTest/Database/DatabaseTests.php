@@ -85,12 +85,12 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $image = $this->getImage();
 
         $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $image));
-        $lastModified1 = $this->adapter->getLastModified($user, $imageIdentifier);
+        $lastModified1 = $this->adapter->getLastModified([$user], $imageIdentifier);
 
         sleep(1);
 
         $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $image));
-        $lastModified2 = $this->adapter->getLastModified($user, $imageIdentifier);
+        $lastModified2 = $this->adapter->getLastModified([$user], $imageIdentifier);
 
         $this->assertTrue($lastModified2 > $lastModified1);
     }
@@ -134,7 +134,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Image not found
      */
     public function testGetLastModifiedOfImageThatDoesNotExist() {
-        $this->adapter->getLastModified('user', 'id');
+        $this->adapter->getLastModified(['user'], 'id');
     }
 
     public function testGetLastModified() {
@@ -143,11 +143,11 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $image = $this->getImage();
 
         $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $image));
-        $this->assertInstanceOf('DateTime', $this->adapter->getLastModified($user, $imageIdentifier));
+        $this->assertInstanceOf('DateTime', $this->adapter->getLastModified([$user], $imageIdentifier));
     }
 
     public function testGetLastModifiedWhenUserHasNoImages() {
-        $this->assertInstanceOf('DateTime', $this->adapter->getLastModified('user'));
+        $this->assertInstanceOf('DateTime', $this->adapter->getLastModified(['user']));
     }
 
     public function testGetNumImages() {
@@ -282,7 +282,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $query = new Query();
         $model = $this->getMock('Imbo\Model\Images');
         $model->expects($this->once())->method('setHits')->with(6);
-        $images = $this->adapter->getImages('user', $query, $model);
+        $images = $this->adapter->getImages(['user'], $query, $model);
         $this->assertCount(6, $images);
     }
 
@@ -295,25 +295,25 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         // Fetch to the timestamp of when the last image was added
         $query = new Query();
         $query->to($end);
-        $this->assertCount(6, $this->adapter->getImages($user, $query, $model));
+        $this->assertCount(6, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(6, $model->getHits());
 
         // Fetch until the second the first image was added
         $query = new Query();
         $query->to($start);
-        $this->assertCount(1, $this->adapter->getImages($user, $query, $model));
+        $this->assertCount(1, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(1, $model->getHits());
 
         // Fetch from the second the first image was added
         $query = new Query();
         $query->from($start);
-        $this->assertCount(6, $this->adapter->getImages($user, $query, $model));
+        $this->assertCount(6, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(6, $model->getHits());
 
         // Fetch from the second the last image was added
         $query = new Query();
         $query->from($end);
-        $this->assertCount(1, $this->adapter->getImages($user, $query, $model));
+        $this->assertCount(1, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(1, $model->getHits());
     }
 
@@ -323,7 +323,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $query = new Query();
         $query->returnMetadata(true);
 
-        $images = $this->adapter->getImages('user', $query, $this->getMock('Imbo\Model\Images'));
+        $images = $this->adapter->getImages(['user'], $query, $this->getMock('Imbo\Model\Images'));
 
         foreach ($images as $image) {
             $this->assertArrayHasKey('metadata', $image);
@@ -343,7 +343,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
 
         $model = new Images();
         $query = new Query();
-        $images = $this->adapter->getImages('user', $query, $model);
+        $images = $this->adapter->getImages(['user'], $query, $model);
 
         foreach ($images as $image) {
             $this->assertSame('user', $image['user']);
@@ -355,7 +355,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     public function testGetImagesReturnsImagesWithDateTimeInstances() {
         $this->insertImages();
 
-        $images = $this->adapter->getImages('user', new Query(), $this->getMock('Imbo\Model\Images'));
+        $images = $this->adapter->getImages(['user'], new Query(), $this->getMock('Imbo\Model\Images'));
 
         foreach (array('added', 'updated') as $dateField) {
             foreach ($images as $image) {
@@ -414,7 +414,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $model = $this->getMock('Imbo\Model\Images');
         $model->expects($this->once())->method('setHits')->with(6);
 
-        $images = $this->adapter->getImages('user', $query, $model);
+        $images = $this->adapter->getImages(['user'], $query, $model);
         $this->assertCount(count($imageIdentifiers), $images);
 
         foreach ($images as $i => $image) {
@@ -567,27 +567,27 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $model = new Images();
 
         $query->imageIdentifiers(array($id1));
-        $this->assertCount(1, $this->adapter->getImages($user, $query, $model));
+        $this->assertCount(1, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(1, $model->getHits());
 
         $query->imageIdentifiers(array($id1, $id2));
-        $this->assertCount(2, $this->adapter->getImages($user, $query, $model));
+        $this->assertCount(2, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(2, $model->getHits());
 
         $query->imageIdentifiers(array($id1, $id2, $id3));
-        $this->assertCount(3, $this->adapter->getImages($user, $query, $model));
+        $this->assertCount(3, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(3, $model->getHits());
 
         $query->imageIdentifiers(array($id1, $id2, $id3, $id4));
-        $this->assertCount(4, $this->adapter->getImages($user, $query, $model));
+        $this->assertCount(4, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(4, $model->getHits());
 
         $query->imageIdentifiers(array($id1, $id2, $id3, $id4, $id5));
-        $this->assertCount(5, $this->adapter->getImages($user, $query, $model));
+        $this->assertCount(5, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(5, $model->getHits());
 
         $query->imageIdentifiers(array($id1, $id2, $id3, $id4, $id5, str_repeat('f', 32)));
-        $this->assertCount(5, $this->adapter->getImages($user, $query, $model));
+        $this->assertCount(5, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(5, $model->getHits());
     }
 
@@ -674,7 +674,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
             $query->sort($sort);
         }
 
-        $images = $this->adapter->getImages('user', $query, $this->getMock('Imbo\Model\Images'));
+        $images = $this->adapter->getImages(['user'], $query, $this->getMock('Imbo\Model\Images'));
 
         foreach ($images as $i => $image) {
             $this->assertSame($values[$i], $image[$field]);
