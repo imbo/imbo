@@ -22,17 +22,22 @@ Feature: Imbo features access control backed by a MongoDB database
         Then I should get a response with "400 Permission denied (public key)"
         And the Imbo error message is "Permission denied (public key)" and the error code is "0"
 
-    Scenario: Request an access-controlled resource with public key that does not have access to the user
-        Given I use "valid-pubkey" and "foobar" for public and private keys
+    Scenario Outline: Request an access-controlled resource with public key that does not have access to the user
+        Given I use "foobar" and "barfoo" for public and private keys
         And I include an access token in the query
-        When I request "/users/user2.json"
-        Then I should get a response with "400 Permission denied (public key)"
-        And the Imbo error message is "Permission denied (public key)" and the error code is "0"
+        When I request "<url>"
+        Then I should get a response with "<status>"
+        And the Imbo error message is "<message>" and the error code is "<code>"
+
+        Examples:
+            | url                  | status                             | code | message                        |
+            | /users/user2         | 400 Permission denied (public key) | 0    | Permission denied (public key) |
+            | /users/foobar/images | 400 Permission denied (public key) | 0    | Permission denied (public key) |
 
     Scenario: Request an access-controlled resource with valid public key specified
         Given I use "foobar" and "barfoo" for public and private keys
         And I include an access token in the query
-        When I request "/users/foobar/images.json"
+        When I request "/users/barfoo/images.json"
         Then I should get a response with "200 OK"
 
     Scenario: Request an access-controlled resource with group that does not contain the resource
