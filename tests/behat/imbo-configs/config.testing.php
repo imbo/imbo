@@ -20,6 +20,14 @@ $testConfig = array(
                 'privateKey' => 'privatekey',
                 'acl' => [[
                     'resources' => ArrayAdapter::getReadWriteResources(),
+                    'users' => ['user', 'other-user'],
+                ]]
+            ],
+            [
+                'publicKey' => 'unpriviledged',
+                'privateKey' => 'privatekey',
+                'acl' => [[
+                    'resources' => ArrayAdapter::getReadWriteResources(),
                     'users' => ['user'],
                 ]]
             ],
