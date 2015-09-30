@@ -33,11 +33,17 @@ return [
         [
             'publicKey' => 'foobar',
             'privateKey' => 'barfoo',
-            'acl' => [[
-                'id' => new MongoId('100000000000000000001337'),
-                'resources' => ['access.get', 'access.head', 'images.get'],
-                'users' => ['foobar']
-            ]]
+            'acl' => [
+                [
+                    'id' => new MongoId('100000000000000000001337'),
+                    'resources' => ['access.get', 'access.head'],
+                    'users' => ['foobar']
+                ], [
+                    'id' => new MongoId('100000000000000000002468'),
+                    'resources' => ['images.get'],
+                    'users' => ['barfoo']
+                ]
+            ]
         ],
         [
             'publicKey' => 'acl-creator',
