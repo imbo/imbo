@@ -18,7 +18,6 @@ use Imbo\EventManager\EventInterface,
     Imagick,
     ImagickException,
     Ramsey\Uuid\Uuid;
-    Rhumsaa\Uuid\Uuid;
 
 /**
  * Image preparation
