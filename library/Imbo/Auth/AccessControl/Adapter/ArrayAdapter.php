@@ -73,7 +73,7 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
         $users = call_user_func_array('array_merge', $userLists);
 
         // Check if public key has access to user with same name
-        if ($this->hasAccess($publicKey, $resource)) {
+        if ($this->hasAccess($publicKey, $resource, $publicKey)) {
             $userList[] = $publicKey;
         }
 

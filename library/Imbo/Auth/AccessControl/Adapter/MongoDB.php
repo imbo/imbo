@@ -124,7 +124,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         $users = call_user_func_array('array_merge', $userLists);
 
         // Check if public key has access to user with same name
-        if ($this->hasAccess($publicKey, $resource)) {
+        if ($this->hasAccess($publicKey, $resource, $publicKey)) {
             $userList[] = $publicKey;
         }
 
