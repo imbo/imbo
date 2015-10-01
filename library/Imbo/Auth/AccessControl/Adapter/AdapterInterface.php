@@ -58,6 +58,9 @@ interface AdapterInterface {
     const RESOURCE_IMAGES_POST             = 'images.post';
     const RESOURCE_IMAGES_OPTIONS          = 'images.options';
 
+    const RESOURCE_GLOBAL_IMAGES_GET       = 'globalimages.get';
+    const RESOURCE_GLOBAL_IMAGES_HEAD      = 'globalimages.head';
+
     const RESOURCE_METADATA_GET            = 'metadata.get';
     const RESOURCE_METADATA_HEAD           = 'metadata.head';
     const RESOURCE_METADATA_PUT            = 'metadata.put';
