@@ -20,58 +20,6 @@ use Imbo\Model\Image;
  */
 class SmartSizeTest extends \PHPUnit_Framework_TestCase {
     /**
-     * Fetch different invalid image parameter arrays
-     *
-     * @return array[]
-     */
-    public function getInvalidImageParams() {
-        return [
-            'Missing both width and height' => [
-                [],
-                400,
-                'Both width and height needs to be specified'
-            ],
-
-            'Missing width' => [
-                ['height' => 1337],
-                400,
-                'Both width and height needs to be specified'
-            ],
-
-            'Missing height' => [
-                ['width' => 1337],
-                400,
-                'Both width and height needs to be specified'
-            ],
-
-            'Missing poi' => [
-                ['width' => 1337, 'height' => 1337],
-                400,
-                'A point-of-interest x,y needs to be specified'
-            ],
-        ];
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\SmartSize::transform
-     * @dataProvider getInvalidImageParams
-     */
-    public function testThrowsExceptionWhenWidthIsMissing($params, $expectedExceptionCode, $expectedExceptionMessage) {
-        $this->setExpectedException(
-          'Imbo\Exception\TransformationException',
-          $expectedExceptionMessage,
-          $expectedExceptionCode
-        );
-
-        $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue(new Image()));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
-
-        $transformation = new SmartSize();
-        $transformation->transform($event);
-    }
-
-    /**
      * Fetch different valid smart size crop arguments and expected results
      *
      * @return array
