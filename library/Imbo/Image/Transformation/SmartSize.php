@@ -41,13 +41,9 @@ class SmartSize extends Transformation implements ListenerInterface {
         }
 
         $poi = empty($params['poi']) ? null : explode(',', $params['poi']);
-        $aoi = empty($params['aoi']) ? null : explode(',', $params['aoi']);
 
-        if (!$poi && !$aoi) {
-            throw new TransformationException(
-                'Either a point-of-interest (poi=x,y) or an area-of-interest (aoi=[w,h,x,y]) ' .
-                'needs to be specified', 400
-            );
+        if (!$poi) {
+            throw new TransformationException('A point-of-interest x,y needs to be specified', 400);
         }
 
         $focalX = $poi[0];

@@ -44,10 +44,10 @@ class SmartSizeTest extends \PHPUnit_Framework_TestCase {
                 'Both width and height needs to be specified'
             ],
 
-            'Missing poi and aoi' => [
+            'Missing poi' => [
                 ['width' => 1337, 'height' => 1337],
                 400,
-                'Either a point-of-interest (poi=x,y) or an area-of-interest (aoi=[w,h,x,y]) needs to be specified'
+                'A point-of-interest x,y needs to be specified'
             ],
         ];
     }
@@ -100,6 +100,18 @@ class SmartSizeTest extends \PHPUnit_Framework_TestCase {
                 ['width' => 1200, 'height' => 1200],
                 ['width' => 400, 'height' => 400, 'poi' => '500,500'],
                 ['width' => 1200, 'height' => 1200, 'left' => 0, 'top' => 0]
+            ],
+
+            'Portrait crop, (600,300) poi on landscape image' => [
+                ['width' => 1200, 'height' => 600],
+                ['width' => 400, 'height' => 700, 'poi' => '600,300'],
+                ['width' => 343, 'height' => 600, 'left' => 429, 'top' => 0]
+            ],
+
+            'Panorame crop, (100,700) point on portrait image' => [
+                ['width' => 800, 'height' => 1800],
+                ['width' => 800, 'height' => 300, 'poi' => '100,700'],
+                ['width' => 800, 'height' => 300, 'left' => 0, 'top' => 550]
             ]
         ];
     }
