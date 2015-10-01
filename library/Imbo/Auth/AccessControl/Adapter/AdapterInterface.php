@@ -45,7 +45,7 @@ interface AdapterInterface {
     const RESOURCE_ACCESS_RULES_OPTIONS    = 'accessrules.options';
 
     const RESOURCE_USER_GET                = 'user.get';
-    const RESOURCE_USER_HEAD               = 'user.header';
+    const RESOURCE_USER_HEAD               = 'user.head';
     const RESOURCE_USER_OPTIONS            = 'user.options';
 
     const RESOURCE_IMAGE_GET               = 'image.get';
