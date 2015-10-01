@@ -249,6 +249,7 @@ $config = [
         'rotate' => 'Imbo\Image\Transformation\Rotate',
         'sepia' => 'Imbo\Image\Transformation\Sepia',
         'sharpen' => 'Imbo\Image\Transformation\Sharpen',
+        'smartSize' => 'Imbo\Image\Transformation\SmartSize',
         'strip' => 'Imbo\Image\Transformation\Strip',
         'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
         'transpose' => 'Imbo\Image\Transformation\Transpose',
