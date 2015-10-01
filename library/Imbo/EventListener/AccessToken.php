@@ -94,6 +94,8 @@ class AccessToken implements ListenerInterface {
             'image.head',
             'images.get',
             'images.head',
+            'globalimages.get',
+            'globalimages.head',
             'metadata.get',
             'metadata.head',
             'shorturl.get',

@@ -318,10 +318,17 @@ class ImboContext extends RESTContext {
      * @Given /^"([^"]*)" exists in Imbo$/
      */
     public function addImageToImbo($imagePath) {
+        $this->addUserImageToImbo($imagePath, 'user');
+    }
+
+    /**
+     * @Given /^"([^"]*)" exists for user "([^"]*)" in Imbo$/
+     */
+    public function addUserImageToImbo($imagePath, $user) {
         $this->setClientAuth('publickey', 'privatekey');
         $this->signRequest();
         $this->attachFileToRequestBody($imagePath);
-        $this->request('/users/user/images/', 'POST');
+        $this->request('/users/' . $user . '/images/', 'POST');
         $this->imageUrls[$imagePath] = $this->getPreviouslyAddedImageUrl();
         $this->imageIdentifiers[$imagePath] = $this->getPreviouslyAddedImageIdentifier();
     }

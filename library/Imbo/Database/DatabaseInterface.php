@@ -85,13 +85,13 @@ interface DatabaseInterface {
      *
      * This method is also responsible for setting a correct "hits" number in the images model.
      *
-     * @param string $user The user which the image belongs to
+     * @param array $users The users which the images belongs to
      * @param Query $query A query instance
      * @param Images $model The images model
      * @return array
      * @throws DatabaseException
      */
-    function getImages($user, Query $query, Images $model);
+    function getImages(array $users, Query $query, Images $model);
 
     /**
      * Load information from database into the image object
@@ -114,18 +114,18 @@ interface DatabaseInterface {
     function getImageProperties($user, $imageIdentifier);
 
     /**
-     * Get the last modified timestamp of a user
+     * Get the last modified timestamp for given users
      *
      * If the $imageIdentifier parameter is set, return when that image was last updated. If not
-     * set, return when the user last updated any image. If the user does not have any images
-     * stored, return the current timestamp.
+     * set, return the most recent date when one of the specified users last updated any image. If
+     * the provided users does not have any images stored, return the current timestamp.
      *
-     * @param string $user The user which the image belongs to
+     * @param array $users The users
      * @param string $imageIdentifier The image identifier
      * @return DateTime Returns an instance of DateTime
      * @throws DatabaseException
      */
-    function getLastModified($user, $imageIdentifier = null);
+    function getLastModified(array $users, $imageIdentifier = null);
 
     /**
      * Fetch the number of images, optionally filtered by a given user

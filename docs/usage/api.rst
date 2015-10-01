@@ -227,7 +227,7 @@ results in:
       "lastModified": "Wed, 18 Apr 2012 15:12:52 GMT"
     }
 
-where ``id`` is the user (the same used in the URI of the request), ``numImages`` is the number of images the user has stored in Imbo and ``lastModified`` is when the user last uploaded or deleted an image, or when the user last updated metadata of an image. If the user has not added any images yet, the ``lastModified`` value will be set to the current time on the server.
+where ``user`` is the user (the same used in the URI of the request), ``numImages`` is the number of images the user has stored in Imbo and ``lastModified`` is when the user last uploaded or deleted an image, or when the user last updated metadata of an image. If the user has not added any images yet, the ``lastModified`` value will be set to the current time on the server.
 
 **Typical response codes:**
 
@@ -641,6 +641,24 @@ results in:
 * 200 OK
 * 400 Bad request
 * 404 Image not found
+
+.. _global-images-resource:
+
+Global images resource - ``/images``
+++++++++++++++++++++++++++++++++++++++++++
+
+The global images resource is used to search for images across users, given that the public key has access to the images of these users.
+
+This resource is read only, and behaves in the same way as described in the `Get image collections` section of :doc:`_images-resource`. In addition to the parameters specified for `Get image collections`, the following query parameter must be specified:
+
+``user[]``
+    An array of users to get images for.
+
+.. code-block:: bash
+
+    curl "http://imbo/images?user[]=foo&user[]=bar"
+
+results in a response with the exact same format as shown under `Get image collections`.
 
 .. _publickey-resource:
 

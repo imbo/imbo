@@ -46,6 +46,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->image = $this->getMock('Imbo\Model\Image');
 
         $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
+        $this->request->expects($this->any())->method('getUsers')->will($this->returnValue([$this->user]));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
         $this->event = $this->getMock('Imbo\EventManager\Event');
@@ -131,7 +132,7 @@ class DatabaseOperationsTest extends ListenerTests {
     public function testCanLoadMetadata() {
         $date = new DateTime();
         $this->database->expects($this->once())->method('getMetadata')->with($this->user, $this->imageIdentifier)->will($this->returnValue(array('key' => 'value')));
-        $this->database->expects($this->once())->method('getLastModified')->with($this->user, $this->imageIdentifier)->will($this->returnValue($date));
+        $this->database->expects($this->once())->method('getLastModified')->with([$this->user], $this->imageIdentifier)->will($this->returnValue($date));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Metadata'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setLastModified')->with($date);
 
@@ -154,6 +155,7 @@ class DatabaseOperationsTest extends ListenerTests {
                 'originalChecksum' => 'checksum1',
                 'mime' => 'image/png',
                 'extension' => 'png',
+                'user' => $this->user,
                 'metadata' => array(),
             ),
             array(
@@ -167,6 +169,7 @@ class DatabaseOperationsTest extends ListenerTests {
                 'originalChecksum' => 'checksum2',
                 'mime' => 'image/png',
                 'extension' => 'png',
+                'user' => $this->user,
                 'metadata' => array(),
             ),
             array(
@@ -180,6 +183,7 @@ class DatabaseOperationsTest extends ListenerTests {
                 'originalChecksum' => 'checksum3',
                 'mime' => 'image/png',
                 'extension' => 'png',
+                'user' => $this->user,
                 'metadata' => array(),
             ),
         );
@@ -210,8 +214,8 @@ class DatabaseOperationsTest extends ListenerTests {
         $imagesQuery = $this->getMock('Imbo\Resource\Images\Query');
         $this->listener->setImagesQuery($imagesQuery);
 
-        $this->database->expects($this->once())->method('getImages')->with($this->user, $imagesQuery)->will($this->returnValue($images));
-        $this->database->expects($this->once())->method('getLastModified')->with($this->user)->will($this->returnValue($date));
+        $this->database->expects($this->once())->method('getImages')->with([$this->user], $imagesQuery)->will($this->returnValue($images));
+        $this->database->expects($this->once())->method('getLastModified')->with([$this->user])->will($this->returnValue($date));
 
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Images'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setLastModified')->with($date);
@@ -226,7 +230,7 @@ class DatabaseOperationsTest extends ListenerTests {
     public function testCanLoadUser() {
         $date = new DateTime();
         $this->database->expects($this->once())->method('getNumImages')->with($this->user)->will($this->returnValue(123));
-        $this->database->expects($this->once())->method('getLastModified')->with($this->user)->will($this->returnValue($date));
+        $this->database->expects($this->once())->method('getLastModified')->with([$this->user])->will($this->returnValue($date));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\User'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setLastModified')->with($date);
 

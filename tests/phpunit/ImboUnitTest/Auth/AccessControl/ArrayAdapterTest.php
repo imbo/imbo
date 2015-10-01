@@ -55,6 +55,37 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
+    public function testReturnsCorrectListOfAllowedUsersForResource() {
+        $accessControl = new ArrayAdapter([
+            [
+                'publicKey' => 'pubKey1',
+                'privateKey' => 'privateKey1',
+                'acl' => [[
+                    'resources' => [ACI::RESOURCE_IMAGES_GET],
+                    'users' => ['user1', 'user2'],
+                ]]
+            ],
+            [
+                'publicKey' => 'pubKey2',
+                'privateKey' => 'privateKey2',
+                'acl' => [[
+                    'resources' => [ACI::RESOURCE_IMAGES_GET],
+                    'users' => ['user2', 'user3', '*'],
+                ]]
+            ]
+        ]);
+
+        $this->assertEquals(
+            ['user1', 'user2'],
+            $accessControl->getUsersForResource('pubKey1', ACI::RESOURCE_IMAGES_GET)
+        );
+
+        $this->assertEquals(
+            ['user1', 'user2'],
+            $accessControl->getUsersForResource('pubKey1', ACI::RESOURCE_IMAGES_GET)
+        );
+    }
+
     public function testGetPrivateKey() {
         $accessControl = new ArrayAdapter([
             [
@@ -107,6 +138,25 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($ac->hasAccess('pubkey', ACI::RESOURCE_USER_GET, 'user2'));
         $this->assertTrue($ac->hasAccess('pubkey', ACI::RESOURCE_USER_HEAD, 'user1'));
         $this->assertTrue($ac->hasAccess('pubkey', ACI::RESOURCE_USER_GET, 'user1'));
+    }
+
+    public function testCanReadResourcesGrantedUsingWildcard() {
+        $accessControl = new ArrayAdapter([
+            [
+                'publicKey'  => 'pubkey',
+                'privateKey' => 'privkey',
+                'acl' => [
+                    [
+                        'resources' => [ACI::RESOURCE_IMAGES_GET],
+                        'users' => '*'
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertTrue($accessControl->hasAccess('pubkey', ACI::RESOURCE_IMAGES_GET, 'user1'));
+        $this->assertTrue($accessControl->hasAccess('pubkey', ACI::RESOURCE_IMAGES_GET, 'user2'));
+        $this->assertFalse($accessControl->hasAccess('pubkey', ACI::RESOURCE_IMAGES_POST, 'user2'));
     }
 
     /**
