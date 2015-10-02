@@ -29,25 +29,25 @@ class SmartSizeTest extends \PHPUnit_Framework_TestCase {
             'Square crop, (800,300) poi on landscape image' => [
                 ['width' => 1200, 'height' => 700],
                 ['width' => 400, 'height' => 400, 'poi' => '800,300'],
-                ['width' => 700, 'height' => 700, 'left' => 450, 'top' => 0]
+                ['width' => 500, 'height' => 500, 'left' => 550, 'top' => 50]
             ],
 
             'Square crop, (0,0) poi on portrait image' => [
                 ['width' => 700, 'height' => 1200],
                 ['width' => 400, 'height' => 400, 'poi' => '0,0'],
-                ['width' => 700, 'height' => 700, 'left' => 0, 'top' => 0]
+                ['width' => 500, 'height' => 500, 'left' => 0, 'top' => 0]
             ],
 
             'Square crop, (0,700) poi on portrait image' => [
                 ['width' => 700, 'height' => 1200],
                 ['width' => 400, 'height' => 400, 'poi' => '0,700'],
-                ['width' => 700, 'height' => 700, 'left' => 0, 'top' => 350]
+                ['width' => 500, 'height' => 500, 'left' => 0, 'top' => 450]
             ],
 
             'Square crop, (500,500) poi on portrait image' => [
                 ['width' => 1200, 'height' => 1200],
                 ['width' => 400, 'height' => 400, 'poi' => '500,500'],
-                ['width' => 1200, 'height' => 1200, 'left' => 0, 'top' => 0]
+                ['width' => 500, 'height' => 500, 'left' => 250, 'top' => 250]
             ],
 
             'Portrait crop, (600,300) poi on landscape image' => [

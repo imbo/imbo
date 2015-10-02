@@ -36,6 +36,14 @@ class SmartSize extends Transformation implements ListenerInterface {
         $image = $event->getArgument('image');
         $params = $event->getArgument('params');
 
+        // Factor that the target width/height is grown by when cropping. THe lower this factor is
+        // set, the closer the crop is
+        $growFactor = 1.25;
+
+        // Threshold of the original width/height that the crop area should never go below
+        // this is important to make sure that a too small portion of a large image is selected
+        $sourcePortionThreshold = 0.4;
+
         if (empty($params['width']) || empty($params['height'])) {
             throw new TransformationException('Both width and height needs to be specified', 400);
         }
@@ -44,6 +52,25 @@ class SmartSize extends Transformation implements ListenerInterface {
 
         if (!$poi) {
             throw new TransformationException('A point-of-interest x,y needs to be specified', 400);
+        }
+
+        if (!empty($params['crop']) && array_search($params['crop'], ['close', 'medium', 'wide']) === false) {
+            throw new TransformationException('Invalid crop value. Valid values are: close,medium,wide', 400);
+        }
+
+        // Crop factor presets
+        if (!empty($params['crop'])) {
+            switch ($params['crop']) {
+                case 'close':
+                    $growFactor = 1;
+                    $sourcePortionThreshold = 0.2;
+                    break;
+
+                case 'wide':
+                    $growFactor = 1.6;
+                    $sourcePortionThreshold = 0.66;
+                    break;
+            }
         }
 
         $focalX = $poi[0];
@@ -57,37 +84,41 @@ class SmartSize extends Transformation implements ListenerInterface {
         $targetHeight = $params['height'];
         $targetRatio  = $targetWidth / $targetHeight;
 
-        $cropWidth;
-        $cropHeight;
-        $cropLeft;
-        $cropTop;
-
         if ($sourceRatio >= $targetRatio) {
             // Image is wider than needed, crop from the sides
-            $cropHeight = $sourceHeight;
-            $cropWidth = (int) ceil($targetRatio * $sourceHeight);
-            $cropTop = 0;
-            $cropLeft = (int) ($focalX - floor($cropWidth / 2));
-
-            // Make sure that we're not cropping outside the image
-            if ($cropLeft < 0) {
-                $cropLeft = 0;
-            } else if ($cropLeft + $cropWidth > $sourceWidth) {
-                $cropLeft = $sourceWidth - $cropWidth;
-            }
+            $cropWidth = (int) ceil(
+                $targetRatio * max(
+                    min($sourceHeight, $targetHeight * $growFactor),
+                    $sourceHeight * $sourcePortionThreshold
+                )
+            );
+            $cropHeight = (int) floor($cropWidth / $targetRatio);
         } else {
             // Image is taller than needed, crop from the top/bottom
-            $cropWidth = $sourceWidth;
-            $cropHeight = (int) ceil($sourceWidth / $targetRatio);
-            $cropLeft = 0;
-            $cropTop = (int) ($focalY - floor($cropHeight / 2));
+            $cropHeight = (int) ceil(
+                max(
+                    min($sourceWidth, $targetWidth * $growFactor),
+                    $sourceWidth * $sourcePortionThreshold
+                ) / $targetRatio
+            );
+            $cropWidth = (int) floor($cropHeight * $targetRatio);
+        }
 
-            // Make sure that we're not cropping outside the image
-            if ($cropTop < 0) {
-                $cropTop = 0;
-            } else if ($cropTop + $cropWidth > $sourceHeight) {
-                $cropTop = $sourceHeight - $cropHeight;
-            }
+        $cropTop = (int) ($focalY - floor($cropHeight / 2));
+        $cropLeft = (int) ($focalX - floor($cropWidth / 2));
+
+        // Make sure that we're not cropping outside the image on the x axis
+        if ($cropLeft < 0) {
+            $cropLeft = 0;
+        } else if ($cropLeft + $cropWidth > $sourceWidth) {
+            $cropLeft = $sourceWidth - $cropWidth;
+        }
+
+        // Make sure that we're not cropping outside the image on the y axis
+        if ($cropTop < 0) {
+            $cropTop = 0;
+        } else if ($cropTop + $cropWidth > $sourceHeight) {
+            $cropTop = $sourceHeight - $cropHeight;
         }
 
         try {
