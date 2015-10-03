@@ -56,7 +56,7 @@ class SmartSizeTest extends \PHPUnit_Framework_TestCase {
                 ['width' => 343, 'height' => 600, 'left' => 429, 'top' => 0]
             ],
 
-            'Panorama, close crop, (100,700) point on portrait image' => [
+            'Panorama, close crop, (100,700) poi on portrait image' => [
                 ['width' => 800, 'height' => 1800],
                 ['width' => 80, 'height' => 30, 'poi' => '100,700', 'crop' => 'close'],
                 ['width' => 240, 'height' => 90, 'left' => 0, 'top' => 655]
@@ -92,7 +92,7 @@ class SmartSizeTest extends \PHPUnit_Framework_TestCase {
                 ['width' => 343, 'height' => 600, 'left' => 429, 'top' => 0]
             ],
 
-            'Panorama, medium crop, (100,700) point on portrait image' => [
+            'Panorama, medium crop, (100,700) poi on portrait image' => [
                 ['width' => 800, 'height' => 1800],
                 ['width' => 800, 'height' => 300, 'poi' => '100,700', 'crop' => 'medium'],
                 ['width' => 800, 'height' => 300, 'left' => 0, 'top' => 550]

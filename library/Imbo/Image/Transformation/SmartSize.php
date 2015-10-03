@@ -117,7 +117,7 @@ class SmartSize extends Transformation implements ListenerInterface {
         // Make sure that we're not cropping outside the image on the y axis
         if ($cropTop < 0) {
             $cropTop = 0;
-        } else if ($cropTop + $cropWidth > $sourceHeight) {
+        } else if ($cropTop + $cropHeight > $sourceHeight) {
             $cropTop = $sourceHeight - $cropHeight;
         }
 
