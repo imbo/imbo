@@ -96,6 +96,42 @@ class SmartSizeTest extends \PHPUnit_Framework_TestCase {
                 ['width' => 800, 'height' => 1800],
                 ['width' => 800, 'height' => 300, 'poi' => '100,700', 'crop' => 'medium'],
                 ['width' => 800, 'height' => 300, 'left' => 0, 'top' => 550]
+            ],
+
+            'Square, wide crop, (800,300) poi on landscape image' => [
+                ['width' => 1200, 'height' => 700],
+                ['width' => 400, 'height' => 400, 'poi' => '800,300', 'crop' => 'wide'],
+                ['width' => 640, 'height' => 640, 'left' => 480, 'top' => 0]
+            ],
+
+            'Square, wide crop, (0,0) poi on portrait image' => [
+                ['width' => 700, 'height' => 1200],
+                ['width' => 400, 'height' => 400, 'poi' => '0,0', 'crop' => 'wide'],
+                ['width' => 640, 'height' => 640, 'left' => 0, 'top' => 0]
+            ],
+
+            'Square, wide crop, (0,700) poi on portrait image' => [
+                ['width' => 700, 'height' => 1200],
+                ['width' => 400, 'height' => 400, 'poi' => '0,700', 'crop' => 'wide'],
+                ['width' => 640, 'height' => 640, 'left' => 0, 'top' => 380]
+            ],
+
+            'Square, wide crop, (500,500) poi on square image' => [
+                ['width' => 1200, 'height' => 1200],
+                ['width' => 400, 'height' => 400, 'poi' => '500,500', 'crop' => 'wide'],
+                ['width' => 792, 'height' => 792, 'left' => 104, 'top' => 104]
+            ],
+
+            'Portrait, wide crop, (600,300) poi on landscape image' => [
+                ['width' => 1200, 'height' => 600],
+                ['width' => 400, 'height' => 700, 'poi' => '600,300', 'crop' => 'wide'],
+                ['width' => 343, 'height' => 600, 'left' => 429, 'top' => 0]
+            ],
+
+            'Panorama, wide crop, (100,700) poi on portrait image' => [
+                ['width' => 800, 'height' => 1800],
+                ['width' => 800, 'height' => 300, 'poi' => '100,700', 'crop' => 'wide'],
+                ['width' => 800, 'height' => 300, 'left' => 0, 'top' => 550]
             ]
         ];
     }
