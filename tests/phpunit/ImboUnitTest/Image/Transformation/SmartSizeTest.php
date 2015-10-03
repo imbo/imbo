@@ -26,39 +26,75 @@ class SmartSizeTest extends \PHPUnit_Framework_TestCase {
      */
     public function getSmartSizeArguments() {
         return [
-            'Square crop, (800,300) poi on landscape image' => [
+            'Square, close crop, (800,300) poi on landscape image' => [
                 ['width' => 1200, 'height' => 700],
-                ['width' => 400, 'height' => 400, 'poi' => '800,300'],
-                ['width' => 500, 'height' => 500, 'left' => 550, 'top' => 50]
+                ['width' => 400, 'height' => 400, 'poi' => '800,300', 'crop' => 'close'],
+                ['width' => 400, 'height' => 400, 'left' => 600, 'top' => 100]
             ],
 
-            'Square crop, (0,0) poi on portrait image' => [
+            'Square, close crop, (0,0) poi on portrait image' => [
                 ['width' => 700, 'height' => 1200],
-                ['width' => 400, 'height' => 400, 'poi' => '0,0'],
-                ['width' => 500, 'height' => 500, 'left' => 0, 'top' => 0]
+                ['width' => 400, 'height' => 400, 'poi' => '0,0', 'crop' => 'close'],
+                ['width' => 400, 'height' => 400, 'left' => 0, 'top' => 0]
             ],
 
-            'Square crop, (0,700) poi on portrait image' => [
+            'Square, close crop, (0,700) poi on portrait image' => [
                 ['width' => 700, 'height' => 1200],
-                ['width' => 400, 'height' => 400, 'poi' => '0,700'],
-                ['width' => 500, 'height' => 500, 'left' => 0, 'top' => 450]
+                ['width' => 400, 'height' => 400, 'poi' => '0,700', 'crop' => 'close'],
+                ['width' => 400, 'height' => 400, 'left' => 0, 'top' => 500]
             ],
 
-            'Square crop, (500,500) poi on portrait image' => [
+            'Square, close crop, (500,500) poi on square image' => [
                 ['width' => 1200, 'height' => 1200],
-                ['width' => 400, 'height' => 400, 'poi' => '500,500'],
-                ['width' => 500, 'height' => 500, 'left' => 250, 'top' => 250]
+                ['width' => 400, 'height' => 400, 'poi' => '500,500', 'crop' => 'close'],
+                ['width' => 400, 'height' => 400, 'left' => 300, 'top' => 300]
             ],
 
-            'Portrait crop, (600,300) poi on landscape image' => [
+            'Portrait, close crop, (600,300) poi on landscape image' => [
                 ['width' => 1200, 'height' => 600],
-                ['width' => 400, 'height' => 700, 'poi' => '600,300'],
+                ['width' => 400, 'height' => 700, 'poi' => '600,300', 'crop' => 'close'],
                 ['width' => 343, 'height' => 600, 'left' => 429, 'top' => 0]
             ],
 
-            'Panorame crop, (100,700) point on portrait image' => [
+            'Panorama, close crop, (100,700) point on portrait image' => [
                 ['width' => 800, 'height' => 1800],
-                ['width' => 800, 'height' => 300, 'poi' => '100,700'],
+                ['width' => 80, 'height' => 30, 'poi' => '100,700', 'crop' => 'close'],
+                ['width' => 240, 'height' => 90, 'left' => 0, 'top' => 655]
+            ],
+
+            'Square, medium crop, (800,300) poi on landscape image' => [
+                ['width' => 1200, 'height' => 700],
+                ['width' => 400, 'height' => 400, 'poi' => '800,300', 'crop' => 'medium'],
+                ['width' => 500, 'height' => 500, 'left' => 550, 'top' => 50]
+            ],
+
+            'Square, medium crop, (0,0) poi on portrait image' => [
+                ['width' => 700, 'height' => 1200],
+                ['width' => 400, 'height' => 400, 'poi' => '0,0', 'crop' => 'medium'],
+                ['width' => 500, 'height' => 500, 'left' => 0, 'top' => 0]
+            ],
+
+            'Square, medium crop, (0,700) poi on portrait image' => [
+                ['width' => 700, 'height' => 1200],
+                ['width' => 400, 'height' => 400, 'poi' => '0,700', 'crop' => 'medium'],
+                ['width' => 500, 'height' => 500, 'left' => 0, 'top' => 450]
+            ],
+
+            'Square, medium crop, (500,500) poi on square image' => [
+                ['width' => 1200, 'height' => 1200],
+                ['width' => 400, 'height' => 400, 'poi' => '500,500', 'crop' => 'medium'],
+                ['width' => 600, 'height' => 600, 'left' => 200, 'top' => 200]
+            ],
+
+            'Portrait, medium crop, (600,300) poi on landscape image' => [
+                ['width' => 1200, 'height' => 600],
+                ['width' => 400, 'height' => 700, 'poi' => '600,300', 'crop' => 'medium'],
+                ['width' => 343, 'height' => 600, 'left' => 429, 'top' => 0]
+            ],
+
+            'Panorama, medium crop, (100,700) point on portrait image' => [
+                ['width' => 800, 'height' => 1800],
+                ['width' => 800, 'height' => 300, 'poi' => '100,700', 'crop' => 'medium'],
                 ['width' => 800, 'height' => 300, 'left' => 0, 'top' => 550]
             ]
         ];

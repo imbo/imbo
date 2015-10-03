@@ -42,7 +42,7 @@ class SmartSize extends Transformation implements ListenerInterface {
 
         // Threshold of the original width/height that the crop area should never go below
         // this is important to make sure that a too small portion of a large image is selected
-        $sourcePortionThreshold = 0.4;
+        $sourcePortionThreshold = 0.5;
 
         if (empty($params['width']) || empty($params['height'])) {
             throw new TransformationException('Both width and height needs to be specified', 400);
@@ -63,7 +63,7 @@ class SmartSize extends Transformation implements ListenerInterface {
             switch ($params['crop']) {
                 case 'close':
                     $growFactor = 1;
-                    $sourcePortionThreshold = 0.2;
+                    $sourcePortionThreshold = 0.3;
                     break;
 
                 case 'wide':
