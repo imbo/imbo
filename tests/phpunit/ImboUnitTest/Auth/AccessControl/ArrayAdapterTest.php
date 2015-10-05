@@ -19,42 +19,6 @@ use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
  * @group unit
  */
 class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
-    /**
-     * @dataProvider getAuthConfig
-     */
-    public function testCanSetKeysFromLegacyConfig(array $users, $publicKey, $privateKey) {
-        $accessControl = new ArrayAdapter();
-        $accessControl->setAccessListFromAuth($users);
-
-        $this->assertSame($privateKey, $accessControl->getPrivateKey($publicKey));
-    }
-
-    /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage A public key can only have a single private key (as of 2.0.0)
-     */
-    public function testThrowsOnMultiplePrivateKeysPerPublicKey() {
-        $accessControl = new ArrayAdapter();
-        $accessControl->setAccessListFromAuth([
-            'publicKey' => ['key1', 'key2']
-        ]);
-    }
-
-    public function testLegacyConfigKeysHaveWriteAccess() {
-        $accessControl = new ArrayAdapter();
-        $accessControl->setAccessListFromAuth([
-            'publicKey' => 'privateKey',
-        ]);
-
-        $this->assertTrue(
-            $accessControl->hasAccess(
-                'publicKey',
-                ACI::RESOURCE_IMAGES_POST,
-                'publicKey'
-            )
-        );
-    }
-
     public function testReturnsCorrectListOfAllowedUsersForResource() {
         $accessControl = new ArrayAdapter([
             [
