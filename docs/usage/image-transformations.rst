@@ -411,7 +411,7 @@ When using any of the presets the different parameters can be overridden by spec
 .. _smartsize-transformation:
 
 Smart size the image - ``t[]=smartSize``
------------------------------
+----------------------------------------
 
 This transformation is used to crop the image based on a point of interest (POI) provided either as a transformation parameter or from the image metadata.
 

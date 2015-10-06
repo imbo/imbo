@@ -645,11 +645,11 @@ results in:
 .. _global-images-resource:
 
 Global images resource - ``/images``
-++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++
 
 The global images resource is used to search for images across users, given that the public key has access to the images of these users.
 
-This resource is read only, and behaves in the same way as described in the `Get image collections` section of :doc:`_images-resource`. In addition to the parameters specified for `Get image collections`, the following query parameter must be specified:
+This resource is read only, and behaves in the same way as described in the `Get image collections` section of :ref:`images-resource`. In addition to the parameters specified for `Get image collections`, the following query parameter must be specified:
 
 ``user[]``
     An array of users to get images for.
