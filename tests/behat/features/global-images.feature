@@ -21,6 +21,17 @@ Feature: Imbo provides a global images endpoint
         #^{"search":{"hits":0#
         """
 
+    Scenario: Fetch images for user with wildcard access
+        Given I use "wildcard" and "*" for public and private keys
+        And I include an access token in the query
+        When I request "/images.json?user[]=user&user[]=other-user"
+        Then I should get a response with "200 OK"
+        And the "Content-Type" response header is "application/json"
+        And the response body matches:
+        """
+        #^{"search":{"hits":4#
+        """
+
     Scenario Outline: Fetch images specifying users
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
@@ -38,19 +49,9 @@ Feature: Imbo provides a global images endpoint
             | ?user[]=user                   | #^{"search":{"hits":2,"page":1,"limit":20,"count":2}# |
             | ?user[]=other-user             | #^{"search":{"hits":2,"page":1,"limit":20,"count":2}# |
 
-    Scenario Outline: Fetch images specifying a user without having access to it
+    Scenario: Fetch images specifying users that the publickey does not have access to
         Given I use "unpriviledged" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/images.json<queryString>"
-        Then I should get a response with "200 OK"
+        When I request "/images.json?user[]=foo&user[]=bar"
+        Then I should get a response with "400 Public key does not have access to the users: [foo, bar]"
         And the "Content-Type" response header is "application/json"
-        And the response body matches:
-        """
-        <response>
-        """
-
-        Examples:
-            | queryString                    | response               |
-            | ?user[]=user&user[]=other-user | #^{"search":{"hits":2,"page":1,"limit":20,"count":2}# |
-            | ?user[]=user                   | #^{"search":{"hits":2,"page":1,"limit":20,"count":2}# |
-            | ?user[]=other-user             | #^{"search":{"hits":0,"page":1,"limit":20,"count":0}# |

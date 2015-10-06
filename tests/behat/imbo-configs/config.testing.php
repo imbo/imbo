@@ -31,6 +31,14 @@ $testConfig = array(
                     'users' => ['user'],
                 ]]
             ],
+            [
+                'publicKey' => 'wildcard',
+                'privateKey' => '*',
+                'acl' => [[
+                    'resources' => ArrayAdapter::getReadWriteResources(),
+                    'users' => '*'
+                ]]
+            ]
         ]);
     },
 

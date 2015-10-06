@@ -34,6 +34,7 @@ class Cors implements ListenerInterface {
             'index'          => array('GET', 'HEAD'),
             'image'          => array('GET', 'HEAD'),
             'images'         => array('GET', 'HEAD'),
+            'globalimages'   => array('GET', 'HEAD'),
             'metadata'       => array('GET', 'HEAD'),
             'status'         => array('GET', 'HEAD'),
             'stats'          => array('GET', 'HEAD'),
