@@ -42,6 +42,70 @@ class AccessRules implements ResourceInterface {
     }
 
     /**
+     * Checks if this is an array containing only strings
+     *
+     * @param Mixed Values to test
+     * @return boolean True if all values are strings
+     */
+    private function isStringArray($values) {
+        if (!is_array($values)) {
+            return false;
+        }
+
+        return array_reduce($values, function($res, $value) {
+            return $res && is_string($value);
+        }, true);
+    }
+
+    /**
+     * Validate the contents of an access rule.
+     *
+     * @param array $rule Access rule to check
+     * @throws RuntimeException
+     */
+    private function validateRule(EventInterface $event, array $rule) {
+        $acl = $event->getAccessControl();
+
+        $allowedProperties = ['resources', 'group', 'users'];
+
+        $unknownProperties = array_diff(array_keys($rule), $allowedProperties);
+
+        if (count($unknownProperties)) {
+            throw new RuntimeException('Found unknown properties in rule: [' . implode(', ', $unknownProperties) . ']', 400);
+        }
+
+        if (isset($rule['resources']) && isset($rule['group'])) {
+            throw new RuntimeException('Both resources and group found in rule', 400);
+        }
+
+        if (!isset($rule['resources']) && !isset($rule['group'])) {
+            throw new RuntimeException('Neither group nor resources found in rule', 400);
+        }
+
+        if (isset($rule['resources']) && !$this->isStringArray($rule['resources'])) {
+            throw new RuntimeException('Illegal value in resources array. Strings only', 400);
+        }
+
+        if (isset($rule['group'])) {
+            if (!is_string($rule['group'])) {
+                throw new RuntimeException('Group must be specified as a string value', 400);
+            }
+
+            if (!$acl->getGroup($rule['group'])) {
+                throw new RuntimeException('Group "' . $rule['group'] . '" does not exist', 400);
+            }
+        }
+
+        if (!isset($rule['users'])) {
+            throw new RuntimeException('Users not specified in rule', 400);
+        }
+
+        if ($rule['users'] !== '*' && !$this->isStringArray($rule['users'])) {
+            throw new RuntimeException('Illegal value for users property. Allowed: "*" or array with users', 400);
+        }
+    }
+
+    /**
      * Get access rules for the specified public key
      *
      * @param EventInterface $event The current event
@@ -87,6 +151,12 @@ class AccessRules implements ResourceInterface {
 
         $accessControl = $event->getAccessControl();
 
+        // Perform rule validation
+        foreach ($data as $rule) {
+            $this->validateRule($event, $rule);
+        }
+
+        // Insert the rules
         foreach ($data as $rule) {
             $accessControl->addAccessRule($publicKey, $rule);
         }
