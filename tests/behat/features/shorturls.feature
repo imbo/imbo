@@ -5,6 +5,8 @@ Feature: Imbo can generate short URLs for images on demand
 
     Scenario: Generate a short URL
         Given "tests/phpunit/Fixtures/image.png" exists in Imbo
+        And I use "publickey" and "privatekey" for public and private keys
+        And I sign the request
         And I generate a short URL with the following parameters:
             """
             {"user": "user", "extension": "gif"}
@@ -16,8 +18,25 @@ Feature: Imbo can generate short URLs for images on demand
            #^{"id":"[a-zA-Z0-9]{7}"}$#
            """
 
+    Scenario: Generate a short URL without having access to the user
+        Given "tests/phpunit/Fixtures/image.png" exists for user "other-user" in Imbo
+        And I use "unpriviledged" and "privatekey" for public and private keys
+        And I sign the request
+        And I generate a short URL with the following parameters:
+            """
+            {"user": "other-user", "extension": "gif"}
+            """
+        Then I should get a response with "201 Created"
+        And the "Content-Type" response header is "application/json"
+        And the response body matches:
+           """
+           #^{"id":"[a-zA-Z0-9]{7}"}$#
+           """
+
     Scenario Outline: Request an image using the short URL
         Given "tests/phpunit/Fixtures/image.png" exists in Imbo
+        And I use "publickey" and "privatekey" for public and private keys
+        And I sign the request
         And I generate a short URL with the following parameters:
             """
             <params>

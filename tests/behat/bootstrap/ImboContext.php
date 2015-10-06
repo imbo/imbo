@@ -569,17 +569,20 @@ class ImboContext extends RESTContext {
      * @Given /^I generate a short URL with the following parameters:$/
      */
     public function generateShortImageUrl(PyStringNode $params) {
-        $imageIdentifier = $this->getLastResponse()->json()['imageIdentifier'];
+        $lastResponse = $this->getLastResponse();
+
+        preg_match('/\/users\/([^\/]+)/', $lastResponse->getInfo('url'), $matches);
+        $user = $matches[1];
+
+        $imageIdentifier = $lastResponse->json()['imageIdentifier'];
         $params = array_merge(json_decode((string) $params, true), [
             'imageIdentifier' => $imageIdentifier,
         ]);
 
-        return array(
-            new Given('I use "publickey" and "privatekey" for public and private keys'),
-            new Given('I sign the request'),
+        return [
             new Given('the request body contains:', new PyStringNode(json_encode($params))),
-            new Given('I request "/users/user/images/' . $imageIdentifier . '/shorturls" using HTTP "POST"'),
-        );
+            new Given('I request "/users/' . $user . '/images/' . $imageIdentifier . '/shorturls" using HTTP "POST"'),
+        ];
     }
 
     /**
