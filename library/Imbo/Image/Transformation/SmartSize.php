@@ -57,6 +57,12 @@ class SmartSize extends Transformation implements ListenerInterface {
         return false;
     }
 
+    /**
+     * Transform the image
+     *
+     * @param EventInterface $event The event instance
+     * @throws TransformationException
+     */
     public function transform(EventInterface $event) {
         $image = $event->getArgument('image');
         $params = $event->getArgument('params');
@@ -164,7 +170,12 @@ class SmartSize extends Transformation implements ListenerInterface {
         }
     }
 
-    private function resize($image, $targetWidth, $targetHeight) {
+    /**
+     * Resize the image
+     *
+     * @param Image $image The image to resize
+     */
+    private function resize(Image $image, $targetWidth, $targetHeight) {
         $this->imagick->setOption('jpeg:size', $targetWidth . 'x' . $targetHeight);
         $this->imagick->thumbnailImage($targetWidth, $targetHeight);
 
