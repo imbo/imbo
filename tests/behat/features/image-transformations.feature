@@ -67,6 +67,9 @@ Feature: Imbo enables dynamic transformations of images
             | sharpen:preset=moderate                                                                           | 599   | 417    |
             | sharpen:preset=strong                                                                             | 599   | 417    |
             | sharpen:preset=extreme                                                                            | 599   | 417    |
+            | smartSize:width=250,height=400,poi=0\,0                                                           | 250   | 400    |
+            | smartSize:width=700,height=300,poi=0\,0                                                           | 700   | 300    |
+            | smartSize:width=300,height=300,poi=0\,0                                                           | 300   | 300    |
             | strip                                                                                             | 599   | 417    |
             | thumbnail                                                                                         | 50    | 50     |
             | thumbnail:width=40,height=30                                                                      | 40    | 30     |
@@ -131,6 +134,7 @@ Feature: Imbo enables dynamic transformations of images
             | sharpen:preset=moderate                                                                           |
             | sharpen:preset=strong                                                                             |
             | sharpen:preset=extreme                                                                            |
+            | smartSize:width=300,height=300,poi=0\,0                                                           |
             | strip                                                                                             |
             | thumbnail                                                                                         |
             | thumbnail:width=40,height=30                                                                      |
@@ -157,13 +161,17 @@ Feature: Imbo enables dynamic transformations of images
         And the "X-Imbo-Originalwidth" response header is "599"
 
         Examples:
-            | transformation     | reason-phrase                                                               |
-            | compress           | 400 Missing required parameter: level                                       |
-            | compress:level=200 | 400 level must be between 0 and 100                                         |
-            | compress:level=-10 | 400 level must be between 0 and 100                                         |
-            | crop:width=100     | 400 Missing required parameter: height                                      |
-            | resize             | 400 Missing both width and height. You need to specify at least one of them |
-            | rotate             | 400 Missing required parameter: angle                                       |
+            | transformation                    | reason-phrase                                                               |
+            | compress                          | 400 Missing required parameter: level                                       |
+            | compress:level=200                | 400 level must be between 0 and 100                                         |
+            | compress:level=-10                | 400 level must be between 0 and 100                                         |
+            | crop:width=100                    | 400 Missing required parameter: height                                      |
+            | resize                            | 400 Missing both width and height. You need to specify at least one of them |
+            | rotate                            | 400 Missing required parameter: angle                                       |
+            | smartSize                         | 400 Both width and height needs to be specified                             |
+            | smartSize:height=300              | 400 Both width and height needs to be specified                             |
+            | smartSize:width=300               | 400 Both width and height needs to be specified                             |
+            | smartSize:width=300,height=200    | 400 A point-of-interest x,y needs to be specified                           |
 
     Scenario: Support multiple transformations
         Given I use "publickey" and "privatekey" for public and private keys

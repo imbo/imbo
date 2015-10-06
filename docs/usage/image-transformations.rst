@@ -408,6 +408,36 @@ When using any of the presets the different parameters can be overridden by spec
 * ``t[]=sharpen:preset=extrene,gain=10`` (use the ``extreme`` preset, but use a gain value of 10 instead of 4)
 * ``t[]=sharpen:radius=2,sigma=1,gain=1,threshold= 0.05`` (same as using ``t[]=sharpen:preset=light``, or simply ``t[]=sharpen``)
 
+.. _smartsize-transformation:
+
+Smart size the image - ``t[]=smartSize``
+-----------------------------
+
+This transformation is used to crop the image based on a point of interest (POI) provided either as a transformation parameter or from the image metadata.
+
+**Parameters:**
+
+``width``
+    The width of the crop in pixels.
+
+``height``
+    The height of the crop in pixels.
+
+``poi``
+    The POI coordinate ``x,y`` to crop around. The parameter is optional if the POI exists in metadata.
+
+``crop``
+    The closeness of the crop (optional). Possible values are:
+
+    ``close``
+    ``medium``
+    ``wide``
+
+**Examples:**
+
+* ``t[]=smartSize:width=250,height=250,poi=300,200``
+* ``t[]=smartSize:width=250,height=250,poi=300,200,crop=close``
+
 .. _strip-transformation:
 
 Strip image properties and comments - ``t[]=strip``

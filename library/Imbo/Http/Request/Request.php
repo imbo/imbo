@@ -140,19 +140,14 @@ class Request extends SymfonyRequest {
                 // Initialize params for the transformation
                 $params = array();
 
-                // See if we have more than one parameter
-                if (strpos($urlParams, ',') !== false) {
-                    $urlParams = explode(',', $urlParams);
-                } else {
-                    $urlParams = array($urlParams);
-                }
-
-                foreach ($urlParams as $param) {
-                    $pos = strpos($param, '=');
-
-                    if ($pos !== false) {
-                        $params[substr($param, 0, $pos)] = substr($param, $pos + 1);
-                    }
+                // Loop through the parameter string and assign params to an array
+                $offset = 0;
+                $pattern = '#(\w+)=(?:(.+?),\w+=|(.+?$))#';
+                while (preg_match($pattern, $urlParams, $matches, PREG_OFFSET_CAPTURE, $offset)) {
+                    $offset = $matches[2][1];
+                    $paramName = $matches[1][0];
+                    $paramValue = $matches[2][0] ?: $matches[3][0];
+                    $params[$paramName] = $paramValue;
                 }
 
                 $this->transformations[] = array(
