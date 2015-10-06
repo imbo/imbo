@@ -655,6 +655,7 @@ as well as event listeners for image transformations:
 * :ref:`resize <resize-transformation>`
 * :ref:`rotate <rotate-transformation>`
 * :ref:`sepia <sepia-transformation>`
+* :ref:`smartSize <smartsize-transformation>`
 * :ref:`strip <strip-transformation>`
 * :ref:`thumbnail <thumbnail-transformation>`
 * :ref:`transpose <transpose-transformation>`
