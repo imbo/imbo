@@ -11,6 +11,7 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
+    Imbo\Exception\RuntimeException,
     Imbo\Model;
 
 /**
@@ -54,18 +55,31 @@ class GlobalImages implements ResourceInterface {
     public function getImages(EventInterface $event) {
         $acl = $event->getAccessControl();
 
-        // Get intersection between specified users and users which
-        // the public key has access to the given endpoint for
-        $users = array_intersect(
-            $event->getRequest()->getUsers(),
-            $acl->getUsersForResource(
+        $missingAccess = [];
+
+        foreach ($event->getRequest()->getUsers() as $user) {
+            $hasAccess = $acl->hasAccess(
                 $event->getRequest()->getPublicKey(),
-                'images.get'
-            )
-        );
+                'images.get',
+                $user
+            );
+
+            if (!$hasAccess) {
+                $missingAccess[] = $user;
+            }
+        }
+
+        if (!empty($missingAccess)) {
+            throw new RuntimeException(
+                'Public key does not have acess to the users: [' .
+                implode(', ', $missingAccess) .
+                ']',
+                400
+            );
+        }
 
         $event->getManager()->trigger('db.images.load', [
-            'users' => $users
+            'users' => $event->getRequest()->getUsers()
         ]);
     }
 }
