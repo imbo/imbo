@@ -56,7 +56,7 @@ Feature: Imbo provides a keys endpoint
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And the request body contains:
           """
-          [{"resources":["images.get"],"users":["user1"]},{"group":"read-images","users":["user1", "user5"]}]
+          [{"resources":["images.get"],"users":["user1"]},{"group":"existing-group","users":["user1", "user5"]}]
           """
         And I sign the request
         When I request "/keys/foobar/access" using HTTP "POST"
