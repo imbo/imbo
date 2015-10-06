@@ -146,10 +146,10 @@ class ImboContext extends RESTContext {
      * @Given /^the database and the storage is down$/
      */
     public function forceBothAdapterFailure() {
-        return array(
+        return [
             new Given('the storage is down'),
             new Given('the database is down'),
-        );
+        ];
     }
 
     /**
@@ -240,11 +240,11 @@ class ImboContext extends RESTContext {
             $signature = hash_hmac('sha256', $data, $this->privateKey);
 
             if ($useHeaders) {
-                $request->addHeaders(array(
+                $request->addHeaders([
                     'X-Imbo-PublicKey'              => $this->publicKey,
                     'X-Imbo-Authenticate-Signature' => $signature,
                     'X-Imbo-Authenticate-Timestamp' => $timestamp,
-                ));
+                ]);
             } else {
                 $query->set('signature', $signature);
                 $query->set('timestamp', $timestamp);
@@ -257,7 +257,7 @@ class ImboContext extends RESTContext {
      */
     public function applyTransformation($transformation) {
         $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($transformation) {
-            $event['request']->getQuery()->set('t', array($transformation));
+            $event['request']->getQuery()->set('t', [$transformation]);
         });
     }
 
@@ -569,17 +569,20 @@ class ImboContext extends RESTContext {
      * @Given /^I generate a short URL with the following parameters:$/
      */
     public function generateShortImageUrl(PyStringNode $params) {
-        $imageIdentifier = $this->getLastResponse()->json()['imageIdentifier'];
+        $lastResponse = $this->getLastResponse();
+
+        preg_match('/\/users\/([^\/]+)/', $lastResponse->getInfo('url'), $matches);
+        $user = $matches[1];
+
+        $imageIdentifier = $lastResponse->json()['imageIdentifier'];
         $params = array_merge(json_decode((string) $params, true), [
             'imageIdentifier' => $imageIdentifier,
         ]);
 
-        return array(
-            new Given('I use "publickey" and "privatekey" for public and private keys'),
-            new Given('I sign the request'),
+        return [
             new Given('the request body contains:', new PyStringNode(json_encode($params))),
-            new Given('I request "/users/user/images/' . $imageIdentifier . '/shorturls" using HTTP "POST"'),
-        );
+            new Given('I request "/users/' . $user . '/images/' . $imageIdentifier . '/shorturls" using HTTP "POST"'),
+        ];
     }
 
     /**
@@ -588,10 +591,10 @@ class ImboContext extends RESTContext {
     public function requestImageUsingShortUrl() {
         $shortUrlId = $this->getLastResponse()->json()['id'];
 
-        return array(
+        return [
             new Given('the "Accept" request header is "image/*"'),
             new Given('I request "/s/' . $shortUrlId . '"'),
-        );
+        ];
     }
 
     /**
