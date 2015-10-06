@@ -25,9 +25,9 @@ Feature: Imbo provides a keys endpoint
     Scenario: Create a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And the request body contains:
-          """
-          {"privateKey":"the-private-key"}
-          """
+        """
+        {"privateKey":"the-private-key"}
+        """
         And I sign the request
         When I request "/keys/the-public-key" using HTTP "PUT"
         Then I should get a response with "201 Created"
@@ -35,9 +35,9 @@ Feature: Imbo provides a keys endpoint
     Scenario: Update the private key for an existing public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And the request body contains:
-          """
-          {"privateKey":"new-private-key"}
-          """
+        """
+        {"privateKey":"new-private-key"}
+        """
         And I sign the request
         When I request "/keys/master-pubkey" using HTTP "PUT"
         Then I should get a response with "200 OK"
@@ -45,22 +45,35 @@ Feature: Imbo provides a keys endpoint
     Scenario: Create new public key without having access to the keys resource
         Given I use "foobar" and "barfoo" for public and private keys
         And the request body contains:
-          """
-          {"privateKey":"moo"}
-          """
+        """
+        {"privateKey":"moo"}
+        """
         And I sign the request
         When I request "/keys/some-new-pubkey" using HTTP "PUT"
         Then I should get a response with "400 Permission denied (public key)"
 
-    Scenario: Update list of access rules for a public key
+    Scenario Outline: Add access rules for a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And the request body contains:
-          """
-          [{"resources":["images.get"],"users":["user1"]},{"group":"existing-group","users":["user1", "user5"]}]
-          """
+        """
+        <body>
+        """
         And I sign the request
         When I request "/keys/foobar/access" using HTTP "POST"
-        Then I should get a response with "200 OK"
+        Then I should get a response with "<status>"
+        Examples:
+        | body                                                                                                   | status                                                                 |
+        |                                                                                                        | 400 No access rule data provided                                       |
+        | {}                                                                                                     | 400 Neither group nor resources found in rule                          |
+        | {"group":"existing-group"}                                                                             | 400 Users not specified in rule                                        |
+        | {"group":"non-existant-group"}                                                                         | 400 Group 'non-existant-group' does not exist                          |
+        | {"resources":"images.get"}                                                                             | 400 Illegal value in resources array. String array expected            |
+        | {"resources":[123]}                                                                                    | 400 Illegal value in resources array. String array expected            |
+        | {"resources":["images.get"]}                                                                           | 400 Users not specified in rule                                        |
+        | {"resources":["images.get"],"users":"foobar"}                                                          | 400 Illegal value for users property. Allowed: '*' or array with users |
+        | {"foo":"bar","bar":"foo"}                                                                              | 400 Found unknown properties in rule: [foo, bar]                       |
+        | [{"resources":["images.get"],"users":["user1"]}]                                                       | 200 OK                                                                 |
+        | {"group":"existing-group","users":["user1", "user5"]}                                                  | 200 OK                                                                 |
 
     Scenario: Get an access control rule
         And I use "master-pubkey" and "master-privkey" for public and private keys

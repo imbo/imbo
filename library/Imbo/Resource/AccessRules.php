@@ -11,6 +11,7 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
+    Imbo\Exception\InvalidArgumentException,
     Imbo\Exception\RuntimeException,
     Imbo\Exception\ResourceException,
     Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface,
@@ -67,7 +68,6 @@ class AccessRules implements ResourceInterface {
         $acl = $event->getAccessControl();
 
         $allowedProperties = ['resources', 'group', 'users'];
-
         $unknownProperties = array_diff(array_keys($rule), $allowedProperties);
 
         if (count($unknownProperties)) {
@@ -83,7 +83,7 @@ class AccessRules implements ResourceInterface {
         }
 
         if (isset($rule['resources']) && !$this->isStringArray($rule['resources'])) {
-            throw new RuntimeException('Illegal value in resources array. Strings only', 400);
+            throw new RuntimeException('Illegal value in resources array. String array expected', 400);
         }
 
         if (isset($rule['group'])) {
@@ -92,7 +92,7 @@ class AccessRules implements ResourceInterface {
             }
 
             if (!$acl->getGroup($rule['group'])) {
-                throw new RuntimeException('Group "' . $rule['group'] . '" does not exist', 400);
+                throw new RuntimeException('Group \'' . $rule['group'] . '\' does not exist', 400);
             }
         }
 
@@ -101,7 +101,7 @@ class AccessRules implements ResourceInterface {
         }
 
         if ($rule['users'] !== '*' && !$this->isStringArray($rule['users'])) {
-            throw new RuntimeException('Illegal value for users property. Allowed: "*" or array with users', 400);
+            throw new RuntimeException('Illegal value for users property. Allowed: \'*\' or array with users', 400);
         }
     }
 
@@ -147,6 +147,11 @@ class AccessRules implements ResourceInterface {
 
         if (!is_array($data)) {
             throw new InvalidArgumentException('No access rule data provided', 400);
+        }
+
+        // If a single rule was provided, wrap it in an array
+        if (!count($data) || !isset($data[0])) {
+            $data = [$data];
         }
 
         $accessControl = $event->getAccessControl();
