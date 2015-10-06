@@ -60,6 +60,7 @@ interface AdapterInterface {
 
     const RESOURCE_GLOBAL_IMAGES_GET       = 'globalimages.get';
     const RESOURCE_GLOBAL_IMAGES_HEAD      = 'globalimages.head';
+    const RESOURCE_GLOBAL_IMAGES_OPTIONS   = 'globalimages.options';
 
     const RESOURCE_METADATA_GET            = 'metadata.get';
     const RESOURCE_METADATA_HEAD           = 'metadata.head';
@@ -75,6 +76,7 @@ interface AdapterInterface {
 
     const RESOURCE_SHORTURLS_POST          = 'shorturls.post';
     const RESOURCE_SHORTURLS_DELETE        = 'shorturls.delete';
+    const RESOURCE_SHORTURLS_OPTIONS       = 'shorturls.options';
 
     /**
      * Get a list of users the public key has access for on a given resource

@@ -297,6 +297,10 @@ class CorsTest extends ListenerTests {
                     'images.head' => array('invoke' => 1000),
                     'images.options' => array('options' => 20),
 
+                    'globalimages.get' => array('invoke' => 1000),
+                    'globalimages.head' => array('invoke' => 1000),
+                    'globalimages.options' => array('options' => 20),
+
                     'metadata.get' => array('invoke' => 1000),
                     'metadata.head' => array('invoke' => 1000),
                     'metadata.options' => array('options' => 20),
