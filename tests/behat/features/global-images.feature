@@ -53,5 +53,5 @@ Feature: Imbo provides a global images endpoint
         Given I use "unpriviledged" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/images.json?user[]=foo&user[]=bar"
-        Then I should get a response with "400 Public key does not have acess to the users: [foo, bar]"
+        Then I should get a response with "400 Public key does not have access to the users: [foo, bar]"
         And the "Content-Type" response header is "application/json"

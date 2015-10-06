@@ -71,7 +71,7 @@ class GlobalImages implements ResourceInterface {
 
         if (!empty($missingAccess)) {
             throw new RuntimeException(
-                'Public key does not have acess to the users: [' .
+                'Public key does not have access to the users: [' .
                 implode(', ', $missingAccess) .
                 ']',
                 400
