@@ -18,7 +18,7 @@ use Imbo\Http\Request\Request,
     Imbo\Model\Error,
     Imbo\Auth\AccessControl,
     Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlInterface,
-    Imbo\Auth\AccessControl\Adapter\ArrayAdapter as AccessControlArrayAdapter,
+    Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter as SimpleAclArrayAdapter,
     Imbo\Exception\RuntimeException,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Database\DatabaseInterface,
@@ -79,8 +79,10 @@ class Application {
         }
 
         // Check if we have an auth array present in the configuration
-        if (isset($config['auth']) && is_array($config['auth']) && $accessControl instanceof AccessControlArrayAdapter) {
-            $accessControl->setAccessListFromAuth($config['auth']);
+        if (isset($config['auth']) && is_array($config['auth']) &&
+            $accessControl instanceof SimpleAclArrayAdapter &&
+            $accessControl->isEmpty()) {
+            $accessControl = new SimpleAclArrayAdapter($config['auth']);
         }
 
         // Create a router based on the routes in the configuration and internal routes

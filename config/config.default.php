@@ -24,60 +24,28 @@ $config = [
     /**
      * Access Control adapter
      *
-     * See the different adapter implementations for possible configuration parameters. The value
-     * must be set to a closure returning an instance of Imbo\Auth\AccessControl\Adapter\AdapterInterface,
-     * or an implementation of said interface.
+     * See the different adapter implementations for possible configuration parameters.
+     * The value must be set to a closure returning an instance of
+     * Imbo\Auth\AccessControl\Adapter\AdapterInterface, or an implementation of said interface.
      *
-     * The default ArrayAdapter takes an array of access control rules, in the following form:
-     *
-     * [
-     *     [
-     *         // A unique public key matching the following regular expression: [A-Za-z0-9_-]{1,}
-     *         'publicKey'  => 'some-public-key',
-     *
-     *         // Some form of private key
-     *         'privateKey' => 'some-private-key',
-     *
-     *         // Array of rules for this public key
-     *         'acl' => [
-     *             [
-     *                 // An array of different resource names that the public key should have
-     *                 // access to - see AdapterInterface::RESOURCE_* for available options.
-     *                 'resources' => ArrayAdapter::getReadOnlyResources(),
-     *
-     *                 // Names of the users which the public key should have access to.
-     *                 'users' => ['some', 'users'],
-     *             ],
-     *
-     *             // Multiple rules can be applied in order to make a single public key have
-     *             // different access rights on different users
-     *             [
-     *                 'resources' => ArrayAdapter::getReadWriteResources(),
-     *                 'users' => ['different-users'],
-     *             ],
-     *
-     *             // You can also specify resource groups instead of explicitly setting them like
-     *             // in the above examples. Note that you cannot specify both resources and group
-     *             // in the same rule.
-     *             [
-     *                 'group' => 'read-stats',
-     *                 'users' => ['user1', 'user2']
-     *             ]
-     *         ]
-     *     ]
-     * ]
-     *
-     * The second argument to ArrayAdapter specifies the available resource groups. For example:
+     * The default SimpleArrayAdapter takes an array keyed by user (which will also be used as the
+     * public key) and a private key, in the following form:
      *
      * [
-     *     'group-name' => ['image.get', 'image.head'],
-     *     'read-stats' => ['user.get', 'user.head', 'user.options'],
+     *     'some-user' => 'some-private-key',
+     *     'other-user' => 'different-private-key'
      * ]
+     *
+     * This is the absolute simplest access control implementation - for instance, there is a
+     * 1:1 correlation between a user and a public key. The public key will have read and write
+     * access to all resources belonging to that user. Should you require more fine-grained access
+     * control, please take a look at the other adapters available, many of which are mutable -
+     * meaning you can use the Imbo API to alter access control on the fly.
      *
      * @var Auth\AccessControl\Adapter\AdapterInterface|Closure
      */
     'accessControl' => function() {
-        return new Auth\AccessControl\Adapter\ArrayAdapter();
+        return new Auth\AccessControl\Adapter\SimpleArrayAdapter([]);
     },
 
     /**

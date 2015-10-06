@@ -25,7 +25,7 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
      *
      * @var array
      */
-    private $accessList = [];
+    protected $accessList = [];
 
     /**
      * Public => private key pairs
@@ -200,32 +200,6 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
         }
 
         return null;
-    }
-
-    /**
-     * For compatibility reasons, where the configuration for Imbo has a set of
-     * 'public key' => 'private key' pairs - this method converts that config
-     * to an AccessControl-compatible format. Public key will equal the user.
-     *
-     * @param array $authDetails
-     */
-    public function setAccessListFromAuth(array $authDetails) {
-        foreach ($authDetails as $publicKey => $privateKey) {
-            if (is_array($privateKey)) {
-                throw new InvalidArgumentException('A public key can only have a single private key (as of 2.0.0)');
-            }
-
-            $this->accessList[] = [
-                'publicKey'  => $publicKey,
-                'privateKey' => $privateKey,
-                'acl' => [[
-                    'resources' => $this->getReadWriteResources(),
-                    'users' => [$publicKey]
-                ]]
-            ];
-
-            $this->keys[$publicKey] = $privateKey;
-        }
     }
 
     /**
