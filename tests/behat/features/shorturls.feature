@@ -26,12 +26,7 @@ Feature: Imbo can generate short URLs for images on demand
             """
             {"user": "other-user", "extension": "gif"}
             """
-        Then I should get a response with "201 Created"
-        And the "Content-Type" response header is "application/json"
-        And the response body matches:
-           """
-           #^{"id":"[a-zA-Z0-9]{7}"}$#
-           """
+        Then I should get a response with "400 Permission denied (public key)"
 
     Scenario Outline: Request an image using the short URL
         Given "tests/phpunit/Fixtures/image.png" exists in Imbo
