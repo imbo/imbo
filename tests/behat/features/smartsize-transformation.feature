@@ -5,6 +5,14 @@ Feature: Imbo can crop images using smart size and POIs
 
     Background:
         Given "tests/behat/fixtures/trolltunga.jpg" is used as the test image for the "smartsize" feature
+        And I use "publickey" and "privatekey" for public and private keys
+        And the request body contains:
+          """
+          {"poi": [{"x": 810, "y": 568}]}
+          """
+        And I sign the request
+        When I request the metadata of the test image using HTTP "PUT"
+        Then I should get a response with "200 OK"
 
     Scenario Outline: Smart size image
         Given I use "publickey" and "privatekey" for public and private keys
@@ -29,3 +37,13 @@ Feature: Imbo can crop images using smart size and POIs
             | smartsize:width=250,height=600,poi=810,568,crop=close  | 0, 0  | #5b8089 | 250   | 600    |
             | smartsize:width=250,height=600,poi=810,568,crop=medium | 0, 0  | #aaab84 | 250   | 600    |
             | smartsize:width=250,height=600,poi=810,568,crop=wide   | 0, 0  | #fafff3 | 250   | 600    |
+
+    Scenario: Smart size based on POI stored in metadata
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        And I specify "smartsize:width=250,height=250" as transformation
+        When I request the test image as a "png"
+        Then I should get a response with "200 OK"
+        And the width of the image is "250"
+        And the height of the image is "250"
+        And the pixel at coordinate "0, 0" should have a color of "#355170"

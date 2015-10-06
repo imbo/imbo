@@ -13,6 +13,7 @@ namespace Imbo\Image\Transformation;
 use Imbo\Exception\TransformationException,
     Imbo\EventListener\ListenerInterface,
     Imbo\EventManager\EventInterface,
+    Imbo\Model\Image,
     ImagickException;
 
 /**
@@ -32,6 +33,30 @@ class SmartSize extends Transformation implements ListenerInterface {
         ];
     }
 
+    /**
+     * Fetch POI from metadata for the image
+     *
+     * @param EventInterface $event
+     * @param Image $image
+     * @return array|false Array with x and y coordinate, or false if no POI was found
+     */
+    private function getPoiFromMetadata(EventInterface $event, Image $image) {
+        $metadata = $event->getDatabase()->getMetadata(
+            $image->getUser(),
+            $image->getImageIdentifier()
+        );
+
+        // Fetch POI from metadata. Array used if we want to expand with multiple POIs in the future
+        if (isset($metadata['poi'][0]['x']) && isset($metadata['poi'][0]['y'])) {
+            return [
+                (int) $metadata['poi'][0]['x'],
+                (int) $metadata['poi'][0]['y']
+            ];
+        }
+
+        return false;
+    }
+
     public function transform(EventInterface $event) {
         $image = $event->getArgument('image');
         $params = $event->getArgument('params');
@@ -49,6 +74,15 @@ class SmartSize extends Transformation implements ListenerInterface {
         }
 
         $poi = empty($params['poi']) ? null : explode(',', $params['poi']);
+
+        // Check if we have the POI in metadata
+        if (!$poi) {
+            $metadataPoi = $this->getPoiFromMetadata($event, $image);
+
+            if ($metadataPoi) {
+                $poi = $metadataPoi;
+            }
+        }
 
         if (!$poi) {
             throw new TransformationException('A point-of-interest x,y needs to be specified', 400);
