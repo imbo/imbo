@@ -556,19 +556,19 @@ If you want to set the default watermark image you will have to do so in the con
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
+        'eventListeners' => [
             'watermark' => function() {
                 $transformation = new Imbo\Image\Transformation\Watermark();
                 $transformation->setDefaultImage('some image identifier');
 
                 return $transformation;
             },
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 When you have specified a default watermark image you are not required to use the ``img`` option for the transformation, but if you do so it will override the default one.

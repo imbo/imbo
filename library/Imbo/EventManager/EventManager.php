@@ -96,10 +96,10 @@ class EventManager {
                     'users' => $users,
                 ], $defaultPriority);
             } else if (is_array($callback)) {
-                // 'eventName' => array( ... )
+                // 'eventName' => [ ... ]
                 foreach ($callback as $method => $priority) {
                     if (is_int($method)) {
-                        // 'eventName' => array('someMethod', ...)
+                        // 'eventName' => ['someMethod', ...]
                         $method = $priority;
                         $priority = $defaultPriority;
                     }

@@ -95,28 +95,28 @@ The stats resource enables users to attach custom statistics via event listeners
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'customStats' => array(
-                'events' => array('stats.get'),
+        'eventListeners' => [
+            'customStats' => [
+                'events' => ['stats.get'],
                 'callback' => function($event) {
                     // Fetch the model from the response
                     $model = $event->getResponse()->getModel();
 
                     // Set some values
                     $model['someValue'] = 123;
-                    $model['someOtherValue'] = array(
+                    $model['someOtherValue'] = [
                         'foo' => 'bar',
-                    );
-                    $model['someList'] = array(1, 2, 3);
+                    ];
+                    $model['someList'] = [1, 2, 3];
                 }
-            ),
-        ),
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 When requesting the stats endpoint, the output will look like this:
 

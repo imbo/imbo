@@ -29,7 +29,7 @@ use Imbo\Exception\StorageException,
  * - <pre>(string) server</pre> The server string to use when connecting to MongoDB. Defaults to
  *                              'mongodb://localhost:27017'
  * - <pre>(array) options</pre> Options to use when creating the Mongo client instance. Defaults to
- *                              array('connect' => true, 'connectTimeoutMS' => 1000).
+ *                              ['connect' => true, 'connectTimeoutMS' => 1000].
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Storage

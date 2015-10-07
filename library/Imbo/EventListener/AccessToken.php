@@ -38,20 +38,20 @@ class AccessToken implements ListenerInterface {
          * specified using the short names of the transformations (the name used in the query to
          * trigger the transformation).
          *
-         * 'transformations' => array(
-         *     'whitelist' => array(
+         * 'transformations' => [
+         *     'whitelist' => [
          *         'border',
          *         'thumbnail',
-         *      ),
-         * )
+         *      ],
+         * ]
          *
          * Use the 'whitelist' for making the listener skip the access token check for some
          * transformations, and the 'blacklist' key for the opposite:
          *
-         * 'whitelist' => array('border') means that the access token
+         * 'whitelist' => ['border'] means that the access token
          * will *not* be enforced for the Border transformation, but for all others.
          *
-         * 'blacklist' => array('border') means that the access token
+         * 'blacklist' => ['border'] means that the access token
          * will be enforced *only* when the Border transformation is in effect.
          *
          * If both 'whitelist' and 'blacklist' are specified all transformations will require an
