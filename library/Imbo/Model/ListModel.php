@@ -22,7 +22,7 @@ class ListModel implements ModelInterface {
      *
      * @var array
      */
-    private $list = array();
+    private $list = [];
 
     /**
      * The container name

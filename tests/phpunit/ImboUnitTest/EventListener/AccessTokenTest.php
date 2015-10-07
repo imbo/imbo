@@ -104,77 +104,77 @@ class AccessTokenTest extends ListenerTests {
      * @return array[]
      */
     public function getFilterData() {
-        return array(
-            'no filter and no transformations' => array(
-                $filter = array(),
-                $transformations = array(),
+        return [
+            'no filter and no transformations' => [
+                $filter = [],
+                $transformations = [],
                 $whitelisted = false,
-            ),
+            ],
             // @see https://github.com/imbo/imbo/issues/258
-            'configured filters, but no transformations in the request' => array(
-                $filter = array('transformations' => array('whitelist' => array('border'))),
-                $transformations = array(),
+            'configured filters, but no transformations in the request' => [
+                $filter = ['transformations' => ['whitelist' => ['border']]],
+                $transformations = [],
                 $whitelisted = false,
-            ),
-            array(
-                $filter = array(),
-                $transformations = array(
-                    array('name' => 'border', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = [],
+                $transformations = [
+                    ['name' => 'border', 'params' => []],
+                ],
                 $whitelisted = false,
-            ),
-            array(
-                $filter = array('transformations' => array('whitelist' => array('border'))),
-                $transformations = array(
-                    array('name' => 'border', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['whitelist' => ['border']]],
+                $transformations = [
+                    ['name' => 'border', 'params' => []],
+                ],
                 $whitelisted = true,
-            ),
-            array(
-                $filter = array('transformations' => array('whitelist' => array('border'))),
-                $transformations = array(
-                    array('name' => 'border', 'params' => array()),
-                    array('name' => 'thumbnail', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['whitelist' => ['border']]],
+                $transformations = [
+                    ['name' => 'border', 'params' => []],
+                    ['name' => 'thumbnail', 'params' => []],
+                ],
                 $whitelisted = false,
-            ),
-            array(
-                $filter = array('transformations' => array('blacklist' => array('border'))),
-                $transformations = array(
-                    array('name' => 'thumbnail', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['blacklist' => ['border']]],
+                $transformations = [
+                    ['name' => 'thumbnail', 'params' => []],
+                ],
                 $whitelisted = true,
-            ),
-            array(
-                $filter = array('transformations' => array('blacklist' => array('border'))),
-                $transformations = array(
-                    array('name' => 'border', 'params' => array()),
-                    array('name' => 'thumbnail', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['blacklist' => ['border']]],
+                $transformations = [
+                    ['name' => 'border', 'params' => []],
+                    ['name' => 'thumbnail', 'params' => []],
+                ],
                 $whitelisted = false,
-            ),
-            array(
-                $filter = array('transformations' => array('whitelist' => array('border'), 'blacklist' => array('thumbnail'))),
-                $transformations = array(
-                    array('name' => 'border', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['thumbnail']]],
+                $transformations = [
+                    ['name' => 'border', 'params' => []],
+                ],
                 $whitelisted = true,
-            ),
-            array(
-                $filter = array('transformations' => array('whitelist' => array('border'), 'blacklist' => array('thumbnail'))),
-                $transformations = array(
-                    array('name' => 'canvas', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['thumbnail']]],
+                $transformations = [
+                    ['name' => 'canvas', 'params' => []],
+                ],
                 $whitelisted = false,
-            ),
-            array(
-                $filter = array('transformations' => array('whitelist' => array('border'), 'blacklist' => array('border'))),
-                $transformations = array(
-                    array('name' => 'border', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['border']]],
+                $transformations = [
+                    ['name' => 'border', 'params' => []],
+                ],
                 $whitelisted = false,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -202,33 +202,33 @@ class AccessTokenTest extends ListenerTests {
      * @return array[]
      */
     public function getAccessTokens() {
-        return array(
-            array(
+        return [
+            [
                 'http://imbo/users/christer',
                 'some access token',
                 'private key',
                 false
-            ),
-            array(
+            ],
+            [
                 'http://imbo/users/christer',
                 '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
                 'private key',
                 true
-            ),
-            array(
+            ],
+            [
                 'http://imbo/users/christer',
                 '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
                 'other private key',
                 false
-            ),
+            ],
             // Test that checking URL "as is" works properly. This is for backwards compatibility.
-            array(
+            [
                 'http://imbo/users/christer?t[]=thumbnail%3Awidth%3D40%2Cheight%3D40%2Cfit%3Doutbound',
                 'f0166cb4f7c8eabbe82c5d753f681ed53bcfa10391d4966afcfff5806cc2bff4',
                 'some random private key',
                 true
-            ),
-        );
+            ],
+        ];
     }
 
     /**

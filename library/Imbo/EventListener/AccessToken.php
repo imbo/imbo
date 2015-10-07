@@ -31,7 +31,7 @@ class AccessToken implements ListenerInterface {
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         /**
          * Use this parameter to enforce the access token listener for only some of the image
          * transformations (if the request is against an image). Each transformation must be
@@ -57,11 +57,11 @@ class AccessToken implements ListenerInterface {
          * If both 'whitelist' and 'blacklist' are specified all transformations will require an
          * access token unless included in the 'whitelist'.
          */
-        'transformations' => array(
-            'whitelist' => array(),
-            'blacklist' => array(),
-        ),
-    );
+        'transformations' => [
+            'whitelist' => [],
+            'blacklist' => [],
+        ],
+    ];
 
     /**
      * Class constructor
@@ -78,8 +78,8 @@ class AccessToken implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        $callbacks = array();
-        $events = array(
+        $callbacks = [];
+        $events = [
             'groups.get',
             'groups.head',
             'group.get',
@@ -102,10 +102,10 @@ class AccessToken implements ListenerInterface {
             'shorturl.head',
 
             'auth.accesstoken'
-        );
+        ];
 
         foreach ($events as $event) {
-            $callbacks[$event] = array('checkAccessToken' => 100);
+            $callbacks[$event] = ['checkAccessToken' => 100];
         }
 
         return $callbacks;
@@ -137,7 +137,7 @@ class AccessToken implements ListenerInterface {
         $token = $query->get('accessToken');
 
         // First the the raw un-encoded URI, then the URI as is
-        $uris = array($request->getRawUri(), $request->getUriAsIs());
+        $uris = [$request->getRawUri(), $request->getUriAsIs()];
         $privateKey = $event->getAccessControl()->getPrivateKey($request->getPublicKey());
 
         foreach ($uris as $uri) {

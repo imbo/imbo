@@ -30,7 +30,7 @@ class Keys implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('PUT', 'DELETE');
+        return ['PUT', 'DELETE'];
     }
 
     /**

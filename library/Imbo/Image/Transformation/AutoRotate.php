@@ -29,9 +29,9 @@ class AutoRotate extends Transformation implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.transformation.autorotate' => 'transform',
-        );
+        ];
     }
 
     /**

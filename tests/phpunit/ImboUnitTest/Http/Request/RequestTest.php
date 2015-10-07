@@ -42,19 +42,19 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Request\Request::getTransformations
      */
     public function testGetTransformationsWithNoTransformationsPresent() {
-        $this->assertEquals(array(), $this->request->getTransformations());
+        $this->assertEquals([], $this->request->getTransformations());
     }
 
     /**
      * @covers Imbo\Http\Request\Request::getTransformations
      */
     public function testGetTransformationsWithCorrectOrder() {
-        $query = array(
-            't' => array(
+        $query = [
+            't' => [
                 'flipHorizontally',
                 'flipVertically',
-            ),
-        );
+            ],
+        ];
 
         $request = new Request($query);
         $transformations = $request->getTransformations();
@@ -66,8 +66,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Request\Request::getTransformations
      */
     public function testGetTransformations() {
-        $query = array(
-            't' => array(
+        $query = [
+            't' => [
                 // Valid transformations with all options
                 'border:color=fff,width=2,height=2',
                 'compress:level=90',
@@ -80,21 +80,21 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
                 // The same transformation can be applied multiple times
                 'resize:width=50,height=75',
-            ),
-        );
+            ],
+        ];
 
         $request = new Request($query);
         $transformations = $request->getTransformations();
         $this->assertInternalType('array', $transformations);
         $this->assertSame(7, count($transformations));
 
-        $this->assertEquals(array('color' => 'fff', 'width' => 2, 'height' => 2), $transformations[0]['params']);
-        $this->assertEquals(array('level' => '90'), $transformations[1]['params']);
-        $this->assertEquals(array('x' => 1, 'y' => 2, 'width' => 3, 'height' => 4), $transformations[2]['params']);
-        $this->assertEquals(array('width' => 100, 'height' => 100), $transformations[3]['params']);
-        $this->assertEquals(array(), $transformations[4]['params']);
-        $this->assertEquals(array(), $transformations[5]['params']);
-        $this->assertEquals(array('width' => 50, 'height' => 75), $transformations[6]['params']);
+        $this->assertEquals(['color' => 'fff', 'width' => 2, 'height' => 2], $transformations[0]['params']);
+        $this->assertEquals(['level' => '90'], $transformations[1]['params']);
+        $this->assertEquals(['x' => 1, 'y' => 2, 'width' => 3, 'height' => 4], $transformations[2]['params']);
+        $this->assertEquals(['width' => 100, 'height' => 100], $transformations[3]['params']);
+        $this->assertEquals([], $transformations[4]['params']);
+        $this->assertEquals([], $transformations[5]['params']);
+        $this->assertEquals(['width' => 50, 'height' => 75], $transformations[6]['params']);
     }
 
     /**
@@ -207,9 +207,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Request\Request::getTransformations
      */
     public function testRequiresTransformationsToBeSpecifiedAsAnArray() {
-        $request = new Request(array(
+        $request = new Request([
             't' => 'desaturate',
-        ));
+        ]);
         $request->getTransformations();
     }
 
@@ -220,41 +220,41 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Request\Request::getTransformations
      */
     public function testDoesNotGenerateWarningWhenTransformationIsNotAString() {
-        $query = array(
-            't' => array(
-                array(
+        $query = [
+            't' => [
+                [
                     'flipHorizontally',
                     'flipVertically',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $request = new Request($query);
         $request->getTransformations();
     }
 
     public function getQueryStrings() {
-        return array(
-            'transformation with params' => array(
+        return [
+            'transformation with params' => [
                 't[]=thumbnail:width=100',
                 't[]=thumbnail:width=100',
-            ),
-            'transformation with params, encoded' => array(
+            ],
+            'transformation with params, encoded' => [
                 't%5B0%5D%3Dthumbnail%3Awidth%3D100',
                 't[0]=thumbnail:width=100',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
      * @dataProvider getQueryStrings
      */
     public function testGetRawUriDecodesUri($queryString, $expectedQueryString) {
-        $request = new Request(array(), array(), array(), array(), array(), array(
+        $request = new Request([], [], [], [], [], [
             'SERVER_NAME' => 'imbo',
             'SERVER_PORT' => 80,
             'QUERY_STRING' => $queryString,
-        ));
+        ]);
 
         $uri = $request->getRawUri();
         $this->assertSame($expectedQueryString, substr($uri, strpos($uri, '?') + 1));

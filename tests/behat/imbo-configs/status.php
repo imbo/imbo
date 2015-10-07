@@ -11,12 +11,12 @@
 /**
  * Set a database and storage adapter that has some behaviour determined via request headers
  */
-return array(
+return [
     'database' => function() {
         $adapter = (new PHPUnit_Framework_MockObject_Generator())->getMock(
             'Imbo\Database\MongoDB',
-            array('getStatus'),
-            array(array('databaseName' => 'imbo_testing'))
+            ['getStatus'],
+            [['databaseName' => 'imbo_testing']]
         );
 
         $adapter->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount())
@@ -29,8 +29,8 @@ return array(
     'storage' => function() {
         $adapter = (new PHPUnit_Framework_MockObject_Generator())->getMock(
             'Imbo\Storage\GridFS',
-            array('getStatus'),
-            array(array('databaseName' => 'imbo_testing'))
+            ['getStatus'],
+            [['databaseName' => 'imbo_testing']]
         );
 
         $adapter->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount())
@@ -39,4 +39,4 @@ return array(
 
         return $adapter;
     },
-);
+];

@@ -38,13 +38,13 @@ class Doctrine implements StorageInterface {
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         'dbname'   => null,
         'user'     => null,
         'password' => null,
         'host'     => null,
         'driver'   => null,
-    );
+    ];
 
     /**
      * Name of the table used for storing the images
@@ -82,20 +82,20 @@ class Doctrine implements StorageInterface {
         $now = time();
 
         if ($this->imageExists($user, $imageIdentifier)) {
-            return (boolean) $this->getConnection()->update($this->getTableName($user, $imageIdentifier), array(
+            return (boolean) $this->getConnection()->update($this->getTableName($user, $imageIdentifier), [
                 'updated' => $now,
-            ), array(
+            ], [
                 'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
-            ));
+            ]);
         }
 
-        return (boolean) $this->getConnection()->insert($this->getTableName($user, $imageIdentifier), array(
+        return (boolean) $this->getConnection()->insert($this->getTableName($user, $imageIdentifier), [
             'user'            => $user,
             'imageIdentifier' => $imageIdentifier,
             'data'            => $imageData,
             'updated'         => $now,
-        ));
+        ]);
     }
 
     /**
@@ -106,10 +106,10 @@ class Doctrine implements StorageInterface {
             throw new StorageException('File not found', 404);
         }
 
-        return (boolean) $this->getConnection()->delete($this->getTableName($user, $imageIdentifier), array(
+        return (boolean) $this->getConnection()->delete($this->getTableName($user, $imageIdentifier), [
             'user' => $user,
             'imageIdentifier' => $imageIdentifier,
-        ));
+        ]);
     }
 
     /**
@@ -161,10 +161,10 @@ class Doctrine implements StorageInterface {
               ->from($this->getTableName($user, $imageIdentifier), 'i')
               ->where('user = :user')
               ->andWhere('imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
+              ->setParameters([
                   ':user'            => $user,
                   ':imageIdentifier' => $imageIdentifier,
-              ));
+              ]);
 
         $stmt = $query->execute();
         $row = $stmt->fetch();

@@ -505,7 +505,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertShortUrl($shortUrlId, $user, $imageIdentifier, $extension = null, array $query = array()) {
+    public function insertShortUrl($shortUrlId, $user, $imageIdentifier, $extension = null, array $query = []) {
         try {
             $data = [
                 'shortUrlId' => $shortUrlId,
@@ -526,7 +526,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getShortUrlId($user, $imageIdentifier, $extension = null, array $query = array()) {
+    public function getShortUrlId($user, $imageIdentifier, $extension = null, array $query = []) {
         try {
             $result = $this->getShortUrlCollection()->findOne([
                 'user' => $user,

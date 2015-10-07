@@ -138,36 +138,36 @@ class ShortUrlsTest extends ResourceTests {
     }
 
     public function createShortUrlParams() {
-        return array(
-            'no extension, no query' => array(
-                null, null, array(),
-            ),
-            'image extension, no query' => array(
-                'gif', null, array(),
-            ),
-            'query string with leading ?' => array(
-                null, '?t[]=thumbnail:width=40,height=40&t[]=desaturate', array(
-                    't' => array(
+        return [
+            'no extension, no query' => [
+                null, null, [],
+            ],
+            'image extension, no query' => [
+                'gif', null, [],
+            ],
+            'query string with leading ?' => [
+                null, '?t[]=thumbnail:width=40,height=40&t[]=desaturate', [
+                    't' => [
                         'thumbnail:width=40,height=40',
                         'desaturate',
-                    ),
-                ),
-            ),
-            'query string without leading ?' => array(
-                null, 't[]=thumbnail:width=40,height=40&t[]=desaturate', array(
-                    't' => array(
+                    ],
+                ],
+            ],
+            'query string without leading ?' => [
+                null, 't[]=thumbnail:width=40,height=40&t[]=desaturate', [
+                    't' => [
                         'thumbnail:width=40,height=40',
                         'desaturate',
-                    ),
-                ),
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**
      * @dataProvider createShortUrlParams
      */
-    public function testCanCreateShortUrls($extension = null, $queryString = null, array $query = array()) {
+    public function testCanCreateShortUrls($extension = null, $queryString = null, array $query = []) {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('
             {
                 "user": "user",
@@ -198,7 +198,7 @@ class ShortUrlsTest extends ResourceTests {
         '));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
-        $this->database->expects($this->once())->method('getShortUrlId')->with('user', 'id', null, array())->will($this->returnValue('aaaaaaa'));
+        $this->database->expects($this->once())->method('getShortUrlId')->with('user', 'id', null, [])->will($this->returnValue('aaaaaaa'));
         $this->database->expects($this->never())->method('insertShortUrl');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setStatusCode')->with(200);
@@ -211,11 +211,11 @@ class ShortUrlsTest extends ResourceTests {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
 
-        $this->database->expects($this->at(0))->method('getShortUrlId')->with('user', 'id', null, array())->will($this->returnValue(null));
-        $this->database->expects($this->at(1))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(array('user' => 'value')));
-        $this->database->expects($this->at(2))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(array('user' => 'value')));
+        $this->database->expects($this->at(0))->method('getShortUrlId')->with('user', 'id', null, [])->will($this->returnValue(null));
+        $this->database->expects($this->at(1))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(['user' => 'value']));
+        $this->database->expects($this->at(2))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(['user' => 'value']));
         $this->database->expects($this->at(3))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(null));
-        $this->database->expects($this->at(4))->method('insertShortUrl')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'), 'user', 'id', null, array());
+        $this->database->expects($this->at(4))->method('insertShortUrl')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'), 'user', 'id', null, []);
 
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setStatusCode')->with(201);

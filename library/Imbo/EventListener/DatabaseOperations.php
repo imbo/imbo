@@ -32,7 +32,7 @@ class DatabaseOperations implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'db.image.insert'    => 'insertImage',
             'db.image.delete'    => 'deleteImage',
             'db.image.load'      => 'loadImage',
@@ -42,7 +42,7 @@ class DatabaseOperations implements ListenerInterface {
             'db.metadata.load'   => 'loadMetadata',
             'db.user.load'       => 'loadUser',
             'db.stats.load'      => 'loadStats',
-        );
+        ];
     }
 
     /**
@@ -245,7 +245,7 @@ class DatabaseOperations implements ListenerInterface {
               ->setPage($query->page());
 
         $images = $database->getImages($users, $query, $model);
-        $modelImages = array();
+        $modelImages = [];
 
         foreach ($images as $image) {
             $entry = new Model\Image();

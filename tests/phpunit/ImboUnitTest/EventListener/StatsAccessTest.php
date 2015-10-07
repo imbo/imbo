@@ -73,68 +73,68 @@ class StatsAccessTest extends ListenerTests {
      * @return array[]
      */
     public function getFilterData() {
-        return array(
-            'IPv4 in whitelist' => array(
+        return [
+            'IPv4 in whitelist' => [
                 '127.0.0.1',        // IP
-                array('127.0.0.1'), // Allow
+                ['127.0.0.1'], // Allow
                 true                // Access?
-            ),
-            'IPv4 not in whitelist' => array(
+            ],
+            'IPv4 not in whitelist' => [
                 '127.0.0.2',
-                array('127.0.0.1'),
+                ['127.0.0.1'],
                 false
-            ),
-            'IPv4 in whitelist range' => array(
+            ],
+            'IPv4 in whitelist range' => [
                 '192.168.1.10',
-                array('192.168.1.0/24'),
+                ['192.168.1.0/24'],
                 true
-            ),
-            'IPv4 outside of whitelist range' => array(
+            ],
+            'IPv4 outside of whitelist range' => [
                 '192.168.1.64',
-                array('192.168.1.32/27'),
+                ['192.168.1.32/27'],
                 false
-            ),
-            'IPv6 in whitelist (in short format)' => array(
+            ],
+            'IPv6 in whitelist (in short format)' => [
                 '2a00:1b60:1011:0000:0000:0000:0000:1338',
-                array('2a00:1b60:1011::1338'),
+                ['2a00:1b60:1011::1338'],
                 true
-            ),
-            'IPv6 in whitelist (in full format)' => array(
+            ],
+            'IPv6 in whitelist (in full format)' => [
                 '2a00:1b60:1011:0000:0000:0000:0000:1338',
-                array('2a00:1b60:1011:0000:0000:0000:0000:1338'),
+                ['2a00:1b60:1011:0000:0000:0000:0000:1338'],
                 true
-            ),
-            'IPv6 in whitelist range' => array(
+            ],
+            'IPv6 in whitelist range' => [
                 '2001:0db8:0000:0000:0000:0000:0000:0000',
-                array('2001:db8::/48'),
+                ['2001:db8::/48'],
                 true
-            ),
-            'IPv6 outside of whitelist range' => array(
+            ],
+            'IPv6 outside of whitelist range' => [
                 '2001:0db9:0000:0000:0000:0000:0000:0000',
-                array('2001:db8::/48'),
+                ['2001:db8::/48'],
                 false
-            ),
-            'IPv6 in whitelist (in short format in both fields)' => array(
+            ],
+            'IPv6 in whitelist (in short format in both fields)' => [
                 '2a00:1b60:1011::1338',
-                array('2a00:1b60:1011::1338'),
+                ['2a00:1b60:1011::1338'],
                 true
-            ),
-            'Blaclisted IPv4 client and both types in allow' => array(
+            ],
+            'Blaclisted IPv4 client and both types in allow' => [
                 '1.2.3.4',
-                array('127.0.0.1', '::1'),
+                ['127.0.0.1', '::1'],
                 false
-            ),
-            'Whitelitsed IPv6 client and both types in allow' => array(
+            ],
+            'Whitelitsed IPv6 client and both types in allow' => [
                 '::1',
-                array('127.0.0.1', '::1'),
+                ['127.0.0.1', '::1'],
                 true
-            ),
-            'Wildcard allows all clients' => array(
+            ],
+            'Wildcard allows all clients' => [
                 '::1',
-                array('*'),
+                ['*'],
                 true
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -145,9 +145,9 @@ class StatsAccessTest extends ListenerTests {
                       ->method('getClientIp')
                       ->will($this->returnValue($clientIp));
 
-        $listener = new StatsAccess(array(
+        $listener = new StatsAccess([
             'allow' => $allow,
-        ));
+        ]);
 
         if (!$hasAccess) {
             $this->setExpectedException('Imbo\Exception\RuntimeException', 'Access denied', 403);

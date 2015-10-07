@@ -25,18 +25,18 @@ class GlobalShortUrl implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD');
+        return ['GET', 'HEAD'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             // Fetch an image using the short URL
             'globalshorturl.get' => 'getImage',
             'globalshorturl.head' => 'getImage',
-        );
+        ];
     }
 
     /**

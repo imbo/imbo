@@ -22,7 +22,7 @@ class ArrayModel implements ModelInterface {
      *
      * @var array
      */
-    private $data = array();
+    private $data = [];
 
     /**
      * Title of the model, used in representations

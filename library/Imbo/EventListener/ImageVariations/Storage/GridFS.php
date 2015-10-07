@@ -49,14 +49,14 @@ class GridFS implements StorageInterface {
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         // Database name
         'databaseName' => 'imbo_imagevariation_storage',
 
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
-        'options' => array('connect' => true, 'connectTimeoutMS' => 1000),
-    );
+        'options' => ['connect' => true, 'connectTimeoutMS' => 1000],
+    ];
 
     /**
      * Class constructor
@@ -83,12 +83,12 @@ class GridFS implements StorageInterface {
      * {@inheritdoc}
      */
     public function storeImageVariation($user, $imageIdentifier, $blob, $width) {
-        $this->getGrid()->storeBytes($blob, array(
+        $this->getGrid()->storeBytes($blob, [
             'added' => time(),
             'user' => $user,
             'imageIdentifier' => $imageIdentifier,
             'width' => (int) $width,
-        ));
+        ]);
 
         return true;
     }
@@ -97,11 +97,11 @@ class GridFS implements StorageInterface {
      * {@inheritdoc}
      */
     public function getImageVariation($user, $imageIdentifier, $width) {
-        $file = $this->getGrid()->findOne(array(
+        $file = $this->getGrid()->findOne([
             'user' => $user,
             'imageIdentifier' => $imageIdentifier,
             'width' => (int) $width,
-        ));
+        ]);
 
         return $file ? $file->getBytes() : null;
     }
@@ -110,10 +110,10 @@ class GridFS implements StorageInterface {
      * {@inheritdoc}
      */
     public function deleteImageVariations($user, $imageIdentifier, $width = null) {
-        $query = array(
+        $query = [
             'user' => $user,
             'imageIdentifier' => $imageIdentifier
-        );
+        ];
 
         if ($width !== null) {
             $query['width'] = $width;

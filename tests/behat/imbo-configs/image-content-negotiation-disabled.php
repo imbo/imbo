@@ -11,6 +11,6 @@
 /**
  * Disable content negotiation for images
  */
-return array(
+return [
     'contentNegotiateImages' => false,
-);
+];

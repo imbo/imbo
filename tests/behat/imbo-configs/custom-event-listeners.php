@@ -33,10 +33,10 @@ class CustomEventListener implements Imbo\EventListener\ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'index.get' => 'getIndex',
             'user.get' => 'getUser',
-        );
+        ];
     }
 
     /**
@@ -45,10 +45,10 @@ class CustomEventListener implements Imbo\EventListener\ListenerInterface {
      * @param Imbo\EventManager\EventInterface $event The current event
      */
     public function getIndex(Imbo\EventManager\EventInterface $event) {
-        $event->getResponse()->headers->add(array(
+        $event->getResponse()->headers->add([
             'X-Imbo-Value1' => $this->value1,
             'X-Imbo-Value2' => $this->value2,
-        ));
+        ]);
     }
 
     /**
@@ -64,32 +64,32 @@ class CustomEventListener implements Imbo\EventListener\ListenerInterface {
 /**
  * Attach some custom event listeners
  */
-return array(
-    'eventListeners' => array(
-        'someHandler' => array(
-            'events' => array(
+return [
+    'eventListeners' => [
+        'someHandler' => [
+            'events' => [
                 'index.get' => 1000,
-            ),
+            ],
             'callback' => function(Imbo\EventManager\EventInterface $event) {
                 $event->getResponse()->headers->set('X-Imbo-SomeHandler', microtime(true));
             }
-        ),
-        'someOtherHandler' => array(
-            'events' => array(
+        ],
+        'someOtherHandler' => [
+            'events' => [
                 'index.get',
                 'index.head',
-            ),
+            ],
             'callback' => function(Imbo\EventManager\EventInterface $event) {
                 $event->getResponse()->headers->set('X-Imbo-SomeOtherHandler', microtime(true));
             },
             'priority' => 10,
-        ),
-        'someEventListener' => array(
+        ],
+        'someEventListener' => [
             'listener' => 'CustomEventListener',
-            'params' => array('key1' => 'value1', 'key2' => 'value2'),
-            'users' => array(
-                'whitelist' => array('user'),
-            ),
-        ),
-    ),
-);
+            'params' => ['key1' => 'value1', 'key2' => 'value2'],
+            'users' => [
+                'whitelist' => ['user'],
+            ],
+        ],
+    ],
+];

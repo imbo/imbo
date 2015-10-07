@@ -58,7 +58,7 @@ class AutoRotateImageTest extends \PHPUnit_Framework_TestCase {
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
 
         $eventManager = $this->getMock('Imbo\EventManager\EventManager');
-        $eventManager->expects($this->once())->method('trigger')->with('image.transformation.autorotate', array('image' => $image));
+        $eventManager->expects($this->once())->method('trigger')->with('image.transformation.autorotate', ['image' => $image]);
 
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));

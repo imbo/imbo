@@ -27,9 +27,9 @@ class Application extends BaseApplication {
         parent::__construct('Imbo', Version::VERSION);
 
         // Register commands
-        $this->addCommands(array(
+        $this->addCommands([
             new Command\GeneratePrivateKey(),
             new Command\AddPublicKey(),
-        ));
+        ]);
     }
 }

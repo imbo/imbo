@@ -23,17 +23,17 @@ class User implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD');
+        return ['GET', 'HEAD'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'user.get' => 'get',
             'user.head' => 'get',
-        );
+        ];
     }
 
     /**

@@ -11,26 +11,26 @@
 /**
  * Whitelist a single transformation in the access token event listener
  */
-return array(
-    'eventListeners' => array(
-        'accessToken' => array(
+return [
+    'eventListeners' => [
+        'accessToken' => [
             'listener' => 'Imbo\EventListener\AccessToken',
-            'params' => array(
-                'transformations' => array(
-                   'whitelist' => array(
+            'params' => [
+                'transformations' => [
+                   'whitelist' => [
                         'whitelisted',
-                    ),
-                ),
-            ),
-        ),
-    ),
-    'transformationPresets' => array(
-        'whitelisted' => array(
-            'crop' => array(
+                    ],
+                ],
+            ],
+        ],
+    ],
+    'transformationPresets' => [
+        'whitelisted' => [
+            'crop' => [
                 'width' => 100,
                 'height' => 50,
                 'mode' => 'center',
-            )
-        ),
-    ),
-);
+            ]
+        ],
+    ],
+];

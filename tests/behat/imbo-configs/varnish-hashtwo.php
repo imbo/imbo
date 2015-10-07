@@ -11,14 +11,14 @@
 /**
  * Enable the Varnish hashtwo event listener
  */
-return array(
-    'eventListeners' => array(
+return [
+    'eventListeners' => [
         'varnishHashTwo' => 'Imbo\EventListener\VarnishHashTwo',
-        'customVarnishHashTwo' => array(
+        'customVarnishHashTwo' => [
             'listener' => 'Imbo\EventListener\VarnishHashTwo',
-            'params' => array(
+            'params' => [
                 'headerName' => 'X-Imbo-HashTwo',
-            ),
-        ),
-    ),
-);
+            ],
+        ],
+    ],
+];

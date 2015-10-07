@@ -74,16 +74,16 @@ class ImageTransformationCache implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             // Look for images in the cache before transformations occur
-            'image.get' => array('loadFromCache' => 20),
+            'image.get' => ['loadFromCache' => 20],
 
             // Store images in the cache before they are sent to the user agent
-            'response.send' => array('storeInCache' => 10),
+            'response.send' => ['storeInCache' => 10],
 
             // Remove from the cache when an image is deleted from Imbo
-            'image.delete' => array('deleteFromCache' => 10),
-        );
+            'image.delete' => ['deleteFromCache' => 10],
+        ];
     }
 
     /**
@@ -150,10 +150,10 @@ class ImageTransformationCache implements ListenerInterface {
         $dir = dirname($path);
 
         // Prepare data for the data
-        $data = serialize(array(
+        $data = serialize([
             'image' => $model,
             'headers' => $response->headers,
-        ));
+        ]);
 
         // Create directory if it does not already exist. The last is_dir is there because race
         // conditions can occur, and another process could already have created the directory after

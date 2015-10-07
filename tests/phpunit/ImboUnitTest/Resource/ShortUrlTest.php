@@ -88,10 +88,10 @@ class ShortUrlTest extends ResourceTests {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->route->expects($this->once())->method('get')->with('shortUrlId')->will($this->returnValue('aaaaaaa'));
-        $this->database->expects($this->once())->method('getShortUrlParams')->with('aaaaaaa')->will($this->returnValue(array(
+        $this->database->expects($this->once())->method('getShortUrlParams')->with('aaaaaaa')->will($this->returnValue([
             'user' => 'otheruser',
             'imageIdentifier' => 'id',
-        )));
+        ]));
 
         $this->getNewResource()->deleteShortUrl($this->event);
     }
@@ -100,10 +100,10 @@ class ShortUrlTest extends ResourceTests {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->route->expects($this->once())->method('get')->with('shortUrlId')->will($this->returnValue('aaaaaaa'));
-        $this->database->expects($this->once())->method('getShortUrlParams')->with('aaaaaaa')->will($this->returnValue(array(
+        $this->database->expects($this->once())->method('getShortUrlParams')->with('aaaaaaa')->will($this->returnValue([
             'user' => 'user',
             'imageIdentifier' => 'id',
-        )));
+        ]));
         $this->database->expects($this->once())->method('deleteShortUrls')->with('user', 'id', 'aaaaaaa');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
 

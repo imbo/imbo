@@ -26,9 +26,9 @@ class MongoDBTest extends DatabaseTests {
      * @see ImboIntegrationTest\Database\DatabaseTests::getAdapter()
      */
     protected function getAdapter() {
-        return new MongoDB(array(
+        return new MongoDB([
             'databaseName' => $this->databaseName,
-        ));
+        ]);
     }
 
     /**
@@ -61,9 +61,9 @@ class MongoDBTest extends DatabaseTests {
      * @covers Imbo\Database\MongoDB::getStatus
      */
     public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() {
-        $db = new MongoDB(array(
+        $db = new MongoDB([
             'server' => 'foobar',
-        ));
+        ]);
         $this->assertFalse($db->getStatus());
     }
 }

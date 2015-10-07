@@ -38,20 +38,20 @@ class ContrastTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function getContrastParams() {
-        return array(
-            'no params' => array(
-                array(), 0, 1,
-            ),
-            'positive contrast' => array(
-                array('sharpen' => 2), 1, 2,
-            ),
-            'zero contrast' => array(
-                array('sharpen' => 0), 0, 1,
-            ),
-            'negative contrast' => array(
-                array('sharpen' => -2), 0, 3,
-            ),
-        );
+        return [
+            'no params' => [
+                [], 0, 1,
+            ],
+            'positive contrast' => [
+                ['sharpen' => 2], 1, 2,
+            ],
+            'zero contrast' => [
+                ['sharpen' => 0], 0, 1,
+            ],
+            'negative contrast' => [
+                ['sharpen' => -2], 0, 3,
+            ],
+        ];
     }
 
     /**

@@ -50,10 +50,10 @@ class ResponseETagTest extends ListenerTests {
      * @return array[]
      */
     public function getTaintedHeaders() {
-        return array(
-            'non-tainted' => array('"be7d5bb2f29494c0a1c95c81e8ae8b99"', '"be7d5bb2f29494c0a1c95c81e8ae8b99"', false),
-            'tainted' => array('"be7d5bb2f29494c0a1c95c81e8ae8b99-gzip"', '"be7d5bb2f29494c0a1c95c81e8ae8b99"', true),
-        );
+        return [
+            'non-tainted' => ['"be7d5bb2f29494c0a1c95c81e8ae8b99"', '"be7d5bb2f29494c0a1c95c81e8ae8b99"', false],
+            'tainted' => ['"be7d5bb2f29494c0a1c95c81e8ae8b99-gzip"', '"be7d5bb2f29494c0a1c95c81e8ae8b99"', true],
+        ];
     }
 
     /**
@@ -84,17 +84,17 @@ class ResponseETagTest extends ListenerTests {
      * @return array[]
      */
     public function getRoutesForETags() {
-        return array(
-            'index route has no ETag' => array('index', false),
-            'stats route has no ETag' => array('stats', false),
-            'status route has no ETag' => array('status', false),
-            'user route has ETag' => array('user', true, true, '{"user":"christer"}'),
-            'images route has ETag' => array('images', true, true, '{"search":{"hits":0,"page":1,"limit":20,"count":0},"images":[]}'),
-            'image route has ETag' => array('image', true, true, file_get_contents(FIXTURES_DIR . '/image.png')),
-            'metadata route has ETag' => array('metadata', true, true, '{"foo":"bar"}'),
-            'shorturl route has ETag' => array('globalshorturl', true, true, file_get_contents(FIXTURES_DIR . '/image.png')),
-            'response codes other than 200 does not get ETags' => array('globalshorturl', true, false),
-        );
+        return [
+            'index route has no ETag' => ['index', false],
+            'stats route has no ETag' => ['stats', false],
+            'status route has no ETag' => ['status', false],
+            'user route has ETag' => ['user', true, true, '{"user":"christer"}'],
+            'images route has ETag' => ['images', true, true, '{"search":{"hits":0,"page":1,"limit":20,"count":0},"images":[]}'],
+            'image route has ETag' => ['image', true, true, file_get_contents(FIXTURES_DIR . '/image.png')],
+            'metadata route has ETag' => ['metadata', true, true, '{"foo":"bar"}'],
+            'shorturl route has ETag' => ['globalshorturl', true, true, file_get_contents(FIXTURES_DIR . '/image.png')],
+            'response codes other than 200 does not get ETags' => ['globalshorturl', true, false],
+        ];
     }
 
     /**

@@ -11,8 +11,8 @@
 /**
  * Enable the EXIF metadata listener
  */
-return array(
-    'eventListeners' => array(
+return [
+    'eventListeners' => [
         'exifMetadataListener' => 'Imbo\EventListener\ExifMetadata',
-    ),
-);
+    ],
+];

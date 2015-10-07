@@ -25,26 +25,26 @@ class Metadata implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'POST', 'PUT', 'DELETE', 'HEAD');
+        return ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'metadata.head' => 'get',
             'metadata.get' => 'get',
-            'metadata.post' => array(
+            'metadata.post' => [
                 'post',
                 'validateMetadata' => 10,
-            ),
-            'metadata.put' => array(
+            ],
+            'metadata.put' => [
                 'put',
                 'validateMetadata' => 10,
-            ),
+            ],
             'metadata.delete' => 'delete',
-        );
+        ];
     }
 
     /**
@@ -68,9 +68,9 @@ class Metadata implements ResourceInterface {
 
         $event->getManager()
             ->trigger('db.metadata.delete')
-            ->trigger('db.metadata.update', array(
+            ->trigger('db.metadata.update', [
                 'metadata' => $metadata,
-            ));
+            ]);
 
         $model = new Model\Metadata();
         $model->setData($metadata);
@@ -86,9 +86,9 @@ class Metadata implements ResourceInterface {
     public function post(EventInterface $event) {
         $request = $event->getRequest();
 
-        $event->getManager()->trigger('db.metadata.update', array(
+        $event->getManager()->trigger('db.metadata.update', [
             'metadata' => json_decode($request->getContent(), true),
-        ));
+        ]);
 
         $model = new Model\Metadata();
         $model->setData($event->getDatabase()->getMetadata($request->getUser(), $request->getImageIdentifier()));

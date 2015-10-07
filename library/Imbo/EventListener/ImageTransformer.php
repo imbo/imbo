@@ -23,9 +23,9 @@ class ImageTransformer implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.transform' => 'transform',
-        );
+        ];
     }
 
     /**
@@ -56,20 +56,20 @@ class ImageTransformer implements ListenerInterface {
 
                     $eventManager->trigger(
                         'image.transformation.' . strtolower($name),
-                        array(
+                        [
                             'image' => $image,
                             'params' => $params,
-                        )
+                        ]
                     );
                 }
             } else {
                 // Regular transformation
                 $eventManager->trigger(
                     'image.transformation.' . strtolower($transformation['name']),
-                    array(
+                    [
                         'image' => $image,
                         'params' => $transformation['params'],
-                    )
+                    ]
                 );
             }
         }

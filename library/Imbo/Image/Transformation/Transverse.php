@@ -27,9 +27,9 @@ class Transverse extends Transformation implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.transformation.transverse' => 'transform',
-        );
+        ];
     }
 
     /**

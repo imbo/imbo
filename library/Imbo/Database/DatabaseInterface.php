@@ -192,7 +192,7 @@ interface DatabaseInterface {
      * @param array $query Optional query parameters
      * @return boolean
      */
-    function insertShortUrl($shortUrlId, $user, $imageIdentifier, $extension = null, array $query = array());
+    function insertShortUrl($shortUrlId, $user, $imageIdentifier, $extension = null, array $query = []);
 
     /**
      * Fetch the short URL identifier
@@ -203,7 +203,7 @@ interface DatabaseInterface {
      * @param array $query Optional query parameters
      * @return string|null
      */
-    function getShortUrlId($user, $imageIdentifier, $extension = null, array $query = array());
+    function getShortUrlId($user, $imageIdentifier, $extension = null, array $query = []);
 
     /**
      * Fetch parameters for a short URL

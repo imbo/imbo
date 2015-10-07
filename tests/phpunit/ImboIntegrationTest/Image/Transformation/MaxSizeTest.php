@@ -32,74 +32,74 @@ class MaxSizeTest extends TransformationTests {
      * @return array[]
      */
     public function getMaxSizeParams() {
-        return array(
-            'landscape image with only width in params' => array(
+        return [
+            'landscape image with only width in params' => [
                 'file' => FIXTURES_DIR . '/image.png',
-                'params' => array('width' => 200),
+                'params' => ['width' => 200],
                 'width' => 665,
                 'height' => 463,
                 'transformedWidth' => 200,
                 'transformedHeight' => 139,
-            ),
-            'landscape image with only height in params' => array(
+            ],
+            'landscape image with only height in params' => [
                 'file' => FIXTURES_DIR . '/image.png',
-                'params' => array('height' => 100),
+                'params' => ['height' => 100],
                 'width' => 665,
                 'height' => 463,
                 'transformedWidth' => 144,
                 'transformedHeight' => 100,
-            ),
-            'landscape image both width and height in params' => array(
+            ],
+            'landscape image both width and height in params' => [
                 'file' => FIXTURES_DIR . '/image.png',
-                'params' => array('width' => 100, 'height' => 100),
+                'params' => ['width' => 100, 'height' => 100],
                 'width' => 665,
                 'height' => 463,
                 'transformedWidth' => 100,
                 'transformedHeight' => 70,
-            ),
-            'landscape image smaller than width and height params' => array(
+            ],
+            'landscape image smaller than width and height params' => [
                 'file' => FIXTURES_DIR . '/image.png',
-                'params' => array('width' => 1000, 'height' => 1000),
+                'params' => ['width' => 1000, 'height' => 1000],
                 'width' => 665,
                 'height' => 463,
                 'transformedWidth' => null,
                 'transformedHeight' => null,
                 'transformation' => false,
-            ),
-            'portrait image with only width in params' => array(
+            ],
+            'portrait image with only width in params' => [
                 'file' => FIXTURES_DIR . '/tall-image.png',
-                'params' => array('width' => 200),
+                'params' => ['width' => 200],
                 'width' => 463,
                 'height' => 665,
                 'transformedWidth' => 200,
                 'transformedHeight' => 287,
-            ),
-            'portrait image with only height in params' => array(
+            ],
+            'portrait image with only height in params' => [
                 'file' => FIXTURES_DIR . '/tall-image.png',
-                'params' => array('height' => 100),
+                'params' => ['height' => 100],
                 'width' => 463,
                 'height' => 665,
                 'transformedWidth' => 70,
                 'transformedHeight' => 100,
-            ),
-            'portrait image both width and height in params' => array(
+            ],
+            'portrait image both width and height in params' => [
                 'file' => FIXTURES_DIR . '/tall-image.png',
-                'params' => array('width' => 100, 'height' => 100),
+                'params' => ['width' => 100, 'height' => 100],
                 'width' => 463,
                 'height' => 665,
                 'transformedWidth' => 70,
                 'transformedHeight' => 100,
-            ),
-            'portrait image smaller than width and height params' => array(
+            ],
+            'portrait image smaller than width and height params' => [
                 'file' => FIXTURES_DIR . '/tall-image.png',
-                'params' => array('width' => 1000, 'height' => 1000),
+                'params' => ['width' => 1000, 'height' => 1000],
                 'width' => 463,
                 'height' => 665,
                 'transformedWidth' => null,
                 'transformedHeight' => null,
                 'transformation' => false,
-            ),
-        );
+            ],
+        ];
     }
 
     /**

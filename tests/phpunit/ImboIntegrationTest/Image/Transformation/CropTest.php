@@ -32,15 +32,15 @@ class CropTest extends TransformationTests {
      * @return array[]
      */
     public function getCropParams() {
-        return array(
-            'cropped area larger than the image' => array(array('width' => 1000, 'height' => 1000), 665, 463, false),
-            'cropped area smaller than the image' => array(array('width' => 100, 'height' => 50), 100, 50, true),
-            'cropped area smaller than the image with x and y offset' => array(array('width' => 100, 'height' => 100, 'x' => 600, 'y' => 400), 65, 63, true),
-            'center mode' => array(array('mode' => 'center', 'width' => 150, 'height' => 100), 150, 100, true),
-            'center-x mode' => array(array('mode' => 'center-x', 'y' => 10, 'width' => 50, 'height' => 40), 50, 40, true),
-            'center-y mode' => array(array('mode' => 'center-y', 'x' => 10, 'width' => 50, 'height' => 40), 50, 40, true),
-            'center mode with cropped area larger than the image' => array(array('mode' => 'center', 'width' => 1000, 'height' => 1000), 665, 463, false),
-        );
+        return [
+            'cropped area larger than the image' => [['width' => 1000, 'height' => 1000], 665, 463, false],
+            'cropped area smaller than the image' => [['width' => 100, 'height' => 50], 100, 50, true],
+            'cropped area smaller than the image with x and y offset' => [['width' => 100, 'height' => 100, 'x' => 600, 'y' => 400], 65, 63, true],
+            'center mode' => [['mode' => 'center', 'width' => 150, 'height' => 100], 150, 100, true],
+            'center-x mode' => [['mode' => 'center-x', 'y' => 10, 'width' => 50, 'height' => 40], 50, 40, true],
+            'center-y mode' => [['mode' => 'center-y', 'x' => 10, 'width' => 50, 'height' => 40], 50, 40, true],
+            'center mode with cropped area larger than the image' => [['mode' => 'center', 'width' => 1000, 'height' => 1000], 665, 463, false],
+        ];
     }
 
     /**

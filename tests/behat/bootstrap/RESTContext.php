@@ -38,21 +38,21 @@ class RESTContext extends BehatContext {
      *
      * @var Response[]
      */
-    protected $responses = array();
+    protected $responses = [];
 
     /**
      * Headers for the request
      *
      * @var array
      */
-    protected $requestHeaders = array();
+    protected $requestHeaders = [];
 
     /**
      * Query parameters for the request
      *
      * @var array
      */
-    protected $queryParams = array();
+    protected $queryParams = [];
 
     /**
      * Optional request body to add to the request
@@ -113,9 +113,9 @@ class RESTContext extends BehatContext {
     private function createClient() {
         $this->client = new Client($this->params['url']);
 
-        $defaultHeaders = array(
+        $defaultHeaders = [
             'X-Test-Session-Id' => self::$testSessionId,
-        );
+        ];
 
         if ($this->params['enableCodeCoverage']) {
             $defaultHeaders['X-Enable-Coverage'] = 1;
@@ -189,11 +189,11 @@ class RESTContext extends BehatContext {
 
         if ($parameters['enableCodeCoverage']) {
             $client = new Client($parameters['url']);
-            $response = $client->get('/', array(
+            $response = $client->get('/', [
                 'X-Enable-Coverage' => 1,
                 'X-Test-Session-Id' => self::$testSessionId,
                 'X-Collect-Coverage' => 1,
-            ))->send();
+            ])->send();
 
             $data = unserialize((string) $response->getBody());
 
@@ -468,7 +468,7 @@ class RESTContext extends BehatContext {
                             $router,
                             $httpdLog);
 
-        $output = array();
+        $output = [];
         exec($command, $output);
 
         return (int) $output[0];

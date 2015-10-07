@@ -33,9 +33,9 @@ class Filesystem implements StorageInterface {
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         'dataDir' => null,
-    );
+    ];
 
     /**
      * Class constructor
@@ -142,7 +142,7 @@ class Filesystem implements StorageInterface {
      */
     private function getImagePath($user, $imageIdentifier, $includeFilename = true) {
         $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
-        $parts = array(
+        $parts = [
             $this->params['dataDir'],
             $userPath[0],
             $userPath[1],
@@ -151,7 +151,7 @@ class Filesystem implements StorageInterface {
             $imageIdentifier[0],
             $imageIdentifier[1],
             $imageIdentifier[2],
-        );
+        ];
 
         if ($includeFilename) {
             $parts[] = $imageIdentifier;

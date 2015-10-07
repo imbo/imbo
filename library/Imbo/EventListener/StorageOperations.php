@@ -24,11 +24,11 @@ class StorageOperations implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'storage.image.delete' => 'deleteImage',
             'storage.image.load' => 'loadImage',
             'storage.image.insert' => 'insertImage',
-        );
+        ];
     }
 
     /**

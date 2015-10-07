@@ -46,16 +46,16 @@ class TransformationTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getColors() {
-        return array(
-            array('red', 'red'),
-            array('000', '#000'),
-            array('000000', '#000000'),
-            array('fff', '#fff'),
-            array('FFF', '#FFF'),
-            array('FFF000', '#FFF000'),
-            array('#FFF', '#FFF'),
-            array('#FFF000', '#FFF000'),
-        );
+        return [
+            ['red', 'red'],
+            ['000', '#000'],
+            ['000000', '#000000'],
+            ['fff', '#fff'],
+            ['FFF', '#FFF'],
+            ['FFF000', '#FFF000'],
+            ['#FFF', '#FFF'],
+            ['#FFF000', '#FFF000'],
+        ];
     }
 
     /**
@@ -71,5 +71,5 @@ class TransformationTest extends \PHPUnit_Framework_TestCase {
 }
 
 class TransformationImpl extends Transformation {
-    public function applyToImage(Image $image, array $params = array()) {}
+    public function applyToImage(Image $image, array $params = []) {}
 }

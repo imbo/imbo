@@ -24,9 +24,9 @@ class AutoRotateImage implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
-            'images.post' => array('autoRotate' => 25),
-        );
+        return [
+            'images.post' => ['autoRotate' => 25],
+        ];
     }
 
     /**
@@ -35,8 +35,8 @@ class AutoRotateImage implements ListenerInterface {
      * @param EventInterface $event The triggered event
      */
     public function autoRotate(EventInterface $event) {
-        $event->getManager()->trigger('image.transformation.autorotate', array(
+        $event->getManager()->trigger('image.transformation.autorotate', [
             'image' => $event->getRequest()->getImage(),
-        ));
+        ]);
     }
 }

@@ -29,9 +29,9 @@ class DoctrineTest extends StorageTests {
      * @see ImboIntegrationTest\Storage\StorageTests::getDriver()
      */
     protected function getDriver() {
-        return new Doctrine(array(
+        return new Doctrine([
             'pdo' => $this->pdo,
-        ));
+        ]);
     }
 
     public function setUp() {

@@ -34,13 +34,13 @@ class Doctrine implements StorageInterface {
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         'dbname'   => null,
         'user'     => null,
         'password' => null,
         'host'     => null,
         'driver'   => null,
-    );
+    ];
 
     /**
      * Name of the table used for storing the images
@@ -92,11 +92,11 @@ class Doctrine implements StorageInterface {
               ->where('user = :user')
               ->andWhere('imageIdentifier = :imageIdentifier')
               ->andWhere('width = :width')
-              ->setParameters(array(
+              ->setParameters([
                   ':user'            => $user,
                   ':imageIdentifier' => $imageIdentifier,
                   ':width'           => (int) $width,
-              ));
+              ]);
 
         $stmt = $query->execute();
         $row = $stmt->fetch();
