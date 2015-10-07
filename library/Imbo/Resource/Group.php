@@ -84,7 +84,7 @@ class Group implements ResourceInterface {
         $resources = json_decode($request->getContent(), true);
 
         if (!is_array($resources)) {
-            throw new ResourceException('Invalid data. Array of resources strings is expected', 400);
+            throw new ResourceException('Invalid data. Array of resource strings is expected', 400);
         }
 
         foreach ($resources as $resource) {

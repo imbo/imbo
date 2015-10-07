@@ -34,9 +34,9 @@ Feature: Imbo provides a group endpoint
         Then I should get a response with "<response>"
         Examples:
             | data               | response                                                           |
-            |                    | 400 Invalid data. Array of resources strings is expected           |
-            | true               | 400 Invalid data. Array of resources strings is expected           |
-            | "string"           | 400 Invalid data. Array of resources strings is expected           |
+            |                    | 400 Invalid data. Array of resource strings is expected            |
+            | true               | 400 Invalid data. Array of resource strings is expected            |
+            | "string"           | 400 Invalid data. Array of resource strings is expected            |
             | [123]              | 400 Invalid value in the resources array. Only strings are allowed |
             | [123,"images.get"] | 400 Invalid value in the resources array. Only strings are allowed |
 
