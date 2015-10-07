@@ -415,6 +415,23 @@ Smart size the image - ``t[]=smartSize``
 
 This transformation is used to crop the image based on a point of interest (POI) provided either as a transformation parameter or from the image metadata.
 
+**Metadata format**
+
+The smart size transformation supports reading the POI from the metadata of the image. The POI information is expected to be stored on the ``poi`` property in metadata. Below is an example of a valid metadata object containing a ``600,240`` POI:
+
+.. code-block:: javascript
+
+    {
+      "poi": [
+        {
+            x: 600,
+            y: 240
+        }
+      ]
+    }
+
+.. note:: The smart size transformation currently takes only the first object into account when cropping the image, but the POIs is stored as an array of objects in order to be easy to expand with more information for a more sophisticated smart size algorithm in the future.
+
 **Parameters:**
 
 ``width``
