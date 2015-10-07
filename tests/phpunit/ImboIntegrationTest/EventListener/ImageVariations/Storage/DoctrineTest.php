@@ -29,9 +29,9 @@ class DoctrineTest extends StorageTests {
      * @see ImboIntegrationTest\EventListener\ImageVariations\Storage\StorageTests::getAdapter()
      */
     protected function getAdapter() {
-        return new Doctrine(array(
+        return new Doctrine([
             'pdo' => $this->pdo,
-        ));
+        ]);
     }
 
     /**

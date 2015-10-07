@@ -34,7 +34,7 @@ class SepiaTest extends TransformationTests {
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
         $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(array()));
+        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue([]));
         $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
 
         $imagick = new Imagick();
@@ -51,7 +51,7 @@ class SepiaTest extends TransformationTests {
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
         $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(array('threshold' => 10)));
+        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(['threshold' => 10]));
         $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
 
         $imagick = new Imagick();

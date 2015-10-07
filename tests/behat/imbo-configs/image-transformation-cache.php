@@ -12,13 +12,13 @@
  * Enable the image transformation metadata cache listener, and store the cached images to a
  * directory in /tmp
  */
-return array(
-    'eventListeners' => array(
-        'imageTransformationCache' => array(
+return [
+    'eventListeners' => [
+        'imageTransformationCache' => [
             'listener' => 'Imbo\EventListener\ImageTransformationCache',
-            'params' => array(
+            'params' => [
                 'path' => '/tmp/imbo-behat-image-transformation-cache',
-            ),
-        ),
-    ),
-);
+            ],
+        ],
+    ],
+];

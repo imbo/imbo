@@ -190,7 +190,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $imageIdentifier = 'id';
 
         $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $this->getImage()));
-        $this->assertSame(array(), $this->adapter->getMetadata($user, $imageIdentifier));
+        $this->assertSame([], $this->adapter->getMetadata($user, $imageIdentifier));
     }
 
     public function testUpdateAndGetMetadata() {
@@ -198,10 +198,10 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $imageIdentifier = 'id';
 
         $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $this->getImage()));
-        $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, array('foo' => 'bar')));
-        $this->assertSame(array('foo' => 'bar'), $this->adapter->getMetadata($user, $imageIdentifier));
-        $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, array('foo' => 'foo', 'bar' => 'foo')));
-        $this->assertSame(array('foo' => 'foo', 'bar' => 'foo'), $this->adapter->getMetadata($user, $imageIdentifier));
+        $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, ['foo' => 'bar']));
+        $this->assertSame(['foo' => 'bar'], $this->adapter->getMetadata($user, $imageIdentifier));
+        $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, ['foo' => 'foo', 'bar' => 'foo']));
+        $this->assertSame(['foo' => 'foo', 'bar' => 'foo'], $this->adapter->getMetadata($user, $imageIdentifier));
     }
 
     public function testUpdateDeleteAndGetMetadata() {
@@ -209,10 +209,10 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $imageIdentifier = 'id';
 
         $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $this->getImage()));
-        $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, array('foo' => 'bar')));
-        $this->assertSame(array('foo' => 'bar'), $this->adapter->getMetadata($user, $imageIdentifier));
+        $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, ['foo' => 'bar']));
+        $this->assertSame(['foo' => 'bar'], $this->adapter->getMetadata($user, $imageIdentifier));
         $this->assertTrue($this->adapter->deleteMetadata($user, $imageIdentifier));
-        $this->assertSame(array(), $this->adapter->getMetadata($user, $imageIdentifier));
+        $this->assertSame([], $this->adapter->getMetadata($user, $imageIdentifier));
     }
 
     /**
@@ -238,9 +238,9 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     private function insertImages($alternateUser = false) {
         $now = time();
         $start = $now;
-        $images = array();
+        $images = [];
 
-        foreach (array('image.jpg', 'image.png', 'image1.png', 'image2.png', 'image3.png', 'image4.png') as $i => $fileName) {
+        foreach (['image.jpg', 'image.png', 'image1.png', 'image2.png', 'image3.png', 'image4.png'] as $i => $fileName) {
             $path = FIXTURES_DIR . '/' . $fileName;
             $info = getimagesize($path);
 
@@ -264,15 +264,15 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
             $this->adapter->insertImage($user, $imageIdentifier, $image);
 
             // Insert some metadata
-            $this->adapter->updateMetadata($user, $imageIdentifier, array(
+            $this->adapter->updateMetadata($user, $imageIdentifier, [
                 'key' . $i => 'value' . $i,
-            ));
+            ]);
         }
 
         // Remove the last increment to get the timestamp for when the last image was added
         $end = $now - 1;
 
-        return array($start, $end);
+        return [$start, $end];
     }
 
     public function testGetImagesWithNoQuery() {
@@ -329,12 +329,12 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
             $this->assertArrayHasKey('metadata', $image);
         }
 
-        $this->assertSame(array('key5' => 'value5'), $images[0]['metadata']);
-        $this->assertSame(array('key4' => 'value4'), $images[1]['metadata']);
-        $this->assertSame(array('key3' => 'value3'), $images[2]['metadata']);
-        $this->assertSame(array('key2' => 'value2'), $images[3]['metadata']);
-        $this->assertSame(array('key1' => 'value1'), $images[4]['metadata']);
-        $this->assertSame(array('key0' => 'value0'), $images[5]['metadata']);
+        $this->assertSame(['key5' => 'value5'], $images[0]['metadata']);
+        $this->assertSame(['key4' => 'value4'], $images[1]['metadata']);
+        $this->assertSame(['key3' => 'value3'], $images[2]['metadata']);
+        $this->assertSame(['key2' => 'value2'], $images[3]['metadata']);
+        $this->assertSame(['key1' => 'value1'], $images[4]['metadata']);
+        $this->assertSame(['key0' => 'value0'], $images[5]['metadata']);
 
     }
 
@@ -357,7 +357,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
 
         $images = $this->adapter->getImages(['user'], new Query(), $this->getMock('Imbo\Model\Images'));
 
-        foreach (array('added', 'updated') as $dateField) {
+        foreach (['added', 'updated'] as $dateField) {
             foreach ($images as $image) {
                 $this->assertInstanceOf('DateTime', $image[$dateField]);
             }
@@ -365,33 +365,33 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     }
 
     public function getPageAndLimit() {
-        return array(
-            'no page or limit' => array(null, null, array(
+        return [
+            'no page or limit' => [null, null, [
                 'a501051db16e3cbf88ea50bfb0138a47',
                 '1d5b88aec8a3e1c4c57071307b2dae3a',
                 'b914b28f4d5faa516e2049b9a6a2577c',
                 'fc7d2d06993047a0b5056e8fac4462a2',
                 '929db9c5fc3099f7576f5655207eba47',
                 'f3210f1bb34bfbfa432cc3560be40761',
-            )),
-            'no page, 2 images' => array(null, 2, array(
+            ]],
+            'no page, 2 images' => [null, 2, [
                 'a501051db16e3cbf88ea50bfb0138a47',
                 '1d5b88aec8a3e1c4c57071307b2dae3a',
-            )),
-            'first page, 2 images' => array(1, 2, array(
+            ]],
+            'first page, 2 images' => [1, 2, [
                 'a501051db16e3cbf88ea50bfb0138a47',
                 '1d5b88aec8a3e1c4c57071307b2dae3a',
-            )),
-            'second page, 2 images' => array(2, 2, array(
+            ]],
+            'second page, 2 images' => [2, 2, [
                 'b914b28f4d5faa516e2049b9a6a2577c',
                 'fc7d2d06993047a0b5056e8fac4462a2',
-            )),
-            'second page, 4 images' => array(2, 4, array(
+            ]],
+            'second page, 4 images' => [2, 4, [
                 '929db9c5fc3099f7576f5655207eba47',
                 'f3210f1bb34bfbfa432cc3560be40761',
-            )),
-            'fourth page, 2 images' => array(4, 2, array()),
-        );
+            ]],
+            'fourth page, 2 images' => [4, 2, []],
+        ];
     }
 
     /**
@@ -423,7 +423,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetImageMimeType() {
-        $images = array();
+        $images = [];
         $user = 'user';
 
         $images[0] = new Image();
@@ -476,41 +476,41 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getShortUrlVariations() {
-        return array(
-            'without query and extension' => array(
+        return [
+            'without query and extension' => [
                 'aaaaaaa',
-            ),
-            'with query and extension' => array(
+            ],
+            'with query and extension' => [
                 'bbbbbbb',
-                array(
-                    't' => array(
+                [
+                    't' => [
                         'thumbnail:width=40'
-                    ),
+                    ],
                     'accessToken' => 'token',
-                ),
+                ],
                 'png',
-            ),
-            'with query' => array(
+            ],
+            'with query' => [
                 'ccccccc',
-                array(
-                    't' => array(
+                [
+                    't' => [
                         'thumbnail:width=40'
-                    ),
+                    ],
                     'accessToken' => 'token',
-                ),
-            ),
-            'with extension' => array(
+                ],
+            ],
+            'with extension' => [
                 'ddddddd',
-                array(),
+                [],
                 'gif',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
      * @dataProvider getShortUrlVariations
      */
-    public function testCanInsertAndGetParametersForAShortUrl($shortUrlId, array $query = array(), $extension = null) {
+    public function testCanInsertAndGetParametersForAShortUrl($shortUrlId, array $query = [], $extension = null) {
         $user = 'user';
         $imageIdentifier = 'id';
         $this->assertTrue($this->adapter->insertShortUrl($shortUrlId, $user, $imageIdentifier, $extension, $query));
@@ -566,27 +566,27 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $query = new Query();
         $model = new Images();
 
-        $query->imageIdentifiers(array($id1));
+        $query->imageIdentifiers([$id1]);
         $this->assertCount(1, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(1, $model->getHits());
 
-        $query->imageIdentifiers(array($id1, $id2));
+        $query->imageIdentifiers([$id1, $id2]);
         $this->assertCount(2, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(2, $model->getHits());
 
-        $query->imageIdentifiers(array($id1, $id2, $id3));
+        $query->imageIdentifiers([$id1, $id2, $id3]);
         $this->assertCount(3, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(3, $model->getHits());
 
-        $query->imageIdentifiers(array($id1, $id2, $id3, $id4));
+        $query->imageIdentifiers([$id1, $id2, $id3, $id4]);
         $this->assertCount(4, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(4, $model->getHits());
 
-        $query->imageIdentifiers(array($id1, $id2, $id3, $id4, $id5));
+        $query->imageIdentifiers([$id1, $id2, $id3, $id4, $id5]);
         $this->assertCount(5, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(5, $model->getHits());
 
-        $query->imageIdentifiers(array($id1, $id2, $id3, $id4, $id5, str_repeat('f', 32)));
+        $query->imageIdentifiers([$id1, $id2, $id3, $id4, $id5, str_repeat('f', 32)]);
         $this->assertCount(5, $this->adapter->getImages([$user], $query, $model));
         $this->assertSame(5, $model->getHits());
     }
@@ -610,56 +610,56 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     }
 
     public function getSortData() {
-        return array(
-            'no sorting' => array(
+        return [
+            'no sorting' => [
                 null,
                 'imageIdentifier',
-                array(
+                [
                     'a501051db16e3cbf88ea50bfb0138a47',
                     '1d5b88aec8a3e1c4c57071307b2dae3a',
                     'b914b28f4d5faa516e2049b9a6a2577c',
                     'fc7d2d06993047a0b5056e8fac4462a2',
                     '929db9c5fc3099f7576f5655207eba47',
                     'f3210f1bb34bfbfa432cc3560be40761',
-                ),
-            ),
-            'default sort on size' => array(
-                array('size'),
+                ],
+            ],
+            'default sort on size' => [
+                ['size'],
                 'size',
-                array(
+                [
                     41423,
                     64828,
                     74337,
                     84988,
                     92795,
                     95576,
-                ),
-            ),
-            'desc sort on size' => array(
-                array('size:desc'),
+                ],
+            ],
+            'desc sort on size' => [
+                ['size:desc'],
                 'size',
-                array(
+                [
                     95576,
                     92795,
                     84988,
                     74337,
                     64828,
                     41423,
-                ),
-            ),
-            'sort on multiple fields' => array(
-                array('width:asc', 'size:desc'),
+                ],
+            ],
+            'sort on multiple fields' => [
+                ['width:asc', 'size:desc'],
                 'size',
-                array(
+                [
                     74337,
                     84988,
                     92795,
                     95576,
                     64828,
                     41423,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**

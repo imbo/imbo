@@ -113,9 +113,9 @@ class Request extends SymfonyRequest {
      */
     public function getTransformations() {
         if ($this->transformations === null) {
-            $this->transformations = array();
+            $this->transformations = [];
 
-            $transformations = $this->query->get('t', array());
+            $transformations = $this->query->get('t', []);
 
             if (!is_array($transformations)) {
                 throw new InvalidArgumentException('Transformations must be specifed as an array', 400);
@@ -138,7 +138,7 @@ class Request extends SymfonyRequest {
                 }
 
                 // Initialize params for the transformation
-                $params = array();
+                $params = [];
 
                 // Loop through the parameter string and assign params to an array
                 $offset = 0;
@@ -150,10 +150,10 @@ class Request extends SymfonyRequest {
                     $params[$paramName] = $paramValue;
                 }
 
-                $this->transformations[] = array(
+                $this->transformations[] = [
                     'name'   => $name,
                     'params' => $params,
-                );
+                ];
             }
         }
 

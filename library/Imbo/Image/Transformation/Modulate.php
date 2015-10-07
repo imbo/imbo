@@ -26,9 +26,9 @@ class Modulate extends Transformation implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.transformation.modulate' => 'transform',
-        );
+        ];
     }
 
     /**

@@ -49,12 +49,12 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\ExifMetadata::filterProperties
      */
     public function testCanGetPropertiesFromImageFiltered() {
-        $listener = new ExifMetadata(array(
-            'allowedTags' => array(
+        $listener = new ExifMetadata([
+            'allowedTags' => [
                 'exif:Flash',
                 'exif:Compression',
-            ),
-        ));
+            ],
+        ]);
 
         $image = new Image();
         $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));

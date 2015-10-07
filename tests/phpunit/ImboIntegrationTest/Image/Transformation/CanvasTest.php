@@ -42,39 +42,39 @@ class CanvasTest extends TransformationTests {
      * @return array[]
      */
     public function getCanvasParameters() {
-        return array(
+        return [
             // free mode with only width
-            array(1000, null, 'free', 1000, 463),
+            [1000, null, 'free', 1000, 463],
 
             // free mode with only height
-            array(null, 1000, 'free', 665, 1000),
+            [null, 1000, 'free', 665, 1000],
 
             // free mode where both sides are smaller than the original
-            array(200, 200, 'free', 200, 200),
+            [200, 200, 'free', 200, 200],
 
             // free mode where height is smaller than the original
-            array(1000, 200, 'free', 1000, 200),
+            [1000, 200, 'free', 1000, 200],
 
             // free mode where width is smaller than the original
-            array(200, 1000, 'free', 200, 1000),
+            [200, 1000, 'free', 200, 1000],
 
             // center, center-x and center-y modes
-            array(1000, 1000, 'center', 1000, 1000),
-            array(1000, 1000, 'center-x', 1000, 1000),
-            array(1000, 1000, 'center-y', 1000, 1000),
+            [1000, 1000, 'center', 1000, 1000],
+            [1000, 1000, 'center-x', 1000, 1000],
+            [1000, 1000, 'center-y', 1000, 1000],
 
             // center, center-x and center-y modes where one of the sides are smaller than the
             // original
-            array(1000, 200, 'center', 1000, 200),
-            array(200, 1000, 'center', 200, 1000),
-            array(1000, 200, 'center-x', 1000, 200),
-            array(1000, 200, 'center-y', 1000, 200),
+            [1000, 200, 'center', 1000, 200],
+            [200, 1000, 'center', 200, 1000],
+            [1000, 200, 'center-x', 1000, 200],
+            [1000, 200, 'center-y', 1000, 200],
 
             // center, center-x and center-y modes where both sides are smaller than the original
-            array(200, 200, 'center', 200, 200),
-            array(200, 200, 'center-x', 200, 200),
-            array(200, 200, 'center-y', 200, 200),
-        );
+            [200, 200, 'center', 200, 200],
+            [200, 200, 'center-x', 200, 200],
+            [200, 200, 'center-y', 200, 200],
+        ];
     }
 
     /**
@@ -100,11 +100,11 @@ class CanvasTest extends TransformationTests {
         $event->expects($this->at(1))
               ->method('getArgument')
               ->with('params')
-              ->will($this->returnValue(array(
+              ->will($this->returnValue([
                   'width' => $width,
                   'height' => $height,
                   'mode' => $mode,
-              )));
+              ]));
 
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);

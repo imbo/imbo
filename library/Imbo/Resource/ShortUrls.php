@@ -26,21 +26,21 @@ class ShortUrls implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('POST', 'DELETE');
+        return ['POST', 'DELETE'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             // Add short URL
             'shorturls.post' => 'createShortUrl',
 
             // Remove short URLs for a given image
             'shorturls.delete' => 'deleteImageShortUrls',
             'image.delete' => 'deleteImageShortUrls',
-        );
+        ];
     }
 
     /**
@@ -81,7 +81,7 @@ class ShortUrls implements ResourceInterface {
         if ($queryString) {
             parse_str(urldecode(ltrim($queryString, '?')), $query);
         } else {
-            $query = array();
+            $query = [];
         }
 
         $database = $event->getDatabase();
@@ -105,9 +105,9 @@ class ShortUrls implements ResourceInterface {
 
         // Attach the header
         $model = new ArrayModel();
-        $model->setData(array(
+        $model->setData([
             'id' => $shortUrlId,
-        ));
+        ]);
 
         $event->getResponse()->setModel($model)
                              ->setStatusCode($exists ? 200 : 201);
@@ -133,9 +133,9 @@ class ShortUrls implements ResourceInterface {
             // response model. If this method is triggered because of an image has been deleted
             // the image resource will supply the response model
             $model = new ArrayModel();
-            $model->setData(array(
+            $model->setData([
                 'imageIdentifier' => $imageIdentifier,
-            ));
+            ]);
 
             $event->getResponse()->setModel($model);
         }

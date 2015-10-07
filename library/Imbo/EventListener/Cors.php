@@ -28,23 +28,23 @@ class Cors implements ListenerInterface {
      *
      * @var array
      */
-    private $params = array(
-        'allowedOrigins' => array(),
-        'allowedMethods' => array(
-            'index'          => array('GET', 'HEAD'),
-            'image'          => array('GET', 'HEAD'),
-            'images'         => array('GET', 'HEAD'),
-            'globalimages'   => array('GET', 'HEAD'),
-            'metadata'       => array('GET', 'HEAD'),
-            'status'         => array('GET', 'HEAD'),
-            'stats'          => array('GET', 'HEAD'),
-            'user'           => array('GET', 'HEAD'),
-            'globalshorturl' => array('GET', 'HEAD'),
-            'shorturl'       => array('GET', 'HEAD'),
-            'shorturls'      => array('GET', 'HEAD'),
-        ),
+    private $params = [
+        'allowedOrigins' => [],
+        'allowedMethods' => [
+            'index'          => ['GET', 'HEAD'],
+            'image'          => ['GET', 'HEAD'],
+            'images'         => ['GET', 'HEAD'],
+            'globalimages'   => ['GET', 'HEAD'],
+            'metadata'       => ['GET', 'HEAD'],
+            'status'         => ['GET', 'HEAD'],
+            'stats'          => ['GET', 'HEAD'],
+            'user'           => ['GET', 'HEAD'],
+            'globalshorturl' => ['GET', 'HEAD'],
+            'shorturl'       => ['GET', 'HEAD'],
+            'shorturls'      => ['GET', 'HEAD'],
+        ],
         'maxAge' => 3600,
-    );
+    ];
 
     /**
      * Whether the request matched an allowed method + origin
@@ -58,7 +58,7 @@ class Cors implements ListenerInterface {
      *
      * @param array $params Parameters for the listener
      */
-    public function __construct(array $params = array()) {
+    public function __construct(array $params = []) {
         if ($params) {
             $this->params = array_replace($this->params, $params);
 
@@ -74,10 +74,10 @@ class Cors implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'route.match' => 'subscribe',
-            'response.send' => array('setExposedHeaders' => 5),
-        );
+            'response.send' => ['setExposedHeaders' => 5],
+        ];
     }
 
     /**
@@ -86,18 +86,18 @@ class Cors implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function subscribe(EventInterface $event) {
-        $events = array();
+        $events = [];
 
         // Enable the event listener only for resources and methods specified
         foreach ($this->params['allowedMethods'] as $resource => $methods) {
             foreach ($methods as $method) {
                 $eventName = $resource . '.' . strtolower($method);
-                $events[$eventName] = array('invoke' => 1000);
+                $events[$eventName] = ['invoke' => 1000];
             }
 
             // Always enable the listener for the OPTIONS method
             $eventName = $resource . '.options';
-            $events[$eventName] = array('options' => 20);
+            $events[$eventName] = ['options' => 20];
         }
 
         $manager = $event->getManager();
@@ -119,11 +119,11 @@ class Cors implements ListenerInterface {
             return;
         }
 
-        $headers = array(
+        $headers = [
             // The ResponseSender-listener will add this header and send the response,
             // so we have no way to pick it up - instead we'll always whitelist it
             'X-Imbo-ImageIdentifier'
-        );
+        ];
 
         foreach ($event->getResponse()->headers as $header => $value) {
             if (strpos($header, 'x-imbo') === 0) {
@@ -131,9 +131,9 @@ class Cors implements ListenerInterface {
             }
         }
 
-        $event->getResponse()->headers->add(array(
+        $event->getResponse()->headers->add([
             'Access-Control-Expose-Headers' => implode(', ', $headers)
-        ));
+        ]);
     }
 
     /**
@@ -159,13 +159,13 @@ class Cors implements ListenerInterface {
 
         $resource = (string) $request->getRoute();
 
-        $allowedMethods = array('OPTIONS');
+        $allowedMethods = ['OPTIONS'];
 
         if (isset($this->params['allowedMethods'][$resource])) {
             $allowedMethods = array_merge($allowedMethods, $this->params['allowedMethods'][$resource]);
         }
 
-        $allowedHeaders = array('Content-Type', 'Accept');
+        $allowedHeaders = ['Content-Type', 'Accept'];
 
         $requestHeaders = $request->headers->get('Access-Control-Request-Headers', '');
         $requestHeaders = array_map('trim', explode(',', $requestHeaders));
@@ -176,12 +176,12 @@ class Cors implements ListenerInterface {
             }
         }
 
-        $response->headers->add(array(
+        $response->headers->add([
             'Access-Control-Allow-Origin' => $origin,
             'Access-Control-Allow-Methods' => implode(', ', $allowedMethods),
             'Access-Control-Allow-Headers' => implode(', ', $allowedHeaders),
             'Access-Control-Max-Age' => (int) $this->params['maxAge'],
-        ));
+        ]);
 
         // Since this is an OPTIONS-request, there is no need for further parsing
         $event->stopPropagation();
@@ -216,9 +216,9 @@ class Cors implements ListenerInterface {
         // Flag this as an allowed request
         $this->requestAllowed = true;
 
-        $event->getResponse()->headers->add(array(
+        $event->getResponse()->headers->add([
             'Access-Control-Allow-Origin' => $origin,
-        ));
+        ]);
     }
 
     /**

@@ -49,7 +49,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Storage\Filesystem::delete
      */
     public function testDeleteFileThatDoesNotExist() {
-        $driver = new Filesystem(array('dataDir' => 'foobar'));
+        $driver = new Filesystem(['dataDir' => 'foobar']);
         $driver->delete($this->user, $this->imageIdentifier);
     }
 
@@ -58,12 +58,12 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      */
     public function testDelete() {
         vfsStream::setup('basedir');
-        $driver = new Filesystem(array('dataDir' => vfsStream::url('basedir')));
+        $driver = new Filesystem(['dataDir' => vfsStream::url('basedir')]);
 
         $root = vfsStreamWrapper::getRoot();
         $last = $root;
 
-        $parts = array(
+        $parts = [
             $this->user[0],
             $this->user[1],
             $this->user[2],
@@ -71,7 +71,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
             $this->imageIdentifier[0],
             $this->imageIdentifier[1],
             $this->imageIdentifier[2],
-        );
+        ];
 
         foreach ($parts as $part) {
             $d = vfsStream::newDirectory($part);
@@ -98,7 +98,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         // Create the virtual directory with no permissions
         vfsStream::setup($dir, 0);
 
-        $driver = new Filesystem(array('dataDir' => vfsStream::url($dir)));
+        $driver = new Filesystem(['dataDir' => vfsStream::url($dir)]);
         $driver->store($this->user, $this->imageIdentifier, $image);
     }
 
@@ -113,7 +113,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
         // Create the virtual directory
         vfsStream::setup($baseDir);
 
-        $driver = new Filesystem(array('dataDir' => vfsStream::url($baseDir)));
+        $driver = new Filesystem(['dataDir' => vfsStream::url($baseDir)]);
         $this->assertTrue($driver->store($this->user, $this->imageIdentifier, $imageData));
     }
 
@@ -121,7 +121,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Storage\Filesystem::getImagePath
      */
     public function testGetImagePath() {
-        $driver = new Filesystem(array('dataDir' => DIRECTORY_SEPARATOR . 'tmp'));
+        $driver = new Filesystem(['dataDir' => DIRECTORY_SEPARATOR . 'tmp']);
 
         $reflection = new \ReflectionClass($driver);
         $method = $reflection->getMethod('getImagePath');
@@ -151,7 +151,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Storage\Filesystem::getImage
      */
     public function testGetImageFileThatDoesNotExist() {
-        $driver = new Filesystem(array('dataDir' => '/tmp'));
+        $driver = new Filesystem(['dataDir' => '/tmp']);
         $driver->getImage($this->user, $this->imageIdentifier);
     }
 
@@ -160,12 +160,12 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      */
     public function testGetImage() {
         vfsStream::setup('basedir');
-        $driver = new Filesystem(array('dataDir' => vfsStream::url('basedir')));
+        $driver = new Filesystem(['dataDir' => vfsStream::url('basedir')]);
 
         $root = vfsStreamWrapper::getRoot();
         $last = $root;
 
-        $parts = array(
+        $parts = [
             $this->user[0],
             $this->user[1],
             $this->user[2],
@@ -173,7 +173,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
             $this->imageIdentifier[0],
             $this->imageIdentifier[1],
             $this->imageIdentifier[2],
-        );
+        ];
 
         foreach ($parts as $part) {
             $d = vfsStream::newDirectory($part);
@@ -196,7 +196,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Storage\Filesystem::getLastModified
      */
     public function testGetLastModifiedWithFileThatDoesNotExist() {
-        $driver = new Filesystem(array('dataDir' => '/some/path'));
+        $driver = new Filesystem(['dataDir' => '/some/path']);
         $driver->getLastModified($this->user, $this->imageIdentifier);
     }
 
@@ -205,12 +205,12 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      */
     public function testGetLastModified() {
         vfsStream::setup('basedir');
-        $driver = new Filesystem(array('dataDir' => vfsStream::url('basedir')));
+        $driver = new Filesystem(['dataDir' => vfsStream::url('basedir')]);
 
         $root = vfsStreamWrapper::getRoot();
         $last = $root;
 
-        $parts = array(
+        $parts = [
             $this->user[0],
             $this->user[1],
             $this->user[2],
@@ -218,7 +218,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
             $this->imageIdentifier[0],
             $this->imageIdentifier[1],
             $this->imageIdentifier[2],
-        );
+        ];
 
         foreach ($parts as $part) {
             $d = vfsStream::newDirectory($part);
@@ -243,7 +243,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     public function testGetStatusWhenBaseDirIsNotWritable() {
         vfsStream::setup('dir', 0);
 
-        $driver = new Filesystem(array('dataDir' => vfsStream::url('dir')));
+        $driver = new Filesystem(['dataDir' => vfsStream::url('dir')]);
         $this->assertFalse($driver->getStatus());
     }
 
@@ -253,7 +253,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
     public function testGetStatusWhenBaseDirIsWritable() {
         vfsStream::setup('dir');
 
-        $driver = new Filesystem(array('dataDir' => vfsStream::url('dir')));
+        $driver = new Filesystem(['dataDir' => vfsStream::url('dir')]);
         $this->assertTrue($driver->getStatus());
     }
 }

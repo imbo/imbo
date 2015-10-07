@@ -11,14 +11,14 @@
 /**
  * Enable the max image size event listener, setting a max size of w1000 x h600
  */
-return array(
-    'eventListeners' => array(
-        'maxImageSize' => array(
+return [
+    'eventListeners' => [
+        'maxImageSize' => [
             'listener' => 'Imbo\EventListener\MaxImageSize',
-            'params' => array(
+            'params' => [
                 'width' => 1000,
                 'height' => 600,
-            ),
-        ),
-    ),
-);
+            ],
+        ],
+    ],
+];

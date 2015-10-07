@@ -12,7 +12,7 @@ use Imbo\Auth\AccessControl\Adapter\AdapterInterface as ACI,
     Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 
 // Default config for testing
-$testConfig = array(
+$testConfig = [
     'accessControl' => function() {
         return new ArrayAdapter([
             [
@@ -53,7 +53,7 @@ $testConfig = array(
             'databaseName' => 'imbo_testing',
         ]);
     },
-);
+];
 
 // Default Imbo config
 $defaultConfig = require __DIR__ . '/../../../config/config.default.php';

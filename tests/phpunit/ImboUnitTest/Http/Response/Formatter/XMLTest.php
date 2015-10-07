@@ -161,10 +161,10 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $filesize = 123123;
         $width = 800;
         $height = 600;
-        $metadata = array(
+        $metadata = [
             'some key' => 'some value',
             'some other key' => 'some other value',
-        );
+        ];
 
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getUser')->will($this->returnValue($user));
@@ -179,7 +179,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $image->expects($this->once())->method('getHeight')->will($this->returnValue($height));
         $image->expects($this->once())->method('getMetadata')->will($this->returnValue($metadata));
 
-        $images = array($image);
+        $images = [$image];
         $model = $this->getMock('Imbo\Model\Images');
         $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
         $model->expects($this->once())->method('getHits')->will($this->returnValue(100));
@@ -192,12 +192,12 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $xml = $this->formatter->format($model);
 
         // Check the search data
-        foreach (array('hits' => 100, 'page' => 2, 'limit' => 20, 'count' => 1) as $tag => $value) {
+        foreach (['hits' => 100, 'page' => 2, 'limit' => 20, 'count' => 1] as $tag => $value) {
             $this->assertXPathMatches('/imbo/search/'. $tag . '[.="' . $value . '"]', $xml, $tag . ' is not correct');
         }
 
         // Check image
-        foreach (array(
+        foreach ([
             'user' => $user,
             'imageIdentifier' => $imageIdentifier,
             'checksum' => $checksum,
@@ -208,7 +208,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
             'size' => (string) $filesize, // Need to case to string since 100 !== "100"
             'width' => (string) $width,
             'height' => (string) $height,
-        ) as $tag => $value) {
+        ] as $tag => $value) {
             $this->assertXPathMatches('/imbo/images/image/'. $tag . '[.="' . $value . '"]', $xml);
         }
 
@@ -232,7 +232,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $image->expects($this->once())->method('getAddedDate')->will($this->returnValue(new DateTime()));
         $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue(new DateTime()));
 
-        $images = array($image);
+        $images = [$image];
         $model = $this->getMock('Imbo\Model\Images');
         $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
 
@@ -247,11 +247,11 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanFormatAnImagesModelWithNoMetadata() {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getMetadata')->will($this->returnValue(array()));
+        $image->expects($this->once())->method('getMetadata')->will($this->returnValue([]));
         $image->expects($this->once())->method('getAddedDate')->will($this->returnValue(new DateTime()));
         $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue(new DateTime()));
 
-        $images = array($image);
+        $images = [$image];
         $model = $this->getMock('Imbo\Model\Images');
         $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
 
@@ -266,7 +266,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanFormatAnImagesModelWithNoImages() {
         $model = $this->getMock('Imbo\Model\Images');
-        $model->expects($this->once())->method('getImages')->will($this->returnValue(array()));
+        $model->expects($this->once())->method('getImages')->will($this->returnValue([]));
 
         $xml = $this->formatter->format($model);
 
@@ -278,10 +278,10 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\XML::formatMetadata
      */
     public function testCanFormatAMetadataModel() {
-        $metadata = array(
+        $metadata = [
             'some key' => 'some value',
             'some other key' => 'some other value',
-        );
+        ];
         $model = $this->getMock('Imbo\Model\Metadata');
         $model->expects($this->once())->method('getData')->will($this->returnValue($metadata));
 
@@ -298,7 +298,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanFormatAMetadataModelWithNoMetadata() {
         $model = $this->getMock('Imbo\Model\Metadata');
-        $model->expects($this->once())->method('getData')->will($this->returnValue(array()));
+        $model->expects($this->once())->method('getData')->will($this->returnValue([]));
 
         $xml = $this->formatter->format($model);
 
@@ -310,10 +310,10 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\XML::formatArrayModel
      */
     public function testCanFormatAnArrayModel() {
-        $data = array(
+        $data = [
             'key1' => 'value1',
             'key2' => 'value2',
-        );
+        ];
         $model = $this->getMock('Imbo\Model\ArrayModel');
         $model->expects($this->once())->method('getData')->will($this->returnValue($data));
 
@@ -330,9 +330,9 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\XML::formatArray
      */
     public function testCanFormatArrayModelWithLists() {
-        $data = array(
-            'key' => array(1, 2, 3),
-        );
+        $data = [
+            'key' => [1, 2, 3],
+        ];
         $model = $this->getMock('Imbo\Model\ArrayModel');
         $model->expects($this->once())->method('getData')->will($this->returnValue($data));
 
@@ -347,14 +347,14 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\XML::formatArray
      */
     public function testCanFormatAnArrayModelWithNestedArrays() {
-        $data = array(
-            'key' => array(
-                'sub' => array(
+        $data = [
+            'key' => [
+                'sub' => [
                     'subsub' => 'value',
-                ),
-            ),
+                ],
+            ],
             'key2' => 'value',
-        );
+        ];
         $model = $this->getMock('Imbo\Model\ArrayModel');
         $model->expects($this->once())->method('getData')->will($this->returnValue($data));
 
@@ -370,7 +370,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanFormatAnEmptyArrayModel() {
         $model = $this->getMock('Imbo\Model\ArrayModel');
-        $model->expects($this->once())->method('getData')->will($this->returnValue(array()));
+        $model->expects($this->once())->method('getData')->will($this->returnValue([]));
 
         $xml = $this->formatter->format($model);
 
@@ -382,7 +382,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\XML::formatListModel
      */
     public function testCanFormatAListModel() {
-        $list = array('foo', 'bar');
+        $list = ['foo', 'bar'];
         $container = 'users';
         $entry = 'user';
 
@@ -399,7 +399,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\XML::formatListModel
      */
     public function testCanFormatAnEmptyListModel() {
-        $list = array();
+        $list = [];
         $container = 'users';
         $entry = 'user';
 

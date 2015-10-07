@@ -27,9 +27,9 @@ class FilesystemTest extends StorageTests {
      * @see ImboIntegrationTest\Storage\StorageTests::getDriver()
      */
     protected function getDriver() {
-        return new Filesystem(array(
+        return new Filesystem([
             'dataDir' => $this->path,
-        ));
+        ]);
     }
 
     public function setUp() {

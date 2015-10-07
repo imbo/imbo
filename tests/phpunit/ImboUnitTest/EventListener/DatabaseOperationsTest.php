@@ -120,8 +120,8 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::updateMetadata
      */
     public function testCanUpdateMetadata() {
-        $this->event->expects($this->once())->method('getArgument')->with('metadata')->will($this->returnValue(array('key' => 'value')));
-        $this->database->expects($this->once())->method('updateMetadata')->with($this->user, $this->imageIdentifier, array('key' => 'value'));
+        $this->event->expects($this->once())->method('getArgument')->with('metadata')->will($this->returnValue(['key' => 'value']));
+        $this->database->expects($this->once())->method('updateMetadata')->with($this->user, $this->imageIdentifier, ['key' => 'value']);
 
         $this->listener->updateMetadata($this->event);
     }
@@ -131,7 +131,7 @@ class DatabaseOperationsTest extends ListenerTests {
      */
     public function testCanLoadMetadata() {
         $date = new DateTime();
-        $this->database->expects($this->once())->method('getMetadata')->with($this->user, $this->imageIdentifier)->will($this->returnValue(array('key' => 'value')));
+        $this->database->expects($this->once())->method('getMetadata')->with($this->user, $this->imageIdentifier)->will($this->returnValue(['key' => 'value']));
         $this->database->expects($this->once())->method('getLastModified')->with([$this->user], $this->imageIdentifier)->will($this->returnValue($date));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Metadata'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setLastModified')->with($date);
@@ -143,8 +143,8 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::loadImages
      */
     public function testCanLoadImages() {
-        $images = array(
-            array(
+        $images = [
+            [
                 'added' => new DateTime(),
                 'updated' => new DateTime(),
                 'size' => 123,
@@ -156,9 +156,9 @@ class DatabaseOperationsTest extends ListenerTests {
                 'mime' => 'image/png',
                 'extension' => 'png',
                 'user' => $this->user,
-                'metadata' => array(),
-            ),
-            array(
+                'metadata' => [],
+            ],
+            [
                 'added' => new DateTime(),
                 'updated' => new DateTime(),
                 'size' => 456,
@@ -170,9 +170,9 @@ class DatabaseOperationsTest extends ListenerTests {
                 'mime' => 'image/png',
                 'extension' => 'png',
                 'user' => $this->user,
-                'metadata' => array(),
-            ),
-            array(
+                'metadata' => [],
+            ],
+            [
                 'added' => new DateTime(),
                 'updated' => new DateTime(),
                 'size' => 789,
@@ -184,9 +184,9 @@ class DatabaseOperationsTest extends ListenerTests {
                 'mime' => 'image/png',
                 'extension' => 'png',
                 'user' => $this->user,
-                'metadata' => array(),
-            ),
-        );
+                'metadata' => [],
+            ],
+        ];
 
         $date = new DateTime();
 
@@ -202,13 +202,13 @@ class DatabaseOperationsTest extends ListenerTests {
         $query->expects($this->at(8))->method('has')->with('to')->will($this->returnValue(true));
         $query->expects($this->at(9))->method('get')->with('to')->will($this->returnValue(1355176488));
         $query->expects($this->at(10))->method('has')->with('sort')->will($this->returnValue(true));
-        $query->expects($this->at(11))->method('get')->with('sort')->will($this->returnValue(array('size:desc')));
+        $query->expects($this->at(11))->method('get')->with('sort')->will($this->returnValue(['size:desc']));
         $query->expects($this->at(12))->method('has')->with('ids')->will($this->returnValue(true));
-        $query->expects($this->at(13))->method('get')->with('ids')->will($this->returnValue(array('identifier1', 'identifier2', 'identifier3')));
+        $query->expects($this->at(13))->method('get')->with('ids')->will($this->returnValue(['identifier1', 'identifier2', 'identifier3']));
         $query->expects($this->at(14))->method('has')->with('checksums')->will($this->returnValue(true));
-        $query->expects($this->at(15))->method('get')->with('checksums')->will($this->returnValue(array('checksum1', 'checksum2', 'checksum3')));
+        $query->expects($this->at(15))->method('get')->with('checksums')->will($this->returnValue(['checksum1', 'checksum2', 'checksum3']));
         $query->expects($this->at(16))->method('has')->with('originalChecksums')->will($this->returnValue(true));
-        $query->expects($this->at(17))->method('get')->with('originalChecksums')->will($this->returnValue(array('checksum1', 'checksum2', 'checksum3')));
+        $query->expects($this->at(17))->method('get')->with('originalChecksums')->will($this->returnValue(['checksum1', 'checksum2', 'checksum3']));
         $this->request->query = $query;
 
         $imagesQuery = $this->getMock('Imbo\Resource\Images\Query');

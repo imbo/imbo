@@ -11,24 +11,24 @@
 /**
  * Enable the CORS event listener
  */
-return array(
-    'eventListeners' => array(
-        'cors' => array(
+return [
+    'eventListeners' => [
+        'cors' => [
             'listener' => 'Imbo\EventListener\Cors',
-            'params' => array(
-                'allowedOrigins' => array('http://allowedhost'),
-                'allowedMethods' => array(
-                    'index'    => array('GET', 'HEAD'),
-                    'image'    => array('GET', 'HEAD'),
-                    'images'   => array('GET', 'HEAD', 'POST'),
-                    'metadata' => array('GET', 'HEAD'),
-                    'status'   => array('GET', 'HEAD'),
-                    'stats'    => array('GET', 'HEAD'),
-                    'user'     => array('GET', 'HEAD'),
-                    'shorturl' => array('GET', 'HEAD'),
-                ),
+            'params' => [
+                'allowedOrigins' => ['http://allowedhost'],
+                'allowedMethods' => [
+                    'index'    => ['GET', 'HEAD'],
+                    'image'    => ['GET', 'HEAD'],
+                    'images'   => ['GET', 'HEAD', 'POST'],
+                    'metadata' => ['GET', 'HEAD'],
+                    'status'   => ['GET', 'HEAD'],
+                    'stats'    => ['GET', 'HEAD'],
+                    'user'     => ['GET', 'HEAD'],
+                    'shorturl' => ['GET', 'HEAD'],
+                ],
                 'maxAge' => 1349,
-            ),
-        ),
-    ),
-);
+            ],
+        ],
+    ],
+];

@@ -10,19 +10,19 @@ $method     = "DELETE";                 // HTTP method to use
 $uri = sprintf("http://imbo/users/%s/images/%s", $user, $image);
 
 // Data for the hash
-$data = implode("|", array($method, $uri, $publicKey, $timestamp));
+$data = implode("|", [$method, $uri, $publicKey, $timestamp]);
 
 // Generate the token
 $signature = hash_hmac("sha256", $data, $privateKey);
 
 // Request the URI
-$response = file_get_contents($uri, false, stream_context_create(array(
-    "http" => array(
+$response = file_get_contents($uri, false, stream_context_create([
+    "http" => [
         "method" => $method,
-        "header" => array(
+        "header" => [
             "X-Imbo-PublicKey " . $publicKey,
             "X-Imbo-Authenticate-Signature: " . $signature,
             "X-Imbo-Authenticate-Timestamp: " . $timestamp,
-        ),
-    ),
-)));
+        ],
+    ],
+]));

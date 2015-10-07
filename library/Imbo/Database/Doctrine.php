@@ -44,24 +44,24 @@ class Doctrine implements DatabaseInterface {
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         'dbname'   => null,
         'user'     => null,
         'password' => null,
         'host'     => null,
         'driver'   => null,
-    );
+    ];
 
     /**
      * Default table names for the database
      *
      * @var array
      */
-    private $tableNames = array(
+    private $tableNames = [
         'imageinfo' => 'imageinfo',
         'metadata'  => 'metadata',
         'shorturl'  => 'shorturl',
-    );
+    ];
 
     /**
      * Doctrine connection
@@ -106,14 +106,14 @@ class Doctrine implements DatabaseInterface {
         }
 
         if ($id = $this->getImageId($user, $imageIdentifier)) {
-            return (boolean) $this->getConnection()->update($this->tableNames['imageinfo'], array(
+            return (boolean) $this->getConnection()->update($this->tableNames['imageinfo'], [
                 'updated' => $now,
-            ), array(
+            ], [
                 'id' => $id
-            ));
+            ]);
         }
 
-        return (boolean) $this->getConnection()->insert($this->tableNames['imageinfo'], array(
+        return (boolean) $this->getConnection()->insert($this->tableNames['imageinfo'], [
             'size'             => $image->getFilesize(),
             'user'             => $user,
             'imageIdentifier'  => $imageIdentifier,
@@ -125,7 +125,7 @@ class Doctrine implements DatabaseInterface {
             'height'           => $image->getHeight(),
             'checksum'         => $image->getChecksum(),
             'originalChecksum' => $image->getOriginalChecksum(),
-        ));
+        ]);
     }
 
     /**
@@ -139,16 +139,16 @@ class Doctrine implements DatabaseInterface {
         $query = $this->getConnection()->createQueryBuilder();
         $query->delete($this->tableNames['imageinfo'])
               ->where('id = :id')
-              ->setParameters(array(
+              ->setParameters([
                   ':id' => $id,
-              ))->execute();
+              ])->execute();
 
         $query->resetQueryParts();
         $query->delete($this->tableNames['metadata'])
               ->where('imageId = :imageId')
-              ->setParameters(array(
+              ->setParameters([
                   ':imageId' => $id,
-              ))->execute();
+              ])->execute();
 
         return true;
     }
@@ -169,16 +169,16 @@ class Doctrine implements DatabaseInterface {
         $this->deleteMetadata($user, $imageIdentifier);
 
         // Normalize metadata
-        $normalizedMetadata = array();
+        $normalizedMetadata = [];
         $this->normalizeMetadata($metadata, $normalizedMetadata);
 
         // Insert merged and normalized metadata
         foreach ($normalizedMetadata as $key => $value) {
-            $connection->insert($this->tableNames['metadata'], array(
+            $connection->insert($this->tableNames['metadata'], [
                 'imageId'  => $imageId,
                 'tagName'  => $key,
                 'tagValue' => $value,
-            ));
+            ]);
         }
 
         return true;
@@ -196,11 +196,11 @@ class Doctrine implements DatabaseInterface {
         $query->select('tagName', 'tagValue')
               ->from($this->tableNames['metadata'], 'm')
               ->where('imageId = :imageId')
-              ->setParameters(array(':imageId' => $id));
+              ->setParameters([':imageId' => $id]);
 
         $stmt = $query->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $metadata = array();
+        $metadata = [];
 
         foreach ($rows as $row) {
             $metadata[$row['tagName']] = $row['tagValue'];
@@ -220,9 +220,9 @@ class Doctrine implements DatabaseInterface {
         $query = $this->getConnection()->createQueryBuilder();
         $query->delete($this->tableNames['metadata'])
               ->where('imageId = :imageId')
-              ->setParameters(array(
+              ->setParameters([
                   ':imageId' => $id,
-                ))->execute();
+                ])->execute();
 
         return true;
     }
@@ -231,7 +231,7 @@ class Doctrine implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function getImages(array $users, Query $query, Images $model) {
-        $images = array();
+        $images = [];
 
         $qb = $this->getConnection()->createQueryBuilder();
         $qb->select('*')->from($this->tableNames['imageinfo'], 'i');
@@ -249,7 +249,7 @@ class Doctrine implements DatabaseInterface {
 
         if ($sort = $query->sort()) {
             // Fields valid for sorting
-            $validFields = array(
+            $validFields = [
                 'size'             => true,
                 'user'             => true,
                 'imageIdentifier'  => true,
@@ -261,7 +261,7 @@ class Doctrine implements DatabaseInterface {
                 'height'           => true,
                 'checksum'         => true,
                 'originalChecksum' => true,
-            );
+            ];
 
             foreach ($sort as $f) {
                 if (!isset($validFields[$f['field']])) {
@@ -343,7 +343,7 @@ class Doctrine implements DatabaseInterface {
         $returnMetadata = $query->returnMetadata();
 
         foreach ($rows as $row) {
-            $image = array(
+            $image = [
                 'extension'        => $row['extension'],
                 'added'            => new DateTime('@' . $row['added'], new DateTimeZone('UTC')),
                 'updated'          => new DateTime('@' . $row['updated'], new DateTimeZone('UTC')),
@@ -355,7 +355,7 @@ class Doctrine implements DatabaseInterface {
                 'size'             => (int) $row['size'],
                 'width'            => (int) $row['width'],
                 'height'           => (int) $row['height']
-            );
+            ];
 
             if ($returnMetadata) {
                 $image['metadata'] = $this->getMetadata($user, $row['imageIdentifier']);
@@ -376,10 +376,10 @@ class Doctrine implements DatabaseInterface {
               ->from($this->tableNames['imageinfo'], 'i')
               ->where('i.user = :user')
               ->andWhere('i.imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
+              ->setParameters([
                   ':user'            => $user,
                   ':imageIdentifier' => $imageIdentifier,
-        ));
+        ]);
         $stmt = $query->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
@@ -435,7 +435,7 @@ class Doctrine implements DatabaseInterface {
         if (!$row && $imageIdentifier) {
             throw new DatabaseException('Image not found', 404);
         } else if (!$row) {
-            $row = array('updated' => time());
+            $row = ['updated' => time()];
         }
 
         return new DateTime('@' . $row['updated'], new DateTimeZone('UTC'));
@@ -512,10 +512,10 @@ class Doctrine implements DatabaseInterface {
               ->from($this->tableNames['imageinfo'], 'i')
               ->where('i.user = :user')
               ->andWhere('i.imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
+              ->setParameters([
                   ':user'            => $user,
                   ':imageIdentifier' => $imageIdentifier,
-              ));
+              ]);
 
         $stmt = $query->execute();
         $mime = $stmt->fetchColumn();
@@ -537,14 +537,14 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertShortUrl($shortUrlId, $user, $imageIdentifier, $extension = null, array $query = array()) {
-        return (boolean) $this->getConnection()->insert($this->tableNames['shorturl'], array(
+    public function insertShortUrl($shortUrlId, $user, $imageIdentifier, $extension = null, array $query = []) {
+        return (boolean) $this->getConnection()->insert($this->tableNames['shorturl'], [
             'shortUrlId' => $shortUrlId,
             'user' => $user,
             'imageIdentifier' => $imageIdentifier,
             'extension' => $extension,
             'query' => serialize($query),
-        ));
+        ]);
     }
 
     /**
@@ -555,7 +555,7 @@ class Doctrine implements DatabaseInterface {
         $qb->select('user', 'imageIdentifier', 'extension', 'query')
            ->from($this->tableNames['shorturl'], 's')
            ->where('shortUrlId = :shortUrlId')
-           ->setParameters(array(':shortUrlId' => $shortUrlId));
+           ->setParameters([':shortUrlId' => $shortUrlId]);
 
         $stmt = $qb->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -572,18 +572,18 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getShortUrlId($user, $imageIdentifier, $extension = null, array $query = array()) {
+    public function getShortUrlId($user, $imageIdentifier, $extension = null, array $query = []) {
         $qb = $this->getConnection()->createQueryBuilder();
         $qb->select('shortUrlId')
            ->from($this->tableNames['shorturl'], 's')
            ->where('user = :user')
            ->andWhere('imageIdentifier = :imageIdentifier')
            ->andWhere('query = :query')
-           ->setParameters(array(
+           ->setParameters([
                ':user' => $user,
                ':imageIdentifier' => $imageIdentifier,
                ':query' => serialize($query),
-           ));
+           ]);
 
         if ($extension === null) {
             $qb->andWhere('extension is NULL');
@@ -611,10 +611,10 @@ class Doctrine implements DatabaseInterface {
         $qb->delete($this->tableNames['shorturl'])
            ->where('user = :user')
            ->andWhere('imageIdentifier = :imageIdentifier')
-           ->setParameters(array(
+           ->setParameters([
                ':user' => $user,
                ':imageIdentifier' => $imageIdentifier,
-           ));
+           ]);
 
         if ($shortUrlId) {
             $qb->andWhere('shortUrlId = :shortUrlId')
@@ -662,10 +662,10 @@ class Doctrine implements DatabaseInterface {
               ->from($this->tableNames['imageinfo'], 'i')
               ->where('i.user = :user')
               ->andWhere('i.imageIdentifier = :imageIdentifier')
-              ->setParameters(array(
+              ->setParameters([
                   ':user'            => $user,
                   ':imageIdentifier' => $imageIdentifier,
-              ));
+              ]);
 
         $stmt = $query->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -704,7 +704,7 @@ class Doctrine implements DatabaseInterface {
      * @return array
      */
     private function denormalizeMetadata(array $data) {
-        $result = array();
+        $result = [];
 
         foreach ($data as $key => $value) {
             $keys = explode($this->metadataNamespaceSeparator, $key);

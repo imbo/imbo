@@ -30,16 +30,16 @@ class ExifMetadata implements ListenerInterface {
      *
      * @var array
      */
-    protected $allowedTags = array(
+    protected $allowedTags = [
         'exif:*',
-    );
+    ];
 
     /**
      * Exif properties
      *
      * @var array
      */
-    protected $properties = array();
+    protected $properties = [];
 
     /**
      * Imagick instance
@@ -63,13 +63,13 @@ class ExifMetadata implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             // High priority to prevent other listeners from stripping EXIF-data
-            'images.post' => array('populate' => 45),
+            'images.post' => ['populate' => 45],
 
             // When image has been inserted to database, insert metadata
-            'db.image.insert' => array('save' => -100),
-        );
+            'db.image.insert' => ['save' => -100],
+        ];
     }
 
     /**
@@ -166,7 +166,7 @@ class ExifMetadata implements ListenerInterface {
             return $properties;
         }
 
-        $filtered = array();
+        $filtered = [];
 
         foreach ($properties as $key => $value) {
             if (isset($tags[$key])) {
@@ -198,7 +198,7 @@ class ExifMetadata implements ListenerInterface {
             isset($properties['exif:GPSLongitude'])) {
 
             // We store coordinates in GeoJSON-format (lng/lat)
-            $properties['gps:location'] = array(
+            $properties['gps:location'] = [
                 $this->parseGpsCoordinate(
                     $properties['exif:GPSLongitude'],
                     $properties['exif:GPSLongitudeRef']
@@ -207,7 +207,7 @@ class ExifMetadata implements ListenerInterface {
                     $properties['exif:GPSLatitude'],
                     $properties['exif:GPSLatitudeRef']
                 ),
-            );
+            ];
         }
 
         if (isset($properties['exif:GPSAltitude'])) {

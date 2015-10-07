@@ -11,11 +11,11 @@
 /**
  * Add an image transformation preset
  */
-return array(
-    'transformationPresets' => array(
-        'graythumb' => array(
+return [
+    'transformationPresets' => [
+        'graythumb' => [
             'thumbnail',
             'desaturate',
-        ),
-    ),
-);
+        ],
+    ],
+];

@@ -38,7 +38,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testCanSetAndGetConfiguration() {
-        $config = array('some' => 'config');
+        $config = ['some' => 'config'];
         $this->command->setConfig($config);
         $this->assertSame($config, $this->command->getConfig());
     }

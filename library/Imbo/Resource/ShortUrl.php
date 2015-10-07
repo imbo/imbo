@@ -25,16 +25,16 @@ class ShortUrl implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('DELETE');
+        return ['DELETE'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'shorturl.delete' => 'deleteShortUrl',
-        );
+        ];
     }
 
     /**
@@ -64,9 +64,9 @@ class ShortUrl implements ResourceInterface {
         );
 
         $model = new ArrayModel();
-        $model->setData(array(
+        $model->setData([
             'id' => $shortUrlId,
-        ));
+        ]);
 
         $event->getResponse()->setModel($model);
     }

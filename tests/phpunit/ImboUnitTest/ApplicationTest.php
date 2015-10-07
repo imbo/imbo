@@ -45,10 +45,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Application::run
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidDatabaseAdapter() {
-        $this->application->run(array(
+        $this->application->run([
             'database' => function() { return new \stdClass(); },
             'trustedProxies' => [],
-        ));
+        ]);
     }
 
     /**
@@ -58,11 +58,11 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Application::run
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidStorageAdapter() {
-        $this->application->run(array(
+        $this->application->run([
             'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
             'storage' => function() { return new \stdClass(); },
             'trustedProxies' => [],
-        ));
+        ]);
     }
 
     /**
@@ -72,13 +72,13 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Application::run
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidAccessControlAdapter() {
-        $this->application->run(array(
+        $this->application->run([
             'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
             'storage' => $this->getMock('Imbo\Storage\StorageInterface'),
             'routes' => [],
             'trustedProxies' => [],
             'accessControl' => function() { return new \stdClass(); },
-        ));
+        ]);
     }
 
     /**
@@ -88,7 +88,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $this->expectOutputRegex('|{"version":"' . preg_quote(Version::VERSION, '|') . '",.*}|');
 
         $this->assertEmpty(Request::getTrustedProxies());
-        $this->application->run(array(
+        $this->application->run([
             'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
             'storage' => $this->getMock('Imbo\Storage\StorageInterface'),
             'accessControl' => $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface'),
@@ -99,7 +99,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
             'routes' => [],
             'auth' => [],
             'trustedProxies' => ['10.0.0.77'],
-        ));
+        ]);
         $this->assertSame(['10.0.0.77'], Request::getTrustedProxies());
     }
 

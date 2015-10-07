@@ -27,10 +27,10 @@ class RotateTest extends TransformationTests {
     }
 
     public function getRotateParams() {
-        return array(
-            '90 angle' => array(90, 463, 665),
-            '180 angle' => array(180, 665, 463),
-        );
+        return [
+            '90 angle' => [90, 463, 665],
+            '180 angle' => [180, 665, 463],
+        ];
     }
 
     /**
@@ -46,10 +46,10 @@ class RotateTest extends TransformationTests {
 
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue([
             'angle' => $angle,
             'bg' => 'fff',
-        )));
+        ]));
 
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));

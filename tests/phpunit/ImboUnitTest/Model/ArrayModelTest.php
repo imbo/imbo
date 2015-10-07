@@ -42,9 +42,9 @@ class ArrayModelTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Model\ArrayModel::setData
      */
     public function testCanSetAndGetData() {
-        $this->assertSame(array(), $this->model->getData());
-        $this->assertSame($this->model, $this->model->setData(array('key' => 'value')));
-        $this->assertSame(array('key' => 'value'), $this->model->getData());
+        $this->assertSame([], $this->model->getData());
+        $this->assertSame($this->model, $this->model->setData(['key' => 'value']));
+        $this->assertSame(['key' => 'value'], $this->model->getData());
     }
 
     /**

@@ -41,9 +41,9 @@ class Crop extends Transformation implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.transformation.crop' => 'transform',
-        );
+        ];
     }
 
     /**
@@ -55,7 +55,7 @@ class Crop extends Transformation implements ListenerInterface {
         $image = $event->getArgument('image');
         $params = $event->getArgument('params');
 
-        foreach (array('width', 'height') as $param) {
+        foreach (['width', 'height'] as $param) {
             if (!isset($params[$param])) {
                 throw new TransformationException('Missing required parameter: ' . $param, 400);
             }

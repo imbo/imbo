@@ -32,12 +32,12 @@ class HistogramTest extends TransformationTests {
      * @return array[]
      */
     public function getHistogramParameters() {
-        return array(
-            array(1, 256),
-            array(2, 512),
-            array(4, 1024),
-            array(8, 2048),
-        );
+        return [
+            [1, 256],
+            [2, 512],
+            [4, 1024],
+            [8, 2048],
+        ];
     }
 
     /**
@@ -63,9 +63,9 @@ class HistogramTest extends TransformationTests {
         $event->expects($this->at(1))
               ->method('getArgument')
               ->with('params')
-              ->will($this->returnValue(array(
+              ->will($this->returnValue([
                   'scale' => $scale,
-              )));
+              ]));
 
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);

@@ -73,12 +73,12 @@ class GlobalShortUrlTest extends ResourceTests {
         $user = 'christer';
         $imageIdentifier = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         $extension = 'png';
-        $query = array(
-            't' => array(
+        $query = [
+            't' => [
                 'thumbnail:width=40'
-            ),
+            ],
             'accessToken' => 'some token',
-        );
+        ];
 
         $route = $this->getMock('Imbo\Router\Route');
         $route->expects($this->at(0))->method('get')->with('shortUrlId')->will($this->returnValue($id));
@@ -87,12 +87,12 @@ class GlobalShortUrlTest extends ResourceTests {
         $route->expects($this->at(3))->method('set')->with('extension', $extension);
         $this->request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
         $this->request->expects($this->once())->method('getUri')->will($this->returnValue('http://imbo/s/' . $id));
-        $this->database->expects($this->once())->method('getShortUrlParams')->with($id)->will($this->returnValue(array(
+        $this->database->expects($this->once())->method('getShortUrlParams')->with($id)->will($this->returnValue([
             'user' => $user,
             'imageIdentifier' => $imageIdentifier,
             'extension' => $extension,
             'query' => $query,
-        )));
+        ]));
         $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $responseHeaders->expects($this->once())->method('set')->with('X-Imbo-ShortUrl', 'http://imbo/s/' . $id);
         $this->response->headers = $responseHeaders;

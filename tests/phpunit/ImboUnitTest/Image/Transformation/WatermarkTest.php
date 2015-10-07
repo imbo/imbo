@@ -48,7 +48,7 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase {
 
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array()));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue([]));
 
         $this->transformation->transform($event);
     }
@@ -74,9 +74,9 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase {
 
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array(
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue([
             'img' => 'foobar',
-        )));
+        ]));
         $event->expects($this->at(2))->method('getStorage')->will($this->returnValue($storage));
         $event->expects($this->at(3))->method('getRequest')->will($this->returnValue($request));
 

@@ -24,22 +24,22 @@ class Image implements ModelInterface {
      *
      * @var array
      */
-    static public $mimeTypes = array(
+    static public $mimeTypes = [
         'image/png'  => 'png',
         'image/jpeg' => 'jpg',
         'image/gif'  => 'gif',
-    );
+    ];
 
     /**
      * Mapping for some mime types
      *
      * @var array
      */
-    static public $mimeTypeMapping = array(
+    static public $mimeTypeMapping = [
         'image/x-png'  => 'image/png',
         'image/x-jpeg' => 'image/jpeg',
         'image/x-gif'  => 'image/gif',
-    );
+    ];
 
     /**
      * Size of the file

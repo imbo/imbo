@@ -68,7 +68,7 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
         $this->cacheDir = vfsStream::setup($this->path);
-        $this->listener = new ImageTransformationCache(array('path' => vfsStream::url($this->path)));
+        $this->listener = new ImageTransformationCache(['path' => vfsStream::url($this->path)]);
     }
 
     /**
@@ -99,10 +99,10 @@ class ImageTransformationCacheTest extends ListenerTests {
     public function testChangesTheImageInstanceOnCacheHit() {
         $imageFromCache = $this->getMock('Imbo\Model\Image');
         $headersFromCache = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
-        $cachedData = serialize(array(
+        $cachedData = serialize([
             'image' => $imageFromCache,
             'headers' => $headersFromCache,
-        ));
+        ]);
 
         $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
@@ -114,7 +114,7 @@ class ImageTransformationCacheTest extends ListenerTests {
                                  'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
                              ));
 
-        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(array('thumbnail')));
+        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(['thumbnail']));
 
         $this->response->expects($this->once())->method('setModel')->with($imageFromCache)->will($this->returnSelf());
         $this->event->expects($this->once())->method('stopPropagation');
@@ -148,7 +148,7 @@ class ImageTransformationCacheTest extends ListenerTests {
                                  'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
                              ));
 
-        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(array('thumbnail')));
+        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(['thumbnail']));
 
         $dir = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6';
         $file = 'bc6ffe312a5741a5705afe8639c08835';
@@ -219,11 +219,11 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformationCache::rmdir
      */
     public function testCanDeleteAllImageVariationsFromCache() {
-        $cachedFiles = array(
+        $cachedFiles = [
             'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/f/30f0763c8422360d10fd84573dd58293',
             'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/e/30e0763c8422360d10fd84573dd58293',
             'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/d/30d0763c8422360d10fd84573dd58293',
-        );
+        ];
 
         foreach ($cachedFiles as $file) {
             @mkdir(dirname($file), 0775, true);
@@ -248,7 +248,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformationCache::__construct
      */
     public function testThrowsAnExceptionWhenPathIsMissingFromTheParameters() {
-        $listener = new ImageTransformationCache(array());
+        $listener = new ImageTransformationCache([]);
     }
 
     /**
@@ -261,13 +261,13 @@ class ImageTransformationCacheTest extends ListenerTests {
         $dir = new vfsStreamDirectory('dir', 0);
         $this->cacheDir->addChild($dir);
 
-        $listener = new ImageTransformationCache(array('path' => 'vfs://cacheDir/dir'));
+        $listener = new ImageTransformationCache(['path' => 'vfs://cacheDir/dir']);
     }
 
     /**
      * @covers Imbo\EventListener\ImageTransformationCache::__construct
      */
     public function testDoesNotTriggerWarningIfCachePathDoesNotExistAndParentIsWritable() {
-        $listener = new ImageTransformationCache(array('path' => 'vfs://cacheDir/some/dir/that/does/not/exist'));
+        $listener = new ImageTransformationCache(['path' => 'vfs://cacheDir/some/dir/that/does/not/exist']);
     }
 }

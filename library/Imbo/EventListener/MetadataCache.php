@@ -47,20 +47,20 @@ class MetadataCache implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             // Load and store in cache
-            'db.metadata.load' => array(
+            'db.metadata.load' => [
                 'loadFromCache' => 10,
                 'storeInCache' => -10,
-            ),
+            ],
 
             // Delete from cache
-            'db.metadata.delete' => array('deleteFromCache' => -10),
-            'db.image.delete' => array('deleteFromCache' => -10),
+            'db.metadata.delete' => ['deleteFromCache' => -10],
+            'db.image.delete' => ['deleteFromCache' => -10],
 
             // Store updated data in cache
-            'db.metadata.update' => array('storeInCache' => -10),
-        );
+            'db.metadata.update' => ['storeInCache' => -10],
+        ];
     }
 
     /**
@@ -115,16 +115,16 @@ class MetadataCache implements ListenerInterface {
 
         // Store the response in the cache for later use
         if ($response->getStatusCode() === 200) {
-            $metadata = array();
+            $metadata = [];
 
             if ($model = $response->getModel()) {
                 $metadata = $model->getData();
             }
 
-            $this->cache->set($cacheKey, array(
+            $this->cache->set($cacheKey, [
                 'lastModified' => $response->getLastModified(),
                 'metadata' => $metadata,
-            ));
+            ]);
         }
     }
 

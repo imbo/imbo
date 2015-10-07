@@ -45,16 +45,16 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $this->event->expects($this->any())->method('getConfig')->will($this->returnValue(array('contentNegotiateImages' => true)));
+        $this->event->expects($this->any())->method('getConfig')->will($this->returnValue(['contentNegotiateImages' => true]));
         $this->formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
-        $this->formatters = array(
+        $this->formatters = [
             'format' => $this->formatter,
-        );
+        ];
         $this->contentNegotiation = $this->getMock('Imbo\Http\ContentNegotiation');
-        $this->responseFormatter = new ResponseFormatter(array(
+        $this->responseFormatter = new ResponseFormatter([
             'formatters' => $this->formatters,
             'contentNegotiation' => $this->contentNegotiation,
-        ));
+        ]);
         $this->responseFormatter->setFormatter('format');
     }
 
@@ -63,7 +63,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
      */
     public function tearDown() {
         $this->responseFormatter = null;
-        $this->formatters = array();
+        $this->formatters = [];
         $this->contentNegotiation = null;
         $this->formatter = null;
         $this->request = null;
@@ -105,17 +105,17 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getJsonpTriggers() {
-        return array(
-            array('callback', 'func', 'application/json'),
-            array('json', 'func', 'application/json'),
-            array('jsonp', 'func', 'application/json'),
-            array('function', 'func', 'application/json', false),
+        return [
+            ['callback', 'func', 'application/json'],
+            ['json', 'func', 'application/json'],
+            ['jsonp', 'func', 'application/json'],
+            ['function', 'func', 'application/json', false],
 
-            array('callback', 'func', 'application/xml', false),
-            array('json', 'func', 'application/xml', false),
-            array('jsonp', 'func', 'application/xml', false),
-            array('function', 'func', 'application/xml', false),
-        );
+            ['callback', 'func', 'application/xml', false],
+            ['json', 'func', 'application/xml', false],
+            ['jsonp', 'func', 'application/xml', false],
+            ['function', 'func', 'application/xml', false],
+        ];
     }
 
     /**
@@ -135,17 +135,17 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $this->formatter->expects($this->once())->method('format')->with($model)->will($this->returnValue($json));
         $this->formatter->expects($this->once())->method('getContentType')->will($this->returnValue($contentType));
 
-        $query = new ParameterBag(array(
+        $query = new ParameterBag([
             $param => $callback,
-        ));
+        ]);
 
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $this->request->query = $query;
         $this->response->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $this->response->headers->expects($this->once())->method('add')->with(array(
+        $this->response->headers->expects($this->once())->method('add')->with([
             'Content-Type' => $contentType,
             'Content-Length' => strlen($expectedContent),
-        ));
+        ]);
         $this->response->expects($this->once())->method('setContent')->with($expectedContent);
         $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(200));
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($model));
@@ -239,11 +239,11 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getOriginalMimeTypes() {
-        return array(
-            'jpg' => array('image/jpeg', 'jpg'),
-            'gif' => array('image/gif', 'gif'),
-            'png' => array('image/png', 'png'),
-        );
+        return [
+            'jpg' => ['image/jpeg', 'jpg'],
+            'gif' => ['image/gif', 'gif'],
+            'png' => ['image/png', 'png'],
+        ];
     }
 
     /**
@@ -286,7 +286,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $event->expects($this->any())->method('getConfig')->will($this->returnValue(array('contentNegotiateImages' => false)));
+        $event->expects($this->any())->method('getConfig')->will($this->returnValue(['contentNegotiateImages' => false]));
 
         $this->responseFormatter->negotiate($event);
         $this->assertSame($expectedFormatter, $this->responseFormatter->getFormatter());
@@ -345,14 +345,14 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
                      ->method('trigger')
                      ->with(
                          'image.transformation.convert',
-                         array(
+                         [
                              'image' => $image,
-                             'params' => array('type' => 'png'),
-                         )
+                             'params' => ['type' => 'png'],
+                         ]
                      );
         $eventManager->expects($this->at(1))
                      ->method('trigger')
-                     ->with('image.transformed', array('image' => $image));
+                     ->with('image.transformed', ['image' => $image]);
 
         $this->event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
 
@@ -372,7 +372,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $eventManager = $this->getMock('Imbo\EventManager\EventManager');
         $eventManager->expects($this->once())
                      ->method('trigger')
-                     ->with('image.transformed', array('image' => $image));
+                     ->with('image.transformed', ['image' => $image]);
 
         $this->event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
 

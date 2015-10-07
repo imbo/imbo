@@ -31,14 +31,14 @@ class JSON extends Formatter implements FormatterInterface {
      * {@inheritdoc}
      */
     public function formatError(Model\Error $model) {
-        $data = array(
-            'error' => array(
+        $data = [
+            'error' => [
                 'code' => $model->getHttpCode(),
                 'message' => $model->getErrorMessage(),
                 'date' => $this->dateFormatter->formatDate($model->getDate()),
                 'imboErrorCode' => $model->getImboErrorCode(),
-            ),
-        );
+            ],
+        ];
 
         if ($imageIdentifier = $model->getImageIdentifier()) {
             $data['imageIdentifier'] = $imageIdentifier;
@@ -51,22 +51,22 @@ class JSON extends Formatter implements FormatterInterface {
      * {@inheritdoc}
      */
     public function formatStatus(Model\Status $model) {
-        return $this->encode(array(
+        return $this->encode([
             'date' => $this->dateFormatter->formatDate($model->getDate()),
             'database' => $model->getDatabaseStatus(),
             'storage' => $model->getStorageStatus(),
-        ));
+        ]);
     }
 
     /**
      * {@inheritdoc}
      */
     public function formatUser(Model\User $model) {
-        return $this->encode(array(
+        return $this->encode([
             'user' => $model->getUserId(),
             'numImages' => $model->getNumImages(),
             'lastModified' => $this->dateFormatter->formatDate($model->getLastModified()),
-        ));
+        ]);
     }
 
     /**
@@ -74,7 +74,7 @@ class JSON extends Formatter implements FormatterInterface {
      */
     public function formatImages(Model\Images $model) {
         $images = $model->getImages();
-        $data = array();
+        $data = [];
 
         // Fields to display
         if ($fields = $model->getFields()) {
@@ -82,7 +82,7 @@ class JSON extends Formatter implements FormatterInterface {
         }
 
         foreach ($images as $image) {
-            $entry = array(
+            $entry = [
                 'added' => $this->dateFormatter->formatDate($image->getAddedDate()),
                 'updated' => $this->dateFormatter->formatDate($image->getUpdatedDate()),
                 'checksum' => $image->getChecksum(),
@@ -94,7 +94,7 @@ class JSON extends Formatter implements FormatterInterface {
                 'mime' => $image->getMimeType(),
                 'imageIdentifier' => $image->getImageIdentifier(),
                 'user' => $image->getUser(),
-            );
+            ];
 
             // Add metadata if the field is to be displayed
             if (empty($fields) || isset($fields['metadata'])) {
@@ -121,15 +121,15 @@ class JSON extends Formatter implements FormatterInterface {
             $data[] = $entry;
         }
 
-        return $this->encode(array(
-            'search' => array(
+        return $this->encode([
+            'search' => [
                 'hits' => $model->getHits(),
                 'page' => $model->getPage(),
                 'limit' => $model->getLimit(),
                 'count' => $model->getCount(),
-            ),
+            ],
             'images' => $data,
-        ));
+        ]);
     }
 
     /**
@@ -150,7 +150,7 @@ class JSON extends Formatter implements FormatterInterface {
      * {@inheritdoc}
      */
     public function formatListModel(Model\ListModel $model) {
-        return $this->encode(array($model->getContainer() => $model->getList()));
+        return $this->encode([$model->getContainer() => $model->getList()]);
     }
 
     /**

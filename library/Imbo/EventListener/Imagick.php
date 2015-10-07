@@ -46,11 +46,11 @@ class Imagick implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             // Update the model after all transformations have been applied
             'image.transformed' => 'updateModel',
 
-            'images.post' => array(
+            'images.post' => [
                 // Update the model before storing the image data in case an event listener has
                 // changed the incoming image
                 'updateModelBeforeStoring' => 1,
@@ -58,11 +58,11 @@ class Imagick implements ListenerInterface {
                 // Inject the image blob into the image model after preparing the image based on
                 // the request body
                 'readImageBlob' => 40,
-            ),
+            ],
 
             // Inject the image blob into the image model after loading it from the database
-            'image.loaded' => array('readImageBlob' => -10),
-        );
+            'image.loaded' => ['readImageBlob' => -10],
+        ];
     }
 
     /**

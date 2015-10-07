@@ -27,7 +27,7 @@ class CropTest extends \PHPUnit_Framework_TestCase {
     public function testThrowsExceptionWhenWidthIsMissing() {
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($this->getMock('Imbo\Model\Image')));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array('height' => 123)));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(['height' => 123]));
 
         $transformation = new Crop();
         $transformation->transform($event);
@@ -42,7 +42,7 @@ class CropTest extends \PHPUnit_Framework_TestCase {
     public function testThrowsExceptionWhenHeightIsMissing() {
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($this->getMock('Imbo\Model\Image')));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array('width' => 123)));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(['width' => 123]));
 
         $transformation = new Crop();
         $transformation->transform($event);
@@ -54,12 +54,12 @@ class CropTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getImageParams() {
-        return array(
-            'Do not perform work when cropping same sized images' => array(array('width' => 123, 'height' => 234), 123, 234, 0, 0, false),
-            'Do not perform work when getting a larger crop than image' => array(array('width' => 5123, 'height' => 5234), 123, 234, 0, 0, false),
-            'Create new cropped image #1' => array(array('width' => 123, 'height' => 234, 'y' => 10), 123, 234, 0, 10),
-            'Create new cropped image #2' => array(array('width' => 123, 'height' => 234, 'x' => 10, 'y' => 20), 123, 234, 10, 20),
-        );
+        return [
+            'Do not perform work when cropping same sized images' => [['width' => 123, 'height' => 234], 123, 234, 0, 0, false],
+            'Do not perform work when getting a larger crop than image' => [['width' => 5123, 'height' => 5234], 123, 234, 0, 0, false],
+            'Create new cropped image #1' => [['width' => 123, 'height' => 234, 'y' => 10], 123, 234, 0, 10],
+            'Create new cropped image #2' => [['width' => 123, 'height' => 234, 'x' => 10, 'y' => 20], 123, 234, 10, 20],
+        ];
     }
 
     /**
@@ -78,7 +78,7 @@ class CropTest extends \PHPUnit_Framework_TestCase {
             $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnSelf());
 
             $imagick->expects($this->once())->method('cropImage')->with($width, $height, $x, $y);
-            $imagick->expects($this->once())->method('getImageGeometry')->will($this->returnValue(array('width' => $width, 'height' => $height)));
+            $imagick->expects($this->once())->method('getImageGeometry')->will($this->returnValue(['width' => $width, 'height' => $height]));
         } else {
             $imagick->expects($this->never())->method('cropImage');
         }

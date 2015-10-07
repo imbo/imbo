@@ -34,7 +34,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      */
     public function setUp() {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->event = new Event($this, array('request' => $this->request));
+        $this->event = new Event($this, ['request' => $this->request]);
         $this->manager = new EventManager();
         $this->manager->setEventTemplate($this->event);
     }
@@ -60,11 +60,11 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame(
             $this->manager,
-            $this->manager->addEventHandler('handler1', $callback1)->addCallbacks('handler1', array('event1' => 0))
-                          ->addEventHandler('handler2', $callback2)->addCallbacks('handler2', array('event2' => 1))
-                          ->addEventHandler('handler3', $callback3)->addCallbacks('handler3', array('event2' => 2))
-                          ->addEventHandler('handler4', $callback3)->addCallbacks('handler4', array('event3' => 0))
-                          ->addEventHandler('handler5', $callback1)->addCallbacks('handler5', array('event4' => 0))
+            $this->manager->addEventHandler('handler1', $callback1)->addCallbacks('handler1', ['event1' => 0])
+                          ->addEventHandler('handler2', $callback2)->addCallbacks('handler2', ['event2' => 1])
+                          ->addEventHandler('handler3', $callback3)->addCallbacks('handler3', ['event2' => 2])
+                          ->addEventHandler('handler4', $callback3)->addCallbacks('handler4', ['event3' => 0])
+                          ->addEventHandler('handler5', $callback1)->addCallbacks('handler5', ['event4' => 0])
         );
 
         $this->expectOutputString('1321');
@@ -86,10 +86,10 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
             $event->stopPropagation();
         };
 
-        $this->manager->addEventHandler('handler1', $callback1)->addCallbacks('handler1', array('event' => 3))
-                      ->addEventHandler('handler2', $stopper)->addCallbacks('handler2', array('event' => 2))
-                      ->addEventHandler('handler3', $callback2)->addCallbacks('handler3', array('event' => 1))
-                      ->addEventHandler('handler4', $callback3)->addCallbacks('handler4', array('otherevent' => 0));
+        $this->manager->addEventHandler('handler1', $callback1)->addCallbacks('handler1', ['event' => 3])
+                      ->addEventHandler('handler2', $stopper)->addCallbacks('handler2', ['event' => 2])
+                      ->addEventHandler('handler3', $callback2)->addCallbacks('handler3', ['event' => 1])
+                      ->addEventHandler('handler4', $callback3)->addCallbacks('handler4', ['otherevent' => 0]);
 
         $this->expectOutputString('13');
 
@@ -104,7 +104,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\EventManager::hasListenersForEvent
      */
     public function testCanCheckIfTheManagerHasListenersForSpecificEvents() {
-        $this->manager->addEventHandler('handler', function($event) {})->addCallbacks('handler', array('event' => 0));
+        $this->manager->addEventHandler('handler', function($event) {})->addCallbacks('handler', ['event' => 0]);
         $this->assertFalse($this->manager->hasListenersForEvent('some.event'));
         $this->assertTrue($this->manager->hasListenersForEvent('event'));
     }
@@ -115,14 +115,14 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getUsers() {
-        return array(
-            array(null, array(), '1'),
-            array(null, array('christer'), '1'),
-            array('christer', array('blacklist' => array('christer', 'user')), ''),
-            array('christer', array('blacklist' => array('user')), '1'),
-            array('christer', array('whitelist' => array('user')), ''),
-            array('christer', array('whitelist' => array('christer', 'user')), '1'),
-        );
+        return [
+            [null, [], '1'],
+            [null, ['christer'], '1'],
+            ['christer', ['blacklist' => ['christer', 'user']], ''],
+            ['christer', ['blacklist' => ['user']], '1'],
+            ['christer', ['whitelist' => ['user']], ''],
+            ['christer', ['whitelist' => ['christer', 'user']], '1'],
+        ];
     }
 
     /**
@@ -133,7 +133,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
     public function testCanIncludeAndExcludeUsers($user, $users, $output = '') {
         $callback = function ($event) { echo '1'; };
 
-        $this->manager->addEventHandler('handler', $callback)->addCallbacks('handler', array('event' => 0), $users);
+        $this->manager->addEventHandler('handler', $callback)->addCallbacks('handler', ['event' => 0], $users);
 
         $this->request->expects($this->any())->method('getUser')->will($this->returnValue($user));
 
@@ -148,14 +148,14 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $this->manager->addEventHandler('handler', function($event) {
             echo $event->getArgument('foo');
             echo $event->getArgument('bar');
-        })->addCallbacks('handler', array('event' => 0));
+        })->addCallbacks('handler', ['event' => 0]);
 
         $this->expectOutputString('barbaz');
 
-        $this->manager->trigger('event', array(
+        $this->manager->trigger('event', [
             'foo' => 'bar',
             'bar' => 'baz',
-        ));
+        ]);
     }
 
     /**
@@ -178,7 +178,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventManager\EventManager::addCallbacks
      */
     public function testThrowsExceptionsWhenInvalidHandlersAreAdded() {
-        $this->manager->addCallbacks('someName', array('event' => function($event) {}));
+        $this->manager->addCallbacks('someName', ['event' => function($event) {}]);
     }
 
     /**
@@ -198,7 +198,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanInjectParamsInConstructor() {
         $listenerClassName = __NAMESPACE__ . '\Listener';
-        $this->manager->addEventHandler('someHandler', $listenerClassName, array('param'));
+        $this->manager->addEventHandler('someHandler', $listenerClassName, ['param']);
         $this->manager->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
 
         $this->expectOutputString('a:1:{i:0;s:5:"param";}');
@@ -214,15 +214,15 @@ class Listener implements ListenerInterface {
     }
 
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'event' => 'method',
-            'someEvent' => array(
+            'someEvent' => [
                 'foo',
                 'baz' => 2,
                 'bar' => 1,
-            ),
+            ],
             'getParams' => 'getParams',
-        );
+        ];
     }
 
     public function getParams($event) {

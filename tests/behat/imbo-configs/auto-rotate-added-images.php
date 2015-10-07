@@ -11,8 +11,8 @@
 /**
  * Enable the auto rotate event listener
  */
-return array(
-    'eventListeners' => array(
+return [
+    'eventListeners' => [
         'autoRotateListener' => 'Imbo\EventListener\AutoRotateImage',
-    ),
-);
+    ],
+];

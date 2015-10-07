@@ -43,28 +43,28 @@ class StatsTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getStatsData() {
-        return array(
-            array(
+        return [
+            [
                 0,
                 0,
                 0
-            ),
-            array(
+            ],
+            [
                 1,
                 2,
                 1349
-            ),
-            array(
+            ],
+            [
                 2,
                 44,
                 100114
-            ),
-            array(
+            ],
+            [
                 4,
                 14,
                 1000
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -105,19 +105,19 @@ class StatsTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Model\Stats::offsetUnset
      */
     public function testSupportsCustomStats() {
-        $this->assertSame(array(), $this->model->getCustomStats());
+        $this->assertSame([], $this->model->getCustomStats());
 
         $this->model['foo'] = 'bar';
         $this->model['bar'] = 'foo';
 
-        $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $this->model->getCustomStats());
+        $this->assertSame(['foo' => 'bar', 'bar' => 'foo'], $this->model->getCustomStats());
 
         $this->assertTrue(isset($this->model['bar']));
         $this->assertSame('foo', $this->model['bar']);
         unset($this->model['bar']);
         $this->assertFalse(isset($this->model['bar']));
 
-        $this->assertSame(array('foo' => 'bar'), $this->model->getCustomStats());
+        $this->assertSame(['foo' => 'bar'], $this->model->getCustomStats());
     }
 
     /**

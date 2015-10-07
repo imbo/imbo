@@ -22,14 +22,14 @@ class Images implements ModelInterface {
      *
      * @var Image[]
      */
-    private $images = array();
+    private $images = [];
 
     /**
      * Which fields to display
      *
      * @var string[]
      */
-    private $fields = array();
+    private $fields = [];
 
     /**
      * Query hits

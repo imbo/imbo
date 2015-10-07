@@ -42,8 +42,8 @@ class Authenticate implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        $callbacks = array();
-        $events = array(
+        $callbacks = [];
+        $events = [
             'group.put',         // Add/update resource group
             'group.delete',      // Delete a resource group
             'keys.put',          // Create a public key
@@ -60,10 +60,10 @@ class Authenticate implements ListenerInterface {
             'shorturls.delete',  // Delete a collection of short URLs
 
             'auth.authenticate', // Authenticate event
-        );
+        ];
 
         foreach ($events as $event) {
-            $callbacks[$event] = array('authenticate' => 100);
+            $callbacks[$event] = ['authenticate' => 100];
         }
 
         return $callbacks;

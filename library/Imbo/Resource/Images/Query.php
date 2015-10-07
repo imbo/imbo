@@ -59,28 +59,28 @@ class Query {
      *
      * @var array
      */
-    private $imageIdentifiers = array();
+    private $imageIdentifiers = [];
 
     /**
      * Checksums filter
      *
      * @var array
      */
-    private $checksums = array();
+    private $checksums = [];
 
     /**
      * Original checksums filter
      *
      * @var array
      */
-    private $originalChecksums = array();
+    private $originalChecksums = [];
 
     /**
      * Sort
      *
      * @var array
      */
-    private $sort = array();
+    private $sort = [];
 
     /**
      * Set or get the page property
@@ -221,7 +221,7 @@ class Query {
             return $this->sort;
         }
 
-        $sortData = array();
+        $sortData = [];
 
         foreach ($sort as $field) {
             $field = trim($field);
@@ -241,10 +241,10 @@ class Query {
                 $field = $fieldName;
             }
 
-            $sortData[] = array(
+            $sortData[] = [
                 'field' => $field,
                 'sort' => $dir,
-            );
+            ];
         }
 
         $this->sort = $sortData;

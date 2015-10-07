@@ -30,9 +30,9 @@ class ImagePreparation implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
-            'images.post' => array('prepareImage' => 50),
-        );
+        return [
+            'images.post' => ['prepareImage' => 50],
+        ];
     }
 
     /**

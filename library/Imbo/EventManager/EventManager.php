@@ -26,7 +26,7 @@ class EventManager {
      *
      * @var array
      */
-    private $eventHandlers = array();
+    private $eventHandlers = [];
 
     /**
      * Event template
@@ -40,14 +40,14 @@ class EventManager {
      *
      * @var array
      */
-    private $callbacks = array();
+    private $callbacks = [];
 
     /**
      * Event listener initializers
      *
      * @var InitializerInterface[]
      */
-    private $initializers = array();
+    private $initializers = [];
 
     /**
      * Register an event handler
@@ -57,12 +57,12 @@ class EventManager {
      * @param array $params Parameters for the handler if $handler is a string
      * @return self
      */
-    public function addEventHandler($name, $handler, array $params = array()) {
+    public function addEventHandler($name, $handler, array $params = []) {
         if (is_string($handler)) {
-            $this->eventHandlers[$name] = array(
+            $this->eventHandlers[$name] = [
                 'handler' => $handler,
                 'params' => $params,
-            );
+            ];
         } else {
             $this->eventHandlers[$name] = $handler;
         }
@@ -78,7 +78,7 @@ class EventManager {
      * @param array $users User filter for the events
      * @return self
      */
-    public function addCallbacks($name, array $events, array $users = array()) {
+    public function addCallbacks($name, array $events, array $users = []) {
         // Default priority
         $defaultPriority = 0;
 
@@ -90,32 +90,32 @@ class EventManager {
 
             if (is_string($callback)) {
                 // 'eventName' => 'someMethod'
-                $this->callbacks[$event]->insert(array(
+                $this->callbacks[$event]->insert([
                     'handler' => $name,
                     'method' => $callback,
                     'users' => $users,
-                ), $defaultPriority);
+                ], $defaultPriority);
             } else if (is_array($callback)) {
-                // 'eventName' => array( ... )
+                // 'eventName' => [ ... ]
                 foreach ($callback as $method => $priority) {
                     if (is_int($method)) {
-                        // 'eventName' => array('someMethod', ...)
+                        // 'eventName' => ['someMethod', ...]
                         $method = $priority;
                         $priority = $defaultPriority;
                     }
 
-                    $this->callbacks[$event]->insert(array(
+                    $this->callbacks[$event]->insert([
                         'handler' => $name,
                         'method' => $method,
                         'users' => $users,
-                    ), $priority);
+                    ], $priority);
                 }
             } else if (is_int($callback)) {
                 // We have a closure as a callback, so $callback is the actual priority
-                $this->callbacks[$event]->insert(array(
+                $this->callbacks[$event]->insert([
                     'handler' => $name,
                     'users' => $users,
-                ), $callback);
+                ], $callback);
             } else {
                 throw new InvalidArgumentException('Invalid event definition for listener: ' . $name, 500);
             }
@@ -167,7 +167,7 @@ class EventManager {
      * @param array $params Extra parameters for the event
      * @return EventManager
      */
-    public function trigger($eventName, array $params = array()) {
+    public function trigger($eventName, array $params = []) {
         if (!empty($this->callbacks[$eventName])) {
             $event = clone $this->event;
             $event->setName($eventName);
@@ -186,7 +186,7 @@ class EventManager {
                 $callback = $this->getHandlerInstance($listener['handler']);
 
                 if ($callback instanceof ListenerInterface) {
-                    $callback = array($callback, $listener['method']);
+                    $callback = [$callback, $listener['method']];
                 }
 
                 $users = $listener['users'];
@@ -237,12 +237,12 @@ class EventManager {
      * @param array $filter The array from the listener with "whitelist" and "blacklist"
      * @return boolean
      */
-    private function triggersFor($user = null, array $filter = array()) {
+    private function triggersFor($user = null, array $filter = []) {
         if (empty($user) || empty($filter)) {
             return true;
         }
 
-        $filter = array_merge(array('whitelist' => array(), 'blacklist' => array()),  $filter);
+        $filter = array_merge(['whitelist' => [], 'blacklist' => []],  $filter);
 
         $whitelist = array_flip($filter['whitelist']);
         $blacklist = array_flip($filter['blacklist']);

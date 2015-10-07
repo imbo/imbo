@@ -29,9 +29,9 @@ class DoctrineTest extends DatabaseTests {
      * @see ImboIntegrationTest\Database\DatabaseTests::getAdapter()
      */
     protected function getAdapter() {
-        return new Doctrine(array(
+        return new Doctrine([
             'pdo' => $this->pdo,
-        ));
+        ]);
     }
 
     public function setUp() {

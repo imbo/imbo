@@ -49,7 +49,7 @@ class GeneratePrivateKeyTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanGenerateAPrivateKey() {
         $commandTester = new CommandTester($this->command);
-        $commandTester->execute(array('command' => $this->command->getName()));
+        $commandTester->execute(['command' => $this->command->getName()]);
 
         $this->assertRegExp('/^[a-zA-Z_\\-0-9]{8,}$/', trim($commandTester->getDisplay()));
     }
@@ -62,6 +62,6 @@ class GeneratePrivateKeyTest extends \PHPUnit_Framework_TestCase {
     public function testFailsWhenItCantGenerateAPrivateKey() {
         $this->command->maxTries = 0;
         $commandTester = new CommandTester($this->command);
-        $commandTester->execute(array('command' => $this->command->getName()));
+        $commandTester->execute(['command' => $this->command->getName()]);
     }
 }

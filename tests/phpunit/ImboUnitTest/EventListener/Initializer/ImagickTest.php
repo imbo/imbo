@@ -47,10 +47,10 @@ class ImagickTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getListeners() {
-        return array(
-            'image transformation' => array($this->getMock('Imbo\Image\Transformation\Border'), true),
-            'regular transformation' => array($this->getMock('Imbo\EventListener\ListenerInterface'), false),
-        );
+        return [
+            'image transformation' => [$this->getMock('Imbo\Image\Transformation\Border'), true],
+            'regular transformation' => [$this->getMock('Imbo\EventListener\ListenerInterface'), false],
+        ];
     }
 
     /**

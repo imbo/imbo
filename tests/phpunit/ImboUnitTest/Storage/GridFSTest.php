@@ -62,7 +62,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
 
         $this->grid = $this->getMockBuilder('MongoGridFS')->disableOriginalConstructor()->getMock();
         $this->mongoClient = $this->getMockBuilder('MongoClient')->disableOriginalConstructor()->getMock();
-        $this->driver = new GridFS(array(), $this->mongoClient, $this->grid);
+        $this->driver = new GridFS([], $this->mongoClient, $this->grid);
     }
 
     /**
@@ -86,10 +86,10 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
 
         $this->grid->expects($this->at(0))
                    ->method('find')
-                   ->with(array(
+                   ->with([
                        'user' => $this->user,
                        'imageIdentifier' => $this->imageIdentifier
-                   ))
+                   ])
                    ->will($this->returnValue($cursor));
         $this->grid->expects($this->once())->method('storeBytes')->with($data, $this->isType('array'));
 
@@ -214,9 +214,9 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
 
 if (class_exists('MongoGridFSFile')) {
     class TestFile extends MongoGridFSFile {
-        public $file = array(
+        public $file = [
             'updated' => 1334579830,
-        );
+        ];
 
         public function __construct() {}
     }

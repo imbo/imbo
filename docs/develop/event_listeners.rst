@@ -84,17 +84,17 @@ Below is an example of how the :ref:`authenticate-event-listener` event listener
     // ...
 
     public static function getSubscribedEvents() {
-        $callbacks = array();
-        $events = array(
+        $callbacks = [];
+        $events = [
             'images.post',
             'image.delete',
             'metadata.put',
             'metadata.post',
             'metadata.delete'
-        );
+        ];
 
         foreach ($events as $event) {
-            $callbacks[$event] = array('authenticate' => 100);
+            $callbacks[$event] = ['authenticate' => 100];
         }
 
         return $callbacks;
@@ -134,20 +134,20 @@ For testing and/or debugging purposes you can also write the event listener dire
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'customListener' => array(
+        'eventListeners' => [
+            'customListener' => [
                 'callback' => function(Imbo\EventManager\EventInterface $event) {
                     // Custom code
                 },
-                'events' => array('image.get'),
-            ),
-        ),
+                'events' => ['image.get'],
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 The ``$event`` object passed to the function is the same as in the previous two examples. This approach should mostly be used for testing purposes and quick hacks. More information regarding this approach is available in the :ref:`event listener configuration <configuration-event-listeners>` section.
 

@@ -26,7 +26,7 @@ class Router {
      *
      * @var array
      */
-    static private $supportedHttpMethods = array(
+    static private $supportedHttpMethods = [
         'GET'     => true,
         'POST'    => true,
         'PUT'     => true,
@@ -34,14 +34,14 @@ class Router {
         'DELETE'  => true,
         'OPTIONS' => true,
         'SEARCH'  => true,
-    );
+    ];
 
     /**
      * The different routes that imbo handles
      *
      * @var array
      */
-    private $routes = array(
+    private $routes = [
         'image'          => '#^/users/(?<user>[a-z0-9_-]{1,})/images/(?<imageIdentifier>[a-f0-9-]{32,36})(\.(?<extension>gif|jpg|png))?$#',
         'globalshorturl' => '#^/s/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
         'status'         => '#^/status(/|(\.(?<extension>json|xml)))?$#',
@@ -58,14 +58,14 @@ class Router {
         'keys'           => '#^/keys/(?<publickey>[a-z0-9_-]{1,})$#',
         'accessrules'    => '#^/keys/(?<publickey>[a-z0-9_-]{1,})/access(/|(\.(?<extension>json|xml)))?$#',
         'accessrule'     => '#^/keys/(?<publickey>[a-z0-9_-]{1,})/access/(?<accessRuleId>[a-f0-9]{1,})(\.(?<extension>json|xml))?$#',
-    );
+    ];
 
     /**
      * Class constructor
      *
      * @param array $extraRoutes Extra routes passed in from configuration
      */
-    public function __construct(array $extraRoutes = array()) {
+    public function __construct(array $extraRoutes = []) {
         $this->routes = array_merge($this->routes, $extraRoutes);
     }
 
@@ -86,7 +86,7 @@ class Router {
         }
 
         $path = $request->getPathInfo();
-        $matches = array();
+        $matches = [];
 
         foreach ($this->routes as $resourceName => $route) {
             if (preg_match($route, $path, $matches)) {
