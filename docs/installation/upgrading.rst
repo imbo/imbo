@@ -23,6 +23,8 @@ Public key is an authentication detail
 
 Versions prior to 2.0.0 had a 1:1 correlation between what a ``user`` and a ``public key`` was. In 2.0.0, a ``user`` is the entity which images belong to, while a ``public key`` is one part of the authentication scheme. ``Public keys`` each has their own set of permissions, which can grant them access to different resources within different users.
 
+Imbo provides some level of backwards compatibility with the old ``auth`` part of the configuration file, but no longer supports multiple private keys per public key (such as read-only/read+write). If you are using this, Imbo will throw an exception on startup. We recommend moving away from the ``auth`` setup and onto the new :ref:`Access Control adapters <access-control-configuration>` as soon as possible.
+
 Prior to 2.0.0, both the database and HTTP endpoints used a field name of ``publicKey`` to identify the user. Going forward, apart from when working with authentication, ``user`` will be the new field name. This requires some database changes - see below.
 
 Doctrine

@@ -11,6 +11,8 @@ The configuration file(s) you need to create should simply return arrays with co
     :local:
     :depth: 1
 
+.. _access-control-configuration:
+
 Imbo access control - ``accessControl``
 ---------------------------------------
 
