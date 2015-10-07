@@ -75,6 +75,19 @@ $config = [
     },
 
     /**
+     * Image identifier generator
+     *
+     * See the different adapter implementations for possible configuration parameters.
+     * The value must be set to a closure returning an instance of
+     * Imbo\Image\Identifier\Generator\GeneratorInterface, or an implementation of said interface.
+     *
+     * @var Imbo\Image\Identifier\Generator\GeneratorInterface|Closure
+     */
+    'imageIdentifierGenerator' => function() {
+        return new Image\Identifier\Generator\RandomString();
+    },
+
+    /**
      * Whether to content negotiate images or not. If set to true, Imbo will try to find a
      * suitable image format based on the Accept-header received. If set to false, it will
      * deliver the image in the format it was originally added as. Note that this does not

@@ -570,6 +570,46 @@ If you need to create your own storage adapter you need to create a class that i
 
 You can read more about how to achieve this in the :doc:`../develop/custom_adapters` chapter.
 
+.. _image-identifier-generation:
+
+Image identifier generation - ``imageIdentifierGenerator``
+----------------------------------------------------------
+
+By default, Imbo will generate a random string of characters as the image identifier for added images. These are in the RegExp range ``[A-Za-z0-9_-]`` and by default, the identifier will be 12 characters long.
+
+You can easily change the generation process to a different method. Imbo currently ships with two generators:
+
+RandomString
+++++++++++++
+
+The default, as stated above. This generator has the following parameters:
+
+``length``
+    The length of the randomly generated string. Defaults to ``12``.
+
+Uuid
+++++
+
+Generates 36-character v4 UUIDs, for instance ``f47ac10b-58cc-4372-a567-0e02b2c3d479``. This generator does not have any parameters.
+
+Usage:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'imageIdentifierGenerator' => new Imbo\Image\Identifier\Generator\Uuid(),
+
+        // ...
+    ];
+
+Custom generators
++++++++++++++++++
+
+To create your own custom image identifier generators, simply create a class that implements ``Imbo\Image\Identifier\Generator\GeneratorInterface`` and ensure that the identifiers generated are in the character range ``[A-Za-z0-9_-]`` and are between one and 255 characters long.
+
 .. _configuration-content-negotiation:
 
 Content negotiation for images - ``contentNegotiateImages``

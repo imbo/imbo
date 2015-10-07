@@ -31,12 +31,13 @@ interface Exception {
     const AUTH_TIMESTAMP_EXPIRED  = 104;
 
     // Image resource errors
-    const IMAGE_ALREADY_EXISTS       = 200;
-    const IMAGE_NO_IMAGE_ATTACHED    = 201;
-    const IMAGE_HASH_MISMATCH        = 202;
-    const IMAGE_UNSUPPORTED_MIMETYPE = 203;
-    const IMAGE_BROKEN_IMAGE         = 204;
-    const IMAGE_INVALID_IMAGE        = 205;
+    const IMAGE_ALREADY_EXISTS               = 200;
+    const IMAGE_NO_IMAGE_ATTACHED            = 201;
+    const IMAGE_HASH_MISMATCH                = 202;
+    const IMAGE_UNSUPPORTED_MIMETYPE         = 203;
+    const IMAGE_BROKEN_IMAGE                 = 204;
+    const IMAGE_INVALID_IMAGE                = 205;
+    const IMAGE_IDENTIFIER_GENERATION_FAILED = 206;
     /**#@-*/
 
     /**
