@@ -11,46 +11,20 @@ The configuration file(s) you need to create should simply return arrays with co
     :local:
     :depth: 1
 
-Imbo users - ``auth``
----------------------
+.. _access-control-configuration:
 
-Every user that wants to store images in Imbo needs a public and one or more private key. Imbo supports both read+write and read-only private keys. These keys can either be stored in the configuration file, or they can be fetched using a custom adapter. The configuration is done in the ``auth`` part of your configuration file:
+Imbo access control - ``accessControl``
+---------------------------------------
 
-.. code-block:: php
+Imbo catalogs stored images under a ``user``. To add an image to a given user, you need a public and private key pair. This pair is used to sign requests to Imbo's API and ensures that the API can't be accessed without knowing the private key.
 
-    <?php
-    return [
-        // ...
+Multiple public keys can be given access to a user, and you can also configure a public key to have access to several users. It's important to note that a ``user`` doesn't have to be created in any way - as long as a public key is defined to have access to a given user, you're ready to start adding images.
 
-        'auth' => [
-            // Read+write private key:
-            'username'  => '95f02d701b8dc19ee7d3710c477fd5f4633cec32087f562264e4975659029af7',
+Public keys can be configured to have varying degrees of access. For instance, you might want one public key for write operations (such as adding and deleting images) and a different public key for read operations (such as viewing images and applying transformations to them). Access is defined on a ``resource`` basis - which basically translates to an API endpoint and an HTTP method. To retrieve an image, for instance, you would give access to the ``image.get`` resource.
 
-            // Or, specify individual read-only and read+write keys:
-            'otheruser' => [
-                'ro' => 'b312ff29d5da23dcd230b61ff4db1e2515c862b9fb0bb59e7dd54ce1e4e94a53',
-                'rw' => 'd5da23dcd2e2515c862b9fb0bb59e7dd54cb312ff29d594a53b11b8dc87f5622',
-            ],
+Specifying a long list of resources can get tedious, so Imbo also supports ``resource groups`` - basically just a list of different resources. When creating access rules for a public key, these can be used instead of specifying specific resources.
 
-            // There is also support for multiple private keys:
-            'someuser' => [
-                'ro' => ['multiple', 'different', 'keys'],
-                'rw' => ['different', 'read+write'],
-            ],
-        ],
-
-        // ...
-    ];
-
-The public keys can consist of the following characters:
-
-* a-z (only lowercase is allowed)
-* 0-9
-* _ and -
-
-and must be at least 3 characters long.
-
-For the private keys you can for instance use a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images (given it's a read+write key). Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want. The key itself will never be a part of the payload sent to/from the server.
+For the private keys you can for instance use a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images (given the public key it belongs to has write access). Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want. The key itself will never be a part of the payload sent to/from the server.
 
 Imbo ships with a small command line tool that can be used to generate private keys for you using the `openssl_random_pseudo_bytes <http://php.net/openssl_random_pseudo_bytes>`_ function. The tool is located in the ``bin`` directory of the Imbo installation:
 
@@ -61,10 +35,12 @@ Imbo ships with a small command line tool that can be used to generate private k
 
 The private key can be changed whenever you want as long as you remember to change it in both the server configuration and in the client you use. The user can not be changed easily as database and storage adapters use it when storing/fetching images and metadata.
 
-Custom user lookup adapter
-++++++++++++++++++++++++++
+Access control is managed by ``adapters``. The simplest adapter is the ``SimpleArrayAdapter``, which has a number of trade-offs in favor of being easy to set up. Mainly, it expects the public key to have the same name as the user it should have access to, and that the public key should be given full read+write access to all resources belonging to that user.
 
-You can also use a custom adapter to fetch the public and private keys. The adapter must implement the ``Imbo\Auth\UserLookupInterface``, and be specified in the configuration under the ``auth`` key:
+.. warning::
+    It's not recommended that you use the same public key for both read and write operations. Read on to see how you can create different public keys for read and read/write access.
+
+The adapter is set up using the ``accessControl`` key in your configuration file:
 
 .. code-block:: php
 
@@ -72,12 +48,133 @@ You can also use a custom adapter to fetch the public and private keys. The adap
     return [
         // ...
 
-        'auth' => new My\Custom\UserLookupAdapter([
-            'some' => 'option',
-        ]),
+        'accessControl' => function() {
+            return new Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter([
+                'some-user' => 'my-super-secret-private-key',
+                'other-user' => 'other-super-secret-private-key',
+            ])
+        },
 
         // ...
     ];
+
+It's usually a good idea to have separate public keys for read-only and read+write operations. You can achieve this by using a more flexible access control adapter, such as the ``ArrayAdapter``:
+
+.. code-block:: php
+
+    <?php
+    use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
+
+    return [
+        // ...
+
+        'accessControl' => function() {
+            return new ArrayAdapter([
+                [
+                    'publicKey'  => 'some-read-only-pubkey',
+                    'privateKey' => 'some-private-key',
+                    'acl' => [[
+                        'resources' => ArrayAdapter::getReadOnlyResources(),
+                        'users' => ['some-user']
+                    ]]
+                ],
+                [
+                    'publicKey'  => 'some-read-write-pubkey',
+                    'privateKey' => 'some-other-private-key',
+                    'acl' => [[
+                        'resources' => ArrayAdapter::getReadWriteResources(),
+                        'users' => ['some-user']
+                    ]]
+                ]
+            ]);
+        }
+
+        // ...
+    ];
+
+As you can see, the ``ArrayAdapter`` is much more flexible than the ``SimpleArrayAdapter``. The above example only shows part of this flexibility. You can also provide resource groups and multiple access control rules per public key. The following example shows this more clearly:
+
+.. code-block:: php
+
+    <?php
+    use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
+
+    return [
+        // ...
+
+        'accessControl' => function() {
+            return new ArrayAdapter([
+                [
+                    // A unique public key matching the following regular expression: [A-Za-z0-9_-]{1,}
+                    'publicKey'  => 'some-pubkey',
+
+                    // Some form of private key
+                    'privateKey' => 'some-private-key',
+
+                    // Array of rules for this public key
+                    'acl' => [
+                        [
+                            // An array of different resource names that the public key should have
+                            // access to - see AdapterInterface::RESOURCE_* for available options.
+                            'resources' => ArrayAdapter::getReadOnlyResources(),
+
+                            // Names of the users which the public key should have access to.
+                            'users' => ['some', 'users'],
+                        ],
+
+                        // Multiple rules can be applied in order to make a single public key have
+                        // different access rights on different users
+                        [
+                            'resources' => ArrayAdapter::getReadWriteResources(),
+                            'users' => ['different-user'],
+                        ],
+
+                        // You can also specify resource groups instead of explicitly setting them like
+                        // in the above examples. Note that you cannot specify both resources and group
+                        // in the same rule.
+                        [
+                            'group' => 'read-stats',
+                            'users' => ['user1', 'user2']
+                        ]
+                    ]
+                ]
+            ], [
+                // Second argument to the ArrayAdapter being the available resource groups
+                // Format: 'name' => ['resource1', 'resource2']
+                'read-stats' => ['user.get', 'user.head', 'user.options'],
+            ]);
+        },
+
+        // ...
+    ];
+
+Imbo also ships with a MongoDB access control adapter, which is mutable. This means you can manipulate the access control rules on the fly, using Imbo's API. The adapter uses PHP's `mongo extension <http://pecl.php.net/package/mongo>`_. The following parameters are supported:
+
+``databaseName``
+    Name of the database to use. Defaults to ``imbo``.
+
+``server``
+    The server string to use when connecting. Defaults to ``mongodb://localhost:27017``.
+
+``options``
+    Options passed to the underlying adapter. Defaults to ``['connect' => true, 'timeout' => 1000]``. See the `manual for the MongoClient constructor <http://www.php.net/manual/en/mongoclient.construct.php>`_ for available options.
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'accessControl' => function() {
+            return new Imbo\Auth\AccessControl\Adapter\MongoDB([
+                'databaseName' => 'imbo-acl'
+            ]);
+        },
+
+        // ...
+    ];
+
+When using a mutable access control adapter, you will need to create an initial public key that can subsequently be used to create other public keys. The easiest way to create public keys when using a mutable adapter is to utilize the :ref:`add-public-key command <cli-add-public-key>` provided by the CLI tool that Imbo is shipped with.
 
 .. _database-configuration:
 

@@ -9,6 +9,21 @@ The binary can be found in one of two places, depending on the :doc:`installatio
     :local:
     :depth: 1
 
+.. _cli-add-public-key:
+
+Add a public key - ``add-public-key``
++++++++++++++++++++++++++++++++++++++
+
+When using a mutable access control adapter (usually meaning it's backed by a database or similar), this command helps you with adding public/private key pairs and associated rules. It's an alternative to using Imbo's public REST API for this purpose, and is the only way to add an initial public key with access to create and modify other public keys.
+
+Example:
+
+.. code-block:: console
+
+    ./bin/imbo add-public-key somePublicKey
+
+The above command will start an interactive session that will guide you through creating a public key with the name ``somePublicKey``, given it does not already exist.
+
 .. _cli-generate-private-key:
 
 Generate a private key - ``generate-private-key``

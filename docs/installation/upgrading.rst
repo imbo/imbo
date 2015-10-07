@@ -23,6 +23,8 @@ Public key is an authentication detail
 
 Versions prior to 2.0.0 had a 1:1 correlation between what a ``user`` and a ``public key`` was. In 2.0.0, a ``user`` is the entity which images belong to, while a ``public key`` is one part of the authentication scheme. ``Public keys`` each has their own set of permissions, which can grant them access to different resources within different users.
 
+Imbo provides some level of backwards compatibility with the old ``auth`` part of the configuration file, but no longer supports multiple private keys per public key (such as read-only/read+write). If you are using this, Imbo will throw an exception on startup. We recommend moving away from the ``auth`` setup and onto the new :ref:`Access Control adapters <access-control-configuration>` as soon as possible.
+
 Prior to 2.0.0, both the database and HTTP endpoints used a field name of ``publicKey`` to identify the user. Going forward, apart from when working with authentication, ``user`` will be the new field name. This requires some database changes - see below.
 
 Doctrine
@@ -68,6 +70,28 @@ If you use the GridFS adapter, you will need to rename the ``publicKey`` field w
     db.fs.files.update({}, { $rename: { 'publicKey': 'user' } )
 
 .. note:: The default database names for the GridFS adapters are ``imbo_storage`` and ``imbo_imagevariation_storage``. The query specified should be run on both databases. If the ``imbo_imagevariation_storage`` database does not exist, run the query on ``imbo_storage`` and follow the instructions specified in the :ref:`database-setup` section to create the appropriate indexes for the ``imbo_imagevariation_storage`` database.
+
+Image identifiers are no longer MD5-sums
+++++++++++++++++++++++++++++++++++++++++
+
+Previously, Imbo used the MD5 algorithm to generate the image identifier for an image. In Imbo 2.0.0 and onwards, image identifiers are simply randomly generated strings (currently using UUIDs, but this might change in the future). This means that the same image can exist multiple times within the same user. If this is not what you want, you can check if the image already exists by querying the :ref:`images resource <images-resource>` and specifying the MD5-sum of the image as an ``originalChecksum``-filter. Most Imbo-clients implement this already, as ``imageExists()`` or similar.
+
+To accommodate the new image identifiers and the possibility of future changes in how they are represented, databases should be able to store an image identifier of up to 255 characters. If you are using the :ref:`Doctrine database adapter <doctrine-database-adapter>` with the suggested schema on a MySQL database, this will require some changes:
+
+.. code-block:: sql
+
+    ALTER TABLE imageinfo MODIFY imageIdentifier varchar(255) COLLATE utf8_danish_ci NOT NULL;
+    ALTER TABLE shorturl MODIFY imageIdentifier varchar(255) COLLATE utf8_danish_ci NOT NULL;
+    ALTER TABLE imagevariations MODIFY imageIdentifier varchar(255) COLLATE utf8_danish_ci NOT NULL;
+
+If you use the Doctrine storage adapter for images and/or image variations, you will have to rename fields in those databases too:
+
+.. code-block:: sql
+
+    ALTER TABLE storage_images MODIFY imageIdentifier varchar(255) COLLATE utf8_danish_ci NOT NULL;
+    ALTER TABLE storage_image_variations MODIFY imageIdentifier varchar(255) COLLATE utf8_danish_ci NOT NULL;
+
+.. note:: The ``imagevariations`` and ``storage_image_variations`` table might not be present in your database unless you previously upgraded to 1.2.4. In this case, skip the queries affecting those tables and instead follow the instructions specified in the :ref:`database-setup` section.
 
 Imbo-1.2.4
 ----------
