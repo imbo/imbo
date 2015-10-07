@@ -21,6 +21,25 @@ Feature: Imbo provides a group endpoint
             | json      | application/json | #^{"resources":\["groups\.get","groups\.head"]}$# |
             | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<resources>\s*<resource>groups\.get</resource>\s*<resource>groups\.head</resource>\s*</resources>\s*</imbo>$#ms |
 
+    Scenario Outline: Create a resource group with invalid data
+        Given Imbo uses the "access-control-mutable.php" configuration
+        And I prime the database with "access-control-mutable.php"
+        And I use "acl-creator" and "someprivkey" for public and private keys
+        And the request body contains:
+          """
+          <data>
+          """
+        And I sign the request
+        When I request "/groups/read-images" using HTTP "PUT"
+        Then I should get a response with "<response>"
+        Examples:
+            | data               | response                                                           |
+            |                    | 400 Invalid data. Array of resource strings is expected            |
+            | true               | 400 Invalid data. Array of resource strings is expected            |
+            | "string"           | 400 Invalid data. Array of resource strings is expected            |
+            | [123]              | 400 Invalid value in the resources array. Only strings are allowed |
+            | [123,"images.get"] | 400 Invalid value in the resources array. Only strings are allowed |
+
     Scenario: Create a resource group
         Given Imbo uses the "access-control-mutable.php" configuration
         And I prime the database with "access-control-mutable.php"
