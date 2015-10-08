@@ -281,15 +281,22 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $metadata = [
             'some key' => 'some value',
             'some other key' => 'some other value',
+            'poi' => [['x' => 810, 'y' => 568]],
+            'location' => ['city' => 'Oslo'],
+            'dangerous stuff' => [
+                'greater than' => '4 > 2',
+                'less than' => '1 < 2',
+                'ampersand' => 'this & that',
+                'quote' => 'Everyone is "working"..',
+                'apostrophe' => 'I\'m backing up, backing up, backing up',
+            ],
         ];
         $model = $this->getMock('Imbo\Model\Metadata');
         $model->expects($this->once())->method('getData')->will($this->returnValue($metadata));
 
         $xml = $this->formatter->format($model);
 
-        foreach ($metadata as $key => $value) {
-            $this->assertXPathMatches('/imbo/metadata/tag[@key="' . $key . '" and .="' . $value . '"]', $xml);
-        }
+        $this->assertContains('<metadata><tag key="some key">some value</tag><tag key="some other key">some other value</tag><tag key="poi"><list><value><x>810</x><y>568</y></value></list></tag><tag key="location"><city>Oslo</city></tag><tag key="dangerous stuff"><greater than><![CDATA[4 > 2]]></greater than><less than><![CDATA[1 < 2]]></less than><ampersand><![CDATA[this & that]]></ampersand><quote><![CDATA[Everyone is "working"..]]></quote><apostrophe><![CDATA[I\'m backing up, backing up, backing up]]></apostrophe></tag></metadata>', $xml);
     }
 
     /**
@@ -339,6 +346,23 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $xml = $this->formatter->format($model);
 
         $this->assertContains('<imbo><key><list><value>1</value><value>2</value><value>3</value></list></key></imbo>', $xml);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatArrayModel
+     * @covers Imbo\Http\Response\Formatter\XML::formatArray
+     */
+    public function testCanFormatArrayModelWithNestedLists() {
+        $data = [
+            'key' => [[1, 2], [3, 4]],
+        ];
+        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($data));
+
+        $xml = $this->formatter->format($model);
+
+        $this->assertContains('<imbo><key><list><value><list><value>1</value><value>2</value></list></value><value><list><value>3</value><value>4</value></list></value></list></key></imbo>', $xml);
     }
 
     /**

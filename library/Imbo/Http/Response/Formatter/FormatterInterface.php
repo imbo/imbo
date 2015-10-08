@@ -67,7 +67,7 @@ interface FormatterInterface {
      * @param Model\Metadata $model The model to format
      * @return string Formatted data
      */
-    function formatMetadata(Model\Metadata $model);
+    function formatMetadataModel(Model\Metadata $model);
 
     /**
      * Format a groups model
