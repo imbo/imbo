@@ -335,7 +335,15 @@ DATA;
             $xml .= '<list>';
 
             foreach ($data as $value) {
-                $xml .= '<value>' . $value . '</value>';
+                $xml .= '<value>';
+
+                if (is_array($value)) {
+                    $xml .= $this->formatArray($value);
+                } else {
+                    $xml .= $value;
+                }
+
+                $xml .= '</value>';
             }
 
             $xml .= '</list>';
