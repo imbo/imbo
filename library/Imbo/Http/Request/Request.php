@@ -146,7 +146,7 @@ class Request extends SymfonyRequest {
                 while (preg_match($pattern, $urlParams, $matches, PREG_OFFSET_CAPTURE, $offset)) {
                     $offset = $matches[2][1];
                     $paramName = $matches[1][0];
-                    $paramValue = $matches[2][0] ?: $matches[3][0];
+                    $paramValue = isset($matches[3]) ? $matches[3][0] : $matches[2][0];
                     $params[$paramName] = $paramValue;
                 }
 
