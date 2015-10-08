@@ -525,28 +525,29 @@ class ImboContext extends RESTContext {
      * @Given /^the pixel at coordinate "([^"]*)" should have a color of "#([^"]*)"$/
      */
     public function assertImagePixelColor($coordinates, $expectedColor) {
-        $coordinates = array_map('trim', explode(',', $coordinates));
-        $coordinates = array_map('intval', $coordinates);
-
+        $info = $this->getImagePixelInfo($coordinates);
         $expectedColor = strtolower($expectedColor);
-
-        $imagick = new \Imagick();
-        $imagick->readImageBlob((string) $this->getLastResponse()->getBody());
-
-        $pixel = $imagick->getImagePixelColor($coordinates[0], $coordinates[1]);
-        $color = $pixel->getColor();
-
-        $toHex = function($col) {
-            return str_pad(dechex($col), 2, '0', STR_PAD_LEFT);
-        };
-
-        $hexColor = $toHex($color['r']) . $toHex($color['g']) . $toHex($color['b']);
 
         assertSame(
             $expectedColor,
-            $hexColor,
-            'Incorrect color at coordinate ' . implode(', ', $coordinates) .
-            ', expected ' . $expectedColor . ', got ' . $hexColor
+            $info['color'],
+            'Incorrect color at coordinate ' . $coordinates .
+            ', expected ' . $expectedColor . ', got ' . $info['color']
+        );
+    }
+
+    /**
+     * @Given /^the pixel at coordinate "([^"]*)" should have an alpha of "([^"]*)"$/
+     */
+    public function assertImagePixelAlpha($coordinates, $expectedAlpha) {
+        $info = $this->getImagePixelInfo($coordinates);
+        $expectedAlpha = (float) $expectedAlpha;
+
+        assertSame(
+            $expectedAlpha,
+            $info['alpha'],
+            'Incorrect alpha value at coordinate ' . $coordinates .
+            ', expected ' . $expectedAlpha . ', got ' . $info['alpha']
         );
     }
 
@@ -689,5 +690,33 @@ class ImboContext extends RESTContext {
     private function getPreviouslyAddedImageUrl() {
         $identifier = $this->getPreviouslyAddedImageIdentifier();
         return '/users/' . $this->user . '/images/' . $identifier;
+    }
+
+    /**
+     * Get the pixel info for given coordinates, from the image returned in the previous response
+     *
+     * @param  string $coordinates
+     * @return array
+     */
+    private function getImagePixelInfo($coordinates) {
+        $coordinates = array_map('trim', explode(',', $coordinates));
+        $coordinates = array_map('intval', $coordinates);
+
+        $imagick = new \Imagick();
+        $imagick->readImageBlob((string) $this->getLastResponse()->getBody());
+
+        $pixel = $imagick->getImagePixelColor($coordinates[0], $coordinates[1]);
+        $color = $pixel->getColor();
+
+        $toHex = function($col) {
+            return str_pad(dechex($col), 2, '0', STR_PAD_LEFT);
+        };
+
+        $hexColor = $toHex($color['r']) . $toHex($color['g']) . $toHex($color['b']);
+
+        return [
+            'color' => $hexColor,
+            'alpha' => (float) $pixel->getColorValue(\Imagick::COLOR_ALPHA),
+        ];
     }
 }
