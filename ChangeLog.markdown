@@ -5,6 +5,7 @@ Imbo-2.0.0
 ----------
 __yyyy-mm-dd__
 
+* #366: Fix border transformation + alpha channel bug (Espen Hovlandsdal)
 * #363: Add pluggable image identifier generation (Espen Hovlandsdal)
 * #357: Add public key generation CLI-command (Espen Hovlandsdal)
 * #351: New image transformation: SmartSize (Kristoffer Brabrand, Espen Hovlandsdal)
