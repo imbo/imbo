@@ -106,6 +106,15 @@ class Border extends Transformation implements ListenerInterface {
         }
     }
 
+    /**
+     * Expand the image so that we can fit the width and height of the borders specified on each
+     * side, than copy the original image to the center of the canvas.
+     *
+     * @param string $color
+     * @param integer $borderWidth
+     * @param integer $borderHeight
+     * @param Image $image
+     */
     private function expandImage($color, $borderWidth, $borderHeight, Image $image) {
         $imageWidth = $image->getWidth();
         $imageHeight = $image->getHeight();
