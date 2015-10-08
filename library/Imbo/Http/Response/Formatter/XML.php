@@ -178,6 +178,28 @@ IMAGES;
         $metadata = '';
 
         foreach ($model->getData() as $key => $value) {
+            if (is_array($value)) {
+                $metadata .= '<tag key="' . $key . '">';
+                $metadata .= $this->formatArray($value);
+                $metadata .= '</tag>';
+
+                continue;
+            }
+
+            $containsSpecialCharacter = (
+                strpos($value, '<') !== false ||
+                strpos($value, '>') !== false ||
+                strpos($value, '&') !== false ||
+                strpos($value, '"') !== false ||
+                strpos($value, '\'') !== false
+            );
+
+            if ($containsSpecialCharacter) {
+                $metadata .= '<tag key="' . $key . '"><![CDATA[' . $value . ']]></tag>';
+
+                continue;
+            }
+
             $metadata .= '<tag key="' . $key . '">' . $value . '</tag>';
         }
 
