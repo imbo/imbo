@@ -34,11 +34,11 @@ class RandomString implements GeneratorInterface {
      */
     public function generate(Image $image) {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-';
-        $charsLen = 64;
+        $charsLen = strlen($chars);
         $key = '';
 
         for ($i = 0; $i < $this->stringLength; $i++) {
-            $key .= $chars[mt_rand() % $charsLen];
+            $key .= $chars[mt_rand(0, $charsLen - 1)];
         }
 
         return $key;
