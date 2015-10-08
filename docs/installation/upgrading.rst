@@ -74,7 +74,7 @@ If you use the GridFS adapter, you will need to rename the ``publicKey`` field w
 Image identifiers are no longer MD5-sums
 ++++++++++++++++++++++++++++++++++++++++
 
-Previously, Imbo used the MD5 algorithm to generate the image identifier for an image. In Imbo 2.0.0 and onwards, image identifiers are simply randomly generated strings (currently using UUIDs, but this might change in the future). This means that the same image can exist multiple times within the same user. If this is not what you want, you can check if the image already exists by querying the :ref:`images resource <images-resource>` and specifying the MD5-sum of the image as an ``originalChecksum``-filter. Most Imbo-clients implement this already, as ``imageExists()`` or similar.
+Previously, Imbo used the MD5 algorithm to generate the image identifier for an image. In Imbo 2.0.0 and onwards, image identifiers are simply randomly generated strings. This means that the same image can exist multiple times within the same user. If this is not what you want, you can check if the image already exists by querying the :ref:`images resource <images-resource>` and specifying the MD5-sum of the image as an ``originalChecksum``-filter. Most Imbo-clients implement this already, as ``imageExists()`` or similar.
 
 To accommodate the new image identifiers and the possibility of future changes in how they are represented, databases should be able to store an image identifier of up to 255 characters. If you are using the :ref:`Doctrine database adapter <doctrine-database-adapter>` with the suggested schema on a MySQL database, this will require some changes:
 

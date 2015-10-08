@@ -13,7 +13,7 @@ Feature: Imbo provides an event listener for the hashtwo Varnish module
         And Imbo uses the "varnish-hashtwo.php" configuration
         When I request the previously added image as a "png"
         Then I should get a response with "200 OK"
-        And the "X-HashTwo" response header matches "imbo;image;user;[a-f0-9-]{32,36}, imbo;user;user"
+        And the "X-HashTwo" response header matches "imbo;image;user;[A-Za-z0-9_-]{1,255}, imbo;user;user"
 
         Examples:
             | transformation   |
@@ -31,7 +31,7 @@ Feature: Imbo provides an event listener for the hashtwo Varnish module
         And Imbo uses the "varnish-hashtwo.php" configuration
         When I request the previously added image as a "png"
         Then I should get a response with "200 OK"
-        And the "X-Imbo-HashTwo" response header matches "imbo;image;user;[a-f0-9-]{32,36}, imbo;user;user"
+        And the "X-Imbo-HashTwo" response header matches "imbo;image;user;[A-Za-z0-9_-]{1,255}, imbo;user;user"
 
         Examples:
             | transformation   |
