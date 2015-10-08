@@ -1,6 +1,17 @@
 Changelog for Imbo
 ==================
 
+Imbo-2.0.0
+----------
+__yyyy-mm-dd__
+
+* #363: Add pluggable image identifier generation (Espen Hovlandsdal)
+* #357: Add public key generation CLI-command (Espen Hovlandsdal)
+* #351: New image transformation: SmartSize (Kristoffer Brabrand, Espen Hovlandsdal)
+* #348: Add global images endpoint (Kristoffer Brabrand)
+* #347: Use UUID instead of MD5 for image identifiers (Espen Hovlandsdal)
+* #328: New access control implementation (Espen Hovlandsdal, Kristoffer Brabrand)
+
 Imbo-1.2.5
 ----------
 __2015-08-14__
