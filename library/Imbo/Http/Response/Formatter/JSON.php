@@ -135,7 +135,7 @@ class JSON extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
-    public function formatMetadata(Model\Metadata $model) {
+    public function formatMetadataModel(Model\Metadata $model) {
         return $this->encode($model->getData() ?: new stdClass());
     }
 

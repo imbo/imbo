@@ -145,13 +145,7 @@ USER;
             $metadata = $image->getMetadata();
 
             if (is_array($metadata) && (empty($fields) || isset($fields['metadata']))) {
-                $images .= '<metadata>';
-
-                foreach ($metadata as $key => $value) {
-                    $images .= '<tag key="' . $key . '">' . $value . '</tag>';
-                }
-
-                $images .= '</metadata>';
+                $images .= '<metadata>' . $this->formatMetadata($metadata) . '</metadata>';
             }
 
             $images .= '</image>';
@@ -174,12 +168,8 @@ IMAGES;
     /**
      * {@inheritdoc}
      */
-    public function formatMetadata(Model\Metadata $model) {
-        $metadata = '';
-
-        foreach ($model->getData() as $key => $value) {
-            $metadata .= '<tag key="' . $key . '">' . $value . '</tag>';
-        }
+    public function formatMetadataModel(Model\Metadata $model) {
+        $metadata = $this->formatMetadata($model->getData());
 
         return <<<METADATA
 <?xml version="1.0" encoding="UTF-8"?>
@@ -213,7 +203,7 @@ DATA;
         $list = $model->getList();
 
         foreach ($list as $element) {
-            $entries .= '<' . $entry . '>' . $element . '</' . $entry . '>';
+            $entries .= '<' . $entry . '>' . $this->formatValue($element) . '</' . $entry . '>';
         }
 
         $data = '<' . $container . '>' . $entries . '</' . $container . '>';
@@ -232,10 +222,12 @@ DATA;
 
         $entries = '';
         foreach ($data['groups'] as $group) {
+            $resources = array_map(array($this, 'formatValue'), $group['resources']);
+
             $entries .= '<group>';
-            $entries .= '  <name>' . $group['name'] . '</name>';
+            $entries .= '  <name>' . $this->formatValue($group['name']) . '</name>';
             $entries .= '  <resources>';
-            $entries .= '    <resource>' . implode($group['resources'], '</resource><resource>') . '</resource>';
+            $entries .= '    <resource>' . implode($resources, '</resource><resource>') . '</resource>';
             $entries .= '  </resources>';
             $entries .= '</group>';
         }
@@ -256,7 +248,7 @@ DATA;
 
         $entries = '';
         foreach ($data['resources'] as $resource) {
-            $entries .= '<resource>' . $resource . '</resource>';
+            $entries .= '<resource>' . $this->formatValue($resource) . '</resource>';
         }
 
         return <<<DATA
@@ -323,6 +315,44 @@ DATA;
     }
 
     /**
+     * Format a value, and CDATA wrap it if it contains special characters
+     *
+     * @param string $value
+     * @return string
+     */
+    private function formatValue($value) {
+        if (strpbrk($value, '<>&"\'') !== false) {
+            return '<![CDATA[' . $value . ']]>';
+        }
+
+        return $value;
+    }
+
+    /**
+     * Format dataset containing metadata
+     *
+     * @param array $data
+     * @return string
+     */
+    private function formatMetadata(array $data) {
+        $metadata = '';
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $metadata .= '<tag key="' . $key . '">';
+                $metadata .= $this->formatArray($value);
+                $metadata .= '</tag>';
+
+                continue;
+            }
+
+            $metadata .= '<tag key="' . $key . '">' . $this->formatValue($value) . '</tag>';
+        }
+
+        return $metadata;
+    }
+
+    /**
      * Format a nested dataset
      *
      * @param array $data A nested array
@@ -335,7 +365,15 @@ DATA;
             $xml .= '<list>';
 
             foreach ($data as $value) {
-                $xml .= '<value>' . $value . '</value>';
+                $xml .= '<value>';
+
+                if (is_array($value)) {
+                    $xml .= $this->formatArray($value);
+                } else {
+                    $xml .= $this->formatValue($value);
+                }
+
+                $xml .= '</value>';
             }
 
             $xml .= '</list>';
@@ -346,7 +384,7 @@ DATA;
                 if (is_array($value)) {
                     $xml .= $this->formatArray($value);
                 } else {
-                    $xml .= $value;
+                    $xml .= $this->formatValue($value);
                 }
 
                 $xml .= '</' . $key . '>';
@@ -368,19 +406,19 @@ DATA;
         if (isset($accessRule['resources']) && !!$accessRule['resources']) {
             $rule .= '<resources>';
             foreach ($accessRule['resources'] as $resource) {
-                $rule .= '<resource>' . $resource . '</resource>';
+                $rule .= '<resource>' . $this->formatValue($resource) . '</resource>';
             }
             $rule .= '</resources>';
         }
 
         if (isset($accessRule['group'])) {
-            $rule .= '<group>' . $accessRule['group'] . '</group>';
+            $rule .= '<group>' . $this->formatValue($accessRule['group']) . '</group>';
         }
 
         if (isset($accessRule['users']) && !!$accessRule['users']) {
             $rule .= '<users>';
             foreach ($accessRule['users'] as $user) {
-                $rule .= '<user>' . $user . '</user>';
+                $rule .= '<user>' . $this->formatValue($user) . '</user>';
             }
             $rule .= '</users>';
         }
