@@ -681,7 +681,7 @@ Every public key must also have a private key, which is used to sign and generat
     curl -XPUT http://imbo/keys/<publicKey>.json -d '{"privateKey":"<privateKey>"}'
 
 Check if a public key exist
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A ``HEAD`` request can be used if you want to check if a public key exist. The public key used to sign the request must have access to the ``keys.head`` resource.
 
