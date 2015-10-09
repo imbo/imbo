@@ -10,8 +10,7 @@
 
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Model\Groups as GroupsModel;
+use Imbo\EventManager\EventInterface;
 
 /**
  * Resource groups resource
@@ -43,18 +42,6 @@ class Groups implements ResourceInterface {
      * @param EventInterface $event The current event
      */
     public function listGroups(EventInterface $event) {
-        $groups = [];
-        foreach ($event->getAccessControl()->getGroups() as $groupName => $resources) {
-            $groups[] = [
-                'name' => $groupName,
-                'resources' => $resources,
-            ];
-        }
-
-        $model = new GroupsModel();
-        $model->setData(['groups' => $groups]);
-
-        $response = $event->getResponse();
-        $response->setModel($model);
+        $event->getManager()->trigger('acl.groups.load');
     }
 }

@@ -714,7 +714,13 @@ The groups resource can list available resource groups, used in the access contr
 List resource groups
 ~~~~~~~~~~~~~~~~~~~~
 
-Requests using HTTP GET on this resource returns all available resource groups.
+Requests using HTTP GET on this resource returns all available resource groups. Supported query parameters are:
+
+``page``
+    The page number. Defaults to ``1``.
+
+``limit``
+    Number of groups per page. Defaults to ``20``.
 
 .. code-block:: bash
 
@@ -724,13 +730,19 @@ results in:
 
 .. code-block:: javascript
 
-    {"groups":[]}
+    {"search":{"hits":0,"page":1,"limit":20,"count":0},"groups":[]}
 
 when there are no resource groups defined, or for example
 
 .. code-block:: javascript
 
     {
+      "search": {
+        "hits": 1,
+        "page": 1,
+        "limit": 20,
+        "count": 1
+      },
       "groups": [
         {
           "name": "read-stats",
