@@ -53,7 +53,7 @@ return [
                 'resources' => [
                     'group.get', 'group.head', 'group.put', 'group.delete',
                     'accessrules.get', 'accessrules.head', 'accessrules.post',
-                    'keys.put', 'keys.delete',
+                    'keys.put', 'keys.delete', 'groups.get',
                 ],
                 'users' => [],
             ]]

@@ -14,6 +14,7 @@ use Imbo\Exception\DatabaseException,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Exception\RuntimeException,
     Imbo\Auth\AccessControl\GroupQuery,
+    Imbo\Model\Groups as GroupsModel,
     MongoClient,
     MongoCollection,
     MongoException,
@@ -182,10 +183,14 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
     /**
      * {@inheritdoc}
      */
-    public function getGroups(GroupQuery $query = null) {
+    public function getGroups(GroupQuery $query = null, GroupsModel $model) {
+        if ($query === null) {
+            $query = new GroupQuery();
+        }
+
         $cursor = $this->getGroupsCollection()
             ->find()
-            ->skip($query->offset() ?: 0)
+            ->skip(($query->page() - 1) * $query->limit())
             ->limit($query->limit());
 
         $groups = [];
@@ -195,6 +200,9 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
 
         // Cache the retrieved groups
         $this->groups = array_merge($this->groups, $groups);
+
+        // Update model with total hits
+        $model->setHits($cursor->count());
 
         return $groups;
     }

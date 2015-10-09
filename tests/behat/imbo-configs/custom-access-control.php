@@ -10,8 +10,8 @@
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface,
     Imbo\Auth\AccessControl\Adapter\AbstractAdapter,
-    Imbo\Auth\AccessControl\UserQuery,
-    Imbo\Auth\AccessControl\GroupQuery;
+    Imbo\Auth\AccessControl\GroupQuery,
+    Imbo\Model\Groups as GroupsModel;
 
 /**
  * Use a custom user lookup implementation
@@ -25,11 +25,7 @@ class StaticAccessControl extends AbstractAdapter implements AdapterInterface {
         return 'private';
     }
 
-    public function getUsers(UserQuery $query = null) {
-        return ['public'];
-    }
-
-    public function getGroups(GroupQuery $query = null) {
+    public function getGroups(GroupQuery $query = null, GroupsModel $model) {
         return [];
     }
 

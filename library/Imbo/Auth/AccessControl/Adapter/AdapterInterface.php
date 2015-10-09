@@ -10,8 +10,8 @@
 
 namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Auth\AccessControl\UserQuery,
-    Imbo\Auth\AccessControl\GroupQuery;
+use Imbo\Auth\AccessControl\GroupQuery,
+    Imbo\Model\Groups as GroupsModel;
 
 /**
  * Access control interface
@@ -101,9 +101,10 @@ interface AdapterInterface {
      * Fetch a list of available resource groups
      *
      * @param GroupQuery $query A query object used to filter the groups returned
+     * @param GroupsModel $model Groups model to populate total number of hits with
      * @return array
      */
-    function getGroups(GroupQuery $query = null);
+    function getGroups(GroupQuery $query = null, GroupsModel $model);
 
     /**
      * Fetch a resource group with the given name

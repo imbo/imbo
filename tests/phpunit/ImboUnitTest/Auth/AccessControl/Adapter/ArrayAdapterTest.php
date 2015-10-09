@@ -8,11 +8,10 @@
  * distributed with this source code.
  */
 
-namespace ImboUnitTest\Auth;
+namespace ImboUnitTest\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
-    Imbo\Auth\AccessControl\Adapter\AdapterInterface as ACI,
-    Imbo\Auth\AccessControl\UserQuery;
+    Imbo\Auth\AccessControl\Adapter\AdapterInterface as ACI;
 
 /**
  * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter

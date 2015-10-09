@@ -157,7 +157,15 @@ class JSON extends Formatter implements FormatterInterface {
      * {@inheritdoc}
      */
     public function formatGroups(Model\Groups $model) {
-        return $this->encode($model->getData());
+        return $this->encode([
+            'search' => [
+                'hits' => $model->getHits(),
+                'page' => $model->getPage(),
+                'limit' => $model->getLimit(),
+                'count' => $model->getCount(),
+            ],
+            'groups' => $model->getGroups(),
+        ]);
     }
 
     /**

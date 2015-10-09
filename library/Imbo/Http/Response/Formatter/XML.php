@@ -218,10 +218,10 @@ DATA;
      * {@inheritdoc}
      */
     public function formatGroups(Model\Groups $model) {
-        $data = $model->getData();
+        $data = $model->getGroups();
 
         $entries = '';
-        foreach ($data['groups'] as $group) {
+        foreach ($data as $group) {
             $resources = array_map(array($this, 'formatValue'), $group['resources']);
 
             $entries .= '<group>';
@@ -232,12 +232,18 @@ DATA;
             $entries .= '</group>';
         }
 
-        return <<<DATA
+        return <<<GROUPS
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
+  <search>
+    <hits>{$model->getHits()}</hits>
+    <page>{$model->getPage()}</page>
+    <limit>{$model->getLimit()}</limit>
+    <count>{$model->getCount()}</count>
+  </search>
   <groups>{$entries}</groups>
 </imbo>
-DATA;
+GROUPS;
     }
 
     /**

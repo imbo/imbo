@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace ImboUnitTest\Auth;
+namespace ImboUnitTest\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
     Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter,
