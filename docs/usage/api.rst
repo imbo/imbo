@@ -874,7 +874,13 @@ results in:
 Adding access control rules
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Requests using HTTP POST on this resource adds new rules to the given public key. The request body should contain an array of resources the group should consist of.
+Requests using HTTP POST on this resource adds new rules to the given public key. The request body should contain an array of rules. The parameters for a rule must be specified as JSON objects, where the object supports the following fields:
+
+* ``users``: Defines on which users the public key should have access to the defined resources. Either an array of users or the string ``*`` (all users).
+* ``resources``: An array of resources you want the public key to have access to.
+* ``group``: A resource group the public key should have access to.
+
+.. note:: A rule must contain *either* ``resources`` or ``group``, not both. ``users`` is required.
 
 .. code-block:: bash
 
