@@ -17,6 +17,16 @@ task :default => [:lint, :installdep, :test, :phpcs, :apidocs, :readthedocs]
 desc "Run tests"
 task :test => [:phpunit, :behat]
 
+desc "Run tests without code coverage"
+task :test_no_cc do
+  begin
+    sh %{vendor/bin/phpunit --verbose -c tests/phpunit}
+    sh %{vendor/bin/behat --strict --config tests/behat/behat.yml --profile=no-cc}
+  rescue Exception
+    exit 1
+  end
+end
+
 desc "Spell check and generate end user docs"
 task :readthedocs do
   wd = Dir.getwd
