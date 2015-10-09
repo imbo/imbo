@@ -31,6 +31,7 @@ interface AdapterInterface {
     const RESOURCE_GROUP_OPTIONS           = 'group.options';
 
     const RESOURCE_KEYS_PUT                = 'keys.put';
+    const RESOURCE_KEYS_HEAD               = 'keys.head';
     const RESOURCE_KEYS_DELETE             = 'keys.delete';
     const RESOURCE_KEYS_OPTIONS            = 'keys.options';
 

@@ -19,8 +19,8 @@ Feature: Imbo provides a keys endpoint
         """
         Examples:
             | extension | content-type     | response |
-            | json      | application/json | #^\[{"id":".*?","resources":\["keys\.put","keys\.delete","accessrule\.get","accessrule\.head","accessrule\.delete","accessrules\.get","accessrules\.head","accessrules\.post"],"users":\[]},{"id":".*?","group":"something","users":\["some-user"]}]$# |
-            | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<access>\s*<rule id=".*?">\s*<resources>\s*<resource>keys\.put</resource>\s*<resource>keys\.delete</resource>\s*<resource>accessrule\.get</resource>\s*<resource>accessrule\.head</resource>\s*<resource>accessrule\.delete</resource>\s*<resource>accessrules\.get</resource>\s*<resource>accessrules\.head</resource>\s*<resource>accessrules\.post</resource>\s*</resources>\s*</rule><rule id=".*?">\s*<group>something</group>\s*<users>\s*<user>some-user</user>\s*</users>\s*</rule>\s*</access>\s*</imbo>$#ms |
+            | json      | application/json | #^\[{"id":".*?","resources":\["keys\.put","keys\.head","keys\.delete","accessrule\.get","accessrule\.head","accessrule\.delete","accessrules\.get","accessrules\.head","accessrules\.post"],"users":\[]},{"id":".*?","group":"something","users":\["some-user"]}]$# |
+            | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<access>\s*<rule id=".*?">\s*<resources>\s*<resource>keys\.put</resource>\s*<resource>keys\.head</resource>\s*<resource>keys\.delete</resource>\s*<resource>accessrule\.get</resource>\s*<resource>accessrule\.head</resource>\s*<resource>accessrule\.delete</resource>\s*<resource>accessrules\.get</resource>\s*<resource>accessrules\.head</resource>\s*<resource>accessrules\.post</resource>\s*</resources>\s*</rule><rule id=".*?">\s*<group>something</group>\s*<users>\s*<user>some-user</user>\s*</users>\s*</rule>\s*</access>\s*</imbo>$#ms |
 
     Scenario: Create a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
@@ -31,6 +31,16 @@ Feature: Imbo provides a keys endpoint
         And I sign the request
         When I request "/keys/the-public-key" using HTTP "PUT"
         Then I should get a response with "201 Created"
+
+    Scenario Outline: Check if a public key exist
+        Given I use "acl-creator" and "someprivkey" for public and private keys
+        And I include an access token in the query
+        When I request "/keys/<pubkey>" using HTTP "HEAD"
+        Then I should get a response with "<status>"
+        Examples:
+            | pubkey       | status                   |
+            | foobar       | 200 OK                   |
+            | non-existant | 404 Public key not found |
 
     Scenario: Update the private key for an existing public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
@@ -86,14 +96,16 @@ Feature: Imbo provides a keys endpoint
         And I sign the request
         When I request "/keys/foobar/access/100000000000000000001337" using HTTP "DELETE"
         Then I should get a response with "200 OK"
+        And the ACL rule under public key "foobar" with ID "100000000000000000001337" should not exist
 
     Scenario: Delete a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I sign the request
         When I request "/keys/foobar" using HTTP "DELETE"
         Then I should get a response with "200 OK"
+        And the "foobar" public key should not exist
 
-    Scenario Outline: The keys resource supports PUT and DELETE only
+    Scenario Outline: The keys resource supports PUT, HEAD and DELETE only
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I authenticate using "<auth-method>"
         And the request body contains:
@@ -106,7 +118,7 @@ Feature: Imbo provides a keys endpoint
         Examples:
             | method | auth-method  | body                             | status                 |
             | GET    | access-token |                                  | 405 Method not allowed |
-            | HEAD   | access-token |                                  | 405 Method not allowed |
+            | HEAD   | access-token |                                  | 200 OK                 |
             | POST   | signature    |                                  | 405 Method not allowed |
             | PUT    | signature    | {"privateKey":"the-private-key"} | 200 OK                 |
             | DELETE | signature    |                                  | 200 OK                 |
@@ -157,7 +169,7 @@ Feature: Imbo provides a keys endpoint
         Examples:
             | uri                         | method | auth-method  | body                          | status                                  |
             | /keys/valid-pubkey          | GET    | access-token |                               | 405 Method not allowed                  |
-            | /keys/valid-pubkey          | HEAD   | access-token |                               | 405 Method not allowed                  |
+            | /keys/valid-pubkey          | HEAD   | access-token |                               | 200 OK                                  |
             | /keys/valid-pubkey          | POST   | signature    | {"privateKey": "secret"}      | 405 Method not allowed                  |
             | /keys/valid-pubkey          | PUT    | signature    | {"privateKey": "secret"}      | 405 Access control adapter is immutable |
             | /keys/valid-pubkey          | DELETE | signature    |                               | 405 Access control adapter is immutable |

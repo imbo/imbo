@@ -47,6 +47,7 @@ return [
 
                         ACI::RESOURCE_USER_GET,
                         ACI::RESOURCE_KEYS_PUT,
+                        ACI::RESOURCE_KEYS_HEAD,
                         ACI::RESOURCE_KEYS_DELETE,
                         ACI::RESOURCE_ACCESS_RULE_GET,
                         ACI::RESOURCE_ACCESS_RULE_HEAD,

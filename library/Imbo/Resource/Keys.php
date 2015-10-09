@@ -30,7 +30,7 @@ class Keys implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return ['PUT', 'DELETE'];
+        return ['HEAD', 'PUT', 'DELETE'];
     }
 
     /**
@@ -39,10 +39,31 @@ class Keys implements ResourceInterface {
     public static function getSubscribedEvents() {
         return [
             'keys.put' => 'setKey',
+            'keys.head' => 'getKey',
             'keys.delete' => 'deleteKey'
         ];
     }
 
+    /**
+     * Get a public key, but return only status code, not private key information
+     *
+     * @param EventInterface $event The current event
+     */
+    public function getKey(EventInterface $event) {
+        $acl = $event->getAccessControl();
+
+        $publicKey = $event->getRequest()->getRoute()->get('publickey');
+
+        if (!$acl->publicKeyExists($publicKey)) {
+            throw new RuntimeException('Public key not found', 404);
+        }
+    }
+
+    /**
+     * Add or update public key
+     *
+     * @param EventInterface $event The current event
+     */
     public function setKey(EventInterface $event) {
         $acl = $event->getAccessControl();
 
@@ -71,6 +92,11 @@ class Keys implements ResourceInterface {
         $event->getResponse()->setStatusCode($keyExists ? 200 : 201);
     }
 
+    /**
+     * Delete public key
+     *
+     * @param EventInterface $event The current event
+     */
     public function deleteKey(EventInterface $event) {
         $acl = $event->getAccessControl();
 
