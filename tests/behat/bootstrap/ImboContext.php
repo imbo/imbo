@@ -642,6 +642,23 @@ class ImboContext extends RESTContext {
     }
 
     /**
+     * @Given /^the "([^"]*)" public key should not exist( anymore)?$/
+     */
+    public function publicKeyShouldNotExist($publicKey) {
+        if ($this->currentConfig) {
+            $this->addHeaderToNextRequest('X-Imbo-Test-Config', $this->currentConfig);
+        }
+
+        $url = '/keys/' . $publicKey;
+        return [
+            new Given('I use "acl-creator" and "someprivkey" for public and private keys'),
+            new Given('I include an access token in the query'),
+            new Given('I request "' . $url . '" using HTTP "HEAD"'),
+            new Given('I should get a response with "404 Public key not found"')
+        ];
+    }
+
+    /**
      * @Given /^Imbo starts with an empty database$/
      */
     public function imboStartsWithEmptyDatabase() {

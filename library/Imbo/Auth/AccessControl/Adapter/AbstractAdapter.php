@@ -102,6 +102,7 @@ abstract class AbstractAdapter implements AdapterInterface {
         return array_merge(
             self::getReadWriteResources(), [
                 ACI::RESOURCE_KEYS_PUT,
+                ACI::RESOURCE_KEYS_HEAD,
                 ACI::RESOURCE_KEYS_DELETE,
                 ACI::RESOURCE_KEYS_OPTIONS,
 

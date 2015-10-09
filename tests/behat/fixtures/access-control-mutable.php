@@ -11,6 +11,7 @@ return [
                     'id' => new MongoId(),
                     'resources' => [
                         ACI::RESOURCE_KEYS_PUT,
+                        ACI::RESOURCE_KEYS_HEAD,
                         ACI::RESOURCE_KEYS_DELETE,
 
                         ACI::RESOURCE_ACCESS_RULE_GET,
@@ -53,7 +54,7 @@ return [
                 'resources' => [
                     'group.get', 'group.head', 'group.put', 'group.delete',
                     'accessrules.get', 'accessrules.head', 'accessrules.post',
-                    'keys.put', 'keys.delete', 'groups.get',
+                    'keys.head', 'keys.put', 'keys.delete', 'groups.get'
                 ],
                 'users' => [],
             ]]
