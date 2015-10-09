@@ -44,6 +44,11 @@ class Keys implements ResourceInterface {
         ];
     }
 
+    /**
+     * Get a public key, but return only status code, not private key information
+     *
+     * @param EventInterface $event The current event
+     */
     public function getKey(EventInterface $event) {
         $acl = $event->getAccessControl();
 
@@ -52,10 +57,13 @@ class Keys implements ResourceInterface {
         if (!$acl->publicKeyExists($publicKey)) {
             throw new RuntimeException('Public key not found', 404);
         }
-
-        $event->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * Add or update public key
+     *
+     * @param EventInterface $event The current event
+     */
     public function setKey(EventInterface $event) {
         $acl = $event->getAccessControl();
 
@@ -84,6 +92,11 @@ class Keys implements ResourceInterface {
         $event->getResponse()->setStatusCode($keyExists ? 200 : 201);
     }
 
+    /**
+     * Delete public key
+     *
+     * @param EventInterface $event The current event
+     */
     public function deleteKey(EventInterface $event) {
         $acl = $event->getAccessControl();
 
