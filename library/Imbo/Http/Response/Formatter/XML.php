@@ -314,16 +314,14 @@ DATA;
 DATA;
     }
 
+    /**
+     * Format a value, and CDATA wrap it if it contains special characters
+     *
+     * @param string $value
+     * @return string
+     */
     private function formatValue($value) {
-        $containsSpecialCharacter = (
-            strpos($value, '<') !== false ||
-            strpos($value, '>') !== false ||
-            strpos($value, '&') !== false ||
-            strpos($value, '"') !== false ||
-            strpos($value, '\'') !== false
-        );
-
-        if ($containsSpecialCharacter) {
+        if (strpbrk($value, '<>&"\'') !== false) {
             return '<![CDATA[' . $value . ']]>';
         }
 
@@ -347,14 +345,6 @@ DATA;
 
                 continue;
             }
-
-            $containsSpecialCharacter = (
-                strpos($value, '<') !== false ||
-                strpos($value, '>') !== false ||
-                strpos($value, '&') !== false ||
-                strpos($value, '"') !== false ||
-                strpos($value, '\'') !== false
-            );
 
             $metadata .= '<tag key="' . $key . '">' . $this->formatValue($value) . '</tag>';
         }
