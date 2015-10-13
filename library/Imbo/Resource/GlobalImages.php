@@ -56,8 +56,9 @@ class GlobalImages implements ResourceInterface {
         $acl = $event->getAccessControl();
 
         $missingAccess = [];
+        $users = $event->getRequest()->getUsers();
 
-        foreach ($event->getRequest()->getUsers() as $user) {
+        foreach ($users as $user) {
             $hasAccess = $acl->hasAccess(
                 $event->getRequest()->getPublicKey(),
                 'images.get',
@@ -79,7 +80,7 @@ class GlobalImages implements ResourceInterface {
         }
 
         $event->getManager()->trigger('db.images.load', [
-            'users' => $event->getRequest()->getUsers()
+            'users' => $users
         ]);
     }
 }

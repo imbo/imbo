@@ -93,7 +93,7 @@ class Request extends SymfonyRequest {
      */
     public function getUsers() {
         $routeUser = $this->getUser();
-        $queryUsers = $this->query->get('user', []);
+        $queryUsers = $this->query->get('users', []);
 
         if (!$routeUser && !$queryUsers) {
             return [];

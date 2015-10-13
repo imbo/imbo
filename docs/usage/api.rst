@@ -651,12 +651,12 @@ The global images resource is used to search for images across users, given that
 
 This resource is read only, and behaves in the same way as described in the `Get image collections` section of :ref:`images-resource`. In addition to the parameters specified for `Get image collections`, the following query parameter must be specified:
 
-``user[]``
+``users[]``
     An array of users to get images for.
 
 .. code-block:: bash
 
-    curl "http://imbo/images?user[]=foo&user[]=bar"
+    curl "http://imbo/images?users[]=foo&users[]=bar"
 
 results in a response with the exact same format as shown under `Get image collections`.
 
