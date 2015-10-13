@@ -24,7 +24,7 @@ Feature: Imbo provides a global images endpoint
     Scenario: Fetch images for user with wildcard access
         Given I use "wildcard" and "*" for public and private keys
         And I include an access token in the query
-        When I request "/images.json?user[]=user&user[]=other-user"
+        When I request "/images.json?users[]=user&users[]=other-user"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
@@ -44,14 +44,14 @@ Feature: Imbo provides a global images endpoint
         """
 
         Examples:
-            | queryString                    | response               |
-            | ?user[]=user&user[]=other-user | #^{"search":{"hits":4,"page":1,"limit":20,"count":4}# |
-            | ?user[]=user                   | #^{"search":{"hits":2,"page":1,"limit":20,"count":2}# |
-            | ?user[]=other-user             | #^{"search":{"hits":2,"page":1,"limit":20,"count":2}# |
+            | queryString                      | response                                              |
+            | ?users[]=user&users[]=other-user | #^{"search":{"hits":4,"page":1,"limit":20,"count":4}# |
+            | ?users[]=user                    | #^{"search":{"hits":2,"page":1,"limit":20,"count":2}# |
+            | ?users[]=other-user              | #^{"search":{"hits":2,"page":1,"limit":20,"count":2}# |
 
     Scenario: Fetch images specifying users that the publickey does not have access to
         Given I use "unpriviledged" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/images.json?user[]=foo&user[]=bar"
+        When I request "/images.json?users[]=foo&users[]=bar"
         Then I should get a response with "400 Public key does not have access to the users: [foo, bar]"
         And the "Content-Type" response header is "application/json"
