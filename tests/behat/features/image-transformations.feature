@@ -171,7 +171,6 @@ Feature: Imbo enables dynamic transformations of images
             | smartSize                         | 400 Both width and height needs to be specified                             |
             | smartSize:height=300              | 400 Both width and height needs to be specified                             |
             | smartSize:width=300               | 400 Both width and height needs to be specified                             |
-            | smartSize:width=300,height=200    | 400 A point-of-interest x,y needs to be specified                           |
 
     Scenario: Support multiple transformations
         Given I use "publickey" and "privatekey" for public and private keys

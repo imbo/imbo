@@ -90,8 +90,11 @@ class SmartSize extends Transformation implements ListenerInterface {
             }
         }
 
+        $event->getResponse()->headers->set('X-Imbo-POIs-Used', $poi ? 1 : 0);
+
+        // Do a simple crop if don't have a POI
         if (!$poi) {
-            throw new TransformationException('A point-of-interest x,y needs to be specified', 400);
+            return $this->simpleCrop($event, $params['width'], $params['height']);
         }
 
         if (!empty($params['crop']) && array_search($params['crop'], ['close', 'medium', 'wide']) === false) {
@@ -182,5 +185,41 @@ class SmartSize extends Transformation implements ListenerInterface {
         $image->setWidth($targetWidth)
               ->setHeight($targetHeight)
               ->hasBeenTransformed(true);
+    }
+
+    /**
+     * Perform a simple crop/resize operation on the image
+     *
+     * @param EventInterface $event
+     * @param int $width
+     * @param int $height
+     */
+    public function simpleCrop(EventInterface $event, $width, $height) {
+        $image = $event->getArgument('image');
+
+        $sourceRatio = $image->getWidth() / $image->getHeight();
+        $cropRatio = $width / $height;
+
+        $params = [];
+
+        if ($cropRatio > $sourceRatio) {
+            $params['width'] = $width;
+        } else {
+            $params['height'] = $height;
+        }
+
+        $event->getManager()->trigger('image.transformation.maxsize', [
+            'image' => $event->getArgument('image'),
+            'params' => $params
+        ]);
+
+        $event->getManager()->trigger('image.transformation.crop', [
+            'image' => $event->getArgument('image'),
+            'params' => [
+                'width' => $width,
+                'height' => $height,
+                'mode' => 'center'
+            ]
+        ]);
     }
 }
