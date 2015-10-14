@@ -621,6 +621,64 @@ If what you want is for images to be delivered in the format they were uploaded 
 
 You are still able to convert between formats by specifying an extension when requesting the image (`.jpg`, `.png`, `.gif` etc).
 
+.. _configuration-trusted-proxies:
+
+Trusted proxies - ``trustedProxies``
+------------------------------------
+
+If you find yourself behind some sort of reverse proxy (like a load balancer), certain header information may be sent to you using special ``X-Forwarded-*`` headers. For example, the ``Host`` HTTP-header is usually used to return the requested host. But when you're behind a proxy, the true host may be stored in an ``X-Forwarded-Host`` header.
+
+Since HTTP headers can be spoofed, Imbo does not trust these proxy headers by default. If you are behind a proxy, you should manually whitelist your proxy. This can be done by defining the proxies IP addresses and/or using CIDR notations. Example:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'trustedProxies' => ['192.0.0.1', '10.0.0.0/8'],
+
+        // ...
+    ];
+
+.. note:: Not all proxies set the required ``X-Forwarded-*`` headers by default. A search for ``X-Forwarded-Proto <your proxy here>`` usually gives helpful answers to how you can add them to incoming requests.
+
+.. _configuration-authentication-protocol:
+
+Authentication protocol - ``authentication``
+--------------------------------------------
+
+Imbo generates access tokens and authentication signatures based on the incoming URL, and includes the protocol (by default). This can sometimes be problematic, for instance when Imbo is behind a load balancer which doesn't send ``X-Forwarded-Proto`` header, or if you want to use protocol-less image URLs on the client side (``//imbo.host/users/some-user/images/img``).
+
+Setting the ``protocol`` option under ``authentication`` allows you to control how Imbo's authentication should behave. The option has the following possible values:
+
+``incoming``
+    Will try to detect the incoming protocol - this is based on ``$_SERVER['HTTPS']`` or the ``X-Forwarded-Proto`` header (given the ``trustedProxies`` option is configured). This is the default value.
+
+``both``
+    Will try to match based on both HTTP and HTTPS protocols and allow the request if any of them yields the correct signature/access token.
+
+``http``
+    Will always use ``http`` as the protocol, replacing ``https`` with ``http`` in the incoming URL, if that is the case.
+
+``https``
+    Will always use ``https`` as the protocol, replacing ``http`` with ``https`` in the incoming URL, if that is the case.
+
+Example usage:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'authentication' => [
+            'protocol' => 'both',
+        ],
+
+        // ...
+    ];
+
 .. _configuration-event-listeners:
 
 Event listeners - ``eventListeners``
