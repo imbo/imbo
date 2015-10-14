@@ -664,6 +664,21 @@ Setting the ``protocol`` option under ``authentication`` allows you to control h
 ``https``
     Will always use ``https`` as the protocol, replacing ``http`` with ``https`` in the incoming URL, if that is the case.
 
+Example usage:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'authentication' => [
+            'protocol' => 'both',
+        ],
+
+        // ...
+    ];
+
 .. _configuration-event-listeners:
 
 Event listeners - ``eventListeners``
