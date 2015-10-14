@@ -231,6 +231,8 @@ class SmartSize extends Transformation implements ListenerInterface {
      * Resize the image
      *
      * @param Image $image The image to resize
+     * @param int $targetWidth The resize target width
+     * @param int $tartHeight The resize target height
      */
     private function resize(Image $image, $targetWidth, $targetHeight) {
         $this->imagick->setOption('jpeg:size', $targetWidth . 'x' . $targetHeight);
