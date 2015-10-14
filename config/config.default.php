@@ -98,6 +98,40 @@ $config = [
     'contentNegotiateImages' => true,
 
     /**
+     * Options related to authentication. See documentation for individual settings.
+     *
+     * @var array
+     */
+    'authentication' => [
+        /**
+         * Imbo generates access tokens and authentication signatures based on the incoming URL,
+         * and includes the protocol (by default). This can sometimes be problematic, for instance
+         * when Imbo is behind a load balancer which doesn't send `X-Forwarded-Proto` header, or
+         * if you want to use protocol-less image URLs (`//imbo.host/users/some-user/images/img`)
+         *
+         * This option allows you to control how Imbo's authentication should behave:
+         *
+         * - `incoming`
+         *     Will try to detect the incoming protocol - this is based on `$_SERVER['HTTPS']` or
+         *     the `X-Forwarded-Proto` header (given the `trustedProxies` option is configured).
+         *     This is the default.
+         *
+         * - `both`
+         *     Will try to match based on both HTTP and HTTPS protocols and allow the request if
+         *     any of them yields the correct signature/access token.
+         *
+         * - `http`
+         *     Will always use `http` as the protocol, replacing `https` with `http` in the
+         *     incoming URL, if that is the case.
+         *
+         * - `https`
+         *     Will always use `https` as the protocol, replacing `http` with `https` in the
+         *     incoming URL, if that is the case.
+         */
+        'protocol' => 'incoming',
+    ],
+
+    /**
      * Event listeners
      *
      * An associative array where the keys are short names for the event listeners (not really used

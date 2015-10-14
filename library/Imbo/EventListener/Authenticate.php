@@ -75,6 +75,7 @@ class Authenticate implements ListenerInterface {
     public function authenticate(EventInterface $event) {
         $response = $event->getResponse();
         $request = $event->getRequest();
+        $config = $event->getConfig();
 
         // Whether or not the authentication info is in the request headers
         $fromHeaders = $request->headers->has('x-imbo-authenticate-timestamp') &&
@@ -127,15 +128,31 @@ class Authenticate implements ListenerInterface {
             $url = rtrim(preg_replace('/(?<=(\?|&))(signature|timestamp)=[^&]+&?/', '', $url), '&?');
         }
 
-        // Add the URL used for auth to the response headers
-        $response->headers->set('X-Imbo-AuthUrl', $url);
-
-        if (!$this->signatureIsValid($request->getMethod(), $url, $publicKey, $privateKey, $timestamp, $signature)) {
-            $exception = new RuntimeException('Signature mismatch', 400);
-            $exception->setImboErrorCode(Exception::AUTH_SIGNATURE_MISMATCH);
-
-            throw $exception;
+        // See if we should modify the protocol for the incoming request
+        $uris = [$url];
+        $protocol = $config['authentication']['protocol'];
+        if ($protocol === 'both') {
+            $uris = [
+                preg_replace('#^https?#', 'http',  $url),
+                preg_replace('#^https?#', 'https', $url),
+            ];
+        } else if (in_array($protocol, ['http', 'https'])) {
+            $uris = [preg_replace('#^https?#', $protocol, $url)];
         }
+
+        // Add the URL used for auth to the response headers
+        $response->headers->set('X-Imbo-AuthUrl', implode(', ', $uris));
+
+        foreach ($uris as $uri) {
+            if ($this->signatureIsValid($request->getMethod(), $uri, $publicKey, $privateKey, $timestamp, $signature)) {
+                return;
+            }
+        }
+
+        $exception = new RuntimeException('Signature mismatch', 400);
+        $exception->setImboErrorCode(Exception::AUTH_SIGNATURE_MISMATCH);
+
+        throw $exception;
     }
 
     /**

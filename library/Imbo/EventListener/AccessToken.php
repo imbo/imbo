@@ -119,6 +119,7 @@ class AccessToken implements ListenerInterface {
         $response = $event->getResponse();
         $query = $request->query;
         $eventName = $event->getName();
+        $config = $event->getConfig();
 
         if (($eventName === 'image.get' || $eventName === 'image.head') && $this->isWhitelisted($request)) {
             // All transformations in the request are whitelisted. Skip the access token check
@@ -139,6 +140,21 @@ class AccessToken implements ListenerInterface {
         // First the the raw un-encoded URI, then the URI as is
         $uris = [$request->getRawUri(), $request->getUriAsIs()];
         $privateKey = $event->getAccessControl()->getPrivateKey($request->getPublicKey());
+
+        // See if we should modify the protocol for the incoming request
+        $protocol = $config['authentication']['protocol'];
+        if ($protocol === 'both') {
+            $uris = array_reduce($uris, function($dest, $uri) use ($protocol) {
+                $baseUrl = preg_replace('#^https?#', '', $uri);
+                $dest[] = 'http' . $baseUrl;
+                $dest[] = 'https' . $baseUrl;
+                return $dest;
+            }, []);
+        } else if (in_array($protocol, ['http', 'https'])) {
+            $uris = array_map(function($uri) use ($protocol) {
+                return preg_replace('#^https?#', $protocol, $uri);
+            }, $uris);
+        }
 
         foreach ($uris as $uri) {
             // Remove the access token from the query string as it's not used to generate the HMAC
