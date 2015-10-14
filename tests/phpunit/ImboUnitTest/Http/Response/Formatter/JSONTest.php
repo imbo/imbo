@@ -271,7 +271,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers Imbo\Http\Response\Formatter\JSON::formatMetadata
+     * @covers Imbo\Http\Response\Formatter\JSON::formatMetadataModel
      */
     public function testCanFormatAMetadataModel() {
         $metadata = [
@@ -289,7 +289,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers Imbo\Http\Response\Formatter\JSON::formatMetadata
+     * @covers Imbo\Http\Response\Formatter\JSON::formatMetadataModel
      */
     public function testCanFormatAMetadataModelWithNoMetadata() {
         $model = $this->getMock('Imbo\Model\Metadata');
