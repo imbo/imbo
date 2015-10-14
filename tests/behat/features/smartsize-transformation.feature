@@ -15,7 +15,6 @@ Feature: Imbo can crop images using smart size and POIs
         Then I should get a response with "200 OK"
 
     Scenario Outline: Smart size image
-        Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         And I specify "<transformation>" as transformation
         When I request the test image as a "png"
@@ -23,6 +22,7 @@ Feature: Imbo can crop images using smart size and POIs
         And the width of the image is "<width>"
         And the height of the image is "<height>"
         And the pixel at coordinate "<coord>" should have a color of "<color>"
+        And the "X-Imbo-POIs-Used" response header is "1"
 
         Examples:
             | transformation                                         | coord | color   | width | height |
@@ -39,7 +39,6 @@ Feature: Imbo can crop images using smart size and POIs
             | smartsize:width=250,height=600,poi=810,568,crop=wide   | 0, 0  | #fafff3 | 250   | 600    |
 
     Scenario: Smart size based on POI stored in metadata
-        Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         And I specify "smartsize:width=250,height=250" as transformation
         When I request the test image as a "png"
@@ -47,3 +46,27 @@ Feature: Imbo can crop images using smart size and POIs
         And the width of the image is "250"
         And the height of the image is "250"
         And the pixel at coordinate "0, 0" should have a color of "#355170"
+        And the "X-Imbo-POIs-Used" response header is "1"
+
+    Scenario Outline: Smart size falls back to simple crop/resize when no POI data is found
+        Given the request body contains:
+          """
+          {}
+          """
+        And I sign the request
+        When I request the metadata of the test image using HTTP "PUT"
+        Then I should get a response with "200 OK"
+        Given I include an access token in the query
+        And I specify "smartsize:width=<width>,height=<height>" as transformation
+        When I request the test image as a "png"
+        Then I should get a response with "200 OK"
+        And the width of the image is "<width>"
+        And the height of the image is "<height>"
+        And the pixel at coordinate "0, 0" should have a color of "<color>"
+        And the "X-Imbo-POIs-Used" response header is "0"
+
+        Examples:
+            | coord | color   | width | height |
+            | 0, 0  | #495569 | 250   | 250    |
+            | 0, 0  | #171c3a | 500   | 150    |
+            | 0, 0  | #feffef | 150   | 500    |
