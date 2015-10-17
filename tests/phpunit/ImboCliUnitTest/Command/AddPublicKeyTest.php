@@ -221,6 +221,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
      */
     public function testPromptsForListOfSpecificResourcesIfOptionIsSelected() {
         $allResources = AbstractAdapter::getAllResources();
+        sort($allResources);
 
         $this->adapter
             ->expects($this->once())
