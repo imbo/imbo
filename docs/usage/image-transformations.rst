@@ -182,6 +182,31 @@ This transformation desaturates the image (in practice, gray scales it).
 
 * ``t[]=desaturate``
 
+.. _drawpois-transformation:
+
+Draw points of interest - ``t[]=drawPois``
+------------------------------------------
+
+This transformation will draw an outline around all the POIs (points of interest) stored in the metadata for the image.
+
+**Parameters:**
+
+``color``
+    Color of the border in hexadecimal format. Defaults to ``ff0000`` (You can also specify short values like ``f0f`` (``ff00ff``)).
+
+``borderSize``
+    Width of the border in pixels. Defaults to ``2``.
+
+``pointSize``
+    The diameter (in pixels) of the circle drawn around points of interest that do not have a height and width specified. Defaults to ``30``.
+
+**Examples:**
+
+* ``t[]=drawPois``
+* ``t[]=drawPois:borderSize=10``
+* ``t[]=drawPois:color=0f0``
+* ``t[]=drawPois:color=00f,borderSize=10,pointSize=100``
+
 .. _flip-horizontally-transformation:
 
 Make a mirror image - ``t[]=flipHorizontally``

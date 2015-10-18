@@ -253,6 +253,7 @@ $config = [
         'convert' => 'Imbo\Image\Transformation\Convert',
         'crop' => 'Imbo\Image\Transformation\Crop',
         'desaturate' => 'Imbo\Image\Transformation\Desaturate',
+        'drawPois' => 'Imbo\Image\Transformation\DrawPois',
         'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
         'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
         'histogram' => 'Imbo\Image\Transformation\Histogram',
