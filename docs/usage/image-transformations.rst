@@ -187,7 +187,7 @@ This transformation desaturates the image (in practice, gray scales it).
 Draw points of interest - ``t[]=drawPois``
 ------------------------------------------
 
-This transformation will draw an outline around all the POIs (points of interest) stored in the metadata for the image.
+This transformation will draw an outline around all the POIs (points of interest) stored in the metadata for the image. The format of the metadata is documented under the :ref:`smartSize <smartsize-transformation>` transformation.
 
 **Parameters:**
 
