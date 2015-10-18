@@ -15,7 +15,7 @@ Feature: Imbo can crop images using smart size and POIs
         Then I should get a response with "200 OK"
 
     Scenario Outline: Smart size image
-        And I include an access token in the query
+        Given I include an access token in the query
         And I specify "<transformation>" as transformation
         When I request the test image as a "png"
         Then I should get a response with "200 OK"
