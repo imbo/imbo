@@ -176,11 +176,22 @@ class SmartSize extends Transformation implements ListenerInterface {
             $image->getImageIdentifier()
         );
 
+        $poi = isset($metadata['poi'][0]) ? $metadata['poi'][0] : false;
+
         // Fetch POI from metadata. Array used if we want to expand with multiple POIs in the future
-        if (isset($metadata['poi'][0]['x']) && isset($metadata['poi'][0]['y'])) {
+        if ($poi && isset($poi['cx']) && isset($poi['cy'])) {
             return [
-                (int) $metadata['poi'][0]['x'],
-                (int) $metadata['poi'][0]['y']
+                (int) $poi['cx'],
+                (int) $poi['cy']
+            ];
+        } else if (
+            $poi &&
+            isset($poi['x']) && isset($poi['y']) &&
+            isset($poi['width']) && isset($poi['height'])
+        ) {
+            return [
+                (int) $poi['x'] + ($poi['width']  / 2),
+                (int) $poi['y'] + ($poi['height'] / 2)
             ];
         }
 
