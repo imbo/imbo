@@ -8,7 +8,7 @@ Feature: Imbo can crop images using smart size and POIs
         And I use "publickey" and "privatekey" for public and private keys
         And the request body contains:
           """
-          {"poi": [{"x": 810, "y": 568}]}
+          {"poi": [{"cx": 810, "cy": 568}]}
           """
         And I sign the request
         When I request the metadata of the test image using HTTP "PUT"
@@ -39,9 +39,27 @@ Feature: Imbo can crop images using smart size and POIs
             | smartsize:width=250,height=600,poi=810,568,crop=wide   | 0, 0  | #fafff3 | 250   | 600    |
 
     Scenario: Smart size based on POI stored in metadata
+        Given I specify "smartsize:width=250,height=250" as transformation
         And I include an access token in the query
-        And I specify "smartsize:width=250,height=250" as transformation
         When I request the test image as a "png"
+        Then I should get a response with "200 OK"
+        And the width of the image is "250"
+        And the height of the image is "250"
+        And the pixel at coordinate "0, 0" should have a color of "#355170"
+        And the "X-Imbo-POIs-Used" response header is "1"
+
+    Scenario: Smart size based on POI without center coordinates stored in metadata
+        Given I use "publickey" and "privatekey" for public and private keys
+        And the request body contains:
+          """
+          {"poi": [{"x": 800, "y": 558, "width": 20, "height": 20}]}
+          """
+        And I sign the request
+        And I request the metadata of the test image using HTTP "PUT"
+        Then I should get a response with "200 OK"
+        When I specify "smartsize:width=250,height=250" as transformation
+        And I include an access token in the query
+        And I request the test image as a "png"
         Then I should get a response with "200 OK"
         And the width of the image is "250"
         And the height of the image is "250"
