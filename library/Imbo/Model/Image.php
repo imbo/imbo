@@ -28,6 +28,7 @@ class Image implements ModelInterface {
         'image/png'  => 'png',
         'image/jpeg' => 'jpg',
         'image/gif'  => 'gif',
+        'application/pdf' => 'pdf',
     );
 
     /**
@@ -39,6 +40,7 @@ class Image implements ModelInterface {
         'image/x-png'  => 'image/png',
         'image/x-jpeg' => 'image/jpeg',
         'image/x-gif'  => 'image/gif',
+        'application/x-pdf' => 'application/pdf',
     );
 
     /**

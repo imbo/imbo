@@ -46,6 +46,11 @@ class ImagePreparation implements ListenerInterface {
     public function prepareImage(EventInterface $event) {
         $request = $event->getRequest();
 
+        // Check if someone else has already prepared the image for us in another listener
+        if ($request->getImage()) {
+            return;
+        }
+
         // Fetch image data from input
         $imageBlob = $request->getContent();
 
