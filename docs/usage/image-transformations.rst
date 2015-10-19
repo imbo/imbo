@@ -430,7 +430,7 @@ When using any of the presets the different parameters can be overridden by spec
 
 * ``t[]=sharpen``
 * ``t[]=sharpen:preset=light`` (same as above)
-* ``t[]=sharpen:preset=extrene,gain=10`` (use the ``extreme`` preset, but use a gain value of 10 instead of 4)
+* ``t[]=sharpen:preset=extreme,gain=10`` (use the ``extreme`` preset, but use a gain value of 10 instead of 4)
 * ``t[]=sharpen:radius=2,sigma=1,gain=1,threshold= 0.05`` (same as using ``t[]=sharpen:preset=light``, or simply ``t[]=sharpen``)
 
 .. _smartsize-transformation:
