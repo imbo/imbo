@@ -107,6 +107,7 @@ Feature: Imbo enables dynamic transformations of images
             | crop:width=50,height=60,x=1,y=10                                                                  |
             | crop:width=5000,height=6000,x=0,y=0                                                               |
             | desaturate                                                                                        |
+            | drawPois                                                                                          |
             | flipHorizontally                                                                                  |
             | flipVertically                                                                                    |
             | histogram                                                                                         |
@@ -179,6 +180,7 @@ Feature: Imbo enables dynamic transformations of images
           resize:width=100,height=100
           resize:width=123,height=456
           desaturate
+          drawPois
           flipHorizontally
           flipVertically
           thumbnail:width=40,height=30
