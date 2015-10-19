@@ -59,7 +59,7 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Image\Transformation\DrawPois::transform
      * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionMessage Point of interest had neither `width` and `height` or `cx` and `cy`
+     * @expectedExceptionMessage Point of interest had neither `width` and `height` nor `cx` and `cy`
      */
     public function testThrowsExceptionOnInvalidPoi() {
         $image = $this->getMock('Imbo\Model\Image');

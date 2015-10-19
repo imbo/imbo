@@ -86,7 +86,7 @@ class DrawPois extends Transformation implements ListenerInterface {
                     $this->drawPoiCircle($poi, $color, $borderSize, $pointSize);
                 } else {
                     throw new TransformationException(
-                        'Point of interest had neither `width` and `height` or `cx` and `cy`'
+                        'Point of interest had neither `width` and `height` nor `cx` and `cy`'
                     );
                 }
             }
