@@ -139,9 +139,12 @@ class AddPublicKey extends Command {
      * @return array
      */
     private function askForSpecificResources(InputInterface $input, OutputInterface $output) {
+        $resources = AbstractAdapter::getAllResources();
+        sort($resources);
+
         $question = new ChoiceQuestion(
             'Which resources should the public key have access to? (comma-separated) ',
-            AbstractAdapter::getAllResources()
+            $resources
         );
         $question->setMultiselect(true);
 
