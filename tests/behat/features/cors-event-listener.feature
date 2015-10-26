@@ -92,3 +92,29 @@ Feature: Imbo provides an event listener for CORS
         """
         Access-Control-Allow-Origin
         """
+
+    Scenario: Request a resource using HTTP OPTIONS without an Origin header when all origins are accepted
+        Given Imbo uses the "cors-wildcard.php" configuration
+        When I request "/" using HTTP "OPTIONS"
+        Then I should get a response with "204 No Content"
+        And the "Vary" response header contains "Origin"
+        And the following response headers should not be present:
+        """
+        Access-Control-Allow-Origin
+        Access-Control-Allow-Methods
+        Access-Control-Allow-Headers
+        Access-Control-Max-Age
+        """
+
+    Scenario: Request a resource without an Origin header when all origins are accepted
+        Given Imbo uses the "cors-wildcard.php" configuration
+        When I request "/" using HTTP "GET"
+        Then I should get a response with "200 Hell Yeah"
+        And the "Vary" response header contains "Origin"
+        And the following response headers should not be present:
+        """
+        Access-Control-Allow-Origin
+        Access-Control-Allow-Methods
+        Access-Control-Allow-Headers
+        Access-Control-Max-Age
+        """

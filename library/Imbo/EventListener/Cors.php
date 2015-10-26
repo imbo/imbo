@@ -144,7 +144,7 @@ class Cors implements ListenerInterface {
     public function options(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
-        $origin = $request->headers->get('Origin', '*');
+        $origin = $request->headers->get('Origin');
 
         // This is an OPTIONS request, send 204 since no more content will follow
         $response->setStatusCode(204);
@@ -153,7 +153,7 @@ class Cors implements ListenerInterface {
         $event->getResponse()->setVary('Origin', false);
 
         // Fall back if the passed origin is not allowed
-        if (!$this->originIsAllowed($origin)) {
+        if (!$origin || !$this->originIsAllowed($origin)) {
             return;
         }
 
@@ -203,13 +203,13 @@ class Cors implements ListenerInterface {
             return;
         }
 
-        $origin = $request->headers->get('Origin', '*');
+        $origin = $request->headers->get('Origin');
 
         // Vary on Origin to prevent caching allowed/disallowed requests
         $event->getResponse()->setVary('Origin', false);
 
         // Fall back if the passed origin is not allowed
-        if (!$this->originIsAllowed($origin)) {
+        if (!$origin || !$this->originIsAllowed($origin)) {
             return;
         }
 

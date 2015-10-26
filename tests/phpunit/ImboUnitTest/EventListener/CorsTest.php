@@ -34,7 +34,7 @@ class CorsTest extends ListenerTests {
      */
     public function setUp() {
         $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $requestHeaders->expects($this->any())->method('get')->with('Origin', '*')->will($this->returnValue('http://imbo-project.org'));
+        $requestHeaders->expects($this->any())->method('get')->with('Origin')->will($this->returnValue('http://imbo-project.org'));
 
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->headers = $requestHeaders;
@@ -219,7 +219,7 @@ class CorsTest extends ListenerTests {
         $this->request->headers
             ->expects($this->at(0))
             ->method('get')
-            ->with('Origin', '*')
+            ->with('Origin')
             ->will($this->returnValue('http://imbo-project.org'));
 
         $this->request->headers
@@ -258,7 +258,7 @@ class CorsTest extends ListenerTests {
         $route->expects($this->once())->method('__toString')->will($this->returnValue('image'));
 
         $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $requestHeaders->expects($this->any())->method('get')->with('Origin', '*')->will($this->returnValue('http://somehost'));
+        $requestHeaders->expects($this->any())->method('get')->with('Origin')->will($this->returnValue('http://somehost'));
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
