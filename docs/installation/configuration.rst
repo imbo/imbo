@@ -63,7 +63,8 @@ It's usually a good idea to have separate public keys for read-only and read+wri
 .. code-block:: php
 
     <?php
-    use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
+    use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
+        Imbo\Resource;
 
     return [
         // ...
@@ -74,7 +75,7 @@ It's usually a good idea to have separate public keys for read-only and read+wri
                     'publicKey'  => 'some-read-only-pubkey',
                     'privateKey' => 'some-private-key',
                     'acl' => [[
-                        'resources' => ArrayAdapter::getReadOnlyResources(),
+                        'resources' => Resource::getReadOnlyResources(),
                         'users' => ['some-user']
                     ]]
                 ],
@@ -82,7 +83,7 @@ It's usually a good idea to have separate public keys for read-only and read+wri
                     'publicKey'  => 'some-read-write-pubkey',
                     'privateKey' => 'some-other-private-key',
                     'acl' => [[
-                        'resources' => ArrayAdapter::getReadWriteResources(),
+                        'resources' => Resource::getReadWriteResources(),
                         'users' => ['some-user']
                     ]]
                 ]
@@ -97,7 +98,8 @@ As you can see, the ``ArrayAdapter`` is much more flexible than the ``SimpleArra
 .. code-block:: php
 
     <?php
-    use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
+    use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
+        Imbo\Resource
 
     return [
         // ...
@@ -116,7 +118,7 @@ As you can see, the ``ArrayAdapter`` is much more flexible than the ``SimpleArra
                         [
                             // An array of different resource names that the public key should have
                             // access to - see AdapterInterface::RESOURCE_* for available options.
-                            'resources' => ArrayAdapter::getReadOnlyResources(),
+                            'resources' => Resource::getReadOnlyResources(),
 
                             // Names of the users which the public key should have access to.
                             'users' => ['some', 'users'],
@@ -125,7 +127,7 @@ As you can see, the ``ArrayAdapter`` is much more flexible than the ``SimpleArra
                         // Multiple rules can be applied in order to make a single public key have
                         // different access rights on different users
                         [
-                            'resources' => ArrayAdapter::getReadWriteResources(),
+                            'resources' => Resource::getReadWriteResources(),
                             'users' => ['different-user'],
                         ],
 

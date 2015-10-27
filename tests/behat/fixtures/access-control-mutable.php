@@ -1,5 +1,5 @@
 <?php
-use Imbo\Auth\AccessControl\Adapter\AdapterInterface as ACI;
+use Imbo\Resource;
 
 return [
     'accesscontrol' => [
@@ -10,17 +10,17 @@ return [
                 [
                     'id' => new MongoId(),
                     'resources' => [
-                        ACI::RESOURCE_KEYS_PUT,
-                        ACI::RESOURCE_KEYS_HEAD,
-                        ACI::RESOURCE_KEYS_DELETE,
+                        Resource::KEYS_PUT,
+                        Resource::KEYS_HEAD,
+                        Resource::KEYS_DELETE,
 
-                        ACI::RESOURCE_ACCESS_RULE_GET,
-                        ACI::RESOURCE_ACCESS_RULE_HEAD,
-                        ACI::RESOURCE_ACCESS_RULE_DELETE,
+                        Resource::ACCESS_RULE_GET,
+                        Resource::ACCESS_RULE_HEAD,
+                        Resource::ACCESS_RULE_DELETE,
 
-                        ACI::RESOURCE_ACCESS_RULES_GET,
-                        ACI::RESOURCE_ACCESS_RULES_HEAD,
-                        ACI::RESOURCE_ACCESS_RULES_POST,
+                        Resource::ACCESS_RULES_GET,
+                        Resource::ACCESS_RULES_HEAD,
+                        Resource::ACCESS_RULES_POST,
                     ],
                     'users' => []
                 ],
@@ -83,7 +83,7 @@ return [
             'privateKey' => 'foobar',
             'acl' => [[
                 'id' => new MongoId(),
-                'resources' => [ACI::RESOURCE_ACCESS_RULE_GET],
+                'resources' => [Resource::ACCESS_RULE_GET],
                 'users' => [],
             ]]
         ]

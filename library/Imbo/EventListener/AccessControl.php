@@ -15,7 +15,8 @@ use Imbo\EventManager\EventInterface,
     Imbo\Exception\RuntimeException,
     Imbo\Auth\AccessControl\AccessControlAdapter,
     Imbo\Auth\AccessControl\GroupQuery,
-    Imbo\Model\Groups as GroupsModel;
+    Imbo\Model\Groups as GroupsModel,
+    Imbo\Resource;
 
 /**
  * Access control event listener
@@ -65,7 +66,7 @@ class AccessControl implements ListenerInterface {
      * @param EventInterface $event
      */
     public function subscribe(EventInterface $event) {
-        $resources = $event->getAccessControl()->getAllResources();
+        $resources = Resource::getAllResources();
 
         if ($this->params['additionalResources']) {
             $resources = array_merge($resources, $this->params['additionalResources']);

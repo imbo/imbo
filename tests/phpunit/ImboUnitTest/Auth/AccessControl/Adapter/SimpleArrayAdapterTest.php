@@ -12,7 +12,7 @@ namespace ImboUnitTest\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
     Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter,
-    Imbo\Auth\AccessControl\Adapter\AdapterInterface as ACI;
+    Imbo\Resource;
 
 /**
  * @covers Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter
@@ -46,7 +46,7 @@ class SimpleArrayAdapterTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue(
             $accessControl->hasAccess(
                 'publicKey',
-                ACI::RESOURCE_IMAGES_POST,
+                Resource::IMAGES_POST,
                 'publicKey'
             )
         );

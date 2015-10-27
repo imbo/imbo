@@ -8,11 +8,11 @@
  * distributed with this source code.
  */
 
-use Imbo\Auth\AccessControl\Adapter\AdapterInterface as ACI,
-    Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
     Imbo\Resource\ResourceInterface,
     Imbo\EventManager\EventInterface,
-    Imbo\Model\ListModel;
+    Imbo\Model\ListModel,
+    Imbo\Resource;
 
 class Foobar implements ResourceInterface {
     public function getAllowedMethods() {
@@ -45,16 +45,16 @@ return [
                     'resources' => [
                         'foobar.get',
 
-                        ACI::RESOURCE_USER_GET,
-                        ACI::RESOURCE_KEYS_PUT,
-                        ACI::RESOURCE_KEYS_HEAD,
-                        ACI::RESOURCE_KEYS_DELETE,
-                        ACI::RESOURCE_ACCESS_RULE_GET,
-                        ACI::RESOURCE_ACCESS_RULE_HEAD,
-                        ACI::RESOURCE_ACCESS_RULE_DELETE,
-                        ACI::RESOURCE_ACCESS_RULES_GET,
-                        ACI::RESOURCE_ACCESS_RULES_HEAD,
-                        ACI::RESOURCE_ACCESS_RULES_POST
+                        Resource::USER_GET,
+                        Resource::KEYS_PUT,
+                        Resource::KEYS_HEAD,
+                        Resource::KEYS_DELETE,
+                        Resource::ACCESS_RULE_GET,
+                        Resource::ACCESS_RULE_HEAD,
+                        Resource::ACCESS_RULE_DELETE,
+                        Resource::ACCESS_RULES_GET,
+                        Resource::ACCESS_RULES_HEAD,
+                        Resource::ACCESS_RULES_POST
                     ],
                 ]]
             ],
@@ -63,7 +63,7 @@ return [
                 'publicKey' => 'valid-pubkey-with-wildcard',
                 'privateKey' => 'foobar',
                 'acl' => [[
-                    'resources' => [ACI::RESOURCE_USER_GET, 'foobar.get'],
+                    'resources' => [Resource::USER_GET, 'foobar.get'],
                     'users' => '*',
                 ]]
             ],
@@ -84,15 +84,15 @@ return [
                 'publicKey' => 'acl-checker',
                 'privateKey' => 'foobar',
                 'acl' => [[
-                    'resources' => [ACI::RESOURCE_ACCESS_RULE_GET],
+                    'resources' => [Resource::ACCESS_RULE_GET],
                     'users' => [],
                 ]]
             ]
         ], [
-            'images-read' => [ACI::RESOURCE_IMAGES_GET],
+            'images-read' => [Resource::IMAGES_GET],
             'groups-read' => [
-                ACI::RESOURCE_GROUPS_GET,
-                ACI::RESOURCE_GROUPS_HEAD
+                Resource::GROUPS_GET,
+                Resource::GROUPS_HEAD
             ],
         ]);
     },

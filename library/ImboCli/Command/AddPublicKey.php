@@ -18,8 +18,8 @@ use Symfony\Component\Console\Command\Command as BaseCommand,
     Symfony\Component\Console\Question\ConfirmationQuestion,
     Symfony\Component\Console\Output\OutputInterface,
     Imbo\Auth\AccessControl\Adapter\AdapterInterface,
-    Imbo\Auth\AccessControl\Adapter\AbstractAdapter,
     Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface,
+    Imbo\Resource,
     RuntimeException;
 
 /**
@@ -121,11 +121,11 @@ class AddPublicKey extends Command {
         $type = $this->getHelper('question')->ask($input, $output, $question);
         switch ($type) {
             case self::RESOURCES_READ_ONLY:
-                return AbstractAdapter::getReadOnlyResources();
+                return Resource::getReadOnlyResources();
             case self::RESOURCES_READ_WRITE:
-                return AbstractAdapter::getReadWriteResources();
+                return Resource::getReadWriteResources();
             case self::RESOURCES_ALL:
-                return AbstractAdapter::getAllResources();
+                return Resource::getAllResources();
         }
 
         return $this->askForSpecificResources($input, $output);
@@ -139,7 +139,7 @@ class AddPublicKey extends Command {
      * @return array
      */
     private function askForSpecificResources(InputInterface $input, OutputInterface $output) {
-        $resources = AbstractAdapter::getAllResources();
+        $resources = Resource::getAllResources();
         sort($resources);
 
         $question = new ChoiceQuestion(
