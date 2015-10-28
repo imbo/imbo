@@ -20,65 +20,6 @@ use Imbo\Auth\AccessControl\GroupQuery,
  * @package Core\Auth\AccessControl
  */
 interface AdapterInterface {
-    const RESOURCE_GROUPS_GET              = 'groups.get';
-    const RESOURCE_GROUPS_HEAD             = 'groups.head';
-    const RESOURCE_GROUPS_OPTIONS          = 'groups.options';
-
-    const RESOURCE_GROUP_GET               = 'group.get';
-    const RESOURCE_GROUP_HEAD              = 'group.head';
-    const RESOURCE_GROUP_PUT               = 'group.put';
-    const RESOURCE_GROUP_DELETE            = 'group.delete';
-    const RESOURCE_GROUP_OPTIONS           = 'group.options';
-
-    const RESOURCE_KEYS_PUT                = 'keys.put';
-    const RESOURCE_KEYS_HEAD               = 'keys.head';
-    const RESOURCE_KEYS_DELETE             = 'keys.delete';
-    const RESOURCE_KEYS_OPTIONS            = 'keys.options';
-
-    const RESOURCE_ACCESS_RULE_GET         = 'accessrule.get';
-    const RESOURCE_ACCESS_RULE_HEAD        = 'accessrule.head';
-    const RESOURCE_ACCESS_RULE_DELETE      = 'accessrule.delete';
-    const RESOURCE_ACCESS_RULE_OPTIONS     = 'accessrule.options';
-
-    const RESOURCE_ACCESS_RULES_GET        = 'accessrules.get';
-    const RESOURCE_ACCESS_RULES_HEAD       = 'accessrules.head';
-    const RESOURCE_ACCESS_RULES_POST       = 'accessrules.post';
-    const RESOURCE_ACCESS_RULES_OPTIONS    = 'accessrules.options';
-
-    const RESOURCE_USER_GET                = 'user.get';
-    const RESOURCE_USER_HEAD               = 'user.head';
-    const RESOURCE_USER_OPTIONS            = 'user.options';
-
-    const RESOURCE_IMAGE_GET               = 'image.get';
-    const RESOURCE_IMAGE_HEAD              = 'image.head';
-    const RESOURCE_IMAGE_DELETE            = 'image.delete';
-    const RESOURCE_IMAGE_OPTIONS           = 'image.options';
-
-    const RESOURCE_IMAGES_GET              = 'images.get';
-    const RESOURCE_IMAGES_HEAD             = 'images.head';
-    const RESOURCE_IMAGES_POST             = 'images.post';
-    const RESOURCE_IMAGES_OPTIONS          = 'images.options';
-
-    const RESOURCE_GLOBAL_IMAGES_GET       = 'globalimages.get';
-    const RESOURCE_GLOBAL_IMAGES_HEAD      = 'globalimages.head';
-    const RESOURCE_GLOBAL_IMAGES_OPTIONS   = 'globalimages.options';
-
-    const RESOURCE_METADATA_GET            = 'metadata.get';
-    const RESOURCE_METADATA_HEAD           = 'metadata.head';
-    const RESOURCE_METADATA_PUT            = 'metadata.put';
-    const RESOURCE_METADATA_POST           = 'metadata.post';
-    const RESOURCE_METADATA_DELETE         = 'metadata.delete';
-    const RESOURCE_METADATA_OPTIONS        = 'metadata.options';
-
-    const RESOURCE_SHORTURL_GET            = 'shorturl.get';
-    const RESOURCE_SHORTURL_HEAD           = 'shorturl.head';
-    const RESOURCE_SHORTURL_DELETE         = 'shorturl.delete';
-    const RESOURCE_SHORTURL_OPTIONS        = 'shorturl.options';
-
-    const RESOURCE_SHORTURLS_POST          = 'shorturls.post';
-    const RESOURCE_SHORTURLS_DELETE        = 'shorturls.delete';
-    const RESOURCE_SHORTURLS_OPTIONS       = 'shorturls.options';
-
     /**
      * Get a list of users the public key has access for on a given resource
      *
@@ -146,25 +87,4 @@ interface AdapterInterface {
      * @return array Access rule
      */
     function getAccessRule($publicKey, $accessRuleId);
-
-    /**
-     * Returns a list of resources which should be accessible for read-only public keys
-     *
-     * @return array
-     */
-    static function getReadOnlyResources();
-
-    /**
-     * Returns a list of resources which should be accessible for read+write public keys
-     *
-     * @return array
-     */
-    static function getReadWriteResources();
-
-    /**
-     * Returns a list of all resources available, including those which involves access control
-     *
-     * @return array
-     */
-    static function getAllResources();
 }

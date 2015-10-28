@@ -11,7 +11,8 @@
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Exception\InvalidArgumentException,
-    Imbo\Auth\AccessControl\GroupQuery;
+    Imbo\Auth\AccessControl\GroupQuery,
+    Imbo\Resource;
 
 /**
  * Simple array-backed access control adapter
@@ -55,7 +56,7 @@ class SimpleArrayAdapter extends ArrayAdapter implements AdapterInterface {
                 'publicKey'  => $publicKey,
                 'privateKey' => $privateKey,
                 'acl' => [[
-                    'resources' => $this->getReadWriteResources(),
+                    'resources' => Resource::getReadWriteResources(),
                     'users' => [$publicKey]
                 ]]
             ];

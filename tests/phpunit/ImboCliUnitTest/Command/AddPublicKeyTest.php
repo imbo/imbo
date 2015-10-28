@@ -12,7 +12,7 @@ namespace ImboCliUnitTest\Command;
 
 use ImboCli\Command\AddPublicKey,
     Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
-    Imbo\Auth\AccessControl\Adapter\AbstractAdapter,
+    Imbo\Resource,
     Symfony\Component\Console\Application,
     Symfony\Component\Console\Tester\CommandTester;
 
@@ -175,7 +175,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
                         count($rule['users']) === 2 &&
                         in_array('espenh', $rule['users']) &&
                         in_array('kribrabr', $rule['users']) &&
-                        empty(array_diff($rule['resources'], AbstractAdapter::getReadOnlyResources()))
+                        empty(array_diff($rule['resources'], Resource::getReadOnlyResources()))
                     );
                 })],
                 [$this->equalTo('foo'), $this->callback(function($rule) {
@@ -183,13 +183,13 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
                         count($rule['users']) === 2 &&
                         in_array('rexxars', $rule['users']) &&
                         in_array('kbrabrand', $rule['users']) &&
-                        empty(array_diff($rule['resources'], AbstractAdapter::getReadWriteResources()))
+                        empty(array_diff($rule['resources'], Resource::getReadWriteResources()))
                     );
                 })],
                 [$this->equalTo('foo'), $this->callback(function($rule) {
                     return (
                         $rule['users'] === '*' &&
-                        empty(array_diff($rule['resources'], AbstractAdapter::getAllResources()))
+                        empty(array_diff($rule['resources'], Resource::getAllResources()))
                     );
                 })]
             );
@@ -220,7 +220,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
      * @covers ImboCli\Command\AddPublicKey::askForUsers
      */
     public function testPromptsForListOfSpecificResourcesIfOptionIsSelected() {
-        $allResources = AbstractAdapter::getAllResources();
+        $allResources = Resource::getAllResources();
         sort($allResources);
 
         $this->adapter

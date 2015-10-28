@@ -8,8 +8,8 @@
  * distributed with this source code.
  */
 
-use Imbo\Auth\AccessControl\Adapter\AdapterInterface as ACI,
-    Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
+    Imbo\Resource;
 
 // Default config for testing
 $testConfig = [
@@ -19,7 +19,7 @@ $testConfig = [
                 'publicKey' => 'publickey',
                 'privateKey' => 'privatekey',
                 'acl' => [[
-                    'resources' => ArrayAdapter::getReadWriteResources(),
+                    'resources' => Resource::getReadWriteResources(),
                     'users' => ['user', 'other-user'],
                 ]]
             ],
@@ -27,7 +27,7 @@ $testConfig = [
                 'publicKey' => 'unpriviledged',
                 'privateKey' => 'privatekey',
                 'acl' => [[
-                    'resources' => ArrayAdapter::getReadWriteResources(),
+                    'resources' => Resource::getReadWriteResources(),
                     'users' => ['user'],
                 ]]
             ],
@@ -35,7 +35,7 @@ $testConfig = [
                 'publicKey' => 'wildcard',
                 'privateKey' => '*',
                 'acl' => [[
-                    'resources' => ArrayAdapter::getReadWriteResources(),
+                    'resources' => Resource::getReadWriteResources(),
                     'users' => '*'
                 ]]
             ]
