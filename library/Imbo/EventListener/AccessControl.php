@@ -95,11 +95,11 @@ class AccessControl implements ListenerInterface {
 
         $request = $event->getRequest();
         $response = $event->getResponse();
-        $accessControl = $event->getAccessControl();
+        $aclAdapter = $event->getAccessControl();
         $query = $request->query;
         $resource = $event->getName();
 
-        $hasAccess = $accessControl->hasAccess(
+        $hasAccess = $aclAdapter->hasAccess(
             $request->getPublicKey(),
             $resource,
             $request->getUser()
@@ -128,14 +128,14 @@ class AccessControl implements ListenerInterface {
         }
 
         $response = $event->getResponse();
-        $accessControl = $event->getAccessControl();
+        $aclAdapter = $event->getAccessControl();
 
         // Create the model and set some pagination values
         $model = new GroupsModel();
         $model->setLimit($query->limit())
               ->setPage($query->page());
 
-        $groups = $accessControl->getGroups($query, $model);
+        $groups = $aclAdapter->getGroups($query, $model);
         $modelGroups = [];
 
         foreach ($groups as $groupName => $resources) {

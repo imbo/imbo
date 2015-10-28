@@ -91,51 +91,6 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
     /**
      * {@inheritdoc}
      */
-    public function hasAccess($publicKey, $resource, $user = null) {
-        foreach ($this->accessList as $access) {
-            if ($access['publicKey'] !== $publicKey) {
-                continue;
-            }
-
-            foreach ($access['acl'] as $acl) {
-                // If the group specified has not been defined, throw an exception to help the user
-                if (!isset($acl['users'])) {
-                    throw new InvalidArgumentException('Missing property "users" in access rule');
-                }
-
-                // If a user is specified, ensure the public key has access to the user
-                $userAccess = !$user || $acl['users'] === '*' || in_array($user, $acl['users']);
-                if (!$userAccess) {
-                    continue;
-                }
-
-                // Figure out which resources the public key has access to, based on group or
-                // explicit definition
-                $resources = isset($acl['resources']) ? $acl['resources'] : [];
-                $group = isset($acl['group']) ? $acl['group'] : false;
-
-                // If the group specified has not been defined, throw an exception to help the user
-                if ($group && !isset($this->groups[$group])) {
-                    throw new InvalidArgumentException('Group "' . $group . '" is not defined');
-                }
-
-                // If a group is specified, fetch resources belonging to that group
-                if ($group) {
-                    $resources = $this->groups[$group];
-                }
-
-                if (in_array($resource, $resources)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getGroups(GroupQuery $query = null, GroupsModel $model) {
         if ($query === null) {
             $query = new GroupQuery();
@@ -196,7 +151,7 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
     /**
      * {@inheritdoc}
      */
-    function getAccessRule($publicKey, $accessRuleId) {
+    public function getAccessRule($publicKey, $accessRuleId) {
         foreach ($this->getAccessListForPublicKey($publicKey) as $rule) {
             if ($rule['id'] == $accessRuleId) {
                 return $rule;
