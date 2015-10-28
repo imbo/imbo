@@ -63,12 +63,29 @@ Feature: Imbo provides an event listener that generates variations when adding i
         And the "X-Imbo-ImageVariation" response header matches "512x128"
         And the width of the image is "50"
 
-    Scenario: Request an image with a maxSize and border transformation
+    Scenario: Request an image with a maxSize and crop transformation
         Given I use "publickey" and "privatekey" for public and private keys
         And Imbo uses the "image-variations.php" configuration
         And I specify the following transformations:
           """
           crop:width=256,height=256,x=768,y=0
+          maxSize:width=100
+          """
+        And I include an access token in the query
+        When I request the previously added image as a "png"
+        Then I should get a response with "200 OK"
+        And the "X-Imbo-ImageVariation" response header matches "512x128"
+        And the pixel at coordinate "5, 5" should have a color of "#215d10"
+        And the width of the image is "100"
+        And the height of the image is "100"
+
+    Scenario: Request an image with crop in the middle of the chain
+        Given I use "publickey" and "privatekey" for public and private keys
+        And Imbo uses the "image-variations.php" configuration
+        And I specify the following transformations:
+          """
+          rotate:angle=90,bg=000000
+          crop:width=256,height=256,x=0,y=768
           maxSize:width=100
           """
         And I include an access token in the query

@@ -294,7 +294,7 @@ class ImageVariations implements ListenerInterface {
             // Find the new max width
             $maxWidth = $maxWidth * $extractFactor;
 
-            return [array_search($maxWidth, $extracts) => $maxWidth];
+            return [key($extracts) => $maxWidth];
         }
 
         if ($widths) {
