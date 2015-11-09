@@ -77,6 +77,9 @@ return [
                 ], [
                     'group' => 'groups-read',
                     'users' => '*'
+                ], [
+                    'resources' => [Resource::GROUP_DELETE, Resource::GROUP_PUT],
+                    'users' => '*'
                 ]]
             ],
 

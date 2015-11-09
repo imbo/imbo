@@ -91,10 +91,6 @@ class Resource {
             self::IMAGE_HEAD,
             self::IMAGE_OPTIONS,
 
-            self::GROUPS_GET,
-            self::GROUPS_HEAD,
-            self::GROUPS_OPTIONS,
-
             self::IMAGES_GET,
             self::IMAGES_HEAD,
             self::IMAGES_OPTIONS,
@@ -160,6 +156,16 @@ class Resource {
                 self::ACCESS_RULES_HEAD,
                 self::ACCESS_RULES_POST,
                 self::ACCESS_RULES_OPTIONS,
+
+                self::GROUPS_GET,
+                self::GROUPS_HEAD,
+                self::GROUPS_OPTIONS,
+
+                self::GROUP_GET,
+                self::GROUP_HEAD,
+                self::GROUP_PUT,
+                self::GROUP_DELETE,
+                self::GROUP_OPTIONS,
             ]
         );
     }
