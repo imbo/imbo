@@ -48,13 +48,9 @@ class Blur extends Transformation implements ListenerInterface {
 
         switch ($type) {
             case 'adaptive':
-                return $this->adaptiveBlur($event);
-            case 'motion':
-                return $this->motionBlur($event);
-            case 'radial':
-                return $this->radialBlur($event);
+                return $this->blur($event, true);
             default:
-                return $this->blur($event);
+                return $this->blur($event, false);
         }
     }
 
@@ -74,11 +70,12 @@ class Blur extends Transformation implements ListenerInterface {
     }
 
     /**
-     * Perform regular blur on the image
+     * Perform adaptive or regular blur on the image
      *
      * @param EventInterface $event The event instance
+     * @param bool $adaptive Whether or not to perform adaptive blur
      */
-    private function blur(EventInterface $event) {
+    private function blur(EventInterface $event, $adaptive = false) {
         $params = $event->getArgument('params');
 
         $this->checkRequiredParams($params, ['radius', 'sigma']);
@@ -92,7 +89,12 @@ class Blur extends Transformation implements ListenerInterface {
         }
 
         try {
-            $this->imagick->blurImage($radius, $sigma);
+            if ($adaptive) {
+                $this->imagick->adaptiveBlurImage($radius, $sigma);
+            } else {
+                $this->imagick->blurImage($radius, $sigma);
+            }
+
             $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
