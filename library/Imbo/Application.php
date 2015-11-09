@@ -141,6 +141,7 @@ class Application {
             'Imbo\EventListener\ImageTransformer',
             'Imbo\EventListener\ResponseSender',
             'Imbo\EventListener\ResponseETag',
+            'Imbo\EventListener\HttpCache',
         ];
 
         foreach ($eventListeners as $listener => $params) {

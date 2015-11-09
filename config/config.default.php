@@ -98,6 +98,21 @@ $config = [
     'contentNegotiateImages' => true,
 
     /**
+     * HTTP cache header settings that are applied to resources that do not explicitly set
+     * other values. For instance, the `image` resource sets a very long `max-age`, as it
+     * shouldn't change over time. The `metadata` resource however could potentially change
+     * much more often. To ensure that clients get fresh responses, the default is to ask
+     * the client to always revalidate (ask if there has been any changes since last fetch)
+     *
+     * @var array
+     */
+    'httpCacheHeaders' => [
+        'maxAge' => 0,
+        'mustRevalidate' => true,
+        'public' => true,
+    ],
+
+    /**
      * Options related to authentication. See documentation for individual settings.
      *
      * @var array

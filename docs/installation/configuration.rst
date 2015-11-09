@@ -612,6 +612,30 @@ Custom generators
 
 To create your own custom image identifier generators, simply create a class that implements ``Imbo\Image\Identifier\Generator\GeneratorInterface`` and ensure that the identifiers generated are in the character range ``[A-Za-z0-9_-]`` and are between one and 255 characters long.
 
+.. _configuration-http-cache-headers:
+
+HTTP cache headers - ``httpCacheHeaders``
+-----------------------------------------
+
+Imbo ships with reasonable defaults for which HTTP cache header settings it sends to clients. For some resources, however, it can be difficult to figure out a good middle ground between clients asking too often and too rarely. For instance, the ``images`` resource will change every time a new image has been added - but whether that happens once a second or once a year is hard to know.
+
+To ensure that clients get fresh responses, Imbo sends ``max-age=0, must-revalidate`` on these kind of resources. You can however override these defaults in the configuration. For instance, if you wanted to set the ``max-age`` to 30 seconds, leave it up to the client if it should re-validate and tell intermediary proxies that this response is private, you could set the configuration to the following:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'httpCacheHeaders' => [
+            'maxAge' => 30,
+            'mustRevalidate' => false,
+            'public' => false,
+        ],
+
+        // ...
+    ];
+
 .. _configuration-content-negotiation:
 
 Content negotiation for images - ``contentNegotiateImages``

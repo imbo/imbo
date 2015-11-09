@@ -339,6 +339,33 @@ class RESTContext extends BehatContext {
     }
 
     /**
+     * @Given /^the response has a max age of (\d+) seconds$/
+     */
+    public function assertMaxAge($seconds) {
+        $cacheControl = $this->getPreviousCacheControlHeader();
+        $maxAge = $cacheControl->getDirective('max-age');
+
+        if ($maxAge === null) {
+            throw new \Exception('No `max-age` directive present in `cache-control`');
+        }
+
+        assertSame((int) $seconds, (int) $maxAge);
+    }
+
+    /**
+     * @Given /^the response (does not )?(?:has|have) a must-revalidate directive$/
+     */
+    public function assertMustRevalidate($doesNotHave = false) {
+        $cacheControl = $this->getPreviousCacheControlHeader();
+
+        if ($doesNotHave) {
+            assertFalse($cacheControl->hasDirective('must-revalidate'));
+        } else {
+            assertTrue($cacheControl->hasDirective('must-revalidate'));
+        }
+    }
+
+    /**
      * @Then /^I should get a response with "([^"]*)"$/
      */
     public function assertResponseStatus($status) {
@@ -493,5 +520,20 @@ class RESTContext extends BehatContext {
         $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($key, $value) {
             $event['request']->setHeader($key, $value);
         });
+    }
+
+    /**
+     * Get the cache-control header for the previous response
+     *
+     * @throws Exception If no cache-control header is present in the previous response
+     * @return Guzzle\Http\Message\Header\CacheControl The Cache-Control header for the previous response
+     */
+    protected function getPreviousCacheControlHeader() {
+        $cacheControl = $this->getLastResponse()->getHeader('Cache-Control');
+        if (!$cacheControl) {
+            throw new \Exception('No `cache-control` header present');
+        }
+
+        return $cacheControl;
     }
 }
