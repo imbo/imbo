@@ -246,6 +246,7 @@ $config = [
 
         // Image transformations
         'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
+        'blur' => 'Imbo\Image\Transformation\Blur',
         'border' => 'Imbo\Image\Transformation\Border',
         'canvas' => 'Imbo\Image\Transformation\Canvas',
         'compress' => 'Imbo\Image\Transformation\Compress',
