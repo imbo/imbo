@@ -47,8 +47,29 @@ class Blur extends Transformation implements ListenerInterface {
         }
 
         switch ($type) {
+            case 'adaptive':
+                return $this->adaptiveBlur($event);
+            case 'motion':
+                return $this->motionBlur($event);
+            case 'radial':
+                return $this->radialBlur($event);
             default:
                 return $this->blur($event);
+        }
+    }
+
+    /**
+     * Check that all params are present
+     *
+     * @param array $params Transformation parameter list
+     * @param array $required Array with required parameters
+     * @throws TransformationException
+     */
+    private function checkRequiredParams(array $params, array $required) {
+        foreach ($required as $param) {
+            if (!isset($params[$param])) {
+                throw new TransformationException('Missing required parameter: ' . $param, 400);
+            }
         }
     }
 
@@ -60,11 +81,7 @@ class Blur extends Transformation implements ListenerInterface {
     private function blur(EventInterface $event) {
         $params = $event->getArgument('params');
 
-        foreach (['radius', 'sigma'] as $param) {
-            if (!isset($params[$param])) {
-                throw new TransformationException('Missing required parameter: ' . $param, 400);
-            }
-        }
+        $this->checkRequiredParams($params, ['radius', 'sigma']);
 
         if (isset($params['radius'])) {
             $radius = (float) $params['radius'];
