@@ -40,6 +40,32 @@ class AccessControl implements ListenerInterface {
     ];
 
     /**
+     * Certain resources should be allowed when the requested public key
+     * is the same as the public key used to sign the request
+     *
+     * @var array
+     */
+    private $ownPublicKeyAllowedResources = [
+        Resource::ACCESS_RULE_GET,
+        Resource::ACCESS_RULE_HEAD,
+        Resource::ACCESS_RULE_OPTIONS,
+        Resource::ACCESS_RULES_GET,
+        Resource::ACCESS_RULES_HEAD,
+        Resource::ACCESS_RULES_OPTIONS,
+    ];
+
+    /**
+     * The resources that concerns resource group lookups
+     *
+     * @var array
+     */
+    private $groupLookupResources = [
+        Resource::GROUP_GET,
+        Resource::GROUP_HEAD,
+        Resource::GROUP_OPTIONS
+    ];
+
+    /**
      * Class constructor
      *
      * @param array $params Parameters for the listener
@@ -94,20 +120,42 @@ class AccessControl implements ListenerInterface {
         }
 
         $request = $event->getRequest();
-        $response = $event->getResponse();
         $aclAdapter = $event->getAccessControl();
-        $query = $request->query;
         $resource = $event->getName();
+        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
 
-        $hasAccess = $aclAdapter->hasAccess(
-            $request->getPublicKey(),
-            $resource,
-            $request->getUser()
-        );
+        $hasAccess = $aclAdapter->hasAccess($publicKey, $resource, $user);
 
-        if (!$hasAccess) {
-            throw new RuntimeException('Permission denied (public key)', 400);
+        if ($hasAccess) {
+            return;
         }
+
+        // If we're asking for info on a public key, and that public key happens to be the one
+        // used to sign the request, accept this as a valid request and let the user have access
+        // to the resource. Note that this requires the accessToken listener to be in place -
+        // if disabled, any user can ask for the access rules for all public keys
+        if (in_array($resource, $this->ownPublicKeyAllowedResources)) {
+            $routePubKey = $request->getRoute()->get('publickey');
+            if ($routePubKey === $publicKey) {
+                return;
+            }
+        }
+
+        // If a public key has access to resources within a resource group, allow the
+        // public key to access the group resource to see which resources it contains
+        if (in_array($resource, $this->groupLookupResources)) {
+            $routeGroup = $request->getRoute()->get('group');
+            $aclList = $aclAdapter->getAccessListForPublicKey($publicKey);
+
+            foreach ($aclList as $aclRule) {
+                if (isset($aclRule['groups']) && in_array($routeGroup, $aclRule['groups'])) {
+                    return;
+                }
+            }
+        }
+
+        throw new RuntimeException('Permission denied (public key)', 400);
     }
 
     /**

@@ -9,7 +9,7 @@ Feature: Imbo provides a group endpoint
     Scenario Outline: Fetch resources of a group
         Given I use "valid-group-pubkey" and "foobar" for public and private keys
         And I include an access token in the query
-        When I request "/groups/groups-read.<extension>"
+        When I request "/groups/images-read.<extension>"
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "<content-type>"
         And the response body matches:
@@ -18,8 +18,8 @@ Feature: Imbo provides a group endpoint
         """
         Examples:
             | extension | content-type     | response |
-            | json      | application/json | #^{"resources":\["groups\.get","groups\.head"]}$# |
-            | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<resources>\s*<resource>groups\.get</resource>\s*<resource>groups\.head</resource>\s*</resources>\s*</imbo>$#ms |
+            | json      | application/json | #^{"resources":\["images\.get","images\.head"]}$# |
+            | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<resources>\s*<resource>images\.get</resource>\s*<resource>images\.head</resource>\s*</resources>\s*</imbo>$#ms |
 
     Scenario Outline: Create a resource group with invalid data
         Given Imbo uses the "access-control-mutable.php" configuration
