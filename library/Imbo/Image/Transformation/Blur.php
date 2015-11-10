@@ -128,7 +128,7 @@ class Blur extends Transformation implements ListenerInterface {
         }
 
         try {
-            $this->imagick->motionBlurImage(0, $sigma, $angle);
+            $this->imagick->motionBlurImage($radius, $sigma, $angle);
             $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
