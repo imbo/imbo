@@ -30,7 +30,7 @@ This transformation can be used to blur the image.
 **Parameters:**
 
 ``mode``
-    The blur type (optional). Possible values are:
+    The blur type (optional). Defaults to ``regular``. Possible values are:
 
     ``regular``
         When adding regular blur, the ``radius`` and ``sigma`` parameters are required.
