@@ -39,22 +39,26 @@ class Blur extends Transformation implements ListenerInterface {
      */
     public function transform(EventInterface $event) {
         $params = $event->getArgument('params');
+        $type = isset($params['type']) ? $params['type'] : 'gaussian';
 
-        $type = isset($params['type']) ? $params['type'] : 'regular';
+        $blurTypes = ['gaussian', 'adaptive', 'motion', 'radial'];
 
-        if (!in_array($type, ['regular', 'adaptive', 'motion', 'radial'])) {
+        if (!in_array($type, $blurTypes)) {
             throw new TransformationException('Unknown blur type: ' . $type, 400);
         }
 
         switch ($type) {
             case 'motion':
                 return $this->motionBlur($event);
+
             case 'radial':
                 return $this->radialBlur($event);
+
             case 'adaptive':
                 return $this->blur($event, true);
+
             default:
-                return $this->blur($event, false);
+                return $this->blur($event);
         }
     }
 
@@ -74,10 +78,10 @@ class Blur extends Transformation implements ListenerInterface {
     }
 
     /**
-     * Add adaptive or regular blur to the image
+     * Add Gaussian or adaptive blur to the image
      *
      * @param EventInterface $event The event instance
-     * @param bool $adaptive Whether or not to perform adaptive blur
+     * @param bool $adaptive Perform adaptive blur or not
      */
     private function blur(EventInterface $event, $adaptive = false) {
         $params = $event->getArgument('params');
@@ -96,7 +100,7 @@ class Blur extends Transformation implements ListenerInterface {
             if ($adaptive) {
                 $this->imagick->adaptiveBlurImage($radius, $sigma);
             } else {
-                $this->imagick->blurImage($radius, $sigma);
+                $this->imagick->gaussianBlurImage($radius, $sigma);
             }
 
             $event->getArgument('image')->hasBeenTransformed(true);

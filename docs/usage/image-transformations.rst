@@ -30,10 +30,10 @@ This transformation can be used to blur the image.
 **Parameters:**
 
 ``mode``
-    The blur type (optional). Defaults to ``regular``. Possible values are:
+    The blur type (optional). Defaults to ``gaussian``. Possible values are:
 
-    ``regular``
-        When adding regular blur, the ``radius`` and ``sigma`` parameters are required.
+    ``gaussian``
+        When adding gaussian blur, the ``radius`` and ``sigma`` parameters are required.
 
     ``adaptive``
         When adding adaptive blur, the ``radius`` and ``sigma`` parameters are required. Adaptive blur decrease the blur in the part of the picture near to the edge of the image canvas.
@@ -45,7 +45,7 @@ This transformation can be used to blur the image.
         When adding radial blur, the ``angle`` parameter is required.
 
 ``radius``
-    The radius of the Gaussian operator in pixels.
+    The radius of the Gaussian, in pixels, not counting the center pixel.
 
 ``sigma``
     The standard deviation of the Gaussian, in pixels.
