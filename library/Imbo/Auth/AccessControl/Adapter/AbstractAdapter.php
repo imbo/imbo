@@ -12,6 +12,7 @@ namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface,
     Imbo\Auth\AccessControl\GroupQuery,
+    Imbo\Exception\InvalidArgumentException,
     Imbo\Model\Groups as GroupsModel;
 
 /**

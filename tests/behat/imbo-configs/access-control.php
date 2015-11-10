@@ -77,6 +77,9 @@ return [
                 ], [
                     'group' => 'groups-read',
                     'users' => '*'
+                ], [
+                    'resources' => [Resource::GROUP_DELETE, Resource::GROUP_PUT],
+                    'users' => '*'
                 ]]
             ],
 
@@ -89,8 +92,10 @@ return [
                 ]]
             ]
         ], [
-            'images-read' => [Resource::IMAGES_GET],
+            'images-read' => [Resource::IMAGES_GET, Resource::IMAGES_HEAD],
             'groups-read' => [
+                Resource::GROUP_GET,
+                Resource::GROUP_HEAD,
                 Resource::GROUPS_GET,
                 Resource::GROUPS_HEAD
             ],
