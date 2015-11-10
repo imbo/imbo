@@ -25,6 +25,10 @@ Feature: Imbo enables dynamic transformations of images
 
         Examples:
             | transformation                                                                                    | width | height |
+            | blur:radius=2,sigma=4                                                                             | 599   | 417    |
+            | blur:angle=5,type=radial                                                                          | 599   | 417    |
+            | blur:radius=20,sigma=10,angle=70,type=motion                                                      | 599   | 417    |
+            | blur:radius=2,sigma=4,type=adaptive                                                               | 599   | 417    |
             | border                                                                                            | 601   | 419    |
             | border:width=4,height=5                                                                           | 607   | 427    |
             | border:mode=inline,width=4,height=5                                                               | 599   | 417    |
@@ -98,6 +102,10 @@ Feature: Imbo enables dynamic transformations of images
 
         Examples:
             | transformation                                                                                    |
+            | blur:radius=2,sigma=4                                                                             |
+            | blur:angle=5,type=radial                                                                          |
+            | blur:radius=20,sigma=10,angle=70,type=motion                                                      |
+            | blur:radius=2,sigma=4,type=adaptive                                                               |
             | border                                                                                            |
             | border:width=4,height=5                                                                           |
             | border:mode=inline,width=4,height=5                                                               |
@@ -163,6 +171,14 @@ Feature: Imbo enables dynamic transformations of images
 
         Examples:
             | transformation                    | reason-phrase                                                               |
+            | blur                              | 400 Missing required parameter: radius                                      |
+            | blur:radius=2                     | 400 Missing required parameter: sigma                                       |
+            | blur:type=foobar                  | 400 Unknown blur type: foobar                                               |
+            | blur:type=radial                  | 400 Missing required parameter: angle                                       |
+            | blur:radius=2,type=motion         | 400 Missing required parameter: sigma                                       |
+            | blur:sigma=1,type=motion          | 400 Missing required parameter: radius                                      |
+            | blur:sigma=1,radius=2,type=motion | 400 Missing required parameter: angle                                       |
+            | blur:type=radial                  | 400 Missing required parameter: angle                                       |
             | compress                          | 400 Missing required parameter: level                                       |
             | compress:level=200                | 400 level must be between 0 and 100                                         |
             | compress:level=-10                | 400 level must be between 0 and 100                                         |

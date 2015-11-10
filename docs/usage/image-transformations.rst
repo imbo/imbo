@@ -20,6 +20,44 @@ This transformation will auto rotate the image based on EXIF data stored in the 
 
 * ``t[]=autoRotate``
 
+.. _blur-transformation:
+
+Blur the image - ``t[]=blur``
+-----------------------------------
+
+This transformation can be used to blur the image.
+
+**Parameters:**
+
+``mode``
+    The blur type (optional). Defaults to ``gaussian``. Possible values are:
+
+    ``gaussian``
+        When adding gaussian blur, the ``radius`` and ``sigma`` parameters are required.
+
+    ``adaptive``
+        When adding adaptive blur, the ``radius`` and ``sigma`` parameters are required. Adaptive blur decrease the blur in the part of the picture near to the edge of the image canvas.
+
+    ``motion``
+        When adding motion blur, the ``radius``, ``sigma`` and ``angle`` parameters are required.
+
+    ``radial``
+        When adding radial blur, the ``angle`` parameter is required.
+
+``radius``
+    The radius of the Gaussian, in pixels, not counting the center pixel.
+
+``sigma``
+    The standard deviation of the Gaussian, in pixels.
+
+``angle``
+    The number of degrees to rotate the image.
+
+**Examples:**
+
+* ``t[]=blur,radius=1,sigma=2``
+* ``t[]=blur,type=adaptive,radius=2,sigma=4``
+
 .. _border-transformation:
 
 Add an image border - ``t[]=border``
