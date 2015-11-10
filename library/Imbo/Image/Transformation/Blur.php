@@ -88,13 +88,8 @@ class Blur extends Transformation implements ListenerInterface {
 
         $this->checkRequiredParams($params, ['radius', 'sigma']);
 
-        if (isset($params['radius'])) {
-            $radius = (float) $params['radius'];
-        }
-
-        if (isset($params['sigma'])) {
-            $sigma = (float) $params['sigma'];
-        }
+        $radius = (float) $params['radius'];
+        $sigma = (float) $params['sigma'];
 
         try {
             if ($adaptive) {
@@ -119,17 +114,9 @@ class Blur extends Transformation implements ListenerInterface {
 
         $this->checkRequiredParams($params, ['radius', 'sigma', 'angle']);
 
-        if (isset($params['radius'])) {
-            $radius = (float) $params['radius'];
-        }
-
-        if (isset($params['sigma'])) {
-            $sigma = (float) $params['sigma'];
-        }
-
-        if (isset($params['angle'])) {
-            $angle = (float) $params['angle'];
-        }
+        $radius = (float) $params['radius'];
+        $sigma = (float) $params['sigma'];
+        $angle = (float) $params['angle'];
 
         try {
             $this->imagick->motionBlurImage($radius, $sigma, $angle);
@@ -149,9 +136,7 @@ class Blur extends Transformation implements ListenerInterface {
 
         $this->checkRequiredParams($params, ['angle']);
 
-        if (isset($params['angle'])) {
-            $angle = (float) $params['angle'];
-        }
+        $angle = (float) $params['angle'];
 
         try {
             $this->imagick->radialBlurImage($angle);
