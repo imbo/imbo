@@ -55,8 +55,8 @@ This transformation can be used to blur the image.
 
 **Examples:**
 
-* ``t[]=blur,radius=1,sigma=2``
-* ``t[]=blur,type=adaptive,radius=2,sigma=4``
+* ``t[]=blur:radius=1,sigma=2``
+* ``t[]=blur:type=adaptive,radius=2,sigma=4``
 
 .. _border-transformation:
 
