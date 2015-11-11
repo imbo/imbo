@@ -155,6 +155,8 @@ This transformation can be used to change the contrast of the colors in the imag
 
 * ``t[]=contrast:alpha=3``
 
+.. note:: If you are getting different results than expected when using negative ``alpha`` values, your ``imagick`` extension is probably built against an old version of ImageMagick.
+
 .. _convert-transformation:
 
 Convert the image type - ``.jpg/.gif/.png``
