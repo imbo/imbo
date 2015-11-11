@@ -136,3 +136,56 @@ Feature: Imbo provides a metadata endpoint
             | extension | response |
             | json      | #^{}$# |
             | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<metadata></metadata>\s*</imbo>$#ms |
+
+    Scenario: Set unparsable metadata
+        Given I use "publickey" and "privatekey" for public and private keys
+        And the request body contains:
+          """
+          {"json got broken in half sort of
+          """
+        And I sign the request
+        When I request the metadata of the test image using HTTP "PUT"
+        Then I should get a response with "400 Invalid JSON data"
+
+    Scenario Outline: Set and get metadata with nested info
+        Given I use "publickey" and "privatekey" for public and private keys
+        And the request body contains:
+          """
+          {"foo": {"bar": "value", "exif:foo": "value2" } }
+          """
+        And I sign the request
+        And I request the metadata of the test image using HTTP "PUT"
+        When I include an access token in the query
+        And I request the metadata of the test image as "<extension>"
+        Then I should get a response with "200 OK"
+        And the response body matches:
+           """
+           <response>
+           """
+
+        Examples:
+            | extension | response |
+            | json      | #^{"foo":{"bar":"value","exif:foo":"value2"}}$# |
+            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<metadata><tag key="foo">\s*<bar>value</bar>\s*<exif:foo>value2</exif:foo>\s*</tag>\s*</metadata>\s*</imbo>$#sm |
+
+
+    Scenario Outline: Set and get metadata with special characters
+        Given I use "publickey" and "privatekey" for public and private keys
+        And the request body contains:
+          """
+          {"html":"<div class=\"fat-text foo\">It's cool<!-- comment --></div>","json":"{\"foo\":\"bar\"}","norwegian":"\u00c5tte karer m\u00f8ter \u00e6rlige Erlend"}
+          """
+        And I sign the request
+        And I request the metadata of the test image using HTTP "PUT"
+        When I include an access token in the query
+        And I request the metadata of the test image as "<extension>"
+        Then I should get a response with "200 OK"
+        And the response body matches:
+           """
+           <response>
+           """
+
+        Examples:
+            | extension | response |
+            | json      | #^{"html":"<div class=\\"fat-text foo\\">It\'s cool<!-- comment --><\\/div>","json":"{\\"foo\\":\\"bar\\"}","norwegian":"\\u00c5tte karer m\\u00f8ter \\u00e6rlige Erlend"}$# |
+            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<metadata>\s*<tag key="html"><!\[CDATA\[<div class="fat-text foo">It's cool<!-- comment --></div>\]\]></tag>\s*<tag key="json"><!\[CDATA\[{"foo":"bar"}\]\]></tag>\s*<tag key="norwegian">Åtte karer møter ærlige Erlend</tag>\s*</metadata>\s*</imbo>$#sum |
