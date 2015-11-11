@@ -41,7 +41,7 @@ class Contrast extends Transformation implements ListenerInterface {
     public function transform(EventInterface $event) {
         $params = $event->getArgument('params');
 
-        $alpha = isset($params['sharpen']) ? (float) $params['sharpen'] : 0;
+        $alpha = isset($params['sharpen']) ? (float) $params['sharpen'] : 1;
         $alpha = isset($params['alpha']) ? (float) $params['alpha'] : $alpha;
         $beta = isset($params['beta']) ? (float) $params['beta'] : 0.5;
         $sharpen = $alpha > 0;
