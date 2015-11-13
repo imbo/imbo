@@ -250,6 +250,8 @@ This transformation will draw an outline around all the POIs (points of interest
 * ``t[]=drawPois:color=0f0``
 * ``t[]=drawPois:color=00f,borderSize=10,pointSize=100``
 
+.. note:: This transformation has a bug/limitation: all coordinates are based on the original image. In other words, applying this at the end of a transformation chain which resizes/crops/rotates the image can lead to unexpected results. This will hopefully change in the future.
+
 .. _flip-horizontally-transformation:
 
 Make a mirror image - ``t[]=flipHorizontally``
