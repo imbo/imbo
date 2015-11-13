@@ -50,7 +50,15 @@ class Contrast extends Transformation implements ListenerInterface {
             return;
         }
 
-        $quantumRange = $this->imagick->getQuantumRange()['quantumRangeLong'];
+        // Newer versions of Imagick expose getQuantumRange as a static method,
+        // and won't allow phpunit to mock it even when called on an instance
+        if (method_exists('Imagick', 'getQuantumRange')) {
+            $quantumRange = \Imagick::getQuantumRange();
+        } else {
+            $quantumRange = $this->imagick->getQuantumRange();
+        }
+
+        $quantumRange = $quantumRange['quantumRangeLong'];
         $beta *= $quantumRange;
 
         try {
