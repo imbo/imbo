@@ -104,7 +104,7 @@ class ImboContext extends RESTContext {
         $mongo = new MongoClient();
         $mongo->imbo_testing->drop();
 
-        $cachePath = '/tmp/imbo-behat-image-transformation-cache';
+        $cachePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'imbo-behat-image-transformation-cache';
 
         if (is_dir($cachePath)) {
             $iterator = new RecursiveIteratorIterator(
