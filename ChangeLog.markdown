@@ -5,6 +5,16 @@ Imbo-2.0.0
 ----------
 __yyyy-mm-dd__
 
+* #402: Fix Strip-transformation not doing anything on newer Imagick versions (Espen Hovlandsdal)
+* #402: Improve Contrast-transformation predictability (Espen Hovlandsdal)
+* #400: New image transformation: Blur (Kristoffer Brabrand)
+* #398: Add ability to configure HTTP cache headers (Espen Hovlandsdal)
+* #391: Make Crop-transformation validate coordinates (Espen Hovlandsdal)
+* #390: Fix image variation + crop transformation bug (Espen Hovlandsdal)
+* #386: Fix CORS wildcard-issue when client did not send `Origin`-header (Espen Hovlandsdal)
+* #381: New image transformation: DrawPois (points of interest) (Espen Hovlandsdal)
+* #376: Add config option to alter protocol used for authentication signatures (Espen Hovlandsdal)
+* #367: Fix bug where special characters could break metadata XML response (Kristoffer Brabrand)
 * #366: Fix border transformation + alpha channel bug (Espen Hovlandsdal)
 * #363: Add pluggable image identifier generation (Espen Hovlandsdal)
 * #357: Add public key generation CLI-command (Espen Hovlandsdal)
