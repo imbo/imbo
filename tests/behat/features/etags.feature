@@ -4,7 +4,8 @@ Feature: Imbo adds ETag's to some responses
     I can specify ETag's in some responses
 
     Background:
-        Given "tests/phpunit/Fixtures/image.png" exists in Imbo
+        Given "tests/phpunit/Fixtures/image.png" is used as the test image for the "etags" feature
+        And I use "publickey" and "privatekey" for public and private keys
 
     Scenario: Index resource does not contain any Etag header
         When I request "/"
@@ -22,44 +23,31 @@ Feature: Imbo adds ETag's to some responses
         And the "ETag" response header does not exist
 
     Scenario: User resource includes an Etag
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
+        Given I include an access token in the query
         When I request "/users/user"
         Then I should get a response with "200 OK"
         And the "ETag" response header matches ""[a-z0-9]{32}""
 
     Scenario: Images resource includes an Etag
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
+        Given I include an access token in the query
         When I request "/users/user/images"
         Then I should get a response with "200 OK"
         And the "ETag" response header matches ""[a-z0-9]{32}""
 
-    Scenario Outline: Different image formats result in different ETag's
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
-        And the "Accept" request header is "<acceptHeader>"
-        When I request the previously added image
-        Then I should get a response with "200 OK"
-        And the "ETag" response header is "<etag>"
-
-        Examples:
-            | acceptHeader | etag  |
-            | */*          | "929db9c5fc3099f7576f5655207eba47" |
-            | image/*      | "929db9c5fc3099f7576f5655207eba47" |
-            | image/png    | "929db9c5fc3099f7576f5655207eba47" |
-            | image/jpeg   | "1500190f1aca23117c53490e856e209c" |
-            | image/gif    | "44a80402ab32b74593721053541dfb9f" |
+    Scenario: Different image formats result in different ETag's
+        Given I include an access token in the query
+        When I request the test image as a "png"
+        And I request the test image as a "jpg"
+        And I request the test image as a "gif"
+        Then the "etag" response header is not the same for any of the requests
 
     Scenario: Metadata resource includes an ETag
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
-        When I request the metadata of the previously added image
+        Given I include an access token in the query
+        When I request the metadata of the test image
         Then I should get a response with "200 OK"
         And the "ETag" response header matches ""[a-z0-9]{32}""
 
     Scenario: Responses that is not 200 OK does not get ETags
-        Given I use "publickey" and "privatekey" for public and private keys
         When I request "/users/user"
         Then I should get a response with "400 Missing access token"
         And the "ETag" response header does not exist
