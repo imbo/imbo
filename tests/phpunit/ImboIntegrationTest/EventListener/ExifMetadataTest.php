@@ -52,7 +52,7 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
         $listener = new ExifMetadata([
             'allowedTags' => [
                 'exif:Flash',
-                'exif:Compression',
+                'exif:YResolution',
             ],
         ]);
 
@@ -67,7 +67,7 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
         $properties = $listener->populate($event);
 
         $this->assertSame('16', $properties['exif:Flash']);
-        $this->assertSame('6', $properties['exif:Compression']);
+        $this->assertSame('72/1', $properties['exif:YResolution']);
         $this->assertArrayNotHasKey('exif:GPSAltitude', $properties);
     }
 

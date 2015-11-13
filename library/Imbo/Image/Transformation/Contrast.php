@@ -20,6 +20,7 @@ use Imbo\Model\Image,
  * Contrast transformation
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
+ * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
 class Contrast extends Transformation implements ListenerInterface {
@@ -40,18 +41,28 @@ class Contrast extends Transformation implements ListenerInterface {
     public function transform(EventInterface $event) {
         $params = $event->getArgument('params');
 
-        $sharpen = isset($params['sharpen']) ? (int) $params['sharpen'] : 0;
+        $alpha = isset($params['sharpen']) ? (float) $params['sharpen'] : 1;
+        $alpha = isset($params['alpha']) ? (float) $params['alpha'] : $alpha;
+        $beta = isset($params['beta']) ? (float) $params['beta'] : 0.5;
+        $sharpen = $alpha > 0;
+
+        if ($alpha == 0) {
+            return;
+        }
+
+        // Newer versions of Imagick expose getQuantumRange as a static method,
+        // and won't allow phpunit to mock it even when called on an instance
+        if (method_exists('Imagick', 'getQuantumRange')) {
+            $quantumRange = \Imagick::getQuantumRange();
+        } else {
+            $quantumRange = $this->imagick->getQuantumRange();
+        }
+
+        $quantumRange = $quantumRange['quantumRangeLong'];
+        $beta *= $quantumRange;
 
         try {
-            if ($sharpen > 0) {
-                for ($i = 0; $i < $sharpen; $i++) {
-                    $this->imagick->contrastImage(1);
-                }
-            } else {
-                for ($i = 0; $i >= $sharpen; $i--) {
-                    $this->imagick->contrastImage(0);
-                }
-            }
+            $this->imagick->sigmoidalContrastImage($sharpen, abs($alpha), $beta);
 
             $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {

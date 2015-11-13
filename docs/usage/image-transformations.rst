@@ -145,12 +145,17 @@ This transformation can be used to change the contrast of the colors in the imag
 
 **Parameters:**
 
-``sharpen``
-    Used to adjust the intensity differences between the lighter and darker elements of the image. Can also be negative.
+``alpha``
+    Used to adjust the intensity differences between the lighter and darker elements of the image. Can also be negative. Note: this parameter was named ``sharpen`` in Imbo 1.x.
+
+``beta``
+    Where the midpoint of the gradient will be. This value should be in the range 0 to 1. Default: ``0.5``.
 
 **Examples:**
 
-* ``t[]=contrast:sharpen=3``
+* ``t[]=contrast:alpha=3``
+
+.. note:: If you are getting different results than expected when using negative ``alpha`` values, your ``imagick`` extension is probably built against an old version of ImageMagick.
 
 .. _convert-transformation:
 

@@ -271,9 +271,6 @@ class RESTContext extends BehatContext {
         }
 
         $this->responses[] = $response;
-
-        // Create a fresh client
-        $this->createClient();
     }
 
     /**
@@ -447,6 +444,22 @@ class RESTContext extends BehatContext {
      */
     public function assertResponseBodyLength($length) {
         assertSame(strlen((string) $this->getLastResponse()->getBody()), (int) $length);
+    }
+
+    /**
+     * @Then /^the "([^"]*)" response header is not the same for any of the requests$/
+     */
+    public function assertHeaderNotSameForPreviousRequests($header) {
+        $responses = array_slice($this->responses, 1);
+
+        $headerValues = array_map(function($response) use ($header) {
+            return (string) $response->getHeader($header);
+        }, $responses);
+
+        $totalValues = count($headerValues);
+        $uniqueValues = count(array_unique($headerValues));
+
+        assertSame($totalValues, $uniqueValues, 'Only ' . $uniqueValues . ' header(s) were unique, out of ' . $totalValues . ' total');
     }
 
     /**
