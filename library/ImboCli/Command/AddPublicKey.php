@@ -32,6 +32,7 @@ class AddPublicKey extends Command {
     const RESOURCES_READ_ONLY = 'Read-only on user resources';
     const RESOURCES_READ_WRITE = 'Read+write on user resources';
     const RESOURCES_SPECIFIC = 'Specific resources';
+    const RESOURCES_CUSTOM = 'Custom resources';
     const RESOURCES_ALL = 'All resources (master user)';
 
     /**
@@ -114,6 +115,7 @@ class AddPublicKey extends Command {
                 self::RESOURCES_READ_WRITE,
                 self::RESOURCES_ALL,
                 self::RESOURCES_SPECIFIC,
+                self::RESOURCES_CUSTOM,
             ],
             self::RESOURCES_SPECIFIC
         );
@@ -126,6 +128,8 @@ class AddPublicKey extends Command {
                 return Resource::getReadWriteResources();
             case self::RESOURCES_ALL:
                 return Resource::getAllResources();
+            case self::RESOURCES_CUSTOM:
+                return $this->askForCustomResources($input, $output);
         }
 
         return $this->askForSpecificResources($input, $output);
@@ -152,6 +156,34 @@ class AddPublicKey extends Command {
     }
 
     /**
+     * Ask the user which custom resources the public key should have access to
+     *
+     * @param  InputInterface  $input
+     * @param  OutputInterface $output
+     * @return array|string
+     */
+    private function askForCustomResources(InputInterface $input, OutputInterface $output) {
+        $question = new Question(
+            'Which custom resources should the public key have access to?' . PHP_EOL .
+            '(comma-separated) '
+        );
+
+        $question->setValidator(function($answer) {
+            $resources = array_filter(array_map('trim', explode(',', $answer)));
+
+            if (empty($resources)) {
+                throw new RuntimeException(
+                    'You must specify at least one resource'
+                );
+            }
+
+            return $resources;
+        });
+
+        return $this->getHelper('question')->ask($input, $output, $question);
+    }
+
+    /**
      * Ask the user which users the public key should have access to (for the current ACL-rule)
      *
      * @param  InputInterface  $input
@@ -165,6 +197,7 @@ class AddPublicKey extends Command {
         );
         $question->setValidator(function($answer) {
             $users = array_filter(array_map('trim', explode(',', $answer)));
+
             if (empty($users)) {
                 throw new RuntimeException(
                     'You must specify at least one user, alternatively a wildcard character (*)'
