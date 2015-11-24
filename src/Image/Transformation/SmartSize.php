@@ -256,10 +256,10 @@ class SmartSize extends Transformation {
         $transformationManager = $this->event->getTransformationManager();
 
         $maxSize = $transformationManager->getTransformation('maxSize');
-        $maxSize->transform($params);
+        $maxSize->setImage($this->image)->transform($params);
 
         $crop = $transformationManager->getTransformation('crop');
-        $crop->transform([
+        $crop->setImage($this->image)->transform([
             'width' => $width,
             'height' => $height,
             'mode' => 'center'
