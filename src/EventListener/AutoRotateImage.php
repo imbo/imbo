@@ -35,8 +35,9 @@ class AutoRotateImage implements ListenerInterface {
      * @param EventInterface $event The triggered event
      */
     public function autoRotate(EventInterface $event) {
-        $event->getManager()->trigger('image.transformation.autorotate', [
-            'image' => $event->getRequest()->getImage(),
-        ]);
+        $event->getTransformationManager()
+            ->getTransformation('autoRotate')
+            ->setImage($event->getRequest()->getImage())
+            ->transform([]);
     }
 }
