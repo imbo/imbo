@@ -213,7 +213,7 @@ $defaultConfig = [
      * of each element in this array can be one of the following:
      *
      * 1) A string representing a class name of a class implementing the
-     *    Imbo\EventListener\ListenerInteface interface
+     *    Imbo\EventListener\ListenerInterface interface
      *
      * 2) An instance of an object implementing the Imbo\EventListener\ListenerInterface interface
      *
