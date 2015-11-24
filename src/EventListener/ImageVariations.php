@@ -316,8 +316,8 @@ class ImageVariations implements ListenerInterface {
      * @param EventInterface $event
      */
     public function generateVariations(EventInterface $event) {
-        // Fetch the event manager to trigger events
         $eventManager = $event->getManager();
+        $transformationManager = $event->getTransformationManager();
 
         $request = $event->getRequest();
         $user = $request->getUser();
@@ -346,13 +346,12 @@ class ImageVariations implements ListenerInterface {
                 $variationWidth = round($variationWidth * $scaleFactor);
 
                 if ($variationWidth > $maxWidth) {
-                    // Width too big, try again (twss)
+                    // Width too big, try again
                     continue;
                 }
 
                 if ((($previousWidth - $variationWidth) < $minDiff) || ($variationWidth < $minWidth)) {
-                    // The diff is too small, or the variation is too small, stop generating more
-                    // widths
+                    // The diff is too small, or the variation is too small, stop generating more widths
                     break;
                 }
 
@@ -374,21 +373,17 @@ class ImageVariations implements ListenerInterface {
 
                 // If configured, use a lossless variation format
                 if ($this->params['lossless'] === true) {
-                    $eventManager->trigger('image.transformation.convert', [
-                        'image' => $image,
-                        'params' => [
-                            'type' => 'png',
-                        ]
-                    ]);
+                    $transformationManager
+                        ->getTransformation('convert')
+                        ->setImage($image)
+                        ->transform(['type' => 'png']);
                 }
 
                 // Trigger a resize of the image (the transformation handles aspect ratio)
-                $eventManager->trigger('image.transformation.resize', [
-                    'image' => $image,
-                    'params' => [
-                        'width' => $width,
-                    ],
-                ]);
+                $transformationManager
+                    ->getTransformation('resize')
+                    ->setImage($image)
+                    ->transform(['width' => $width]);
 
                 // Trigger an update of the model
                 $eventManager->trigger('image.transformed', [
