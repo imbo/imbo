@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -21,24 +19,11 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Sharpen extends Transformation implements ListenerInterface {
+class Sharpen extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.sharpen' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $params = $event->getArgument('params');
-
+    public function transform(array $params) {
         $preset = isset($params['preset']) ? $params['preset'] : null;
 
         switch ($preset) {
@@ -90,7 +75,7 @@ class Sharpen extends Transformation implements ListenerInterface {
 
         try {
             $this->imagick->unsharpMaskImage($radius, $sigma, $gain, $threshold);
-            $event->getArgument('image')->hasBeenTransformed(true);
+            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     ImagickException,
     ImagickPixelException;
 
@@ -22,7 +20,7 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Rotate extends Transformation implements ListenerInterface {
+class Rotate extends Transformation {
     /**
      * Background color of the image
      *
@@ -33,25 +31,12 @@ class Rotate extends Transformation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.rotate' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-        $params = $event->getArgument('params');
-
+    public function transform(array $params) {
         if (empty($params['angle'])) {
             throw new TransformationException('Missing required parameter: angle', 400);
         }
 
+        $image = $this->image;
         $angle = (int) $params['angle'];
         $bg = !empty($params['bg']) ? $this->formatColor($params['bg']) : $this->bg;
 

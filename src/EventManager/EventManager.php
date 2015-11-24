@@ -161,6 +161,15 @@ class EventManager {
     }
 
     /**
+     * Get the registered initializers
+     *
+     * @return InitializerInterface[]
+     */
+    public function getInitializers() {
+        return $this->initializers;
+    }
+
+    /**
      * Trigger a given event
      *
      * @param string $eventName The name of the event to trigger

@@ -11,9 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
-    Imbo\Model\Image,
     ImagickException;
 
 /**
@@ -23,26 +20,11 @@ use Imbo\Exception\TransformationException,
  * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Image\Transformations
  */
-class SmartSize extends Transformation implements ListenerInterface {
+class SmartSize extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.smartsize' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     * @throws TransformationException
-     */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-        $params = $event->getArgument('params');
-
+    public function transform(array $params) {
         if (empty($params['width']) || empty($params['height'])) {
             throw new TransformationException('Both width and height needs to be specified', 400);
         }
@@ -52,21 +34,21 @@ class SmartSize extends Transformation implements ListenerInterface {
 
         // Check if we have the POI in metadata
         if (!$poi) {
-            $metadataPoi = $this->getPoiFromMetadata($event, $image);
+            $metadataPoi = $this->getPoiFromMetadata();
 
             if ($metadataPoi) {
                 $poi = $metadataPoi;
             }
         }
 
-        $event->getResponse()->headers->set('X-Imbo-POIs-Used', $poi ? 1 : 0);
+        $this->event->getResponse()->headers->set('X-Imbo-POIs-Used', $poi ? 1 : 0);
 
         // Do a simple crop if don't have a POI
         if (!$poi) {
-            return $this->simpleCrop($event, $params['width'], $params['height']);
+            return $this->simpleCrop($params['width'], $params['height']);
         }
 
-        if (!empty($params['crop']) && array_search($params['crop'], ['close', 'medium', 'wide']) === false) {
+        if (!empty($params['crop']) && in_array($params['crop'], ['close', 'medium', 'wide']) === false) {
             throw new TransformationException('Invalid crop value. Valid values are: close,medium,wide', 400);
         }
 
@@ -78,8 +60,8 @@ class SmartSize extends Transformation implements ListenerInterface {
             'focalX' => $poi[0],
             'focalY' => $poi[1],
 
-            'sourceWidth' => $image->getWidth(),
-            'sourceHeight' => $image->getHeight(),
+            'sourceWidth' => $this->image->getWidth(),
+            'sourceHeight' => $this->image->getHeight(),
 
             'targetWidth' => $targetWidth,
             'targetHeight' => $targetHeight,
@@ -91,7 +73,7 @@ class SmartSize extends Transformation implements ListenerInterface {
         try {
             $this->imagick->cropImage($crop['width'], $crop['height'], $crop['left'], $crop['top']);
             $this->imagick->setImagePage(0, 0, 0, 0);
-            $this->resize($image, $targetWidth, $targetHeight);
+            $this->resize($targetWidth, $targetHeight);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
@@ -170,10 +152,10 @@ class SmartSize extends Transformation implements ListenerInterface {
      * @param Image $image
      * @return array|false Array with x and y coordinate, or false if no POI was found
      */
-    private function getPoiFromMetadata(EventInterface $event, Image $image) {
-        $metadata = $event->getDatabase()->getMetadata(
-            $image->getUser(),
-            $image->getImageIdentifier()
+    private function getPoiFromMetadata() {
+        $metadata = $this->event->getDatabase()->getMetadata(
+            $this->image->getUser(),
+            $this->image->getImageIdentifier()
         );
 
         $poi = isset($metadata['poi'][0]) ? $metadata['poi'][0] : false;
@@ -241,30 +223,26 @@ class SmartSize extends Transformation implements ListenerInterface {
     /**
      * Resize the image
      *
-     * @param Image $image The image to resize
      * @param int $targetWidth The resize target width
      * @param int $tartHeight The resize target height
      */
-    private function resize(Image $image, $targetWidth, $targetHeight) {
-        $this->imagick->setOption('jpeg:size', $targetWidth . 'x' . $targetHeight);
+    private function resize($targetWidth, $targetHeight) {
         $this->imagick->thumbnailImage($targetWidth, $targetHeight);
 
-        $image->setWidth($targetWidth)
-              ->setHeight($targetHeight)
-              ->hasBeenTransformed(true);
+        $this->image
+             ->setWidth($targetWidth)
+             ->setHeight($targetHeight)
+             ->hasBeenTransformed(true);
     }
 
     /**
      * Perform a simple crop/resize operation on the image
      *
-     * @param EventInterface $event
      * @param int $width
      * @param int $height
      */
-    private function simpleCrop(EventInterface $event, $width, $height) {
-        $image = $event->getArgument('image');
-
-        $sourceRatio = $image->getWidth() / $image->getHeight();
+    private function simpleCrop($width, $height) {
+        $sourceRatio = $this->image->getWidth() / $this->image->getHeight();
         $cropRatio = $width / $height;
 
         $params = [];
@@ -275,18 +253,16 @@ class SmartSize extends Transformation implements ListenerInterface {
             $params['height'] = $height;
         }
 
-        $event->getManager()->trigger('image.transformation.maxsize', [
-            'image' => $event->getArgument('image'),
-            'params' => $params
-        ]);
+        $transformationManager = $this->event->getTransformationManager();
 
-        $event->getManager()->trigger('image.transformation.crop', [
-            'image' => $event->getArgument('image'),
-            'params' => [
-                'width' => $width,
-                'height' => $height,
-                'mode' => 'center'
-            ]
+        $maxSize = $transformationManager->getTransformation('maxSize');
+        $maxSize->transform($params);
+
+        $crop = $transformationManager->getTransformation('crop');
+        $crop->transform([
+            'width' => $width,
+            'height' => $height,
+            'mode' => 'center'
         ]);
     }
 }

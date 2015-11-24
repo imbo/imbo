@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -21,23 +19,11 @@ use Imbo\Exception\TransformationException,
  * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Image\Transformations
  */
-class Blur extends Transformation implements ListenerInterface {
+class Blur extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.blur' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $params = $event->getArgument('params');
+    public function transform(array $params) {
         $type = isset($params['type']) ? $params['type'] : 'gaussian';
 
         $blurTypes = ['gaussian', 'adaptive', 'motion', 'radial'];
@@ -48,16 +34,16 @@ class Blur extends Transformation implements ListenerInterface {
 
         switch ($type) {
             case 'motion':
-                return $this->motionBlur($event);
+                return $this->motionBlur($params);
 
             case 'radial':
-                return $this->radialBlur($event);
+                return $this->radialBlur($params);
 
             case 'adaptive':
-                return $this->blur($event, true);
+                return $this->blur($params, true);
 
             default:
-                return $this->blur($event);
+                return $this->blur($params);
         }
     }
 
@@ -79,12 +65,10 @@ class Blur extends Transformation implements ListenerInterface {
     /**
      * Add Gaussian or adaptive blur to the image
      *
-     * @param EventInterface $event The event instance
+     * @param array $params The transformation parameters
      * @param bool $adaptive Perform adaptive blur or not
      */
-    private function blur(EventInterface $event, $adaptive = false) {
-        $params = $event->getArgument('params');
-
+    private function blur(array $params, $adaptive = false) {
         $this->checkRequiredParams($params, ['radius', 'sigma']);
 
         $radius = (float) $params['radius'];
@@ -97,7 +81,7 @@ class Blur extends Transformation implements ListenerInterface {
                 $this->imagick->gaussianBlurImage($radius, $sigma);
             }
 
-            $event->getArgument('image')->hasBeenTransformed(true);
+            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
@@ -106,11 +90,9 @@ class Blur extends Transformation implements ListenerInterface {
     /**
      * Add motion blur to the image
      *
-     * @param EventInterface $event The event instance
+     * @param array $params The transformation parameters
      */
-    private function motionBlur(EventInterface $event) {
-        $params = $event->getArgument('params');
-
+    private function motionBlur(array $params) {
         $this->checkRequiredParams($params, ['radius', 'sigma', 'angle']);
 
         $radius = (float) $params['radius'];
@@ -119,7 +101,7 @@ class Blur extends Transformation implements ListenerInterface {
 
         try {
             $this->imagick->motionBlurImage($radius, $sigma, $angle);
-            $event->getArgument('image')->hasBeenTransformed(true);
+            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
@@ -128,18 +110,16 @@ class Blur extends Transformation implements ListenerInterface {
     /**
      * Add radial blur to the image
      *
-     * @param EventInterface $event The event instance
+     * @param array $params The transformation parameters
      */
-    private function radialBlur(EventInterface $event) {
-        $params = $event->getArgument('params');
-
+    private function radialBlur(array $params) {
         $this->checkRequiredParams($params, ['angle']);
 
         $angle = (float) $params['angle'];
 
         try {
             $this->imagick->radialBlurImage($angle);
-            $event->getArgument('image')->hasBeenTransformed(true);
+            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

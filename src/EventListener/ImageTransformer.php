@@ -10,7 +10,11 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface;
+use Imbo\Model\Image,
+    Imbo\Image\TransformationManager,
+    Imbo\EventManager\EventInterface,
+    Imbo\Exception\TransformationException,
+    Imbo\Image\Transformation\Transformation;
 
 /**
  * Image transformer listener
@@ -36,8 +40,8 @@ class ImageTransformer implements ListenerInterface {
     public function transform(EventInterface $event) {
         $request = $event->getRequest();
         $image = $event->getResponse()->getModel();
-        $eventManager = $event->getManager();
         $presets = $event->getConfig()['transformationPresets'];
+        $transformationManager = $event->getTransformationManager();
 
         // Fetch transformations specifed in the query and transform the image
         foreach ($request->getTransformations() as $transformation) {
@@ -54,24 +58,41 @@ class ImageTransformer implements ListenerInterface {
                         $params = array_replace($transformation['params'], $params);
                     }
 
-                    $eventManager->trigger(
-                        'image.transformation.' . strtolower($name),
-                        [
-                            'image' => $image,
-                            'params' => $params,
-                        ]
-                    );
+                    $this
+                        ->getHandler($transformationManager, $name)
+                        ->setImage($image)
+                        ->setEvent($event)
+                        ->transform($params);
                 }
             } else {
                 // Regular transformation
-                $eventManager->trigger(
-                    'image.transformation.' . strtolower($transformation['name']),
-                    [
-                        'image' => $image,
-                        'params' => $transformation['params'],
-                    ]
-                );
+                $params = $transformation['params'];
+                $name = $transformation['name'];
+
+                $this
+                    ->getHandler($transformationManager, $name)
+                    ->setImage($image)
+                    ->setEvent($event)
+                    ->transform($params);
             }
         }
+    }
+
+    /**
+     * Get the transformation with the given name, or throw exception if it is not registered
+     *
+     * @param TransformationManager $manager Transformation manager
+     * @param string $name Transformation name
+     * @return Transformation
+     * @throws TransformationException
+     */
+    private function getHandler(TransformationManager $manager, $name) {
+        $handler = $manager->getTransformation($name);
+
+        if (!$handler) {
+            throw new TransformationException('Transformation "' . $name . '" not registered', 400);
+        }
+
+        return $handler;
     }
 }

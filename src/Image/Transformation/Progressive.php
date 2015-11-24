@@ -22,25 +22,14 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Progressive extends Transformation implements ListenerInterface {
+class Progressive extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.progressive' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
+    public function transform(array $params) {
         try {
             $this->imagick->setInterlaceScheme(Imagick::INTERLACE_PLANE);
-            $event->getArgument('image')->hasBeenTransformed(true);
+            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

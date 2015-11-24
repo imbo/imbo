@@ -25,6 +25,7 @@ use Imbo\Http\Request\Request,
     Imbo\Storage\StorageInterface,
     Imbo\Http\Response\Formatter,
     Imbo\Resource\ResourceInterface,
+    Imbo\Image\TransformationManager,
     Imbo\EventListener\Initializer\InitializerInterface;
 
 /**
@@ -81,6 +82,12 @@ class Application {
         // Create a router based on the routes in the configuration and internal routes
         $router = new Router($config['routes']);
 
+        // Create a new image transformation manager
+        $transformationManager = new TransformationManager();
+        if (isset($config['transformations']) && is_array($config['transformations'])) {
+            $transformationManager->addTransformations($config['transformations']);
+        }
+
         // Create the event manager and the event template
         $eventManager = new EventManager();
         $event = new Event();
@@ -92,6 +99,7 @@ class Application {
             'config' => $config,
             'manager' => $eventManager,
             'accessControl' => $accessControl,
+            'transformationManager' => $transformationManager,
         ]);
         $eventManager->setEventTemplate($event);
 
@@ -164,6 +172,7 @@ class Application {
             }
 
             $eventManager->addInitializer($initializer);
+            $transformationManager->addInitializer($initializer);
         }
 
         // Listeners from configuration

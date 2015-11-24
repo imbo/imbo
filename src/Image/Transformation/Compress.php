@@ -12,7 +12,6 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
     Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -32,7 +31,6 @@ class Compress extends Transformation implements ListenerInterface {
      */
     public static function getSubscribedEvents() {
         return [
-            'image.transformation.compress' => 'transform',
             'image.transformed' => 'compress',
         ];
     }
@@ -68,13 +66,9 @@ class Compress extends Transformation implements ListenerInterface {
     }
 
     /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
+     * {@inheritdoc}
      */
-    public function transform(EventInterface $event) {
-        $params = $event->getArgument('params');
-
+    public function transform(array $params) {
         if (empty($params['level'])) {
             throw new TransformationException('Missing required parameter: level', 400);
         }

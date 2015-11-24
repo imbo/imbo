@@ -11,9 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
-    Imbo\Model\Image,
     Imagick,
     ImagickException,
     ImagickDraw;
@@ -24,7 +21,7 @@ use Imbo\Exception\TransformationException,
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
-class DrawPois extends Transformation implements ListenerInterface {
+class DrawPois extends Transformation {
     /**
      * Color of the border
      *
@@ -49,32 +46,19 @@ class DrawPois extends Transformation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.drawpois' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-        $pois = $this->getPoisFromMetadata($event, $image);
+    public function transform(array $params) {
+        $pois = $this->getPoisFromMetadata();
 
         if (empty($pois) || !is_array($pois)) {
             return;
         }
 
-        $params = $event->getArgument('params');
         $color = !empty($params['color']) ? $this->formatColor($params['color']) : $this->color;
         $borderSize = isset($params['borderSize']) ? (int) $params['borderSize'] : $this->borderSize;
         $pointSize = isset($params['pointSize']) ? (int) $params['pointSize'] : $this->pointSize;
 
-        $imageWidth = $image->getWidth();
-        $imageHeight = $image->getHeight();
+        $imageWidth = $this->image->getWidth();
+        $imageHeight = $this->image->getHeight();
 
         try {
             foreach ($pois as $poi) {
@@ -89,7 +73,7 @@ class DrawPois extends Transformation implements ListenerInterface {
                 }
             }
 
-            $image->hasBeenTransformed(true);
+            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
@@ -174,14 +158,12 @@ class DrawPois extends Transformation implements ListenerInterface {
     /**
      * Fetch POIs from metadata for the image
      *
-     * @param EventInterface $event
-     * @param Image $image
      * @return array Array with POIs
      */
-    private function getPoisFromMetadata(EventInterface $event, Image $image) {
-        $metadata = $event->getDatabase()->getMetadata(
-            $image->getUser(),
-            $image->getImageIdentifier()
+    private function getPoisFromMetadata() {
+        $metadata = $this->event->getDatabase()->getMetadata(
+            $this->image->getUser(),
+            $this->image->getImageIdentifier()
         );
 
         return isset($metadata['poi']) ? $metadata['poi'] : [];

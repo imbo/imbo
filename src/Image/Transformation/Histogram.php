@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     Imagick,
     ImagickDraw,
     ImagickPixel,
@@ -25,7 +23,7 @@ use Imbo\Exception\TransformationException,
  * @author Mats Lindh <mats@lindh.no>
  * @package Image\Transformations
  */
-class Histogram extends Transformation implements ListenerInterface {
+class Histogram extends Transformation {
     /**
      * Generated histogram scale factor.
      *
@@ -71,21 +69,7 @@ class Histogram extends Transformation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.histogram' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image into a histogram
-     *
-     * @param EventInterface $event
-     */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-        $params = $event->getArgument('params');
-
+    public function transform(array $params) {
         $scale = !empty($params['scale']) ? max(1, min(8, (int) $params['scale'])) : $this->scale;
         $ratio = !empty($params['ratio']) ? max(0.1, min(8, (double) $params['ratio'])) : $this->ratio;
 
@@ -174,6 +158,7 @@ class Histogram extends Transformation implements ListenerInterface {
 
             // Store the new image
             $size = $this->imagick->getImageGeometry();
+            $image = $this->image;
             $image->setWidth($size['width'])
                   ->setHeight($size['height'])
                   ->hasBeenTransformed(true);

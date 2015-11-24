@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -21,7 +19,7 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Thumbnail extends Transformation implements ListenerInterface {
+class Thumbnail extends Transformation {
     /**
      * Width of the thumbnail
      *
@@ -48,28 +46,12 @@ class Thumbnail extends Transformation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.thumbnail' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-        $params = $event->getArgument('params');
-
+    public function transform(array $event) {
         $width = !empty($params['width']) ? (int) $params['width'] : $this->width;
         $height = !empty($params['height']) ? (int) $params['height'] : $this->height;
         $fit = !empty($params['fit']) ? $params['fit'] : $this->fit;
 
         try {
-            $this->imagick->setOption('jpeg:size', $width . 'x' . $height);
-
             if ($fit === 'inset') {
                 $this->imagick->thumbnailimage($width, $height, true);
             } else {
@@ -78,9 +60,10 @@ class Thumbnail extends Transformation implements ListenerInterface {
 
             $size = $this->imagick->getImageGeometry();
 
-            $image->setWidth($size['width'])
-                  ->setHeight($size['height'])
-                  ->hasBeenTransformed(true);
+            $this->image
+                ->setWidth($size['width'])
+                ->setHeight($size['height'])
+                ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

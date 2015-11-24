@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     ImagickException,
     Imagick;
 
@@ -24,24 +22,11 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Level extends Transformation implements ListenerInterface {
+class Level extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.level' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $params = $event->getArgument('params');
-
+    public function transform(array $params) {
         $channel = isset($params['channel']) ? $params['channel'] : 'all';
         $amount = isset($params['amount']) ? $params['amount'] : 1;
 
@@ -86,7 +71,7 @@ class Level extends Transformation implements ListenerInterface {
             $quantumRange = $this->getQuantumRange();
 
             $this->imagick->levelImage(0, (float) $gamma, $quantumRange, $channel);
-            $event->getArgument('image')->hasBeenTransformed(true);
+            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

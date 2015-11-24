@@ -28,20 +28,25 @@ class ImageTransformerTest extends ListenerTests {
     private $event;
     private $image;
     private $eventManager;
+    private $transformationManager;
 
     /**
      * Set up the listener
      */
     public function setUp() {
-        $this->eventManager = $this->createMock('Imbo\EventManager\EventManager');
-        $this->request = $this->createMock('Imbo\Http\Request\Request');
-        $this->image = $this->createMock('Imbo\Model\Image');
-        $this->response = $this->createMock('Imbo\Http\Response\Response');
+        $this->transformationManager = $this->getMockBuilder('\Imbo\Image\TransformationManager')->getMock();
+        $this->eventManager = $this->getMock('Imbo\EventManager\EventManager');
+        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->image = $this->getMock('Imbo\Model\Image');
+        $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->response->expects($this->any())->method('getModel')->will($this->returnValue($this->image));
         $this->event = $this->createMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getManager')->will($this->returnValue($this->eventManager));
+        $this->event->expects($this->any())->method('getTransformationManager')->will($this->returnValue($this->transformationManager));
+        $this->transformationManager->expects($this->any())->method('setImage')->will($this->returnSelf());
+        $this->transformationManager->expects($this->any())->method('setEvent')->will($this->returnSelf());
 
         $this->listener = new ImageTransformer();
     }
@@ -56,6 +61,7 @@ class ImageTransformerTest extends ListenerTests {
         $this->event = null;
         $this->listener = null;
         $this->eventManager = null;
+        $this->transformationManager = null;
     }
 
     /**
@@ -85,28 +91,27 @@ class ImageTransformerTest extends ListenerTests {
             ],
         ]));
 
-        $this->eventManager->expects($this->at(0))
-                           ->method('trigger')
-                           ->with(
-                               'image.transformation.resize',
-                               [
-                                   'image' => $this->image,
-                                   'params' => [
-                                       'width' => 100,
-                                   ],
-                               ]
-                           );
-        $this->eventManager->expects($this->at(1))
-                           ->method('trigger')
-                           ->with(
-                               'image.transformation.thumbnail',
-                               [
-                                   'image' => $this->image,
-                                   'params' => [
-                                       'some' => 'value',
-                                   ],
-                               ]
-                           );
+        $resize = $this->getMock('Imbo\Image\Transformation\Transformation');
+        $resize->expects($this->once())
+            ->method('transform')
+            ->with(['width' => 100]);
+
+        $thumbnail = $this->getMock('Imbo\Image\Transformation\Transformation');
+        $thumbnail->expects($this->once())
+            ->method('transform')
+            ->with(['some' => 'value']);
+
+        $this->transformationManager
+            ->expects($this->at(0))
+            ->method('getTransformation')
+            ->with('resize')
+            ->will($this->returnValue($resize));
+
+        $this->transformationManager
+            ->expects($this->at(1))
+            ->method('getTransformation')
+            ->with('thumbnail')
+            ->will($this->returnValue($thumbnail));
 
         $this->listener->transform($this->event);
     }
@@ -130,24 +135,27 @@ class ImageTransformerTest extends ListenerTests {
             ],
         ]));
 
-        $this->eventManager->expects($this->at(0))
-                           ->method('trigger')
-                           ->with(
-                               'image.transformation.fliphorizontally',
-                               [
-                                   'image' => $this->image,
-                                   'params' => [],
-                               ]
-                           );
-        $this->eventManager->expects($this->at(1))
-                           ->method('trigger')
-                           ->with(
-                               'image.transformation.flipvertically',
-                               [
-                                   'image' => $this->image,
-                                   'params' => [],
-                               ]
-                           );
+        $flip = $this->getMock('Imbo\Image\Transformation\Transformation');
+        $flip->expects($this->once())
+            ->method('transform')
+            ->with([]);
+
+        $flop = $this->getMock('Imbo\Image\Transformation\Transformation');
+        $flop->expects($this->once())
+            ->method('transform')
+            ->with([]);
+
+        $this->transformationManager
+            ->expects($this->at(0))
+            ->method('getTransformation')
+            ->with('flipHorizontally')
+            ->will($this->returnValue($flip));
+
+        $this->transformationManager
+            ->expects($this->at(1))
+            ->method('getTransformation')
+            ->with('flipVertically')
+            ->will($this->returnValue($flop));
 
         $this->listener->transform($this->event);
     }

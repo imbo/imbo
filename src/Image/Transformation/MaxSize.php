@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -22,24 +20,12 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class MaxSize extends Transformation implements ListenerInterface {
+class MaxSize extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.maxsize' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-        $params = $event->getArgument('params');
+    public function transform(array $params) {
+        $image = $this->image;
 
         $maxWidth = !empty($params['width']) ? (int) $params['width'] : 0;
         $maxHeight = !empty($params['height']) ? (int) $params['height'] : 0;
@@ -66,7 +52,6 @@ class MaxSize extends Transformation implements ListenerInterface {
                 return;
             }
 
-            $this->imagick->setOption('jpeg:size', $width . 'x' . $height);
             $this->imagick->thumbnailImage($width, $height);
 
             $size = $this->imagick->getImageGeometry();

@@ -158,6 +158,54 @@ $defaultConfig = [
     ],
 
     /**
+     * Image transformations
+     *
+     * An associative array where the keys identify the name used in URLs to trigger the
+     * transformation. The value of each element in this array can be on of the following:
+     *
+     * 1) A string representing a class name of a class extending the
+     *    Imbo\Image\Transformation\Transformation abstract class
+     *
+     * 2) An instance of an object implementing the Imbo\Image\Transformation\Transformation
+     *    abstract class
+     *
+     * 3) A closure returning an instance of an object extending the
+     *    Imbo\Image\Transformation\Transformation abstract class
+     *
+     * @var array
+     */
+    'transformations' => [
+        'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
+        'blur' => 'Imbo\Image\Transformation\Blur',
+        'border' => 'Imbo\Image\Transformation\Border',
+        'canvas' => 'Imbo\Image\Transformation\Canvas',
+        'compress' => 'Imbo\Image\Transformation\Compress',
+        'contrast' => 'Imbo\Image\Transformation\Contrast',
+        'convert' => 'Imbo\Image\Transformation\Convert',
+        'crop' => 'Imbo\Image\Transformation\Crop',
+        'desaturate' => 'Imbo\Image\Transformation\Desaturate',
+        'drawPois' => 'Imbo\Image\Transformation\DrawPois',
+        'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
+        'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
+        'histogram' => 'Imbo\Image\Transformation\Histogram',
+        'level' => 'Imbo\Image\Transformation\Level',
+        'maxSize' => 'Imbo\Image\Transformation\MaxSize',
+        'modulate' => 'Imbo\Image\Transformation\Modulate',
+        'progressive' => 'Imbo\Image\Transformation\Progressive',
+        'resize' => 'Imbo\Image\Transformation\Resize',
+        'rotate' => 'Imbo\Image\Transformation\Rotate',
+        'sepia' => 'Imbo\Image\Transformation\Sepia',
+        'sharpen' => 'Imbo\Image\Transformation\Sharpen',
+        'smartSize' => 'Imbo\Image\Transformation\SmartSize',
+        'strip' => 'Imbo\Image\Transformation\Strip',
+        'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
+        'transpose' => 'Imbo\Image\Transformation\Transpose',
+        'transverse' => 'Imbo\Image\Transformation\Transverse',
+        'vignette' => 'Imbo\Image\Transformation\Vignette',
+        'watermark' => 'Imbo\Image\Transformation\Watermark',
+    ],
+
+    /**
      * Event listeners
      *
      * An associative array where the keys are short names for the event listeners (not really used
@@ -269,36 +317,6 @@ $defaultConfig = [
                 'allow' => ['127.0.0.1', '::1'],
             ],
         ],
-
-        // Image transformations
-        'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
-        'blur' => 'Imbo\Image\Transformation\Blur',
-        'border' => 'Imbo\Image\Transformation\Border',
-        'canvas' => 'Imbo\Image\Transformation\Canvas',
-        'compress' => 'Imbo\Image\Transformation\Compress',
-        'contrast' => 'Imbo\Image\Transformation\Contrast',
-        'convert' => 'Imbo\Image\Transformation\Convert',
-        'crop' => 'Imbo\Image\Transformation\Crop',
-        'desaturate' => 'Imbo\Image\Transformation\Desaturate',
-        'drawPois' => 'Imbo\Image\Transformation\DrawPois',
-        'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
-        'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
-        'histogram' => 'Imbo\Image\Transformation\Histogram',
-        'level' => 'Imbo\Image\Transformation\Level',
-        'maxSize' => 'Imbo\Image\Transformation\MaxSize',
-        'modulate' => 'Imbo\Image\Transformation\Modulate',
-        'progressive' => 'Imbo\Image\Transformation\Progressive',
-        'resize' => 'Imbo\Image\Transformation\Resize',
-        'rotate' => 'Imbo\Image\Transformation\Rotate',
-        'sepia' => 'Imbo\Image\Transformation\Sepia',
-        'sharpen' => 'Imbo\Image\Transformation\Sharpen',
-        'smartSize' => 'Imbo\Image\Transformation\SmartSize',
-        'strip' => 'Imbo\Image\Transformation\Strip',
-        'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
-        'transpose' => 'Imbo\Image\Transformation\Transpose',
-        'transverse' => 'Imbo\Image\Transformation\Transverse',
-        'vignette' => 'Imbo\Image\Transformation\Vignette',
-        'watermark' => 'Imbo\Image\Transformation\Watermark',
 
         // Imagick-specific event listener for the built in image transformations
         'imagick' => 'Imbo\EventListener\Imagick',

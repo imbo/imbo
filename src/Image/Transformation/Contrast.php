@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -22,24 +20,11 @@ use Imbo\Exception\TransformationException,
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
-class Contrast extends Transformation implements ListenerInterface {
+class Contrast extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.contrast' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $params = $event->getArgument('params');
-
+    public function transform(array $params) {
         $alpha = isset($params['sharpen']) ? (float) $params['sharpen'] : 1;
         $alpha = isset($params['alpha']) ? (float) $params['alpha'] : $alpha;
         $beta = isset($params['beta']) ? (float) $params['beta'] : 0.5;
@@ -54,7 +39,7 @@ class Contrast extends Transformation implements ListenerInterface {
         try {
             $this->imagick->sigmoidalContrastImage($sharpen, abs($alpha), $beta);
 
-            $event->getArgument('image')->hasBeenTransformed(true);
+            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }

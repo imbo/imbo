@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -21,24 +19,11 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Resize extends Transformation implements ListenerInterface {
+class Resize extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.resize' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-        $params = $event->getArgument('params');
+    public function transform(array $params) {
 
         if (empty($params['width']) && empty($params['height'])) {
             throw new TransformationException('Missing both width and height. You need to specify at least one of them', 400);
@@ -47,6 +32,7 @@ class Resize extends Transformation implements ListenerInterface {
         $width = !empty($params['width']) ? (int) $params['width'] : 0;
         $height = !empty($params['height']) ? (int) $params['height'] : 0;
 
+        $image = $this->image;
         $originalWidth = $image->getWidth();
         $originalHeight = $image->getHeight();
 
@@ -63,7 +49,6 @@ class Resize extends Transformation implements ListenerInterface {
         }
 
         try {
-            $this->imagick->setOption('jpeg:size', $width . 'x' . $height);
             $this->imagick->thumbnailImage($width, $height);
 
             $size = $this->imagick->getImageGeometry();

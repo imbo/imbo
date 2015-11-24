@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     Imagick,
     ImagickException,
     ImagickPixelException;
@@ -24,24 +22,11 @@ use Imbo\Exception\TransformationException,
  * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Image\Transformations
  */
-class AutoRotate extends Transformation implements ListenerInterface {
+class AutoRotate extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.autorotate' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-
+    public function transform(array $params) {
         try {
             // Get orientation from exif data
             $orientation = $this->imagick->getImageOrientation();
@@ -91,8 +76,8 @@ class AutoRotate extends Transformation implements ListenerInterface {
                     if ($rotate % 180) {
                         $size = $this->imagick->getImageGeometry();
 
-                        $image->setWidth($size['width'])
-                              ->setHeight($size['height']);
+                        $this->image->setWidth($size['width'])
+                                    ->setHeight($size['height']);
                     }
                 }
 
@@ -107,7 +92,7 @@ class AutoRotate extends Transformation implements ListenerInterface {
                 if ($rotate || $flipHorizontally || $flipVertically) {
                     // Set the image orientation so it reflects the transformation that's been done
                     $this->imagick->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
-                    $image->hasBeenTransformed(true);
+                    $this->image->hasBeenTransformed(true);
                 }
             }
         } catch (ImagickException $e) {
