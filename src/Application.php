@@ -138,20 +138,26 @@ class Application {
             'Imbo\EventListener\DatabaseOperations',
             'Imbo\EventListener\StorageOperations',
             'Imbo\Image\ImagePreparation',
-            'Imbo\EventListener\ImageTransformer',
             'Imbo\EventListener\ResponseSender',
             'Imbo\EventListener\ResponseETag',
             'Imbo\EventListener\HttpCache',
+            'Imbo\Image\TransformationManager' => $transformationManager
         ];
 
         foreach ($eventListeners as $listener => $params) {
+            $name = $listener;
             if (is_string($params)) {
                 $listener = $params;
                 $params = [];
+                $name = $listener;
+            } else if ($params instanceof ListenerInterface) {
+                $listener = $params;
+                $params = [];
+                $name = get_class($listener);
             }
 
-            $eventManager->addEventHandler($listener, $listener, $params)
-                         ->addCallbacks($listener, $listener::getSubscribedEvents());
+            $eventManager->addEventHandler($name, $listener, $params)
+                         ->addCallbacks($name, $listener::getSubscribedEvents());
         }
 
         // Event listener initializers

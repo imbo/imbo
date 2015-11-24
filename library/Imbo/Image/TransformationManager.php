@@ -11,7 +11,10 @@
 namespace Imbo\Image;
 
 use Imbo\Image\Transformation\Transformation,
-    Imbo\EventListener\Initializer\InitializerInterface;
+    Imbo\Exception\TransformationException,
+    Imbo\EventManager\EventInterface,
+    Imbo\EventListener\Initializer\InitializerInterface,
+    Imbo\EventListener\ListenerInterface;
 
 /**
  * Image transformation manager
@@ -19,7 +22,7 @@ use Imbo\Image\Transformation\Transformation,
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Event\Manager
  */
-class TransformationManager {
+class TransformationManager implements ListenerInterface {
     /**
      * Uninitialized image transformations
      *
@@ -40,6 +43,15 @@ class TransformationManager {
      * @var array
      */
     protected $initializers = [];
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents() {
+        return [
+            'image.transform' => 'applyTransformations',
+        ];
+    }
 
     /**
      * Add a transformation to the manager
@@ -115,5 +127,64 @@ class TransformationManager {
         $this->handlers[$name] = $transformation;
 
         return $this->handlers[$name];
+    }
+
+    /**
+     * Apply image transformations
+     *
+     * @param EventInterface $event The current event
+     */
+    public function applyTransformations(EventInterface $event) {
+        $request = $event->getRequest();
+        $image = $event->getResponse()->getModel();
+        $presets = $event->getConfig()['transformationPresets'];
+
+        // Fetch transformations specifed in the query and transform the image
+        foreach ($request->getTransformations() as $transformation) {
+            if (isset($presets[$transformation['name']])) {
+                // Preset
+                foreach ($presets[$transformation['name']] as $name => $params) {
+                    if (is_int($name)) {
+                        // No hardcoded params, use the ones from the request
+                        $name = $params;
+                        $params = $transformation['params'];
+                    } else {
+                        // Some hardcoded params. Merge with the ones from the request, making the
+                        // hardcoded params overwrite the ones from the request
+                        $params = array_replace($transformation['params'], $params);
+                    }
+
+                    $this->triggerTransformation($name, $params, $event);
+                }
+            } else {
+                // Regular transformation
+                $this->triggerTransformation(
+                    $transformation['name'],
+                    $transformation['params'],
+                    $event
+                );
+            }
+        }
+    }
+
+    /**
+     * Trigger transformation with the given name, with the given parameters
+     *
+     * @param string $name Name of transformation
+     * @param array $params Transformation parameters
+     * @param EventInterface $event Event that triggered the transformation chain
+     * @throws TransformationException If the transformation fails or is not registered
+     */
+    protected function triggerTransformation($name, array $params, EventInterface $event) {
+        $transformation = $this->getTransformation($name);
+
+        if (!$transformation) {
+            throw new TransformationException('Transformation "' . $name . '" not registered', 400);
+        }
+
+        $transformation
+            ->setImage($event->getResponse()->getModel())
+            ->setEvent($event)
+            ->transform($params);
     }
 }
