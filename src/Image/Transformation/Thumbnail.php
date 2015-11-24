@@ -46,14 +46,14 @@ class Thumbnail extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public function transform(array $event) {
+    public function transform(array $params) {
         $width = !empty($params['width']) ? (int) $params['width'] : $this->width;
         $height = !empty($params['height']) ? (int) $params['height'] : $this->height;
         $fit = !empty($params['fit']) ? $params['fit'] : $this->fit;
 
         try {
             if ($fit === 'inset') {
-                $this->imagick->thumbnailimage($width, $height, true);
+                $this->imagick->thumbnailImage($width, $height, true);
             } else {
                 $this->imagick->cropThumbnailImage($width, $height);
             }

@@ -10,6 +10,7 @@
 
 namespace ImboUnitTest\Image\Transformation;
 
+use Imagick;
 use Imbo\Image\Transformation\AutoRotate;
 
 /**
@@ -28,11 +29,25 @@ class AutoRotateTest extends \PHPUnit_Framework_TestCase {
         $imagick->expects($this->once())->method('getImageOrientation')->will($this->returnValue(0));
         $imagick->expects($this->never())->method('setImageOrientation');
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->once())->method('getArgument')->with('image')->will($this->returnValue($image));
+        $transformation = new AutoRotate();
+        $transformation->setImagick($imagick);
+        $transformation->transform([]);
+    }
+
+    /**
+     * @covers Imbo\Image\Transformation\AutoRotate::transform
+     */
+    public function testWillRotateWhenNeeded() {
+        $imagick = $this->getMock('Imagick');
+        $imagick->expects($this->once())->method('getImageOrientation')->will($this->returnValue(
+            Imagick::ORIENTATION_TOPRIGHT
+        ));
+        $imagick->expects($this->once())->method('flopImage');
+        $imagick->expects($this->once())->method('setImageOrientation')->with(Imagick::ORIENTATION_TOPLEFT);
 
         $transformation = new AutoRotate();
         $transformation->setImagick($imagick);
-        $transformation->transform($event);
+        $transformation->setImage($this->getMock('Imbo\Model\Image'));
+        $transformation->transform([]);
     }
 }

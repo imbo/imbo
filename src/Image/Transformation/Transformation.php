@@ -105,6 +105,21 @@ abstract class Transformation implements ListenerInterface {
     }
 
     /**
+     * Get the imagick version
+     *
+     * @return string
+     */
+    protected function getImagickVersion() {
+        // Newer versions of Imagick expose getVersion as a static method,
+        // and won't allow phpunit to mock it even when called on an instance
+        if (method_exists('Imagick', 'getVersion')) {
+            return Imagick::getVersion();
+        }
+
+        return $this->imagick->getVersion();
+    }
+
+    /**
      * Transform the image
      *
      * @param array $params Parameters for the transformation

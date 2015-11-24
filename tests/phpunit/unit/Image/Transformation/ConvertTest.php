@@ -45,10 +45,7 @@ class ConvertTest extends \PHPUnit_Framework_TestCase {
         $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
         $image->expects($this->never())->method('getBlob');
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(['type' => 'png']));
-
-        $this->transformation->transform($event);
+        $this->transformation->setImage($image);
+        $this->transformation->transform(['type' => 'png']);
     }
 }

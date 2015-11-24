@@ -156,16 +156,20 @@ class SmartSizeTest extends \PHPUnit_Framework_TestCase {
         $image->setWidth($imageDimensions['width']);
         $image->setHeight($imageDimensions['height']);
 
-        $response = new Response();
+        $headerBag = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $headerBag->expects($this->once())->method('set')->with('X-Imbo-POIs-Used', 1);
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
-        $event->expects($this->at(2))->method('getResponse')->will($this->returnValue($response));
+        $response = new Response();
+        $response->headers = $headerBag;
+
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->once())->method('getResponse')->will($this->returnValue($response));
 
         $transformation = new SmartSize();
-        $transformation->setImagick($imagick);
-
-        $transformation->transform($event);
+        $transformation
+            ->setImagick($imagick)
+            ->setImage($image)
+            ->setEvent($event)
+            ->transform($params);
     }
 }

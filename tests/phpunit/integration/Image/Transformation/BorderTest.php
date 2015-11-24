@@ -47,26 +47,16 @@ class BorderTest extends TransformationTests {
         $image->expects($this->once())->method('setHeight')->with($expectedHeight)->will($this->returnValue($image));
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))
-              ->method('getArgument')
-              ->with('image')
-              ->will($this->returnValue($image));
-        $event->expects($this->at(1))
-              ->method('getArgument')
-              ->with('params')
-              ->will($this->returnValue([
-                  'color' => 'white',
-                  'width' => $borderWidth,
-                  'height' => $borderHeight,
-                  'mode' => $borderMode,
-              ]));
-
         $blob = file_get_contents(FIXTURES_DIR . '/image.png');
 
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);
 
-        $this->getTransformation()->setImagick($imagick)->transform($event);
+        $this->getTransformation()->setImagick($imagick)->setImage($image)->transform([
+            'color' => 'white',
+            'width' => $borderWidth,
+            'height' => $borderHeight,
+            'mode' => $borderMode,
+        ]);
     }
 }

@@ -77,13 +77,9 @@ class ResizeTest extends TransformationTests {
             $image->expects($this->never())->method('hasBeenTransformed');
         }
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
-
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
-        $this->getTransformation()->setImagick($imagick)->transform($event);
+        $this->getTransformation()->setImage($image)->setImagick($imagick)->transform($params);
     }
 }

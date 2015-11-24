@@ -45,8 +45,6 @@ class ImageTransformerTest extends ListenerTests {
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getManager')->will($this->returnValue($this->eventManager));
         $this->event->expects($this->any())->method('getTransformationManager')->will($this->returnValue($this->transformationManager));
-        $this->transformationManager->expects($this->any())->method('setImage')->will($this->returnSelf());
-        $this->transformationManager->expects($this->any())->method('setEvent')->will($this->returnSelf());
 
         $this->listener = new ImageTransformer();
     }
@@ -91,12 +89,12 @@ class ImageTransformerTest extends ListenerTests {
             ],
         ]));
 
-        $resize = $this->getMock('Imbo\Image\Transformation\Transformation');
+        $resize = $this->getTransformationMock();
         $resize->expects($this->once())
             ->method('transform')
             ->with(['width' => 100]);
 
-        $thumbnail = $this->getMock('Imbo\Image\Transformation\Transformation');
+        $thumbnail = $this->getTransformationMock();
         $thumbnail->expects($this->once())
             ->method('transform')
             ->with(['some' => 'value']);
@@ -135,12 +133,12 @@ class ImageTransformerTest extends ListenerTests {
             ],
         ]));
 
-        $flip = $this->getMock('Imbo\Image\Transformation\Transformation');
+        $flip = $this->getTransformationMock();
         $flip->expects($this->once())
             ->method('transform')
             ->with([]);
 
-        $flop = $this->getMock('Imbo\Image\Transformation\Transformation');
+        $flop = $this->getTransformationMock();
         $flop->expects($this->once())
             ->method('transform')
             ->with([]);
@@ -183,18 +181,24 @@ class ImageTransformerTest extends ListenerTests {
             ],
         ]));
 
-        $this->eventManager->expects($this->once())
-                           ->method('trigger')
-                           ->with(
-                               'image.transformation.thumbnail',
-                               [
-                                   'image' => $this->image,
-                                   'params' => [
-                                       'width' => '100',
-                                       'height' => 75,
-                                   ],
-                               ]
-                           );
+        $thumbnail = $this->getTransformationMock();
+        $thumbnail->expects($this->once())
+                  ->method('transform')
+                  ->with([ 'width' => '100', 'height' => 75 ]);
+
+        $this->transformationManager
+            ->expects($this->at(0))
+            ->method('getTransformation')
+            ->with('thumbnail')
+            ->will($this->returnValue($thumbnail));
+
         $this->listener->transform($this->event);
+    }
+
+    protected function getTransformationMock() {
+        $transformation = $this->getMock('Imbo\Image\Transformation\Transformation');
+        $transformation->expects($this->any())->method('setImage')->will($this->returnSelf());
+        $transformation->expects($this->any())->method('setEvent')->will($this->returnSelf());
+        return $transformation;
     }
 }

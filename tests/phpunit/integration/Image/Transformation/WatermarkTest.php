@@ -281,8 +281,6 @@ class WatermarkTest extends TransformationTests {
 
         $event = new Event();
         $event->setArguments([
-            'image' => $image,
-            'params' => $params,
             'storage' => $storage,
             'request' => $request,
         ]);
@@ -290,7 +288,7 @@ class WatermarkTest extends TransformationTests {
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);
 
-        $transformation->setImagick($imagick)->transform($event);
+        $transformation->setEvent($event)->setImage($image)->setImagick($imagick)->transform($params);
 
         foreach ($colors as $c) {
             $this->verifyColor($imagick, $c['x'], $c['y'], $c['colors']);

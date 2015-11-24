@@ -28,14 +28,13 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
         $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('getMetadata')->will($this->returnValue([]));
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getDatabase')->will($this->returnValue($database));
 
         $image->expects($this->never())->method('hasBeenTransformed');
 
         $transformation = new DrawPois();
-        $transformation->transform($event);
+        $transformation->setEvent($event)->setImage($image)->transform([]);
     }
 
     /**
@@ -46,14 +45,13 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
         $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('getMetadata')->will($this->returnValue(['poi' => 'wat']));
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getDatabase')->will($this->returnValue($database));
 
         $image->expects($this->never())->method('hasBeenTransformed');
 
         $transformation = new DrawPois();
-        $transformation->transform($event);
+        $transformation->setEvent($event)->setImage($image)->transform([]);
     }
 
     /**
@@ -68,14 +66,13 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
             'poi' => [['foo' => 'bar']]
         ]));
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getDatabase')->will($this->returnValue($database));
 
         $image->expects($this->never())->method('hasBeenTransformed');
 
         $transformation = new DrawPois();
-        $transformation->transform($event);
+        $transformation->setEvent($event)->setImage($image)->transform([]);
     }
 
     /**
@@ -105,8 +102,7 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
             ]]
         ]));
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
+        $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getDatabase')->will($this->returnValue($database));
 
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
@@ -115,39 +111,10 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
         $imagick->expects($this->exactly(3))->method('drawImage');
 
         $transformation = new DrawPois();
-        $transformation->setImagick($imagick);
-        $transformation->transform($event);
-    }
-
-    /**
-     * @covers Imbo\Image\Transformation\DrawPois::transform
-     */
-    public function testDrawPois() {
-        return;
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->any())
-                ->method('cropImage')
-                ->with(
-                    $cropParams['width'],
-                    $cropParams['height'],
-                    $cropParams['left'],
-                    $cropParams['top']
-                );
-
-        $image = new Image();
-        $image->setWidth($imageDimensions['width']);
-        $image->setHeight($imageDimensions['height']);
-
-        $response = new Response();
-
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
-        $event->expects($this->at(2))->method('getResponse')->will($this->returnValue($response));
-
-        $transformation = new DrawPois();
-        $transformation->setImagick($imagick);
-
-        $transformation->transform($event);
+        $transformation
+            ->setEvent($event)
+            ->setImage($image)
+            ->setImagick($imagick)
+            ->transform([]);
     }
 }

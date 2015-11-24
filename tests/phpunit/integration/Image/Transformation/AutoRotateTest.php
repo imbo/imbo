@@ -94,15 +94,13 @@ class AutoRotateTest extends TransformationTests {
             $image->expects($this->never())->method('hasBeenTransformed');
         }
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->once())->method('getArgument')->with('image')->will($this->returnValue($image));
-
         // Perform the auto rotate transformation on the image
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);
 
         $this->getTransformation()->setImagick($imagick)
-                                  ->transform($event);
+                                  ->setImage($image)
+                                  ->transform([]);
 
         // Do assertion comparison on the color values
         foreach ($colorValues as $pixelInfo) {

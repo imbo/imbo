@@ -12,6 +12,7 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
     Imbo\EventListener\ListenerInterface,
+    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -45,7 +46,7 @@ class Compress extends Transformation implements ListenerInterface {
             return;
         }
 
-        $image = $event->getArgument('image');
+        $image = $this->image;
         $mimeType = $image->getMimeType();
 
         if ($mimeType === 'image/gif') {
@@ -78,5 +79,7 @@ class Compress extends Transformation implements ListenerInterface {
         if ($this->level < 0 || $this->level > 100) {
             throw new TransformationException('level must be between 0 and 100', 400);
         }
+
+        return $this;
     }
 }

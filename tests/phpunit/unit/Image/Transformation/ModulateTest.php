@@ -62,13 +62,12 @@ class ModulateTest extends \PHPUnit_Framework_TestCase {
     public function testUsesDefaultValuesWhenParametersAreNotSpecified(array $params, $brightness, $saturation, $hue) {
         $image = $this->createMock('Imbo\Model\Image');
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue($params));
-        $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
-
-        $imagick = $this->createMock('Imagick');
+        $imagick = $this->getMock('Imagick');
         $imagick->expects($this->once())->method('modulateImage')->with($brightness, $saturation, $hue);
 
-        $this->transformation->setImagick($imagick)->transform($event);
+        $this->transformation
+            ->setImage($image)
+            ->setImagick($imagick)
+            ->transform($params);
     }
 }
