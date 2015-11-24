@@ -38,8 +38,10 @@ class ImageVariationsTest extends ListenerTests {
     private $imageModel;
     private $imageStorage;
     private $eventManager;
+    private $transformationManager;
     private $user = 'user';
     private $imageIdentifier = 'imgid';
+    private $transformation;
 
     /**
      * {@inheritdoc}
@@ -67,6 +69,15 @@ class ImageVariationsTest extends ListenerTests {
         $this->eventManager = $this->createMock('Imbo\EventManager\EventManager');
         $this->imageStorage = $this->createMock('Imbo\Storage\StorageInterface');
 
+        $this->transformation = $this->getMock('Imbo\Image\Transformation\Transformation');
+        $this->transformation->expects($this->any())->method('setImage')->will($this->returnSelf());
+
+        $this->transformationManager = $this->getMock('Imbo\Image\TransformationManager');
+        $this->transformationManager
+            ->expects($this->any())
+            ->method('getTransformation')
+            ->will($this->returnValue($this->transformation));
+
         $this->imageModel->method('getImageIdentifier')->willReturn($this->imageIdentifier);
 
         $this->request = $this->createMock('Imbo\Http\Request\Request');
@@ -85,6 +96,7 @@ class ImageVariationsTest extends ListenerTests {
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getManager')->will($this->returnValue($this->eventManager));
         $this->event->expects($this->any())->method('getStorage')->will($this->returnValue($this->imageStorage));
+        $this->event->expects($this->any())->method('getTransformationManager')->will($this->returnValue($this->transformationManager));
 
         $this->listener = $this->getListener();
     }
@@ -524,14 +536,11 @@ class ImageVariationsTest extends ListenerTests {
 
         $this->imageModel->method('getWidth')->willReturn(2048);
 
-        $this->eventManager
+        $this->transformation
             ->expects($this->at(1))
-            ->method('trigger')
-            ->with('image.transformation.convert', [
-                'image'  => $this->imageModel,
-                'params' => [
-                    'type' => 'png'
-                ]
+            ->method('transform')
+            ->with([
+                'type' => 'png'
             ]);
 
         $listener->generateVariations($this->event);
@@ -596,9 +605,9 @@ class ImageVariationsTest extends ListenerTests {
     public function testGenerateVariationsTriggersWarningOnTransformationException() {
         $this->imageModel->method('getWidth')->willReturn(1024);
 
-        $this->eventManager->expects($this->at(1))
-            ->method('trigger')
-            ->with('image.transformation.resize', $this->anything())
+        $this->transformation->expects($this->at(1))
+            ->method('transform')
+            ->with($this->anything())
             ->will($this->throwException(new TransformationException()));
 
         $this->listener->generateVariations($this->event);

@@ -348,17 +348,20 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $eventManager = $this->createMock('Imbo\EventManager\EventManager');
         $eventManager->expects($this->at(0))
                      ->method('trigger')
-                     ->with(
-                         'image.transformation.convert',
-                         [
-                             'image' => $image,
-                             'params' => ['type' => 'png'],
-                         ]
-                     );
-        $eventManager->expects($this->at(1))
-                     ->method('trigger')
                      ->with('image.transformed', ['image' => $image]);
 
+        $convert = $this->getMock('Imbo\Image\Transformation\Convert');
+        $convert->expects($this->once())->method('setImage')->will($this->returnSelf());
+        $convert->expects($this->once())->method('transform')->with(['type' => 'png']);
+
+        $transformationManager = $this->getMock('Imbo\Image\TransformationManager');
+        $transformationManager
+            ->expects($this->once())
+            ->method('getTransformation')
+            ->with('convert')
+            ->will($this->returnValue($convert));
+
+        $this->event->expects($this->once())->method('getTransformationManager')->will($this->returnValue($transformationManager));
         $this->event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
 
         $this->responseFormatter->format($this->event);
