@@ -167,13 +167,18 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
         $helper->setInputStream($this->getInputStream([
             '4',
             '',
+            'foo.bar,bar.foo',
             '*',
             'n'
         ]));
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
-        $this->assertRegExp('/at least one resource/', $commandTester->getDisplay(true));
+
+        $this->assertRegExp(
+            '/must specify at least one resource/',
+            $commandTester->getDisplay(true)
+        );
     }
 
     /**
