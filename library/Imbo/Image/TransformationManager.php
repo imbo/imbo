@@ -167,6 +167,111 @@ class TransformationManager implements ListenerInterface {
         }
     }
 
+    public function getMinimumImageInputSize(EventInterface $event) {
+        $transformations = $event->getRequest()->getTransformations();
+        $image = $event->getResponse()->getModel();
+
+        $minimum = ['width' => 0, 'height' => 0];
+        foreach ($transformations as $i => $transformation) {
+            $params = $transformation['params'];
+
+            $handler = $this->getTransformation($transformation['name']);
+            if ($handler instanceof InputSizeAware) {
+                $minSize = $handler->setImage($image)->getMinimumInputSize($params);
+
+                if (!$minSize) {
+                    continue;
+                }
+
+                if ($minimum['width']  < $minSize['width'] ||
+                    $minimum['height'] < $minSize['height']) {
+                    $minimum = $minSize;
+                }
+            }
+        }
+
+        // Return false if the input size is either zero or the size is larger than the original
+        if (!$minimum['width'] || !$minimum['height'] ||
+            $minimum['width'] > $image->getWidth() || $minimum['height'] > $image->getHeight()) {
+            return false;
+        }
+
+        return array_map('intval', array_map('ceil', $minimum));
+
+        // Possible widths to use
+        $widths = [];
+
+        // Extracts from the image
+        $extracts = [];
+
+        // Calculate the aspect ratio in case some transformations only specify height
+        $ratio = $width / $height;
+
+        foreach ($transformations as $i => $transformation) {
+            $name = $transformation['name'];
+            $params = $transformation['params'];
+
+            if ($name === 'maxSize') {
+                // MaxSize transformation
+                if (isset($params['width'])) {
+                    // width detected
+                    $widths[$i] = (int) $params['width'];
+                } else if (isset($params['height'])) {
+                    // height detected, calculate ratio
+                    $widths[$i] = (int) $params['height'] * $ratio;
+                }
+            } else if ($name === 'resize') {
+                // Resize transformation
+                if (isset($params['width'])) {
+                    // width detected
+                    $widths[$i] = (int) $params['width'];
+                } else if (isset($params['height'])) {
+                    // height detected, calculate ratio
+                    $widths[$i] = (int) $params['height'] * $ratio;
+                }
+            } else if ($name === 'thumbnail') {
+                // Thumbnail transformation
+                if (isset($params['width'])) {
+                    // Width have been specified
+                    $widths[$i] = (int) $params['width'];
+                } else if (isset($params['height']) && isset($params['fit']) && $params['fit'] === 'inset') {
+                    // Height have been specified, and the fit mode is inset, calculate width
+                    $widths[$i] = (int) $params['height'] * $ratio;
+                } else {
+                    // No width or height/inset fit combo. Use default width for thumbnails
+                    $widths[$i] = 50;
+                }
+            } else if ($name === 'crop' && empty($widths)) {
+                // Crop transformation
+                $extracts[$i] = $params;
+            }
+        }
+
+        if ($widths && !empty($extracts)) {
+            // If we are fetching extracts, we need a larger version of the image
+            $extract = reset($extracts);
+
+            // Find the correct scaling factor for the extract
+            $extractFactor = $width / $extract['width'];
+            $maxWidth = max($widths);
+
+            // Find the new max width
+            $maxWidth = $maxWidth * $extractFactor;
+
+            return [key($extracts) => $maxWidth];
+        }
+
+        if ($widths) {
+            // Find the max width in the set, and return it along with the index of the
+            // transformation that first referenced it
+            $maxWidth = max($widths);
+
+            return [array_search($maxWidth, $widths) => $maxWidth];
+        }
+
+        return null;
+    }
+
     /**
      * Trigger transformation with the given name, with the given parameters
      *

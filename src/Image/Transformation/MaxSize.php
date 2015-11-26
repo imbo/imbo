@@ -11,6 +11,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
+    Imbo\Image\InputSizeAware,
     ImagickException;
 
 /**
@@ -20,47 +21,75 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class MaxSize extends Transformation {
+class MaxSize extends Transformation implements InputSizeAware {
     /**
      * {@inheritdoc}
      */
     public function transform(array $params) {
+        $newSize = $this->calculateSize($params);
+
+        // No need to transform? Fall back
+        if (!$newSize) {
+            return;
+        }
+
+        try {
+            $this->imagick->thumbnailImage($newSize['width'], $newSize['height']);
+
+            $size = $this->imagick->getImageGeometry();
+
+            $this->image
+                 ->setWidth($size['width'])
+                 ->setHeight($size['height'])
+                 ->hasBeenTransformed(true);
+        } catch (ImagickException $e) {
+            throw new TransformationException($e->getMessage(), 400, $e);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMinimumInputSize(array $params) {
+        return $this->calculateSize($params) ?: [
+            'width' => $this->image->getWidth(),
+            'height' => $this->image->getHeight()
+        ];
+    }
+
+    /**
+     * Calculate the output size based on the specified parameters
+     *
+     * @param array $params
+     * @return array|boolean
+     */
+    protected function calculateSize(array $params) {
         $image = $this->image;
 
         $maxWidth = !empty($params['width']) ? (int) $params['width'] : 0;
         $maxHeight = !empty($params['height']) ? (int) $params['height'] : 0;
 
-        try {
-            $sourceWidth  = $image->getWidth();
-            $sourceHeight = $image->getHeight();
+        $sourceWidth  = $image->getWidth();
+        $sourceHeight = $image->getHeight();
 
-            $width  = $maxWidth  ?: $sourceWidth;
-            $height = $maxHeight ?: $sourceHeight;
+        $width  = $maxWidth  ?: $sourceWidth;
+        $height = $maxHeight ?: $sourceHeight;
 
-            // Figure out original ratio
-            $ratio = $sourceWidth / $sourceHeight;
+        // Figure out original ratio
+        $ratio = $sourceWidth / $sourceHeight;
 
-            // Is the original image larger than the max-parameters?
-            if (($sourceWidth > $width) || ($sourceHeight > $height)) {
-                if (($width / $height) > $ratio) {
-                    $width  = round($height * $ratio);
-                } else {
-                    $height = round($width / $ratio);
-                }
-            } else {
-                // Original image is smaller than the max-parameters, don't transform
-                return;
-            }
-
-            $this->imagick->thumbnailImage($width, $height);
-
-            $size = $this->imagick->getImageGeometry();
-
-            $image->setWidth($size['width'])
-                  ->setHeight($size['height'])
-                  ->hasBeenTransformed(true);
-        } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+        if (($width / $height) > $ratio) {
+            $width  = round($height * $ratio);
+        } else {
+            $height = round($width / $ratio);
         }
+
+        // Is the original image smaller than the specified parameters?
+        if ($sourceWidth <= $width && $sourceHeight <= $height) {
+            // Original image is smaller than the max-parameters, don't transform
+            return false;
+        }
+
+        return ['width' => $width, 'height' => $height];
     }
 }
