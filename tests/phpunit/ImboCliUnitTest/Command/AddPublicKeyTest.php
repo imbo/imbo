@@ -160,6 +160,28 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers ImboCli\Command\AddPublicKey::askForCustomResources
+     */
+    public function testWillNotAcceptEmptyCustomResourceSpecification() {
+        $helper = $this->command->getHelper('question');
+        $helper->setInputStream($this->getInputStream([
+            '4',
+            '',
+            'foo.bar,bar.foo',
+            '*',
+            'n'
+        ]));
+
+        $commandTester = new CommandTester($this->command);
+        $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
+
+        $this->assertRegExp(
+            '/must specify at least one resource/',
+            $commandTester->getDisplay(true)
+        );
+    }
+
+    /**
      * @covers ImboCli\Command\AddPublicKey::execute
      * @covers ImboCli\Command\AddPublicKey::askForAnotherAclRule
      * @covers ImboCli\Command\AddPublicKey::askForResources
@@ -241,6 +263,43 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
 
         $helper = $this->command->getHelper('question');
         $helper->setInputStream($this->getInputStream(['3', '0,5', '*', 'n']));
+
+        $commandTester = new CommandTester($this->command);
+        $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
+    }
+
+    /**
+     * @covers ImboCli\Command\AddPublicKey::execute
+     * @covers ImboCli\Command\AddPublicKey::askForAnotherAclRule
+     * @covers ImboCli\Command\AddPublicKey::askForCustomResources
+     */
+    public function testPromtpsForListOfCustomResourcesIfOptionIsSelected() {
+        $allResources = Resource::getAllResources();
+        sort($allResources);
+
+        $this->adapter
+            ->expects($this->once())
+            ->method('addAccessRule')
+            ->with('foo', [
+                'resources' => [
+                    'foo.read',
+                    'bar.write'
+                ],
+                'users' => '*'
+            ]);
+
+        $this->adapter
+            ->expects($this->once())
+            ->method('addKeyPair')
+            ->with('foo', 'bar');
+
+        $helper = $this->command->getHelper('question');
+        $helper->setInputStream($this->getInputStream([
+            '4',
+            'foo.read,bar.write',
+            '*',
+            'n'
+        ]));
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
