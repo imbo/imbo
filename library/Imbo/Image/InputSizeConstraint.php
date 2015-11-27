@@ -11,13 +11,20 @@
 namespace Imbo\Image;
 
 /**
- * Input size aware interface - transformations that implement this interface
+ * Input size contraint interface - transformations that implement this interface
  * can let Imbo know the minimum size of the input image that it can receive,
  * given a set of parameters.
  *
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image
  */
-interface InputSizeAware {
+interface InputSizeConstraint {
+    /**
+     * Get the minimum input size that this transformation can accept as input,
+     * given the parameters provided.
+     *
+     * @param array $params Transformation parameters
+     * @return array Array containing `width` and `height`
+     */
     public function getMinimumInputSize(array $params);
 }
