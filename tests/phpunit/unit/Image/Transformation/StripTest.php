@@ -39,7 +39,6 @@ class StripTest extends \PHPUnit_Framework_TestCase {
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
         $imagick = $this->getMock('Imagick');
-        $imagick->expects($this->any())->method('getVersion')->will($this->returnValue('6.9.1'));
         $imagick->expects($this->once())->method('getImageBlob')->will($this->returnValue('foo'));
         $imagick->expects($this->once())->method('clear');
         $imagick->expects($this->once())->method('readImageBlob')->with('foo');

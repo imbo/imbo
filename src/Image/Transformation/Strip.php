@@ -29,14 +29,9 @@ class Strip extends Transformation {
 
             // In newer versions of Imagick, it seems we need to clear and re-read
             // the data to properly clear the properties
-            $version = $this->getImagickVersion();
-            $version = preg_replace('#.*?(\d+\.\d+\.\d+).*#', '$1', $version['versionString']);
-
-            if (version_compare($version, '6.8.0') >= 0){
-                $data = $this->imagick->getImageBlob();
-                $this->imagick->clear();
-                $this->imagick->readImageBlob($data);
-            }
+            $data = $this->imagick->getImageBlob();
+            $this->imagick->clear();
+            $this->imagick->readImageBlob($data);
 
             $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
