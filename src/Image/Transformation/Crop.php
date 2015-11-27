@@ -41,6 +41,10 @@ class Crop extends Transformation implements RegionExtractor {
     public function transform(array $params) {
         $region = $this->getExtractedRegion($params);
 
+        if (!$region) {
+            return;
+        }
+
         try {
             $this->imagick->cropImage(
                 $region['width'],
