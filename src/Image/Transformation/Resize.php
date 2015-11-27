@@ -11,7 +11,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\Image\InputSizeAware,
+    Imbo\Image\InputSizeConstraint,
     ImagickException;
 
 /**
@@ -20,7 +20,7 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Resize extends Transformation implements InputSizeAware {
+class Resize extends Transformation implements InputSizeConstraint {
     /**
      * {@inheritdoc}
      */

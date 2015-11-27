@@ -11,6 +11,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
+    Imbo\Image\RegionExtractor,
     ImagickException;
 
 /**
@@ -19,7 +20,7 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Crop extends Transformation {
+class Crop extends Transformation implements RegionExtractor {
     /**
      * X coordinate of the top left corner of the crop
      *
@@ -38,6 +39,32 @@ class Crop extends Transformation {
      * {@inheritdoc}
      */
     public function transform(array $params) {
+        $region = $this->getExtractedRegion($params);
+
+        try {
+            $this->imagick->cropImage(
+                $region['width'],
+                $region['height'],
+                $region['x'],
+                $region['y']
+            );
+
+            $this->imagick->setImagePage(0, 0, 0, 0);
+            $size = $this->imagick->getImageGeometry();
+
+            $this->image
+                 ->setWidth($size['width'])
+                 ->setHeight($size['height'])
+                 ->hasBeenTransformed(true);
+        } catch (ImagickException $e) {
+            throw new TransformationException($e->getMessage(), 400, $e);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtractedRegion(array $params) {
         $image = $this->image;
 
         foreach (['width', 'height'] as $param) {
@@ -73,24 +100,15 @@ class Crop extends Transformation {
         }
 
         // Return if there is no need for cropping
-        if (
-            $x === 0 && $y === 0 &&
-            $imageWidth <= $width &&
-            $imageHeight <= $height
-        ) {
-            return;
+        if ($imageWidth === $width && $imageHeight === $height) {
+            return false;
         }
 
-        try {
-            $this->imagick->cropImage($width, $height, $x, $y);
-            $this->imagick->setImagePage(0, 0, 0, 0);
-            $size = $this->imagick->getImageGeometry();
-
-            $image->setWidth($size['width'])
-                  ->setHeight($size['height'])
-                  ->hasBeenTransformed(true);
-        } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
-        }
+        return [
+            'width' => $width,
+            'height' => $height,
+            'x' => $x,
+            'y' => $y
+        ];
     }
 }

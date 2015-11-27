@@ -82,35 +82,9 @@ class Imagick implements ListenerInterface {
             $image = $event->getResponse()->getModel();
         }
 
-        $enabled = true;
-        $fakeVariation = true;
-
         // See if we can hint to imagick that we expect a smaller output
         $minSize = $event->getTransformationManager()->getMinimumImageInputSize($event);
-        if ($enabled && $minSize && $fakeVariation) {
-            /*$sourceWidth  = $image->getWidth();
-            $sourceHeight = $image->getHeight();
-
-            $width  = $minSize['width']  ?: $sourceWidth;
-            $height = $minSize['height'] ?: $sourceHeight;
-
-            // Figure out original ratio
-            $ratio = $sourceWidth / $sourceHeight;
-
-            if (($width / $height) > $ratio) {
-                $width  = round($height * $ratio);
-            } else {
-                $height = round($width / $ratio);
-            }
-
-            var_dump($minSize, $width, $height);exit;*/
-            $width = $minSize['width'];
-            $height = $minSize['height'];
-
-            $this->imagick->readImageBlob($image->getBlob());
-            $this->imagick->thumbnailImage((int) $width, (int) $height);
-            return;
-        } else if ($enabled && $minSize) {
+        if ($minSize) {
             $this->imagick->setOption('jpeg:size', $minSize['width'] . 'x' . $minSize['height']);
         }
 

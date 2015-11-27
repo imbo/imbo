@@ -167,27 +167,75 @@ class TransformationManager implements ListenerInterface {
         }
     }
 
+    /**
+     * Get the minimum size of the original image that we can accept, based on the transformations
+     * present in the request query string. For instance, if we have an image that is 10 000 pixels
+     * in width, and we have applied a single `maxSize`-transformation with a width of 1000 pixels,
+     * we could in theory use an image that is down to 1000 pixels wide as input, as opposed to the
+     * original image which might take significantly longer to resize.
+     *
+     * Returns an array consisting of keys: `width`, `height` and `index`, where `index` is the
+     * index of the transformation that determined the minimum input size, in the end. This is used
+     * in cases where we need to adjust the transformation parameters to account for the new size
+     * of the input image.
+     *
+     * @param  EventInterface $event The event that triggered this calculation
+     * @return array|boolean `false` if we need the full size of the input image, array otherwise
+     */
     public function getMinimumImageInputSize(EventInterface $event) {
         $transformations = $event->getRequest()->getTransformations();
         $image = $event->getResponse()->getModel();
 
-        $minimum = ['width' => 0, 'height' => 0];
+        $region = null;
+        $minimum = ['width' => 0, 'height' => 0, 'index' => 0];
         foreach ($transformations as $i => $transformation) {
             $params = $transformation['params'];
 
             $handler = $this->getTransformation($transformation['name']);
-            if ($handler instanceof InputSizeAware) {
+
+            // Some transformations, such as `crop`, will return a region of the input image.
+            // In some cases, we'll need the full size of the image to extract this properly,
+            // but in other cases we can make do with a smaller version. We only fetch the
+            // first region that is requested, as this will determine the minimum input size
+            if (!$region && $handler instanceof RegionExtractor) {
+                $region = $handler->setImage($image)->getExtractedRegion($params);
+
+                // RegionExtractors return false if no region is extracted
+                if ($region) {
+                    $minimum['index'] = $i;
+                }
+            }
+
+            if ($handler instanceof InputSizeConstraint) {
                 $minSize = $handler->setImage($image)->getMinimumInputSize($params);
 
+                // Some transformations might return false if no transformation will occur for the
+                // given parameters
                 if (!$minSize) {
                     continue;
                 }
 
+                // Check if the output size of this transformation is larger than our current
                 if ($minimum['width']  < $minSize['width'] ||
                     $minimum['height'] < $minSize['height']) {
                     $minimum = $minSize;
+
+                    // Any region that has been found will determine the size in the end,
+                    // do not override the index in such cases
+                    if (!$region) {
+                        $minimum['index'] = $i;
+                    }
                 }
             }
+        }
+
+        // If region has been found, calculate input size based on original aspect ratio
+        if ($region && $minimum['width'] > 0) {
+            $originalRatio = $image->getWidth() / $image->getHeight();
+            $regionRatio = $image->getWidth() / $region['width'];
+
+            $minimum['width'] = $minimum['width'] * $regionRatio;
+            $minimum['height'] = $minimum['width'] / $originalRatio;
         }
 
         // Return false if the input size is either zero or the size is larger than the original
@@ -197,79 +245,6 @@ class TransformationManager implements ListenerInterface {
         }
 
         return array_map('intval', array_map('ceil', $minimum));
-
-        // Possible widths to use
-        $widths = [];
-
-        // Extracts from the image
-        $extracts = [];
-
-        // Calculate the aspect ratio in case some transformations only specify height
-        $ratio = $width / $height;
-
-        foreach ($transformations as $i => $transformation) {
-            $name = $transformation['name'];
-            $params = $transformation['params'];
-
-            if ($name === 'maxSize') {
-                // MaxSize transformation
-                if (isset($params['width'])) {
-                    // width detected
-                    $widths[$i] = (int) $params['width'];
-                } else if (isset($params['height'])) {
-                    // height detected, calculate ratio
-                    $widths[$i] = (int) $params['height'] * $ratio;
-                }
-            } else if ($name === 'resize') {
-                // Resize transformation
-                if (isset($params['width'])) {
-                    // width detected
-                    $widths[$i] = (int) $params['width'];
-                } else if (isset($params['height'])) {
-                    // height detected, calculate ratio
-                    $widths[$i] = (int) $params['height'] * $ratio;
-                }
-            } else if ($name === 'thumbnail') {
-                // Thumbnail transformation
-                if (isset($params['width'])) {
-                    // Width have been specified
-                    $widths[$i] = (int) $params['width'];
-                } else if (isset($params['height']) && isset($params['fit']) && $params['fit'] === 'inset') {
-                    // Height have been specified, and the fit mode is inset, calculate width
-                    $widths[$i] = (int) $params['height'] * $ratio;
-                } else {
-                    // No width or height/inset fit combo. Use default width for thumbnails
-                    $widths[$i] = 50;
-                }
-            } else if ($name === 'crop' && empty($widths)) {
-                // Crop transformation
-                $extracts[$i] = $params;
-            }
-        }
-
-        if ($widths && !empty($extracts)) {
-            // If we are fetching extracts, we need a larger version of the image
-            $extract = reset($extracts);
-
-            // Find the correct scaling factor for the extract
-            $extractFactor = $width / $extract['width'];
-            $maxWidth = max($widths);
-
-            // Find the new max width
-            $maxWidth = $maxWidth * $extractFactor;
-
-            return [key($extracts) => $maxWidth];
-        }
-
-        if ($widths) {
-            // Find the max width in the set, and return it along with the index of the
-            // transformation that first referenced it
-            $maxWidth = max($widths);
-
-            return [array_search($maxWidth, $widths) => $maxWidth];
-        }
-
-        return null;
     }
 
     /**

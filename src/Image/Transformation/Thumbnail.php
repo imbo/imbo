@@ -11,7 +11,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\Image\InputSizeAware,
+    Imbo\Image\InputSizeConstraint,
     ImagickException;
 
 /**
@@ -20,7 +20,7 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Thumbnail extends Transformation implements InputSizeAware {
+class Thumbnail extends Transformation implements InputSizeConstraint {
     /**
      * Width of the thumbnail
      *
