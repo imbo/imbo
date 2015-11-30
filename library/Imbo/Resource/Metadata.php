@@ -125,7 +125,7 @@ class Metadata implements ResourceInterface {
                     continue;
                 }
 
-                throw new InvalidArgumentException('Invalid metadata. Dots are not allowed in metadata keys', 400);
+                throw new InvalidArgumentException('Invalid metadata. Dot characters (\'.\') are not allowed in metadata keys', 400);
             }
 
             if ($metadata === null) {

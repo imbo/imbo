@@ -155,7 +155,7 @@ Feature: Imbo provides a metadata endpoint
           """
         And I sign the request
         When I request the metadata of the test image using HTTP "PUT"
-        Then I should get a response with "400 Invalid metadata. Dots are not allowed in metadata keys"
+        Then I should get a response with "400 Invalid metadata. Dot characters ('.') are not allowed in metadata keys"
 
     Scenario Outline: Set and get metadata with nested info
         Given I use "publickey" and "privatekey" for public and private keys
