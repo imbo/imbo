@@ -13,6 +13,11 @@
  */
 return [
     'eventListeners' => [
-        'exifMetadataListener' => 'Imbo\EventListener\ExifMetadata',
+        'exifMetadataListener' => [
+            'listener' => 'Imbo\EventListener\ExifMetadata',
+            'params' => [
+                'allowedTags' => ['exif:*', 'png:*']
+            ]
+        ]
     ],
 ];
