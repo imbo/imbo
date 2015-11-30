@@ -141,11 +141,21 @@ Feature: Imbo provides a metadata endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And the request body contains:
           """
-          {"json got broken in half sort of
+          {foo bar}
           """
         And I sign the request
         When I request the metadata of the test image using HTTP "PUT"
         Then I should get a response with "400 Invalid JSON data"
+
+    Scenario: Set data for invalid metadata key
+        Given I use "publickey" and "privatekey" for public and private keys
+        And the request body contains:
+          """
+          {"foo.bar": "bar"}
+          """
+        And I sign the request
+        When I request the metadata of the test image using HTTP "PUT"
+        Then I should get a response with "400 Invalid metadata. Dot characters ('.') are not allowed in metadata keys"
 
     Scenario Outline: Set and get metadata with nested info
         Given I use "publickey" and "privatekey" for public and private keys

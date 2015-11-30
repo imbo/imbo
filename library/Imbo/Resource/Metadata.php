@@ -120,6 +120,14 @@ class Metadata implements ResourceInterface {
         } else {
             $metadata = json_decode($metadata, true);
 
+            foreach (array_keys($metadata) as $key) {
+                if (strpos($key, '.') === false) {
+                    continue;
+                }
+
+                throw new InvalidArgumentException('Invalid metadata. Dot characters (\'.\') are not allowed in metadata keys', 400);
+            }
+
             if ($metadata === null) {
                 throw new InvalidArgumentException('Invalid JSON data', 400);
             }
