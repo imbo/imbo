@@ -43,4 +43,11 @@ class RandomString implements GeneratorInterface {
 
         return $key;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isDeterministic() {
+        return false;
+    }
 }

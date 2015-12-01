@@ -26,4 +26,12 @@ interface GeneratorInterface {
      * @return string A valid image identifier, between 1 and 255 characters
      */
     function generate(Image $image);
+
+    /**
+     * Return a boolean indicating whether or not the generator is deterministic. Meaning
+     * that it will always return the same identifier for the same image.
+     *
+     * @return boolean
+     */
+    function isDeterministic();
 }

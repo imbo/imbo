@@ -113,6 +113,10 @@ class ImagePreparation implements ListenerInterface {
             $imageIdentifierGenerator = $imageIdentifierGenerator();
         }
 
+        if ($imageIdentifierGenerator->isDeterministic()) {
+            return $imageIdentifierGenerator->generate($image);
+        }
+
         // Continue generating image identifiers until we get one that does not already exist
         $maxAttempts = 100;
         $attempts = 0;
