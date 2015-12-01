@@ -409,7 +409,7 @@ DATA;
     private function formatAccessRuleArray(array $accessRule) {
         $rule = '<rule id="' . $accessRule['id'] . '">';
 
-        if (isset($accessRule['resources']) && !!$accessRule['resources']) {
+        if (isset($accessRule['resources']) && $accessRule['resources']) {
             $rule .= '<resources>';
             foreach ($accessRule['resources'] as $resource) {
                 $rule .= '<resource>' . $this->formatValue($resource) . '</resource>';
@@ -421,9 +421,11 @@ DATA;
             $rule .= '<group>' . $this->formatValue($accessRule['group']) . '</group>';
         }
 
-        if (isset($accessRule['users']) && !!$accessRule['users']) {
+        if (isset($accessRule['users']) && $accessRule['users']) {
+            $users = (array) $accessRule['users'];
+
             $rule .= '<users>';
-            foreach ($accessRule['users'] as $user) {
+            foreach ($users as $user) {
                 $rule .= '<user>' . $this->formatValue($user) . '</user>';
             }
             $rule .= '</users>';
