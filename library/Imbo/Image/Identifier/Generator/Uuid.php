@@ -26,4 +26,11 @@ class Uuid implements GeneratorInterface {
     public function generate(Image $image) {
         return (string) UuidFactory::uuid4();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isDeterministic() {
+        return false;
+    }
 }

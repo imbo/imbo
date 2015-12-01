@@ -26,4 +26,11 @@ class Md5 implements GeneratorInterface {
     public function generate(Image $image) {
         return md5($image->getBlob());
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isDeterministic() {
+        return true;
+    }
 }
