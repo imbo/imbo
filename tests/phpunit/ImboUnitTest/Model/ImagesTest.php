@@ -42,12 +42,12 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Model\Images::setImages
      */
     public function testCanSetAndGetImages() {
-        $images = array(
+        $images = [
             $this->getMock('Imbo\Model\Image'),
             $this->getMock('Imbo\Model\Image'),
             $this->getMock('Imbo\Model\Image'),
-        );
-        $this->assertSame(array(), $this->model->getImages());
+        ];
+        $this->assertSame([], $this->model->getImages());
         $this->assertSame($this->model, $this->model->setImages($images));
         $this->assertSame($images, $this->model->getImages());
     }
@@ -57,9 +57,9 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Model\Images::getFields
      */
     public function testCanSetAndGetFields() {
-        $this->assertSame(array(), $this->model->getFields());
-        $this->assertSame($this->model, $this->model->setFields(array('width', 'height')));
-        $this->assertSame(array('width', 'height'), $this->model->getFields());
+        $this->assertSame([], $this->model->getFields());
+        $this->assertSame($this->model, $this->model->setFields(['width', 'height']));
+        $this->assertSame(['width', 'height'], $this->model->getFields());
     }
 
     /**
@@ -97,11 +97,11 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanCountImages() {
         $this->assertSame(0, $this->model->getCount());
-        $images = array(
+        $images = [
             $this->getMock('Imbo\Model\Image'),
             $this->getMock('Imbo\Model\Image'),
             $this->getMock('Imbo\Model\Image'),
-        );
+        ];
         $this->model->setImages($images);
         $this->assertSame(3, $this->model->getCount());
     }

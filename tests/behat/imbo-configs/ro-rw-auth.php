@@ -8,14 +8,41 @@
  * distributed with this source code.
  */
 
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
+    Imbo\Resource;
+
 /**
  * Use individual read-only/read+write keys
  */
 return [
-    'auth' => [
-        'publickey' => [
-            'ro' => 'read-only-key',
-            'rw' => ['read+write-key'],
-        ]
-    ],
+    'accessControl' => function() {
+        return new ArrayAdapter([
+            [
+                'publicKey'  => 'ro-pubkey',
+                'privateKey' => 'read-only-key',
+                'acl' => [[
+                    'resources' => Resource::getReadOnlyResources(),
+                    'users' => ['someuser'],
+                ]]
+            ],
+
+            [
+                'publicKey'  => 'rw-pubkey',
+                'privateKey' => 'read+write-key',
+                'acl' => [[
+                    'resources' => Resource::getReadWriteResources(),
+                    'users' => ['someuser'],
+                ]]
+            ],
+
+            [
+                'publicKey'  => 'foo',
+                'privateKey' => 'bar',
+                'acl' => [[
+                    'resources' => Resource::getReadOnlyResources(),
+                    'users' => ['user'],
+                ]]
+            ]
+        ]);
+    }
 ];

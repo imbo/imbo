@@ -73,9 +73,9 @@ class Watermark extends Transformation implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.transformation.watermark' => 'transform',
-        );
+        ];
     }
 
     /**
@@ -104,7 +104,7 @@ class Watermark extends Transformation implements ListenerInterface {
         // Try to load watermark image from storage
         try {
             $watermarkData = $event->getStorage()->getImage(
-                $event->getRequest()->getPublicKey(),
+                $event->getRequest()->getUser(),
                 $imageIdentifier
             );
 

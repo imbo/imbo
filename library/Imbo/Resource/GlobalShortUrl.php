@@ -25,18 +25,18 @@ class GlobalShortUrl implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD');
+        return ['GET', 'HEAD'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             // Fetch an image using the short URL
             'globalshorturl.get' => 'getImage',
             'globalshorturl.head' => 'getImage',
-        );
+        ];
     }
 
     /**
@@ -54,12 +54,12 @@ class GlobalShortUrl implements ResourceInterface {
             throw new ResourceException('Image not found', 404);
         }
 
-        $route->set('publicKey', $params['publicKey']);
+        $route->set('user', $params['user']);
         $route->set('imageIdentifier', $params['imageIdentifier']);
         $route->set('extension', $params['extension']);
 
         $request->query = new ParameterBag($params['query']);
         $event->getResponse()->headers->set('X-Imbo-ShortUrl', $request->getUri());
-        $event->getManager()->trigger('image.get');
+        $event->getManager()->trigger('image.get', ['skipAccessControl' => true]);
     }
 }

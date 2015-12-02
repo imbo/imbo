@@ -27,7 +27,7 @@ class MaxImageSizeTest extends ListenerTests {
      * Set up the listener
      */
     public function setUp() {
-        $this->listener = new MaxImageSize(array());
+        $this->listener = new MaxImageSize([]);
     }
 
     /**
@@ -50,12 +50,12 @@ class MaxImageSizeTest extends ListenerTests {
      * @return array[]
      */
     public function getImageDimensions() {
-        return array(
-            'below limit' => array(100, 100, 200, 200, false),
-            'width above' => array(300, 100, 200, 200, true),
-            'height above' => array(100, 300, 200, 200, true),
-            'both above' => array(300, 300, 200, 200, true),
-        );
+        return [
+            'below limit' => [100, 100, 200, 200, false],
+            'width above' => [300, 100, 200, 200, true],
+            'height above' => [100, 300, 200, 200, true],
+            'both above' => [300, 300, 200, 200, true],
+        ];
     }
 
     /**
@@ -75,11 +75,11 @@ class MaxImageSizeTest extends ListenerTests {
 
         if ($willTrigger) {
             $eventManager = $this->getMock('Imbo\EventManager\EventManager');
-            $eventManager->expects($this->once())->method('trigger')->with('image.transformation.maxsize', array('image' => $image, 'params' => array('width' => $maxWidth, 'height' => $maxHeight)));
+            $eventManager->expects($this->once())->method('trigger')->with('image.transformation.maxsize', ['image' => $image, 'params' => ['width' => $maxWidth, 'height' => $maxHeight]]);
             $event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
         }
 
-        $listener = new MaxImageSize(array('width' => $maxWidth, 'height' => $maxHeight));
+        $listener = new MaxImageSize(['width' => $maxWidth, 'height' => $maxHeight]);
         $listener->enforceMaxSize($event);
     }
 }

@@ -11,46 +11,20 @@ The configuration file(s) you need to create should simply return arrays with co
     :local:
     :depth: 1
 
-Imbo users - ``auth``
----------------------
+.. _access-control-configuration:
 
-Every user that wants to store images in Imbo needs a public and one or more private key. Imbo supports both read+write and read-only private keys. These keys can either be stored in the configuration file, or they can be fetched using a custom adapter. The configuration is done in the ``auth`` part of your configuration file:
+Imbo access control - ``accessControl``
+---------------------------------------
 
-.. code-block:: php
+Imbo catalogs stored images under a ``user``. To add an image to a given user, you need a public and private key pair. This pair is used to sign requests to Imbo's API and ensures that the API can't be accessed without knowing the private key.
 
-    <?php
-    return [
-        // ...
+Multiple public keys can be given access to a user, and you can also configure a public key to have access to several users. It's important to note that a ``user`` doesn't have to be created in any way - as long as a public key is defined to have access to a given user, you're ready to start adding images.
 
-        'auth' => [
-            // Read+write private key:
-            'username'  => '95f02d701b8dc19ee7d3710c477fd5f4633cec32087f562264e4975659029af7',
+Public keys can be configured to have varying degrees of access. For instance, you might want one public key for write operations (such as adding and deleting images) and a different public key for read operations (such as viewing images and applying transformations to them). Access is defined on a ``resource`` basis - which basically translates to an API endpoint and an HTTP method. To retrieve an image, for instance, you would give access to the ``image.get`` resource.
 
-            // Or, specify individual read-only and read+write keys:
-            'otheruser' => [
-                'ro' => 'b312ff29d5da23dcd230b61ff4db1e2515c862b9fb0bb59e7dd54ce1e4e94a53',
-                'rw' => 'd5da23dcd2e2515c862b9fb0bb59e7dd54cb312ff29d594a53b11b8dc87f5622',
-            ],
+Specifying a long list of resources can get tedious, so Imbo also supports ``resource groups`` - basically just a list of different resources. When creating access rules for a public key, these can be used instead of specifying specific resources.
 
-            // There is also support for multiple private keys:
-            'someuser' => [
-                'ro' => ['multiple', 'different', 'keys'],
-                'rw' => ['different', 'read+write'],
-            ],
-        ],
-
-        // ...
-    ];
-
-The public keys can consist of the following characters:
-
-* a-z (only lowercase is allowed)
-* 0-9
-* _ and -
-
-and must be at least 3 characters long.
-
-For the private keys you can for instance use a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images (given it's a read+write key). Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want. The key itself will never be a part of the payload sent to/from the server.
+For the private keys you can for instance use a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images (given the public key it belongs to has write access). Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want. The key itself will never be a part of the payload sent to/from the server.
 
 Imbo ships with a small command line tool that can be used to generate private keys for you using the `openssl_random_pseudo_bytes <http://php.net/openssl_random_pseudo_bytes>`_ function. The tool is located in the ``bin`` directory of the Imbo installation:
 
@@ -59,12 +33,14 @@ Imbo ships with a small command line tool that can be used to generate private k
     $ ./bin/imbo generate-private-key
     3b98dde5f67989a878b8b268d82f81f0858d4f1954597cc713ae161cdffcc84a
 
-The private key can be changed whenever you want as long as you remember to change it in both the server configuration and in the client you use. The public key can not be changed easily as database and storage adapters use it when storing/fetching images and metadata.
+The private key can be changed whenever you want as long as you remember to change it in both the server configuration and in the client you use. The user can not be changed easily as database and storage adapters use it when storing/fetching images and metadata.
 
-Custom user lookup adapter
-++++++++++++++++++++++++++
+Access control is managed by ``adapters``. The simplest adapter is the ``SimpleArrayAdapter``, which has a number of trade-offs in favor of being easy to set up. Mainly, it expects the public key to have the same name as the user it should have access to, and that the public key should be given full read+write access to all resources belonging to that user.
 
-You can also use a custom adapter to fetch the public and private keys. The adapter must implement the ``Imbo\Auth\UserLookupInterface``, and be specified in the configuration under the ``auth`` key:
+.. warning::
+    It's not recommended that you use the same public key for both read and write operations. Read on to see how you can create different public keys for read and read/write access.
+
+The adapter is set up using the ``accessControl`` key in your configuration file:
 
 .. code-block:: php
 
@@ -72,12 +48,135 @@ You can also use a custom adapter to fetch the public and private keys. The adap
     return [
         // ...
 
-        'auth' => new My\Custom\UserLookupAdapter([
-            'some' => 'option',
-        ]),
+        'accessControl' => function() {
+            return new Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter([
+                'some-user' => 'my-super-secret-private-key',
+                'other-user' => 'other-super-secret-private-key',
+            ])
+        },
 
         // ...
     ];
+
+It's usually a good idea to have separate public keys for read-only and read+write operations. You can achieve this by using a more flexible access control adapter, such as the ``ArrayAdapter``:
+
+.. code-block:: php
+
+    <?php
+    use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
+        Imbo\Resource;
+
+    return [
+        // ...
+
+        'accessControl' => function() {
+            return new ArrayAdapter([
+                [
+                    'publicKey'  => 'some-read-only-pubkey',
+                    'privateKey' => 'some-private-key',
+                    'acl' => [[
+                        'resources' => Resource::getReadOnlyResources(),
+                        'users' => ['some-user']
+                    ]]
+                ],
+                [
+                    'publicKey'  => 'some-read-write-pubkey',
+                    'privateKey' => 'some-other-private-key',
+                    'acl' => [[
+                        'resources' => Resource::getReadWriteResources(),
+                        'users' => ['some-user']
+                    ]]
+                ]
+            ]);
+        }
+
+        // ...
+    ];
+
+As you can see, the ``ArrayAdapter`` is much more flexible than the ``SimpleArrayAdapter``. The above example only shows part of this flexibility. You can also provide resource groups and multiple access control rules per public key. The following example shows this more clearly:
+
+.. code-block:: php
+
+    <?php
+    use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
+        Imbo\Resource
+
+    return [
+        // ...
+
+        'accessControl' => function() {
+            return new ArrayAdapter([
+                [
+                    // A unique public key matching the following regular expression: [A-Za-z0-9_-]{1,}
+                    'publicKey'  => 'some-pubkey',
+
+                    // Some form of private key
+                    'privateKey' => 'some-private-key',
+
+                    // Array of rules for this public key
+                    'acl' => [
+                        [
+                            // An array of different resource names that the public key should have
+                            // access to - see AdapterInterface::RESOURCE_* for available options.
+                            'resources' => Resource::getReadOnlyResources(),
+
+                            // Names of the users which the public key should have access to.
+                            'users' => ['some', 'users'],
+                        ],
+
+                        // Multiple rules can be applied in order to make a single public key have
+                        // different access rights on different users
+                        [
+                            'resources' => Resource::getReadWriteResources(),
+                            'users' => ['different-user'],
+                        ],
+
+                        // You can also specify resource groups instead of explicitly setting them like
+                        // in the above examples. Note that you cannot specify both resources and group
+                        // in the same rule.
+                        [
+                            'group' => 'read-stats',
+                            'users' => ['user1', 'user2']
+                        ]
+                    ]
+                ]
+            ], [
+                // Second argument to the ArrayAdapter being the available resource groups
+                // Format: 'name' => ['resource1', 'resource2']
+                'read-stats' => ['user.get', 'user.head', 'user.options'],
+            ]);
+        },
+
+        // ...
+    ];
+
+Imbo also ships with a MongoDB access control adapter, which is mutable. This means you can manipulate the access control rules on the fly, using Imbo's API. The adapter uses PHP's `mongo extension <http://pecl.php.net/package/mongo>`_. The following parameters are supported:
+
+``databaseName``
+    Name of the database to use. Defaults to ``imbo``.
+
+``server``
+    The server string to use when connecting. Defaults to ``mongodb://localhost:27017``.
+
+``options``
+    Options passed to the underlying adapter. Defaults to ``['connect' => true, 'timeout' => 1000]``. See the `manual for the MongoClient constructor <http://www.php.net/manual/en/mongoclient.construct.php>`_ for available options.
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'accessControl' => function() {
+            return new Imbo\Auth\AccessControl\Adapter\MongoDB([
+                'databaseName' => 'imbo-acl'
+            ]);
+        },
+
+        // ...
+    ];
+
+When using a mutable access control adapter, you will need to create an initial public key that can subsequently be used to create other public keys. The easiest way to create public keys when using a mutable adapter is to utilize the :ref:`add-public-key command <cli-add-public-key>` provided by the CLI tool that Imbo is shipped with.
 
 .. _database-configuration:
 
@@ -374,7 +473,7 @@ This adapter simply stores all images on the file system. It has a single parame
 ``dataDir``
     The base path where the images are stored.
 
-This adapter is configured to create subdirectories inside of ``dataDir`` based on the public key of the user and the checksum of the images added to Imbo. The algorithm that generates the path simply takes the three first characters of the public key and creates directories for each of them, then the full public key, then a directory of each of the first characters in the image identifier, and lastly it stores the image in a file with a filename equal to the image identifier itself.
+This adapter is configured to create subdirectories inside of ``dataDir`` based on the user and the checksum of the images added to Imbo. The algorithm that generates the path simply takes the three first characters of the user and creates directories for each of them, then the complete user, then a directory of each of the first characters in the image identifier, and lastly it stores the image in a file with a filename equal to the image identifier itself. For instance, an image stored under the user ``foobar`` with the image identifier ``5c01e554-9fca-4231-bb95-a6eabf259b64`` would be stored as ``<dataDir>/f/o/o/foobar/5/c/0/5c01e554-9fca-4231-bb95-a6eabf259b64``.
 
 Examples
 ^^^^^^^^
@@ -473,6 +572,70 @@ If you need to create your own storage adapter you need to create a class that i
 
 You can read more about how to achieve this in the :doc:`../develop/custom_adapters` chapter.
 
+.. _image-identifier-generation:
+
+Image identifier generation - ``imageIdentifierGenerator``
+----------------------------------------------------------
+
+By default, Imbo will generate a random string of characters as the image identifier for added images. These are in the RegExp range ``[A-Za-z0-9_-]`` and by default, the identifier will be 12 characters long.
+
+You can easily change the generation process to a different method. Imbo currently ships with two generators:
+
+RandomString
+++++++++++++
+
+The default, as stated above. This generator has the following parameters:
+
+``length``
+    The length of the randomly generated string. Defaults to ``12``.
+
+Uuid
+++++
+
+Generates 36-character v4 UUIDs, for instance ``f47ac10b-58cc-4372-a567-0e02b2c3d479``. This generator does not have any parameters.
+
+Usage:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'imageIdentifierGenerator' => new Imbo\Image\Identifier\Generator\Uuid(),
+
+        // ...
+    ];
+
+Custom generators
++++++++++++++++++
+
+To create your own custom image identifier generators, simply create a class that implements ``Imbo\Image\Identifier\Generator\GeneratorInterface`` and ensure that the identifiers generated are in the character range ``[A-Za-z0-9_-]`` and are between one and 255 characters long.
+
+.. _configuration-http-cache-headers:
+
+HTTP cache headers - ``httpCacheHeaders``
+-----------------------------------------
+
+Imbo ships with reasonable defaults for which HTTP cache header settings it sends to clients. For some resources, however, it can be difficult to figure out a good middle ground between clients asking too often and too rarely. For instance, the ``images`` resource will change every time a new image has been added - but whether that happens once a second or once a year is hard to know.
+
+To ensure that clients get fresh responses, Imbo sends ``max-age=0, must-revalidate`` on these kind of resources. You can however override these defaults in the configuration. For instance, if you wanted to set the ``max-age`` to 30 seconds, leave it up to the client if it should re-validate and tell intermediary proxies that this response is private, you could set the configuration to the following:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'httpCacheHeaders' => [
+            'maxAge' => 30,
+            'mustRevalidate' => false,
+            'public' => false,
+        ],
+
+        // ...
+    ];
+
 .. _configuration-content-negotiation:
 
 Content negotiation for images - ``contentNegotiateImages``
@@ -483,6 +646,64 @@ By default, Imbo will do content negotiation for images. In other words, if a re
 If what you want is for images to be delivered in the format they were uploaded in, you can set ``contentNegotiateImages`` to ``false`` in the configuration. This will also ensure Imbo does not include ``Accept`` in the ``Vary``-header for image requests, which will make caching behind reverse proxies more efficient.
 
 You are still able to convert between formats by specifying an extension when requesting the image (`.jpg`, `.png`, `.gif` etc).
+
+.. _configuration-trusted-proxies:
+
+Trusted proxies - ``trustedProxies``
+------------------------------------
+
+If you find yourself behind some sort of reverse proxy (like a load balancer), certain header information may be sent to you using special ``X-Forwarded-*`` headers. For example, the ``Host`` HTTP-header is usually used to return the requested host. But when you're behind a proxy, the true host may be stored in an ``X-Forwarded-Host`` header.
+
+Since HTTP headers can be spoofed, Imbo does not trust these proxy headers by default. If you are behind a proxy, you should manually whitelist your proxy. This can be done by defining the proxies IP addresses and/or using CIDR notations. Example:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'trustedProxies' => ['192.0.0.1', '10.0.0.0/8'],
+
+        // ...
+    ];
+
+.. note:: Not all proxies set the required ``X-Forwarded-*`` headers by default. A search for ``X-Forwarded-Proto <your proxy here>`` usually gives helpful answers to how you can add them to incoming requests.
+
+.. _configuration-authentication-protocol:
+
+Authentication protocol - ``authentication``
+--------------------------------------------
+
+Imbo generates access tokens and authentication signatures based on the incoming URL, and includes the protocol (by default). This can sometimes be problematic, for instance when Imbo is behind a load balancer which doesn't send ``X-Forwarded-Proto`` header, or if you want to use protocol-less image URLs on the client side (``//imbo.host/users/some-user/images/img``).
+
+Setting the ``protocol`` option under ``authentication`` allows you to control how Imbo's authentication should behave. The option has the following possible values:
+
+``incoming``
+    Will try to detect the incoming protocol - this is based on ``$_SERVER['HTTPS']`` or the ``X-Forwarded-Proto`` header (given the ``trustedProxies`` option is configured). This is the default value.
+
+``both``
+    Will try to match based on both HTTP and HTTPS protocols and allow the request if any of them yields the correct signature/access token.
+
+``http``
+    Will always use ``http`` as the protocol, replacing ``https`` with ``http`` in the incoming URL, if that is the case.
+
+``https``
+    Will always use ``https`` as the protocol, replacing ``http`` with ``https`` in the incoming URL, if that is the case.
+
+Example usage:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'authentication' => [
+            'protocol' => 'both',
+        ],
+
+        // ...
+    ];
 
 .. _configuration-event-listeners:
 
@@ -540,7 +761,7 @@ Event listeners can be configured in the following ways:
         // ...
     ];
 
-4) Use a class implementing the ``Imbo\EventListener\ListenerInterface`` interface together with an optional public key filter:
+4) Use a class implementing the ``Imbo\EventListener\ListenerInterface`` interface together with an optional user filter:
 
 .. code-block:: php
 
@@ -551,7 +772,7 @@ Event listeners can be configured in the following ways:
         'eventListeners' => [
             'maxImageSize' => [
                 'listener' => new Imbo\EventListener\MaxImageSize(1024, 768),
-                'publicKeys' => [
+                'users' => [
                     'whitelist' => ['user'],
                     // 'blacklist' => ['someotheruser'],
                 ],
@@ -568,7 +789,7 @@ a) a string representing a class name of a class implementing the ``Imbo\EventLi
 b) an instance of the ``Imbo\EventListener\ListenerInterface`` interface
 c) a closure returning an instance ``Imbo\EventListener\ListenerInterface``
 
-The ``publicKeys`` element is an array that you can use if you want your listener to only be triggered for some users (public keys). The value of this is an array with two elements, ``whitelist`` and ``blacklist``, where ``whitelist`` is an array of public keys you **want** your listener to trigger for, and ``blacklist`` is an array of public keys you **don't want** your listener to trigger for. ``publicKeys`` is optional, and per default the listener will trigger for all users.
+The ``users`` element is an array that you can use if you want your listener to only be triggered for some users. The value of this is an array with two elements, ``whitelist`` and ``blacklist``, where ``whitelist`` is an array of users you **want** your listener to trigger for, and ``blacklist`` is an array of users you **don't want** your listener to trigger for. ``users`` is optional, and per default the listener will trigger for all users.
 
 There also exists a ``params`` key that can be used to specify parameters for the event listener, if you choose to specify the listener as a string in the ``listener`` key:
 
@@ -581,7 +802,7 @@ There also exists a ``params`` key that can be used to specify parameters for th
         'eventListeners' => [
             'maxImageSize' => [
                 'listener' => 'Imbo\EventListener\MaxImageSize',
-                'publicKeys' => [
+                'users' => [
                     'whitelist' => ['user'],
                     // 'blacklist' => ['someotheruser'],
                 ],
@@ -612,7 +833,7 @@ The value of the ``params`` array will be sent to the constructor of the event l
                 },
                 'events' => ['image.get'],
                 'priority' => 1,
-                'publicKeys' => [
+                'users' => [
                     'whitelist' => ['user'],
                     // 'blacklist' => ['someotheruser'],
                 ],
@@ -622,7 +843,7 @@ The value of the ``params`` array will be sent to the constructor of the event l
         // ...
     ];
 
-where ``callback`` is the code you want executed, and ``events`` is an array of the events you want it triggered for. ``priority`` is the priority of the listener and defaults to 0. The higher the number, the earlier in the chain your listener will be triggered. This number can also be negative. Imbo's internal event listeners uses numbers between 0 and 100. ``publicKeys`` uses the same format as described above. If you use this method, and want your callback to trigger for multiple events with different priorities, specify an associative array in the ``events`` element, where the keys are the event names, and the values are the priorities for the different events. This way of attaching event listeners should mostly be used for quick and temporary solutions.
+where ``callback`` is the code you want executed, and ``events`` is an array of the events you want it triggered for. ``priority`` is the priority of the listener and defaults to 0. The higher the number, the earlier in the chain your listener will be triggered. This number can also be negative. Imbo's internal event listeners uses numbers between 0 and 100. ``users`` uses the same format as described above. If you use this method, and want your callback to trigger for multiple events with different priorities, specify an associative array in the ``events`` element, where the keys are the event names, and the values are the priorities for the different events. This way of attaching event listeners should mostly be used for quick and temporary solutions.
 
 All event listeners will receive an event object (which implements ``Imbo\EventManager\EventInterface``), that is described in detail in the :ref:`the-event-object` section.
 
@@ -655,6 +876,7 @@ as well as event listeners for image transformations:
 * :ref:`resize <resize-transformation>`
 * :ref:`rotate <rotate-transformation>`
 * :ref:`sepia <sepia-transformation>`
+* :ref:`smartSize <smartsize-transformation>`
 * :ref:`strip <strip-transformation>`
 * :ref:`thumbnail <thumbnail-transformation>`
 * :ref:`transpose <transpose-transformation>`

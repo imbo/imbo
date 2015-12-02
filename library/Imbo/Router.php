@@ -26,7 +26,7 @@ class Router {
      *
      * @var array
      */
-    static private $supportedHttpMethods = array(
+    static private $supportedHttpMethods = [
         'GET'     => true,
         'POST'    => true,
         'PUT'     => true,
@@ -34,32 +34,38 @@ class Router {
         'DELETE'  => true,
         'OPTIONS' => true,
         'SEARCH'  => true,
-    );
+    ];
 
     /**
      * The different routes that imbo handles
      *
      * @var array
      */
-    private $routes = array(
-        'image'          => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})(\.(?<extension>gif|jpg|png))?$#',
+    private $routes = [
+        'image'          => '#^/users/(?<user>[a-z0-9_-]{1,})/images/(?<imageIdentifier>[A-Za-z0-9_-]{1,255})(\.(?<extension>gif|jpg|png))?$#',
         'globalshorturl' => '#^/s/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
         'status'         => '#^/status(/|(\.(?<extension>json|xml)))?$#',
-        'images'         => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images(/|(\.(?<extension>json|xml)))?$#',
-        'metadata'       => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/meta(?:data)?(/|\.(?<extension>json|xml))?$#',
-        'user'           => '#^/users/(?<publicKey>[a-z0-9_-]{3,})(/|\.(?<extension>json|xml))?$#',
+        'images'         => '#^/users/(?<user>[a-z0-9_-]{1,})/images(/|(\.(?<extension>json|xml)))?$#',
+        'globalimages'   => '#^/images(/|(\.(?<extension>json|xml)))?$#',
+        'metadata'       => '#^/users/(?<user>[a-z0-9_-]{1,})/images/(?<imageIdentifier>[A-Za-z0-9_-]{1,255})/meta(?:data)?(/|\.(?<extension>json|xml))?$#',
+        'user'           => '#^/users/(?<user>[a-z0-9_-]{1,})(/|\.(?<extension>json|xml))?$#',
         'stats'          => '#^/stats(/|(\.(?<extension>json|xml)))?$#',
         'index'          => '#^/?$#',
-        'shorturls'      => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/shorturls(/|\.(?<extension>json|xml))?$#',
-        'shorturl'       => '#^/users/(?<publicKey>[a-z0-9_-]{3,})/images/(?<imageIdentifier>[a-f0-9]{32})/shorturls/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
-    );
+        'shorturls'      => '#^/users/(?<user>[a-z0-9_-]{1,})/images/(?<imageIdentifier>[A-Za-z0-9_-]{1,255})/shorturls(/|\.(?<extension>json|xml))?$#',
+        'shorturl'       => '#^/users/(?<user>[a-z0-9_-]{1,})/images/(?<imageIdentifier>[A-Za-z0-9_-]{1,255})/shorturls/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
+        'groups'         => '#^/groups(/|(\.(?<extension>json|xml)))?$#',
+        'group'          => '#^/groups/(?<group>[a-z0-9_-]{1,})(/|\.(?<extension>json|xml))?$#',
+        'keys'           => '#^/keys/(?<publickey>[a-z0-9_-]{1,})$#',
+        'accessrules'    => '#^/keys/(?<publickey>[a-z0-9_-]{1,})/access(/|(\.(?<extension>json|xml)))?$#',
+        'accessrule'     => '#^/keys/(?<publickey>[a-z0-9_-]{1,})/access/(?<accessRuleId>[a-f0-9]{1,})(\.(?<extension>json|xml))?$#',
+    ];
 
     /**
      * Class constructor
      *
      * @param array $extraRoutes Extra routes passed in from configuration
      */
-    public function __construct(array $extraRoutes = array()) {
+    public function __construct(array $extraRoutes = []) {
         $this->routes = array_merge($this->routes, $extraRoutes);
     }
 
@@ -80,7 +86,7 @@ class Router {
         }
 
         $path = $request->getPathInfo();
-        $matches = array();
+        $matches = [];
 
         foreach ($this->routes as $resourceName => $route) {
             if (preg_match($route, $path, $matches)) {

@@ -26,7 +26,7 @@ class EventManager {
      *
      * @var array
      */
-    private $eventHandlers = array();
+    private $eventHandlers = [];
 
     /**
      * Event template
@@ -40,14 +40,14 @@ class EventManager {
      *
      * @var array
      */
-    private $callbacks = array();
+    private $callbacks = [];
 
     /**
      * Event listener initializers
      *
      * @var InitializerInterface[]
      */
-    private $initializers = array();
+    private $initializers = [];
 
     /**
      * Register an event handler
@@ -57,12 +57,12 @@ class EventManager {
      * @param array $params Parameters for the handler if $handler is a string
      * @return self
      */
-    public function addEventHandler($name, $handler, array $params = array()) {
+    public function addEventHandler($name, $handler, array $params = []) {
         if (is_string($handler)) {
-            $this->eventHandlers[$name] = array(
+            $this->eventHandlers[$name] = [
                 'handler' => $handler,
                 'params' => $params,
-            );
+            ];
         } else {
             $this->eventHandlers[$name] = $handler;
         }
@@ -75,10 +75,10 @@ class EventManager {
      *
      * @param string $name The name of the handler that owns the callback
      * @param array $events Which events the callback will trigger for
-     * @param array $publicKeys Public key filter for the events
+     * @param array $users User filter for the events
      * @return self
      */
-    public function addCallbacks($name, array $events, array $publicKeys = array()) {
+    public function addCallbacks($name, array $events, array $users = []) {
         // Default priority
         $defaultPriority = 0;
 
@@ -90,32 +90,32 @@ class EventManager {
 
             if (is_string($callback)) {
                 // 'eventName' => 'someMethod'
-                $this->callbacks[$event]->insert(array(
+                $this->callbacks[$event]->insert([
                     'handler' => $name,
                     'method' => $callback,
-                    'publicKeys' => $publicKeys,
-                ), $defaultPriority);
+                    'users' => $users,
+                ], $defaultPriority);
             } else if (is_array($callback)) {
-                // 'eventName' => array( ... )
+                // 'eventName' => [ ... ]
                 foreach ($callback as $method => $priority) {
                     if (is_int($method)) {
-                        // 'eventName' => array('someMethod', ...)
+                        // 'eventName' => ['someMethod', ...]
                         $method = $priority;
                         $priority = $defaultPriority;
                     }
 
-                    $this->callbacks[$event]->insert(array(
+                    $this->callbacks[$event]->insert([
                         'handler' => $name,
                         'method' => $method,
-                        'publicKeys' => $publicKeys,
-                    ), $priority);
+                        'users' => $users,
+                    ], $priority);
                 }
             } else if (is_int($callback)) {
                 // We have a closure as a callback, so $callback is the actual priority
-                $this->callbacks[$event]->insert(array(
+                $this->callbacks[$event]->insert([
                     'handler' => $name,
-                    'publicKeys' => $publicKeys,
-                ), $callback);
+                    'users' => $users,
+                ], $callback);
             } else {
                 throw new InvalidArgumentException('Invalid event definition for listener: ' . $name, 500);
             }
@@ -167,7 +167,7 @@ class EventManager {
      * @param array $params Extra parameters for the event
      * @return EventManager
      */
-    public function trigger($eventName, array $params = array()) {
+    public function trigger($eventName, array $params = []) {
         if (!empty($this->callbacks[$eventName])) {
             $event = clone $this->event;
             $event->setName($eventName);
@@ -177,8 +177,8 @@ class EventManager {
                 $event->setArgument($key, $value);
             }
 
-            // Fetch current public key
-            $publicKey = $event->getRequest()->getPublicKey();
+            // Fetch current user
+            $user = $event->getRequest()->getUser();
 
             // Trigger all listeners for this event and pass in the event instance
             foreach (clone $this->callbacks[$eventName] as $listener) {
@@ -186,12 +186,12 @@ class EventManager {
                 $callback = $this->getHandlerInstance($listener['handler']);
 
                 if ($callback instanceof ListenerInterface) {
-                    $callback = array($callback, $listener['method']);
+                    $callback = [$callback, $listener['method']];
                 }
 
-                $publicKeys = $listener['publicKeys'];
+                $users = $listener['users'];
 
-                if (!$this->triggersFor($publicKey, $publicKeys)) {
+                if (!$this->triggersFor($user, $users)) {
                     continue;
                 }
 
@@ -231,18 +231,18 @@ class EventManager {
     }
 
     /**
-     * Check if a listener will trigger for a given public key
+     * Check if a listener will trigger for a given user
      *
-     * @param string $publicKey The public key to check for, can be null
+     * @param string $user The user to check for, can be null
      * @param array $filter The array from the listener with "whitelist" and "blacklist"
      * @return boolean
      */
-    private function triggersFor($publicKey = null, array $filter = array()) {
-        if (empty($publicKey) || empty($filter)) {
+    private function triggersFor($user = null, array $filter = []) {
+        if (empty($user) || empty($filter)) {
             return true;
         }
 
-        $filter = array_merge(array('whitelist' => array(), 'blacklist' => array()),  $filter);
+        $filter = array_merge(['whitelist' => [], 'blacklist' => []],  $filter);
 
         $whitelist = array_flip($filter['whitelist']);
         $blacklist = array_flip($filter['blacklist']);
@@ -251,11 +251,11 @@ class EventManager {
             // Both lists are empty
             empty($whitelist) && empty($blacklist) ||
 
-            // Whitelist is empty, and the public key is not blacklisted
-            empty($whitelist) && !isset($blacklist[$publicKey]) ||
+            // Whitelist is empty, and the user is not blacklisted
+            empty($whitelist) && !isset($blacklist[$user]) ||
 
-            // Blacklist is empty, and the public key is whitelisted
-            empty($blacklist) && isset($whitelist[$publicKey])
+            // Blacklist is empty, and the user is whitelisted
+            empty($blacklist) && isset($whitelist[$user])
         ) {
             return true;
         }

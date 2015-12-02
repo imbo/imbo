@@ -22,43 +22,31 @@ if (is_file(__DIR__ . '/../../../autoload.php')) {
 
 $config = [
     /**
-     * Authentication
+     * Access Control adapter
      *
-     * This value must be set to either:
-     * 1) An array mapping public and private keys of the users of this installation.
-     *    The array can take two different forms:
+     * See the different adapter implementations for possible configuration parameters.
+     * The value must be set to a closure returning an instance of
+     * Imbo\Auth\AccessControl\Adapter\AdapterInterface, or an implementation of said interface.
      *
-     * 'auth' => [
-     *     '<publicKey>' => '<read+write private key>',
-     *     '<differentPublicKey>' => '<different read+write private key>'
+     * The default SimpleArrayAdapter takes an array keyed by user (which will also be used as the
+     * public key) and a private key, in the following form:
+     *
+     * [
+     *     'some-user' => 'some-private-key',
+     *     'other-user' => 'different-private-key'
      * ]
      *
-     * Or:
-     * 'auth' => [
-     *     '<publicKey>' => [
-     *         'ro' => '<read-only private key>',
-     *         'rw' => '<read-write private key>',
-     *     ]
-     * ]
+     * This is the absolute simplest access control implementation - for instance, there is a
+     * 1:1 correlation between a user and a public key. The public key will have read and write
+     * access to all resources belonging to that user. Should you require more fine-grained access
+     * control, please take a look at the other adapters available, many of which are mutable -
+     * meaning you can use the Imbo API to alter access control on the fly.
      *
-     * You can also specify multiple private keys for both read-only and read+write:
-     *
-     * 'auth' => [
-     *     '<publicKey>' => [
-     *         'ro' => ['<readKey1>', '<readKey2>'],
-     *         'rw' => ['<readWriteKey1>', '<readWriteKey2>']
-     *     ]
-     * ]
-     *
-     * 2) An instance of the Imbo\Auth\UserLookupInterface interface.
-     *
-     * Public keys must match the following case sensitive regular expression:
-     *
-     * ^[a-z0-9_-]{3,}$
-     *
-     * @var array|Auth\UserLookupInterface
+     * @var Auth\AccessControl\Adapter\AdapterInterface|Closure
      */
-    'auth' => [],
+    'accessControl' => function() {
+        return new Auth\AccessControl\Adapter\SimpleArrayAdapter([]);
+    },
 
     /**
      * Database adapter
@@ -87,6 +75,19 @@ $config = [
     },
 
     /**
+     * Image identifier generator
+     *
+     * See the different adapter implementations for possible configuration parameters.
+     * The value must be set to a closure returning an instance of
+     * Imbo\Image\Identifier\Generator\GeneratorInterface, or an implementation of said interface.
+     *
+     * @var Imbo\Image\Identifier\Generator\GeneratorInterface|Closure
+     */
+    'imageIdentifierGenerator' => function() {
+        return new Image\Identifier\Generator\RandomString();
+    },
+
+    /**
      * Whether to content negotiate images or not. If set to true, Imbo will try to find a
      * suitable image format based on the Accept-header received. If set to false, it will
      * deliver the image in the format it was originally added as. Note that this does not
@@ -95,6 +96,55 @@ $config = [
      * @var boolean
      */
     'contentNegotiateImages' => true,
+
+    /**
+     * HTTP cache header settings that are applied to resources that do not explicitly set
+     * other values. For instance, the `image` resource sets a very long `max-age`, as it
+     * shouldn't change over time. The `metadata` resource however could potentially change
+     * much more often. To ensure that clients get fresh responses, the default is to ask
+     * the client to always revalidate (ask if there has been any changes since last fetch)
+     *
+     * @var array
+     */
+    'httpCacheHeaders' => [
+        'maxAge' => 0,
+        'mustRevalidate' => true,
+        'public' => true,
+    ],
+
+    /**
+     * Options related to authentication. See documentation for individual settings.
+     *
+     * @var array
+     */
+    'authentication' => [
+        /**
+         * Imbo generates access tokens and authentication signatures based on the incoming URL,
+         * and includes the protocol (by default). This can sometimes be problematic, for instance
+         * when Imbo is behind a load balancer which doesn't send `X-Forwarded-Proto` header, or
+         * if you want to use protocol-less image URLs (`//imbo.host/users/some-user/images/img`)
+         *
+         * This option allows you to control how Imbo's authentication should behave:
+         *
+         * - `incoming`
+         *     Will try to detect the incoming protocol - this is based on `$_SERVER['HTTPS']` or
+         *     the `X-Forwarded-Proto` header (given the `trustedProxies` option is configured).
+         *     This is the default.
+         *
+         * - `both`
+         *     Will try to match based on both HTTP and HTTPS protocols and allow the request if
+         *     any of them yields the correct signature/access token.
+         *
+         * - `http`
+         *     Will always use `http` as the protocol, replacing `https` with `http` in the
+         *     incoming URL, if that is the case.
+         *
+         * - `https`
+         *     Will always use `https` as the protocol, replacing `http` with `https` in the
+         *     incoming URL, if that is the case.
+         */
+        'protocol' => 'incoming',
+    ],
 
     /**
      * Event listeners
@@ -199,6 +249,7 @@ $config = [
      * @var array
      */
     'eventListeners' => [
+        'accessControl' => 'Imbo\EventListener\AccessControl',
         'accessToken' => 'Imbo\EventListener\AccessToken',
         'auth' => 'Imbo\EventListener\Authenticate',
         'statsAccess' => [
@@ -210,6 +261,7 @@ $config = [
 
         // Image transformations
         'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
+        'blur' => 'Imbo\Image\Transformation\Blur',
         'border' => 'Imbo\Image\Transformation\Border',
         'canvas' => 'Imbo\Image\Transformation\Canvas',
         'compress' => 'Imbo\Image\Transformation\Compress',
@@ -217,6 +269,7 @@ $config = [
         'convert' => 'Imbo\Image\Transformation\Convert',
         'crop' => 'Imbo\Image\Transformation\Crop',
         'desaturate' => 'Imbo\Image\Transformation\Desaturate',
+        'drawPois' => 'Imbo\Image\Transformation\DrawPois',
         'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
         'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
         'histogram' => 'Imbo\Image\Transformation\Histogram',
@@ -228,6 +281,7 @@ $config = [
         'rotate' => 'Imbo\Image\Transformation\Rotate',
         'sepia' => 'Imbo\Image\Transformation\Sepia',
         'sharpen' => 'Imbo\Image\Transformation\Sharpen',
+        'smartSize' => 'Imbo\Image\Transformation\SmartSize',
         'strip' => 'Imbo\Image\Transformation\Strip',
         'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
         'transpose' => 'Imbo\Image\Transformation\Transpose',

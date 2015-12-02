@@ -26,7 +26,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $application->setAutoExit(false);
 
         $applicationTester = new ApplicationTester($application);
-        $applicationTester->run(array('command' => 'list'));
+        $applicationTester->run(['command' => 'list']);
         $output = $applicationTester->getDisplay();
 
         $this->assertContains('generate-private-key', $output);

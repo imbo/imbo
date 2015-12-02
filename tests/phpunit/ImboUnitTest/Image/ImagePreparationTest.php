@@ -20,18 +20,32 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     /**
      * @var ImagePreparation
      */
-    private $preparation;
+    private $prepare;
 
     private $request;
+    private $response;
     private $event;
+    private $config;
+    private $database;
+    private $headers;
+    private $imageIdentifierGenerator;
 
     /**
      * Set up the image preparation instance
      */
     public function setUp() {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->event = $this->getMock('Imbo\EventManager\Event');
+        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $this->headers = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $this->response->headers = $this->headers;
+        $this->imageIdentifierGenerator = $this->getMock('Imbo\Image\Identifier\Generator\GeneratorInterface');
+        $this->config = ['imageIdentifierGenerator' => $this->imageIdentifierGenerator];
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
+        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->event->expects($this->any())->method('getConfig')->will($this->returnValue($this->config));
+        $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
 
         $this->prepare = new ImagePreparation();
     }
@@ -40,8 +54,13 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
      * Tear down the image prepration instance
      */
     public function tearDown() {
-        $this->preparation = null;
+        $this->imageIdentifierGenerator = null;
+        $this->database = null;
+        $this->response = null;
+        $this->prepare = null;
+        $this->headers = null;
         $this->request = null;
+        $this->config = null;
         $this->event = null;
     }
 
@@ -104,14 +123,54 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
+     * @covers Imbo\Image\ImagePreparation::generateImageIdentifier
+     * @expectedException Imbo\Exception\ImageException
+     * @expectedExceptionMessage Failed to generate unique image identifier
+     * @expectedExceptionCode 503
+     */
+    public function testThrowsExceptionWhenItFailsToGenerateUniqueImageIdentifier() {
+        $imagePath = FIXTURES_DIR . '/image.png';
+        $imageData = file_get_contents($imagePath);
+
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue($imageData));
+        $this->database->expects($this->any())->method('imageExists')->will($this->returnValue(true));
+        $this->headers->expects($this->once())->method('set')->with('Retry-After', 1);
+        $this->prepare->prepareImage($this->event);
+    }
+
+    /**
+     * @covers Imbo\Image\ImagePreparation::prepareImage
      */
     public function testPopulatesRequestWhenImageIsValid() {
         $imagePath = FIXTURES_DIR . '/image.png';
         $imageData = file_get_contents($imagePath);
-        $imageIdentifier = md5($imageData);
 
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue($imageData));
         $this->request->expects($this->once())->method('setImage')->with($this->isInstanceOf('Imbo\Model\Image'));
         $this->prepare->prepareImage($this->event);
+    }
+
+    /**
+     * @covers Imbo\Image\ImagePreparation::prepareImage
+     * @covers Imbo\Image\ImagePreparation::generateImageIdentifier
+     */
+    public function testInstantiatesImageIdentifierGeneratorOnCallable() {
+        $imagePath = FIXTURES_DIR . '/image.png';
+        $imageData = file_get_contents($imagePath);
+
+        $generator = $this->imageIdentifierGenerator;
+        $config['imageIdentifierGenerator'] = function() use ($generator) {
+            return $generator;
+        };
+
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
+        $event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $event->expects($this->any())->method('getConfig')->will($this->returnValue($config));
+        $event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
+
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue($imageData));
+        $this->request->expects($this->once())->method('setImage')->with($this->isInstanceOf('Imbo\Model\Image'));
+        $this->prepare->prepareImage($event);
     }
 }

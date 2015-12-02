@@ -20,11 +20,11 @@ use DateTime;
  */
 class User implements ModelInterface {
     /**
-     * Public key
+     * User ID
      *
      * @var string
      */
-    private $publicKey;
+    private $user;
 
     /**
      * Number of images
@@ -41,24 +41,24 @@ class User implements ModelInterface {
     private $lastModified;
 
     /**
-     * Set the public key
+     * Set the user ID
      *
-     * @param string $publicKey The public key
+     * @param string $user The user ID
      * @return User
      */
-    public function setPublicKey($publicKey) {
-        $this->publicKey = $publicKey;
+    public function setUserId($user) {
+        $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get the public key
+     * Get the user ID
      *
      * @return string
      */
-    public function getPublicKey() {
-        return $this->publicKey;
+    public function getUserId() {
+        return $this->user;
     }
 
     /**

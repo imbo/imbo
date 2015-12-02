@@ -49,7 +49,7 @@ class ResponseSenderTest extends ListenerTests {
      */
     public function testCanSendTheResponse() {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getChecksum')->will($this->returnValue('checksum'));
+        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('checksum'));
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));

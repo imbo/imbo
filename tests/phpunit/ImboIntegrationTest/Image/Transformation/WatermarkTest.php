@@ -49,160 +49,160 @@ class WatermarkTest extends TransformationTests {
      * @return array[]
      */
     public function getParamsForWatermarks() {
-        return array(
-            'top left with default watermark and width' => array(
-                array(
+        return [
+            'top left with default watermark and width' => [
+                [
                     'width' => 200,
-                ),
-                array(
-                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(0, 0, 0)),
-                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'edge of watermark (inside)' => array('x' => 199, 'y' => 0, 'colors' => array(0, 0, 0)),
-                    'edge of watermark (outside)' => array('x' => 200, 'y' => 0, 'colors' => array(255, 255, 255)),
-                ),
-            ),
-            'top left with default watermark and height' => array(
-                array(
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [0, 0, 0]],
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'bottom left corner' => ['x' => 0, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'bottom right corner' => ['x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'edge of watermark (inside)' => ['x' => 199, 'y' => 0, 'colors' => [0, 0, 0]],
+                    'edge of watermark (outside)' => ['x' => 200, 'y' => 0, 'colors' => [255, 255, 255]],
+                ],
+            ],
+            'top left with default watermark and height' => [
+                [
                     'height' => 200,
-                ),
-                array(
-                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(0, 0, 0)),
-                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'edge of watermark (inside)' => array('x' => 199, 'y' => 0, 'colors' => array(0, 0, 0)),
-                    'edge of watermark (outside)' => array('x' => 200, 'y' => 0, 'colors' => array(255, 255, 255)),
-                ),
-            ),
-            'top right with default watermark and width' => array(
-                array(
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [0, 0, 0]],
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'bottom left corner' => ['x' => 0, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'bottom right corner' => ['x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'edge of watermark (inside)' => ['x' => 199, 'y' => 0, 'colors' => [0, 0, 0]],
+                    'edge of watermark (outside)' => ['x' => 200, 'y' => 0, 'colors' => [255, 255, 255]],
+                ],
+            ],
+            'top right with default watermark and width' => [
+                [
                     'width' => 200,
                     'position' => 'top-right',
-                ),
-                array(
-                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(0, 0, 0)),
-                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'edge of watermark (inside)' => array('x' => $this->width - 200, 'y' => 0, 'colors' => array(0, 0, 0)),
-                    'edge of watermark (outside)' => array('x' => $this->width - 201, 'y' => 0, 'colors' => array(255, 255, 255)),
-                ),
-            ),
-            'top right with default watermark and height' => array(
-                array(
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [0, 0, 0]],
+                    'bottom left corner' => ['x' => 0, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'bottom right corner' => ['x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'edge of watermark (inside)' => ['x' => $this->width - 200, 'y' => 0, 'colors' => [0, 0, 0]],
+                    'edge of watermark (outside)' => ['x' => $this->width - 201, 'y' => 0, 'colors' => [255, 255, 255]],
+                ],
+            ],
+            'top right with default watermark and height' => [
+                [
                     'height' => 200,
                     'position' => 'top-right',
-                ),
-                array(
-                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(0, 0, 0)),
-                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'edge of watermark (inside)' => array('x' => $this->width - 200, 'y' => 0, 'colors' => array(0, 0, 0)),
-                    'edge of watermark (outside)' => array('x' => $this->width - 201, 'y' => 0, 'colors' => array(255, 255, 255)),
-                ),
-            ),
-            'bottom left with default watermark and width' => array(
-                array(
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [0, 0, 0]],
+                    'bottom left corner' => ['x' => 0, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'bottom right corner' => ['x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'edge of watermark (inside)' => ['x' => $this->width - 200, 'y' => 0, 'colors' => [0, 0, 0]],
+                    'edge of watermark (outside)' => ['x' => $this->width - 201, 'y' => 0, 'colors' => [255, 255, 255]],
+                ],
+            ],
+            'bottom left with default watermark and width' => [
+                [
                     'width' => 200,
                     'position' => 'bottom-left',
-                ),
-                array(
-                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
-                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'edge of watermark (inside)' => array('x' => 199, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
-                    'edge of watermark (outside)' => array('x' => 200, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                ),
-            ),
-            'bottom left with default watermark and height' => array(
-                array(
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'bottom left corner' => ['x' => 0, 'y' => $this->height - 1, 'colors' => [0, 0, 0]],
+                    'bottom right corner' => ['x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'edge of watermark (inside)' => ['x' => 199, 'y' => $this->height - 1, 'colors' => [0, 0, 0]],
+                    'edge of watermark (outside)' => ['x' => 200, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                ],
+            ],
+            'bottom left with default watermark and height' => [
+                [
                     'height' => 200,
                     'position' => 'bottom-left',
-                ),
-                array(
-                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
-                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'edge of watermark (inside)' => array('x' => 199, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
-                    'edge of watermark (outside)' => array('x' => 200, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                ),
-            ),
-            'bottom right with default watermark and width' => array(
-                array(
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'bottom left corner' => ['x' => 0, 'y' => $this->height - 1, 'colors' => [0, 0, 0]],
+                    'bottom right corner' => ['x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'edge of watermark (inside)' => ['x' => 199, 'y' => $this->height - 1, 'colors' => [0, 0, 0]],
+                    'edge of watermark (outside)' => ['x' => 200, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                ],
+            ],
+            'bottom right with default watermark and width' => [
+                [
                     'width' => 200,
                     'position' => 'bottom-right',
-                ),
-                array(
-                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
-                    'edge of watermark (inside)' => array('x' => $this->width - 200, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
-                    'edge of watermark (outside)' => array('x' => $this->width - 201, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                ),
-            ),
-            'bottom right with default watermark and height' => array(
-                array(
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'bottom left corner' => ['x' => 0, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'bottom right corner' => ['x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => [0, 0, 0]],
+                    'edge of watermark (inside)' => ['x' => $this->width - 200, 'y' => $this->height - 1, 'colors' => [0, 0, 0]],
+                    'edge of watermark (outside)' => ['x' => $this->width - 201, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                ],
+            ],
+            'bottom right with default watermark and height' => [
+                [
                     'height' => 200,
                     'position' => 'bottom-right',
-                ),
-                array(
-                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
-                    'edge of watermark (inside)' => array('x' => $this->width - 200, 'y' => $this->height - 1, 'colors' => array(0, 0, 0)),
-                    'edge of watermark (outside)' => array('x' => $this->width - 201, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                ),
-            ),
-            'center position' => array(
-                array(
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'bottom left corner' => ['x' => 0, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'bottom right corner' => ['x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => [0, 0, 0]],
+                    'edge of watermark (inside)' => ['x' => $this->width - 200, 'y' => $this->height - 1, 'colors' => [0, 0, 0]],
+                    'edge of watermark (outside)' => ['x' => $this->width - 201, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                ],
+            ],
+            'center position' => [
+                [
                     'width' => 50,
                     'height' => 50,
                     'position' => 'center',
-                ),
-                array(
-                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'left edge of watermark (inside)' => array('x' => 225, 'y' => 225, 'colors' => array(0, 0, 0)),
-                    'left edge of watermark (outside)' => array('x' => 224, 'y' => 225, 'colors' => array(255, 255, 255)),
-                    'right edge of watermark (inside)' => array('x' => 274, 'y' => 225, 'colors' => array(0, 0, 0)),
-                    'right edge of watermark (outside)' => array('x' => 275, 'y' => 225, 'colors' => array(255, 255, 255)),
-                    'top edge of watermark (inside)' => array('x' => 225, 'y' => 225, 'colors' => array(0, 0, 0)),
-                    'top edge of watermark (outside)' => array('x' => 225, 'y' => 224, 'colors' => array(255, 255, 255)),
-                    'bottom edge of watermark (inside)' => array('x' => 225, 'y' => 274, 'colors' => array(0, 0, 0)),
-                    'bottom edge of watermark (outside)' => array('x' => 225, 'y' => 275, 'colors' => array(255, 255, 255)),
-                ),
-            ),
-            'offset' => array(
-                array(
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'bottom left corner' => ['x' => 0, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'bottom right corner' => ['x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'left edge of watermark (inside)' => ['x' => 225, 'y' => 225, 'colors' => [0, 0, 0]],
+                    'left edge of watermark (outside)' => ['x' => 224, 'y' => 225, 'colors' => [255, 255, 255]],
+                    'right edge of watermark (inside)' => ['x' => 274, 'y' => 225, 'colors' => [0, 0, 0]],
+                    'right edge of watermark (outside)' => ['x' => 275, 'y' => 225, 'colors' => [255, 255, 255]],
+                    'top edge of watermark (inside)' => ['x' => 225, 'y' => 225, 'colors' => [0, 0, 0]],
+                    'top edge of watermark (outside)' => ['x' => 225, 'y' => 224, 'colors' => [255, 255, 255]],
+                    'bottom edge of watermark (inside)' => ['x' => 225, 'y' => 274, 'colors' => [0, 0, 0]],
+                    'bottom edge of watermark (outside)' => ['x' => 225, 'y' => 275, 'colors' => [255, 255, 255]],
+                ],
+            ],
+            'offset' => [
+                [
                     'position' => 'top-left',
                     'x' => 1,
                     'y' => 1,
-                ),
-                array(
-                    'top left corner' => array('x' => 0, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'top right corner' => array('x' => $this->width - 1, 'y' => 0, 'colors' => array(255, 255, 255)),
-                    'bottom left corner' => array('x' => 0, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'bottom right corner' => array('x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => array(255, 255, 255)),
-                    'left edge of watermark (inside)' => array('x' => 1, 'y' => 1, 'colors' => array(0, 0, 0)),
-                    'left edge of watermark (outside)' => array('x' => 0, 'y' => 1, 'colors' => array(255, 255, 255)),
-                    'right edge of watermark (inside)' => array('x' => 100, 'y' => 1, 'colors' => array(0, 0, 0)),
-                    'right edge of watermark (outside)' => array('x' => 101, 'y' => 1, 'colors' => array(255, 255, 255)),
-                    'top edge of watermark (inside)' => array('x' => 1, 'y' => 1, 'colors' => array(0, 0, 0)),
-                    'top edge of watermark (outside)' => array('x' => 0, 'y' => 1, 'colors' => array(255, 255, 255)),
-                    'bottom edge of watermark (inside)' => array('x' => 1, 'y' => 100, 'colors' => array(0, 0, 0)),
-                    'bottom edge of watermark (outside)' => array('x' => 1, 'y' => 101, 'colors' => array(255, 255, 255)),
-                ),
-            ),
-        );
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'bottom left corner' => ['x' => 0, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'bottom right corner' => ['x' => $this->width - 1, 'y' => $this->height - 1, 'colors' => [255, 255, 255]],
+                    'left edge of watermark (inside)' => ['x' => 1, 'y' => 1, 'colors' => [0, 0, 0]],
+                    'left edge of watermark (outside)' => ['x' => 0, 'y' => 1, 'colors' => [255, 255, 255]],
+                    'right edge of watermark (inside)' => ['x' => 100, 'y' => 1, 'colors' => [0, 0, 0]],
+                    'right edge of watermark (outside)' => ['x' => 101, 'y' => 1, 'colors' => [255, 255, 255]],
+                    'top edge of watermark (inside)' => ['x' => 1, 'y' => 1, 'colors' => [0, 0, 0]],
+                    'top edge of watermark (outside)' => ['x' => 0, 'y' => 1, 'colors' => [255, 255, 255]],
+                    'bottom edge of watermark (inside)' => ['x' => 1, 'y' => 100, 'colors' => [0, 0, 0]],
+                    'bottom edge of watermark (outside)' => ['x' => 1, 'y' => 101, 'colors' => [255, 255, 255]],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -229,19 +229,19 @@ class WatermarkTest extends TransformationTests {
         $storage = $this->getMock('Imbo\Storage\StorageInterface');
         $storage->expects($this->once())
                 ->method('getImage')
-                ->with('publickey', $expectedWatermark)
+                ->with('someUser', $expectedWatermark)
                 ->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/black.png')));
 
         $request = $this->getMock('Imbo\Http\Request\Request');
-        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue('publickey'));
+        $request->expects($this->once())->method('getUser')->will($this->returnValue('someUser'));
 
         $event = new Event();
-        $event->setArguments(array(
+        $event->setArguments([
             'image' => $image,
             'params' => $params,
             'storage' => $storage,
             'request' => $request,
-        ));
+        ]);
 
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);

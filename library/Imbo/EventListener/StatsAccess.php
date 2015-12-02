@@ -32,21 +32,21 @@ class StatsAccess implements ListenerInterface {
      *
      * @var array
      */
-    private $params = array(
-        'allow' => array(),
-    );
+    private $params = [
+        'allow' => [],
+    ];
 
     /**
      * Class constructor
      *
      * @param array $params Parameters for the listener
      */
-    public function __construct(array $params = array()) {
+    public function __construct(array $params = []) {
         if (isset($params['allow'])) {
             $this->params = array_replace_recursive($this->params, $params);
 
             // Exand all IPv6 addresses in the filters
-            array_walk($this->params['allow'], array($this, 'expandIPv6InFilters'));
+            array_walk($this->params['allow'], [$this, 'expandIPv6InFilters']);
         }
     }
 
@@ -54,10 +54,10 @@ class StatsAccess implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
-            'stats.get' => array('checkAccess' => 1),
-            'stats.head' => array('checkAccess' => 1),
-        );
+        return [
+            'stats.get' => ['checkAccess' => 1],
+            'stats.head' => ['checkAccess' => 1],
+        ];
     }
 
     /**
@@ -93,9 +93,9 @@ class StatsAccess implements ListenerInterface {
 
         // Remove IP's which is not of the same type as $ip before matching
         if ($this->isIPv6($ip)) {
-            $list = array_filter($this->params['allow'], array($this, 'isIPv6'));
+            $list = array_filter($this->params['allow'], [$this, 'isIPv6']);
         } else {
-            $list = array_filter($this->params['allow'], array($this, 'isIPv4'));
+            $list = array_filter($this->params['allow'], [$this, 'isIPv4']);
         }
 
         foreach ($list as $range) {

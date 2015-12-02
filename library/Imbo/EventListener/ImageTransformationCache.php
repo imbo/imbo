@@ -27,7 +27,7 @@ use Imbo\EventManager\EventInterface,
  *
  * The values used to generate the unique cache key for each image are:
  *
- * - public key
+ * - user
  * - image identifier
  * - normalized accept header
  * - image extension (can be null)
@@ -74,16 +74,16 @@ class ImageTransformationCache implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             // Look for images in the cache before transformations occur
-            'image.get' => array('loadFromCache' => 20),
+            'image.get' => ['loadFromCache' => 20],
 
             // Store images in the cache before they are sent to the user agent
-            'response.send' => array('storeInCache' => 10),
+            'response.send' => ['storeInCache' => 10],
 
             // Remove from the cache when an image is deleted from Imbo
-            'image.delete' => array('deleteFromCache' => 10),
-        );
+            'image.delete' => ['deleteFromCache' => 10],
+        ];
     }
 
     /**
@@ -150,10 +150,10 @@ class ImageTransformationCache implements ListenerInterface {
         $dir = dirname($path);
 
         // Prepare data for the data
-        $data = serialize(array(
+        $data = serialize([
             'image' => $model,
             'headers' => $response->headers,
-        ));
+        ]);
 
         // Create directory if it does not already exist. The last is_dir is there because race
         // conditions can occur, and another process could already have created the directory after
@@ -176,7 +176,7 @@ class ImageTransformationCache implements ListenerInterface {
      */
     public function deleteFromCache(EventInterface $event) {
         $request = $event->getRequest();
-        $cacheDir = $this->getCacheDir($request->getPublicKey(), $request->getImageIdentifier());
+        $cacheDir = $this->getCacheDir($request->getUser(), $request->getImageIdentifier());
 
         if (is_dir($cacheDir)) {
             $this->rmdir($cacheDir);
@@ -186,18 +186,19 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Get the path to the current image cache dir
      *
-     * @param string $publicKey The public key
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier
      * @return string Returns the absolute path to the image cache dir
      */
-    private function getCacheDir($publicKey, $imageIdentifier) {
+    private function getCacheDir($user, $imageIdentifier) {
+        $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         return sprintf(
             '%s/%s/%s/%s/%s/%s/%s/%s/%s',
             $this->path,
-            $publicKey[0],
-            $publicKey[1],
-            $publicKey[2],
-            $publicKey,
+            $userPath[0],
+            $userPath[1],
+            $userPath[2],
+            $user,
             $imageIdentifier[0],
             $imageIdentifier[1],
             $imageIdentifier[2],
@@ -213,7 +214,7 @@ class ImageTransformationCache implements ListenerInterface {
      */
     private function getCacheFilePath(Request $request) {
         $hash = $this->getCacheKey($request);
-        $dir = $this->getCacheDir($request->getPublicKey(), $request->getImageIdentifier());
+        $dir = $this->getCacheDir($request->getUser(), $request->getImageIdentifier());
 
         return sprintf(
             '%s/%s/%s/%s/%s',
@@ -232,7 +233,7 @@ class ImageTransformationCache implements ListenerInterface {
      * @return string Returns a string that can be used as a cache key for the current image
      */
     private function getCacheKey(Request $request) {
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
         $accept = $request->headers->get('Accept', '*/*');
 
@@ -263,7 +264,7 @@ class ImageTransformationCache implements ListenerInterface {
             $transformations = implode('&', $transformations);
         }
 
-        return md5($publicKey . $imageIdentifier . $accept . $extension . $transformations);
+        return md5($user . $imageIdentifier . $accept . $extension . $transformations);
     }
 
     /**

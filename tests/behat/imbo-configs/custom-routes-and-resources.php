@@ -13,16 +13,16 @@ class CustomResource implements Imbo\Resource\ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET');
+        return ['GET'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'custom1.get' => 'get',
-        );
+        ];
     }
 
     /**
@@ -32,10 +32,10 @@ class CustomResource implements Imbo\Resource\ResourceInterface {
      */
     public function get(Imbo\EventManager\EventInterface $event) {
         $model = new Imbo\Model\ArrayModel();
-        $model->setData(array(
+        $model->setData([
             'event' => $event->getName(),
             'id' => $event->getRequest()->getRoute()->get('id'),
-        ));
+        ]);
         $event->getResponse()->setModel($model);
     }
 }
@@ -48,17 +48,17 @@ class CustomResource2 implements Imbo\Resource\ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'PUT');
+        return ['GET', 'PUT'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'custom2.get' => 'get',
             'custom2.put' => 'put',
-        );
+        ];
     }
 
     /**
@@ -68,9 +68,9 @@ class CustomResource2 implements Imbo\Resource\ResourceInterface {
      */
     public function get(Imbo\EventManager\EventInterface $event) {
         $model = new Imbo\Model\ArrayModel();
-        $model->setData(array(
+        $model->setData([
             'event' => $event->getName(),
-        ));
+        ]);
         $event->getResponse()->setModel($model);
     }
 
@@ -81,9 +81,9 @@ class CustomResource2 implements Imbo\Resource\ResourceInterface {
      */
     public function put(Imbo\EventManager\EventInterface $event) {
         $model = new Imbo\Model\ArrayModel();
-        $model->setData(array(
+        $model->setData([
             'event' => $event->getName(),
-        ));
+        ]);
         $event->getResponse()->setModel($model);
     }
 }
@@ -91,15 +91,15 @@ class CustomResource2 implements Imbo\Resource\ResourceInterface {
 /**
  * Add a couple of resources and routes
  */
-return array(
-    'routes' => array(
+return [
+    'routes' => [
         'custom1' => '#^/custom/(?<id>[a-zA-Z0-9]{7})$#',
         'custom2' => '#^/custom(?:\.(?<extension>json|xml))?$#',
-    ),
-    'resources' => array(
+    ],
+    'resources' => [
         'custom1' => 'CustomResource',
         'custom2' => function() {
             return new CustomResource2();
         }
-    ),
-);
+    ],
+];

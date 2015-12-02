@@ -38,85 +38,62 @@ class StatsTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Get users
+     * Get stats data
      *
      * @return array[]
      */
-    public function getUsers() {
-        return array(
-            array(
-                array(),
+    public function getStatsData() {
+        return [
+            [
                 0,
                 0,
                 0
-            ),
-            array(
-                array(
-                    'user' => array('numImages' => 2, 'numBytes' => 1349),
-                ),
+            ],
+            [
                 1,
                 2,
                 1349
-            ),
-            array(
-                array(
-                    'user1' => array('numImages' => 2, 'numBytes' => 1349),
-                    'user2' => array('numImages' => 42, 'numBytes' => 98765),
-                ),
+            ],
+            [
                 2,
                 44,
                 100114
-            ),
-            array(
-                array(
-                    'user1' => array('numImages' => 2, 'numBytes' => 100),
-                    'user2' => array('numImages' => 3, 'numBytes' => 200),
-                    'user3' => array('numImages' => 4, 'numBytes' => 300),
-                    'user4' => array('numImages' => 5, 'numBytes' => 400),
-                ),
+            ],
+            [
                 4,
                 14,
                 1000
-            ),
-        );
+            ],
+        ];
     }
 
     /**
-     * @dataProvider getUsers
-     * @covers Imbo\Model\Stats::getUsers
-     * @covers Imbo\Model\Stats::setUsers
-     */
-    public function testCanSetAndGetUsers(array $users, $numUsers, $images, $bytes) {
-        $this->assertSame(array(), $this->model->getUsers());
-        $this->assertSame($this->model, $this->model->setUsers($users));
-        $this->assertSame($users, $this->model->getUsers());
-    }
-
-    /**
-     * @dataProvider getUsers
+     * @dataProvider getStatsData
+     * @covers Imbo\Model\Stats::setNumUsers
      * @covers Imbo\Model\Stats::getNumUsers
      */
-    public function testCanGetNumberOfUsers(array $users, $numUsers, $images, $bytes) {
-        $this->assertSame(0, $this->model->getNumUsers());
-        $this->model->setUsers($users);
-        $this->assertSame($numUsers, $this->model->getNumUsers());
+    public function testCanSetAndGetNumberOfUsers($users, $images, $bytes) {
+        $this->model->setNumUsers($users);
+        $this->assertSame($users, $this->model->getNumUsers());
     }
 
     /**
-     * @dataProvider getUsers
+     * @dataProvider getStatsData
+     * @covers Imbo\Model\Stats::setNumImages
      * @covers Imbo\Model\Stats::getNumImages
      */
-    public function testCanGetTotalAmountOfImages(array $users, $numUsers, $images, $bytes) {
-        $this->model->setUsers($users);
+    public function testCanSetAndGetAmountOfImages($users, $images, $bytes) {
+        $this->model->setNumImages($images);
         $this->assertSame($images, $this->model->getNumImages());
     }
 
     /**
-     * @dataProvider getUsers
+     * @dataProvider getStatsData
+     * @covers Imbo\Model\Stats::setNumBytes
      * @covers Imbo\Model\Stats::getNumBytes
      */
-    public function testCanGetTotalAmountOfBytes(array $users, $numUsers, $images, $bytes) {
-        $this->model->setUsers($users);
+    public function testCanSetAndGetAmountOfBytes($users, $images, $bytes) {
+        $this->model->setNumBytes($bytes);
         $this->assertSame($bytes, $this->model->getNumBytes());
     }
 
@@ -128,19 +105,19 @@ class StatsTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Model\Stats::offsetUnset
      */
     public function testSupportsCustomStats() {
-        $this->assertSame(array(), $this->model->getCustomStats());
+        $this->assertSame([], $this->model->getCustomStats());
 
         $this->model['foo'] = 'bar';
         $this->model['bar'] = 'foo';
 
-        $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $this->model->getCustomStats());
+        $this->assertSame(['foo' => 'bar', 'bar' => 'foo'], $this->model->getCustomStats());
 
         $this->assertTrue(isset($this->model['bar']));
         $this->assertSame('foo', $this->model['bar']);
         unset($this->model['bar']);
         $this->assertFalse(isset($this->model['bar']));
 
-        $this->assertSame(array('foo' => 'bar'), $this->model->getCustomStats());
+        $this->assertSame(['foo' => 'bar'], $this->model->getCustomStats());
     }
 
     /**

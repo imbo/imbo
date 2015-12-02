@@ -32,43 +32,43 @@ class ThumbnailTest extends TransformationTests {
      * @return array[]
      */
     public function getThumbnailParams() {
-        return array(
-            'no params' => array(
-                'params' => array(),
+        return [
+            'no params' => [
+                'params' => [],
                 'width'  => 50,
                 'height' => 50
-            ),
-            'only width' => array(
-                'params' => array('width' => 60),
+            ],
+            'only width' => [
+                'params' => ['width' => 60],
                 'width'  => 60,
                 'height' => 50
-            ),
-            'only height' => array(
-                'params' => array('height' => 60),
+            ],
+            'only height' => [
+                'params' => ['height' => 60],
                 'width'  => 50,
                 'height' => 60
-            ),
-            'only fit (inset)' => array(
-                'params' => array('fit' => 'inset'),
+            ],
+            'only fit (inset)' => [
+                'params' => ['fit' => 'inset'],
                 'width'  => 50,
                 'height' => 34
-            ),
-            'only fit (outbound)' => array(
-                'params' => array('fit' => 'outbound'),
+            ],
+            'only fit (outbound)' => [
+                'params' => ['fit' => 'outbound'],
                 'width'  => 50,
                 'height' => 50
-            ),
-            'all params (inset)' => array(
-                'params' => array('width' => 123, 'height' => 456, 'fit' => 'inset'),
+            ],
+            'all params (inset)' => [
+                'params' => ['width' => 123, 'height' => 456, 'fit' => 'inset'],
                 'width'  => 123,
                 'height' => 85
-            ),
-            'all params (outbound)' => array(
-                'params' => array('width' => 123, 'height' => 456, 'fit' => 'outbound'),
+            ],
+            'all params (outbound)' => [
+                'params' => ['width' => 123, 'height' => 456, 'fit' => 'outbound'],
                 'width'  => 123,
                 'height' => 456
-            ),
-        );
+            ],
+        ];
     }
 
     /**

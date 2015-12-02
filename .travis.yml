@@ -19,7 +19,7 @@ before_install:
   - sudo add-apt-repository -y ppa:moti-p/cc
   - sudo apt-get update
   - sudo apt-get -y --reinstall install imagemagick
-  - printf "\n" | pecl install apcu-beta
+  - printf "\n" | pecl install apcu
   - printf "\n" | pecl install imagick-beta
 before_script:
   - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
@@ -30,3 +30,7 @@ before_script:
 script:
   - ./vendor/bin/phpunit --verbose -c tests/phpunit/phpunit.xml.travis
   - ./vendor/bin/behat --strict --profile no-cc --config tests/behat/behat.yml
+after_failure:
+  - echo "Tests failed - httpd log follows"
+  - echo "================================"
+  - cat build/logs/httpd.log

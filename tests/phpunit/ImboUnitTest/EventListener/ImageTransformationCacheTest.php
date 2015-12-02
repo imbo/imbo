@@ -36,7 +36,7 @@ class ImageTransformationCacheTest extends ListenerTests {
     private $request;
     private $response;
     private $query;
-    private $publicKey = 'publicKey';
+    private $user = 'user';
     private $imageIdentifier = '7bf2e67f09de203da740a86cd37bbe8d';
     private $responseHeaders;
     private $requestHeaders;
@@ -60,7 +60,7 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->query = $this->query;
         $this->request->headers = $this->requestHeaders;
-        $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
         $this->event = $this->getMock('Imbo\EventManager\Event');
@@ -68,7 +68,7 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
         $this->cacheDir = vfsStream::setup($this->path);
-        $this->listener = new ImageTransformationCache(array('path' => vfsStream::url($this->path)));
+        $this->listener = new ImageTransformationCache(['path' => vfsStream::url($this->path)]);
     }
 
     /**
@@ -99,12 +99,12 @@ class ImageTransformationCacheTest extends ListenerTests {
     public function testChangesTheImageInstanceOnCacheHit() {
         $imageFromCache = $this->getMock('Imbo\Model\Image');
         $headersFromCache = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
-        $cachedData = serialize(array(
+        $cachedData = serialize([
             'image' => $imageFromCache,
             'headers' => $headersFromCache,
-        ));
+        ]);
 
-        $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->request->expects($this->any())->method('getExtension')->will($this->returnValue('png'));
         $this->requestHeaders->expects($this->once())
@@ -114,13 +114,13 @@ class ImageTransformationCacheTest extends ListenerTests {
                                  'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
                              ));
 
-        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(array('thumbnail')));
+        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(['thumbnail']));
 
         $this->response->expects($this->once())->method('setModel')->with($imageFromCache)->will($this->returnSelf());
         $this->event->expects($this->once())->method('stopPropagation');
 
-        $dir = 'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/6/7/7';
-        $file = '677605632e7a57c58734e0a60cc1aaa7';
+        $dir = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6';
+        $file = 'bc6ffe312a5741a5705afe8639c08835';
         $fullPath = $dir . '/' . $file;
 
         mkdir($dir, 0775, true);
@@ -138,7 +138,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
      */
     public function testRemovesCorruptCachedDataOnCacheHit() {
-        $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->request->expects($this->any())->method('getExtension')->will($this->returnValue('png'));
         $this->requestHeaders->expects($this->once())
@@ -148,10 +148,10 @@ class ImageTransformationCacheTest extends ListenerTests {
                                  'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
                              ));
 
-        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(array('thumbnail')));
+        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(['thumbnail']));
 
-        $dir = 'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/6/7/7';
-        $file = '677605632e7a57c58734e0a60cc1aaa7';
+        $dir = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6';
+        $file = 'bc6ffe312a5741a5705afe8639c08835';
         $fullPath = $dir . '/' . $file;
 
         mkdir($dir, 0775, true);
@@ -182,7 +182,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     public function testDoesNotStoreNonImageModelsInTheCache() {
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->getMock('Imbo\Model\Error')));
-        $this->request->expects($this->never())->method('getPublicKey');
+        $this->request->expects($this->never())->method('getUser');
         $this->listener->storeInCache($this->event);
     }
 
@@ -201,7 +201,7 @@ class ImageTransformationCacheTest extends ListenerTests {
                              ->with('Accept', '*/*')
                              ->will($this->returnValue('*/*'));
 
-        $cacheFile = 'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/5/a/a/5aa83f9df03e31b07c97299b927c6fd7';
+        $cacheFile = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/0/5/b0571fa001b22145f82750c84c6ddda4';
 
         $this->assertFalse(is_file($cacheFile));
         $this->listener->storeInCache($this->event);
@@ -219,11 +219,11 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformationCache::rmdir
      */
     public function testCanDeleteAllImageVariationsFromCache() {
-        $cachedFiles = array(
-            'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/f/30f0763c8422360d10fd84573dd58293',
-            'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/e/30e0763c8422360d10fd84573dd58293',
-            'vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/d/30d0763c8422360d10fd84573dd58293',
-        );
+        $cachedFiles = [
+            'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/f/30f0763c8422360d10fd84573dd58293',
+            'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/e/30e0763c8422360d10fd84573dd58293',
+            'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/d/30d0763c8422360d10fd84573dd58293',
+        ];
 
         foreach ($cachedFiles as $file) {
             @mkdir(dirname($file), 0775, true);
@@ -237,8 +237,8 @@ class ImageTransformationCacheTest extends ListenerTests {
             $this->assertFalse(is_file($file));
         }
 
-        $this->assertFalse(is_dir('vfs://cacheDir/p/u/b/publicKey/7/b/f/7bf2e67f09de203da740a86cd37bbe8d'));
-        $this->assertTrue(is_dir('vfs://cacheDir/p/u/b/publicKey/7/b/f'));
+        $this->assertFalse(is_dir('vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d'));
+        $this->assertTrue(is_dir('vfs://cacheDir/u/s/e/user/7/b/f'));
     }
 
     /**
@@ -248,7 +248,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformationCache::__construct
      */
     public function testThrowsAnExceptionWhenPathIsMissingFromTheParameters() {
-        $listener = new ImageTransformationCache(array());
+        $listener = new ImageTransformationCache([]);
     }
 
     /**
@@ -261,13 +261,13 @@ class ImageTransformationCacheTest extends ListenerTests {
         $dir = new vfsStreamDirectory('dir', 0);
         $this->cacheDir->addChild($dir);
 
-        $listener = new ImageTransformationCache(array('path' => 'vfs://cacheDir/dir'));
+        $listener = new ImageTransformationCache(['path' => 'vfs://cacheDir/dir']);
     }
 
     /**
      * @covers Imbo\EventListener\ImageTransformationCache::__construct
      */
     public function testDoesNotTriggerWarningIfCachePathDoesNotExistAndParentIsWritable() {
-        $listener = new ImageTransformationCache(array('path' => 'vfs://cacheDir/some/dir/that/does/not/exist'));
+        $listener = new ImageTransformationCache(['path' => 'vfs://cacheDir/some/dir/that/does/not/exist']);
     }
 }

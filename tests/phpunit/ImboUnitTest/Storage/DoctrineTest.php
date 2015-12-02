@@ -39,7 +39,7 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
         }
 
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
-        $this->driver = new Doctrine(array(), $this->connection);
+        $this->driver = new Doctrine([], $this->connection);
     }
 
     /**

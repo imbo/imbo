@@ -41,9 +41,9 @@ class Crop extends Transformation implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.transformation.crop' => 'transform',
-        );
+        ];
     }
 
     /**
@@ -55,7 +55,7 @@ class Crop extends Transformation implements ListenerInterface {
         $image = $event->getArgument('image');
         $params = $event->getArgument('params');
 
-        foreach (array('width', 'height') as $param) {
+        foreach (['width', 'height'] as $param) {
             if (!isset($params[$param])) {
                 throw new TransformationException('Missing required parameter: ' . $param, 400);
             }
@@ -71,15 +71,6 @@ class Crop extends Transformation implements ListenerInterface {
         $imageWidth = $image->getWidth();
         $imageHeight = $image->getHeight();
 
-        // Fix too large values for width and/or height
-        if ($width > $imageWidth) {
-            $width = $imageWidth;
-        }
-
-        if ($height > $imageHeight) {
-            $height = $imageHeight;
-        }
-
         // Set correct x and/or y values based on the crop mode
         if ($mode === 'center' || $mode === 'center-x') {
             $x = (int) ($imageWidth - $width) / 2;
@@ -87,6 +78,13 @@ class Crop extends Transformation implements ListenerInterface {
 
         if ($mode === 'center' || $mode === 'center-y') {
             $y = (int) ($imageHeight - $height) / 2;
+        }
+
+        // Throw exception on X/Y values that are out of bounds
+        if ($x + $width > $imageWidth) {
+            throw new TransformationException('Crop area is out of bounds (`x` + `width` > image width)', 400);
+        } else if ($y + $height > $imageHeight) {
+            throw new TransformationException('Crop area is out of bounds (`y` + `height` > image height)', 400);
         }
 
         // Return if there is no need for cropping

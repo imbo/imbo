@@ -5,12 +5,12 @@ Feature: Imbo provides an event listener for turning EXIF data into metadata
 
     Background:
         Given Imbo uses the "add-exif-data-as-metadata.php" configuration
-        And "tests/phpunit/Fixtures/exif-logo.jpg" exists in Imbo
 
     Scenario: Fetch the added metadata
-        Given I use "publickey" and "privatekey" for public and private keys
+        Given "tests/phpunit/Fixtures/exif-logo.jpg" exists in Imbo
+        And I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images/753e11e00522ff1e95600d8f91c74e8e/metadata.json"
+        When I request the metadata of the previously added image
         Then I should get a response with "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body contains:
@@ -40,4 +40,16 @@ Feature: Imbo provides an event listener for turning EXIF data into metadata
         And the response body contains:
         """
         "gps:altitude":50.8
+        """
+
+    Scenario: Metadata is normalized
+        Given "tests/phpunit/Fixtures/logo-horizontal.png" exists in Imbo
+        And I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        When I request the metadata of the previously added image
+        Then I should get a response with "200 OK"
+        And the "Content-Type" response header is "application/json"
+        And the response body contains:
+        """
+        "png:IHDR:bit-depth":"8"
         """

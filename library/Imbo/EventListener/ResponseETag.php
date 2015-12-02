@@ -23,12 +23,12 @@ class ResponseETag implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
-            'response.send' => array(
+        return [
+            'response.send' => [
                 'setETag' => 5,
                 'fixIfNoneMatchHeader' => 5,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -62,13 +62,13 @@ class ResponseETag implements ListenerInterface {
         $response = $event->getResponse();
         $request = $event->getRequest();
 
-        $routesWithETags = array(
+        $routesWithETags = [
             'user' => true,
             'images' => true,
             'image' => true,
             'metadata' => true,
             'globalshorturl' => true,
-        );
+        ];
         $currentRoute = (string) $request->getRoute();
 
         if (!isset($routesWithETags[$currentRoute])) {

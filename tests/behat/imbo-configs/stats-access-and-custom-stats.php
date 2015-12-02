@@ -20,33 +20,33 @@ if (isset($_SERVER['HTTP_X_CLIENT_IP'])) {
  *
  * Also add some custom stats that will be included in the response from the stats endpoint
  */
-return array(
-    'eventListeners' => array(
+return [
+    'eventListeners' => [
         'statsAccess' => function() {
-            $statsAllow = array();
+            $statsAllow = [];
 
             if (!empty($_GET['statsAllow'])) {
                 // Set the range
                 $statsAllow = explode(',', $_GET['statsAllow']);
             }
 
-            return new Imbo\EventListener\StatsAccess(array(
+            return new Imbo\EventListener\StatsAccess([
                 'allow' => $statsAllow,
-            ));
+            ]);
         },
-        'customStats' => array(
-            'events' => array('stats.get'),
+        'customStats' => [
+            'events' => ['stats.get'],
             'callback' => function($event) {
                 // Fetch the model from the response
                 $model = $event->getResponse()->getModel();
 
                 // Set some values
                 $model['someValue'] = 123;
-                $model['someOtherValue'] = array(
+                $model['someOtherValue'] = [
                     'foo' => 'bar',
-                );
-                $model['someList'] = array(1, 2, 3);
+                ];
+                $model['someList'] = [1, 2, 3];
             }
-        )
-    ),
-);
+        ]
+    ],
+];

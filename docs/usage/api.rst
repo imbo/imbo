@@ -38,13 +38,13 @@ results in:
       "endpoints": {
         "status": "http://imbo/status",
         "stats": "http://imbo/stats",
-        "user": "http://imbo/users/{publicKey}",
-        "images": "http://imbo/users/{publicKey}/images",
-        "image": "http://imbo/users/{publicKey}/images/{imageIdentifier}",
+        "user": "http://imbo/users/{user}",
+        "images": "http://imbo/users/{user}/images",
+        "image": "http://imbo/users/{user}/images/{imageIdentifier}",
         "globalShortImageUrl": "http://imbo/s/{id}",
-        "metadata": "http://imbo/users/{publicKey}/images/{imageIdentifier}/metadata",
-        "shortImageUrls": "http://imbo/users/{publicKey}/images/{imageIdentifier}/shorturls",
-        "shortImageUrl": "http://imbo/users/{publicKey}/images/{imageIdentifier}/shorturls/{id}"
+        "metadata": "http://imbo/users/{user}/images/{imageIdentifier}/metadata",
+        "shortImageUrls": "http://imbo/users/{user}/images/{imageIdentifier}/shorturls",
+        "shortImageUrl": "http://imbo/users/{user}/images/{imageIdentifier}/shorturls/{id}"
       }
     }
 
@@ -74,21 +74,9 @@ results in:
 .. code-block:: javascript
 
     {
-      "users": {
-        "someuser": {
-          "numImages": 11,
-          "numBytes": 3817197
-        },
-        "someotheruser": {
-          "numImages": 1,
-          "numBytes": 81097
-        }
-      },
-      "total": {
-        "numImages": 12,
-        "numUsers": 2,
-        "numBytes": 3898294
-      },
+      "numImages": 12,
+      "numUsers": 2,
+      "numBytes": 3898294
       "custom": {}
     }
 
@@ -107,28 +95,28 @@ The stats resource enables users to attach custom statistics via event listeners
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
-            'customStats' => array(
-                'events' => array('stats.get'),
+        'eventListeners' => [
+            'customStats' => [
+                'events' => ['stats.get'],
                 'callback' => function($event) {
                     // Fetch the model from the response
                     $model = $event->getResponse()->getModel();
 
                     // Set some values
                     $model['someValue'] = 123;
-                    $model['someOtherValue'] = array(
+                    $model['someOtherValue'] = [
                         'foo' => 'bar',
-                    );
-                    $model['someList'] = array(1, 2, 3);
+                    ];
+                    $model['someList'] = [1, 2, 3];
                 }
-            ),
-        ),
+            ],
+        ],
 
         // ...
-    );
+    ];
 
 When requesting the stats endpoint, the output will look like this:
 
@@ -234,18 +222,18 @@ results in:
 .. code-block:: javascript
 
     {
-      "publicKey": "<user>",
+      "user": "<user>",
       "numImages": 42,
       "lastModified": "Wed, 18 Apr 2012 15:12:52 GMT"
     }
 
-where ``publicKey`` is the public key of the user (the same used in the URI of the request), ``numImages`` is the number of images the user has stored in Imbo and ``lastModified`` is when the user last uploaded or deleted an image, or when the user last updated metadata of an image. If the user has not added any images yet, the ``lastModified`` value will be set to the current time on the server.
+where ``user`` is the user (the same used in the URI of the request), ``numImages`` is the number of images the user has stored in Imbo and ``lastModified`` is when the user last uploaded or deleted an image, or when the user last updated metadata of an image. If the user has not added any images yet, the ``lastModified`` value will be set to the current time on the server.
 
 **Typical response codes:**
 
 * 200 OK
 * 304 Not modified
-* 404 Public key not found
+* 404 User not found
 
 .. _images-resource:
 
@@ -344,7 +332,7 @@ results in:
           "height": 77,
           "mime": "image/png",
           "imageIdentifier": "<image>",
-          "publicKey": "<user>",
+          "user": "<user>",
           "metadata": {
             "key": "value",
             "foo": "bar"
@@ -367,14 +355,14 @@ The ``images`` list contains image objects. Each object has the following fields
 * ``height``: The height of the image in pixels.
 * ``mime``: The mime type of the image.
 * ``imageIdentifier``: The image identifier stored in Imbo.
-* ``publicKey``: The public key of the user who owns the image.
+* ``user``: The user who owns the image.
 * ``metadata``: A JSON object containing metadata attached to the image. This field is only available if the ``metadata`` query parameter described above is used.
 
 **Typical response codes:**
 
 * 200 OK
 * 304 Not modified
-* 404 Public key not found
+* 404 User not found
 
 .. _image-resource:
 
@@ -455,7 +443,7 @@ Create a short URL
 Creating a short URL is done by requesting this resource using ``HTTP POST`` while including some parameters for the short URL in the request body. The parameters must be specified as a JSON object, and the object supports the following fields:
 
 * ``imageIdentfier``: The same image identifier as the one in the requested URI.
-* ``publicKey``: The same public key as the one in the requested URI.
+* ``user``: The same user as the one in the requested URI.
 * ``extension``: An optional extension to the image, for instance ``jpg`` or ``png``.
 * ``query``: The query string with transformations that will be applied. The format is the same as when requesting the image resource with one or more transformations. See the :doc:`image-transformations` chapter for more information regarding the transformation of images.
 
@@ -465,7 +453,7 @@ The generated ID of the short URL can be found in the response:
 
     curl -XPOST http://imbo/users/<user>/images/<image>/shorturls.json -d '{
       "imageIdentifier": "<image>",
-      "publicKey": "<user>",
+      "user": "<user>",
       "extension": "jpg",
       "query": "t[]=thumbnail:width=75,height=75&t[]=desaturate"
     }'
@@ -654,6 +642,303 @@ results in:
 * 400 Bad request
 * 404 Image not found
 
+.. _global-images-resource:
+
+Global images resource - ``/images``
+++++++++++++++++++++++++++++++++++++
+
+The global images resource is used to search for images across users, given that the public key has access to the images of these users.
+
+This resource is read only, and behaves in the same way as described in the `Get image collections` section of :ref:`images-resource`. In addition to the parameters specified for `Get image collections`, the following query parameter must be specified:
+
+``users[]``
+    An array of users to get images for.
+
+.. code-block:: bash
+
+    curl "http://imbo/images?users[]=foo&users[]=bar"
+
+results in a response with the exact same format as shown under `Get image collections`.
+
+.. _publickey-resource:
+
+Public key resource - ``/keys/<publicKey>``
++++++++++++++++++++++++++++++++++++++++++++
+
+The public key resource provides a way for clients to dynamically add, remove and update public keys to be used as part of the access control routines. Not all access control adapters implement this functionality - in this case the configuration is done through configuration files.
+
+A private key does not have any specific requirements, while a public key must match the following `regular expression <http://en.wikipedia.org/wiki/Regular_expression>`_::
+
+    /^[a-zA-Z0-9_-]{1,}$/
+
+Add a public key
+~~~~~~~~~~~~~~~~
+
+Every public key must also have a private key, which is used to sign and generate access tokens for requests. This is the only required parameter in the request body.
+
+.. code-block:: bash
+
+    curl -XPUT http://imbo/keys/<publicKey>.json -d '{"privateKey":"<privateKey>"}'
+
+Check if a public key exist
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A ``HEAD`` request can be used if you want to check if a public key exist. The public key used to sign the request must have access to the ``keys.head`` resource.
+
+.. code-block:: bash
+
+    curl -XHEAD http://imbo/keys/<publicKey>
+
+**Typical response codes:**
+
+* 200 OK
+* 404 Public key not found
+
+Change private key for a public key
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use the same method as when adding a public key to change the private key.
+
+Remove a public key
+~~~~~~~~~~~~~~~~~~~
+
+Public keys can be removed using a ``DELETE`` request. The public key used to sign the request must have access to the ``keys.delete`` resource.
+
+.. code-block:: bash
+
+    curl -XDELETE http://imbo/keys/<publicKey>.json
+
+**Typical response codes:**
+
+* 200 OK
+* 201 Created
+* 400 Bad request
+* 404 Public key not found
+* 405 Access control adapter is immutable
+
+.. note:: The keys resource is not cache-able.
+
+.. _groups-resource:
+
+Groups resource - ``/groups``
++++++++++++++++++++++++++++++++++++++
+
+The groups resource can list available resource groups, used in the access control routines.
+
+List resource groups
+~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP GET on this resource returns all available resource groups. Supported query parameters are:
+
+``page``
+    The page number. Defaults to ``1``.
+
+``limit``
+    Number of groups per page. Defaults to ``20``.
+
+.. code-block:: bash
+
+    curl http://imbo/groups.json
+
+results in:
+
+.. code-block:: javascript
+
+    {"search":{"hits":0,"page":1,"limit":20,"count":0},"groups":[]}
+
+when there are no resource groups defined, or for example
+
+.. code-block:: javascript
+
+    {
+      "search": {
+        "hits": 1,
+        "page": 1,
+        "limit": 20,
+        "count": 1
+      },
+      "groups": [
+        {
+          "name": "read-stats",
+          "resources": [
+            "user.get",
+            "user.head",
+            "user.options"
+          ]
+        }
+      ]
+    }
+
+if there are resource groups defined.
+
+**Typical response codes:**
+
+* 200 OK
+
+.. _group-resource:
+
+Group resource - ``/groups/<groupName>``
+++++++++++++++++++++++++++++++++++++++++
+
+The group resource enables adding, modifying and deleting resource groups used in the access control routine. Not all access control adapters allow modification of groups - in this case the configuration is done through configuration files, and PUT/DELETE operations will result in an HTTP 405 response.
+
+List resources of a group
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP GET on this resource returns all the resources the group consists of.
+
+.. code-block:: bash
+
+    curl http://imbo/groups/<group>.json
+
+results in:
+
+.. code-block:: javascript
+
+    {
+      "resources": [
+        "user.get",
+        "user.head",
+        "user.options"
+      ]
+    }
+
+Add/modify resources for a group
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP PUT on this resource either adds a new group with the given name, or if it already exists, updates it. The request body should contain an array of resources the group should consist of.
+
+.. code-block:: bash
+
+    curl -XPUT http://imbo/groups/<group>.json -d '[
+      "user.get",
+      "stats.get"
+    ]'
+
+Delete a resource group
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP DELETE on this resource will remove the entire resource group. Note that any access control rules that are using this resource group will also be deleted, since they are now invalid.
+
+.. code-block:: bash
+
+    curl -XDELETE http://imbo/groups/<group>.json
+
+
+**Typical response codes:**
+
+* 200 OK
+* 201 Created
+* 404 Group not found
+* 405 Access control adapter is immutable
+
+.. _access-rules-resource:
+
+Access rules resource - ``/keys/<publicKey>/access``
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The access rules endpoint allows you to add rules that give a public key access to a specified set of resources. These rules can also be defined on a per-user basis. Instead of defining a list of resources, you also have the option to specify a :ref:`resource group <groups-resource>`.
+
+Listing access control rules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP GET on this resource returns all the access control rules defined for the given public key.
+
+.. code-block:: bash
+
+    curl http://imbo/keys/<publicKey>/access.json
+
+results in:
+
+.. code-block:: javascript
+
+    [
+      {
+        "id": 1,
+        "resources": ['images.get', 'image.get', 'images.post', 'image.delete'],
+        "users": [
+          "user1",
+          "user2"
+        ]
+      },
+      {
+        "id": 2,
+        "group": "read-stats",
+        "users": [
+          "user1",
+          "user2"
+        ]
+      }
+    ]
+
+Adding access control rules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP POST on this resource adds new rules to the given public key. The request body should contain an array of rules. The parameters for a rule must be specified as JSON objects, where the object supports the following fields:
+
+* ``users``: Defines on which users the public key should have access to the defined resources. Either an array of users or the string ``*`` (all users).
+* ``resources``: An array of resources you want the public key to have access to.
+* ``group``: A resource group the public key should have access to.
+
+.. note:: A rule must contain *either* ``resources`` or ``group``, not both. ``users`` is required.
+
+.. code-block:: bash
+
+    curl -XPOST http://imbo/keys/<publicKey>/access -d '[{
+      "resources": ["user.get", "image.get", "images.get", "metadata.get"],
+      "users": "*"
+    }]'
+
+**Typical response codes:**
+
+* 200 OK
+* 400 No access rule data provided
+* 404 Public key not found
+* 405 Access control adapter is immutable
+
+.. _access-rule-resource:
+
+Access rule resource - ``/keys/<publicKey>/access/<ruleId>``
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The access rule endpoint allows you to see which resources and users a given access control rule contains. It also allows you to remove a specific access control rule.
+
+Get access rule details
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+    curl http://imbo/keys/<publicKey>/access/<ruleId>.json
+
+results in:
+
+.. code-block:: javascript
+
+    {
+      "id": 1,
+      "resources": ['images.get', 'image.get', 'images.post', 'image.delete'],
+      "users": [
+        "user1",
+        "user2"
+      ]
+    }
+
+Removing an access rule
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests using HTTP DELETE on this resource removes the access control rule, given the access control adapter supports mutations.
+
+.. code-block:: bash
+
+    curl -XDELETE http://imbo/keys/<publicKey>/access/<ruleId>
+
+**Typical response codes:**
+
+* 200 OK
+* 404 Public key not found
+* 404 Access rule not found
+* 405 Access control adapter is immutable
+
 .. _access-tokens:
 
 Access tokens
@@ -696,7 +981,7 @@ The data for the hash is generated using the following elements:
 
 * HTTP method (``PUT``, ``POST`` or ``DELETE``)
 * The URI
-* Public key of the user
+* Public key
 * GMT timestamp (``YYYY-MM-DDTHH:MM:SSZ``, for instance: ``2011-02-01T14:33:03Z``)
 
 These elements are concatenated in the above order with ``|`` as a delimiter character, and a hash is generated using the private key of the user. The following snippet shows how this can be accomplished in PHP when deleting an image:

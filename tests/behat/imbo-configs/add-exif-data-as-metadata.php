@@ -11,8 +11,13 @@
 /**
  * Enable the EXIF metadata listener
  */
-return array(
-    'eventListeners' => array(
-        'exifMetadataListener' => 'Imbo\EventListener\ExifMetadata',
-    ),
-);
+return [
+    'eventListeners' => [
+        'exifMetadataListener' => [
+            'listener' => 'Imbo\EventListener\ExifMetadata',
+            'params' => [
+                'allowedTags' => ['exif:*', 'png:*']
+            ]
+        ]
+    ],
+];

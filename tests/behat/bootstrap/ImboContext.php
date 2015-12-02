@@ -25,6 +25,13 @@ require 'RESTContext.php';
  */
 class ImboContext extends RESTContext {
     /**
+     * The user used by the client
+     *
+     * @var string
+     */
+    private $user = 'user';
+
+    /**
      * The public key used by the client
      *
      * @var string
@@ -39,6 +46,56 @@ class ImboContext extends RESTContext {
     private $privateKey;
 
     /**
+     * Holds the configuration file specified in the current feature
+     *
+     * @var string
+     */
+    private $currentConfig;
+
+    /**
+     * An array of urls for added images, keyed by local file path
+     *
+     * @var array
+     */
+    private $imageUrls = [];
+
+    /**
+     * An array of image identifiers for added images, keyed by local file path
+     *
+     * @var array
+     */
+    private $imageIdentifiers = [];
+
+    /**
+     * Holds the current image target URL - used when the same image is requested
+     * over several tests in the same feature
+     *
+     * @var string
+     */
+    private static $testImageUrl;
+
+    /**
+     * Holds the image identifier of the current testing target
+     *
+     * @var string
+     */
+    private static $testImageIdentifier;
+
+    /**
+     * Holds the path to the image currently used as the testing target
+     *
+     * @var string
+     */
+    private static $testImagePath;
+
+    /**
+     * Holds the current feature for this test image
+     *
+     * @var string
+     */
+    private static $testImageFeature;
+
+    /**
      * @BeforeFeature
      */
     public static function prepare(FeatureEvent $event) {
@@ -47,7 +104,7 @@ class ImboContext extends RESTContext {
         $mongo = new MongoClient();
         $mongo->imbo_testing->drop();
 
-        $cachePath = '/tmp/imbo-behat-image-transformation-cache';
+        $cachePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'imbo-behat-image-transformation-cache';
 
         if (is_dir($cachePath)) {
             $iterator = new RecursiveIteratorIterator(
@@ -89,10 +146,10 @@ class ImboContext extends RESTContext {
      * @Given /^the database and the storage is down$/
      */
     public function forceBothAdapterFailure() {
-        return array(
+        return [
             new Given('the storage is down'),
             new Given('the database is down'),
-        );
+        ];
     }
 
     /**
@@ -101,6 +158,36 @@ class ImboContext extends RESTContext {
     public function setClientAuth($publicKey, $privateKey) {
         $this->publicKey = $publicKey;
         $this->privateKey = $privateKey;
+
+        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) {
+            $request = $event['request'];
+            $request->addHeaders([
+                'X-Imbo-PublicKey' => $this->publicKey
+            ]);
+        }, -100);
+    }
+
+    /**
+     * @Given /^I do not specify a public and private key$/
+     */
+    public function removeClientAuth() {
+        $this->publicKey = null;
+        $this->privateKey = null;
+    }
+
+    /**
+     * @Given /^I authenticate using "(.*?)"$/
+     */
+    public function authenticateRequest($method) {
+        if ($method == 'access-token') {
+            return new Given('I include an access token in the query');
+        }
+
+        if ($method == 'signature') {
+            return new Given('I sign the request');
+        }
+
+        throw new \Exception('Unknown authentication method: ' . $method);
     }
 
     /**
@@ -109,9 +196,15 @@ class ImboContext extends RESTContext {
     public function appendAccessToken() {
         $this->client->getEventDispatcher()->addListener('request.before_send', function($event) {
             $request = $event['request'];
-            $request->getQuery()->remove('accessToken');
+            $query = $request->getQuery();
+
+            if (!$query->get('publicKey')) {
+                $query->set('publicKey', $this->publicKey);
+            }
+
+            $query->remove('accessToken');
             $accessToken = hash_hmac('sha256', urldecode($request->getUrl()), $this->privateKey);
-            $request->getQuery()->set('accessToken', $accessToken);
+            $query->set('accessToken', $accessToken);
         }, -100);
     }
 
@@ -125,6 +218,7 @@ class ImboContext extends RESTContext {
             $request = $event['request'];
 
             // Remove headers and query params that should not be present at this time
+            $request->removeHeader('X-Imbo-PublicKey');
             $request->removeHeader('X-Imbo-Authenticate-Signature');
             $request->removeHeader('X-Imbo-Authenticate-Timestamp');
             $query = $request->getQuery();
@@ -146,11 +240,11 @@ class ImboContext extends RESTContext {
             $signature = hash_hmac('sha256', $data, $this->privateKey);
 
             if ($useHeaders) {
-                $request->addHeaders(array(
+                $request->addHeaders([
                     'X-Imbo-PublicKey'              => $this->publicKey,
                     'X-Imbo-Authenticate-Signature' => $signature,
                     'X-Imbo-Authenticate-Timestamp' => $timestamp,
-                ));
+                ]);
             } else {
                 $query->set('signature', $signature);
                 $query->set('timestamp', $timestamp);
@@ -163,7 +257,7 @@ class ImboContext extends RESTContext {
      */
     public function applyTransformation($transformation) {
         $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($transformation) {
-            $event['request']->getQuery()->set('t', array($transformation));
+            $event['request']->getQuery()->set('t', [$transformation]);
         });
     }
 
@@ -192,14 +286,22 @@ class ImboContext extends RESTContext {
         $response = $this->getLastResponse();
         $contentType = $response->getContentType();
 
-        if ($contentType === 'application/json') {
-            $data = $response->json();
-            $errorMessage = $data['error']['message'];
-            $errorCode = $data['error']['imboErrorCode'];
-        } else if ($contentType === 'application/xml') {
-            $data = $response->xml();
-            $errorMessage = (string) $data->error->message;
-            $errorCode = $data->error->imboErrorCode;
+        try {
+            if ($contentType === 'application/json') {
+                $data = $response->json();
+                $errorMessage = $data['error']['message'];
+                $errorCode = $data['error']['imboErrorCode'];
+            } else if ($contentType === 'application/xml') {
+                $data = $response->xml();
+                $errorMessage = (string) $data->error->message;
+                $errorCode = $data->error->imboErrorCode;
+            }
+        } catch (\Exception $e) {
+            throw new RuntimeException(
+                "Unable to parse response: \n" .
+                $response->getMessage() . "\n\n" .
+                $e->getMessage()
+            );
         }
 
         assertSame($message, $errorMessage, 'Expected "' . $message. '", got "' . $errorMessage . '"');
@@ -216,12 +318,19 @@ class ImboContext extends RESTContext {
      * @Given /^"([^"]*)" exists in Imbo$/
      */
     public function addImageToImbo($imagePath) {
-        return array(
-            new Given('I use "publickey" and "privatekey" for public and private keys'),
-            new Given('I sign the request'),
-            new Given('I attach "' . $imagePath . '" to the request body'),
-            new Given('I request "/users/publickey/images" using HTTP "POST"'),
-        );
+        $this->addUserImageToImbo($imagePath, 'user');
+    }
+
+    /**
+     * @Given /^"([^"]*)" exists for user "([^"]*)" in Imbo$/
+     */
+    public function addUserImageToImbo($imagePath, $user) {
+        $this->setClientAuth('publickey', 'privatekey');
+        $this->signRequest();
+        $this->attachFileToRequestBody($imagePath);
+        $this->request('/users/' . $user . '/images/', 'POST');
+        $this->imageUrls[$imagePath] = $this->getPreviouslyAddedImageUrl();
+        $this->imageIdentifiers[$imagePath] = $this->getPreviouslyAddedImageIdentifier();
     }
 
     /**
@@ -247,11 +356,139 @@ class ImboContext extends RESTContext {
     }
 
     /**
-     * @When /^I request the added image as a "(jpg|png|gif)"$/
+     * @Given /^"([^"]*)" is used as the test image( for the "([^"]*)" feature)?$/
+     */
+    public function imageIsUsedAsTestImage($testImagePath, $forFeature = null, $feature = null) {
+        if (self::$testImagePath === $testImagePath && $feature &&
+            self::$testImageFeature === $feature) {
+            return;
+        }
+
+        $this->addImageToImbo($testImagePath);
+        self::$testImageIdentifier = $this->getPreviouslyAddedImageIdentifier();
+        self::$testImageUrl = $this->getPreviouslyAddedImageUrl();
+        self::$testImagePath = $testImagePath;
+        self::$testImageFeature = $feature;
+    }
+
+    /**
+     * @When /^I request the test image(?: as a "([^"]*)")?$/
+     */
+    public function requestTestImage($format = null) {
+        $url = self::$testImageUrl . ($format ? '.' . $format : '');
+        return [
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the test image using HTTP "([^"]*)"$/
+     */
+    public function requestTestImageUsingHttpMethod($method) {
+        $url = self::$testImageUrl;
+        return [
+            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the metadata of the test image(?: using HTTP "(.*?)")?$/
+     */
+    public function requestMetadataOfTestImage($method = 'GET') {
+        $url = self::$testImageUrl . '/meta';
+        return [
+            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the metadata of the test image as "(xml|json)"$/
+     */
+    public function requestMetadataOfTestImageInFormat($format = null) {
+        $url = self::$testImageUrl . '/meta' . ($format ? '.' . $format : '');
+        return [
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the (?:previously )?added image(?: with the query string "([^"]*)")?$/
+     */
+    public function requestPreviouslyAddedImage($queryParams = '') {
+        $url = $this->getPreviouslyAddedImageUrl() . $queryParams;
+        return [
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the (?:previously )?added image using HTTP "([^"]*)"$/
+     */
+    public function requestPreviouslyAddedImageWithHttpMethod($method) {
+        $url = $this->getPreviouslyAddedImageUrl();
+        return [
+            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
+        ];
+    }
+
+
+    /**
+     * @When /^I request the (?:previously )?added image as a "(jpg|png|gif)"$/
      */
     public function requestTheAddedImage($extension) {
-        $identifier = $this->getLastResponse()->json()['imageIdentifier'];
-        $this->request('/users/' . $this->publicKey . '/images/' . $identifier . '.' . $extension);
+        $url = $this->getPreviouslyAddedImageUrl() . '.' . $extension;
+        return [
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the metadata of the previously added image as "(xml|json)"$/
+     */
+    public function requestMetadataOfPreviouslyAddedImageInFormat($format = null) {
+        $url = $this->getPreviouslyAddedImageUrl() . '/meta' . ($format ? '.' . $format : '');
+        return [
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the metadata of the previously added image(?: using HTTP "(.*?)")?$/
+     */
+    public function requestMetadataOfPreviouslyAddedImage($method = 'GET') {
+        $url = $this->getPreviouslyAddedImageUrl() . '/meta';
+        return [
+            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
+        ];
+    }
+
+    /**
+     * @When /^I request the image resource for "([^"]*)"(?: as a "(png|gif|jpg)")?(?: using HTTP "([^"]*)")?$/
+     */
+    public function requestImageResourceForLocalImage($imagePath, $format = null, $method = 'GET') {
+        if (!isset($this->imageUrls[$imagePath])) {
+            throw new RuntimeException('Image URL for "' . $imagePath . '" not found');
+        }
+
+        $url = $this->imageUrls[$imagePath];
+        if ($format) {
+            $url .= '.' . $format;
+        }
+
+        return [
+            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
+        ];
+    }
+
+    /**
+     * @Given /^I append a query string parameter, "([^"]*)" with the image identifier of "([^"]*)"$/
+     */
+    public function appendQueryStringParamWithImageIdentifierForLocalImage($queryParam, $imagePath) {
+        if (!isset($this->imageIdentifiers[$imagePath])) {
+            throw new RuntimeException('Image identifier for "' . $imagePath . '" not found');
+        }
+
+        $this->appendQueryStringParameter($queryParam, $this->imageIdentifiers[$imagePath]);
     }
 
     /**
@@ -262,7 +499,7 @@ class ImboContext extends RESTContext {
 
         $this->setClientAuth('publickey', 'privatekey');
         $this->signRequest();
-        $this->request('/users/publickey/images/' . $identifier, 'DELETE');
+        $this->request('/users/user/images/' . $identifier, 'DELETE');
     }
 
     /**
@@ -288,28 +525,29 @@ class ImboContext extends RESTContext {
      * @Given /^the pixel at coordinate "([^"]*)" should have a color of "#([^"]*)"$/
      */
     public function assertImagePixelColor($coordinates, $expectedColor) {
-        $coordinates = array_map('trim', explode(',', $coordinates));
-        $coordinates = array_map('intval', $coordinates);
-
+        $info = $this->getImagePixelInfo($coordinates);
         $expectedColor = strtolower($expectedColor);
-
-        $imagick = new \Imagick();
-        $imagick->readImageBlob((string) $this->getLastResponse()->getBody());
-
-        $pixel = $imagick->getImagePixelColor($coordinates[0], $coordinates[1]);
-        $color = $pixel->getColor();
-
-        $toHex = function($col) {
-            return str_pad(dechex($col), 2, '0', STR_PAD_LEFT);
-        };
-
-        $hexColor = $toHex($color['r']) . $toHex($color['g']) . $toHex($color['b']);
 
         assertSame(
             $expectedColor,
-            $hexColor,
-            'Incorrect color at coordinate ' . implode(', ', $coordinates) .
-            ', expected ' . $expectedColor . ', got ' . $hexColor
+            $info['color'],
+            'Incorrect color at coordinate ' . $coordinates .
+            ', expected ' . $expectedColor . ', got ' . $info['color']
+        );
+    }
+
+    /**
+     * @Given /^the pixel at coordinate "([^"]*)" should have an alpha of "([^"]*)"$/
+     */
+    public function assertImagePixelAlpha($coordinates, $expectedAlpha) {
+        $info = $this->getImagePixelInfo($coordinates);
+        $expectedAlpha = (float) $expectedAlpha;
+
+        assertSame(
+            $expectedAlpha,
+            $info['alpha'],
+            'Incorrect alpha value at coordinate ' . $coordinates .
+            ', expected ' . $expectedAlpha . ', got ' . $info['alpha']
         );
     }
 
@@ -317,6 +555,7 @@ class ImboContext extends RESTContext {
      * @Given /^Imbo uses the "([^"]*)" configuration$/
      */
     public function setImboConfigHeader($config) {
+        $this->currentConfig = $config;
         $this->addHeaderToNextRequest('X-Imbo-Test-Config', $config);
     }
 
@@ -331,14 +570,20 @@ class ImboContext extends RESTContext {
      * @Given /^I generate a short URL with the following parameters:$/
      */
     public function generateShortImageUrl(PyStringNode $params) {
-        $imageIdentifier = $this->getLastResponse()->json()['imageIdentifier'];
+        $lastResponse = $this->getLastResponse();
 
-        return array(
-            new Given('I use "publickey" and "privatekey" for public and private keys'),
-            new Given('I sign the request'),
-            new Given('the request body contains:', $params),
-            new Given('I request "/users/publickey/images/' . $imageIdentifier . '/shorturls" using HTTP "POST"'),
-        );
+        preg_match('/\/users\/([^\/]+)/', $lastResponse->getInfo('url'), $matches);
+        $user = $matches[1];
+
+        $imageIdentifier = $lastResponse->json()['imageIdentifier'];
+        $params = array_merge(json_decode((string) $params, true), [
+            'imageIdentifier' => $imageIdentifier,
+        ]);
+
+        return [
+            new Given('the request body contains:', new PyStringNode(json_encode($params))),
+            new Given('I request "/users/' . $user . '/images/' . $imageIdentifier . '/shorturls" using HTTP "POST"'),
+        ];
     }
 
     /**
@@ -347,9 +592,148 @@ class ImboContext extends RESTContext {
     public function requestImageUsingShortUrl() {
         $shortUrlId = $this->getLastResponse()->json()['id'];
 
-        return array(
+        return [
             new Given('the "Accept" request header is "image/*"'),
             new Given('I request "/s/' . $shortUrlId . '"'),
-        );
+        ];
+    }
+
+    /**
+     * @Given /^I prime the database with "([^"]*)"$/
+     */
+    public function iPrimeTheDatabaseWith($fixture) {
+        $fixturePath = implode(DIRECTORY_SEPARATOR, [
+            dirname(__DIR__),
+            'fixtures',
+            $fixture
+        ]);
+
+        if (!$fixturePath = realpath($fixturePath)) {
+            throw new RuntimeException('Path "' . $fixturePath . '" is invalid');
+        }
+
+        $mongo = (new MongoClient())->imbo_testing;
+
+        $fixtures = require $fixturePath;
+        foreach ($fixtures as $collection => $data) {
+            $mongo->$collection->drop();
+
+            if ($data) {
+                $mongo->$collection->batchInsert($data);
+            }
+        }
+    }
+
+    /**
+     * @Given /^the ACL rule under public key "([^"]*)" with ID "([^"]*)" should not exist( anymore)?$/
+     */
+    public function aclRuleWithIdShouldNotExist($publicKey, $aclId) {
+        if ($this->currentConfig) {
+            $this->addHeaderToNextRequest('X-Imbo-Test-Config', $this->currentConfig);
+        }
+
+        $url = '/keys/' . $publicKey . '/access/' . $aclId;
+        return [
+            new Given('I use "acl-checker" and "foobar" for public and private keys'),
+            new Given('I include an access token in the query'),
+            new Given('I request "' . $url . '" using HTTP "GET"'),
+            new Given('I should get a response with "404 Access rule not found"')
+        ];
+    }
+
+    /**
+     * @Given /^the "([^"]*)" public key should not exist( anymore)?$/
+     */
+    public function publicKeyShouldNotExist($publicKey) {
+        if ($this->currentConfig) {
+            $this->addHeaderToNextRequest('X-Imbo-Test-Config', $this->currentConfig);
+        }
+
+        $url = '/keys/' . $publicKey;
+        return [
+            new Given('I use "acl-creator" and "someprivkey" for public and private keys'),
+            new Given('I include an access token in the query'),
+            new Given('I request "' . $url . '" using HTTP "HEAD"'),
+            new Given('I should get a response with "404 Public key not found"')
+        ];
+    }
+
+    /**
+     * @Given /^Imbo starts with an empty database$/
+     */
+    public function imboStartsWithEmptyDatabase() {
+        $mongo = new MongoClient();
+        $mongo->imbo_testing->drop();
+    }
+
+    /**
+     * @Given /^I use "([^"]*)" as the watermark image with "([^"]*)" as parameters$/
+     */
+    public function specifyAsTheWatermarkImage($watermarkPath, $parameters = '') {
+        $this->addImageToImbo($watermarkPath);
+        $imageIdentifier = $this->getPreviouslyAddedImageIdentifier();
+        $params = empty($parameters) ? '' : ',' . $parameters;
+        $transformation = 'watermark:img=' . $imageIdentifier . $params;
+
+        return [
+            new Given('I specify "' . $transformation . '" as transformation')
+        ];
+    }
+
+    /**
+     * Get the previously added image identifier
+     *
+     * @throws RuntimeException If previous response did not include image identifier
+     * @return string
+     */
+    private function getPreviouslyAddedImageIdentifier() {
+        $response = $this->getLastResponse()->json();
+        if (!isset($response['imageIdentifier'])) {
+            throw new RuntimeException(
+                'Image identifier was not present in previous response, response: ' .
+                $this->getLastResponse()->getBody(true)
+            );
+        }
+
+        return $response['imageIdentifier'];
+    }
+
+    /**
+     * Get the previously added image URL
+     *
+     * @throws RuntimeException If previous response did not include image identifier
+     * @return string
+     */
+    private function getPreviouslyAddedImageUrl() {
+        $identifier = $this->getPreviouslyAddedImageIdentifier();
+        return '/users/' . $this->user . '/images/' . $identifier;
+    }
+
+    /**
+     * Get the pixel info for given coordinates, from the image returned in the previous response
+     *
+     * @param  string $coordinates
+     * @return array
+     */
+    private function getImagePixelInfo($coordinates) {
+        $coordinates = array_map('trim', explode(',', $coordinates));
+        $coordinates = array_map('intval', $coordinates);
+
+        $imagick = new \Imagick();
+        $imagick->readImageBlob((string) $this->getLastResponse()->getBody());
+
+        $pixel = $imagick->getImagePixelColor($coordinates[0], $coordinates[1]);
+        $color = $pixel->getColor();
+
+        $toHex = function($col) {
+            return str_pad(dechex($col), 2, '0', STR_PAD_LEFT);
+        };
+
+        $hexColor = $toHex($color['r']) . $toHex($color['g']) . $toHex($color['b']);
+
+        return [
+            'color' => $hexColor,
+            'alpha' => (float) $pixel->getColorValue(\Imagick::COLOR_ALPHA),
+        ];
     }
 }

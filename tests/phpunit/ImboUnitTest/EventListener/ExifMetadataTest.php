@@ -52,7 +52,7 @@ class ExifMetadataTest extends ListenerTests {
      * @return array[]
      */
     public function getFilterData() {
-        $data = array(
+        $data = [
             'date:create' => '2013-11-26T19:42:48+01:00',
             'date:modify' => '2013-11-26T19:42:48+01:00',
             'exif:Flash' => '16',
@@ -71,28 +71,28 @@ class ExifMetadataTest extends ListenerTests {
             'exif:Model' => 'GT-I9100',
             'jpeg:colorspace' => '2',
             'jpeg:sampling-factor' => '2x2,1x1,1x1',
-        );
-        return array(
-            'all values' => array(
+        ];
+        return [
+            'all values' => [
                 'data' => $data,
-                'tags' => array('*'),
-                'expectedData' => array_merge($data, array(
-                    'gps:location' => array(9.0841802, 63.680437300003),
+                'tags' => ['*'],
+                'expectedData' => array_merge($data, [
+                    'gps:location' => [9.0841802, 63.680437300003],
                     'gps:altitude' => 50.8,
-                )),
+                ]),
 
-            ),
-            'specific value' => array(
+            ],
+            'specific value' => [
                 'data' => $data,
-                'tags' => array('exif:Make'),
-                'expectedData' => array(
+                'tags' => ['exif:Make'],
+                'expectedData' => [
                     'exif:Make' => 'SAMSUNG',
-                ),
-            ),
-            'default' => array(
+                ],
+            ],
+            'default' => [
                 'data' => $data,
                 'tags' => null,
-                'expectedData' => array(
+                'expectedData' => [
                     'exif:Flash' => '16',
                     'exif:GPSAltitude' => '254/5',
                     'exif:GPSAltitudeRef' => '0',
@@ -107,22 +107,22 @@ class ExifMetadataTest extends ListenerTests {
                     'exif:GPSVersionID' => '2, 2, 0, 0',
                     'exif:Make' => 'SAMSUNG',
                     'exif:Model' => 'GT-I9100',
-                    'gps:location' => array(9.0841802, 63.680437300003),
+                    'gps:location' => [9.0841802, 63.680437300003],
                     'gps:altitude' => 50.8,
-                ),
-            ),
-            'mixed' => array(
+                ],
+            ],
+            'mixed' => [
                 'data' => $data,
-                'tags' => array('exif:Model', 'jpeg:*', 'date:*'),
-                'expectedData' => array(
+                'tags' => ['exif:Model', 'jpeg:*', 'date:*'],
+                'expectedData' => [
                     'date:create' => '2013-11-26T19:42:48+01:00',
                     'date:modify' => '2013-11-26T19:42:48+01:00',
                     'exif:Model' => 'GT-I9100',
                     'jpeg:colorspace' => '2',
                     'jpeg:sampling-factor' => '2x2,1x1,1x1',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -135,12 +135,12 @@ class ExifMetadataTest extends ListenerTests {
      * @covers Imbo\EventListener\ExifMetadata::parseProperties
      */
     public function testCanFilterData($data, $tags, $expectedData) {
-        $publicKey = 'publickey';
-        $checksum = 'checksum';
+        $user = 'user';
+        $imageIdentifier = 'imageIdentifier';
         $blob = 'blob';
 
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getChecksum')->will($this->returnValue($checksum));
+        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
         $image->expects($this->once())->method('getBlob')->will($this->returnValue($blob));
 
         $imagick = $this->getMock('Imagick');
@@ -148,17 +148,17 @@ class ExifMetadataTest extends ListenerTests {
         $imagick->expects($this->once())->method('getImageProperties')->will($this->returnValue($data));
 
         $request = $this->getMock('Imbo\Http\Request\Request');
-        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
-        $request->expects($this->exactly(2))->method('getImage')->will($this->returnValue($image));
+        $request->expects($this->once())->method('getUser')->will($this->returnValue($user));
+        $request->expects($this->any())->method('getImage')->will($this->returnValue($image));
 
         $database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $database->expects($this->once())->method('updateMetadata')->with($publicKey, $checksum, $expectedData);
+        $database->expects($this->once())->method('updateMetadata')->with($user, $imageIdentifier, $expectedData);
 
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->exactly(2))->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
 
-        $listener = new ExifMetadata(array('allowedTags' => $tags));
+        $listener = new ExifMetadata(['allowedTags' => $tags]);
         $listener->setImagick($imagick);
         $listener->populate($event);
         $listener->save($event);
@@ -173,14 +173,14 @@ class ExifMetadataTest extends ListenerTests {
     public function testWillDeleteImageWhenUpdatingMetadataFails() {
         $databaseException = $this->getMock('Imbo\Exception\DatabaseException');
         $database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $database->expects($this->once())->method('updateMetadata')->with('publickey', 'imageidentifier', array())->will($this->throwException($databaseException));
-        $database->expects($this->once())->method('deleteImage')->with('publickey', 'imageidentifier');
+        $database->expects($this->once())->method('updateMetadata')->with('user', 'imageidentifier', [])->will($this->throwException($databaseException));
+        $database->expects($this->once())->method('deleteImage')->with('user', 'imageidentifier');
 
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getChecksum')->will($this->returnValue('imageidentifier'));
+        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageidentifier'));
 
         $request = $this->getMock('Imbo\Http\Request\Request');
-        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue('publickey'));
+        $request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
 
         $event = $this->getMock('Imbo\EventManager\Event');

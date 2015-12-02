@@ -4,7 +4,8 @@ Feature: Imbo provides a stats endpoint
     I want to make requests against the stats endpoint
 
     Background:
-        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
+        Given Imbo starts with an empty database
+        And "tests/phpunit/Fixtures/image1.png" exists in Imbo
         And "tests/phpunit/Fixtures/image.jpg" exists in Imbo
         And "tests/phpunit/Fixtures/image.gif" exists in Imbo
 
@@ -19,8 +20,8 @@ Feature: Imbo provides a stats endpoint
 
         Examples:
             | extension | response |
-            | json      | {"users":{"publickey":{"numImages":3,"numBytes":226424},"user":{"numImages":0,"numBytes":0}},"total":{"numImages":3,"numUsers":2,"numBytes":226424},"custom":{.*}} |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<stats>\s*<users>\s*<user publicKey="publickey">\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*</user>\s*<user publicKey="user">\s*<numImages>0</numImages>\s*<numBytes>0</numBytes>\s*</user>\s*</users>\s*<total>\s*<numImages>3</numImages>\s*<numBytes>226424</numBytes>\s*<numUsers>2</numUsers>\s*</total>\s*<custom>.*</custom>\s*</stats>\s*</imbo>$#ms |
+            | json      | {"numImages":3,"numUsers":1,"numBytes":226424,"custom":{.*}} |
+            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<stats>\s*<numImages>3</numImages>\s*<numUsers>1</numUsers>\s*<numBytes>226424</numBytes>\s*<custom>.*</custom>\s*</stats>\s*</imbo>$#ms |
 
     Scenario Outline: The stats endpoint only supports HTTP GET and HEAD
         Given Imbo uses the "stats-access-and-custom-stats.php" configuration

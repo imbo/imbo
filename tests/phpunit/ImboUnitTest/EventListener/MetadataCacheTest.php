@@ -29,7 +29,7 @@ class MetadataCacheTest extends ListenerTests {
     private $cache;
     private $response;
     private $responseHeaders;
-    private $publicKey = 'key';
+    private $user = 'user';
     private $imageIdentifier = 'imageid';
 
     /**
@@ -38,7 +38,7 @@ class MetadataCacheTest extends ListenerTests {
     public function setUp() {
         $this->cache = $this->getMock('Imbo\Cache\CacheInterface');
         $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->request->expects($this->any())->method('getPublicKey')->will($this->returnValue($this->publicKey));
+        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
@@ -47,7 +47,7 @@ class MetadataCacheTest extends ListenerTests {
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
-        $this->listener = new MetadataCache(array('cache' => $this->cache));
+        $this->listener = new MetadataCache(['cache' => $this->cache]);
     }
 
     /**
@@ -74,10 +74,10 @@ class MetadataCacheTest extends ListenerTests {
     public function testUpdatesResponseOnCacheHit() {
         $date = new DateTime();
 
-        $this->cache->expects($this->once())->method('get')->with($this->isType('string'))->will($this->returnValue(array(
+        $this->cache->expects($this->once())->method('get')->with($this->isType('string'))->will($this->returnValue([
             'lastModified' => $date,
-            'metadata' => array('key' => 'value'),
-        )));
+            'metadata' => ['key' => 'value'],
+        ]));
 
         $this->responseHeaders->expects($this->once())->method('set')->with('X-Imbo-MetadataCache', 'Hit');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Metadata'))->will($this->returnSelf());
@@ -92,10 +92,10 @@ class MetadataCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\MetadataCache::loadFromCache
      */
     public function testDeletesInvalidCachedData() {
-        $this->cache->expects($this->once())->method('get')->with($this->isType('string'))->will($this->returnValue(array(
+        $this->cache->expects($this->once())->method('get')->with($this->isType('string'))->will($this->returnValue([
             'lastModified' => 'preformatted date',
-            'metadata' => array('key' => 'value'),
-        )));
+            'metadata' => ['key' => 'value'],
+        ]));
         $this->cache->expects($this->once())->method('delete')->with($this->isType('string'));
         $this->responseHeaders->expects($this->once())->method('set')->with('X-Imbo-MetadataCache', 'Miss');
         $this->response->expects($this->never())->method('setModel');
@@ -107,12 +107,12 @@ class MetadataCacheTest extends ListenerTests {
      */
     public function testStoresDataInCacheWhenResponseCodeIs200() {
         $lastModified = new DateTime();
-        $data = array('some' => 'value');
+        $data = ['some' => 'value'];
 
-        $this->cache->expects($this->once())->method('set')->with($this->isType('string'), array(
+        $this->cache->expects($this->once())->method('set')->with($this->isType('string'), [
             'lastModified' => $lastModified,
             'metadata' => $data,
-        ));
+        ]);
 
         $model = $this->getMock('Imbo\Model\ArrayModel');
         $model->expects($this->once())->method('getData')->will($this->returnValue($data));
@@ -130,10 +130,10 @@ class MetadataCacheTest extends ListenerTests {
     public function testStoresDataInCacheWhenResponseCodeIs200AndHasNoModel() {
         $lastModified = new DateTime();
 
-        $this->cache->expects($this->once())->method('set')->with($this->isType('string'), array(
+        $this->cache->expects($this->once())->method('set')->with($this->isType('string'), [
             'lastModified' => $lastModified,
-            'metadata' => array(),
-        ));
+            'metadata' => [],
+        ]);
 
         $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(200));
         $this->response->expects($this->once())->method('getLastModified')->will($this->returnValue($lastModified));
@@ -157,7 +157,7 @@ class MetadataCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\MetadataCache::getCacheKey
      */
     public function testCanDeleteContentFromCache() {
-        $this->cache->expects($this->once())->method('delete')->with('metadata:' . $this->publicKey . '|' . $this->imageIdentifier);
+        $this->cache->expects($this->once())->method('delete')->with('metadata:' . $this->user . '|' . $this->imageIdentifier);
         $this->listener->deleteFromCache($this->event);
     }
 }

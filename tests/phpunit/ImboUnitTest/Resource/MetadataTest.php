@@ -84,10 +84,10 @@ class MetadataTest extends ResourceTests {
      * @covers Imbo\Resource\Metadata::put
      */
     public function testSupportsHttpPut() {
-        $metadata = array('foo' => 'bar');
+        $metadata = ['foo' => 'bar'];
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"foo":"bar"}'));
         $this->manager->expects($this->at(0))->method('trigger')->with('db.metadata.delete')->will($this->returnSelf());
-        $this->manager->expects($this->at(1))->method('trigger')->with('db.metadata.update', array('metadata' => $metadata))->will($this->returnSelf());
+        $this->manager->expects($this->at(1))->method('trigger')->with('db.metadata.update', ['metadata' => $metadata])->will($this->returnSelf());
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
 
         $this->resource->put($this->event);
@@ -97,12 +97,12 @@ class MetadataTest extends ResourceTests {
      * @covers Imbo\Resource\Metadata::post
      */
     public function testSupportsHttpPost() {
-        $metadata = array('foo' => 'bar');
+        $metadata = ['foo' => 'bar'];
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"foo":"bar"}'));
-        $this->manager->expects($this->once())->method('trigger')->with('db.metadata.update', array('metadata' => $metadata));
+        $this->manager->expects($this->once())->method('trigger')->with('db.metadata.update', ['metadata' => $metadata]);
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ModelInterface'));
-        $this->database->expects($this->once())->method('getMetadata')->with('key', 'id')->will($this->returnValue(array('foo' => 'bar')));
-        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('key'));
+        $this->database->expects($this->once())->method('getMetadata')->with('user', 'id')->will($this->returnValue(['foo' => 'bar']));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
 
         $this->resource->post($this->event);

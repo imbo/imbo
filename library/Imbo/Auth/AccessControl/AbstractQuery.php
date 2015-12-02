@@ -8,28 +8,28 @@
  * distributed with this source code.
  */
 
-namespace Imbo\Auth\UserLookup;
+namespace Imbo\Auth\AccessControl;
 
 /**
- * Query for public keys
+ * Abstract query interface for access control
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @package Core\Auth
+ * @author Espen Hovlandsdal <espen@hovlandsdal.com>
+ * @package Core\Auth\AccessControl
  */
-class Query {
+abstract class AbstractQuery {
     /**
      * Limit
      *
      * @var int
      */
-    private $limit;
+    private $limit = 20;
 
     /**
-     * Offset
+     * Page
      *
      * @var int
      */
-    private $offset;
+    private $page = 1;
 
     /**
      * Set or get the limit
@@ -48,17 +48,17 @@ class Query {
     }
 
     /**
-     * Set or get the offset
+     * Set or get the page
      *
-     * @param int $offset The offset to set. Skip to get the current value
+     * @param int $page The page to set. Skip to get the current value
      * @return self|int
      */
-    public function offset($offset = null) {
-        if ($offset === null) {
-            return $this->offset;
+    public function page($page = null) {
+        if ($page === null) {
+            return $this->page;
         }
 
-        $this->offset = (int) $offset;
+        $this->page = (int) $page;
 
         return $this;
     }

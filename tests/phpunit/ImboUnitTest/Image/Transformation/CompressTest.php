@@ -44,7 +44,7 @@ class CompressTest extends \PHPUnit_Framework_TestCase {
      */
     public function testThrowsExceptionOnMissingLevelParameter() {
         $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->once())->method('getArgument')->with('params')->will($this->returnValue(array()));
+        $event->expects($this->once())->method('getArgument')->with('params')->will($this->returnValue([]));
         $this->transformation->transform($event);
     }
 
@@ -53,7 +53,7 @@ class CompressTest extends \PHPUnit_Framework_TestCase {
         $image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/gif'));
 
         $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(array('level' => 40)));
+        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(['level' => 40]));
         $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
 
         $imagick = $this->getMock('Imagick');
@@ -78,7 +78,7 @@ class CompressTest extends \PHPUnit_Framework_TestCase {
      */
     public function testThrowsExceptionOnInvalidLevel() {
         $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->once())->method('getArgument')->with('params')->will($this->returnValue(array('level' => 200)));
+        $event->expects($this->once())->method('getArgument')->with('params')->will($this->returnValue(['level' => 200]));
         $this->transformation->transform($event);
     }
 }

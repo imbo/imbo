@@ -24,7 +24,7 @@ class AuthenticateTest extends ListenerTests {
     private $listener;
 
     private $event;
-    private $userLookup;
+    private $accessControl;
     private $request;
     private $response;
     private $query;
@@ -36,7 +36,7 @@ class AuthenticateTest extends ListenerTests {
     public function setUp() {
         $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
         $this->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $this->userLookup = $this->getMock('Imbo\Auth\UserLookupInterface');
+        $this->accessControl = $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
 
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->query = $this->query;
@@ -44,10 +44,7 @@ class AuthenticateTest extends ListenerTests {
 
         $this->response = $this->getMock('Imbo\Http\Response\Response');
 
-        $this->event = $this->getMock('Imbo\EventManager\Event');
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getUserLookup')->will($this->returnValue($this->userLookup));
+        $this->event = $this->getEventMock();
 
         $this->listener = new Authenticate();
     }
@@ -57,6 +54,19 @@ class AuthenticateTest extends ListenerTests {
      */
     protected function getListener() {
         return $this->listener;
+    }
+
+    protected function getEventMock($config = null) {
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
+        $event->expects($this->any())->method('getAccessControl')->will($this->returnValue($this->accessControl));
+        $event->expects($this->any())->method('getConfig')->will($this->returnValue($config ?: [
+            'authentication' => [
+                'protocol' => 'incoming'
+            ]
+        ]));
+        return $event;
     }
 
     /**
@@ -158,7 +168,7 @@ class AuthenticateTest extends ListenerTests {
         $data = $httpMethod . '|' . $url . '|' . $publicKey . '|' . $timestamp;
         $signature = hash_hmac('sha256', $data, $privateKey);
 
-        $this->userLookup->expects($this->once())->method('getPrivateKeys')->will($this->returnValue([$privateKey]));
+        $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
 
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
         $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
@@ -193,7 +203,7 @@ class AuthenticateTest extends ListenerTests {
         $signature = hash_hmac('sha256', $data, $privateKey);
         $rawUrl = $url . '?signature=' . $signature . '&timestamp=' . $timestamp;
 
-        $this->userLookup->expects($this->once())->method('getPrivateKeys')->will($this->returnValue([$privateKey]));
+        $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
 
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(false));
         $this->headers->expects($this->at(1))->method('get')->with('x-imbo-authenticate-timestamp', $timestamp)->will($this->returnValue($timestamp));
@@ -211,5 +221,144 @@ class AuthenticateTest extends ListenerTests {
         $this->response->headers = $responseHeaders;
 
         $this->listener->authenticate($this->event);
+    }
+
+    /**
+     * Get signatures with rewritten URLs
+     *
+     * @return array[]
+     */
+    public function getRewrittenSignatureData() {
+        return array_map(function($dataSet) {
+            $httpMethod = 'PUT';
+            $publicKey = 'christer';
+            $privateKey = 'key';
+            $timestamp = gmdate('Y-m-d\TH:i:s\Z');
+            $data = $httpMethod . '|' . $dataSet[0] . '|' . $publicKey . '|' . $timestamp;
+            $signature = hash_hmac('sha256', $data, $privateKey);
+            return [
+                // Server-reported URL
+                $dataSet[1] . '?signature=' . $signature . '&timestamp=' . $timestamp,
+                // Imbo configured protocol
+                $dataSet[2],
+                // Expected auth URL header
+                $dataSet[3],
+                // Should match?
+                $dataSet[4],
+                // Signature
+                $signature,
+                // Timestamp
+                $timestamp,
+            ];
+        }, [
+            [
+                // URL used for signing on client side
+                'http://imbo/users/christer/images/image',
+                // URL reported by server (in case of misconfiguration/proxies etc)
+                'http://imbo/users/christer/images/image',
+                // Protocol configuration on Imbo
+                'http',
+                // Expected auth URL header (all attempted variants)
+                'http://imbo/users/christer/images/image',
+                // Should it match?
+                true
+            ],
+            [
+                'http://imbo/users/christer/images/image',
+                'https://imbo/users/christer/images/image',
+                'http',
+                'http://imbo/users/christer/images/image',
+                true
+            ],
+            [
+                'https://imbo/users/christer/images/image',
+                'http://imbo/users/christer/images/image',
+                'https',
+                'https://imbo/users/christer/images/image',
+                true
+            ],
+            // URL gets rewritten to HTTPS, which doesn't match what was used for signing
+            [
+                'http://imbo/users/christer/images/image',
+                'http://imbo/users/christer/images/image',
+                'https',
+                'https://imbo/users/christer/images/image',
+                false
+            ],
+            // If we allow both protocols, it shouldn't matter if its signed with HTTP or HTTPS
+            [
+                'http://imbo/users/christer/images/image',
+                'https://imbo/users/christer/images/image',
+                'both',
+                'http://imbo/users/christer/images/image, https://imbo/users/christer/images/image',
+                true
+            ],
+            [
+                'https://imbo/users/christer/images/image',
+                'http://imbo/users/christer/images/image',
+                'both',
+                'http://imbo/users/christer/images/image, https://imbo/users/christer/images/image',
+                true
+            ],
+            // Different URLs should always fail, obviously
+            [
+                'https://imbo/users/christer/images/someotherimage',
+                'http://imbo/users/christer/images/image',
+                'both',
+                'http://imbo/users/christer/images/image, https://imbo/users/christer/images/image',
+                false
+            ],
+            // Different URLs should always fail, even when forced to http/https
+            [
+                'https://imbo/users/christer/images/someotherimage',
+                'http://imbo/users/christer/images/image',
+                'http',
+                'http://imbo/users/christer/images/image',
+                false
+            ],
+            [
+                'http://imbo/users/christer/images/someotherimage',
+                'http://imbo/users/christer/images/image',
+                'https',
+                'https://imbo/users/christer/images/image',
+                false
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider getRewrittenSignatureData
+     * @covers Imbo\EventListener\Authenticate::authenticate
+     * @covers Imbo\EventListener\Authenticate::signatureIsValid
+     * @covers Imbo\EventListener\Authenticate::timestampIsValid
+     * @covers Imbo\EventListener\Authenticate::timestampHasExpired
+     */
+    public function testApprovesSignaturesWhenConfigurationForcesProtocol($serverUrl, $protocol, $authHeader, $shouldMatch, $signature, $timestamp) {
+        if (!$shouldMatch) {
+            $this->setExpectedException('Imbo\Exception\RuntimeException', 'Signature mismatch', 400);
+        }
+
+        $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue('key'));
+
+        $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(false));
+        $this->headers->expects($this->at(1))->method('get')->with('x-imbo-authenticate-timestamp', $timestamp)->will($this->returnValue($timestamp));
+        $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-signature', $signature)->will($this->returnValue($signature));
+        $this->query->expects($this->at(0))->method('get')->with('timestamp')->will($this->returnValue($timestamp));
+        $this->query->expects($this->at(1))->method('get')->with('signature')->will($this->returnValue($signature));
+
+        $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue($serverUrl));
+        $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('christer'));
+        $this->request->expects($this->any())->method('getMethod')->will($this->returnValue('PUT'));
+
+        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $responseHeaders->expects($this->once())->method('set')->with('X-Imbo-AuthUrl', $authHeader);
+
+        $this->response->headers = $responseHeaders;
+
+        $this->listener->authenticate($this->getEventMock([
+            'authentication' => [
+                'protocol' => $protocol,
+            ]
+        ]));
     }
 }

@@ -36,7 +36,7 @@ if (isset($_SERVER['HTTP_X_COLLECT_COVERAGE']) && isset($_SERVER['HTTP_X_TEST_SE
         $coverageDir,
         FilesystemIterator::CURRENT_AS_PATHNAME | FilesystemIterator::SKIP_DOTS
     );
-    $data = array();
+    $data = [];
     $suffix = $_SERVER['HTTP_X_TEST_SESSION_ID'] . '.cov';
 
     foreach ($files as $filename) {

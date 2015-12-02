@@ -41,7 +41,7 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
         }
 
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
-        $this->driver = new Doctrine(array(), $this->connection);
+        $this->driver = new Doctrine([], $this->connection);
     }
 
     /**
@@ -93,52 +93,52 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getMetadata() {
-        return array(
-            'simple key/value' => array(
-                array('key' => 'value', 'key2' => 'value2'),
-                array('key' => 'value', 'key2' => 'value2'),
-            ),
-            'numeric array' => array(
-                array('key' => array(1, 2, 3)),
-                array(
+        return [
+            'simple key/value' => [
+                ['key' => 'value', 'key2' => 'value2'],
+                ['key' => 'value', 'key2' => 'value2'],
+            ],
+            'numeric array' => [
+                ['key' => [1, 2, 3]],
+                [
                     'key::0' => 1,
                     'key::1' => 2,
                     'key::2' => 3,
-                ),
-            ),
-            'nested array' => array(
-                array('some' => array('key' => array('with' => array('a' => 'value')))),
-                array('some::key::with::a' => 'value'),
-            ),
-            'all sorts of stuff' => array(
-                array(
+                ],
+            ],
+            'nested array' => [
+                ['some' => ['key' => ['with' => ['a' => 'value']]]],
+                ['some::key::with::a' => 'value'],
+            ],
+            'all sorts of stuff' => [
+                [
                     'place' => 'Bar & Cigar',
-                    'people' => array(
-                        array(
+                    'people' => [
+                        [
                             'name' => 'christer',
-                            'beers' => array(
-                                array(
+                            'beers' => [
+                                [
                                     'brewery' => 'Nøgne Ø',
                                     'name' => 'Pils',
-                                ),
-                                array(
+                                ],
+                                [
                                     'brewery' => 'HaandBryggeriet',
                                     'name' => 'Fyr & Flamme',
-                                ),
-                            ),
-                        ),
-                        array(
+                                ],
+                            ],
+                        ],
+                        [
                             'name' => 'espen',
-                            'beers' => array(
-                                array(
+                            'beers' => [
+                                [
                                     'brewery' => 'AleSmith',
                                     'name' => 'Speedway Stout',
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-                array(
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
                     'place' => 'Bar & Cigar',
                     'people::0::name' => 'christer',
                     'people::0::beers::0::brewery' => 'Nøgne Ø',
@@ -148,9 +148,9 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
                     'people::1::name' => 'espen',
                     'people::1::beers::0::brewery' => 'AleSmith',
                     'people::1::beers::0::name' => 'Speedway Stout',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -161,8 +161,8 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
         $method = new ReflectionMethod($this->driver, 'normalizeMetadata');
         $method->setAccessible(true);
 
-        $result = array();
-        $method->invokeArgs($this->driver, array(&$denormalizedMetadata, &$result));
+        $result = [];
+        $method->invokeArgs($this->driver, [&$denormalizedMetadata, &$result]);
         $this->assertSame($result, $normalizedMetadata);
     }
 
@@ -187,11 +187,11 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
         $method = new ReflectionMethod($this->driver, 'normalizeMetadata');
         $method->setAccessible(true);
 
-        $result = array();
-        $metadata = array(
+        $result = [];
+        $metadata = [
             'some::key' => 'value',
-        );
-        $method->invokeArgs($this->driver, array(&$metadata, &$result));
+        ];
+        $method->invokeArgs($this->driver, [&$metadata, &$result]);
         $this->assertSame($result, $normalizedMetadata);
     }
 }

@@ -34,7 +34,7 @@ class CorsTest extends ListenerTests {
      */
     public function setUp() {
         $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $requestHeaders->expects($this->any())->method('get')->with('Origin', '*')->will($this->returnValue('http://imbo-project.org'));
+        $requestHeaders->expects($this->any())->method('get')->with('Origin')->will($this->returnValue('http://imbo-project.org'));
 
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->headers = $requestHeaders;
@@ -70,19 +70,19 @@ class CorsTest extends ListenerTests {
      * @covers Imbo\EventListener\Cors::getAllowedOrigins
      */
     public function testCleansUpOrigins() {
-        $listener = new Cors(array(
-            'allowedOrigins' => array(
+        $listener = new Cors([
+            'allowedOrigins' => [
                 'HTTP://www.rexxars.com:8080/',
                 'https://IMBO-project.org',
-            )
-        ));
+            ]
+        ]);
 
         $allowed = $listener->getAllowedOrigins();
 
-        $expected = array(
+        $expected = [
             'http://www.rexxars.com:8080',
             'https://imbo-project.org',
-        );
+        ];
 
         foreach ($expected as $e) {
             $this->assertContains($e, $allowed);
@@ -117,14 +117,14 @@ class CorsTest extends ListenerTests {
      * @covers Imbo\EventListener\Cors::originIsAllowed
      */
     public function testAddsHeadersIfWildcardOriginIsDefined() {
-        $listener = new Cors(array(
-            'allowedOrigins' => array('*')
-        ));
+        $listener = new Cors([
+            'allowedOrigins' => ['*']
+        ]);
 
         $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $headers->expects($this->once())->method('add')->with(array(
+        $headers->expects($this->once())->method('add')->with([
             'Access-Control-Allow-Origin' => 'http://imbo-project.org',
-        ));
+        ]);
 
         $this->response->headers = $headers;
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
@@ -139,15 +139,15 @@ class CorsTest extends ListenerTests {
      * @covers Imbo\EventListener\Cors::originIsAllowed
      */
     public function testAddsHeadersIfOriginIsDefinedAndAllowed() {
-        $listener = new Cors(array(
-            'allowedOrigins' => array('http://imbo-project.org')
-        ));
+        $listener = new Cors([
+            'allowedOrigins' => ['http://imbo-project.org']
+        ]);
 
         $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
 
-        $headers->expects($this->once())->method('add')->with(array(
+        $headers->expects($this->once())->method('add')->with([
             'Access-Control-Allow-Origin' => 'http://imbo-project.org',
-        ));
+        ]);
 
         $this->response->headers = $headers;
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
@@ -162,20 +162,20 @@ class CorsTest extends ListenerTests {
      * @covers Imbo\EventListener\Cors::setExposedHeaders
      */
     public function testIncludesAllImboHeadersAsExposedHeaders() {
-        $listener = new Cors(array(
-            'allowedOrigins' => array('http://imbo-project.org')
-        ));
+        $listener = new Cors([
+            'allowedOrigins' => ['http://imbo-project.org']
+        ]);
 
-        $headerIterator = new \ArrayIterator(array('x-imbo-something' => 'value', 'not-included' => 'foo'));
+        $headerIterator = new \ArrayIterator(['x-imbo-something' => 'value', 'not-included' => 'foo']);
 
         $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $headers->expects($this->once())->method('getIterator')->will($this->returnValue($headerIterator));
-        $headers->expects($this->at(0))->method('add')->with(array(
+        $headers->expects($this->at(0))->method('add')->with([
             'Access-Control-Allow-Origin' => 'http://imbo-project.org',
-        ));
-        $headers->expects($this->at(2))->method('add')->with(array(
+        ]);
+        $headers->expects($this->at(2))->method('add')->with([
             'Access-Control-Expose-Headers' => 'X-Imbo-ImageIdentifier, X-Imbo-Something',
-        ));
+        ]);
 
         $this->response->headers = $headers;
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
@@ -190,7 +190,7 @@ class CorsTest extends ListenerTests {
      * @covers Imbo\EventListener\Cors::setExposedHeaders
      */
     public function testDoesNotAddExposeHeadersHeaderWhenOriginIsInvalid() {
-        $listener = new Cors(array());
+        $listener = new Cors([]);
 
         $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $headers->expects($this->never())->method('add');
@@ -203,13 +203,13 @@ class CorsTest extends ListenerTests {
      * @covers Imbo\EventListener\Cors::options
      */
     public function testSetsCorrectResposeHeadersOnOptionsRequestWhenOriginIsAllowed() {
-        $listener = new Cors(array(
-            'allowedOrigins' => array('*'),
-            'allowedMethods' => array(
-                'image' => array('HEAD'),
-            ),
+        $listener = new Cors([
+            'allowedOrigins' => ['*'],
+            'allowedMethods' => [
+                'image' => ['HEAD'],
+            ],
             'maxAge' => 60,
-        ));
+        ]);
 
         $route = $this->getMock('Imbo\Router\Route');
         $route->expects($this->once())->method('__toString')->will($this->returnValue('image'));
@@ -219,7 +219,7 @@ class CorsTest extends ListenerTests {
         $this->request->headers
             ->expects($this->at(0))
             ->method('get')
-            ->with('Origin', '*')
+            ->with('Origin')
             ->will($this->returnValue('http://imbo-project.org'));
 
         $this->request->headers
@@ -229,12 +229,12 @@ class CorsTest extends ListenerTests {
             ->will($this->returnValue('x-imbo-signature,something-else'));
 
         $headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $headers->expects($this->once())->method('add')->with(array(
+        $headers->expects($this->once())->method('add')->with([
             'Access-Control-Allow-Origin' => 'http://imbo-project.org',
             'Access-Control-Allow-Methods' => 'OPTIONS, HEAD',
             'Access-Control-Allow-Headers' => 'Content-Type, Accept, X-Imbo-Signature',
             'Access-Control-Max-Age' => 60,
-        ));
+        ]);
 
         $this->response->headers = $headers;
         $this->response->expects($this->once())->method('setStatusCode')->with(204);
@@ -258,7 +258,7 @@ class CorsTest extends ListenerTests {
         $route->expects($this->once())->method('__toString')->will($this->returnValue('image'));
 
         $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $requestHeaders->expects($this->any())->method('get')->with('Origin', '*')->will($this->returnValue('http://somehost'));
+        $requestHeaders->expects($this->any())->method('get')->with('Origin')->will($this->returnValue('http://somehost'));
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
@@ -269,9 +269,9 @@ class CorsTest extends ListenerTests {
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->once())->method('getResponse')->will($this->returnValue($this->response));
 
-        $listener = new Cors(array(
+        $listener = new Cors([
             'allowedOrigin' => 'http://imbo',
-        ));
+        ]);
         $listener->invoke($event);
     }
 
@@ -281,66 +281,70 @@ class CorsTest extends ListenerTests {
      * @return array[]
      */
     public function getAllowedMethodsParams() {
-        return array(
-            'default' => array(
-                'params' => array(),
-                'events' => array(
-                    'index.get' => array('invoke' => 1000),
-                    'index.head' => array('invoke' => 1000),
-                    'index.options' => array('options' => 20),
+        return [
+            'default' => [
+                'params' => [],
+                'events' => [
+                    'index.get' => ['invoke' => 1000],
+                    'index.head' => ['invoke' => 1000],
+                    'index.options' => ['options' => 20],
 
-                    'image.get' => array('invoke' => 1000),
-                    'image.head' => array('invoke' => 1000),
-                    'image.options' => array('options' => 20),
+                    'image.get' => ['invoke' => 1000],
+                    'image.head' => ['invoke' => 1000],
+                    'image.options' => ['options' => 20],
 
-                    'images.get' => array('invoke' => 1000),
-                    'images.head' => array('invoke' => 1000),
-                    'images.options' => array('options' => 20),
+                    'images.get' => ['invoke' => 1000],
+                    'images.head' => ['invoke' => 1000],
+                    'images.options' => ['options' => 20],
 
-                    'metadata.get' => array('invoke' => 1000),
-                    'metadata.head' => array('invoke' => 1000),
-                    'metadata.options' => array('options' => 20),
+                    'globalimages.get' => ['invoke' => 1000],
+                    'globalimages.head' => ['invoke' => 1000],
+                    'globalimages.options' => ['options' => 20],
 
-                    'status.get' => array('invoke' => 1000),
-                    'status.head' => array('invoke' => 1000),
-                    'status.options' => array('options' => 20),
+                    'metadata.get' => ['invoke' => 1000],
+                    'metadata.head' => ['invoke' => 1000],
+                    'metadata.options' => ['options' => 20],
 
-                    'stats.get' => array('invoke' => 1000),
-                    'stats.head' => array('invoke' => 1000),
-                    'stats.options' => array('options' => 20),
+                    'status.get' => ['invoke' => 1000],
+                    'status.head' => ['invoke' => 1000],
+                    'status.options' => ['options' => 20],
 
-                    'user.get' => array('invoke' => 1000),
-                    'user.head' => array('invoke' => 1000),
-                    'user.options' => array('options' => 20),
+                    'stats.get' => ['invoke' => 1000],
+                    'stats.head' => ['invoke' => 1000],
+                    'stats.options' => ['options' => 20],
 
-                    'globalshorturl.get' => array('invoke' => 1000),
-                    'globalshorturl.head' => array('invoke' => 1000),
-                    'globalshorturl.options' => array('options' => 20),
+                    'user.get' => ['invoke' => 1000],
+                    'user.head' => ['invoke' => 1000],
+                    'user.options' => ['options' => 20],
 
-                    'shorturl.get' => array('invoke' => 1000),
-                    'shorturl.head' => array('invoke' => 1000),
-                    'shorturl.options' => array('options' => 20),
+                    'globalshorturl.get' => ['invoke' => 1000],
+                    'globalshorturl.head' => ['invoke' => 1000],
+                    'globalshorturl.options' => ['options' => 20],
 
-                    'shorturls.get' => array('invoke' => 1000),
-                    'shorturls.head' => array('invoke' => 1000),
-                    'shorturls.options' => array('options' => 20),
-                ),
-            ),
-            'some endpoints' => array(
-                'params' => array(
-                    'allowedMethods' => array(
-                        'stats' => array('GET'),
-                        'images' => array('POST'),
-                    ),
-                ),
-                'events' => array(
-                    'stats.get' => array('invoke' => 1000),
-                    'stats.options' => array('options' => 20),
-                    'images.post' => array('invoke' => 1000),
-                    'images.options' => array('options' => 20),
-                ),
-            ),
-        );
+                    'shorturl.get' => ['invoke' => 1000],
+                    'shorturl.head' => ['invoke' => 1000],
+                    'shorturl.options' => ['options' => 20],
+
+                    'shorturls.get' => ['invoke' => 1000],
+                    'shorturls.head' => ['invoke' => 1000],
+                    'shorturls.options' => ['options' => 20],
+                ],
+            ],
+            'some endpoints' => [
+                'params' => [
+                    'allowedMethods' => [
+                        'stats' => ['GET'],
+                        'images' => ['POST'],
+                    ],
+                ],
+                'events' => [
+                    'stats.get' => ['invoke' => 1000],
+                    'stats.options' => ['options' => 20],
+                    'images.post' => ['invoke' => 1000],
+                    'images.options' => ['options' => 20],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -377,9 +381,9 @@ class CorsTest extends ListenerTests {
         $this->request->expects($this->any())->method('getRoute')->will($this->returnValue($route));
 
         // Allowed
-        $listener = new Cors(array(
-            'allowedOrigins' => array('http://imbo-project.org')
-        ));
+        $listener = new Cors([
+            'allowedOrigins' => ['http://imbo-project.org']
+        ]);
 
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
@@ -391,9 +395,9 @@ class CorsTest extends ListenerTests {
         $listener->invoke($event);
 
         // Disallowed
-        $listener = new Cors(array(
-            'allowedOrigins' => array()
-        ));
+        $listener = new Cors([
+            'allowedOrigins' => []
+        ]);
 
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));

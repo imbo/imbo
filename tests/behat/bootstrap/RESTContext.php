@@ -16,7 +16,7 @@ use Behat\Behat\Context\BehatContext,
     Guzzle\Http\Message\Request,
     Guzzle\Http\Message\Response;
 
-// PHPUnit related classes
+// Require PHPUnit assertions manually since we're using it outside of PHPUnit
 require __DIR__ . '/../../../vendor/phpunit/phpunit/src/Framework/Assert/Functions.php';
 
 /**
@@ -38,14 +38,21 @@ class RESTContext extends BehatContext {
      *
      * @var Response[]
      */
-    protected $responses = array();
+    protected $responses = [];
 
     /**
      * Headers for the request
      *
      * @var array
      */
-    protected $requestHeaders = array();
+    protected $requestHeaders = [];
+
+    /**
+     * Query parameters for the request
+     *
+     * @var array
+     */
+    protected $queryParams = [];
 
     /**
      * Optional request body to add to the request
@@ -106,9 +113,9 @@ class RESTContext extends BehatContext {
     private function createClient() {
         $this->client = new Client($this->params['url']);
 
-        $defaultHeaders = array(
+        $defaultHeaders = [
             'X-Test-Session-Id' => self::$testSessionId,
-        );
+        ];
 
         if ($this->params['enableCodeCoverage']) {
             $defaultHeaders['X-Enable-Coverage'] = 1;
@@ -182,11 +189,11 @@ class RESTContext extends BehatContext {
 
         if ($parameters['enableCodeCoverage']) {
             $client = new Client($parameters['url']);
-            $response = $client->get('/', array(
+            $response = $client->get('/', [
                 'X-Enable-Coverage' => 1,
                 'X-Test-Session-Id' => self::$testSessionId,
                 'X-Collect-Coverage' => 1,
-            ))->send();
+            ])->send();
 
             $data = unserialize((string) $response->getBody());
 
@@ -220,6 +227,20 @@ class RESTContext extends BehatContext {
         $this->requestHeaders[$header] = $value;
     }
 
+     /**
+     * @Given /^I append a query string parameter, "([^"]*)" with the value "([^"]*)"$/
+     */
+    public function appendQueryStringParameter($queryParam, $value) {
+        $this->queryParams[] = $queryParam . '=' . $value;
+    }
+
+    /**
+     * @When /^I request "([^"]*)" with the given query string$/
+     */
+    public function performRequestWithGivenQueryString($path) {
+        $this->request($path . '?' . implode('&', $this->queryParams));
+    }
+
     /**
      * @When /^I request "([^"]*)"(?: using HTTP "([^"]*)")?$/
      */
@@ -250,9 +271,6 @@ class RESTContext extends BehatContext {
         }
 
         $this->responses[] = $response;
-
-        // Create a fresh client
-        $this->createClient();
     }
 
     /**
@@ -315,6 +333,33 @@ class RESTContext extends BehatContext {
         }
 
         assertSame($cacheable, $this->getLastResponse()->canCache());
+    }
+
+    /**
+     * @Given /^the response has a max age of (\d+) seconds$/
+     */
+    public function assertMaxAge($seconds) {
+        $cacheControl = $this->getPreviousCacheControlHeader();
+        $maxAge = $cacheControl->getDirective('max-age');
+
+        if ($maxAge === null) {
+            throw new \Exception('No `max-age` directive present in `cache-control`');
+        }
+
+        assertSame((int) $seconds, (int) $maxAge);
+    }
+
+    /**
+     * @Given /^the response (does not )?(?:has|have) a must-revalidate directive$/
+     */
+    public function assertMustRevalidate($doesNotHave = false) {
+        $cacheControl = $this->getPreviousCacheControlHeader();
+
+        if ($doesNotHave) {
+            assertFalse($cacheControl->hasDirective('must-revalidate'));
+        } else {
+            assertTrue($cacheControl->hasDirective('must-revalidate'));
+        }
     }
 
     /**
@@ -402,6 +447,22 @@ class RESTContext extends BehatContext {
     }
 
     /**
+     * @Then /^the "([^"]*)" response header is not the same for any of the requests$/
+     */
+    public function assertHeaderNotSameForPreviousRequests($header) {
+        $responses = array_slice($this->responses, 1);
+
+        $headerValues = array_map(function($response) use ($header) {
+            return (string) $response->getHeader($header);
+        }, $responses);
+
+        $totalValues = count($headerValues);
+        $uniqueValues = count(array_unique($headerValues));
+
+        assertSame($totalValues, $uniqueValues, 'Only ' . $uniqueValues . ' header(s) were unique, out of ' . $totalValues . ' total');
+    }
+
+    /**
      * See if we have an httpd we can connect to
      *
      * @param string $host The hostname to connect to
@@ -434,6 +495,12 @@ class RESTContext extends BehatContext {
      * @throws RuntimeException
      */
     private static function startBuiltInHttpd($host, $port, $documentRoot, $router, $httpdLog) {
+        $logPath = dirname($httpdLog);
+
+        if (!is_dir($logPath)) {
+            mkdir($logPath, 0777, true);
+        }
+
         $command = sprintf('php -S %s:%d -t %s %s >%s 2>&1 & echo $!',
                             $host,
                             $port,
@@ -441,7 +508,7 @@ class RESTContext extends BehatContext {
                             $router,
                             $httpdLog);
 
-        $output = array();
+        $output = [];
         exec($command, $output);
 
         return (int) $output[0];
@@ -466,5 +533,20 @@ class RESTContext extends BehatContext {
         $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($key, $value) {
             $event['request']->setHeader($key, $value);
         });
+    }
+
+    /**
+     * Get the cache-control header for the previous response
+     *
+     * @throws Exception If no cache-control header is present in the previous response
+     * @return Guzzle\Http\Message\Header\CacheControl The Cache-Control header for the previous response
+     */
+    protected function getPreviousCacheControlHeader() {
+        $cacheControl = $this->getLastResponse()->getHeader('Cache-Control');
+        if (!$cacheControl) {
+            throw new \Exception('No `cache-control` header present');
+        }
+
+        return $cacheControl;
     }
 }

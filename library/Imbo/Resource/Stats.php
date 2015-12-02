@@ -26,17 +26,17 @@ class Stats implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD');
+        return ['GET', 'HEAD'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'stats.get' => 'get',
             'stats.head' => 'get',
-        );
+        ];
     }
 
     /**

@@ -31,37 +31,37 @@ class AccessToken implements ListenerInterface {
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         /**
          * Use this parameter to enforce the access token listener for only some of the image
          * transformations (if the request is against an image). Each transformation must be
          * specified using the short names of the transformations (the name used in the query to
          * trigger the transformation).
          *
-         * 'transformations' => array(
-         *     'whitelist' => array(
+         * 'transformations' => [
+         *     'whitelist' => [
          *         'border',
          *         'thumbnail',
-         *      ),
-         * )
+         *      ],
+         * ]
          *
          * Use the 'whitelist' for making the listener skip the access token check for some
          * transformations, and the 'blacklist' key for the opposite:
          *
-         * 'whitelist' => array('border') means that the access token
+         * 'whitelist' => ['border'] means that the access token
          * will *not* be enforced for the Border transformation, but for all others.
          *
-         * 'blacklist' => array('border') means that the access token
+         * 'blacklist' => ['border'] means that the access token
          * will be enforced *only* when the Border transformation is in effect.
          *
          * If both 'whitelist' and 'blacklist' are specified all transformations will require an
          * access token unless included in the 'whitelist'.
          */
-        'transformations' => array(
-            'whitelist' => array(),
-            'blacklist' => array(),
-        ),
-    );
+        'transformations' => [
+            'whitelist' => [],
+            'blacklist' => [],
+        ],
+    ];
 
     /**
      * Class constructor
@@ -78,15 +78,34 @@ class AccessToken implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        $callbacks = array();
-        $events = array(
-            'user.get', 'images.get', 'image.get', 'metadata.get',
-            'user.head', 'images.head', 'image.head', 'metadata.head',
+        $callbacks = [];
+        $events = [
+            'groups.get',
+            'groups.head',
+            'group.get',
+            'group.head',
+            'accessrule.get',
+            'accessrule.head',
+            'accessrules.get',
+            'accessrules.head',
+            'user.get',
+            'user.header',
+            'image.get',
+            'image.head',
+            'images.get',
+            'images.head',
+            'globalimages.get',
+            'globalimages.head',
+            'metadata.get',
+            'metadata.head',
+            'shorturl.get',
+            'shorturl.head',
+
             'auth.accesstoken'
-        );
+        ];
 
         foreach ($events as $event) {
-            $callbacks[$event] = array('checkAccessToken' => 100);
+            $callbacks[$event] = ['checkAccessToken' => 100];
         }
 
         return $callbacks;
@@ -100,6 +119,7 @@ class AccessToken implements ListenerInterface {
         $response = $event->getResponse();
         $query = $request->query;
         $eventName = $event->getName();
+        $config = $event->getConfig();
 
         if (($eventName === 'image.get' || $eventName === 'image.head') && $this->isWhitelisted($request)) {
             // All transformations in the request are whitelisted. Skip the access token check
@@ -118,21 +138,32 @@ class AccessToken implements ListenerInterface {
         $token = $query->get('accessToken');
 
         // First the the raw un-encoded URI, then the URI as is
-        $uris = array($request->getRawUri(), $request->getUriAsIs());
-        $privateKeys = $event->getUserLookup()->getPrivateKeys(
-            $request->getPublicKey()
-        ) ?: [];
+        $uris = [$request->getRawUri(), $request->getUriAsIs()];
+        $privateKey = $event->getAccessControl()->getPrivateKey($request->getPublicKey());
+
+        // See if we should modify the protocol for the incoming request
+        $protocol = $config['authentication']['protocol'];
+        if ($protocol === 'both') {
+            $uris = array_reduce($uris, function($dest, $uri) use ($protocol) {
+                $baseUrl = preg_replace('#^https?#', '', $uri);
+                $dest[] = 'http' . $baseUrl;
+                $dest[] = 'https' . $baseUrl;
+                return $dest;
+            }, []);
+        } else if (in_array($protocol, ['http', 'https'])) {
+            $uris = array_map(function($uri) use ($protocol) {
+                return preg_replace('#^https?#', $protocol, $uri);
+            }, $uris);
+        }
 
         foreach ($uris as $uri) {
             // Remove the access token from the query string as it's not used to generate the HMAC
             $uri = rtrim(preg_replace('/(?<=(\?|&))accessToken=[^&]+&?/', '', $uri), '&?');
 
-            foreach ($privateKeys as $privateKey) {
-                $correctToken = hash_hmac('sha256', $uri, $privateKey);
+            $correctToken = hash_hmac('sha256', $uri, $privateKey);
 
-                if ($correctToken === $token) {
-                    return;
-                }
+            if ($correctToken === $token) {
+                return;
             }
         }
 

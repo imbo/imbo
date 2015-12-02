@@ -27,12 +27,12 @@ abstract class CacheTests extends \PHPUnit_Framework_TestCase {
     }
 
     public function getCacheData() {
-        return array(
-            array('key1', 'value'),
-            array('key2', 123),
-            array('key3', array(1, 2, 3)),
-            array('key4', new \stdClass()),
-        );
+        return [
+            ['key1', 'value'],
+            ['key2', 123],
+            ['key3', [1, 2, 3]],
+            ['key4', new \stdClass()],
+        ];
     }
 
     /**

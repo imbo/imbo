@@ -34,7 +34,7 @@ class PriorityQueue extends SplPriorityQueue {
      */
     public function insert($datum, $priority) {
         if (is_int($priority)) {
-            $priority = array($priority, $this->queueOrder--);
+            $priority = [$priority, $this->queueOrder--];
         }
 
         parent::insert($datum, $priority);

@@ -50,8 +50,8 @@ class Event extends GenericEvent implements EventInterface {
     /**
      * {@inheritdoc}
      */
-    public function getUserLookup() {
-        return $this->getArgument('userLookup');
+    public function getAccessControl() {
+        return $this->getArgument('accessControl');
     }
 
     /**
