@@ -38,20 +38,27 @@ class ContrastTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function getContrastParams() {
-        $quantumRange = 65535;
+        $imagick = new \Imagick();
+        if (is_callable([$imagick, 'getQuantumRange'])) {
+            $quantumRange = $imagick->getQuantumRange();
+        } else {
+            $quantumRange = \Imagick::getQuantumRange();
+        }
+
+        $quantumRange = $quantumRange['quantumRangeLong'];
 
         return [
             'no params' => [
-                [], true, true, 1, $quantumRange * 0.5
+                [], true
             ],
             'positive contrast' => [
-                ['alpha' => 2.5], true, true, 2.5, $quantumRange * 0.5
+                ['alpha' => 2.5], true
             ],
             'zero contrast' => [
-                ['alpha' => 0], false, false, false, false,
+                ['alpha' => 0], false
             ],
             'negative contrast, specific beta' => [
-                ['alpha' => -2, 'beta' => 0.75], true, false, 2.0, $quantumRange * 0.75
+                ['alpha' => -2, 'beta' => 0.75], true
             ],
         ];
     }
@@ -59,10 +66,12 @@ class ContrastTest extends \PHPUnit_Framework_TestCase {
     /**
      * @dataProvider getContrastParams
      */
-    public function testSetsTheCorrectContrast(array $params, $shouldTransform, $sharpen, $alpha, $beta) {
+    public function testSetsTheCorrectContrast(array $params, $shouldTransform) {
         $image = $this->getMock('Imbo\Model\Image');
         $event = $this->getMock('Imbo\EventManager\Event');
-        $imagick = $this->getMock('Imagick');
+
+        $imagick = new \Imagick();
+        $imagick->newImage(16, 16, '#fff');
 
         $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue($params));
 
@@ -73,10 +82,7 @@ class ContrastTest extends \PHPUnit_Framework_TestCase {
             $image->expects($this->never())->method('hasBeenTransformed');
         }
 
-        $imagick->expects($this->any())->method('getQuantumRange')->will($this->returnValue(['quantumRangeLong' => 65535]));
-
         $howMany = $shouldTransform ? $this->once() : $this->never();
-        $imagick->expects($howMany)->method('sigmoidalContrastImage')->with($sharpen, $alpha, $beta);
 
         $this->transformation->setImagick($imagick);
         $this->transformation->transform($event);
