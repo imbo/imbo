@@ -83,9 +83,9 @@ class Level extends Transformation implements ListenerInterface {
         }
 
         try {
-            $quantumRange = $this->imagick->getQuantumRange();
+            $quantumRange = $this->getQuantumRange();
 
-            $this->imagick->levelImage(0, (float) $gamma, $quantumRange['quantumRangeLong'], $channel);
+            $this->imagick->levelImage(0, (float) $gamma, $quantumRange, $channel);
             $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
