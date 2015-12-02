@@ -193,25 +193,28 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
             ->method('addAccessRule')
             ->withConsecutive(
                 [$this->equalTo('foo'), $this->callback(function($rule) {
+                    $diff = array_diff($rule['resources'], Resource::getReadOnlyResources());
                     return (
                         count($rule['users']) === 2 &&
                         in_array('espenh', $rule['users']) &&
                         in_array('kribrabr', $rule['users']) &&
-                        empty(array_diff($rule['resources'], Resource::getReadOnlyResources()))
+                        empty($diff)
                     );
                 })],
                 [$this->equalTo('foo'), $this->callback(function($rule) {
+                    $diff = array_diff($rule['resources'], Resource::getReadWriteResources());
                     return (
                         count($rule['users']) === 2 &&
                         in_array('rexxars', $rule['users']) &&
                         in_array('kbrabrand', $rule['users']) &&
-                        empty(array_diff($rule['resources'], Resource::getReadWriteResources()))
+                        empty($diff)
                     );
                 })],
                 [$this->equalTo('foo'), $this->callback(function($rule) {
+                    $diff = array_diff($rule['resources'], Resource::getAllResources());
                     return (
                         $rule['users'] === '*' &&
-                        empty(array_diff($rule['resources'], Resource::getAllResources()))
+                        empty($diff)
                     );
                 })]
             );
