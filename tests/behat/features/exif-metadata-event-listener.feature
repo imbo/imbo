@@ -51,5 +51,5 @@ Feature: Imbo provides an event listener for turning EXIF data into metadata
         And the "Content-Type" response header is "application/json"
         And the response body contains:
         """
-        "png:IHDR:bit-depth-orig":"8"
+        "png:IHDR:bit-depth":"8"
         """
