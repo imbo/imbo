@@ -48,6 +48,10 @@ class SmartSize extends Transformation {
             return $this->simpleCrop($params['width'], $params['height']);
         }
 
+        if (!isset($poi[0]) || !isset($poi[1])) {
+            throw new TransformationException('Invalid POI format, expected format `<x>,<y>`', 400);
+        }
+
         if (!empty($params['crop']) && in_array($params['crop'], ['close', 'medium', 'wide']) === false) {
             throw new TransformationException('Invalid crop value. Valid values are: close,medium,wide', 400);
         }
