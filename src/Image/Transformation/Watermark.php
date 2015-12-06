@@ -12,6 +12,7 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\StorageException,
     Imbo\Exception\TransformationException,
+    Imbo\Image\InputSizeConstraint,
     Imagick,
     ImagickException;
 
@@ -21,7 +22,7 @@ use Imbo\Exception\StorageException,
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
-class Watermark extends Transformation {
+class Watermark extends Transformation implements InputSizeConstraint {
     /**
      * Default image identifier to use for watermarks
      *
@@ -163,5 +164,25 @@ class Watermark extends Transformation {
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMinimumInputSize(array $params, array $imageSize) {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function adjustParameters($ratio, array $parameters) {
+        foreach (['x', 'y', 'width', 'height'] as $param) {
+            if (isset($parameters[$param])) {
+                $parameters[$param] = round($parameters[$param] / $ratio);
+            }
+        }
+
+        return $parameters;
     }
 }

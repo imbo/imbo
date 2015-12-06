@@ -13,7 +13,9 @@ namespace Imbo\Image;
 /**
  * Input size contraint interface - transformations that implement this interface
  * can let Imbo know the minimum size of the input image that it can receive,
- * given a set of parameters.
+ * given a set of parameters. It can also be used to signal that the parameters
+ * provided to this transformation needs to be adjusted if the input size has changed,
+ * for instance when the ImageVariations-listener is used.
  *
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image
@@ -35,4 +37,14 @@ interface InputSizeConstraint {
      * @return array Array containing `width` and `height`
      */
     public function getMinimumInputSize(array $params, array $imageSize);
+
+    /**
+     * Adjust the parameters for this transformation, in the event that the size of the
+     * input image has changed, for instance if the `ImageVariations`-listener is in place
+     *
+     * @param float $ratio Ratio (input image width / original image width)
+     * @param array $parameters Transformation parameters
+     * @return array Adjusted parameters
+     */
+    public function adjustParameters($ratio, array $parameters);
 }

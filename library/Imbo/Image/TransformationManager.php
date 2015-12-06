@@ -50,6 +50,13 @@ class TransformationManager implements ListenerInterface {
     public static function getSubscribedEvents() {
         return [
             'image.transform' => 'applyTransformations',
+
+            // Adjust transformations so that crop coordinates (and other parameters) works on an
+            // input image of a different size than the original, for instance when the image
+            // variations listener is enabled
+            'image.transformations.adjust' => 'adjustImageTransformations',
+
+            'image.loaded' => ['adjustImageTransformations' => 50]
         ];
     }
 
@@ -286,6 +293,36 @@ class TransformationManager implements ListenerInterface {
             'height' => (int) ceil($minimum['height']),
             'index'  => $minimum['index'],
         ];
+    }
+
+    public function adjustImageTransformations(EventInterface $event) {
+        // If the image has not stepped through any input size transformations,
+        // we don't set any ratio, and it should be safe to assume no transformations
+        // parameters require any adjustment
+        if (!$event->hasArgument('ratio')) {
+            return;
+        }
+
+        $request = $event->getRequest();
+        $transformations = $request->getTransformations();
+
+        $ratio = $event->getArgument('ratio');
+        $transformationIndex = $event->getArgument('transformationIndex');
+
+        // Adjust coordinates according to the ratio between the original and the variation
+        for ($i = 0; $i <= $transformationIndex; $i++) {
+            $name = $transformations[$i]['name'];
+            $params = $transformations[$i]['params'];
+            $handler = $this->getTransformation($name);
+
+            if ($handler instanceof InputSizeConstraint) {
+                $params = $handler->adjustParameters($ratio, $params);
+
+                $transformations[$i]['params'] = $params;
+            }
+        }
+
+        $request->setTransformations($transformations);
     }
 
     /**

@@ -120,6 +120,18 @@ abstract class Transformation implements ListenerInterface {
     }
 
     /**
+     * Adjust the parameters for this transformation, in the event that the size of the
+     * input image has changed, for instance if the `ImageVariations`-listener is in place
+     *
+     * @param float $ratio Ratio (input image width / original image width)
+     * @param array $parameters Transformation parameters
+     * @return array Adjusted parameters
+     */
+    public function adjustParameters($ratio, array $parameters) {
+        return $parameters;
+    }
+
+    /**
      * Transform the image
      *
      * @param array $params Parameters for the transformation

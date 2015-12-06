@@ -11,6 +11,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
+    Imbo\Image\InputSizeConstraint,
     Imbo\Model\Image,
     Imagick,
     ImagickPixel,
@@ -24,7 +25,7 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Border extends Transformation {
+class Border extends Transformation implements InputSizeConstraint {
     /**
      * Color of the border
      *
@@ -153,5 +154,25 @@ class Border extends Transformation {
 
         // Draw the border
         $this->imagick->drawImage($rect);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMinimumInputSize(array $params, array $imageSize) {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function adjustParameters($ratio, array $parameters) {
+        foreach (['width', 'height'] as $param) {
+            if (isset($parameters[$param])) {
+                $parameters[$param] = round($parameters[$param] / $ratio);
+            }
+        }
+
+        return $parameters;
     }
 }

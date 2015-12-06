@@ -61,7 +61,7 @@ class Imagick implements ListenerInterface {
             ],
 
             // Inject the image blob into the image model after loading it from the database
-            'image.loaded' => ['readImageBlob' => -10],
+            'image.loaded' => ['readImageBlob' => 100],
         ];
     }
 
@@ -72,6 +72,8 @@ class Imagick implements ListenerInterface {
      */
     public function readImageBlob(EventInterface $event) {
         $eventName = $event->getName();
+        $config = $event->getConfig();
+        $jpegSizeHintEnabled = $config['optimizations']['jpegSizeHint'];
 
         if ($event->hasArgument('image')) {
             // The image has been specified as an argument to the event
@@ -84,7 +86,8 @@ class Imagick implements ListenerInterface {
             $image = $event->getResponse()->getModel();
         }
 
-        if ($eventName === 'image.loaded') {
+        $shouldOptimize = $jpegSizeHintEnabled && !$event->hasArgument('skipOptimization');
+        if ($shouldOptimize && $eventName === 'image.loaded') {
             // See if we can hint to imagick that we expect a smaller output
             $minSize = $event->getTransformationManager()->getMinimumImageInputSize($event);
             if ($minSize) {
@@ -95,6 +98,15 @@ class Imagick implements ListenerInterface {
 
         // Inject the image blob
         $this->imagick->readImageBlob($image->getBlob());
+
+        // If we have specified a size hint, check if we have a different input size
+        // than the original and set the ratio as an argument for any other listeners
+        if (isset($inputSize)) {
+            $newSize = $this->imagick->getImageGeometry();
+            $ratio = $image->getWidth() / $newSize['width'];
+            $event->setArgument('ratio', $ratio);
+            $event->setArgument('transformationIndex', $minSize['index']);
+        }
     }
 
     /**

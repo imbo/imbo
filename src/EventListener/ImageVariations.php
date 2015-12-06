@@ -94,11 +94,6 @@ class ImageVariations implements ListenerInterface {
 
             // Delete variations of an image when the image itself is deleted
             'image.delete' => ['deleteVariations' => -10],
-
-            // Adjust transformations so that crop coordinates (and other stuff) works on the image
-            // variation, which will be smaller than the image the coordintates where meant to work
-            // with in the first place
-            'image.transformations.adjust' => 'adjustImageTransformations',
         ];
     }
 
@@ -122,7 +117,8 @@ class ImageVariations implements ListenerInterface {
             return;
         }
 
-        $maxSize = $event->getTransformationManager()->getMinimumImageInputSize($event);
+        $transformationManager = $event->getTransformationManager();
+        $maxSize = $transformationManager->getMinimumImageInputSize($event);
 
         if (!$maxSize) {
             // No need to use a variation based on the set of transformations
@@ -190,42 +186,6 @@ class ImageVariations implements ListenerInterface {
     }
 
     /**
-     * Adjust image transformations
-     *
-     * This method will adjust transformation parameters based on the ration between the original
-     * image and the image variation used.
-     *
-     * @param EventInterface $event The current event
-     */
-    public function adjustImageTransformations(EventInterface $event) {
-        $request = $event->getRequest();
-        $transformations = $request->getTransformations();
-
-        $transformationIndex = $event->getArgument('transformationIndex');
-        $ratio = $event->getArgument('ratio');
-
-        $transformationNames = ['crop', 'border', 'canvas', 'watermark'];
-
-        // Adjust coordinates according to the ratio between the original and the variation
-        for ($i = 0; $i <= $transformationIndex; $i++) {
-            $name = $transformations[$i]['name'];
-            $params = $transformations[$i]['params'];
-
-            if (in_array($name, $transformationNames)) {
-                foreach (['x', 'y', 'width', 'height'] as $param) {
-                    if (isset($params[$param])) {
-                        $params[$param] = round($params[$param] / $ratio);
-                    }
-                }
-
-                $transformations[$i]['params'] = $params;
-            }
-        }
-
-        $request->setTransformations($transformations);
-    }
-
-    /**
      * Generate multiple variations based on the configuration
      *
      * If any of the operations fail Imbo will trigger errors
@@ -286,6 +246,10 @@ class ImageVariations implements ListenerInterface {
                 // Trigger a loading of the image, using the clone of the original as an argument
                 $eventManager->trigger('image.loaded', [
                     'image' => $image,
+
+                    // Don't apply any sort of optimization to the image before saving, we want
+                    // as high quality on the stored variation as possible
+                    'skipOptimization' => true,
                 ]);
 
                 // If configured, use a lossless variation format

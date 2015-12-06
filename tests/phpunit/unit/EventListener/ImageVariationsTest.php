@@ -215,50 +215,6 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::adjustImageTransformations
-     */
-    public function testDoesNotAdjustTransformationsAfterGivenTransformationIndex() {
-        $transformations = [[
-            'name'   => 'desaturate',
-            'params' => []
-        ], [
-            'name'   => 'border',
-            'params' => ['width' => 5, 'height' => 5]
-        ]];
-
-        $this->event->method('getArgument')->will($this->returnValueMap([
-            ['transformationIndex', 0],
-            ['ratio', 0.25]
-        ]));
-
-        $this->request->expects($this->any())->method('getTransformations')->will($this->returnValue($transformations));
-        $this->request->expects($this->once())->method('setTransformations')->with($this->equalTo($transformations));
-
-        $this->listener->adjustImageTransformations($this->event);
-    }
-
-    /**
-     * @covers Imbo\EventListener\ImageVariations::adjustImageTransformations
-     * @dataProvider getAdjustmentTransformations
-     */
-    public function testAdjustsTransformationParams($transformations, $index, $ratio, $expectedIndex, $expected) {
-        $this->event->method('getArgument')->will($this->returnValueMap([
-            ['transformationIndex', $index],
-            ['ratio', $ratio]
-        ]));
-
-        $this->request->expects($this->any())->method('getTransformations')->will($this->returnValue($transformations));
-        $this->request->expects($this->once())->method('setTransformations')->with(
-            $this->callback(function($adjusted) use ($expected, $expectedIndex) {
-                $diff = array_diff($adjusted[$expectedIndex]['params'], $expected);
-                return empty($diff);
-            })
-        );
-
-        $this->listener->adjustImageTransformations($this->event);
-    }
-
-    /**
      * @covers Imbo\EventListener\ImageVariations::chooseVariation
      */
     public function testFallsBackIfNoTransformationsAreApplied() {

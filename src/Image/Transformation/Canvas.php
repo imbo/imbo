@@ -155,4 +155,17 @@ class Canvas extends Transformation implements InputSizeConstraint {
         // we can't make any further optimizations on the input size.
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function adjustParameters($ratio, array $parameters) {
+        foreach (['x', 'y', 'width', 'height'] as $param) {
+            if (isset($parameters[$param])) {
+                $parameters[$param] = round($parameters[$param] / $ratio);
+            }
+        }
+
+        return $parameters;
+    }
 }

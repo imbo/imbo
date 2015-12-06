@@ -109,6 +109,28 @@ $defaultConfig = [
     'contentNegotiateImages' => true,
 
     /**
+     * Various optimizations that might be enabled or disabled. Most of the configuration-
+     * exposed optimizations have some trade, be it speed or image quality, which is why
+     * it's possible to disable them through configuration
+     *
+     * @var array
+     */
+    'optimizations' => [
+        /**
+         * Tries to calculate what the transformed output size of images will be before
+         * loading the image into Imagick, which set a hint to libjpeg that enables
+         * "shrink-on-load", which significantly increases speed or resizing.
+         *
+         * Tradeoffs: Transformations have to adjust parameters based on new input size,
+         * some parameters will be one pixel off. Image quality should be the same for
+         * most images, but there is always the possibility of slightly worse quality
+         *
+         * @var boolean
+         */
+        'jpegSizeHint' => true,
+    ],
+
+    /**
      * HTTP cache header settings that are applied to resources that do not explicitly set
      * other values. For instance, the `image` resource sets a very long `max-age`, as it
      * shouldn't change over time. The `metadata` resource however could potentially change
@@ -153,6 +175,8 @@ $defaultConfig = [
          * - `https`
          *     Will always use `https` as the protocol, replacing `http` with `https` in the
          *     incoming URL, if that is the case.
+         *
+         * @var string
          */
         'protocol' => 'incoming',
     ],
