@@ -11,6 +11,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
+    Imbo\Image\InputSizeConstraint,
     Imagick,
     ImagickException,
     ImagickPixelException;
@@ -21,7 +22,7 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Canvas extends Transformation {
+class Canvas extends Transformation implements InputSizeConstraint {
     /**
      * Canvas mode
      *
@@ -144,5 +145,14 @@ class Canvas extends Transformation {
         } catch (ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMinimumInputSize(array $params, array $imageSize) {
+        // Since we're modifying the input image in a way that alters the size and content,
+        // we can't make any further optimizations on the input size.
+        return false;
     }
 }

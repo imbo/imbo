@@ -184,10 +184,17 @@ class TransformationManager implements ListenerInterface {
      */
     public function getMinimumImageInputSize(EventInterface $event) {
         $transformations = $event->getRequest()->getTransformations();
-        $image = $event->getResponse()->getModel();
 
+        if (empty($transformations)) {
+            return false;
+        }
+
+        $image = $event->getResponse()->getModel();
         $region = null;
-        $minimum = ['width' => 0, 'height' => 0, 'index' => 0];
+
+        $flipDimensions = false;
+        $minimum = ['width' => $image->getWidth(), 'height' => $image->getHeight(), 'index' => 0];
+        $inputSize = ['width' => $image->getWidth(), 'height' => $image->getHeight()];
         foreach ($transformations as $i => $transformation) {
             $params = $transformation['params'];
 
@@ -198,7 +205,7 @@ class TransformationManager implements ListenerInterface {
             // but in other cases we can make do with a smaller version. We only fetch the
             // first region that is requested, as this will determine the minimum input size
             if (!$region && $handler instanceof RegionExtractor) {
-                $region = $handler->setImage($image)->getExtractedRegion($params);
+                $region = $handler->setImage($image)->getExtractedRegion($params, $inputSize);
 
                 // RegionExtractors return false if no region is extracted
                 if ($region) {
@@ -207,24 +214,47 @@ class TransformationManager implements ListenerInterface {
             }
 
             if ($handler instanceof InputSizeConstraint) {
-                $minSize = $handler->setImage($image)->getMinimumInputSize($params);
+                $minSize = $handler->setImage($image)->getMinimumInputSize($params, $inputSize);
 
-                // Some transformations might return false if no transformation will occur for the
-                // given parameters
-                if (!$minSize) {
+                // Transformations can return `null` if no transformation will occur,
+                // or `false` if we should stop the minimum input size resolving because
+                // the transformation can't be predicted or calculated in advance
+                // (for instance if it needs access to the Imagick instance)
+                if ($minSize === null) {
                     continue;
+                } else if ($minSize === false) {
+                    break;
                 }
 
-                // Check if the output size of this transformation is larger than our current
-                if ($minimum['width']  < $minSize['width'] ||
-                    $minimum['height'] < $minSize['height']) {
-                    $minimum = $minSize;
+                // Check that the calculated value contains a width (some only return rotation)
+                if (isset($minSize['width'])) {
+                    // Check if the output size of this transformation is larger than our current
+                    $isThinner = $minSize['width'] < $minimum['width'];
+                    $isLower = $minSize['height'] < $minimum['height'];
 
-                    // Any region that has been found will determine the size in the end,
-                    // do not override the index in such cases
-                    if (!$region) {
-                        $minimum['index'] = $i;
+                    if ($isThinner || $isLower) {
+                        $minimum['width'] = $minSize['width'];
+                        $minimum['height'] = $minSize['height'];
+
+                        // Any region that has been found will determine the size in the end,
+                        // do not override the index in such cases
+                        if (!$region) {
+                            $minimum['index'] = $i;
+                        }
                     }
+                }
+
+                // Some transformation might rotate the image. If it yields an angle that is
+                // divisable by 90, but not by 180, exchange the values provided as width/height
+                // for the next transformations in the chain
+                $rotation = isset($minSize['rotation']) ? $minSize['rotation'] : false;
+                if ($rotation && $rotation % 180 !== 0 && $rotation % 90 === 0) {
+                    $inputSize = [
+                        'width'  => $inputSize['height'],
+                        'height' => $inputSize['width'],
+                    ];
+
+                    $flipDimensions = !$flipDimensions;
                 }
             }
         }
@@ -236,15 +266,26 @@ class TransformationManager implements ListenerInterface {
 
             $minimum['width'] = $minimum['width'] * $regionRatio;
             $minimum['height'] = $minimum['width'] / $originalRatio;
+        } else if ($flipDimensions) {
+            $minimum = [
+                'width'  => $minimum['height'],
+                'height' => $minimum['width'],
+                'index'  => $minimum['index'],
+            ];
         }
 
-        // Return false if the input size is either zero or the size is larger than the original
-        if (!$minimum['width'] || !$minimum['height'] ||
-            $minimum['width'] > $image->getWidth() || $minimum['height'] > $image->getHeight()) {
+        // Return false if the input size is larger than the original
+        $widerThanOriginal = $minimum['width'] >= $image->getWidth();
+        $higherThanOriginal = $minimum['height'] >= $image->getHeight();
+        if ($widerThanOriginal || $higherThanOriginal) {
             return false;
         }
 
-        return array_map('intval', array_map('ceil', $minimum));
+        return [
+            'width'  => (int) ceil($minimum['width']),
+            'height' => (int) ceil($minimum['height']),
+            'index'  => $minimum['index'],
+        ];
     }
 
     /**

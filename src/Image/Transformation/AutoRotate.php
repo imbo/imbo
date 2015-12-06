@@ -11,6 +11,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
+    Imbo\Image\InputSizeConstraint,
     Imagick,
     ImagickException,
     ImagickPixelException;
@@ -22,7 +23,7 @@ use Imbo\Exception\TransformationException,
  * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Image\Transformations
  */
-class AutoRotate extends Transformation {
+class AutoRotate extends Transformation implements InputSizeConstraint {
     /**
      * {@inheritdoc}
      */
@@ -100,5 +101,15 @@ class AutoRotate extends Transformation {
         } catch (ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMinimumInputSize(array $params, array $imageSize) {
+        // We don't have an imagick instance at this point in the flow, so we don't have any way to
+        // determine if the image should be rotated. Return false to signal that we can't make any
+        // assumptions on the input size from this point on.
+        return false;
     }
 }

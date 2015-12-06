@@ -73,7 +73,7 @@ class Thumbnail extends Transformation implements InputSizeConstraint {
     /**
      * {@inheritdoc}
      */
-    public function getMinimumInputSize(array $params) {
+    public function getMinimumInputSize(array $params, array $imageSize) {
         $fit = isset($params['fit']) ? $params['fit'] : $this->fit;
         $width = !empty($params['width']) ? (int) $params['width'] : $this->width;
         $height = !empty($params['height']) ? (int) $params['height'] : $this->height;
@@ -83,8 +83,8 @@ class Thumbnail extends Transformation implements InputSizeConstraint {
             return ['width' => $width, 'height' => $height];
         }
 
-        $sourceWidth = $this->image->getWidth();
-        $sourceHeight = $this->image->getHeight();
+        $sourceWidth = $imageSize['width'];
+        $sourceHeight = $imageSize['height'];
 
         $ratioX = $width  / $sourceWidth;
         $ratioY = $height / $sourceHeight;

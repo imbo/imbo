@@ -82,10 +82,13 @@ class Imagick implements ListenerInterface {
             $image = $event->getResponse()->getModel();
         }
 
-        // See if we can hint to imagick that we expect a smaller output
-        $minSize = $event->getTransformationManager()->getMinimumImageInputSize($event);
-        if ($minSize) {
-            $this->imagick->setOption('jpeg:size', $minSize['width'] . 'x' . $minSize['height']);
+        if ($event->getName() === 'image.loaded') {
+            // See if we can hint to imagick that we expect a smaller output
+            $minSize = $event->getTransformationManager()->getMinimumImageInputSize($event);
+            if ($minSize) {
+                $inputSize = $minSize['width'] . 'x' . $minSize['height'];
+                $this->imagick->setOption('jpeg:size', $inputSize);
+            }
         }
 
         // Inject the image blob

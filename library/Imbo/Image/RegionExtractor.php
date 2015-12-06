@@ -24,7 +24,8 @@ interface RegionExtractor {
      * with the parameters provided.
      *
      * @param array $params Transformation parameters
+     * @param array $imageSize Size of image
      * @return array Array containing `width`, `height`, `x` and `y`
      */
-    public function getExtractedRegion(array $params);
+    public function getExtractedRegion(array $params, array $imageSize);
 }

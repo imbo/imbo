@@ -39,7 +39,10 @@ class Crop extends Transformation implements RegionExtractor {
      * {@inheritdoc}
      */
     public function transform(array $params) {
-        $region = $this->getExtractedRegion($params);
+        $region = $this->getExtractedRegion($params, [
+            'width'  => $this->image->getWidth(),
+            'height' => $this->image->getHeight(),
+        ]);
 
         if (!$region) {
             return;
@@ -68,9 +71,7 @@ class Crop extends Transformation implements RegionExtractor {
     /**
      * {@inheritdoc}
      */
-    public function getExtractedRegion(array $params) {
-        $image = $this->image;
-
+    public function getExtractedRegion(array $params, array $imageSize) {
         foreach (['width', 'height'] as $param) {
             if (!isset($params[$param])) {
                 throw new TransformationException('Missing required parameter: ' . $param, 400);
@@ -84,27 +85,31 @@ class Crop extends Transformation implements RegionExtractor {
 
         $width = (int) $params['width'];
         $height = (int) $params['height'];
-        $imageWidth = $image->getWidth();
-        $imageHeight = $image->getHeight();
 
         // Set correct x and/or y values based on the crop mode
         if ($mode === 'center' || $mode === 'center-x') {
-            $x = (int) ($imageWidth - $width) / 2;
+            $x = (int) ($imageSize['width'] - $width) / 2;
         }
 
         if ($mode === 'center' || $mode === 'center-y') {
-            $y = (int) ($imageHeight - $height) / 2;
+            $y = (int) ($imageSize['height'] - $height) / 2;
         }
 
         // Throw exception on X/Y values that are out of bounds
-        if ($x + $width > $imageWidth) {
-            throw new TransformationException('Crop area is out of bounds (`x` + `width` > image width)', 400);
-        } else if ($y + $height > $imageHeight) {
-            throw new TransformationException('Crop area is out of bounds (`y` + `height` > image height)', 400);
+        if ($x + $width > $imageSize['width']) {
+            throw new TransformationException(
+                'Crop area is out of bounds (`x` + `width` > image width)',
+                400
+            );
+        } else if ($y + $height > $imageSize['height']) {
+            throw new TransformationException(
+                'Crop area is out of bounds (`y` + `height` > image height)',
+                400
+            );
         }
 
         // Return if there is no need for cropping
-        if ($imageWidth === $width && $imageHeight === $height) {
+        if ($imageSize['width'] === $width && $imageSize['height'] === $height) {
             return false;
         }
 

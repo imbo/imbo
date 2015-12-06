@@ -26,7 +26,10 @@ class MaxSize extends Transformation implements InputSizeConstraint {
      * {@inheritdoc}
      */
     public function transform(array $params) {
-        $newSize = $this->calculateSize($params);
+        $newSize = $this->calculateSize($params, [
+            'width'  => $this->image->getWidth(),
+            'height' => $this->image->getHeight(),
+        ]);
 
         // No need to transform? Fall back
         if (!$newSize) {
@@ -50,27 +53,25 @@ class MaxSize extends Transformation implements InputSizeConstraint {
     /**
      * {@inheritdoc}
      */
-    public function getMinimumInputSize(array $params) {
-        return $this->calculateSize($params) ?: [
-            'width' => $this->image->getWidth(),
-            'height' => $this->image->getHeight()
-        ];
+    public function getMinimumInputSize(array $params, array $imageSize) {
+        return $this->calculateSize($params, $imageSize);
     }
 
     /**
      * Calculate the output size based on the specified parameters
      *
      * @param array $params
+     * @param array $imageSize
      * @return array|boolean
      */
-    protected function calculateSize(array $params) {
+    protected function calculateSize(array $params, array $imageSize) {
         $image = $this->image;
 
         $maxWidth = !empty($params['width']) ? (int) $params['width'] : 0;
         $maxHeight = !empty($params['height']) ? (int) $params['height'] : 0;
 
-        $sourceWidth  = $image->getWidth();
-        $sourceHeight = $image->getHeight();
+        $sourceWidth  = $imageSize['width'];
+        $sourceHeight = $imageSize['height'];
 
         $width  = $maxWidth  ?: $sourceWidth;
         $height = $maxHeight ?: $sourceHeight;
@@ -87,7 +88,7 @@ class MaxSize extends Transformation implements InputSizeConstraint {
         // Is the original image smaller than the specified parameters?
         if ($sourceWidth <= $width && $sourceHeight <= $height) {
             // Original image is smaller than the max-parameters, don't transform
-            return false;
+            return;
         }
 
         return ['width' => $width, 'height' => $height];
