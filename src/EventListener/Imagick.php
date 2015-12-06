@@ -71,10 +71,12 @@ class Imagick implements ListenerInterface {
      * @param EventInterface $event The event instance
      */
     public function readImageBlob(EventInterface $event) {
+        $eventName = $event->getName();
+
         if ($event->hasArgument('image')) {
             // The image has been specified as an argument to the event
             $image = $event->getArgument('image');
-        } else if ($event->getName() === 'images.post') {
+        } else if ($eventName === 'images.post') {
             // The image is found in the request
             $image = $event->getRequest()->getImage();
         } else {
@@ -82,7 +84,7 @@ class Imagick implements ListenerInterface {
             $image = $event->getResponse()->getModel();
         }
 
-        if ($event->getName() === 'image.loaded') {
+        if ($eventName === 'image.loaded') {
             // See if we can hint to imagick that we expect a smaller output
             $minSize = $event->getTransformationManager()->getMinimumImageInputSize($event);
             if ($minSize) {
