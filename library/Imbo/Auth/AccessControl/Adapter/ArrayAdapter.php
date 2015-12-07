@@ -53,6 +53,8 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
         $this->accessList = $accessList;
         $this->groups = $groups;
         $this->keys = $this->getKeysFromAcl();
+
+        $this->validateAccessList();
     }
 
     /**
@@ -173,5 +175,26 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
         }
 
         return $keys;
+    }
+
+    /**
+     * Validate access list data
+     *
+     * @throws InvalidArgumentException
+     */
+    private function validateAccessList() {
+        // Get all user lists
+        $declaredPublicKeys = array_map(function($acl) {
+            return $acl['publicKey'];
+        }, $this->accessList);
+
+        $publicKeys = [];
+        foreach ($declaredPublicKeys as $key) {
+            if (in_array($key, $publicKeys)) {
+                throw new InvalidArgumentException('Public key declared twice in config: ' . $key, 500);
+            }
+
+            $publicKeys[] = $key;
+        }
     }
 }
