@@ -16,13 +16,15 @@
     "issues": "https://github.com/imbo/imbo/issues",
     "irc": "irc://irc.freenode.net/imbo"
   },
+  "minimum-stability": "dev",
   "require": {
     "php": ">=5.4.0",
     "ext-imagick": ">=3.0.1",
     "symfony/http-foundation": "~2.7.3",
     "symfony/event-dispatcher": "~2.7.3",
     "symfony/console": "~2.7.3",
-    "ramsey/uuid": "~3.0.0"
+    "ramsey/uuid": "~3.0.0",
+    "mongodb/mongodb": "^1.0.0@beta"
   },
   "require-dev": {
     "mikey179/vfsStream": "~1.5.0",
@@ -33,7 +35,7 @@
     "aws/aws-sdk-php": "~2.8"
   },
   "suggest": {
-    "ext-mongo": "Enables usage of MongoDB and GridFS as database and store. Recommended version: >=1.4.0",
+    "ext-mongodb": "Enables usage of MongoDB and GridFS as database and store. Recommended version: >=1.0.0",
     "ext-memcached": "Enables usage of the Memcached cache adapter for custom event listeners. Recommended version: >=2.0.0",
     "doctrine/dbal": "Enables usage of using RDMS for storing data (and optionally images). Recommended version: >=2.3",
     "aws/aws-sdk-php": "Enables usage of the AWS S3 storage adapter. Recommended version >=2.4"

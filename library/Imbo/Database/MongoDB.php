@@ -14,9 +14,10 @@ use Imbo\Model\Image,
     Imbo\Model\Images,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
-    MongoClient,
-    MongoCollection,
-    MongoException,
+    MongoDB\Driver\Command,
+    MongoDB\Driver\Manager as DriverManager,
+    MongoDB\Collection,
+    MongoDB\Driver\Exception\Exception as MongoException,
     DateTime,
     DateTimeZone;
 
@@ -38,11 +39,11 @@ use Imbo\Model\Image,
  */
 class MongoDB implements DatabaseInterface {
     /**
-     * Mongo client instance
+     * MongoDB driver manager instance
      *
-     * @var MongoClient
+     * @var MongoDB\Driver\Manager
      */
-    private $mongoClient;
+    private $driverManager;
 
     /**
      * The collection instances used by the driver
@@ -65,24 +66,24 @@ class MongoDB implements DatabaseInterface {
 
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
-        'options' => ['connect' => true, 'connectTimeoutMS' => 1000],
+        'options' => ['connectTimeoutMS' => 1000],
     ];
 
     /**
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param MongoClient $client MongoClient instance
-     * @param MongoCollection $imageCollection MongoCollection instance for the images
-     * @param MongoCollection $shortUrlCollection MongoCollection instance for the short URLs
+     * @param MongoDB\Driver\Manager $manager Driver manager instance
+     * @param MongoDB\Collection $imageCollection Collection instance for the images
+     * @param MongoDB\Collection $shortUrlCollection Collection instance for short URLs
      */
-    public function __construct(array $params = null, MongoClient $client = null, MongoCollection $imageCollection = null, MongoCollection $shortUrlCollection = null) {
+    public function __construct(array $params = null, DriverManager $manager = null, Collection $imageCollection = null, Collection $shortUrlCollection = null) {
         if ($params !== null) {
             $this->params = array_replace_recursive($this->params, $params);
         }
 
-        if ($client !== null) {
-            $this->mongoClient = $client;
+        if ($manager !== null) {
+            $this->driverManager = $manager;
         }
 
         if ($imageCollection !== null) {
@@ -110,10 +111,9 @@ class MongoDB implements DatabaseInterface {
 
         if ($this->imageExists($user, $imageIdentifier)) {
             try {
-                $this->getImageCollection()->update(
+                $this->getImageCollection()->updateOne(
                     ['user' => $user, 'imageIdentifier' => $imageIdentifier],
-                    ['$set' => ['updated' => $now]],
-                    ['multiple' => false]
+                    ['$set' => ['updated' => $now]]
                 );
 
                 return true;
@@ -138,7 +138,7 @@ class MongoDB implements DatabaseInterface {
         ];
 
         try {
-            $this->getImageCollection()->insert($data);
+            $this->getImageCollection()->insertOne($data);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to save image data', 500, $e);
         }
@@ -160,10 +160,10 @@ class MongoDB implements DatabaseInterface {
                 throw new DatabaseException('Image not found', 404);
             }
 
-            $this->getImageCollection()->remove(
-                ['user' => $user, 'imageIdentifier' => $imageIdentifier],
-                ['justOne' => true]
-            );
+            $this->getImageCollection()->deleteOne([
+                'user' => $user,
+                'imageIdentifier' => $imageIdentifier
+            ]);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to delete image data', 500, $e);
         }
@@ -180,10 +180,9 @@ class MongoDB implements DatabaseInterface {
             $existing = $this->getMetadata($user, $imageIdentifier);
             $updatedMetadata = array_merge($existing, $metadata);
 
-            $this->getImageCollection()->update(
+            $this->getImageCollection()->updateOne(
                 ['user' => $user, 'imageIdentifier' => $imageIdentifier],
-                ['$set' => ['updated' => time(), 'metadata' => $updatedMetadata]],
-                ['multiple' => false]
+                ['$set' => ['updated' => time(), 'metadata' => $updatedMetadata]]
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to update meta data', 500, $e);
@@ -209,7 +208,7 @@ class MongoDB implements DatabaseInterface {
             throw new DatabaseException('Image not found', 404);
         }
 
-        return isset($data['metadata']) ? $data['metadata'] : [];
+        return isset($data->metadata) ? $this->resultToArray($data->metadata) : [];
     }
 
     /**
@@ -226,10 +225,9 @@ class MongoDB implements DatabaseInterface {
                 throw new DatabaseException('Image not found', 404);
             }
 
-            $this->getImageCollection()->update(
+            $this->getImageCollection()->updateOne(
                 ['user' => $user, 'imageIdentifier' => $imageIdentifier],
-                ['$set' => ['metadata' => []]],
-                ['multiple' => false]
+                ['$set' => ['metadata' => []]]
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to delete meta data', 500, $e);
@@ -295,27 +293,34 @@ class MongoDB implements DatabaseInterface {
         }
 
         // Fields to fetch
-        $fields = array_fill_keys([
+        $projection = array_fill_keys([
             'extension', 'added', 'checksum', 'originalChecksum', 'updated',
             'user', 'imageIdentifier', 'mime', 'size', 'width', 'height'
         ], true);
 
         if ($query->returnMetadata()) {
-            $fields['metadata'] = true;
+            $projection['metadata'] = true;
         }
 
         try {
-            $cursor = $this->getImageCollection()->find($queryData, $fields)
-                                                 ->limit($query->limit())
-                                                 ->sort($sort);
+            $options = [
+                'projection' => $projection,
+                'limit' => $query->limit(),
+                'sort' => $sort,
+            ];
 
             // Skip some images if a page has been set
             if (($page = $query->page()) > 1) {
                 $skip = $query->limit() * ($page - 1);
-                $cursor->skip($skip);
+                $options['skip'] = $skip;
             }
 
+            $imageCollection = $this->getImageCollection();
+            $cursor = $imageCollection->find($queryData, $options);
+
             foreach ($cursor as $image) {
+                $image = $this->resultToArray($image);
+
                 unset($image['_id']);
                 $image['added'] = new DateTime('@' . $image['added'], new DateTimeZone('UTC'));
                 $image['updated'] = new DateTime('@' . $image['updated'], new DateTimeZone('UTC'));
@@ -323,7 +328,7 @@ class MongoDB implements DatabaseInterface {
             }
 
             // Update model
-            $model->setHits($cursor->count());
+            $model->setHits($imageCollection->count($queryData));
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to search for images', 500, $e);
         }
@@ -335,18 +340,24 @@ class MongoDB implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function getImageProperties($user, $imageIdentifier) {
+        $projection = array_fill_keys([
+            'size', 'width', 'height', 'mime', 'extension', 'added', 'updated'
+        ], true);
+
         try {
             $data = $this->getImageCollection()->findOne(
                 ['user' => $user, 'imageIdentifier' => $imageIdentifier],
-                array_fill_keys(['size', 'width', 'height', 'mime', 'extension', 'added', 'updated'], true)
+                ['projection' => $projection]
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch image data', 500, $e);
         }
+
         if ($data === null) {
             throw new DatabaseException('Image not found', 404);
         }
-        return $data;
+
+        return $this->resultToArray($data);
     }
 
     /**
@@ -379,15 +390,10 @@ class MongoDB implements DatabaseInterface {
                 $query['imageIdentifier'] = $imageIdentifier;
             }
 
-            // Create the cursor
-            $cursor = $this->getImageCollection()->find($query, ['updated' => true])
-                                                 ->limit(1)
-                                                 ->sort([
-                                                     'updated' => -1,
-                                                 ]);
-
-            // Fetch the next row
-            $data = $cursor->getNext();
+            $data = $this->getImageCollection()->findOne($query, [
+                'sort' => ['updated' => -1],
+                'projection' => ['updated' => true]
+            ]);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch image data', 500, $e);
         }
@@ -395,10 +401,10 @@ class MongoDB implements DatabaseInterface {
         if ($data === null && $imageIdentifier) {
             throw new DatabaseException('Image not found', 404);
         } else if ($data === null) {
-            $data = ['updated' => time()];
+            return new DateTime('now', new DateTimeZone('UTC'));
         }
 
-        return new DateTime('@' . $data['updated'], new DateTimeZone('UTC'));
+        return new DateTime('@' . $data->updated, new DateTimeZone('UTC'));
     }
 
     /**
@@ -429,18 +435,21 @@ class MongoDB implements DatabaseInterface {
             $group = ['$group' => ['_id' => null, 'numBytes' => ['$sum' => '$size']]];
 
             if ($user) {
-                $results = $collection->aggregate(['$match' => ['user' => $user]], $group);
+                $pipeline = [['$match' => ['user' => $user]]];
+                $pipeline[] = $group;
+
+                $results = $collection->aggregate($pipeline);
             } else {
-                $results = $collection->aggregate($group);
+                $results = $collection->aggregate([$group]);
             }
 
-            $result = $results['result'];
+            $result = $results->current();
 
             if (empty($result)) {
                 return 0;
             }
 
-            return (int) $result[0]['numBytes'];
+            return $result->numBytes;
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch information from the database', 500, $e);
         }
@@ -464,7 +473,18 @@ class MongoDB implements DatabaseInterface {
      */
     public function getStatus() {
         try {
-            return $this->getMongoClient()->connect();
+            $manager = $this->getDriverManager();
+
+            // Mongo connects lazily, so we might have to ping it to get the actual status
+            $isConnected = (bool) $manager->getServers();
+            if ($isConnected) {
+                return true;
+            }
+
+            $command = new Command(['ping' => 1]);
+            $manager->executeCommand('db', $command);
+
+            return (bool) $manager->getServers();
         } catch (DatabaseException $e) {
             return false;
         }
@@ -487,7 +507,7 @@ class MongoDB implements DatabaseInterface {
             throw new DatabaseException('Image not found', 404);
         }
 
-        return $data['mime'];
+        return $data->mime;
     }
 
     /**
@@ -515,7 +535,7 @@ class MongoDB implements DatabaseInterface {
                 'query' => serialize($query),
             ];
 
-            $this->getShortUrlCollection()->insert($data);
+            $this->getShortUrlCollection()->insertOne($data);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to create short URL', 500, $e);
         }
@@ -534,14 +554,14 @@ class MongoDB implements DatabaseInterface {
                 'extension' => $extension,
                 'query' => serialize($query),
             ], [
-                'shortUrlId' => true,
+                'projection' => ['shortUrlId' => true],
             ]);
 
             if (!$result) {
                 return null;
             }
 
-            return $result['shortUrlId'];
+            return $result->shortUrlId;
         } catch (MongoException $e) {
             return null;
         }
@@ -555,13 +575,14 @@ class MongoDB implements DatabaseInterface {
             $result = $this->getShortUrlCollection()->findOne([
                 'shortUrlId' => $shortUrlId,
             ], [
-                '_id' => false
+                'projection' => ['_id' => false]
             ]);
 
             if (!$result) {
                 return null;
             }
 
+            $result = $this->resultToArray($result);
             $result['query'] = unserialize($result['query']);
 
             return $result;
@@ -584,7 +605,7 @@ class MongoDB implements DatabaseInterface {
         }
 
         try {
-            $this->getShortUrlCollection()->remove($query);
+            $this->getShortUrlCollection()->deleteMany($query);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to delete short URLs', 500, $e);
         }
@@ -614,14 +635,14 @@ class MongoDB implements DatabaseInterface {
      * Get the mongo collection instance
      *
      * @param string $type "image" or "shortUrl"
-     * @return MongoCollection
+     * @return MongoDB\Collection
      */
     private function getCollection($type) {
         if ($this->collections[$type] === null) {
             try {
-                $this->collections[$type] = $this->getMongoClient()->selectCollection(
-                    $this->params['databaseName'],
-                    $type
+                $this->collections[$type] = new Collection(
+                    $this->getDriverManager(),
+                    $this->getCollectionNamespace($type)
                 );
             } catch (MongoException $e) {
                 throw new DatabaseException('Could not select collection', 500, $e);
@@ -631,20 +652,47 @@ class MongoDB implements DatabaseInterface {
         return $this->collections[$type];
     }
 
+    private function getCollectionNamespace($name) {
+        return $this->params['databaseName'] . '.' . $name;
+    }
+
     /**
-     * Get the mongo client instance
+     * Get the mongo driver manager instance
      *
-     * @return MongoClient
+     * @return MongoDB\Driver\Manager
      */
-    private function getMongoClient() {
-        if ($this->mongoClient === null) {
+    private function getDriverManager() {
+        if ($this->driverManager === null) {
             try {
-                $this->mongoClient = new MongoClient($this->params['server'], $this->params['options']);
+                $this->driverManager = new DriverManager(
+                    $this->params['server'],
+                    $this->params['options']
+                );
             } catch (MongoException $e) {
                 throw new DatabaseException('Could not connect to database', 500, $e);
             }
         }
 
-        return $this->mongoClient;
+        return $this->driverManager;
+    }
+
+    private function resultToArray($result) {
+        if (is_array($result)) {
+            foreach ($result as $key => $value) {
+                if (is_array($value)) {
+                    $result[$key] = $this->resultToArray($value);
+                }
+
+                if ($value instanceof \stdClass) {
+                    $result[$key] = $this->resultToArray((array) $value);
+                }
+            }
+        }
+
+        if ($result instanceof \stdClass) {
+            return $this->resultToArray((array) $result);
+        }
+
+        return $result;
     }
 }
