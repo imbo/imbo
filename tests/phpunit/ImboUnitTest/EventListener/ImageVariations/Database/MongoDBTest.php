@@ -11,8 +11,9 @@
 namespace ImboUnitTest\EventListener\ImageVariations\Database;
 
 use Imbo\EventListener\ImageVariations\Database\MongoDB,
-    MongoException,
-    MongoClient;
+    MongoDB\Driver\Manager as DriverManager,
+    MongoDB\Collection,
+    MongoDB\Driver\Exception\RuntimeException as RuntimeException;
 
 /**
  * @covers Imbo\EventListener\ImageVariations\Database\MongoDB
@@ -37,39 +38,17 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testInsertFailureThrowsDatabaseException() {
-        $client = $this->getMockBuilder('MongoClient')->disableOriginalConstructor()->getMock();
-        $collection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
+        $manager = new DriverManager('mongodb://localhost');
+        $collection = $this->getMockBuilder('MongoDB\Collection')->disableOriginalConstructor()->getMock();
 
         $collection
             ->expects($this->once())
-            ->method('insert')
-            ->will($this->throwException(new MongoException()));
+            ->method('insertOne')
+            ->will($this->throwException(new RuntimeException()));
 
         $adapter = new MongoDB([
             'databaseName' => $this->databaseName,
-        ], $client, $collection);
-
-        $adapter->storeImageVariationMetadata('key', 'id', 700, 700);
-    }
-
-    /**
-     * @covers Imbo\EventListener\ImageVariations\Database\MongoDB::__construct
-     * @covers Imbo\EventListener\ImageVariations\Database\MongoDB::getCollection
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionMessage Could not select collection
-     * @expectedExceptionCode 500
-     */
-    public function testThrowsExceptionWhenNotAbleToGetCollection() {
-        $client = $this->getMockBuilder('MongoClient')->disableOriginalConstructor()->getMock();
-
-        $client
-            ->expects($this->once())
-            ->method('selectCollection')
-            ->will($this->throwException(new MongoException()));
-
-        $adapter = new MongoDB([
-            'databaseName' => $this->databaseName,
-        ], $client);
+        ], $manager, $collection);
 
         $adapter->storeImageVariationMetadata('key', 'id', 700, 700);
     }

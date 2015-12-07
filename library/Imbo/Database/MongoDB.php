@@ -14,6 +14,7 @@ use Imbo\Model\Image,
     Imbo\Model\Images,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
+    Imbo\Helpers\ObjectToArray,
     MongoDB\Driver\Command,
     MongoDB\Driver\Manager as DriverManager,
     MongoDB\Collection,
@@ -208,7 +209,7 @@ class MongoDB implements DatabaseInterface {
             throw new DatabaseException('Image not found', 404);
         }
 
-        return isset($data->metadata) ? $this->resultToArray($data->metadata) : [];
+        return isset($data->metadata) ? ObjectToArray::toArray($data->metadata) : [];
     }
 
     /**
@@ -319,7 +320,7 @@ class MongoDB implements DatabaseInterface {
             $cursor = $imageCollection->find($queryData, $options);
 
             foreach ($cursor as $image) {
-                $image = $this->resultToArray($image);
+                $image = ObjectToArray::toArray($image);
 
                 unset($image['_id']);
                 $image['added'] = new DateTime('@' . $image['added'], new DateTimeZone('UTC'));
@@ -357,7 +358,7 @@ class MongoDB implements DatabaseInterface {
             throw new DatabaseException('Image not found', 404);
         }
 
-        return $this->resultToArray($data);
+        return ObjectToArray::toArray($data);
     }
 
     /**
@@ -582,7 +583,7 @@ class MongoDB implements DatabaseInterface {
                 return null;
             }
 
-            $result = $this->resultToArray($result);
+            $result = ObjectToArray::toArray($result);
             $result['query'] = unserialize($result['query']);
 
             return $result;
@@ -616,7 +617,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * Fetch the image collection
      *
-     * @return MongoCollection
+     * @return MongoDB\Collection
      */
     private function getImageCollection() {
         return $this->getCollection('image');
@@ -625,7 +626,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * Fetch the shortUrl collection
      *
-     * @return MongoCollection
+     * @return MongoDB\Collection
      */
     private function getShortUrlCollection() {
         return $this->getCollection('shortUrl');
@@ -680,31 +681,5 @@ class MongoDB implements DatabaseInterface {
         }
 
         return $this->driverManager;
-    }
-
-    /**
-     * Turn a result set (stdObject shaped) into an array, recursively
-     *
-     * @param array|stdClass $result
-     * @return array
-     */
-    private function resultToArray($result) {
-        if (is_array($result)) {
-            foreach ($result as $key => $value) {
-                if (is_array($value)) {
-                    $result[$key] = $this->resultToArray($value);
-                }
-
-                if ($value instanceof \stdClass) {
-                    $result[$key] = $this->resultToArray((array) $value);
-                }
-            }
-        }
-
-        if ($result instanceof \stdClass) {
-            return $this->resultToArray((array) $result);
-        }
-
-        return $result;
     }
 }

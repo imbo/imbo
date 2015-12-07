@@ -10,10 +10,14 @@
 
 namespace Imbo\EventListener\ImageVariations\Database;
 
-use Imbo\Exception\DatabaseException,
-    MongoClient,
-    MongoCollection,
-    MongoException;
+use Imbo\Model\Image,
+    Imbo\Model\Images,
+    Imbo\Resource\Images\Query,
+    Imbo\Exception\DatabaseException,
+    Imbo\Helpers\ObjectToArray,
+    MongoDB\Driver\Manager as DriverManager,
+    MongoDB\Collection,
+    MongoDB\Driver\Exception\Exception as MongoException;
 
 /**
  * MongoDB database driver for the image variations
@@ -23,8 +27,8 @@ use Imbo\Exception\DatabaseException,
  * - (string) databaseName Name of the database. Defaults to 'imbo'
  * - (string) server The server string to use when connecting to MongoDB. Defaults to
  *                   'mongodb://localhost:27017'
- * - (array) options Options to use when creating the MongoClient instance. Defaults to
- *                   ['connect' => true, 'connectTimeoutMS' => 1000].
+ * - (array) options Options to use when creating the driver manager instance.
+ *                   Defaults to ['connectTimeoutMS' => 1000].
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
@@ -33,14 +37,14 @@ class MongoDB implements DatabaseInterface {
     /**
      * Mongo client instance
      *
-     * @var MongoClient
+     * @var MongoDB\Driver\Manager
      */
-    private $mongoClient;
+    private $driverManager;
 
     /**
      * The imagevariation collection
      *
-     * @var MongoCollection
+     * @var MongoDB\Collection
      */
     private $collection;
 
@@ -55,23 +59,23 @@ class MongoDB implements DatabaseInterface {
 
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
-        'options' => ['connect' => true, 'connectTimeoutMS' => 1000],
+        'options' => ['connectTimeoutMS' => 1000],
     ];
 
     /**
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param MongoClient $client MongoClient instance
-     * @param MongoCollection $collection MongoCollection instance for the image variation collection
+     * @param MongoDB\Driver\Manager $manager MongoDB driver manager instance
+     * @param MongoDB\Collection $collection MongoDB collection instance for the image variation collection
      */
-    public function __construct(array $params = null, MongoClient $client = null, MongoCollection $collection = null) {
+    public function __construct(array $params = null, DriverManager $manager = null, Collection $collection = null) {
         if ($params !== null) {
             $this->params = array_replace_recursive($this->params, $params);
         }
 
-        if ($client !== null) {
-            $this->mongoClient = $client;
+        if ($manager !== null) {
+            $this->driverManager = $manager;
         }
 
         if ($collection !== null) {
@@ -84,7 +88,7 @@ class MongoDB implements DatabaseInterface {
      */
     public function storeImageVariationMetadata($user, $imageIdentifier, $width, $height) {
         try {
-            $this->getCollection()->insert([
+            $this->getCollection()->insertOne([
                 'added' => time(),
                 'user' => $user,
                 'imageIdentifier'  => $imageIdentifier,
@@ -110,16 +114,16 @@ class MongoDB implements DatabaseInterface {
             ],
         ];
 
-        $cursor = $this->getCollection()
-            ->find($query, [
+        $result = $this->getCollection()->findOne($query, [
+            'sort' => ['width' => 1],
+            'projection' => [
                 '_id' => false,
                 'width' => true,
                 'height' => true,
-            ])
-            ->limit(1)
-            ->sort(['width' => 1]);
+            ]
+        ]);
 
-        return $cursor->getNext();
+        return $result ? ObjectToArray::toArray($result) : null;
     }
 
     /**
@@ -135,7 +139,7 @@ class MongoDB implements DatabaseInterface {
             $query['width'] = $width;
         }
 
-        $this->getCollection()->remove($query);
+        $this->getCollection()->deleteMany($query);
 
         return true;
     }
@@ -143,14 +147,14 @@ class MongoDB implements DatabaseInterface {
     /**
      * Get the mongo collection
      *
-     * @return MongoCollection
+     * @return MongoDB\Collection
      */
     private function getCollection() {
         if ($this->collection === null) {
             try {
-                $this->collection = $this->getMongoClient()->selectCollection(
-                    $this->params['databaseName'],
-                    'imagevariation'
+                $this->collection = new Collection(
+                    $this->getDriverManager(),
+                    $this->getCollectionNamespace('imagevariation')
                 );
             } catch (MongoException $e) {
                 throw new DatabaseException('Could not select collection', 500, $e);
@@ -161,19 +165,32 @@ class MongoDB implements DatabaseInterface {
     }
 
     /**
+     * Get the namespaced collection name for a given collection
+     *
+     * @param string $name Name of collection
+     * @return string
+     */
+    private function getCollectionNamespace($name) {
+        return $this->params['databaseName'] . '.' . $name;
+    }
+
+    /**
      * Get the mongo client instance
      *
-     * @return MongoClient
+     * @return MongoDB\Driver\Manager
      */
-    private function getMongoClient() {
-        if ($this->mongoClient === null) {
+    private function getDriverManager() {
+        if ($this->driverManager === null) {
             try {
-                $this->mongoClient = new MongoClient($this->params['server'], $this->params['options']);
+                $this->driverManager = new DriverManager(
+                    $this->params['server'],
+                    $this->params['options']
+                );
             } catch (MongoException $e) {
                 throw new DatabaseException('Could not connect to database', 500, $e);
             }
         }
 
-        return $this->mongoClient;
+        return $this->driverManager;
     }
 }
