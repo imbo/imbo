@@ -652,6 +652,12 @@ class MongoDB implements DatabaseInterface {
         return $this->collections[$type];
     }
 
+    /**
+     * Get the namespaced collection name for a given collection
+     *
+     * @param string $name Name of collection
+     * @return string
+     */
     private function getCollectionNamespace($name) {
         return $this->params['databaseName'] . '.' . $name;
     }
@@ -676,6 +682,12 @@ class MongoDB implements DatabaseInterface {
         return $this->driverManager;
     }
 
+    /**
+     * Turn a result set (stdObject shaped) into an array, recursively
+     *
+     * @param array|stdClass $result
+     * @return array
+     */
     private function resultToArray($result) {
         if (is_array($result)) {
             foreach ($result as $key => $value) {
