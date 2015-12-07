@@ -139,4 +139,15 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
             'public key does not exist' => [$users, 'publicKey3', null],
         ];
     }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Public key declared twice in config: pubkey
+     */
+    public function testThrowsErrorOnDuplicatePublicKey() {
+        $accessControl = new ArrayAdapter([
+            ['publicKey'  => 'pubkey', 'privateKey' => 'privkey', 'acl' => []],
+            ['publicKey'  => 'pubkey', 'privateKey' => 'privkey', 'acl' => []]
+        ]);
+    }
 }
