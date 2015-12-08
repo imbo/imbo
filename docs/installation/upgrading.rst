@@ -67,7 +67,7 @@ If you use the GridFS adapter, you will need to rename the ``publicKey`` field w
 
 .. code-block:: javascript
 
-    db.fs.files.update({}, { $rename: { 'publicKey': 'user' } )
+    db.fs.files.update({}, { $rename: { 'publicKey': 'user' } }, { multi: true } )
 
 .. note:: The default database names for the GridFS adapters are ``imbo_storage`` and ``imbo_imagevariation_storage``. The query specified should be run on both databases. If the ``imbo_imagevariation_storage`` database does not exist, run the query on ``imbo_storage`` and follow the instructions specified in the :ref:`database-setup` section to create the appropriate indexes for the ``imbo_imagevariation_storage`` database.
 
