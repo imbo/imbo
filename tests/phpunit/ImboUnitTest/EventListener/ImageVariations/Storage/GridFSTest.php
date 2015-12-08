@@ -22,6 +22,12 @@ use Imbo\EventListener\ImageVariations\Storage\GridFS,
 class GridFSTest extends \PHPUnit_Framework_TestCase {
     private $databaseName = 'imboGridFSUnitTest';
 
+    protected function setUp() {
+        if (!class_exists('MongoClient')) {
+            $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
+        }
+    }
+
     /**
      * @covers Imbo\EventListener\ImageVariations\Storage\GridFS::__construct
      * @covers Imbo\EventListener\ImageVariations\Storage\GridFS::getGrid
