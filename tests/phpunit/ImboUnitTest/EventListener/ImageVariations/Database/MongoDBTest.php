@@ -23,6 +23,12 @@ use Imbo\EventListener\ImageVariations\Database\MongoDB,
 class MongoDBTest extends \PHPUnit_Framework_TestCase {
     private $databaseName = 'imboUnitTestDatabase';
 
+    protected function setUp() {
+        if (!class_exists('MongoClient')) {
+            $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
+        }
+    }
+
     /**
      * @covers Imbo\EventListener\ImageVariations\Database\MongoDB::__construct
      * @covers Imbo\EventListener\ImageVariations\Database\MongoDB::storeImageVariationMetadata
