@@ -316,7 +316,6 @@ class DatabaseOperations implements ListenerInterface {
     public function loadStats(EventInterface $event) {
         $response = $event->getResponse();
         $database = $event->getDatabase();
-        $accessControl = $event->getAccessControl();
 
         $statsModel = new Model\Stats();
         $statsModel->setNumUsers($database->getNumUsers());

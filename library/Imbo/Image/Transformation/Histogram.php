@@ -120,7 +120,6 @@ class Histogram extends Transformation implements ListenerInterface {
 
             // let's draw a histogram
             $origwidth = 256;
-            $origheight = floor($origwidth / $ratio);
             $width = $origwidth * $scale;
             $height = floor($width / $ratio);
 

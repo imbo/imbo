@@ -144,7 +144,7 @@ class AccessToken implements ListenerInterface {
         // See if we should modify the protocol for the incoming request
         $protocol = $config['authentication']['protocol'];
         if ($protocol === 'both') {
-            $uris = array_reduce($uris, function($dest, $uri) use ($protocol) {
+            $uris = array_reduce($uris, function($dest, $uri) {
                 $baseUrl = preg_replace('#^https?#', '', $uri);
                 $dest[] = 'http' . $baseUrl;
                 $dest[] = 'https' . $baseUrl;
