@@ -15,9 +15,7 @@ use Imbo\Exception\TransformationException,
     Imbo\EventManager\EventInterface,
     Imbo\Model\Image,
     Imagick,
-    ImagickPixel,
     ImagickException,
-    ImagickPixelException,
     ImagickDraw;
 
 /**

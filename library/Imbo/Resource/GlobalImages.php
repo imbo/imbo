@@ -11,8 +11,7 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Exception\RuntimeException,
-    Imbo\Model;
+    Imbo\Exception\RuntimeException;
 
 /**
  * Global images resource

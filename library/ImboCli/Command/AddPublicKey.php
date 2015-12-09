@@ -10,8 +10,7 @@
 
 namespace ImboCli\Command;
 
-use Symfony\Component\Console\Command\Command as BaseCommand,
-    Symfony\Component\Console\Input\InputArgument,
+use Symfony\Component\Console\Input\InputArgument,
     Symfony\Component\Console\Input\InputInterface,
     Symfony\Component\Console\Question\Question,
     Symfony\Component\Console\Question\ChoiceQuestion,

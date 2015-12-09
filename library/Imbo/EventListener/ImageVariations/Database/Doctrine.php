@@ -10,16 +10,10 @@
 
 namespace Imbo\EventListener\ImageVariations\Database;
 
-use Imbo\Model\Image,
-    Imbo\Model\Images,
-    Imbo\Resource\Images\Query,
-    Imbo\Exception\DatabaseException,
-    Doctrine\DBAL\Configuration,
+use Doctrine\DBAL\Configuration,
     Doctrine\DBAL\DriverManager,
     Doctrine\DBAL\Connection,
-    PDO,
-    DateTime,
-    DateTimeZone;
+    PDO;
 
 /**
  * Doctrine 2 database driver for the image variations

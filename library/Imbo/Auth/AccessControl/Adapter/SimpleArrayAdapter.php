@@ -11,7 +11,6 @@
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Exception\InvalidArgumentException,
-    Imbo\Auth\AccessControl\GroupQuery,
     Imbo\Resource;
 
 /**

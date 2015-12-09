@@ -11,8 +11,6 @@
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Exception\DatabaseException,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\RuntimeException,
     Imbo\Auth\AccessControl\GroupQuery,
     Imbo\Model\Groups as GroupsModel,
     MongoClient,
@@ -104,39 +102,6 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         if ($collection !== null) {
             $this->collection = $collection;
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUsersForResource($publicKey, $resource) {
-        if (!$publicKey || !$resource) {
-            return [];
-        }
-
-        $accessList = $this->getAccessListForPublicKey($publicKey);
-
-        // Get all user lists
-        $userLists = array_filter(array_map(function($acl) {
-            return isset($acl['users']) ? $acl['users'] : false;
-        }, $accessList));
-
-        // Merge user lists
-        $users = call_user_func_array('array_merge', $userLists);
-
-        // Check if public key has access to user with same name
-        if ($this->hasAccess($publicKey, $resource, $publicKey)) {
-            $userList[] = $publicKey;
-        }
-
-        // Check for each user specified in acls
-        foreach ($users as $user) {
-            if ($this->hasAccess($publicKey, $resource, $user)) {
-                $userList[] = $user;
-            }
-        }
-
-        return $userList;
     }
 
     /**
@@ -388,8 +353,6 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
 
             return $info;
         }, $info['acl']);
-
-        return $info['acl'];
     }
 
     /**

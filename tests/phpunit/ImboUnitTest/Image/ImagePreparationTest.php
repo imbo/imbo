@@ -10,7 +10,9 @@
 
 namespace ImboUnitTest\Image;
 
-use Imbo\Image\ImagePreparation;
+use Imbo\Image\ImagePreparation,
+    Imbo\Model\Image,
+    Imbo\Image\Identifier\Generator\GeneratorInterface;
 
 /**
  * @covers Imbo\Image\ImagePreparation
@@ -173,4 +175,31 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
         $this->request->expects($this->once())->method('setImage')->with($this->isInstanceOf('Imbo\Model\Image'));
         $this->prepare->prepareImage($event);
     }
+
+    /**
+     * @covers Imbo\Image\ImagePreparation::prepareImage
+     * @covers Imbo\Image\ImagePreparation::generateImageIdentifier
+     */
+    public function testDoesNotInstantiateCallableGenerator() {
+        $imagePath = FIXTURES_DIR . '/image.png';
+        $imageData = file_get_contents($imagePath);
+
+        $config['imageIdentifierGenerator'] = new CallableImageIdentifierGenerator();
+
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
+        $event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $event->expects($this->any())->method('getConfig')->will($this->returnValue($config));
+        $event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
+
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue($imageData));
+        $this->request->expects($this->once())->method('setImage')->with($this->isInstanceOf('Imbo\Model\Image'));
+        $this->prepare->prepareImage($event);
+    }
+}
+
+class CallableImageIdentifierGenerator implements GeneratorInterface {
+    public function generate(Image $image) {}
+    public function isDeterministic() {}
+    public function __invoke() {}
 }
