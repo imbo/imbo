@@ -12,6 +12,7 @@ namespace Imbo\Image;
 
 use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerInterface,
+    Imbo\Image\Identifier\Generator\GeneratorInterface,
     Imbo\Exception\ImageException,
     Imbo\Exception,
     Imbo\Model\Image,
@@ -109,7 +110,7 @@ class ImagePreparation implements ListenerInterface {
         $imageIdentifierGenerator = $config['imageIdentifierGenerator'];
 
         if (is_callable($imageIdentifierGenerator) &&
-            !($imageIdentifierGenerator instanceof ImageIdentifierGeneratorInterface)) {
+            !($imageIdentifierGenerator instanceof GeneratorInterface)) {
             $imageIdentifierGenerator = $imageIdentifierGenerator();
         }
 
