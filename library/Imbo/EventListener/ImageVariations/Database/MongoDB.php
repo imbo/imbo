@@ -10,10 +10,7 @@
 
 namespace Imbo\EventListener\ImageVariations\Database;
 
-use Imbo\Model\Image,
-    Imbo\Model\Images,
-    Imbo\Resource\Images\Query,
-    Imbo\Exception\DatabaseException,
+use Imbo\Exception\DatabaseException,
     MongoClient,
     MongoCollection,
     MongoException;

@@ -11,7 +11,6 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Exception\InvalidArgumentException,
     Imbo\Exception\ResourceException,
     Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface,
     Imbo\Model\Group as GroupModel;

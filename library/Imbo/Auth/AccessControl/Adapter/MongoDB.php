@@ -11,8 +11,6 @@
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Exception\DatabaseException,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\RuntimeException,
     Imbo\Auth\AccessControl\GroupQuery,
     Imbo\Model\Groups as GroupsModel,
     MongoClient,

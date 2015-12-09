@@ -11,9 +11,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface,
-    Imbo\Http\Request\Request,
     Imbo\Exception\RuntimeException,
-    Imbo\Auth\AccessControl\AccessControlAdapter,
     Imbo\Auth\AccessControl\GroupQuery,
     Imbo\Model\Groups as GroupsModel,
     Imbo\Resource;

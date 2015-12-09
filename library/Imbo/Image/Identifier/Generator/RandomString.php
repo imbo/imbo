@@ -10,8 +10,7 @@
 
 namespace Imbo\Image\Identifier\Generator;
 
-use Imbo\Model\Image,
-    Ramsey\Uuid\Uuid as UuidFactory;
+use Imbo\Model\Image;
 
 /**
  * Random string image identifier generator
