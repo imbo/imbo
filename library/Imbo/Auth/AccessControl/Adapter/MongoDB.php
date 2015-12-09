@@ -355,8 +355,6 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
 
             return $info;
         }, $info['acl']);
-
-        return $info['acl'];
     }
 
     /**
