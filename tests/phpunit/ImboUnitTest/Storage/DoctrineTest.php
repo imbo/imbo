@@ -31,6 +31,11 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
     private $connection;
 
     /**
+     * @var string
+     */
+    private $user = 'key';
+
+    /**
      * Set up the driver
      */
     public function setUp() {
@@ -48,6 +53,23 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
     public function tearDown() {
         $this->connection = null;
         $this->driver = null;
+    }
+
+    /**
+     * @covers Imbo\Storage\Doctrine::store
+     * @expectedException Imbo\Exception\StorageException
+     * @expectedExceptionCode 500
+     */
+    public function testStoreExceptionOnInsertFailure() {
+        $this->connection->expects($this->once())->method('insert')->will($this->returnValue(0));
+
+        $driverMock = $this->getMockBuilder('Imbo\Storage\Doctrine')
+            ->setConstructorArgs(array([], $this->connection))
+            ->setMethods(array('imageExists'))
+            ->getMock();
+
+        $driverMock->expects($this->once())->method('imageExists')->will($this->returnValue(false));
+        $driverMock->store($this->user, 'image_identifier_not_used', 'image_data_not_used');
     }
 
     /**
