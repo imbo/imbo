@@ -45,6 +45,24 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
     abstract protected function getDriver();
 
     /**
+     * Get the currently instanced, active driver in inherited tests
+     *
+     * @return string
+     */
+    protected function getDriverActive() {
+        return $this->driver;
+    }
+
+    /**
+     * Get the user name in inherited tests
+     *
+     * @return string
+     */
+    protected function getUser() {
+        return $this->user;
+    }
+
+    /**
      * Set up
      */
     public function setUp() {
