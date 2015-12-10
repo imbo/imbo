@@ -53,6 +53,14 @@ class FilesystemTest extends StorageTests {
     }
 
     /**
+     * @expectedException Imbo\Exception\StorageException
+     * @expectedExceptionCode 507
+     */
+    public function testStoringEmptyDataFails() {
+        $this->getDriverActive()->store($this->getUser(), "this_identifier_left_empty", "");
+    }
+
+    /**
      * Recursively delete the test directory
      *
      * @param string $path Path to a file or a directory
