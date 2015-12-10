@@ -90,12 +90,18 @@ class Doctrine implements StorageInterface {
             ]);
         }
 
-        return (boolean) $this->getConnection()->insert($this->getTableName($user, $imageIdentifier), [
+        $inserted = $this->getConnection()->insert($this->getTableName($user, $imageIdentifier), [
             'user'            => $user,
             'imageIdentifier' => $imageIdentifier,
             'data'            => $imageData,
             'updated'         => $now,
         ]);
+
+        if (!$inserted) {
+            throw new StorageException('Unable to persist image data to database.', 500);
+        }
+
+        return true;
     }
 
     /**
