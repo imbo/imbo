@@ -37,6 +37,21 @@ Feature: Imbo provides a keys endpoint
             | json      | application/json | #^\[{"id":".*?","group":"user-stats","users":"\*"}\]$# |
             | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<access>\s*<rule id=".*?">\s*<group>user-stats</group>\s*<users>\s*<user>\*</user>\s*</users>\s*</rule>\s*</access>\s*</imbo>$#ms |
 
+    Scenario Outline: Fetch access control rules with expanded groups
+        Given I use "master-pubkey" and "master-privkey" for public and private keys
+        And I include an access token in the query
+        When I request "/keys/group-based/access.<extension>?expandGroups=1"
+        Then I should get a response with "200 OK"
+        And the "Content-Type" response header is "<content-type>"
+        And the response body matches:
+        """
+        <response>
+        """
+        Examples:
+            | extension | content-type     | response |
+            | json      | application/json | #^\[{"id":".*?","group":"user-stats","users":\["user1"\],"resources":\["user\.get","user\.head"]}]$# |
+            | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<access>\s*<rule id=".*?">\s*<resources>\s*<resource>user\.get</resource>\s*<resource>user\.head</resource>\s*</resources>\s*<group>user-stats</group>\s*<users>\s*<user>user1</user>\s*</users>\s*</rule>\s*</access>\s*</imbo>$#ms |
+
     Scenario: Create a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And the request body contains:

@@ -60,6 +60,16 @@ class AccessRules implements ResourceInterface {
 
         $accessList = $accessControl->getAccessListForPublicKey($publicKey);
 
+        if ($request->query->has('expandGroups')) {
+            foreach ($accessList as &$rule) {
+                if (!isset($rule['group'])) {
+                    continue;
+                }
+
+                $rule['resources'] = $accessControl->getGroup($rule['group']);
+            }
+        }
+
         $model = new AccessRulesModel();
         $model->setData($accessList);
 
