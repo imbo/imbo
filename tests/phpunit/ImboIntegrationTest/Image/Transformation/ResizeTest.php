@@ -37,12 +37,12 @@ class ResizeTest extends TransformationTests {
                 'params'         => ['width' => 100],
                 'transformation' => true,
                 'resizedWidth'   => 100,
-                'resizedHeight'  => 69,
+                'resizedHeight'  => 70,
             ],
             'only height' => [
                 'params'         => ['height' => 100],
                 'transformation' => true,
-                'resizedWidth'   => 143,
+                'resizedWidth'   => 144,
                 'resizedHeight'  => 100,
             ],
             'width and height' => [

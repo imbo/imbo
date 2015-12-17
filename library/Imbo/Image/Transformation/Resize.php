@@ -57,9 +57,9 @@ class Resize extends Transformation implements ListenerInterface {
 
         // Calculate width or height if not both have been specified
         if (!$height) {
-            $height = ($originalHeight / $originalWidth) * $width;
+            $height = ceil(($originalHeight / $originalWidth) * $width);
         } else if (!$width) {
-            $width = ($originalWidth / $originalHeight) * $height;
+            $width = ceil(($originalWidth / $originalHeight) * $height);
         }
 
         try {
