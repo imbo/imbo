@@ -173,7 +173,14 @@ class ImageTransformationCache implements ListenerInterface {
         //
         // "What?! Did you forget to is_dir()-guard it?" - Mats Lindh
         if (is_dir($dir) || @mkdir($dir, 0775, true) || is_dir($dir)) {
-            if (file_put_contents($path. '.tmp', $data)) {
+            $tmpPath = $path. '.tmp';
+
+            // If in the middle of a cache write operation, fall back
+            if (file_exists($tmpPath) || file_exists($path)) {
+                return;
+            }
+
+            if (file_put_contents($tmpPath, $data)) {
                 rename($path. '.tmp', $path);
             }
         }
