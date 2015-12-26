@@ -38,11 +38,18 @@ use Imbo\EventManager\EventInterface,
  */
 class ImageTransformationCache implements ListenerInterface {
     /**
-     * Root path where the temp. images can be stored
+     * Root path where the cached images can be stored
      *
      * @var string
      */
     private $path;
+
+    /**
+     * Whether or not this request hit a cached version
+     *
+     * @var boolean
+     */
+    private $cacheHit = false;
 
     /**
      * Class constructor
@@ -120,6 +127,9 @@ class ImageTransformationCache implements ListenerInterface {
                 // Stop other listeners on this event
                 $event->stopPropagation();
 
+                // Mark this as a cache hit to prevent us from re-writing the result
+                $this->cacheHit = true;
+
                 return;
             } else {
                 // Invalid data in the cache, delete the file
@@ -141,8 +151,8 @@ class ImageTransformationCache implements ListenerInterface {
         $response = $event->getResponse();
         $model = $response->getModel();
 
-        if (!$model instanceof Image) {
-            // Only store images in the cache
+        if (!$model instanceof Image || $this->cacheHit) {
+            // Only store images in the cache, and don't try to rewrite on cache hit
             return;
         }
 

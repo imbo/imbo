@@ -107,14 +107,14 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->request->expects($this->any())->method('getExtension')->will($this->returnValue('png'));
-        $this->requestHeaders->expects($this->once())
+        $this->requestHeaders->expects($this->any())
                              ->method('get')
                              ->with('Accept', '*/*')
                              ->will($this->returnValue(
                                  'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
                              ));
 
-        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(['thumbnail']));
+        $this->query->expects($this->any())->method('get')->with('t')->will($this->returnValue(['thumbnail']));
 
         $this->response->expects($this->once())->method('setModel')->with($imageFromCache)->will($this->returnSelf());
         $this->event->expects($this->once())->method('stopPropagation');
@@ -129,6 +129,8 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->listener->loadFromCache($this->event);
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\ResponseHeaderBag', $this->response->headers);
+
+        return $this->listener;
     }
 
     /**
@@ -211,6 +213,31 @@ class ImageTransformationCacheTest extends ListenerTests {
 
         $this->assertEquals($image, $data['image']);
         $this->assertEquals($this->responseHeaders, $data['headers']);
+    }
+
+    /**
+     * @covers Imbo\EventListener\ImageTransformationCache::storeInCache
+     * @covers Imbo\EventListener\ImageTransformationCache::getCacheDir
+     * @covers Imbo\EventListener\ImageTransformationCache::getCacheKey
+     * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
+     */
+    public function testDoesNotStoreIfCachedVersionAlreadyExists() {
+        // Reusing the same logic as this test
+        $this->testChangesTheImageInstanceOnCacheHit();
+
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->getMock('Imbo\Model\Image')));
+
+        // Overwrite cached file
+        $dir = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6';
+        $file = 'bc6ffe312a5741a5705afe8639c08835';
+        $fullPath = $dir . '/' . $file;
+
+        file_put_contents($fullPath, 'foobar');
+
+        // Since we hit a cached version earlier, we shouldn't overwrite the cached file
+        $this->listener->storeInCache($this->event);
+
+        $this->assertEquals('foobar', file_get_contents($fullPath));
     }
 
     /**
