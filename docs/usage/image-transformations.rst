@@ -632,11 +632,14 @@ This transformation can be used to apply a watermark on top of the original imag
 ``y``
     Number of pixels in the Y-axis the watermark image should be offset from the original position (defined by the ``position`` parameter). Supports negative numbers. Defaults to ``0``
 
+``opacity``
+    Can be an integer between 0 and 100 where 0 is fully transparent, and 100 is fully opaque. Defaults to ``100``
+
 **Examples:**
 
 * ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f``
 * ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f,width=200,x=5``
-* ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f,height=50,x=-5,y=-5,position=bottom-right``
+* ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f,height=50,x=-5,y=-5,position=bottom-right,opacity=50``
 
 If you want to set the default watermark image you will have to do so in the configuration:
 
