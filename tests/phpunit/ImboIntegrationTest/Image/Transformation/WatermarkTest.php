@@ -202,6 +202,15 @@ class WatermarkTest extends TransformationTests {
                     'bottom edge of watermark (outside)' => ['x' => 1, 'y' => 101, 'colors' => [255, 255, 255]],
                 ],
             ],
+            'opacity' => [
+                [
+                    'opacity' => 40
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [153, 153, 153]], // 255*0.6=153
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [255, 255, 255]],
+                ]
+            ]
         ];
     }
 
