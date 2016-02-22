@@ -68,9 +68,6 @@ class Mongo implements DatabaseInterface {
         'options' => ['connect' => true, 'connectTimeoutMS' => 1000],
     ];
 
-
-    private $isConnected = false;
-
     /**
      * Class constructor
      *
@@ -211,6 +208,7 @@ class Mongo implements DatabaseInterface {
             throw new DatabaseException('Image not found', 404);
         }
 
+        // Transform object to array hack.
         $data = json_decode(json_encode($data), true);
 
         return isset($data['metadata']) ? $data['metadata'] : [];
