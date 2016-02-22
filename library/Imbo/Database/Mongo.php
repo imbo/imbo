@@ -143,7 +143,6 @@ class Mongo implements DatabaseInterface {
         try {
             $this->getImageCollection()->insertOne($data);
         } catch (InvalidArgumentException $e) {
-            //var_dump(get_class($e)); die();
             throw new DatabaseException('Unable to save image data', 500, $e);
         }
 
@@ -212,9 +211,7 @@ class Mongo implements DatabaseInterface {
             throw new DatabaseException('Image not found', 404);
         }
 
-        $data = json_decode(json_encode($data), true);;
-
-        //var_dump($data); die();
+        $data = json_decode(json_encode($data), true);
 
         return isset($data['metadata']) ? $data['metadata'] : [];
     }
