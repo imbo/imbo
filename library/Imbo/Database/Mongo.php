@@ -65,7 +65,7 @@ class Mongo implements DatabaseInterface {
 
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
-        'options' => ['connect' => true, 'connectTimeoutMS' => 1000],
+        'options' => ['connectTimeoutMS' => 1000],
     ];
 
     /**
