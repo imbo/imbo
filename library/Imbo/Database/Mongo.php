@@ -65,7 +65,9 @@ class Mongo implements DatabaseInterface {
 
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
-        'options' => ['connectTimeoutMS' => 1000],
+        'options' => [
+            'connectTimeoutMS' => 1000
+        ],
     ];
 
     /**
@@ -151,7 +153,7 @@ class Mongo implements DatabaseInterface {
      */
     public function deleteImage($user, $imageIdentifier) {
         try {
-            $data = $this->getImageCollection()->findOne([
+            $data = $this->getImageCollection()->findOneAndDelete([
                 'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
             ]);
@@ -159,10 +161,6 @@ class Mongo implements DatabaseInterface {
             if ($data === null) {
                 throw new DatabaseException('Image not found', 404);
             }
-
-            $this->getImageCollection()->deleteOne(
-                ['user' => $user, 'imageIdentifier' => $imageIdentifier]
-            );
         } catch (InvalidArgumentException $e) {
             throw new DatabaseException('Unable to delete image data', 500, $e);
         }
