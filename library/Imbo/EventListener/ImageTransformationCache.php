@@ -13,6 +13,7 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface,
     Imbo\Http\Request\Request,
     Imbo\Model\Image,
+    Imbo\Exception\StorageException,
     Imbo\Exception\InvalidArgumentException,
     Symfony\Component\HttpFoundation\ResponseHeaderBag,
     RecursiveDirectoryIterator,
@@ -180,8 +181,17 @@ class ImageTransformationCache implements ListenerInterface {
                 return;
             }
 
+            // Write the transformed image to a temporary location
             if (file_put_contents($tmpPath, $data)) {
-                rename($path. '.tmp', $path);
+                // Move the transformed image to the correct destination
+
+                // We have to silence this in case race-conditions lead to source not existing,
+                // in which case it'll give a warning (we'd use try/catch here in case of PHP7)
+                if (@rename($path. '.tmp', $path) === false && !file_exists($path)) {
+                    throw new StorageException(
+                        'An error occured while moving transformed image to cache'
+                    );
+                }
             }
         }
     }
