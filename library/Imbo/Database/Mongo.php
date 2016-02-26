@@ -30,8 +30,8 @@ use Imbo\Model\Image,
  * - (string) databaseName Name of the database. Defaults to 'imbo'
  * - (string) server The server string to use when connecting to MongoDB. Defaults to
  *                   'mongodb://localhost:27017'
- * - (array) options Options to use when creating the MongoClient instance. Defaults to
- *                   ['connect' => true, 'connectTimeoutMS' => 1000].
+ * - (array) options Options to use when creating the Client instance. Defaults to
+ *                   ['connectTimeoutMS' => 1000].
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
@@ -153,7 +153,7 @@ class Mongo implements DatabaseInterface {
      */
     public function deleteImage($user, $imageIdentifier) {
         try {
-            $data = $this->getImageCollection()->findOneAndDelete([
+            $data = $this->getImageCollection()->findOne([
                 'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
             ]);
@@ -161,6 +161,11 @@ class Mongo implements DatabaseInterface {
             if ($data === null) {
                 throw new DatabaseException('Image not found', 404);
             }
+
+            $this->getImageCollection()->deleteOne([
+                'user' => $user,
+                'imageIdentifier' => $imageIdentifier,
+            ]);
         } catch (InvalidArgumentException $e) {
             throw new DatabaseException('Unable to delete image data', 500, $e);
         }
