@@ -14,7 +14,7 @@ use Imbo\Database\Mongo,
     MongoDB\Client;
 
 /**
- * @covers Imbo\Database\MongoDB
+ * @covers Imbo\Database\Mongo
  * @group integration
  * @group database
  * @group mongodb
@@ -59,7 +59,7 @@ class MongoTest extends DatabaseTests {
     }
 
     /**
-     * @covers Imbo\Database\MongoDB::getStatus
+     * @covers Imbo\Database\Mongo::getStatus
      */
     public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() {
         $db = new Mongo([
