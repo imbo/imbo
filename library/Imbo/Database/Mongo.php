@@ -443,7 +443,7 @@ class Mongo implements DatabaseInterface {
             $data = [];
 
             foreach ($results as $result) {
-                $data[] = $result;
+                $data[] = (array) $result;
             }
 
             if (empty($data)) {
