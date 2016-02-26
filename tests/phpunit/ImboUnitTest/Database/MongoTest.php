@@ -52,7 +52,7 @@ class MongoTest extends \PHPUnit_Framework_TestCase {
      * Set up the mongo and collection mocks and the driver that we want to test
      */
     public function setUp() {
-        if (!class_exists('MongoDB\Client')) {
+        if (!class_exists('MongoDB\Driver\Manager')) {
             $this->markTestSkipped('pecl/mongodb >= 1.1.2 is required to run this test');
         }
 

@@ -36,7 +36,7 @@ class MongoTest extends DatabaseTests {
      * Make sure we have the mongo extension available and drop the test database just in case
      */
     public function setUp() {
-        if (!class_exists('MongoDB\Client')) {
+        if (!class_exists('MongoDB\Driver\Manager')) {
             $this->markTestSkipped('pecl/mongodb >= 1.1.2 is required to run this test');
         }
 
@@ -50,7 +50,7 @@ class MongoTest extends DatabaseTests {
      * Drop the test database after each test
      */
     public function tearDown() {
-        if (class_exists('MongoDB\Client')) {
+        if (class_exists('MongoDB\Driver\Manager')) {
             $client = new Client();
             $client->selectDatabase($this->databaseName)->drop();
         }
