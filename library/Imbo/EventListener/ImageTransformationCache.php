@@ -13,6 +13,7 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface,
     Imbo\Http\Request\Request,
     Imbo\Model\Image,
+    Imbo\Exception\StorageException,
     Imbo\Exception\InvalidArgumentException,
     Symfony\Component\HttpFoundation\ResponseHeaderBag,
     RecursiveDirectoryIterator,
@@ -38,11 +39,18 @@ use Imbo\EventManager\EventInterface,
  */
 class ImageTransformationCache implements ListenerInterface {
     /**
-     * Root path where the temp. images can be stored
+     * Root path where the cached images can be stored
      *
      * @var string
      */
     private $path;
+
+    /**
+     * Whether or not this request hit a cached version
+     *
+     * @var boolean
+     */
+    private $cacheHit = false;
 
     /**
      * Class constructor
@@ -120,6 +128,9 @@ class ImageTransformationCache implements ListenerInterface {
                 // Stop other listeners on this event
                 $event->stopPropagation();
 
+                // Mark this as a cache hit to prevent us from re-writing the result
+                $this->cacheHit = true;
+
                 return;
             } else {
                 // Invalid data in the cache, delete the file
@@ -141,8 +152,8 @@ class ImageTransformationCache implements ListenerInterface {
         $response = $event->getResponse();
         $model = $response->getModel();
 
-        if (!$model instanceof Image) {
-            // Only store images in the cache
+        if (!$model instanceof Image || $this->cacheHit) {
+            // Only store images in the cache, and don't try to rewrite on cache hit
             return;
         }
 
@@ -163,8 +174,24 @@ class ImageTransformationCache implements ListenerInterface {
         //
         // "What?! Did you forget to is_dir()-guard it?" - Mats Lindh
         if (is_dir($dir) || @mkdir($dir, 0775, true) || is_dir($dir)) {
-            if (file_put_contents($path. '.tmp', $data)) {
-                rename($path. '.tmp', $path);
+            $tmpPath = $path. '.tmp';
+
+            // If in the middle of a cache write operation, fall back
+            if (file_exists($tmpPath) || file_exists($path)) {
+                return;
+            }
+
+            // Write the transformed image to a temporary location
+            if (file_put_contents($tmpPath, $data)) {
+                // Move the transformed image to the correct destination
+
+                // We have to silence this in case race-conditions lead to source not existing,
+                // in which case it'll give a warning (we'd use try/catch here in case of PHP7)
+                if (@rename($path. '.tmp', $path) === false && !file_exists($path)) {
+                    throw new StorageException(
+                        'An error occured while moving transformed image to cache'
+                    );
+                }
             }
         }
     }
