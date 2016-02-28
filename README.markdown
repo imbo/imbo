@@ -7,7 +7,7 @@ Imbo is an image "server" that can be used to add/get/delete images using a REST
 End-user docs can be found [here](http://docs.imbo-project.org/en/latest/).
 
 ## License
-Copyright (c) 2011-2015, Christer Edvartsen <cogo@starzinger.net>
+Copyright (c) 2011-2016, Christer Edvartsen <cogo@starzinger.net>
 
 Licensed under the MIT License
 

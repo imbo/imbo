@@ -3,8 +3,13 @@ Changelog for Imbo
 
 Imbo-2.0.0
 ----------
-__yyyy-mm-dd__
+__2016-02-28__
 
+* #430: Prevent race conditions in image transformation cache (Espen Hovlandsdal)
+* #429: Added opacity to watermark image (Sindre Gulseth)
+* #427: When resizing with one param round up the other calculated value (Sindre Gulseth)
+* #423: Make storage drivers throw exceptions as expected in StorageOperations (Mats Lindh)
+* #410: Validate incoming image metadata (Kristoffer Brabrand)
 * #402: Fix Strip-transformation not doing anything on newer Imagick versions (Espen Hovlandsdal)
 * #402: Improve Contrast-transformation predictability (Espen Hovlandsdal)
 * #400: New image transformation: Blur (Kristoffer Brabrand)
