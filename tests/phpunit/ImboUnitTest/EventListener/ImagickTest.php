@@ -100,10 +100,10 @@ class ImagickTest extends ListenerTests {
      * @return array[]
      */
     public function hasImageBeenTransformed() {
-        return array(
-            'has been transformed' => array(true),
-            'has not been transformed' => array(false),
-        );
+        return [
+            'has been transformed' => [true],
+            'has not been transformed' => [false],
+        ];
     }
 
     /**

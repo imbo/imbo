@@ -73,8 +73,37 @@ class Request extends SymfonyRequest {
         return (
             $this->headers->get('X-Imbo-PublicKey', null) ?:
             $this->query->get('publicKey', null) ?:
-            ($this->route ? $this->route->get('publicKey') : null)
+            ($this->route ? $this->route->get('user') : null)
         );
+    }
+
+    /**
+     * Get the user found in the request
+     *
+     * @return string
+     */
+    public function getUser() {
+        return $this->route ? $this->route->get('user') : null;
+    }
+
+    /**
+     * Get users specified in the request
+     *
+     * @return array Users specified in the request
+     */
+    public function getUsers() {
+        $routeUser = $this->getUser();
+        $queryUsers = $this->query->get('users', []);
+
+        if (!$routeUser && !$queryUsers) {
+            return [];
+        } elseif (!$queryUsers) {
+            return [$routeUser];
+        } elseif (!$routeUser) {
+            return $queryUsers;
+        }
+
+        return array_merge([$routeUser], $queryUsers);
     }
 
     /**
@@ -84,9 +113,9 @@ class Request extends SymfonyRequest {
      */
     public function getTransformations() {
         if ($this->transformations === null) {
-            $this->transformations = array();
+            $this->transformations = [];
 
-            $transformations = $this->query->get('t', array());
+            $transformations = $this->query->get('t', []);
 
             if (!is_array($transformations)) {
                 throw new InvalidArgumentException('Transformations must be specifed as an array', 400);
@@ -109,27 +138,22 @@ class Request extends SymfonyRequest {
                 }
 
                 // Initialize params for the transformation
-                $params = array();
+                $params = [];
 
-                // See if we have more than one parameter
-                if (strpos($urlParams, ',') !== false) {
-                    $urlParams = explode(',', $urlParams);
-                } else {
-                    $urlParams = array($urlParams);
+                // Loop through the parameter string and assign params to an array
+                $offset = 0;
+                $pattern = '#(\w+)=(?:(.+?),\w+=|(.+?$))#';
+                while (preg_match($pattern, $urlParams, $matches, PREG_OFFSET_CAPTURE, $offset)) {
+                    $offset = $matches[2][1];
+                    $paramName = $matches[1][0];
+                    $paramValue = isset($matches[3]) ? $matches[3][0] : $matches[2][0];
+                    $params[$paramName] = $paramValue;
                 }
 
-                foreach ($urlParams as $param) {
-                    $pos = strpos($param, '=');
-
-                    if ($pos !== false) {
-                        $params[substr($param, 0, $pos)] = substr($param, $pos + 1);
-                    }
-                }
-
-                $this->transformations[] = array(
+                $this->transformations[] = [
                     'name'   => $name,
                     'params' => $params,
-                );
+                ];
             }
         }
 

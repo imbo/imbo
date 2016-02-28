@@ -10,6 +10,11 @@ Site: https://github.com/rexxars
 Twitter: @rexxars
 Location: Oslo, Norway
 
+Developer: Kristoffer Brabrand
+Site: https://github.com/kbrabrand
+Twitter: @kbrabrand
+Location: Oslo, Norway
+
 Rubberduck: André Roaldseth
 Site: https://github.com/androa
 Twitter: @androa

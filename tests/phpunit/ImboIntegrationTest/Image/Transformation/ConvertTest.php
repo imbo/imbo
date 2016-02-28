@@ -35,7 +35,7 @@ class ConvertTest extends TransformationTests {
 
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(array('type' => 'gif')));
+        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(['type' => 'gif']));
 
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));

@@ -51,4 +51,21 @@ abstract class Transformation {
 
         return $color;
     }
+
+    /**
+     * Get the quantum range of an image
+     *
+     * @return int
+     */
+    protected function getQuantumRange() {
+        // Newer versions of Imagick expose getQuantumRange as a static method,
+        // and won't allow phpunit to mock it even when called on an instance
+        if (is_callable([$this->imagick, 'getQuantumRange'])) {
+            $quantumRange = $this->imagick->getQuantumRange();
+        } else {
+            $quantumRange = \Imagick::getQuantumRange();
+        }
+
+        return $quantumRange['quantumRangeLong'];
+    }
 }

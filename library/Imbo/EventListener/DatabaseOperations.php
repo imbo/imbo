@@ -32,7 +32,7 @@ class DatabaseOperations implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'db.image.insert'    => 'insertImage',
             'db.image.delete'    => 'deleteImage',
             'db.image.load'      => 'loadImage',
@@ -42,7 +42,7 @@ class DatabaseOperations implements ListenerInterface {
             'db.metadata.load'   => 'loadMetadata',
             'db.user.load'       => 'loadUser',
             'db.stats.load'      => 'loadStats',
-        );
+        ];
     }
 
     /**
@@ -79,8 +79,8 @@ class DatabaseOperations implements ListenerInterface {
         $request = $event->getRequest();
 
         $event->getDatabase()->insertImage(
-            $request->getPublicKey(),
-            $request->getImage()->getChecksum(),
+            $request->getUser(),
+            $request->getImage()->getImageIdentifier(),
             $request->getImage()
         );
     }
@@ -94,7 +94,7 @@ class DatabaseOperations implements ListenerInterface {
         $request = $event->getRequest();
 
         $event->getDatabase()->deleteImage(
-            $request->getPublicKey(),
+            $request->getUser(),
             $request->getImageIdentifier()
         );
     }
@@ -109,7 +109,7 @@ class DatabaseOperations implements ListenerInterface {
         $response = $event->getResponse();
 
         $event->getDatabase()->load(
-            $request->getPublicKey(),
+            $request->getUser(),
             $request->getImageIdentifier(),
             $response->getModel()
         );
@@ -124,7 +124,7 @@ class DatabaseOperations implements ListenerInterface {
         $request = $event->getRequest();
 
         $event->getDatabase()->deleteMetadata(
-            $request->getPublicKey(),
+            $request->getUser(),
             $request->getImageIdentifier()
         );
     }
@@ -138,7 +138,7 @@ class DatabaseOperations implements ListenerInterface {
         $request = $event->getRequest();
 
         $event->getDatabase()->updateMetadata(
-            $request->getPublicKey(),
+            $request->getUser(),
             $request->getImageIdentifier(),
             $event->getArgument('metadata')
         );
@@ -152,15 +152,15 @@ class DatabaseOperations implements ListenerInterface {
     public function loadMetadata(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
         $database = $event->getDatabase();
 
         $model = new Model\Metadata();
-        $model->setData($database->getMetadata($publicKey, $imageIdentifier));
+        $model->setData($database->getMetadata($user, $imageIdentifier));
 
         $response->setModel($model)
-                 ->setLastModified($database->getLastModified($publicKey, $imageIdentifier));
+                 ->setLastModified($database->getLastModified([$user], $imageIdentifier));
     }
 
     /**
@@ -226,7 +226,16 @@ class DatabaseOperations implements ListenerInterface {
             }
         }
 
-        $publicKey = $event->getRequest()->getPublicKey();
+        if ($event->hasArgument('users')) {
+            $users = $event->getArgument('users');
+        } else {
+            $users = $event->getRequest()->getUsers();
+
+            if (!is_array($users)) {
+                $users = [];
+            }
+        }
+
         $response = $event->getResponse();
         $database = $event->getDatabase();
 
@@ -235,15 +244,15 @@ class DatabaseOperations implements ListenerInterface {
         $model->setLimit($query->limit())
               ->setPage($query->page());
 
-        $images = $database->getImages($publicKey, $query, $model);
-        $modelImages = array();
+        $images = $database->getImages($users, $query, $model);
+        $modelImages = [];
 
         foreach ($images as $image) {
             $entry = new Model\Image();
             $entry->setFilesize($image['size'])
                   ->setWidth($image['width'])
                   ->setHeight($image['height'])
-                  ->setPublicKey($publicKey)
+                  ->setUser($image['user'])
                   ->setImageIdentifier($image['imageIdentifier'])
                   ->setChecksum($image['checksum'])
                   ->setOriginalChecksum(isset($image['originalChecksum']) ? $image['originalChecksum'] : null)
@@ -270,7 +279,7 @@ class DatabaseOperations implements ListenerInterface {
             }
         }
 
-        $lastModified = $database->getLastModified($publicKey);
+        $lastModified = $database->getLastModified($users);
 
         $response->setModel($model)
                  ->setLastModified($lastModified);
@@ -284,14 +293,14 @@ class DatabaseOperations implements ListenerInterface {
     public function loadUser(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $database = $event->getDatabase();
 
-        $numImages = $database->getNumImages($publicKey);
-        $lastModified = $database->getLastModified($publicKey);
+        $numImages = $database->getNumImages($user);
+        $lastModified = $database->getLastModified([$user]);
 
         $userModel = new Model\User();
-        $userModel->setPublicKey($publicKey)
+        $userModel->setUserId($user)
                   ->setNumImages($numImages)
                   ->setLastModified($lastModified);
 
@@ -307,19 +316,11 @@ class DatabaseOperations implements ListenerInterface {
     public function loadStats(EventInterface $event) {
         $response = $event->getResponse();
         $database = $event->getDatabase();
-        $userLookup = $event->getUserLookup();
-        $publicKeys = $userLookup->getPublicKeys();
-        $users = array();
-
-        foreach ($publicKeys as $key) {
-            $users[$key] = array(
-                'numImages' => $database->getNumImages($key),
-                'numBytes' => $database->getNumBytes($key),
-            );
-        }
 
         $statsModel = new Model\Stats();
-        $statsModel->setUsers($users);
+        $statsModel->setNumUsers($database->getNumUsers());
+        $statsModel->setNumBytes($database->getNumBytes());
+        $statsModel->setNumImages($database->getNumImages());
 
         $response->setModel($statsModel);
     }

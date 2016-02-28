@@ -43,13 +43,13 @@ class ResponseFormatter implements ListenerInterface {
      *
      * @var array
      */
-    private $extensionsToMimeType = array(
+    private $extensionsToMimeType = [
         'json' => 'application/json',
         'xml'  => 'application/xml',
         'gif'  => 'image/gif',
         'jpg'  => 'image/jpeg',
         'png'  => 'image/png',
-    );
+    ];
 
     /**
      * Supported content types and the associated formatter class name or instance, or in the
@@ -57,23 +57,23 @@ class ResponseFormatter implements ListenerInterface {
      *
      * @var array
      */
-    private $supportedTypes = array(
+    private $supportedTypes = [
         'application/json' => 'json',
         'application/xml'  => 'xml',
         'image/gif'        => 'gif',
         'image/png'        => 'png',
         'image/jpeg'       => 'jpg',
-    );
+    ];
 
     /**
      * The default types that models support, in a prioritized order
      *
      * @var array
      */
-    private $defaultModelTypes = array(
+    private $defaultModelTypes = [
         'application/json',
         'application/xml',
-    );
+    ];
 
     /**
      * The types the different models can be expressed as, if they don't support the default ones,
@@ -87,13 +87,13 @@ class ResponseFormatter implements ListenerInterface {
      *
      * @var array
      */
-    private $modelTypes = array(
-        'image' => array(
+    private $modelTypes = [
+        'image' => [
             'image/jpeg',
             'image/png',
             'image/gif',
-        ),
-    );
+        ],
+    ];
 
     /**
      * The formatter to use
@@ -116,10 +116,10 @@ class ResponseFormatter implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
-            'response.send' => array('format' => 20),
+        return [
+            'response.send' => ['format' => 20],
             'response.negotiate' => 'negotiate',
-        );
+        ];
     }
 
     /**
@@ -180,7 +180,7 @@ class ResponseFormatter implements ListenerInterface {
             $response->setVary('Accept', false);
 
             // No extension have been provided
-            $acceptableTypes = array();
+            $acceptableTypes = [];
 
             foreach (AcceptHeader::fromString($request->headers->get('Accept', '*/*'))->all() as $item) {
                 $acceptableTypes[$item->getValue()] = $item->getQuality();
@@ -259,16 +259,16 @@ class ResponseFormatter implements ListenerInterface {
             $eventManager = $event->getManager();
 
             if ($this->extensionsToMimeType[$this->formatter] !== $model->getMimeType()) {
-                $eventManager->trigger('image.transformation.convert', array(
+                $eventManager->trigger('image.transformation.convert', [
                     'image' => $model,
-                    'params' => array(
+                    'params' => [
                         'type' => $this->formatter,
-                    ),
-                ));
+                    ],
+                ]);
             }
 
             // Finished transforming the image
-            $eventManager->trigger('image.transformed', array('image' => $model));
+            $eventManager->trigger('image.transformed', ['image' => $model]);
 
             $formattedData = $model->getBlob();
             $contentType = $model->getMimeType();
@@ -281,7 +281,7 @@ class ResponseFormatter implements ListenerInterface {
         }
 
         if ($contentType === 'application/json') {
-            foreach (array('callback', 'jsonp', 'json') as $validParam) {
+            foreach (['callback', 'jsonp', 'json'] as $validParam) {
                 if ($request->query->has($validParam)) {
                     $formattedData = sprintf("%s(%s)", $request->query->get($validParam), $formattedData);
                     break;
@@ -289,10 +289,10 @@ class ResponseFormatter implements ListenerInterface {
             }
         }
 
-        $response->headers->add(array(
+        $response->headers->add([
             'Content-Type' => $contentType,
             'Content-Length' => strlen($formattedData),
-        ));
+        ]);
 
         if ($request->getMethod() !== 'HEAD') {
             $response->setContent($formattedData);

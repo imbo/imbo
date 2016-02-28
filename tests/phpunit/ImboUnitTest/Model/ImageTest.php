@@ -44,10 +44,10 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanSetAndGetMetadata() {
         $this->assertNull($this->image->getMetadata());
-        $data = array(
+        $data = [
             'foo' => 'bar',
             'bar' => 'foo',
-        );
+        ];
         $this->assertSame($this->image, $this->image->setMetadata($data));
         $this->assertSame($data, $this->image->getMetadata());
     }
@@ -139,13 +139,13 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Image::setPublicKey
-     * @covers Imbo\Model\Image::getPublicKey
+     * @covers Imbo\Model\Image::setUser
+     * @covers Imbo\Model\Image::getUser
      */
-    public function testCanSetAndGetThePublicKey() {
-        $this->assertNull($this->image->getPublicKey());
-        $this->assertSame($this->image, $this->image->setPublicKey('christer'));
-        $this->assertSame('christer', $this->image->getPublicKey());
+    public function testCanSetAndGetTheUser() {
+        $this->assertNull($this->image->getUser());
+        $this->assertSame($this->image, $this->image->setUser('christer'));
+        $this->assertSame('christer', $this->image->getUser());
     }
 
     /**
@@ -164,15 +164,15 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @return array
      */
     public function getSupportedMimeTypes() {
-        return array(
-            array('image/png', true),
-            array('image/x-png', true),
-            array('image/jpeg', true),
-            array('image/x-jpeg', true),
-            array('image/gif', true),
-            array('image/x-gif', true),
-            array('image/jpg', false),
-        );
+        return [
+            ['image/png', true],
+            ['image/x-png', true],
+            ['image/jpeg', true],
+            ['image/x-jpeg', true],
+            ['image/gif', true],
+            ['image/x-gif', true],
+            ['image/jpg', false],
+        ];
     }
 
     /**
@@ -189,15 +189,15 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @return array
      */
     public function getFileExtensions() {
-        return array(
-            array('image/png', 'png'),
-            array('image/jpeg', 'jpg'),
-            array('image/gif', 'gif'),
-            array('image/x-png', 'png'),
-            array('image/x-jpeg', 'jpg'),
-            array('image/x-gif', 'gif'),
-            array('image/jpg', false),
-        );
+        return [
+            ['image/png', 'png'],
+            ['image/jpeg', 'jpg'],
+            ['image/gif', 'gif'],
+            ['image/x-png', 'png'],
+            ['image/x-jpeg', 'jpg'],
+            ['image/x-gif', 'gif'],
+            ['image/jpg', false],
+        ];
     }
 
     /**
@@ -231,14 +231,14 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getMimeTypes() {
-        return array(
-            array('image/jpeg', 'image/jpeg'),
-            array('image/png', 'image/png'),
-            array('image/gif', 'image/gif'),
-            array('image/x-jpeg', 'image/jpeg'),
-            array('image/x-png', 'image/png'),
-            array('image/x-gif', 'image/gif'),
-        );
+        return [
+            ['image/jpeg', 'image/jpeg'],
+            ['image/png', 'image/png'],
+            ['image/gif', 'image/gif'],
+            ['image/x-jpeg', 'image/jpeg'],
+            ['image/x-png', 'image/png'],
+            ['image/x-gif', 'image/gif'],
+        ];
     }
 
     /**

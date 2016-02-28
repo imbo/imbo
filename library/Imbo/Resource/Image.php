@@ -65,12 +65,12 @@ class Image implements ResourceInterface {
         $response = $event->getResponse();
         $eventManager = $event->getManager();
 
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
 
         $image = new Model\Image();
         $image->setImageIdentifier($imageIdentifier)
-              ->setPublicKey($publicKey);
+              ->setUser($user);
 
         $response->setModel($image);
 

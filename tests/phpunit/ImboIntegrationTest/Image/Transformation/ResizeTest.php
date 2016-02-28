@@ -32,30 +32,30 @@ class ResizeTest extends TransformationTests {
      * @return array[]
      */
     public function getResizeParams() {
-        return array(
-            'only width' => array(
-                'params'         => array('width' => 100),
+        return [
+            'only width' => [
+                'params'         => ['width' => 100],
                 'transformation' => true,
                 'resizedWidth'   => 100,
-                'resizedHeight'  => 69,
-            ),
-            'only height' => array(
-                'params'         => array('height' => 100),
+                'resizedHeight'  => 70,
+            ],
+            'only height' => [
+                'params'         => ['height' => 100],
                 'transformation' => true,
-                'resizedWidth'   => 143,
+                'resizedWidth'   => 144,
                 'resizedHeight'  => 100,
-            ),
-            'width and height' => array(
-                'params'         => array('width' => 100, 'height' => 200),
+            ],
+            'width and height' => [
+                'params'         => ['width' => 100, 'height' => 200],
                 'transformation' => true,
                 'resizedWidth'   => 100,
                 'resizedHeight'  => 200,
-            ),
-            'params match image size' => array(
-                'params'         => array('width' => 665, 'height' => 463),
+            ],
+            'params match image size' => [
+                'params'         => ['width' => 665, 'height' => 463],
                 'transformation' => false
-            ),
-        );
+            ],
+        ];
     }
 
     /**

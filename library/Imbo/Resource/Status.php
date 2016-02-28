@@ -29,17 +29,17 @@ class Status implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD');
+        return ['GET', 'HEAD'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'status.get' => 'get',
             'status.head' => 'get',
-        );
+        ];
     }
 
     /**

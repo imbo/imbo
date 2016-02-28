@@ -36,3 +36,5 @@ Imagick
 Behat
 Lighttpd
 ETag
+Uuid
+gaussian

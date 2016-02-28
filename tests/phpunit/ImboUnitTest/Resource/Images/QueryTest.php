@@ -90,8 +90,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Resource\Images\Query::imageIdentifiers
      */
     public function testImageIdentifiers() {
-        $value = array('id1', 'id2');
-        $this->assertSame(array(), $this->query->imageIdentifiers());
+        $value = ['id1', 'id2'];
+        $this->assertSame([], $this->query->imageIdentifiers());
         $this->assertSame($this->query, $this->query->imageIdentifiers($value));
         $this->assertSame($value, $this->query->imageIdentifiers());
     }
@@ -100,8 +100,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Resource\Images\Query::checksums
      */
     public function testChecksums() {
-        $value = array('sum1', 'sum2');
-        $this->assertSame(array(), $this->query->checksums());
+        $value = ['sum1', 'sum2'];
+        $this->assertSame([], $this->query->checksums());
         $this->assertSame($this->query, $this->query->checksums($value));
         $this->assertSame($value, $this->query->checksums());
     }
@@ -110,8 +110,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Resource\Images\Query::originalChecksums
      */
     public function testOriginalChecksums() {
-        $value = array('sum1', 'sum2');
-        $this->assertSame(array(), $this->query->originalChecksums());
+        $value = ['sum1', 'sum2'];
+        $this->assertSame([], $this->query->originalChecksums());
         $this->assertSame($this->query, $this->query->originalChecksums($value));
         $this->assertSame($value, $this->query->originalChecksums());
     }
@@ -122,43 +122,43 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getSortData() {
-        return array(
-            'single field without sort' => array(
-                array('field1'),
-                array(
-                    array(
+        return [
+            'single field without sort' => [
+                ['field1'],
+                [
+                    [
                         'field' => 'field1',
                         'sort' => 'asc',
-                    ),
-                ),
-            ),
-            'single field with sort' => array(
-                array('field1:desc'),
-                array(
-                    array(
+                    ],
+                ],
+            ],
+            'single field with sort' => [
+                ['field1:desc'],
+                [
+                    [
                         'field' => 'field1',
                         'sort' => 'desc',
-                    ),
-                ),
-            ),
-            'multiple fields' => array(
-                array('field1', 'field2:desc', 'field3:asc'),
-                array(
-                    array(
+                    ],
+                ],
+            ],
+            'multiple fields' => [
+                ['field1', 'field2:desc', 'field3:asc'],
+                [
+                    [
                         'field' => 'field1',
                         'sort' => 'asc',
-                    ),
-                    array(
+                    ],
+                    [
                         'field' => 'field2',
                         'sort' => 'desc',
-                    ),
-                    array(
+                    ],
+                    [
                         'field' => 'field3',
                         'sort' => 'asc',
-                    ),
-                ),
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -166,7 +166,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Resource\Images\Query::sort
      */
     public function testSort(array $value, $formatted) {
-        $this->assertSame(array(), $this->query->sort());
+        $this->assertSame([], $this->query->sort());
         $this->assertSame($this->query, $this->query->sort($value));
         $this->assertSame($formatted, $this->query->sort());
     }
@@ -178,7 +178,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 400
      */
     public function testSortThrowsExceptionOnInvalidSortValues() {
-        $this->query->sort(array('field:foo'));
+        $this->query->sort(['field:foo']);
     }
 
     /**
@@ -187,6 +187,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 400
      */
     public function testSortThrowsExceptionWhenTheStortStringIsBadlyFormatted() {
-        $this->query->sort(array('field:asc', ''));
+        $this->query->sort(['field:asc', '']);
     }
 }

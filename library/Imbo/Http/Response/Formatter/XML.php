@@ -77,7 +77,7 @@ STATUS;
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   <user>
-    <publicKey>{$model->getPublicKey()}</publicKey>
+    <user>{$model->getUserId()}</user>
     <numImages>{$model->getNumImages()}</numImages>
     <lastModified>{$this->dateFormatter->formatDate($model->getLastModified())}</lastModified>
   </user>
@@ -98,8 +98,8 @@ USER;
         foreach ($model->getImages() as $image) {
             $images .= '<image>';
 
-            if (empty($fields) || isset($fields['publicKey'])) {
-                $images .= '<publicKey>' . $image->getPublicKey() . '</publicKey>';
+            if (empty($fields) || isset($fields['user'])) {
+                $images .= '<user>' . $image->getUser() . '</user>';
             }
 
             if (empty($fields) || isset($fields['imageIdentifier'])) {
@@ -145,13 +145,7 @@ USER;
             $metadata = $image->getMetadata();
 
             if (is_array($metadata) && (empty($fields) || isset($fields['metadata']))) {
-                $images .= '<metadata>';
-
-                foreach ($metadata as $key => $value) {
-                    $images .= '<tag key="' . $key . '">' . $value . '</tag>';
-                }
-
-                $images .= '</metadata>';
+                $images .= '<metadata>' . $this->formatMetadata($metadata) . '</metadata>';
             }
 
             $images .= '</image>';
@@ -174,12 +168,8 @@ IMAGES;
     /**
      * {@inheritdoc}
      */
-    public function formatMetadata(Model\Metadata $model) {
-        $metadata = '';
-
-        foreach ($model->getData() as $key => $value) {
-            $metadata .= '<tag key="' . $key . '">' . $value . '</tag>';
-        }
+    public function formatMetadataModel(Model\Metadata $model) {
+        $metadata = $this->formatMetadata($model->getData());
 
         return <<<METADATA
 <?xml version="1.0" encoding="UTF-8"?>
@@ -213,7 +203,7 @@ DATA;
         $list = $model->getList();
 
         foreach ($list as $element) {
-            $entries .= '<' . $entry . '>' . $element . '</' . $entry . '>';
+            $entries .= '<' . $entry . '>' . $this->formatValue($element) . '</' . $entry . '>';
         }
 
         $data = '<' . $container . '>' . $entries . '</' . $container . '>';
@@ -227,32 +217,145 @@ DATA;
     /**
      * {@inheritdoc}
      */
-    public function formatStats(Model\Stats $model) {
-        $users = '';
-        $numUsers = 0;
+    public function formatGroups(Model\Groups $model) {
+        $data = $model->getGroups();
 
-        foreach ($model->getUsers() as $user => $stats) {
-            $users .= '<user publicKey="' . $user . '">' . $this->formatArray($stats) . '</user>';
-            $numUsers++;
+        $entries = '';
+        foreach ($data as $group) {
+            $resources = array_map(array($this, 'formatValue'), $group['resources']);
+
+            $entries .= '<group>';
+            $entries .= '  <name>' . $this->formatValue($group['name']) . '</name>';
+            $entries .= '  <resources>';
+            $entries .= '    <resource>' . implode($resources, '</resource><resource>') . '</resource>';
+            $entries .= '  </resources>';
+            $entries .= '</group>';
         }
 
-        $total = $this->formatArray(array(
+        return <<<GROUPS
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <search>
+    <hits>{$model->getHits()}</hits>
+    <page>{$model->getPage()}</page>
+    <limit>{$model->getLimit()}</limit>
+    <count>{$model->getCount()}</count>
+  </search>
+  <groups>{$entries}</groups>
+</imbo>
+GROUPS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatGroup(Model\Group $model) {
+        $data = $model->getData();
+
+        $entries = '';
+        foreach ($data['resources'] as $resource) {
+            $entries .= '<resource>' . $this->formatValue($resource) . '</resource>';
+        }
+
+        return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <resources>{$entries}</resources>
+</imbo>
+DATA;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatStats(Model\Stats $model) {
+        $total = $this->formatArray([
             'numImages' => $model->getNumImages(),
+            'numUsers' => $model->getNumUsers(),
             'numBytes' => $model->getNumBytes(),
-            'numUsers' => $numUsers,
-        ));
-        $custom = $this->formatArray($model->getCustomStats() ?: array());
+        ]);
+        $custom = $this->formatArray($model->getCustomStats() ?: []);
 
         return <<<STATUS
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   <stats>
-    <users>{$users}</users>
-    <total>{$total}</total>
+    {$total}
     <custom>{$custom}</custom>
   </stats>
 </imbo>
 STATUS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatAccessRule(Model\AccessRule $model) {
+        $rule = $this->formatAccessRuleArray($model->getData());
+
+                return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  {$rule}
+</imbo>
+DATA;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatAccessRules(Model\AccessRules $model) {
+        $data = $model->getData();
+
+        $rules = '';
+        foreach ($data as $rule) {
+            $rules .= $this->formatAccessRuleArray($rule);
+        }
+
+        return <<<DATA
+<?xml version="1.0" encoding="UTF-8"?>
+<imbo>
+  <access>{$rules}</access>
+</imbo>
+DATA;
+    }
+
+    /**
+     * Format a value, and CDATA wrap it if it contains special characters
+     *
+     * @param string $value
+     * @return string
+     */
+    private function formatValue($value) {
+        if (strpbrk($value, '<>&"\'') !== false) {
+            return '<![CDATA[' . $value . ']]>';
+        }
+
+        return $value;
+    }
+
+    /**
+     * Format dataset containing metadata
+     *
+     * @param array $data
+     * @return string
+     */
+    private function formatMetadata(array $data) {
+        $metadata = '';
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $metadata .= '<tag key="' . $key . '">';
+                $metadata .= $this->formatArray($value);
+                $metadata .= '</tag>';
+
+                continue;
+            }
+
+            $metadata .= '<tag key="' . $key . '">' . $this->formatValue($value) . '</tag>';
+        }
+
+        return $metadata;
     }
 
     /**
@@ -268,7 +371,15 @@ STATUS;
             $xml .= '<list>';
 
             foreach ($data as $value) {
-                $xml .= '<value>' . $value . '</value>';
+                $xml .= '<value>';
+
+                if (is_array($value)) {
+                    $xml .= $this->formatArray($value);
+                } else {
+                    $xml .= $this->formatValue($value);
+                }
+
+                $xml .= '</value>';
             }
 
             $xml .= '</list>';
@@ -279,7 +390,7 @@ STATUS;
                 if (is_array($value)) {
                     $xml .= $this->formatArray($value);
                 } else {
-                    $xml .= $value;
+                    $xml .= $this->formatValue($value);
                 }
 
                 $xml .= '</' . $key . '>';
@@ -287,5 +398,41 @@ STATUS;
         }
 
         return $xml;
+    }
+
+    /**
+     * Format access rule data array
+     *
+     * @param array $accessRule
+     * @return string
+     */
+    private function formatAccessRuleArray(array $accessRule) {
+        $rule = '<rule id="' . $accessRule['id'] . '">';
+
+        if (isset($accessRule['resources']) && $accessRule['resources']) {
+            $rule .= '<resources>';
+            foreach ($accessRule['resources'] as $resource) {
+                $rule .= '<resource>' . $this->formatValue($resource) . '</resource>';
+            }
+            $rule .= '</resources>';
+        }
+
+        if (isset($accessRule['group'])) {
+            $rule .= '<group>' . $this->formatValue($accessRule['group']) . '</group>';
+        }
+
+        if (isset($accessRule['users']) && $accessRule['users']) {
+            $users = (array) $accessRule['users'];
+
+            $rule .= '<users>';
+            foreach ($users as $user) {
+                $rule .= '<user>' . $this->formatValue($user) . '</user>';
+            }
+            $rule .= '</users>';
+        }
+
+        $rule .= '</rule>';
+
+        return $rule;
     }
 }

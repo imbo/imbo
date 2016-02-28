@@ -73,9 +73,9 @@ class Watermark extends Transformation implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.transformation.watermark' => 'transform',
-        );
+        ];
     }
 
     /**
@@ -93,6 +93,7 @@ class Watermark extends Transformation implements ListenerInterface {
         $position = !empty($params['position']) ? $params['position'] : $this->position;
         $x = !empty($params['x']) ? (int) $params['x'] : $this->x;
         $y = !empty($params['y']) ? (int) $params['y'] : $this->y;
+        $opacity = (!empty($params['opacity']) ? (int) $params['opacity'] : 100)/100;
 
         if (empty($imageIdentifier)) {
             throw new TransformationException(
@@ -104,13 +105,14 @@ class Watermark extends Transformation implements ListenerInterface {
         // Try to load watermark image from storage
         try {
             $watermarkData = $event->getStorage()->getImage(
-                $event->getRequest()->getPublicKey(),
+                $event->getRequest()->getUser(),
                 $imageIdentifier
             );
 
             $watermark = new Imagick();
             $watermark->readImageBlob($watermarkData);
             $watermarkSize = $watermark->getImageGeometry();
+            $watermark->setImageOpacity($opacity);
         } catch (StorageException $e) {
             if ($e->getCode() == 404) {
                 throw new TransformationException('Watermark image not found', 400);

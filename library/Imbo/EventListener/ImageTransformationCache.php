@@ -13,6 +13,7 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface,
     Imbo\Http\Request\Request,
     Imbo\Model\Image,
+    Imbo\Exception\StorageException,
     Imbo\Exception\InvalidArgumentException,
     Symfony\Component\HttpFoundation\ResponseHeaderBag,
     RecursiveDirectoryIterator,
@@ -27,7 +28,7 @@ use Imbo\EventManager\EventInterface,
  *
  * The values used to generate the unique cache key for each image are:
  *
- * - public key
+ * - user
  * - image identifier
  * - normalized accept header
  * - image extension (can be null)
@@ -38,11 +39,18 @@ use Imbo\EventManager\EventInterface,
  */
 class ImageTransformationCache implements ListenerInterface {
     /**
-     * Root path where the temp. images can be stored
+     * Root path where the cached images can be stored
      *
      * @var string
      */
     private $path;
+
+    /**
+     * Whether or not this request hit a cached version
+     *
+     * @var boolean
+     */
+    private $cacheHit = false;
 
     /**
      * Class constructor
@@ -74,16 +82,16 @@ class ImageTransformationCache implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             // Look for images in the cache before transformations occur
-            'image.get' => array('loadFromCache' => 20),
+            'image.get' => ['loadFromCache' => 20],
 
             // Store images in the cache before they are sent to the user agent
-            'response.send' => array('storeInCache' => 10),
+            'response.send' => ['storeInCache' => 10],
 
             // Remove from the cache when an image is deleted from Imbo
-            'image.delete' => array('deleteFromCache' => 10),
-        );
+            'image.delete' => ['deleteFromCache' => 10],
+        ];
     }
 
     /**
@@ -120,6 +128,9 @@ class ImageTransformationCache implements ListenerInterface {
                 // Stop other listeners on this event
                 $event->stopPropagation();
 
+                // Mark this as a cache hit to prevent us from re-writing the result
+                $this->cacheHit = true;
+
                 return;
             } else {
                 // Invalid data in the cache, delete the file
@@ -141,8 +152,8 @@ class ImageTransformationCache implements ListenerInterface {
         $response = $event->getResponse();
         $model = $response->getModel();
 
-        if (!$model instanceof Image) {
-            // Only store images in the cache
+        if (!$model instanceof Image || $this->cacheHit) {
+            // Only store images in the cache, and don't try to rewrite on cache hit
             return;
         }
 
@@ -150,10 +161,10 @@ class ImageTransformationCache implements ListenerInterface {
         $dir = dirname($path);
 
         // Prepare data for the data
-        $data = serialize(array(
+        $data = serialize([
             'image' => $model,
             'headers' => $response->headers,
-        ));
+        ]);
 
         // Create directory if it does not already exist. The last is_dir is there because race
         // conditions can occur, and another process could already have created the directory after
@@ -163,8 +174,24 @@ class ImageTransformationCache implements ListenerInterface {
         //
         // "What?! Did you forget to is_dir()-guard it?" - Mats Lindh
         if (is_dir($dir) || @mkdir($dir, 0775, true) || is_dir($dir)) {
-            if (file_put_contents($path. '.tmp', $data)) {
-                rename($path. '.tmp', $path);
+            $tmpPath = $path. '.tmp';
+
+            // If in the middle of a cache write operation, fall back
+            if (file_exists($tmpPath) || file_exists($path)) {
+                return;
+            }
+
+            // Write the transformed image to a temporary location
+            if (file_put_contents($tmpPath, $data)) {
+                // Move the transformed image to the correct destination
+
+                // We have to silence this in case race-conditions lead to source not existing,
+                // in which case it'll give a warning (we'd use try/catch here in case of PHP7)
+                if (@rename($path. '.tmp', $path) === false && !file_exists($path)) {
+                    throw new StorageException(
+                        'An error occured while moving transformed image to cache'
+                    );
+                }
             }
         }
     }
@@ -176,7 +203,7 @@ class ImageTransformationCache implements ListenerInterface {
      */
     public function deleteFromCache(EventInterface $event) {
         $request = $event->getRequest();
-        $cacheDir = $this->getCacheDir($request->getPublicKey(), $request->getImageIdentifier());
+        $cacheDir = $this->getCacheDir($request->getUser(), $request->getImageIdentifier());
 
         if (is_dir($cacheDir)) {
             $this->rmdir($cacheDir);
@@ -186,18 +213,19 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Get the path to the current image cache dir
      *
-     * @param string $publicKey The public key
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier
      * @return string Returns the absolute path to the image cache dir
      */
-    private function getCacheDir($publicKey, $imageIdentifier) {
+    private function getCacheDir($user, $imageIdentifier) {
+        $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         return sprintf(
             '%s/%s/%s/%s/%s/%s/%s/%s/%s',
             $this->path,
-            $publicKey[0],
-            $publicKey[1],
-            $publicKey[2],
-            $publicKey,
+            $userPath[0],
+            $userPath[1],
+            $userPath[2],
+            $user,
             $imageIdentifier[0],
             $imageIdentifier[1],
             $imageIdentifier[2],
@@ -213,7 +241,7 @@ class ImageTransformationCache implements ListenerInterface {
      */
     private function getCacheFilePath(Request $request) {
         $hash = $this->getCacheKey($request);
-        $dir = $this->getCacheDir($request->getPublicKey(), $request->getImageIdentifier());
+        $dir = $this->getCacheDir($request->getUser(), $request->getImageIdentifier());
 
         return sprintf(
             '%s/%s/%s/%s/%s',
@@ -232,7 +260,7 @@ class ImageTransformationCache implements ListenerInterface {
      * @return string Returns a string that can be used as a cache key for the current image
      */
     private function getCacheKey(Request $request) {
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
         $accept = $request->headers->get('Accept', '*/*');
 
@@ -263,7 +291,7 @@ class ImageTransformationCache implements ListenerInterface {
             $transformations = implode('&', $transformations);
         }
 
-        return md5($publicKey . $imageIdentifier . $accept . $extension . $transformations);
+        return md5($user . $imageIdentifier . $accept . $extension . $transformations);
     }
 
     /**

@@ -69,43 +69,43 @@ class ImageTransformerTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformer::transform
      */
     public function testTriggersImageTransformationEvents() {
-        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue(array('transformationPresets' => array())));
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array(
-            array(
+        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue(['transformationPresets' => []]));
+        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue([
+            [
                 'name' => 'resize',
-                'params' => array(
+                'params' => [
                     'width' => 100,
-                ),
-            ),
-            array(
+                ],
+            ],
+            [
                 'name' => 'thumbnail',
-                'params' => array(
+                'params' => [
                     'some' => 'value',
-                ),
-            ),
-        )));
+                ],
+            ],
+        ]));
 
         $this->eventManager->expects($this->at(0))
                            ->method('trigger')
                            ->with(
                                'image.transformation.resize',
-                               array(
+                               [
                                    'image' => $this->image,
-                                   'params' => array(
+                                   'params' => [
                                        'width' => 100,
-                                   ),
-                               )
+                                   ],
+                               ]
                            );
         $this->eventManager->expects($this->at(1))
                            ->method('trigger')
                            ->with(
                                'image.transformation.thumbnail',
-                               array(
+                               [
                                    'image' => $this->image,
-                                   'params' => array(
+                                   'params' => [
                                        'some' => 'value',
-                                   ),
-                               )
+                                   ],
+                               ]
                            );
 
         $this->listener->transform($this->event);
@@ -115,38 +115,38 @@ class ImageTransformerTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformer::transform
      */
     public function testSupportsPresets() {
-        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue(array(
-            'transformationPresets' => array(
-                'preset' => array(
+        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue([
+            'transformationPresets' => [
+                'preset' => [
                     'flipHorizontally',
                     'flipVertically',
-                ),
-            )
-        )));
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array(
-            array(
+                ],
+            ]
+        ]));
+        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue([
+            [
                 'name' => 'preset',
-                'params' => array(),
-            ),
-        )));
+                'params' => [],
+            ],
+        ]));
 
         $this->eventManager->expects($this->at(0))
                            ->method('trigger')
                            ->with(
                                'image.transformation.fliphorizontally',
-                               array(
+                               [
                                    'image' => $this->image,
-                                   'params' => array(),
-                               )
+                                   'params' => [],
+                               ]
                            );
         $this->eventManager->expects($this->at(1))
                            ->method('trigger')
                            ->with(
                                'image.transformation.flipvertically',
-                               array(
+                               [
                                    'image' => $this->image,
-                                   'params' => array(),
-                               )
+                                   'params' => [],
+                               ]
                            );
 
         $this->listener->transform($this->event);
@@ -156,36 +156,36 @@ class ImageTransformerTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformer::transform
      */
     public function testPresetsCanHardcodeSomeParameters() {
-        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue(array(
-            'transformationPresets' => array(
-                'preset' => array(
-                    'thumbnail' => array(
+        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue([
+            'transformationPresets' => [
+                'preset' => [
+                    'thumbnail' => [
                         'height' => 75,
-                    ),
-                ),
-            )
-        )));
-        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue(array(
-            array(
+                    ],
+                ],
+            ]
+        ]));
+        $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue([
+            [
                 'name' => 'preset',
-                'params' => array(
+                'params' => [
                     'width' => '100',
                     'height' => '200',
-                ),
-            ),
-        )));
+                ],
+            ],
+        ]));
 
         $this->eventManager->expects($this->once())
                            ->method('trigger')
                            ->with(
                                'image.transformation.thumbnail',
-                               array(
+                               [
                                    'image' => $this->image,
-                                   'params' => array(
+                                   'params' => [
                                        'width' => '100',
                                        'height' => 75,
-                                   ),
-                               )
+                                   ],
+                               ]
                            );
         $this->listener->transform($this->event);
     }

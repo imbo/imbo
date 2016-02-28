@@ -30,16 +30,16 @@ class ExifMetadata implements ListenerInterface {
      *
      * @var array
      */
-    protected $allowedTags = array(
+    protected $allowedTags = [
         'exif:*',
-    );
+    ];
 
     /**
      * Exif properties
      *
      * @var array
      */
-    protected $properties = array();
+    protected $properties = [];
 
     /**
      * Imagick instance
@@ -63,13 +63,13 @@ class ExifMetadata implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             // High priority to prevent other listeners from stripping EXIF-data
-            'images.post' => array('populate' => 45),
+            'images.post' => ['populate' => 45],
 
             // When image has been inserted to database, insert metadata
-            'db.image.insert' => array('save' => -100),
-        );
+            'db.image.insert' => ['save' => -100],
+        ];
     }
 
     /**
@@ -137,17 +137,17 @@ class ExifMetadata implements ListenerInterface {
         $request = $event->getRequest();
         $database = $event->getDatabase();
 
-        $publicKey = $request->getPublicKey();
-        $imageIdentifier = $request->getImage()->getChecksum();
+        $user = $request->getUser();
+        $imageIdentifier = $request->getImage()->getImageIdentifier();
 
         try {
             $database->updateMetadata(
-                $publicKey,
+                $user,
                 $imageIdentifier,
                 $this->properties
             );
         } catch (DatabaseException $e) {
-            $database->deleteImage($publicKey, $imageIdentifier);
+            $database->deleteImage($user, $imageIdentifier);
 
             throw new RuntimeException('Could not store EXIF-metadata', 500);
         }
@@ -166,7 +166,7 @@ class ExifMetadata implements ListenerInterface {
             return $properties;
         }
 
-        $filtered = array();
+        $filtered = [];
 
         foreach ($properties as $key => $value) {
             if (isset($tags[$key])) {
@@ -190,29 +190,42 @@ class ExifMetadata implements ListenerInterface {
     /**
      * Parse an array of properties into a storable format
      *
-     * @param array $properties An array of properties to parse
+     * @param array $rawProperties An array of properties to parse
      * @return array Parsed array of properties
      */
-    protected function parseProperties(array $properties) {
-        if (isset($properties['exif:GPSLatitude']) &&
-            isset($properties['exif:GPSLongitude'])) {
+    protected function parseProperties(array $rawProperties) {
+        if (isset($rawProperties['exif:GPSLatitude']) &&
+            isset($rawProperties['exif:GPSLongitude'])) {
 
             // We store coordinates in GeoJSON-format (lng/lat)
-            $properties['gps:location'] = array(
+            $rawProperties['gps:location'] = [
                 $this->parseGpsCoordinate(
-                    $properties['exif:GPSLongitude'],
-                    $properties['exif:GPSLongitudeRef']
+                    $rawProperties['exif:GPSLongitude'],
+                    $rawProperties['exif:GPSLongitudeRef']
                 ),
                 $this->parseGpsCoordinate(
-                    $properties['exif:GPSLatitude'],
-                    $properties['exif:GPSLatitudeRef']
+                    $rawProperties['exif:GPSLatitude'],
+                    $rawProperties['exif:GPSLatitudeRef']
                 ),
-            );
+            ];
         }
 
-        if (isset($properties['exif:GPSAltitude'])) {
-            $alt = explode('/', $properties['exif:GPSAltitude'], 2);
-            $properties['gps:altitude'] = $alt[0] / (int) $alt[1];
+        if (isset($rawProperties['exif:GPSAltitude'])) {
+            $alt = explode('/', $rawProperties['exif:GPSAltitude'], 2);
+            $rawProperties['gps:altitude'] = $alt[0] / (int) $alt[1];
+        }
+
+        $properties = [];
+        foreach ($rawProperties as $key => $val) {
+            // Get rid of dots in property names
+            $key = str_replace('.', ':', $key);
+
+            // Replace underscore with dash for png properties
+            if (substr($key, 0, 3) === 'png') {
+                $key = str_replace('_', '-', $key);
+            }
+
+            $properties[$key] = $val;
         }
 
         return $properties;

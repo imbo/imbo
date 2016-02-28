@@ -10,16 +10,10 @@
 
 namespace Imbo\EventListener\ImageVariations\Database;
 
-use Imbo\Model\Image,
-    Imbo\Model\Images,
-    Imbo\Resource\Images\Query,
-    Imbo\Exception\DatabaseException,
-    Doctrine\DBAL\Configuration,
+use Doctrine\DBAL\Configuration,
     Doctrine\DBAL\DriverManager,
     Doctrine\DBAL\Connection,
-    PDO,
-    DateTime,
-    DateTimeZone;
+    PDO;
 
 /**
  * Doctrine 2 database driver for the image variations
@@ -78,10 +72,10 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function storeImageVariationMetadata($publicKey, $imageIdentifier, $width, $height) {
+    public function storeImageVariationMetadata($user, $imageIdentifier, $width, $height) {
         return (boolean) $this->getConnection()->insert($this->params['tableName'], [
             'added'           => time(),
-            'publicKey'       => $publicKey,
+            'user'            => $user,
             'imageIdentifier' => $imageIdentifier,
             'width'           => $width,
             'height'          => $height,
@@ -91,17 +85,17 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getBestMatch($publicKey, $imageIdentifier, $width) {
+    public function getBestMatch($user, $imageIdentifier, $width) {
         $qb = $this->getConnection()->createQueryBuilder();
         $qb->select('width', 'height')
            ->from($this->params['tableName'], 'iv')
-           ->where('iv.publicKey = :publicKey')
+           ->where('iv.user = :user')
            ->andWhere('iv.imageIdentifier = :imageIdentifier')
            ->andWhere('iv.width >= :width')
            ->setMaxResults(1)
            ->orderBy('iv.width', 'ASC')
            ->setParameters([
-               ':publicKey'       => $publicKey,
+               ':user'            => $user,
                ':imageIdentifier' => $imageIdentifier,
                ':width'           => $width,
            ]);
@@ -115,14 +109,14 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteImageVariations($publicKey, $imageIdentifier, $width = null) {
+    public function deleteImageVariations($user, $imageIdentifier, $width = null) {
         $qb = $this->getConnection()->createQueryBuilder();
 
         $qb->delete($this->params['tableName'])
-           ->where('publicKey = :publicKey')
+           ->where('user = :user')
            ->andWhere('imageIdentifier = :imageIdentifier')
            ->setParameters([
-               ':publicKey' => $publicKey,
+               ':user' => $user,
                ':imageIdentifier' => $imageIdentifier,
            ]);
 

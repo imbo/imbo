@@ -42,8 +42,8 @@ class ListModelTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Model\ListModel::getList
      */
     public function testCanSetAndGetAList() {
-        $this->assertSame(array(), $this->model->getList());
-        $list = array(1, 2, 3);
+        $this->assertSame([], $this->model->getList());
+        $list = [1, 2, 3];
         $this->assertSame($this->model, $this->model->setList($list));
         $this->assertSame($list, $this->model->getList());
     }

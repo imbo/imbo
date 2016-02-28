@@ -33,44 +33,44 @@ class AutoRotateTest extends TransformationTests {
      * @return array[]
      */
     public function getFiles() {
-        return array(
-            'orientation1.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation1.jpeg', false, false),
-            'orientation2.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation2.jpeg', false, true),
-            'orientation3.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation3.jpeg', false, true),
-            'orientation4.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation4.jpeg', false, true),
-            'orientation5.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation5.jpeg', true, true),
-            'orientation6.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation6.jpeg', true, true),
-            'orientation7.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation7.jpeg', true, true),
-            'orientation8.jpeg' => array(FIXTURES_DIR . '/autoRotate/orientation8.jpeg', true, true),
-        );
+        return [
+            'orientation1.jpeg' => [FIXTURES_DIR . '/autoRotate/orientation1.jpeg', false, false],
+            'orientation2.jpeg' => [FIXTURES_DIR . '/autoRotate/orientation2.jpeg', false, true],
+            'orientation3.jpeg' => [FIXTURES_DIR . '/autoRotate/orientation3.jpeg', false, true],
+            'orientation4.jpeg' => [FIXTURES_DIR . '/autoRotate/orientation4.jpeg', false, true],
+            'orientation5.jpeg' => [FIXTURES_DIR . '/autoRotate/orientation5.jpeg', true, true],
+            'orientation6.jpeg' => [FIXTURES_DIR . '/autoRotate/orientation6.jpeg', true, true],
+            'orientation7.jpeg' => [FIXTURES_DIR . '/autoRotate/orientation7.jpeg', true, true],
+            'orientation8.jpeg' => [FIXTURES_DIR . '/autoRotate/orientation8.jpeg', true, true],
+        ];
     }
 
     /**
      * @dataProvider getFiles
      */
     public function testAutoRotatesAllOrientations($file, $changeDimensions, $transformed) {
-        $colorValues = array(
-            array(
+        $colorValues = [
+            [
                 'x' => 0,
                 'y' => 0,
                 'color' => 'rgb(128,63,193)'
-            ),
-            array(
+            ],
+            [
                 'x' => 0,
                 'y' => 1000,
                 'color' => 'rgb(254,57,126)'
-            ),
-            array(
+            ],
+            [
                 'x' => 1000,
                 'y' => 0,
                 'color' => 'rgb(127,131,194)'
-            ),
-            array(
+            ],
+            [
                 'x' => 1000,
                 'y' => 1000,
                 'color' => 'rgb(249,124,192)'
-            ),
-        );
+            ],
+        ];
 
         /**
          * Load the image, perform the auto rotate tranformation and check that the color codes in

@@ -72,9 +72,9 @@ class Histogram extends Transformation implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.transformation.histogram' => 'transform',
-        );
+        ];
     }
 
     /**
@@ -90,17 +90,17 @@ class Histogram extends Transformation implements ListenerInterface {
         $ratio = !empty($params['ratio']) ? max(0.1, min(8, (double) $params['ratio'])) : $this->ratio;
 
         // colors to use for each channel when drawing the histogram
-        $colors = array(
+        $colors = [
             'red' => !empty($params['red']) ? $this->formatColor($params['red']) : $this->red,
             'green' => !empty($params['green']) ? $this->formatColor($params['green']) : $this->green,
             'blue' => !empty($params['blue']) ? $this->formatColor($params['blue']) : $this->blue,
-        );
+        ];
 
         // channels and their sequence when retrieving statistics
-        $vals = array('red', 'green', 'blue');
+        $vals = ['red', 'green', 'blue'];
 
         // counts of each color intensity for each channel, initialize to zero
-        $counts = array();
+        $counts = [];
 
         foreach ($vals as $val) {
             $counts[$val] = array_fill(0, 256, 0);
@@ -120,7 +120,6 @@ class Histogram extends Transformation implements ListenerInterface {
 
             // let's draw a histogram
             $origwidth = 256;
-            $origheight = floor($origwidth / $ratio);
             $width = $origwidth * $scale;
             $height = floor($width / $ratio);
 

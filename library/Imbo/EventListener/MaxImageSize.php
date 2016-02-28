@@ -49,9 +49,9 @@ class MaxImageSize implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
-            'images.post' => array('enforceMaxSize' => 25),
-        );
+        return [
+            'images.post' => ['enforceMaxSize' => 25],
+        ];
     }
 
     /**
@@ -64,13 +64,13 @@ class MaxImageSize implements ListenerInterface {
         $height = $image->getHeight();
 
         if (($this->width && ($width > $this->width)) || ($this->height && ($height > $this->height))) {
-            $event->getManager()->trigger('image.transformation.maxsize', array(
+            $event->getManager()->trigger('image.transformation.maxsize', [
                 'image' => $image,
-                'params' => array(
+                'params' => [
                     'width' => $this->width,
                     'height' => $this->height,
-                ),
-            ));
+                ],
+            ]);
         }
     }
 }

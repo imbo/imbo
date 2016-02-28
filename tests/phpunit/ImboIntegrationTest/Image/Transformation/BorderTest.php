@@ -32,10 +32,10 @@ class BorderTest extends TransformationTests {
      * @return array[]
      */
     public function getBorderParams() {
-        return array(
-            'inline border' => array(665, 463, 3, 4, 'inset'),
-            'outbound border' => array(671, 471, 3, 4, 'outbound'),
-        );
+        return [
+            'inline border' => [665, 463, 3, 4, 'inset'],
+            'outbound border' => [671, 471, 3, 4, 'outbound'],
+        ];
     }
 
     /**
@@ -55,12 +55,12 @@ class BorderTest extends TransformationTests {
         $event->expects($this->at(1))
               ->method('getArgument')
               ->with('params')
-              ->will($this->returnValue(array(
+              ->will($this->returnValue([
                   'color' => 'white',
                   'width' => $borderWidth,
                   'height' => $borderHeight,
                   'mode' => $borderMode,
-              )));
+              ]));
 
         $blob = file_get_contents(FIXTURES_DIR . '/image.png');
 

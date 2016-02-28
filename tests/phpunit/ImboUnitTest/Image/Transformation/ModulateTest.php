@@ -43,17 +43,17 @@ class ModulateTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getModulateParams() {
-        return array(
-            'no params' => array(
-                array(), 100, 100, 100,
-            ),
-            'some params' => array(
-                array('b' => 10, 's' => 50), 10, 50, 100,
-            ),
-            'all params' => array(
-                array('b' => 1, 's' => 2, 'h' => 3), 1, 2, 3,
-            ),
-        );
+        return [
+            'no params' => [
+                [], 100, 100, 100,
+            ],
+            'some params' => [
+                ['b' => 10, 's' => 50], 10, 50, 100,
+            ],
+            'all params' => [
+                ['b' => 1, 's' => 2, 'h' => 3], 1, 2, 3,
+            ],
+        ];
     }
 
     /**

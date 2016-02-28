@@ -27,9 +27,9 @@ class FilesystemTest extends StorageTests {
      * @see ImboIntegrationTest\Storage\StorageTests::getDriver()
      */
     protected function getDriver() {
-        return new Filesystem(array(
+        return new Filesystem([
             'dataDir' => $this->path,
-        ));
+        ]);
     }
 
     public function setUp() {
@@ -50,6 +50,14 @@ class FilesystemTest extends StorageTests {
         }
 
         parent::tearDown();
+    }
+
+    /**
+     * @expectedException Imbo\Exception\StorageException
+     * @expectedExceptionCode 507
+     */
+    public function testStoringEmptyDataFails() {
+        $this->getDriverActive()->store($this->getUser(), "this_identifier_left_empty", "");
     }
 
     /**

@@ -25,17 +25,17 @@ class Index implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD');
+        return ['GET', 'HEAD'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'index.get' => 'get',
             'index.head' => 'get',
-        );
+        ];
     }
 
     /**
@@ -51,26 +51,27 @@ class Index implements ResourceInterface {
         $baseUrl = $request->getSchemeAndHttpHost() . $request->getBaseUrl();
 
         $model = new Model\ArrayModel();
-        $model->setData(array(
+        $model->setData([
             'version' => Version::VERSION,
-            'urls' => array(
+            'urls' => [
                 'site' => 'http://www.imbo-project.org',
                 'source' => 'https://github.com/imbo/imbo',
                 'issues' => 'https://github.com/imbo/imbo/issues',
                 'docs' => 'http://docs.imbo-project.org',
-            ),
-            'endpoints' => array(
+            ],
+            'endpoints' => [
                 'status' => $baseUrl . '/status',
                 'stats' => $baseUrl . '/stats',
-                'user' => $baseUrl . '/users/{publicKey}',
-                'images' => $baseUrl . '/users/{publicKey}/images',
-                'image' => $baseUrl . '/users/{publicKey}/images/{imageIdentifier}',
+                'user' => $baseUrl . '/users/{user}',
+                'images' => $baseUrl . '/users/{user}/images',
+                'image' => $baseUrl . '/users/{user}/images/{imageIdentifier}',
                 'globalShortImageUrl' => $baseUrl . '/s/{id}',
-                'metadata' => $baseUrl . '/users/{publicKey}/images/{imageIdentifier}/metadata',
-                'shortImageUrls' => $baseUrl . '/users/{publicKey}/images/{imageIdentifier}/shorturls',
-                'shortImageUrl' =>  $baseUrl . '/users/{publicKey}/images/{imageIdentifier}/shorturls/{id}',
-            ),
-        ));
+                'globalImages' => $baseUrl . '/images',
+                'metadata' => $baseUrl . '/users/{user}/images/{imageIdentifier}/metadata',
+                'shortImageUrls' => $baseUrl . '/users/{user}/images/{imageIdentifier}/shorturls',
+                'shortImageUrl' =>  $baseUrl . '/users/{user}/images/{imageIdentifier}/shorturls/{id}',
+            ],
+        ]);
 
         $response->setModel($model);
 

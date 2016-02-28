@@ -29,9 +29,9 @@ class Level extends Transformation implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.transformation.level' => 'transform',
-        );
+        ];
     }
 
     /**
@@ -63,7 +63,7 @@ class Level extends Transformation implements ListenerInterface {
             $channel = Imagick::CHANNEL_ALL;
         } else {
             $c = null;
-            $channels = array(
+            $channels = [
                 'r' => Imagick::CHANNEL_RED,
                 'g' => Imagick::CHANNEL_GREEN,
                 'b' => Imagick::CHANNEL_BLUE,
@@ -71,7 +71,7 @@ class Level extends Transformation implements ListenerInterface {
                 'm' => Imagick::CHANNEL_MAGENTA,
                 'y' => Imagick::CHANNEL_YELLOW,
                 'k' => Imagick::CHANNEL_BLACK,
-            );
+            ];
 
             foreach ($channels as $id => $value) {
                 if (strpos($channel, $id) !== false) {
@@ -83,9 +83,9 @@ class Level extends Transformation implements ListenerInterface {
         }
 
         try {
-            $quantumRange = $this->imagick->getQuantumRange();
+            $quantumRange = $this->getQuantumRange();
 
-            $this->imagick->levelImage(0, (float) $gamma, $quantumRange['quantumRangeLong'], $channel);
+            $this->imagick->levelImage(0, (float) $gamma, $quantumRange, $channel);
             $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);

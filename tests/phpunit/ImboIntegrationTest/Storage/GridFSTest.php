@@ -31,9 +31,9 @@ class GridFSTest extends StorageTests {
      * @see ImboIntegrationTest\Storage\StorageTests::getDriver()
      */
     protected function getDriver() {
-        return new GridFS(array(
+        return new GridFS([
             'databaseName' => $this->testDbName,
-        ));
+        ]);
     }
 
     public function setUp() {
@@ -60,9 +60,9 @@ class GridFSTest extends StorageTests {
      * @covers Imbo\Storage\GridFS::getStatus
      */
     public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() {
-        $storage = new GridFS(array(
+        $storage = new GridFS([
             'server' => 'foobar',
-        ));
+        ]);
         $this->assertFalse($storage->getStatus());
     }
 }

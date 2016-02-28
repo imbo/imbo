@@ -43,32 +43,32 @@ class EventTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function getArguments() {
-        return array(
-            'request' => array(
+        return [
+            'request' => [
                 'getRequest', 'request', $this->getMock('Imbo\Http\Request\Request'),
-            ),
-            'response' => array(
+            ],
+            'response' => [
                 'getResponse', 'response', $this->getMock('Imbo\Http\Response\Response'),
-            ),
-            'database' => array(
+            ],
+            'database' => [
                 'getDatabase', 'database', $this->getMock('Imbo\Database\DatabaseInterface'),
-            ),
-            'storage' => array(
+            ],
+            'storage' => [
                 'getStorage', 'storage', $this->getMock('Imbo\Storage\StorageInterface'),
-            ),
-            'userLookup' => array(
-                'getUserLookup', 'userLookup', $this->getMock('Imbo\Auth\UserLookupInterface'),
-            ),
-            'manager' => array(
+            ],
+            'accessControl' => [
+                'getAccessControl', 'accessControl', $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface'),
+            ],
+            'manager' => [
                 'getManager', 'manager', $this->getMockBuilder('Imbo\EventManager\EventManager')->disableOriginalConstructor()->getMock(),
-            ),
-            'config' => array(
-                'getConfig', 'config', array('some' => 'config'),
-            ),
-            'handler' => array(
+            ],
+            'config' => [
+                'getConfig', 'config', ['some' => 'config'],
+            ],
+            'handler' => [
                 'getHandler', 'handler', 'handler name',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

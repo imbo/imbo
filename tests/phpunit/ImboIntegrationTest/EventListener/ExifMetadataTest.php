@@ -49,12 +49,12 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\ExifMetadata::filterProperties
      */
     public function testCanGetPropertiesFromImageFiltered() {
-        $listener = new ExifMetadata(array(
-            'allowedTags' => array(
+        $listener = new ExifMetadata([
+            'allowedTags' => [
                 'exif:Flash',
-                'exif:Compression',
-            ),
-        ));
+                'exif:YResolution',
+            ],
+        ]);
 
         $image = new Image();
         $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
@@ -67,7 +67,7 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
         $properties = $listener->populate($event);
 
         $this->assertSame('16', $properties['exif:Flash']);
-        $this->assertSame('6', $properties['exif:Compression']);
+        $this->assertSame('72/1', $properties['exif:YResolution']);
         $this->assertArrayNotHasKey('exif:GPSAltitude', $properties);
     }
 
@@ -102,19 +102,21 @@ class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanGetAndSaveProperties() {
         $listener = new ExifMetadata();
-        $publicKey = 'foobar';
+        $user = 'foobar';
+        $imageIdentifier = 'imageId';
 
         $image = new Image();
         $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
+        $image->setImageIdentifier($imageIdentifier);
 
         $request = $this->getMock('Imbo\Http\Request\Request');
         $request->expects($this->exactly(2))->method('getImage')->will($this->returnValue($image));
-        $request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
+        $request->expects($this->once())->method('getUser')->will($this->returnValue($user));
 
         $database = $this->getMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('updateMetadata')->with(
-            $this->equalTo($publicKey),
-            $this->equalTo('753e11e00522ff1e95600d8f91c74e8e'),
+            $this->equalTo($user),
+            $this->equalTo($imageIdentifier),
             $this->arrayHasKey('gps:location')
         );
 

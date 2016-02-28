@@ -10,8 +10,7 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Model\Image,
-    Imbo\Exception\TransformationException,
+use Imbo\Exception\TransformationException,
     Imbo\EventListener\ListenerInterface,
     Imbo\EventManager\EventInterface,
     ImagickException;
@@ -27,9 +26,9 @@ class Sharpen extends Transformation implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.transformation.sharpen' => 'transform',
-        );
+        ];
     }
 
     /**

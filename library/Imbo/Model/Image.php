@@ -24,22 +24,22 @@ class Image implements ModelInterface {
      *
      * @var array
      */
-    static public $mimeTypes = array(
+    static public $mimeTypes = [
         'image/png'  => 'png',
         'image/jpeg' => 'jpg',
         'image/gif'  => 'gif',
-    );
+    ];
 
     /**
      * Mapping for some mime types
      *
      * @var array
      */
-    static public $mimeTypeMapping = array(
+    static public $mimeTypeMapping = [
         'image/x-png'  => 'image/png',
         'image/x-jpeg' => 'image/jpeg',
         'image/x-gif'  => 'image/gif',
-    );
+    ];
 
     /**
      * Size of the file
@@ -119,11 +119,11 @@ class Image implements ModelInterface {
     private $updated;
 
     /**
-     * Public key
+     * User
      *
      * @var string
      */
-    private $publicKey;
+    private $user;
 
     /**
      * Image identifier
@@ -336,22 +336,22 @@ class Image implements ModelInterface {
     }
 
     /**
-     * Get the public key
+     * Get the user
      *
      * @return string
      */
-    public function getPublicKey() {
-        return $this->publicKey;
+    public function getUser() {
+        return $this->user;
     }
 
     /**
-     * Set the public key
+     * Set the user
      *
-     * @param string $publicKey The public key
+     * @param string $user The user
      * @return Image
      */
-    public function setPublicKey($publicKey) {
-        $this->publicKey = $publicKey;
+    public function setUser($user) {
+        $this->user = $user;
 
         return $this;
     }
@@ -366,9 +366,9 @@ class Image implements ModelInterface {
     }
 
     /**
-     * Set the public key
+     * Set the image identifier
      *
-     * @param string $imageIdentifier The public key
+     * @param string $imageIdentifier The image identifier
      * @return Image
      */
     public function setImageIdentifier($imageIdentifier) {

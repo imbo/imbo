@@ -9,16 +9,19 @@
  */
 
 /**
- * Enable the image transformation metadata cache listener, and store the cached images to a
- * directory in /tmp
+ * Enable the image transformation metadata cache listener,
+ * and store the cached images to a temporary directory
  */
-return array(
-    'eventListeners' => array(
-        'imageTransformationCache' => array(
+
+$tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'imbo-behat-image-transformation-cache';
+
+return [
+    'eventListeners' => [
+        'imageTransformationCache' => [
             'listener' => 'Imbo\EventListener\ImageTransformationCache',
-            'params' => array(
-                'path' => '/tmp/imbo-behat-image-transformation-cache',
-            ),
-        ),
-    ),
-);
+            'params' => [
+                'path' => $tmpDir
+            ],
+        ],
+    ],
+];

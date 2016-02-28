@@ -38,34 +38,51 @@ class ContrastTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function getContrastParams() {
-        return array(
-            'no params' => array(
-                array(), 0, 1,
-            ),
-            'positive contrast' => array(
-                array('sharpen' => 2), 1, 2,
-            ),
-            'zero contrast' => array(
-                array('sharpen' => 0), 0, 1,
-            ),
-            'negative contrast' => array(
-                array('sharpen' => -2), 0, 3,
-            ),
-        );
+        $imagick = new \Imagick();
+        if (is_callable([$imagick, 'getQuantumRange'])) {
+            $quantumRange = $imagick->getQuantumRange();
+        } else {
+            $quantumRange = \Imagick::getQuantumRange();
+        }
+
+        $quantumRange = $quantumRange['quantumRangeLong'];
+
+        return [
+            'no params' => [
+                [], true
+            ],
+            'positive contrast' => [
+                ['alpha' => 2.5], true
+            ],
+            'zero contrast' => [
+                ['alpha' => 0], false
+            ],
+            'negative contrast, specific beta' => [
+                ['alpha' => -2, 'beta' => 0.75], true
+            ],
+        ];
     }
 
     /**
      * @dataProvider getContrastParams
      */
-    public function testSetsTheCorrectContrast(array $params, $contrastValue, $times) {
+    public function testSetsTheCorrectContrast(array $params, $shouldTransform) {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('hasBeenTransformed')->with(true);
         $event = $this->getMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue($params));
-        $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
 
-        $imagick = $this->getMock('Imagick');
-        $imagick->expects($this->exactly($times))->method('contrastImage')->with($contrastValue);
+        $imagick = new \Imagick();
+        $imagick->newImage(16, 16, '#fff');
+
+        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue($params));
+
+        if ($shouldTransform) {
+            $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
+            $image->expects($this->once())->method('hasBeenTransformed')->with(true);
+        } else {
+            $image->expects($this->never())->method('hasBeenTransformed');
+        }
+
+        $howMany = $shouldTransform ? $this->once() : $this->never();
 
         $this->transformation->setImagick($imagick);
         $this->transformation->transform($event);

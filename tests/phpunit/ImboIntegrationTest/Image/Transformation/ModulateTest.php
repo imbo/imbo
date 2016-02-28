@@ -32,17 +32,17 @@ class ModulateTest extends TransformationTests {
      * @return array[]
      */
     public function getModulateParams() {
-        return array(
-            'no params' => array(
-                array(),
-            ),
-            'some params' => array(
-                array('b' => 10, 's' => 10),
-            ),
-            'all params' => array(
-                array('b' => 1, 's' => 2, 'h' => 3),
-            ),
-        );
+        return [
+            'no params' => [
+                [],
+            ],
+            'some params' => [
+                ['b' => 10, 's' => 10],
+            ],
+            'all params' => [
+                ['b' => 1, 's' => 2, 'h' => 3],
+            ],
+        ];
     }
 
     /**

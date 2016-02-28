@@ -26,9 +26,9 @@ class Strip extends Transformation implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'image.transformation.strip' => 'transform',
-        );
+        ];
     }
 
     /**
@@ -39,6 +39,18 @@ class Strip extends Transformation implements ListenerInterface {
     public function transform(EventInterface $event) {
         try {
             $this->imagick->stripImage();
+
+            // In newer versions of Imagick, it seems we need to clear and re-read
+            // the data to properly clear the properties
+            $version = $this->imagick->getVersion();
+            $version = preg_replace('#.*?(\d+\.\d+\.\d+).*#', '$1', $version['versionString']);
+
+            if (version_compare($version, '6.8.0') >= 0){
+                $data = $this->imagick->getImagesBlob();
+                $this->imagick->clear();
+                $this->imagick->readImageBlob($data);
+            }
+
             $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);

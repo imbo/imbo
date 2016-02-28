@@ -20,6 +20,44 @@ This transformation will auto rotate the image based on EXIF data stored in the 
 
 * ``t[]=autoRotate``
 
+.. _blur-transformation:
+
+Blur the image - ``t[]=blur``
+-----------------------------------
+
+This transformation can be used to blur the image.
+
+**Parameters:**
+
+``mode``
+    The blur type (optional). Defaults to ``gaussian``. Possible values are:
+
+    ``gaussian``
+        When adding gaussian blur, the ``radius`` and ``sigma`` parameters are required.
+
+    ``adaptive``
+        When adding adaptive blur, the ``radius`` and ``sigma`` parameters are required. Adaptive blur decrease the blur in the part of the picture near to the edge of the image canvas.
+
+    ``motion``
+        When adding motion blur, the ``radius``, ``sigma`` and ``angle`` parameters are required.
+
+    ``radial``
+        When adding radial blur, the ``angle`` parameter is required.
+
+``radius``
+    The radius of the Gaussian, in pixels, not counting the center pixel.
+
+``sigma``
+    The standard deviation of the Gaussian, in pixels.
+
+``angle``
+    The number of degrees to rotate the image.
+
+**Examples:**
+
+* ``t[]=blur:radius=1,sigma=2``
+* ``t[]=blur:type=adaptive,radius=2,sigma=4``
+
 .. _border-transformation:
 
 Add an image border - ``t[]=border``
@@ -107,12 +145,17 @@ This transformation can be used to change the contrast of the colors in the imag
 
 **Parameters:**
 
-``sharpen``
-    Used to adjust the intensity differences between the lighter and darker elements of the image. Can also be negative.
+``alpha``
+    Used to adjust the intensity differences between the lighter and darker elements of the image. Can also be negative. Note: this parameter was named ``sharpen`` in Imbo 1.x.
+
+``beta``
+    Where the midpoint of the gradient will be. This value should be in the range 0 to 1. Default: ``0.5``.
 
 **Examples:**
 
-* ``t[]=contrast:sharpen=3``
+* ``t[]=contrast:alpha=3``
+
+.. note:: If you are getting different results than expected when using negative ``alpha`` values, your ``imagick`` extension is probably built against an old version of ImageMagick.
 
 .. _convert-transformation:
 
@@ -181,6 +224,33 @@ This transformation desaturates the image (in practice, gray scales it).
 **Examples:**
 
 * ``t[]=desaturate``
+
+.. _drawpois-transformation:
+
+Draw points of interest - ``t[]=drawPois``
+------------------------------------------
+
+This transformation will draw an outline around all the POIs (points of interest) stored in the metadata for the image. The format of the metadata is documented under the :ref:`smartSize <smartsize-transformation>` transformation.
+
+**Parameters:**
+
+``color``
+    Color of the border in hexadecimal format. Defaults to ``ff0000`` (You can also specify short values like ``f0f`` (``ff00ff``)).
+
+``borderSize``
+    Width of the border in pixels. Defaults to ``2``.
+
+``pointSize``
+    The diameter (in pixels) of the circle drawn around points of interest that do not have a height and width specified. Defaults to ``30``.
+
+**Examples:**
+
+* ``t[]=drawPois``
+* ``t[]=drawPois:borderSize=10``
+* ``t[]=drawPois:color=0f0``
+* ``t[]=drawPois:color=00f,borderSize=10,pointSize=100``
+
+.. note:: This transformation has a bug/limitation: all coordinates are based on the original image. In other words, applying this at the end of a transformation chain which resizes/crops/rotates the image can lead to unexpected results. This will hopefully change in the future.
 
 .. _flip-horizontally-transformation:
 
@@ -405,8 +475,55 @@ When using any of the presets the different parameters can be overridden by spec
 
 * ``t[]=sharpen``
 * ``t[]=sharpen:preset=light`` (same as above)
-* ``t[]=sharpen:preset=extrene,gain=10`` (use the ``extreme`` preset, but use a gain value of 10 instead of 4)
+* ``t[]=sharpen:preset=extreme,gain=10`` (use the ``extreme`` preset, but use a gain value of 10 instead of 4)
 * ``t[]=sharpen:radius=2,sigma=1,gain=1,threshold= 0.05`` (same as using ``t[]=sharpen:preset=light``, or simply ``t[]=sharpen``)
+
+.. _smartsize-transformation:
+
+Smart size the image - ``t[]=smartSize``
+----------------------------------------
+
+This transformation is used to crop the image based on a point of interest (POI) provided either as a transformation parameter or from the image metadata.
+
+**Metadata format**
+
+The smart size transformation supports reading the POI from the metadata of the image. The POI information is expected to be stored on the ``poi`` property in metadata. Below is an example of a valid metadata object containing a ``600,240`` POI:
+
+.. code-block:: javascript
+
+    {
+      "poi": [
+        {
+            x: 600,
+            y: 240
+        }
+      ]
+    }
+
+.. note:: The smart size transformation currently takes only the first object into account when cropping the image, but the POIs is stored as an array of objects in order to be easy to expand with more information for a more sophisticated smart size algorithm in the future.
+
+**Parameters:**
+
+``width``
+    The width of the crop in pixels.
+
+``height``
+    The height of the crop in pixels.
+
+``poi``
+    The POI coordinate ``x,y`` to crop around. The parameter is optional if the POI exists in metadata.
+
+``crop``
+    The closeness of the crop (optional). Possible values are:
+
+    ``close``
+    ``medium``
+    ``wide``
+
+**Examples:**
+
+* ``t[]=smartSize:width=250,height=250,poi=300,200``
+* ``t[]=smartSize:width=250,height=250,poi=300,200,crop=close``
 
 .. _strip-transformation:
 
@@ -515,30 +632,33 @@ This transformation can be used to apply a watermark on top of the original imag
 ``y``
     Number of pixels in the Y-axis the watermark image should be offset from the original position (defined by the ``position`` parameter). Supports negative numbers. Defaults to ``0``
 
+``opacity``
+    Can be an integer between 0 and 100 where 0 is fully transparent, and 100 is fully opaque. Defaults to ``100``
+
 **Examples:**
 
 * ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f``
 * ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f,width=200,x=5``
-* ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f,height=50,x=-5,y=-5,position=bottom-right``
+* ``t[]=watermark:img=f5f7851c40e2b76a01af9482f67bbf3f,height=50,x=-5,y=-5,position=bottom-right,opacity=50``
 
 If you want to set the default watermark image you will have to do so in the configuration:
 
 .. code-block:: php
 
     <?php
-    return array(
+    return [
         // ...
 
-        'eventListeners' => array(
+        'eventListeners' => [
             'watermark' => function() {
                 $transformation = new Imbo\Image\Transformation\Watermark();
                 $transformation->setDefaultImage('some image identifier');
 
                 return $transformation;
             },
-        ),
+        ],
 
         // ...
-    );
+    ];
 
 When you have specified a default watermark image you are not required to use the ``img`` option for the transformation, but if you do so it will override the default one.

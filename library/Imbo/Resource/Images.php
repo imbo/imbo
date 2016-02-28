@@ -34,18 +34,18 @@ class Images implements ResourceInterface {
      * {@inheritdoc}
      */
     public function getAllowedMethods() {
-        return array('GET', 'HEAD', 'POST');
+        return ['GET', 'HEAD', 'POST'];
     }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
+        return [
             'images.get' => 'getImages',
             'images.head' => 'getImages',
             'images.post' => 'addImage',
-        );
+        ];
     }
 
     /**
@@ -71,12 +71,12 @@ class Images implements ResourceInterface {
         $image = $request->getImage();
 
         $model = new Model\ArrayModel();
-        $model->setData(array(
-            'imageIdentifier' => $image->getChecksum(),
+        $model->setData([
+            'imageIdentifier' => $image->getImageIdentifier(),
             'width' => $image->getWidth(),
             'height' => $image->getHeight(),
             'extension' => $image->getExtension(),
-        ));
+        ]);
 
         $response->setModel($model);
     }

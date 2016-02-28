@@ -30,7 +30,6 @@ class UserTest extends ResourceTests {
     private $database;
     private $storage;
     private $event;
-    private $publicKey = 'key';
 
     /**
      * {@inheritdoc}

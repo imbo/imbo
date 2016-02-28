@@ -29,7 +29,7 @@ use Imbo\Exception\StorageException,
  * - <pre>(string) server</pre> The server string to use when connecting to MongoDB. Defaults to
  *                              'mongodb://localhost:27017'
  * - <pre>(array) options</pre> Options to use when creating the Mongo client instance. Defaults to
- *                              array('connect' => true, 'connectTimeoutMS' => 1000).
+ *                              ['connect' => true, 'connectTimeoutMS' => 1000].
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Storage
@@ -54,14 +54,14 @@ class GridFS implements StorageInterface {
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         // Database name
         'databaseName' => 'imbo_storage',
 
         // Server string and ctor options
         'server'  => 'mongodb://localhost:27017',
-        'options' => array('connect' => true, 'connectTimeoutMS' => 1000),
-    );
+        'options' => ['connect' => true, 'connectTimeoutMS' => 1000],
+    ];
 
     /**
      * Class constructor
@@ -87,23 +87,23 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function store($publicKey, $imageIdentifier, $imageData) {
+    public function store($user, $imageIdentifier, $imageData) {
         $now = time();
 
-        if ($this->imageExists($publicKey, $imageIdentifier)) {
+        if ($this->imageExists($user, $imageIdentifier)) {
             $this->getGrid()->update(
-                array('publicKey' => $publicKey, 'imageIdentifier' => $imageIdentifier),
-                array('$set' => array('updated' => $now))
+                ['user' => $user, 'imageIdentifier' => $imageIdentifier],
+                ['$set' => ['updated' => $now]]
             );
 
             return true;
         }
 
-        $metadata = array(
-            'publicKey' => $publicKey,
+        $metadata = [
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
             'updated' => $now,
-        );
+        ];
 
         $this->getGrid()->storeBytes($imageData, $metadata);
 
@@ -113,8 +113,8 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete($publicKey, $imageIdentifier) {
-        if (($file = $this->getImageObject($publicKey, $imageIdentifier)) === false) {
+    public function delete($user, $imageIdentifier) {
+        if (($file = $this->getImageObject($user, $imageIdentifier)) === false) {
             throw new StorageException('File not found', 404);
         }
 
@@ -126,8 +126,8 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImage($publicKey, $imageIdentifier) {
-        if (($file = $this->getImageObject($publicKey, $imageIdentifier)) === false) {
+    public function getImage($user, $imageIdentifier) {
+        if (($file = $this->getImageObject($user, $imageIdentifier)) === false) {
             throw new StorageException('File not found', 404);
         }
 
@@ -137,8 +137,8 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getLastModified($publicKey, $imageIdentifier) {
-        if (($file = $this->getImageObject($publicKey, $imageIdentifier)) === false) {
+    public function getLastModified($user, $imageIdentifier) {
+        if (($file = $this->getImageObject($user, $imageIdentifier)) === false) {
             throw new StorageException('File not found', 404);
         }
 
@@ -161,11 +161,11 @@ class GridFS implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function imageExists($publicKey, $imageIdentifier) {
-        $cursor = $this->getGrid()->find(array(
-            'publicKey' => $publicKey,
+    public function imageExists($user, $imageIdentifier) {
+        $cursor = $this->getGrid()->find([
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier
-        ));
+        ]);
 
         return (boolean) $cursor->count();
     }
@@ -208,16 +208,16 @@ class GridFS implements StorageInterface {
     /**
      * Get an image object
      *
-     * @param string $publicKey The public key of the user
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier
      * @return boolean|MongoGridFSFile Returns false if the file does not exist or an instance of
      *                                 MongoGridFSFile if the file exists
      */
-    private function getImageObject($publicKey, $imageIdentifier) {
-        $cursor = $this->getGrid()->find(array(
-            'publicKey' => $publicKey,
+    private function getImageObject($user, $imageIdentifier) {
+        $cursor = $this->getGrid()->find([
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier
-        ));
+        ]);
 
         if ($cursor->count()) {
             return $cursor->getNext();

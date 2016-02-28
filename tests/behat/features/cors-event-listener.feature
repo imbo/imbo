@@ -74,7 +74,7 @@ Feature: Imbo provides an event listener for CORS
         And the "Origin" request header is "http://allowedhost"
         And I sign the request
         And I attach "ChangeLog.markdown" to the request body
-        When I request "/users/publickey/images" using HTTP "POST"
+        When I request "/users/user/images" using HTTP "POST"
         Then I should get a response with "415 Invalid image"
         And the "Vary" response header contains "Origin"
         And the following response headers should be present:
@@ -86,9 +86,35 @@ Feature: Imbo provides an event listener for CORS
         Given I use "invalid-pubkey" and "invalid-privkey" for public and private keys
         And Imbo uses the "cors.php" configuration
         And the "Origin" request header is "http://allowedhost"
-        When I request "/users/publickey/images" using HTTP "GET"
-        Then I should get a response with "400 Missing access token"
+        When I request "/users/user/images" using HTTP "GET"
+        Then I should get a response with "400 Permission denied (public key)"
         And the following response headers should be present:
         """
         Access-Control-Allow-Origin
+        """
+
+    Scenario: Request a resource using HTTP OPTIONS without an Origin header when all origins are accepted
+        Given Imbo uses the "cors-wildcard.php" configuration
+        When I request "/" using HTTP "OPTIONS"
+        Then I should get a response with "204 No Content"
+        And the "Vary" response header contains "Origin"
+        And the following response headers should not be present:
+        """
+        Access-Control-Allow-Origin
+        Access-Control-Allow-Methods
+        Access-Control-Allow-Headers
+        Access-Control-Max-Age
+        """
+
+    Scenario: Request a resource without an Origin header when all origins are accepted
+        Given Imbo uses the "cors-wildcard.php" configuration
+        When I request "/" using HTTP "GET"
+        Then I should get a response with "200 Hell Yeah"
+        And the "Vary" response header contains "Origin"
+        And the following response headers should not be present:
+        """
+        Access-Control-Allow-Origin
+        Access-Control-Allow-Methods
+        Access-Control-Allow-Headers
+        Access-Control-Max-Age
         """

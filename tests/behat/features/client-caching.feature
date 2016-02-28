@@ -36,24 +36,35 @@ Feature: Imbo enables client caching using related response headers
     Scenario: Request user information
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey"
+        When I request "/users/user"
         Then the response is cacheable
 
     Scenario: Request user images
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images"
+        When I request "/users/user/images"
         Then the response is cacheable
+        And the response has a max age of 0 seconds
+        And the response has a must-revalidate directive
+
+    Scenario: Request user images with custom caching configuration
+        Given Imbo uses the "custom-http-cache.php" configuration
+        And I use "publickey" and "privatekey" for public and private keys
+        And I include an access token in the query
+        When I request "/users/user/images"
+        Then the response has a max age of 15 seconds
+        And the response does not have a must-revalidate directive
 
     Scenario: Request user image
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         And the "Accept" request header is "image/*"
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2"
+        When I request the previously added image
         Then the response is cacheable
+        And the response has a max age of 31536000 seconds
 
     Scenario: Request user image metadata
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
-        When I request "/users/publickey/images/fc7d2d06993047a0b5056e8fac4462a2/meta"
+        When I request the metadata of the previously added image
         Then the response is cacheable

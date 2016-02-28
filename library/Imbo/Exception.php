@@ -25,19 +25,19 @@ interface Exception {
     const ERR_UNSPECIFIED = 0;
 
     // Auth errors
-    const AUTH_UNKNOWN_PUBLIC_KEY = 100;
     const AUTH_MISSING_PARAM      = 101;
     const AUTH_INVALID_TIMESTAMP  = 102;
     const AUTH_SIGNATURE_MISMATCH = 103;
     const AUTH_TIMESTAMP_EXPIRED  = 104;
 
     // Image resource errors
-    const IMAGE_ALREADY_EXISTS       = 200;
-    const IMAGE_NO_IMAGE_ATTACHED    = 201;
-    const IMAGE_HASH_MISMATCH        = 202;
-    const IMAGE_UNSUPPORTED_MIMETYPE = 203;
-    const IMAGE_BROKEN_IMAGE         = 204;
-    const IMAGE_INVALID_IMAGE        = 205;
+    const IMAGE_ALREADY_EXISTS               = 200;
+    const IMAGE_NO_IMAGE_ATTACHED            = 201;
+    const IMAGE_HASH_MISMATCH                = 202;
+    const IMAGE_UNSUPPORTED_MIMETYPE         = 203;
+    const IMAGE_BROKEN_IMAGE                 = 204;
+    const IMAGE_INVALID_IMAGE                = 205;
+    const IMAGE_IDENTIFIER_GENERATION_FAILED = 206;
     /**#@-*/
 
     /**

@@ -24,11 +24,11 @@ class InvalidArgumentExceptionTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getErrorCodes() {
-        return array(
-            array(123, 123),
-            array('123', 123),
-            array(0, 0),
-        );
+        return [
+            [123, 123],
+            ['123', 123],
+            [0, 0],
+        ];
     }
 
     /**

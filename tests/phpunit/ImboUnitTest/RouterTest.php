@@ -31,7 +31,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     public function setUp() {
         $this->router = new Router();
         $this->request = $this->getMockBuilder('Imbo\Http\Request\Request')
-                              ->setMethods(array('getPathInfo', 'getMethod'))
+                              ->setMethods(['getPathInfo', 'getMethod'])
                               ->getMock();
     }
 
@@ -71,19 +71,19 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getInvalidRoutes() {
-        return array(
-            array('/foobar'),
-            array('/status.json/'),
-            array('/users/Christer'),
-            array('/users/christer.json/'),
-            array('/users/Christer.json/'),
-            array('/users/christer/images.json/'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c.gif/'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta.json/'),
-            array('/s/asdfghjk'),
-            array('/s/asdfghj.jpg'),
-        );
+        return [
+            ['/foobar'],
+            ['/status.json/'],
+            ['/users/Christer'],
+            ['/users/christer.json/'],
+            ['/users/Christer.json/'],
+            ['/users/christer/images.json/'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c.gif/'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta.json/'],
+            ['/s/asdfghjk'],
+            ['/s/asdfghj.jpg'],
+        ];
     }
 
     /**
@@ -105,76 +105,76 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getValidRoutes() {
-        return array(
+        return [
             // Global short URL resource
-            array('/s/asdfghj', 'globalshorturl'),
-            array('/s/1234567', 'globalshorturl'),
-            array('/s/1234asd', 'globalshorturl'),
-            array('/s/aAbB012', 'globalshorturl'),
+            ['/s/asdfghj', 'globalshorturl'],
+            ['/s/1234567', 'globalshorturl'],
+            ['/s/1234asd', 'globalshorturl'],
+            ['/s/aAbB012', 'globalshorturl'],
 
             // Short URLs
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls.json', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'json'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls.xml', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'xml'),
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls.json', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'json'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls.xml', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'xml'],
 
             // Short URL
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/asdfghj', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/1234567', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/1234asd', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/aAbB012', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/asdfghj', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/1234567', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/1234asd', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/aAbB012', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
 
             // Status resource
-            array('/status', 'status'),
-            array('/status/', 'status'),
-            array('/status.json', 'status', null, null, 'json'),
-            array('/status.xml', 'status', null, null, 'xml'),
+            ['/status', 'status'],
+            ['/status/', 'status'],
+            ['/status.json', 'status', null, null, 'json'],
+            ['/status.xml', 'status', null, null, 'xml'],
 
             // User resource
-            array('/users/christer', 'user', 'christer'),
-            array('/users/christer/', 'user', 'christer'),
-            array('/users/christer.json', 'user', 'christer', null, 'json'),
-            array('/users/christer.xml', 'user', 'christer', null, 'xml'),
-            array('/users/user_name', 'user', 'user_name'),
-            array('/users/user-name', 'user', 'user-name'),
+            ['/users/christer', 'user', 'christer'],
+            ['/users/christer/', 'user', 'christer'],
+            ['/users/christer.json', 'user', 'christer', null, 'json'],
+            ['/users/christer.xml', 'user', 'christer', null, 'xml'],
+            ['/users/user_name', 'user', 'user_name'],
+            ['/users/user-name', 'user', 'user-name'],
 
             // Images resource
-            array('/users/christer/images', 'images', 'christer'),
-            array('/users/christer/images/', 'images', 'christer'),
-            array('/users/christer/images.json', 'images', 'christer', null, 'json'),
-            array('/users/christer/images.xml', 'images', 'christer', null, 'xml'),
-            array('/users/user_name/images', 'images', 'user_name'),
-            array('/users/user-name/images', 'images', 'user-name'),
+            ['/users/christer/images', 'images', 'christer'],
+            ['/users/christer/images/', 'images', 'christer'],
+            ['/users/christer/images.json', 'images', 'christer', null, 'json'],
+            ['/users/christer/images.xml', 'images', 'christer', null, 'xml'],
+            ['/users/user_name/images', 'images', 'user_name'],
+            ['/users/user-name/images', 'images', 'user-name'],
 
             // Image resource
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c.png', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'png'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c.jpg', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'jpg'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c.gif', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'gif'),
-            array('/users/user_name/images/a9b80ed42957fd508c617549cad07d6c', 'image', 'user_name', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/user-name/images/a9b80ed42957fd508c617549cad07d6c', 'image', 'user-name', 'a9b80ed42957fd508c617549cad07d6c'),
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c.png', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'png'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c.jpg', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'jpg'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c.gif', 'image', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'gif'],
+            ['/users/user_name/images/a9b80ed42957fd508c617549cad07d6c', 'image', 'user_name', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/user-name/images/a9b80ed42957fd508c617549cad07d6c', 'image', 'user-name', 'a9b80ed42957fd508c617549cad07d6c'],
 
             // Metadata resource
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta/', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta.json', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'json'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta.xml', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'xml'),
-            array('/users/user_name/images/a9b80ed42957fd508c617549cad07d6c/meta', 'metadata', 'user_name', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/user-name/images/a9b80ed42957fd508c617549cad07d6c/meta', 'metadata', 'user-name', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata/', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata.json', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'json'),
-            array('/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata.xml', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'xml'),
-            array('/users/user_name/images/a9b80ed42957fd508c617549cad07d6c/metadata', 'metadata', 'user_name', 'a9b80ed42957fd508c617549cad07d6c'),
-            array('/users/user-name/images/a9b80ed42957fd508c617549cad07d6c/metadata', 'metadata', 'user-name', 'a9b80ed42957fd508c617549cad07d6c'),
-        );
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta/', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta.json', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'json'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta.xml', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'xml'],
+            ['/users/user_name/images/a9b80ed42957fd508c617549cad07d6c/meta', 'metadata', 'user_name', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/user-name/images/a9b80ed42957fd508c617549cad07d6c/meta', 'metadata', 'user-name', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata/', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata.json', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'json'],
+            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata.xml', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'xml'],
+            ['/users/user_name/images/a9b80ed42957fd508c617549cad07d6c/metadata', 'metadata', 'user_name', 'a9b80ed42957fd508c617549cad07d6c'],
+            ['/users/user-name/images/a9b80ed42957fd508c617549cad07d6c/metadata', 'metadata', 'user-name', 'a9b80ed42957fd508c617549cad07d6c'],
+        ];
     }
 
     /**
      * @dataProvider getValidRoutes
      * @covers Imbo\Router::route
      */
-    public function testCanMatchValidRoutes($route, $resource, $publicKey = null, $imageIdentifier = null, $extension = null) {
+    public function testCanMatchValidRoutes($route, $resource, $user = null, $imageIdentifier = null, $extension = null) {
         $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
 
@@ -182,7 +182,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
         $route = $this->request->getRoute();
 
-        $this->assertSame($publicKey, $route->get('publicKey'));
+        $this->assertSame($user, $route->get('user'));
         $this->assertSame($imageIdentifier, $route->get('imageIdentifier'));
         $this->assertSame($extension, $route->get('extension'));
         $this->assertSame($resource, (string) $route);

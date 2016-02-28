@@ -45,10 +45,10 @@ class DateFormatterTest extends \PHPUnit_Framework_TestCase {
      * @return array[]
      */
     public function getDates() {
-        return array(
-            array(new DateTime('@1234567890'), 'Fri, 13 Feb 2009 23:31:30 GMT'),
-            array(new DateTime('16/Mar/2012:15:05:00 +0100'), 'Fri, 16 Mar 2012 14:05:00 GMT'),
-        );
+        return [
+            [new DateTime('@1234567890'), 'Fri, 13 Feb 2009 23:31:30 GMT'],
+            [new DateTime('16/Mar/2012:15:05:00 +0100'), 'Fri, 16 Mar 2012 14:05:00 GMT'],
+        ];
     }
 
     /**

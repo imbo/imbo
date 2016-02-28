@@ -44,7 +44,7 @@ class S3 implements StorageInterface {
      *
      * @var array
      */
-    private $params = array(
+    private $params = [
         // Access key
         'key' => null,
 
@@ -56,7 +56,7 @@ class S3 implements StorageInterface {
 
         // Region
         'region' => null,
-    );
+    ];
 
     /**
      * Class constructor
@@ -77,13 +77,13 @@ class S3 implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function store($publicKey, $imageIdentifier, $imageData) {
+    public function store($user, $imageIdentifier, $imageData) {
         try {
-            $this->getClient()->putObject(array(
+            $this->getClient()->putObject([
                 'Bucket' => $this->params['bucket'],
-                'Key' => $this->getImagePath($publicKey, $imageIdentifier),
+                'Key' => $this->getImagePath($user, $imageIdentifier),
                 'Body' => $imageData,
-            ));
+            ]);
         } catch (S3Exception $e) {
             throw new StorageException('Could not store image', 500);
         }
@@ -94,15 +94,15 @@ class S3 implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete($publicKey, $imageIdentifier) {
-        if (!$this->imageExists($publicKey, $imageIdentifier)) {
+    public function delete($user, $imageIdentifier) {
+        if (!$this->imageExists($user, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
 
-        $this->getClient()->deleteObject(array(
+        $this->getClient()->deleteObject([
             'Bucket' => $this->params['bucket'],
-            'Key' => $this->getImagePath($publicKey, $imageIdentifier),
-        ));
+            'Key' => $this->getImagePath($user, $imageIdentifier),
+        ]);
 
         return true;
     }
@@ -110,12 +110,12 @@ class S3 implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImage($publicKey, $imageIdentifier) {
+    public function getImage($user, $imageIdentifier) {
         try {
-            $model = $this->getClient()->getObject(array(
+            $model = $this->getClient()->getObject([
                 'Bucket' => $this->params['bucket'],
-                'Key' => $this->getImagePath($publicKey, $imageIdentifier),
-            ));
+                'Key' => $this->getImagePath($user, $imageIdentifier),
+            ]);
         } catch (NoSuchKeyException $e) {
             throw new StorageException('File not found', 404);
         }
@@ -126,12 +126,12 @@ class S3 implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getLastModified($publicKey, $imageIdentifier) {
+    public function getLastModified($user, $imageIdentifier) {
         try {
-            $model = $this->getClient()->headObject(array(
+            $model = $this->getClient()->headObject([
                 'Bucket' => $this->params['bucket'],
-                'Key' => $this->getImagePath($publicKey, $imageIdentifier),
-            ));
+                'Key' => $this->getImagePath($user, $imageIdentifier),
+            ]);
         } catch (NoSuchKeyException $e) {
             throw new StorageException('File not found', 404);
         }
@@ -144,9 +144,9 @@ class S3 implements StorageInterface {
      */
     public function getStatus() {
         try {
-            $this->getClient()->headBucket(array(
+            $this->getClient()->headBucket([
                 'Bucket' => $this->params['bucket'],
-            ));
+            ]);
         } catch (S3Exception $e) {
             return false;
         }
@@ -157,12 +157,12 @@ class S3 implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function imageExists($publicKey, $imageIdentifier) {
+    public function imageExists($user, $imageIdentifier) {
         try {
-            $this->getClient()->headObject(array(
+            $this->getClient()->headObject([
                 'Bucket' => $this->params['bucket'],
-                'Key' => $this->getImagePath($publicKey, $imageIdentifier),
-            ));
+                'Key' => $this->getImagePath($user, $imageIdentifier),
+            ]);
         } catch (NoSuchKeyException $e) {
             return false;
         }
@@ -173,21 +173,22 @@ class S3 implements StorageInterface {
     /**
      * Get the path to an image
      *
-     * @param string $publicKey The key
+     * @param string $user The user which the image belongs to
      * @param string $imageIdentifier Image identifier
      * @return string
      */
-    private function getImagePath($publicKey, $imageIdentifier) {
-        return implode('/', array(
-            $publicKey[0],
-            $publicKey[1],
-            $publicKey[2],
-            $publicKey,
+    private function getImagePath($user, $imageIdentifier) {
+        $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
+        return implode('/', [
+            $userPath[0],
+            $userPath[1],
+            $userPath[2],
+            $user,
             $imageIdentifier[0],
             $imageIdentifier[1],
             $imageIdentifier[2],
             $imageIdentifier,
-        ));
+        ]);
     }
 
     /**
@@ -197,10 +198,10 @@ class S3 implements StorageInterface {
      */
     private function getClient() {
         if ($this->client === null) {
-            $params = array(
+            $params = [
                 'key' => $this->params['key'],
                 'secret' => $this->params['secret'],
-            );
+            ];
 
             if ($this->params['region']) {
                 $params['region'] = $this->params['region'];

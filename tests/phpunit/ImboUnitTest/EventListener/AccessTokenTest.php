@@ -24,7 +24,7 @@ class AccessTokenTest extends ListenerTests {
     private $listener;
 
     private $event;
-    private $userLookup;
+    private $accessControl;
     private $request;
     private $response;
     private $responseHeaders;
@@ -36,7 +36,7 @@ class AccessTokenTest extends ListenerTests {
     public function setUp() {
         $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
 
-        $this->userLookup = $this->getMock('Imbo\Auth\UserLookupInterface');
+        $this->accessControl = $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
 
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->request->query = $this->query;
@@ -45,10 +45,7 @@ class AccessTokenTest extends ListenerTests {
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->response->headers = $this->responseHeaders;
 
-        $this->event = $this->getMock('Imbo\EventManager\Event');
-        $this->event->expects($this->any())->method('getUserLookup')->will($this->returnValue($this->userLookup));
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->event = $this->getEventMock();
 
         $this->listener = new AccessToken();
     }
@@ -104,77 +101,77 @@ class AccessTokenTest extends ListenerTests {
      * @return array[]
      */
     public function getFilterData() {
-        return array(
-            'no filter and no transformations' => array(
-                $filter = array(),
-                $transformations = array(),
+        return [
+            'no filter and no transformations' => [
+                $filter = [],
+                $transformations = [],
                 $whitelisted = false,
-            ),
+            ],
             // @see https://github.com/imbo/imbo/issues/258
-            'configured filters, but no transformations in the request' => array(
-                $filter = array('transformations' => array('whitelist' => array('border'))),
-                $transformations = array(),
+            'configured filters, but no transformations in the request' => [
+                $filter = ['transformations' => ['whitelist' => ['border']]],
+                $transformations = [],
                 $whitelisted = false,
-            ),
-            array(
-                $filter = array(),
-                $transformations = array(
-                    array('name' => 'border', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = [],
+                $transformations = [
+                    ['name' => 'border', 'params' => []],
+                ],
                 $whitelisted = false,
-            ),
-            array(
-                $filter = array('transformations' => array('whitelist' => array('border'))),
-                $transformations = array(
-                    array('name' => 'border', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['whitelist' => ['border']]],
+                $transformations = [
+                    ['name' => 'border', 'params' => []],
+                ],
                 $whitelisted = true,
-            ),
-            array(
-                $filter = array('transformations' => array('whitelist' => array('border'))),
-                $transformations = array(
-                    array('name' => 'border', 'params' => array()),
-                    array('name' => 'thumbnail', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['whitelist' => ['border']]],
+                $transformations = [
+                    ['name' => 'border', 'params' => []],
+                    ['name' => 'thumbnail', 'params' => []],
+                ],
                 $whitelisted = false,
-            ),
-            array(
-                $filter = array('transformations' => array('blacklist' => array('border'))),
-                $transformations = array(
-                    array('name' => 'thumbnail', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['blacklist' => ['border']]],
+                $transformations = [
+                    ['name' => 'thumbnail', 'params' => []],
+                ],
                 $whitelisted = true,
-            ),
-            array(
-                $filter = array('transformations' => array('blacklist' => array('border'))),
-                $transformations = array(
-                    array('name' => 'border', 'params' => array()),
-                    array('name' => 'thumbnail', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['blacklist' => ['border']]],
+                $transformations = [
+                    ['name' => 'border', 'params' => []],
+                    ['name' => 'thumbnail', 'params' => []],
+                ],
                 $whitelisted = false,
-            ),
-            array(
-                $filter = array('transformations' => array('whitelist' => array('border'), 'blacklist' => array('thumbnail'))),
-                $transformations = array(
-                    array('name' => 'border', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['thumbnail']]],
+                $transformations = [
+                    ['name' => 'border', 'params' => []],
+                ],
                 $whitelisted = true,
-            ),
-            array(
-                $filter = array('transformations' => array('whitelist' => array('border'), 'blacklist' => array('thumbnail'))),
-                $transformations = array(
-                    array('name' => 'canvas', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['thumbnail']]],
+                $transformations = [
+                    ['name' => 'canvas', 'params' => []],
+                ],
                 $whitelisted = false,
-            ),
-            array(
-                $filter = array('transformations' => array('whitelist' => array('border'), 'blacklist' => array('border'))),
-                $transformations = array(
-                    array('name' => 'border', 'params' => array()),
-                ),
+            ],
+            [
+                $filter = ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['border']]],
+                $transformations = [
+                    ['name' => 'border', 'params' => []],
+                ],
                 $whitelisted = false,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -202,33 +199,40 @@ class AccessTokenTest extends ListenerTests {
      * @return array[]
      */
     public function getAccessTokens() {
-        return array(
-            array(
+        return [
+            [
                 'http://imbo/users/christer',
                 'some access token',
                 'private key',
                 false
-            ),
-            array(
+            ],
+            [
                 'http://imbo/users/christer',
                 '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
                 'private key',
                 true
-            ),
-            array(
+            ],
+            [
                 'http://imbo/users/christer',
                 '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
                 'other private key',
                 false
-            ),
+            ],
             // Test that checking URL "as is" works properly. This is for backwards compatibility.
-            array(
+            [
                 'http://imbo/users/christer?t[]=thumbnail%3Awidth%3D40%2Cheight%3D40%2Cfit%3Doutbound',
                 'f0166cb4f7c8eabbe82c5d753f681ed53bcfa10391d4966afcfff5806cc2bff4',
                 'some random private key',
                 true
-            ),
-        );
+            ],
+            // Test checking URL against incorrect protocol
+            [
+                'https://imbo/users/christer',
+                '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
+                'private key',
+                false
+            ],
+        ];
     }
 
     /**
@@ -245,7 +249,7 @@ class AccessTokenTest extends ListenerTests {
         $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue(urldecode($url)));
         $this->request->expects($this->once())->method('getUriAsIs')->will($this->returnValue($url));
 
-        $this->userLookup->expects($this->once())->method('getPrivateKeys')->will($this->returnValue([$privateKey]));
+        $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
 
         $this->listener->checkAccessToken($this->event);
     }
@@ -257,5 +261,136 @@ class AccessTokenTest extends ListenerTests {
         $this->responseHeaders->expects($this->once())->method('has')->with('X-Imbo-ShortUrl')->will($this->returnValue(true));
         $this->query->expects($this->never())->method('has');
         $this->listener->checkAccessToken($this->event);
+    }
+
+    /**
+     * @covers Imbo\EventListener\AccessToken::checkAccessToken
+     */
+    public function testWillAcceptBothProtocolsIfConfiguredTo() {
+        $event = $this->getEventMock([
+            'authentication' => [
+                'protocol' => 'both'
+            ]
+        ]);
+
+        $privateKey = 'foobar';
+        $baseUrl = '//imbo.host/users/some-user/imgUrl.png?t[]=smartSize:width=320,height=240';
+
+        foreach (['http', 'https'] as $signedProtocol) {
+            $token = hash_hmac('sha256', $signedProtocol . ':' . $baseUrl, $privateKey);
+
+            foreach (['http', 'https'] as $protocol) {
+                $url = $protocol . ':' . $baseUrl . '&accessToken=' . $token;
+
+                $this->query->expects($this->any())->method('has')->with('accessToken')->will($this->returnValue(true));
+                $this->query->expects($this->any())->method('get')->with('accessToken')->will($this->returnValue($token));
+                $this->request->expects($this->any())->method('getRawUri')->will($this->returnValue(urldecode($url)));
+                $this->request->expects($this->any())->method('getUriAsIs')->will($this->returnValue($url));
+
+                $this->accessControl->expects($this->any())->method('getPrivateKey')->will($this->returnValue($privateKey));
+
+                $this->listener->checkAccessToken($event);
+            }
+        }
+    }
+
+    /**
+     * Get access tokens with rewritten URLs
+     *
+     * @return array[]
+     */
+    public function getRewrittenAccessTokenData() {
+        $getAccessToken = function($url) {
+            return hash_hmac('sha256', $url, 'foobar');
+        };
+
+        return [
+            [
+                // Access token created from URL
+                $getAccessToken('http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                 // URL returned by Imbo
+                'http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                // Protocol which Imbo is configured to rewrite incoming URL to
+                'http',
+                // Should it accept the access token as correct?
+                true
+            ],
+            [
+                $getAccessToken('http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'http',
+                true
+            ],
+            [
+                $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'http',
+                false
+            ],
+            [
+                $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'http',
+                false
+            ],
+            [
+                $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'https',
+                true
+            ],
+            [
+                $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'https',
+                true
+            ],
+            [
+                $getAccessToken('http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'https',
+                false
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getRewrittenAccessTokenData
+     * @covers Imbo\EventListener\AccessToken::checkAccessToken
+     */
+    public function testWillRewriteIncomingUrlToConfiguredProtocol($accessToken, $url, $protocol, $correct) {
+        if (!$correct) {
+            $this->setExpectedException('Imbo\Exception\RuntimeException', 'Incorrect access token', 400);
+        }
+
+        $event = $this->getEventMock([
+            'authentication' => [
+                'protocol' => $protocol
+            ]
+        ]);
+
+        $url = $url . '&accessToken=' . $accessToken;
+
+        $this->query->expects($this->any())->method('has')->with('accessToken')->will($this->returnValue(true));
+        $this->query->expects($this->any())->method('get')->with('accessToken')->will($this->returnValue($accessToken));
+        $this->request->expects($this->any())->method('getRawUri')->will($this->returnValue(urldecode($url)));
+        $this->request->expects($this->any())->method('getUriAsIs')->will($this->returnValue($url));
+
+        $this->accessControl->expects($this->any())->method('getPrivateKey')->will($this->returnValue('foobar'));
+
+        $this->listener->checkAccessToken($event);
+    }
+
+    protected function getEventMock($config = null) {
+        $event = $this->getMock('Imbo\EventManager\Event');
+        $event->expects($this->any())->method('getAccessControl')->will($this->returnValue($this->accessControl));
+        $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
+        $event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $event->expects($this->any())->method('getConfig')->will($this->returnValue($config ?: [
+            'authentication' => [
+                'protocol' => 'incoming'
+            ]
+        ]));
+        return $event;
     }
 }

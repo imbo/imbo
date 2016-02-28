@@ -8,25 +8,52 @@
  * distributed with this source code.
  */
 
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
+    Imbo\Resource;
+
 // Default config for testing
-$testConfig = array(
-    'auth' => array(
-        'publickey' => 'privatekey',
-        'user' => 'key',
-    ),
+$testConfig = [
+    'accessControl' => function() {
+        return new ArrayAdapter([
+            [
+                'publicKey' => 'publickey',
+                'privateKey' => 'privatekey',
+                'acl' => [[
+                    'resources' => Resource::getReadWriteResources(),
+                    'users' => ['user', 'other-user'],
+                ]]
+            ],
+            [
+                'publicKey' => 'unpriviledged',
+                'privateKey' => 'privatekey',
+                'acl' => [[
+                    'resources' => Resource::getReadWriteResources(),
+                    'users' => ['user'],
+                ]]
+            ],
+            [
+                'publicKey' => 'wildcard',
+                'privateKey' => '*',
+                'acl' => [[
+                    'resources' => Resource::getReadWriteResources(),
+                    'users' => '*'
+                ]]
+            ]
+        ]);
+    },
 
     'database' => function() {
-        return new Imbo\Database\MongoDB(array(
+        return new Imbo\Database\MongoDB([
             'databaseName' => 'imbo_testing',
-        ));
+        ]);
     },
 
     'storage' => function() {
-        return new Imbo\Storage\GridFS(array(
+        return new Imbo\Storage\GridFS([
             'databaseName' => 'imbo_testing',
-        ));
+        ]);
     },
-);
+];
 
 // Default Imbo config
 $defaultConfig = require __DIR__ . '/../../../config/config.default.php';
@@ -35,7 +62,7 @@ $defaultConfig = require __DIR__ . '/../../../config/config.default.php';
 if (isset($_SERVER['HTTP_X_IMBO_TEST_CONFIG'])) {
     $customConfig = require __DIR__ . '/' . basename($_SERVER['HTTP_X_IMBO_TEST_CONFIG']);
 } else {
-    $customConfig = array();
+    $customConfig = [];
 }
 
 // Return the merged configuration, having the custom config overwrite the default testing config,

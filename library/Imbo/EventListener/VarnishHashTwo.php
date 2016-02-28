@@ -45,10 +45,10 @@ class VarnishHashTwo implements ListenerInterface {
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
-        return array(
-            'image.get' => array('addHeader' => -1),
-            'image.head' => array('addHeader' => -1),
-        );
+        return [
+            'image.get' => ['addHeader' => -1],
+            'image.head' => ['addHeader' => -1],
+        ];
     }
 
     /**
@@ -60,15 +60,15 @@ class VarnishHashTwo implements ListenerInterface {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
-        $publicKey = $request->getPublicKey();
+        $user = $request->getUser();
         $imageIdentifier = $response->getModel()->getImageIdentifier();
 
         $response->headers->set(
             $this->header,
-            array(
-                'imbo;image;' . $publicKey . ';' . $imageIdentifier,
-                'imbo;user;' . $publicKey,
-            )
+            [
+                'imbo;image;' . $user . ';' . $imageIdentifier,
+                'imbo;user;' . $user,
+            ]
         );
     }
 }
