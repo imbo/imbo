@@ -18,8 +18,8 @@ Feature: Imbo provides a group endpoint
         """
         Examples:
             | extension | content-type     | response |
-            | json      | application/json | #^{"resources":\["images\.get","images\.head"]}$# |
-            | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<resources>\s*<resource>images\.get</resource>\s*<resource>images\.head</resource>\s*</resources>\s*</imbo>$#ms |
+            | json      | application/json | #^{"name":"images-read","resources":\["images\.get","images\.head"]}$# |
+            | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<name>images-read</name>\s*<resources>\s*<resource>images\.get</resource>\s*<resource>images\.head</resource>\s*</resources>\s*</imbo>$#ms |
 
     Scenario Outline: Create a resource group with invalid data
         Given Imbo uses the "access-control-mutable.php" configuration

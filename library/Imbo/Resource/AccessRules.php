@@ -71,7 +71,7 @@ class AccessRules implements ResourceInterface {
         }
 
         $model = new AccessRulesModel();
-        $model->setData($accessList);
+        $model->setRules($accessList);
 
         $event->getResponse()->setModel($model);
     }
