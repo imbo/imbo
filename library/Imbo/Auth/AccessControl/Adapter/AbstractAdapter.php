@@ -30,6 +30,11 @@ abstract class AbstractAdapter implements AdapterInterface {
     /**
      * {@inheritdoc}
      */
+    abstract public function groupExists($groupName);
+
+    /**
+     * {@inheritdoc}
+     */
     abstract public function getGroup($groupName);
 
     /**

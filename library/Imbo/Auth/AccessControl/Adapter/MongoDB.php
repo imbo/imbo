@@ -134,6 +134,15 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
     /**
      * {@inheritdoc}
      */
+    public function groupExists($groupName) {
+        return (boolean) $this->getGroupsCollection()->findOne([
+            'name' => $groupName
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getGroup($groupName) {
         if (isset($this->groups[$groupName])) {
             return $this->groups[$groupName];

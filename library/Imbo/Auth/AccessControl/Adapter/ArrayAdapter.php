@@ -74,6 +74,13 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
     /**
      * {@inheritdoc}
      */
+    public function groupExists($groupName) {
+        return isset($this->groups[$groupName]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getGroup($groupName) {
         return isset($this->groups[$groupName]) ? $this->groups[$groupName] : false;
     }

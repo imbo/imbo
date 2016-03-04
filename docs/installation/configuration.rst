@@ -52,7 +52,7 @@ The adapter is set up using the ``accessControl`` key in your configuration file
             return new Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter([
                 'some-user' => 'my-super-secret-private-key',
                 'other-user' => 'other-super-secret-private-key',
-            ])
+            ]);
         },
 
         // ...
