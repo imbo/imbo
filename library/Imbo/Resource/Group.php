@@ -49,14 +49,18 @@ class Group implements ResourceInterface {
     public function getGroup(EventInterface $event) {
         $route = $event->getRequest()->getRoute();
         $groupName = $route->get('group');
-        $group = $event->getAccessControl()->getGroup($groupName);
 
-        if (!$group) {
+        $adapter = $event->getAccessControl();
+
+        if (!$adapter->groupExists($groupName)) {
             throw new ResourceException('Resource group not found', 404);
         }
 
+        $resources = $adapter->getGroup($groupName);
+
         $model = new GroupModel();
-        $model->setData(['resources' => $group]);
+        $model->setName($groupName);
+        $model->setResources($resources);
 
         $response = $event->getResponse();
         $response->setModel($model);

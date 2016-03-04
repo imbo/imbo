@@ -250,17 +250,16 @@ GROUPS;
      * {@inheritdoc}
      */
     public function formatGroup(Model\Group $model) {
-        $data = $model->getData();
-
         $entries = '';
 
-        foreach ($data['resources'] as $resource) {
+        foreach ($model->getResources() as $resource) {
             $entries .= '<resource>' . $this->formatValue($resource) . '</resource>';
         }
 
         return <<<GROUP
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
+  <name>{$model->getName()}</name>
   <resources>{$entries}</resources>
 </imbo>
 GROUP;
