@@ -27,7 +27,7 @@ class Group implements ModelInterface {
     /**
      * Resources
      *
-     * @var array
+     * @var string[]
      */
     private $resources = [];
 
@@ -55,7 +55,7 @@ class Group implements ModelInterface {
     /**
      * Set the group resources
      *
-     * @param array $resources
+     * @param string[] $resources
      * @return self
      */
     public function setResources(array $resources = []) {
@@ -67,7 +67,7 @@ class Group implements ModelInterface {
     /**
      * Get the group resources
      *
-     * @return array
+     * @return string[]
      */
     public function getResources() {
         return $this->resources;
