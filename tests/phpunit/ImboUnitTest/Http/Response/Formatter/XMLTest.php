@@ -489,16 +489,17 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\XML::formatGroup
      */
     public function testCanFormatAGroupModel() {
-        $group = [
-            'name' => 'group',
-            'resources' => ['user.get', 'user.head'],
+        $name = 'group';
+        $resources = [
+            'user.get',
+            'user.head',
         ];
+
         $model = $this->getMock('Imbo\Model\Group');
-        $model->expects($this->once())->method('getData')->will($this->returnValue($group));
+        $model->expects($this->once())->method('getName')->will($this->returnValue($name));
+        $model->expects($this->once())->method('getResources')->will($this->returnValue($resources));
 
-        $xml = $this->formatter->format($model);
-
-        $this->assertRegExp('#<imbo>\s*<resources><resource>user.get</resource><resource>user.head</resource></resources>\s*</imbo>$#', $xml);
+        $this->assertRegExp('#<imbo>\s*<name>group</name>\s*<resources><resource>user.get</resource><resource>user.head</resource></resources>\s*</imbo>$#', $this->formatter->format($model));
     }
 
     /**
@@ -506,16 +507,15 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\XML::formatAccessRule
      * @covers Imbo\Http\Response\Formatter\XML::formatAccessRuleArray
      */
-    public function testCanFormatAnAccessRuleModel() {
-        $rule = [
-            'id' => 1,
-            'resources' => ['images.get', 'image.get'],
-            'users' => ['user1', 'user2'],
-        ];
-        $model = $this->getMock('Imbo\Model\AccessRule');
-        $model->expects($this->once())->method('getData')->will($this->returnValue($rule));
+    public function testCanFormatAnAccessRuleModelWithGroup() {
+    }
 
-        $this->assertRegExp('#<imbo>\s*<rule id="1"><resources><resource>images.get</resource><resource>image.get</resource></resources><users><user>user1</user><user>user2</user></users></rule>\s*</imbo>$#', $this->formatter->format($model));
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatAccessRule
+     * @covers Imbo\Http\Response\Formatter\XML::formatAccessRuleArray
+     */
+    public function testCanFormatAnAccessRuleModelWithResource() {
     }
 
     /**
@@ -527,19 +527,19 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $rules = [
             [
                 'id' => 1,
-                'resources' => ['image.get'],
-                'users' => ['user1'],
+                'group' => 'group',
+                'users' => ['user1', 'user2'],
             ],
             [
                 'id' => 2,
-                'resources' => ['image.head'],
-                'users' => ['user2'],
+                'resources' => ['image.get', 'image.head'],
+                'users' => ['user3', 'user4'],
             ],
         ];
         $model = $this->getMock('Imbo\Model\AccessRules');
-        $model->expects($this->once())->method('getData')->will($this->returnValue($rules));
+        $model->expects($this->once())->method('getRules')->will($this->returnValue($rules));
 
-        $this->assertRegExp('#<imbo>\s*<access><rule id="1"><resources><resource>image.get</resource></resources><users><user>user1</user></users></rule><rule id="2"><resources><resource>image.head</resource></resources><users><user>user2</user></users></rule></access>\s*</imbo>$#', $this->formatter->format($model));
+        $this->assertRegExp('#<imbo>\s*<access><rule id="1"><group>group</group><users><user>user1</user><user>user2</user></users></rule><rule id="2"><resources><resource>image.get</resource><resource>image.head</resource></resources><users><user>user3</user><user>user4</user></users></rule></access>\s*</imbo>$#', $this->formatter->format($model));
     }
 
     /**
