@@ -419,39 +419,51 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\JSON::formatGroup
      */
     public function testCanFormatAGroupModel() {
-        $group = [
-            'name' => 'group',
-            'resources' => [
-                'user.get',
-                'user.head',
-            ],
+        $name = 'group';
+        $resources = [
+            'user.get',
+            'user.head',
         ];
-        $model = $this->getMock('Imbo\Model\Group');
-        $model->expects($this->once())->method('getData')->will($this->returnValue($group));
 
-        $this->assertSame($group, json_decode($this->formatter->format($model), true));
+        $model = $this->getMock('Imbo\Model\Group');
+        $model->expects($this->once())->method('getName')->will($this->returnValue($name));
+        $model->expects($this->once())->method('getResources')->will($this->returnValue($resources));
+
+        $this->assertSame('{"name":"group","resources":["user.get","user.head"]}', $this->formatter->format($model));
     }
 
     /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatAccessRule
      */
-    public function testCanFormatAnAccessRuleModel() {
-        $data = [
-            'some key' => 'some value',
-            'some other key' => 'some other value',
-            'nested' => [
-                'subkey' => [
-                    'subsubkey' => 'some value',
-                ],
-            ],
-        ];
+    public function testCanFormatAnAccessRuleModelWithGroup() {
+        $id = 1;
+        $users = ['user1', 'user2'];
+        $group = 'group';
+
         $model = $this->getMock('Imbo\Model\AccessRule');
-        $model->expects($this->once())->method('getData')->will($this->returnValue($data));
+        $model->expects($this->once())->method('getId')->will($this->returnValue($id));
+        $model->expects($this->once())->method('getUsers')->will($this->returnValue($users));
+        $model->expects($this->once())->method('getGroup')->will($this->returnValue($group));
 
-        $json = $this->formatter->format($model);
+        $this->assertSame('{"id":1,"users":["user1","user2"],"group":"group"}', $this->formatter->format($model));
+    }
 
-        $this->assertSame(json_decode($json, true), $data);
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatAccessRule
+     */
+    public function testCanFormatAnAccessRuleModelWithResource() {
+        $id = 1;
+        $users = ['user1', 'user2'];
+        $resources = ['resource1', 'resource2'];
+
+        $model = $this->getMock('Imbo\Model\AccessRule');
+        $model->expects($this->once())->method('getId')->will($this->returnValue($id));
+        $model->expects($this->once())->method('getUsers')->will($this->returnValue($users));
+        $model->expects($this->once())->method('getResources')->will($this->returnValue($resources));
+
+        $this->assertSame('{"id":1,"users":["user1","user2"],"resources":["resource1","resource2"]}', $this->formatter->format($model));
     }
 
     /**
@@ -459,21 +471,22 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\JSON::formatAccessRules
      */
     public function testCanFormatAccessRulesModel() {
-        $data = [
-            'some key' => 'some value',
-            'some other key' => 'some other value',
-            'nested' => [
-                'subkey' => [
-                    'subsubkey' => 'some value',
-                ],
+        $rules = [
+            [
+                'id' => 1,
+                'group' => 'group',
+                'users' => ['user1', 'user2'],
+            ],
+            [
+                'id' => 2,
+                'resources' => ['image.get', 'image.head'],
+                'users' => ['user3', 'user4'],
             ],
         ];
         $model = $this->getMock('Imbo\Model\AccessRules');
-        $model->expects($this->once())->method('getData')->will($this->returnValue($data));
+        $model->expects($this->once())->method('getRules')->will($this->returnValue($rules));
 
-        $json = $this->formatter->format($model);
-
-        $this->assertSame(json_decode($json, true), $data);
+        $this->assertSame('[{"id":1,"group":"group","users":["user1","user2"]},{"id":2,"resources":["image.get","image.head"],"users":["user3","user4"]}]', $this->formatter->format($model));
     }
 
     /**
