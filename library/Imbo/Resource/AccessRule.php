@@ -66,7 +66,16 @@ class AccessRule implements ResourceInterface {
         }
 
         $model = new AccessRuleModel();
-        $model->setData($accessRule);
+        $model->setId($accessRule['id'])
+              ->setUsers($accessRule['users']);
+
+        if (isset($accessRule['group'])) {
+            $model->setGroup($accessRule['group']);
+        }
+
+        if (isset($accessRule['resources'])) {
+            $model->setResources($accessRule['resources']);
+        }
 
         $event->getResponse()->setModel($model);
     }

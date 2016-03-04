@@ -182,14 +182,27 @@ class JSON extends Formatter implements FormatterInterface {
      * {@inheritdoc}
      */
     public function formatAccessRule(Model\AccessRule $model) {
-        return $this->encode($model->getData());
+        $data = [
+            'id' => $model->getId(),
+            'users' => $model->getUsers(),
+        ];
+
+        if ($group = $model->getGroup()) {
+            $data['group'] = $group;
+        }
+
+        if ($resources = $model->getResources()) {
+            $data['resources'] = $resources;
+        }
+
+        return $this->encode($data);
     }
 
     /**
      * {@inheritdoc}
      */
     public function formatAccessRules(Model\AccessRules $model) {
-        return $this->encode($model->getData());
+        return $this->encode($model->getRules());
     }
 
     /**
