@@ -49,8 +49,17 @@ interface AdapterInterface {
     function getGroups(GroupQuery $query = null, GroupsModel $model);
 
     /**
+     * Check whether or not a group exists
+     *
+     * @param string $groupName Name of the group
+     * @return boolean
+     */
+    function groupExists($groupName);
+
+    /**
      * Fetch a resource group with the given name
      *
+     * @param string $groupName Name of the group
      * @return array Array of resources the group consists of
      */
     function getGroup($groupName);
