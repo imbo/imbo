@@ -271,6 +271,34 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatImages
+     */
+    public function testCanFormatAnImagesModelWithSomefields() {
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->once())->method('getAddedDate')->will($this->returnValue(new DateTime()));
+        $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue(new DateTime()));
+
+        $images = [$image];
+        $model = $this->getMock('Imbo\Model\Images');
+        $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
+        $fields = ['size', 'width', 'height'];
+        $model->expects($this->once())->method('getFields')->will($this->returnValue($fields));
+
+        $json = $this->formatter->format($model);
+
+        $data = json_decode($json, true);
+        $this->assertCount(1, $data['images']);
+        $image = $data['images'][0];
+
+        $this->assertArrayHasKey('size', $image);
+        $this->assertArrayHasKey('width', $image);
+        $this->assertArrayHasKey('height', $image);
+
+        $this->assertSameSize($fields, $image, 'Image array has to many keys');
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatMetadataModel
      */
     public function testCanFormatAMetadataModel() {
@@ -363,5 +391,135 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $model->expects($this->once())->method('getContainer')->will($this->returnValue($container));
 
         $this->assertSame('{"foo":[]}', $this->formatter->format($model));
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatGroups
+     */
+    public function testCanFormatGroupsModel() {
+        $groups = ['group', 'othergroup'];
+        $count = count($groups);
+        $hits = 2;
+        $limit = 5;
+        $page = 1;
+
+        $model = $this->getMock('Imbo\Model\Groups');
+        $model->expects($this->once())->method('getHits')->will($this->returnValue($hits));
+        $model->expects($this->once())->method('getPage')->will($this->returnValue($page));
+        $model->expects($this->once())->method('getLimit')->will($this->returnValue($limit));
+        $model->expects($this->once())->method('getCount')->will($this->returnValue($count));
+        $model->expects($this->once())->method('getGroups')->will($this->returnValue($groups));
+
+        $this->assertSame('{"search":{"hits":2,"page":1,"limit":5,"count":2},"groups":["group","othergroup"]}', $this->formatter->format($model));
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatGroup
+     */
+    public function testCanFormatAGroupModel() {
+        $group = [
+            'name' => 'group',
+            'resources' => [
+                'user.get',
+                'user.head',
+            ],
+        ];
+        $model = $this->getMock('Imbo\Model\Group');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($group));
+
+        $this->assertSame($group, json_decode($this->formatter->format($model), true));
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatAccessRule
+     */
+    public function testCanFormatAnAccessRuleModel() {
+        $data = [
+            'some key' => 'some value',
+            'some other key' => 'some other value',
+            'nested' => [
+                'subkey' => [
+                    'subsubkey' => 'some value',
+                ],
+            ],
+        ];
+        $model = $this->getMock('Imbo\Model\AccessRule');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($data));
+
+        $json = $this->formatter->format($model);
+
+        $this->assertSame(json_decode($json, true), $data);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatAccessRules
+     */
+    public function testCanFormatAccessRulesModel() {
+        $data = [
+            'some key' => 'some value',
+            'some other key' => 'some other value',
+            'nested' => [
+                'subkey' => [
+                    'subsubkey' => 'some value',
+                ],
+            ],
+        ];
+        $model = $this->getMock('Imbo\Model\AccessRules');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($data));
+
+        $json = $this->formatter->format($model);
+
+        $this->assertSame(json_decode($json, true), $data);
+    }
+
+    /**
+     * Data provider for the stats model
+     *
+     * @return array[]
+     */
+    public function getStats() {
+        return [
+            'no-custom-stats' => [
+                1,
+                2,
+                3,
+                [],
+                '{"numImages":1,"numUsers":2,"numBytes":3,"custom":{}}',
+            ],
+            'custom-stats' => [
+                4,
+                5,
+                6,
+                [
+                    'foo' => 'bar',
+                    'bar' => [
+                        'foobar' => 'foooo',
+                    ],
+                ],
+                '{"numImages":4,"numUsers":5,"numBytes":6,"custom":{"foo":"bar","bar":{"foobar":"foooo"}}}',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getStats
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\JSON::formatStats
+     */
+    public function testCanFormatAStatsModel($images, $users, $bytes, $customStats, $expectedJson) {
+        $model = $this->getMock('Imbo\Model\Stats');
+        $model->expects($this->once())->method('getNumImages')->will($this->returnValue($images));
+        $model->expects($this->once())->method('getNumUsers')->will($this->returnValue($users));
+        $model->expects($this->once())->method('getNumBytes')->will($this->returnValue($bytes));
+        $model->expects($this->once())->method('getCustomStats')->will($this->returnValue($customStats));
+
+        $this->assertSame(
+            $this->formatter->format($model),
+            $expectedJson
+        );
     }
 }

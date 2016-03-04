@@ -275,6 +275,26 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatImages
+     */
+    public function testCanFormatAnImagesModelWithSomefields() {
+        $image = $this->getMock('Imbo\Model\Image');
+        $image->expects($this->never())->method('getAddedDate');
+        $image->expects($this->never())->method('getUpdatedDate');
+
+        $images = [$image];
+        $model = $this->getMock('Imbo\Model\Images');
+        $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
+        $fields = ['size', 'width', 'height'];
+        $model->expects($this->once())->method('getFields')->will($this->returnValue($fields));
+
+        $xml = $this->formatter->format($model);
+
+        $this->assertContains('<images><image><size></size><width></width><height></height></image></images>', $xml);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\XML::formatMetadata
      */
     public function testCanFormatAMetadataModel() {
@@ -433,6 +453,137 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $model->expects($this->once())->method('getEntry')->will($this->returnValue($entry));
 
         $this->assertContains('<imbo><users></users></imbo>', $this->formatter->format($model));
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatGroups
+     */
+    public function testCanFormatGroupsModel() {
+        $groups = [
+            [
+                'name' => 'group',
+                'resources' => [
+                    'user.get',
+                    'user.head',
+                ],
+            ],
+        ];
+        $count = count($groups);
+        $hits = 2;
+        $limit = 5;
+        $page = 1;
+
+        $model = $this->getMock('Imbo\Model\Groups');
+        $model->expects($this->once())->method('getHits')->will($this->returnValue($hits));
+        $model->expects($this->once())->method('getPage')->will($this->returnValue($page));
+        $model->expects($this->once())->method('getLimit')->will($this->returnValue($limit));
+        $model->expects($this->once())->method('getCount')->will($this->returnValue($count));
+        $model->expects($this->once())->method('getGroups')->will($this->returnValue($groups));
+
+        $this->assertRegExp('#<imbo>\s*<search>\s*<hits>2</hits>\s*<page>1</page>\s*<limit>5</limit>\s*<count>1</count>\s*</search>\s*<groups><group>\s*<name>group</name>\s*<resources>\s*<resource>user.get</resource><resource>user.head</resource>\s*</resources></group></groups>\s</imbo>$#', $this->formatter->format($model));
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatGroup
+     */
+    public function testCanFormatAGroupModel() {
+        $group = [
+            'name' => 'group',
+            'resources' => ['user.get', 'user.head'],
+        ];
+        $model = $this->getMock('Imbo\Model\Group');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($group));
+
+        $xml = $this->formatter->format($model);
+
+        $this->assertRegExp('#<imbo>\s*<resources><resource>user.get</resource><resource>user.head</resource></resources>\s*</imbo>$#', $xml);
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatAccessRule
+     * @covers Imbo\Http\Response\Formatter\XML::formatAccessRuleArray
+     */
+    public function testCanFormatAnAccessRuleModel() {
+        $rule = [
+            'id' => 1,
+            'resources' => ['images.get', 'image.get'],
+            'users' => ['user1', 'user2'],
+        ];
+        $model = $this->getMock('Imbo\Model\AccessRule');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($rule));
+
+        $this->assertRegExp('#<imbo>\s*<rule id="1"><resources><resource>images.get</resource><resource>image.get</resource></resources><users><user>user1</user><user>user2</user></users></rule>\s*</imbo>$#', $this->formatter->format($model));
+    }
+
+    /**
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatAccessRules
+     * @covers Imbo\Http\Response\Formatter\XML::formatAccessRuleArray
+     */
+    public function testCanFormatAccessRulesModel() {
+        $rules = [
+            [
+                'id' => 1,
+                'resources' => ['image.get'],
+                'users' => ['user1'],
+            ],
+            [
+                'id' => 2,
+                'resources' => ['image.head'],
+                'users' => ['user2'],
+            ],
+        ];
+        $model = $this->getMock('Imbo\Model\AccessRules');
+        $model->expects($this->once())->method('getData')->will($this->returnValue($rules));
+
+        $this->assertRegExp('#<imbo>\s*<access><rule id="1"><resources><resource>image.get</resource></resources><users><user>user1</user></users></rule><rule id="2"><resources><resource>image.head</resource></resources><users><user>user2</user></users></rule></access>\s*</imbo>$#', $this->formatter->format($model));
+    }
+
+    /**
+     * Data provider for the stats model
+     *
+     * @return array[]
+     */
+    public function getStats() {
+        return [
+            'no-custom-stats' => [
+                1,
+                2,
+                3,
+                [],
+                '#<imbo>\s*<stats>\s*<numImages>1</numImages><numUsers>2</numUsers><numBytes>3</numBytes>\s*<custom></custom>\s*</stats>\s*</imbo>$#',
+            ],
+            'custom-stats' => [
+                4,
+                5,
+                6,
+                [
+                    'foo' => 'bar',
+                    'bar' => [
+                        'foobar' => 'foooo',
+                    ],
+                ],
+                '#<imbo>\s*<stats>\s*<numImages>4</numImages><numUsers>5</numUsers><numBytes>6</numBytes>\s*<custom><foo>bar</foo><bar><foobar>foooo</foobar></bar></custom>\s*</stats>\s*</imbo>$#',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getStats
+     * @covers Imbo\Http\Response\Formatter\Formatter::format
+     * @covers Imbo\Http\Response\Formatter\XML::formatStats
+     */
+    public function testCanFormatAStatsModel($images, $users, $bytes, $customStats, $pattern) {
+        $model = $this->getMock('Imbo\Model\Stats');
+        $model->expects($this->once())->method('getNumImages')->will($this->returnValue($images));
+        $model->expects($this->once())->method('getNumUsers')->will($this->returnValue($users));
+        $model->expects($this->once())->method('getNumBytes')->will($this->returnValue($bytes));
+        $model->expects($this->once())->method('getCustomStats')->will($this->returnValue($customStats));
+
+        $this->assertRegExp($pattern, $this->formatter->format($model));
     }
 
     /**

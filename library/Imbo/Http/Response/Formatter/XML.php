@@ -253,16 +253,17 @@ GROUPS;
         $data = $model->getData();
 
         $entries = '';
+
         foreach ($data['resources'] as $resource) {
             $entries .= '<resource>' . $this->formatValue($resource) . '</resource>';
         }
 
-        return <<<DATA
+        return <<<GROUP
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   <resources>{$entries}</resources>
 </imbo>
-DATA;
+GROUP;
     }
 
     /**
@@ -276,7 +277,7 @@ DATA;
         ]);
         $custom = $this->formatArray($model->getCustomStats() ?: []);
 
-        return <<<STATUS
+        return <<<STATS
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   <stats>
@@ -284,7 +285,7 @@ DATA;
     <custom>{$custom}</custom>
   </stats>
 </imbo>
-STATUS;
+STATS;
     }
 
     /**
@@ -293,7 +294,7 @@ STATUS;
     public function formatAccessRule(Model\AccessRule $model) {
         $rule = $this->formatAccessRuleArray($model->getData());
 
-                return <<<DATA
+        return <<<DATA
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   {$rule}
