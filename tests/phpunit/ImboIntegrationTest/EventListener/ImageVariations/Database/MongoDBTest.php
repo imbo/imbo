@@ -11,8 +11,8 @@
 namespace ImboIntegrationTest\EventListener\ImageVariations\Database;
 
 use Imbo\EventListener\ImageVariations\Database\MongoDB,
-    MongoException,
-    MongoClient;
+    MongoDB\Driver\Manager,
+    MongoDB\Database;
 
 /**
  * @covers Imbo\EventListener\ImageVariations\Database\MongoDB
@@ -36,12 +36,11 @@ class MongoDBTest extends DatabaseTests {
      * Make sure we have the mongo extension available and drop the test database just in case
      */
     public function setUp() {
-        if (!class_exists('MongoClient')) {
-            $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
+        if (!class_exists('MongoDB\Driver\Manager')) {
+            $this->markTestSkipped('pecl/mongodb >= 1.0.0 is required to run this test');
         }
 
-        $client = new MongoClient();
-        $client->selectDB($this->databaseName)->drop();
+        $this->dropDatabase();
 
         parent::setUp();
     }
@@ -50,11 +49,14 @@ class MongoDBTest extends DatabaseTests {
      * Drop the test database after each test
      */
     public function tearDown() {
-        if (class_exists('MongoClient')) {
-            $client = new MongoClient();
-            $client->selectDB($this->databaseName)->drop();
+        if (class_exists('MongoDB\Driver\Manager')) {
+            $this->dropDatabase();
         }
 
         parent::tearDown();
+    }
+
+    private function dropDatabase() {
+        (new Database(new Manager('mongodb://localhost:27017'), $this->databaseName))->drop();
     }
 }
