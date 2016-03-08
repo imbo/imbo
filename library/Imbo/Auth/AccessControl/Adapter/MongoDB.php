@@ -88,9 +88,10 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      *
      * @param array $params Parameters for the driver
      * @param MongoClient $client MongoClient instance
-     * @param MongoCollection $collection MongoCollection instance for the image variation collection
+     * @param MongoCollection $aclCollection MongoCollection instance for the acl collection
+     * @param MongoCollection $aclGrouplection MongoCollection instance for the acl group collection
      */
-    public function __construct(array $params = null, MongoClient $client = null, MongoCollection $collection = null) {
+    public function __construct(array $params = null, MongoClient $client = null, MongoCollection $aclCollection = null, MongoCollection $aclGroupCollection = null) {
         if ($params !== null) {
             $this->params = array_replace_recursive($this->params, $params);
         }
@@ -99,8 +100,12 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
             $this->mongoClient = $client;
         }
 
-        if ($collection !== null) {
-            $this->collection = $collection;
+        if ($aclCollection !== null) {
+            $this->aclCollection = $aclCollection;
+        }
+
+        if ($aclGroupCollection !== null) {
+            $this->aclGroupCollection = $aclGroupCollection;
         }
     }
 
@@ -200,6 +205,8 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
                 'publicKey' => $publicKey
             ]);
 
+            unset($this->publicKeys[$publicKey]);
+
             return (bool) $result['ok'];
 
         } catch (MongoException $e) {
@@ -217,6 +224,8 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
                 ['$set' => ['privateKey' => $privateKey]]
             );
 
+            unset($this->publicKeys[$publicKey]);
+
             return (bool) $result['ok'];
 
         } catch (MongoException $e) {
@@ -228,7 +237,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * {@inheritdoc}
      */
     public function getAccessRule($publicKey, $accessId) {
-        $rules = $this->getAccessListForPublicKey($publicKey);
+        $rules = $this->getAccessListForPublicKey($publicKey) ?: [];
 
         foreach ($rules as $rule) {
             if ($rule['id'] == $accessId) {
@@ -247,13 +256,12 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
             $result = $this->getAclCollection()->update(
                 ['publicKey' => $publicKey],
                 ['$push' => ['acl' => array_merge(
-                    ['id' => new MongoId()],
+                    ['id' => $id = new MongoId()],
                     $accessRule
                 )]]
             );
 
-            return (bool) $result['ok'];
-
+            return (string) $id;
         } catch (MongoException $e) {
             throw new DatabaseException('Could not update rule in database', 500, $e);
         }
@@ -277,7 +285,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
 
             return (bool) $result['ok'];
         } catch (MongoException $e) {
-            throw new DatabaseException('Could not delete rule from in database', 500, $e);
+            throw new DatabaseException('Could not delete rule from database', 500, $e);
         }
     }
 
@@ -305,6 +313,9 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
             ], [
                 '$set' => ['resources' => $resources],
             ]);
+
+            // Remove from local cache
+            unset($this->groups[$groupName]);
         } catch (MongoException $e) {
             throw new DatabaseException('Could not update resource group in database', 500, $e);
         }
@@ -320,6 +331,9 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
             ])['ok'];
 
             if ($success) {
+                // Remove from local cache
+                unset($this->groups[$groupName]);
+
                 // Also remove ACL rules that depended on this group
                 $this->getAclCollection()->update(
                     ['acl.group' => $groupName],
