@@ -680,4 +680,8 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
             $this->assertSame($values[$i], $image[$field]);
         }
     }
+
+    public function testCanGetStatus() {
+        $this->assertTrue($this->adapter->getStatus());
+    }
 }
