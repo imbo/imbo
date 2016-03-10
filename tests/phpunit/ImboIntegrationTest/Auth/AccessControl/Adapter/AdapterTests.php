@@ -95,21 +95,44 @@ abstract class AdapterTests extends \PHPUnit_Framework_TestCase {
     }
 
     public function testCanRemoveGroup() {
-        $this->adapter->addResourceGroup('g1', ['images.get', 'images.head']);
+        // Try to delete group that does not exist
+        $this->assertFalse($this->adapter->deleteResourceGroup('g1'));
+
+        $this->assertTrue($this->adapter->addResourceGroup('g1', ['images.get', 'images.head']));
         $this->assertSame(['images.get', 'images.head'], $this->adapter->getGroup('g1'));
         $this->assertTrue($this->adapter->deleteResourceGroup('g1'));
         $this->assertSame(false, $this->adapter->getGroup('g1'));
     }
 
     public function testCanManipulateKeys() {
-        $this->assertNull($this->adapter->getPrivateKey('publicKey'));
+        // Ensure the public key does not exist
         $this->assertFalse($this->adapter->publicKeyExists('publicKey'));
+
+        // Get private key of a public key that does not exist
+        $this->assertNull($this->adapter->getPrivateKey('publicKey'));
+
+        // Try to update the private key of a public key that does not exist
+        $this->assertFalse($this->adapter->updatePrivateKey('publicKey', 'privateKey'));
+
+        // Add a key pair
         $this->assertTrue($this->adapter->addKeyPair('publicKey', 'privateKey'));
+
+        // Ensure it exists
         $this->assertTrue($this->adapter->publicKeyExists('publicKey'));
+
+        // Fetch the private key
         $this->assertSame('privateKey', $this->adapter->getPrivateKey('publicKey'));
+
+        // Change the public key
         $this->assertTrue($this->adapter->updatePrivateKey('publicKey', 'newPrivateKey'));
+
+        // Make sure the change occured
         $this->assertSame('newPrivateKey', $this->adapter->getPrivateKey('publicKey'));
+
+        // Delete the key
         $this->assertTrue($this->adapter->deletePublicKey('publicKey'));
+
+        // Ensure the key no longer exists
         $this->assertFalse($this->adapter->publicKeyExists('publicKey'));
         $this->assertNull($this->adapter->getPrivateKey('publicKey'));
     }
