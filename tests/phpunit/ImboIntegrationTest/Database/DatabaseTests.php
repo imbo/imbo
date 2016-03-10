@@ -255,8 +255,11 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
                   ->setWidth($info[0])
                   ->setHeight($info[1])
                   ->setBlob(file_get_contents($path))
-                  ->setAddedDate(new DateTime('@' . $now++, new DateTimeZone('UTC')))
+                  ->setAddedDate(new DateTime('@' . $now, new DateTimeZone('UTC')))
+                  ->setUpdatedDate(new DateTime('@' . $now, new DateTimeZone('UTC')))
                   ->setOriginalChecksum(md5_file($path));
+
+            $now++;
 
             $imageIdentifier = md5($image->getBlob());
 
@@ -525,6 +528,10 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertSame($shortUrlId, $this->adapter->getShortUrlId($user, $imageIdentifier, $extension, $query));
     }
 
+    public function testCanGetShortUrlIdThatDoesNotExist() {
+        $this->assertNull($this->adapter->getShortUrlId('user', 'image'));
+    }
+
     public function testCanDeleteShortUrls() {
         $shortUrlId = 'aaaaaaa';
         $user = 'user';
@@ -591,7 +598,72 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertSame(5, $model->getHits());
     }
 
+    public function testCanFilterOnChecksums() {
+        $user = 'christer';
+        $id1 = 'id1';
+        $id2 = 'id2';
+        $id3 = 'id3';
+        $id4 = 'id4';
+        $id5 = 'id5';
+        $image1 = $this->getImage();
+        $image1->setChecksum('checksum1');
+        $image2 = $this->getImage();
+        $image2->setChecksum('checksum2');
+        $image3 = $this->getImage();
+        $image3->setChecksum('checksum3');
+        $image4 = $this->getImage();
+        $image4->setChecksum('checksum4');
+        $image5 = $this->getImage();
+        $image5->setChecksum('checksum5');
+
+        // This is the same for all image objects above
+        $originalChecksum = $image1->getOriginalChecksum();
+
+        $this->assertTrue($this->adapter->insertImage($user, $id1, $image1));
+        $this->assertTrue($this->adapter->insertImage($user, $id2, $image2));
+        $this->assertTrue($this->adapter->insertImage($user, $id3, $image3));
+        $this->assertTrue($this->adapter->insertImage($user, $id4, $image4));
+        $this->assertTrue($this->adapter->insertImage($user, $id5, $image5));
+
+        $query = new Query();
+        $model = new Images();
+
+        $query->originalChecksums(['foobar']);
+        $this->assertCount(0, $this->adapter->getImages([$user], $query, $model));
+        $this->assertSame(0, $model->getHits());
+
+        $query->originalChecksums([$originalChecksum]);
+        $this->assertCount(5, $this->adapter->getImages([$user], $query, $model));
+        $this->assertSame(5, $model->getHits());
+
+        $query->checksums(['foobar']);
+        $this->assertCount(0, $this->adapter->getImages([$user], $query, $model));
+        $this->assertSame(0, $model->getHits());
+
+        $query->checksums(['checksum1']);
+        $this->assertCount(1, $this->adapter->getImages([$user], $query, $model));
+        $this->assertSame(1, $model->getHits());
+
+        $query->checksums(['checksum1', 'checksum2']);
+        $this->assertCount(2, $this->adapter->getImages([$user], $query, $model));
+        $this->assertSame(2, $model->getHits());
+
+        $query->checksums(['checksum1', 'checksum2', 'checksum3']);
+        $this->assertCount(3, $this->adapter->getImages([$user], $query, $model));
+        $this->assertSame(3, $model->getHits());
+
+        $query->checksums(['checksum1', 'checksum2', 'checksum3', 'checksum4']);
+        $this->assertCount(4, $this->adapter->getImages([$user], $query, $model));
+        $this->assertSame(4, $model->getHits());
+
+        $query->checksums(['checksum1', 'checksum2', 'checksum3', 'checksum4', 'checksum5']);
+        $this->assertCount(5, $this->adapter->getImages([$user], $query, $model));
+        $this->assertSame(5, $model->getHits());
+    }
+
     public function testCanGetNumberOfBytes() {
+        $this->assertSame(0, $this->adapter->getNumBytes('user'));
+
         $this->adapter->insertImage('user', 'id', $this->getImage());
         $this->assertSame($this->getImage()->getFilesize(), $this->adapter->getNumBytes('user'));
 
