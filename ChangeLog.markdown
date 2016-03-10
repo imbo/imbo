@@ -1,6 +1,13 @@
 Changelog for Imbo
 ==================
 
+Imbo-2.1.0
+----------
+__2016-03-10__
+
+* #436: Added new MongoDB adapters that use the mongodb extension (Christer Edvartsen)
+* #434: Custom models for group(s) and access rule(s) (Christer Edvartsen)
+
 Imbo-2.0.0
 ----------
 __2016-02-28__

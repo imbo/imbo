@@ -66,7 +66,7 @@ interface MutableAdapterInterface extends AdapterInterface {
      *
      * @param string $groupName Group name
      * @param array  $resources Array of resources (eg. 'image.get', 'user.head' etc)
-     * @param boolean
+     * @return boolean
      */
     function addResourceGroup($groupName, array $resources = []);
 

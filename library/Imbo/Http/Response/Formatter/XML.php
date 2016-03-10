@@ -250,19 +250,19 @@ GROUPS;
      * {@inheritdoc}
      */
     public function formatGroup(Model\Group $model) {
-        $data = $model->getData();
-
         $entries = '';
-        foreach ($data['resources'] as $resource) {
+
+        foreach ($model->getResources() as $resource) {
             $entries .= '<resource>' . $this->formatValue($resource) . '</resource>';
         }
 
-        return <<<DATA
+        return <<<GROUP
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
+  <name>{$model->getName()}</name>
   <resources>{$entries}</resources>
 </imbo>
-DATA;
+GROUP;
     }
 
     /**
@@ -276,7 +276,7 @@ DATA;
         ]);
         $custom = $this->formatArray($model->getCustomStats() ?: []);
 
-        return <<<STATUS
+        return <<<STATS
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   <stats>
@@ -284,40 +284,44 @@ DATA;
     <custom>{$custom}</custom>
   </stats>
 </imbo>
-STATUS;
+STATS;
     }
 
     /**
      * {@inheritdoc}
      */
     public function formatAccessRule(Model\AccessRule $model) {
-        $rule = $this->formatAccessRuleArray($model->getData());
+        $rule = $this->formatAccessRuleArray([
+            'id' => $model->getId(),
+            'users' => $model->getUsers(),
+            'group' => $model->getGroup(),
+            'resources' => $model->getResources(),
+        ]);
 
-                return <<<DATA
+        return <<<RULE
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   {$rule}
 </imbo>
-DATA;
+RULE;
     }
 
     /**
      * {@inheritdoc}
      */
     public function formatAccessRules(Model\AccessRules $model) {
-        $data = $model->getData();
-
         $rules = '';
-        foreach ($data as $rule) {
+
+        foreach ($model->getRules() as $rule) {
             $rules .= $this->formatAccessRuleArray($rule);
         }
 
-        return <<<DATA
+        return <<<RULES
 <?xml version="1.0" encoding="UTF-8"?>
 <imbo>
   <access>{$rules}</access>
 </imbo>
-DATA;
+RULES;
     }
 
     /**

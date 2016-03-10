@@ -52,7 +52,7 @@ The adapter is set up using the ``accessControl`` key in your configuration file
             return new Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter([
                 'some-user' => 'my-super-secret-private-key',
                 'other-user' => 'other-super-secret-private-key',
-            ])
+            ]);
         },
 
         // ...
@@ -318,6 +318,11 @@ Examples
 
         // ...
     ];
+
+Mongo
++++++
+
+This adapter uses PHP's `mongodb extension <http://pecl.php.net/package/mongodb>`_. It can be configured in the same was as the :ref:`mongodb-database-adapter` adapter.
 
 Custom database adapter
 +++++++++++++++++++++++

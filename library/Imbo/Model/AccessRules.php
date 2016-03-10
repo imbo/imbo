@@ -13,7 +13,35 @@ namespace Imbo\Model;
 /**
  * Access rules model
  *
- * @author Kristoffer Brabrand <kristoffer@brabrand.no>
+ * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
-class AccessRules extends ArrayModel {}
+class AccessRules implements ModelInterface {
+    /**
+     * List of rules
+     *
+     * @var array[]
+     */
+    private $rules = [];
+
+    /**
+     * Set the rules
+     *
+     * @param array[]
+     * @return self
+     */
+    public function setRules(array $rules) {
+        $this->rules = $rules;
+
+        return $this;
+    }
+
+    /**
+     * Get the rules
+     *
+     * @return array[]
+     */
+    public function getRules() {
+        return $this->rules;
+    }
+}
