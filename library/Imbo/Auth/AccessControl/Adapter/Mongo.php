@@ -13,6 +13,7 @@ namespace Imbo\Auth\AccessControl\Adapter;
 use Imbo\Exception\DatabaseException,
     Imbo\Auth\AccessControl\GroupQuery,
     Imbo\Model\Groups as GroupsModel,
+    Imbo\Helpers\BSONToArray,
     MongoDB\Client as MongoClient,
     MongoDB\Collection as MongoCollection,
     MongoDB\Driver\Exception\Exception as MongoException,
@@ -84,14 +85,22 @@ class Mongo extends AbstractAdapter implements MutableAdapterInterface {
     ];
 
     /**
+     * BSONToArray helper
+     *
+     * @var BSONToArray
+     */
+    private $bsonToArray;
+
+    /**
      * Class constructor
      *
      * @param array $params Parameters for the driver
      * @param MongoClient $client MongoClient instance
      * @param MongoCollection $aclCollection MongoCollection instance for the acl collection
      * @param MongoCollection $aclGrouplection MongoCollection instance for the acl group collection
+     * @param BSONToArray $bsonToArray BSONToArray helper
      */
-    public function __construct(array $params = null, MongoClient $client = null, MongoCollection $aclCollection = null, MongoCollection $aclGroupCollection = null) {
+    public function __construct(array $params = null, MongoClient $client = null, MongoCollection $aclCollection = null, MongoCollection $aclGroupCollection = null, BSONToArray $bsonToArray = null) {
         if ($params !== null) {
             $this->params = array_replace_recursive($this->params, $params);
         }
@@ -107,6 +116,12 @@ class Mongo extends AbstractAdapter implements MutableAdapterInterface {
         if ($aclGroupCollection !== null) {
             $this->aclGroupCollection = $aclGroupCollection;
         }
+
+        if ($bsonToArray === null) {
+            $bsonToArray = new BSONToArray();
+        }
+
+        $this->bsonToArray = $bsonToArray;
     }
 
     /**
@@ -399,18 +414,7 @@ class Mongo extends AbstractAdapter implements MutableAdapterInterface {
             return [];
         }
 
-        $data = $pubkeyInfo->getArrayCopy();
-        $acl = [];
-
-        foreach ($data['acl'] as $rule) {
-            $rule = $rule->getArrayCopy();
-            $rule['resources'] = $rule['resources']->getArrayCopy();
-            $rule['users'] = $rule['users']->getArrayCopy();
-
-            $acl[] = $rule;
-        }
-
-        $data['acl'] = $acl;
+        $data = $this->bsonToArray->toArray($pubkeyInfo->getArrayCopy());
 
         $this->publicKeys[$publicKey] = $data;
 
