@@ -1,6 +1,12 @@
 Changelog for Imbo
 ==================
 
+Imbo-2.1.1
+----------
+__2016-03-11__
+
+* #437: Fixed issue with metadata not being formatted correctly using the new Mongo adapters (Christer Edvartsen)
+
 Imbo-2.1.0
 ----------
 __2016-03-10__
