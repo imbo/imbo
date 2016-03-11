@@ -204,6 +204,89 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertSame(['foo' => 'foo', 'bar' => 'foo'], $this->adapter->getMetadata($user, $imageIdentifier));
     }
 
+    public function testMetadataWithNestedArraysIsRepresetedCorrectly() {
+        if (get_class($this->adapter) === 'Imbo\Database\Doctrine') {
+            $this->markTestSkipped('Skipped for the Doctrine adapter as Doctrine can\'t handle types');
+        }
+
+        $metadata = [
+            'string' => 'bar',
+            'integer' => 1,
+            'float' => 1.1,
+            'boolean' => true,
+            'list' => [1, 2, 3],
+            'assoc' => [
+                'string' => 'bar',
+                'integer' => 1,
+                'float' => 1.1,
+                'boolean' => false,
+                'list' => [1, 2, 3],
+                'assoc' => [
+                    'list' => [
+                        1,
+                        2, [
+                            'list' => [1, 2, 3]
+                        ],
+                        [1, 2, 3],
+                    ],
+                ],
+            ],
+        ];
+
+        $user = 'user';
+        $imageIdentifier = 'id';
+
+        $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $this->getImage()));
+        $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, $metadata));
+
+        $this->assertSame($metadata, $this->adapter->getMetadata($user, $imageIdentifier));
+    }
+
+    public function testMetadataWithNestedArraysIsRepresetedCorrectlyWhenFetchingMultipleImages() {
+        if (get_class($this->adapter) === 'Imbo\Database\Doctrine') {
+            $this->markTestSkipped('Skipped for the Doctrine adapter as Doctrine can\'t handle types');
+        }
+
+        $metadata = [
+            'string' => 'bar',
+            'integer' => 1,
+            'float' => 1.1,
+            'boolean' => true,
+            'list' => [1, 2, 3],
+            'assoc' => [
+                'string' => 'bar',
+                'integer' => 1,
+                'float' => 1.1,
+                'boolean' => false,
+                'list' => [1, 2, 3],
+                'assoc' => [
+                    'list' => [
+                        1,
+                        2, [
+                            'list' => [1, 2, 3]
+                        ],
+                        [1, 2, 3],
+                    ],
+                ],
+            ],
+        ];
+
+        $user = 'user';
+        $imageIdentifier = 'id';
+
+        $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $this->getImage()));
+        $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, $metadata));
+
+        $query = new Query();
+        $query->returnMetadata(true);
+
+        $images = $this->adapter->getImages(['user'], $query, new Images());
+
+        $this->assertCount(1, $images);
+
+        $this->assertSame($metadata, $images[0]['metadata']);
+    }
+
     public function testUpdateDeleteAndGetMetadata() {
         $user = 'user';
         $imageIdentifier = 'id';
