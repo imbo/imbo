@@ -14,6 +14,7 @@ use Imbo\Model\Image,
     Imbo\Model\Images,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
+    Imbo\Helpers\BSONToArray,
     MongoDB\Client as MongoClient,
     MongoDB\Driver\Manager,
     MongoDB\Driver\Command,
@@ -71,14 +72,22 @@ class Mongo implements DatabaseInterface {
     ];
 
     /**
+     * BSONToArray helper
+     *
+     * @var BSONToArray
+     */
+    private $bsonToArray;
+
+    /**
      * Class constructor
      *
      * @param array $params Parameters for the driver
      * @param MongoClient $client MongoClient instance
      * @param MongoCollection $imageCollection MongoCollection instance for the images
      * @param MongoCollection $shortUrlCollection MongoCollection instance for the short URLs
+     * @param BSONToArray $bsonToArray Helper to recursively convert documents to arrays
      */
-    public function __construct(array $params = null, MongoClient $client = null, MongoCollection $imageCollection = null, MongoCollection $shortUrlCollection = null) {
+    public function __construct(array $params = null, MongoClient $client = null, MongoCollection $imageCollection = null, MongoCollection $shortUrlCollection = null, BSONToArray $bsonToArray = null) {
         if ($params !== null) {
             $this->params = array_replace_recursive($this->params, $params);
         }
@@ -94,6 +103,12 @@ class Mongo implements DatabaseInterface {
         if ($shortUrlCollection !== null) {
             $this->collections['shortUrl'] = $shortUrlCollection;
         }
+
+        if ($bsonToArray === null) {
+            $bsonToArray = new BSONToArray();
+        }
+
+        $this->bsonToArray = $bsonToArray;
     }
 
     /**
@@ -209,7 +224,7 @@ class Mongo implements DatabaseInterface {
             throw new DatabaseException('Image not found', 404);
         }
 
-        return $data['metadata']->getArrayCopy();
+        return $this->bsonToArray->toArray($data['metadata']->getArrayCopy());
     }
 
     /**
@@ -322,13 +337,7 @@ class Mongo implements DatabaseInterface {
                 unset($image['_id']);
                 $image['added'] = new DateTime('@' . $image['added'], new DateTimeZone('UTC'));
                 $image['updated'] = new DateTime('@' . $image['updated'], new DateTimeZone('UTC'));
-
-                if (isset($image['metadata'])) {
-                    $metadata = $image['metadata']->getArrayCopy();
-                    $image->offsetSet('metadata', $metadata);
-                }
-
-                $images[] = $image->getArrayCopy();
+                $images[] = $this->bsonToArray->toArray($image->getArrayCopy());
             }
 
             // Update model
