@@ -72,4 +72,14 @@ class Group implements ModelInterface {
     public function getResources() {
         return $this->resources;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData() {
+        return [
+            'name' => $this->getName(),
+            'resources' => $this->getResources(),
+        ];
+    }
 }

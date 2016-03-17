@@ -129,4 +129,22 @@ class StatsTest extends \PHPUnit_Framework_TestCase {
     public function testThrowsExceptionWhenUsedAsArrayWithoutAKey() {
         $this->model[] = 'foobar';
     }
+
+    /**
+     * @covers Imbo\Model\Stats::getData
+     */
+    public function testGetData() {
+        $this->model
+            ->setNumUsers(100)
+            ->setNumBytes(1000)
+            ->setNumImages(10000);
+        $this->model['some'] = 'value';
+
+        $this->assertSame([
+            'numUsers' => 100,
+            'numBytes' => 1000,
+            'numImages' => 10000,
+            'customStats' => ['some' => 'value'],
+        ], $this->model->getData());
+    }
 }

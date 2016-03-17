@@ -76,4 +76,22 @@ class AccessRuleTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->model, $this->model->setUsers(['u1', 'u2']));
         $this->assertSame(['u1', 'u2'], $this->model->getUsers());
     }
+
+    /**
+     * @covers Imbo\Model\AccessRule::getData
+     */
+    public function testGetData() {
+        $this->model
+            ->setId(1)
+            ->setGroup('name')
+            ->setResources(['r1', 'r2'])
+            ->setUsers(['u1', 'u2']);
+
+        $this->assertSame([
+            'id' => 1,
+            'group' => 'name',
+            'resources' => ['r1', 'r2'],
+            'users' => ['u1', 'u2'],
+        ], $this->model->getData());
+    }
 }

@@ -1,6 +1,12 @@
 Changelog for Imbo
 ==================
 
+Imbo-2.1.2
+----------
+__N/A__
+
+* #444: Added a getData() method to the Imbo\Model\ModelInterface (Christer Edvartsen)
+
 Imbo-2.1.1
 ----------
 __2016-03-11__

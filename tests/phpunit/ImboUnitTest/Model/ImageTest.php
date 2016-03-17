@@ -11,7 +11,8 @@
 namespace ImboUnitTest\Model;
 
 use Imbo\Model\Image,
-    Imbo\Image\Transformation\Transformation;
+    Imbo\Image\Transformation\Transformation,
+    DateTime;
 
 /**
  * @covers Imbo\Model\Image
@@ -247,5 +248,56 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     public function testSetsTheCorrectMimeTypeWhenAMappedOneIsUsed($set, $get) {
         $this->image->setMimeType($set);
         $this->assertSame($get, $this->image->getMimeType());
+    }
+
+    /**
+     * @covers Imbo\Model\Image::getData
+     */
+    public function testGetData() {
+        $metadata = [
+            'foo' => 'bar',
+            'bar' => 'foo',
+        ];
+        $mimeType = 'image/png';
+        $blob = 'some string';
+        $filesize = strlen($blob);
+        $checksum = md5($blob);
+        $extension = 'png';
+        $width = 123;
+        $height = 234;
+        $added = new DateTime();
+        $updated = new DateTime();
+        $user = 'christer';
+        $identifier = 'identifier';
+
+        $this->image
+            ->setMetadata($metadata)
+            ->setMimeType($mimeType)
+            ->setBlob($blob)
+            ->setExtension($extension)
+            ->setWidth($width)
+            ->setHeight($height)
+            ->setAddedDate($added)
+            ->setUpdatedDate($updated)
+            ->setUser($user)
+            ->setImageIdentifier($identifier)
+            ->hasBeenTransformed(true)
+            ->setOriginalChecksum($checksum);
+
+        $this->assertSame([
+            'filesize' => $filesize,
+            'mimeType' => $mimeType,
+            'extension' => $extension,
+            'metadata' => $metadata,
+            'width' => $width,
+            'height' => $height,
+            'addedDate' => $added,
+            'updatedDate' => $updated,
+            'user' => $user,
+            'imageIdentifier' => $identifier,
+            'checksum' => $checksum,
+            'originalChecksum' => $checksum,
+            'hasBeenTransformed' => true,
+        ], $this->image->getData());
     }
 }

@@ -165,4 +165,18 @@ class Images implements ModelInterface {
     public function getPage() {
         return $this->page;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData() {
+        return [
+            'images' => $this->getImages(),
+            'fields' => $this->getFields(),
+            'count' => $this->getCount(),
+            'hits' => $this->getHits(),
+            'limit' => $this->getLimit(),
+            'page' => $this->getPage(),
+        ];
+    }
 }

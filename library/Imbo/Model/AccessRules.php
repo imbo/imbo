@@ -44,4 +44,11 @@ class AccessRules implements ModelInterface {
     public function getRules() {
         return $this->rules;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData() {
+        return $this->getRules();
+    }
 }
