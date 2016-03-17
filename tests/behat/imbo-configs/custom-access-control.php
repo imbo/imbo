@@ -33,6 +33,10 @@ class StaticAccessControl extends AbstractAdapter implements AdapterInterface {
         return false;
     }
 
+    public function groupExists($groupName) {
+        return false;
+    }
+
     public function userExists($publicKey) {
         return $publicKey === 'public';
     }
