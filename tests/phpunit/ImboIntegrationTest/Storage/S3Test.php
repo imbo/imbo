@@ -49,4 +49,19 @@ class S3Test extends StorageTests {
 
         parent::setUp();
     }
+
+    /**
+     * @covers Imbo\Storage\S3::getStatus
+     */
+    public function testGetStatus() {
+        $this->assertTrue($this->getDriver()->getStatus());
+
+        $driver = new S3([
+            'key' => $GLOBALS['AWS_S3_KEY'],
+            'secret' => $GLOBALS['AWS_S3_SECRET'],
+            'bucket' => uniqid(),
+        ]);
+
+        $this->assertFalse($driver->getStatus());
+    }
 }
