@@ -1,11 +1,12 @@
 Changelog for Imbo
 ==================
 
-Imbo-2.1.2
+Imbo-x.x.x
 ----------
 __N/A__
 
 * #444: Added a getData() method to the Imbo\Model\ModelInterface (Christer Edvartsen)
+* #431: Added an Amazon S3 storage adapter for the image variations (Ali Asaria)
 
 Imbo-2.1.1
 ----------
