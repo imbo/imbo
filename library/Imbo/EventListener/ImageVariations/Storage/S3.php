@@ -33,17 +33,17 @@ use Imbo\Exception\StorageException,
  */
 class S3 implements StorageInterface {
     /**
-    * S3 client
-    *
-    * @var S3Client
-    */
+     * S3 client
+     *
+     * @var S3Client
+     */
     private $client;
 
     /**
-    * Parameters for the driver
-    *
-    * @var array
-    */
+     * Parameters for the driver
+     *
+     * @var array
+     */
     private $params = [
         // Access key
         'key' => null,
@@ -101,7 +101,7 @@ class S3 implements StorageInterface {
                 'Key' => $this->getImagePath($user, $imageIdentifier, $width),
             ]);
         } catch (NoSuchKeyException $e) {
-            throw new StorageException('File not found', 404);
+            return null;
         }
 
         return (string) $model->get('Body');
@@ -111,32 +111,31 @@ class S3 implements StorageInterface {
      * {@inheritdoc}
      */
     public function deleteImageVariations($user, $imageIdentifier, $width = null) {
-        /// If width is specified, delete only the specific image.
+        // If width is specified, delete only the specific image
         if ($width !== null) {
-          $this->getClient()->deleteObject([
-              'Bucket' => $this->params['bucket'],
-              'Key' => $this->getImagePath($user, $imageIdentifier, $width)
-          ]);
-          return true;
+            $this->getClient()->deleteObject([
+                'Bucket' => $this->params['bucket'],
+                'Key' => $this->getImagePath($user, $imageIdentifier, $width)
+            ]);
+
+            return true;
         }
 
-        // If width is not specified, delete every variation.
-        // Ask S3 to list all files in the directory
+        // If width is not specified, delete every variation. Ask S3 to list all files in the
+        // directory.
         $variationsPath = $this->getImagePath($user, $imageIdentifier);
 
         $varations = $this->getClient()->getIterator('ListObjects', [
-          'Bucket' => $this->params['bucket'],
-          'Prefix' => $variationsPath
+            'Bucket' => $this->params['bucket'],
+            'Prefix' => $variationsPath
         ]);
 
-        // Note: could also use AWS's deleteMatchingObjects instead of
-        // deleting items one by ne
-
+        // Note: could also use AWS's deleteMatchingObjects instead of deleting items one by one
         foreach ($varations as $variation) {
-                $this->getClient()->deleteObject([
-                    'Bucket' => $this->params['bucket'],
-                    'Key' => $variation['Key']
-                ]);
+            $this->getClient()->deleteObject([
+                'Bucket' => $this->params['bucket'],
+                'Key' => $variation['Key']
+            ]);
         }
 
         return true;
@@ -155,6 +154,7 @@ class S3 implements StorageInterface {
     private function getImagePath($user, $imageIdentifier, $width = null, $includeFilename = true) {
         $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         $parts = [
+            'imageVariation',
             $userPath[0],
             $userPath[1],
             $userPath[2],
