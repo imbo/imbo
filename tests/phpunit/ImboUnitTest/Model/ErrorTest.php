@@ -142,4 +142,25 @@ class ErrorTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(123, $model->getImboErrorCode());
         $this->assertSame('imageId', $model->getImageIdentifier());
     }
+
+    /**
+     * @covers Imbo\Model\Error::getData
+     */
+    public function testGetData() {
+        $date = new DateTime();
+
+        $this->model->setHttpCode(404);
+        $this->model->setErrorMessage('message');
+        $this->model->setDate($date);
+        $this->model->setImboErrorCode(100);
+        $this->model->setImageIdentifier('identifier');
+
+        $this->assertSame([
+            'httpCode' => 404,
+            'errorMessage' => 'message',
+            'date' => $date,
+            'imboErrorCode' => 100,
+            'imageIdentifier' => 'identifier',
+        ], $this->model->getData());
+    }
 }

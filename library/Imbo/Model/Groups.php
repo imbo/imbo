@@ -137,4 +137,17 @@ class Groups implements ModelInterface {
     public function getPage() {
         return $this->page;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData() {
+        return [
+            'groups' => $this->getGroups(),
+            'count' => $this->getCount(),
+            'hits' => $this->getHits(),
+            'limit' => $this->getLimit(),
+            'page' => $this->getPage(),
+        ];
+    }
 }

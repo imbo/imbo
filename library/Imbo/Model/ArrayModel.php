@@ -44,9 +44,7 @@ class ArrayModel implements ModelInterface {
     }
 
     /**
-     * Get the data
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getData() {
         return $this->data;

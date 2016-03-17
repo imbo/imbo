@@ -105,4 +105,32 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
         $this->model->setImages($images);
         $this->assertSame(3, $this->model->getCount());
     }
+
+    /**
+     * @covers Imbo\Model\Images::getData
+     */
+    public function testGetData() {
+        $images = [
+            $this->getMock('Imbo\Model\Image'),
+            $this->getMock('Imbo\Model\Image'),
+            $this->getMock('Imbo\Model\Image'),
+        ];
+        $fields = ['width', 'height'];
+
+        $this->model
+            ->setImages($images)
+            ->setFields($fields)
+            ->setHits(10)
+            ->setLimit(11)
+            ->setPage(12);
+
+        $this->assertSame([
+            'images' => $images,
+            'fields' => $fields,
+            'count' => 3,
+            'hits' => 10,
+            'limit' => 11,
+            'page' => 12,
+        ], $this->model->getData());
+    }
 }

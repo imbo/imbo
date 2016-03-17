@@ -163,6 +163,19 @@ class Error implements ModelInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getData() {
+        return [
+            'httpCode' => $this->getHttpCode(),
+            'errorMessage' => $this->getErrorMessage(),
+            'date' => $this->getDate(),
+            'imboErrorCode' => $this->getImboErrorCode(),
+            'imageIdentifier' => $this->getImageIdentifier(),
+        ];
+    }
+
+    /**
      * Create an error based on an exception instance
      *
      * @param Exception $exception An Imbo\Exception instance
