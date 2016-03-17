@@ -85,4 +85,23 @@ class GroupsTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->model, $this->model->setGroups(['group1' => [], 'group2' => []]));
         $this->assertSame(2, $this->model->getCount());
     }
+
+    /**
+     * @covers Imbo\Model\Groups::getData
+     */
+    public function testGetData() {
+        $this->model
+            ->setGroups(['group' => [], 'group2' => []])
+            ->setHits(10)
+            ->setPage(10)
+            ->setLimit(10);
+
+        $this->assertSame([
+            'groups' => ['group' => [], 'group2' => []],
+            'count' => 2,
+            'hits' => 10,
+            'limit' => 10,
+            'page' => 10,
+        ], $this->model->getData());
+    }
 }

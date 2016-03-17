@@ -56,4 +56,18 @@ class GroupTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->model, $this->model->setResources(['image.get', 'image.head']));
         $this->assertSame(['image.get', 'image.head'], $this->model->getResources());
     }
+
+    /**
+     * @covers Imbo\Model\Group::getData
+     */
+    public function testGetData() {
+        $this->model
+            ->setName('name')
+            ->setResources(['image.get', 'image.head']);
+
+        $this->assertSame([
+            'name' => 'name',
+            'resources' => ['image.get', 'image.head'],
+        ], $this->model->getData());
+    }
 }

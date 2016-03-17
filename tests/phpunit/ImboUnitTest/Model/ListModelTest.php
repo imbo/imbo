@@ -69,4 +69,24 @@ class ListModelTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->model, $this->model->setEntry($entry));
         $this->assertSame($entry, $this->model->getEntry());
     }
+
+    /**
+     * @covers Imbo\Model\ListModel::getData
+     */
+    public function testGetData() {
+        $list = [1, 2, 3];
+        $container = 'container';
+        $entry = 'entry';
+
+        $this->model
+            ->setList($list)
+            ->setContainer($container)
+            ->setEntry($entry);
+
+        $this->assertSame([
+            'list' => $list,
+            'container' => $container,
+            'entry' => $entry,
+        ], $this->model->getData());
+    }
 }

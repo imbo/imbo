@@ -102,4 +102,15 @@ class User implements ModelInterface {
     public function getLastModified() {
         return $this->lastModified;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData() {
+        return [
+            'id' => $this->getUserId(),
+            'numImages' => $this->getNumImages(),
+            'lastModified' => $this->getLastModified(),
+        ];
+    }
 }

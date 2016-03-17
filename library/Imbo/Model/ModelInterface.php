@@ -16,4 +16,11 @@ namespace Imbo\Model;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
-interface ModelInterface {}
+interface ModelInterface {
+    /**
+     * Return the "data" found in the model
+     *
+     * @return mixed
+     */
+    function getData();
+}

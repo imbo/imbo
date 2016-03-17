@@ -151,4 +151,16 @@ class Stats implements ModelInterface, ArrayAccess {
     public function offsetUnset($offset) {
         unset($this->customStats[$offset]);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData() {
+        return [
+            'numUsers' => $this->getNumUsers(),
+            'numBytes' => $this->getNumBytes(),
+            'numImages' => $this->getNumImages(),
+            'customStats' => $this->getCustomStats(),
+        ];
+    }
 }
