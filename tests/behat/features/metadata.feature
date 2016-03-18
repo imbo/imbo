@@ -19,7 +19,6 @@ Feature: Imbo provides a metadata endpoint
         Examples:
             | extension | response |
             | json      | #^{}$# |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<metadata></metadata>\s*</imbo>$#ms |
 
     Scenario: Attach metadata to an image
         Given I use "publickey" and "privatekey" for public and private keys
@@ -49,7 +48,6 @@ Feature: Imbo provides a metadata endpoint
         Examples:
             | extension | response |
             | json      | #^{"foo":"bar"}$# |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<metadata><tag key="foo">bar</tag></metadata>\s*</imbo>$#sm |
 
     Scenario: Partially update metadata
         Given I use "publickey" and "privatekey" for public and private keys
@@ -79,7 +77,6 @@ Feature: Imbo provides a metadata endpoint
         Examples:
             | extension | response |
             | json      | #^{"foo":"bar","bar":"foo"}$# |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<metadata><tag key="foo">bar</tag><tag key="bar">foo</tag></metadata>\s*</imbo>$#sm |
 
     Scenario: Replace metadata
         Given I use "publickey" and "privatekey" for public and private keys
@@ -109,7 +106,6 @@ Feature: Imbo provides a metadata endpoint
         Examples:
             | extension | response |
             | json      | #^{"key":"value"}$# |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<metadata><tag key="key">value</tag></metadata>\s*</imbo>$#sm |
 
     Scenario: Delete metadata
         Given I use "publickey" and "privatekey" for public and private keys
@@ -135,7 +131,6 @@ Feature: Imbo provides a metadata endpoint
         Examples:
             | extension | response |
             | json      | #^{}$# |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<metadata></metadata>\s*</imbo>$#ms |
 
     Scenario: Set unparsable metadata
         Given I use "publickey" and "privatekey" for public and private keys
@@ -176,7 +171,6 @@ Feature: Imbo provides a metadata endpoint
         Examples:
             | extension | response |
             | json      | #^{"foo":{"bar":"value","exif:foo":"value2"}}$# |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<metadata><tag key="foo">\s*<bar>value</bar>\s*<exif:foo>value2</exif:foo>\s*</tag>\s*</metadata>\s*</imbo>$#sm |
 
 
     Scenario Outline: Set and get metadata with special characters
@@ -198,4 +192,3 @@ Feature: Imbo provides a metadata endpoint
         Examples:
             | extension | response |
             | json      | #^{"html":"<div class=\\"fat-text foo\\">It\'s cool<!-- comment --><\\/div>","json":"{\\"foo\\":\\"bar\\"}","norwegian":"\\u00c5tte karer m\\u00f8ter \\u00e6rlige Erlend"}$# |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<metadata>\s*<tag key="html"><!\[CDATA\[<div class="fat-text foo">It's cool<!-- comment --></div>\]\]></tag>\s*<tag key="json"><!\[CDATA\[{"foo":"bar"}\]\]></tag>\s*<tag key="norwegian">Åtte karer møter ærlige Erlend</tag>\s*</metadata>\s*</imbo>$#sum |

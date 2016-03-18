@@ -45,7 +45,6 @@ class ResponseFormatter implements ListenerInterface {
      */
     private $extensionsToMimeType = [
         'json' => 'application/json',
-        'xml'  => 'application/xml',
         'gif'  => 'image/gif',
         'jpg'  => 'image/jpeg',
         'png'  => 'image/png',
@@ -59,7 +58,6 @@ class ResponseFormatter implements ListenerInterface {
      */
     private $supportedTypes = [
         'application/json' => 'json',
-        'application/xml'  => 'xml',
         'image/gif'        => 'gif',
         'image/png'        => 'png',
         'image/jpeg'       => 'jpg',
@@ -72,7 +70,6 @@ class ResponseFormatter implements ListenerInterface {
      */
     private $defaultModelTypes = [
         'application/json',
-        'application/xml',
     ];
 
     /**

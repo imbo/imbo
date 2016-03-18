@@ -108,7 +108,6 @@ class Application {
         // Response formatters
         $formatters = [
             'json' => new Formatter\JSON($dateFormatter),
-            'xml'  => new Formatter\XML($dateFormatter),
         ];
         $contentNegotiation = new Http\ContentNegotiation();
 

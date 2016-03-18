@@ -110,11 +110,6 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
             ['json', 'func', 'application/json'],
             ['jsonp', 'func', 'application/json'],
             ['function', 'func', 'application/json', false],
-
-            ['callback', 'func', 'application/xml', false],
-            ['json', 'func', 'application/xml', false],
-            ['jsonp', 'func', 'application/xml', false],
-            ['function', 'func', 'application/xml', false],
         ];
     }
 

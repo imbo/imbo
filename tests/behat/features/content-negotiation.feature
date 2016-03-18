@@ -18,16 +18,10 @@ Feature: Imbo supports content negotiation
         Examples:
             | resource                                                 | accept                                                          | content-type     |
             | /status                                                  | application/json                                                | application/json |
-            | /status                                                  | application/xml                                                 | application/xml  |
-            | /status                                                  | text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8 | application/xml  |
             | /status                                                  | image/*,*/*;q=0.1                                               | application/json |
             | /users/user                                              | application/json                                                | application/json |
-            | /users/user                                              | application/xml                                                 | application/xml  |
-            | /users/user                                              | text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8 | application/xml  |
             | /users/user                                              | image/*,*/*;q=0.1                                               | application/json |
             | /users/user/images                                       | application/json                                                | application/json |
-            | /users/user/images                                       | application/xml                                                 | application/xml  |
-            | /users/user/images                                       | text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8 | application/xml  |
             | /users/user/images                                       | image/*,*/*;q=0.1                                               | application/json |
 
     Scenario Outline: Imbo's metadata resource can respond with different content types using content negotiation
@@ -40,8 +34,6 @@ Feature: Imbo supports content negotiation
         Examples:
             | accept                                                          | content-type     |
             | application/json                                                | application/json |
-            | application/xml                                                 | application/xml  |
-            | text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8 | application/xml  |
             | image/*,*/*;q=0.1                                               | application/json |
 
     Scenario: If the client includes an extension, the Accept header should be ignored

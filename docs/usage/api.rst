@@ -1011,25 +1011,11 @@ If you want to implement your own authentication paradigm you can do this by cre
 Supported content types
 -----------------------
 
-Imbo currently responds with images (jpg, gif and png), `JSON <http://en.wikipedia.org/wiki/JSON>`_ and `XML <http://en.wikipedia.org/wiki/XML>`_, but only accepts images (jpg, gif and png) and JSON as input.
+Imbo currently responds with images (jpg, gif and png) and `JSON <http://en.wikipedia.org/wiki/JSON>`_ and accepts images (jpg, gif and png) and JSON as input.
 
 Imbo will do content negotiation using the `Accept <http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html>`_ header found in the request, unless you specify a file extension, in which case Imbo will deliver the type requested without looking at the ``Accept`` header.
 
-The default content type for non-image responses is JSON. Examples in this chapter uses the ``.json`` extension. Change it to ``.xml`` to get the XML representation instead. You can also skip the extension and force a specific content type using the ``Accept`` header:
-
-.. code-block:: bash
-
-    curl http://imbo/status.json
-
-and
-
-.. code-block:: bash
-
-    curl -H "Accept: application/json" http://imbo/status
-
-will end up with the same content type. Use ``application/xml`` for XML.
-
-If you use JSON you can wrap the content in a function (`JSONP <http://en.wikipedia.org/wiki/JSONP>`_) by using one of the following query parameters:
+The only supported content type for non-image responses is JSON. Theses responses can be wrapped in a function (`JSONP <http://en.wikipedia.org/wiki/JSONP>`_) by using one of the following query parameters:
 
 * ``callback``
 * ``jsonp``

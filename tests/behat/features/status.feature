@@ -14,7 +14,6 @@ Feature: Imbo provides a status endpoint
         Examples:
             | extension | response |
             | json      | #^{"date":"[^"]+","database":true,"storage":true}$# |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<status>\s*<date>[^<]+</date>\s*<database>1</database>\s*<storage>1</storage>\s*</status>\s*</imbo>$#ms |
 
     Scenario Outline: The status endpoint only supports HTTP GET and HEAD
         When I request "/status.json" using HTTP "<method>"
