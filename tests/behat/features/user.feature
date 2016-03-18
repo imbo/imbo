@@ -16,7 +16,6 @@ Feature: Imbo provides a user endpoint
         Examples:
             | extension | response |
             | json      | #^{"user":"user","numImages":0,"lastModified":"[^"]+"}$# |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<user>\s*<user>user</user>\s*<numImages>0</numImages>\s*<lastModified>[^<]+</lastModified>\s*</user>\s*</imbo>$#ms |
 
     Scenario: Request user that does not exist
         Given I use "foo" and "bar" for public and private keys

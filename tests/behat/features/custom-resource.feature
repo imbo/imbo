@@ -33,13 +33,3 @@ Feature: Imbo supports custom resources
            """
            {"event":"custom2.put"}
            """
-
-    Scenario: Request the XML representation of a custom resource with a closure returning the resource in the configuration
-        Given Imbo uses the "custom-routes-and-resources.php" configuration
-        When I request "/custom.xml"
-        Then I should get a response with "200 OK"
-        And the "Content-Type" response header is "application/xml"
-        And the response body contains:
-           """
-           <event>custom2.get</event>
-           """

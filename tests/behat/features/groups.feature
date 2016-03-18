@@ -19,7 +19,6 @@ Feature: Imbo provides a groups endpoint
         Examples:
             | extension | content-type     | response |
             | json      | application/json | #^{"search":{"hits":2,"page":1,"limit":20,"count":2},"groups":\[{"name":"images-read","resources":\["images\.get","images\.head"]},{"name":"groups-read","resources":\["group\.get","group\.head","groups\.get","groups\.head"]}]}$# |
-            | xml       | application/xml  | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<search>\s*<hits>2</hits>\s*<page>1</page>\s*<limit>20</limit>\s*<count>2</count>\s*</search>\s*<groups>\s*<group>\s*<name>images-read</name>\s*<resources>\s*<resource>images\.get</resource>\s*<resource>images\.head</resource>\s*</resources>\s*</group>\s*<group>\s*<name>groups-read</name>\s*<resources>\s*<resource>group\.get</resource>\s*<resource>group\.head</resource>\s*<resource>groups\.get</resource>\s*<resource>groups\.head</resource>\s*</resources>\s*</group>\s*</groups>\s*</imbo>$#ms |
 
     Scenario Outline: Fetch a list of groups with limit + paging
         Given I use "valid-group-pubkey" and "foobar" for public and private keys

@@ -1,6 +1,12 @@
 Changelog for Imbo
 ==================
 
+Imbo-3.0.0
+----------
+__N/A__
+
+* #449: Removed support for XML (Christer Edvartsen)
+
 Imbo-x.x.x
 ----------
 __N/A__
