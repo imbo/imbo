@@ -116,7 +116,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
             ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
             ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
             ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls.json', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'json'],
-            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls.xml', 'shorturls', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'xml'],
 
             // Short URL
             ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/shorturls/asdfghj', 'shorturl', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
@@ -128,13 +127,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
             ['/status', 'status'],
             ['/status/', 'status'],
             ['/status.json', 'status', null, null, 'json'],
-            ['/status.xml', 'status', null, null, 'xml'],
 
             // User resource
             ['/users/christer', 'user', 'christer'],
             ['/users/christer/', 'user', 'christer'],
             ['/users/christer.json', 'user', 'christer', null, 'json'],
-            ['/users/christer.xml', 'user', 'christer', null, 'xml'],
             ['/users/user_name', 'user', 'user_name'],
             ['/users/user-name', 'user', 'user-name'],
 
@@ -142,7 +139,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
             ['/users/christer/images', 'images', 'christer'],
             ['/users/christer/images/', 'images', 'christer'],
             ['/users/christer/images.json', 'images', 'christer', null, 'json'],
-            ['/users/christer/images.xml', 'images', 'christer', null, 'xml'],
             ['/users/user_name/images', 'images', 'user_name'],
             ['/users/user-name/images', 'images', 'user-name'],
 
@@ -158,13 +154,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
             ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
             ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta/', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
             ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta.json', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'json'],
-            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/meta.xml', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'xml'],
             ['/users/user_name/images/a9b80ed42957fd508c617549cad07d6c/meta', 'metadata', 'user_name', 'a9b80ed42957fd508c617549cad07d6c'],
             ['/users/user-name/images/a9b80ed42957fd508c617549cad07d6c/meta', 'metadata', 'user-name', 'a9b80ed42957fd508c617549cad07d6c'],
             ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
             ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata/', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c'],
             ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata.json', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'json'],
-            ['/users/christer/images/a9b80ed42957fd508c617549cad07d6c/metadata.xml', 'metadata', 'christer', 'a9b80ed42957fd508c617549cad07d6c', 'xml'],
             ['/users/user_name/images/a9b80ed42957fd508c617549cad07d6c/metadata', 'metadata', 'user_name', 'a9b80ed42957fd508c617549cad07d6c'],
             ['/users/user-name/images/a9b80ed42957fd508c617549cad07d6c/metadata', 'metadata', 'user-name', 'a9b80ed42957fd508c617549cad07d6c'],
         ];

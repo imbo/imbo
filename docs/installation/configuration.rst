@@ -1071,7 +1071,7 @@ If you need to create a custom route you can attach a route and a custom resourc
         ],
 
         'routes' => [
-            'users' => '#^/users(\.(?<extension>json|xml))?$#',
+            'users' => '#^/users(\.(?<extension>json))?$#',
         ],
 
         // ...
@@ -1081,7 +1081,6 @@ In the above example we are creating a route for Imbo using a regular expression
 
 * ``/users``
 * ``/users.json``
-* ``/users.xml``
 
 When a request is made against any of these endpoints Imbo will try to access a resource that is specified with the same key (``users``). The value specified for this entry in the ``resources`` array can be:
 
@@ -1130,17 +1129,5 @@ In the ``get()`` method we are simply creating a list model for Imbo's response 
         "someotheruser"
       ]
     }
-
-and the XML representation looks like this:
-
-.. code-block:: xml
-
-    <?xml version="1.0" encoding="UTF-8"?>
-    <imbo>
-      <users>
-        <user>someuser</user>
-        <user>someotheruser</user>
-      </users>
-    </imbo>
 
 Feel free to experiment with this feature. If you end up creating a resource that you think should be a part of Imbo, send a `pull request on GitHub <https://github.com/imbo/imbo>`_.

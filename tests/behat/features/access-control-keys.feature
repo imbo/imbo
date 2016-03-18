@@ -20,7 +20,6 @@ Feature: Imbo provides a keys endpoint
         Examples:
             | extension | content-type     | response |
             | json      | application/json | #^\[{"id":".*?","resources":\["keys\.put","keys\.head","keys\.delete","accessrule\.get","accessrule\.head","accessrule\.delete","accessrules\.get","accessrules\.head","accessrules\.post"],"users":\[]},{"id":".*?","group":"something","users":\["some-user"]}]$# |
-            | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<access>\s*<rule id=".*?">\s*<resources>\s*<resource>keys\.put</resource>\s*<resource>keys\.head</resource>\s*<resource>keys\.delete</resource>\s*<resource>accessrule\.get</resource>\s*<resource>accessrule\.head</resource>\s*<resource>accessrule\.delete</resource>\s*<resource>accessrules\.get</resource>\s*<resource>accessrules\.head</resource>\s*<resource>accessrules\.post</resource>\s*</resources>\s*</rule><rule id=".*?">\s*<group>something</group>\s*<users>\s*<user>some-user</user>\s*</users>\s*</rule>\s*</access>\s*</imbo>$#ms |
 
     Scenario Outline: Fetch access control rules for a public key that has access to all users
         Given I use "master-pubkey" and "master-privkey" for public and private keys
@@ -35,7 +34,6 @@ Feature: Imbo provides a keys endpoint
         Examples:
             | extension | content-type     | response |
             | json      | application/json | #^\[{"id":".*?","group":"user-stats","users":"\*"}\]$# |
-            | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<access>\s*<rule id=".*?">\s*<group>user-stats</group>\s*<users>\s*<user>\*</user>\s*</users>\s*</rule>\s*</access>\s*</imbo>$#ms |
 
     Scenario Outline: Fetch access control rules with expanded groups
         Given I use "master-pubkey" and "master-privkey" for public and private keys
@@ -50,7 +48,6 @@ Feature: Imbo provides a keys endpoint
         Examples:
             | extension | content-type     | response |
             | json      | application/json | #^\[{"id":".*?","group":"user-stats","users":\["user1"\],"resources":\["user\.get","user\.head"]}]$# |
-            | xml       | application/xml  | #^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<imbo>\s*<access>\s*<rule id=".*?">\s*<resources>\s*<resource>user\.get</resource>\s*<resource>user\.head</resource>\s*</resources>\s*<group>user-stats</group>\s*<users>\s*<user>user1</user>\s*</users>\s*</rule>\s*</access>\s*</imbo>$#ms |
 
     Scenario: Create a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys

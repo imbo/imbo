@@ -21,7 +21,6 @@ Feature: Imbo provides a stats endpoint
         Examples:
             | extension | response |
             | json      | {"numImages":3,"numUsers":1,"numBytes":226424,"custom":{.*}} |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>\s*<imbo>\s*<stats>\s*<numImages>3</numImages>\s*<numUsers>1</numUsers>\s*<numBytes>226424</numBytes>\s*<custom>.*</custom>\s*</stats>\s*</imbo>$#ms |
 
     Scenario Outline: The stats endpoint only supports HTTP GET and HEAD
         Given Imbo uses the "stats-access-and-custom-stats.php" configuration
@@ -87,4 +86,3 @@ Feature: Imbo provides a stats endpoint
         Examples:
             | extension | response |
             | json      | {.*?,"custom":{"someValue":123,"someOtherValue":{"foo":"bar"},"someList":\[1,2,3\]}} |
-            | xml       | #^<\?xml version="1.0" encoding="UTF-8"\?>.*?<custom><someValue>123</someValue><someOtherValue><foo>bar</foo></someOtherValue><someList><list><value>1</value><value>2</value><value>3</value></list></someList></custom>\s*</stats>\s*</imbo>$#ms |
