@@ -1151,7 +1151,7 @@ Feel free to experiment with this feature. If you end up creating a resource tha
 Redirect the index route - ``indexRedirect``
 --------------------------------------------
 
-The index resource (:ref:`index-resource`) simply lists some URL's related to the Imbo project. If you would rather the index resource redirect the client to some specific URL, set the ``indexRedirect`` configuration option to that URL:
+The index resource (:ref:`index-resource`) simply lists some URLs related to the Imbo project. If you would rather the index resource redirect the client to some specific URL, set the ``indexRedirect`` configuration option to that URL:
 
 .. code-block:: php
 

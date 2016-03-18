@@ -14,7 +14,7 @@ Feature: Imbo provides an index endpoint
 
         Examples:
             | accept           | response |
-            | application/json | #^{.*}$#    |
+            | application/json | #^{"version":"[^"]+".*?}$# |
 
     Scenario Outline: The index endpoint only supports HTTP GET and HEAD
         When I request "/" using HTTP "<method>"
