@@ -536,40 +536,6 @@ and is enabled like this:
 
 which would effectively downsize all images exceeding a ``width`` of ``1024`` or a ``height`` of ``768``. The aspect ratio will be kept.
 
-Metadata cache
-++++++++++++++
-
-This event listener enables caching of metadata fetched from the backend so other requests won't need to go all the way to the metadata backend to fetch it. To achieve this the listener subscribes to the following events:
-
-* ``db.metadata.load``
-* ``db.metadata.delete``
-* ``db.metadata.update``
-* ``db.image.delete``
-
-and the parameters supports a single element:
-
-``cache``
-    An instance of a cache adapter. Imbo ships with :ref:`apc-cache` and :ref:`memcached-cache` adapters, and both can be used for this event listener. If you want to use another form of caching you can simply implement the ``Imbo\Cache\CacheInterface`` interface and pass an instance of the custom adapter to the constructor of the event listener. See the :ref:`custom-cache-adapter` section for more information regarding this. Here is an example that uses the APC adapter for caching:
-
-.. code-block:: php
-
-    <?php
-    return [
-        // ...
-
-        'eventListeners' => [
-            'metadataCache' => [
-                'listener' => 'Imbo\EventListener\MetadataCache',
-                'params' => [
-                    'cache' => new Imbo\Cache\APC('imbo'),
-                ],
-            ],
-        ],
-
-        // ...
-    ];
-
-
 .. _stats-access-event-listener:
 
 Stats access
