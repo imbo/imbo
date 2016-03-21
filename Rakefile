@@ -5,7 +5,7 @@ require 'json'
 
 basedir  = "."
 build    = "#{basedir}/build"
-source   = "#{basedir}/library"
+source   = "#{basedir}/src"
 tests    = "#{basedir}/tests"
 
 desc "Task used by Jenkins-CI"
