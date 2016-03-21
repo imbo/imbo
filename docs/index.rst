@@ -33,5 +33,4 @@ Extending/customizing Imbo
     develop/event_listeners
     develop/custom_adapters
     develop/image_transformations
-    develop/cache_adapters
     develop/contributing
