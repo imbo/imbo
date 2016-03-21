@@ -13,10 +13,6 @@
   </testsuites>
 
   <php>
-    <!-- Memcached cache driver integration tests -->
-    <var name="MEMCACHED_HOST" value="" />
-    <var name="MEMCACHED_PORT" value="" />
-
     <!-- AWS S3 tests -->
     <var name="AWS_S3_KEY" value="" />
     <var name="AWS_S3_SECRET" value="" />
