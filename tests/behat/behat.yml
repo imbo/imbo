@@ -22,7 +22,7 @@ default:
       enableCodeCoverage: true
       coveragePath: %behat.paths.base%/../../build/behat-coverage
       whitelist:
-        - %behat.paths.base%/../../library
+        - %behat.paths.base%/../../src
         - %behat.paths.base%/../../public
 
 no-cc:

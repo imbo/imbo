@@ -69,7 +69,7 @@ Implement the ``Imbo\EventListener\ListenerInterface`` interface
 
 Below is the complete interface with comments:
 
-.. literalinclude:: ../../library/Imbo/EventListener/ListenerInterface.php
+.. literalinclude:: ../../src/Imbo/EventListener/ListenerInterface.php
     :language: php
     :linenos:
 
