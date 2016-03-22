@@ -15,6 +15,7 @@ branches:
   only:
     - develop
     - master
+    - imbo-3.0
 services:
   - mongodb
 before_install:
