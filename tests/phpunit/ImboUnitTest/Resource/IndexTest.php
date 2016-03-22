@@ -40,6 +40,7 @@ class IndexTest extends ResourceTests {
     public function setUp() {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $this->event = $this->getMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
@@ -66,11 +67,26 @@ class IndexTest extends ResourceTests {
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
         $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
         $this->response->expects($this->once())->method('setPrivate');
+        $this->event->expects($this->any())->method('getConfig')->will($this->returnValue(['indexRedirect' => null]));
 
         $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;
+
+        $this->resource->get($this->event);
+    }
+
+    public function testRedirectsIfConfigurationOptionHasBeenSet() {
+        $url = 'http://imbo.io';
+        $this->event->expects($this->any())->method('getConfig')->will($this->returnValue(['indexRedirect' => $url]));
+
+        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $responseHeaders->expects($this->once())->method('set')->with('Location', $url);
+
+        $this->response->headers = $responseHeaders;
+        $this->response->expects($this->once())->method('setStatusCode')->with(307);
+        $this->response->expects($this->never())->method('setModel');
 
         $this->resource->get($this->event);
     }

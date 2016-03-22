@@ -46,31 +46,25 @@ class Index implements ResourceInterface {
     public function get(EventInterface $event) {
         $request = $event->getRequest();
         $response = $event->getResponse();
+
+        $redirectUrl = $event->getConfig()['indexRedirect'];
+
+        if ($redirectUrl) {
+            $response->setStatusCode(307);
+            $response->headers->set('Location', $redirectUrl);
+            return;
+        }
+
         $response->setStatusCode(200, 'Hell Yeah');
 
         $baseUrl = $request->getSchemeAndHttpHost() . $request->getBaseUrl();
 
         $model = new Model\ArrayModel();
         $model->setData([
-            'version' => Version::VERSION,
-            'urls' => [
-                'site' => 'http://www.imbo-project.org',
-                'source' => 'https://github.com/imbo/imbo',
-                'issues' => 'https://github.com/imbo/imbo/issues',
-                'docs' => 'http://docs.imbo-project.org',
-            ],
-            'endpoints' => [
-                'status' => $baseUrl . '/status',
-                'stats' => $baseUrl . '/stats',
-                'user' => $baseUrl . '/users/{user}',
-                'images' => $baseUrl . '/users/{user}/images',
-                'image' => $baseUrl . '/users/{user}/images/{imageIdentifier}',
-                'globalShortImageUrl' => $baseUrl . '/s/{id}',
-                'globalImages' => $baseUrl . '/images',
-                'metadata' => $baseUrl . '/users/{user}/images/{imageIdentifier}/metadata',
-                'shortImageUrls' => $baseUrl . '/users/{user}/images/{imageIdentifier}/shorturls',
-                'shortImageUrl' =>  $baseUrl . '/users/{user}/images/{imageIdentifier}/shorturls/{id}',
-            ],
+            'site' => 'http://imbo.io',
+            'source' => 'https://github.com/imbo/imbo',
+            'issues' => 'https://github.com/imbo/imbo/issues',
+            'docs' => 'http://docs.imbo.io',
         ]);
 
         $response->setModel($model);

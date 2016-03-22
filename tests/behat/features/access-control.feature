@@ -104,5 +104,5 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
 
         Examples:
             | url          | status           | response |
-            | /            | 200 Hell Yeah    | #^{"version":".*?",.*}$# |
+            | /            | 200 Hell Yeah    | #^{.*}$# |
             | /status.json | 200 OK           | #^{"date":".*?","database":true,"storage":true}$# |
