@@ -370,6 +370,16 @@ $config = [
      * @var array
      */
     'trustedProxies' => [],
+
+    /**
+     * Index redirect
+     *
+     * Set this to a URL if you want the front page to do a redirect instead of showing generic
+     * information regarding the Imbo-project.
+     *
+     * @var string
+     */
+    'indexRedirect' => null,
 ];
 
 // See if a custom config path has been defined. If so, don't require the custom one as this is

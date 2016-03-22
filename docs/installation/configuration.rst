@@ -1145,3 +1145,21 @@ In the ``get()`` method we are simply creating a list model for Imbo's response 
     }
 
 Feel free to experiment with this feature. If you end up creating a resource that you think should be a part of Imbo, send a `pull request on GitHub <https://github.com/imbo/imbo>`_.
+
+.. _configuration-indexredirect:
+
+Redirect the index route - ``indexRedirect``
+--------------------------------------------
+
+The index resource (:ref:`index-resource`) simply lists some URL's related to the Imbo project. If you would rather the index resource redirect the client to some specific URL, set the ``indexRedirect`` configuration option to that URL:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'indexRedirect' => 'https://github.com/imbo',
+
+        // ...
+    ];

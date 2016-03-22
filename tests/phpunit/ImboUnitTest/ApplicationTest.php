@@ -87,7 +87,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Application::run
      */
     public function testApplicationSetsTrustedProxies() {
-        $this->expectOutputRegex('|{"version":"' . preg_quote(Version::VERSION, '|') . '",.*}|');
+        $this->expectOutputRegex('|^{.*}$|');
 
         $this->assertEmpty(Request::getTrustedProxies());
         $this->application->run([
@@ -101,6 +101,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
             'routes' => [],
             'auth' => [],
             'trustedProxies' => ['10.0.0.77'],
+            'indexRedirect' => null,
         ]);
         $this->assertSame(['10.0.0.77'], Request::getTrustedProxies());
     }
@@ -165,7 +166,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Application::run
      */
     public function testCanRunWithDefaultConfiguration() {
-        $this->expectOutputRegex('|{"version":"' . preg_quote(Version::VERSION, '|') . '",.*}|');
+        $this->expectOutputRegex('|^{.*}$|');
         $this->application->run(require __DIR__ . '/../../../config/config.default.php');
     }
 }

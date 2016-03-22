@@ -17,7 +17,7 @@ In this section you will find information on the different resources Imbo's REST
 Index resource - ``/``
 ++++++++++++++++++++++
 
-The index resource shows the version of the Imbo installation along with some external URLs for Imbo-related information, and some internal URLs for the available endpoints.
+The index resource shows some URL's related to the Imbo project.
 
 .. code-block:: bash
 
@@ -28,33 +28,20 @@ results in:
 .. code-block:: javascript
 
     {
-      "version": "dev",
-      "urls": {
-        "site": "http://www.imbo-project.org",
-        "source": "https://github.com/imbo/imbo",
-        "issues": "https://github.com/imbo/imbo/issues",
-        "docs": "http://docs.imbo-project.org"
-      },
-      "endpoints": {
-        "status": "http://imbo/status",
-        "stats": "http://imbo/stats",
-        "user": "http://imbo/users/{user}",
-        "images": "http://imbo/users/{user}/images",
-        "image": "http://imbo/users/{user}/images/{imageIdentifier}",
-        "globalShortImageUrl": "http://imbo/s/{id}",
-        "metadata": "http://imbo/users/{user}/images/{imageIdentifier}/metadata",
-        "shortImageUrls": "http://imbo/users/{user}/images/{imageIdentifier}/shorturls",
-        "shortImageUrl": "http://imbo/users/{user}/images/{imageIdentifier}/shorturls/{id}"
-      }
+      "site": "http://imbo.io",
+      "source": "https://github.com/imbo/imbo",
+      "issues": "https://github.com/imbo/imbo/issues",
+      "docs": "http://docs.imbo.io"
     }
 
-This resource does not support any extensions in the URI, so you will need to use the ``Accept`` header to fetch different representations of the data.
-
 The index resource does not require any authentication per default.
+
+If you want the client to be redirected to some URL instead of displaying the above information, use the ``indexRedirect`` configuration option (:ref:`configuration-indexredirect`).
 
 **Typical response codes:**
 
 * 200 Hell Yeah
+* 307 Temporary Redirect
 
 .. note:: The index resource is not cache-able.
 
