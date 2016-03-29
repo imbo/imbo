@@ -34,7 +34,6 @@ else
 fi
 
 mongo ${MONGOHOST}/${DBNAME} <<EOF
- use imbo
  db.image.ensureIndex({"user": 1, "imageIdentifier": 1}, { background: true })
  db.image.ensureIndex({"user": 1, "added": -1}, { background: true })
  db.image.ensureIndex({"user": 1, "updated": -1}, { background: true })
