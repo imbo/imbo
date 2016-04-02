@@ -78,13 +78,6 @@ class Application {
             throw new InvalidArgumentException('Invalid access control adapter', 500);
         }
 
-        // Check if we have an auth array present in the configuration
-        if (isset($config['auth']) && is_array($config['auth']) &&
-            $accessControl instanceof SimpleAclArrayAdapter &&
-            $accessControl->isEmpty()) {
-            $accessControl = new SimpleAclArrayAdapter($config['auth']);
-        }
-
         // Create a router based on the routes in the configuration and internal routes
         $router = new Router($config['routes']);
 
