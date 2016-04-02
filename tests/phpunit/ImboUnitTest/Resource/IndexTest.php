@@ -26,6 +26,7 @@ class IndexTest extends ResourceTests {
     private $request;
     private $response;
     private $event;
+    private $config;
 
     /**
      * {@inheritdoc}
@@ -44,6 +45,7 @@ class IndexTest extends ResourceTests {
         $this->event = $this->getMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->config = $this->getMock('Imbo\Config\ConfigInterface');
 
         $this->resource = $this->getNewResource();
     }
@@ -67,7 +69,8 @@ class IndexTest extends ResourceTests {
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
         $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
         $this->response->expects($this->once())->method('setPrivate');
-        $this->event->expects($this->any())->method('getConfig')->will($this->returnValue(['indexRedirect' => null]));
+        $this->config->expects($this->any())->method('getIndexRedirect')->will($this->returnValue(null));
+        $this->event->expects($this->any())->method('getConfig')->will($this->returnValue($this->config));
 
         $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
@@ -79,7 +82,8 @@ class IndexTest extends ResourceTests {
 
     public function testRedirectsIfConfigurationOptionHasBeenSet() {
         $url = 'http://imbo.io';
-        $this->event->expects($this->any())->method('getConfig')->will($this->returnValue(['indexRedirect' => $url]));
+        $this->config->expects($this->any())->method('getIndexRedirect')->will($this->returnValue($url));
+        $this->event->expects($this->any())->method('getConfig')->will($this->returnValue($this->config));
 
         $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $responseHeaders->expects($this->once())->method('set')->with('Location', $url);

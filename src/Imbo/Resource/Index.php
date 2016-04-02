@@ -47,7 +47,7 @@ class Index implements ResourceInterface {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
-        $redirectUrl = $event->getConfig()['indexRedirect'];
+        $redirectUrl = $event->getConfig()->getIndexRedirect();
 
         if ($redirectUrl) {
             $response->setStatusCode(307);

@@ -25,7 +25,8 @@ use Imbo\Http\Request\Request,
     Imbo\Storage\StorageInterface,
     Imbo\Http\Response\Formatter,
     Imbo\Resource\ResourceInterface,
-    Imbo\EventListener\Initializer\InitializerInterface;
+    Imbo\EventListener\Initializer\InitializerInterface,
+    Imbo\Config\ConfigInterface;
 
 /**
  * Imbo application
@@ -37,17 +38,17 @@ class Application {
     /**
      * Run the application
      */
-    public function run(array $config) {
+    public function run(ConfigInterface $config) {
         // Request and response objects
         $request = Request::createFromGlobals();
-        Request::setTrustedProxies($config['trustedProxies']);
+        Request::setTrustedProxies($config->getTrustedProxies());
 
         $response = new Response();
         $response->setPublic();
         $response->headers->set('X-Imbo-Version', Version::VERSION);
 
         // Database and storage adapters
-        $database = $config['database'];
+        $database = $config->getDatabase();
 
         if (is_callable($database) && !($database instanceof DatabaseInterface)) {
             $database = $database();
@@ -57,7 +58,7 @@ class Application {
             throw new InvalidArgumentException('Invalid database adapter', 500);
         }
 
-        $storage = $config['storage'];
+        $storage = $config->getStorage();
 
         if (is_callable($storage) && !($storage instanceof StorageInterface)) {
             $storage = $storage();
@@ -68,7 +69,7 @@ class Application {
         }
 
         // Access control adapter
-        $accessControl = $config['accessControl'];
+        $accessControl = $config->getAccessControl();
 
         if (is_callable($accessControl) && !($accessControl instanceof AccessControlInterface)) {
             $accessControl = $accessControl();
@@ -86,7 +87,7 @@ class Application {
         }
 
         // Create a router based on the routes in the configuration and internal routes
-        $router = new Router($config['routes']);
+        $router = new Router($config->getRoutes());
 
         // Create the event manager and the event template
         $eventManager = new EventManager();
@@ -154,7 +155,7 @@ class Application {
         }
 
         // Event listener initializers
-        foreach ($config['eventListenerInitializers'] as $name => $initializer) {
+        foreach ($config->getEventListenerInitializers() as $name => $initializer) {
             if (!$initializer) {
                 // The initializer has been disabled via config
                 continue;
@@ -174,7 +175,7 @@ class Application {
         }
 
         // Listeners from configuration
-        foreach ($config['eventListeners'] as $name => $definition) {
+        foreach ($config->getEventListeners() as $name => $definition) {
             if (!$definition) {
                 // This occurs when a user disables a default event listener
                 continue;
@@ -243,7 +244,7 @@ class Application {
         }
 
         // Custom resources
-        foreach ($config['resources'] as $name => $resource) {
+        foreach ($config->getResources() as $name => $resource) {
             if (is_callable($resource)) {
                 $resource = $resource();
             }
@@ -261,8 +262,8 @@ class Application {
             // Create the resource
             $routeName = (string) $request->getRoute();
 
-            if (isset($config['resources'][$routeName])) {
-                $resource = $config['resources'][$routeName];
+            if (isset($config->getResources()[$routeName])) {
+                $resource = $config->getResources()[$routeName];
 
                 if (is_callable($resource)) {
                     $resource = $resource();

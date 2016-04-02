@@ -15,6 +15,7 @@ use Imbo\Http\Response\ResponseFormatter,
     Imbo\Model\Error,
     Imbo\Model\Image,
     Imbo\Router\Route,
+    Imbo\Config\ConfigInterface,
     Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
@@ -35,6 +36,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
     private $request;
     private $response;
     private $event;
+    private $config;
 
     /**
      * Set up the response formatter
@@ -43,9 +45,10 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $this->event = $this->getMock('Imbo\EventManager\Event');
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->config = $this->getMock('Imbo\Config\ConfigInterface');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $this->event->expects($this->any())->method('getConfig')->will($this->returnValue(['contentNegotiateImages' => true]));
+        $this->event->expects($this->any())->method('getConfig')->will($this->returnValue($this->config));
         $this->formatter = $this->getMock('Imbo\Http\Response\Formatter\FormatterInterface');
         $this->formatters = [
             'format' => $this->formatter,
@@ -251,6 +254,8 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $image = new Image();
         $image->setMimeType($originalMimeType);
 
+        $this->config->expects($this->any())->method('getContentNegotiateImages')->will($this->returnValue(true));
+
         $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('image/*'));
         $this->request->headers = $requestHeaders;
@@ -272,6 +277,8 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $image = new Image();
         $image->setMimeType($originalMimeType);
 
+        $this->config->expects($this->any())->method('getContentNegotiateImages')->will($this->returnValue(false));
+
         $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $this->request->headers = $requestHeaders;
         $this->contentNegotiation->expects($this->any())->method('isAcceptable')->will($this->returnValue(1));
@@ -281,7 +288,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $event = $this->getMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $event->expects($this->any())->method('getConfig')->will($this->returnValue(['contentNegotiateImages' => false]));
+        $event->expects($this->any())->method('getConfig')->will($this->returnValue($this->config));
 
         $this->responseFormatter->negotiate($event);
         $this->assertSame($expectedFormatter, $this->responseFormatter->getFormatter());

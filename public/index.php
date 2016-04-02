@@ -11,12 +11,13 @@
 namespace Imbo;
 
 use Exception as BaseException;
+use Imbo\Config\ArrayConfig;
 
 try {
     // Fetch the configuration
     $configPath = defined('IMBO_CONFIG_PATH') ? IMBO_CONFIG_PATH : __DIR__ . '/../config/config.default.php';
 
-    $config = require $configPath;
+    $config = new ArrayConfig(require $configPath);
 
     $application = new Application();
     $application->run($config);

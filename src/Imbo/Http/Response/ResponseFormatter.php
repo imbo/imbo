@@ -153,7 +153,7 @@ class ResponseFormatter implements ListenerInterface {
         $extension = $request->getExtension();
         $routeName = (string) $request->getRoute();
         $config = $event->getConfig();
-        $contentNegotiateImages = $config['contentNegotiateImages'];
+        $contentNegotiateImages = $config->getContentNegotiateImages();
         $model = $response->getModel();
 
         if (!$extension && !$contentNegotiateImages && $model instanceof Model\Image) {

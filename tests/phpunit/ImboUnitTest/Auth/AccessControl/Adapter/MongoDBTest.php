@@ -16,6 +16,7 @@ use Imbo\Auth\AccessControl\Adapter\MongoDB,
 /**
  * @covers Imbo\Auth\AccessControl\Adapter\MongoDB
  * @group unit
+ * @group database
  * @group mongodb
  */
 class MongoDBTest extends \PHPUnit_Framework_TestCase {
