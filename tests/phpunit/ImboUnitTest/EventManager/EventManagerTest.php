@@ -34,7 +34,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      */
     public function setUp() {
         $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->event = new Event($this, ['request' => $this->request]);
+        $this->event = new Event(['request' => $this->request]);
         $this->manager = new EventManager();
         $this->manager->setEventTemplate($this->event);
     }
@@ -203,6 +203,71 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
 
         $this->expectOutputString('a:1:{i:0;s:5:"param";}');
         $this->manager->trigger('getParams');
+    }
+
+    public function getWildcardListeners() {
+        $callback1 = function($event) { echo '1:' . $event->getName() . ' '; };
+        $callback2 = function($event) { echo '2:' . $event->getName() . ' '; };
+        $callback3 = function($event) { echo '3:' . $event->getName() . ' '; };
+
+        return [
+            'global wildcard listeners' => [
+                'listeners' => [
+                    [
+                        'callback' => $callback1,
+                        'event' => '*',
+                        'priority' => 0,
+                    ],
+                    [
+                        'callback' => $callback2,
+                        'event' => '*',
+                        'priority' => 1,
+                    ],
+                ],
+                'events' => ['foo', 'bar', 'baz'],
+                'output' => '2:foo 1:foo 2:bar 1:bar 2:baz 1:baz ',
+            ],
+            'mixed listeners' => [
+                'listeners' => [
+                    [
+                        'callback' => $callback1,
+                        'event' => '*',
+                        'priority' => 0,
+                    ],
+                    [
+                        'callback' => $callback2,
+                        'event' => 'image.*',
+                        'priority' => 0,
+                    ],
+                    [
+                        'callback' => $callback3,
+                        'event' => 'image.get',
+                        'priority' => 100, // This has higher priority than callback2 above, but is
+                                           // still triggered last (because wildcard listeners run
+                                           // in their own queues, and is triggerd first
+                    ],
+                ],
+                'events' => ['app.start', 'image.get', 'image.send'],
+                'output' => '1:app.start 1:image.get 2:image.get 3:image.get 1:image.send 2:image.send ',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getWildcardListeners
+     * @covers Imbo\EventManager\EventManager::getListenersForEvent
+     * @covers Imbo\EventManager\EventManager::getEventNameParts
+     */
+    public function testSupportsWildcardListeners(array $listeners, array $events, $output) {
+        foreach ($listeners as $name => $listener) {
+            $this->manager->addEventHandler($name, $listener['callback'])->addCallbacks($name, [$listener['event'] => $listener['priority']]);
+        }
+
+        $this->expectOutputString($output);
+
+        foreach ($events as $event) {
+            $this->manager->trigger($event);
+        }
     }
 }
 
