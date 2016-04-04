@@ -9,6 +9,23 @@ If you did a :ref:`git clone <git-clone>` you could simply do a ``git pull`` to 
 
 From time to time Imbo will introduce new features or fix bugs that might require you to update the contents of the database you choose to use. This chapter will contain all information you need to keep your installation up to date. Each of the following sections include the necessary steps you need to execute when upgrading to the different versions.
 
+.. contents::
+    :local:
+    :depth: 2
+
+Imbo-3.0.0
+----------
+
+Below are the changes you need to be aware of when upgrading to Imbo-2.0.0.
+
+.. contents::
+    :local:
+    :depth: 2
+
+``auth`` is removed from the configuration
+++++++++++++++++++++++++++++++++++++++++++
+Imbo-3 no longer provides support for using the ``auth`` part of the configuration file. You will need to use the :ref:`Access Control adapters <access-control-configuration>` from now on.
+
 Imbo-2.0.0
 ----------
 
