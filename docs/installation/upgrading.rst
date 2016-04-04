@@ -22,6 +22,10 @@ Below are the changes you need to be aware of when upgrading to Imbo-2.0.0.
     :local:
     :depth: 2
 
+XML-support has been removed
+++++++++++++++++++++++++++++
+Imbo-3 no longer supports XML output. The only supported response format is JSON.
+
 ``auth`` is removed from the configuration
 ++++++++++++++++++++++++++++++++++++++++++
 Imbo-3 no longer provides support for using the ``auth`` part of the configuration file. You will need to use the :ref:`Access Control adapters <access-control-configuration>` from now on.
