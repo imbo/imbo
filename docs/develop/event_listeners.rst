@@ -151,6 +151,60 @@ For testing and/or debugging purposes you can also write the event listener dire
 
 The ``$event`` object passed to the function is the same as in the previous two examples. This approach should mostly be used for testing purposes and quick hacks. More information regarding this approach is available in the :ref:`event listener configuration <configuration-event-listeners>` section.
 
+Subscribing to events using a wild card
++++++++++++++++++++++++++++++++++++++++
+When subscribing to one or more events Imbo let's you use wild cards. This means that you can have your event listener subscribe to all the different image events by specifying ``'image.*'`` as the event you are subscribing to. If you want a listener to subscribe to **all** events you can simply use ``'*'``. Use ``$event->getName()`` in your handler to figure out which event is actually being triggered.
+
+One other thing to keep in mind while using wild card events is priorities. Global wild card event listeners (that listens to ``'*'``) is triggered before all other listeners, and other wild card listeners are triggered before the ones who has absolute event names they are subscribing to.
+
+Example:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'eventListeners' => [
+            'listener1' => [
+                'callback' => function ($e) { /* ... */ },
+                'events' => ['*'],
+                'priority' => 100,
+            ],
+            'listener2' => [
+                'callback' => function ($e) { /* ... */ },
+                'events' => ['*'],
+                'priority' => 200,
+            ],
+            'listener3' => [
+                'callback' => function ($e) { /* ... */ },
+                'events' => ['image.*'],
+                'priority' => 300,
+            ],
+            'listener4' => [
+                'callback' => function ($e) { /* ... */ },
+                'events' => ['image.*'],
+                'priority' => 400,
+            ],
+            'listener5' => [
+                'callback' => function ($e) { /* ... */ },
+                'events' => ['image.get'],
+                'priority' => PHP_INT_MAX,
+            ],
+        ],
+
+        // ...
+    ];
+
+Given the configuration above the execution order would be:
+
+* ``listener2``
+* ``listener1``
+* ``listener4``
+* ``listener3``
+* ``listener5``
+
+Even though ``listener5`` has the highest possible priority the wild card listeners are executed first, because they are in their own priority queues.
 
 .. _the-event-object:
 
