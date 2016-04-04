@@ -5,6 +5,7 @@ Imbo-x.x.x
 ----------
 __N/A__
 
+* #459: Support wildcards when subscribing to events (Christer Edvartsen)
 * #444: Added a getData() method to the Imbo\Model\ModelInterface (Christer Edvartsen)
 * #431: Added an Amazon S3 storage adapter for the image variations (Ali Asaria)
 
