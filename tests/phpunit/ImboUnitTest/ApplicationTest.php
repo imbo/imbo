@@ -99,7 +99,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
             'contentNegotiateImages' => false,
             'resources' => [],
             'routes' => [],
-            'auth' => [],
             'trustedProxies' => ['10.0.0.77'],
             'indexRedirect' => null,
         ]);
