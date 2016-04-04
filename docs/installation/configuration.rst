@@ -1125,15 +1125,15 @@ Below is an example implementation of the ``ImboUsers`` resource used in the abo
         }
 
         public function get(EventInterface $event) {
-            $model = new ListModel();
-            $model->setList('users', 'user', array_keys($event->getConfig()['auth']));
-            $event->getResponse()->setModel($model);
+            $event->getResponse()->setModel(
+                new ListModel('users', ['someuser', 'someotheruser']
+            );
         }
     }
 
 This resource informs Imbo that it supports ``HTTP GET``, and specifies a callback for the ``users.get`` event. The name of the event is the name specified for the resource in the configuration above, along with the HTTP method, separated with a dot.
 
-In the ``get()`` method we are simply creating a list model for Imbo's response formatter, and we are supplying the keys from the ``auth`` part of your configuration file as data. When formatted as JSON the response looks like this:
+In the ``get()`` method we are simply creating a list model for Imbo's response formatter, and we are supplying a list of users to the model. When formatted as JSON the response looks like this:
 
 .. code-block:: json
 

@@ -32,11 +32,15 @@ class ListModel implements ModelInterface {
     private $container;
 
     /**
-     * The entry name
+     * Class constructor
      *
-     * @var string
+     * @param string $container
+     * @param array $list
      */
-    private $entry;
+    public function __construct($container = null, array $list = []) {
+        $this->container = $container;
+        $this->list = $list;
+    }
 
     /**
      * Get the list
@@ -81,34 +85,12 @@ class ListModel implements ModelInterface {
     }
 
     /**
-     * Get the entry value
-     *
-     * @return string
-     */
-    public function getEntry() {
-        return $this->entry;
-    }
-
-    /**
-     * Set the entry value
-     *
-     * @param string $entry
-     * @return self
-     */
-    public function setEntry($entry) {
-        $this->entry = $entry;
-
-        return $this;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getData() {
         return [
-            'list' => $this->getList(),
             'container' => $this->getContainer(),
-            'entry' => $this->getEntry(),
+            'list' => $this->getList(),
         ];
     }
 }
