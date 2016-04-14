@@ -292,12 +292,20 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expectedFormatter, $this->responseFormatter->getFormatter());
     }
 
+    public function getImageResources() {
+        return [
+            'image' => ['image'],
+            'global short url' => ['globalshorturl'],
+        ];
+    }
+
     /**
      * @covers Imbo\Http\Response\ResponseFormatter::negotiate
+     * @dataProvider getImageResources
      */
-    public function testForcesContentNegotiationOnErrorModelsWhenResourceIsAnImage() {
+    public function testForcesContentNegotiationOnErrorModelsWhenResourceIsAnImage($routeName) {
         $route = new Route();
-        $route->setName('image');
+        $route->setName($routeName);
 
         $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
         $requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('*/*'));
