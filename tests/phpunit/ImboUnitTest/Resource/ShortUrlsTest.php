@@ -178,6 +178,7 @@ class ShortUrlsTest extends ResourceTests {
         '));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
+        $this->database->expects($this->once())->method('imageExists')->with('user', 'id')->will($this->returnValue(true));
         $this->database->expects($this->once())->method('getShortUrlId')->with('user', 'id', $extension, $query)->will($this->returnValue(null));
         $this->database->expects($this->once())->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(null));
         $this->database->expects($this->once())->method('insertShortUrl')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'), 'user', 'id', $extension, $query);
@@ -198,6 +199,7 @@ class ShortUrlsTest extends ResourceTests {
         '));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
+        $this->database->expects($this->once())->method('imageExists')->with('user', 'id')->will($this->returnValue(true));
         $this->database->expects($this->once())->method('getShortUrlId')->with('user', 'id', null, [])->will($this->returnValue('aaaaaaa'));
         $this->database->expects($this->never())->method('insertShortUrl');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'))->will($this->returnSelf());
@@ -211,11 +213,12 @@ class ShortUrlsTest extends ResourceTests {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
 
-        $this->database->expects($this->at(0))->method('getShortUrlId')->with('user', 'id', null, [])->will($this->returnValue(null));
-        $this->database->expects($this->at(1))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(['user' => 'value']));
+        $this->database->expects($this->at(0))->method('imageExists')->with('user', 'id')->will($this->returnValue(true));
+        $this->database->expects($this->at(1))->method('getShortUrlId')->with('user', 'id', null, [])->will($this->returnValue(null));
         $this->database->expects($this->at(2))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(['user' => 'value']));
-        $this->database->expects($this->at(3))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(null));
-        $this->database->expects($this->at(4))->method('insertShortUrl')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'), 'user', 'id', null, []);
+        $this->database->expects($this->at(3))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(['user' => 'value']));
+        $this->database->expects($this->at(4))->method('getShortUrlParams')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))->will($this->returnValue(null));
+        $this->database->expects($this->at(5))->method('insertShortUrl')->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'), 'user', 'id', null, []);
 
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'))->will($this->returnSelf());
         $this->response->expects($this->once())->method('setStatusCode')->with(201);
@@ -241,5 +244,26 @@ class ShortUrlsTest extends ResourceTests {
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
 
         $this->getNewResource()->deleteImageShortUrls($this->event);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Image does not exist
+     * @expectedExceptionCode 404
+     */
+    public function testCanNotAddShortUrlWhenImageDoesNotExist() {
+        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('
+            {
+                "user": "user",
+                "imageIdentifier": "id",
+                "extension": null,
+                "query": null
+            }
+        '));
+        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
+        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
+        $this->database->expects($this->once())->method('imageExists')->with('user', 'id')->will($this->returnValue(false));
+
+        $this->getNewResource()->createShortUrl($this->event);
     }
 }
