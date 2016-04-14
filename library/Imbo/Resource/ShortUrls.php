@@ -86,6 +86,10 @@ class ShortUrls implements ResourceInterface {
 
         $database = $event->getDatabase();
 
+        if (!$database->imageExists($image['user'], $image['imageIdentifier'])) {
+            throw new InvalidArgumentException('Image does not exist', 404);
+        }
+
         // See if a short URL ID already exists the for given parameters
         $exists = true;
         $shortUrlId = $database->getShortUrlId($image['user'], $image['imageIdentifier'], $extension, $query);
