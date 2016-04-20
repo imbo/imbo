@@ -168,42 +168,79 @@ class EventManager {
      * @return EventManager
      */
     public function trigger($eventName, array $params = []) {
-        if (!empty($this->callbacks[$eventName])) {
-            $event = clone $this->event;
-            $event->setName($eventName);
+        $event = clone $this->event;
+        $event->setName($eventName);
 
-            // Add optional extra arguments
-            foreach ($params as $key => $value) {
-                $event->setArgument($key, $value);
+        // Add optional extra arguments
+        foreach ($params as $key => $value) {
+            $event->setArgument($key, $value);
+        }
+
+        // Fetch current user
+        $user = $event->getRequest()->getUser();
+
+        // Trigger all listeners for this event and pass in the event instance
+        foreach ($this->getListenersForEvent($eventName) as $listener) {
+            $event->setArgument('handler', $listener['handler']);
+            $callback = $this->getHandlerInstance($listener['handler']);
+
+            if ($callback instanceof ListenerInterface) {
+                $callback = [$callback, $listener['method']];
             }
 
-            // Fetch current user
-            $user = $event->getRequest()->getUser();
+            $users = $listener['users'];
 
-            // Trigger all listeners for this event and pass in the event instance
-            foreach (clone $this->callbacks[$eventName] as $listener) {
-                $event->setArgument('handler', $listener['handler']);
-                $callback = $this->getHandlerInstance($listener['handler']);
+            if (!$this->triggersFor($user, $users)) {
+                continue;
+            }
 
-                if ($callback instanceof ListenerInterface) {
-                    $callback = [$callback, $listener['method']];
-                }
+            $callback($event);
 
-                $users = $listener['users'];
-
-                if (!$this->triggersFor($user, $users)) {
-                    continue;
-                }
-
-                $callback($event);
-
-                if ($event->isPropagationStopped()) {
-                    break;
-                }
+            if ($event->isPropagationStopped()) {
+                break;
             }
         }
 
         return $this;
+    }
+
+    /**
+     * Get all listeners that listens for an event, including wildcard listeners
+     *
+     * @param string $event Name of the event
+     * @return PriorityQueue[]
+     */
+    private function getListenersForEvent($event) {
+        $listeners = [];
+
+        foreach ($this->getEventNameParts($event) as $name) {
+            if (isset($this->callbacks[$name])) {
+                foreach (clone $this->callbacks[$name] as $listener) {
+                    $listeners[] = $listener;
+                }
+            }
+        }
+
+        return $listeners;
+    }
+
+    /**
+     * Get all parts of an event name
+     *
+     * @param string $event
+     * @param string[]
+     */
+    private function getEventNameParts($event) {
+        $parts = ['*'];
+        $offset = 0;
+
+        while ($offset = strpos($event, '.', $offset + 1)) {
+            $parts[] = substr($event, 0, $offset) . '.*';
+        }
+
+        $parts[] = $event;
+
+        return $parts;
     }
 
     /**
