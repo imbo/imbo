@@ -89,7 +89,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
      * @expectedException Imbo\Exception\ImageException
-     * @expectedExceptionMessage Invalid image
+     * @expectedExceptionMessage Unsupported image type: text/x-php
      * @expectedExceptionCode 415
      */
     public function testThrowsExceptionWhenImageTypeIsNotSupported() {
@@ -116,7 +116,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Invalid image
      * @expectedExceptionCode 415
      */
-    public function testThrowsExceptionWhenImageIsBrokenButSizeIsReadable() {
+    public function testThrowsExceptionWhenImageIsSlightlyBroken() {
         $filePath = FIXTURES_DIR . '/slightly-broken-image.png';
 
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents($filePath)));

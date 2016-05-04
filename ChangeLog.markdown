@@ -14,6 +14,12 @@ Bug fixes:
 * #463: Fixed issue with an error model being formatted as an image (Christer Edvartsen)
 * #462: Adding short URLs to an image that does not exist now results in 404 (Christer Edvartsen)
 
+Imbo-2.1.2
+----------
+__N/A__
+
+* #467: Use finfo to determine mime type of uploaded images before loading them into ImageMagick (Christer Edvartsen)
+
 Imbo-2.1.1
 ----------
 __2016-03-11__
