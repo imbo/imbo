@@ -40,6 +40,7 @@ class AccessRulesTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Model\AccessRules::getRules
      * @covers Imbo\Model\AccessRules::setRules
+     * @covers Imbo\Model\AccessRules::getData
      */
     public function testSetAndGetId() {
         $rules = [
@@ -47,7 +48,9 @@ class AccessRulesTest extends \PHPUnit_Framework_TestCase {
             ['id' => 2, 'resources' => ['image.get', 'image.head'], 'users' => ['user']],
         ];
         $this->assertSame([], $this->model->getRules());
+        $this->assertSame([], $this->model->getData());
         $this->assertSame($this->model, $this->model->setRules($rules));
         $this->assertSame($rules, $this->model->getRules());
+        $this->assertSame($rules, $this->model->getData());
     }
 }

@@ -102,4 +102,15 @@ class Status implements ModelInterface {
     public function getStorageStatus() {
         return $this->storageStatus;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData() {
+        return [
+            'date' => $this->getDate(),
+            'database' => $this->getDatabaseStatus(),
+            'storage' => $this->getStorageStatus(),
+        ];
+    }
 }

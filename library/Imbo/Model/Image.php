@@ -436,6 +436,27 @@ class Image implements ModelInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getData() {
+        return [
+            'filesize' => $this->getFilesize(),
+            'mimeType' => $this->getMimeType(),
+            'extension' => $this->getExtension(),
+            'metadata' => $this->getMetadata(),
+            'width' => $this->getWidth(),
+            'height' => $this->getHeight(),
+            'addedDate' => $this->getAddedDate(),
+            'updatedDate' => $this->getUpdatedDate(),
+            'user' => $this->getUser(),
+            'imageIdentifier' => $this->getImageIdentifier(),
+            'checksum' => $this->getChecksum(),
+            'originalChecksum' => $this->getOriginalChecksum(),
+            'hasBeenTransformed' => $this->hasBeenTransformed(),
+        ];
+    }
+
+    /**
      * Check if a mime type is supported by Imbo
      *
      * @param string $mime The mime type to check. For instance "image/png"

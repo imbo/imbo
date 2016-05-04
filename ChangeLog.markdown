@@ -1,6 +1,25 @@
 Changelog for Imbo
 ==================
 
+Imbo-x.x.x
+----------
+__N/A__
+
+* #459: Support wildcards when subscribing to events (Christer Edvartsen)
+* #444: Added a getData() method to the Imbo\Model\ModelInterface (Christer Edvartsen)
+* #431: Added an Amazon S3 storage adapter for the image variations (Ali Asaria)
+
+Bug fixes:
+
+* #463: Fixed issue with an error model being formatted as an image (Christer Edvartsen)
+* #462: Adding short URLs to an image that does not exist now results in 404 (Christer Edvartsen)
+
+Imbo-2.1.2
+----------
+__2016-05-04__
+
+* #467: Use finfo to determine mime type of uploaded images before loading them into ImageMagick (Christer Edvartsen)
+
 Imbo-2.1.1
 ----------
 __2016-03-11__
@@ -18,28 +37,31 @@ Imbo-2.0.0
 ----------
 __2016-02-28__
 
-* #430: Prevent race conditions in image transformation cache (Espen Hovlandsdal)
 * #429: Added opacity to watermark image (Sindre Gulseth)
 * #427: When resizing with one param round up the other calculated value (Sindre Gulseth)
 * #423: Make storage drivers throw exceptions as expected in StorageOperations (Mats Lindh)
 * #410: Validate incoming image metadata (Kristoffer Brabrand)
-* #402: Fix Strip-transformation not doing anything on newer Imagick versions (Espen Hovlandsdal)
 * #402: Improve Contrast-transformation predictability (Espen Hovlandsdal)
 * #400: New image transformation: Blur (Kristoffer Brabrand)
 * #398: Add ability to configure HTTP cache headers (Espen Hovlandsdal)
 * #391: Make Crop-transformation validate coordinates (Espen Hovlandsdal)
-* #390: Fix image variation + crop transformation bug (Espen Hovlandsdal)
-* #386: Fix CORS wildcard-issue when client did not send `Origin`-header (Espen Hovlandsdal)
 * #381: New image transformation: DrawPois (points of interest) (Espen Hovlandsdal)
 * #376: Add config option to alter protocol used for authentication signatures (Espen Hovlandsdal)
-* #367: Fix bug where special characters could break metadata XML response (Kristoffer Brabrand)
-* #366: Fix border transformation + alpha channel bug (Espen Hovlandsdal)
 * #363: Add pluggable image identifier generation (Espen Hovlandsdal)
 * #357: Add public key generation CLI-command (Espen Hovlandsdal)
 * #351: New image transformation: SmartSize (Kristoffer Brabrand, Espen Hovlandsdal)
 * #348: Add global images endpoint (Kristoffer Brabrand)
 * #347: Use UUID instead of MD5 for image identifiers (Espen Hovlandsdal)
 * #328: New access control implementation (Espen Hovlandsdal, Kristoffer Brabrand)
+
+Bug fixes:
+
+* #430: Prevent race conditions in image transformation cache (Espen Hovlandsdal)
+* #402: Fix Strip-transformation not doing anything on newer Imagick versions (Espen Hovlandsdal)
+* #390: Fix image variation + crop transformation bug (Espen Hovlandsdal)
+* #386: Fix CORS wildcard-issue when client did not send `Origin`-header (Espen Hovlandsdal)
+* #367: Fix bug where special characters could break metadata XML response (Kristoffer Brabrand)
+* #366: Fix border transformation + alpha channel bug (Espen Hovlandsdal)
 
 Imbo-1.2.5
 ----------

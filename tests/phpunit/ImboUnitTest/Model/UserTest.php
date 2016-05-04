@@ -68,4 +68,21 @@ class UserTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->model, $this->model->setLastModified($date));
         $this->assertSame($date, $this->model->getLastModified());
     }
+
+    /**
+     * @covers Imbo\Model\User::getData
+     */
+    public function testGetData() {
+        $date = new DateTime();
+        $this->model
+            ->setUserId('id')
+            ->setNumImages(100)
+            ->setLastModified($date);
+
+        $this->assertSame([
+            'id' => 'id',
+            'numImages' => 100,
+            'lastModified' => $date,
+        ], $this->model->getData());
+    }
 }

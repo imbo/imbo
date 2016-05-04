@@ -3,6 +3,21 @@ Feature: Imbo can generate short URLs for images on demand
     As an HTTP Client
     I can request the short URLs resource
 
+    Scenario: Responds with 404 when the image does not exist
+        Given I use "publickey" and "privatekey" for public and private keys
+        And I sign the request
+        And the request body contains:
+            """
+            {"user": "user", "imageIdentifier": "id", "extension": "gif", "query": null}
+            """
+        When I request "/users/user/images/id/shorturls" using HTTP "POST"
+        Then I should get a response with "404 Image does not exist"
+        And the "Content-Type" response header is "application/json"
+        And the response body matches:
+           """
+           #^{"error":{"code":404,"message":"Image does not exist".*?,"imageIdentifier":"id"}$#
+           """
+
     Scenario: Generate a short URL
         Given "tests/phpunit/Fixtures/image.png" exists in Imbo
         And I use "publickey" and "privatekey" for public and private keys

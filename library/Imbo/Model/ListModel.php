@@ -100,4 +100,15 @@ class ListModel implements ModelInterface {
 
         return $this;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData() {
+        return [
+            'list' => $this->getList(),
+            'container' => $this->getContainer(),
+            'entry' => $this->getEntry(),
+        ];
+    }
 }

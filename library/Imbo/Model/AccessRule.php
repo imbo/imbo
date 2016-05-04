@@ -128,4 +128,16 @@ class AccessRule implements ModelInterface {
     public function getUsers() {
         return $this->users;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData() {
+        return [
+            'id' => $this->getId(),
+            'group' => $this->getGroup(),
+            'resources' => $this->getResources(),
+            'users' => $this->getUsers(),
+        ];
+    }
 }

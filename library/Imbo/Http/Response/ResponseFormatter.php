@@ -164,10 +164,10 @@ class ResponseFormatter implements ListenerInterface {
             // instead we want to use the original format of the image
             $mime = $model->getMimeType();
             $formatter = $this->supportedTypes[$mime];
-        } else if ($extension && !($model instanceof Model\Error && $routeName === 'image')) {
+        } else if ($extension && !($model instanceof Model\Error && ($routeName === 'image' || $routeName === 'globalshorturl'))) {
             // The user agent wants a specific type. Skip content negotiation completely, but not
-            // if the request is against the image resource, and ended up as an error, because then
-            // Imbo would try to render the error as an image.
+            // if the request is against the image resource (or the global short url resource), and
+            // ended up as an error, because then Imbo would try to render the error as an image.
             $mime = $this->defaultMimeType;
 
             if (isset($this->extensionsToMimeType[$extension])) {

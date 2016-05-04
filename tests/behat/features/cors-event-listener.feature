@@ -75,7 +75,7 @@ Feature: Imbo provides an event listener for CORS
         And I sign the request
         And I attach "ChangeLog.markdown" to the request body
         When I request "/users/user/images" using HTTP "POST"
-        Then I should get a response with "415 Invalid image"
+        Then I should get a response with "415 Unsupported image type: text/plain"
         And the "Vary" response header contains "Origin"
         And the following response headers should be present:
         """

@@ -8,13 +8,13 @@
  * distributed with this source code.
  */
 
-namespace ImboIntegrationTest\Storage;
+namespace ImboIntegrationTest\EventListener\ImageVariations\Storage;
 
-use Imbo\Storage\S3,
+use Imbo\EventListener\ImageVariations\Storage\S3,
     Aws\S3\S3Client;
 
 /**
- * @covers Imbo\Storage\S3
+ * @covers Imbo\EventListener\ImageVariations\Storage\S3
  * @group integration
  * @group storage
  * @group aws
@@ -23,7 +23,7 @@ class S3Test extends StorageTests {
     /**
      * @see ImboIntegrationTest\Storage\StorageTests::getDriver()
      */
-    protected function getDriver() {
+    protected function getAdapter() {
         return new S3([
             'key' => $GLOBALS['AWS_S3_KEY'],
             'secret' => $GLOBALS['AWS_S3_SECRET'],
@@ -48,20 +48,5 @@ class S3Test extends StorageTests {
         $client->clearBucket($GLOBALS['AWS_S3_BUCKET']);
 
         parent::setUp();
-    }
-
-    /**
-     * @covers Imbo\Storage\S3::getStatus
-     */
-    public function testGetStatus() {
-        $this->assertTrue($this->getDriver()->getStatus());
-
-        $driver = new S3([
-            'key' => $GLOBALS['AWS_S3_KEY'],
-            'secret' => $GLOBALS['AWS_S3_SECRET'],
-            'bucket' => uniqid(),
-        ]);
-
-        $this->assertFalse($driver->getStatus());
     }
 }

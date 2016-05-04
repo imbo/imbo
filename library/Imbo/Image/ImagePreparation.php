@@ -17,7 +17,8 @@ use Imbo\EventManager\EventInterface,
     Imbo\Exception,
     Imbo\Model\Image,
     Imagick,
-    ImagickException;
+    ImagickException,
+    finfo;
 
 /**
  * Image preparation
@@ -57,23 +58,25 @@ class ImagePreparation implements ListenerInterface {
             throw $e;
         }
 
-        // Open the image with imagick to fetch the mime type
-        $imagick = new Imagick();
-
-        try {
-            $imagick->readImageBlob($imageBlob);
-            $mime = $imagick->getImageMimeType();
-            $size = $imagick->getImageGeometry();
-        } catch (ImagickException $e) {
-            $e = new ImageException('Invalid image', 415);
-            $e->setImboErrorCode(Exception::IMAGE_INVALID_IMAGE);
-
-            throw $e;
-        }
+        // Fetch mime using finfo
+        $mime = (new finfo(FILEINFO_MIME_TYPE))->buffer($imageBlob);
 
         if (!Image::supportedMimeType($mime)) {
             $e = new ImageException('Unsupported image type: ' . $mime, 415);
             $e->setImboErrorCode(Exception::IMAGE_UNSUPPORTED_MIMETYPE);
+
+            throw $e;
+        }
+
+        // Open the image with imagick to make sure it's valid and to fetch dimensions
+        $imagick = new Imagick();
+
+        try {
+            $imagick->readImageBlob($imageBlob);
+            $size = $imagick->getImageGeometry();
+        } catch (ImagickException $e) {
+            $e = new ImageException('Invalid image', 415);
+            $e->setImboErrorCode(Exception::IMAGE_INVALID_IMAGE);
 
             throw $e;
         }

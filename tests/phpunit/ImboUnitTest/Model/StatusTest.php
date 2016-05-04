@@ -68,4 +68,22 @@ class StatusTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->model, $this->model->setStorageStatus(true));
         $this->assertTrue($this->model->getStorageStatus());
     }
+
+    /**
+     * @covers Imbo\Model\Status::getData
+     */
+    public function testGetData() {
+        $date = new DateTime();
+
+        $this->model
+            ->setDate($date)
+            ->setDatabaseStatus(true)
+            ->setStorageStatus(true);
+
+        $this->assertSame([
+            'date' => $date,
+            'database' => true,
+            'storage' => true,
+        ], $this->model->getData());
+    }
 }

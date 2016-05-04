@@ -32,18 +32,38 @@ Doctrine
 
 If you use the :ref:`Doctrine database adapter <doctrine-database-adapter>` you'll need to rename the ``publicKey`` fields to ``user``. The field has been updated in the :ref:`database-setup` section. The field should be renamed while there are no write operations pending, as a write could fail before upgrading Imbo itself.
 
+Postgres/Other
+^^^^^^^^^^^^^^
 .. code-block:: sql
 
     ALTER TABLE imageinfo RENAME COLUMN publicKey to user;
     ALTER TABLE shorturl RENAME COLUMN publicKey to user;
     ALTER TABLE imagevariations RENAME COLUMN publicKey to user;
 
+MySQL
+^^^^^
+.. code-block:: sql
+
+    ALTER TABLE imageinfo CHANGE `publicKey` `user` varchar(255) COLLATE utf8_danish_ci NOT NULL;
+    ALTER TABLE shorturl CHANGE `publicKey` `user` varchar(255) COLLATE utf8_danish_ci NOT NULL;
+    ALTER TABLE imagevariations CHANGE `publicKey` `user` varchar(255) COLLATE utf8_danish_ci NOT NULL;
+
+
 If you use the Doctrine storage adapter for images and/or image variations, you will have to rename fields in those databases too:
 
+Postgres/Other
+^^^^^^^^^^^^^^
 .. code-block:: sql
 
     ALTER TABLE storage_images RENAME COLUMN publicKey to user;
     ALTER TABLE storage_image_variations RENAME COLUMN publicKey to user;
+
+MySQL
+^^^^^
+.. code-block:: sql
+
+    ALTER TABLE storage_images CHANGE `publicKey` `user` varchar(255) COLLATE utf8_danish_ci NOT NULL;
+    ALTER TABLE storage_image_variations CHANGE `publicKey` `user` varchar(255) COLLATE utf8_danish_ci NOT NULL;
 
 .. note:: The ``imagevariations`` and ``storage_image_variations`` table might not be present in your database unless you previously upgraded to 1.2.4. In this case, skip the queries affecting those tables and instead follow the instructions specified in the :ref:`database-setup` section.
 

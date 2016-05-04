@@ -78,4 +78,59 @@ class EventTest extends \PHPUnit_Framework_TestCase {
         $this->event->setArgument($argument, $value);
         $this->assertSame($value, $this->event->$method());
     }
+
+    /**
+     * @covers Imbo\EventManager\Event::setName
+     * @covers Imbo\EventManager\Event::getName
+     */
+    public function testCanSetAndGetName() {
+        $this->assertNull($this->event->getName());
+        $this->assertSame($this->event, $this->event->setName('name'));
+        $this->assertSame('name', $this->event->getName());
+    }
+
+    /**
+     * @covers Imbo\EventManager\Event::stopPropagation
+     * @covers Imbo\EventManager\Event::isPropagationStopped
+     */
+    public function testCanStopPropagation() {
+        $this->assertFalse($this->event->isPropagationStopped());
+        $this->assertSame($this->event, $this->event->stopPropagation());
+        $this->assertTrue($this->event->isPropagationStopped());
+    }
+
+    /**
+     * @covers Imbo\EventManager\Event::getArgument
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Argument "foobar" does not exist
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenGettingArgumentThatDoesNotExist() {
+        $this->event->getArgument('foobar');
+    }
+
+    /**
+     * @covers Imbo\EventManager\Event::__construct
+     * @covers Imbo\EventManager\Event::setArguments
+     */
+    public function testCanSetArgumentsThroughConstructor() {
+        $event = new Event(['foo' => 'bar']);
+        $this->assertSame('bar', $event->getArgument('foo'));
+    }
+
+    /**
+     * @covers Imbo\EventManager\Event::setArguments
+     * @covers Imbo\EventManager\Event::getArgument
+     * @covers Imbo\EventManager\Event::hasArgument
+     */
+    public function testSetArgumentsOverridesAllArguments() {
+        $this->assertFalse($this->event->hasArgument('foo'));
+
+        $this->assertSame($this->event, $this->event->setArguments(['foo' => 'bar']));
+        $this->assertSame('bar', $this->event->getArgument('foo'));
+
+        $this->assertSame($this->event, $this->event->setArguments(['bar' => 'foo']));
+        $this->assertFalse($this->event->hasArgument('foo'));
+        $this->assertSame('foo', $this->event->getArgument('bar'));
+    }
 }
