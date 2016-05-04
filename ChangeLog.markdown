@@ -16,7 +16,7 @@ Bug fixes:
 
 Imbo-2.1.2
 ----------
-__N/A__
+__2016-05-04__
 
 * #467: Use finfo to determine mime type of uploaded images before loading them into ImageMagick (Christer Edvartsen)
 
