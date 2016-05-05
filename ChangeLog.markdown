@@ -14,6 +14,12 @@ Bug fixes:
 * #463: Fixed issue with an error model being formatted as an image (Christer Edvartsen)
 * #462: Adding short URLs to an image that does not exist now results in 404 (Christer Edvartsen)
 
+Imbo-2.1.3
+----------
+__2016-05-05__
+
+* #469: Move the mongodb/mongodb dependency back to require as it was moved to require-dev for 2.1.2 (Christer Edvartsen)
+
 Imbo-2.1.2
 ----------
 __2016-05-04__
