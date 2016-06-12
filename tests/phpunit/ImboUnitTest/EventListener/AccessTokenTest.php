@@ -246,8 +246,8 @@ class AccessTokenTest extends ListenerTests {
 
         $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(true));
         $this->query->expects($this->once())->method('get')->with('accessToken')->will($this->returnValue($token));
-        $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue(urldecode($url)));
-        $this->request->expects($this->once())->method('getUriAsIs')->will($this->returnValue($url));
+        $this->request->expects($this->atLeastOnce())->method('getRawUri')->will($this->returnValue(urldecode($url)));
+        $this->request->expects($this->atLeastOnce())->method('getUriAsIs')->will($this->returnValue($url));
 
         $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
 
