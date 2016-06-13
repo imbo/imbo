@@ -10,14 +10,11 @@
 
 namespace Imbo\EventListener;
 
-use Guzzle\Http\QueryAggregator\QueryAggregatorInterface;
-use Guzzle\Http\Url;
-
 use Imbo\EventManager\EventInterface,
     Imbo\Http\Request\Request,
     Imbo\Exception\RuntimeException,
-    Imbo\Helpers\QueryStringArrayConverter,
-    Guzzle\Http\QueryString;
+    Imbo\Helpers\Urls,
+    GuzzleHttp\Psr7;
 
 /**
  * Access token event listener
@@ -192,55 +189,51 @@ class AccessToken implements ListenerInterface {
      * URLs when Facebook attempts to retrieve them.
      *
      * @param $url string The URL to generate the alternative form of
-     * @param $configuredQuery QueryString Configured query string instance for return format
+     * @param $encoding string The encoding to use - from GuzzleHttp\Psr7
      * @return string
      */
-    protected function getAlternativeURL($url, QueryString $configuredQuery) {
-        $url = Url::factory($url);
-        $useAggregator = false;
-        $fixedArrays = array();
+    protected function getAlternativeURL($url, $encoding = PHP_QUERY_RFC3986) {
+        $urlParts = parse_url($url);
+
+        if (!isset($urlParts['query'])) {
+            return $url;
+        }
+
+        $queryString = $urlParts['query'];
         $fixKeyPattern = '#\[[0-9]+\]$#';
 
-        // We have to do this in two runs to at least try to keep the sequence of vars consistent
-        foreach($url->getQuery() as $key => $value) {
-            // if we're converting to [], we'll need our custom aggregator
-            if (!$useAggregator && (strpos($key, '[0]') !== false)) {
-                $useAggregator = true;
-            }
+        $parsed = Psr7\parse_query($queryString);
+        $newArguments = array();
 
+        foreach ($parsed as $key => $value) {
             $fixedKey = preg_replace($fixKeyPattern, '', $key);
 
             // if the key came out different, we're talking about a t[x] format - so we store those
             // to allow for the correct sequence when regenerating the URL further below.
             if ($fixedKey != $key) {
-                if (!isset($fixedArrays[$fixedKey])) {
-                    $fixedArrays[$fixedKey] = array();
+                $fixedKey .= '[]';
+
+                if (!isset($newArguments[$fixedKey])) {
+                    $newArguments[$fixedKey] = array();
                 }
 
-                $fixedArrays[$fixedKey][] = $value;
-            }
-        }
-
-        // we now know which of our parameters are actual arrays, so we create our alternative QS
-        foreach($url->getQuery() as $key => $value) {
-            $fixedKey = preg_replace($fixKeyPattern, '', $key);
-
-            if ($fixedKey != $key) {
-                if (isset($fixedArrays[$fixedKey])) {
-                    $configuredQuery[$fixedKey] = $fixedArrays[$fixedKey];
-                    unset($fixedArrays[$fixedKey]);
+                $newArguments[$fixedKey][] = $value;
+            } else if (is_array($value) && substr($key, -2) == '[]') {
+                // if the value is an array, and we have the [] format already, we expand the keys
+                foreach ($value as $innerKey => $innerValue) {
+                    // remove [] from the key and append the inner array key
+                    $indexedKey = substr($key, 0, -2) . '[' . $innerKey . ']';
+                    $newArguments[$indexedKey] = $innerValue;
                 }
             } else {
-                $configuredQuery[$key] = $value;
+                $newArguments[$key] = $value;
             }
         }
 
-        if ($useAggregator) {
-            $configuredQuery->setAggregator(new QueryStringArrayConverter());
-        }
+        $urlParts['query'] = Psr7\build_query($newArguments, $encoding);
+        $url = Urls::buildFromParseUrlParts($urlParts);
 
-        $url->setQuery($configuredQuery);
-        return (string) $url;
+        return $url;
     }
 
     /**
@@ -251,9 +244,7 @@ class AccessToken implements ListenerInterface {
      * @return string
      */
     protected function getUnescapedAlternativeURL($url) {
-        $fixedQuery = new QueryString();
-        $fixedQuery->useUrlEncoding(false);
-        return $this->getAlternativeURL($url, $fixedQuery);
+        return $this->getAlternativeURL($url, false);
     }
 
     /**
@@ -264,9 +255,7 @@ class AccessToken implements ListenerInterface {
      * @return string
      */
     protected function getEscapedAlternativeURL($url) {
-        $fixedQuery = new QueryString();
-        $fixedQuery->useUrlEncoding(true);
-        return $this->getAlternativeURL($url, $fixedQuery);
+        return $this->getAlternativeURL($url, PHP_QUERY_RFC3986);
     }
 
     /**
