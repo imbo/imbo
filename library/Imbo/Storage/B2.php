@@ -1,0 +1,201 @@
+<?php
+/**
+ * This file is part of the Imbo package
+ *
+ * (c) Christer Edvartsen <cogo@starzinger.net>
+ *
+ * For the full copyright and license information, please view the LICENSE file that was
+ * distributed with this source code.
+ */
+
+namespace Imbo\Storage;
+
+use Imbo\Exception\StorageException,
+    Imbo\Exception\InvalidArgumentException,
+    ChrisWhite\B2\Client,
+    ChrisWhite\B2\Exceptions\NotFoundException,
+    DateTime,
+    DateTimeZone;
+
+/**
+ * Backblaze B2 Cloud Storage adapter
+ *
+ * Parameters for this adapter:
+ *
+ * - (string) accountId Your B2 Account ID
+ * - (string) applicationKey Your B2 Application Key
+ * - (string) bucket The name of the bucket to store the files in. The bucket must exist prior
+ *                   to using the B2 client.
+ * - (string) bucketId The id of the bucket referenced by name. We currently need both.
+ *
+ * @author Mats Lindh <mats@lindh.no>
+ * @package Storage
+ */
+class B2 implements StorageInterface {
+    /**
+     * B2 Client
+     *
+     * @var Client
+     */
+    private $client = null;
+
+    /**
+     * Parameters for the driver
+     *
+     * @var array
+     */
+    private $params = [
+        // B2 Account ID
+        'accountId' => null,
+
+        // B2 Application Key
+        'applicationKey' => null,
+
+        // Name of the bucket to store the files in
+        'bucket' => null,
+
+        // ID of the bucket to store the files in
+        'bucketId' => null,
+    ];
+
+    public function __construct(array $params = null, Client $client = null) {
+        if ($params !== null) {
+            $this->params = array_replace_recursive($this->params, $params);
+        }
+
+        if ($client !== null) {
+            $this->client = $client;
+        }
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function store($user, $imageIdentifier, $imageData)
+    {
+        // Upload a file to a bucket. Returns a File object.
+        $file = $this->getClient()->upload([
+            'BucketId' => $this->getParam('bucketId'),
+            'FileName' => $this->getImagePath($user, $imageIdentifier),
+            'Body' => $imageData,
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function delete($user, $imageIdentifier)
+    {
+        $this->getClient()->deleteFile([
+            'BucketId' => $this->getParam('bucketId'),
+            'FileName' => $this->getImagePath($user, $imageIdentifier),
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getImage($user, $imageIdentifier)
+    {
+        try {
+            return $this->getClient()->download([
+                'BucketName' => $this->getParam('bucket'),
+                'FileName' => $this->getImagePath($user, $imageIdentifier),
+            ]);
+        } catch (NotFoundException $e) {
+            throw new StorageException('File not found.', 404);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLastModified($user, $imageIdentifier)
+    {
+        /*$info = $this->getClient()->getFile([
+            'BucketName' => $this->getParam('bucket'),
+            'FileName' => $this->getImagePath($user, $imageIdentifier),
+        ]); */
+
+        // The library currently doesn't support returning the UTC timestamp, but we'll fix that..
+        // return new DateTime($info->getUploadTimestamp(), new DateTimeZone('UTC'));
+        return new DateTime('now', new DateTimeZone('UTC'));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getStatus()
+    {
+        if (!$this->getClient()) {
+            return false;
+        }
+
+        if (!$this->getClient()->listBuckets()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function imageExists($user, $imageIdentifier)
+    {
+        // We try to retrieve the metadata and return false if it isn't found.
+        // The library needs a more efficient implementation to get the file id from file name to make this work
+        // properly for us.
+        try {
+            return false;
+
+            // this currently does not work - the client assumes that the file exists, and has no method to test for existence..
+            $info = $this->getFile([
+                'BucketId' => $this->getParam('bucketId'),
+                'FileName' => $this->getImagePath($user, $imageIdentifier),
+            ]);
+        } catch (NotFoundException $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the current B2 client
+     */
+    private function getClient() {
+        if ($this->client === null) {
+            $this->client = new Client($this->getParam('accountId'), $this->getParam('applicationKey'));
+        }
+
+        if (!$this->getParam('bucketId') || !$this->getParam('bucket')) {
+            throw new InvalidArgumentException('B2: Missing required bucket parameters. Both bucket and bucketId must be provided.', 500);
+        }
+
+        return $this->client;
+    }
+
+    /**
+     * Get a parameter
+     */
+    private function getParam($param) {
+        if (!isset($this->params[$param])) {
+            throw new InvalidArgumentException('Attempted to read invalid parameter', 500);
+        }
+
+        return $this->params[$param];
+    }
+
+    /**
+     * Get the path to an image
+     *
+     * @param string $user The user which the image belongs to
+     * @param string $imageIdentifier Image identifier
+     * @return string
+     */
+    private function getImagePath($user, $imageIdentifier) {
+        return $user . '/' . $imageIdentifier;
+    }
+}
