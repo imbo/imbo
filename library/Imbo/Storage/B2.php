@@ -80,6 +80,10 @@ class B2 implements StorageInterface {
             'FileName' => $this->getImagePath($user, $imageIdentifier),
             'Body' => $imageData,
         ]);
+
+        if (!$file) {
+            throw new StorageException('Storage backend is not available.', 503);
+        }
     }
 
     /**
