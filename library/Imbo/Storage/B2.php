@@ -91,6 +91,8 @@ class B2 implements StorageInterface {
             'BucketId' => $this->getParam('bucketId'),
             'FileName' => $this->getImagePath($user, $imageIdentifier),
         ]);
+
+        return true;
     }
 
     /**
@@ -113,14 +115,12 @@ class B2 implements StorageInterface {
      */
     public function getLastModified($user, $imageIdentifier)
     {
-        /*$info = $this->getClient()->getFile([
+        $info = $this->getClient()->getFile([
             'BucketName' => $this->getParam('bucket'),
             'FileName' => $this->getImagePath($user, $imageIdentifier),
-        ]); */
+        ]);
 
-        // The library currently doesn't support returning the UTC timestamp, but we'll fix that..
-        // return new DateTime($info->getUploadTimestamp(), new DateTimeZone('UTC'));
-        return new DateTime('now', new DateTimeZone('UTC'));
+        return new DateTime('@' . $info->getUploadTimestamp(), new DateTimeZone('UTC'));
     }
 
     /**
@@ -144,22 +144,14 @@ class B2 implements StorageInterface {
      */
     public function imageExists($user, $imageIdentifier)
     {
-        // We try to retrieve the metadata and return false if it isn't found.
-        // The library needs a more efficient implementation to get the file id from file name to make this work
-        // properly for us.
         try {
-            return false;
-
-            // this currently does not work - the client assumes that the file exists, and has no method to test for existence..
-            $info = $this->getFile([
+            return $this->getClient()->fileExists([
                 'BucketId' => $this->getParam('bucketId'),
                 'FileName' => $this->getImagePath($user, $imageIdentifier),
             ]);
         } catch (NotFoundException $e) {
             return false;
         }
-
-        return true;
     }
 
     /**
