@@ -17,7 +17,7 @@
     "irc": "irc://irc.freenode.net/imbo"
   },
   "require": {
-    "php": ">=5.4.0",
+    "php": ">=5.6.0",
     "ext-imagick": ">=3.0.1",
     "symfony/http-foundation": "~2.7.3",
     "symfony/console": "~2.7.3",
