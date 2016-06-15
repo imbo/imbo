@@ -188,8 +188,8 @@ class AccessToken implements ListenerInterface {
      * requested from the backend. Since we sign our URLs, this breaks the token generation and thus breaks
      * URLs when Facebook attempts to retrieve them.
      *
-     * @param $url string The URL to generate the alternative form of
-     * @param $encoding string The encoding to use - from GuzzleHttp\Psr7
+     * @param string $url The URL to generate the alternative form of
+     * @param int $encoding The encoding to use - from GuzzleHttp\Psr7
      * @return string
      */
     protected function getAlternativeURL($url, $encoding = PHP_QUERY_RFC3986) {

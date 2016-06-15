@@ -17,6 +17,12 @@ namespace Imbo\Helpers;
  * @package Core\Helpers
  */
 class Urls {
+    /**
+     * Generate a URL from an array with similar structure as returned from parse_url.
+     *
+     * @param array $parts An array in the format produced from parse_url
+     * @return string
+     */
     public static function buildFromParseUrlParts(array $parts) {
         $url = '';
 
