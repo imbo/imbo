@@ -1,20 +1,25 @@
 {
   "name": "imbo/imbo",
-  "type": "library",
+  "type": "project",
   "description": "RESTful image server that handles image storage/transformations and metadata",
   "keywords": [ "image storage", "image transformation", "image metadata" ],
-  "homepage": "http://www.imbo-project.org/",
+  "homepage": "http://imbo.io/",
   "license": "MIT",
   "authors": [{
       "name": "Christer Edvartsen",
       "email": "cogo@starzinger.net",
       "role": "Project lead",
-      "homepage": "http://cogo.wordpress.com"
+      "homepage": "https://github.com/christeredvartsen"
+    }, {
+        "name": "Contributors",
+        "homepage": "https://github.com/imbo/imbo/graphs/contributors"
     }
   ],
   "support": {
     "issues": "https://github.com/imbo/imbo/issues",
-    "irc": "irc://irc.freenode.net/imbo"
+    "irc": "irc://irc.freenode.net/imbo",
+    "source": "https://github.com/imbo/imbo",
+    "docs": "http://docs.imbo.io"
   },
   "require": {
     "php": ">=5.6.0",
