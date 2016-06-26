@@ -84,6 +84,8 @@ class B2 implements StorageInterface {
         if (!$file) {
             throw new StorageException('Storage backend is not available.', 503);
         }
+
+        return true;
     }
 
     /**
