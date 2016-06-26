@@ -95,6 +95,7 @@ class B2 implements StorageInterface {
     {
         $this->getClient()->deleteFile([
             'BucketId' => $this->getParam('bucketId'),
+            'BucketName' => $this->getParam('bucket'),
             'FileName' => $this->getImagePath($user, $imageIdentifier),
         ]);
 
