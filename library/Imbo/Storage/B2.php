@@ -72,8 +72,7 @@ class B2 implements StorageInterface {
     /**
      * @inheritDoc
      */
-    public function store($user, $imageIdentifier, $imageData)
-    {
+    public function store($user, $imageIdentifier, $imageData) {
         // Upload a file to a bucket. Returns a File object.
         $file = $this->getClient()->upload([
             'BucketId' => $this->getParam('bucketId'),
@@ -91,8 +90,7 @@ class B2 implements StorageInterface {
     /**
      * @inheritDoc
      */
-    public function delete($user, $imageIdentifier)
-    {
+    public function delete($user, $imageIdentifier) {
         try {
             $this->getClient()->deleteFile([
                 'BucketId' => $this->getParam('bucketId'),
@@ -109,8 +107,7 @@ class B2 implements StorageInterface {
     /**
      * @inheritDoc
      */
-    public function getImage($user, $imageIdentifier)
-    {
+    public function getImage($user, $imageIdentifier) {
         try {
             return $this->getClient()->download([
                 'BucketName' => $this->getParam('bucket'),
@@ -124,8 +121,7 @@ class B2 implements StorageInterface {
     /**
      * @inheritDoc
      */
-    public function getLastModified($user, $imageIdentifier)
-    {
+    public function getLastModified($user, $imageIdentifier) {
         try {
             $info = $this->getClient()->getFile([
                 'BucketName' => $this->getParam('bucket'),
@@ -141,8 +137,7 @@ class B2 implements StorageInterface {
     /**
      * @inheritDoc
      */
-    public function getStatus()
-    {
+    public function getStatus() {
         if (!$this->getClient()) {
             return false;
         }
@@ -157,8 +152,7 @@ class B2 implements StorageInterface {
     /**
      * @inheritDoc
      */
-    public function imageExists($user, $imageIdentifier)
-    {
+    public function imageExists($user, $imageIdentifier) {
         try {
             return $this->getClient()->fileExists([
                 'BucketId' => $this->getParam('bucketId'),
