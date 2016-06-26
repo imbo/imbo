@@ -93,11 +93,15 @@ class B2 implements StorageInterface {
      */
     public function delete($user, $imageIdentifier)
     {
-        $this->getClient()->deleteFile([
-            'BucketId' => $this->getParam('bucketId'),
-            'BucketName' => $this->getParam('bucket'),
-            'FileName' => $this->getImagePath($user, $imageIdentifier),
-        ]);
+        try {
+            $this->getClient()->deleteFile([
+                'BucketId' => $this->getParam('bucketId'),
+                'BucketName' => $this->getParam('bucket'),
+                'FileName' => $this->getImagePath($user, $imageIdentifier),
+            ]);
+        } catch (NotFoundException $e) {
+            throw new StorageException('File not found.', 404);
+        }
 
         return true;
     }
@@ -122,10 +126,14 @@ class B2 implements StorageInterface {
      */
     public function getLastModified($user, $imageIdentifier)
     {
-        $info = $this->getClient()->getFile([
-            'BucketName' => $this->getParam('bucket'),
-            'FileName' => $this->getImagePath($user, $imageIdentifier),
-        ]);
+        try {
+            $info = $this->getClient()->getFile([
+                'BucketName' => $this->getParam('bucket'),
+                'FileName' => $this->getImagePath($user, $imageIdentifier),
+            ]);
+        } catch (NotFoundException $e) {
+            throw new StorageException('File not found.', 404);
+        }
 
         return new DateTime('@' . $info->getUploadTimestamp(), new DateTimeZone('UTC'));
     }
