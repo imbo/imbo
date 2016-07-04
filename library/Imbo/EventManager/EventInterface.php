@@ -74,6 +74,11 @@ interface EventInterface {
     function getManager();
 
     /**
+     * Get the defined transformation presets
+     */
+    function getTransformationPresets();
+
+    /**
      * Get the Imbo configuration
      *
      * @return array
