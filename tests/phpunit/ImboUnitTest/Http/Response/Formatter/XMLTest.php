@@ -481,7 +481,7 @@ class XMLTest extends \PHPUnit_Framework_TestCase {
         $model->expects($this->once())->method('getCount')->will($this->returnValue($count));
         $model->expects($this->once())->method('getGroups')->will($this->returnValue($groups));
 
-        $this->assertRegExp('#<imbo>\s*<search>\s*<hits>2</hits>\s*<page>1</page>\s*<limit>5</limit>\s*<count>1</count>\s*</search>\s*<groups><group>\s*<name>group</name>\s*<resources>\s*<resource>user.get</resource><resource>user.head</resource>\s*</resources></group></groups>\s</imbo>$#', $this->formatter->format($model));
+        $this->assertRegExp('#<imbo>\s*<search>\s*<hits>2</hits>\s*<page>1</page>\s*<limit>5</limit>\s*<count>1</count>\s*</search>\s*<groups><group>\s*<name>group</name>\s*<resources>\s*<resource>user.get</resource><resource>user.head</resource>\s*</resources></group></groups>\s*</imbo>$#', $this->formatter->format($model));
     }
 
     /**
