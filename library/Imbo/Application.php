@@ -88,10 +88,10 @@ class Application {
         }
 
         // Transformation presets
-        $transformationPresets = $config['transformationPresets'];
+        $transformationPresets = isset($config['transformationPresets']) ? $config['transformationPresets'] : [];
 
-        if (is_array($transformationPresets) || !$transformationPresets) {
-            $transformationPresets = new PresetsArrayAdapter($config['transformationPresets']);
+        if (is_array($transformationPresets)) {
+            $transformationPresets = new PresetsArrayAdapter($transformationPresets);
         }
 
         if (!$transformationPresets instanceof PresetsInterface) {
