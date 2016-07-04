@@ -98,8 +98,6 @@ class Application {
             throw new InvalidArgumentException('Invalid transformation presets adapter (has to implement PresetsInterface)', 500);
         }
 
-        var_dump($transformationPresets);
-
         // Create a router based on the routes in the configuration and internal routes
         $router = new Router($config['routes']);
 
