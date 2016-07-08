@@ -24,7 +24,7 @@ class PresetsArrayAdapter implements PresetsInterface {
             $preset = new Preset();
             $preset->setName($name);
             $preset->setTransformations($params);
-            $preset->isArgumentsMutable(true);
+            $preset->setArgumentsMutable(true);
             $this->presets[$name] = $preset;
         }
     }
