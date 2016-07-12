@@ -50,7 +50,7 @@ class Application {
         $database = $config['database'];
 
         if (is_callable($database) && !($database instanceof DatabaseInterface)) {
-            $database = $database();
+            $database = $database($request, $response);
         }
 
         if (!$database instanceof DatabaseInterface) {
@@ -60,7 +60,7 @@ class Application {
         $storage = $config['storage'];
 
         if (is_callable($storage) && !($storage instanceof StorageInterface)) {
-            $storage = $storage();
+            $storage = $storage($request, $response);
         }
 
         if (!$storage instanceof StorageInterface) {
@@ -71,7 +71,7 @@ class Application {
         $accessControl = $config['accessControl'];
 
         if (is_callable($accessControl) && !($accessControl instanceof AccessControlInterface)) {
-            $accessControl = $accessControl();
+            $accessControl = $accessControl($request, $response);
         }
 
         if (!$accessControl instanceof AccessControlInterface) {
@@ -190,7 +190,7 @@ class Application {
 
             if (is_callable($definition) && !($definition instanceof ListenerInterface)) {
                 // Callable piece of code which is not an implementation of the listener interface
-                $definition = $definition();
+                $definition = $definition($request, $response);
             }
 
             if ($definition instanceof ListenerInterface) {
@@ -205,7 +205,7 @@ class Application {
                 $users = isset($definition['users']) ? $definition['users'] : [];
 
                 if (is_callable($listener) && !($listener instanceof ListenerInterface)) {
-                    $listener = $listener();
+                    $listener = $listener($request, $response);
                 }
 
                 if (!is_string($listener) && !($listener instanceof ListenerInterface)) {
@@ -246,7 +246,7 @@ class Application {
         // Custom resources
         foreach ($config['resources'] as $name => $resource) {
             if (is_callable($resource)) {
-                $resource = $resource();
+                $resource = $resource($request, $response);
             }
 
             $eventManager->addEventHandler($name, $resource)
@@ -266,7 +266,7 @@ class Application {
                 $resource = $config['resources'][$routeName];
 
                 if (is_callable($resource)) {
-                    $resource = $resource();
+                    $resource = $resource($request, $response);
                 }
 
                 if (is_string($resource)) {

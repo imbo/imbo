@@ -12,7 +12,9 @@ namespace ImboUnitTest;
 
 use Imbo\Application,
     Imbo\Version,
-    Imbo\Http\Request\Request;
+    Imbo\EventListener\ListenerInterface,
+    Imbo\Http\Request\Request,
+    Imbo\Resource\ResourceInterface;
 
 /**
  * @covers Imbo\Application
@@ -106,8 +108,80 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\Application::run
      */
+    public function testApplicationPassesRequestAndResponseToCallbacks() {
+        // We just want to swallow the output, since we're testing it explicitly below.
+        $this->expectOutputRegex('|.*}|');
+
+        $default = require __DIR__ . '/../../../config/config.default.php';
+        $test = array(
+            'database' => function ($request, $response) {
+                $this->assertInstanceOf('Imbo\\Http\\Request\\Request', $request);
+                $this->assertInstanceOf('Imbo\\Http\\Response\\Response', $response);
+
+                return $this->getMock('Imbo\Database\DatabaseInterface');
+            },
+            'storage' => function ($request, $response) {
+                $this->assertInstanceOf('Imbo\\Http\\Request\\Request', $request);
+                $this->assertInstanceOf('Imbo\\Http\\Response\\Response', $response);
+
+                return $this->getMock('Imbo\Storage\StorageInterface');
+            },
+            'accessControl' => function ($request, $response) {
+                $this->assertInstanceOf('Imbo\\Http\\Request\\Request', $request);
+                $this->assertInstanceOf('Imbo\\Http\\Response\\Response', $response);
+
+                return $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
+            },
+            'eventListeners' => [
+                'test' => function ($request, $response) {
+                    $this->assertInstanceOf('Imbo\\Http\\Request\\Request', $request);
+                    $this->assertInstanceOf('Imbo\\Http\\Response\\Response', $response);
+
+                    return new TestListener();
+                },
+                'testSubelement' => [
+                    'listener' => function ($request, $response) {
+                        $this->assertInstanceOf('Imbo\\Http\\Request\\Request', $request);
+                        $this->assertInstanceOf('Imbo\\Http\\Response\\Response', $response);
+
+                        return new TestListener();
+                    },
+                ],
+            ],
+            'resources' => [
+                'test' => function ($request, $response) {
+                    $this->assertInstanceOf('Imbo\\Http\\Request\\Request', $request);
+                    $this->assertInstanceOf('Imbo\\Http\\Response\\Response', $response);
+
+                    return new TestResource();
+                },
+            ],
+        );
+
+        $this->application->run(array_merge($default, $test));
+    }
+
+    /**
+     * @covers Imbo\Application::run
+     */
     public function testCanRunWithDefaultConfiguration() {
         $this->expectOutputRegex('|{"version":"' . preg_quote(Version::VERSION, '|') . '",.*}|');
         $this->application->run(require __DIR__ . '/../../../config/config.default.php');
+    }
+}
+
+class TestListener implements ListenerInterface {
+    public static function getSubscribedEvents() {
+        return [];
+    }
+}
+
+class TestResource implements ListenerInterface, ResourceInterface {
+    public static function getSubscribedEvents() {
+        return [];
+    }
+
+    public function getAllowedMethods() {
+        return [];
     }
 }
