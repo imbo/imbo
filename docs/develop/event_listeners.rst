@@ -62,7 +62,7 @@ When writing an event listener for Imbo you can choose one of the following appr
 Below you will find examples on the approaches mentioned above.
 
 .. note::
-    Information regarding how to **attach** the event listeners to Imbo is available in the :ref:`event listener configuration <configuration-event-listeners>` section.
+    Information regarding how to **attach** the event listeners to Imbo is available in the :ref:`event listener configuration <event-listeners-configuration>` section.
 
 Implement the ``Imbo\EventListener\ListenerInterface`` interface
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -149,7 +149,7 @@ For testing and/or debugging purposes you can also write the event listener dire
         // ...
     ];
 
-The ``$event`` object passed to the function is the same as in the previous two examples. This approach should mostly be used for testing purposes and quick hacks. More information regarding this approach is available in the :ref:`event listener configuration <configuration-event-listeners>` section.
+The ``$event`` object passed to the function is the same as in the previous two examples. This approach should mostly be used for testing purposes and quick hacks. More information regarding this approach is available in the :ref:`event listener configuration <event-listeners-configuration>` section.
 
 Subscribing to events using a wild card
 +++++++++++++++++++++++++++++++++++++++
