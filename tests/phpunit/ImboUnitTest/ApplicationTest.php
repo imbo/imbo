@@ -115,34 +115,34 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $default = require __DIR__ . '/../../../config/config.default.php';
         $test = array(
             'database' => function ($request, $response) {
-                $this->assertInstanceOf('Imbo\\Http\\Request\\Request', $request);
-                $this->assertInstanceOf('Imbo\\Http\\Response\\Response', $response);
+                $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
+                $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
 
                 return $this->getMock('Imbo\Database\DatabaseInterface');
             },
             'storage' => function ($request, $response) {
-                $this->assertInstanceOf('Imbo\\Http\\Request\\Request', $request);
-                $this->assertInstanceOf('Imbo\\Http\\Response\\Response', $response);
+                $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
+                $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
 
                 return $this->getMock('Imbo\Storage\StorageInterface');
             },
             'accessControl' => function ($request, $response) {
-                $this->assertInstanceOf('Imbo\\Http\\Request\\Request', $request);
-                $this->assertInstanceOf('Imbo\\Http\\Response\\Response', $response);
+                $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
+                $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
 
                 return $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
             },
             'eventListeners' => [
                 'test' => function ($request, $response) {
-                    $this->assertInstanceOf('Imbo\\Http\\Request\\Request', $request);
-                    $this->assertInstanceOf('Imbo\\Http\\Response\\Response', $response);
+                    $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
+                    $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
 
                     return new TestListener();
                 },
                 'testSubelement' => [
                     'listener' => function ($request, $response) {
-                        $this->assertInstanceOf('Imbo\\Http\\Request\\Request', $request);
-                        $this->assertInstanceOf('Imbo\\Http\\Response\\Response', $response);
+                        $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
+                        $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
 
                         return new TestListener();
                     },
@@ -150,8 +150,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
             ],
             'resources' => [
                 'test' => function ($request, $response) {
-                    $this->assertInstanceOf('Imbo\\Http\\Request\\Request', $request);
-                    $this->assertInstanceOf('Imbo\\Http\\Response\\Response', $response);
+                    $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
+                    $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
 
                     return new TestResource();
                 },
