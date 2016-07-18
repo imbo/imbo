@@ -11,6 +11,16 @@ The configuration file(s) you need to create should simply return arrays with co
     :local:
     :depth: 1
 
+.. _configuration-with-callables:
+
+Using callables in configuration
+--------------------------------
+
+Imbo supports providing callables for certain configuration options. In Imbo 2 these are the :ref:`accessControl <access-control-configuration>`, :ref:`database <database-configuration>`, :ref:`eventListeners[name] <event-listeners-configuration>`, :ref:`resource <resource-configuration>` and :ref:`storage <storage-configuration>` options, while Imbo 3 adds callable support for :ref:`transformationPresets <transformation-presets-configuration>`. The callable receives two arguments (`$request` and `$response`) which map to the active request and response objects.
+
+By using a callable you can extend Imbo with custom logic for most configuration options (or provide the ``$request`` or ``$response`` objects to your implementing class), such as switching storage modules based on which user performed the request.
+
+
 .. _access-control-configuration:
 
 Imbo access control - ``accessControl``
@@ -710,7 +720,7 @@ Example usage:
         // ...
     ];
 
-.. _configuration-event-listeners:
+.. _event-listeners-configuration:
 
 Event listeners - ``eventListeners``
 ------------------------------------
@@ -995,6 +1005,8 @@ Imbo itself includes an event listener initializer in the default configuration 
 
 .. note:: Only event listeners specified as strings (class names) in the configuration will be instantiated by Imbo, so event listeners instantiated in the configuration array, either directly or via a Closures, will not be initialized by the configured event listener initializers.
 
+.. _transformation-presets-configuration:
+
 Image transformation presets - ``transformationPresets``
 --------------------------------------------------------
 
@@ -1042,6 +1054,8 @@ where the keys are the names of the transformations as specified in the URL, and
 By doing this the ``thumbnail`` part of the ``fixedGraythumb`` preset will ignore the ``width`` and ``height`` query parameters, if present. By only specifying for instance ``'width' => 50`` in the configuration the height of the thumbnail can be adjusted via the query parameter, but the ``width`` is fixed.
 
 .. note:: The URLs will stay the same if you change the transformation chain in a preset. Keep this in mind if you use for instance Varnish or some other HTTP accelerator in front of your web server(s).
+
+.. _resource-configuration:
 
 Custom resources and routes - ``resources`` and ``routes``
 ----------------------------------------------------------
