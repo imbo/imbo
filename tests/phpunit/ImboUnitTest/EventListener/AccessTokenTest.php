@@ -232,6 +232,26 @@ class AccessTokenTest extends ListenerTests {
                 'private key',
                 false
             ],
+            // Test that URLs with t[0] and t[] can use the same accessToken
+            [
+                'http://imbo/users/imbo/images/foobar?t%5B0%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B1%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
+                '1ae7643a70e68377502c30ba54d0ffbfedd67a1f3c4b3f038a42c0ed17ad3551',
+                'foo',
+                true
+            ],
+            [
+                'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
+                '1ae7643a70e68377502c30ba54d0ffbfedd67a1f3c4b3f038a42c0ed17ad3551',
+                'foo',
+                true
+            ],
+            // and that they still break if something else is changed
+            [
+                'http://imbo/users/imbo/images/foobar?g%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
+                '1ae7643a70e68377502c30ba54d0ffbfedd67a1f3c4b3f038a42c0ed17ad3551',
+                'foo',
+                false
+            ],
         ];
     }
 
@@ -246,8 +266,8 @@ class AccessTokenTest extends ListenerTests {
 
         $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(true));
         $this->query->expects($this->once())->method('get')->with('accessToken')->will($this->returnValue($token));
-        $this->request->expects($this->once())->method('getRawUri')->will($this->returnValue(urldecode($url)));
-        $this->request->expects($this->once())->method('getUriAsIs')->will($this->returnValue($url));
+        $this->request->expects($this->atLeastOnce())->method('getRawUri')->will($this->returnValue(urldecode($url)));
+        $this->request->expects($this->atLeastOnce())->method('getUriAsIs')->will($this->returnValue($url));
 
         $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
 

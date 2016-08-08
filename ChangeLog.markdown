@@ -1,10 +1,11 @@
 Changelog for Imbo
 ==================
 
-Imbo-x.x.x
+Imbo-2.2.0
 ----------
-__N/A__
+__2016-08-08__
 
+* #475: Validate signed URLs regardless of t[] vs t[0] (Mats Lindh)
 * #459: Support wildcards when subscribing to events (Christer Edvartsen)
 * #444: Added a getData() method to the Imbo\Model\ModelInterface (Christer Edvartsen)
 * #431: Added an Amazon S3 storage adapter for the image variations (Ali Asaria)
