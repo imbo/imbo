@@ -24,6 +24,67 @@ use Imbo\Http\Request\Request,
  */
 interface EventInterface {
     /**
+     * Get the event name
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Sets the event name
+     *
+     * @param string $name
+     * @return self
+     */
+    public function setName($name);
+
+    /**
+     * Check if propagation has been stopped
+     *
+     * @return boolean
+     */
+    public function isPropagationStopped();
+
+    /**
+     * Stops the propagation of the event
+     */
+    public function stopPropagation();
+
+    /**
+     * Get argument
+     *
+     * @param string $key
+     * @throws InvalidArgumentException
+     * @return mixed
+     */
+    public function getArgument($key);
+
+    /**
+     * Add argument
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return self
+     */
+    public function setArgument($key, $value);
+
+    /**
+     * Set arguments
+     *
+     * @param array $arguments
+     * @return self
+     */
+    public function setArguments(array $arguments = []);
+
+    /**
+     * See if the event has an argument
+     *
+     * @param string $key
+     * @return boolean
+     */
+    public function hasArgument($key);
+
+    /**
      * Get the request parameter
      *
      * @return Request
