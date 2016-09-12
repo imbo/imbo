@@ -409,7 +409,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $query = new Query();
         $query->returnMetadata(true);
 
-        $images = $this->adapter->getImages(['user'], $query, $this->getMock('Imbo\Model\Images'));
+        $images = $this->adapter->getImages(['user', 'foo'], $query, $this->getMock('Imbo\Model\Images'));
 
         foreach ($images as $image) {
             $this->assertArrayHasKey('metadata', $image);
