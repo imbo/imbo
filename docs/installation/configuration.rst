@@ -408,6 +408,9 @@ This adapter stores your images in a bucket in the Amazon Simple Storage Service
 ``bucket``
     The name of the bucket you want to store your images in. Imbo will **not** create this for you.
 
+``region``
+    The name of the region your bucket resides in. Required for Imbo 3.
+
 This adapter creates subdirectories in the bucket in the same fashion as the :ref:`Filesystem storage adapter <filesystem-storage-adapter>` stores the files on the local filesystem.
 
 Examples
@@ -424,6 +427,7 @@ Examples
                 'key' => '<aws access key>'
                 'secret' => '<aws secret key>',
                 'bucket' => 'my-imbo-bucket',
+                'region' => 'eu-central-1',
             ]);
         },
 
