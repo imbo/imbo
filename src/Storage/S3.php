@@ -12,7 +12,6 @@ namespace Imbo\Storage;
 
 use Imbo\Exception\StorageException,
     Aws\S3\S3Client,
-    Aws\S3\Exception\NoSuchKeyException,
     Aws\S3\Exception\S3Exception,
     DateTime,
     DateTimeZone;
@@ -119,7 +118,7 @@ class S3 implements StorageInterface {
                 'Bucket' => $this->getParams()['bucket'],
                 'Key' => $this->getImagePath($user, $imageIdentifier),
             ]);
-        } catch (NoSuchKeyException $e) {
+        } catch (S3Exception $e) {
             throw new StorageException('File not found', 404);
         }
 
@@ -135,7 +134,7 @@ class S3 implements StorageInterface {
                 'Bucket' => $this->getParams()['bucket'],
                 'Key' => $this->getImagePath($user, $imageIdentifier),
             ]);
-        } catch (NoSuchKeyException $e) {
+        } catch (S3Exception $e) {
             throw new StorageException('File not found', 404);
         }
 
@@ -166,7 +165,7 @@ class S3 implements StorageInterface {
                 'Bucket' => $this->getParams()['bucket'],
                 'Key' => $this->getImagePath($user, $imageIdentifier),
             ]);
-        } catch (NoSuchKeyException $e) {
+        } catch (S3Exception $e) {
             return false;
         }
 
