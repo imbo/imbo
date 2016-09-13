@@ -80,7 +80,7 @@ class S3 implements StorageInterface {
     public function store($user, $imageIdentifier, $imageData) {
         try {
             $this->getClient()->putObject([
-                'Bucket' => $this->params['bucket'],
+                'Bucket' => $this->getParams()['bucket'],
                 'Key' => $this->getImagePath($user, $imageIdentifier),
                 'Body' => $imageData,
             ]);
@@ -100,7 +100,7 @@ class S3 implements StorageInterface {
         }
 
         $this->getClient()->deleteObject([
-            'Bucket' => $this->params['bucket'],
+            'Bucket' => $this->getParams()['bucket'],
             'Key' => $this->getImagePath($user, $imageIdentifier),
         ]);
 
@@ -113,7 +113,7 @@ class S3 implements StorageInterface {
     public function getImage($user, $imageIdentifier) {
         try {
             $model = $this->getClient()->getObject([
-                'Bucket' => $this->params['bucket'],
+                'Bucket' => $this->getParams()['bucket'],
                 'Key' => $this->getImagePath($user, $imageIdentifier),
             ]);
         } catch (NoSuchKeyException $e) {
@@ -129,7 +129,7 @@ class S3 implements StorageInterface {
     public function getLastModified($user, $imageIdentifier) {
         try {
             $model = $this->getClient()->headObject([
-                'Bucket' => $this->params['bucket'],
+                'Bucket' => $this->getParams()['bucket'],
                 'Key' => $this->getImagePath($user, $imageIdentifier),
             ]);
         } catch (NoSuchKeyException $e) {
@@ -145,7 +145,7 @@ class S3 implements StorageInterface {
     public function getStatus() {
         try {
             $this->getClient()->headBucket([
-                'Bucket' => $this->params['bucket'],
+                'Bucket' => $this->getParams()['bucket'],
             ]);
         } catch (S3Exception $e) {
             return false;
@@ -160,7 +160,7 @@ class S3 implements StorageInterface {
     public function imageExists($user, $imageIdentifier) {
         try {
             $this->getClient()->headObject([
-                'Bucket' => $this->params['bucket'],
+                'Bucket' => $this->getParams()['bucket'],
                 'Key' => $this->getImagePath($user, $imageIdentifier),
             ]);
         } catch (NoSuchKeyException $e) {
@@ -177,7 +177,7 @@ class S3 implements StorageInterface {
      * @param string $imageIdentifier Image identifier
      * @return string
      */
-    private function getImagePath($user, $imageIdentifier) {
+    protected function getImagePath($user, $imageIdentifier) {
         $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         return implode('/', [
             $userPath[0],
@@ -192,19 +192,28 @@ class S3 implements StorageInterface {
     }
 
     /**
+     * Get the set of params provided when creating the instance
+     *
+     * @return array<string>
+     */
+    protected function getParams() {
+        return $this->params;
+    }
+
+    /**
      * Get the S3Client instance
      *
      * @return S3Client
      */
-    private function getClient() {
+    protected function getClient() {
         if ($this->client === null) {
             $params = [
-                'key' => $this->params['key'],
-                'secret' => $this->params['secret'],
+                'key' => $this->getParams()['key'],
+                'secret' => $this->getParams()['secret'],
             ];
 
-            if ($this->params['region']) {
-                $params['region'] = $this->params['region'];
+            if ($this->getParams()['region']) {
+                $params['region'] = $this->getParams()['region'];
             }
 
             $this->client = S3Client::factory($params);
