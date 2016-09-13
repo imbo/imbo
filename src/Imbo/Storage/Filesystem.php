@@ -50,7 +50,7 @@ class Filesystem implements StorageInterface {
      * {@inheritdoc}
      */
     public function store($user, $imageIdentifier, $imageData) {
-        if (!is_writable($this->params['dataDir'])) {
+        if (!is_writable($this->getParams()['dataDir'])) {
             throw new StorageException('Could not store image', 500);
         }
 
@@ -126,7 +126,7 @@ class Filesystem implements StorageInterface {
      * {@inheritdoc}
      */
     public function getStatus() {
-        return is_writable($this->params['dataDir']);
+        return is_writable($this->getParams()['dataDir']);
     }
 
     /**
@@ -139,6 +139,15 @@ class Filesystem implements StorageInterface {
     }
 
     /**
+     * Get the set of params provided when creating the instance
+     *
+     * @return array<string>
+     */
+    protected function getParams() {
+        return $this->params;
+    }
+
+    /**
      * Get the path to an image
      *
      * @param string $user The user which the image belongs to
@@ -147,10 +156,10 @@ class Filesystem implements StorageInterface {
      *                                 filename itself)
      * @return string
      */
-    private function getImagePath($user, $imageIdentifier, $includeFilename = true) {
+    protected function getImagePath($user, $imageIdentifier, $includeFilename = true) {
         $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         $parts = [
-            $this->params['dataDir'],
+            $this->getParams()['dataDir'],
             $userPath[0],
             $userPath[1],
             $userPath[2],
