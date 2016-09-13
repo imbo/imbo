@@ -56,6 +56,9 @@ class S3 implements StorageInterface {
 
         // Region
         'region' => null,
+
+        // Version of API
+        'version' => '2006-03-01',
     ];
 
     /**
@@ -208,15 +211,18 @@ class S3 implements StorageInterface {
     protected function getClient() {
         if ($this->client === null) {
             $params = [
-                'key' => $this->getParams()['key'],
-                'secret' => $this->getParams()['secret'],
+                'credentials' => [
+                    'key' => $this->params['key'],
+                    'secret' => $this->params['secret'],
+                ],
+                'version' => $this->params['version'],
             ];
 
-            if ($this->getParams()['region']) {
-                $params['region'] = $this->getParams()['region'];
+            if ($this->params['region']) {
+                $params['region'] = $this->params['region'];
             }
 
-            $this->client = S3Client::factory($params);
+            $this->client = new S3Client($params);
         }
 
         return $this->client;
