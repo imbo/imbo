@@ -12,7 +12,6 @@ namespace Imbo\EventListener\ImageVariations\Storage;
 
 use Imbo\Exception\StorageException,
     Aws\S3\S3Client,
-    Aws\S3\Exception\NoSuchKeyException,
     Aws\S3\Exception\S3Exception,
     DateTime,
     DateTimeZone;
@@ -56,6 +55,9 @@ class S3 implements StorageInterface {
 
         // Region
         'region' => null,
+
+        // Version of API
+        'version' => '2006-03-01',
     ];
 
     /**
@@ -100,7 +102,7 @@ class S3 implements StorageInterface {
                 'Bucket' => $this->params['bucket'],
                 'Key' => $this->getImagePath($user, $imageIdentifier, $width),
             ]);
-        } catch (NoSuchKeyException $e) {
+        } catch (S3Exception $e) {
             return null;
         }
 
@@ -181,15 +183,18 @@ class S3 implements StorageInterface {
     private function getClient() {
         if ($this->client === null) {
             $params = [
-                'key' => $this->params['key'],
-                'secret' => $this->params['secret'],
+                'credentials' => [
+                    'key' => $this->params['key'],
+                    'secret' => $this->params['secret'],
+                ],
+                'version' => $this->params['version'],
             ];
 
             if ($this->params['region']) {
                 $params['region'] = $this->params['region'];
             }
 
-            $this->client = S3Client::factory($params);
+            $this->client = new S3Client($params);
         }
 
         return $this->client;
