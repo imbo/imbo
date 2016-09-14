@@ -163,6 +163,13 @@ class Event implements EventInterface {
     /**
      * {@inheritdoc}
      */
+    public function getTransformationPresets() {
+        return $this->getArgument('transformationPresets');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAccessControl() {
         return $this->getArgument('accessControl');
     }

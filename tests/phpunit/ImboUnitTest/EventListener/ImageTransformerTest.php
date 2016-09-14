@@ -28,6 +28,7 @@ class ImageTransformerTest extends ListenerTests {
     private $event;
     private $image;
     private $eventManager;
+    private $transformationPresets;
 
     /**
      * Set up the listener
@@ -36,6 +37,7 @@ class ImageTransformerTest extends ListenerTests {
         $this->eventManager = $this->getMock('Imbo\EventManager\EventManager');
         $this->request = $this->getMock('Imbo\Http\Request\Request');
         $this->image = $this->getMock('Imbo\Model\Image');
+        $this->transformationPresets = $this->getMock('Imbo\EventListener\TransformationPresets\PresetsInterface');
         $this->response = $this->getMock('Imbo\Http\Response\Response');
         $this->response->expects($this->any())->method('getModel')->will($this->returnValue($this->image));
         $this->event = $this->getMock('Imbo\EventManager\Event');
@@ -56,6 +58,7 @@ class ImageTransformerTest extends ListenerTests {
         $this->event = null;
         $this->listener = null;
         $this->eventManager = null;
+        $this->transformationPresets = null;
     }
 
     /**
@@ -69,7 +72,7 @@ class ImageTransformerTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformer::transform
      */
     public function testTriggersImageTransformationEvents() {
-        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue(['transformationPresets' => []]));
+        $this->event->expects($this->once())->method('getTransformationPresets')->will($this->returnValue($this->transformationPresets));
         $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue([
             [
                 'name' => 'resize',
@@ -115,14 +118,23 @@ class ImageTransformerTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformer::transform
      */
     public function testSupportsPresets() {
-        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue([
-            'transformationPresets' => [
-                'preset' => [
-                    'flipHorizontally',
-                    'flipVertically',
-                ],
+        $preset = $this->getMock('Imbo\EventListener\TransformationPresets\Preset');
+        $preset->expects($this->any())->method('areArgumentsMutable')->will($this->returnValue(true));
+        $preset->expects($this->any())->method('getTransformations')->will($this->returnValue([
+            'flipHorizontally',
+            'flipVertically',
+        ]));
+        $this->transformationPresets->expects($this->any())->method('hasTransformationPreset')->will($this->returnValueMap([
+            [
+                'preset', true
             ]
         ]));
+        $this->transformationPresets->expects($this->any())->method('getTransformationPreset')->will($this->returnValueMap([
+            [
+                'preset', $preset
+            ]
+        ]));
+        $this->event->expects($this->once())->method('getTransformationPresets')->will($this->returnValue($this->transformationPresets));
         $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue([
             [
                 'name' => 'preset',
@@ -156,15 +168,25 @@ class ImageTransformerTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformer::transform
      */
     public function testPresetsCanHardcodeSomeParameters() {
-        $this->event->expects($this->once())->method('getConfig')->will($this->returnValue([
-            'transformationPresets' => [
-                'preset' => [
-                    'thumbnail' => [
-                        'height' => 75,
-                    ],
-                ],
+        $preset = $this->getMock('Imbo\EventListener\TransformationPresets\Preset');
+        $preset->expects($this->any())->method('areArgumentsMutable')->will($this->returnValue(true));
+        $preset->expects($this->any())->method('getTransformations')->will($this->returnValue([
+            'thumbnail' => [
+                'height' => 75,
+            ],
+        ]));
+        $this->transformationPresets->expects($this->any())->method('hasTransformationPreset')->will($this->returnValueMap([
+            [
+                'preset', true
             ]
         ]));
+        $this->transformationPresets->expects($this->any())->method('getTransformationPreset')->will($this->returnValueMap([
+            [
+                'preset', $preset
+            ]
+        ]));
+        $this->event->expects($this->once())->method('getTransformationPresets')->will($this->returnValue($this->transformationPresets));
+
         $this->request->expects($this->once())->method('getTransformations')->will($this->returnValue([
             [
                 'name' => 'preset',

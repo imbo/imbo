@@ -13,6 +13,8 @@ namespace Imbo;
 use Imbo\Http\Request\Request,
     Imbo\Http\Response\Response,
     Imbo\EventListener\ListenerInterface,
+    Imbo\EventListener\TransformationPresets\PresetsInterface,
+    Imbo\EventListener\TransformationPresets\PresetsArrayAdapter,
     Imbo\EventManager\Event,
     Imbo\EventManager\EventManager,
     Imbo\Model\Error,
@@ -85,6 +87,17 @@ class Application {
             $accessControl = new SimpleAclArrayAdapter($config['auth']);
         }
 
+        // Transformation presets
+        $transformationPresets = isset($config['transformationPresets']) ? $config['transformationPresets'] : [];
+
+        if (is_array($transformationPresets)) {
+            $transformationPresets = new PresetsArrayAdapter($transformationPresets);
+        }
+
+        if (!$transformationPresets instanceof PresetsInterface) {
+            throw new InvalidArgumentException('Invalid transformation presets adapter (has to implement PresetsInterface)', 500);
+        }
+
         // Create a router based on the routes in the configuration and internal routes
         $router = new Router($config['routes']);
 
@@ -99,6 +112,7 @@ class Application {
             'config' => $config,
             'manager' => $eventManager,
             'accessControl' => $accessControl,
+            'transformationPresets' => $transformationPresets,
         ]);
         $eventManager->setEventTemplate($event);
 

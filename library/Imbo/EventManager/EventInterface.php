@@ -24,6 +24,14 @@ use Imbo\Http\Request\Request,
  */
 interface EventInterface {
     /**
+     * Get parameter from key
+     *
+     * @param string $key Parameter to event to retrieve
+     * @return mixed
+     */
+    function getArgument($key);
+
+    /**
      * Get the request parameter
      *
      * @return Request
@@ -64,6 +72,11 @@ interface EventInterface {
      * @return EventManager
      */
     function getManager();
+
+    /**
+     * Get the defined transformation presets
+     */
+    function getTransformationPresets();
 
     /**
      * Get the Imbo configuration
