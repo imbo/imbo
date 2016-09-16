@@ -178,7 +178,7 @@ class GridFS implements StorageInterface {
     protected function getGrid() {
         if ($this->grid === null) {
             try {
-                $database = $this->getMongoClient()->selectDB($this->params['databaseName']);
+                $database = $this->getMongoClient()->selectDB($this->getParams()['databaseName']);
                 $this->grid = $database->getGridFS();
             } catch (MongoException $e) {
                 throw new StorageException('Could not connect to database', 500, $e);
@@ -196,13 +196,22 @@ class GridFS implements StorageInterface {
     protected function getMongoClient() {
         if ($this->mongoClient === null) {
             try {
-                $this->mongoClient = new MongoClient($this->params['server'], $this->params['options']);
+                $this->mongoClient = new MongoClient($this->getParams()['server'], $this->getParams()['options']);
             } catch (MongoException $e) {
                 throw new StorageException('Could not connect to database', 500, $e);
             }
         }
 
         return $this->mongoClient;
+    }
+
+    /**
+     * Get the set of params provided when creating the instance
+     *
+     * @return array<string>
+     */
+    protected function getParams() {
+        return $this->params;
     }
 
     /**
@@ -213,7 +222,7 @@ class GridFS implements StorageInterface {
      * @return boolean|MongoGridFSFile Returns false if the file does not exist or an instance of
      *                                 MongoGridFSFile if the file exists
      */
-    private function getImageObject($user, $imageIdentifier) {
+    protected function getImageObject($user, $imageIdentifier) {
         $cursor = $this->getGrid()->find([
             'user' => $user,
             'imageIdentifier' => $imageIdentifier
