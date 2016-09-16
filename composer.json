@@ -58,6 +58,15 @@
     "bin/imbo"
   ],
   "scripts": {
-    "lint": "for file in `git ls-files '*php'`; do php -l $file; done"
+    "lint": "for file in `git ls-files '*php'`; do php -l $file; done",
+    "prepare": [
+      "rm -rf build",
+      "mkdir build",
+      "mkdir build/coverage",
+      "mkdir build/logs",
+      "mkdir build/docs",
+      "mkdir build/code-browser",
+      "mkdir build/pdepend"
+    ]
   }
 }

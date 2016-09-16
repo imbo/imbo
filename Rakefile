@@ -7,7 +7,7 @@ source   = "#{basedir}/src"
 tests    = "#{basedir}/tests"
 
 desc "Task used by Jenkins-CI"
-task :jenkins => [:prepare, :installdep, :test, :apidocs, :phploc, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
+task :jenkins => [:installdep, :test, :apidocs, :phploc, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
 
 desc "Default task"
 task :default => [:installdep, :test, :phpcs, :apidocs, :readthedocs]
@@ -38,16 +38,6 @@ task :readthedocs do
   puts "No spelling errors. Generate docs"
   sh %{make html}
   Dir.chdir(wd)
-end
-
-desc "Clean up and create artifact directories"
-task :prepare do
-  FileUtils.rm_rf build
-  FileUtils.mkdir build
-
-  ["coverage", "logs", "docs", "code-browser", "pdepend"].each do |d|
-    FileUtils.mkdir "#{build}/#{d}"
-  end
 end
 
 desc "Install dependencies"
