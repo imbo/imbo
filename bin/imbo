@@ -29,5 +29,5 @@ if (!$autoloaderFound) {
 }
 
 // Run the application
-$cli = new ImboCli\Application();
+$cli = new Imbo\CliApplication();
 $cli->run();

@@ -8,18 +8,18 @@
  * distributed with this source code.
  */
 
-namespace ImboCliUnitTest\Command;
+namespace ImboUnitTest\CliCommand;
 
-use ImboCli\Command\Command;
+use Imbo\CliCommand\CliCommand;
 
 /**
- * @covers ImboCli\Command\Command
+ * @covers Imbo\CliCommand\CliCommand
  * @group unit-cli
  * @group cli-commands
  */
-class CommandTest extends \PHPUnit_Framework_TestCase {
+class CliCommandTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var ImboCli\Command\Command
+     * @var Imbo\CliCommand\CliCommand
      */
     private $command;
 
@@ -27,7 +27,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase {
      * Set up the command
      */
     public function setUp() {
-        $this->command = $this->getMockBuilder('ImboCli\Command\Command')->disableOriginalConstructor()->getMockForAbstractClass();
+        $this->command = $this->getMockBuilder('Imbo\CliCommand\CliCommand')->disableOriginalConstructor()->getMockForAbstractClass();
     }
 
     /**

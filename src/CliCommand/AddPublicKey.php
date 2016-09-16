@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace ImboCli\Command;
+namespace Imbo\CliCommand;
 
 use Symfony\Component\Console\Input\InputArgument,
     Symfony\Component\Console\Input\InputInterface,
@@ -27,7 +27,7 @@ use Symfony\Component\Console\Input\InputArgument,
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Cli
  */
-class AddPublicKey extends Command {
+class AddPublicKey extends CliCommand {
     const RESOURCES_READ_ONLY = 'Read-only on user resources';
     const RESOURCES_READ_WRITE = 'Read+write on user resources';
     const RESOURCES_SPECIFIC = 'Specific resources';

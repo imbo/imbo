@@ -8,27 +8,27 @@
  * distributed with this source code.
  */
 
-namespace ImboCliUnitTest\Command;
+namespace ImboUnitTest\CliCommand;
 
-use ImboCli\Command\GeneratePrivateKey,
+use Imbo\CliCommand\GeneratePrivateKey,
     Symfony\Component\Console\Application,
     Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * @covers ImboCli\Command\GeneratePrivateKey
+ * @covers Imbo\CliCommand\GeneratePrivateKey
  * @group unit-cli
  * @group cli-commands
  */
 class GeneratePrivateKeyTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var ImboCli\Command\GeneratePrivateKey
+     * @var Imbo\CliCommand\GeneratePrivateKey
      */
     private $command;
 
     /**
      * Set up the command
      *
-     * @covers ImboCli\Command\GeneratePrivateKey::__construct
+     * @covers Imbo\CliCommand\GeneratePrivateKey::__construct
      */
     public function setUp() {
         $this->command = new GeneratePrivateKey();
@@ -45,7 +45,7 @@ class GeneratePrivateKeyTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers ImboCli\Command\GeneratePrivateKey::execute
+     * @covers Imbo\CliCommand\GeneratePrivateKey::execute
      */
     public function testCanGenerateAPrivateKey() {
         $commandTester = new CommandTester($this->command);
@@ -57,7 +57,7 @@ class GeneratePrivateKeyTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage Could not generate private key
-     * @covers ImboCli\Command\GeneratePrivateKey::execute
+     * @covers Imbo\CliCommand\GeneratePrivateKey::execute
      */
     public function testFailsWhenItCantGenerateAPrivateKey() {
         $this->command->maxTries = 0;

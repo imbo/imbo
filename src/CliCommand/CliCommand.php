@@ -8,9 +8,9 @@
  * distributed with this source code.
  */
 
-namespace ImboCli\Command;
+namespace Imbo\CliCommand;
 
-use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * Base command
@@ -18,7 +18,7 @@ use Symfony\Component\Console\Command\Command as BaseCommand;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Cli
  */
-abstract class Command extends BaseCommand {
+abstract class CliCommand extends Command {
     /**
      * Configuration array
      *
