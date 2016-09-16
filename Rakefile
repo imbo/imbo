@@ -1,7 +1,5 @@
 require 'date'
-require 'digest/md5'
 require 'fileutils'
-require 'json'
 
 basedir  = "."
 build    = "#{basedir}/build"
@@ -9,10 +7,10 @@ source   = "#{basedir}/src"
 tests    = "#{basedir}/tests"
 
 desc "Task used by Jenkins-CI"
-task :jenkins => [:prepare, :lint, :installdep, :test, :apidocs, :phploc, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
+task :jenkins => [:prepare, :installdep, :test, :apidocs, :phploc, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
 
 desc "Default task"
-task :default => [:lint, :installdep, :test, :phpcs, :apidocs, :readthedocs]
+task :default => [:installdep, :test, :phpcs, :apidocs, :readthedocs]
 
 desc "Run tests"
 task :test => [:phpunit, :behat]
@@ -118,34 +116,6 @@ task :apidocs do
   system "phpdoc -d #{source} -t #{build}/docs --title \"Imbo API docs\""
 end
 
-desc "Check syntax on all php files in the project"
-task :lint do
-  lintCache = "#{basedir}/.lintcache"
-
-  begin
-    sums = JSON.parse(IO.read(lintCache))
-  rescue Exception => foo
-    sums = {}
-  end
-
-  `git ls-files "*.php"`.split("\n").each do |f|
-    f = File.absolute_path(f)
-    md5 = Digest::MD5.hexdigest(File.read(f))
-
-    next if sums[f] == md5
-
-    sums[f] = md5
-
-    begin
-      sh %{php -l #{f}}
-    rescue Exception
-      exit 1
-    end
-  end
-
-  IO.write(lintCache, JSON.dump(sums))
-end
-
 desc "Run PHPUnit tests"
 task :phpunit do
   begin
@@ -185,9 +155,6 @@ task :release, :version do |t, args|
   version = args[:version]
 
   if /^[\d]+\.[\d]+\.[\d]+$/ =~ version
-    # Syntax check
-    Rake::Task["lint"].invoke
-
     # Unit tests
     Rake::Task["test"].invoke
 

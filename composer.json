@@ -56,5 +56,8 @@
   },
   "bin": [
     "bin/imbo"
-  ]
+  ],
+  "scripts": {
+    "lint": "for file in `git ls-files '*php'`; do php -l $file; done"
+  }
 }
