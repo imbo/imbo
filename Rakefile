@@ -6,7 +6,7 @@ source   = "#{basedir}/src"
 tests    = "#{basedir}/tests"
 
 desc "Task used by Jenkins-CI"
-task :jenkins => [:test, :apidocs, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
+task :jenkins => [:test, :apidocs, :phpcs_ci, :phpcb, :pdepend, :phpmd, :phpmd_html]
 
 desc "Default task"
 task :default => [:test, :phpcs, :apidocs, :readthedocs]
@@ -44,16 +44,6 @@ end
 desc "Check CS"
 task :phpcs do
   system "phpcs --standard=Imbo #{source}"
-end
-
-desc "Aggregate tool output with PHP_CodeBrowser"
-task :phpcb do
-  system "phpcb --log #{build}/logs --source #{source} --output #{build}/code-browser"
-end
-
-desc "Generate pmd-cpd.xml using PHPCPD"
-task :phpcpd do
-  system "phpcpd --log-pmd #{build}/logs/pmd-cpd.xml #{source}"
 end
 
 desc "Generate jdepend.xml and software metrics charts using PHP_Depend"

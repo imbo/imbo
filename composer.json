@@ -37,7 +37,8 @@
     "phpunit/phpunit": "^4.8",
     "behat/behat": "^2.0",
     "guzzle/guzzle": "^3.9.3",
-    "phploc/phploc": "^3.0"
+    "phploc/phploc": "^3.0",
+    "sebastian/phpcpd": "^2.0"
   },
   "suggest": {
     "ext-mongo": "Enables usage of MongoDB and GridFS as database and store. Recommended version: >=1.4.0",
@@ -72,7 +73,8 @@
     "test-phpunit": "vendor/bin/phpunit --verbose -c tests/phpunit",
     "test-behat": "vendor/bin/behat --strict --config tests/behat/behat.yml",
     "test": ["@test-phpunit", "@test-behat"],
-    "qa-phploc": "phploc --log-csv build/logs/phploc.csv --log-xml build/logs/phploc.xml src",
-    "qa": ["@qa-phploc"]
+    "qa-phploc": "vendor/bin/phploc --log-csv build/logs/phploc.csv --log-xml build/logs/phploc.xml src",
+    "qa-phpcpd": "vendor/bin/phpcpd --log-pmd build/logs/pmd-cpd.xml src",
+    "qa": ["@qa-phploc", "@qa-phpcpd"]
   }
 }
