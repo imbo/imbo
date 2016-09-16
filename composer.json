@@ -49,9 +49,9 @@
     }
   },
   "autoload-dev": {
-    "psr-0": {
-      "ImboUnitTest\\": "tests/phpunit",
-      "ImboIntegrationTest\\": "tests/phpunit"
+    "psr-4": {
+      "ImboUnitTest\\": "tests/phpunit/unit",
+      "ImboIntegrationTest\\": "tests/phpunit/integration"
     }
   },
   "bin": [

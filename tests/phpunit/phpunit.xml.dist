@@ -2,10 +2,10 @@
 <phpunit colors="false" bootstrap="bootstrap.php">
   <testsuites>
     <testsuite name="imbo-unit">
-      <directory>ImboUnitTest</directory>
+      <directory>unit</directory>
     </testsuite>
     <testsuite name="imbo-integration">
-      <directory>ImboIntegrationTest</directory>
+      <directory>integration</directory>
     </testsuite>
   </testsuites>
 
