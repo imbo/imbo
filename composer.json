@@ -67,6 +67,9 @@
       "mkdir build/docs",
       "mkdir build/code-browser",
       "mkdir build/pdepend"
-    ]
+    ],
+    "test-phpunit": "vendor/bin/phpunit --verbose -c tests/phpunit",
+    "test-behat": "vendor/bin/behat --strict --config tests/behat/behat.yml",
+    "test": ["@test-phpunit", "@test-behat"]
   }
 }

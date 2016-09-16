@@ -12,9 +12,6 @@ task :jenkins => [:installdep, :test, :apidocs, :phploc, :phpcs_ci, :phpcb, :php
 desc "Default task"
 task :default => [:installdep, :test, :phpcs, :apidocs, :readthedocs]
 
-desc "Run tests"
-task :test => [:phpunit, :behat]
-
 desc "Run tests without code coverage"
 task :test_no_cc do
   begin
@@ -104,24 +101,6 @@ end
 desc "Generate API documentation using phpdoc"
 task :apidocs do
   system "phpdoc -d #{source} -t #{build}/docs --title \"Imbo API docs\""
-end
-
-desc "Run PHPUnit tests"
-task :phpunit do
-  begin
-    sh %{vendor/bin/phpunit --verbose -c tests/phpunit --coverage-html build/coverage --coverage-clover build/logs/clover.xml --log-junit build/logs/junit.xml}
-  rescue Exception
-    exit 1
-  end
-end
-
-desc "Run functional tests"
-task :behat do
-  begin
-    sh %{vendor/bin/behat --strict --config tests/behat/behat.yml}
-  rescue Exception
-    exit 1
-  end
 end
 
 desc "Tag current state of the master branch and push it to GitHub"
