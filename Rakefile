@@ -1,5 +1,4 @@
 require 'date'
-require 'fileutils'
 
 basedir  = "."
 build    = "#{basedir}/build"
@@ -7,10 +6,10 @@ source   = "#{basedir}/src"
 tests    = "#{basedir}/tests"
 
 desc "Task used by Jenkins-CI"
-task :jenkins => [:installdep, :test, :apidocs, :phploc, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
+task :jenkins => [:test, :apidocs, :phploc, :phpcs_ci, :phpcb, :phpcpd, :pdepend, :phpmd, :phpmd_html]
 
 desc "Default task"
-task :default => [:installdep, :test, :phpcs, :apidocs, :readthedocs]
+task :default => [:test, :phpcs, :apidocs, :readthedocs]
 
 desc "Run tests without code coverage"
 task :test_no_cc do
@@ -35,27 +34,6 @@ task :readthedocs do
   puts "No spelling errors. Generate docs"
   sh %{make html}
   Dir.chdir(wd)
-end
-
-desc "Install dependencies"
-task :installdep do
-  Rake::Task["install_composer"].invoke
-  system "php -d \"apc.enable_cli=0\" composer.phar -n install --prefer-source"
-end
-
-desc "Update dependencies"
-task :updatedep do
-  Rake::Task["install_composer"].invoke
-  system "php -d \"apc.enable_cli=0\" composer.phar -n update --prefer-source"
-end
-
-desc "Install/update composer itself"
-task :install_composer do
-  if File.exists?("composer.phar")
-    system "php -d \"apc.enable_cli=0\" composer.phar self-update"
-  else
-    system "curl -s http://getcomposer.org/installer | php -d \"apc.enable_cli=0\""
-  end
 end
 
 desc "Generate checkstyle.xml using PHP_CodeSniffer"
