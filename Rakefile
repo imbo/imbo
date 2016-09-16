@@ -6,7 +6,7 @@ source   = "#{basedir}/src"
 tests    = "#{basedir}/tests"
 
 desc "Task used by Jenkins-CI"
-task :jenkins => [:test, :apidocs, :phpcs_ci, :phpcb, :pdepend, :phpmd, :phpmd_html]
+task :jenkins => [:test, :apidocs, :phpcs_ci]
 
 desc "Default task"
 task :default => [:test, :phpcs, :apidocs, :readthedocs]
@@ -49,16 +49,6 @@ end
 desc "Generate jdepend.xml and software metrics charts using PHP_Depend"
 task :pdepend do
   system "pdepend --jdepend-xml=#{build}/logs/jdepend.xml --jdepend-chart=#{build}/pdepend/dependencies.svg --overview-pyramid=#{build}/pdepend/overview-pyramid.svg #{source}"
-end
-
-desc "Generate pmd.xml using PHPMD (configuration in phpmd.xml)"
-task :phpmd do
-  system "phpmd #{source} xml #{basedir}/phpmd.xml --reportfile #{build}/logs/pmd.xml"
-end
-
-desc "Generate pmd.html using PHPMD (configuration in phpmd.xml)"
-task :phpmd_html do
-  system "phpmd #{source} html #{basedir}/phpmd.xml --reportfile #{build}/logs/pmd.html"
 end
 
 desc "Generate API documentation using phpdoc"
