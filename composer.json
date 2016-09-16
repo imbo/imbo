@@ -46,7 +46,11 @@
   "autoload": {
     "psr-0": {
       "Imbo\\": "src/",
-      "ImboCli\\": "src/",
+      "ImboCli\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-0": {
       "ImboUnitTest\\": "tests/phpunit",
       "ImboIntegrationTest\\": "tests/phpunit",
       "ImboCliUnitTest\\": "tests/phpunit"
