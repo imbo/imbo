@@ -44,7 +44,7 @@
     "imbo/imbo-metadata-cache": "Enabled caching of metadata through an event listener. Recommended version >=1.0.0"
   },
   "autoload": {
-    "psr-0": {
+    "psr-4": {
       "Imbo\\": "src/"
     }
   },
