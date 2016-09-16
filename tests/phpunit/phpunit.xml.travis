@@ -7,9 +7,6 @@
     <testsuite name="imbo-integration">
       <directory>ImboIntegrationTest</directory>
     </testsuite>
-    <testsuite name="imbocli-unit">
-      <directory>ImboCliUnitTest</directory>
-    </testsuite>
   </testsuites>
 
   <php>

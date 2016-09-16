@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace ImboCli;
+namespace Imbo;
 
 use Imbo\Version,
     Symfony\Component\Console\Application as BaseApplication;
@@ -19,7 +19,7 @@ use Imbo\Version,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Cli
  */
-class Application extends BaseApplication {
+class CliApplication extends BaseApplication {
     /**
      * Class constructor
      */
@@ -28,8 +28,8 @@ class Application extends BaseApplication {
 
         // Register commands
         $this->addCommands([
-            new Command\GeneratePrivateKey(),
-            new Command\AddPublicKey(),
+            new CliCommand\GeneratePrivateKey(),
+            new CliCommand\AddPublicKey(),
         ]);
     }
 }

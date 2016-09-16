@@ -8,9 +8,9 @@
  * distributed with this source code.
  */
 
-namespace ImboCli\Command;
+namespace Imbo\CliCommand;
 
-use Symfony\Component\Console\Command\Command as BaseCommand,
+use Symfony\Component\Console\Command\Command,
     Symfony\Component\Console\Input\InputInterface,
     Symfony\Component\Console\Output\OutputInterface,
     RuntimeException;
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Command\Command as BaseCommand,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Cli
  */
-class GeneratePrivateKey extends BaseCommand {
+class GeneratePrivateKey extends Command {
     /**
      * How many times to try to generate before we give up
      *

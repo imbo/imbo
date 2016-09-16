@@ -8,21 +8,21 @@
  * distributed with this source code.
  */
 
-namespace ImboCliUnitTest;
+namespace ImboUnitTest;
 
-use ImboCli\Application,
+use Imbo\CliApplication,
     Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
- * @covers ImboCli\Application
+ * @covers Imbo\CliApplication
  * @group unit-cli
  */
-class ApplicationTest extends \PHPUnit_Framework_TestCase {
+class CliApplicationTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @covers ImboCli\Application::__construct
+     * @covers Imbo\CliApplication::__construct
      */
     public function testAddsCommands() {
-        $application = new Application();
+        $application = new CliApplication();
         $application->setAutoExit(false);
 
         $applicationTester = new ApplicationTester($application);

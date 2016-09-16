@@ -8,22 +8,22 @@
  * distributed with this source code.
  */
 
-namespace ImboCliUnitTest\Command;
+namespace ImboUnitTest\CliCommand;
 
-use ImboCli\Command\AddPublicKey,
+use Imbo\CliCommand\AddPublicKey,
     Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
     Imbo\Resource,
     Symfony\Component\Console\Application,
     Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * @covers ImboCli\Command\AddPublicKey
+ * @covers Imbo\CliCommand\AddPublicKey
  * @group unit-cli
  * @group cli-commands
  */
 class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var ImboCli\Command\AddPublicKey
+     * @var Imbo\CliCommand\AddPublicKey
      */
     private $command;
 
@@ -35,7 +35,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     /**
      * Set up the command
      *
-     * @covers ImboCli\Command\AddPublicKey::__construct
+     * @covers Imbo\CliCommand\AddPublicKey::__construct
      */
     public function setUp() {
         $this->adapter = $this->getMock('Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface');
@@ -60,7 +60,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage Invalid access control adapter
-     * @covers ImboCli\Command\AddPublicKey::getAclAdapter
+     * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter
      */
     public function testThrowsWhenAccessControlIsNotValid() {
         $command = new AddPublicKey();
@@ -75,7 +75,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage Invalid access control adapter
-     * @covers ImboCli\Command\AddPublicKey::getAclAdapter
+     * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter
      */
     public function testThrowsWhenCallableReturnsInvalidAccessControl() {
         $command = new AddPublicKey();
@@ -92,7 +92,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage The configured access control adapter is not mutable
-     * @covers ImboCli\Command\AddPublicKey::getAclAdapter
+     * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter
      */
     public function testThrowsOnImmutableAdapter() {
         $command = new AddPublicKey();
@@ -107,7 +107,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage Public key with that name already exists
-     * @covers ImboCli\Command\AddPublicKey::execute
+     * @covers Imbo\CliCommand\AddPublicKey::execute
      */
     public function testThrowsOnDuplicatePublicKeyName() {
         $this->adapter
@@ -121,7 +121,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers ImboCli\Command\AddPublicKey::askForPrivateKey
+     * @covers Imbo\CliCommand\AddPublicKey::askForPrivateKey
      */
     public function testWillAskForPrivateKeyIfNotSpecified() {
         $this->adapter
@@ -142,7 +142,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers ImboCli\Command\AddPublicKey::askForUsers
+     * @covers Imbo\CliCommand\AddPublicKey::askForUsers
      */
     public function testWillNotAcceptEmptyUserSpecification() {
         $helper = $this->command->getHelper('question');
@@ -160,7 +160,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers ImboCli\Command\AddPublicKey::askForCustomResources
+     * @covers Imbo\CliCommand\AddPublicKey::askForCustomResources
      */
     public function testWillNotAcceptEmptyCustomResourceSpecification() {
         $helper = $this->command->getHelper('question');
@@ -182,10 +182,10 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers ImboCli\Command\AddPublicKey::execute
-     * @covers ImboCli\Command\AddPublicKey::askForAnotherAclRule
-     * @covers ImboCli\Command\AddPublicKey::askForResources
-     * @covers ImboCli\Command\AddPublicKey::askForUsers
+     * @covers Imbo\CliCommand\AddPublicKey::execute
+     * @covers Imbo\CliCommand\AddPublicKey::askForAnotherAclRule
+     * @covers Imbo\CliCommand\AddPublicKey::askForResources
+     * @covers Imbo\CliCommand\AddPublicKey::askForUsers
      */
     public function testContinuesAskingForAclRulesIfUserSaysThereAreMoreRulesToAdd() {
         $this->adapter
@@ -239,10 +239,10 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers ImboCli\Command\AddPublicKey::execute
-     * @covers ImboCli\Command\AddPublicKey::askForAnotherAclRule
-     * @covers ImboCli\Command\AddPublicKey::askForResources
-     * @covers ImboCli\Command\AddPublicKey::askForUsers
+     * @covers Imbo\CliCommand\AddPublicKey::execute
+     * @covers Imbo\CliCommand\AddPublicKey::askForAnotherAclRule
+     * @covers Imbo\CliCommand\AddPublicKey::askForResources
+     * @covers Imbo\CliCommand\AddPublicKey::askForUsers
      */
     public function testPromptsForListOfSpecificResourcesIfOptionIsSelected() {
         $allResources = Resource::getAllResources();
@@ -272,9 +272,9 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers ImboCli\Command\AddPublicKey::execute
-     * @covers ImboCli\Command\AddPublicKey::askForAnotherAclRule
-     * @covers ImboCli\Command\AddPublicKey::askForCustomResources
+     * @covers Imbo\CliCommand\AddPublicKey::execute
+     * @covers Imbo\CliCommand\AddPublicKey::askForAnotherAclRule
+     * @covers Imbo\CliCommand\AddPublicKey::askForCustomResources
      */
     public function testPromtpsForListOfCustomResourcesIfOptionIsSelected() {
         $allResources = Resource::getAllResources();
