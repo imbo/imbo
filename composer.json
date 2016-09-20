@@ -5,14 +5,15 @@
   "keywords": [ "image storage", "image transformation", "image metadata" ],
   "homepage": "http://imbo.io/",
   "license": "MIT",
-  "authors": [{
+  "authors": [
+    {
       "name": "Christer Edvartsen",
       "email": "cogo@starzinger.net",
       "role": "Project lead",
       "homepage": "https://github.com/christeredvartsen"
     }, {
-        "name": "Contributors",
-        "homepage": "https://github.com/imbo/imbo/graphs/contributors"
+      "name": "Contributors",
+      "homepage": "https://github.com/imbo/imbo/graphs/contributors"
     }
   ],
   "support": {
@@ -36,7 +37,13 @@
     "mikey179/vfsStream": "^1.5.0",
     "phpunit/phpunit": "^4.8",
     "behat/behat": "^2.0",
-    "guzzle/guzzle": "^3.9.3"
+    "guzzle/guzzle": "^3.9.3",
+    "phploc/phploc": "^3.0",
+    "sebastian/phpcpd": "^2.0",
+    "phpmd/phpmd": "^2.4",
+    "squizlabs/php_codesniffer": "^2.7",
+    "imbo/imbo-phpcs-standard": "^1.4",
+    "phpdocumentor/phpdocumentor": "^2.9"
   },
   "suggest": {
     "ext-mongo": "Enables usage of MongoDB and GridFS as database and store. Recommended version: >=1.4.0",
@@ -56,5 +63,44 @@
   },
   "bin": [
     "bin/imbo"
-  ]
+  ],
+  "scripts": {
+    "lint": "for file in `git ls-files '*php'`; do php -l $file; done",
+    "prepare": [
+      "rm -rf build",
+      "mkdir build",
+      "mkdir build/coverage",
+      "mkdir build/logs",
+      "mkdir build/docs",
+      "mkdir build/code-browser",
+      "mkdir build/pdepend"
+    ],
+    "test-phpunit": "vendor/bin/phpunit --verbose -c tests/phpunit",
+    "test-behat": "vendor/bin/behat --strict --config tests/behat/behat.yml",
+    "test": [
+      "@test-phpunit",
+      "@test-behat"
+    ],
+    "qa-phploc": "vendor/bin/phploc --log-csv build/logs/phploc.csv --log-xml build/logs/phploc.xml src",
+    "qa-phpcpd": "vendor/bin/phpcpd --log-pmd build/logs/pmd-cpd.xml src",
+    "qa-phpmd-xml": "vendor/bin/phpmd src xml phpmd.xml --reportfile build/logs/pmd.xml",
+    "qa-phpmd-html": "vendor/bin/phpmd src html phpmd.xml --reportfile build/logs/pmd.html",
+    "qa-phpmd": [
+      "@qa-phpmd-xml",
+      "@qa-phpmd-html"
+    ],
+    "qa-phpcs": "vendor/bin/phpcs --report=checkstyle --report-file=build/logs/checkstyle.xml --standard=vendor/imbo/imbo-phpcs-standard/src src",
+    "qa-phpdoc": "vendor/bin/phpdoc -d src -t build/docs",
+    "qa": [
+      "@qa-phploc",
+      "@qa-phpcpd",
+      "@qa-phpmd",
+      "@qa-phpcs",
+      "@qa-phpdoc"
+    ],
+    "docs": [
+      "cd docs; make spelling",
+      "cd docs; make html"
+    ]
+  }
 }
