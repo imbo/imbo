@@ -7,20 +7,6 @@ Imbo is an open source project licensed with the `MIT license <http://opensource
 
 If you have found a bug in Imbo, please leave an issue in the `issue tracker <https://github.com/imbo/imbo/issues>`_.
 
-Build script
-------------
-
-Imbo uses `Rake <http://rake.rubyforge.org/>`_ for building, and if you have Rake installed you can simply run the ``rake`` command after cloning Imbo to run the complete build. You might need to install some additional tools for the whole build to complete successfully. If you need help getting the build script to work with no errors drop by the ``#imbo`` channel on IRC (Freenode) or simply add an issue in the issue tracker on GitHub.
-
-Running the complete suite is not necessary for all contributions. If you skip the build script and simply want to get Imbo up and running for contributing you can run the following commands in the directory where you cloned Imbo:
-
-.. code-block:: console
-
-    curl -s https://getcomposer.org/installer | php
-    php composer.phar install
-
-Remember to **not** include the ``--no-dev`` argument to composer. If you include that argument the development requirements will not be installed.
-
 Requirements
 ------------
 
@@ -38,50 +24,36 @@ When introducing new features you are required to add tests. Unit/integration te
 
 .. code-block:: console
 
-    ./vendor/bin/phpunit -c tests/phpunit
+    composer test-phpunit
 
-If you want to generate code coverage as well you can run the test suite by using a Rake task:
-
-.. code-block:: console
-
-    rake phpunit
-
-For the Behat test suite you can run similar commands:
+For the Behat test suite you can the following command:
 
 .. code-block:: console
 
-    ./vendor/bin/behat --strict --profile no-cc --config tests/behat/behat.yml
+    composer test-behat
 
-to skip code coverage, or
-
-.. code-block:: console
-
-    rake behat
-
-for code coverage of the Behat tests. If you want to run both suites and collect code coverage you can execute:
+If you want to run both suites you can simply run:
 
 .. code-block:: console
 
-    rake test
-
-Code coverage is located in ``build/coverage`` and ``build/behat-coverage`` respectively.
+    composer test
 
 If you find a bug that you want to fix please add a test first that confirms the bug, and then fix the bug, making the newly added test pass.
 
 Documentation
 +++++++++++++
 
-API documentation is written using `phpDocumentor <http://www.phpdoc.org/>`_, and can be generated via a Rake task:
+API documentation is written using `phpDocumentor <http://www.phpdoc.org/>`_, and can be generated via a composer script:
 
 .. code-block:: console
 
-    rake apidocs
+    composer qa-phpdoc
 
 End user documentation (the ones you are reading now) is written using `Sphinx <http://sphinx-doc.org/>`_ and is located in the ``docs/`` directory in the project root. To generate the HTML version of the docs you can execute the following command:
 
 .. code-block:: console
 
-    rake readthedocs
+    composer docs
 
 This task also includes a spell checking stage.
 

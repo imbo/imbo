@@ -5,14 +5,15 @@
   "keywords": [ "image storage", "image transformation", "image metadata" ],
   "homepage": "http://imbo.io/",
   "license": "MIT",
-  "authors": [{
+  "authors": [
+    {
       "name": "Christer Edvartsen",
       "email": "cogo@starzinger.net",
       "role": "Project lead",
       "homepage": "https://github.com/christeredvartsen"
     }, {
-        "name": "Contributors",
-        "homepage": "https://github.com/imbo/imbo/graphs/contributors"
+      "name": "Contributors",
+      "homepage": "https://github.com/imbo/imbo/graphs/contributors"
     }
   ],
   "support": {
@@ -39,7 +40,10 @@
     "guzzle/guzzle": "^3.9.3",
     "phploc/phploc": "^3.0",
     "sebastian/phpcpd": "^2.0",
-    "phpmd/phpmd": "^2.4"
+    "phpmd/phpmd": "^2.4",
+    "squizlabs/php_codesniffer": "^2.7",
+    "imbo/imbo-phpcs-standard": "^1.4",
+    "phpdocumentor/phpdocumentor": "^2.9"
   },
   "suggest": {
     "ext-mongo": "Enables usage of MongoDB and GridFS as database and store. Recommended version: >=1.4.0",
@@ -85,10 +89,18 @@
       "@qa-phpmd-xml",
       "@qa-phpmd-html"
     ],
+    "qa-phpcs": "vendor/bin/phpcs --report=checkstyle --report-file=build/logs/checkstyle.xml --standard=vendor/imbo/imbo-phpcs-standard/src src",
+    "qa-phpdoc": "vendor/bin/phpdoc -d src -t build/docs",
     "qa": [
       "@qa-phploc",
       "@qa-phpcpd",
-      "@qa-phpmd"
+      "@qa-phpmd",
+      "@qa-phpcs",
+      "@qa-phpdoc"
+    ],
+    "docs": [
+      "cd docs; make spelling",
+      "cd docs; make html"
     ]
   }
 }
