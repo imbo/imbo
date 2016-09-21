@@ -129,7 +129,7 @@ class ImageTransformationCache implements ListenerInterface {
                 $event->stopPropagation();
 
                 // Mark this as a cache hit to prevent us from re-writing the result
-                $this->cacheHit = true;
+                $this->setCacheHit(true);
 
                 return;
             } else {
@@ -152,7 +152,7 @@ class ImageTransformationCache implements ListenerInterface {
         $response = $event->getResponse();
         $model = $response->getModel();
 
-        if (!$model instanceof Image || $this->cacheHit) {
+        if (!$model instanceof Image || $this->isCacheHit()) {
             // Only store images in the cache, and don't try to rewrite on cache hit
             return;
         }
@@ -211,13 +211,31 @@ class ImageTransformationCache implements ListenerInterface {
     }
 
     /**
+     * Set whether the current request already did a cache hit
+     *
+     * @param boolean Whether the request has already triggered a cache hit
+     */
+    protected function setCacheHit($cacheHit) {
+        $this->cacheHit = $cacheHit;
+    }
+
+    /**
+     * Check whether the current request hit the cache
+     *
+     * @return boolean
+     */
+    protected function isCacheHit() {
+        return $this->cacheHit;
+    }
+
+    /**
      * Get the path to the current image cache dir
      *
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier
      * @return string Returns the absolute path to the image cache dir
      */
-    private function getCacheDir($user, $imageIdentifier) {
+    protected function getCacheDir($user, $imageIdentifier) {
         $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         return sprintf(
             '%s/%s/%s/%s/%s/%s/%s/%s/%s',
@@ -239,7 +257,7 @@ class ImageTransformationCache implements ListenerInterface {
      * @param Request $request The current request instance
      * @return string Returns the absolute path to the cache file
      */
-    private function getCacheFilePath(Request $request) {
+    protected function getCacheFilePath(Request $request) {
         $hash = $this->getCacheKey($request);
         $dir = $this->getCacheDir($request->getUser(), $request->getImageIdentifier());
 
@@ -259,7 +277,7 @@ class ImageTransformationCache implements ListenerInterface {
      * @param Request $request The current request instance
      * @return string Returns a string that can be used as a cache key for the current image
      */
-    private function getCacheKey(Request $request) {
+    protected function getCacheKey(Request $request) {
         $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
         $accept = $request->headers->get('Accept', '*/*');
@@ -299,7 +317,7 @@ class ImageTransformationCache implements ListenerInterface {
      *
      * @param string $dir Name of a directory
      */
-    private function rmdir($dir) {
+    protected function rmdir($dir) {
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($dir),
             RecursiveIteratorIterator::CHILD_FIRST
@@ -331,7 +349,7 @@ class ImageTransformationCache implements ListenerInterface {
      * @param string $path The path to check
      * @return boolean
      */
-    private function isWritable($path) {
+    protected function isWritable($path) {
         if (!is_dir($path)) {
             // Path does not exist, check parent
             return $this->isWritable(dirname($path));
