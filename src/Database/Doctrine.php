@@ -16,7 +16,6 @@ use Imbo\Model\Image,
     Imbo\Exception\DatabaseException,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Exception,
-    Doctrine\DBAL\Configuration,
     Doctrine\DBAL\DriverManager,
     Doctrine\DBAL\Connection,
     PDO,
@@ -643,7 +642,7 @@ class Doctrine implements DatabaseInterface {
      */
     private function getConnection() {
         if ($this->connection === null) {
-            $this->connection = DriverManager::getConnection($this->params, new Configuration());
+            $this->connection = DriverManager::getConnection($this->params);
         }
 
         return $this->connection;
