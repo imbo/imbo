@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0ad78b3eb4c332c15ab1a49c9d881d10",
-    "content-hash": "0584739505815dea8c57c9df23e939c6",
+    "hash": "c92f99c1d7ac55598536a8b360f2deeb",
+    "content-hash": "713ab3bd9126cd865ef92ee00fdad0cd",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1614,6 +1614,56 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "time": "2014-12-30 15:22:37"
+        },
+        {
+            "name": "cwhite92/b2-sdk-php",
+            "version": "v1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cwhite92/b2-sdk-php.git",
+                "reference": "3a83aedbb5d9c85b33524defef5f1ec7895ed9ac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cwhite92/b2-sdk-php/zipball/3a83aedbb5d9c85b33524defef5f1ec7895ed9ac",
+                "reference": "3a83aedbb5d9c85b33524defef5f1ec7895ed9ac",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.1",
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.8.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ChrisWhite\\B2\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris White",
+                    "email": "chris@cwhite.me",
+                    "homepage": "https://cwhite.me"
+                }
+            ],
+            "description": "A SDK for working with B2 cloud storage.",
+            "homepage": "https://github.com/cwhite92/b2-sdk-php",
+            "keywords": [
+                "b2",
+                "backblaze",
+                "backup",
+                "cloud",
+                "filesystem",
+                "storage"
+            ],
+            "time": "2016-07-21 02:38:03"
         },
         {
             "name": "doctrine/instantiator",

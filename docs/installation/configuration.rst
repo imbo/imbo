@@ -424,10 +424,48 @@ Examples
 
         'storage' => function() {
             new Imbo\Storage\S3([
-                'key' => '<aws access key>'
+                'key' => '<aws access key>',
                 'secret' => '<aws secret key>',
                 'bucket' => 'my-imbo-bucket',
                 'region' => 'eu-central-1',
+            ]);
+        },
+
+        // ...
+    ];
+
+Backblaze B2 Cloud Storage
+++++++++++++++++++++++++++
+
+This adapter stores your images in a bucket in the `Backblaze B2 Cloud Storage <https://www.backblaze.com/b2/cloud-storage.html>`_. The parameters are:
+
+``accountId``
+    Your B2 account ID.
+
+``applicationKey``
+    Your B2 application key.
+
+``bucket``
+    The name of the bucket you want to store your images in.
+
+``bucketId``
+    The ID of the bucket.
+
+Examples
+^^^^^^^^
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'storage' => function() {
+            new Imbo\Storage\B2([
+                'accountId' => '<b2 account ID>',
+                'applicationKey' => '<b2 application key>',
+                'bucket' => 'my-imbo-bucket',
+                'bucketId' => '<bucket ID>',
             ]);
         },
 
