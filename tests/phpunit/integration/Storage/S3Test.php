@@ -28,6 +28,8 @@ class S3Test extends StorageTests {
             'key' => $GLOBALS['AWS_S3_KEY'],
             'secret' => $GLOBALS['AWS_S3_SECRET'],
             'bucket' => $GLOBALS['AWS_S3_BUCKET'],
+            'region' => $GLOBALS['AWS_S3_REGION'],
+            'version' => '2006-03-01',
         ]);
     }
 
@@ -35,17 +37,21 @@ class S3Test extends StorageTests {
      * Make sure we have the correct config available
      */
     public function setUp() {
-        foreach (['AWS_S3_KEY', 'AWS_S3_SECRET', 'AWS_S3_BUCKET'] as $key) {
+        foreach (['AWS_S3_KEY', 'AWS_S3_SECRET', 'AWS_S3_BUCKET', 'AWS_S3_REGION'] as $key) {
             if (empty($GLOBALS[$key])) {
                 $this->markTestSkipped('This test needs the ' . $key . ' value to be set in phpunit.xml');
             }
         }
 
-        $client = S3Client::factory([
-            'key' => $GLOBALS['AWS_S3_KEY'],
-            'secret' => $GLOBALS['AWS_S3_SECRET'],
+        $client = new S3Client([
+            'credentials' => [
+                'key' => $GLOBALS['AWS_S3_KEY'],
+                'secret' => $GLOBALS['AWS_S3_SECRET'],
+            ],
+            'region' => $GLOBALS['AWS_S3_REGION'],
+            'version' => '2006-03-01',
         ]);
-        $client->clearBucket($GLOBALS['AWS_S3_BUCKET']);
+        self::clearBucket($client, $GLOBALS['AWS_S3_BUCKET']);
 
         parent::setUp();
     }
@@ -59,9 +65,38 @@ class S3Test extends StorageTests {
         $driver = new S3([
             'key' => $GLOBALS['AWS_S3_KEY'],
             'secret' => $GLOBALS['AWS_S3_SECRET'],
+            'region' => $GLOBALS['AWS_S3_REGION'],
             'bucket' => uniqid(),
         ]);
 
         $this->assertFalse($driver->getStatus());
+    }
+
+    static public function clearBucket(S3Client $client, $bucket) {
+        // Do we need to implement listVersions as well? For testing, this is not usually required..
+        $objects = $client->getIterator('ListObjects', array('Bucket' => $bucket));
+        $keysToDelete = [];
+
+        foreach ($objects as $object) {
+            $keysToDelete[] = [
+                'Key' => $object['Key'],
+            ];
+        }
+
+        if (!$keysToDelete) {
+            return;
+        }
+
+        $action = $client->deleteObjects([
+            'Bucket' => $bucket,
+            'Delete' => [
+                'Objects' => $keysToDelete,
+            ],
+        ]);
+
+        if (!empty($action['Errors'])) {
+            var_dump($action['Errors']);
+            return;
+        }
     }
 }

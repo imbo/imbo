@@ -31,7 +31,7 @@
     "mongodb/mongodb": "^1.0",
     "guzzlehttp/psr7": "^1.3",
     "doctrine/dbal": "^2.5",
-    "aws/aws-sdk-php": "^2.8"
+    "aws/aws-sdk-php": "^3.19"
   },
   "require-dev": {
     "mikey179/vfsStream": "^1.5.0",

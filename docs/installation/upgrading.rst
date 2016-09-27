@@ -9,14 +9,10 @@ If you did a :ref:`git clone <git-clone>` you could simply do a ``git pull`` to 
 
 From time to time Imbo will introduce new features or fix bugs that might require you to update the contents of the database you choose to use. This chapter will contain all information you need to keep your installation up to date. Each of the following sections include the necessary steps you need to execute when upgrading to the different versions.
 
-.. contents::
-    :local:
-    :depth: 2
-
 Imbo-3.0.0
 ----------
 
-Below are the changes you need to be aware of when upgrading to Imbo-2.0.0.
+Below are the changes you need to be aware of when upgrading to Imbo-3.0.0.
 
 .. contents::
     :local:
@@ -24,11 +20,30 @@ Below are the changes you need to be aware of when upgrading to Imbo-2.0.0.
 
 XML-support has been removed
 ++++++++++++++++++++++++++++
+
 Imbo-3 no longer supports XML output. The only supported response format is JSON.
 
 ``auth`` is removed from the configuration
 ++++++++++++++++++++++++++++++++++++++++++
+
 Imbo-3 no longer provides support for using the ``auth`` part of the configuration file. You will need to use the :ref:`Access Control adapters <access-control-configuration>` from now on.
+
+S3 Library Upgraded
++++++++++++++++++++
+
+The dependency on ``aws-sdk-php`` has been upgraded to the most recent version at the time of release. The updated library requires the ``region`` parameter to be supplied when connecting to S3. This also applies to the Image Variations support if you're storing the variations in S3.
+
+Example
+^^^^^^^
+
+.. code-block:: php
+
+    new Imbo\Storage\S3([
+        'key' => '<aws access key>'
+        'secret' => '<aws secret key>',
+        'bucket' => 'my-imbo-bucket',
+        'region' => 'eu-central-1',
+    ]);
 
 Imbo-2.0.0
 ----------

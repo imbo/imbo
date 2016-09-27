@@ -11,6 +11,7 @@
 namespace ImboIntegrationTest\EventListener\ImageVariations\Storage;
 
 use Imbo\EventListener\ImageVariations\Storage\S3,
+    ImboIntegrationTest\Storage\S3Test as S3TestMain,
     Aws\S3\S3Client;
 
 /**
@@ -28,6 +29,8 @@ class S3Test extends StorageTests {
             'key' => $GLOBALS['AWS_S3_KEY'],
             'secret' => $GLOBALS['AWS_S3_SECRET'],
             'bucket' => $GLOBALS['AWS_S3_BUCKET'],
+            'region' => $GLOBALS['AWS_S3_REGION'],
+            'version' => '2006-03-01',
         ]);
     }
 
@@ -41,11 +44,16 @@ class S3Test extends StorageTests {
             }
         }
 
-        $client = S3Client::factory([
-            'key' => $GLOBALS['AWS_S3_KEY'],
-            'secret' => $GLOBALS['AWS_S3_SECRET'],
+        $client = new S3Client([
+            'credentials' => [
+                'key' => $GLOBALS['AWS_S3_KEY'],
+                'secret' => $GLOBALS['AWS_S3_SECRET'],
+            ],
+            'region' => $GLOBALS['AWS_S3_REGION'],
+            'version' => '2006-03-01',
         ]);
-        $client->clearBucket($GLOBALS['AWS_S3_BUCKET']);
+
+        S3TestMain::clearBucket($client, $GLOBALS['AWS_S3_BUCKET']);
 
         parent::setUp();
     }

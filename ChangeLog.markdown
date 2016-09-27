@@ -5,6 +5,7 @@ Imbo-3.0.0
 ----------
 __N/A__
 
+* #495: Upgrade aws-sdk-php-dependency to new major: `^3.19` (Mats Lindh)
 * #449: Removed support for XML (Christer Edvartsen)
 * #440: Added configuration option to redirect clients hitting the index page (Christer Edvartsen)
 * #408: Moved the metadata cache event listener to a separate project: https://github.com/imbo/imbo-metadata-cache (Christer Edvartsen)
