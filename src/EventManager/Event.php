@@ -44,19 +44,14 @@ class Event implements EventInterface {
     }
 
     /**
-     * Get the event name
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName() {
         return $this->name;
     }
 
     /**
-     * Sets the event name
-     *
-     * @param string $name
-     * @return self
+     * {@inheritdoc}
      */
     public function setName($name) {
         $this->name = $name;
@@ -65,16 +60,14 @@ class Event implements EventInterface {
     }
 
     /**
-     * Check if propagation has been stopped
-     *
-     * @return boolean
+     * {@inheritdoc}
      */
     public function isPropagationStopped() {
         return $this->propagationStopped;
     }
 
     /**
-     * Stops the propagation of the event
+     * {@inheritdoc}
      */
     public function stopPropagation() {
         $this->propagationStopped = true;
@@ -83,11 +76,7 @@ class Event implements EventInterface {
     }
 
     /**
-     * Get argument
-     *
-     * @param string $key
-     * @throws InvalidArgumentException
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getArgument($key) {
         if ($this->hasArgument($key)) {
@@ -98,11 +87,7 @@ class Event implements EventInterface {
     }
 
     /**
-     * Add argument
-     *
-     * @param string $key
-     * @param mixed $value
-     * @return self
+     * {@inheritdoc}
      */
     public function setArgument($key, $value) {
         $this->arguments[$key] = $value;
@@ -111,10 +96,7 @@ class Event implements EventInterface {
     }
 
     /**
-     * Set arguments
-     *
-     * @param array $arguments
-     * @return self
+     * {@inheritdoc}
      */
     public function setArguments(array $arguments = []) {
         $this->arguments = $arguments;
@@ -123,10 +105,7 @@ class Event implements EventInterface {
     }
 
     /**
-     * See if the event has an argument
-     *
-     * @param string $key
-     * @return boolean
+     * {@inheritdoc}
      */
     public function hasArgument($key) {
         return isset($this->arguments[$key]);
