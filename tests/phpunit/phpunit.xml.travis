@@ -14,6 +14,7 @@
     <var name="AWS_S3_KEY" value="" />
     <var name="AWS_S3_SECRET" value="" />
     <var name="AWS_S3_BUCKET" value="" />
+    <var name="AWS_S3_REGION" value="" />
 
     <!-- Backblaze B2 tests -->
     <var name="BACKBLAZE_B2_ACCOUNT_ID" value="" />
@@ -24,8 +25,8 @@
 
   <groups>
     <exclude>
-      <!-- Exclude the aws group per default -->
       <group>aws</group>
+      <group>backblaze</group>
     </exclude>
   </groups>
 </phpunit>

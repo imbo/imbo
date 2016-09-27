@@ -27,17 +27,17 @@
     <whitelist addUncoveredFilesFromWhitelist="true">
       <directory suffix=".php">../../src</directory>
       <exclude>
-        <directory suffix="Interface.php">../../src/Imbo</directory>
-        <file>../../src/Imbo/Exception.php</file>
-        <file>../../src/Imbo/Version.php</file>
+        <directory suffix="Interface.php">../../src</directory>
+        <file>../../src/Exception.php</file>
+        <file>../../src/Version.php</file>
       </exclude>
     </whitelist>
   </filter>
 
   <groups>
     <exclude>
-      <!-- Exclude the aws group per default -->
       <group>aws</group>
+      <group>backblaze</group>
     </exclude>
   </groups>
 </phpunit>
