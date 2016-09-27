@@ -9,11 +9,15 @@ __N/A__
 * #440: Added configuration option to redirect clients hitting the index page (Christer Edvartsen)
 * #408: Moved the metadata cache event listener to a separate project: https://github.com/imbo/imbo-metadata-cache (Christer Edvartsen)
 
+Bug fixes:
+
+* #491: Fix undefined user when retrieving metadata (Mats Lindh)
+
 Imbo-2.2.0
 ----------
 __2016-08-08__
 
-* #475: Validate signed URLs regardless of t[] vs t[0] (Mats Lindh)
+* #475: Validate signed URLs regardless of `t[]` vs `t[0]` (Mats Lindh)
 * #459: Support wildcards when subscribing to events (Christer Edvartsen)
 * #444: Added a getData() method to the Imbo\Model\ModelInterface (Christer Edvartsen)
 * #431: Added an Amazon S3 storage adapter for the image variations (Ali Asaria)
