@@ -63,6 +63,15 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Get the imageIdentifier in inherited tests
+     *
+     * @return string
+     */
+    protected function getImageIdentifier() {
+        return $this->imageIdentifier;
+    }
+
+    /**
      * Set up
      */
     public function setUp() {
