@@ -64,7 +64,7 @@ Imbo provides some level of backwards compatibility with the old ``auth`` part o
 Prior to 2.0.0, both the database and HTTP endpoints used a field name of ``publicKey`` to identify the user. Going forward, apart from when working with authentication, ``user`` will be the new field name. This requires some database changes - see below.
 
 Doctrine
-~~~~~~~~
+++++++++
 
 If you use the :ref:`Doctrine database adapter <doctrine-database-adapter>` you'll need to rename the ``publicKey`` fields to ``user``. The field has been updated in the :ref:`database-setup` section. The field should be renamed while there are no write operations pending, as a write could fail before upgrading Imbo itself.
 
@@ -174,7 +174,7 @@ Original checksum
 Imbo-1.2.0 includes a new feature that lets you filter images based on the original checksum of the image when querying the :ref:`images resource <images-resource>`. For this to work you need to add a field to your database. You can also populate this field for all images if you want, but this is not required. If you have event listeners that update incoming images, the values already stored in the database under the ``checksum`` field (which is used to populate the ``originalChecksum`` field in the following examples) might not be the checksum of the original image. If you don't have such event listeners added to your configuration you should be able to update the data as explained below and end up with 100% correct results.
 
 Doctrine
-~~~~~~~~
+++++++++
 
 If you use the :ref:`Doctrine database adapter <doctrine-database-adapter>` you'll need to add the new ``originalChecksum`` field to the table. The field has also been added to the :ref:`database-setup` section. The field should be added while there are no write operations pending, as a write could fail before upgrading Imbo itself.
 
@@ -191,7 +191,7 @@ When you have added the field to your database you can run the following query t
 This query will simply copy the value of the existing ``checksum`` field over to ``originalChecksum``. If you have a lot of images this operation might take a while.
 
 MongoDB
-~~~~~~~
++++++++
 
 If you use the MongoDB adapter all you need to do is to update all entries in the image collection:
 
