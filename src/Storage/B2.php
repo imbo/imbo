@@ -58,6 +58,12 @@ class B2 implements StorageInterface {
         'bucketId' => null,
     ];
 
+    /**
+     * Class constructor
+     *
+     * @param array $params Parameters for the adapter
+     * @param Client $client A configured client
+     */
     public function __construct(array $params = null, Client $client = null) {
         if ($params !== null) {
             $this->params = array_replace_recursive($this->params, $params);
