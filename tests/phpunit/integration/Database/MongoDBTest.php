@@ -11,13 +11,13 @@
 namespace ImboIntegrationTest\Database;
 
 use Imbo\Database\MongoDB,
-    MongoClient;
+    MongoDB\Client as MongoClient;
 
 /**
  * @covers Imbo\Database\MongoDB
  * @group integration
  * @group database
- * @group mongodb
+ * @group mongo
  */
 class MongoDBTest extends DatabaseTests {
     protected $databaseName = 'imboIntegrationTestDatabase';
@@ -35,12 +35,12 @@ class MongoDBTest extends DatabaseTests {
      * Make sure we have the mongo extension available and drop the test database just in case
      */
     public function setUp() {
-        if (!class_exists('MongoClient')) {
-            $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
+        if (!class_exists('MongoDB\Client')) {
+            $this->markTestSkipped('pecl/mongodb >= 1.1.3 is required to run this test');
         }
 
         $client = new MongoClient();
-        $client->selectDB($this->databaseName)->drop();
+        $client->dropDatabase($this->databaseName);
         $client->selectCollection($this->databaseName, 'image')->createIndex(
             ['user' => 1, 'imageIdentifier' => 1],
             ['unique' => true]
@@ -53,9 +53,9 @@ class MongoDBTest extends DatabaseTests {
      * Drop the test database after each test
      */
     public function tearDown() {
-        if (class_exists('MongoClient')) {
+        if (class_exists('MongoDB\Client')) {
             $client = new MongoClient();
-            $client->selectDB($this->databaseName)->drop();
+            $client->dropDatabase($this->databaseName);
         }
 
         parent::tearDown();
@@ -66,7 +66,7 @@ class MongoDBTest extends DatabaseTests {
      */
     public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() {
         $db = new MongoDB([
-            'server' => 'foobar',
+            'server' => 'mongodb://localhost:11111',
         ]);
         $this->assertFalse($db->getStatus());
     }

@@ -34,9 +34,9 @@ use Imbo\Exception\DatabaseException,
  * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Core\Auth\AccessControl\Adapter
  */
-class Mongo extends AbstractAdapter implements MutableAdapterInterface {
+class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
     /**
-     * Mongo client instance
+     * MongoDB client instance
      *
      * @var MongoClient
      */

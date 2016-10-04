@@ -58,7 +58,7 @@ $defaultConfig = [
      * @var Imbo\Database\DatabaseInterface|Closure
      */
     'database' => function() {
-        return new Database\Mongo();
+        return new Database\MongoDB();
     },
 
     /**

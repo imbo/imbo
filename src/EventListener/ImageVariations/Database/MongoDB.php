@@ -29,7 +29,7 @@ use Imbo\Exception\DatabaseException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
  */
-class Mongo implements DatabaseInterface {
+class MongoDB implements DatabaseInterface {
     /**
      * Mongo client instance
      *

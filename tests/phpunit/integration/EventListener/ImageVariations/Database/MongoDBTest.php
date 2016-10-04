@@ -8,29 +8,25 @@
  * distributed with this source code.
  */
 
-namespace ImboIntegrationTest\Auth\AccessControl\Adapter;
+namespace ImboIntegrationTest\EventListener\ImageVariations\Database;
 
-use Imbo\Auth\AccessControl\Adapter\Mongo,
+use Imbo\EventListener\ImageVariations\Database\MongoDB,
     MongoDB\Client as MongoClient;
 
 /**
- * @covers Imbo\Auth\AccessControl\Adapter\Mongo
+ * @covers Imbo\EventListener\ImageVariations\Database\MongoDB
  * @group integration
+ * @group database
  * @group mongo
  */
-class MongoTest extends AdapterTests {
-    /**
-     * Name of the test database
-     *
-     * @var string
-     */
-    protected $databaseName = 'imboIntegrationTestAuth';
+class MongoDBTest extends DatabaseTests {
+    private $databaseName = 'imboIntegrationTestDatabase';
 
     /**
-     * @see ImboIntegrationTest\Database\DatabaseTests::getAdapter()
+     * @see ImboIntegrationTest\EventListener\ImageVariations\Database\DatabaseTests::getAdapter()
      */
     protected function getAdapter() {
-        return new Mongo([
+        return new MongoDB([
             'databaseName' => $this->databaseName,
         ]);
     }
