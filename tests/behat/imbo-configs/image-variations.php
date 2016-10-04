@@ -17,7 +17,7 @@ return [
             'listener' => 'Imbo\EventListener\ImageVariations',
             'params' => [
                 'database' => [
-                    'adapter' => 'Imbo\EventListener\ImageVariations\Database\MongoDB',
+                    'adapter' => 'Imbo\EventListener\ImageVariations\Database\Mongo',
                     'params'  => ['databaseName' => 'imbo_testing'],
                 ],
                 'storage' => [

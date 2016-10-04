@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-use Imbo\Auth\AccessControl\Adapter\MongoDB as MongoAclAdapter;
+use Imbo\Auth\AccessControl\Adapter\Mongo as MongoAclAdapter;
 
 return [
     'accessControl' => function() {
