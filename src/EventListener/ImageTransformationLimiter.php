@@ -31,11 +31,20 @@ class ImageTransformationLimiter implements ListenerInterface {
     /**
      * Class constructor
      *
-     * @param int $transformationLimit The number of transformations to allow. Any count > this number will
-     *                                 generate an error. 0 (or invalid integer) will disable the check.
+     * @param array $params Parameters for the limit listener. `limit` (int) is required, and is the max number of
+     *                      transformations to allow. 0 will disable the check, but allow the listener to remain
+     *                      active.
+     * @throws InvalidArgumentException Throws an exception if the "limit" element is missing in params
      */
-    public function __construct($transformationLimit) {
-        $this->setTransformationLimit($transformationLimit);
+    public function __construct(array $params) {
+        if (!isset($params['limit'])) {
+            throw new InvalidArgumentException(
+                'The image transformation limiter needs the "limit" argument to be configured.',
+                500
+            );
+        }
+
+        $this->setTransformationLimit($params['limit']);
     }
 
     /**
