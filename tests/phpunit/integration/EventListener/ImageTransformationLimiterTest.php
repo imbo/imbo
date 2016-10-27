@@ -24,7 +24,7 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationCount
      */
     public function testLimitsTransformationCount() {
-        $listener = new ImageTransformationLimiter(2);
+        $listener = new ImageTransformationLimiter(['limit' => 2]);
 
         $request = $this->getMock('Imbo\Http\Request\Request');
 
@@ -44,7 +44,7 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationCount
      */
     public function testAllowsTransformationCount() {
-        $listener = new ImageTransformationLimiter(2);
+        $listener = new ImageTransformationLimiter(['limit' => 2]);
 
         $request = $this->getMock('Imbo\Http\Request\Request');
 
@@ -63,7 +63,7 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationCount
      */
     public function testAllowsAnyTransformationCount() {
-        $listener = new ImageTransformationLimiter(0);
+        $listener = new ImageTransformationLimiter(['limit' => 0]);
 
         $request = $this->getMock('Imbo\Http\Request\Request');
 
@@ -82,7 +82,7 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationCount
      */
     public function testGetSetLimitCountTransformationCount() {
-        $listener = new ImageTransformationLimiter(42);
+        $listener = new ImageTransformationLimiter(['limit' => 42]);
         $this->assertSame(42, $listener->getTransformationLimit());
 
         $listener->setTransformationLimit(10);
