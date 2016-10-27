@@ -260,6 +260,35 @@ and is enabled like this:
 
     The above command will delete all files in ``/path/to/cache`` older than 7 days and can be used with for instance `crontab <http://en.wikipedia.org/wiki/Cron>`_.
 
+
+Image transformation limiter
+++++++++++++++++++++++++++++
+
+Allows you to limit the number of transformations a user can apply to a single resource in a request. Read more about image transformations in the :ref:`image-transformations` section.
+
+The listener accepts a single parameter, the number of transformations a user can apply:
+
+``(int) limit``
+    The number of transformations to allow (count > limit will be denied with a 403 response code).
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'eventListeners' => [
+            'imageTransformationLimiter' => [
+                'listener' => 'Imbo\EventListener\ImageTransformationLimiter',
+                'params' => [
+                    'limit' => 2,
+                ],
+            ],
+        ],
+
+        // ...
+    ];
+
 .. _image-variations-listener:
 
 Image variations
