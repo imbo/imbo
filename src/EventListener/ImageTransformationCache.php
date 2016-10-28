@@ -75,7 +75,7 @@ class ImageTransformationCache implements ListenerInterface {
             );
         }
 
-        $this->path = $path;
+        $this->setPath($path);
     }
 
     /**
@@ -229,6 +229,24 @@ class ImageTransformationCache implements ListenerInterface {
     }
 
     /**
+     * Get the base path for the cache.
+     *
+     * @return string
+     */
+    protected function getPath() {
+        return $this->path;
+    }
+
+    /**
+     * Set the current base path for the cache.
+     *
+     * @param string $path
+     */
+    protected function setPath($path) {
+        $this->path = $path;
+    }
+
+    /**
      * Get the path to the current image cache dir
      *
      * @param string $user The user which the image belongs to
@@ -239,7 +257,7 @@ class ImageTransformationCache implements ListenerInterface {
         $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         return sprintf(
             '%s/%s/%s/%s/%s/%s/%s/%s/%s',
-            $this->path,
+            $this->getPath(),
             $userPath[0],
             $userPath[1],
             $userPath[2],
