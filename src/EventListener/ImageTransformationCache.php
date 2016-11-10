@@ -213,10 +213,10 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * Set whether the current request already did a cache hit
      *
-     * @param boolean Whether the request has already triggered a cache hit
+     * @param boolean $cacheHit Whether the request has already triggered a cache hit
      */
     protected function setCacheHit($cacheHit) {
-        $this->cacheHit = $cacheHit;
+        $this->cacheHit = (boolean) $cacheHit;
     }
 
     /**
