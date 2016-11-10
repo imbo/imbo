@@ -172,7 +172,7 @@ class B2 implements StorageInterface {
     /**
      * Get the current B2 client
      */
-    private function getClient() {
+    protected function getClient() {
         if ($this->client === null) {
             $this->client = new Client($this->getParam('accountId'), $this->getParam('applicationKey'));
         }
@@ -187,7 +187,7 @@ class B2 implements StorageInterface {
     /**
      * Get a parameter
      */
-    private function getParam($param) {
+    protected function getParam($param) {
         if (!isset($this->params[$param])) {
             throw new InvalidArgumentException('Attempted to read invalid parameter', 500);
         }
@@ -202,7 +202,7 @@ class B2 implements StorageInterface {
      * @param string $imageIdentifier Image identifier
      * @return string
      */
-    private function getImagePath($user, $imageIdentifier) {
+    protected function getImagePath($user, $imageIdentifier) {
         return $user . '/' . $imageIdentifier;
     }
 }
