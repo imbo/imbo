@@ -13,7 +13,7 @@ namespace ImboIntegrationTest\EventListener;
 use Imbo\EventListener\ImageTransformationLimiter;
 
 /**
- * @covers Imbo\EventListener\ExifMetadata
+ * @covers Imbo\EventListener\ImageTransformationLimiter
  * @group integration
  * @group listeners
  */
@@ -21,7 +21,7 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\EventListener\ImageTransformationLimiter::__construct
      * @covers Imbo\EventListener\ImageTransformationLimiter::checkTransformationCount
-     * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationCount
+     * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationLimit
      */
     public function testLimitsTransformationCount() {
         $listener = new ImageTransformationLimiter(['limit' => 2]);
@@ -41,7 +41,7 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\EventListener\ImageTransformationLimiter::__construct
      * @covers Imbo\EventListener\ImageTransformationLimiter::checkTransformationCount
-     * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationCount
+     * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationLimit
      */
     public function testAllowsTransformationCount() {
         $listener = new ImageTransformationLimiter(['limit' => 2]);
@@ -60,7 +60,7 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\EventListener\ImageTransformationLimiter::__construct
      * @covers Imbo\EventListener\ImageTransformationLimiter::checkTransformationCount
-     * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationCount
+     * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationLimit
      */
     public function testAllowsAnyTransformationCount() {
         $listener = new ImageTransformationLimiter(['limit' => 0]);
@@ -78,8 +78,8 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\EventListener\ImageTransformationLimiter::__construct
-     * @covers Imbo\EventListener\ImageTransformationLimiter::getTransformationCount
-     * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationCount
+     * @covers Imbo\EventListener\ImageTransformationLimiter::getTransformationLimit
+     * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationLimit
      */
     public function testGetSetLimitCountTransformationCount() {
         $listener = new ImageTransformationLimiter(['limit' => 42]);
