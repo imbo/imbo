@@ -73,18 +73,18 @@ class B2 implements StorageInterface {
 
         if ($client !== null) {
             $this->client = $client;
-        }
-
-        $missingFields = Parameters::getEmptyOrMissingParamFields(
-            ['accountId', 'applicationKey', 'bucketId', 'bucket'],
-            $this->params
-        );
-
-        if ($missingFields) {
-            throw new ConfigurationException(
-                'Missing required configuration parameters in ' . __CLASS__ . ': ' .
-                join(', ', $missingFields)
+        } else {
+            $missingFields = Parameters::getEmptyOrMissingParamFields(
+                ['accountId', 'applicationKey', 'bucketId', 'bucket'],
+                $this->params
             );
+
+            if ($missingFields && !$client) {
+                throw new ConfigurationException(
+                    'Missing required configuration parameters in ' . __CLASS__ . ': ' .
+                    join(', ', $missingFields)
+                );
+            }
         }
     }
 
