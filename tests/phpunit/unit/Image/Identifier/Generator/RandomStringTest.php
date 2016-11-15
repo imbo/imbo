@@ -21,7 +21,7 @@ class RandomStringTest extends \PHPUnit_Framework_TestCase {
     public function testGeneratesUniqueStrings() {
         $stringLength = 15;
 
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $generator = new RandomStringGenerator($stringLength);
         $generated = [];
 

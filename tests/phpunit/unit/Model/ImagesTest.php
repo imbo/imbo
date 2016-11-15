@@ -43,9 +43,9 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanSetAndGetImages() {
         $images = [
-            $this->getMock('Imbo\Model\Image'),
-            $this->getMock('Imbo\Model\Image'),
-            $this->getMock('Imbo\Model\Image'),
+            $this->createMock('Imbo\Model\Image'),
+            $this->createMock('Imbo\Model\Image'),
+            $this->createMock('Imbo\Model\Image'),
         ];
         $this->assertSame([], $this->model->getImages());
         $this->assertSame($this->model, $this->model->setImages($images));
@@ -98,9 +98,9 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
     public function testCanCountImages() {
         $this->assertSame(0, $this->model->getCount());
         $images = [
-            $this->getMock('Imbo\Model\Image'),
-            $this->getMock('Imbo\Model\Image'),
-            $this->getMock('Imbo\Model\Image'),
+            $this->createMock('Imbo\Model\Image'),
+            $this->createMock('Imbo\Model\Image'),
+            $this->createMock('Imbo\Model\Image'),
         ];
         $this->model->setImages($images);
         $this->assertSame(3, $this->model->getCount());
@@ -111,9 +111,9 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
      */
     public function testGetData() {
         $images = [
-            $this->getMock('Imbo\Model\Image'),
-            $this->getMock('Imbo\Model\Image'),
-            $this->getMock('Imbo\Model\Image'),
+            $this->createMock('Imbo\Model\Image'),
+            $this->createMock('Imbo\Model\Image'),
+            $this->createMock('Imbo\Model\Image'),
         ];
         $fields = ['width', 'height'];
 

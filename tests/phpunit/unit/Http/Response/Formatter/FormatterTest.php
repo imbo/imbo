@@ -26,7 +26,7 @@ class FormatterTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenModelIsNotSupported() {
-        $formatter = new JSON($this->getMock('Imbo\Helpers\DateFormatter'));
-        $formatter->format($this->getMock('Imbo\Model\ModelInterface'));
+        $formatter = new JSON($this->createMock('Imbo\Helpers\DateFormatter'));
+        $formatter->format($this->createMock('Imbo\Model\ModelInterface'));
     }
 }

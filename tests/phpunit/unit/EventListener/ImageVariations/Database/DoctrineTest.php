@@ -24,7 +24,7 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\ImageVariations\Database\Doctrine::setConnection
      */
     public function testCanSetConnection() {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock('Doctrine\DBAL\Connection');
         $connection->expects($this->once())->method('insert')->will($this->returnValue(false));
 
         $adapter = new Doctrine([], $connection);

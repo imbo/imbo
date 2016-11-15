@@ -29,7 +29,7 @@ class ImagickTest extends \PHPUnit_Framework_TestCase {
      * Set up the initializer
      */
     public function setUp() {
-        $this->imagick = $this->getMock('Imagick');
+        $this->imagick = $this->createMock('Imagick');
         $this->initializer = new Imagick($this->imagick);
     }
 
@@ -48,8 +48,8 @@ class ImagickTest extends \PHPUnit_Framework_TestCase {
      */
     public function getListeners() {
         return [
-            'image transformation' => [$this->getMock('Imbo\Image\Transformation\Border'), true],
-            'regular transformation' => [$this->getMock('Imbo\EventListener\ListenerInterface'), false],
+            'image transformation' => [$this->createMock('Imbo\Image\Transformation\Border'), true],
+            'regular transformation' => [$this->createMock('Imbo\EventListener\ListenerInterface'), false],
         ];
     }
 
@@ -70,7 +70,7 @@ class ImagickTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\Initializer\Imagick::initialize
      */
     public function testCanCreateAnImagickInstanceByItself() {
-        $listener = $this->getMock('Imbo\Image\Transformation\Border');
+        $listener = $this->createMock('Imbo\Image\Transformation\Border');
         $listener->expects($this->once())->method('setImagick')->with($this->isInstanceOf('Imagick'));
 
         $initializer = new Imagick();

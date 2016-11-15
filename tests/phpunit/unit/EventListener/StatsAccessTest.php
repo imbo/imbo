@@ -33,9 +33,9 @@ class StatsAccessTest extends ListenerTests {
      * Set up the listener
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
 
-        $this->event = $this->getMock('Imbo\EventManager\Event');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
 
         $this->listener = new StatsAccess();

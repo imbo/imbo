@@ -39,10 +39,10 @@ class StatusTest extends ResourceTests {
      * Set up the resource
      */
     public function setUp() {
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
-        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
-        $this->event = $this->getMock('Imbo\EventManager\Event');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
+        $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
+        $this->storage = $this->createMock('Imbo\Storage\StorageInterface');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
         $this->event->expects($this->any())->method('getStorage')->will($this->returnValue($this->storage));
@@ -68,7 +68,7 @@ class StatusTest extends ResourceTests {
         $this->database->expects($this->once())->method('getStatus')->will($this->returnValue(false));
         $this->storage->expects($this->once())->method('getStatus')->will($this->returnValue(true));
 
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;
@@ -87,7 +87,7 @@ class StatusTest extends ResourceTests {
         $this->database->expects($this->once())->method('getStatus')->will($this->returnValue(true));
         $this->storage->expects($this->once())->method('getStatus')->will($this->returnValue(false));
 
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;
@@ -106,7 +106,7 @@ class StatusTest extends ResourceTests {
         $this->database->expects($this->once())->method('getStatus')->will($this->returnValue(false));
         $this->storage->expects($this->once())->method('getStatus')->will($this->returnValue(false));
 
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;
@@ -125,7 +125,7 @@ class StatusTest extends ResourceTests {
         $this->database->expects($this->once())->method('getStatus')->will($this->returnValue(true));
         $this->storage->expects($this->once())->method('getStatus')->will($this->returnValue(true));
 
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;

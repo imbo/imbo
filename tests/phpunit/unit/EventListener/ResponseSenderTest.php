@@ -48,19 +48,19 @@ class ResponseSenderTest extends ListenerTests {
      * @covers Imbo\EventListener\ResponseSender::send
      */
     public function testCanSendTheResponse() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('checksum'));
 
-        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request = $this->createMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
 
-        $response = $this->getMock('Imbo\Http\Response\Response');
+        $response = $this->createMock('Imbo\Http\Response\Response');
         $response->expects($this->once())->method('isNotModified')->with($request);
         $response->expects($this->once())->method('send');
-        $response->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $response->headers = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $response->headers->expects($this->once())->method('set')->with('X-Imbo-ImageIdentifier', 'checksum');
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($response));
 
@@ -71,16 +71,16 @@ class ResponseSenderTest extends ListenerTests {
      * @covers Imbo\EventListener\ResponseSender::send
      */
     public function testCanSendTheResponseAndInjectTheCorrectImageIdentifier() {
-        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request = $this->createMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('checksum'));
 
-        $response = $this->getMock('Imbo\Http\Response\Response');
+        $response = $this->createMock('Imbo\Http\Response\Response');
         $response->expects($this->once())->method('isNotModified')->with($request);
         $response->expects($this->once())->method('send');
-        $response->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $response->headers = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $response->headers->expects($this->once())->method('set')->with('X-Imbo-ImageIdentifier', 'checksum');
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($response));
 

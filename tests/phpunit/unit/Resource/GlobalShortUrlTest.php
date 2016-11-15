@@ -40,11 +40,11 @@ class GlobalShortUrlTest extends ResourceTests {
      * Set up the resource
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
-        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->event = $this->getMock('Imbo\EventManager\Event');
-        $this->manager = $this->getMockBuilder('Imbo\EventManager\EventManager')->disableOriginalConstructor()->getMock();
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
+        $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
+        $this->manager = $this->createMock('Imbo\EventManager\EventManager');
 
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
@@ -80,7 +80,7 @@ class GlobalShortUrlTest extends ResourceTests {
             'accessToken' => 'some token',
         ];
 
-        $route = $this->getMock('Imbo\Router\Route');
+        $route = $this->createMock('Imbo\Router\Route');
         $route->expects($this->at(0))->method('get')->with('shortUrlId')->will($this->returnValue($id));
         $route->expects($this->at(1))->method('set')->with('user', $user);
         $route->expects($this->at(2))->method('set')->with('imageIdentifier', $imageIdentifier);
@@ -93,7 +93,7 @@ class GlobalShortUrlTest extends ResourceTests {
             'extension' => $extension,
             'query' => $query,
         ]));
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $responseHeaders->expects($this->once())->method('set')->with('X-Imbo-ShortUrl', 'http://imbo/s/' . $id);
         $this->response->headers = $responseHeaders;
 
@@ -109,7 +109,7 @@ class GlobalShortUrlTest extends ResourceTests {
      * @expectedExceptionCode 404
      */
     public function testRespondsWith404WhenShortUrlDoesNotExist() {
-        $route = $this->getMock('Imbo\Router\Route');
+        $route = $this->createMock('Imbo\Router\Route');
         $route->expects($this->once())->method('get')->with('shortUrlId')->will($this->returnValue('aaaaaaa'));
         $this->request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
         $this->database->expects($this->once())->method('getShortUrlParams')->with('aaaaaaa')->will($this->returnValue(null));

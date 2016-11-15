@@ -27,11 +27,11 @@ class CompressTest extends TransformationTests {
     }
 
     public function testCanTransformTheImage() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
         $image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/jpeg'));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(['level' => 50]));
         $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
 

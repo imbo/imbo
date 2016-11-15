@@ -61,7 +61,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidStorageAdapter() {
         $this->application->run([
-            'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
+            'database' => $this->createMock('Imbo\Database\DatabaseInterface'),
             'storage' => function() { return new \stdClass(); },
             'trustedProxies' => [],
         ]);
@@ -75,8 +75,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidAccessControlAdapter() {
         $this->application->run([
-            'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
-            'storage' => $this->getMock('Imbo\Storage\StorageInterface'),
+            'database' => $this->createMock('Imbo\Database\DatabaseInterface'),
+            'storage' => $this->createMock('Imbo\Storage\StorageInterface'),
             'routes' => [],
             'trustedProxies' => [],
             'accessControl' => function() { return new \stdClass(); },
@@ -91,9 +91,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEmpty(Request::getTrustedProxies());
         $this->application->run([
-            'database' => $this->getMock('Imbo\Database\DatabaseInterface'),
-            'storage' => $this->getMock('Imbo\Storage\StorageInterface'),
-            'accessControl' => $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface'),
+            'database' => $this->createMock('Imbo\Database\DatabaseInterface'),
+            'storage' => $this->createMock('Imbo\Storage\StorageInterface'),
+            'accessControl' => $this->createMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface'),
             'eventListenerInitializers' => [],
             'eventListeners' => [],
             'contentNegotiateImages' => false,
@@ -118,19 +118,19 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
                 $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
                 $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
 
-                return $this->getMock('Imbo\Database\DatabaseInterface');
+                return $this->createMock('Imbo\Database\DatabaseInterface');
             },
             'storage' => function ($request, $response) {
                 $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
                 $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
 
-                return $this->getMock('Imbo\Storage\StorageInterface');
+                return $this->createMock('Imbo\Storage\StorageInterface');
             },
             'accessControl' => function ($request, $response) {
                 $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
                 $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
 
-                return $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
+                return $this->createMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
             },
             'eventListeners' => [
                 'test' => function ($request, $response) {

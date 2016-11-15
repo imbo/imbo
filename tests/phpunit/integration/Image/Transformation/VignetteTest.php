@@ -30,12 +30,12 @@ class VignetteTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Vignette::transform
      */
     public function testCanVignetteImages() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(640));
         $image->expects($this->once())->method('getHeight')->will($this->returnValue(480));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue([]));
         $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
 

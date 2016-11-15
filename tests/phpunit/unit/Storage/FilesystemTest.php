@@ -92,7 +92,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Storage\Filesystem::store
      */
     public function testStoreToUnwritablePath() {
-        $image = $this->getMock('Imbo\Image\ImageInterface');
+        $image = 'some image data';
         $dir = 'unwritableDirectory';
 
         // Create the virtual directory with no permissions

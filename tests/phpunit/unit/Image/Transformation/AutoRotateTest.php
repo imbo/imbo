@@ -22,13 +22,13 @@ class AutoRotateTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Transformation\AutoRotate::transform
      */
     public function testWillNotUpdateTheImageWhenNotNeeded() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
 
-        $imagick = $this->getMock('Imagick');
+        $imagick = $this->createMock('Imagick');
         $imagick->expects($this->once())->method('getImageOrientation')->will($this->returnValue(0));
         $imagick->expects($this->never())->method('setImageOrientation');
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getArgument')->with('image')->will($this->returnValue($image));
 
         $transformation = new AutoRotate();

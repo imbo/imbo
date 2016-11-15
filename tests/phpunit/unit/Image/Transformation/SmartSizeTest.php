@@ -142,7 +142,7 @@ class SmartSizeTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider getSmartSizeArguments
      */
     public function testSmartSize($imageDimensions, $params, $cropParams) {
-        $imagick = $this->getMock('Imagick');
+        $imagick = $this->createMock('Imagick');
         $imagick->expects($this->any())
                 ->method('cropImage')
                 ->with(
@@ -158,7 +158,7 @@ class SmartSizeTest extends \PHPUnit_Framework_TestCase {
 
         $response = new Response();
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
         $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
         $event->expects($this->at(2))->method('getResponse')->will($this->returnValue($response));

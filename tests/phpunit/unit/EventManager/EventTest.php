@@ -45,22 +45,22 @@ class EventTest extends \PHPUnit_Framework_TestCase {
     public function getArguments() {
         return [
             'request' => [
-                'getRequest', 'request', $this->getMock('Imbo\Http\Request\Request'),
+                'getRequest', 'request', $this->createMock('Imbo\Http\Request\Request'),
             ],
             'response' => [
-                'getResponse', 'response', $this->getMock('Imbo\Http\Response\Response'),
+                'getResponse', 'response', $this->createMock('Imbo\Http\Response\Response'),
             ],
             'database' => [
-                'getDatabase', 'database', $this->getMock('Imbo\Database\DatabaseInterface'),
+                'getDatabase', 'database', $this->createMock('Imbo\Database\DatabaseInterface'),
             ],
             'storage' => [
-                'getStorage', 'storage', $this->getMock('Imbo\Storage\StorageInterface'),
+                'getStorage', 'storage', $this->createMock('Imbo\Storage\StorageInterface'),
             ],
             'accessControl' => [
-                'getAccessControl', 'accessControl', $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface'),
+                'getAccessControl', 'accessControl', $this->createMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface'),
             ],
             'manager' => [
-                'getManager', 'manager', $this->getMockBuilder('Imbo\EventManager\EventManager')->disableOriginalConstructor()->getMock(),
+                'getManager', 'manager', $this->createMock('Imbo\EventManager\EventManager'),
             ],
             'config' => [
                 'getConfig', 'config', ['some' => 'config'],

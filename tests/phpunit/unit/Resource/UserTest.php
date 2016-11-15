@@ -42,11 +42,11 @@ class UserTest extends ResourceTests {
      * Set up the resource
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
-        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->storage = $this->getMock('Imbo\Storage\StorageInterface');
-        $this->event = $this->getMock('Imbo\EventManager\Event');
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
+        $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
+        $this->storage = $this->createMock('Imbo\Storage\StorageInterface');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
@@ -71,7 +71,7 @@ class UserTest extends ResourceTests {
      */
     public function testSupportsHttpGet() {
         $date = new DateTime('@1361628679', new DateTimeZone('UTC'));
-        $manager = $this->getMockBuilder('Imbo\EventManager\EventManager')->disableOriginalConstructor()->getMock();
+        $manager = $this->createMock('Imbo\EventManager\EventManager');
         $manager->expects($this->once())->method('trigger')->with('db.user.load');
         $this->event->expects($this->once())->method('getManager')->will($this->returnValue($manager));
 

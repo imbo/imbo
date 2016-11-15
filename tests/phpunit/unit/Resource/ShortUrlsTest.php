@@ -40,10 +40,10 @@ class ShortUrlsTest extends ResourceTests {
      */
     public function setUp() {
         $this->resource = $this->getNewResource();
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
-        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->event = $this->getMock('Imbo\EventManager\Event');
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
+        $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
 
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));

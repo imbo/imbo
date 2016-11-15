@@ -39,9 +39,9 @@ class StatsTest extends ResourceTests {
      * Set up the resource
      */
     public function setUp() {
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
-        $this->eventManager = $this->getMockBuilder('Imbo\EventManager\EventManager')->disableOriginalConstructor()->getMock();
-        $this->event = $this->getMock('Imbo\EventManager\Event');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
+        $this->eventManager = $this->createMock('Imbo\EventManager\EventManager');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getManager')->will($this->returnValue($this->eventManager));
 
@@ -62,7 +62,7 @@ class StatsTest extends ResourceTests {
      * @covers Imbo\Resource\Stats::get
      */
     public function testTriggersTheCorrectEvent() {
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;

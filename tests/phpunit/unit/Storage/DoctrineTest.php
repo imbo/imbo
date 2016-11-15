@@ -43,7 +43,7 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
             $this->markTestSkipped('Doctrine is required to run this test');
         }
 
-        $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
+        $this->connection = $this->createMock('Doctrine\DBAL\Connection');
         $this->driver = new Doctrine([], $this->connection);
     }
 

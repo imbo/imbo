@@ -202,7 +202,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Request\Request::setImage
      */
     public function testCanSetAndGetAnImage() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $this->assertSame($this->request, $this->request->setImage($image));
         $this->assertSame($image, $this->request->getImage());
     }
@@ -213,7 +213,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
      */
     public function testCanSetAndGetARoute() {
         $this->assertNull($this->request->getRoute());
-        $route = $this->getMockBuilder('Imbo\Router\Route')->disableOriginalConstructor()->getMock();
+        $route = $this->createMock('Imbo\Router\Route');
         $this->assertSame($this->request, $this->request->setRoute($route));
         $this->assertSame($route, $this->request->getRoute());
     }

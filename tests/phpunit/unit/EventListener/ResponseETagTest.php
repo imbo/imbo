@@ -60,7 +60,7 @@ class ResponseETagTest extends ListenerTests {
      * @dataProvider getTaintedHeaders
      */
     public function testCanFixATaintedInNoneMatchHeader($incoming, $real, $willFix) {
-        $requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $requestHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $requestHeaders->expects($this->once())->method('get')->with('if-none-match', false)->will($this->returnValue($incoming));
 
         if ($willFix) {
@@ -69,10 +69,10 @@ class ResponseETagTest extends ListenerTests {
             $requestHeaders->expects($this->never())->method('set');
         }
 
-        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request = $this->createMock('Imbo\Http\Request\Request');
         $request->headers = $requestHeaders;
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
 
         $this->listener->fixIfNoneMatchHeader($event);
@@ -101,9 +101,9 @@ class ResponseETagTest extends ListenerTests {
      * @dataProvider getRoutesForETags
      */
     public function testWillSetETagForSomeRoutes($route, $hasETag, $isOk = false, $content = null) {
-        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request = $this->createMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
-        $response = $this->getMock('Imbo\Http\Response\Response');
+        $response = $this->createMock('Imbo\Http\Response\Response');
 
         if ($hasETag) {
             $response->expects($this->once())->method('isOk')->will($this->returnValue($isOk));
@@ -116,7 +116,7 @@ class ResponseETagTest extends ListenerTests {
             $response->expects($this->never())->method('isOk');
         }
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->once())->method('getResponse')->will($this->returnValue($response));
 

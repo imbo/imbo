@@ -37,8 +37,8 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testInsertFailureThrowsDatabaseException() {
-        $client = $this->getMockBuilder('MongoClient')->disableOriginalConstructor()->getMock();
-        $collection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
+        $client = $this->createMock('MongoClient');
+        $collection = $this->createMock('MongoCollection');
 
         $collection
             ->expects($this->once())
@@ -60,7 +60,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenNotAbleToGetCollection() {
-        $client = $this->getMockBuilder('MongoClient')->disableOriginalConstructor()->getMock();
+        $client = $this->createMock('MongoClient');
 
         $client
             ->expects($this->once())

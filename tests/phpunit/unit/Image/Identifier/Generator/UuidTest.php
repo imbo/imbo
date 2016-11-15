@@ -19,7 +19,7 @@ use Imbo\Image\Identifier\Generator\Uuid as UuidGenerator,
  */
 class UuidTest extends \PHPUnit_Framework_TestCase {
     public function testGeneratesUniqueUuidV4() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $generator = new UuidGenerator();
         $generated = [];
 

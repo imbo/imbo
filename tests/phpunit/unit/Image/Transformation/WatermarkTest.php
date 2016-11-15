@@ -44,9 +44,9 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage You must specify an image identifier to use for the watermark
      */
     public function testTransformThrowsExceptionIfNoImageSpecified() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
         $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue([]));
 
@@ -59,20 +59,20 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Watermark image not found
      */
     public function testThrowsExceptionIfSpecifiedImageIsNotFound() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
 
         $e = new StorageException('File not found', 404);
 
-        $storage = $this->getMock('Imbo\Storage\StorageInterface');
+        $storage = $this->createMock('Imbo\Storage\StorageInterface');
         $storage->expects($this->once())
                 ->method('getImage')
                 ->with('someuser', 'foobar')
                 ->will($this->throwException($e));
 
-        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request = $this->createMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getUser')->will($this->returnValue('someuser'));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
         $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue([
             'img' => 'foobar',

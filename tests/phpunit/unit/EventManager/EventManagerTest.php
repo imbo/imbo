@@ -33,7 +33,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
      * Set up the event manager
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->event = new Event(['request' => $this->request]);
         $this->manager = new EventManager();
         $this->manager->setEventTemplate($this->event);

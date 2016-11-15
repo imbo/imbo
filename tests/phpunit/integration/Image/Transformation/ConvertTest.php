@@ -27,13 +27,13 @@ class ConvertTest extends TransformationTests {
     }
 
     public function testCanConvertAnImage() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
         $image->expects($this->once())->method('setMimeType')->with('image/gif')->will($this->returnValue($image));
         $image->expects($this->once())->method('setExtension')->with('gif')->will($this->returnValue($image));
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
         $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(['type' => 'gif']));
 

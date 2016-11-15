@@ -30,10 +30,10 @@ class SepiaTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Sepia::transform
      */
     public function testCanTransformImageWithoutParams() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue([]));
         $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
 
@@ -47,10 +47,10 @@ class SepiaTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Sepia::transform
      */
     public function testCanTransformImageWithParams() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(['threshold' => 10]));
         $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
 

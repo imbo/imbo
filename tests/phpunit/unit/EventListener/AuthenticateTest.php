@@ -34,15 +34,16 @@ class AuthenticateTest extends ListenerTests {
      * Set up the listener
      */
     public function setUp() {
-        $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
-        $this->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $this->accessControl = $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
+        $this->query = $this->createMock('Symfony\Component\HttpFoundation\ParameterBag');
+        $this->headers = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $this->accessControl = $this->createMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
 
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->request->query = $this->query;
         $this->request->headers = $this->headers;
 
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
+        $this->response->headers = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
 
         $this->event = $this->getEventMock();
 
@@ -57,7 +58,7 @@ class AuthenticateTest extends ListenerTests {
     }
 
     protected function getEventMock($config = null) {
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $event->expects($this->any())->method('getAccessControl')->will($this->returnValue($this->accessControl));
@@ -179,7 +180,7 @@ class AuthenticateTest extends ListenerTests {
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue($httpMethod));
 
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $responseHeaders->expects($this->once())->method('set')->with('X-Imbo-AuthUrl', $url);
 
         $this->response->headers = $responseHeaders;
@@ -215,7 +216,7 @@ class AuthenticateTest extends ListenerTests {
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue($publicKey));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue($httpMethod));
 
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $responseHeaders->expects($this->once())->method('set')->with('X-Imbo-AuthUrl', $url);
 
         $this->response->headers = $responseHeaders;
@@ -350,7 +351,7 @@ class AuthenticateTest extends ListenerTests {
         $this->request->expects($this->once())->method('getPublicKey')->will($this->returnValue('christer'));
         $this->request->expects($this->any())->method('getMethod')->will($this->returnValue('PUT'));
 
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $responseHeaders->expects($this->once())->method('set')->with('X-Imbo-AuthUrl', $authHeader);
 
         $this->response->headers = $responseHeaders;

@@ -36,7 +36,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenNotAbleToGetDatabase() {
-        $client = $this->getMockBuilder('MongoClient')->disableOriginalConstructor()->getMock();
+        $client = $this->createMock('MongoClient');
 
         $client
             ->expects($this->once())
@@ -55,8 +55,8 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\ImageVariations\Storage\GridFS::getGrid
      */
     public function testCanPassGridInstance() {
-        $client = $this->getMockBuilder('MongoClient')->disableOriginalConstructor()->getMock();
-        $grid = $this->getMockBuilder('MongoGridFS')->disableOriginalConstructor()->getMock();
+        $client = $this->createMock('MongoClient');
+        $grid = $this->createMock('MongoGridFS');
 
         $grid
             ->expects($this->once())

@@ -122,7 +122,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Model\Image::getAddedDate
      */
     public function testCanSetAndGetTheAddedDate() {
-        $date = $this->getMock('DateTime');
+        $date = $this->createMock('DateTime');
         $this->assertNull($this->image->getAddedDate());
         $this->assertSame($this->image, $this->image->setAddedDate($date));
         $this->assertSame($date, $this->image->getAddedDate());
@@ -133,7 +133,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Model\Image::getUpdatedDate
      */
     public function testCanSetAndGetTheUpdatedDate() {
-        $date = $this->getMock('DateTime');
+        $date = $this->createMock('DateTime');
         $this->assertNull($this->image->getUpdatedDate());
         $this->assertSame($this->image, $this->image->setUpdatedDate($date));
         $this->assertSame($date, $this->image->getUpdatedDate());

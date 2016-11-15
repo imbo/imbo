@@ -33,7 +33,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::__construct
      */
     public function setUp() {
-        $this->dateFormatter = $this->getMock('Imbo\Helpers\DateFormatter');
+        $this->dateFormatter = $this->createMock('Imbo\Helpers\DateFormatter');
         $this->formatter = new JSON($this->dateFormatter);
     }
 
@@ -61,7 +61,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
         $date = new DateTime($formattedDate);
 
-        $model = $this->getMock('Imbo\Model\Error');
+        $model = $this->createMock('Imbo\Model\Error');
         $model->expects($this->once())->method('getHttpCode')->will($this->returnValue(404));
         $model->expects($this->once())->method('getErrorMessage')->will($this->returnValue('Public key not found'));
         $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
@@ -86,7 +86,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
     public function testCanFormatAnErrorModelWhenNoImageIdentifierExists() {
         $date = new DateTime();
 
-        $model = $this->getMock('Imbo\Model\Error');
+        $model = $this->createMock('Imbo\Model\Error');
         $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
         $model->expects($this->once())->method('getImageIdentifier')->will($this->returnValue(null));
 
@@ -104,7 +104,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
         $date = new DateTime($formattedDate);
 
-        $model = $this->getMock('Imbo\Model\Status');
+        $model = $this->createMock('Imbo\Model\Status');
         $model->expects($this->once())->method('getDate')->will($this->returnValue($date));
         $model->expects($this->once())->method('getDatabaseStatus')->will($this->returnValue(true));
         $model->expects($this->once())->method('getStorageStatus')->will($this->returnValue(false));
@@ -127,7 +127,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
         $date = new DateTime($formattedDate);
 
-        $model = $this->getMock('Imbo\Model\User');
+        $model = $this->createMock('Imbo\Model\User');
         $model->expects($this->once())->method('getLastModified')->will($this->returnValue($date));
         $model->expects($this->once())->method('getNumImages')->will($this->returnValue(123));
         $model->expects($this->once())->method('getUserId')->will($this->returnValue('christer'));
@@ -166,7 +166,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
             'some other key' => 'some other value',
         ];
 
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getUser')->will($this->returnValue($user));
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
         $image->expects($this->once())->method('getChecksum')->will($this->returnValue($checksum));
@@ -180,7 +180,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $image->expects($this->once())->method('getMetadata')->will($this->returnValue($metadata));
 
         $images = [$image];
-        $model = $this->getMock('Imbo\Model\Images');
+        $model = $this->createMock('Imbo\Model\Images');
         $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
         $model->expects($this->once())->method('getHits')->will($this->returnValue(100));
         $model->expects($this->once())->method('getPage')->will($this->returnValue(2));
@@ -214,13 +214,13 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\JSON::formatImages
      */
     public function testCanFormatAnImagesModelWithNoMetadataSet() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMetadata')->will($this->returnValue(null));
         $image->expects($this->once())->method('getAddedDate')->will($this->returnValue(new DateTime()));
         $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue(new DateTime()));
 
         $images = [$image];
-        $model = $this->getMock('Imbo\Model\Images');
+        $model = $this->createMock('Imbo\Model\Images');
         $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
 
         $json = $this->formatter->format($model);
@@ -237,13 +237,13 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\JSON::formatImages
      */
     public function testCanFormatAnImagesModelWithNoMetadata() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMetadata')->will($this->returnValue([]));
         $image->expects($this->once())->method('getAddedDate')->will($this->returnValue(new DateTime()));
         $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue(new DateTime()));
 
         $images = [$image];
-        $model = $this->getMock('Imbo\Model\Images');
+        $model = $this->createMock('Imbo\Model\Images');
         $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
 
         $json = $this->formatter->format($model);
@@ -260,7 +260,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\JSON::formatImages
      */
     public function testCanFormatAnImagesModelWithNoImages() {
-        $model = $this->getMock('Imbo\Model\Images');
+        $model = $this->createMock('Imbo\Model\Images');
         $model->expects($this->once())->method('getImages')->will($this->returnValue([]));
 
         $json = $this->formatter->format($model);
@@ -274,12 +274,12 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\JSON::formatImages
      */
     public function testCanFormatAnImagesModelWithSomefields() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getAddedDate')->will($this->returnValue(new DateTime()));
         $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue(new DateTime()));
 
         $images = [$image];
-        $model = $this->getMock('Imbo\Model\Images');
+        $model = $this->createMock('Imbo\Model\Images');
         $model->expects($this->once())->method('getImages')->will($this->returnValue($images));
         $fields = ['size', 'width', 'height'];
         $model->expects($this->once())->method('getFields')->will($this->returnValue($fields));
@@ -306,7 +306,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
             'some key' => 'some value',
             'some other key' => 'some other value',
         ];
-        $model = $this->getMock('Imbo\Model\Metadata');
+        $model = $this->createMock('Imbo\Model\Metadata');
         $model->expects($this->once())->method('getData')->will($this->returnValue($metadata));
 
         $json = $this->formatter->format($model);
@@ -320,7 +320,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\JSON::formatMetadataModel
      */
     public function testCanFormatAMetadataModelWithNoMetadata() {
-        $model = $this->getMock('Imbo\Model\Metadata');
+        $model = $this->createMock('Imbo\Model\Metadata');
         $model->expects($this->once())->method('getData')->will($this->returnValue([]));
 
         $json = $this->formatter->format($model);
@@ -343,7 +343,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
                 ],
             ],
         ];
-        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model = $this->createMock('Imbo\Model\ArrayModel');
         $model->expects($this->once())->method('getData')->will($this->returnValue($data));
 
         $json = $this->formatter->format($model);
@@ -356,7 +356,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\JSON::formatArrayModel
      */
     public function testCanFormatAnEmptyArrayModel() {
-        $model = $this->getMock('Imbo\Model\ArrayModel');
+        $model = $this->createMock('Imbo\Model\ArrayModel');
         $model->expects($this->once())->method('getData')->will($this->returnValue([]));
 
         $json = $this->formatter->format($model);
@@ -372,7 +372,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
     public function testCanFormatAListModel() {
         $list = [1, 2, 3];
         $container = 'foo';
-        $model = $this->getMock('Imbo\Model\ListModel');
+        $model = $this->createMock('Imbo\Model\ListModel');
         $model->expects($this->once())->method('getList')->will($this->returnValue($list));
         $model->expects($this->once())->method('getContainer')->will($this->returnValue($container));
 
@@ -386,7 +386,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
     public function testCanFormatAnEmptyListModel() {
         $list = [];
         $container = 'foo';
-        $model = $this->getMock('Imbo\Model\ListModel');
+        $model = $this->createMock('Imbo\Model\ListModel');
         $model->expects($this->once())->method('getList')->will($this->returnValue($list));
         $model->expects($this->once())->method('getContainer')->will($this->returnValue($container));
 
@@ -404,7 +404,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $limit = 5;
         $page = 1;
 
-        $model = $this->getMock('Imbo\Model\Groups');
+        $model = $this->createMock('Imbo\Model\Groups');
         $model->expects($this->once())->method('getHits')->will($this->returnValue($hits));
         $model->expects($this->once())->method('getPage')->will($this->returnValue($page));
         $model->expects($this->once())->method('getLimit')->will($this->returnValue($limit));
@@ -425,7 +425,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
             'user.head',
         ];
 
-        $model = $this->getMock('Imbo\Model\Group');
+        $model = $this->createMock('Imbo\Model\Group');
         $model->expects($this->once())->method('getName')->will($this->returnValue($name));
         $model->expects($this->once())->method('getResources')->will($this->returnValue($resources));
 
@@ -441,7 +441,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $users = ['user1', 'user2'];
         $group = 'group';
 
-        $model = $this->getMock('Imbo\Model\AccessRule');
+        $model = $this->createMock('Imbo\Model\AccessRule');
         $model->expects($this->once())->method('getId')->will($this->returnValue($id));
         $model->expects($this->once())->method('getUsers')->will($this->returnValue($users));
         $model->expects($this->once())->method('getGroup')->will($this->returnValue($group));
@@ -458,7 +458,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
         $users = ['user1', 'user2'];
         $resources = ['resource1', 'resource2'];
 
-        $model = $this->getMock('Imbo\Model\AccessRule');
+        $model = $this->createMock('Imbo\Model\AccessRule');
         $model->expects($this->once())->method('getId')->will($this->returnValue($id));
         $model->expects($this->once())->method('getUsers')->will($this->returnValue($users));
         $model->expects($this->once())->method('getResources')->will($this->returnValue($resources));
@@ -483,7 +483,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
                 'users' => ['user3', 'user4'],
             ],
         ];
-        $model = $this->getMock('Imbo\Model\AccessRules');
+        $model = $this->createMock('Imbo\Model\AccessRules');
         $model->expects($this->once())->method('getRules')->will($this->returnValue($rules));
 
         $this->assertSame('[{"id":1,"group":"group","users":["user1","user2"]},{"id":2,"resources":["image.get","image.head"],"users":["user3","user4"]}]', $this->formatter->format($model));
@@ -524,7 +524,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Formatter\JSON::formatStats
      */
     public function testCanFormatAStatsModel($images, $users, $bytes, $customStats, $expectedJson) {
-        $model = $this->getMock('Imbo\Model\Stats');
+        $model = $this->createMock('Imbo\Model\Stats');
         $model->expects($this->once())->method('getNumImages')->will($this->returnValue($images));
         $model->expects($this->once())->method('getNumUsers')->will($this->returnValue($users));
         $model->expects($this->once())->method('getNumBytes')->will($this->returnValue($bytes));

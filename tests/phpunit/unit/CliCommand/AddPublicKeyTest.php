@@ -38,7 +38,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\CliCommand\AddPublicKey::__construct
      */
     public function setUp() {
-        $this->adapter = $this->getMock('Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface');
+        $this->adapter = $this->createMock('Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface');
 
         $this->command = new AddPublicKey();
         $this->command->setConfig([
@@ -97,7 +97,7 @@ class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
     public function testThrowsOnImmutableAdapter() {
         $command = new AddPublicKey();
         $command->setConfig([
-            'accessControl' => $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface')
+            'accessControl' => $this->createMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface')
         ]);
 
         $commandTester = new CommandTester($command);

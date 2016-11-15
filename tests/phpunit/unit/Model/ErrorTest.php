@@ -95,7 +95,7 @@ class ErrorTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Model\Error::createFromException
      */
     public function testCanCreateAnErrorBasedOnAnException() {
-        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request = $this->createMock('Imbo\Http\Request\Request');
 
         $exception = new RuntimeException('You wronged', 400);
 
@@ -114,7 +114,7 @@ class ErrorTest extends \PHPUnit_Framework_TestCase {
         $exception = new RuntimeException('You wronged', 400);
         $exception->setImboErrorCode(123);
 
-        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request = $this->createMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImage')->will($this->returnValue(null));
         $request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageIdentifier'));
 
@@ -131,11 +131,11 @@ class ErrorTest extends \PHPUnit_Framework_TestCase {
         $exception = new RuntimeException('You wronged', 400);
         $exception->setImboErrorCode(123);
 
-        $request = $this->getMock('Imbo\Http\Request\Request');
-        $image = $this->getMock('Imbo\Model\Image');
+        $request = $this->createMock('Imbo\Http\Request\Request');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $request->expects($this->never())->method('imageId');
+        $request->expects($this->never())->method('getImageIdentifier');
 
         $model = Error::createFromException($exception, $request);
 

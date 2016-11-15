@@ -19,7 +19,7 @@ use Imbo\Image\Identifier\Generator\Md5 as Md5Generator,
  */
 class Md5Test extends \PHPUnit_Framework_TestCase {
     public function testGeneratesCorrectMd5ForBlob() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->any())->method('getBlob')->will($this->returnValue('foobar'));
 
         $generator = new Md5Generator();

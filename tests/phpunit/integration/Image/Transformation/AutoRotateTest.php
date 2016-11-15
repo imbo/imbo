@@ -78,7 +78,7 @@ class AutoRotateTest extends TransformationTests {
          */
         $blob = file_get_contents($file);
 
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
 
         if ($changeDimensions) {
             $image->expects($this->once())->method('setWidth')->with(350)->will($this->returnValue($image));
@@ -94,7 +94,7 @@ class AutoRotateTest extends TransformationTests {
             $image->expects($this->never())->method('hasBeenTransformed');
         }
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getArgument')->with('image')->will($this->returnValue($image));
 
         // Perform the auto rotate transformation on the image
