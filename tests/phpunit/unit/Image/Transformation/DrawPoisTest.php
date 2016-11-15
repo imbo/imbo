@@ -24,11 +24,11 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Transformation\DrawPois::transform
      */
     public function testDoesNotModifyImageIfNoPoisAreFound() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $image = $this->createMock('Imbo\Model\Image');
+        $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('getMetadata')->will($this->returnValue([]));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
         $event->expects($this->any())->method('getDatabase')->will($this->returnValue($database));
 
@@ -42,11 +42,11 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Transformation\DrawPois::transform
      */
     public function testDoesNotModifyImageIfNoPoiMetadataKeyIsNotAnArray() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $image = $this->createMock('Imbo\Model\Image');
+        $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('getMetadata')->will($this->returnValue(['poi' => 'wat']));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
         $event->expects($this->any())->method('getDatabase')->will($this->returnValue($database));
 
@@ -62,13 +62,13 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Point of interest had neither `width` and `height` nor `cx` and `cy`
      */
     public function testThrowsExceptionOnInvalidPoi() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $image = $this->createMock('Imbo\Model\Image');
+        $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('getMetadata')->will($this->returnValue([
             'poi' => [['foo' => 'bar']]
         ]));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
         $event->expects($this->any())->method('getDatabase')->will($this->returnValue($database));
 
@@ -82,8 +82,8 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Transformation\DrawPois::transform
      */
     public function testDrawsSameAmountOfTimesAsPoisArePresent() {
-        $image = $this->getMock('Imbo\Model\Image');
-        $database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $image = $this->createMock('Imbo\Model\Image');
+        $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('getMetadata')->will($this->returnValue([
             'poi' => [[
                 'x' => 362,
@@ -105,13 +105,13 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
             ]]
         ]));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
         $event->expects($this->any())->method('getDatabase')->will($this->returnValue($database));
 
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        $imagick = $this->getMock('Imagick');
+        $imagick = $this->createMock('Imagick');
         $imagick->expects($this->exactly(3))->method('drawImage');
 
         $transformation = new DrawPois();
@@ -124,7 +124,7 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
      */
     public function testDrawPois() {
         return;
-        $imagick = $this->getMock('Imagick');
+        $imagick = $this->createMock('Imagick');
         $imagick->expects($this->any())
                 ->method('cropImage')
                 ->with(
@@ -140,7 +140,7 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
 
         $response = new Response();
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
         $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
         $event->expects($this->at(2))->method('getResponse')->will($this->returnValue($response));

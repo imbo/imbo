@@ -41,7 +41,7 @@ abstract class AdapterTests extends \PHPUnit_Framework_TestCase {
     }
 
     public function testReturnsEmptyArrayWhenThereIsNoGroups() {
-        $model = $this->getMock('Imbo\Model\Groups');
+        $model = $this->createMock('Imbo\Model\Groups');
         $model->expects($this->once())->method('setHits')->with(0);
 
         $this->assertSame([], $this->adapter->getGroups(null, $model));
@@ -57,7 +57,7 @@ abstract class AdapterTests extends \PHPUnit_Framework_TestCase {
         $this->assertSame(['images.get', 'images.head'], $this->adapter->getGroup('g1'));
         $this->assertSame(['status.get'], $this->adapter->getGroup('g2'));
 
-        $model = $this->getMock('Imbo\Model\Groups');
+        $model = $this->createMock('Imbo\Model\Groups');
         $model->expects($this->once())->method('setHits')->with(2);
 
         $groups = $this->adapter->getGroups(null, $model);

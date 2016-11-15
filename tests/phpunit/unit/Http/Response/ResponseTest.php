@@ -46,7 +46,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Response::getModel
      */
     public function testCanSetAndGetModel() {
-        $model = $this->getMock('Imbo\Model\ModelInterface');
+        $model = $this->createMock('Imbo\Model\ModelInterface');
         $this->assertNull($this->response->getModel());
         $this->assertSame($this->response, $this->response->setModel($model));
         $this->assertSame($model, $this->response->getModel());
@@ -59,7 +59,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Http\Response\Response::setNotModified
      */
     public function testRemovesModelWhenMarkedAsNotModified() {
-        $model = $this->getMock('Imbo\Model\ModelInterface');
+        $model = $this->createMock('Imbo\Model\ModelInterface');
         $this->assertSame($this->response, $this->response->setModel($model));
         $this->assertSame($this->response, $this->response->setNotModified());
         $this->assertSame(304, $this->response->getStatusCode());
@@ -75,7 +75,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
         $imboErrorCode = 123;
         $date = new DateTime('@1361614522', new DateTimeZone('UTC'));
 
-        $error = $this->getMock('Imbo\Model\Error');
+        $error = $this->createMock('Imbo\Model\Error');
         $error->expects($this->once())->method('getHttpCode')->will($this->returnValue($code));
         $error->expects($this->once())->method('getImboErrorCode')->will($this->returnValue($imboErrorCode));
         $error->expects($this->once())->method('getErrorMessage')->will($this->returnValue($message));

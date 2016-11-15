@@ -42,12 +42,12 @@ class BorderTest extends TransformationTests {
      * @dataProvider getBorderParams
      */
     public function testTransformationSupportsDifferentModes($expectedWidth, $expectedHeight, $borderWidth, $borderHeight, $borderMode) {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('setWidth')->with($expectedWidth)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($expectedHeight)->will($this->returnValue($image));
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))
               ->method('getArgument')
               ->with('image')

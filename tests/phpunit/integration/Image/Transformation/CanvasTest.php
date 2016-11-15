@@ -83,7 +83,7 @@ class CanvasTest extends TransformationTests {
     public function testTransformWithDifferentParameters($width, $height, $mode = 'free', $resultingWidth = 665, $resultingHeight = 463) {
         $blob = file_get_contents(FIXTURES_DIR . '/image.png');
 
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->any())->method('getBlob')->will($this->returnValue($blob));
         $image->expects($this->any())->method('getWidth')->will($this->returnValue(665));
         $image->expects($this->any())->method('getHeight')->will($this->returnValue(463));
@@ -92,7 +92,7 @@ class CanvasTest extends TransformationTests {
         $image->expects($this->once())->method('setHeight')->with($resultingHeight)->will($this->returnValue($image));
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))
               ->method('getArgument')
               ->with('image')

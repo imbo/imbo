@@ -43,9 +43,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
      * Set up
      */
     public function setUp() {
-        $this->client = $this->getMock('MongoClient');
-        $this->aclCollection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
-        $this->aclGroupCollection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
+        $this->client = $this->createMock('MongoClient');
+        $this->aclCollection = $this->createMock('MongoCollection');
+        $this->aclGroupCollection = $this->createMock('MongoCollection');
         $this->adapter = new MongoDB(null, $this->client, $this->aclCollection, $this->aclGroupCollection);
     }
 

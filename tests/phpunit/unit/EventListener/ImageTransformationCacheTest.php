@@ -50,20 +50,20 @@ class ImageTransformationCacheTest extends ListenerTests {
             $this->markTestSkipped('This testcase requires vfsStream to run');
         }
 
-        $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
-        $this->requestHeaders = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+        $this->responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $this->requestHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $this->query = $this->createMock('Symfony\Component\HttpFoundation\ParameterBag');
 
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
         $this->response->headers = $this->responseHeaders;
 
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->request->query = $this->query;
         $this->request->headers = $this->requestHeaders;
         $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
-        $this->event = $this->getMock('Imbo\EventManager\Event');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
@@ -97,8 +97,8 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
      */
     public function testChangesTheImageInstanceOnCacheHit() {
-        $imageFromCache = $this->getMock('Imbo\Model\Image');
-        $headersFromCache = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $imageFromCache = $this->createMock('Imbo\Model\Image');
+        $headersFromCache = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $cachedData = serialize([
             'image' => $imageFromCache,
             'headers' => $headersFromCache,
@@ -183,7 +183,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformationCache::storeInCache
      */
     public function testDoesNotStoreNonImageModelsInTheCache() {
-        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->getMock('Imbo\Model\Error')));
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->createMock('Imbo\Model\Error')));
         $this->request->expects($this->never())->method('getUser');
         $this->listener->storeInCache($this->event);
     }
@@ -195,9 +195,9 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
      */
     public function testStoresImageInCache() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
 
-        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->getMock('Imbo\Model\Image')));
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->createMock('Imbo\Model\Image')));
         $this->requestHeaders->expects($this->once())
                              ->method('get')
                              ->with('Accept', '*/*')
@@ -225,7 +225,7 @@ class ImageTransformationCacheTest extends ListenerTests {
         // Reusing the same logic as this test
         $this->testChangesTheImageInstanceOnCacheHit();
 
-        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->getMock('Imbo\Model\Image')));
+        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->createMock('Imbo\Model\Image')));
 
         // Overwrite cached file
         $dir = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6';

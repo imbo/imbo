@@ -59,28 +59,28 @@ class ImageVariationsTest extends ListenerTests {
      * Set up the listener
      */
     public function setUp() {
-        $this->db = $this->getMock('Imbo\EventListener\ImageVariations\Database\DatabaseInterface');
-        $this->storage = $this->getMock('Imbo\EventListener\ImageVariations\Storage\StorageInterface');
+        $this->db = $this->createMock('Imbo\EventListener\ImageVariations\Database\DatabaseInterface');
+        $this->storage = $this->createMock('Imbo\EventListener\ImageVariations\Storage\StorageInterface');
 
-        $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
-        $this->imageModel = $this->getMock('Imbo\Model\Image');
-        $this->eventManager = $this->getMock('Imbo\EventManager\EventManager');
-        $this->imageStorage = $this->getMock('Imbo\Storage\StorageInterface');
+        $this->query = $this->createMock('Symfony\Component\HttpFoundation\ParameterBag');
+        $this->imageModel = $this->createMock('Imbo\Model\Image');
+        $this->eventManager = $this->createMock('Imbo\EventManager\EventManager');
+        $this->imageStorage = $this->createMock('Imbo\Storage\StorageInterface');
 
         $this->imageModel->method('getImageIdentifier')->willReturn($this->imageIdentifier);
 
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
         $this->request->expects($this->any())->method('getImage')->will($this->returnValue($this->imageModel));
         $this->request->query = $this->query;
 
-        $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
         $this->response->headers = $this->responseHeaders;
         $this->response->expects($this->any())->method('getModel')->will($this->returnValue($this->imageModel));
 
-        $this->event = $this->getMock('Imbo\EventManager\Event');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getManager')->will($this->returnValue($this->eventManager));

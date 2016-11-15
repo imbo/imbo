@@ -26,12 +26,12 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
     public function testLimitsTransformationCount() {
         $listener = new ImageTransformationLimiter(['limit' => 2]);
 
-        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request = $this->createMock('Imbo\Http\Request\Request');
 
         // content of array isn't important, the check is done on the count of the array
         $request->expects($this->any())->method('getTransformations')->will($this->returnValue([1, 2, 3, 4, 5]));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
 
         $this->setExpectedException('Imbo\Exception\ResourceException', '', 403);
@@ -46,12 +46,12 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
     public function testAllowsTransformationCount() {
         $listener = new ImageTransformationLimiter(['limit' => 2]);
 
-        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request = $this->createMock('Imbo\Http\Request\Request');
 
         // content of array isn't important, the check is done on the count of the array
         $request->expects($this->any())->method('getTransformations')->will($this->returnValue([1, 2]));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
 
         $listener->checkTransformationCount($event);
@@ -65,12 +65,12 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
     public function testAllowsAnyTransformationCount() {
         $listener = new ImageTransformationLimiter(['limit' => 0]);
 
-        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request = $this->createMock('Imbo\Http\Request\Request');
 
         // content of array isn't important, the check is done on the count of the array
         $request->expects($this->any())->method('getTransformations')->will($this->returnValue([1, 2, 3, 4, 5, 6, 7, 8, 9]));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
 
         $listener->checkTransformationCount($event);

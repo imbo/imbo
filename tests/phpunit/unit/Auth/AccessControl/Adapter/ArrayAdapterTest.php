@@ -208,7 +208,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
     public function testCanGetGroups(array $groups, array $result, $query = null) {
         $numGroups = count($groups);
 
-        $model = $this->getMock('Imbo\Model\Groups');
+        $model = $this->createMock('Imbo\Model\Groups');
         $model->expects($this->once())->method('setHits')->with($numGroups);
 
         $adapter = new ArrayAdapter([], $groups);

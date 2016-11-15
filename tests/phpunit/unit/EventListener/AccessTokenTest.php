@@ -34,15 +34,15 @@ class AccessTokenTest extends ListenerTests {
      * Set up the listener
      */
     public function setUp() {
-        $this->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+        $this->query = $this->createMock('Symfony\Component\HttpFoundation\ParameterBag');
 
-        $this->accessControl = $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
+        $this->accessControl = $this->createMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
 
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->request->query = $this->query;
 
-        $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
         $this->response->headers = $this->responseHeaders;
 
         $this->event = $this->getEventMock();
@@ -402,7 +402,7 @@ class AccessTokenTest extends ListenerTests {
     }
 
     protected function getEventMock($config = null) {
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getAccessControl')->will($this->returnValue($this->accessControl));
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));

@@ -76,12 +76,12 @@ class ThumbnailTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Thumbnail::transform
      */
     public function testCanTransformImage($params, $width, $height) {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
         $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
 

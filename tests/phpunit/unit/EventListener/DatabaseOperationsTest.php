@@ -39,17 +39,17 @@ class DatabaseOperationsTest extends ListenerTests {
      * Set up the listener
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
-        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->accessControl = $this->getMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
-        $this->image = $this->getMock('Imbo\Model\Image');
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
+        $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
+        $this->accessControl = $this->createMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
+        $this->image = $this->createMock('Imbo\Model\Image');
 
         $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
         $this->request->expects($this->any())->method('getUsers')->will($this->returnValue([$this->user]));
         $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
-        $this->event = $this->getMock('Imbo\EventManager\Event');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
@@ -190,7 +190,7 @@ class DatabaseOperationsTest extends ListenerTests {
 
         $date = new DateTime();
 
-        $query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+        $query = $this->createMock('Symfony\Component\HttpFoundation\ParameterBag');
         $query->expects($this->at(0))->method('has')->with('page')->will($this->returnValue(true));
         $query->expects($this->at(1))->method('get')->with('page')->will($this->returnValue(1));
         $query->expects($this->at(2))->method('has')->with('limit')->will($this->returnValue(true));
@@ -211,7 +211,7 @@ class DatabaseOperationsTest extends ListenerTests {
         $query->expects($this->at(17))->method('get')->with('originalChecksums')->will($this->returnValue(['checksum1', 'checksum2', 'checksum3']));
         $this->request->query = $query;
 
-        $imagesQuery = $this->getMock('Imbo\Resource\Images\Query');
+        $imagesQuery = $this->createMock('Imbo\Resource\Images\Query');
         $this->listener->setImagesQuery($imagesQuery);
 
         $this->database->expects($this->once())->method('getImages')->with([$this->user], $imagesQuery)->will($this->returnValue($images));
@@ -254,7 +254,7 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers Imbo\EventListener\DatabaseOperations::setImagesQuery
      */
     public function testCanCreateItsOwnImagesQuery() {
-        $query = $this->getMock('Imbo\Resource\Images\Query');
+        $query = $this->createMock('Imbo\Resource\Images\Query');
         $this->assertInstanceOf('Imbo\Resource\Images\Query', $this->listener->getImagesQuery());
         $this->listener->getImagesQuery();
         $this->assertSame($this->listener, $this->listener->setImagesQuery($query));

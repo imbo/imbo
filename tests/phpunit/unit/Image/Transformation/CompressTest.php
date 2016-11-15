@@ -43,20 +43,20 @@ class CompressTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 400
      */
     public function testThrowsExceptionOnMissingLevelParameter() {
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getArgument')->with('params')->will($this->returnValue([]));
         $this->transformation->transform($event);
     }
 
     public function testDoesNotApplyCompressionToGifImages() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/gif'));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(['level' => 40]));
         $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
 
-        $imagick = $this->getMock('Imagick');
+        $imagick = $this->createMock('Imagick');
         $imagick->expects($this->never())->method('setImageCompressionQuality');
 
         $this->transformation->setImagick($imagick)->transform($event);
@@ -64,11 +64,11 @@ class CompressTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testDoesNotApplyCompressionWhenLevelIsNotSet() {
-        $imagick = $this->getMock('Imagick');
+        $imagick = $this->createMock('Imagick');
         $imagick->expects($this->never())->method('setImageCompressionQuality');
 
         $this->transformation->setImagick($imagick)
-                             ->compress($this->getMock('Imbo\EventManager\Event'));
+                             ->compress($this->createMock('Imbo\EventManager\Event'));
     }
 
     /**
@@ -77,7 +77,7 @@ class CompressTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 400
      */
     public function testThrowsExceptionOnInvalidLevel() {
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getArgument')->with('params')->will($this->returnValue(['level' => 200]));
         $this->transformation->transform($event);
     }

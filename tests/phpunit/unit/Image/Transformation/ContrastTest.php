@@ -67,8 +67,8 @@ class ContrastTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider getContrastParams
      */
     public function testSetsTheCorrectContrast(array $params, $shouldTransform) {
-        $image = $this->getMock('Imbo\Model\Image');
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $image = $this->createMock('Imbo\Model\Image');
+        $event = $this->createMock('Imbo\EventManager\Event');
 
         $imagick = new \Imagick();
         $imagick->newImage(16, 16, '#fff');

@@ -46,7 +46,7 @@ class HistogramTest extends TransformationTests {
     public function testTransformWithDifferentParameters($scale, $resultingWidth = 256) {
         $blob = file_get_contents(FIXTURES_DIR . '/512x512.png');
 
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->any())->method('getBlob')->will($this->returnValue($blob));
         $image->expects($this->any())->method('getWidth')->will($this->returnValue(512));
         $image->expects($this->any())->method('getHeight')->will($this->returnValue(512));
@@ -55,7 +55,7 @@ class HistogramTest extends TransformationTests {
         $image->expects($this->once())->method('setHeight')->will($this->returnValue($image));
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))
               ->method('getArgument')
               ->with('image')

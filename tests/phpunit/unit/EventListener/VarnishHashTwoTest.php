@@ -32,13 +32,13 @@ class VarnishHashTwoTest extends ListenerTests {
      * Set up the listener
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
 
-        $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
         $this->response->headers = $this->responseHeaders;
 
-        $this->event = $this->getMock('Imbo\EventManager\Event');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
@@ -68,7 +68,7 @@ class VarnishHashTwoTest extends ListenerTests {
      */
     public function testCanSendAHashTwoHeader() {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
         $this->responseHeaders->expects($this->once())->method('set')->with('X-HashTwo', [
@@ -87,7 +87,7 @@ class VarnishHashTwoTest extends ListenerTests {
         $listener = new VarnishHashTwo(['headerName' => 'X-CustomHeader']);
 
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
         $this->responseHeaders->expects($this->once())->method('set')->with('X-CustomHeader', [

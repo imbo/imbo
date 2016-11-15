@@ -36,13 +36,13 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
      * Set up the image preparation instance
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
-        $this->event = $this->getMock('Imbo\EventManager\Event');
-        $this->database = $this->getMock('Imbo\Database\DatabaseInterface');
-        $this->headers = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
+        $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
+        $this->headers = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $this->response->headers = $this->headers;
-        $this->imageIdentifierGenerator = $this->getMock('Imbo\Image\Identifier\Generator\GeneratorInterface');
+        $this->imageIdentifierGenerator = $this->createMock('Imbo\Image\Identifier\Generator\GeneratorInterface');
         $this->config = ['imageIdentifierGenerator' => $this->imageIdentifierGenerator];
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
@@ -165,7 +165,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
             return $generator;
         };
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $event->expects($this->any())->method('getConfig')->will($this->returnValue($config));
@@ -186,7 +186,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
 
         $config['imageIdentifierGenerator'] = new CallableImageIdentifierGenerator();
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $event->expects($this->any())->method('getConfig')->will($this->returnValue($config));

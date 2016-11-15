@@ -41,11 +41,11 @@ class ConvertTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Transformation\Convert::transform
      */
     public function testWillNotConvertImageIfNotNeeded() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
         $image->expects($this->never())->method('getBlob');
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
         $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(['type' => 'png']));
 

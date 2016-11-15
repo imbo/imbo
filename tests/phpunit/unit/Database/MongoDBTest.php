@@ -49,9 +49,9 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
             $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
         }
 
-        $this->mongoClient = $this->getMockBuilder('MongoClient')->disableOriginalConstructor()->getMock();
-        $this->imageCollection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
-        $this->shortUrlCollection = $this->getMockBuilder('MongoCollection')->disableOriginalConstructor()->getMock();
+        $this->mongoClient = $this->createMock('MongoClient');
+        $this->imageCollection = $this->createMock('MongoCollection');
+        $this->shortUrlCollection = $this->createMock('MongoCollection');
         $this->driver = new MongoDB([], $this->mongoClient, $this->imageCollection, $this->shortUrlCollection);
     }
 
@@ -95,7 +95,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                               ->method('insert')
                               ->will($this->throwException(new MongoException()));
 
-        $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Model\Image'));
+        $this->driver->insertImage('key', 'identifier', $this->createMock('Imbo\Model\Image'));
     }
 
     /**
@@ -112,7 +112,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                               ->method('update')
                               ->will($this->throwException(new MongoException()));
 
-        $this->driver->insertImage('key', 'identifier', $this->getMock('Imbo\Model\Image'));
+        $this->driver->insertImage('key', 'identifier', $this->createMock('Imbo\Model\Image'));
     }
 
     /**
@@ -186,7 +186,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                               ->method('find')
                               ->will($this->throwException(new MongoException()));
 
-        $this->driver->getImages(['key'], $this->getMock('Imbo\Resource\Images\Query'), $this->getMock('Imbo\Model\Images'));
+        $this->driver->getImages(['key'], $this->createMock('Imbo\Resource\Images\Query'), $this->createMock('Imbo\Model\Images'));
     }
 
     /**
@@ -200,7 +200,7 @@ class MongoDBTest extends \PHPUnit_Framework_TestCase {
                               ->method('findOne')
                               ->will($this->throwException(new MongoException()));
 
-        $this->driver->load('key', 'identifier', $this->getMock('Imbo\Model\Image'));
+        $this->driver->load('key', 'identifier', $this->createMock('Imbo\Model\Image'));
     }
 
     /**

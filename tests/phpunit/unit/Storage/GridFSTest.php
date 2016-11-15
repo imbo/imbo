@@ -60,8 +60,8 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
             $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
         }
 
-        $this->grid = $this->getMockBuilder('MongoGridFS')->disableOriginalConstructor()->getMock();
-        $this->mongoClient = $this->getMockBuilder('MongoClient')->disableOriginalConstructor()->getMock();
+        $this->grid = $this->createMock('MongoGridFS');
+        $this->mongoClient = $this->createMock('MongoClient');
         $this->driver = new GridFS([], $this->mongoClient, $this->grid);
     }
 
@@ -81,7 +81,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     public function testStore() {
         $data = 'some content';
 
-        $cursor = $this->getMockBuilder('MongoGridFSCursor')->disableOriginalConstructor()->getMock();
+        $cursor = $this->createMock('MongoGridFSCursor');
         $cursor->expects($this->once())->method('count')->will($this->returnValue(0));
 
         $this->grid->expects($this->at(0))
@@ -103,7 +103,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Storage\GridFS::imageExists
      */
     public function testDeleteFileThatDoesNotExist() {
-        $cursor = $this->getMockBuilder('MongoGridFSCursor')->disableOriginalConstructor()->getMock();
+        $cursor = $this->createMock('MongoGridFSCursor');
         $cursor->expects($this->once())->method('count')->will($this->returnValue(0));
 
         $this->grid->expects($this->once())->method('find')->will($this->returnValue($cursor));
@@ -116,9 +116,9 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Storage\GridFS::imageExists
      */
     public function testDeleteFile() {
-        $file = $this->getMockBuilder('MongoGridFSFile')->disableOriginalConstructor()->getMock();
+        $file = $this->createMock('MongoGridFSFile');
 
-        $cursor = $this->getMockBuilder('MongoGridFSCursor')->disableOriginalConstructor()->getMock();
+        $cursor = $this->createMock('MongoGridFSCursor');
         $cursor->expects($this->once())->method('count')->will($this->returnValue(1));
         $cursor->expects($this->once())->method('getNext')->will($this->returnValue($file));
 
@@ -135,7 +135,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Storage\GridFS::imageExists
      */
     public function testGetImageThatDoesNotExist() {
-        $cursor = $this->getMockBuilder('MongoGridFSCursor')->disableOriginalConstructor()->getMock();
+        $cursor = $this->createMock('MongoGridFSCursor');
         $cursor->expects($this->once())->method('count')->will($this->returnValue(0));
 
         $this->grid->expects($this->once())->method('find')->will($this->returnValue($cursor));
@@ -150,10 +150,10 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     public function testGetImage() {
         $data = 'file contents';
 
-        $file = $this->getMockBuilder('MongoGridFSFile')->disableOriginalConstructor()->getMock();
+        $file = $this->createMock('MongoGridFSFile');
         $file->expects($this->once())->method('getBytes')->will($this->returnValue($data));
 
-        $cursor = $this->getMockBuilder('MongoGridFSCursor')->disableOriginalConstructor()->getMock();
+        $cursor = $this->createMock('MongoGridFSCursor');
         $cursor->expects($this->once())->method('count')->will($this->returnValue(1));
         $cursor->expects($this->once())->method('getNext')->will($this->returnValue($file));
 
@@ -169,7 +169,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Storage\GridFS::imageExists
      */
     public function testGetLastModifiedWhenImageDoesNotExist() {
-        $cursor = $this->getMockBuilder('MongoGridFSCursor')->disableOriginalConstructor()->getMock();
+        $cursor = $this->createMock('MongoGridFSCursor');
         $cursor->expects($this->once())->method('count')->will($this->returnValue(0));
 
         $this->grid->expects($this->once())->method('find')->will($this->returnValue($cursor));
@@ -184,7 +184,7 @@ class GridFSTest extends \PHPUnit_Framework_TestCase {
     public function testGetLastModified() {
         $file = new TestFile();
 
-        $cursor = $this->getMockBuilder('MongoGridFSCursor')->disableOriginalConstructor()->getMock();
+        $cursor = $this->createMock('MongoGridFSCursor');
         $cursor->expects($this->once())->method('count')->will($this->returnValue(1));
         $cursor->expects($this->once())->method('getNext')->will($this->returnValue($file));
 

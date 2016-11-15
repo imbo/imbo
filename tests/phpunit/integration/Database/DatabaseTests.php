@@ -107,7 +107,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $this->getImage()));
         $this->assertTrue($this->adapter->deleteImage($user, $imageIdentifier));
 
-        $this->adapter->load($user, $imageIdentifier, $this->getMock('Imbo\Model\Image'));
+        $this->adapter->load($user, $imageIdentifier, $this->createMock('Imbo\Model\Image'));
     }
 
     /**
@@ -125,7 +125,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Image not found
      */
     public function testLoadImageThatDoesNotExist() {
-        $this->adapter->load('user', 'id', $this->getMock('Imbo\Model\Image'));
+        $this->adapter->load('user', 'id', $this->createMock('Imbo\Model\Image'));
     }
 
     /**
@@ -367,7 +367,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
 
         // Empty query
         $query = new Query();
-        $model = $this->getMock('Imbo\Model\Images');
+        $model = $this->createMock('Imbo\Model\Images');
         $model->expects($this->once())->method('setHits')->with(6);
         $images = $this->adapter->getImages(['user'], $query, $model);
         $this->assertCount(6, $images);
@@ -413,7 +413,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $query = new Query();
         $query->returnMetadata(true);
 
-        $images = $this->adapter->getImages(['user', 'user2'], $query, $this->getMock('Imbo\Model\Images'));
+        $images = $this->adapter->getImages(['user', 'user2'], $query, $this->createMock('Imbo\Model\Images'));
         $this->assertCount(6, $images, 'Incorrect length. Expected 6, got ' . count($images));
 
         foreach ($images as $image) {
@@ -456,7 +456,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     public function testGetImagesReturnsImagesWithDateTimeInstances() {
         $this->insertImages();
 
-        $images = $this->adapter->getImages(['user'], new Query(), $this->getMock('Imbo\Model\Images'));
+        $images = $this->adapter->getImages(['user'], new Query(), $this->createMock('Imbo\Model\Images'));
 
         foreach (['added', 'updated'] as $dateField) {
             foreach ($images as $image) {
@@ -512,7 +512,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
             $query->limit($limit);
         }
 
-        $model = $this->getMock('Imbo\Model\Images');
+        $model = $this->createMock('Imbo\Model\Images');
         $model->expects($this->once())->method('setHits')->with(6);
 
         $images = $this->adapter->getImages(['user'], $query, $model);
@@ -844,7 +844,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
             $query->sort($sort);
         }
 
-        $images = $this->adapter->getImages(['user'], $query, $this->getMock('Imbo\Model\Images'));
+        $images = $this->adapter->getImages(['user'], $query, $this->createMock('Imbo\Model\Images'));
 
         foreach ($images as $i => $image) {
             $this->assertSame($values[$i], $image[$field]);

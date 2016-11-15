@@ -139,22 +139,22 @@ class ExifMetadataTest extends ListenerTests {
         $imageIdentifier = 'imageIdentifier';
         $blob = 'blob';
 
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
         $image->expects($this->once())->method('getBlob')->will($this->returnValue($blob));
 
-        $imagick = $this->getMock('Imagick');
+        $imagick = $this->createMock('Imagick');
         $imagick->expects($this->once())->method('readImageBlob')->will($this->returnValue($blob));
         $imagick->expects($this->once())->method('getImageProperties')->will($this->returnValue($data));
 
-        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request = $this->createMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getUser')->will($this->returnValue($user));
         $request->expects($this->any())->method('getImage')->will($this->returnValue($image));
 
-        $database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('updateMetadata')->with($user, $imageIdentifier, $expectedData);
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->exactly(2))->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
 
@@ -171,19 +171,19 @@ class ExifMetadataTest extends ListenerTests {
      * @expectedExceptionCode 500
      */
     public function testWillDeleteImageWhenUpdatingMetadataFails() {
-        $databaseException = $this->getMock('Imbo\Exception\DatabaseException');
-        $database = $this->getMock('Imbo\Database\DatabaseInterface');
+        $databaseException = $this->createMock('Imbo\Exception\DatabaseException');
+        $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('updateMetadata')->with('user', 'imageidentifier', [])->will($this->throwException($databaseException));
         $database->expects($this->once())->method('deleteImage')->with('user', 'imageidentifier');
 
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageidentifier'));
 
-        $request = $this->getMock('Imbo\Http\Request\Request');
+        $request = $this->createMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
 

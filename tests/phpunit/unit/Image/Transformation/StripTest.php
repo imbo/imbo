@@ -27,10 +27,10 @@ class StripTest extends \PHPUnit_Framework_TestCase {
     public function testThrowsCorrectExceptionWhenAnErrorOccurs() {
         $imagickException = new ImagickException('error');
 
-        $imagick = $this->getMock('Imagick');
+        $imagick = $this->createMock('Imagick');
         $imagick->expects($this->once())->method('stripImage')->will($this->throwException($imagickException));
 
         $transformation = new Strip();
-        $transformation->setImagick($imagick)->transform($this->getMock('Imbo\EventManager\Event'));
+        $transformation->setImagick($imagick)->transform($this->createMock('Imbo\EventManager\Event'));
     }
 }

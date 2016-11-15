@@ -38,10 +38,10 @@ class IndexTest extends ResourceTests {
      * Set up the resource
      */
     public function setUp() {
-        $this->request = $this->getMock('Imbo\Http\Request\Request');
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
-        $this->responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
-        $this->event = $this->getMock('Imbo\EventManager\Event');
+        $this->request = $this->createMock('Imbo\Http\Request\Request');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
+        $this->responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
 
@@ -69,7 +69,7 @@ class IndexTest extends ResourceTests {
         $this->response->expects($this->once())->method('setPrivate');
         $this->event->expects($this->any())->method('getConfig')->will($this->returnValue(['indexRedirect' => null]));
 
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
         $this->response->headers = $responseHeaders;
@@ -81,7 +81,7 @@ class IndexTest extends ResourceTests {
         $url = 'http://imbo.io';
         $this->event->expects($this->any())->method('getConfig')->will($this->returnValue(['indexRedirect' => $url]));
 
-        $responseHeaders = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $responseHeaders->expects($this->once())->method('set')->with('Location', $url);
 
         $this->response->headers = $responseHeaders;

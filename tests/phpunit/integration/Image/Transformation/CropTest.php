@@ -45,7 +45,7 @@ class CropTest extends TransformationTests {
      * @dataProvider getCropParams
      */
     public function testCanCropImages($params, $endWidth, $endHeight, $transformed) {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->any())->method('getWidth')->will($this->returnValue(665));
         $image->expects($this->any())->method('getHeight')->will($this->returnValue(463));
 
@@ -55,7 +55,7 @@ class CropTest extends TransformationTests {
             $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
         }
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
         $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
 
