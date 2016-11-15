@@ -12,7 +12,8 @@ namespace ImboUnitTest\Storage;
 
 use Imbo\Storage\Filesystem,
     org\bovigo\vfs\vfsStream,
-    org\bovigo\vfs\vfsStreamWrapper;
+    org\bovigo\vfs\vfsStreamWrapper,
+    Imbo\Exception\ConfigurationException;
 
 /**
  * @covers Imbo\Storage\Filesystem
@@ -255,5 +256,12 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
 
         $driver = new Filesystem(['dataDir' => vfsStream::url('dir')]);
         $this->assertTrue($driver->getStatus());
+    }
+
+    /**
+     * @expectedException Imbo\Exception\ConfigurationException
+     */
+    public function testMissingDataDir() {
+        new Filesystem([]);
     }
 }
