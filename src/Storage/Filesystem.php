@@ -44,6 +44,12 @@ class Filesystem implements StorageInterface {
      */
     public function __construct(array $params) {
         $this->params = array_merge($this->params, $params);
+
+        if (empty($this->params['dataDir'])) {
+            throw new Exception\ConfigurationException(
+                'Missing required parameter dataDir in the Filesystem storage driver.'
+            );
+        }
     }
 
     /**
