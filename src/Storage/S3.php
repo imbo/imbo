@@ -11,6 +11,8 @@
 namespace Imbo\Storage;
 
 use Imbo\Exception\StorageException,
+    Imbo\Helpers\Parameters,
+    Imbo\Exception\ConfigurationException,
     Aws\S3\S3Client,
     Aws\S3\Exception\S3Exception,
     DateTime,
@@ -73,6 +75,18 @@ class S3 implements StorageInterface {
 
         if ($client !== null) {
             $this->client = $client;
+        } else {
+            $missingFields = Parameters::getEmptyOrMissingParamFields(
+                ['key', 'secret', 'bucket', 'region'],
+                $this->params
+            );
+
+            if ($missingFields && !$client) {
+                throw new ConfigurationException(
+                    'Missing required configuration parameters in ' . __CLASS__ . ': ' .
+                    join(', ', $missingFields)
+                );
+            }
         }
     }
 
