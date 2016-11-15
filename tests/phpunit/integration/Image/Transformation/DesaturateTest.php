@@ -30,15 +30,15 @@ class DesaturateTest extends TransformationTests {
      * @covers Imbo\Image\Transformation\Desaturate::transform
      */
     public function testCanDesaturateImages() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
+
+        $event = $this->createMock('Imbo\EventManager\Event');
+        $event->expects($this->once())->method('getArgument')->with('image')->will($this->returnValue($image));
 
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
-        $this->getTransformation()
-             ->setImagick($imagick)
-             ->setImage($image)
-             ->transform([]);
+        $this->getTransformation()->setImagick($imagick)->transform($event);
     }
 }

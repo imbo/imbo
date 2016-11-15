@@ -1,5 +1,4 @@
-<?php
-/**
+<?php /**
  * This file is part of the Imbo package
  *
  * (c) Christer Edvartsen <cogo@starzinger.net>

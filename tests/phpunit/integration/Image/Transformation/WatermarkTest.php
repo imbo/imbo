@@ -264,12 +264,6 @@ class WatermarkTest extends TransformationTests {
             $expectedWatermark = $params['img'];
         }
 
-        $watermarkFixture = 'black.png';
-
-        if (isset($params['watermarkFixture'])) {
-            $watermarkFixture = $params['watermarkFixture'];
-        }
-
         $storage = $this->createMock('Imbo\Storage\StorageInterface');
         $storage->expects($this->once())
                 ->method('getImage')
