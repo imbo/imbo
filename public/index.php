@@ -22,5 +22,11 @@ try {
     $application->run($config);
 } catch (BaseException $e) {
     header('HTTP/1.1 500 Internal Server Error');
-    trigger_error('Uncaught Exception with message: ' . $e->getMessage(), E_USER_ERROR);
+
+    // check if we should rethrow the exception and let PHP generate a fatal exception error with a proper stack trace
+    if (!empty($config['rethrowFinalException'])) {
+        throw $e;
+    } else {
+        trigger_error('Uncaught Exception with message: ' . $e->getMessage(), E_USER_ERROR);
+    }
 }
