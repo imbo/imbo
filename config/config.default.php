@@ -88,6 +88,17 @@ $config = [
     },
 
     /**
+     * Keep errors as exceptions
+     *
+     * By default Imbo will catch any exceptions thrown internally and instead trigger a
+     * user error with the exception message. If you set this option to `true`, Imbo will
+     * instead rethrow the generated exception, giving you a full stack trace in your PHP
+     * error log. This should not be enabled in production, unless you have configured
+     * PHP in the recommended way with a separate error_log and display_errors=Off.
+     */
+    'rethrowFinalException' => false,
+
+    /**
      * Whether to content negotiate images or not. If set to true, Imbo will try to find a
      * suitable image format based on the Accept-header received. If set to false, it will
      * deliver the image in the format it was originally added as. Note that this does not

@@ -704,6 +704,26 @@ If what you want is for images to be delivered in the format they were uploaded 
 
 You are still able to convert between formats by specifying an extension when requesting the image (`.jpg`, `.png`, `.gif` etc).
 
+.. _configuration-rethrow-exceptions:
+
+Rethrow any non-handled general exceptions - ``rethrowFinalException``
+----------------------------------------------------------------------
+
+If an exception occurs internally while Imbo is processing a request, the exception will be caught by the main application entry point and an appropriate error will be generated. This does however hide implementation details that can be useful if you're doing actual development on Imbo. This value is ``false`` by default.
+
+Setting this value to ``true`` will make Imbo rethrow the exception instead of swallowing the original exception and triggering an error. In the latter case the actual stack trace will be lost, and seeing which part of the code that actually failed will be harder in a log file.
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'rethrowFinalException' => true,
+
+        // ...
+    ];
+
 .. _configuration-trusted-proxies:
 
 Trusted proxies - ``trustedProxies``
