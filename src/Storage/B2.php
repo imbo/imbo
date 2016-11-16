@@ -79,7 +79,7 @@ class B2 implements StorageInterface {
                 $this->params
             );
 
-            if ($missingFields && !$client) {
+            if ($missingFields) {
                 throw new ConfigurationException(
                     'Missing required configuration parameters in ' . __CLASS__ . ': ' .
                     join(', ', $missingFields)
