@@ -37,6 +37,7 @@ class B2Test extends \PHPUnit_Framework_TestCase {
      * Test that we _do_ get an exception with required parameters present
      *
      * @expectedException Imbo\Exception\ConfigurationException
+     * @expectedExceptionMessageRegExp /: accountId, bucketId/
      */
     public function testConstructorMissingRequiredParameters() {
         $b2 = new B2([
@@ -67,6 +68,9 @@ class B2Test extends \PHPUnit_Framework_TestCase {
                 new B2($local);
             } catch (ConfigurationException $e) {
                 $exception = true;
+
+                // test that the exception message ends with the field missing
+                $this->assertStringEndsWith(': ' . $param, $e->getMessage());
             } finally {
                 $this->assertTrue($exception);
             }

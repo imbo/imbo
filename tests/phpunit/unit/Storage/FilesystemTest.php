@@ -260,6 +260,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException Imbo\Exception\ConfigurationException
+     * @expectedExceptionMessageRegExp /Missing required parameter dataDir/
      */
     public function testMissingDataDir() {
         new Filesystem([]);
