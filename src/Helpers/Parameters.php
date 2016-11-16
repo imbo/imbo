@@ -17,6 +17,11 @@ namespace Imbo\Helpers;
 * @package Core\Helpers
 */
 class Parameters {
+    /**
+     * @param $fields array List of fields to ensure is present in $params
+     * @param $params array Associative array with field => value pairs to check for fields being present
+     * @return array
+     */
     public static function getEmptyOrMissingParamFields($fields, $params) {
         $missing = [];
 
