@@ -14,7 +14,9 @@ use Behat\Behat\Context\BehatContext,
     Behat\Gherkin\Node\PyStringNode,
     Guzzle\Http\Client,
     Guzzle\Http\Message\Request,
-    Guzzle\Http\Message\Response;
+    Guzzle\Http\Message\Response,
+    SebastianBergmann\CodeCoverage,
+    SebastianBergmann\CodeCoverage\Report\Html\Facade as HtmlReport;
 
 // Require PHPUnit assertions manually since we're using it outside of PHPUnit
 require __DIR__ . '/../../../vendor/phpunit/phpunit/src/Framework/Assert/Functions.php';
@@ -197,16 +199,16 @@ class RESTContext extends BehatContext {
 
             $data = unserialize((string) $response->getBody());
 
-            $filter = new PHP_CodeCoverage_Filter();
+            $filter = new CodeCoverage\Filter();
 
             foreach ($parameters['whitelist'] as $dir) {
                 $filter->addDirectoryToWhitelist($dir);
             }
 
-            $coverage = new PHP_CodeCoverage(null, $filter);
+            $coverage = new CodeCoverage\CodeCoverage(null, $filter);
             $coverage->append($data, 'behat-suite');
 
-            $report = new PHP_CodeCoverage_Report_HTML();
+            $report = new HtmlReport();
             $report->process($coverage, $parameters['coveragePath']);
         }
     }
