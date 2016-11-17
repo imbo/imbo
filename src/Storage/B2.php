@@ -10,12 +10,14 @@
 
 namespace Imbo\Storage;
 
+use Imbo\Exception\ConfigurationException;
 use Imbo\Exception\StorageException,
     Imbo\Exception\InvalidArgumentException,
     ChrisWhite\B2\Client,
     ChrisWhite\B2\Exceptions\NotFoundException,
     DateTime,
-    DateTimeZone;
+    DateTimeZone,
+    Imbo\Helpers\Parameters;
 
 /**
  * Backblaze B2 Cloud Storage adapter
@@ -71,6 +73,18 @@ class B2 implements StorageInterface {
 
         if ($client !== null) {
             $this->client = $client;
+        } else {
+            $missingFields = Parameters::getEmptyOrMissingParamFields(
+                ['accountId', 'applicationKey', 'bucketId', 'bucket'],
+                $this->params
+            );
+
+            if ($missingFields) {
+                throw new ConfigurationException(
+                    'Missing required configuration parameters in ' . __CLASS__ . ': ' .
+                    join(', ', $missingFields)
+                );
+            }
         }
     }
 
@@ -175,10 +189,6 @@ class B2 implements StorageInterface {
     protected function getClient() {
         if ($this->client === null) {
             $this->client = new Client($this->getParam('accountId'), $this->getParam('applicationKey'));
-        }
-
-        if (!$this->getParam('bucketId') || !$this->getParam('bucket')) {
-            throw new InvalidArgumentException('B2: Missing required bucket parameters. Both bucket and bucketId must be provided.', 500);
         }
 
         return $this->client;
