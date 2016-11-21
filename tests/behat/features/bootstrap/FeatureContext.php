@@ -41,7 +41,7 @@ class FeatureContext extends RESTContext {
     private $privateKey;
 
     /**
-     * Holds the configuration file specified in the current feature
+     * Holds the name of the configuration file specified in the current feature
      *
      * @var string
      */
@@ -130,22 +130,44 @@ class FeatureContext extends RESTContext {
     }
 
     /**
-     * @Given /^the (storage|database) is down$/
+     * Set a request header that will have Imbo load a custom configuration file
+     *
+     * @Given /^Imbo uses the "([^"]*)" configuration$/
+     *
+     * @param string $configFile Custom configuration file to use for the next request (file must
+     *                           reside in the tests/behat/imbo-configs directory)
+     * @throws InvalidArgumentException
      */
-    public function forceAdapterFailure($adapter) {
-        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($adapter) {
-            $event['request']->getQuery()->set($adapter . 'Down', 1);
-        });
+    public function setImboConfigHeader($configFile) {
+        $dir = __DIR__ . '/../../imbo-configs';
+
+        if (!is_file($dir . '/' . $configFile)) {
+            throw new InvalidArgumentException(sprintf(
+                'Configuration file "%s" does not exist in the "%s" directory.',
+                $configFile,
+                $dir
+            ));
+        }
+
+        // $this->currentConfig = $configFile;
+        $this->givenTheRequestHeaderIs('X-Imbo-Test-Config-File', $configFile);
     }
 
     /**
-     * @Given /^the database and the storage is down$/
+     * Send a query parameter with the next requesting, informing Imbo which adapter to take down
+     *
+     * This feature is implemented in the status.php custom configuration file.
+     *
+     * @Given /^the (storage|database) is down$/
+     *
+     * @param string $adapter Which adapter to take down
      */
-    public function forceBothAdapterFailure() {
-        return [
-            new Given('the storage is down'),
-            new Given('the database is down'),
-        ];
+    public function forceAdapterFailure($adapter) {
+        if ($adapter === 'storage') {
+            $this->givenTheRequestHeaderIs('X-Imbo-Status-Storage-Failure', 1);
+        } else {
+            $this->givenTheRequestHeaderIs('X-Imbo-Status-Database-Failure', 1);
+        }
     }
 
     /**
@@ -548,14 +570,6 @@ class FeatureContext extends RESTContext {
     }
 
     /**
-     * @Given /^Imbo uses the "([^"]*)" configuration$/
-     */
-    public function setImboConfigHeader($config) {
-        $this->currentConfig = $config;
-        $this->addHeaderToNextRequest('X-Imbo-Test-Config', $config);
-    }
-
-    /**
      * @Given /^the checksum of the image is "([^"]*)"$/
      */
     public function assertImageChecksum($checksum) {
@@ -625,7 +639,7 @@ class FeatureContext extends RESTContext {
      */
     public function aclRuleWithIdShouldNotExist($publicKey, $aclId) {
         if ($this->currentConfig) {
-            $this->addHeaderToNextRequest('X-Imbo-Test-Config', $this->currentConfig);
+            $this->addHeaderToNextRequest('X-Imbo-Test-Config-File', $this->currentConfig);
         }
 
         $url = '/keys/' . $publicKey . '/access/' . $aclId;
@@ -642,7 +656,7 @@ class FeatureContext extends RESTContext {
      */
     public function publicKeyShouldNotExist($publicKey) {
         if ($this->currentConfig) {
-            $this->addHeaderToNextRequest('X-Imbo-Test-Config', $this->currentConfig);
+            $this->addHeaderToNextRequest('X-Imbo-Test-Config-File', $this->currentConfig);
         }
 
         $url = '/keys/' . $publicKey;
