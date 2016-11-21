@@ -1,3 +1,5 @@
+@resources
+
 Feature: Imbo provides a stats endpoint
     In order to see Imbo stats
     As an HTTP Client
