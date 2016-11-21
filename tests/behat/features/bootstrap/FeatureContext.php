@@ -8,14 +8,9 @@
  * distributed with this source code.
  */
 
-use Behat\Behat\Event\FeatureEvent,
-    Behat\Behat\Event\SuiteEvent,
-    Behat\Behat\Exception\PendingException,
-    Behat\Gherkin\Node\PyStringNode,
-    Behat\Behat\Context\Step\Given;
-
-// Use the RESTContext
-require 'RESTContext.php';
+use Behat\Behat\Hook\Scope\BeforeFeatureScope;
+use Behat\Gherkin\Node\PyStringNode;
+use Behat\Behat\Context\Step\Given;
 
 /**
  * Imbo Context
@@ -97,8 +92,9 @@ class FeatureContext extends RESTContext {
 
     /**
      * @BeforeFeature
+     * @param BeforeFeatureScope $scope
      */
-    public static function prepare(FeatureEvent $event) {
+    public static function prepare(BeforeFeatureScope $scope) {
         // Drop mongo test collection which stores information regarding images, and the images
         // themselves
         $mongo = new MongoClient();
