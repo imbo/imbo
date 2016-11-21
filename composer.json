@@ -83,7 +83,7 @@
       "mkdir build/pdepend"
     ],
     "test-phpunit": "vendor/bin/phpunit --verbose -c tests/phpunit",
-    "test-behat": "vendor/bin/behat --strict --config tests/behat/behat.yml",
+    "test-behat": "vendor/bin/behat --strict",
     "test": [
       "@test-phpunit",
       "@test-behat"
