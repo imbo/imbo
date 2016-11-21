@@ -8,34 +8,33 @@
  * distributed with this source code.
  */
 
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+
+use PHPUnit_Framework_MockObject_Generator as Generator;
+use PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount as Any;
+use PHPUnit_Framework_MockObject_Stub_Return as ReturnValue;
+
 /**
  * Set a database and storage adapter that has some behaviour determined via request headers
  */
 return [
-    'database' => function() {
-        $adapter = (new PHPUnit_Framework_MockObject_Generator())->getMock(
-            'Imbo\Database\MongoDB',
-            ['getStatus'],
-            [['databaseName' => 'imbo_testing']]
-        );
-
-        $adapter->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount())
-                ->method('getStatus')
-                ->will(new PHPUnit_Framework_MockObject_Stub_Return(isset($_GET['databaseDown']) ? false : true));
+    'database' => function(Request $request, Response $response) {
+        $adapter = (new Generator())->getMock('Imbo\Database\DatabaseInterface');
+        $adapter
+            ->expects(new Any())
+            ->method('getStatus')
+            ->will(new ReturnValue(!isset($_SERVER['HTTP_X_IMBO_STATUS_DATABASE_FAILURE'])));
 
         return $adapter;
     },
 
-    'storage' => function() {
-        $adapter = (new PHPUnit_Framework_MockObject_Generator())->getMock(
-            'Imbo\Storage\GridFS',
-            ['getStatus'],
-            [['databaseName' => 'imbo_testing']]
-        );
-
-        $adapter->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount())
-                ->method('getStatus')
-                ->will(new PHPUnit_Framework_MockObject_Stub_Return(isset($_GET['storageDown']) ? false : true));
+    'storage' => function(Request $request, Response $response) {
+        $adapter = (new Generator())->getMock('Imbo\Storage\StorageInterface');
+        $adapter
+            ->expects(new Any())
+            ->method('getStatus')
+            ->will(new ReturnValue(!isset($_SERVER['HTTP_X_IMBO_STATUS_STORAGE_FAILURE'])));
 
         return $adapter;
     },
