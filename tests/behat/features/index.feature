@@ -1,3 +1,5 @@
+@resources
+
 Feature: Imbo provides an index endpoint
     In order to see basic Imbo information
     As an HTTP Client
