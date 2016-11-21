@@ -23,7 +23,7 @@ require 'RESTContext.php';
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Functional tests
  */
-class ImboContext extends RESTContext {
+class FeatureContext extends RESTContext {
     /**
      * The user used by the client
      *

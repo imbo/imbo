@@ -1,7 +1,10 @@
 default:
+    autoload:
+        '': %paths.base%/tests/behat/features/bootstrap
     suites:
         default:
-            paths: [%paths.base%/tests/features]
+            paths: [%paths.base%/tests/behat/features]
+
     extensions:
         Imbo\BehatApiExtension:
             base_uri: http://localhost:8080
