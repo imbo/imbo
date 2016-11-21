@@ -9,6 +9,7 @@
  */
 
 use Imbo\BehatApiExtension\Context\ApiContext;
+use Assert\Assertion;
 
 /**
  * REST context for Behat tests
@@ -17,4 +18,17 @@ use Imbo\BehatApiExtension\Context\ApiContext;
  * @package Test suite\Functional tests
  */
 class RESTContext extends ApiContext {
+    /**
+     * Assert HTTP reason phrase
+     *
+     * @param string $phrase Expected HTTP reason phrase
+     * @Then the response reason phrase is :phrase
+     */
+    public function assertResponseReasonPhrase($phrase) {
+        Assertion::same($phrase, $actual = $this->response->getReasonPhrase(), sprintf(
+            'Invalid HTTP reason phrase, expected "%s", got "%s"',
+            $phrase,
+            $actual
+        ));
+    }
 }
