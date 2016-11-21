@@ -39,6 +39,7 @@ before_script:
   - phpenv config-rm xdebug.ini
   - composer self-update
   - composer install --prefer-dist
+  - composer start-httpd-for-behat-tests
 
 script:
   - ./vendor/bin/phpunit --verbose -c tests/phpunit/phpunit.xml.travis
