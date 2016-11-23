@@ -112,7 +112,13 @@ class Watermark extends Transformation implements ListenerInterface {
             $watermark = new Imagick();
             $watermark->readImageBlob($watermarkData);
             $watermarkSize = $watermark->getImageGeometry();
-            $watermark->setImageOpacity($opacity);
+
+            // we can't use ->setImageOpacity here as it also affects the alpha channel, generating a "ghost" area
+            // around any masked area. By using evaluateImage we multiply existing alpha values instead, allowing us
+            // to retain any existing transparency.
+            if ($opacity < 1) {
+                $watermark->evaluateImage(Imagick::EVALUATE_MULTIPLY, $opacity, Imagick::CHANNEL_ALPHA);
+            }
         } catch (StorageException $e) {
             if ($e->getCode() == 404) {
                 throw new TransformationException('Watermark image not found', 400);
