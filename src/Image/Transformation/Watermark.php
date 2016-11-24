@@ -121,6 +121,7 @@ class Watermark extends Transformation implements ListenerInterface {
                 if (!$watermark->getImageAlphaChannel()) {
                     $watermark->setImageAlphaChannel(Imagick::ALPHACHANNEL_ACTIVATE);
                 }
+
                 $watermark->evaluateImage(Imagick::EVALUATE_MULTIPLY, $opacity, Imagick::CHANNEL_ALPHA);
             }
         } catch (StorageException $e) {
