@@ -14,6 +14,7 @@ use Imbo\Exception\StorageException,
     Imbo\Exception\TransformationException,
     Imbo\EventListener\ListenerInterface,
     Imbo\EventManager\EventInterface,
+    Imbo\Helpers\Imagick as ImagickHelper,
     Imagick,
     ImagickException;
 
@@ -119,7 +120,18 @@ class Watermark extends Transformation implements ListenerInterface {
             if ($opacity < 1) {
                 // if there's no alpha channel already, we have to enable it before calculating transparency
                 if (!$watermark->getImageAlphaChannel()) {
-                    $watermark->setImageAlphaChannel(Imagick::ALPHACHANNEL_ACTIVATE);
+                    try {
+                        $watermark->setImageAlphaChannel(Imagick::ALPHACHANNEL_ACTIVATE);
+                    } catch (ImagickException $e) {
+                        // there's a bug in Imagemagick < 6.8.0-4 which throws an exception even if the value was set
+                        // https://imagemagick.org/discourse-server/viewtopic.php?t=22152
+                        $version = ImagickHelper::getInstalledVersion();
+
+                        if (version_compare($version, '6.8.0-4', '>=')) {
+                            // rethrow exception if we're on 6.8.0-4 or newer.
+                            throw $e;
+                        }
+                    }
                 }
 
                 $watermark->evaluateImage(Imagick::EVALUATE_MULTIPLY, $opacity, Imagick::CHANNEL_ALPHA);
