@@ -117,6 +117,10 @@ class Watermark extends Transformation implements ListenerInterface {
             // around any masked area. By using evaluateImage we multiply existing alpha values instead, allowing us
             // to retain any existing transparency.
             if ($opacity < 1) {
+                // if there's no alpha channel already, we have to enable it before calculating transparency
+                if (!$watermark->getImageAlphaChannel()) {
+                    $watermark->setImageAlphaChannel(Imagick::ALPHACHANNEL_ACTIVATE);
+                }
                 $watermark->evaluateImage(Imagick::EVALUATE_MULTIPLY, $opacity, Imagick::CHANNEL_ALPHA);
             }
         } catch (StorageException $e) {
