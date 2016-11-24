@@ -230,6 +230,16 @@ class WatermarkTest extends TransformationTests {
                     'top mid watermark' => ['x' => 50, 'y' => 50, 'colors' => [153, 153, 153]], // 255*0.6=153
                 ],
             ],
+            'jpg with opacity' => [
+                [
+                    'opacity' => 40,
+                    'watermarkFixture' => 'black.jpg',
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [153, 153, 153]], // 255*0.6=153
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [255, 255, 255]],
+                ],
+            ],
         ];
     }
 
