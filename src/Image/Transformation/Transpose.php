@@ -40,7 +40,10 @@ class Transpose extends Transformation implements ListenerInterface {
     public function transform(EventInterface $event) {
         try {
             $this->imagick->transposeImage();
-            $event->getArgument('image')->hasBeenTransformed(true);
+            $event->getArgument('image')
+                ->setHeight($this->imagick->getImageHeight())
+                ->setWidth($this->imagick->getImageWidth())
+                ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
