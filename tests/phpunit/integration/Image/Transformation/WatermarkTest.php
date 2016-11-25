@@ -210,7 +210,36 @@ class WatermarkTest extends TransformationTests {
                     'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [153, 153, 153]], // 255*0.6=153
                     'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [255, 255, 255]],
                 ]
-            ]
+            ],
+            'alpha' => [
+                [
+                    'watermarkFixture' => 'black-alpha.png',
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'top mid watermark' => ['x' => 50, 'y' => 50, 'colors' => [0, 0, 0]],
+                ],
+            ],
+            'alpha with opacity' => [
+                [
+                    'opacity' => 40,
+                    'watermarkFixture' => 'black-alpha.png',
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [255, 255, 255]],
+                    'top mid watermark' => ['x' => 50, 'y' => 50, 'colors' => [153, 153, 153]], // 255*0.6=153
+                ],
+            ],
+            'jpg with opacity' => [
+                [
+                    'opacity' => 40,
+                    'watermarkFixture' => 'black.jpg',
+                ],
+                [
+                    'top left corner' => ['x' => 0, 'y' => 0, 'colors' => [153, 153, 153]], // 255*0.6=153
+                    'top right corner' => ['x' => $this->width - 1, 'y' => 0, 'colors' => [255, 255, 255]],
+                ],
+            ],
         ];
     }
 
@@ -235,11 +264,17 @@ class WatermarkTest extends TransformationTests {
             $expectedWatermark = $params['img'];
         }
 
+        $watermarkFixture = 'black.png';
+
+        if (isset($params['watermarkFixture'])) {
+            $watermarkFixture = $params['watermarkFixture'];
+        }
+
         $storage = $this->createMock('Imbo\Storage\StorageInterface');
         $storage->expects($this->once())
                 ->method('getImage')
                 ->with('someUser', $expectedWatermark)
-                ->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/black.png')));
+                ->will($this->returnValue(file_get_contents(FIXTURES_DIR . '/' . $watermarkFixture)));
 
         $request = $this->createMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getUser')->will($this->returnValue('someUser'));
