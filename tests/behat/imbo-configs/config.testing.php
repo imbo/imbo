@@ -8,8 +8,10 @@
  * distributed with this source code.
  */
 
-use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
-    Imbo\Resource;
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
+use Imbo\Resource;
+use Imbo\Database\MongoDB;
+use Imbo\Storage\GridFS;
 
 // Default config for testing
 $testConfig = [
@@ -43,13 +45,13 @@ $testConfig = [
     },
 
     'database' => function() {
-        return new Imbo\Database\MongoDB([
+        return new MongoDB([
             'databaseName' => 'imbo_testing',
         ]);
     },
 
     'storage' => function() {
-        return new Imbo\Storage\GridFS([
+        return new GridFS([
             'databaseName' => 'imbo_testing',
         ]);
     },
