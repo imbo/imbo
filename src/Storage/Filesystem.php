@@ -75,12 +75,15 @@ class Filesystem implements StorageInterface {
 
         $imagePath = $imageDir . '/' . $imageIdentifier;
 
-        $bytesWritten = file_put_contents($imagePath, $imageData);
+        // write the file to .tmp, so we can do an atomic rename later to avoid possibly serving partly written files
+        $bytesWritten = file_put_contents($imagePath . '.tmp', $imageData);
 
         // if write failed or 0 bytes were written (0 byte input == fail), or we wrote less than expected
         if (!$bytesWritten || ($bytesWritten < strlen($imageData))) {
             throw new StorageException('Failed writing file (disk full? zero bytes input?) to disk: ' . $imagePath, 507);
         }
+
+        rename($imagePath . '.tmp', $imagePath);
 
         return true;
     }
