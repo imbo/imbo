@@ -31,4 +31,33 @@ class RESTContext extends ApiContext {
             $actual
         ));
     }
+
+    /**
+     * Set the request body to a string or a resource
+     *
+     * @param string $content The content to set as the request body. If the string is in fact a
+     *                        path to a file, the resource will be attached instead of the literal
+     *                        string. If a resource is used the step will also figure out the mime
+     *                        type of the file and set the Content-Type header.
+     * @param boolean $forceString If the " as a string" part is used in the step, the content is
+     *                             treated as a string even if it might be a valid path
+     * @Given /^the request body contains "([^"]+)"( as a string)?$/
+     */
+    public function setRequestBody($content, $forceString = false) {
+        $forceString = (boolean) $forceString;
+
+        if (!$forceString && file_exists($content)) {
+            // Set the Content-Type request header
+            $this->requestOptions['headers']['Content-Type'] = mime_content_type($content);
+
+            // Create a resource to the file
+            $content = fopen($filename = $content, 'r');
+
+            if ($content === false) {
+                throw new InvalidArgumentException(sprintf('Could not open "%s" for reading.', $filename));
+            }
+        }
+
+        $this->requestOptions['body'] = $content;
+    }
 }
