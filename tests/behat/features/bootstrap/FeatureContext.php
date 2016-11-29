@@ -10,7 +10,9 @@
 
 use Behat\Behat\Hook\Scope\BeforeFeatureScope;
 use Behat\Gherkin\Node\PyStringNode;
-use Behat\Behat\Context\Step\Given;
+use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\Middleware;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * Imbo Context
@@ -19,6 +21,8 @@ use Behat\Behat\Context\Step\Given;
  * @package Test suite\Functional tests
  */
 class FeatureContext extends RESTContext {
+    const MIDDLEWARE_SIGN_REQUEST = 'sign-request';
+
     /**
      * The user used by the client
      *
@@ -91,8 +95,8 @@ class FeatureContext extends RESTContext {
     private static $testImageFeature;
 
     /**
-     * @BeforeFeature
      * @param BeforeFeatureScope $scope
+     * @BeforeFeature
      */
     public static function prepare(BeforeFeatureScope $scope) {
         // Drop mongo test collection which stores information regarding images, and the images
@@ -132,11 +136,10 @@ class FeatureContext extends RESTContext {
     /**
      * Set a request header that will have Imbo load a custom configuration file
      *
-     * @Given /^Imbo uses the "([^"]*)" configuration$/
-     *
      * @param string $configFile Custom configuration file to use for the next request (file must
      *                           reside in the tests/behat/imbo-configs directory)
      * @throws InvalidArgumentException
+     * @Given Imbo uses the :configFile configuration
      */
     public function setImboConfigHeader($configFile) {
         $dir = __DIR__ . '/../../imbo-configs';
@@ -154,13 +157,25 @@ class FeatureContext extends RESTContext {
     }
 
     /**
+     * Allow IPs to view stats by specifying a net mask
+     *
+     * This feature is implemented in the stats-access-and-custom-stats.php custom configuration
+     * file.
+     *
+     * @param string $mask Specify which subnet mask who are allowed to view stats
+     * @Given the stats are allowed by :mask
+     */
+    public function statsAllowedBy($mask) {
+        $this->givenTheRequestHeaderIs('X-Imbo-Stats-Allowed-By', $mask);
+    }
+
+    /**
      * Send a query parameter with the next requesting, informing Imbo which adapter to take down
      *
      * This feature is implemented in the status.php custom configuration file.
      *
-     * @Given /^the (storage|database) is down$/
-     *
      * @param string $adapter Which adapter to take down
+     * @Given /^the (storage|database) is down$/
      */
     public function forceAdapterFailure($adapter) {
         if ($adapter === 'storage') {
@@ -171,19 +186,157 @@ class FeatureContext extends RESTContext {
     }
 
     /**
-     * @Given /^I use "([^"]*)" and "([^"]*)" for public and private keys$/
+     * Sign the request with the given public key and private key using HTTP headers
+     *
+     * @param string $publicKey The public key to sign the URL with
+     * @param string $privateKey The private key to sign the URL with
+     * @Given I sign the requestwith :publicKey and :privateKey using HTTP headers
      */
-    public function setClientAuth($publicKey, $privateKey) {
-        $this->publicKey = $publicKey;
-        $this->privateKey = $privateKey;
-
-        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) {
-            $request = $event['request'];
-            $request->addHeaders([
-                'X-Imbo-PublicKey' => $this->publicKey
-            ]);
-        }, -100);
+    public function signRequestUsingHttpHeaders($publicKey, $privateKey) {
+        $this->signRequest($publicKey, $privateKey, true);
     }
+
+    /**
+     * Signal that the request needs to be signed before sent
+     *
+     * This step adds a "sign-request" middleware to the request. The middleware should be executed
+     * last.
+     *
+     * @param string $publicKey The public key to sign the URL with
+     * @param string $privateKey The private key to sign the URL with
+     * @param boolean $useHeaders Whether or not to put the signature in the request HTTP headers
+     * @Given I sign the requestwith :publicKey and :privateKey
+     */
+    public function signRequest($publicKey, $privateKey, $useHeaders = false) {
+        $useHeaders = (boolean) $useHeaders;
+
+        // Fetch the handler stack and push a signature function to it
+        $stack = $this->client->getConfig('handler');
+        $stack->push(Middleware::mapRequest(function(RequestInterface $request) use ($publicKey, $privateKey, $useHeaders) {
+            // Remove headers that should not be present at this time
+            /*
+            $request = $request
+                ->withoutHeader('X-Imbo-PublicKey')
+                ->withoutHeader('X-Imbo-Authenticate-Signature')
+                ->withoutHeader('X-Imbo-Authenticate-Timestamp');
+
+            $uri = $request->getUri();
+            $uri = Uri::withoutQueryValue(
+                Uri::withoutQueryValue(
+                    Uri::withoutQueryValue($uri, 'accessToken'),
+                'signature'),
+            'timestamp');
+            */
+
+            // Add public key as a query parameter if we're told not to use headers. We do this
+            // before the signing below since this parameter needs to be a part of the data that
+            // will be used for signing
+            if (!$useHeaders) {
+                $request = $request->withUri(Uri::withQueryValue(
+                    $request->getUri(),
+                    'publicKey',
+                    $publicKey
+                ));
+            }
+
+            // Fetch the HTTP method
+            $httpMethod = $request->getHeaderLine('X-Http-Method-Override') ?: $request->getMethod();
+
+            // Prepare the data that will be signed using the private key
+            $timestamp = gmdate('Y-m-d\TH:i:s\Z');
+            $data = sprintf('%s|%s|%s|%s',
+                $httpMethod,
+                urldecode((string) $request->getUri()),
+                $publicKey,
+                $timestamp
+            );
+
+            // Generate signature
+            $signature = hash_hmac('sha256', $data, $privateKey);
+
+            if ($useHeaders) {
+                $request = $request
+                    ->withHeader('X-Imbo-PublicKey', $publicKey)
+                    ->withHeader('X-Imbo-Authenticate-Signature', $signature)
+                    ->withHeader('X-Imbo-Authenticate-Timestamp', $timestamp);
+            } else {
+                $request = $request->withUri(
+                    Uri::withQueryValue(
+                        Uri::withQueryValue(
+                            $request->getUri(),
+                            'signature',
+                            $signature
+                        ),
+                        'timestamp',
+                        $timestamp
+                    )
+                );
+            }
+
+            return $request;
+        }), self::MIDDLEWARE_SIGN_REQUEST);
+    }
+
+    /**
+     * Add an image to Imbo for a given user
+     *
+     * This is a convenience step mostly used for backgrounds in tests. It combines a few other
+     * steps:
+     *
+     * - add an image to the request
+     * - sign the request
+     * - issue a POST
+     *
+     * The users, public keys and private keys are specified in the test configuration.
+     *
+     * Since this method might be executed in between other stepd we will not have a fresh instance
+     * of the client after this step is finished, so we need to clean up after we're done by
+     * resetting the request and request options, and by removing the signature middleware added
+     * by ::signRequest( ... ).
+     *
+     * @see tests/behat/imbo-configs
+     *
+     * @param string $imagePath Path to the image, relative to the project root path
+     * @param string $user The user who will own the image
+     * @Given :imagePath exists in Imbo
+     * @Given :imagePath exists for user :user in Imbo
+     */
+    public function addUserImageToImbo($imagePath, $user = 'user') {
+        // Store the original request
+        $originalRequest = clone $this->request;
+        $originalRequestOptions = $this->requestOptions;
+
+        // Attach the file to the request body
+        $this->setRequestBody($imagePath);
+
+        // Signal that the request needs to be signed
+        $this->signRequest('publickey', 'privatekey');
+
+        // Request the endpoint for adding the image
+        $this->whenIRequestPath(sprintf('/users/%s/images', $user), 'POST');
+
+        // Remove the handler that signs the request
+        $this->client->getConfig('handler')->remove(self::MIDDLEWARE_SIGN_REQUEST);
+
+        // Reset the request
+        $this->request = $originalRequest;
+        $this->requestOptions = $originalRequestOptions;
+    }
+
+    /**
+     * Set a request header that is picked up by the "stats-access-and-custom-stats.php" custom
+     * configuration file to test the access part of the event listener
+     *
+     * @param string $ip The IP address to set
+     * @Given the client IP is :ip
+     */
+    public function setClientIp($ip) {
+        $this->givenTheRequestHeaderIs('X-Client-Ip', $ip);
+    }
+
+
+
+
 
     /**
      * @Given /^I do not specify a public and private key$/
@@ -223,50 +376,6 @@ class FeatureContext extends RESTContext {
             $query->remove('accessToken');
             $accessToken = hash_hmac('sha256', urldecode($request->getUrl()), $this->privateKey);
             $query->set('accessToken', $accessToken);
-        }, -100);
-    }
-
-    /**
-     * @Given /^I sign the request( using HTTP headers)?$/
-     */
-    public function signRequest($useHeaders = false) {
-        $useHeaders = (boolean) $useHeaders;
-
-        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($useHeaders) {
-            $request = $event['request'];
-
-            // Remove headers and query params that should not be present at this time
-            $request->removeHeader('X-Imbo-PublicKey');
-            $request->removeHeader('X-Imbo-Authenticate-Signature');
-            $request->removeHeader('X-Imbo-Authenticate-Timestamp');
-            $query = $request->getQuery();
-            $query->remove('accessToken');
-            $query->remove('signature');
-            $query->remove('timestamp');
-
-            // Add public key to query if we're told not to use headers
-            if (!$useHeaders) {
-                $query->set('publicKey', $this->publicKey);
-            }
-
-            $method = $request->getHeader('X-Http-Method-Override') ?: $request->getMethod();
-
-            $timestamp = gmdate('Y-m-d\TH:i:s\Z');
-            $data = $method . '|' . urldecode($request->getUrl()) . '|' . $this->publicKey . '|' . $timestamp;
-
-            // Generate signature
-            $signature = hash_hmac('sha256', $data, $this->privateKey);
-
-            if ($useHeaders) {
-                $request->addHeaders([
-                    'X-Imbo-PublicKey'              => $this->publicKey,
-                    'X-Imbo-Authenticate-Signature' => $signature,
-                    'X-Imbo-Authenticate-Timestamp' => $timestamp,
-                ]);
-            } else {
-                $query->set('signature', $signature);
-                $query->set('timestamp', $timestamp);
-            }
         }, -100);
     }
 
@@ -330,25 +439,6 @@ class FeatureContext extends RESTContext {
 
             assertSame($expected, $actual, 'Expected "' . $expected . '", got "' . $actual . '"');
         }
-    }
-
-    /**
-     * @Given /^"([^"]*)" exists in Imbo$/
-     */
-    public function addImageToImbo($imagePath) {
-        $this->addUserImageToImbo($imagePath, 'user');
-    }
-
-    /**
-     * @Given /^"([^"]*)" exists for user "([^"]*)" in Imbo$/
-     */
-    public function addUserImageToImbo($imagePath, $user) {
-        $this->setClientAuth('publickey', 'privatekey');
-        $this->signRequest();
-        $this->attachFileToRequestBody($imagePath);
-        $this->request('/users/' . $user . '/images/', 'POST');
-        $this->imageUrls[$imagePath] = $this->getPreviouslyAddedImageUrl();
-        $this->imageIdentifiers[$imagePath] = $this->getPreviouslyAddedImageIdentifier();
     }
 
     /**
@@ -521,13 +611,6 @@ class FeatureContext extends RESTContext {
     }
 
     /**
-     * @Given /^the client IP is "([^"]*)"$/
-     */
-    public function setClientIp($ip) {
-        $this->addHeaderToNextRequest('X-Client-Ip', $ip);
-    }
-
-    /**
      * @Given /^the image should not have any "([^"]*)" properties$/
      */
     public function assertImageProperties($tag) {
@@ -666,14 +749,6 @@ class FeatureContext extends RESTContext {
             new Given('I request "' . $url . '" using HTTP "HEAD"'),
             new Given('I should get a response with "404 Public key not found"')
         ];
-    }
-
-    /**
-     * @Given /^Imbo starts with an empty database$/
-     */
-    public function imboStartsWithEmptyDatabase() {
-        $mongo = new MongoClient();
-        $mongo->imbo_testing->drop();
     }
 
     /**
