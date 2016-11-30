@@ -96,7 +96,7 @@ This event listener does not support any parameters and is enabled per default l
         // ...
 
         'eventListeners' => [
-            'authenticate' => 'Imbo\EventListener\Authenticate',
+            'auth' => 'Imbo\EventListener\Authenticate',
         ],
 
         // ...
