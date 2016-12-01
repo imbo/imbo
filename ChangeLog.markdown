@@ -16,6 +16,12 @@ Bug fixes:
 
 * #491: Fix undefined user when retrieving metadata (Mats Lindh)
 
+Imbo-2.2.1
+----------
+__2016-12-01__
+
+* #516: Docs fix (Karol Wnuk)
+
 Imbo-2.2.0
 ----------
 __2016-08-08__
