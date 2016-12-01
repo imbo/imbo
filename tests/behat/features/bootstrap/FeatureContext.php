@@ -10,9 +10,11 @@
 
 use Behat\Behat\Hook\Scope\BeforeFeatureScope;
 use Behat\Gherkin\Node\PyStringNode;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
+use Assert\Assertion;
 
 /**
  * Imbo Context
@@ -22,6 +24,7 @@ use Psr\Http\Message\RequestInterface;
  */
 class FeatureContext extends RESTContext {
     const MIDDLEWARE_SIGN_REQUEST = 'sign-request';
+    const MIDDLEWARE_APPEND_ACCESS_TOKEN = 'append-access-token';
 
     /**
      * The user used by the client
@@ -93,6 +96,26 @@ class FeatureContext extends RESTContext {
      * @var string
      */
     private static $testImageFeature;
+
+    /**
+     * Array container for the history middleware
+     *
+     * @param array
+     */
+    private $history = [];
+
+    /**
+     * Manipulate the handler stack of the client for all tests
+     *
+     * - Add the history middleware to record all request / responses in the $this->history array
+     *
+     * @param ClientInterface $client A GuzzleHttp\Client instance
+     */
+    public function setClient(ClientInterface $client) {
+        $client->getConfig()['handler']->push(Middleware::history($this->history));
+
+        parent::setClient($client);
+    }
 
     /**
      * @param BeforeFeatureScope $scope
@@ -170,7 +193,7 @@ class FeatureContext extends RESTContext {
     }
 
     /**
-     * Send a query parameter with the next requesting, informing Imbo which adapter to take down
+     * Send a query parameter with the next request, informing Imbo which adapter to take down
      *
      * This feature is implemented in the status.php custom configuration file.
      *
@@ -190,7 +213,7 @@ class FeatureContext extends RESTContext {
      *
      * @param string $publicKey The public key to sign the URL with
      * @param string $privateKey The private key to sign the URL with
-     * @Given I sign the requestwith :publicKey and :privateKey using HTTP headers
+     * @Given I sign the request with :publicKey and :privateKey using HTTP headers
      */
     public function signRequestUsingHttpHeaders($publicKey, $privateKey) {
         $this->signRequest($publicKey, $privateKey, true);
@@ -205,29 +228,14 @@ class FeatureContext extends RESTContext {
      * @param string $publicKey The public key to sign the URL with
      * @param string $privateKey The private key to sign the URL with
      * @param boolean $useHeaders Whether or not to put the signature in the request HTTP headers
-     * @Given I sign the requestwith :publicKey and :privateKey
+     * @Given I sign the request with :publicKey and :privateKey
      */
     public function signRequest($publicKey, $privateKey, $useHeaders = false) {
         $useHeaders = (boolean) $useHeaders;
 
         // Fetch the handler stack and push a signature function to it
         $stack = $this->client->getConfig('handler');
-        $stack->push(Middleware::mapRequest(function(RequestInterface $request) use ($publicKey, $privateKey, $useHeaders) {
-            // Remove headers that should not be present at this time
-            /*
-            $request = $request
-                ->withoutHeader('X-Imbo-PublicKey')
-                ->withoutHeader('X-Imbo-Authenticate-Signature')
-                ->withoutHeader('X-Imbo-Authenticate-Timestamp');
-
-            $uri = $request->getUri();
-            $uri = Uri::withoutQueryValue(
-                Uri::withoutQueryValue(
-                    Uri::withoutQueryValue($uri, 'accessToken'),
-                'signature'),
-            'timestamp');
-            */
-
+        $stack->push(Middleware::mapRequest(function(RequestInterface $request) use ($publicKey, $privateKey, $useHeaders, $stack) {
             // Add public key as a query parameter if we're told not to use headers. We do this
             // before the signing below since this parameter needs to be a part of the data that
             // will be used for signing
@@ -273,8 +281,40 @@ class FeatureContext extends RESTContext {
                 );
             }
 
+            // Remove this middleware as we don't want the signing to happen more than once
+            $stack->remove(self::MIDDLEWARE_SIGN_REQUEST);
+
             return $request;
         }), self::MIDDLEWARE_SIGN_REQUEST);
+    }
+
+    /**
+     * Append an access token as a query parameter, using the specified keys
+     *
+     * @param string $publicKey The public key to use
+     * @param string $privateKey The private key to use
+     * @Given I include an access token in the query using :publicKey and :privateKey
+     */
+    public function appendAccessToken($publicKey, $privateKey) {
+        // Fetch the handler stack and push an access token function to it
+        $stack = $this->client->getConfig('handler');
+        $stack->push(Middleware::mapRequest(function(RequestInterface $request) use ($publicKey, $privateKey, $stack) {
+            $uri = $request->getUri();
+
+            // Set the public key and remove a possible accessToken query parameter
+            $uri = Uri::withQueryValue($uri, 'publicKey', $publicKey);
+            $uri = Uri::withoutQueryValue($uri, 'accessToken');
+
+            // Generate the access token and append to the query
+            $accessToken = hash_hmac('sha256', urldecode((string) $uri), $privateKey);
+            $uri = Uri::withQueryValue($uri, 'accessToken', $accessToken);
+
+            // Remove the middleware from the stack
+            $stack->remove(self::MIDDLEWARE_APPEND_ACCESS_TOKEN);
+
+            // Return Uri with query string including the access token
+            return $request->withUri($uri);
+        }), self::MIDDLEWARE_APPEND_ACCESS_TOKEN);
     }
 
     /**
@@ -289,10 +329,9 @@ class FeatureContext extends RESTContext {
      *
      * The users, public keys and private keys are specified in the test configuration.
      *
-     * Since this method might be executed in between other stepd we will not have a fresh instance
+     * Since this method might be executed in between other steps we will not have a fresh instance
      * of the client after this step is finished, so we need to clean up after we're done by
-     * resetting the request and request options, and by removing the signature middleware added
-     * by ::signRequest( ... ).
+     * resetting the request and request options.
      *
      * @see tests/behat/imbo-configs
      *
@@ -315,9 +354,6 @@ class FeatureContext extends RESTContext {
         // Request the endpoint for adding the image
         $this->whenIRequestPath(sprintf('/users/%s/images', $user), 'POST');
 
-        // Remove the handler that signs the request
-        $this->client->getConfig('handler')->remove(self::MIDDLEWARE_SIGN_REQUEST);
-
         // Reset the request
         $this->request = $originalRequest;
         $this->requestOptions = $originalRequestOptions;
@@ -332,6 +368,83 @@ class FeatureContext extends RESTContext {
      */
     public function setClientIp($ip) {
         $this->givenTheRequestHeaderIs('X-Client-Ip', $ip);
+    }
+
+    /**
+     * Make a request to the previously added image (in the same scenario)
+     *
+     * This method will loop through the history in reverse order and look for responses which
+     * contains image identifiers. The first one found will be requested.
+     *
+     * @param string $method The HTTP method to use
+     * @throws RuntimeException
+     * @When I request the previously added image
+     * @When I request the previously added image using HTTP :method
+     */
+    public function requestPreviouslyAddedImage($method = 'GET') {
+        // Go back in the history until we have a request with an image
+        foreach (array_reverse($this->history) as $transaction) {
+            $response = $transaction['response'];
+
+            if ($response) {
+                $body = json_decode((string) $response->getBody());
+
+                if (!empty($body->imageIdentifier)) {
+                    // Fetch the user from the request URI in the same transaction
+                    $request = $transaction['request'];
+                    $matches = [];
+                    preg_match('|/users/(.+?)/images|', (string) $request->getUri(), $matches);
+
+                    $path = sprintf('/users/%s/images/%s', $matches[1], $body->imageIdentifier);
+                    $this->whenIRequestPath($path, $method);
+
+                    return;
+                }
+            }
+        }
+
+        throw new RuntimeException(
+            'Could not find any responses in the history with an image identifier'
+        );
+    }
+
+    /**
+     * Assert the contents of an imbo error message
+     *
+     * @param string $message
+     * @param int $code
+     * @Then the Imbo error message is :message
+     * @Then the Imbo error message is :message and the error code is :code
+     */
+    public function assertImboError($message, $code = null) {
+        $this->requireResponse();
+
+        if ($this->response->getStatusCode() < 400) {
+            throw new InvalidArgumentException(
+                'The status code of the last response is lower than 400, so it is not considered an error.'
+            );
+        }
+
+        $body = json_decode((string) $this->response->getBody());
+        $actualMessage = $body->error->message;
+        $actualCode = $body->error->imboErrorCode;
+
+        Assertion::same(
+            $message,
+            $actualMessage,
+            sprintf('Expected error message "%s", got "%s"', $message, $actualMessage)
+        );
+
+        if ($code !== null) {
+            $code = (int) $code;
+            $actualCode = (int) $actualCode;
+
+            Assertion::same(
+                $code,
+                $actualCode,
+                sprintf('Expected imbo error code "%d", got "%d"', $code, $actualCode)
+            );
+        }
     }
 
 
@@ -362,24 +475,6 @@ class FeatureContext extends RESTContext {
     }
 
     /**
-     * @Given /^I include an access token in the query$/
-     */
-    public function appendAccessToken() {
-        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) {
-            $request = $event['request'];
-            $query = $request->getQuery();
-
-            if (!$query->get('publicKey')) {
-                $query->set('publicKey', $this->publicKey);
-            }
-
-            $query->remove('accessToken');
-            $accessToken = hash_hmac('sha256', urldecode($request->getUrl()), $this->privateKey);
-            $query->set('accessToken', $accessToken);
-        }, -100);
-    }
-
-    /**
      * @Given /^I specify "([^"]*)" as transformation$/
      */
     public function applyTransformation($transformation) {
@@ -404,41 +499,6 @@ class FeatureContext extends RESTContext {
         }
 
         assertSame($size, $info[$index], 'Incorrect ' . $value . ', expected ' . $size . ', got ' . $info[$index]);
-    }
-
-    /**
-     * @Given /^the Imbo error message is "([^"]*)"(?: and the error code is "([^"]*)")?$/
-     */
-    public function assertImboError($message, $code = null) {
-        $response = $this->getLastResponse();
-        $contentType = $response->getContentType();
-
-        try {
-            if ($contentType === 'application/json') {
-                $data = $response->json();
-                $errorMessage = $data['error']['message'];
-                $errorCode = $data['error']['imboErrorCode'];
-            } else if ($contentType === 'application/xml') {
-                $data = $response->xml();
-                $errorMessage = (string) $data->error->message;
-                $errorCode = $data->error->imboErrorCode;
-            }
-        } catch (\Exception $e) {
-            throw new RuntimeException(
-                "Unable to parse response: \n" .
-                $response->getMessage() . "\n\n" .
-                $e->getMessage()
-            );
-        }
-
-        assertSame($message, $errorMessage, 'Expected "' . $message. '", got "' . $errorMessage . '"');
-
-        if ($code !== null) {
-            $expected = (int) $code;
-            $actual = (int) $errorCode;
-
-            assertSame($expected, $actual, 'Expected "' . $expected . '", got "' . $actual . '"');
-        }
     }
 
     /**
@@ -518,27 +578,6 @@ class FeatureContext extends RESTContext {
             new Given('I request "' . $url . '" using HTTP "GET"'),
         ];
     }
-
-    /**
-     * @When /^I request the (?:previously )?added image(?: with the query string "([^"]*)")?$/
-     */
-    public function requestPreviouslyAddedImage($queryParams = '') {
-        $url = $this->getPreviouslyAddedImageUrl() . $queryParams;
-        return [
-            new Given('I request "' . $url . '" using HTTP "GET"'),
-        ];
-    }
-
-    /**
-     * @When /^I request the (?:previously )?added image using HTTP "([^"]*)"$/
-     */
-    public function requestPreviouslyAddedImageWithHttpMethod($method) {
-        $url = $this->getPreviouslyAddedImageUrl();
-        return [
-            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
-        ];
-    }
-
 
     /**
      * @When /^I request the (?:previously )?added image as a "(jpg|png|gif)"$/
