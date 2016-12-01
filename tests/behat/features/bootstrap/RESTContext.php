@@ -60,4 +60,20 @@ class RESTContext extends ApiContext {
 
         $this->requestOptions['body'] = $content;
     }
+
+    /**
+     * Check the size of the response body (not the Content-Length response header)
+     *
+     * @param int $expetedSize The size we are expecting
+     * @Then the response body size is :expectedSize
+     */
+    public function assertResponseBodySize($expectedSize) {
+        $this->requireResponse();
+
+        Assertion::same(
+            $actualSize = strlen((string) $this->response->getBody()),
+            (int) $expectedSize,
+            sprintf('Expected response body size: %d, actual: %d', $expectedSize, $actualSize)
+        );
+    }
 }
