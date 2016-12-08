@@ -20,7 +20,7 @@ if (is_file(__DIR__ . '/../../../autoload.php')) {
     require __DIR__ . '/../vendor/autoload.php';
 }
 
-$config = [
+$defaultConfig = [
     /**
      * Access Control adapter
      *
@@ -393,24 +393,29 @@ $config = [
     'indexRedirect' => null,
 ];
 
+// Keep all external configuration separate
+$extraConfig = [];
+
 // See if a custom config path has been defined. If so, don't require the custom one as this is
 // most likely a Behat test run
 if (!defined('IMBO_CONFIG_PATH')) {
+    // wrap the config loader as a closure to avoid overwriting duplicate names from local configuration files
+    $configLoader = function ($path) {
+        $config = require $path;
+
+        return is_array($config) ? $config : [];
+    };
+
     if (is_dir(__DIR__ . '/../../../../config')) {
         // Someone has installed Imbo via a custom composer.json, so the custom config is outside of
         // the vendor dir. Loop through all available php files in the config dir
         foreach (glob(__DIR__ . '/../../../../config/*.php') as $file) {
-            $extraConfig = require $file;
-
-            if (!is_array($extraConfig)) {
-                continue;
-            }
-
-            $config = array_replace_recursive($config, $extraConfig);
+            $extraConfig = array_replace_recursive($extraConfig, $configLoader($file));
         }
     } else if (file_exists(__DIR__ . '/config.php')) {
-        $config = array_replace_recursive($config, require __DIR__ . '/config.php');
+        $extraConfig = $configLoader(__DIR__ . '/config.php');
     }
 }
 
-return $config;
+// merge external configuration into default configuration
+return array_replace_recursive($defaultConfig, $extraConfig);
