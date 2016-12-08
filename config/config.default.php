@@ -394,7 +394,7 @@ $defaultConfig = [
 ];
 
 // Keep all external configuration separate
-$extraConfig = array();
+$extraConfig = [];
 
 // See if a custom config path has been defined. If so, don't require the custom one as this is
 // most likely a Behat test run
