@@ -74,14 +74,19 @@ class DatabaseOperations implements ListenerInterface {
      * Insert an image
      *
      * @param EventInterface $event An event instance
+     * @param array $params Optional arguments to the insert method
+     *                      - `updateIfDuplicate` controls whether an update will happen if the imageid already exists
      */
-    public function insertImage(EventInterface $event) {
+    public function insertImage(EventInterface $event, $params = []) {
         $request = $event->getRequest();
+
+        $updateIfDuplicate = !isset($params['updateIfDuplicate']) || !empty($params['updateIfDuplicate']);
 
         $event->getDatabase()->insertImage(
             $request->getUser(),
             $request->getImage()->getImageIdentifier(),
-            $request->getImage()
+            $request->getImage(),
+            $updateIfDuplicate
         );
     }
 
