@@ -60,7 +60,7 @@ class Images implements ResourceInterface {
     /**
      * Handle POST requests
      *
-     * @param EventInterface
+     * @param EventInterface $event
      */
     public function addImage(EventInterface $event) {
         $event->getManager()->trigger('db.image.insert');
