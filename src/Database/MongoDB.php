@@ -14,9 +14,11 @@ use Imbo\Model\Image,
     Imbo\Model\Images,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
+    Imbo\Exception\DuplicateImageIdentifierException,
     MongoClient,
     MongoCollection,
     MongoException,
+    MongoDuplicateKeyException,
     DateTime,
     DateTimeZone;
 
@@ -97,19 +99,24 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($user, $imageIdentifier, Image $image) {
+    public function insertImage($user, $imageIdentifier, Image $image, $updateIfDuplicate = true)
+    {
         $now = time();
 
-        if ($added = $image->getAddedDate()) {
+        if ($added = $image->getAddedDate())
+        {
             $added = $added->getTimestamp();
         }
 
-        if ($updated = $image->getUpdatedDate()) {
+        if ($updated = $image->getUpdatedDate())
+        {
             $updated = $updated->getTimestamp();
         }
 
-        if ($this->imageExists($user, $imageIdentifier)) {
-            try {
+        if ($updateIfDuplicate && $this->imageExists($user, $imageIdentifier))
+        {
+            try
+            {
                 $this->getImageCollection()->update(
                     ['user' => $user, 'imageIdentifier' => $imageIdentifier],
                     ['$set' => ['updated' => $now]],
@@ -117,28 +124,31 @@ class MongoDB implements DatabaseInterface {
                 );
 
                 return true;
-            } catch (MongoException $e) {
+            } catch (MongoException $e)
+            {
                 throw new DatabaseException('Unable to save image data', 500, $e);
             }
         }
 
         $data = [
-            'size'             => $image->getFilesize(),
-            'user'             => $user,
-            'imageIdentifier'  => $imageIdentifier,
-            'extension'        => $image->getExtension(),
-            'mime'             => $image->getMimeType(),
-            'metadata'         => [],
-            'added'            => $added ?: $now,
-            'updated'          => $updated ?: $now,
-            'width'            => $image->getWidth(),
-            'height'           => $image->getHeight(),
-            'checksum'         => $image->getChecksum(),
+            'size' => $image->getFilesize(),
+            'user' => $user,
+            'imageIdentifier' => $imageIdentifier,
+            'extension' => $image->getExtension(),
+            'mime' => $image->getMimeType(),
+            'metadata' => [],
+            'added' => $added ?: $now,
+            'updated' => $updated ?: $now,
+            'width' => $image->getWidth(),
+            'height' => $image->getHeight(),
+            'checksum' => $image->getChecksum(),
             'originalChecksum' => $image->getOriginalChecksum(),
         ];
 
         try {
             $this->getImageCollection()->insert($data);
+        } catch (MongoDuplicateKeyException $e) {
+            throw new DuplicateImageIdentifierException('Duplicate image identifier when attempting to insert image into DB.', 503);
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to save image data', 500, $e);
         }
