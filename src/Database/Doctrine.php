@@ -15,10 +15,12 @@ use Imbo\Model\Image,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     Imbo\Exception\InvalidArgumentException,
+    Imbo\Exception\DuplicateImageIdentifierException,
     Imbo\Exception,
     Doctrine\DBAL\DriverManager,
     Doctrine\DBAL\Connection,
     Doctrine\DBAL\DBALException,
+    Doctrine\DBAL\Exception\UniqueConstraintViolationException,
     PDO,
     DateTime,
     DateTimeZone;
@@ -84,38 +86,54 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($user, $imageIdentifier, Image $image) {
+    public function insertImage($user, $imageIdentifier, Image $image, $updateIfDuplicate = true)
+    {
         $now = time();
 
-        if ($added = $image->getAddedDate()) {
+        if ($added = $image->getAddedDate())
+        {
             $added = $added->getTimestamp();
         }
 
-        if ($updated = $image->getUpdatedDate()) {
+        if ($updated = $image->getUpdatedDate())
+        {
             $updated = $updated->getTimestamp();
         }
 
-        if ($id = $this->getImageId($user, $imageIdentifier)) {
-            return (boolean) $this->getConnection()->update($this->tableNames['imageinfo'], [
+        if ($updateIfDuplicate && $id = $this->getImageId($user, $imageIdentifier))
+        {
+            return (boolean)$this->getConnection()->update($this->tableNames['imageinfo'], [
                 'updated' => $now,
             ], [
                 'id' => $id
             ]);
         }
 
-        return (boolean) $this->getConnection()->insert($this->tableNames['imageinfo'], [
-            'size'             => $image->getFilesize(),
-            'user'             => $user,
-            'imageIdentifier'  => $imageIdentifier,
-            'extension'        => $image->getExtension(),
-            'mime'             => $image->getMimeType(),
-            'added'            => $added ?: $now,
-            'updated'          => $updated ?: $now,
-            'width'            => $image->getWidth(),
-            'height'           => $image->getHeight(),
-            'checksum'         => $image->getChecksum(),
-            'originalChecksum' => $image->getOriginalChecksum(),
-        ]);
+        try
+        {
+            $result = $this->getConnection()->insert($this->tableNames['imageinfo'], [
+                'size' => $image->getFilesize(),
+                'user' => $user,
+                'imageIdentifier' => $imageIdentifier,
+                'extension' => $image->getExtension(),
+                'mime' => $image->getMimeType(),
+                'added' => $added ?: $now,
+                'updated' => $updated ?: $now,
+                'width' => $image->getWidth(),
+                'height' => $image->getHeight(),
+                'checksum' => $image->getChecksum(),
+                'originalChecksum' => $image->getOriginalChecksum(),
+            ]);
+        } catch (DBALException $e) {
+            // The DBALException wraps the actual PDO exception, so we'll have to inspect that one..
+            if (($e->getPrevious()->getCode() == '23000') && (strpos($e->getPrevious()->getMessage(), 'Integrity constraint violation') !== false)) {
+                throw new DuplicateImageIdentifierException('Duplicate image identifier when attempting to insert image into DB.', 503);
+            }
+
+            throw $e;
+        }
+
+        return (boolean) $result;
     }
 
     /**
