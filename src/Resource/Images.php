@@ -86,7 +86,12 @@ class Images implements ResourceInterface {
                 $event->getManager()->trigger('db.image.insert', ['updateIfDuplicate' => $imageIdentifierGenerator->isDeterministic()]);
                 break;
             } catch (DuplicateImageIdentifierException $exception) {
-                // the image identifier already exists
+                // the image identifier already exists - or was created before we inserted
+                // so we retry the event to get the last submitted image
+                if ($imageIdentifierGenerator->isDeterministic()) {
+                    $event->getManager()->trigger('db.image.insert', ['updateIfDuplicate' => $imageIdentifierGenerator->isDeterministic()]);
+                }
+
                 continue;
             }
         }
