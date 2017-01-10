@@ -125,23 +125,6 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
-     * @covers Imbo\Image\ImagePreparation::generateImageIdentifier
-     * @expectedException Imbo\Exception\ImageException
-     * @expectedExceptionMessage Failed to generate unique image identifier
-     * @expectedExceptionCode 503
-     */
-    public function testThrowsExceptionWhenItFailsToGenerateUniqueImageIdentifier() {
-        $imagePath = FIXTURES_DIR . '/image.png';
-        $imageData = file_get_contents($imagePath);
-
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue($imageData));
-        $this->database->expects($this->any())->method('imageExists')->will($this->returnValue(true));
-        $this->headers->expects($this->once())->method('set')->with('Retry-After', 1);
-        $this->prepare->prepareImage($this->event);
-    }
-
-    /**
-     * @covers Imbo\Image\ImagePreparation::prepareImage
      */
     public function testPopulatesRequestWhenImageIsValid() {
         $imagePath = FIXTURES_DIR . '/image.png';
