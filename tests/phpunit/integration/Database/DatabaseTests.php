@@ -79,7 +79,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertSame($originalImage->getExtension(), $image->getExtension());
     }
 
-    public function testStoreSameImageTwice() {
+    public function testStoreSameImageTwiceWithUpdateIfDuplicate() {
         $user = 'user';
         $imageIdentifier = 'id';
         $image = $this->getImage();
@@ -94,6 +94,22 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
 
         $this->assertTrue($lastModified2 > $lastModified1);
     }
+
+    /**
+     * @expectedException Imbo\Exception\DuplicateImageIdentifierException
+     * @expectedExceptionCode 503
+     */
+    public function testStoreSameImageTwiceWithoutUpdateIfDuplicate() {
+        $user = 'user';
+        $imageIdentifier = 'id';
+        $image = $this->getImage();
+
+        $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $image, false));
+        sleep(1);
+
+        $this->adapter->insertImage($user, $imageIdentifier, $image, false);
+    }
+
 
     /**
      * @expectedException Imbo\Exception\DatabaseException
