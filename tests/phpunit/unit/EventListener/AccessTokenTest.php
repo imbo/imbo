@@ -315,6 +315,28 @@ class AccessTokenTest extends ListenerTests {
     }
 
     /**
+     * Test that we can configure the access token argument key
+     */
+    public function testAccessTokenArgumentKey() {
+        $url = 'http://imbo/users/christer';
+        $token = '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a';
+        $privateKey = 'private key';
+
+        $listener = new AccessToken([
+            'accessTokenGenerator' => new AccessToken\SHA256(['argumentKey' => 'foo']),
+        ]);
+
+
+        $this->query->expects($this->once())->method('has')->with('foo')->will($this->returnValue(true));
+        $this->query->expects($this->once())->method('get')->with('foo')->will($this->returnValue($token));
+        $this->request->expects($this->atLeastOnce())->method('getRawUri')->will($this->returnValue(urldecode($url)));
+        $this->request->expects($this->atLeastOnce())->method('getUriAsIs')->will($this->returnValue($url));
+
+        $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
+        $listener->checkAccessToken($this->event);
+    }
+
+    /**
      * Get access tokens with rewritten URLs
      *
      * @return array[]
