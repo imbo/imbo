@@ -11,12 +11,22 @@
 namespace Imbo\EventListener\AccessToken;
 
 /**
- * Abstract class for Access Token Generation
+ * Interface for Access Token Generation
  *
  * @author Mats Lindh <mats@lindh.no>
  * @package AccessToken
  */
 interface AccessTokenInterface {
-    public function generateSignature($data, $privateKey);
-    public function getArgumentKey();
+    /**
+     * @param $argumentKey string The URL argument used for key comparison
+     * @param $data string The data to be signed
+     * @param $privateKey string The private key used to sign the data
+     * @return string The generated signature from the parameters given
+     */
+    public function generateSignature($argumentKey, $data, $privateKey);
+
+    /**
+     * @return array<string> The defined argument keys handled by this generator
+     */
+    public function getArgumentKeys();
 }
