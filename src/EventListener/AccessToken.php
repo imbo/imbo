@@ -151,11 +151,18 @@ class AccessToken implements ListenerInterface {
             return;
         }
 
-        if (!$query->has($accessTokenGenerator->getArgumentKey())) {
-            throw new RuntimeException('Missing access token', 400);
+        // Loop through possible access token keys and see if either is present
+        $presentAccessTokenArgumentKeys = [];
+
+        foreach ($accessTokenGenerator->getArgumentKeys() as $argumentKey) {
+            if ($query->has($argumentKey)) {
+                $presentAccessTokenArgumentKeys[$argumentKey] = $query->get($argumentKey);
+            }
         }
 
-        $token = $query->get($accessTokenGenerator->getArgumentKey());
+        if (!$presentAccessTokenArgumentKeys) {
+            throw new RuntimeException('Missing access token', 400);
+        }
 
         // First the the raw un-encoded URI, then the URI as is
         $uris = [$request->getRawUri(), $request->getUriAsIs()];
@@ -181,13 +188,14 @@ class AccessToken implements ListenerInterface {
         }
 
         foreach ($uris as $uri) {
-            // Remove the access token from the query string as it's not used to generate the HMAC
-            $uri = rtrim(preg_replace('/(?<=(\?|&))' . $accessTokenGenerator->getArgumentKey() . '=[^&]+&?/', '', $uri), '&?');
+            foreach ($presentAccessTokenArgumentKeys as $argumentKey => $token) {
+                // Remove the access token from the query string as it's not used to generate the signature
+                $uriWithoutAccessToken = rtrim(preg_replace('/(?<=(\?|&))' . $argumentKey . '=[^&]+&?/', '', $uri), '&?');
+                $correctToken = $accessTokenGenerator->generateSignature($argumentKey, $uriWithoutAccessToken, $privateKey);
 
-            $correctToken = $accessTokenGenerator->generateSignature($uri, $privateKey);
-
-            if ($correctToken === $token) {
-                return;
+                if ($correctToken === $token) {
+                    return;
+                }
             }
         }
 
