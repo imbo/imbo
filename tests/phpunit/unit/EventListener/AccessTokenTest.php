@@ -185,7 +185,7 @@ class AccessTokenTest extends ListenerTests {
         $listener = new AccessToken($filter);
 
         if (!$whitelisted) {
-            $this->setExpectedException('Imbo\Exception\RuntimeException', 'Missing access token', 400);
+            $this->expectException('Imbo\Exception\RuntimeException', 'Missing access token', 400);
         }
 
         $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.get'));
@@ -262,7 +262,7 @@ class AccessTokenTest extends ListenerTests {
      */
     public function testThrowsExceptionOnIncorrectToken($url, $token, $privateKey, $correct) {
         if (!$correct) {
-            $this->setExpectedException('Imbo\Exception\RuntimeException', 'Incorrect access token', 400);
+            $this->expectException('Imbo\Exception\RuntimeException', 'Incorrect access token', 400);
         }
 
         $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(true));
@@ -492,7 +492,7 @@ class AccessTokenTest extends ListenerTests {
      */
     public function testWillRewriteIncomingUrlToConfiguredProtocol($accessToken, $url, $protocol, $correct) {
         if (!$correct) {
-            $this->setExpectedException('Imbo\Exception\RuntimeException', 'Incorrect access token', 400);
+            $this->expectException('Imbo\Exception\RuntimeException', 'Incorrect access token', 400);
         }
 
         $event = $this->getEventMock([
