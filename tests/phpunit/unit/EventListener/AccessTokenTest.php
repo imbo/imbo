@@ -323,7 +323,7 @@ class AccessTokenTest extends ListenerTests {
         $privateKey = 'private key';
 
         $listener = new AccessToken([
-            'accessTokenGenerator' => new AccessToken\SHA256(['argumentKey' => 'foo']),
+            'accessTokenGenerator' => new AccessToken\SHA256(['argumentKeys' => ['foo']]),
         ]);
 
 
