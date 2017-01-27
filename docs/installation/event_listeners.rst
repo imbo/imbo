@@ -97,10 +97,25 @@ You can also provide a list of URL argument names for the access token, if it's 
         'accessTokenGenerator' => new AccessToken\SHA256(['argumentKeys' => ['foo', 'accessToken']]),
     ]
 
-.. which would allow the token to be present under either ``foo`` or ``accessToken`` in the URL arguments.
+which would allow the token to be present under either ``foo`` or ``accessToken`` in the URL arguments.
 
 Imbo uses a SHA256 HMAC as the default signature generation algorithm, available under ``EventListener\AccessToken\SHA256``.
 
+If you want to use multiple access token generators, you can use the bundled `MultipleAccessTokensGenerators` generator, which will pick a generator based on the available URL parameters (in sequence, the first match will be used).
+
+.. code-block:: php
+
+    [
+        'accessTokenGenerator' => new AccessToken\MultipleAccessTokenGenerators([
+            'generators' => [
+                'accessToken' => new AccessToken\SHA256(),
+                'dummy' => new DummyImplementation(),
+                ...
+            ],
+        ]),
+    ]
+
+This will cause the ``SHA256`` implementation to be used if an ``accessToken``  parameter is available, but if only the ``dummy`` parameter is present, the ``DummyImplementation`` generator will be used.
 
 .. _authenticate-event-listener:
 
