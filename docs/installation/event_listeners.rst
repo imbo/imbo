@@ -79,9 +79,9 @@ Custom Access Token Generators
 
 You can customize how the access token is generated and which URL parameter that contain the access token. The default implementation uses a SHA256 HMAC generated from the private key and the URL of the request.
 
-To switch to a different access token generator provide a new generator in the ``accessTokenGenerator`` parameter. This generator must implement the AccessTokenInterface interface, available under EventListener\AccessToken\AccessTokenInterface. An abstract class (``AccessTokenGenerator``) is included that you can subclass to quickly implement an alternative signature algorithm.
+To switch to a different access token generator provide a new generator in the ``accessTokenGenerator`` parameter. This generator must implement the ``AccessTokenInterface`` interface, available under ``EventListener\AccessToken\AccessTokenInterface``. An abstract class (``AccessTokenGenerator``) is included that you can subclass to quickly implement an alternative signature algorithm.
 
-To use a different algorithm, provide it as a key in the parameter array when creating the AccessToken event listener:
+To use a different algorithm, provide it as a key in the parameter array when creating the access token event listener:
 
 .. code-block:: php
 
