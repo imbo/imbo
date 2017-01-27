@@ -101,7 +101,7 @@ which would allow the token to be present under either ``foo`` or ``accessToken`
 
 Imbo uses a SHA256 HMAC as the default signature generation algorithm, available under ``EventListener\AccessToken\SHA256``.
 
-If you want to use multiple access token generators, you can use the bundled `MultipleAccessTokensGenerators` generator, which will pick a generator based on the available URL parameters (in sequence, the first match will be used).
+If you want to use multiple access token generators, you can use the bundled ``MultipleAccessTokensGenerators`` generator, which will pick a generator based on the available URL parameters (in sequence, the first match will be used).
 
 .. code-block:: php
 
