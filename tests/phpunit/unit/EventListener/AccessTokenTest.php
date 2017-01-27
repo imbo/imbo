@@ -10,7 +10,8 @@
 
 namespace ImboUnitTest\EventListener;
 
-use Imbo\EventListener\AccessToken;
+use Imbo\EventListener\AccessToken,
+    Imbo\Exception\ConfigurationException;
 
 /**
  * @covers Imbo\EventListener\AccessToken
@@ -333,6 +334,21 @@ class AccessTokenTest extends ListenerTests {
         $this->request->expects($this->atLeastOnce())->method('getUriAsIs')->will($this->returnValue($url));
 
         $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
+        $listener->checkAccessToken($this->event);
+    }
+
+    /**
+     * Test that we can configure the access token argument key
+     *
+     * @expectedException Imbo\Exception\ConfigurationException
+     * @expectedExceptionMessage Invalid accessTokenGenerator
+     * @expectedExceptionCode 500
+     */
+    public function testConfigurationExceptionOnInvalidAccessTokenGenerator() {
+        $listener = new AccessToken([
+            'accessTokenGenerator' => new \StdClass(),
+        ]);
+
         $listener->checkAccessToken($this->event);
     }
 
