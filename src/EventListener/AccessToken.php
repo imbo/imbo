@@ -14,6 +14,7 @@ use Imbo\EventListener\AccessToken\AccessTokenInterface;
 use Imbo\EventManager\EventInterface,
     Imbo\Http\Request\Request,
     Imbo\Exception\RuntimeException,
+    Imbo\Exception\ConfigurationException,
     Imbo\Helpers\Urls,
     Imbo\EventListener\AccessToken\SHA256,
     GuzzleHttp\Psr7;
