@@ -132,6 +132,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      */
     public function testDeleteImageThatDoesNotExist() {
         $this->adapter->deleteImage('user', 'id');
+        $this->adapter->deleteImage('user', 'id');
     }
 
     /**
