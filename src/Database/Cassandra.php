@@ -64,7 +64,7 @@ class Cassandra implements DatabaseInterface {
         $this->session = $session;
     }
 
-    protected function execute($statement, $args) {
+    protected function execute($statement, $args = []) {
         $options = new ExecutionOptions(['arguments' => $args]);
         return $this->session->execute($statement, $options);
     }
@@ -119,7 +119,21 @@ class Cassandra implements DatabaseInterface {
             'originalChecksum' => $image->getOriginalChecksum(),
         ];
 
-        return (boolean) $this->execute($statement, $args);
+        $result = (boolean) $this->execute($statement, $args);
+
+        // update usermeta
+        $statement = $this->session->prepare("
+            UPDATE
+                usermeta
+            SET
+                last_updated = ?
+            WHERE
+                user = ?
+        ");
+
+        $this->execute($statement, ['last_updated' => new CassandraLib\Timestamp(), 'user' => $user]);
+
+        return $result;
     }
 
     /**
@@ -248,12 +262,25 @@ class Cassandra implements DatabaseInterface {
             }
 
             $row = $rows[0];
-            return new DateTime('@' . $row['updated'], new DateTimeZone('UTC'));
+            return new DateTime('@' .  $row['updated'], new DateTimeZone('UTC'));
+            //return $row['updated'];
         } else {
             // We'll need to introduce a separate table for this..
-            throw new DatabaseException("Multi-user getLastModified without imageIdentifier not implemented yet");
-            $statement = new SimpleStatement("SELECT updated FROM usermeta WHERE " . $where);
+            $statement = new SimpleStatement("SELECT last_updated FROM usermeta WHERE " . $where);
             $rows = $this->execute($statement, $args);
+            $last_updated = null;
+
+            foreach ($rows as $row) {
+                if (!$last_updated || $last_updated < $row['last_updated']) {
+                    $last_updated = $row['last_updated'];
+                }
+            }
+
+            if (!$last_updated) {
+                return new DateTime('now', new DateTimeZone('UTC'));
+            }
+
+            return $last_updated->toDateTime();
         }
     }
 
@@ -261,28 +288,74 @@ class Cassandra implements DatabaseInterface {
      * @inheritDoc
      */
     public function getNumImages($user = null) {
-        // TODO: Implement getNumImages() method.
+        $args = [];
+        $cql = "
+            SELECT 
+                COUNT(imageIdentifier) AS image_count 
+            FROM 
+                imageinfo";
+
+        if ($user) {
+            $args['user'] = $user;
+            $cql .= ' WHERE user = ?';
+        }
+
+        $statement = $this->session->prepare($cql);
+
+        $rows = $this->execute($statement, $args);
+        return (int) $rows[0]['image_count'];
     }
 
     /**
      * @inheritDoc
      */
     public function getNumBytes($user = null) {
-        // TODO: Implement getNumBytes() method.
+        $args = [];
+        $cql = "
+            SELECT
+                SUM(size) AS image_size
+            FROM
+                imageinfo
+        ";
+
+        if ($user) {
+            $args['user'] = $user;
+            $cql .= ' WHERE user = ?';
+        }
+
+        $statement = $this->session->prepare($cql);
+
+        $rows = $this->execute($statement, $args);
+        return (int) $rows[0]['image_size'];
     }
 
     /**
      * @inheritDoc
      */
     public function getNumUsers() {
-        // TODO: Implement getNumUsers() method.
+        $cql = "
+            SELECT
+                COUNT(user) AS user_count
+            FROM
+                imageinfo
+        ";
+
+        $statement = $this->session->prepare($cql);
+        $rows = $this->execute($statement);
+        return (int) $rows[0]['user_count'];
     }
 
     /**
      * @inheritDoc
      */
     public function getStatus() {
-        // TODO: Implement getStatus() method.
+        try {
+            $this->cassandra->execute(new SimpleStatement("SELECT NOW() FROM system.local"));
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -296,7 +369,13 @@ class Cassandra implements DatabaseInterface {
      * @inheritDoc
      */
     public function imageExists($user, $imageIdentifier) {
-        // TODO: Implement imageExists() method.
+        try {
+            $this->getImageProperties($user, $imageIdentifier);
+        } catch (DatabaseException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
