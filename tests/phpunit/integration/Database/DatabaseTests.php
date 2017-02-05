@@ -216,8 +216,15 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $this->getImage()));
         $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, ['foo' => 'bar']));
         $this->assertSame(['foo' => 'bar'], $this->adapter->getMetadata($user, $imageIdentifier));
-        $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, ['foo' => 'foo', 'bar' => 'foo']));
-        $this->assertSame(['foo' => 'foo', 'bar' => 'foo'], $this->adapter->getMetadata($user, $imageIdentifier));
+
+        $store = ['foo' => 'foo', 'bar' => 'foo'];
+        ksort($store);
+        $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, $store));
+
+        $fetch = $this->adapter->getMetadata($user, $imageIdentifier);
+        ksort($fetch);
+
+        $this->assertSame($store, $fetch);
     }
 
     public function testMetadataWithNestedArraysIsRepresetedCorrectly() {
