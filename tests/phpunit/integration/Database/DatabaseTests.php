@@ -341,7 +341,7 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
      *               the first image was added, and the second is the timestamp of when the last
      *               image was added
      */
-    private function insertImages($alternateUser = false) {
+    protected function insertImages($alternateUser = false) {
         $now = time();
         $start = $now;
         $images = [];
