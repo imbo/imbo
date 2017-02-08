@@ -17,6 +17,9 @@ use Imbo\Model\Image,
     Cassandra\Session,
     Cassandra\ExecutionOptions,
     Cassandra\SimpleStatement,
+    Cassandra\Map,
+    Cassandra\Type,
+    Cassandra\Timestamp,
 
     Imbo\Exception\DatabaseException,
     Imbo\Exception\InvalidArgumentException,
@@ -38,6 +41,8 @@ use Imbo\Model\Image,
  * @package Database
  */
 class Cassandra implements DatabaseInterface {
+    protected $metadataNamespaceSeparator = ':::';
+
     public function __construct($params = []) {
         $session = null;
 
@@ -131,7 +136,7 @@ class Cassandra implements DatabaseInterface {
                 user = ?
         ");
 
-        $this->execute($statement, ['last_updated' => new CassandraLib\Timestamp(), 'user' => $user]);
+        $this->execute($statement, ['last_updated' => new Timestamp(), 'user' => $user]);
 
         return $result;
     }
@@ -165,28 +170,105 @@ class Cassandra implements DatabaseInterface {
      * @inheritDoc
      */
     public function updateMetadata($user, $imageIdentifier, array $metadata) {
-        // TODO: Implement updateMetadata() method.
+        $statement = $this->session->prepare("
+            UPDATE
+                imageinfo
+            SET
+                metadata = ?
+            WHERE
+                user = ? AND 
+                imageIdentifier = ?
+        ");
+
+        return (boolean) $this->execute($statement, [
+            'metadata' => $this->mappifyMetdata($metadata),
+            'user' => $user,
+            'imageIdentifier' => $imageIdentifier,
+        ]);
+    }
+
+    protected function mappifyMetdata(array $metadata) {
+        $metadataMap = new Map(Type::text(), Type::text());
+
+        $normalizedMetadata = [];
+        $this->normalizeMetadata($metadata, $normalizedMetadata);
+
+        foreach ($normalizedMetadata as $key => $value) {
+            $metadataMap->set($key, (string) $value);
+        }
+
+        return $metadataMap;
+    }
+
+    protected function demappifyMetadata($metadataMap) {
+        $arr = [];
+
+        foreach ($metadataMap as $key => $value) {
+            $arr[$key] = $value;
+        }
+
+        return $this->denormalizeMetadata($arr);
     }
 
     /**
      * @inheritDoc
      */
     public function getMetadata($user, $imageIdentifier) {
-        // TODO: Implement getMetadata() method.
+        $statement = $this->session->prepare("
+            SELECT
+                metadata
+            FROM
+                imageinfo
+            WHERE
+                user = ? AND 
+                imageIdentifier = ?
+        ");
+
+        $rows = $this->execute($statement, [
+            'user' => $user,
+            'imageIdentifier' => $imageIdentifier,
+        ]);
+
+        if (empty($rows[0])) {
+            throw new DatabaseException("Image not found", 404);
+        }
+
+        if (!$rows[0]['metadata']) {
+            return [];
+        }
+
+        return $this->demappifyMetadata($rows[0]['metadata']);
     }
 
     /**
      * @inheritDoc
      */
     public function deleteMetadata($user, $imageIdentifier) {
-        // TODO: Implement deleteMetadata() method.
+        if (!$row = $this->getImageProperties($user, $imageIdentifier)) {
+            throw new DatabaseException("Image not found", 404);
+        }
+
+        $statement = $this->session->prepare("
+            UPDATE
+                imageinfo
+            SET
+                metadata = {}
+            WHERE
+                user = ? AND 
+                imageIdentifier = ?
+        ");
+
+        return (boolean) $this->execute($statement, [
+            'user' => $user,
+            'imageIdentifier' => $imageIdentifier,
+        ]);
     }
 
     /**
      * @inheritDoc
      */
     public function getImages(array $users, Query $query, Images $model) {
-        // TODO: Implement getImages() method.
+        throw new DatabaseException("Database adapter does not support querying /images.", 501);
     }
 
     /**
@@ -227,8 +309,7 @@ class Cassandra implements DatabaseInterface {
 
         $rows = $this->execute($statement, $args);
 
-        // count() gives int(1), even if there was no actual rows returned?
-        if (empty($rows[0])) {
+        if (!$rows->count()) {
             throw new DatabaseException("Image not found", 404);
         }
 
@@ -350,7 +431,7 @@ class Cassandra implements DatabaseInterface {
      */
     public function getStatus() {
         try {
-            $this->cassandra->execute(new SimpleStatement("SELECT NOW() FROM system.local"));
+            $this->session->execute(new SimpleStatement("SELECT NOW() FROM system.local"));
         } catch (Exception $e) {
             return false;
         }
@@ -362,7 +443,9 @@ class Cassandra implements DatabaseInterface {
      * @inheritDoc
      */
     public function getImageMimeType($user, $imageIdentifier) {
-        // TODO: Implement getImageMimeType() method.
+        $props = $this->getImageProperties($user, $imageIdentifier);
+
+        return $props['mime'];
     }
 
     /**
@@ -382,27 +465,263 @@ class Cassandra implements DatabaseInterface {
      * @inheritDoc
      */
     public function insertShortUrl($shortUrlId, $user, $imageIdentifier, $extension = null, array $query = []) {
-        // TODO: Implement insertShortUrl() method.
+        // Cassandra doesn't like null values, so we replace them with the empty string instead.
+        if (!$extension) {
+            $extension = '';
+        }
+
+        $statement = $this->session->prepare("
+            INSERT INTO
+                shorturl
+                (
+                    shortUrlId,
+                    extension,
+                    query,
+                    user,
+                    imageIdentifier
+                )
+            VALUES
+            (
+                :shortUrlId,
+                :extension,
+                :query,
+                :user,
+                :imageIdentifier
+            )
+        ");
+
+        $result = (boolean) $this->execute($statement, [
+            'shortUrlId' => $shortUrlId,
+            'extension' => $extension,
+            'query' => serialize($query),
+            'user' => $user,
+            'imageIdentifier' => $imageIdentifier,
+        ]);
+
+        $statement = $this->session->prepare("
+            INSERT INTO
+                shorturl_user
+                (
+                    user,
+                    imageIdentifier,
+                    shortUrlId
+                )
+            VALUES
+            (
+                :user,
+                :imageIdentifier,
+                :shortUrlId
+            )
+        ");
+
+        $resultUser = (boolean) $this->execute($statement, [
+            'user' => $user,
+            'imageIdentifier' => $imageIdentifier,
+            'shortUrlId' => $shortUrlId,
+        ]);
+
+        return $result && $resultUser;
+    }
+
+    protected function getShortUrlIdsForUserAndImageIdentifier($user, $imageIdentifier) {
+        $statement = $this->session->prepare("
+            SELECT
+                shorturlid
+            FROM
+                shorturl_user
+            WHERE
+                user = :user AND 
+                imageIdentifier = :imageIdentifier
+        ");
+
+        $rows = $this->execute($statement, [
+            'user' => $user,
+            'imageIdentifier' => $imageIdentifier,
+        ]);
+
+        if (!$rows->count()) {
+            return null;
+        }
+
+        $ids = [];
+
+        foreach ($rows as $row) {
+            $ids[] = $row['shorturlid'];
+        }
+
+        return $ids;
+    }
+
+    protected function getPlaceholderString($elements) {
+        return '(' . substr(str_repeat('?, ', $elements), 0, -2) . ')';
     }
 
     /**
      * @inheritDoc
      */
     public function getShortUrlId($user, $imageIdentifier, $extension = null, array $query = []) {
-        // TODO: Implement getShortUrlId() method.
+        // Cassandra doesn't like to search for null values, so we replace them with the empty string instead.
+        if (!$extension) {
+            $extension = '';
+        }
+
+        $args = $this->getShortUrlIdsForUserAndImageIdentifier($user, $imageIdentifier);
+        $rowCount = count($args);
+
+        $args[] = $extension;
+        $args[] = serialize($query);
+
+        // We might want to rewrite this to a parallel query later
+        $cql = "
+            SELECT
+                shortUrlId
+            FROM
+                shorturl
+            WHERE
+                shortUrlId IN " . $this->getPlaceholderString($rowCount) . " AND
+                extension = ? AND 
+                query = ?
+        ";
+
+        $statement = $this->session->prepare($cql);
+
+        $rows = $this->execute($statement, $args);
+
+        if (!$rows->count()) {
+            return null;
+        }
+
+        return $rows[0]['shorturlid'];
     }
 
     /**
      * @inheritDoc
      */
     public function getShortUrlParams($shortUrlId) {
-        // TODO: Implement getShortUrlParams() method.
+        $statement = $this->session->prepare("
+            SELECT
+                *
+            FROM
+                shorturl
+            WHERE
+                shortUrlId = ?
+        ");
+
+        $rows = $this->execute($statement, [$shortUrlId]);
+
+        if (!$rows->count()) {
+            return null;
+        }
+
+        $row = (array) $rows[0];
+
+        if (!$row['extension']) {
+            $row['extension'] = null;
+        }
+
+        $row['imageIdentifier'] = $row['imageidentifier'];
+        $row['query'] = unserialize($row['query']);
+        unset($row['imageidentifier']);
+
+        return $row;
     }
 
     /**
      * @inheritDoc
      */
     public function deleteShortUrls($user, $imageIdentifier, $shortUrlId = null) {
-        // TODO: Implement deleteShortUrls() method.
+        if (!$shortUrlId) {
+            $shortUrlIds = $this->getShortUrlIdsForUserAndImageIdentifier($user, $imageIdentifier);
+        } else {
+            $shortUrlIds = [$shortUrlId];
+        }
+
+        $cql = "
+            DELETE FROM 
+                shorturl_user
+            WHERE
+                user = :user AND 
+                imageidentifier = :imageidentifier
+        ";
+
+        $args = [
+            'user' => $user,
+            'imageidentifier' => $imageIdentifier,
+        ];
+
+        if ($shortUrlId) {
+            $cql .= ' AND shorturlid = :shorturlid';
+            $args['shorturlid'] = $shortUrlId;
+        }
+
+        $deleteUser = (boolean) $this->execute(new SimpleStatement($cql), $args);
+        $deleteShortUrls = true;
+
+        if ($shortUrlIds) {
+            $statement = new SimpleStatement("
+                DELETE FROM
+                    shorturl
+                WHERE
+                    shortUrlId IN " . $this->getPlaceholderString(count($shortUrlIds)) . "
+            ");
+
+            $deleteShortUrls = (boolean) $this->execute($statement, $shortUrlIds);
+        }
+
+        return $deleteUser && $deleteShortUrls;
+    }
+
+    /**
+     * Normalize metadata
+     *
+     * @param array $metadata Metadata
+     * @param array $normalized Normalized metadata
+     * @param string $namespace Namespace for keys
+     * @return array Returns an associative array with only one level
+     */
+    private function normalizeMetadata(array &$metadata, array &$normalized, $namespace = '') {
+        foreach ($metadata as $key => $value) {
+            if (strstr($key, $this->metadataNamespaceSeparator) !== false) {
+                throw new DatabaseException('Invalid metadata', 400);
+            }
+
+            $ns = $namespace . ($namespace ? $this->metadataNamespaceSeparator : '') . $key;
+
+            if (is_array($value)) {
+                $this->normalizeMetadata($value, $normalized, $ns);
+            } else {
+                $normalized[$ns] = $value;
+            }
+        }
+    }
+
+    /**
+     * De-normalize metadata
+     *
+     * @param array $data Metadata
+     * @return array
+     */
+    private function denormalizeMetadata(array $data) {
+        $result = [];
+
+        foreach ($data as $key => $value)
+        {
+            $keys = explode($this->metadataNamespaceSeparator, $key);
+            $tmp = &$result;
+
+            foreach ($keys as $i => $key)
+            {
+                if (!isset($tmp[$key]))
+                {
+                    $tmp[$key] = null;
+                }
+
+                $tmp = &$tmp[$key];
+            }
+
+            $tmp = $value;
+        }
+
+        return $result;
     }
 }
