@@ -44,7 +44,7 @@
     "imbo/imbo-phpcs-standard": "^1.4",
     "phpdocumentor/phpdocumentor": "^2.9",
     "cwhite92/b2-sdk-php": "^1.2",
-    "imbo/behat-api-extension": "^1.0"
+    "imbo/behat-api-extension": "2.0.x-dev"
   },
   "suggest": {
     "ext-mongo": "Enables usage of MongoDB and GridFS as database and store. Recommended version: >=1.4.0",
