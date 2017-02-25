@@ -15,10 +15,6 @@ use Imbo\Storage\GridFS;
 
 // Default config for testing
 $testConfig = [
-    'eventListeners' => [
-        'accessControl' => null,
-        'accessToken' => null,
-    ],
     'accessControl' => function() {
         return new ArrayAdapter([
             [
@@ -65,10 +61,10 @@ $testConfig = [
 $defaultConfig = require __DIR__ . '/../../../config/config.default.php';
 
 // Custom test config, if any, specified in the X-Imbo-Test-Config-File HTTP request header
+$customConfig = [];
+
 if (isset($_SERVER['HTTP_X_IMBO_TEST_CONFIG_FILE'])) {
     $customConfig = require __DIR__ . '/' . basename($_SERVER['HTTP_X_IMBO_TEST_CONFIG_FILE']);
-} else {
-    $customConfig = [];
 }
 
 // Return the merged configuration, having the custom config overwrite the default testing config,
