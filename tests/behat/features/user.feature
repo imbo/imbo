@@ -7,7 +7,7 @@ Feature: Imbo provides a user endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/user.<extension>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body matches:
            """
            <response>
@@ -20,14 +20,14 @@ Feature: Imbo provides a user endpoint
     Scenario: Request user that does not exist
         Given I use "foo" and "bar" for public and private keys
         When I request "/users/foo.json"
-        Then I should get a response with "400 Permission denied (public key)"
+        Then the response status line is "400 Permission denied (public key)"
         And the Imbo error message is "Permission denied (public key)" and the error code is "0"
 
     Scenario Outline: The user endpoint only supports HTTP GET and HEAD
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/user.json" using HTTP "<method>"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
 
         Examples:
             | method | status                 |

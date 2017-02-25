@@ -10,7 +10,7 @@ Feature: Imbo provides a groups endpoint
         Given I use "valid-group-pubkey" and "foobar" for public and private keys
         And I include an access token in the query
         When I request "/groups.<extension>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
         And the response body matches:
         """
@@ -24,7 +24,7 @@ Feature: Imbo provides a groups endpoint
         Given I use "valid-group-pubkey" and "foobar" for public and private keys
         And I include an access token in the query
         When I request "/groups.json?limit=1&page=<page>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body is:
         """
         <response>
@@ -40,7 +40,7 @@ Feature: Imbo provides a groups endpoint
         And I use "acl-creator" and "someprivkey" for public and private keys
         And I include an access token in the query
         When I request "/groups.json?limit=2"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body is:
         """
         {"search":{"hits":3,"page":1,"limit":2,"count":2},"groups":[{"name":"existing-group","resources":["group.get","group.head"]},{"name":"user-stats","resources":["user.get","user.head"]}]}
@@ -49,4 +49,4 @@ Feature: Imbo provides a groups endpoint
     Scenario: Fetch list of groups without specifying a public key
         Given I do not specify a public and private key
         When I request "/groups.json"
-        Then I should get a response with "400 Permission denied (public key)"
+        Then the response status line is "400 Permission denied (public key)"

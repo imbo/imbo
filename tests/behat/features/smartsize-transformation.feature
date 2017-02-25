@@ -12,13 +12,13 @@ Feature: Imbo can crop images using smart size and POIs
           """
         And I sign the request
         When I request the metadata of the test image using HTTP "PUT"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
 
     Scenario Outline: Smart size image
         Given I include an access token in the query
         And I specify "<transformation>" as transformation
         When I request the test image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the width of the image is "<width>"
         And the height of the image is "<height>"
         And the pixel at coordinate "<coord>" should have a color of "<color>"
@@ -42,7 +42,7 @@ Feature: Imbo can crop images using smart size and POIs
         Given I specify "smartsize:width=250,height=250" as transformation
         And I include an access token in the query
         When I request the test image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the width of the image is "250"
         And the height of the image is "250"
         And the pixel at coordinate "0, 0" should have a color of "#355170"
@@ -56,11 +56,11 @@ Feature: Imbo can crop images using smart size and POIs
           """
         And I sign the request
         And I request the metadata of the test image using HTTP "PUT"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         When I specify "smartsize:width=250,height=250" as transformation
         And I include an access token in the query
         And I request the test image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the width of the image is "250"
         And the height of the image is "250"
         And the pixel at coordinate "0, 0" should have a color of "#355170"
@@ -73,11 +73,11 @@ Feature: Imbo can crop images using smart size and POIs
           """
         And I sign the request
         When I request the metadata of the test image using HTTP "PUT"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         Given I include an access token in the query
         And I specify "smartsize:width=<width>,height=<height>" as transformation
         When I request the test image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the width of the image is "<width>"
         And the height of the image is "<height>"
         And the pixel at coordinate "0, 0" should have a color of "<color>"

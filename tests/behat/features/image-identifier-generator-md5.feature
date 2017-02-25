@@ -12,7 +12,7 @@ Feature: Imbo supports generation of md5 image identifiers
         And I sign the request
         And I attach "tests/phpunit/Fixtures/image.jpg" to the request body
         When I request "/users/user/images" using HTTP "POST"
-        Then I should get a response with "201 Created"
+        Then the response status line is "201 Created"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
           """
@@ -24,7 +24,7 @@ Feature: Imbo supports generation of md5 image identifiers
         And I sign the request
         And I attach "tests/phpunit/Fixtures/image1.png" to the request body
         When I request "/users/user/images" using HTTP "POST"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
           """

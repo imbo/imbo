@@ -31,13 +31,13 @@ Feature: Imbo can read POIs from metadata and draw them on images
           """
         And I sign the request
         When I request the metadata of the test image using HTTP "PUT"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
 
     Scenario Outline: Draw POIs on image
         Given I specify "<transformation>" as transformation
         And I include an access token in the query
         When I request the test image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the pixel at coordinate "<coord>" should have a color of "<color>"
 
         Examples:

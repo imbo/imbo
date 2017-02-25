@@ -9,29 +9,29 @@ Feature: Imbo adds ETag's to some responses
 
     Scenario: Index resource does not contain any Etag header
         When I request "/"
-        Then I should get a response with "200 Hell Yeah"
+        Then the response status line is "200 Hell Yeah"
         And the "ETag" response header does not exist
 
     Scenario: Stats resource does not contain any Etag header
         When I request "/stats?statsAllow=*"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "ETag" response header does not exist
 
     Scenario: Status resource does not contain any Etag header
         When I request "/status"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "ETag" response header does not exist
 
     Scenario: User resource includes an Etag
         Given I include an access token in the query
         When I request "/users/user"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "ETag" response header matches ""[a-z0-9]{32}""
 
     Scenario: Images resource includes an Etag
         Given I include an access token in the query
         When I request "/users/user/images"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "ETag" response header matches ""[a-z0-9]{32}""
 
     Scenario: Different image formats result in different ETag's
@@ -44,10 +44,10 @@ Feature: Imbo adds ETag's to some responses
     Scenario: Metadata resource includes an ETag
         Given I include an access token in the query
         When I request the metadata of the test image
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "ETag" response header matches ""[a-z0-9]{32}""
 
     Scenario: Responses that is not 200 OK does not get ETags
         When I request "/users/user"
-        Then I should get a response with "400 Missing access token"
+        Then the response status line is "400 Missing access token"
         And the "ETag" response header does not exist

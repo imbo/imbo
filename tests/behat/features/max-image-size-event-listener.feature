@@ -9,7 +9,7 @@ Feature: Imbo provides an event listener for enforcing a max image size
         And I attach "tests/phpunit/Fixtures/1024x256.png" to the request body
         And Imbo uses the "enforce-max-image-size.php" configuration
         When I request "/users/user/images" using HTTP "POST"
-        Then I should get a response with "201 Created"
+        Then the response status line is "201 Created"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
           """
@@ -22,7 +22,7 @@ Feature: Imbo provides an event listener for enforcing a max image size
         And I attach "tests/phpunit/Fixtures/256x1024.png" to the request body
         And Imbo uses the "enforce-max-image-size.php" configuration
         When I request "/users/user/images" using HTTP "POST"
-        Then I should get a response with "201 Created"
+        Then the response status line is "201 Created"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
           """
@@ -35,7 +35,7 @@ Feature: Imbo provides an event listener for enforcing a max image size
         And I attach "tests/phpunit/Fixtures/1024x1024.png" to the request body
         And Imbo uses the "enforce-max-image-size.php" configuration
         When I request "/users/user/images" using HTTP "POST"
-        Then I should get a response with "201 Created"
+        Then the response status line is "201 Created"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
           """

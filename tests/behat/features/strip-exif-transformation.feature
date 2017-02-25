@@ -11,6 +11,6 @@ Feature: Imbo can strip EXIF data from images
         And I specify "strip" as transformation
         And I include an access token in the query
         When I request the previously added image as a "jpg"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/jpeg"
         And the image should not have any "exif" properties

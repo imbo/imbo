@@ -12,7 +12,7 @@ Feature: Imbo supports content negotiation
         Given the "Accept" request header is "<accept>"
         And I include an access token in the query
         When I request "<resource>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
 
         Examples:
@@ -28,7 +28,7 @@ Feature: Imbo supports content negotiation
         Given the "Accept" request header is "<accept>"
         And I include an access token in the query
         When I request the metadata of the previously added image
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
 
         Examples:
@@ -39,13 +39,13 @@ Feature: Imbo supports content negotiation
     Scenario: If the client includes an extension, the Accept header should be ignored
         Given the "Accept" request header is "application/xml"
         When I request "/status.json"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
 
     Scenario: If the server responds with an error, and the client included a valid extension, that type should be returned
         Given the "Accept" request header is "application/xml"
         When I request "/users/foobar.json"
-        Then I should get a response with "400 Permission denied (public key)"
+        Then the response status line is "400 Permission denied (public key)"
         And the "Content-Type" response header is "application/json"
 
     Scenario Outline: Imbo uses the Accept header when encountering errors to choose the error format
@@ -53,7 +53,7 @@ Feature: Imbo supports content negotiation
         And I include an access token in the query
         And the "Accept" request header is "<accept>"
         When I request "/users/user/images/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa<extension>"
-        Then I should get a response with "<reason>"
+        Then the response status line is "<reason>"
         And the "Content-Type" response header is "application/json"
 
         Examples:
@@ -68,7 +68,7 @@ Feature: Imbo supports content negotiation
         And I include an access token in the query
         And the "Accept" request header is "application/json"
         When I request the image resource for "tests/phpunit/Fixtures/image1.png"
-        Then I should get a response with "406 Not acceptable"
+        Then the response status line is "406 Not acceptable"
         And the "Content-Type" response header is "application/json"
         And the "X-Imbo-Originalextension" response header is "png"
         And the "X-Imbo-Originalfilesize" response header is "95576"
@@ -85,7 +85,7 @@ Feature: Imbo supports content negotiation
         And I include an access token in the query
         And the "Accept" request header is "image/*"
         When I request the image resource for "<image-path>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
 
         Examples:
@@ -100,7 +100,7 @@ Feature: Imbo supports content negotiation
         And I include an access token in the query
         And the "Accept" request header is "<requested-content-type>"
         When I request the image resource for "<image-path>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "<original-content-type>"
 
         Examples:

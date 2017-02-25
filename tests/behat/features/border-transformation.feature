@@ -11,7 +11,7 @@ Feature: Imbo can apply border to images
         And I specify "border:color=bf1942,height=100,width=0,mode=outbound" as transformation
         And I include an access token in the query
         When I request the test image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the width of the image is "512"
         And the height of the image is "712"
         And the pixel at coordinate "0,0" should have a color of "#bf1942"
@@ -28,7 +28,7 @@ Feature: Imbo can apply border to images
         And I specify "border:color=bf1942,height=100,width=0,mode=outbound" as transformation
         And I include an access token in the query
         When I request the test image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the width of the image is "512"
         And the height of the image is "712"
         And the pixel at coordinate "0,0" should have a color of "#bf1942"
@@ -42,7 +42,7 @@ Feature: Imbo can apply border to images
         And I specify "border:color=bf1942,height=100,width=100,mode=inline" as transformation
         And I include an access token in the query
         When I request the test image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the width of the image is "512"
         And the height of the image is "512"
         And the pixel at coordinate "0,0" should have a color of "#bf1942"

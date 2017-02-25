@@ -11,7 +11,7 @@ Feature: Imbo provides an event listener for auto rotating images based on EXIF-
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request the added image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/png"
         And the width of the image is "640"
         And the height of the image is "160"

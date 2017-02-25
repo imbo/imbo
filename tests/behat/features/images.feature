@@ -14,7 +14,7 @@ Feature: Imbo provides an images endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/user/images.<extension>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
         And the response body matches:
         """
@@ -28,7 +28,7 @@ Feature: Imbo provides an images endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/user/images.<extension>?limit=2"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
         And the response body matches:
         """
@@ -42,7 +42,7 @@ Feature: Imbo provides an images endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/user/images.json?ids[]=foobar"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
         """
@@ -54,7 +54,7 @@ Feature: Imbo provides an images endpoint
         And I include an access token in the query
         And I append a query string parameter, "ids[]" with the image identifier of "tests/phpunit/Fixtures/image1.png"
         When I request "/users/user/images.json" with the given query string
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
         """
@@ -65,7 +65,7 @@ Feature: Imbo provides an images endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/user/images.json?checksums[]=<filter>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
         """
@@ -83,7 +83,7 @@ Feature: Imbo provides an images endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/user/images.<extension>?<fields>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body matches:
         """
         <response>
@@ -98,7 +98,7 @@ Feature: Imbo provides an images endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/user/images.<extension>?metadata=1&fields[]=<fields>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body matches:
         """
         <response>
@@ -113,7 +113,7 @@ Feature: Imbo provides an images endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/user/images.json?<fields>&<sort>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body matches:
         """
         <response>
@@ -134,7 +134,7 @@ Feature: Imbo provides an images endpoint
         And I append a query string parameter, "ids[]" with the image identifier of "tests/phpunit/Fixtures/image1.png"
         And I append a query string parameter, "ids[]" with the image identifier of "tests/phpunit/Fixtures/image.jpg"
         When I request "/users/user/images.json" with the given query string
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body matches:
         """
         #^{"search":{"hits":2,"page":1,"limit":1,"count":1},"images":\[{.*}\]}$#
@@ -144,7 +144,7 @@ Feature: Imbo provides an images endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/users/user/images.json?originalChecksums[]=b60df41830245ee8f278e3ddfe5238a3"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
         """

@@ -11,7 +11,7 @@ Feature: Imbo provides an event listener for turning EXIF data into metadata
         And I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request the metadata of the previously added image
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body contains:
         """
@@ -47,7 +47,7 @@ Feature: Imbo provides an event listener for turning EXIF data into metadata
         And I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request the metadata of the previously added image
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body contains:
         """

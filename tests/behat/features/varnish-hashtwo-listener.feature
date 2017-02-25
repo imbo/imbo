@@ -12,7 +12,7 @@ Feature: Imbo provides an event listener for the hashtwo Varnish module
         And I include an access token in the query
         And Imbo uses the "varnish-hashtwo.php" configuration
         When I request the previously added image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "X-HashTwo" response header matches "imbo;image;user;[A-Za-z0-9_-]{1,255}, imbo;user;user"
 
         Examples:
@@ -30,7 +30,7 @@ Feature: Imbo provides an event listener for the hashtwo Varnish module
         And I include an access token in the query
         And Imbo uses the "varnish-hashtwo.php" configuration
         When I request the previously added image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "X-Imbo-HashTwo" response header matches "imbo;image;user;[A-Za-z0-9_-]{1,255}, imbo;user;user"
 
         Examples:

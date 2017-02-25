@@ -11,7 +11,7 @@ Feature: Imbo provides a keys endpoint
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I include an access token in the query
         When I request "/keys/master-pubkey/access.<extension>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
         And the response body matches:
         """
@@ -25,7 +25,7 @@ Feature: Imbo provides a keys endpoint
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I include an access token in the query
         When I request "/keys/wildcarded/access.<extension>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
         And the response body matches:
         """
@@ -39,7 +39,7 @@ Feature: Imbo provides a keys endpoint
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I include an access token in the query
         When I request "/keys/group-based/access.<extension>?expandGroups=1"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
         And the response body matches:
         """
@@ -57,13 +57,13 @@ Feature: Imbo provides a keys endpoint
         """
         And I sign the request
         When I request "/keys/the-public-key" using HTTP "PUT"
-        Then I should get a response with "201 Created"
+        Then the response status line is "201 Created"
 
     Scenario Outline: Check if a public key exist
         Given I use "acl-creator" and "someprivkey" for public and private keys
         And I include an access token in the query
         When I request "/keys/<pubkey>" using HTTP "HEAD"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
         Examples:
             | pubkey       | status                   |
             | foobar       | 200 OK                   |
@@ -77,7 +77,7 @@ Feature: Imbo provides a keys endpoint
         """
         And I sign the request
         When I request "/keys/master-pubkey" using HTTP "PUT"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
 
     Scenario: Create new public key without having access to the keys resource
         Given I use "foobar" and "barfoo" for public and private keys
@@ -87,7 +87,7 @@ Feature: Imbo provides a keys endpoint
         """
         And I sign the request
         When I request "/keys/some-new-pubkey" using HTTP "PUT"
-        Then I should get a response with "400 Permission denied (public key)"
+        Then the response status line is "400 Permission denied (public key)"
 
     Scenario Outline: Add access rules for a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
@@ -97,7 +97,7 @@ Feature: Imbo provides a keys endpoint
         """
         And I sign the request
         When I request "/keys/foobar/access" using HTTP "POST"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
         Examples:
         | body                                                                                                   | status                                                                 |
         |                                                                                                        | 400 No access rule data provided                                       |
@@ -116,20 +116,20 @@ Feature: Imbo provides a keys endpoint
         And I use "master-pubkey" and "master-privkey" for public and private keys
         And I include an access token in the query
         When I request "/keys/foobar/access/100000000000000000001337" using HTTP "GET"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
 
     Scenario: Delete an access control rule
         And I use "master-pubkey" and "master-privkey" for public and private keys
         And I sign the request
         When I request "/keys/foobar/access/100000000000000000001337" using HTTP "DELETE"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the ACL rule under public key "foobar" with ID "100000000000000000001337" should not exist
 
     Scenario: Delete a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I sign the request
         When I request "/keys/foobar" using HTTP "DELETE"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "foobar" public key should not exist
 
     Scenario Outline: The keys resource supports PUT, HEAD and DELETE only
@@ -140,7 +140,7 @@ Feature: Imbo provides a keys endpoint
         <body>
         """
         When I request "/keys/foobar" using HTTP "<method>"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
 
         Examples:
             | method | auth-method  | body                             | status                 |
@@ -158,7 +158,7 @@ Feature: Imbo provides a keys endpoint
         <body>
         """
         When I request "/keys/master-pubkey/access" using HTTP "<method>"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
 
         Examples:
             | method | auth-method  | body                                             | status                 |
@@ -172,7 +172,7 @@ Feature: Imbo provides a keys endpoint
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I authenticate using "<auth-method>"
         When I request "/keys/foobar/access/100000000000000000001337" using HTTP "<method>"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
 
         Examples:
             | method | auth-method  | body                          | status                 |
@@ -191,7 +191,7 @@ Feature: Imbo provides a keys endpoint
         <body>
         """
         When I request "<uri>" using HTTP "<method>"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
 
         Examples:
             | uri                         | method | auth-method  | body                          | status                                  |

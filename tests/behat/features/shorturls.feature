@@ -11,7 +11,7 @@ Feature: Imbo can generate short URLs for images on demand
             {"user": "user", "imageIdentifier": "id", "extension": "gif", "query": null}
             """
         When I request "/users/user/images/id/shorturls" using HTTP "POST"
-        Then I should get a response with "404 Image does not exist"
+        Then the response status line is "404 Image does not exist"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
            """
@@ -26,7 +26,7 @@ Feature: Imbo can generate short URLs for images on demand
             """
             {"user": "user", "extension": "gif"}
             """
-        Then I should get a response with "201 Created"
+        Then the response status line is "201 Created"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
            """
@@ -41,7 +41,7 @@ Feature: Imbo can generate short URLs for images on demand
             """
             {"user": "other-user", "extension": "gif"}
             """
-        Then I should get a response with "400 Permission denied (public key)"
+        Then the response status line is "400 Permission denied (public key)"
 
     Scenario Outline: Request an image using the short URL
         Given "tests/phpunit/Fixtures/image.png" exists in Imbo
@@ -53,7 +53,7 @@ Feature: Imbo can generate short URLs for images on demand
             """
 
         When I request the image using the generated short URL
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "<mime>"
         And the "X-Imbo-Originalextension" response header is "png"
         And the "X-Imbo-Originalfilesize" response header is "41423"

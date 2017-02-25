@@ -11,23 +11,23 @@ Feature: Imbo enables caching of transformations
     Scenario: Fetch uncached image, then fetch same image from cache
         Given I include an access token in the query
         When I request the test image as a "jpg"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/jpeg"
         And the "X-Imbo-TransformationCache" response header is "Miss"
         When I request the test image as a "jpg"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/jpeg"
         And the "X-Imbo-TransformationCache" response header is "Hit"
 
     Scenario: Fetch the same image, but with a different extension
         Given I include an access token in the query
         When I request the test image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/png"
         And the "X-Imbo-TransformationCache" response header is "Miss"
         And the checksum of the image is "fc7d2d06993047a0b5056e8fac4462a2"
         When I request the test image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/png"
         And the "X-Imbo-TransformationCache" response header is "Hit"
         And the checksum of the image is "fc7d2d06993047a0b5056e8fac4462a2"
@@ -36,13 +36,13 @@ Feature: Imbo enables caching of transformations
         Given I include an access token in the query
         And I specify "crop:width=50,height=60,x=1,y=10" as transformation
         When I request the test image as a "jpg"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/jpeg"
         And the "X-Imbo-TransformationCache" response header is "Miss"
         And the width of the image is "50"
         And the height of the image is "60"
         When I request the test image as a "jpg"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/jpeg"
         And the "X-Imbo-TransformationCache" response header is "Hit"
         And the width of the image is "50"
@@ -52,7 +52,7 @@ Feature: Imbo enables caching of transformations
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         When I request the test image using HTTP "DELETE"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         When I include an access token in the query
         And I request the test image as a "jpg"
-        Then I should get a response with "404 Image not found"
+        Then the response status line is "404 Image not found"

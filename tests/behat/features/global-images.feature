@@ -14,7 +14,7 @@ Feature: Imbo provides a global images endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/images.json"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
         """
@@ -25,7 +25,7 @@ Feature: Imbo provides a global images endpoint
         Given I use "wildcard" and "*" for public and private keys
         And I include an access token in the query
         When I request "/images.json?users[]=user&users[]=other-user"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
         """
@@ -36,7 +36,7 @@ Feature: Imbo provides a global images endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/images.json<queryString>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body matches:
         """
@@ -53,5 +53,5 @@ Feature: Imbo provides a global images endpoint
         Given I use "unpriviledged" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request "/images.json?users[]=foo&users[]=bar"
-        Then I should get a response with "400 Public key does not have access to the users: [foo, bar]"
+        Then the response status line is "400 Public key does not have access to the users: [foo, bar]"
         And the "Content-Type" response header is "application/json"

@@ -11,7 +11,7 @@ Feature: Imbo can adjust color levels of images
         And I specify "level:channel=r,amount=100" as transformation
         And I include an access token in the query
         When I request the previously added image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the pixel at coordinate "5, 55" should have a color of "#de3f3f"
 
     Scenario: Apply a transformation that increases level for all channels
@@ -19,5 +19,5 @@ Feature: Imbo can adjust color levels of images
         And I specify "level:channel=rgb,amount=100" as transformation
         And I include an access token in the query
         When I request the previously added image as a "png"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the pixel at coordinate "22, 32" should have a color of "#ffed00"

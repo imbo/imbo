@@ -10,7 +10,7 @@ Feature: Imbo provides a metadata endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request the metadata of the test image as "<extension>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body matches:
            """
            <response>
@@ -28,7 +28,7 @@ Feature: Imbo provides a metadata endpoint
           """
         And I sign the request
         When I request the metadata of the test image using HTTP "PUT"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """
@@ -39,7 +39,7 @@ Feature: Imbo provides a metadata endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request the metadata of the test image as "<extension>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body matches:
            """
            <response>
@@ -57,7 +57,7 @@ Feature: Imbo provides a metadata endpoint
           """
         And I sign the request
         When I request the metadata of the test image using HTTP "POST"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """
@@ -68,7 +68,7 @@ Feature: Imbo provides a metadata endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request the metadata of the test image as "<extension>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body matches:
            """
            <response>
@@ -86,7 +86,7 @@ Feature: Imbo provides a metadata endpoint
           """
         And I sign the request
         When I request the metadata of the test image using HTTP "PUT"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """
@@ -97,7 +97,7 @@ Feature: Imbo provides a metadata endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request the metadata of the test image as "<extension>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body matches:
            """
            <response>
@@ -111,7 +111,7 @@ Feature: Imbo provides a metadata endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I sign the request
         When I request the metadata of the test image using HTTP "DELETE"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """
@@ -122,7 +122,7 @@ Feature: Imbo provides a metadata endpoint
         Given I use "publickey" and "privatekey" for public and private keys
         And I include an access token in the query
         When I request the metadata of the test image as "<extension>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body matches:
            """
            <response>
@@ -140,7 +140,7 @@ Feature: Imbo provides a metadata endpoint
           """
         And I sign the request
         When I request the metadata of the test image using HTTP "PUT"
-        Then I should get a response with "400 Invalid JSON data"
+        Then the response status line is "400 Invalid JSON data"
 
     Scenario: Set data for invalid metadata key
         Given I use "publickey" and "privatekey" for public and private keys
@@ -150,7 +150,7 @@ Feature: Imbo provides a metadata endpoint
           """
         And I sign the request
         When I request the metadata of the test image using HTTP "PUT"
-        Then I should get a response with "400 Invalid metadata. Dot characters ('.') are not allowed in metadata keys"
+        Then the response status line is "400 Invalid metadata. Dot characters ('.') are not allowed in metadata keys"
 
     Scenario Outline: Set and get metadata with nested info
         Given I use "publickey" and "privatekey" for public and private keys
@@ -162,7 +162,7 @@ Feature: Imbo provides a metadata endpoint
         And I request the metadata of the test image using HTTP "PUT"
         When I include an access token in the query
         And I request the metadata of the test image as "<extension>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body matches:
            """
            <response>
@@ -183,7 +183,7 @@ Feature: Imbo provides a metadata endpoint
         And I request the metadata of the test image using HTTP "PUT"
         When I include an access token in the query
         And I request the metadata of the test image as "<extension>"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the response body matches:
            """
            <response>
