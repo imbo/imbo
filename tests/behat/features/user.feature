@@ -4,8 +4,7 @@ Feature: Imbo provides a user endpoint
     I want to make requests against the user endpoint
 
     Scenario Outline: Request user information
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
+        Given I include an access token in the query using "publicKey" and "privateKey"
         When I request "/users/user.<extension>"
         Then the response status line is "200 OK"
         And the response body matches:
@@ -18,14 +17,13 @@ Feature: Imbo provides a user endpoint
             | json      | #^{"user":"user","numImages":0,"lastModified":"[^"]+"}$# |
 
     Scenario: Request user that does not exist
-        Given I use "foo" and "bar" for public and private keys
-        When I request "/users/foo.json"
+        Given I sign the request with "publicKey" and "privateKey"
+        When I request "/users/foobar.json"
         Then the response status line is "400 Permission denied (public key)"
         And the Imbo error message is "Permission denied (public key)" and the error code is "0"
 
     Scenario Outline: The user endpoint only supports HTTP GET and HEAD
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I include an access token in the query
+        Given I include an access token in the query using "publicKey" and "privateKey"
         When I request "/users/user.json" using HTTP "<method>"
         Then the response status line is "<status>"
 
