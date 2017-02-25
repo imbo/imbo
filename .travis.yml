@@ -36,7 +36,7 @@ before_install:
   - printf "\n" | pecl install imagick-3.4.0RC2
 
 before_script:
-  - phpenv config-add tests/travis-php.ini
+  - phpenv config-rm xdebug.ini
   - composer self-update
   - composer install --prefer-dist
 
