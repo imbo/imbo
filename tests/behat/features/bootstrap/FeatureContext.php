@@ -176,7 +176,7 @@ class FeatureContext extends RESTContext {
         }
 
         // $this->currentConfig = $configFile;
-        $this->givenTheRequestHeaderIs('X-Imbo-Test-Config-File', $configFile);
+        $this->setRequestHeader('X-Imbo-Test-Config-File', $configFile);
     }
 
     /**
