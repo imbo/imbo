@@ -189,7 +189,7 @@ class FeatureContext extends RESTContext {
      * @Given the stats are allowed by :mask
      */
     public function statsAllowedBy($mask) {
-        $this->givenTheRequestHeaderIs('X-Imbo-Stats-Allowed-By', $mask);
+        $this->setRequestHeader('X-Imbo-Stats-Allowed-By', $mask);
     }
 
     /**
@@ -202,9 +202,9 @@ class FeatureContext extends RESTContext {
      */
     public function forceAdapterFailure($adapter) {
         if ($adapter === 'storage') {
-            $this->givenTheRequestHeaderIs('X-Imbo-Status-Storage-Failure', 1);
+            $this->setRequestHeader('X-Imbo-Status-Storage-Failure', 1);
         } else {
-            $this->givenTheRequestHeaderIs('X-Imbo-Status-Database-Failure', 1);
+            $this->setRequestHeader('X-Imbo-Status-Database-Failure', 1);
         }
     }
 
@@ -352,7 +352,7 @@ class FeatureContext extends RESTContext {
         $this->signRequest('publickey', 'privatekey');
 
         // Request the endpoint for adding the image
-        $this->whenIRequestPath(sprintf('/users/%s/images', $user), 'POST');
+        $this->requestPath(sprintf('/users/%s/images', $user), 'POST');
 
         // Reset the request
         $this->request = $originalRequest;
@@ -367,7 +367,7 @@ class FeatureContext extends RESTContext {
      * @Given the client IP is :ip
      */
     public function setClientIp($ip) {
-        $this->givenTheRequestHeaderIs('X-Client-Ip', $ip);
+        $this->setRequestHeader('X-Client-Ip', $ip);
     }
 
     /**
