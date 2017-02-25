@@ -15,7 +15,7 @@ Feature: Imbo provides an image endpoint
         And the response body contains JSON:
           """
           {
-              "imageIdentifier":"@regExp(/^[a-zA-Z0-9_-]{12}$/)",
+              "imageIdentifier": "@regExp(/^[a-zA-Z0-9_-]{12}$/)",
               "width": 599,
               "height": 417,
               "extension": "png"
@@ -33,7 +33,7 @@ Feature: Imbo provides an image endpoint
         And the response body contains JSON:
           """
           {
-              "imageIdentifier":"@regExp(/^[a-zA-Z0-9_-]{12}$/)",
+              "imageIdentifier": "@regExp(/^[a-zA-Z0-9_-]{12}$/)",
               "width": 599,
               "height": 417,
               "extension": "png"

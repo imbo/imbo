@@ -9,6 +9,7 @@
  */
 
 use Behat\Behat\Hook\Scope\BeforeFeatureScope;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Uri;
@@ -119,9 +120,9 @@ class FeatureContext extends RESTContext {
 
     /**
      * @param BeforeFeatureScope $scope
-     * @BeforeFeature
+     * @BeforeScenario
      */
-    public static function prepare(BeforeFeatureScope $scope) {
+    public static function prepare(BeforeScenarioScope $scope) {
         // Drop mongo test collection which stores information regarding images, and the images
         // themselves
         $mongo = new MongoClient();
@@ -346,7 +347,7 @@ class FeatureContext extends RESTContext {
         $originalRequestOptions = $this->requestOptions;
 
         // Attach the file to the request body
-        $this->setRequestBody($imagePath);
+        $this->setRequestBody(fopen($imagePath, 'r'));
 
         // Signal that the request needs to be signed
         $this->signRequest('publickey', 'privatekey');
@@ -354,9 +355,13 @@ class FeatureContext extends RESTContext {
         // Request the endpoint for adding the image
         $this->requestPath(sprintf('/users/%s/images', $user), 'POST');
 
-        // Reset the request
+        // Store the mapping of path => image identifier
+        $this->imageIdentifiers[$imagePath] = json_decode((string)$this->response->getBody())->imageIdentifier;
+
+        // Reset the request / response
         $this->request = $originalRequest;
         $this->requestOptions = $originalRequestOptions;
+        $this->response = null;
     }
 
     /**
@@ -396,7 +401,7 @@ class FeatureContext extends RESTContext {
                     preg_match('|/users/(.+?)/images|', (string) $request->getUri(), $matches);
 
                     $path = sprintf('/users/%s/images/%s', $matches[1], $body->imageIdentifier);
-                    $this->whenIRequestPath($path, $method);
+                    $this->requestPath($path, $method);
 
                     return;
                 }
@@ -520,7 +525,7 @@ class FeatureContext extends RESTContext {
             $value = gmdate('Y-m-d\TH:i:s\Z');
         }
 
-        parent::setRequestHeader($header, $value);
+        return parent::setRequestHeader($header, $value);
     }
 
     /**

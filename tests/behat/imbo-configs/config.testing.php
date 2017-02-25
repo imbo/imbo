@@ -15,6 +15,10 @@ use Imbo\Storage\GridFS;
 
 // Default config for testing
 $testConfig = [
+    'eventListeners' => [
+        'accessControl' => null,
+        'accessToken' => null,
+    ],
     'accessControl' => function() {
         return new ArrayAdapter([
             [

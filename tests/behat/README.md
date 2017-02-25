@@ -1,6 +1,27 @@
 # Behat features
 The `features` directory contains all the feature files that is tested with Behat. [imbo/behat-api-extension](https://github.com/imbo/behat-api-extension) is used to test the API, and the [FeatureContext](features/bootstrap/FeatureContext.php) class contains a series of steps that can be used to test Imbo-specific features. It also contains steps for priming Imbo with given images and metadata.
 
+## Custom steps
+
+The following is a list of steps implemented in the `FeatureContext` class:
+
+```gherkin
+Given Imbo uses the :configFile configuration
+Given the stats are allowed by :mask
+Given the storage is down
+Given the database is down
+Given I sign the request with :publicKey and :privateKey
+Given I sign the request with :publicKey and :privateKey using HTTP headers
+Given I include an access token in the query using :publicKey and :privateKey
+Given :imagePath exists in Imbo
+Given :imagePath exists for user :user in Imbo
+Given the client IP is :ip
+When I request the previously added image
+When I request the previously added image using HTTP :method
+Then the Imbo error message is :message
+Then the Imbo error message is :message and the error code is :code
+```
+
 ## Run tests
 
 To run the complete testsuite, execute the following command from the project root:
