@@ -13,31 +13,31 @@ Feature: Imbo provides an event listener for turning EXIF data into metadata
         When I request the metadata of the previously added image
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
-        And the response body contains:
+        And the response body contains JSON:
         """
         "exif:Make":"SAMSUNG"
         """
-        And the response body contains:
+        And the response body contains JSON:
         """
         "exif:Model":"GT-I9100"
         """
-        And the response body contains:
+        And the response body contains JSON:
         """
         "exif:GPSAltitude":"254\/5"
         """
-        And the response body contains:
+        And the response body contains JSON:
         """
         "exif:GPSLatitude":"63\/1, 40\/1, 173857\/3507"
         """
-        And the response body contains:
+        And the response body contains JSON:
         """
         "exif:GPSLongitude":"9\/1, 5\/1, 38109\/12500"
         """
-        And the response body contains:
+        And the response body contains JSON:
         """
         "gps:location":[9.0841802,63.680437300003]
         """
-        And the response body contains:
+        And the response body contains JSON:
         """
         "gps:altitude":50.8
         """
@@ -49,7 +49,7 @@ Feature: Imbo provides an event listener for turning EXIF data into metadata
         When I request the metadata of the previously added image
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
-        And the response body contains:
+        And the response body contains JSON:
         """
         "png:IHDR:bit-depth":"8"
         """

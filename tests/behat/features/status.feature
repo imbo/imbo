@@ -8,10 +8,10 @@ Feature: Imbo provides a status endpoint
     Scenario: Fetch status information
         When I request "/status"
         Then the response code is 200
-        And the response body contains:
+        And the response body contains JSON:
             """
             {
-                "date": "<re>/.*/</re>",
+                "date": "@regExp(/.*/)",
                 "database": true,
                 "storage": true
             }
@@ -36,7 +36,7 @@ Feature: Imbo provides a status endpoint
         When I request "/status"
         Then the response code is 503
         And the response reason phrase is "Database error"
-        And the response body contains:
+        And the response body contains JSON:
             """
             {
                 "database": false,
@@ -50,7 +50,7 @@ Feature: Imbo provides a status endpoint
         When I request "/status"
         Then the response code is 503
         And the response reason phrase is "Storage error"
-        And the response body contains:
+        And the response body contains JSON:
             """
             {
                 "database": true,
@@ -65,7 +65,7 @@ Feature: Imbo provides a status endpoint
         When I request "/status"
         Then the response code is 503
         And the response reason phrase is "Database and storage error"
-        And the response body contains:
+        And the response body contains JSON:
             """
             {
                 "database": false,

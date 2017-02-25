@@ -13,7 +13,7 @@ Feature: Imbo provides a stats endpoint
         And the stats are allowed by "*"
         When I request "/stats"
         Then the response code is 200
-        And the response body contains:
+        And the response body contains JSON:
             """
             {
                 "numImages": 3,

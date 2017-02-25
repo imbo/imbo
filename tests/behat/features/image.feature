@@ -12,10 +12,10 @@ Feature: Imbo provides an image endpoint
         Then the response code is 201
         And the response reason phrase is "Created"
         And the "Content-Type" response header is "application/json"
-        And the response body contains:
+        And the response body contains JSON:
           """
           {
-              "imageIdentifier":"<re>/^[a-zA-Z0-9_-]{12}$/</re>",
+              "imageIdentifier":"@regExp(/^[a-zA-Z0-9_-]{12}$/)",
               "width": 599,
               "height": 417,
               "extension": "png"
@@ -30,10 +30,10 @@ Feature: Imbo provides an image endpoint
         Then the response code is 201
         And the response reason phrase is "Created"
         And the "Content-Type" response header is "application/json"
-        And the response body contains:
+        And the response body contains JSON:
           """
           {
-              "imageIdentifier":"<re>/^[a-zA-Z0-9_-]{12}$/</re>",
+              "imageIdentifier":"@regExp(/^[a-zA-Z0-9_-]{12}$/)",
               "width": 599,
               "height": 417,
               "extension": "png"
@@ -77,10 +77,10 @@ Feature: Imbo provides an image endpoint
         Then the response code is 200
         And the response reason phrase is "OK"
         And the "Content-Type" response header is "application/json"
-        And the response body contains:
+        And the response body contains JSON:
           """
           {
-              "imageIdentifier":"<re>/^[a-zA-Z0-9_-]{12}$/</re>"
+              "imageIdentifier":"@regExp(/^[a-zA-Z0-9_-]{12}$/)"
           }
           """
 

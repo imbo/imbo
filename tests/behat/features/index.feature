@@ -9,7 +9,7 @@ Feature: Imbo provides an index endpoint
         When I request "/"
         Then the response code is 200
         And the response reason phrase is "Hell Yeah"
-        And the response body contains:
+        And the response body contains JSON:
             """
             {"site":"http://imbo.io"}
             """
