@@ -10,9 +10,10 @@ Given Imbo uses the :configFile configuration
 Given the stats are allowed by :mask
 Given the storage is down
 Given the database is down
-Given I sign the request with :publicKey and :privateKey
-Given I sign the request with :publicKey and :privateKey using HTTP headers
-Given I include an access token in the query using :publicKey and :privateKey
+Given I use :publicKey and :privateKey for public and private keys
+Given I sign the request
+Given I sign the request using HTTP headers
+Given I include an access token in the query string
 Given :imagePath exists in Imbo
 Given :imagePath exists for user :user in Imbo
 Given the client IP is :ip
