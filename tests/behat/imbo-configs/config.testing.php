@@ -18,8 +18,8 @@ $testConfig = [
     'accessControl' => function() {
         return new ArrayAdapter([
             [
-                'publicKey' => 'publickey',
-                'privateKey' => 'privatekey',
+                'publicKey' => 'publicKey',
+                'privateKey' => 'privateKey',
                 'acl' => [[
                     'resources' => Resource::getReadWriteResources(),
                     'users' => ['user', 'other-user'],
@@ -27,7 +27,7 @@ $testConfig = [
             ],
             [
                 'publicKey' => 'unpriviledged',
-                'privateKey' => 'privatekey',
+                'privateKey' => 'privateKey',
                 'acl' => [[
                     'resources' => Resource::getReadWriteResources(),
                     'users' => ['user'],
