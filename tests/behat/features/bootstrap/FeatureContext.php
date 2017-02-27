@@ -706,7 +706,9 @@ class FeatureContext extends ApiContext {
      *
      * @param string $coordinates
      * @throws InvalidArgumentException Throws an exception if the coordinates value is invalid
-     * @return array
+     * @return array Returns an array with two keys:
+     *               - `color`: Hex color of the pixel.
+     *               - `alpha`: Alpha value of the pixel.
      */
     private function getImagePixelInfo($coordinates) {
         $this->requireResponse();
