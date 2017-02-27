@@ -26,6 +26,11 @@ use Assert\Assertion;
  * @package Test suite\Functional tests
  */
 class FeatureContext extends ApiContext {
+    /**
+     * Names for middlewares
+     *
+     * @var string
+     */
     const MIDDLEWARE_SIGN_REQUEST = 'sign-request';
     const MIDDLEWARE_APPEND_ACCESS_TOKEN = 'append-access-token';
 
@@ -34,7 +39,7 @@ class FeatureContext extends ApiContext {
      *
      * @var string
      */
-    private $user = 'user';
+    private $user;
 
     /**
      * The public key used by the client
@@ -51,7 +56,7 @@ class FeatureContext extends ApiContext {
     private $privateKey;
 
     /**
-     * Holds the name of the configuration file specified in the current feature
+     * The name of the current configuration file
      *
      * @var string
      */
@@ -108,25 +113,40 @@ class FeatureContext extends ApiContext {
     private $history = [];
 
     /**
+     * Keys for the users
+     *
+     * @var array
+     */
+    private $keys = [
+        'user' => [
+            'publicKey' => 'publicKey',
+            'privateKey' => 'privateKey',
+        ],
+    ];
+
+    /**
      * Manipulate the handler stack of the client for all tests
      *
      * - Add the history middleware to record all request / responses in the $this->history array
      *
      * @param ClientInterface $client A GuzzleHttp\Client instance
+     * @return self
      */
     public function setClient(ClientInterface $client) {
         $client->getConfig()['handler']->push(Middleware::history($this->history));
 
-        parent::setClient($client);
+        return parent::setClient($client);
     }
 
     /**
+     * Drop mongo test collection which stores information regarding images, and the images
+     * themselves
+     *
      * @param BeforeFeatureScope $scope
+     *
      * @BeforeScenario
      */
     public static function prepare(BeforeScenarioScope $scope) {
-        // Drop mongo test collection which stores information regarding images, and the images
-        // themselves
         $mongo = new MongoClient();
         $mongo->imbo_testing->drop();
 
@@ -165,6 +185,7 @@ class FeatureContext extends ApiContext {
      * @param string $configFile Custom configuration file to use for the next request (file must
      *                           reside in the tests/behat/imbo-configs directory)
      * @throws InvalidArgumentException
+     *
      * @Given Imbo uses the :configFile configuration
      */
     public function setImboConfigHeader($configFile) {
@@ -178,7 +199,7 @@ class FeatureContext extends ApiContext {
             ));
         }
 
-        // $this->currentConfig = $configFile;
+        $this->currentConfig = $configFile;
         $this->setRequestHeader('X-Imbo-Test-Config-File', $configFile);
     }
 
@@ -189,26 +210,32 @@ class FeatureContext extends ApiContext {
      * file.
      *
      * @param string $mask Specify which subnet mask who are allowed to view stats
+     * @return self
+     *
      * @Given the stats are allowed by :mask
      */
     public function statsAllowedBy($mask) {
-        $this->setRequestHeader('X-Imbo-Stats-Allowed-By', $mask);
+        return $this->setRequestHeader('X-Imbo-Stats-Allowed-By', $mask);
     }
 
     /**
-     * Send a query parameter with the next request, informing Imbo which adapter to take down
+     * Send a request header with the next request, informing Imbo which adapter to take down
      *
      * This feature is implemented in the status.php custom configuration file.
      *
      * @param string $adapter Which adapter to take down
+     * @return self
+     *
      * @Given /^the (storage|database) is down$/
      */
     public function forceAdapterFailure($adapter) {
         if ($adapter === 'storage') {
-            $this->setRequestHeader('X-Imbo-Status-Storage-Failure', 1);
+            $header = 'X-Imbo-Status-Storage-Failure';
         } else {
-            $this->setRequestHeader('X-Imbo-Status-Database-Failure', 1);
+            $header = 'X-Imbo-Status-Database-Failure';
         }
+
+        return $this->setRequestHeader($header, 1);
     }
 
     /**
@@ -216,10 +243,12 @@ class FeatureContext extends ApiContext {
      *
      * @param string $publicKey The public key to sign the URL with
      * @param string $privateKey The private key to sign the URL with
+     * @return self
+     *
      * @Given I sign the request with :publicKey and :privateKey using HTTP headers
      */
     public function signRequestUsingHttpHeaders($publicKey, $privateKey) {
-        $this->signRequest($publicKey, $privateKey, true);
+        return $this->signRequest($publicKey, $privateKey, true);
     }
 
     /**
@@ -231,6 +260,8 @@ class FeatureContext extends ApiContext {
      * @param string $publicKey The public key to sign the URL with
      * @param string $privateKey The private key to sign the URL with
      * @param boolean $useHeaders Whether or not to put the signature in the request HTTP headers
+     * @return self
+     *
      * @Given I sign the request with :publicKey and :privateKey
      */
     public function signRequest($publicKey, $privateKey, $useHeaders = false) {
@@ -289,6 +320,8 @@ class FeatureContext extends ApiContext {
 
             return $request;
         }), self::MIDDLEWARE_SIGN_REQUEST);
+
+        return $this;
     }
 
     /**
@@ -296,6 +329,7 @@ class FeatureContext extends ApiContext {
      *
      * @param string $publicKey The public key to use
      * @param string $privateKey The private key to use
+     *
      * @Given I include an access token in the query using :publicKey and :privateKey
      */
     public function appendAccessToken($publicKey, $privateKey) {
@@ -330,40 +364,51 @@ class FeatureContext extends ApiContext {
      * - sign the request
      * - issue a POST
      *
-     * The users, public keys and private keys are specified in the test configuration.
+     * The users, public keys and private keys are specified in the test configuration, and the
+     * map of keys exist in $this->keys.
      *
      * Since this method might be executed in between other steps we will not have a fresh instance
      * of the client after this step is finished, so we need to clean up after we're done by
      * resetting the request and request options.
      *
-     * @see tests/behat/imbo-configs
-     *
      * @param string $imagePath Path to the image, relative to the project root path
      * @param string $user The user who will own the image
-     * @Given :imagePath exists in Imbo
-     * @Given :imagePath exists for user :user in Imbo
+     * @throws InvalidArgumentException Throws an exception if the user specified does not have a
+     *                                  set of keys.
+     * @return self
+     *
+     * @Given :imagePath exists for user :user
      */
-    public function addUserImageToImbo($imagePath, $user = 'user') {
+    public function addUserImageToImbo($imagePath, $user) {
+        // See if the user specified has a set of keys
+        if (!isset($this->keys[$user])) {
+            throw new InvalidArgumentException(sprintf('No keys exist for user "%s".', $user));
+        }
+
         // Store the original request
         $originalRequest = clone $this->request;
         $originalRequestOptions = $this->requestOptions;
 
-        // Attach the file to the request body
-        $this->setRequestBody(fopen($imagePath, 'r'));
+        $this
+            // Attach the file to the request body
+            ->setRequestBody(fopen($imagePath, 'r'))
 
-        // Signal that the request needs to be signed
-        $this->signRequest('publickey', 'privatekey');
+            // Sign the request
+            ->signRequest($this->keys[$user]['publicKey'], $this->keys[$user]['privateKey'])
 
-        // Request the endpoint for adding the image
-        $this->requestPath(sprintf('/users/%s/images', $user), 'POST');
+            // Request the endpoint for adding the image
+            ->requestPath(sprintf('/users/%s/images', $user), 'POST');
 
-        // Store the mapping of path => image identifier
-        $this->imageIdentifiers[$imagePath] = json_decode((string)$this->response->getBody())->imageIdentifier;
+        // Store the mapping of path => image identifier and the image data
+        $imageIdentifier = json_decode((string) $this->response->getBody())->imageIdentifier;
+        $this->imageIdentifiers[$imagePath] = $imageIdentifier;
 
         // Reset the request / response
         $this->request = $originalRequest;
         $this->requestOptions = $originalRequestOptions;
         $this->response = null;
+
+        return $this;
     }
 
     /**
@@ -371,10 +416,14 @@ class FeatureContext extends ApiContext {
      * configuration file to test the access part of the event listener
      *
      * @param string $ip The IP address to set
+     * @return self
+     *
      * @Given the client IP is :ip
      */
     public function setClientIp($ip) {
         $this->setRequestHeader('X-Client-Ip', $ip);
+
+        return $this;
     }
 
     /**
@@ -384,11 +433,15 @@ class FeatureContext extends ApiContext {
      * contains image identifiers. The first one found will be requested.
      *
      * @param string $method The HTTP method to use
-     * @throws RuntimeException
+     * @param string $extension
+     * @throws RuntimeException Throws an exception if there is no response in the history that has
+     *                          added an image.
+     * @return self
+     *
      * @When I request the previously added image
      * @When I request the previously added image using HTTP :method
      */
-    public function requestPreviouslyAddedImage($method = 'GET') {
+    public function requestPreviouslyAddedImage($method = 'GET', $extension = null) {
         // Go back in the history until we have a request with an image
         foreach (array_reverse($this->history) as $transaction) {
             $response = $transaction['response'];
@@ -403,23 +456,49 @@ class FeatureContext extends ApiContext {
                     preg_match('|/users/(.+?)/images|', (string) $request->getUri(), $matches);
 
                     $path = sprintf('/users/%s/images/%s', $matches[1], $body->imageIdentifier);
-                    $this->requestPath($path, $method);
 
-                    return;
+                    if ($extension) {
+                        // Append extension to the path
+                        $path .= '.' . $extension;
+                    }
+
+                    return $this->requestPath($path, $method);
                 }
             }
         }
 
+        // No hit
         throw new RuntimeException(
-            'Could not find any responses in the history with an image identifier'
+            'Could not find any responses in the history with an image identifier.'
         );
+    }
+
+    /**
+     * Request the previously added image as a specific extension
+     *
+     * @param string $extension Extension of the image: jpg, gif or png
+     * @throws InvalidArgumentException Throws an extension if the given extension is invalid
+     * @return self
+     *
+     * @When I request the previously added image as a :extension
+     * @When I request the previously added image as a :extension using HTTP :method
+     */
+    public function requestPreviouslyAddedImageAsType($extension, $method = 'GET') {
+        if (!in_array($extension, ['gif', 'png', 'jpg'])) {
+            throw new InvalidArgumentException(sprintf('Invalid extension: "%s".', $extension));
+        }
+
+        return $this->requestPreviouslyAddedImage($method, $extension);
     }
 
     /**
      * Assert the contents of an imbo error message
      *
-     * @param string $message
-     * @param int $code
+     * @param string $message The error message
+     * @param int $code The error code
+     * @throws InvalidArgumentException
+     * @return self
+     *
      * @Then the Imbo error message is :message
      * @Then the Imbo error message is :message and the error code is :code
      */
@@ -439,7 +518,7 @@ class FeatureContext extends ApiContext {
         Assertion::same(
             $message,
             $actualMessage,
-            sprintf('Expected error message "%s", got "%s"', $message, $actualMessage)
+            sprintf('Expected error message "%s", got "%s".', $message, $actualMessage)
         );
 
         if ($code !== null) {
@@ -449,10 +528,233 @@ class FeatureContext extends ApiContext {
             Assertion::same(
                 $code,
                 $actualCode,
-                sprintf('Expected imbo error code "%d", got "%d"', $code, $actualCode)
+                sprintf('Expected imbo error code "%d", got "%d".', $code, $actualCode)
             );
         }
+
+        return $this;
     }
+
+    /**
+     * Add a transformation to the query parameter for the next request
+     *
+     * @param string $transformation The value of the transformation, for instance "border"
+     * @return self
+     *
+     * @Given I specify :transformation as transformation
+     */
+    public function applyTransformation($transformation) {
+        if (!isset($this->requestOptions['query']['t'])) {
+            $this->requestOptions['query']['t'] = [];
+        }
+
+        $this->requestOptions['query']['t'][] = $transformation;
+    }
+
+    /**
+     * Assert the width of the image in the current response
+     *
+     * @param int $width
+     * @return self
+     *
+     * @Then the image width is :width
+     */
+    public function assertImageWidth($width) {
+        $this->requireResponse();
+
+        $width = (int) $width;
+
+        list($actualWidth) = getimagesizefromstring((string) $this->response->getBody());
+
+        Assertion::same(
+            $width,
+            $actualWidth,
+            sprintf('Incorrect image width, expected %d, got %d.', $width, $actualWidth)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert the height of image in the current response
+     *
+     * @param int $height
+     * @return self
+     *
+     * @Then the image height is :height
+     */
+    public function assertImageHeight($height) {
+        $this->requireResponse();
+
+        $height = (int) $height;
+
+        list($actualWidth, $actualHeight) = getimagesizefromstring((string) $this->response->getBody());
+        unset($actualWidth);
+
+        Assertion::same(
+            $height,
+            $actualHeight,
+            sprintf('Incorrect image height, expected %d, got %d.', $height, $actualHeight)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert the dimensions of the image in the current response
+     *
+     * @param string $dimension Image dimension as "<width>x<height>", for instance "1024x768"
+     * @throws InvalidArgumentException
+     * @return self
+     *
+     * @Then the image dimension is :dimension
+     */
+    public function assertImageDimension($dimension) {
+        $this->requireResponse();
+
+        $match = [];
+        preg_match('/^(?<width>[\d]+)x(?<height>[\d]+)$/', $dimension, $match);
+
+        if (!$match) {
+            throw new InvalidArgumentException(sprintf(
+                'Invalid dimension value: "%s". Specify "<width>x<height>".',
+                $dimension
+            ));
+        }
+
+        $width = (int) $match['width'];
+        $height = (int) $match['height'];
+
+        list($actualWidth, $actualHeight) = getimagesizefromstring((string) $this->response->getBody());
+
+        Assertion::same(
+            $width,
+            $actualWidth,
+            sprintf('Incorrect image width, expected %d, got %d.', $width, $actualWidth)
+        );
+
+        Assertion::same(
+            $height,
+            $actualHeight,
+            sprintf('Incorrect image height, expected %d, got %d.', $height, $actualHeight)
+        );
+    }
+
+    /**
+     * Assert the hex value of a given coordinate in the image found in the current response
+     *
+     * @param string $coordinates X and Y coordinates, separated by a comma
+     * @param string $color Hex color value
+     * @return self
+     *
+     * @Then the pixel at coordinate :coordinates has a color of :color
+     */
+    public function assertImagePixelColor($coordinates, $color) {
+        $this->requireResponse();
+
+        $info = $this->getImagePixelInfo($coordinates);
+        $color = ltrim(strtolower($color), '#');
+
+        Assertion::same(
+            $color,
+            $info['color'],
+            sprintf(
+                'Incorrect color at coordinate "%s", expected "%s", got "%s".',
+                $coordinates,
+                $color,
+                $info['color']
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert the alpha value of a given coordinate in the image found in the current response
+     *
+     * @param string $coordinates X and Y coordinates, separated by a comma
+     * @param float $alpha Alpha value
+     * @return self
+     *
+     * @Given the pixel at coordinate :coordinates has an alpha of :alpha
+     */
+    public function assertImagePixelAlpha($coordinates, $alpha) {
+        $this->requireResponse();
+
+        $info = $this->getImagePixelInfo($coordinates);
+        $alpha = (float) $alpha;
+
+        Assertion::same(
+            $alpha,
+            $info['alpha'],
+            sprintf(
+                'Incorrect alpha value at coordinate "%s", expected "%f", got "%f".',
+                $coordinates,
+                $alpha,
+                $info['alpha']
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Get the pixel info for given coordinates from the image in the current response
+     *
+     * @param string $coordinates
+     * @throws InvalidArgumentException Throws an exception if the coordinates value is invalid
+     * @return array
+     */
+    private function getImagePixelInfo($coordinates) {
+        $this->requireResponse();
+
+        $match = [];
+        preg_match('/^(?<x>[\d]+),(?<y>[\d]+)$/', $coordinates, $match);
+
+        if (!$match) {
+            throw new InvalidArgumentException(sprintf('Invalid coordinates: "%s".', $coordinates));
+        }
+
+        $x = (int) $match['x'];
+        $y = (int) $match['y'];
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob((string) $this->response->getBody());
+
+        $pixel = $imagick->getImagePixelColor($x, $y);
+        $color = $pixel->getColor();
+
+        $toHex = function($col) {
+            return str_pad(dechex($col), 2, '0', STR_PAD_LEFT);
+        };
+
+        $hexColor = $toHex($color['r']) . $toHex($color['g']) . $toHex($color['b']);
+
+        return [
+            'color' => $hexColor,
+            'alpha' => (float) $pixel->getColorValue(Imagick::COLOR_ALPHA),
+        ];
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -479,44 +781,6 @@ class FeatureContext extends ApiContext {
         }
 
         throw new \Exception('Unknown authentication method: ' . $method);
-    }
-
-    /**
-     * @Given /^I specify "([^"]*)" as transformation$/
-     */
-    public function applyTransformation($transformation) {
-        $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($transformation) {
-            $event['request']->getQuery()->set('t', [$transformation]);
-        });
-    }
-
-    /**
-     * @Given /^the (width|height) of the image is "([^"]*)"$/
-     */
-    public function theWidthOfTheImageIs($value, $size) {
-        $image = (string) $this->getLastResponse()->getBody();
-        $size = (int) $size;
-
-        $info = getimagesizefromstring($image);
-
-        if ($value === 'width') {
-            $index = 0;
-        } else {
-            $index = 1;
-        }
-
-        assertSame($size, $info[$index], 'Incorrect ' . $value . ', expected ' . $size . ', got ' . $info[$index]);
-    }
-
-    /**
-     * @Given /^I specify the following transformations:$/
-     */
-    public function applyTransformations(PyStringNode $transformations) {
-        foreach ($transformations->getLines() as $t) {
-            $this->client->getEventDispatcher()->addListener('request.before_send', function($event) use ($t) {
-                $event['request']->getQuery()->add('t', $t);
-            });
-        }
     }
 
     /**
@@ -581,16 +845,6 @@ class FeatureContext extends ApiContext {
      */
     public function requestMetadataOfTestImageInFormat($format = null) {
         $url = self::$testImageUrl . '/meta' . ($format ? '.' . $format : '');
-        return [
-            new Given('I request "' . $url . '" using HTTP "GET"'),
-        ];
-    }
-
-    /**
-     * @When /^I request the (?:previously )?added image as a "(jpg|png|gif)"$/
-     */
-    public function requestTheAddedImage($extension) {
-        $url = $this->getPreviouslyAddedImageUrl() . '.' . $extension;
         return [
             new Given('I request "' . $url . '" using HTTP "GET"'),
         ];
@@ -666,36 +920,6 @@ class FeatureContext extends ApiContext {
         foreach ($imagick->getImageProperties() as $key => $value) {
             assertStringStartsNotWith($tag, $key, 'Properties exist that should have been stripped');
         }
-    }
-
-    /**
-     * @Given /^the pixel at coordinate "([^"]*)" should have a color of "#([^"]*)"$/
-     */
-    public function assertImagePixelColor($coordinates, $expectedColor) {
-        $info = $this->getImagePixelInfo($coordinates);
-        $expectedColor = strtolower($expectedColor);
-
-        assertSame(
-            $expectedColor,
-            $info['color'],
-            'Incorrect color at coordinate ' . $coordinates .
-            ', expected ' . $expectedColor . ', got ' . $info['color']
-        );
-    }
-
-    /**
-     * @Given /^the pixel at coordinate "([^"]*)" should have an alpha of "([^"]*)"$/
-     */
-    public function assertImagePixelAlpha($coordinates, $expectedAlpha) {
-        $info = $this->getImagePixelInfo($coordinates);
-        $expectedAlpha = (float) $expectedAlpha;
-
-        assertSame(
-            $expectedAlpha,
-            $info['alpha'],
-            'Incorrect alpha value at coordinate ' . $coordinates .
-            ', expected ' . $expectedAlpha . ', got ' . $info['alpha']
-        );
     }
 
     /**
@@ -838,34 +1062,6 @@ class FeatureContext extends ApiContext {
     private function getPreviouslyAddedImageUrl() {
         $identifier = $this->getPreviouslyAddedImageIdentifier();
         return '/users/' . $this->user . '/images/' . $identifier;
-    }
-
-    /**
-     * Get the pixel info for given coordinates, from the image returned in the previous response
-     *
-     * @param  string $coordinates
-     * @return array
-     */
-    private function getImagePixelInfo($coordinates) {
-        $coordinates = array_map('trim', explode(',', $coordinates));
-        $coordinates = array_map('intval', $coordinates);
-
-        $imagick = new \Imagick();
-        $imagick->readImageBlob((string) $this->getLastResponse()->getBody());
-
-        $pixel = $imagick->getImagePixelColor($coordinates[0], $coordinates[1]);
-        $color = $pixel->getColor();
-
-        $toHex = function($col) {
-            return str_pad(dechex($col), 2, '0', STR_PAD_LEFT);
-        };
-
-        $hexColor = $toHex($color['r']) . $toHex($color['g']) . $toHex($color['b']);
-
-        return [
-            'color' => $hexColor,
-            'alpha' => (float) $pixel->getColorValue(\Imagick::COLOR_ALPHA),
-        ];
     }
 
     /**
