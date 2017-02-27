@@ -14,70 +14,81 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
         Then the response status line is "400 Permission denied (public key)"
 
     Scenario: Request a resource with invalid public key specified
-        Given I include an access token in the query using "invalid" and "foobar"
+        Given I use "invalid" and "foobar" for public and private keys
+        And I include an access token in the query string
         And Imbo uses the "access-control.php" configuration
         When I request "/users/user1.json"
         Then the response status line is "400 Permission denied (public key)"
         And the Imbo error message is "Permission denied (public key)" and the error code is "0"
 
     Scenario: Request a resource with public key that does not have access to the user
-        Given I include an access token in the query using "valid-pubkey" and "foobar"
+        Given I use "valid-pubkey" and "foobar" for public and private keys
+        And I include an access token in the query string
         And Imbo uses the "access-control.php" configuration
         When I request "/users/user2.json"
         Then the response status line is "400 Permission denied (public key)"
         And the Imbo error message is "Permission denied (public key)" and the error code is "0"
 
     Scenario: Request a resource with valid public key specified
-        Given I include an access token in the query using "valid-pubkey" and "foobar"
+        Given I use "valid-pubkey" and "foobar" for public and private keys
+        And I include an access token in the query string
         And Imbo uses the "access-control.php" configuration
         When I request "/users/user1.json"
         Then the response status line is "200 OK"
 
     Scenario: Request a resource with a public key that has access to all users and the resource
-        Given I include an access token in the query using "valid-pubkey-with-wildcard" and "foobar"
+        Given I use "valid-pubkey-with-wildcard" and "foobar" for public and private keys
+        And I include an access token in the query string
         And Imbo uses the "access-control.php" configuration
         When I request "/users/some-user.json"
         Then the response status line is "200 OK"
 
     Scenario: Request a resource with a public key that has access to all users but not requested resource
-        Given I include an access token in the query using "valid-pubkey-with-wildcard" and "foobar"
+        Given I use "valid-pubkey-with-wildcard" and "foobar" for public and private keys
+        And I include an access token in the query string
         And Imbo uses the "access-control.php" configuration
         When I request "/users/some-user/images.json"
         Then the response status line is "400 Permission denied (public key)"
         And the Imbo error message is "Permission denied (public key)" and the error code is "0"
 
     Scenario: Request a resource with a public key that uses a resource group
-        Given I include an access token in the query using "valid-group-pubkey" and "foobar"
+        Given I use "valid-group-pubkey" and "foobar" for public and private keys
+        And I include an access token in the query string
         And Imbo uses the "access-control.php" configuration
         When I request "/users/user/images.json"
         Then the response status line is "200 OK"
 
     Scenario: Request a resource with group that does not contain the resource
-        Given I include an access token in the query using "valid-group-pubkey" and "foobar"
+        Given I use "valid-group-pubkey" and "foobar" for public and private keys
+        And I include an access token in the query string
         And Imbo uses the "access-control.php" configuration
         When I request "/users/user/images/9c554794f784778cd436064faa2ea24a"
         Then the response status line is "400 Permission denied (public key)"
 
     Scenario: Request custom access-controlled resource with insufficient privileges
-        Given I include an access token in the query using "public" and "private"
+        Given I use "public" and "private" for public and private keys
+        And I include an access token in the query string
         And Imbo uses the "access-control.php" configuration
         When I request "/foobar"
         Then the response status line is "400 Permission denied (public key)"
 
     Scenario: Request custom access-controlled resource that a different public key has access to
-        Given I include an access token in the query using "valid-group-pubkey" and "private"
+        Given I use "valid-group-pubkey" and "private" for public and private keys
+        And I include an access token in the query string
         And Imbo uses the "access-control.php" configuration
         When I request "/foobar"
         Then the response status line is "400 Permission denied (public key)"
 
     Scenario: Request custom access-controlled resource with sufficient privileges specified using wildcard
-        Given I include an access token in the query using "valid-pubkey-with-wildcard" and "private"
+        Given I use "valid-pubkey-with-wildcard" and "private" for public and private keys
+        And I include an access token in the query string
         And Imbo uses the "access-control.php" configuration
         When I request "/foobar"
         Then the response status line is "200 OK"
 
     Scenario: Request user information when Imbo uses an alternative access control adapter
-        Given I include an access token in the query using "public" and "private"
+        Given I use "public" and "private" for public and private keys
+        And I include an access token in the query string
         And Imbo uses the "custom-access-control.php" configuration
         When I request "/users/public"
         Then the response status line is "200 OK"

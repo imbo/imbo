@@ -391,13 +391,23 @@ class FeatureContext extends ApiContext {
             ->setRequestBody(fopen($imagePath, 'r'))
 
             // Sign the request
-            ->signRequest($this->keys[$user]['publicKey'], $this->keys[$user]['privateKey'])
+            ->setPublicAndPrivateKey($this->keys[$user]['publicKey'], $this->keys[$user]['privateKey'])
+            ->signRequest()
 
             // Request the endpoint for adding the image
             ->requestPath(sprintf('/users/%s/images', $user), 'POST');
 
         // Store the mapping of path => image identifier and the image data
-        $imageIdentifier = json_decode((string) $this->response->getBody())->imageIdentifier;
+        $responseBody = json_decode((string) $this->response->getBody(), true);
+
+        if (empty($responseBody['imageIdentifier'])) {
+            throw new RuntimeException(sprintf(
+                'Image was not successfully added. Response body: %s',
+                print_r($responseBody, true)
+            ));
+        }
+
+        $imageIdentifier = $responseBody['imageIdentifier'];
         $this->imageIdentifiers[$imagePath] = $imageIdentifier;
 
         // Reset the request / response
@@ -541,11 +551,7 @@ class FeatureContext extends ApiContext {
      * @Given I specify :transformation as transformation
      */
     public function applyTransformation($transformation) {
-        if (!isset($this->requestOptions['query']['t'])) {
-            $this->requestOptions['query']['t'] = [];
-        }
-
-        $this->requestOptions['query']['t'][] = $transformation;
+        return $this->setRequestQueryParameter('t[]', $transformation);
     }
 
     /**
@@ -888,6 +894,35 @@ class FeatureContext extends ApiContext {
         $this->publicKey = $publicKey;
         $this->privateKey = $privateKey;
 
+        // Add the request header
+        $this->setRequestHeader('X-Imbo-PublicKey', $publicKey);
+
+        return $this;
+    }
+
+    /**
+     * Set a query string parameter
+     *
+     * @param string $name The name of the parameter
+     * @param mixed $value The value for the parameter
+     * @return self
+     *
+     * @Given the query string parameter :name is set to :value
+     */
+    public function setRequestQueryParameter($name, $value) {
+        if (empty($this->requestOptions['query'])) {
+            $this->requestOptions['query'] = [];
+        }
+
+
+        // If the name ends with [] we remove that from the name, and convert the value to an array
+        if (substr($name, -2) === '[]') {
+            $name = substr($name, 0, -2);
+            $value = [$value];
+        }
+
+        $this->requestOptions['query'][$name] = $value;
+
         return $this;
     }
 
@@ -1158,21 +1193,6 @@ class FeatureContext extends ApiContext {
             (int) $expectedSize,
             sprintf('Expected response body size: %d, actual: %d', $expectedSize, $actualSize)
         );
-    }
-
-    /**
-     * Set a query string parameter
-     *
-     * @param string $name The name of the parameter
-     * @param mixed $value The value for the parameter
-     * @Given the query string parameter :name is set to :value
-     */
-    public function setRequestQueryParameter($name, $value) {
-        if (!is_array($this->requestOptions['query'])) {
-            $this->requestOptions['query'] = [];
-        }
-
-        $this->requestOptions['query'][$name] = $value;
     }
 
     /**
