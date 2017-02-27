@@ -239,37 +239,33 @@ class FeatureContext extends ApiContext {
     }
 
     /**
-     * Sign the request with the given public key and private key using HTTP headers
+     * Sign the request using HTTP headers
      *
-     * @param string $publicKey The public key to sign the URL with
-     * @param string $privateKey The private key to sign the URL with
      * @return self
      *
-     * @Given I sign the request with :publicKey and :privateKey using HTTP headers
+     * @Given I sign the request using HTTP headers
      */
-    public function signRequestUsingHttpHeaders($publicKey, $privateKey) {
-        return $this->signRequest($publicKey, $privateKey, true);
+    public function signRequestUsingHttpHeaders() {
+        return $this->signRequest(true);
     }
 
     /**
-     * Signal that the request needs to be signed before sent
+     * Sign the request
      *
      * This step adds a "sign-request" middleware to the request. The middleware should be executed
      * last.
      *
-     * @param string $publicKey The public key to sign the URL with
-     * @param string $privateKey The private key to sign the URL with
      * @param boolean $useHeaders Whether or not to put the signature in the request HTTP headers
      * @return self
      *
-     * @Given I sign the request with :publicKey and :privateKey
+     * @Given I sign the request
      */
-    public function signRequest($publicKey, $privateKey, $useHeaders = false) {
+    public function signRequest($useHeaders = false) {
         $useHeaders = (boolean) $useHeaders;
 
         // Fetch the handler stack and push a signature function to it
         $stack = $this->client->getConfig('handler');
-        $stack->push(Middleware::mapRequest(function(RequestInterface $request) use ($publicKey, $privateKey, $useHeaders, $stack) {
+        $stack->push(Middleware::mapRequest(function(RequestInterface $request) use ($useHeaders, $stack) {
             // Add public key as a query parameter if we're told not to use headers. We do this
             // before the signing below since this parameter needs to be a part of the data that
             // will be used for signing
@@ -277,7 +273,7 @@ class FeatureContext extends ApiContext {
                 $request = $request->withUri(Uri::withQueryValue(
                     $request->getUri(),
                     'publicKey',
-                    $publicKey
+                    $this->publicKey
                 ));
             }
 
@@ -289,16 +285,16 @@ class FeatureContext extends ApiContext {
             $data = sprintf('%s|%s|%s|%s',
                 $httpMethod,
                 urldecode((string) $request->getUri()),
-                $publicKey,
+                $this->publicKey,
                 $timestamp
             );
 
             // Generate signature
-            $signature = hash_hmac('sha256', $data, $privateKey);
+            $signature = hash_hmac('sha256', $data, $this->privateKey);
 
             if ($useHeaders) {
                 $request = $request
-                    ->withHeader('X-Imbo-PublicKey', $publicKey)
+                    ->withHeader('X-Imbo-PublicKey', $this->publicKey)
                     ->withHeader('X-Imbo-Authenticate-Signature', $signature)
                     ->withHeader('X-Imbo-Authenticate-Timestamp', $timestamp);
             } else {
@@ -325,25 +321,24 @@ class FeatureContext extends ApiContext {
     }
 
     /**
-     * Append an access token as a query parameter, using the specified keys
+     * Append an access token as a query parameter
      *
-     * @param string $publicKey The public key to use
-     * @param string $privateKey The private key to use
+     * @return self
      *
-     * @Given I include an access token in the query using :publicKey and :privateKey
+     * @Given I include an access token in the query string
      */
-    public function appendAccessToken($publicKey, $privateKey) {
+    public function appendAccessToken() {
         // Fetch the handler stack and push an access token function to it
         $stack = $this->client->getConfig('handler');
-        $stack->push(Middleware::mapRequest(function(RequestInterface $request) use ($publicKey, $privateKey, $stack) {
+        $stack->push(Middleware::mapRequest(function(RequestInterface $request) use ($stack) {
             $uri = $request->getUri();
 
             // Set the public key and remove a possible accessToken query parameter
-            $uri = Uri::withQueryValue($uri, 'publicKey', $publicKey);
+            $uri = Uri::withQueryValue($uri, 'publicKey', $this->publicKey);
             $uri = Uri::withoutQueryValue($uri, 'accessToken');
 
             // Generate the access token and append to the query
-            $accessToken = hash_hmac('sha256', urldecode((string) $uri), $privateKey);
+            $accessToken = hash_hmac('sha256', urldecode((string) $uri), $this->privateKey);
             $uri = Uri::withQueryValue($uri, 'accessToken', $accessToken);
 
             // Remove the middleware from the stack
@@ -352,6 +347,8 @@ class FeatureContext extends ApiContext {
             // Return Uri with query string including the access token
             return $request->withUri($uri);
         }), self::MIDDLEWARE_APPEND_ACCESS_TOKEN);
+
+        return $this;
     }
 
     /**
@@ -736,6 +733,164 @@ class FeatureContext extends ApiContext {
         ];
     }
 
+    /**
+     * Prive the database with content from a PHP script
+     *
+     * @param string $fixture Name of a PHP file in the tests/behat/fixtures directory that returns
+     *                        an array.
+     * @throws InvalidArgumentException Throws an exception if $fixture does not exist, or if it
+     *                                  does not return an array.
+     * @return self
+     *
+     * @Given I prime the database with :fixture
+     */
+    public function primeDatabase($fixture) {
+        $fixtureDir = realpath(implode(DIRECTORY_SEPARATOR, [
+            dirname(dirname(__DIR__)),
+            'fixtures'
+        ]));
+        $fixturePath = $fixtureDir . DIRECTORY_SEPARATOR . $fixture;
+
+        if (!is_file($fixturePath)) {
+            throw new InvalidArgumentException(sprintf(
+                'Fixture file "%s" does not exist in "%s".',
+                $fixture,
+                $fixtureDir
+            ));
+        }
+
+        $mongo = (new MongoClient())->imbo_testing;
+
+        $fixtures = require $fixturePath;
+
+        if (!is_array($fixtures)) {
+            throw new InvalidArgumentException(sprintf(
+                'Fixture "%s" does not return an array.',
+                $fixturePath
+            ));
+        }
+
+        foreach ($fixtures as $collection => $data) {
+            $mongo->$collection->drop();
+
+            if ($data) {
+                $mongo->$collection->batchInsert($data);
+            }
+        }
+    }
+
+    /**
+     * Authenticate the request using some authentication method
+     *
+     * @param string $method The method of authentication
+     * @throws InvalidArgumentException Throws an exception if an invalid method is used
+     * @return self
+     *
+     * @Given I authenticate using :method
+     */
+    public function authenticateRequest($method) {
+        if ($method === 'access-token') {
+            return $this->appendAccessToken();
+        } else if ($method === 'signature') {
+            return $this->signRequest();
+        } else if ($method === 'signature (headers)') {
+            return $this->signRequestUsingHttpHeaders();
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'Invalid authentication method: "%s".',
+            $method
+        ));
+    }
+
+    /**
+     * Make sure an ACL rule has been deleted
+     *
+     * @param string $publicKey The public key
+     * @param string $aclId The ACL ID to check
+     * @return self
+     *
+     * @Then the ACL rule under public key :publicKey with ID :aclId no longer exists
+     */
+    public function aclRuleWithIdShouldNotExist($publicKey, $aclId) {
+        // Append an access token with the current public / private keys, and request the given
+        // ACL rule
+        $this
+            ->appendAccessToken()
+            ->requestPath(sprintf('/keys/%s/access/%s', $publicKey, $aclId));
+
+        $expectedStatusLine = '404 Access rule not found';
+        $actualStatusLine = sprintf(
+            '%d %s',
+            $this->response->getStatusCode(),
+            $this->response->getReasonPhrase()
+        );
+
+        Assertion::same(
+            $expectedStatusLine,
+            $actualStatusLine,
+            sprintf(
+                'ACL rule still exists. Expected "%s", got "%s".',
+                $expectedStatusLine,
+                $actualStatusLine
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Make sure a public does not exist
+     *
+     * @param string $publicKey The public key to check for
+     * @return self
+     *
+     * @Then the :publicKey public key no longer exists
+     */
+    public function assertPublicKeyDoesNotExist($publicKey) {
+        // Append an access token with the current public / private keys, and request the given
+        // public key
+        $this
+            ->appendAccessToken()
+            ->requestPath(sprintf('/keys/%s', $publicKey), 'HEAD');
+
+        $expectedStatusLine = '404 Public key not found';
+        $actualStatusLine = sprintf(
+            '%d %s',
+            $this->response->getStatusCode(),
+            $this->response->getReasonPhrase()
+        );
+
+        Assertion::same(
+            $expectedStatusLine,
+            $actualStatusLine,
+            sprintf(
+                'Public key still exists. Expected "%s", got "%s".',
+                $expectedStatusLine,
+                $actualStatusLine
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Set the public and private keys to be used for signing the request / generating the access
+     * token
+     *
+     * @param string $publicKey The public key to set
+     * @param string $privateKey The private key to set
+     * @return self
+     *
+     * @Given I use :publicKey and :privateKey for public and private keys
+     */
+    public function setPublicAndPrivateKey($publicKey, $privateKey) {
+        $this->publicKey = $publicKey;
+        $this->privateKey = $privateKey;
+
+        return $this;
+    }
+
 
 
 
@@ -766,21 +921,6 @@ class FeatureContext extends ApiContext {
     public function removeClientAuth() {
         $this->publicKey = null;
         $this->privateKey = null;
-    }
-
-    /**
-     * @Given /^I authenticate using "(.*?)"$/
-     */
-    public function authenticateRequest($method) {
-        if ($method == 'access-token') {
-            return new Given('I include an access token in the query');
-        }
-
-        if ($method == 'signature') {
-            return new Given('I sign the request');
-        }
-
-        throw new \Exception('Unknown authentication method: ' . $method);
     }
 
     /**
@@ -958,66 +1098,6 @@ class FeatureContext extends ApiContext {
         return [
             new Given('the "Accept" request header is "image/*"'),
             new Given('I request "/s/' . $shortUrlId . '"'),
-        ];
-    }
-
-    /**
-     * @Given /^I prime the database with "([^"]*)"$/
-     */
-    public function iPrimeTheDatabaseWith($fixture) {
-        $fixturePath = implode(DIRECTORY_SEPARATOR, [
-            dirname(__DIR__),
-            'fixtures',
-            $fixture
-        ]);
-
-        if (!$fixturePath = realpath($fixturePath)) {
-            throw new RuntimeException('Path "' . $fixturePath . '" is invalid');
-        }
-
-        $mongo = (new MongoClient())->imbo_testing;
-
-        $fixtures = require $fixturePath;
-        foreach ($fixtures as $collection => $data) {
-            $mongo->$collection->drop();
-
-            if ($data) {
-                $mongo->$collection->batchInsert($data);
-            }
-        }
-    }
-
-    /**
-     * @Given /^the ACL rule under public key "([^"]*)" with ID "([^"]*)" should not exist( anymore)?$/
-     */
-    public function aclRuleWithIdShouldNotExist($publicKey, $aclId) {
-        if ($this->currentConfig) {
-            $this->addHeaderToNextRequest('X-Imbo-Test-Config-File', $this->currentConfig);
-        }
-
-        $url = '/keys/' . $publicKey . '/access/' . $aclId;
-        return [
-            new Given('I use "acl-checker" and "foobar" for public and private keys'),
-            new Given('I include an access token in the query'),
-            new Given('I request "' . $url . '" using HTTP "GET"'),
-            new Given('I should get a response with "404 Access rule not found"')
-        ];
-    }
-
-    /**
-     * @Given /^the "([^"]*)" public key should not exist( anymore)?$/
-     */
-    public function publicKeyShouldNotExist($publicKey) {
-        if ($this->currentConfig) {
-            $this->addHeaderToNextRequest('X-Imbo-Test-Config-File', $this->currentConfig);
-        }
-
-        $url = '/keys/' . $publicKey;
-        return [
-            new Given('I use "acl-creator" and "someprivkey" for public and private keys'),
-            new Given('I include an access token in the query'),
-            new Given('I request "' . $url . '" using HTTP "HEAD"'),
-            new Given('I should get a response with "404 Public key not found"')
         ];
     }
 
