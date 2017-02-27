@@ -928,6 +928,83 @@ class FeatureContext extends ApiContext {
         return $this;
     }
 
+    /**
+     * Replay the last request
+     *
+     * This method can be used to replay a request, with or without a different HTTP method. If the
+     * public and private keys have been set the method will append an access token.
+     *
+     * @param string $method Optional HTTP method. If not set the HTTP method from the previous
+     *                       request will be used.
+     * @throws RuntimeException Throws an exception if no request have been made yet.
+     * @return self
+     *
+     * @When I replay the last request
+     * @When I replay the last request using HTTP :method
+     */
+    public function makeSameRequest($method = null) {
+        if (!$this->request) {
+            throw new RuntimeException('No request have been made yet.');
+        }
+
+        $this->setRequestMethod($method ?: $this->request->getMethod());
+
+        if ($this->publicKey && $this->privateKey) {
+            $this->appendAccessToken();
+        }
+
+        return $this->sendRequest();
+    }
+
+    /**
+     * Verify that a set of headers is equal in the current and the previous response instances
+     *
+     * @param PyStringNode $headers A list of headers that should match between the current response
+     *                              and the previous one.
+     * @throws RuntimeException Throws an exception if there are not enough responses in the history
+     * @return self
+     *
+     * @Then the following response headers should be the same:
+     */
+    public function assertEqualResponseHeaders(PyStringNode $headers) {
+        if (count($this->history) < 2) {
+            throw new RuntimeException('Need more than one response to compare headers.');
+        }
+
+        $latestResponse = $this->response;
+        $previousResponse = $this->history[count($this->history) - 2]['response'];
+
+        foreach ($headers->getStrings() as $header) {
+            Assertion::true(
+                $previousResponse->hasHeader($header),
+                sprintf('The previous response is missing the "%s" header.', $header)
+            );
+
+            Assertion::true(
+                $latestResponse->hasHeader($header),
+                sprintf('The latest response is missing the "%s" header.', $header)
+            );
+
+            Assertion::same(
+                $previousHeaderLine = $previousResponse->getHeaderLine($header),
+                $latestHeaderLine = $latestResponse->getHeaderLine($header),
+                sprintf(
+                    'The "%s" header does not match. The value from the previous response is "%s" and the value from the latest response is "%s".',
+                    $header,
+                    $previousHeaderLine,
+                    $latestHeaderLine
+                )
+            );
+
+            Assertion::notEmpty(
+                $previousHeaderLine,
+                sprintf('The "%s" header is not supposed to be empty.', $header)
+            );
+        }
+
+        return $this;
+    }
+
 
 
 

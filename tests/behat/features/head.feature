@@ -8,7 +8,7 @@ Feature: Imbo supports HTTP HEAD for all resources
 
     Scenario: Request status information
         When I request "/status" using HTTP "HEAD"
-        And make the same request using HTTP "GET"
+        And I replay the last request using HTTP "GET"
         Then the following response headers should be the same:
             """
             cache-control
@@ -22,7 +22,7 @@ Feature: Imbo supports HTTP HEAD for all resources
         Given I use "publicKey" and "privateKey" for public and private keys
         And I include an access token in the query string
         When I request "/users/user" using HTTP "HEAD"
-        And make the same request using HTTP "GET"
+        And I replay the last request using HTTP "GET"
         Then the following response headers should be the same:
             """
             cache-control
@@ -36,7 +36,7 @@ Feature: Imbo supports HTTP HEAD for all resources
         Given I use "publicKey" and "privateKey" for public and private keys
         And I include an access token in the query string
         When I request "/users/user/images" using HTTP "HEAD"
-        And make the same request using HTTP "GET"
+        And I replay the last request using HTTP "GET"
         Then the following response headers should be the same:
             """
             cache-control
@@ -51,7 +51,7 @@ Feature: Imbo supports HTTP HEAD for all resources
         And I include an access token in the query string
         And the "Accept" request header is "image/png"
         When I request the previously added image using HTTP "HEAD"
-        And make the same request using HTTP "GET"
+        And I replay the last request using HTTP "GET"
         Then the following response headers should be the same:
             """
             cache-control
