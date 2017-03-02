@@ -18,6 +18,7 @@ use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 use Behat\Gherkin\Node\TableNode;
 use Assert\Assertion;
+use Micheh\Cache\CacheUtil;
 
 /**
  * Imbo Context
@@ -33,6 +34,24 @@ class FeatureContext extends ApiContext {
      */
     const MIDDLEWARE_SIGN_REQUEST = 'sign-request';
     const MIDDLEWARE_APPEND_ACCESS_TOKEN = 'append-access-token';
+
+    /**
+     * @var CacheUtil
+     */
+    private $cacheUtil;
+
+    /**
+     * Class constructor
+     *
+     * @param CacheUtil $cacheUtil
+     */
+    public function __construct(CacheUtil $cacheUtil = null) {
+        if ($cacheUtil === null) {
+            $cacheUtil = new CacheUtil();
+        }
+
+        $this->cacheUtil = $cacheUtil;
+    }
 
     /**
      * The user used by the client
@@ -1005,6 +1024,183 @@ class FeatureContext extends ApiContext {
         return $this;
     }
 
+    /**
+     * Check whether or not the response can be cached
+     *
+     * @param boolean $cacheable
+     * @return self
+     *
+     * @Then /^the response can (not )?be cached$/
+     */
+    public function assertCacheability($cacheable = true) {
+        $this->requireResponse();
+
+        if ($cacheable !== true) {
+            $cacheable = false;
+        }
+
+        Assertion::same(
+            $cacheable,
+            $this->cacheUtil->isCacheable($this->response),
+            $cacheable ?
+                'Response was supposed to be cacheble, but it\'s not.' :
+                'Response was not supposed to be cacheable, but it is.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Validate the max-age directive of the cache-control response header
+     *
+     * @param int $expected Expected max-age
+     * @throws RuntimeException
+     * @return self
+     *
+     * @Then the response has a max-age of :max seconds
+     */
+    public function assertMaxAge($expected) {
+        $this->requireResponse();
+
+        $cacheControl = $this->response->getHeaderLine('cache-control');
+
+        if (!$cacheControl) {
+            throw new RuntimeException('Response does not have a cache-control header.');
+        }
+
+        $match = [];
+        preg_match('/max-age=(?<maxAge>[\d]+)/i', $cacheControl, $match);
+
+        if (!$match) {
+            throw new RuntimeException(sprintf(
+                'Response cache-control header does not include a max-age directive: "%s".',
+                $cacheControl
+            ));
+        }
+
+        $expected = (int) $expected;
+        $maxAge = (int) $match['maxAge'];
+
+        Assertion::same(
+            $expected,
+            $maxAge,
+            sprintf(
+                'The max-age directive in the cache-control header is not correct. Expected %d, got %d. Complete cache-control header: "%s".',
+                $expected,
+                $maxAge,
+                $cacheControl
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Verify that the response has a specific cache-control directive
+     *
+     * @param string $directive
+     * @throws RuntimeException Throws an exception if the response does not have a cache-control
+     *                          directive, or if the validation fails
+     * @return self
+     *
+     * @Then the response has a :directive cache-control directive
+     */
+    public function assertResponseHasCacheControlDirective($directive) {
+        $this->requireResponse();
+
+        $cacheControl = $this->response->getHeaderLine('cache-control');
+
+        if (!$cacheControl) {
+            throw new RuntimeException('Response does not have a cache-control header.');
+        }
+
+        Assertion::contains(
+            $cacheControl,
+            $directive,
+            sprintf(
+                'The cache-control header does not contain the "%s" directive. Complete cache-control header: "%s".',
+                $directive,
+                $cacheControl
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Verify that the response does not have a given cache-control directive
+     *
+     * @param string $directive
+     * @throws RuntimeException Throws an exception if the response does not have a cache-control
+     *                          directive, or if the validation fails
+     * @return self
+     *
+     * @Then the response does not have a :directive cache-control directive
+     */
+    public function assertResponseDoesNotHaveCacheControlDirective($directive) {
+        $this->requireResponse();
+
+        $cacheControl = $this->response->getHeaderLine('cache-control');
+
+        if (!$cacheControl) {
+            throw new RuntimeException('Response does not have a cache-control header.');
+        }
+
+        if (strpos($cacheControl, $directive) !== false) {
+            throw new RuntimeException(
+                sprintf(
+                    'The cache-control header contains the "%s" directive when it should not. Complete cache-control header: "%s".',
+                    $directive,
+                    $cacheControl
+                )
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Request the metadata of the previously added image
+     *
+     * @param string $method The HTTP method to use when fetching the metadata
+     * @throws RuntimeException Throws an exception if no image can be found in the history
+     * @return self
+     *
+     * @When I request the metadata of the previously added image
+     * @When I request the metadata of the previously added image using HTTP :method
+     */
+    public function requestMetadataOfPreviouslyAddedImage($method = 'GET') {
+        // Go back in the history until we have a response with an image identifier
+        foreach (array_reverse($this->history) as $transaction) {
+            $responseBody = json_decode((string) $transaction['response']->getBody(), true);
+
+            if (isset($responseBody['imageIdentifier'])) {
+                $match = [];
+                preg_match(
+                    '|^/users/(?<user>.*?)/images|',
+                    (string) $transaction['request']->getUri()->getPath(),
+                    $match
+                );
+
+                if ($match) {
+                    $user = $match['user'];
+                    $path = sprintf(
+                        '/users/%s/images/%s/metadata',
+                        $user,
+                        $responseBody['imageIdentifier']
+                    );
+
+                    return $this->requestPath($path, $method);
+                }
+            }
+        }
+
+        // No hit
+        throw new RuntimeException(
+            'Could not find any response in the history with an image identifier.'
+        );
+    }
+
 
 
 
@@ -1111,16 +1307,6 @@ class FeatureContext extends ApiContext {
         $url = $this->getPreviouslyAddedImageUrl() . '/meta' . ($format ? '.' . $format : '');
         return [
             new Given('I request "' . $url . '" using HTTP "GET"'),
-        ];
-    }
-
-    /**
-     * @When /^I request the metadata of the previously added image(?: using HTTP "(.*?)")?$/
-     */
-    public function requestMetadataOfPreviouslyAddedImage($method = 'GET') {
-        $url = $this->getPreviouslyAddedImageUrl() . '/meta';
-        return [
-            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
         ];
     }
 
