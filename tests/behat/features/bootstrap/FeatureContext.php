@@ -427,13 +427,15 @@ class FeatureContext extends ApiContext {
      *
      * @param string $imagePath Path to the image, relative to the project root path
      * @param string $user The user who will own the image
+     * @param PyStringNode $metadata Metadata to add to the image
      * @throws InvalidArgumentException Throws an exception if the user specified does not have a
      *                                  set of keys.
      * @return self
      *
      * @Given :imagePath exists for user :user
+     * @Given :imagePath exists for user :user with the following metadata:
      */
-    public function addUserImageToImbo($imagePath, $user) {
+    public function addUserImageToImbo($imagePath, $user, PyStringNode $metadata = null) {
         // See if the user specified has a set of keys
         if (!isset($this->keys[$user])) {
             throw new InvalidArgumentException(sprintf('No keys exist for user "%s".', $user));
@@ -467,6 +469,20 @@ class FeatureContext extends ApiContext {
         $imageIdentifier = $responseBody['imageIdentifier'];
         $this->imageIdentifiers[$imagePath] = $imageIdentifier;
         $this->imageUrls[$imagePath] = sprintf('/users/%s/images/%s', $user, $imageIdentifier);
+
+        // Attach metadata
+        if ($metadata !== null) {
+            $this
+                // Attach the file to the request body
+                ->setRequestBody((string) $metadata)
+
+                // Sign the request
+                ->setPublicAndPrivateKey($this->keys[$user]['publicKey'], $this->keys[$user]['privateKey'])
+                ->signRequest()
+
+                // Request the endpoint for adding the image
+                ->requestPath(sprintf('/users/%s/images/%s/metadata', $user, $imageIdentifier), 'POST');
+        }
 
         // Reset the request / response
         $this->publicKey = null;
