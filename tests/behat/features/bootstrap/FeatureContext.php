@@ -9,6 +9,7 @@
  */
 
 use Imbo\BehatApiExtension\Context\ApiContext;
+use Imbo\BehatApiExtension\ArrayContainsComparator;
 use Behat\Behat\Hook\Scope\BeforeFeatureScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
@@ -155,6 +156,43 @@ class FeatureContext extends ApiContext {
         $client->getConfig()['handler']->push(Middleware::history($this->history));
 
         return parent::setClient($client);
+    }
+
+    /**
+     * Add custom functions to the comparator
+     *
+     * The following functions are added and can be used with the
+     * `Then the response body contains JSON:` step:
+     *
+     * - @isDate(): Check if a field that is supposed to represent a date is property formatted
+     *
+     * @param ArrayContainsComparator $comparator
+     * @return self
+     */
+    public function setArrayContainsComparator(ArrayContainsComparator $comparator) {
+        $comparator->addFunction('isDate', [$this, 'isDate']);
+
+        return parent::setArrayContainsComparator($comparator);
+    }
+
+    /**
+     * Function for the array contains comparator to validate a date string
+     *
+     * Validates the following date format:
+     *
+     * 'D, d M Y H:i:s' . ' GMT'
+     *
+     * @param string $date The string to validate
+     * @throws InvalidArgumentException
+     * @return void
+     */
+    public function isDate($date) {
+        if (!preg_match('/^[A-Z][a-z]{2}, [\d]{2} [A-Z][a-z]{2} [\d]{4} [\d]{2}:[\d]{2}:[\d]{2} GMT$/', $date)) {
+            throw new InvalidArgumentException(sprintf(
+                'Date is not properly formatted: "%s".',
+                $date
+            ));
+        }
     }
 
     /**
@@ -428,8 +466,11 @@ class FeatureContext extends ApiContext {
 
         $imageIdentifier = $responseBody['imageIdentifier'];
         $this->imageIdentifiers[$imagePath] = $imageIdentifier;
+        $this->imageUrls[$imagePath] = sprintf('/users/%s/images/%s', $user, $imageIdentifier);
 
         // Reset the request / response
+        $this->publicKey = null;
+        $this->privateKey = null;
         $this->request = $originalRequest;
         $this->requestOptions = $originalRequestOptions;
         $this->response = null;
@@ -1201,6 +1242,38 @@ class FeatureContext extends ApiContext {
         );
     }
 
+    /**
+     * Request an image using a local file path
+     *
+     * This method can be used to fetch images that has been added to Imbo earlier via the
+     * `addUserImageToImbo` method, that is triggered by `Given :imagePath exists for user :user`.
+     *
+     * @param string $localPath The local path for the image that was added earlier
+     * @param string $format Optional format of the image (png|gif|jpg)
+     * @param string $method Optional HTTP method to use
+     * @throws InvalidArgumentException
+     * @return self
+     *
+     * @When /^I request the image resource for "([^"]*)"(?: as a "(png|gif|jpg)")?(?: using HTTP "([^"]*)")?$/
+     */
+    public function requestImageResourceForLocalImage($localPath, $format = null, $method = 'GET') {
+        if (!isset($this->imageUrls[$localPath])) {
+            throw new InvalidArgumentException(sprintf(
+                'Image URL for image with path "%s" can not be found.',
+                $localPath
+            ));
+        }
+
+        $url = $this->imageUrls[$localPath];
+
+        if ($format) {
+            // Append extension if specified
+            $url .= '.' . $format;
+        }
+
+        return $this->requestPath($url, $method);
+    }
+
 
 
 
@@ -1307,24 +1380,6 @@ class FeatureContext extends ApiContext {
         $url = $this->getPreviouslyAddedImageUrl() . '/meta' . ($format ? '.' . $format : '');
         return [
             new Given('I request "' . $url . '" using HTTP "GET"'),
-        ];
-    }
-
-    /**
-     * @When /^I request the image resource for "([^"]*)"(?: as a "(png|gif|jpg)")?(?: using HTTP "([^"]*)")?$/
-     */
-    public function requestImageResourceForLocalImage($imagePath, $format = null, $method = 'GET') {
-        if (!isset($this->imageUrls[$imagePath])) {
-            throw new RuntimeException('Image URL for "' . $imagePath . '" not found');
-        }
-
-        $url = $this->imageUrls[$imagePath];
-        if ($format) {
-            $url .= '.' . $format;
-        }
-
-        return [
-            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
         ];
     }
 

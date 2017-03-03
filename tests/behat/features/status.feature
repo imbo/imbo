@@ -11,7 +11,7 @@ Feature: Imbo provides a status endpoint
         And the response body contains JSON:
             """
             {
-                "date": "@regExp(/.*/)",
+                "date": "@isDate()",
                 "database": true,
                 "storage": true
             }
@@ -20,10 +20,10 @@ Feature: Imbo provides a status endpoint
     Scenario Outline: The status endpoint only supports HTTP GET and HEAD
         When I request "/status" using HTTP "<method>"
         Then the response code is <code>
-        And the response reason phrase is "<reasonPhrase>"
+        And the response reason phrase is "<reason-phrase>"
 
         Examples:
-            | method | code | reasonPhrase       |
+            | method | code | reason-phrase      |
             | GET    | 200  | OK                 |
             | HEAD   | 200  | OK                 |
             | POST   | 405  | Method not allowed |

@@ -97,12 +97,12 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
         Given the "Accept" request header is "application/json"
         When I request "<url>"
         Then the response status line is "<status>"
-        And the response body matches:
+        And the response body contains JSON:
           """
           <response>
           """
 
         Examples:
             | url          | status           | response |
-            | /            | 200 Hell Yeah    | #^{.*}$# |
-            | /status.json | 200 OK           | #^{"date":".*?","database":true,"storage":true}$# |
+            | /            | 200 Hell Yeah    | {"site": "http://imbo.io"} |
+            | /status.json | 200 OK           | {"date": "@isDate()", "database": true, "storage": true} |
