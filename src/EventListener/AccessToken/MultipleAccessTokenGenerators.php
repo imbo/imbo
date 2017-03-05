@@ -3,6 +3,7 @@ namespace Imbo\EventListener\AccessToken;
 
 use Imbo\EventListener\AccessToken\AccessTokenGenerator,
     Imbo\EventListener\AccessToken\SHA256;
+use Imbo\Exception\RuntimeException;
 
 class MultipleAccessTokenGenerators extends AccessTokenGenerator {
     /**
@@ -21,8 +22,14 @@ class MultipleAccessTokenGenerators extends AccessTokenGenerator {
      * @param array $params Parameters to the MultipleAccessTokenGenerators.
      */
     public function __construct(array $params = []) {
-        if (!isset($params['generators'])) {
+        if (!isset($params['generators']) || !is_array($params['generators'])) {
             $params['generators'] = [];
+        } else {
+            foreach ($params['generators'] as $generator) {
+                if (!$generator instanceof AccessTokenInterface) {
+                    throw new RuntimeException('AccessTokenGenerators must implement AccessTokenInterface');
+                }
+            }
         }
 
         parent::__construct($params);
