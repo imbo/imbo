@@ -21,7 +21,7 @@ class MultipleAccessTokenGenerators extends AccessTokenGenerator {
      * @param array $params Parameters to the MultipleAccessTokenGenerators.
      */
     public function __construct(array $params = []) {
-        if (!$params['generators']) {
+        if (!isset($params['generators'])) {
             $params['generators'] = [];
         }
 
