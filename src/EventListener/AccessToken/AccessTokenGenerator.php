@@ -50,15 +50,15 @@ abstract class AccessTokenGenerator implements AccessTokenInterface {
     }
 
     /**
-     * @param $argumentKey string Add an argument key to be handled by this generator
+     * @param string $argumentKey Add an argument key to be handled by this generator
      */
     public function addArgumentKey($argumentKey) {
         $this->params['argumentKeys'][] = $argumentKey;
     }
 
     /**
-     * @param $argumentKeys array<string> Set the argumentKeys that this generator handles
-     * @return $this
+     * @param string[] $argumentKeys Set the argumentKeys that this generator handles
+     * @return self
      */
     public function setArgumentKeys($argumentKeys) {
         $this->params['argumentKeys'] = $argumentKeys;
