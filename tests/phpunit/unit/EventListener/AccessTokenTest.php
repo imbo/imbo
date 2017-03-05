@@ -327,7 +327,6 @@ class AccessTokenTest extends ListenerTests {
             'accessTokenGenerator' => new AccessToken\SHA256(['argumentKeys' => ['foo']]),
         ]);
 
-
         $this->query->expects($this->once())->method('has')->with('foo')->will($this->returnValue(true));
         $this->query->expects($this->once())->method('get')->with('foo')->will($this->returnValue($token));
         $this->request->expects($this->atLeastOnce())->method('getRawUri')->will($this->returnValue(urldecode($url)));
@@ -408,8 +407,6 @@ class AccessTokenTest extends ListenerTests {
 
         $listener->checkAccessToken($this->event);
     }
-
-
 
     /**
      * Test that we can configure the access token argument key
