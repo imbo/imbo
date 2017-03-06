@@ -72,6 +72,51 @@ This event listener is included in the default configuration file without specif
 
 Disable this event listener with care. Installations with no access token check is open for `DoS <http://en.wikipedia.org/wiki/Denial-of-service_attack>`_ attacks.
 
+.. _custom-access-token-generators:
+
+Custom Access Token Generators
+------------------------------
+
+You can customize how the access token is generated and which URL parameter that contain the access token. The default implementation uses a SHA256 HMAC generated from the private key and the URL of the request.
+
+To switch to a different access token generator provide a new generator in the ``accessTokenGenerator`` parameter. This generator must implement the ``AccessTokenInterface`` interface, available under ``EventListener\AccessToken\AccessTokenInterface``. An abstract class (``AccessTokenGenerator``) is included that you can subclass to quickly implement an alternative signature algorithm.
+
+To use a different algorithm, provide it as a key in the parameter array when creating the access token event listener:
+
+.. code-block:: php
+
+    [
+        'accessTokenGenerator' => new AccessToken\SHA256(),
+    ]
+
+You can also provide a list of URL argument names for the access token, if it's not available through the regular ``accessToken`` argument.
+
+.. code-block:: php
+
+    [
+        'accessTokenGenerator' => new AccessToken\SHA256(['argumentKeys' => ['foo', 'accessToken']]),
+    ]
+
+which would allow the token to be present under either ``foo`` or ``accessToken`` in the URL arguments.
+
+Imbo uses a SHA256 HMAC as the default signature generation algorithm, available under ``EventListener\AccessToken\SHA256``.
+
+If you want to use multiple access token generators, you can use the bundled ``MultipleAccessTokensGenerators`` generator, which will pick a generator based on the available URL parameters (in sequence, the first match will be used).
+
+.. code-block:: php
+
+    [
+        'accessTokenGenerator' => new AccessToken\MultipleAccessTokenGenerators([
+            'generators' => [
+                'accessToken' => new AccessToken\SHA256(),
+                'dummy' => new DummyImplementation(),
+                ...
+            ],
+        ]),
+    ]
+
+This will cause the ``SHA256`` implementation to be used if an ``accessToken``  parameter is available, but if only the ``dummy`` parameter is present, the ``DummyImplementation`` generator will be used.
+
 .. _authenticate-event-listener:
 
 Authenticate
@@ -668,3 +713,4 @@ The header appears multiple times in the response, with slightly different value
 
     X-HashTwo: imbo;image;<publicKey>;<imageIdentifier>
     X-HashTwo: imbo;user;<publicKey>
+

@@ -10,7 +10,8 @@
 
 namespace ImboUnitTest\EventListener;
 
-use Imbo\EventListener\AccessToken;
+use Imbo\EventListener\AccessToken,
+    Imbo\Exception\ConfigurationException;
 
 /**
  * @covers Imbo\EventListener\AccessToken
@@ -184,7 +185,7 @@ class AccessTokenTest extends ListenerTests {
         $listener = new AccessToken($filter);
 
         if (!$whitelisted) {
-            $this->setExpectedException('Imbo\Exception\RuntimeException', 'Missing access token', 400);
+            $this->expectException('Imbo\Exception\RuntimeException', 'Missing access token', 400);
         }
 
         $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.get'));
@@ -261,7 +262,7 @@ class AccessTokenTest extends ListenerTests {
      */
     public function testThrowsExceptionOnIncorrectToken($url, $token, $privateKey, $correct) {
         if (!$correct) {
-            $this->setExpectedException('Imbo\Exception\RuntimeException', 'Incorrect access token', 400);
+            $this->expectException('Imbo\Exception\RuntimeException', 'Incorrect access token', 400);
         }
 
         $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(true));
@@ -312,6 +313,114 @@ class AccessTokenTest extends ListenerTests {
                 $this->listener->checkAccessToken($event);
             }
         }
+    }
+
+    /**
+     * Test that we can configure the access token argument key
+     */
+    public function testAccessTokenArgumentKey() {
+        $url = 'http://imbo/users/christer';
+        $token = '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a';
+        $privateKey = 'private key';
+
+        $listener = new AccessToken([
+            'accessTokenGenerator' => new AccessToken\SHA256(['argumentKeys' => ['foo']]),
+        ]);
+
+        $this->query->expects($this->once())->method('has')->with('foo')->will($this->returnValue(true));
+        $this->query->expects($this->once())->method('get')->with('foo')->will($this->returnValue($token));
+        $this->request->expects($this->atLeastOnce())->method('getRawUri')->will($this->returnValue(urldecode($url)));
+        $this->request->expects($this->atLeastOnce())->method('getUriAsIs')->will($this->returnValue($url));
+
+        $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
+        $listener->checkAccessToken($this->event);
+    }
+
+    public function getAccessTokensForMultipleGenerator() {
+        $tokens = array();
+
+        foreach ($this->getAccessTokens() as $token) {
+            $token[] = 'accessToken';
+            $tokens[] = $token;
+        }
+
+        $tokens = array_merge($tokens, [
+            [
+                'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
+                'dummy',
+                'foo',
+                true,
+                'dummy'
+            ],
+            [
+                'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50123',
+                'dummy',
+                'foobar',
+                true,
+                'dummy'
+            ],
+            [
+                'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50123',
+                'boop',
+                'foobar',
+                false,
+                'dummy'
+            ],
+        ]);
+
+        return $tokens;
+    }
+
+    /**
+     * Test using the multiple access token generators generator
+     *
+     * @dataProvider getAccessTokensForMultipleGenerator
+     */
+    public function testMultipleAccessTokensGenerator($url, $token, $privateKey, $correct, $argumentKey) {
+        if (!$correct) {
+            $this->expectException('Imbo\Exception\RuntimeException', 'Incorrect access token', 400);
+        }
+
+        $dummyAccessToken = $this->createMock('Imbo\EventListener\AccessToken\AccessTokenInterface');
+        $dummyAccessToken->expects($this->any())->method('generateSignature')->will($this->returnValue('dummy'));
+
+        $listener = new AccessToken([
+            'accessTokenGenerator' => new AccessToken\MultipleAccessTokenGenerators([
+                    'generators' => [
+                        'accessToken' => new AccessToken\SHA256(),
+                        'dummy' => $dummyAccessToken,
+                    ]
+                ]
+            ),
+        ]);
+
+        // Allows us to return 'false' as default if the key isn't present
+        $this->query->expects($this->atLeastOnce())->method('has')->with($this->logicalOr(
+            $this->equalTo($argumentKey),
+            $this->anything()
+        ))->will($this->returnCallback(function ($val) use ($argumentKey) { return $val == $argumentKey; }));
+        $this->query->expects($this->atLeastOnce())->method('get')->with($argumentKey)->will($this->returnValue($token));
+        $this->request->expects($this->atLeastOnce())->method('getRawUri')->will($this->returnValue(urldecode($url)));
+        $this->request->expects($this->atLeastOnce())->method('getUriAsIs')->will($this->returnValue($url));
+
+        $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue($privateKey));
+
+        $listener->checkAccessToken($this->event);
+    }
+
+    /**
+     * Test that we can configure the access token argument key
+     *
+     * @expectedException Imbo\Exception\ConfigurationException
+     * @expectedExceptionMessage Invalid accessTokenGenerator
+     * @expectedExceptionCode 500
+     */
+    public function testConfigurationExceptionOnInvalidAccessTokenGenerator() {
+        $listener = new AccessToken([
+            'accessTokenGenerator' => new \StdClass(),
+        ]);
+
+        $listener->checkAccessToken($this->event);
     }
 
     /**
@@ -380,7 +489,7 @@ class AccessTokenTest extends ListenerTests {
      */
     public function testWillRewriteIncomingUrlToConfiguredProtocol($accessToken, $url, $protocol, $correct) {
         if (!$correct) {
-            $this->setExpectedException('Imbo\Exception\RuntimeException', 'Incorrect access token', 400);
+            $this->expectException('Imbo\Exception\RuntimeException', 'Incorrect access token', 400);
         }
 
         $event = $this->getEventMock([

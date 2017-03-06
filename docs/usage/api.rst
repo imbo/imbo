@@ -951,7 +951,7 @@ and Ruby:
     :language: ruby
     :linenos:
 
-If the event listener enforcing the access token check is removed, Imbo will ignore the ``accessToken`` query parameter completely. If you wish to implement your own form of access token you can do this by implementing an event listener of your own (see :ref:`custom-event-listeners` for more information).
+If the event listener enforcing the access token check is removed, Imbo will ignore the ``accessToken`` query parameter completely. If you wish to implement your own form of access token you can do this by either implementing an event listener of your own (see :ref:`custom-event-listeners` for more information), or :ref:`by writing a new access token signature generator for the access token event listener <custom-access-token-generators>`.
 
 Prior to Imbo-1.0.0 there was no rule that the URL had to be completely URL-decoded prior to generating the access token in the clients. Because of this Imbo will also try to re-generate the access token server side by using the URL as-is. This feature has been added to ease the transition to Imbo >= 1.0.0, and will be removed some time in the future.
 

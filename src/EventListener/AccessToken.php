@@ -10,10 +10,13 @@
 
 namespace Imbo\EventListener;
 
+use Imbo\EventListener\AccessToken\AccessTokenInterface;
 use Imbo\EventManager\EventInterface,
     Imbo\Http\Request\Request,
     Imbo\Exception\RuntimeException,
+    Imbo\Exception\ConfigurationException,
     Imbo\Helpers\Urls,
+    Imbo\EventListener\AccessToken\SHA256,
     GuzzleHttp\Psr7;
 
 /**
@@ -63,6 +66,12 @@ class AccessToken implements ListenerInterface {
             'whitelist' => [],
             'blacklist' => [],
         ],
+
+        /**
+         * The generator used to create signatures for URLs so that they can be compared to the submitted
+         * signatures. The client and the server needs to used the same signature algorithm.
+         */
+        'accessTokenGenerator' => null,
     ];
 
     /**
@@ -73,6 +82,15 @@ class AccessToken implements ListenerInterface {
     public function __construct(array $params = null) {
         if ($params) {
             $this->params = array_replace_recursive($this->params, $params);
+        }
+
+        // If no accessTokenGenerator is included, use the SHA256 one by default
+        if (!$this->params['accessTokenGenerator']) {
+            $this->params['accessTokenGenerator'] = new SHA256();
+        }
+
+        if (!$this->params['accessTokenGenerator'] instanceof AccessTokenInterface) {
+            throw new ConfigurationException('Invalid accessTokenGenerator defined (does not implement the AccessTokenInterface).', 500);
         }
     }
 
@@ -122,6 +140,7 @@ class AccessToken implements ListenerInterface {
         $query = $request->query;
         $eventName = $event->getName();
         $config = $event->getConfig();
+        $accessTokenGenerator = $this->params['accessTokenGenerator'];
 
         if (($eventName === 'image.get' || $eventName === 'image.head') && $this->isWhitelisted($request)) {
             // All transformations in the request are whitelisted. Skip the access token check
@@ -133,11 +152,18 @@ class AccessToken implements ListenerInterface {
             return;
         }
 
-        if (!$query->has('accessToken')) {
-            throw new RuntimeException('Missing access token', 400);
+        // Loop through possible access token keys and see if either is present
+        $presentAccessTokenArgumentKeys = [];
+
+        foreach ($accessTokenGenerator->getArgumentKeys() as $argumentKey) {
+            if ($query->has($argumentKey)) {
+                $presentAccessTokenArgumentKeys[$argumentKey] = $query->get($argumentKey);
+            }
         }
 
-        $token = $query->get('accessToken');
+        if (!$presentAccessTokenArgumentKeys) {
+            throw new RuntimeException('Missing access token', 400);
+        }
 
         // First the the raw un-encoded URI, then the URI as is
         $uris = [$request->getRawUri(), $request->getUriAsIs()];
@@ -163,13 +189,14 @@ class AccessToken implements ListenerInterface {
         }
 
         foreach ($uris as $uri) {
-            // Remove the access token from the query string as it's not used to generate the HMAC
-            $uri = rtrim(preg_replace('/(?<=(\?|&))accessToken=[^&]+&?/', '', $uri), '&?');
+            foreach ($presentAccessTokenArgumentKeys as $argumentKey => $token) {
+                // Remove the access token from the query string as it's not used to generate the signature
+                $uriWithoutAccessToken = rtrim(preg_replace('/(?<=(\?|&))' . $argumentKey . '=[^&]+&?/', '', $uri), '&?');
+                $correctToken = $accessTokenGenerator->generateSignature($argumentKey, $uriWithoutAccessToken, $privateKey);
 
-            $correctToken = hash_hmac('sha256', $uri, $privateKey);
-
-            if ($correctToken === $token) {
-                return;
+                if ($correctToken === $token) {
+                    return;
+                }
             }
         }
 
