@@ -145,6 +145,20 @@ class FeatureContext extends ApiContext {
     ];
 
     /**
+     * Whether or not the access token handler is currently active
+     *
+     * @var boolean
+     */
+    private $accessTokenHandlerIsActive = false;
+
+    /**
+     * Whether or not the authentication handler is currently active
+     *
+     * @var boolean
+     */
+    private $authenticationHandlerIsActive = false;
+
+    /**
      * Manipulate the handler stack of the client for all tests
      *
      * - Add the history middleware to record all request / responses in the $this->history array
@@ -380,14 +394,25 @@ class FeatureContext extends ApiContext {
     /**
      * Append an access token as a query parameter
      *
+     * @param boolean $allRequests Whether or not to keep the handler for all requests or not
+     * @throws RuntimeException Method can not be called if the handler is still active
      * @return self
      *
-     * @Given I include an access token in the query string
+     * @Given /^I include an access token in the query string( for all requests)?$/
      */
-    public function appendAccessToken() {
+    public function appendAccessToken($allRequests = false) {
+        if ($this->accessTokenHandlerIsActive) {
+            throw new RuntimeException(
+                'The access token handler is currently added to the stack. It can not be added more than once.'
+            );
+        }
+
+        // Set the token handler as active
+        $this->accessTokenHandlerIsActive = true;
+
         // Fetch the handler stack and push an access token function to it
         $stack = $this->client->getConfig('handler');
-        $stack->push(Middleware::mapRequest(function(RequestInterface $request) use ($stack) {
+        $stack->push(Middleware::mapRequest(function(RequestInterface $request) use ($stack, $allRequests) {
             $uri = $request->getUri();
 
             // Set the public key and remove a possible accessToken query parameter
@@ -398,8 +423,12 @@ class FeatureContext extends ApiContext {
             $accessToken = hash_hmac('sha256', urldecode((string) $uri), $this->privateKey);
             $uri = Uri::withQueryValue($uri, 'accessToken', $accessToken);
 
-            // Remove the middleware from the stack
-            $stack->remove(self::MIDDLEWARE_APPEND_ACCESS_TOKEN);
+            // Remove the middleware from the stack unless we want to keep adding the token
+            if (!$allRequests) {
+                // Deactivate the handler
+                $this->accessTokenHandlerIsActive = false;
+                $stack->remove(self::MIDDLEWARE_APPEND_ACCESS_TOKEN);
+            }
 
             // Return Uri with query string including the access token
             return $request->withUri($uri);
@@ -1033,55 +1062,6 @@ class FeatureContext extends ApiContext {
     }
 
     /**
-     * Verify that a set of headers is equal in the current and the previous response instances
-     *
-     * @param PyStringNode $headers A list of headers that should match between the current response
-     *                              and the previous one.
-     * @throws RuntimeException Throws an exception if there are not enough responses in the history
-     * @return self
-     *
-     * @Then the following response headers should be the same:
-     */
-    public function assertEqualResponseHeaders(PyStringNode $headers) {
-        if (count($this->history) < 2) {
-            throw new RuntimeException('Need more than one response to compare headers.');
-        }
-
-        $latestResponse = $this->response;
-        $previousResponse = $this->history[count($this->history) - 2]['response'];
-
-        foreach ($headers->getStrings() as $header) {
-            Assertion::true(
-                $previousResponse->hasHeader($header),
-                sprintf('The previous response is missing the "%s" header.', $header)
-            );
-
-            Assertion::true(
-                $latestResponse->hasHeader($header),
-                sprintf('The latest response is missing the "%s" header.', $header)
-            );
-
-            Assertion::same(
-                $previousHeaderLine = $previousResponse->getHeaderLine($header),
-                $latestHeaderLine = $latestResponse->getHeaderLine($header),
-                sprintf(
-                    'The "%s" header does not match. The value from the previous response is "%s" and the value from the latest response is "%s".',
-                    $header,
-                    $previousHeaderLine,
-                    $latestHeaderLine
-                )
-            );
-
-            Assertion::notEmpty(
-                $previousHeaderLine,
-                sprintf('The "%s" header is not supposed to be empty.', $header)
-            );
-        }
-
-        return $this;
-    }
-
-    /**
      * Check whether or not the response can be cached
      *
      * @param boolean $cacheable
@@ -1289,6 +1269,80 @@ class FeatureContext extends ApiContext {
 
         return $this->requestPath($url, $method);
     }
+
+    /**
+     * Compare a specific header in the last $num responses
+     *
+     * @param int $num The number of responses to compare. Must be at least 2.
+     * @param string $header The response header to compare
+     * @param boolean $unique Whether or not the values should be unique
+     * @throws InvalidArgumentException|RuntimeException
+     * @return self
+     *
+     * @Then /^the last ([\d]+) "([^"]+)" response headers are (not )?the same$/
+     */
+    public function assertLastResponseHeadersAreNotTheSame($num, $header, $unique = false) {
+        $num = (int) $num;
+
+        if ($num < 2) {
+            throw new InvalidArgumentException(sprintf(
+                'Need to compare at least 2 responses, got %d.',
+                $num
+            ));
+        }
+
+        $numResponses = count($this->history);
+
+        if ($numResponses < $num) {
+            throw new InvalidArgumentException(sprintf(
+                'Not enough responses in the history. Need at least %d, there are currently %d.',
+                $num,
+                $numResponses
+            ));
+        }
+
+        $values = [];
+
+        foreach (array_slice(array_reverse($this->history), 0, $num) as $transaction) {
+            $response = $transaction['response'];
+
+            if (!$response->hasHeader($header)) {
+                throw new RuntimeException(sprintf(
+                    'The "%s" header is not present in all of the last %d response headers.',
+                    $header,
+                    $num
+                ));
+            }
+
+            $values[] = $response->getHeaderLine($header);
+        }
+
+        if ($unique) {
+            Assertion::count(
+                $uniqueValues = array_unique($values),
+                $num,
+                sprintf(
+                    'Expected %d unique values, got %d. Values compared: %s',
+                    $num,
+                    count($uniqueValues),
+                    print_r($values, true)
+                )
+            );
+        } else {
+            Assertion::count(
+                array_unique($values),
+                1,
+                sprintf(
+                    'Expected all values to be the same. Values compared: %s',
+                    print_r($values, true)
+                )
+            );
+        }
+
+        return $this;
+    }
+
+
 
 
 
