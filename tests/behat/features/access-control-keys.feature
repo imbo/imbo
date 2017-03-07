@@ -156,7 +156,6 @@ Feature: Imbo provides a keys endpoint
         When I request "/keys/foobar/access/100000000000000000001337" using HTTP "GET"
         Then the response status line is "200 OK"
 
-    @test
     Scenario: Delete an access control rule
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I sign the request
@@ -164,7 +163,6 @@ Feature: Imbo provides a keys endpoint
         Then the response status line is "200 OK"
         And the ACL rule under public key "foobar" with ID "100000000000000000001337" no longer exists
 
-    @test
     Scenario: Delete a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I sign the request
