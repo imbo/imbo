@@ -142,6 +142,10 @@ class FeatureContext extends ApiContext {
             'publicKey' => 'publicKey',
             'privateKey' => 'privateKey',
         ],
+        'other-user' => [
+            'publicKey' => 'publicKey',
+            'privateKey' => 'privateKey',
+        ],
     ];
 
     /**
