@@ -10,17 +10,46 @@ Given Imbo uses the :configFile configuration
 Given the stats are allowed by :mask
 Given the storage is down
 Given the database is down
-Given I use :publicKey and :privateKey for public and private keys
-Given I sign the request
 Given I sign the request using HTTP headers
+Given I sign the request
 Given I include an access token in the query string
-Given :imagePath exists in Imbo
-Given :imagePath exists for user :user in Imbo
+Given I include an access token in the query string for all requests
+Given :imagePath exists for user :user
+Given :imagePath exists for user :user with the following metadata:
 Given the client IP is :ip
+Given I specify :transformation as transformation
+Given the pixel at coordinate :coordinates has an alpha of :alpha
+Given I prime the database with :fixture
+Given I authenticate using :method
+Given I use :publicKey and :privateKey for public and private keys
+Given the query string parameter :name is set to :value
+Given the query string parameter :param is set to the image identifier of :path
+
 When I request the previously added image
 When I request the previously added image using HTTP :method
+When I request the previously added image as a :extension
+When I request the previously added image as a :extension using HTTP :method
+When I replay the last request
+When I replay the last request using HTTP :method
+When I request the metadata of the previously added image
+When I request the metadata of the previously added image using HTTP :method
+When /^I request the image resource for "([^"]*)"(?: as a "(png|gif|jpg)")?(?: using HTTP "([^"]*)")?$/
+
 Then the Imbo error message is :message
 Then the Imbo error message is :message and the error code is :code
+Then the image width is :width
+Then the image height is :height
+Then the image dimension is :dimension
+Then the pixel at coordinate :coordinates has a color of :color
+Then the ACL rule under public key :publicKey with ID :aclId no longer exists
+Then the :publicKey public key no longer exists
+Then the response can be cached
+Then the response can not be cached
+Then the response has a max-age of :max seconds
+Then the response has a :directive cache-control directive
+Then the response does not have a :directive cache-control directive
+Then the last :num :headerName response headers are the same
+Then the last :num :headerName response headers are not the same
 ```
 
 ## Run tests
