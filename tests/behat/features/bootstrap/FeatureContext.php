@@ -1030,14 +1030,27 @@ class FeatureContext extends ApiContext {
             $this->requestOptions['query'] = [];
         }
 
-
         // If the name ends with [] we remove that from the name, and convert the value to an array
         if (substr($name, -2) === '[]') {
             $name = substr($name, 0, -2);
-            $value = [$value];
-        }
 
-        $this->requestOptions['query'][$name] = $value;
+            if (isset($this->requestOptions['query'][$name]) && !is_array($this->requestOptions['query'][$name])) {
+                // The field already exists, but not as an array
+                throw new InvalidArgumentException(sprintf(
+                    'The "%s" query parameter already exists and it\'s not an array, so can\'t append more values to it.',
+                    $name
+                ));
+            } else if (!isset($this->requestOptions['query'][$name])) {
+                // The field does not exist, set it to an empty array
+                $this->requestOptions['query'][$name] = [];
+            }
+
+            // Append the value
+            $this->requestOptions['query'][$name][] = $value;
+        } else {
+            // Set the key => value
+            $this->requestOptions['query'][$name] = $value;
+        }
 
         return $this;
     }
@@ -1349,6 +1362,27 @@ class FeatureContext extends ApiContext {
         }
 
         return $this;
+    }
+
+    /**
+     * Set a query parameter to the image identifier of a specific image already added to Imbo
+     *
+     * @param string $param Name of the query parameter
+     * @param string $path Path of a local image that exists in Imbo
+     * @throws InvalidArgumentException
+     * @return self
+     *
+     * @Given the query string parameter :param is set to the image identifier of :path
+     */
+    public function setRequestParameterToImageIdentifier($param, $path) {
+        if (!isset($this->imageIdentifiers[$path])) {
+            throw new InvalidArgumentException(sprintf(
+                'No image identifier exists for image: "%s".',
+                $path
+            ));
+        }
+
+        return $this->setRequestQueryParameter($param, $this->imageIdentifiers[$path]);
     }
 
 
