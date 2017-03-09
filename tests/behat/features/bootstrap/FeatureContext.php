@@ -35,6 +35,7 @@ class FeatureContext extends ApiContext {
      */
     const MIDDLEWARE_SIGN_REQUEST = 'sign-request';
     const MIDDLEWARE_APPEND_ACCESS_TOKEN = 'append-access-token';
+    const MIDDLEWARE_HISTORY = 'history';
 
     /**
      * @var CacheUtil
@@ -171,7 +172,11 @@ class FeatureContext extends ApiContext {
      * @return self
      */
     public function setClient(ClientInterface $client) {
-        $client->getConfig()['handler']->push(Middleware::history($this->history));
+        $handlerStack = $client->getConfig()['handler'];
+
+        // Remove a potential handler with the same name
+        $handlerStack->remove(self::MIDDLEWARE_HISTORY);
+        $handlerStack->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
 
         return parent::setClient($client);
     }
