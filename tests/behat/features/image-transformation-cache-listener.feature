@@ -4,55 +4,63 @@ Feature: Imbo enables caching of transformations
     I will cache and re-use transformed images
 
     Background:
-        Given Imbo uses the "image-transformation-cache.php" configuration
-        And I use "publickey" and "privatekey" for public and private keys
-        And "tests/phpunit/Fixtures/image1.png" is used as the test image for the "transformation cache" feature
+        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
+        And Imbo uses the "image-transformation-cache.php" configuration
+        And I use "publicKey" and "privateKey" for public and private keys
+        And I include an access token in the query string for all requests
 
     Scenario: Fetch uncached image, then fetch same image from cache
-        Given I include an access token in the query
-        When I request the test image as a "jpg"
-        Then the response status line is "200 OK"
-        And the "Content-Type" response header is "image/jpeg"
-        And the "X-Imbo-TransformationCache" response header is "Miss"
-        When I request the test image as a "jpg"
-        Then the response status line is "200 OK"
-        And the "Content-Type" response header is "image/jpeg"
-        And the "X-Imbo-TransformationCache" response header is "Hit"
+        When I request:
+            | path                   | extension | method |
+            | previously added image | jpg       | GET    |
+            | previously added image | jpg       | GET    |
+
+        Then the last 2 responses match:
+            | response | status line | header name                | header value |
+            | 1        | 200 OK      | content-type               | image/jpeg   |
+            | 1        |             | X-Imbo-TransformationCache | Miss         |
+            | 2        | 200 OK      | content-type               | image/jpeg   |
+            | 2        |             | X-Imbo-TransformationCache | Hit          |
 
     Scenario: Fetch the same image, but with a different extension
-        Given I include an access token in the query
-        When I request the test image as a "png"
-        Then the response status line is "200 OK"
-        And the "Content-Type" response header is "image/png"
-        And the "X-Imbo-TransformationCache" response header is "Miss"
-        And the checksum of the image is "fc7d2d06993047a0b5056e8fac4462a2"
-        When I request the test image as a "png"
-        Then the response status line is "200 OK"
-        And the "Content-Type" response header is "image/png"
-        And the "X-Imbo-TransformationCache" response header is "Hit"
-        And the checksum of the image is "fc7d2d06993047a0b5056e8fac4462a2"
+        When I request:
+            | path                   | extension | method |
+            | previously added image | png       | GET    |
+            | previously added image | png       | GET    |
+
+        Then the last 2 responses match:
+            | response | status line | header name                | header value | checksum                         |
+            | 1        | 200 OK      | content-type               | image/png    | fc7d2d06993047a0b5056e8fac4462a2 |
+            | 1        |             | X-Imbo-TransformationCache | Miss         |                                  |
+            | 2        | 200 OK      | content-type               | image/png    | fc7d2d06993047a0b5056e8fac4462a2 |
+            | 2        |             | X-Imbo-TransformationCache | Hit          |                                  |
 
     Scenario: Fetch image with extra transformations added
-        Given I include an access token in the query
-        And I specify "crop:width=50,height=60,x=1,y=10" as transformation
-        When I request the test image as a "jpg"
-        Then the response status line is "200 OK"
-        And the "Content-Type" response header is "image/jpeg"
-        And the "X-Imbo-TransformationCache" response header is "Miss"
-        And the width of the image is "50"
-        And the height of the image is "60"
-        When I request the test image as a "jpg"
-        Then the response status line is "200 OK"
-        And the "Content-Type" response header is "image/jpeg"
-        And the "X-Imbo-TransformationCache" response header is "Hit"
-        And the width of the image is "50"
-        And the height of the image is "60"
+        When I request:
+            | path                   | transformation                   | extension | method |
+            | previously added image | crop:width=50,height=60,x=1,y=10 | jpg       | GET    |
+            | previously added image |                                  | jpg       | GET    |
 
-    Scenario: Delete an image, which will also delete the transformed images from the cache
-        Given I use "publickey" and "privatekey" for public and private keys
-        And I sign the request
-        When I request the test image using HTTP "DELETE"
-        Then the response status line is "200 OK"
-        When I include an access token in the query
-        And I request the test image as a "jpg"
-        Then the response status line is "404 Image not found"
+        Then the last 2 responses match:
+            | response | status line | header name                | header value | image width | image height |
+            | 1        | 200 OK      | content-type               | image/jpeg   | 50          | 60           |
+            | 1        |             | X-Imbo-TransformationCache | Miss         |             |              |
+            | 2        | 200 OK      | content-type               | image/jpeg   | 50          | 60           |
+            | 2        |             | X-Imbo-TransformationCache | Hit          |             |              |
+
+    Scenario: Fetch an image to place it in the transformation cache, then delete it, and fetch it again
+        When I request:
+            | path                   | extension | method | sign request |
+            | previously added image | jpg       | GET    |              |
+            | previously added image | jpg       | GET    |              |
+            | previously added image |           | DELETE | yes          |
+            | previously added image | jpg       | GET    |              |
+
+        Then the last 4 responses match:
+            | response | status line         | header name                | header value |
+            | 1        | 200 OK              | content-type               | image/jpeg   |
+            | 1        |                     | X-Imbo-TransformationCache | Miss         |
+            | 2        | 200 OK              | content-type               | image/jpeg   |
+            | 2        |                     | X-Imbo-TransformationCache | Hit          |
+            | 3        | 200 OK              |                            |              |
+            | 4        | 404 Image not found |                            |              |
