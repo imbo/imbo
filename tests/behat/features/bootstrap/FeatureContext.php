@@ -341,6 +341,15 @@ class FeatureContext extends ApiContext {
      * @Given I sign the request
      */
     public function signRequest($useHeaders = false) {
+        if ($this->authenticationHandlerIsActive) {
+            throw new RuntimeException(
+                'The authentication handler is currently added to the stack. It can not be added more than once.'
+            );
+        }
+
+        // Set the token handler as active
+        $this->authenticationHandlerIsActive = true;
+
         $useHeaders = (boolean) $useHeaders;
 
         // Fetch the handler stack and push a signature function to it
@@ -392,6 +401,7 @@ class FeatureContext extends ApiContext {
             }
 
             // Remove this middleware as we don't want the signing to happen more than once
+            $this->authenticationHandlerIsActive = false;
             $stack->remove(self::MIDDLEWARE_SIGN_REQUEST);
 
             return $request;
@@ -1383,6 +1393,201 @@ class FeatureContext extends ApiContext {
         }
 
         return $this->setRequestQueryParameter($param, $this->imageIdentifiers[$path]);
+    }
+
+    /**
+     * Perform a series of requests
+     *
+     * The $table parameter must be a table with the following columns:
+     *
+     * - (string) path, required: The path to request. Some special values can be used for dynamic
+     *                            requests:
+     *                              - "previously added image": Request the previously added image
+     * - (string) method: The HTTP method to use, defaults to GET
+     * - (string) extension: Used to force a specific image type, for instance "jpg"
+     * - (string) transformation: An image transformation to add to the request
+     * - (string) sign request: Set to "yes" to sign the request. Remember to specify public and
+     *                          private keys prior to running the request
+     *
+     * @param TableNode $table Information about the requests to make
+     * @throws InvalidArgumentException
+     * @return self
+     *
+     * @When I request:
+     */
+    public function requestPaths(TableNode $table) {
+        foreach ($table as $row) {
+            foreach (['path', 'method'] as $key) {
+                if (!isset($row[$key])) {
+                    throw new InvalidArgumentException(sprintf('Table is missing "%s" key.', $key));
+                }
+            }
+
+            $method = $row['method'] ?: 'GET';
+            $path = $row['path'];
+
+            if (!empty($row['transformation'])) {
+                $this->applyTransformation($row['transformation']);
+            }
+
+            if (!empty($row['sign request']) && $row['sign request'] === 'yes') {
+                $this->signRequest();
+            }
+
+            if ($path === 'previously added image') {
+                $extension = isset($row['extension']) ? $row['extension'] : null;
+                $this->requestPreviouslyAddedImage($method, $extension);
+            } else {
+                $this->requestPath($path, $method);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Match a series of responses against a data set represented as a TableNode
+     *
+     * This step can be used to match requests typically made with the `@When I request:` step.
+     *
+     * The $table parameter must be a table with the following columns:
+     *
+     * - (int) response, required: The number of the request, 1-based index where the lowest number
+     *                             is the oldest response.
+     * - (string) status line: Match the status line
+     * - (string) header name: Match a header (used with `header value`)
+     * - (string) header value: Match a header (used with `header name`)
+     * - (string) checksum: Match the MD5 checksum of the response body with this value
+     * - (int) image width: Match the width of the image in the request with this value
+     * - (int) image height: Match the height of the image in the reqeust with this value
+     *
+     * @param int $num The number of responses to match
+     * @param TableNode $table The data to match against
+     * @throws RuntimeException|InvalidArgumentException|OutOfBoundsException
+     * @return self
+     *
+     * @Then the last :num responses match:
+     */
+    public function theLastResponsesMatch($num, TableNode $table) {
+        $num = (int) $num;
+
+        if (count($this->history) < $num) {
+            throw new RuntimeException(sprintf(
+                'Not enough requests in the history. Needs at least %d, actual: %d.',
+                $num,
+                count($this->history))
+            );
+        }
+
+        // First, reverse the history and slice $num elements off. Then reverse those, and pick
+        // only the response elements from the resulting array.
+        $reversedOrder = array_reverse($this->history);
+        $responses = array_column(array_reverse(array_slice($reversedOrder, 0, $num)), 'response');
+
+        foreach ($table as $row) {
+            if (!isset($row['response']) || empty($row['response'])) {
+                throw new InvalidArgumentException(
+                    'Each row must refer to a response by using the "response" column.'
+                );
+            }
+
+            $index = $row['response'] - 1;
+
+            if (!isset($responses[$index])) {
+                throw new OutOfBoundsException(sprintf(
+                    'Invalid response number: %d.',
+                    $row['response']
+                ));
+            }
+
+            $response = $responses[$index];
+
+            if (!empty($row['status line'])) {
+                $actualStatusLine = sprintf(
+                    '%d %s',
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase()
+                );
+
+                Assertion::same(
+                    $row['status line'],
+                    $actualStatusLine, sprintf(
+                        'Incorrect status line in response %d, expected "%s", got: "%s".',
+                        $row['response'],
+                        $row['status line'],
+                        $actualStatusLine
+                    )
+                );
+            }
+
+            if (!empty($row['header name']) && !empty($row['header value'])) {
+                Assertion::true(
+                    $response->hasHeader($row['header name']),
+                    sprintf(
+                        'Expected response %d to have the "%s" header, but it does not.',
+                        $row['response'],
+                        $row['header name']
+                    )
+                );
+
+                Assertion::same(
+                    $row['header value'],
+                    $headerValue = $response->getHeaderLine($row['header name']),
+                    sprintf(
+                        'Incorrect "%s" header value in response %d, expected "%s", got: "%s".',
+                        $row['header name'],
+                        $row['response'],
+                        $row['header value'],
+                        $headerValue
+                    )
+                );
+            }
+
+            if (!empty($row['checksum'])) {
+                Assertion::same(
+                    $row['checksum'],
+                    $checksum = md5((string) $response->getBody()),
+                    sprintf(
+                        'Incorrect checksum in response %d, expected "%s", got: "%s".',
+                        $row['response'],
+                        $row['checksum'],
+                        $checksum
+                    )
+                );
+            }
+
+            if (!empty($row['image width']) || !empty($row['image height'])) {
+                list($actualWidth, $actualHeight) = getimagesizefromstring((string) $this->response->getBody());
+
+                if (!empty($row['image width'])) {
+                    Assertion::same(
+                        (int) $row['image width'],
+                        $actualWidth,
+                        sprintf(
+                            'Expected image in response %d to be %d pixel(s) wide, actual: %d.',
+                            $row['response'],
+                            $row['image width'],
+                            $actualWidth
+                        )
+                    );
+                }
+
+                if (!empty($row['image height'])) {
+                    Assertion::same(
+                        (int) $row['image height'],
+                        $actualHeight,
+                        sprintf(
+                            'Expected image in response %d to be %d pixel(s) high, actual: %d.',
+                            $row['response'],
+                            $row['image height'],
+                            $actualHeight
+                        )
+                    );
+                }
+            }
+        }
+
+        return $this;
     }
 
 
