@@ -38,6 +38,8 @@ before_install:
 before_script:
   - phpenv config-rm xdebug.ini
   - composer self-update
+  - composer lint
+  - composer prepare
   - composer install --prefer-dist
   - composer start-httpd-for-behat-tests
 
