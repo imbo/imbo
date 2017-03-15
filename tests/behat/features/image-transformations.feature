@@ -69,9 +69,9 @@ Feature: Imbo enables dynamic transformations of images
             | sharpen:preset=moderate                      | 599   | 417    |
             | sharpen:preset=strong                        | 599   | 417    |
             | sharpen:preset=extreme                       | 599   | 417    |
-            | smartSize:width=250,height=400,poi=0\,0      | 250   | 400    |
-            | smartSize:width=700,height=300,poi=0\,0      | 700   | 300    |
-            | smartSize:width=300,height=300,poi=0\,0      | 300   | 300    |
+            | smartSize:width=250,height=400,poi=0,0       | 250   | 400    |
+            | smartSize:width=700,height=300,poi=0,0       | 700   | 300    |
+            | smartSize:width=300,height=300,poi=0,0       | 300   | 300    |
             | strip                                        | 599   | 417    |
             | thumbnail                                    | 50    | 50     |
             | thumbnail:width=40,height=30                 | 40    | 30     |
@@ -138,7 +138,7 @@ Feature: Imbo enables dynamic transformations of images
             | sharpen:preset=moderate                      |
             | sharpen:preset=strong                        |
             | sharpen:preset=extreme                       |
-            | smartSize:width=300,height=300,poi=0\,0      |
+            | smartSize:width=300,height=300,poi=0,0       |
             | strip                                        |
             | thumbnail                                    |
             | thumbnail:width=40,height=30                 |
