@@ -10,6 +10,7 @@
 
 use Imbo\BehatApiExtension\Context\ApiContext;
 use Imbo\BehatApiExtension\ArrayContainsComparator;
+use Imbo\BehatApiExtension\Exception\AssertionFailedException;
 use Behat\Behat\Hook\Scope\BeforeFeatureScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
@@ -1719,6 +1720,30 @@ class FeatureContext extends ApiContext {
         return $this->requestPath(sprintf('/s/%s', $shortUrlId));
     }
 
+    /**
+     * Assert that the image does not have any properties with a specific prefix
+     *
+     * @param string $prefix
+     * @throws AssertionFailedException
+     * @return self
+     *
+     * @Then the image should not have any :prefix properties
+     */
+    public function assertImageProperties($prefix) {
+        $imagick = new Imagick();
+        $imagick->readImageBlob((string) $this->response->getBody());
+
+        foreach ($imagick->getImageProperties() as $key => $value) {
+            if (strpos($key, $prefix) === 0) {
+                throw new AssertionFailedException(sprintf(
+                    'Image properties have not been properly stripped. Did not expect properties that starts with "%s", found: "%s".',
+                    $prefix,
+                    $key
+                ));
+            }
+        }
+    }
+
 
 
 
@@ -1851,18 +1876,6 @@ class FeatureContext extends ApiContext {
         $this->setClientAuth('publickey', 'privatekey');
         $this->signRequest();
         $this->request('/users/user/images/' . $identifier, 'DELETE');
-    }
-
-    /**
-     * @Given /^the image should not have any "([^"]*)" properties$/
-     */
-    public function assertImageProperties($tag) {
-        $imagick = new \Imagick();
-        $imagick->readImageBlob((string) $this->getLastResponse()->getBody());
-
-        foreach ($imagick->getImageProperties() as $key => $value) {
-            assertStringStartsNotWith($tag, $key, 'Properties exist that should have been stripped');
-        }
     }
 
     /**
