@@ -1422,11 +1422,15 @@ class FeatureContext extends ApiContext {
      * - (string) path, required: The path to request. Some special values can be used for dynamic
      *                            requests:
      *                              - "previously added image": Request the previously added image
+     *                              - "metadata of the previously added image": Request the metadata
+     *                                of the previously added image
      * - (string) method: The HTTP method to use, defaults to GET
      * - (string) extension: Used to force a specific image type, for instance "jpg"
      * - (string) transformation: An image transformation to add to the request
+     * - (string) access token: Set to "yes" to append an access token as a query parameter
      * - (string) sign request: Set to "yes" to sign the request. Remember to specify public and
      *                          private keys prior to running the request
+     * - (string) request body: Set the request body to this value
      *
      * @param TableNode $table Information about the requests to make
      * @throws InvalidArgumentException
@@ -1449,13 +1453,23 @@ class FeatureContext extends ApiContext {
                 $this->applyTransformation($row['transformation']);
             }
 
+            if (!empty($row['access token']) && $row['access token'] === 'yes') {
+                $this->appendAccessToken();
+            }
+
             if (!empty($row['sign request']) && $row['sign request'] === 'yes') {
                 $this->signRequest();
+            }
+
+            if (!empty($row['request body'])) {
+                $this->setRequestBody($row['request body']);
             }
 
             if ($path === 'previously added image') {
                 $extension = isset($row['extension']) ? $row['extension'] : null;
                 $this->requestPreviouslyAddedImage($method, $extension);
+            } else if ($path === 'metadata of previously added image') {
+                $this->requestMetadataOfPreviouslyAddedImage($method);
             } else {
                 $this->requestPath($path, $method);
             }
@@ -1503,7 +1517,29 @@ class FeatureContext extends ApiContext {
         $reversedOrder = array_reverse($this->history);
         $responses = array_column(array_reverse(array_slice($reversedOrder, 0, $num)), 'response');
 
-        foreach ($table as $row) {
+        // Valid keys for the rows in $table
+        $validKeys = [
+            'response',
+            'status line',
+            'body is',
+            'header name',
+            'header value',
+            'checksum',
+            'image width',
+            'image height',
+        ];
+
+        foreach ($table as $i => $row) {
+            foreach (array_keys($row) as $key) {
+                if (!in_array($key, $validKeys)) {
+                    throw new InvalidArgumentException(sprintf(
+                        'Found invalid key in row %d: "%s".',
+                        $i + 1,
+                        $key
+                    ));
+                }
+            }
+
             if (!isset($row['response']) || empty($row['response'])) {
                 throw new InvalidArgumentException(
                     'Each row must refer to a response by using the "response" column.'
@@ -1603,6 +1639,19 @@ class FeatureContext extends ApiContext {
                         )
                     );
                 }
+            }
+
+            if (!empty($row['body is'])) {
+                Assertion::same(
+                    $row['body is'],
+                    $actualBody = (string) $response->getBody(),
+                    sprintf(
+                        'Incorrect response body for request %d, expected "%s", got: "%s".',
+                        $row['response'],
+                        $row['body is'],
+                        $actualBody
+                    )
+                );
             }
         }
 
