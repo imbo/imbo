@@ -15,11 +15,10 @@ Given I sign the request
 Given I include an access token in the query string
 Given I include an access token in the query string for all requests
 Given :imagePath exists for user :user
-Given :imagePath exists for user :user with the following metadata:
+Given :imagePath exists for user :user with the following metadata: <PyStringNode>
 Given the client IP is :ip
 Given I specify :transformation as transformation
 Given I specify the following transformations: <PyStringNode>
-Given the pixel at coordinate :coordinates has an alpha of :alpha
 Given I prime the database with :fixture
 Given I authenticate using :method
 Given I use :publicKey and :privateKey for public and private keys
@@ -50,6 +49,7 @@ Then the image width is :width
 Then the image height is :height
 Then the image dimension is :dimension
 Then the pixel at coordinate :coordinates has a color of :color
+Then the pixel at coordinate :coordinates has an alpha of :alpha
 Then the ACL rule under public key :publicKey with ID :aclId no longer exists
 Then the :publicKey public key no longer exists
 Then the response can be cached
@@ -61,6 +61,7 @@ Then the last :num :headerName response headers are the same
 Then the last :num :headerName response headers are not the same
 Then the last :num responses match: <TableNode>
 Then the image should not have any :prefix properties
+Then the response body size is :expectedSize
 ```
 
 ## Run tests

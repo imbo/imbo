@@ -44,26 +44,6 @@ class FeatureContext extends ApiContext {
     private $cacheUtil;
 
     /**
-     * Class constructor
-     *
-     * @param CacheUtil $cacheUtil
-     */
-    public function __construct(CacheUtil $cacheUtil = null) {
-        if ($cacheUtil === null) {
-            $cacheUtil = new CacheUtil();
-        }
-
-        $this->cacheUtil = $cacheUtil;
-    }
-
-    /**
-     * The user used by the client
-     *
-     * @var string
-     */
-    private $user;
-
-    /**
      * The public key used by the client
      *
      * @var string
@@ -78,13 +58,6 @@ class FeatureContext extends ApiContext {
     private $privateKey;
 
     /**
-     * The name of the current configuration file
-     *
-     * @var string
-     */
-    private $currentConfig;
-
-    /**
      * An array of urls for added images, keyed by local file path
      *
      * @var array
@@ -97,35 +70,6 @@ class FeatureContext extends ApiContext {
      * @var array
      */
     private $imageIdentifiers = [];
-
-    /**
-     * Holds the current image target URL - used when the same image is requested
-     * over several tests in the same feature
-     *
-     * @var string
-     */
-    private static $testImageUrl;
-
-    /**
-     * Holds the image identifier of the current testing target
-     *
-     * @var string
-     */
-    private static $testImageIdentifier;
-
-    /**
-     * Holds the path to the image currently used as the testing target
-     *
-     * @var string
-     */
-    private static $testImagePath;
-
-    /**
-     * Holds the current feature for this test image
-     *
-     * @var string
-     */
-    private static $testImageFeature;
 
     /**
      * Array container for the history middleware
@@ -165,12 +109,24 @@ class FeatureContext extends ApiContext {
     private $authenticationHandlerIsActive = false;
 
     /**
+     * Class constructor
+     *
+     * @param CacheUtil $cacheUtil
+     */
+    public function __construct(CacheUtil $cacheUtil = null) {
+        if ($cacheUtil === null) {
+            $cacheUtil = new CacheUtil();
+        }
+
+        $this->cacheUtil = $cacheUtil;
+    }
+
+    /**
      * Manipulate the handler stack of the client for all tests
      *
      * - Add the history middleware to record all request / responses in the $this->history array
      *
-     * @param ClientInterface $client A GuzzleHttp\Client instance
-     * @return self
+     * {@inheritdoc}
      */
     public function setClient(ClientInterface $client) {
         $handlerStack = $client->getConfig()['handler'];
@@ -190,8 +146,7 @@ class FeatureContext extends ApiContext {
      *
      * - @isDate(): Check if a field that is supposed to represent a date is property formatted
      *
-     * @param ArrayContainsComparator $comparator
-     * @return self
+     * {@inheritdoc}
      */
     public function setArrayContainsComparator(ArrayContainsComparator $comparator) {
         $comparator->addFunction('isDate', [$this, 'isDate']);
@@ -200,11 +155,22 @@ class FeatureContext extends ApiContext {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setRequestHeader($header, $value) {
+        if ($value === 'current-timestamp') {
+            $value = gmdate('Y-m-d\TH:i:s\Z');
+        }
+
+        return parent::setRequestHeader($header, $value);
+    }
+
+    /**
      * Function for the array contains comparator to validate a date string
      *
      * Validates the following date format:
      *
-     * 'D, d M Y H:i:s' . ' GMT'
+     * 'D, d M Y H:i:s GMT'
      *
      * @param string $date The string to validate
      * @throws InvalidArgumentException
@@ -280,7 +246,6 @@ class FeatureContext extends ApiContext {
             ));
         }
 
-        $this->currentConfig = $configFile;
         $this->setRequestHeader('X-Imbo-Test-Config-File', $configFile);
     }
 
@@ -553,9 +518,239 @@ class FeatureContext extends ApiContext {
      * @Given the client IP is :ip
      */
     public function setClientIp($ip) {
-        $this->setRequestHeader('X-Client-Ip', $ip);
+        return $this->setRequestHeader('X-Client-Ip', $ip);
+    }
+
+    /**
+     * Add a transformation to the query parameter for the next request
+     *
+     * @param string $transformation The value of the transformation, for instance "border"
+     * @return self
+     *
+     * @Given I specify :transformation as transformation
+     */
+    public function applyTransformation($transformation) {
+        return $this->setRequestQueryParameter('t[]', $transformation);
+    }
+
+    /**
+     * Add one or more transformations to the query parameter for the next request
+     *
+     * @param PyStringNode $transformations
+     * @return self
+     *
+     * @Given I specify the following transformations:
+     */
+    public function applyTransformations(PyStringNode $transformations) {
+        foreach (explode("\n", (string) $transformations) as $transformation) {
+            $this->applyTransformation(trim($transformation));
+        }
 
         return $this;
+    }
+
+    /**
+     * Prive the database with content from a PHP script
+     *
+     * @param string $fixture Name of a PHP file in the tests/behat/fixtures directory that returns
+     *                        an array.
+     * @throws InvalidArgumentException Throws an exception if $fixture does not exist, or if it
+     *                                  does not return an array.
+     * @return self
+     *
+     * @Given I prime the database with :fixture
+     */
+    public function primeDatabase($fixture) {
+        $fixtureDir = realpath(implode(DIRECTORY_SEPARATOR, [
+            dirname(dirname(__DIR__)),
+            'fixtures'
+        ]));
+        $fixturePath = $fixtureDir . DIRECTORY_SEPARATOR . $fixture;
+
+        if (!is_file($fixturePath)) {
+            throw new InvalidArgumentException(sprintf(
+                'Fixture file "%s" does not exist in "%s".',
+                $fixture,
+                $fixtureDir
+            ));
+        }
+
+        $mongo = (new MongoClient())->imbo_testing;
+
+        $fixtures = require $fixturePath;
+
+        if (!is_array($fixtures)) {
+            throw new InvalidArgumentException(sprintf(
+                'Fixture "%s" does not return an array.',
+                $fixturePath
+            ));
+        }
+
+        foreach ($fixtures as $collection => $data) {
+            $mongo->$collection->drop();
+
+            if ($data) {
+                $mongo->$collection->batchInsert($data);
+            }
+        }
+    }
+
+    /**
+     * Authenticate the request using some authentication method
+     *
+     * @param string $method The method of authentication
+     * @throws InvalidArgumentException Throws an exception if an invalid method is used
+     * @return self
+     *
+     * @Given I authenticate using :method
+     */
+    public function authenticateRequest($method) {
+        if ($method === 'access-token') {
+            return $this->appendAccessToken();
+        } else if ($method === 'signature') {
+            return $this->signRequest();
+        } else if ($method === 'signature (headers)') {
+            return $this->signRequestUsingHttpHeaders();
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'Invalid authentication method: "%s".',
+            $method
+        ));
+    }
+
+    /**
+     * Set the public and private keys to be used for signing the request / generating the access
+     * token
+     *
+     * @param string $publicKey The public key to set
+     * @param string $privateKey The private key to set
+     * @return self
+     *
+     * @Given I use :publicKey and :privateKey for public and private keys
+     */
+    public function setPublicAndPrivateKey($publicKey, $privateKey) {
+        $this->publicKey = $publicKey;
+        $this->privateKey = $privateKey;
+
+        // Add the request header
+        $this->setRequestHeader('X-Imbo-PublicKey', $publicKey);
+
+        return $this;
+    }
+
+    /**
+     * Set a query string parameter
+     *
+     * @param string $name The name of the parameter
+     * @param mixed $value The value for the parameter
+     * @return self
+     *
+     * @Given the query string parameter :name is set to :value
+     */
+    public function setRequestQueryParameter($name, $value) {
+        if (empty($this->requestOptions['query'])) {
+            $this->requestOptions['query'] = [];
+        }
+
+        // If the name ends with [] we remove that from the name, and convert the value to an array
+        if (substr($name, -2) === '[]') {
+            $name = substr($name, 0, -2);
+
+            if (isset($this->requestOptions['query'][$name]) && !is_array($this->requestOptions['query'][$name])) {
+                // The field already exists, but not as an array
+                throw new InvalidArgumentException(sprintf(
+                    'The "%s" query parameter already exists and it\'s not an array, so can\'t append more values to it.',
+                    $name
+                ));
+            } else if (!isset($this->requestOptions['query'][$name])) {
+                // The field does not exist, set it to an empty array
+                $this->requestOptions['query'][$name] = [];
+            }
+
+            // Append the value
+            $this->requestOptions['query'][$name][] = $value;
+        } else {
+            // Set the key => value
+            $this->requestOptions['query'][$name] = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set a query parameter to the image identifier of a specific image already added to Imbo
+     *
+     * @param string $name Name of the query parameter
+     * @param string $path Path of a local image that exists in Imbo
+     * @throws InvalidArgumentException
+     * @return self
+     *
+     * @Given the query string parameter :name is set to the image identifier of :path
+     */
+    public function setRequestParameterToImageIdentifier($name, $path) {
+        if (!isset($this->imageIdentifiers[$path])) {
+            throw new InvalidArgumentException(sprintf(
+                'No image identifier exists for image: "%s".',
+                $path
+            ));
+        }
+
+        return $this->setRequestQueryParameter($name, $this->imageIdentifiers[$path]);
+    }
+
+    /**
+     * Generate a short URL with some parameters for a given image path
+     *
+     * @param string $path
+     * @param PyStringNode $params
+     * @throws InvalidArgumentException
+     * @return self
+     *
+     * @Given I generate a short URL for :path with the following parameters:
+     */
+    public function generateShortImageUrl($path, PyStringNode $params) {
+        if (!isset($this->imageIdentifiers[$path])) {
+            throw new InvalidArgumentException(sprintf(
+                'No image identifier exists for path: "%s".', $path
+            ));
+        }
+
+        $imageIdentifier = $this->imageIdentifiers[$path];
+        $user = $this->getImboUserByLocalImagePath($path);
+        $params = array_merge(json_decode((string) $params, true), [
+            'imageIdentifier' => $imageIdentifier,
+        ]);
+
+        return $this
+            ->setRequestBody(json_encode($params))
+            ->requestPath(sprintf(
+                '/users/%s/images/%s/shorturls', $user, $imageIdentifier
+            ), 'POST');
+    }
+
+    /**
+     * Specify a watermark image based on a local path
+     *
+     * @param string $localPath
+     * @param string $params
+     * @throws InvalidArgumentException
+     * @return self
+     *
+     * @Given I use :localPath as the watermark image
+     * @Given I use :localPath as the watermark image with :params as parameters
+     */
+    public function specifyAsTheWatermarkImage($localPath, $params = null) {
+        if (!isset($this->imageIdentifiers[$localPath])) {
+            throw new InvalidArgumentException(sprintf(
+                'No image exists for path: "%s".', $localPath
+            ));
+        }
+
+        $imageIdentifier = $this->imageIdentifiers[$localPath];
+        $transformation = 'watermark:img=' . $imageIdentifier . ($params ? ',' . $params : '');
+
+        return $this->applyTransformation($transformation);
     }
 
     /**
@@ -624,6 +819,186 @@ class FeatureContext extends ApiContext {
     }
 
     /**
+     * Replay the last request
+     *
+     * This method can be used to replay a request, with or without a different HTTP method. If the
+     * public and private keys have been set the method will append an access token.
+     *
+     * @param string $method Optional HTTP method. If not set the HTTP method from the previous
+     *                       request will be used.
+     * @throws RuntimeException Throws an exception if no request have been made yet.
+     * @return self
+     *
+     * @When I replay the last request
+     * @When I replay the last request using HTTP :method
+     */
+    public function makeSameRequest($method = null) {
+        if (!$this->request) {
+            throw new RuntimeException('No request have been made yet.');
+        }
+
+        $this->setRequestMethod($method ?: $this->request->getMethod());
+
+        if ($this->publicKey && $this->privateKey) {
+            $this->appendAccessToken();
+        }
+
+        return $this->sendRequest();
+    }
+
+    /**
+     * Request the metadata of the previously added image
+     *
+     * @param string $method The HTTP method to use when fetching the metadata
+     * @throws RuntimeException Throws an exception if no image can be found in the history
+     * @return self
+     *
+     * @When I request the metadata of the previously added image
+     * @When I request the metadata of the previously added image using HTTP :method
+     */
+    public function requestMetadataOfPreviouslyAddedImage($method = 'GET') {
+        // Go back in the history until we have a response with an image identifier
+        foreach (array_reverse($this->history) as $transaction) {
+            $responseBody = json_decode((string) $transaction['response']->getBody(), true);
+
+            if (isset($responseBody['imageIdentifier'])) {
+                $match = [];
+                preg_match(
+                    '|^/users/(?<user>.*?)/images|',
+                    (string) $transaction['request']->getUri()->getPath(),
+                    $match
+                );
+
+                if ($match) {
+                    $user = $match['user'];
+                    $path = sprintf(
+                        '/users/%s/images/%s/metadata',
+                        $user,
+                        $responseBody['imageIdentifier']
+                    );
+
+                    return $this->requestPath($path, $method);
+                }
+            }
+        }
+
+        // No hit
+        throw new RuntimeException(
+            'Could not find any response in the history with an image identifier.'
+        );
+    }
+
+    /**
+     * Request an image using a local file path
+     *
+     * This method can be used to fetch images that has been added to Imbo earlier via the
+     * `addUserImageToImbo` method, that is triggered by `Given :imagePath exists for user :user`.
+     *
+     * @param string $localPath The local path for the image that was added earlier
+     * @param string $format Optional format of the image (png|gif|jpg)
+     * @param string $method Optional HTTP method to use
+     * @throws InvalidArgumentException
+     * @return self
+     *
+     * @When /^I request the image resource for "([^"]*)"(?: as a "(png|gif|jpg)")?(?: using HTTP "([^"]*)")?$/
+     */
+    public function requestImageResourceForLocalImage($localPath, $format = null, $method = 'GET') {
+        if (!isset($this->imageUrls[$localPath])) {
+            throw new InvalidArgumentException(sprintf(
+                'Image URL for image with path "%s" can not be found.',
+                $localPath
+            ));
+        }
+
+        $url = $this->imageUrls[$localPath];
+
+        if ($format) {
+            // Append extension if specified
+            $url .= '.' . $format;
+        }
+
+        return $this->requestPath($url, $method);
+    }
+
+    /**
+     * Perform a series of requests
+     *
+     * The $table parameter must be a table with the following columns:
+     *
+     * - (string) path, required: The path to request. Some special values can be used for dynamic
+     *                            requests:
+     *                              - "previously added image": Request the previously added image
+     *                              - "metadata of the previously added image": Request the metadata
+     *                                of the previously added image
+     * - (string) method: The HTTP method to use, defaults to GET
+     * - (string) extension: Used to force a specific image type, for instance "jpg"
+     * - (string) transformation: An image transformation to add to the request
+     * - (string) access token: Set to "yes" to append an access token as a query parameter
+     * - (string) sign request: Set to "yes" to sign the request. Remember to specify public and
+     *                          private keys prior to running the request
+     * - (string) request body: Set the request body to this value
+     *
+     * @param TableNode $table Information about the requests to make
+     * @throws InvalidArgumentException
+     * @return self
+     *
+     * @When I request:
+     */
+    public function requestPaths(TableNode $table) {
+        foreach ($table as $row) {
+            foreach (['path', 'method'] as $key) {
+                if (!isset($row[$key])) {
+                    throw new InvalidArgumentException(sprintf('Table is missing "%s" key.', $key));
+                }
+            }
+
+            $method = $row['method'] ?: 'GET';
+            $path = $row['path'];
+
+            if (!empty($row['transformation'])) {
+                $this->applyTransformation($row['transformation']);
+            }
+
+            if (!empty($row['access token']) && $row['access token'] === 'yes') {
+                $this->appendAccessToken();
+            }
+
+            if (!empty($row['sign request']) && $row['sign request'] === 'yes') {
+                $this->signRequest();
+            }
+
+            if (!empty($row['request body'])) {
+                $this->setRequestBody($row['request body']);
+            }
+
+            if ($path === 'previously added image') {
+                $extension = isset($row['extension']) ? $row['extension'] : null;
+                $this->requestPreviouslyAddedImage($method, $extension);
+            } else if ($path === 'metadata of previously added image') {
+                $this->requestMetadataOfPreviouslyAddedImage($method);
+            } else {
+                $this->requestPath($path, $method);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Make a request to the short URL generated in the previous request
+     *
+     * @return self
+     *
+     * @When I request the image using the generated short URL
+     */
+    public function requestImageUsingShortUrl() {
+        $this->requireResponse();
+        $shortUrlId = json_decode((string) $this->response->getBody(), true)['id'];
+
+        return $this->requestPath(sprintf('/s/%s', $shortUrlId));
+    }
+
+    /**
      * Assert the contents of an imbo error message
      *
      * @param string $message The error message
@@ -662,34 +1037,6 @@ class FeatureContext extends ApiContext {
                 $actualCode,
                 sprintf('Expected imbo error code "%d", got "%d".', $code, $actualCode)
             );
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add a transformation to the query parameter for the next request
-     *
-     * @param string $transformation The value of the transformation, for instance "border"
-     * @return self
-     *
-     * @Given I specify :transformation as transformation
-     */
-    public function applyTransformation($transformation) {
-        return $this->setRequestQueryParameter('t[]', $transformation);
-    }
-
-    /**
-     * Add one or more transformations to the query parameter for the next request
-     *
-     * @param PyStringNode $transformations
-     * @return self
-     *
-     * @Given I specify the following transformations:
-     */
-    public function applyTransformations(PyStringNode $transformations) {
-        foreach (explode("\n", (string) $transformations) as $transformation) {
-            $this->applyTransformation(trim($transformation));
         }
 
         return $this;
@@ -820,7 +1167,7 @@ class FeatureContext extends ApiContext {
      * @param float $alpha Alpha value
      * @return self
      *
-     * @Given the pixel at coordinate :coordinates has an alpha of :alpha
+     * @Then the pixel at coordinate :coordinates has an alpha of :alpha
      */
     public function assertImagePixelAlpha($coordinates, $alpha) {
         $this->requireResponse();
@@ -840,119 +1187,6 @@ class FeatureContext extends ApiContext {
         );
 
         return $this;
-    }
-
-    /**
-     * Get the pixel info for given coordinates from the image in the current response
-     *
-     * @param string $coordinates
-     * @throws InvalidArgumentException Throws an exception if the coordinates value is invalid
-     * @return array Returns an array with two keys:
-     *               - `color`: Hex color of the pixel.
-     *               - `alpha`: Alpha value of the pixel.
-     */
-    private function getImagePixelInfo($coordinates) {
-        $this->requireResponse();
-
-        $match = [];
-        preg_match('/^(?<x>[\d]+),(?<y>[\d]+)$/', $coordinates, $match);
-
-        if (!$match) {
-            throw new InvalidArgumentException(sprintf(
-                'Invalid coordinates: "%s". Format is "<w>x<h>", no spaces allowed.',
-                $coordinates
-            ));
-        }
-
-        $x = (int) $match['x'];
-        $y = (int) $match['y'];
-
-        $imagick = new Imagick();
-        $imagick->readImageBlob((string) $this->response->getBody());
-
-        $pixel = $imagick->getImagePixelColor($x, $y);
-        $color = $pixel->getColor();
-
-        $toHex = function($col) {
-            return str_pad(dechex($col), 2, '0', STR_PAD_LEFT);
-        };
-
-        $hexColor = $toHex($color['r']) . $toHex($color['g']) . $toHex($color['b']);
-
-        return [
-            'color' => $hexColor,
-            'alpha' => (float) $pixel->getColorValue(Imagick::COLOR_ALPHA),
-        ];
-    }
-
-    /**
-     * Prive the database with content from a PHP script
-     *
-     * @param string $fixture Name of a PHP file in the tests/behat/fixtures directory that returns
-     *                        an array.
-     * @throws InvalidArgumentException Throws an exception if $fixture does not exist, or if it
-     *                                  does not return an array.
-     * @return self
-     *
-     * @Given I prime the database with :fixture
-     */
-    public function primeDatabase($fixture) {
-        $fixtureDir = realpath(implode(DIRECTORY_SEPARATOR, [
-            dirname(dirname(__DIR__)),
-            'fixtures'
-        ]));
-        $fixturePath = $fixtureDir . DIRECTORY_SEPARATOR . $fixture;
-
-        if (!is_file($fixturePath)) {
-            throw new InvalidArgumentException(sprintf(
-                'Fixture file "%s" does not exist in "%s".',
-                $fixture,
-                $fixtureDir
-            ));
-        }
-
-        $mongo = (new MongoClient())->imbo_testing;
-
-        $fixtures = require $fixturePath;
-
-        if (!is_array($fixtures)) {
-            throw new InvalidArgumentException(sprintf(
-                'Fixture "%s" does not return an array.',
-                $fixturePath
-            ));
-        }
-
-        foreach ($fixtures as $collection => $data) {
-            $mongo->$collection->drop();
-
-            if ($data) {
-                $mongo->$collection->batchInsert($data);
-            }
-        }
-    }
-
-    /**
-     * Authenticate the request using some authentication method
-     *
-     * @param string $method The method of authentication
-     * @throws InvalidArgumentException Throws an exception if an invalid method is used
-     * @return self
-     *
-     * @Given I authenticate using :method
-     */
-    public function authenticateRequest($method) {
-        if ($method === 'access-token') {
-            return $this->appendAccessToken();
-        } else if ($method === 'signature') {
-            return $this->signRequest();
-        } else if ($method === 'signature (headers)') {
-            return $this->signRequestUsingHttpHeaders();
-        }
-
-        throw new InvalidArgumentException(sprintf(
-            'Invalid authentication method: "%s".',
-            $method
-        ));
     }
 
     /**
@@ -1024,93 +1258,6 @@ class FeatureContext extends ApiContext {
         );
 
         return $this;
-    }
-
-    /**
-     * Set the public and private keys to be used for signing the request / generating the access
-     * token
-     *
-     * @param string $publicKey The public key to set
-     * @param string $privateKey The private key to set
-     * @return self
-     *
-     * @Given I use :publicKey and :privateKey for public and private keys
-     */
-    public function setPublicAndPrivateKey($publicKey, $privateKey) {
-        $this->publicKey = $publicKey;
-        $this->privateKey = $privateKey;
-
-        // Add the request header
-        $this->setRequestHeader('X-Imbo-PublicKey', $publicKey);
-
-        return $this;
-    }
-
-    /**
-     * Set a query string parameter
-     *
-     * @param string $name The name of the parameter
-     * @param mixed $value The value for the parameter
-     * @return self
-     *
-     * @Given the query string parameter :name is set to :value
-     */
-    public function setRequestQueryParameter($name, $value) {
-        if (empty($this->requestOptions['query'])) {
-            $this->requestOptions['query'] = [];
-        }
-
-        // If the name ends with [] we remove that from the name, and convert the value to an array
-        if (substr($name, -2) === '[]') {
-            $name = substr($name, 0, -2);
-
-            if (isset($this->requestOptions['query'][$name]) && !is_array($this->requestOptions['query'][$name])) {
-                // The field already exists, but not as an array
-                throw new InvalidArgumentException(sprintf(
-                    'The "%s" query parameter already exists and it\'s not an array, so can\'t append more values to it.',
-                    $name
-                ));
-            } else if (!isset($this->requestOptions['query'][$name])) {
-                // The field does not exist, set it to an empty array
-                $this->requestOptions['query'][$name] = [];
-            }
-
-            // Append the value
-            $this->requestOptions['query'][$name][] = $value;
-        } else {
-            // Set the key => value
-            $this->requestOptions['query'][$name] = $value;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Replay the last request
-     *
-     * This method can be used to replay a request, with or without a different HTTP method. If the
-     * public and private keys have been set the method will append an access token.
-     *
-     * @param string $method Optional HTTP method. If not set the HTTP method from the previous
-     *                       request will be used.
-     * @throws RuntimeException Throws an exception if no request have been made yet.
-     * @return self
-     *
-     * @When I replay the last request
-     * @When I replay the last request using HTTP :method
-     */
-    public function makeSameRequest($method = null) {
-        if (!$this->request) {
-            throw new RuntimeException('No request have been made yet.');
-        }
-
-        $this->setRequestMethod($method ?: $this->request->getMethod());
-
-        if ($this->publicKey && $this->privateKey) {
-            $this->appendAccessToken();
-        }
-
-        return $this->sendRequest();
     }
 
     /**
@@ -1249,80 +1396,6 @@ class FeatureContext extends ApiContext {
     }
 
     /**
-     * Request the metadata of the previously added image
-     *
-     * @param string $method The HTTP method to use when fetching the metadata
-     * @throws RuntimeException Throws an exception if no image can be found in the history
-     * @return self
-     *
-     * @When I request the metadata of the previously added image
-     * @When I request the metadata of the previously added image using HTTP :method
-     */
-    public function requestMetadataOfPreviouslyAddedImage($method = 'GET') {
-        // Go back in the history until we have a response with an image identifier
-        foreach (array_reverse($this->history) as $transaction) {
-            $responseBody = json_decode((string) $transaction['response']->getBody(), true);
-
-            if (isset($responseBody['imageIdentifier'])) {
-                $match = [];
-                preg_match(
-                    '|^/users/(?<user>.*?)/images|',
-                    (string) $transaction['request']->getUri()->getPath(),
-                    $match
-                );
-
-                if ($match) {
-                    $user = $match['user'];
-                    $path = sprintf(
-                        '/users/%s/images/%s/metadata',
-                        $user,
-                        $responseBody['imageIdentifier']
-                    );
-
-                    return $this->requestPath($path, $method);
-                }
-            }
-        }
-
-        // No hit
-        throw new RuntimeException(
-            'Could not find any response in the history with an image identifier.'
-        );
-    }
-
-    /**
-     * Request an image using a local file path
-     *
-     * This method can be used to fetch images that has been added to Imbo earlier via the
-     * `addUserImageToImbo` method, that is triggered by `Given :imagePath exists for user :user`.
-     *
-     * @param string $localPath The local path for the image that was added earlier
-     * @param string $format Optional format of the image (png|gif|jpg)
-     * @param string $method Optional HTTP method to use
-     * @throws InvalidArgumentException
-     * @return self
-     *
-     * @When /^I request the image resource for "([^"]*)"(?: as a "(png|gif|jpg)")?(?: using HTTP "([^"]*)")?$/
-     */
-    public function requestImageResourceForLocalImage($localPath, $format = null, $method = 'GET') {
-        if (!isset($this->imageUrls[$localPath])) {
-            throw new InvalidArgumentException(sprintf(
-                'Image URL for image with path "%s" can not be found.',
-                $localPath
-            ));
-        }
-
-        $url = $this->imageUrls[$localPath];
-
-        if ($format) {
-            // Append extension if specified
-            $url .= '.' . $format;
-        }
-
-        return $this->requestPath($url, $method);
-    }
-
-    /**
      * Compare a specific header in the last $num responses
      *
      * @param int $num The number of responses to compare. Must be at least 2.
@@ -1389,91 +1462,6 @@ class FeatureContext extends ApiContext {
                     print_r($values, true)
                 )
             );
-        }
-
-        return $this;
-    }
-
-    /**
-     * Set a query parameter to the image identifier of a specific image already added to Imbo
-     *
-     * @param string $param Name of the query parameter
-     * @param string $path Path of a local image that exists in Imbo
-     * @throws InvalidArgumentException
-     * @return self
-     *
-     * @Given the query string parameter :param is set to the image identifier of :path
-     */
-    public function setRequestParameterToImageIdentifier($param, $path) {
-        if (!isset($this->imageIdentifiers[$path])) {
-            throw new InvalidArgumentException(sprintf(
-                'No image identifier exists for image: "%s".',
-                $path
-            ));
-        }
-
-        return $this->setRequestQueryParameter($param, $this->imageIdentifiers[$path]);
-    }
-
-    /**
-     * Perform a series of requests
-     *
-     * The $table parameter must be a table with the following columns:
-     *
-     * - (string) path, required: The path to request. Some special values can be used for dynamic
-     *                            requests:
-     *                              - "previously added image": Request the previously added image
-     *                              - "metadata of the previously added image": Request the metadata
-     *                                of the previously added image
-     * - (string) method: The HTTP method to use, defaults to GET
-     * - (string) extension: Used to force a specific image type, for instance "jpg"
-     * - (string) transformation: An image transformation to add to the request
-     * - (string) access token: Set to "yes" to append an access token as a query parameter
-     * - (string) sign request: Set to "yes" to sign the request. Remember to specify public and
-     *                          private keys prior to running the request
-     * - (string) request body: Set the request body to this value
-     *
-     * @param TableNode $table Information about the requests to make
-     * @throws InvalidArgumentException
-     * @return self
-     *
-     * @When I request:
-     */
-    public function requestPaths(TableNode $table) {
-        foreach ($table as $row) {
-            foreach (['path', 'method'] as $key) {
-                if (!isset($row[$key])) {
-                    throw new InvalidArgumentException(sprintf('Table is missing "%s" key.', $key));
-                }
-            }
-
-            $method = $row['method'] ?: 'GET';
-            $path = $row['path'];
-
-            if (!empty($row['transformation'])) {
-                $this->applyTransformation($row['transformation']);
-            }
-
-            if (!empty($row['access token']) && $row['access token'] === 'yes') {
-                $this->appendAccessToken();
-            }
-
-            if (!empty($row['sign request']) && $row['sign request'] === 'yes') {
-                $this->signRequest();
-            }
-
-            if (!empty($row['request body'])) {
-                $this->setRequestBody($row['request body']);
-            }
-
-            if ($path === 'previously added image') {
-                $extension = isset($row['extension']) ? $row['extension'] : null;
-                $this->requestPreviouslyAddedImage($method, $extension);
-            } else if ($path === 'metadata of previously added image') {
-                $this->requestMetadataOfPreviouslyAddedImage($method);
-            } else {
-                $this->requestPath($path, $method);
-            }
         }
 
         return $this;
@@ -1660,67 +1648,6 @@ class FeatureContext extends ApiContext {
     }
 
     /**
-     * Generate a short URL with some parameters for a given image path
-     *
-     * @param string $path
-     * @param PyStringNode $params
-     * @throws InvalidArgumentException
-     * @return self
-     *
-     * @Given I generate a short URL for :path with the following parameters:
-     */
-    public function generateShortImageUrl($path, PyStringNode $params) {
-        if (!isset($this->imageIdentifiers[$path])) {
-            throw new InvalidArgumentException(sprintf(
-                'No image identifier exists for path: "%s".', $path
-            ));
-        }
-
-        $imageIdentifier = $this->imageIdentifiers[$path];
-        $user = $this->getImboUserByLocalImagePath($path);
-        $params = array_merge(json_decode((string) $params, true), [
-            'imageIdentifier' => $imageIdentifier,
-        ]);
-
-        return $this
-            ->setRequestBody(json_encode($params))
-            ->requestPath(sprintf(
-                '/users/%s/images/%s/shorturls', $user, $imageIdentifier
-            ), 'POST');
-    }
-
-    /**
-     * Get the Imbo user based on a local file path that have been added to Imbo
-     *
-     * @param string $localPath
-     * @throws InvalidArgumentException
-     * @return string
-     */
-    private function getImboUserByLocalImagePath($localPath) {
-        if (!isset($this->imageUrls[$localPath])) {
-            throw new InvalidArgumentException(sprintf(
-                'No image exists for path: "%s".', $localPath
-            ));
-        }
-
-        return explode('/', ltrim($this->imageUrls[$localPath], '/'))[1];
-    }
-
-    /**
-     * Make a request to the short URL generated in the previous request
-     *
-     * @return self
-     *
-     * @When I request the image using the generated short URL
-     */
-    public function requestImageUsingShortUrl() {
-        $this->requireResponse();
-        $shortUrlId = json_decode((string) $this->response->getBody(), true)['id'];
-
-        return $this->requestPath(sprintf('/s/%s', $shortUrlId));
-    }
-
-    /**
      * Assert that the image does not have any properties with a specific prefix
      *
      * @param string $prefix
@@ -1747,204 +1674,11 @@ class FeatureContext extends ApiContext {
     }
 
     /**
-     * Specify a watermark image based on a local path
-     *
-     * @param string $localPath
-     * @param string $params
-     * @throws InvalidArgumentException
-     * @return self
-     *
-     * @Given I use :localPath as the watermark image
-     * @Given I use :localPath as the watermark image with :params as parameters
-     */
-    public function specifyAsTheWatermarkImage($localPath, $params = null) {
-        if (!isset($this->imageIdentifiers[$localPath])) {
-            throw new InvalidArgumentException(sprintf(
-                'No image exists for path: "%s".', $localPath
-            ));
-        }
-
-        $imageIdentifier = $this->imageIdentifiers[$localPath];
-        $transformation = 'watermark:img=' . $imageIdentifier . ($params ? ',' . $params : '');
-
-        return $this->applyTransformation($transformation);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * @Given /^I do not specify a public and private key$/
-     */
-    public function removeClientAuth() {
-        $this->publicKey = null;
-        $this->privateKey = null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setRequestHeader($header, $value) {
-        if ($value === 'current-timestamp') {
-            $value = gmdate('Y-m-d\TH:i:s\Z');
-        }
-
-        return parent::setRequestHeader($header, $value);
-    }
-
-    /**
-     * @Given /^"([^"]*)" is used as the test image( for the "([^"]*)" feature)?$/
-     */
-    public function imageIsUsedAsTestImage($testImagePath, $forFeature = null, $feature = null) {
-        if (self::$testImagePath === $testImagePath && $feature &&
-            self::$testImageFeature === $feature) {
-            return;
-        }
-
-        $this->addImageToImbo($testImagePath);
-        self::$testImageIdentifier = $this->getPreviouslyAddedImageIdentifier();
-        self::$testImageUrl = $this->getPreviouslyAddedImageUrl();
-        self::$testImagePath = $testImagePath;
-        self::$testImageFeature = $feature;
-    }
-
-    /**
-     * @When /^I request the test image(?: as a "([^"]*)")?$/
-     */
-    public function requestTestImage($format = null) {
-        $url = self::$testImageUrl . ($format ? '.' . $format : '');
-        return [
-            new Given('I request "' . $url . '" using HTTP "GET"'),
-        ];
-    }
-
-    /**
-     * @When /^I request the test image using HTTP "([^"]*)"$/
-     */
-    public function requestTestImageUsingHttpMethod($method) {
-        $url = self::$testImageUrl;
-        return [
-            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
-        ];
-    }
-
-    /**
-     * @When /^I request the metadata of the test image(?: using HTTP "(.*?)")?$/
-     */
-    public function requestMetadataOfTestImage($method = 'GET') {
-        $url = self::$testImageUrl . '/meta';
-        return [
-            new Given('I request "' . $url . '" using HTTP "' . $method . '"'),
-        ];
-    }
-
-    /**
-     * @When /^I request the metadata of the test image as "(xml|json)"$/
-     */
-    public function requestMetadataOfTestImageInFormat($format = null) {
-        $url = self::$testImageUrl . '/meta' . ($format ? '.' . $format : '');
-        return [
-            new Given('I request "' . $url . '" using HTTP "GET"'),
-        ];
-    }
-
-    /**
-     * @When /^I request the metadata of the previously added image as "(xml|json)"$/
-     */
-    public function requestMetadataOfPreviouslyAddedImageInFormat($format = null) {
-        $url = $this->getPreviouslyAddedImageUrl() . '/meta' . ($format ? '.' . $format : '');
-        return [
-            new Given('I request "' . $url . '" using HTTP "GET"'),
-        ];
-    }
-
-    /**
-     * @Given /^I append a query string parameter, "([^"]*)" with the image identifier of "([^"]*)"$/
-     */
-    public function appendQueryStringParamWithImageIdentifierForLocalImage($queryParam, $imagePath) {
-        if (!isset($this->imageIdentifiers[$imagePath])) {
-            throw new RuntimeException('Image identifier for "' . $imagePath . '" not found');
-        }
-
-        $this->appendQueryStringParameter($queryParam, $this->imageIdentifiers[$imagePath]);
-    }
-
-    /**
-     * @Given /^the image is deleted$/
-     */
-    public function deleteImage() {
-        $identifier = $this->getLastResponse()->getHeaders()->toArray()['X-Imbo-ImageIdentifier'][0];
-
-        $this->setClientAuth('publickey', 'privatekey');
-        $this->signRequest();
-        $this->request('/users/user/images/' . $identifier, 'DELETE');
-    }
-
-    /**
-     * @Given /^the checksum of the image is "([^"]*)"$/
-     */
-    public function assertImageChecksum($checksum) {
-        assertSame($checksum, md5((string) $this->getLastResponse()->getBody()), 'Checksum of the image in the last response did not match the expected checksum');
-    }
-
-    /**
-     * Get the previously added image identifier
-     *
-     * @throws RuntimeException If previous response did not include image identifier
-     * @return string
-     */
-    private function getPreviouslyAddedImageIdentifier() {
-        $response = $this->getLastResponse()->json();
-        if (!isset($response['imageIdentifier'])) {
-            throw new RuntimeException(
-                'Image identifier was not present in previous response, response: ' .
-                $this->getLastResponse()->getBody(true)
-            );
-        }
-
-        return $response['imageIdentifier'];
-    }
-
-    /**
-     * Get the previously added image URL
-     *
-     * @throws RuntimeException If previous response did not include image identifier
-     * @return string
-     */
-    private function getPreviouslyAddedImageUrl() {
-        $identifier = $this->getPreviouslyAddedImageIdentifier();
-        return '/users/' . $this->user . '/images/' . $identifier;
-    }
-
-    /**
      * Check the size of the response body (not the Content-Length response header)
      *
      * @param int $expetedSize The size we are expecting
+     * @return self
+     *
      * @Then the response body size is :expectedSize
      */
     public function assertResponseBodySize($expectedSize) {
@@ -1955,34 +1689,67 @@ class FeatureContext extends ApiContext {
             (int) $expectedSize,
             sprintf('Expected response body size: %d, actual: %d', $expectedSize, $actualSize)
         );
+
+        return $this;
     }
 
     /**
-     * Set multiple query string parameters
+     * Get the pixel info for given coordinates from the image in the current response
      *
-     * @param TableNode $table Query parameters
-     * @Given the following query string parameters are set:
+     * @param string $coordinates
+     * @throws InvalidArgumentException Throws an exception if the coordinates value is invalid
+     * @return array Returns an array with two keys:
+     *               - `color`: Hex color of the pixel.
+     *               - `alpha`: Alpha value of the pixel.
      */
-    public function setRequestQueryParameters(TableNode $table) {
-        foreach ($table as $row) {
-            $this->addRequestQueryParameter($row['name'], $row['value']);
+    private function getImagePixelInfo($coordinates) {
+        $this->requireResponse();
+
+        $match = [];
+        preg_match('/^(?<x>[\d]+),(?<y>[\d]+)$/', $coordinates, $match);
+
+        if (!$match) {
+            throw new InvalidArgumentException(sprintf(
+                'Invalid coordinates: "%s". Format is "<w>x<h>", no spaces allowed.',
+                $coordinates
+            ));
         }
+
+        $x = (int) $match['x'];
+        $y = (int) $match['y'];
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob((string) $this->response->getBody());
+
+        $pixel = $imagick->getImagePixelColor($x, $y);
+        $color = $pixel->getColor();
+
+        $toHex = function($col) {
+            return str_pad(dechex($col), 2, '0', STR_PAD_LEFT);
+        };
+
+        $hexColor = $toHex($color['r']) . $toHex($color['g']) . $toHex($color['b']);
+
+        return [
+            'color' => $hexColor,
+            'alpha' => (float) $pixel->getColorValue(Imagick::COLOR_ALPHA),
+        ];
     }
 
     /**
-     * Set an array-type query parameter
+     * Get the Imbo user based on a local file path that have been added to Imbo
      *
-     * @param string $name The name of the parameter
-     * @param TableNode $table Values for the query parameter
-     * @Given the query string parameter :name has the following values:
+     * @param string $localPath
+     * @throws InvalidArgumentException
+     * @return string
      */
-    public function setRequestQueryParameterValues($name, TableNode $table) {
-        $values = [];
-
-        foreach ($table as $row) {
-            $values[] = $row['value'];
+    private function getImboUserByLocalImagePath($localPath) {
+        if (!isset($this->imageUrls[$localPath])) {
+            throw new InvalidArgumentException(sprintf(
+                'No image exists for path: "%s".', $localPath
+            ));
         }
 
-        $this->addRequestQueryParameter($name, $values);
+        return explode('/', ltrim($this->imageUrls[$localPath], '/'))[1];
     }
 }
