@@ -1742,7 +1742,34 @@ class FeatureContext extends ApiContext {
                 ));
             }
         }
+
+        return $this;
     }
+
+    /**
+     * Specify a watermark image based on a local path
+     *
+     * @param string $localPath
+     * @param string $params
+     * @throws InvalidArgumentException
+     * @return self
+     *
+     * @Given I use :localPath as the watermark image
+     * @Given I use :localPath as the watermark image with :params as parameters
+     */
+    public function specifyAsTheWatermarkImage($localPath, $params = null) {
+        if (!isset($this->imageIdentifiers[$localPath])) {
+            throw new InvalidArgumentException(sprintf(
+                'No image exists for path: "%s".', $localPath
+            ));
+        }
+
+        $imageIdentifier = $this->imageIdentifiers[$localPath];
+        $transformation = 'watermark:img=' . $imageIdentifier . ($params ? ',' . $params : '');
+
+        return $this->applyTransformation($transformation);
+    }
+
 
 
 
@@ -1883,20 +1910,6 @@ class FeatureContext extends ApiContext {
      */
     public function assertImageChecksum($checksum) {
         assertSame($checksum, md5((string) $this->getLastResponse()->getBody()), 'Checksum of the image in the last response did not match the expected checksum');
-    }
-
-    /**
-     * @Given /^I use "([^"]*)" as the watermark image with "([^"]*)" as parameters$/
-     */
-    public function specifyAsTheWatermarkImage($watermarkPath, $parameters = '') {
-        $this->addImageToImbo($watermarkPath);
-        $imageIdentifier = $this->getPreviouslyAddedImageIdentifier();
-        $params = empty($parameters) ? '' : ',' . $parameters;
-        $transformation = 'watermark:img=' . $imageIdentifier . $params;
-
-        return [
-            new Given('I specify "' . $transformation . '" as transformation')
-        ];
     }
 
     /**

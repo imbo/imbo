@@ -26,6 +26,8 @@ Given I use :publicKey and :privateKey for public and private keys
 Given the query string parameter :name is set to :value
 Given the query string parameter :param is set to the image identifier of :path
 Given I generate a short URL for :path with the following parameters: <PyStringNode>
+Given I use :localPath as the watermark image
+Given I use :localPath as the watermark image with :params as parameters
 
 When I request the previously added image
 When I request the previously added image using HTTP :method
