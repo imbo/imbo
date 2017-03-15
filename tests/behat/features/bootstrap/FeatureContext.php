@@ -679,6 +679,22 @@ class FeatureContext extends ApiContext {
     }
 
     /**
+     * Add one or more transformations to the query parameter for the next request
+     *
+     * @param PyStringNode $transformations
+     * @return self
+     *
+     * @Given I specify the following transformations:
+     */
+    public function applyTransformations(PyStringNode $transformations) {
+        foreach (explode("\n", (string) $transformations) as $transformation) {
+            $this->applyTransformation(trim($transformation));
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert the width of the image in the current response
      *
      * @param int $width

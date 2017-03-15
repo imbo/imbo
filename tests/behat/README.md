@@ -18,6 +18,7 @@ Given :imagePath exists for user :user
 Given :imagePath exists for user :user with the following metadata:
 Given the client IP is :ip
 Given I specify :transformation as transformation
+Given I specify the following transformations: <PyStringNode>
 Given the pixel at coordinate :coordinates has an alpha of :alpha
 Given I prime the database with :fixture
 Given I authenticate using :method
@@ -33,7 +34,11 @@ When I replay the last request
 When I replay the last request using HTTP :method
 When I request the metadata of the previously added image
 When I request the metadata of the previously added image using HTTP :method
-When /^I request the image resource for "([^"]*)"(?: as a "(png|gif|jpg)")?(?: using HTTP "([^"]*)")?$/
+When I request the image resource for :path
+When I request the image resource for :path using HTTP :method
+When I request the image resource for :path as a (png|gif|jpg)
+When I request the image resource for :path as a (png|gif|jpg) using HTTP :method
+When I request: <TableNode>
 
 Then the Imbo error message is :message
 Then the Imbo error message is :message and the error code is :code
@@ -50,6 +55,7 @@ Then the response has a :directive cache-control directive
 Then the response does not have a :directive cache-control directive
 Then the last :num :headerName response headers are the same
 Then the last :num :headerName response headers are not the same
+Then the last :num responses match: <TableNode>
 ```
 
 ## Run tests
