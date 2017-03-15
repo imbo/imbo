@@ -45,8 +45,8 @@ before_script:
   - composer start-httpd-for-behat-tests
 
 script:
-  - ./vendor/bin/phpunit --verbose -c tests/phpunit/phpunit.xml.travis
-  - ./vendor/bin/behat --strict
+  - ./vendor/bin/phpunit --verbose -c tests/phpunit/phpunit.xml.travis --stop-on-failure
+  - ./vendor/bin/behat --strict --stop-on-failure
 
 after_failure:
   - echo "Tests failed - httpd log follows"
