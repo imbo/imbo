@@ -43,7 +43,7 @@ before_script:
 
 script:
   - ./vendor/bin/phpunit --verbose -c tests/phpunit/phpunit.xml.travis
-  - ./vendor/bin/behat --strict --profile no-cc
+  - ./vendor/bin/behat --strict
 
 after_failure:
   - echo "Tests failed - httpd log follows"
