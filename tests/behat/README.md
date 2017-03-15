@@ -25,6 +25,7 @@ Given I authenticate using :method
 Given I use :publicKey and :privateKey for public and private keys
 Given the query string parameter :name is set to :value
 Given the query string parameter :param is set to the image identifier of :path
+Given I generate a short URL for :path with the following parameters: <PyStringNode>
 
 When I request the previously added image
 When I request the previously added image using HTTP :method
@@ -39,6 +40,7 @@ When I request the image resource for :path using HTTP :method
 When I request the image resource for :path as a (png|gif|jpg)
 When I request the image resource for :path as a (png|gif|jpg) using HTTP :method
 When I request: <TableNode>
+When I request the image using the generated short URL
 
 Then the Imbo error message is :message
 Then the Imbo error message is :message and the error code is :code

@@ -1658,6 +1658,68 @@ class FeatureContext extends ApiContext {
         return $this;
     }
 
+    /**
+     * Generate a short URL with some parameters for a given image path
+     *
+     * @param string $path
+     * @param PyStringNode $params
+     * @throws InvalidArgumentException
+     * @return self
+     *
+     * @Given I generate a short URL for :path with the following parameters:
+     */
+    public function generateShortImageUrl($path, PyStringNode $params) {
+        if (!isset($this->imageIdentifiers[$path])) {
+            throw new InvalidArgumentException(sprintf(
+                'No image identifier exists for path: "%s".', $path
+            ));
+        }
+
+        $imageIdentifier = $this->imageIdentifiers[$path];
+        $user = $this->getImboUserByLocalImagePath($path);
+        $params = array_merge(json_decode((string) $params, true), [
+            'imageIdentifier' => $imageIdentifier,
+        ]);
+
+        return $this
+            ->setRequestBody(json_encode($params))
+            ->requestPath(sprintf(
+                '/users/%s/images/%s/shorturls', $user, $imageIdentifier
+            ), 'POST');
+    }
+
+    /**
+     * Get the Imbo user based on a local file path that have been added to Imbo
+     *
+     * @param string $localPath
+     * @throws InvalidArgumentException
+     * @return string
+     */
+    private function getImboUserByLocalImagePath($localPath) {
+        if (!isset($this->imageUrls[$localPath])) {
+            throw new InvalidArgumentException(sprintf(
+                'No image exists for path: "%s".', $localPath
+            ));
+        }
+
+        return explode('/', ltrim($this->imageUrls[$localPath], '/'))[1];
+    }
+
+    /**
+     * Make a request to the short URL generated in the previous request
+     *
+     * @return self
+     *
+     * @When I request the image using the generated short URL
+     */
+    public function requestImageUsingShortUrl() {
+        $this->requireResponse();
+        $shortUrlId = json_decode((string) $this->response->getBody(), true)['id'];
+
+        return $this->requestPath(sprintf('/s/%s', $shortUrlId));
+    }
+
+
 
 
 
@@ -1808,38 +1870,6 @@ class FeatureContext extends ApiContext {
      */
     public function assertImageChecksum($checksum) {
         assertSame($checksum, md5((string) $this->getLastResponse()->getBody()), 'Checksum of the image in the last response did not match the expected checksum');
-    }
-
-    /**
-     * @Given /^I generate a short URL with the following parameters:$/
-     */
-    public function generateShortImageUrl(PyStringNode $params) {
-        $lastResponse = $this->getLastResponse();
-
-        preg_match('/\/users\/([^\/]+)/', $lastResponse->getInfo('url'), $matches);
-        $user = $matches[1];
-
-        $imageIdentifier = $lastResponse->json()['imageIdentifier'];
-        $params = array_merge(json_decode((string) $params, true), [
-            'imageIdentifier' => $imageIdentifier,
-        ]);
-
-        return [
-            new Given('the request body contains:', new PyStringNode(json_encode($params))),
-            new Given('I request "/users/' . $user . '/images/' . $imageIdentifier . '/shorturls" using HTTP "POST"'),
-        ];
-    }
-
-    /**
-     * @When /^I request the image using the generated short URL$/
-     */
-    public function requestImageUsingShortUrl() {
-        $shortUrlId = $this->getLastResponse()->json()['id'];
-
-        return [
-            new Given('the "Accept" request header is "image/*"'),
-            new Given('I request "/s/' . $shortUrlId . '"'),
-        ];
     }
 
     /**
