@@ -857,7 +857,10 @@ class FeatureContext extends ApiContext {
         preg_match('/^(?<x>[\d]+),(?<y>[\d]+)$/', $coordinates, $match);
 
         if (!$match) {
-            throw new InvalidArgumentException(sprintf('Invalid coordinates: "%s".', $coordinates));
+            throw new InvalidArgumentException(sprintf(
+                'Invalid coordinates: "%s". Format is "<w>x<h>", no spaces allowed.',
+                $coordinates
+            ));
         }
 
         $x = (int) $match['x'];
