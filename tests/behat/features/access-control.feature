@@ -85,6 +85,10 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
         And Imbo uses the "access-control.php" configuration
         When I request "/foobar"
         Then the response status line is "200 OK"
+        And the response body is:
+            """
+            {"foo":[1,2,3]}
+            """
 
     Scenario: Request user information when Imbo uses an alternative access control adapter
         Given I use "public" and "private" for public and private keys

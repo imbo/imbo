@@ -26,11 +26,7 @@ class Foobar implements ResourceInterface {
     }
 
     public function get(EventInterface $event) {
-        $model = new ListModel();
-        $model->setContainer('foo');
-        $model->setEntry('bar');
-        $model->setList([1, 2, 3]);
-        $event->getResponse()->setModel($model);
+        $event->getResponse()->setModel(new ListModel('foo', [1, 2, 3]));
     }
 }
 
