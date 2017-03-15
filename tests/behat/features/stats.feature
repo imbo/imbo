@@ -6,9 +6,9 @@ Feature: Imbo provides a stats endpoint
     I want to make requests against the stats endpoint
 
     Scenario: Fetch stats
-        Given "tests/phpunit/Fixtures/image1.png" exists in Imbo
-        And "tests/phpunit/Fixtures/image.jpg" exists in Imbo
-        And "tests/phpunit/Fixtures/image.gif" exists in Imbo
+        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
+        And "tests/phpunit/Fixtures/image.jpg" exists for user "user"
+        And "tests/phpunit/Fixtures/image.gif" exists for user "user"
         And Imbo uses the "stats-access-and-custom-stats.php" configuration
         And the stats are allowed by "*"
         When I request "/stats"

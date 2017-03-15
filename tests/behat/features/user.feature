@@ -3,8 +3,11 @@ Feature: Imbo provides a user endpoint
     As an HTTP Client
     I want to make requests against the user endpoint
 
+    Background:
+        Given I use "publicKey" and "privateKey" for public and private keys
+        And I include an access token in the query string
+
     Scenario: Request user information
-        Given I include an access token in the query using "publickey" and "privatekey"
         When I request "/users/user.json"
         Then the response status line is "200 OK"
         And the response body contains JSON:
@@ -16,13 +19,11 @@ Feature: Imbo provides a user endpoint
             """
 
     Scenario: Request user that does not exist
-        Given I include an access token in the query using "publickey" and "privatekey"
         When I request "/users/foobar.json"
         Then the response status line is "400 Permission denied (public key)"
         And the Imbo error message is "Permission denied (public key)" and the error code is "0"
 
     Scenario Outline: The user endpoint only supports HTTP GET and HEAD
-        Given I include an access token in the query using "publickey" and "privatekey"
         When I request "/users/user.json" using HTTP "<method>"
         Then the response status line is "<status>"
 
