@@ -11,7 +11,6 @@
 use Imbo\BehatApiExtension\Context\ApiContext;
 use Imbo\BehatApiExtension\ArrayContainsComparator;
 use Imbo\BehatApiExtension\Exception\AssertionFailedException;
-use Behat\Behat\Hook\Scope\BeforeFeatureScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use GuzzleHttp\ClientInterface;
@@ -34,9 +33,9 @@ class FeatureContext extends ApiContext {
      *
      * @var string
      */
-    const MIDDLEWARE_SIGN_REQUEST = 'sign-request';
-    const MIDDLEWARE_APPEND_ACCESS_TOKEN = 'append-access-token';
-    const MIDDLEWARE_HISTORY = 'history';
+    const MIDDLEWARE_SIGN_REQUEST = 'imbo-behat-sign-request';
+    const MIDDLEWARE_APPEND_ACCESS_TOKEN = 'imbo-behat-append-access-token';
+    const MIDDLEWARE_HISTORY = 'imbo-behat-history';
 
     /**
      * @var CacheUtil
@@ -129,11 +128,13 @@ class FeatureContext extends ApiContext {
      * {@inheritdoc}
      */
     public function setClient(ClientInterface $client) {
-        $handlerStack = $client->getConfig()['handler'];
+        // Remove a potential history handler with the same name
+        $handlerStack = $client->getConfig('handler');
 
-        // Remove a potential handler with the same name
-        $handlerStack->remove(self::MIDDLEWARE_HISTORY);
-        $handlerStack->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
+        if ($handlerStack) {
+            $handlerStack->remove(self::MIDDLEWARE_HISTORY);
+            $handlerStack->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
+        }
 
         return parent::setClient($client);
     }
@@ -189,9 +190,10 @@ class FeatureContext extends ApiContext {
      * Drop mongo test collection which stores information regarding images, and the images
      * themselves
      *
-     * @param BeforeFeatureScope $scope
+     * @param BeforeScenarioScope $scope
      *
      * @BeforeScenario
+     * @codeCoverageIgnore
      */
     public static function prepare(BeforeScenarioScope $scope) {
         $mongo = new MongoClient();
@@ -232,6 +234,7 @@ class FeatureContext extends ApiContext {
      * @param string $configFile Custom configuration file to use for the next request (file must
      *                           reside in the tests/behat/imbo-configs directory)
      * @throws InvalidArgumentException
+     * @return self
      *
      * @Given Imbo uses the :configFile configuration
      */
@@ -246,7 +249,7 @@ class FeatureContext extends ApiContext {
             ));
         }
 
-        $this->setRequestHeader('X-Imbo-Test-Config-File', $configFile);
+        return $this->setRequestHeader('X-Imbo-Test-Config-File', $configFile);
     }
 
     /**
@@ -270,11 +273,16 @@ class FeatureContext extends ApiContext {
      * This feature is implemented in the status.php custom configuration file.
      *
      * @param string $adapter Which adapter to take down
+     * @throws InvalidArgumentException
      * @return self
      *
      * @Given /^the (storage|database) is down$/
      */
     public function forceAdapterFailure($adapter) {
+        if (!in_array($adapter, ['storage', 'database'])) {
+            throw new InvalidArgumentException(sprintf('Invalid adapter: "%s".', $adapter));
+        }
+
         if ($adapter === 'storage') {
             $header = 'X-Imbo-Status-Storage-Failure';
         } else {
