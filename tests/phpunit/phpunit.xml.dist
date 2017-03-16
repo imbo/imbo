@@ -26,6 +26,7 @@
   <filter>
     <whitelist addUncoveredFilesFromWhitelist="true">
       <directory suffix=".php">../../src</directory>
+      <file>../behat/features/bootstrap/FeatureContext.php</file>
       <exclude>
         <directory suffix="Interface.php">../../src</directory>
         <file>../../src/Exception.php</file>
