@@ -389,4 +389,21 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
             ->appendAccessToken();
     }
 
+    /**
+     * @covers ::addUserImageToImbo
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage No keys exist for user "some user".
+     */
+    public function testThrowsExceptionWhenAddingUserImageWithUnknownUser() {
+        $this->context->addUserImageToImbo(__FILE__, 'some user');
+    }
+
+    /**
+     * @covers ::addUserImageToImbo
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage File does not exist: "/some/path".
+     */
+    public function testThrowsExceptionWhenAddingUserImageWithInvalidFilename() {
+        $this->context->addUserImageToImbo('/some/path', 'user');
+    }
 }

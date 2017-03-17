@@ -458,6 +458,10 @@ class FeatureContext extends ApiContext {
      * @Given :imagePath exists for user :user with the following metadata:
      */
     public function addUserImageToImbo($imagePath, $user, PyStringNode $metadata = null) {
+        if (!file_exists($imagePath)) {
+            throw new InvalidArgumentException(sprintf('File does not exist: "%s".', $imagePath));
+        }
+
         // See if the user specified has a set of keys
         if (!isset($this->keys[$user])) {
             throw new InvalidArgumentException(sprintf('No keys exist for user "%s".', $user));
