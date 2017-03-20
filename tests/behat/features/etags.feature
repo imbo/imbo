@@ -44,7 +44,7 @@ Feature: Imbo adds ETag's to some responses
     Scenario: Metadata resource includes an ETag
         Given I include an access token in the query string
         When I request the metadata of the previously added image
-        And the "ETag" response header matches "/[a-z0-9]{32}/"
+        Then the "ETag" response header matches "/[a-z0-9]{32}/"
 
     Scenario: Responses that is not 200 OK does not get ETags
         When I request "/users/user"

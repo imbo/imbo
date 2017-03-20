@@ -7,13 +7,12 @@ Feature: Imbo enables caching of transformations
         Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
         And Imbo uses the "image-transformation-cache.php" configuration
         And I use "publicKey" and "privateKey" for public and private keys
-        And I include an access token in the query string for all requests
 
     Scenario: Fetch uncached image, then fetch same image from cache
         When I request:
-            | path                   | extension | method |
-            | previously added image | jpg       | GET    |
-            | previously added image | jpg       | GET    |
+            | path                   | extension | method | access token |
+            | previously added image | jpg       | GET    | yes          |
+            | previously added image | jpg       | GET    | yes          |
 
         Then the last 2 responses match:
             | response | status line | header name                | header value |
@@ -24,9 +23,9 @@ Feature: Imbo enables caching of transformations
 
     Scenario: Fetch the same image, but with a different extension
         When I request:
-            | path                   | extension | method |
-            | previously added image | png       | GET    |
-            | previously added image | png       | GET    |
+            | path                   | extension | method | access token |
+            | previously added image | png       | GET    | yes          |
+            | previously added image | png       | GET    | yes          |
 
         Then the last 2 responses match:
             | response | status line | header name                | header value | checksum                         |
@@ -37,9 +36,9 @@ Feature: Imbo enables caching of transformations
 
     Scenario: Fetch image with extra transformations added
         When I request:
-            | path                   | transformation                   | extension | method |
-            | previously added image | crop:width=50,height=60,x=1,y=10 | jpg       | GET    |
-            | previously added image |                                  | jpg       | GET    |
+            | path                   | transformation                   | extension | method | access token |
+            | previously added image | crop:width=50,height=60,x=1,y=10 | jpg       | GET    | yes          |
+            | previously added image |                                  | jpg       | GET    | yes          |
 
         Then the last 2 responses match:
             | response | status line | header name                | header value | image width | image height |
@@ -50,11 +49,11 @@ Feature: Imbo enables caching of transformations
 
     Scenario: Fetch an image to place it in the transformation cache, then delete it, and fetch it again
         When I request:
-            | path                   | extension | method | sign request |
-            | previously added image | jpg       | GET    |              |
-            | previously added image | jpg       | GET    |              |
-            | previously added image |           | DELETE | yes          |
-            | previously added image | jpg       | GET    |              |
+            | path                   | extension | method | sign request | access token |
+            | previously added image | jpg       | GET    |              | yes          |
+            | previously added image | jpg       | GET    |              | yes          |
+            | previously added image |           | DELETE | yes          |              |
+            | previously added image | jpg       | GET    |              | yes          |
 
         Then the last 4 responses match:
             | response | status line         | header name                | header value |

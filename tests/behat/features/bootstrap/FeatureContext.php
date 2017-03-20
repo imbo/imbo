@@ -128,13 +128,10 @@ class FeatureContext extends ApiContext {
      * {@inheritdoc}
      */
     public function setClient(ClientInterface $client) {
-        // Remove a potential history handler with the same name
-        $handlerStack = $client->getConfig('handler');
-
-        if ($handlerStack) {
-            $handlerStack->remove(self::MIDDLEWARE_HISTORY);
-            $handlerStack->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
-        }
+        $client->getConfig('handler')->push(
+            Middleware::history($this->history),
+            self::MIDDLEWARE_HISTORY
+        );
 
         return parent::setClient($client);
     }
@@ -319,6 +316,10 @@ class FeatureContext extends ApiContext {
             throw new RuntimeException(
                 'The authentication handler is currently added to the stack. It can not be added more than once.'
             );
+        } else if ($this->accessTokenHandlerIsActive) {
+            throw new RuntimeException(
+                'The access token handler is currently added to the stack. These handlers should not be added to the same request.'
+            );
         }
 
         // Set the token handler as active
@@ -328,7 +329,7 @@ class FeatureContext extends ApiContext {
 
         // Fetch the handler stack and push a signature function to it
         $stack = $this->client->getConfig('handler');
-        $stack->push(Middleware::mapRequest(function(RequestInterface $request) use ($useHeaders, $stack) {
+        $stack->unshift(Middleware::mapRequest(function(RequestInterface $request) use ($useHeaders, $stack) {
             // Add public key as a query parameter if we're told not to use headers. We do this
             // before the signing below since this parameter needs to be a part of the data that
             // will be used for signing
@@ -398,6 +399,10 @@ class FeatureContext extends ApiContext {
             throw new RuntimeException(
                 'The access token handler is currently added to the stack. It can not be added more than once.'
             );
+        } else if ($this->authenticationHandlerIsActive) {
+            throw new RuntimeException(
+                'The authentication handler is currently added to the stack. These handlers should not be added to the same request.'
+            );
         }
 
         // Set the token handler as active
@@ -405,7 +410,7 @@ class FeatureContext extends ApiContext {
 
         // Fetch the handler stack and push an access token function to it
         $stack = $this->client->getConfig('handler');
-        $stack->push(Middleware::mapRequest(function(RequestInterface $request) use ($stack, $allRequests) {
+        $stack->unshift(Middleware::mapRequest(function(RequestInterface $request) use ($stack, $allRequests) {
             $uri = $request->getUri();
 
             // Set the public key and remove a possible accessToken query parameter
@@ -513,8 +518,7 @@ class FeatureContext extends ApiContext {
         }
 
         // Reset the request / response
-        $this->publicKey = $existingPublicKey;
-        $this->privateKey = $existingPrivateKey;
+        $this->setPublicAndPrivateKey($existingPublicKey, $existingPrivateKey);
         $this->request = $originalRequest;
         $this->requestOptions = $originalRequestOptions;
         $this->response = null;
@@ -971,6 +975,15 @@ class FeatureContext extends ApiContext {
 
             if (!empty($row['transformation'])) {
                 $this->applyTransformation($row['transformation']);
+            }
+
+            if (
+                !empty($row['access token']) && $row['access token'] === 'yes' &&
+                !empty($row['sign request']) && $row['sign request'] === 'yes'
+            ) {
+                throw new InvalidArgumentException(
+                    'Both "sign request" and "access token" can not be set to "yes".'
+                );
             }
 
             if (!empty($row['access token']) && $row['access token'] === 'yes') {
