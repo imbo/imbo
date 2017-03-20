@@ -470,6 +470,8 @@ class FeatureContext extends ApiContext {
         // Store the original request
         $originalRequest = clone $this->request;
         $originalRequestOptions = $this->requestOptions;
+        $existingPublicKey = $this->publicKey;
+        $existingPrivateKey = $this->privateKey;
 
         $this
             // Attach the file to the request body
@@ -511,8 +513,8 @@ class FeatureContext extends ApiContext {
         }
 
         // Reset the request / response
-        $this->publicKey = null;
-        $this->privateKey = null;
+        $this->publicKey = $existingPublicKey;
+        $this->privateKey = $existingPrivateKey;
         $this->request = $originalRequest;
         $this->requestOptions = $originalRequestOptions;
         $this->response = null;
