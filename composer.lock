@@ -2111,12 +2111,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/behat-api-extension.git",
-                "reference": "e6dc907ecd674de369c0f844d1fdfba4bc8afbad"
+                "reference": "1558c0f5a13b4028732400947dfa40695c8df478"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/behat-api-extension/zipball/e6dc907ecd674de369c0f844d1fdfba4bc8afbad",
-                "reference": "e6dc907ecd674de369c0f844d1fdfba4bc8afbad",
+                "url": "https://api.github.com/repos/imbo/behat-api-extension/zipball/1558c0f5a13b4028732400947dfa40695c8df478",
+                "reference": "1558c0f5a13b4028732400947dfa40695c8df478",
                 "shasum": ""
             },
             "require": {
@@ -2166,7 +2166,7 @@
                 "rest",
                 "testing"
             ],
-            "time": "2017-02-23 07:29:16"
+            "time": "2017-03-20 08:50:33"
         },
         {
             "name": "imbo/imbo-phpcs-standard",
