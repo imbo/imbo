@@ -19,6 +19,7 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit_Framework_TestCase;
+use Behat\Gherkin\Node\PyStringNode;
 
 /**
  * @coversDefaultClass FeatureContext
@@ -79,6 +80,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
 
         $this->mockHandler = new MockHandler();
         $this->handlerStack = HandlerStack::create($this->mockHandler);
+        $this->handlerStack->push(Middleware::history($this->history));
         $this->client = new Client([
             'handler' => $this->handlerStack,
             'base_uri' => $this->baseUri,
@@ -90,17 +92,16 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Convenience method to make a single request
+     * Convenience method to make a single request and return the request instance
      *
      * @param string $path
      * @return Request
      */
     private function makeRequest($path = '/somepath') {
-        $this->handlerStack->push(Middleware::history($this->history));
         $this->mockHandler->append(new Response(200));
         $this->context->requestPath($path);
 
-        return $this->history[0]['request'];
+        return $this->history[count($this->history) - 1]['request'];
     }
 
     /**
@@ -108,10 +109,6 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
      */
     public function testCanSetAnApiClient() {
         $handlerStack = $this->createMock('GuzzleHttp\HandlerStack');
-        $handlerStack
-            ->expects($this->once())
-            ->method('remove')
-            ->with($this->isType('string'));
         $handlerStack
             ->expects($this->once())
             ->method('push')
@@ -390,6 +387,28 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers ::signRequest
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage The access token handler is currently added to the stack. These handlers should not be added to the same request.
+     */
+    public function testCanNotAddBothAccessTokenAndSignatureHandlers() {
+        $this->context
+            ->appendAccessToken()
+            ->signRequest();
+    }
+
+    /**
+     * @covers ::appendAccessToken
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage The authentication handler is currently added to the stack. These handlers should not be added to the same request.
+     */
+    public function testCanNotAddBothSignatureAndAccessTokenHandlers() {
+        $this->context
+            ->signRequest()
+            ->appendAccessToken();
+    }
+
+    /**
      * @covers ::addUserImageToImbo
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage No keys exist for user "some user".
@@ -405,5 +424,513 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
      */
     public function testThrowsExceptionWhenAddingUserImageWithInvalidFilename() {
         $this->context->addUserImageToImbo('/some/path', 'user');
+    }
+
+    /**
+     * @covers ::addUserImageToImbo
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Image was not successfully added. Response body:
+     */
+    public function testAddingUserImageToImboFailsWhenImboDoesNotIncludeImageIdentifierInResponse() {
+        $this->mockHandler->append(new Response(400, ['Content-Type' => 'application/json'], '{"error": {"message": "some id"}}'));
+        $this->context->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user');
+    }
+
+    /**
+     * @covers ::addUserImageToImbo
+     */
+    public function testCanAddUserImageToImbo() {
+        $this->mockHandler->append(new Response(200, ['Content-Type' => 'application/json'], '{"imageIdentifier": "some id"}'));
+
+        $this->assertSame(
+            $this->context,
+            $this->context->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user')
+        );
+
+        $this->assertSame(
+            1,
+            $num = count($this->history),
+            sprintf('There should be exactly 1 transction in the history, found %d.', $num)
+        );
+
+        $request = $this->history[0]['request'];
+
+        $this->assertStringStartsWith(
+            'http://localhost:8080/users/user/images?publicKey=publicKey&signature=',
+            (string) $request->getUri()
+        );
+        $this->assertSame('POST', $request->getMethod());
+    }
+
+    /**
+     * @covers ::addUserImageToImbo
+     */
+    public function testCanAddUserImageWithMetadataToImbo() {
+        $this->mockHandler->append(
+            new Response(200, [], '{"imageIdentifier": "imageId"}'),
+            new Response(200)
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context->addUserImageToImbo(
+                FIXTURES_DIR . '/image1.png',
+                'user',
+                new PyStringNode(['{"foo": "bar"}'], 1)
+            )
+        );
+
+        $this->assertSame(
+            2,
+            $num = count($this->history),
+            sprintf('There should be exactly 2 transctions in the history, found %d.', $num)
+        );
+
+        $imageRequest = $this->history[0]['request'];
+        $metadataRequest = $this->history[1]['request'];
+
+        $this->assertStringStartsWith(
+            'http://localhost:8080/users/user/images?publicKey=publicKey&signature=',
+            (string) $imageRequest->getUri()
+        );
+        $this->assertSame('POST', $imageRequest->getMethod());
+
+        $this->assertStringStartsWith(
+            'http://localhost:8080/users/user/images/imageId/metadata?publicKey=publicKey&signature=',
+            (string) $metadataRequest->getUri()
+        );
+        $this->assertSame('POST', $metadataRequest->getMethod());
+    }
+
+    /**
+     * @covers ::setClientIp
+     */
+    public function testCanSetClientIpHeader() {
+        $ip = '1.2.3.4';
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->setClientIp($ip)
+        );
+        $request = $this->makeRequest('/path');
+
+        $this->assertTrue($request->hasHeader('X-Client-Ip'));
+        $this->assertSame($ip, $request->getHeaderLine('X-Client-Ip'));
+    }
+
+    /**
+     * @covers ::applyTransformation
+     * @covers ::setRequestQueryParameter
+     */
+    public function testCanApplyImageTransformation() {
+        $this->assertSame(
+            $this->context,
+            $this->context->applyTransformation('t1')
+        );
+
+        $request = $this->makeRequest('/path');
+
+        $this->assertSame(
+            'http://localhost:8080/path?t%5B0%5D=t1',
+            (string) $request->getUri()
+        );
+    }
+
+    /**
+     * @covers ::applyTransformations
+     * @covers ::applyTransformation
+     * @covers ::setRequestQueryParameter
+     */
+    public function testCanApplyImageTransformations() {
+        $this->assertSame(
+            $this->context,
+            $this->context->applyTransformations(new PyStringNode(['t1', 't2', 't3'], 1))
+        );
+
+        $request = $this->makeRequest('/path');
+
+        $this->assertSame(
+            'http://localhost:8080/path?t%5B0%5D=t1&t%5B1%5D=t2&t%5B2%5D=t3',
+            (string) $request->getUri()
+        );
+    }
+
+    /**
+     * @covers ::primeDatabase
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessageRegExp /Fixture file "foobar.php" does not exist in "[^"]+"\./
+     */
+    public function testThrowsExceptionWhenPrimingDatabaseWithScriptThatDoesNotExist() {
+        $this->context->primeDatabase('foobar.php');
+    }
+
+    /**
+     * @covers ::authenticateRequest
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Invalid authentication method: "auth".
+     */
+    public function testThrowsExceptionWhenSpecifyingInvalidAuthenticationType() {
+        $this->context->authenticateRequest('auth');
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getAuthDetails() {
+        return [
+            'access-token' => [
+                'publicKey' => 'publicKey',
+                'privateKey' => 'privateKey',
+                'authMethod' => 'access-token',
+                'uriRegExp' => '|^http://localhost:8080/path\?publicKey=publicKey&accessToken=582386896ffacd2c34a39476f0fa71ac9e6b22f079482ea7ee687e15826b08ef$|',
+                'headers' => [],
+            ],
+            'access-token #2' => [
+                'publicKey' => 'key',
+                'privateKey' => 'secret',
+                'authMethod' => 'access-token',
+                'uriRegExp' => '|^http://localhost:8080/path\?publicKey=key&accessToken=dd4217a681cf8abdcecdc68cf49630df1e57dc733735e902b8a69859e50797a8$|',
+                'headers' => [],
+            ],
+            'signature' => [
+                'publicKey' => 'publicKey',
+                'privateKey' => 'privateKey',
+                'authMethod' => 'signature',
+                'uriRegExp' => '|^http://localhost:8080/path\?publicKey=publicKey&signature=[a-z0-9]{64}&timestamp=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$|',
+                'headers' => [],
+            ],
+            'signature #2' => [
+                'publicKey' => 'key',
+                'privateKey' => 'secret',
+                'authMethod' => 'signature',
+                'uriRegExp' => '|^http://localhost:8080/path\?publicKey=key&signature=[a-z0-9]{64}&timestamp=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$|',
+                'headers' => [],
+            ],
+            'signature (headers)' => [
+                'publicKey' => 'publicKey',
+                'privateKey' => 'privateKey',
+                'authMethod' => 'signature (headers)',
+                'uriRegExp' => '|^http://localhost:8080/path$|',
+                'headers' => [
+                    'X-Imbo-PublicKey' => '/^publicKey$/',
+                    'X-Imbo-Authenticate-Signature' => '/^[a-z0-9]{64}$/',
+                    'X-Imbo-Authenticate-Timestamp' => '/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
+                ]
+            ],
+            'signature (headers) #2' => [
+                'publicKey' => 'key',
+                'privateKey' => 'secret',
+                'authMethod' => 'signature (headers)',
+                'uriRegExp' => '|^http://localhost:8080/path$|',
+                'headers' => [
+                    'X-Imbo-PublicKey' => '/^key$/',
+                    'X-Imbo-Authenticate-Signature' => '/^[a-z0-9]{64}$/',
+                    'X-Imbo-Authenticate-Timestamp' => '/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getAuthDetails
+     * @covers ::setPublicAndPrivateKey
+     * @covers ::authenticateRequest
+     * @param string $publicKey
+     * @param string $privateKey
+     * @param string $authMethod
+     * @param string $uriRegExp
+     * @param array $headers
+     */
+    public function testCanUseDifferentAuthenticationMethods($publicKey, $privateKey, $authMethod, $uriRegExp, array $headers = []) {
+        $this->assertSame(
+            $this->context,
+            $this->context->setPublicAndPrivateKey($publicKey, $privateKey)
+        );
+        $this->assertSame(
+            $this->context,
+            $this->context->authenticateRequest($authMethod)
+        );
+
+        $request = $this->makeRequest('/path');
+        $this->assertRegExp($uriRegExp, (string) $request->getUri());
+
+        foreach ($headers as $name => $regExp) {
+            $this->assertTrue($request->hasHeader($name));
+            $this->assertRegExp($regExp, $request->getHeaderLine($name));
+        }
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getRequestQueryParams() {
+        return [
+            'single key / value' => [
+                'params' => [
+                    ['name' => 'key', 'value' => 'value'],
+                ],
+                'uri' => 'http://localhost:8080/path?key=value',
+            ],
+            'multiple key / value' => [
+                'params' => [
+                    ['name' => 'foo', 'value' => 'bar'],
+                    ['name' => 'bar', 'value' => 'foo'],
+                    ['name' => 'foobar', 'value' => 'barfoo'],
+                ],
+                'uri' => 'http://localhost:8080/path?foo=bar&bar=foo&foobar=barfoo',
+            ],
+            'array values' => [
+                'params' => [
+                    ['name' => 't[]', 'value' => 'border'],
+                    ['name' => 't[]', 'value' => 'thumb'],
+                ],
+                'uri' => 'http://localhost:8080/path?t%5B0%5D=border&t%5B1%5D=thumb',
+            ],
+            'mixed values' => [
+                'params' => [
+                    ['name' => 'foo', 'value' => 'bar'],
+                    ['name' => 't[]', 'value' => 'border'],
+                    ['name' => 'bar', 'value' => 'foo'],
+                    ['name' => 't[]', 'value' => 'thumb'],
+                ],
+                'uri' => 'http://localhost:8080/path?foo=bar&t%5B0%5D=border&t%5B1%5D=thumb&bar=foo',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getRequestQueryParams
+     * @covers ::setRequestQueryParameter
+     * @param array $params
+     * @param string $uri
+     */
+    public function testCanSetRequestQueryParameters(array $params, $uri) {
+        foreach ($params as $param) {
+            $this->assertSame(
+                $this->context,
+                $this->context->setRequestQueryParameter($param['name'], $param['value'])
+            );
+        }
+
+        $this->assertSame($uri, (string) $this->makeRequest('/path')->getUri());
+    }
+
+    /**
+     * @covers ::setRequestQueryParameter
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The "t" query parameter already exists and it's not an array, so can't append more values to it.
+     */
+    public function testThrowsExceptionWhenAppendingArrayParamToRegularParam() {
+        $this->context
+            ->setRequestQueryParameter('t', 'border')
+            ->setRequestQueryParameter('t[]', 'thumb');
+    }
+
+    /**
+     * @covers ::setRequestParameterToImageIdentifier
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage No image identifier exists for image: "/path".
+     */
+    public function testThrowsExceptionWhenSettingARequestParameterToAnNonExistingImageIdentifier() {
+        $this->context->setRequestParameterToImageIdentifier('foo', '/path');
+    }
+
+    /**
+     * @covers ::setRequestParameterToImageIdentifier
+     */
+    public function testCanSetQueryParameterToImageIdentifier() {
+        $this->mockHandler->append(
+            new Response(200, [], '{"imageIdentifier": "1"}'),
+            new Response(200, [], '{"imageIdentifier": "2"}'),
+            new Response(200, [], '{"imageIdentifier": "3"}')
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user')
+                ->addUserImageToImbo(FIXTURES_DIR . '/image2.png', 'user')
+                ->addUserImageToImbo(FIXTURES_DIR . '/image3.png', 'user')
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->setRequestParameterToImageIdentifier('id1', FIXTURES_DIR . '/image1.png')
+                ->setRequestParameterToImageIdentifier('id2', FIXTURES_DIR . '/image2.png')
+                ->setRequestParameterToImageIdentifier('id3', FIXTURES_DIR . '/image3.png')
+        );
+
+        $this->assertSame(
+            'http://localhost:8080/path?id1=1&id2=2&id3=3',
+            (string) $this->makeRequest('/path')->getUri()
+        );
+    }
+
+    /**
+     * @covers ::generateShortImageUrl
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage No image identifier exists for path: "/path".
+     */
+    public function testThrowsExceptionWheyGeneratingShortImageUrlForNonExistingImage() {
+        $this->context->generateShortImageUrl('/path', new PyStringNode([], 1));
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getShortUrlParams() {
+        return [
+            [
+                'image' => FIXTURES_DIR . '/image1.png',
+                'user' => 'user',
+                'imageIdentifier' => 'fc7d2d06993047a0b5056e8fac4462a2',
+                'params' => [
+                    'user' => 'user',
+                ],
+            ],
+            [
+                'image' => FIXTURES_DIR . '/image2.png',
+                'user' => 'user',
+                'imageIdentifier' => 'b914b28f4d5faa516e2049b9a6a2577c',
+                'params' => [
+                    'user' => 'user',
+                    'extension' => 'gif',
+                ],
+            ],
+            [
+                'image' => FIXTURES_DIR . '/image3.png',
+                'user' => 'user',
+                'imageIdentifier' => '1d5b88aec8a3e1c4c57071307b2dae3a',
+                'params' => [
+                    'user' => 'user',
+                    'query' => 't[]=thumbnail:width=45,height=55&t[]=desaturate',
+                ],
+            ],
+            [
+                'image' => FIXTURES_DIR . '/image4.png',
+                'user' => 'user',
+                'imageIdentifier' => 'a501051db16e3cbf88ea50bfb0138a47',
+                'params' => [
+                    'user' => 'user',
+                    'extension' => 'jpg',
+                    'query' => 't[]=thumbnail:width=45,height=55&t[]=desaturate',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getShortUrlParams
+     * @covers ::generateShortImageUrl
+     * @param string $image
+     * @param string $user
+     * @param string $imageIdentifier
+     * @param array $params
+     */
+    public function testCanGenerateShortUrls($image, $user, $imageIdentifier, array $params) {
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
+            new Response(200)
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context->addUserImageToImbo($image, $user)
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context->generateShortImageUrl(
+                $image,
+                new PyStringNode([json_encode($params)], 1)
+            )
+        );
+
+        $this->assertCount(
+            2,
+            $this->history, 'There should exist exactly 2 requests in the history, found %d.',
+            count($this->history)
+        );
+
+        $request = $this->history[1]['request'];
+
+        $this->assertSame(
+            sprintf('http://localhost:8080/users/user/images/%s/shorturls', $imageIdentifier),
+            (string) $request->getUri()
+        );
+
+        $this->assertSame('POST', $request->getMethod());
+
+        $this->assertSame(
+            array_merge($params, ['imageIdentifier' => $imageIdentifier]),
+            json_decode((string) $request->getBody(), true))
+        ;
+    }
+
+    /**
+     * @covers ::specifyAsTheWatermarkImage
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage No image exists for path: "/path".
+     */
+    public function testThrowsExceptionWhenSpecifyingWatermarkImageThatDoesNotExist() {
+        $this->context->specifyAsTheWatermarkImage('/path');
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForWatermarkImages() {
+        return [
+            'no params' => [
+                'image' => FIXTURES_DIR . '/image1.png',
+                'imageIdentifier' => 'someId',
+                'params' => null,
+                'uri' => 'http://localhost:8080/path?t%5B0%5D=watermark%3Aimg%3DsomeId',
+            ],
+            'with params' => [
+                'image' => FIXTURES_DIR . '/image1.png',
+                'imageIdentifier' => 'someId',
+                'params' => 'x=10,y=5,position=bottom-right,width=20,height=20',
+                'uri' => 'http://localhost:8080/path?t%5B0%5D=watermark%3Aimg%3DsomeId%2Cx%3D10%2Cy%3D5%2Cposition%3Dbottom-right%2Cwidth%3D20%2Cheight%3D20',
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForWatermarkImages
+     * @covers ::specifyAsTheWatermarkImage
+     * @param string $image
+     * @param string $imageIdentifier
+     * @param string $params
+     * @param string $uri
+     */
+    public function testCanSpecifyWatermarkImage($image, $imageIdentifier, $params = null, $uri) {
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
+            new Response(200)
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context->addUserImageToImbo($image, 'user')
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context->specifyAsTheWatermarkImage($image, $params)
+        );
+
+        $request = $this->makeRequest('/path');
+
+        $this->assertSame($uri, (string) $request->getUri());
     }
 }
