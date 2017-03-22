@@ -20,6 +20,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit_Framework_TestCase;
 use Behat\Gherkin\Node\PyStringNode;
+use Behat\Gherkin\Node\TableNode;
 
 /**
  * @coversDefaultClass FeatureContext
@@ -214,7 +215,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     /**
      * @covers ::setImboConfigHeader
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessageRegExp /Configuration file "foobar" does not exist in the "[^"]+" directory\./
+     * @expectedExceptionMessageRegExp |Configuration file "foobar" does not exist in the ".*?/imbo-configs" directory\.|
      */
     public function testSettingConfigHeaderFailsWithNonExistingFile() {
         $this->context->setImboConfigHeader('foobar');
@@ -558,7 +559,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     /**
      * @covers ::primeDatabase
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessageRegExp /Fixture file "foobar.php" does not exist in "[^"]+"\./
+     * @expectedExceptionMessageRegExp |Fixture file "foobar.php" does not exist in ".*?/tests/behat/fixtures"\.|
      */
     public function testThrowsExceptionWhenPrimingDatabaseWithScriptThatDoesNotExist() {
         $this->context->primeDatabase('foobar.php');
@@ -932,5 +933,407 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
         $request = $this->makeRequest('/path');
 
         $this->assertSame($uri, (string) $request->getUri());
+    }
+
+    /**
+     * @covers ::requestPreviouslyAddedImage
+     * @covers ::getUserAndImageIdentifierOfPreviouslyAddedImage
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Could not find any response in the history with an image identifier.
+     */
+    public function testThrowsExceptionWhenTryingToRequestPreviouslyAddedImageWhenNoImageHasBeenAdded() {
+        $this->mockHandler->append(new Response(200));
+        $this->context
+            ->requestPath('/path')
+            ->requestPreviouslyAddedImage();
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForRequestingPreviouslyAddedImage() {
+        return [
+            'HTTP GET' => [
+                'imageIdentifier' => 'imageId',
+                'image' => FIXTURES_DIR . '/image1.png',
+                'method' => 'GET',
+            ],
+            'HTTP DELETE' => [
+                'imageIdentifier' => 'imageId',
+                'image' => FIXTURES_DIR . '/image1.png',
+                'method' => 'DELETE',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForRequestingPreviouslyAddedImage
+     * @covers ::requestPreviouslyAddedImage
+     * @param string $imageIdentifier
+     * @param string $image
+     * @param string $method
+     */
+    public function testCanRequestPreviouslyAddedImage($imageIdentifier, $image, $method) {
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
+            new Response(200)
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->addUserImageToImbo($image, 'user')
+                ->requestPreviouslyAddedImage($method)
+        );
+
+        $this->assertCount(
+            2,
+            $this->history,
+            sprintf('Expected exactly 2 requests, got: %d.', count($this->history))
+        );
+
+        $request = $this->history[1]['request'];
+
+        $this->assertSame($method, $request->getMethod());
+
+        $this->assertSame(
+            sprintf(
+                'http://localhost:8080/users/user/images/%s',
+                $imageIdentifier
+            ),
+            (string) $request->getUri()
+        );
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForRequestingPreviouslyAddedImageWithExtension() {
+        return [
+            [
+                'imageIdentifier' => 'imageId',
+                'image' => FIXTURES_DIR . '/image1.png',
+                'method' => 'HEAD',
+                'extension' => 'png',
+            ],
+            [
+                'imageIdentifier' => 'imageId',
+                'image' => FIXTURES_DIR . '/image1.png',
+                'method' => 'GET',
+                'extension' => 'jpg',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForRequestingPreviouslyAddedImageWithExtension
+     * @covers ::requestPreviouslyAddedImageAsType
+     * @covers ::getUserAndImageIdentifierOfPreviouslyAddedImage
+     */
+    public function testCanRequestPreviouslyAddedImageUsingAlternativeMethod($imageIdentifier, $image, $method, $extension) {
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
+            new Response(200)
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->addUserImageToImbo($image, 'user')
+                ->requestPreviouslyAddedImageAsType($extension, $method)
+        );
+
+        $this->assertCount(
+            2,
+            $this->history,
+            sprintf('Expected exactly 2 requests, got: %d.', count($this->history))
+        );
+
+        $request = $this->history[1]['request'];
+
+        $this->assertSame($method, $request->getMethod());
+
+        $this->assertSame(
+            sprintf(
+                'http://localhost:8080/users/user/images/%s%s',
+                $imageIdentifier,
+                $extension ? '.' . $extension : ''
+            ),
+            (string) $request->getUri()
+        );
+    }
+
+    /**
+     * @covers ::requestPreviouslyAddedImageAsType
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Invalid extension: "jpeg".
+     */
+    public function testThrowsExceptionWhenTryingToFetchPreviouslyAddedImageWithInvalidExtension() {
+        $this->context->requestPreviouslyAddedImageAsType('jpeg');
+    }
+
+    /**
+     * @covers ::makeSameRequest
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage No request has been made yet.
+     */
+    public function testThrowsExceptionWhenTryingToReplayRequestWhenNoRequestHasBeenMade() {
+        $this->context->makeSameRequest();
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForReplayingRequests() {
+        return [
+            'use original method' => [
+                'orignalMethod' => 'GET',
+                'method' => null,
+                'expectedUrl' => 'http://localhost:8080/path',
+                'publicKey' => null,
+                'privateKey' => null,
+            ],
+            'specify custom method' => [
+                'orignalMethod' => 'GET',
+                'method' => 'HEAD',
+                'expectedUrl' => 'http://localhost:8080/path',
+                'publicKey' => null,
+                'privateKey' => null,
+            ],
+            'specify custom method that the same as the original' => [
+                'orignalMethod' => 'DELETE',
+                'method' => 'DELETE',
+                'expectedUrl' => 'http://localhost:8080/path',
+                'publicKey' => null,
+                'privateKey' => null,
+            ],
+            'specify custom method and append access token' => [
+                'orignalMethod' => 'DELETE',
+                'method' => 'DELETE',
+                'expectedUrl' => 'http://localhost:8080/path?publicKey=key&accessToken=dd4217a681cf8abdcecdc68cf49630df1e57dc733735e902b8a69859e50797a8',
+                'publicKey' => 'key',
+                'privateKey' => 'secret',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForReplayingRequests
+     * @covers ::makeSameRequest
+     * @param string $originalMethod
+     * @param string $method
+     * @param string $expectedUrl
+     * @param string $publicKey
+     * @param string $privateKey
+     */
+    public function testCanReplayTheLastRequest($originalMethod, $method, $expectedUrl, $publicKey, $privateKey) {
+        $this->mockHandler->append(new Response(200), new Response(200));
+
+        $this->context->setPublicAndPrivateKey($publicKey, $privateKey);
+
+        if ($publicKey && $privateKey) {
+            $this->context->appendAccessToken();
+        }
+
+        $this->context->requestPath('/path', $originalMethod);
+
+        $this->assertSame(
+            $this->context,
+            $this->context->makeSameRequest($method)
+        );
+
+        $this->assertCount(
+            2,
+            $this->history,
+            sprintf('Expected exactly 2 requests, got: %d.', count($this->history))
+        );
+
+        $this->assertSame($originalMethod, $this->history[0]['request']->getMethod());
+        $this->assertSame($method ?: $originalMethod, $this->history[1]['request']->getMethod());
+        $this->assertSame($expectedUrl, (string) $this->history[0]['request']->getUri());
+        $this->assertSame(
+            (string) $this->history[0]['request']->getUri(),
+            (string) $this->history[1]['request']->getUri()
+        );
+    }
+
+    /**
+     * @covers ::requestMetadataOfPreviouslyAddedImage
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Could not find any response in the history with an image identifier.
+     */
+    public function testThrowsExceptionWhenRequestingMetadataOfPreviouslyAddedImageWhenNoImageHasBeenAdded() {
+        $this->makeRequest('/path');
+        $this->makeRequest('/anotherPath');
+        $this->context->requestMetadataOfPreviouslyAddedImage();
+    }
+
+    /**
+     * @covers ::requestMetadataOfPreviouslyAddedImage
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Could not find any response in the history with an image identifier.
+     */
+    public function testThrowsExceptionWhenRequestingMetadataOfPreviouslyAddedImageWhenNoRequestHasBeenMade() {
+        $this->context->requestMetadataOfPreviouslyAddedImage();
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForRequestingMetadataOfPreviouslyAddedImage() {
+        return [
+            'no metadata' => [
+                'imageIdentifier' => 'imageId',
+                'image' => FIXTURES_DIR . '/image1.png',
+                'method' => 'GET',
+                'metadata' => [],
+            ],
+            'with metadata and custom method' => [
+                'imageIdentifier' => 'imageId',
+                'image' => FIXTURES_DIR . '/image1.png',
+                'method' => 'HEAD',
+                'metadata' => ['key' => 'value'],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForRequestingMetadataOfPreviouslyAddedImage
+     * @covers ::requestMetadataOfPreviouslyAddedImage
+     * @param string $imageIdentifier
+     * @param string $image
+     * @param string $method
+     * @param array $metadata
+     */
+    public function testCanRequestMetadataOfPreviouslyAddedImage($imageIdentifier, $image, $method, array $metadata) {
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
+            new Response(200, [], json_encode($metadata))
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->addUserImageToImbo($image, 'user')
+                ->requestMetadataOfPreviouslyAddedImage($method)
+        );
+
+        $this->assertCount(
+            2,
+            $this->history,
+            sprintf('Expected exactly 2 requests, got: %d.', count($this->history))
+        );
+
+        $request = $this->history[1]['request'];
+
+        $this->assertSame($method, $request->getMethod());
+
+        $this->assertSame(
+            sprintf(
+                'http://localhost:8080/users/user/images/%s/metadata',
+                $imageIdentifier
+            ),
+            (string) $request->getUri()
+        );
+        $this->assertSame($metadata, json_decode((string) $this->history[1]['response']->getBody(), true));
+    }
+
+    /**
+     * @covers ::requestImageResourceForLocalImage
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessageRegExp |Image URL for image with path ".*?/tests/phpunit/Fixtures/image1\.png" can not be found\.|
+     */
+    public function testThrowsExceptionWhenTryingToRequestImageUsingLocalPathAndImageDoesNotExistInImbo() {
+        $this->context->requestImageResourceForLocalImage(FIXTURES_DIR . '/image1.png');
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForRequestingImageWithLocalPath() {
+        return [
+            'default values' => [
+                'image' => FIXTURES_DIR . '/image1.png',
+                'imageIdentifier' => 'imageId',
+                'extension' => null,
+                'method' => 'GET',
+                'expectedPath' => '/users/user/images/imageId',
+            ],
+            'custom extension and method' => [
+                'image' => FIXTURES_DIR . '/image1.png',
+                'imageIdentifier' => 'imageId',
+                'extension' => 'gif',
+                'method' => 'HEAD',
+                'expectedPath' => '/users/user/images/imageId.gif',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForRequestingImageWithLocalPath
+     * @covers ::requestImageResourceForLocalImage
+     * @param string $image
+     * @param string $imageIdentifier
+     * @param string $extension
+     * @param string $method
+     * @param string $expectedPath
+     */
+    public function testCanRequestImageUsingLocalFilePath($image, $imageIdentifier, $extension, $method, $expectedPath) {
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
+            new Response(200)
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->addUserImageToImbo($image, 'user')
+                ->requestImageResourceForLocalImage($image, $extension, $method)
+        );
+
+        $this->assertCount(
+            2,
+            $this->history,
+            sprintf('Expected exactly 2 transactions in the history, got %d.', count($this->history))
+        );
+
+        $request = $this->history[1]['request'];
+
+        $this->assertSame($expectedPath, $request->getUri()->getPath());
+        $this->assertSame($method, $request->getMethod());
+    }
+
+    /**
+     * @covers ::requestPaths
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Table is missing "path" key.
+     */
+    public function testThrowsExceptionWhenRequestingPathWithMissingPath() {
+        $this->context->requestPaths(new TableNode([
+            ['method'],
+            ['GET'],
+        ]));
+    }
+
+    /**
+     * @covers ::requestPaths
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Table is missing "method" key.
+     */
+    public function testThrowsExceptionWhenRequestingPathWithMissingMethod() {
+        $this->context->requestPaths(new TableNode([
+            ['path'],
+            ['/path'],
+        ]));
     }
 }

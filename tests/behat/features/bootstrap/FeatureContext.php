@@ -778,44 +778,16 @@ class FeatureContext extends ApiContext {
      * contains image identifiers. The first one found will be requested.
      *
      * @param string $method The HTTP method to use
-     * @param string $extension
-     * @throws RuntimeException Throws an exception if there is no response in the history that has
-     *                          added an image.
      * @return self
      *
      * @When I request the previously added image
      * @When I request the previously added image using HTTP :method
      */
-    public function requestPreviouslyAddedImage($method = 'GET', $extension = null) {
-        // Go back in the history until we have a request with an image
-        foreach (array_reverse($this->history) as $transaction) {
-            $response = $transaction['response'];
+    public function requestPreviouslyAddedImage($method = 'GET') {
+        $image = $this->getUserAndImageIdentifierOfPreviouslyAddedImage();
+        $path = sprintf('/users/%s/images/%s', $image['user'], $image['imageIdentifier']);
 
-            if ($response) {
-                $body = json_decode((string) $response->getBody());
-
-                if (!empty($body->imageIdentifier)) {
-                    // Fetch the user from the request URI in the same transaction
-                    $request = $transaction['request'];
-                    $matches = [];
-                    preg_match('|/users/(.+?)/images|', (string) $request->getUri(), $matches);
-
-                    $path = sprintf('/users/%s/images/%s', $matches[1], $body->imageIdentifier);
-
-                    if ($extension) {
-                        // Append extension to the path
-                        $path .= '.' . $extension;
-                    }
-
-                    return $this->requestPath($path, $method);
-                }
-            }
-        }
-
-        // No hit
-        throw new RuntimeException(
-            'Could not find any responses in the history with an image identifier.'
-        );
+        return $this->requestPath($path, $method);
     }
 
     /**
@@ -833,7 +805,14 @@ class FeatureContext extends ApiContext {
             throw new InvalidArgumentException(sprintf('Invalid extension: "%s".', $extension));
         }
 
-        return $this->requestPreviouslyAddedImage($method, $extension);
+        $image = $this->getUserAndImageIdentifierOfPreviouslyAddedImage();
+        $path = sprintf('/users/%s/images/%s', $image['user'], $image['imageIdentifier']);
+
+        if ($extension) {
+            $path .= '.' . $extension;
+        }
+
+        return $this->requestPath($path, $method);
     }
 
     /**
@@ -851,8 +830,8 @@ class FeatureContext extends ApiContext {
      * @When I replay the last request using HTTP :method
      */
     public function makeSameRequest($method = null) {
-        if (!$this->request) {
-            throw new RuntimeException('No request have been made yet.');
+        if (!$this->response) {
+            throw new RuntimeException('No request has been made yet.');
         }
 
         $this->setRequestMethod($method ?: $this->request->getMethod());
@@ -868,42 +847,16 @@ class FeatureContext extends ApiContext {
      * Request the metadata of the previously added image
      *
      * @param string $method The HTTP method to use when fetching the metadata
-     * @throws RuntimeException Throws an exception if no image can be found in the history
      * @return self
      *
      * @When I request the metadata of the previously added image
      * @When I request the metadata of the previously added image using HTTP :method
      */
     public function requestMetadataOfPreviouslyAddedImage($method = 'GET') {
-        // Go back in the history until we have a response with an image identifier
-        foreach (array_reverse($this->history) as $transaction) {
-            $responseBody = json_decode((string) $transaction['response']->getBody(), true);
+        $image = $this->getUserAndImageIdentifierOfPreviouslyAddedImage();
+        $path = sprintf('/users/%s/images/%s/metadata', $image['user'], $image['imageIdentifier']);
 
-            if (isset($responseBody['imageIdentifier'])) {
-                $match = [];
-                preg_match(
-                    '|^/users/(?<user>.*?)/images|',
-                    (string) $transaction['request']->getUri()->getPath(),
-                    $match
-                );
-
-                if ($match) {
-                    $user = $match['user'];
-                    $path = sprintf(
-                        '/users/%s/images/%s/metadata',
-                        $user,
-                        $responseBody['imageIdentifier']
-                    );
-
-                    return $this->requestPath($path, $method);
-                }
-            }
-        }
-
-        // No hit
-        throw new RuntimeException(
-            'Could not find any response in the history with an image identifier.'
-        );
+        return $this->requestPath($path, $method);
     }
 
     /**
@@ -913,14 +866,14 @@ class FeatureContext extends ApiContext {
      * `addUserImageToImbo` method, that is triggered by `Given :imagePath exists for user :user`.
      *
      * @param string $localPath The local path for the image that was added earlier
-     * @param string $format Optional format of the image (png|gif|jpg)
+     * @param string $extension Optional extension of the image (png|gif|jpg)
      * @param string $method Optional HTTP method to use
      * @throws InvalidArgumentException
      * @return self
      *
      * @When /^I request the image resource for "([^"]*)"(?: as a "(png|gif|jpg)")?(?: using HTTP "([^"]*)")?$/
      */
-    public function requestImageResourceForLocalImage($localPath, $format = null, $method = 'GET') {
+    public function requestImageResourceForLocalImage($localPath, $extension = null, $method = 'GET') {
         if (!isset($this->imageUrls[$localPath])) {
             throw new InvalidArgumentException(sprintf(
                 'Image URL for image with path "%s" can not be found.',
@@ -930,9 +883,9 @@ class FeatureContext extends ApiContext {
 
         $url = $this->imageUrls[$localPath];
 
-        if ($format) {
+        if ($extension) {
             // Append extension if specified
-            $url .= '.' . $format;
+            $url .= '.' . $extension;
         }
 
         return $this->requestPath($url, $method);
@@ -999,8 +952,11 @@ class FeatureContext extends ApiContext {
             }
 
             if ($path === 'previously added image') {
-                $extension = isset($row['extension']) ? $row['extension'] : null;
-                $this->requestPreviouslyAddedImage($method, $extension);
+                if (!empty($row['extension'])) {
+                    $this->requestPreviouslyAddedImageAsType($row['extension'], $method);
+                } else {
+                    $this->requestPreviouslyAddedImage($method);
+                }
             } else if ($path === 'metadata of previously added image') {
                 $this->requestMetadataOfPreviouslyAddedImage($method);
             } else {
@@ -1778,5 +1734,39 @@ class FeatureContext extends ApiContext {
         }
 
         return explode('/', ltrim($this->imageUrls[$localPath], '/'))[1];
+    }
+
+    /**
+     * Get the user and image identifier of the previoysly added image
+     *
+     * @throws RuntimeException
+     * @return array
+     */
+    private function getUserAndImageIdentifierOfPreviouslyAddedImage() {
+        foreach (array_reverse($this->history) as $transaction) {
+            $request = $transaction['request'];
+            $response = $transaction['response'];
+
+            $body = json_decode((string) $response->getBody());
+
+            if (!empty($body->imageIdentifier) && $request->getMethod() === 'POST') {
+                $match = [];
+                preg_match(
+                    '|^/users/(?<user>.+?)/images$|',
+                    (string) $request->getUri()->getPath(),
+                    $match
+                );
+
+                return [
+                    'user' => $match['user'],
+                    'imageIdentifier' => $body->imageIdentifier
+                ];
+            }
+        }
+
+        // No hit
+        throw new RuntimeException(
+            'Could not find any response in the history with an image identifier.'
+        );
     }
 }
