@@ -978,15 +978,25 @@ class FeatureContext extends ApiContext {
     /**
      * Make a request to the short URL generated in the previous request
      *
+     * @throws RuntimeException
      * @return self
      *
      * @When I request the image using the generated short URL
      */
     public function requestImageUsingShortUrl() {
         $this->requireResponse();
-        $shortUrlId = json_decode((string) $this->response->getBody(), true)['id'];
+        $body = json_decode((string) $this->response->getBody(), true);
 
-        return $this->requestPath(sprintf('/s/%s', $shortUrlId));
+        if (!is_array($body) || json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('Invalid response body in the current response instance');
+        } else if (empty($body['id'])) {
+            throw new RuntimeException(sprintf(
+                'Missing "id" from body: "%s".',
+                (string) $this->response->getBody()
+            ));
+        }
+
+        return $this->requestPath(sprintf('/s/%s', $body['id']));
     }
 
     /**
@@ -1120,6 +1130,8 @@ class FeatureContext extends ApiContext {
             $actualHeight,
             sprintf('Incorrect image height, expected %d, got %d.', $height, $actualHeight)
         );
+
+        return $this;
     }
 
     /**

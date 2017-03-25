@@ -1576,4 +1576,504 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
         $this->assertSame('/users/user/images/imageId/metadata', $this->history[3]['request']->getUri()->getPath());
         $this->assertSame('publicKey=publicKey&accessToken=78ed8225148fb3cc09d61ccd133831ef36e4bbd8ee757d6ff1378c65067d7775', $this->history[3]['request']->getUri()->getQuery());
     }
+
+    /**
+     * @covers ::requestImageUsingShortUrl
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Invalid response body in the current response instance
+     */
+    public function testThrowsExceptionWhenTryingToRequestImageWithShortUrlWhenResponseHasInvalidBody() {
+        $this->mockHandler->append(
+            new Response(200),
+            new Response(200)
+        );
+
+        $this->context
+            ->requestPath('/path')
+            ->requestImageUsingShortUrl();
+    }
+
+    /**
+     * @covers ::requestImageUsingShortUrl
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Missing "id" from body: "{"foo":"bar"}".
+     */
+    public function testThrowsExceptionWhenTryingToRequestImageWithShortUrlWhenResponseBodyIsMissingId() {
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['foo' => 'bar'])),
+            new Response(200)
+        );
+
+        $this->context
+            ->requestPath('/path')
+            ->requestImageUsingShortUrl();
+    }
+
+    /**
+     * @covers ::requestImageUsingShortUrl
+     */
+    public function testCanRequestImageUsingShortUrlCreatedInPreviousRequest() {
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['id' => 'someId'])),
+            new Response(200)
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->requestImageUsingShortUrl()
+        );
+
+        $this->assertCount(
+            2,
+            $this->history,
+            sprintf('Expected exactly 2 requests, got %d.', count($this->history))
+        );
+
+        $request = $this->history[1]['request'];
+
+        $this->assertSame('GET', $request->getMethod());
+        $this->assertSame('/s/someId', $request->getUri()->getPath());
+    }
+
+    /**
+     * @covers ::assertImboError
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The status code of the last response is lower than 400, so it is not considered an error.
+     */
+    public function testThrowsExceptionWhenAssertingImboErrorWhenResponseIsNotAnError() {
+        $this->makeRequest('/path');
+        $this->context->assertImboError('some message');
+    }
+
+    /**
+     * @covers ::assertImboError
+     * @expectedException Assert\InvalidArgumentException
+     * @expectedExceptionMessage Expected error message "foobar", got "error message".
+     */
+    public function testAssertingImboErrorMessageCanFailWhenMessageIsWrong() {
+        $this->mockHandler->append(
+            new Response(500, [], json_encode(['error' => [
+                'message' => 'error message',
+                'imboErrorCode' => 1,
+            ]]))
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImboError('foobar')
+        );
+    }
+
+    /**
+     * @covers ::assertImboError
+     * @expectedException Assert\InvalidArgumentException
+     * @expectedExceptionMessage Expected imbo error code "2", got "1".
+     */
+    public function testAssertingImboErrorMessageCanFailWhenCodeIsWrong() {
+        $this->mockHandler->append(
+            new Response(500, [], json_encode(['error' => [
+                'message' => 'error message',
+                'imboErrorCode' => 1,
+            ]]))
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImboError('error message', 2)
+        );
+    }
+
+    /**
+     * @covers ::assertImboError
+     */
+    public function testCanAssertImboErrorMessage() {
+        $this->mockHandler->append(
+            new Response(500, [], json_encode(['error' => [
+                'message' => 'error message',
+                'imboErrorCode' => 1,
+            ]]))
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImboError('error message', 1)
+        );
+    }
+
+    /**
+     * @covers ::assertImageWidth
+     * @expectedException Assert\InvalidArgumentException
+     * @expectedExceptionMessage Incorrect image width, expected 123, got 599.
+     */
+    public function testAssertingImageWidthCanFail() {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImageWidth(123)
+        );
+    }
+
+    /**
+     * @covers ::assertImageWidth
+     */
+    public function testCanAssertImageWidth() {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImageWidth(599)
+        );
+    }
+
+    /**
+     * @covers ::assertImageHeight
+     * @expectedException Assert\InvalidArgumentException
+     * @expectedExceptionMessage Incorrect image height, expected 123, got 417.
+     */
+    public function testAssertingImageHeightCanFail() {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImageHeight(123)
+        );
+    }
+
+    /**
+     * @covers ::assertImageHeight
+     */
+    public function testCanAssertImageHeight() {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImageHeight(417)
+        );
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForImageDimensionAssertion() {
+        $image1 = file_get_contents(FIXTURES_DIR . '/image1.png');
+        $image2 = file_get_contents(FIXTURES_DIR . '/image2.png');
+
+        return [
+            [
+                'image' => $image1,
+                'dimension' => '123x456',
+                'exceptionMessage' => 'Incorrect image width, expected 123, got 599.',
+            ],
+            [
+                'image' => $image1,
+                'dimension' => '599x456',
+                'exceptionMessage' => 'Incorrect image height, expected 456, got 417.',
+            ],
+            [
+                'image' => $image2,
+                'dimension' => '123x456',
+                'exceptionMessage' => 'Incorrect image width, expected 123, got 539.',
+            ],
+            [
+                'image' => $image2,
+                'dimension' => '539x123',
+                'exceptionMessage' => 'Incorrect image height, expected 123, got 375.',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForImageDimensionAssertion
+     * @covers ::assertImageDimension
+     * @expectedException Assert\InvalidArgumentException
+     * @param string $imageData
+     * @param string $dimension
+     * @param string $exceptionMessage
+     */
+    public function testAssertingImageDimensionCanFail($imageData, $dimension, $exceptionMessage) {
+        $this->expectExceptionMessage($exceptionMessage);
+        $this->mockHandler->append(
+            new Response(200, [], $imageData)
+        );
+
+        $this->context
+            ->requestPath('/path')
+            ->assertImageDimension($dimension);
+    }
+
+    /**
+     * @covers ::assertImageDimension
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Invalid dimension value: "123 x 456". Specify "<width>x<height>".
+     */
+    public function testThrowsExceptionWhenAssertingImageDimensionWhenInvalidDimensionString() {
+        $this->mockHandler->append(
+            new Response(200)
+        );
+        $this->context
+            ->requestPath('/path')
+            ->assertImageDimension('123 x 456');
+    }
+
+    /**
+     * @covers ::assertImageDimension
+     */
+    public function testCanAssertImageDimension() {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImageDimension('599x417')
+        );
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForAssertingImagePixelInfoFailures() {
+        $image = file_get_contents(FIXTURES_DIR . '/image1.png');
+
+        return [
+            [
+                'imageData' => $image,
+                'coordinate' => '1,1',
+                'color' => '000000',
+                'exceptionMessage' => 'Incorrect color at coordinate "1,1", expected "000000", got "ffffff".',
+            ],
+            [
+                'imageData' => $image,
+                'coordinate' => '247,32',
+                'color' => '000000',
+                'exceptionMessage' => 'Incorrect color at coordinate "247,32", expected "000000", got "e8e7e6".',
+            ],
+            [
+                'imageData' => $image,
+                'coordinate' => '275,150',
+                'color' => 'ffffff',
+                'exceptionMessage' => 'Incorrect color at coordinate "275,150", expected "ffffff", got "000000".',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForAssertingImagePixelInfoFailures
+     * @covers ::assertImagePixelColor
+     * @covers ::getImagePixelInfo
+     * @expectedException Assert\InvalidArgumentException
+     * @param string $imageData
+     * @param string $coordinate
+     * @param string $color
+     * @param string $exceptionMessage
+     */
+    public function testAssertingImagePixelColorCanFail($imageData, $coordinate, $color, $exceptionMessage) {
+        $this->mockHandler->append(
+            new Response(200, [], $imageData)
+        );
+
+        $this->expectExceptionMessage($exceptionMessage);
+        $this->context
+            ->requestPath('/path')
+            ->assertImagePixelColor($coordinate, $color);
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForAssertingImagePixelInfo() {
+        $image = file_get_contents(FIXTURES_DIR . '/image1.png');
+
+        return [
+            [
+                'imageData' => $image,
+                'coordinate' => '1,1',
+                'color' => 'ffffff',
+            ],
+            [
+                'imageData' => $image,
+                'coordinate' => '247,32',
+                'color' => 'e8e7e6',
+            ],
+            [
+                'imageData' => $image,
+                'coordinate' => '275,150',
+                'color' => '000000',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForAssertingImagePixelInfo
+     * @covers ::assertImagePixelColor
+     * @covers ::getImagePixelInfo
+     * @param string $imageData
+     * @param string $coordinate
+     * @param string $color
+     */
+    public function testCanAssertImagePixelColor($imageData, $coordinate, $color) {
+        $this->mockHandler->append(
+            new Response(200, [], $imageData)
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImagePixelColor($coordinate, $color)
+        );
+    }
+
+    /**
+     * @covers ::assertImagePixelColor
+     * @covers ::getImagePixelInfo
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Invalid coordinates: "1, 1". Format is "<w>x<h>", no spaces allowed.
+     */
+    public function testThrowsExceptionWhenAssertingImagePixelColorWithInvalidCoordinate() {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+        );
+
+        $this->context
+            ->requestPath('/path')
+            ->assertImagePixelColor('1, 1', 'ffffff');
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForAssertingImagePixelAlphaFailures() {
+        $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
+
+        return [
+            [
+                'imageData' => $image,
+                'coordinate' => '448,192',
+                'alpha' => '0',
+                'exceptionMessage' => sprintf('Incorrect alpha value at coordinate "448,192", expected "%f", got "%f".', 0, 1),
+            ],
+            [
+                'imageData' => $image,
+                'coordinate' => '192,64',
+                'alpha' => '1',
+                'exceptionMessage' => sprintf('Incorrect alpha value at coordinate "192,64", expected "%f", got "%f".', 1, 0),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForAssertingImagePixelAlphaFailures
+     * @covers ::assertImagePixelAlpha
+     * @covers ::getImagePixelInfo
+     * @expectedException Assert\InvalidArgumentException
+     * @param string $imageData
+     * @param string $coordinate
+     * @param string $alpha
+     * @param string $exceptionMessage
+     */
+    public function testAssertingImagePixelAlphaCanFail($imageData, $coordinate, $alpha, $exceptionMessage) {
+        $this->mockHandler->append(
+            new Response(200, [], $imageData)
+        );
+
+        $this->expectExceptionMessage($exceptionMessage);
+        $this->context
+            ->requestPath('/path')
+            ->assertImagePixelAlpha($coordinate, $alpha);
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForAssertingImagePixelAlpha() {
+        $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
+
+        return [
+            [
+                'imageData' => $image,
+                'coordinate' => '448,192',
+                'alpha' => '1',
+            ],
+            [
+                'imageData' => $image,
+                'coordinate' => '192,64',
+                'alpha' => '0',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForAssertingImagePixelAlpha
+     * @covers ::assertImagePixelAlpha
+     * @covers ::getImagePixelInfo
+     * @param string $imageData
+     * @param string $coordinate
+     * @param string $alpha
+     */
+    public function testCanAssertImagePixelAlpha($imageData, $coordinate, $alpha) {
+        $this->mockHandler->append(
+            new Response(200, [], $imageData)
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImagePixelAlpha($coordinate, $alpha)
+        );
+    }
+
+    /**
+     * @covers ::assertImagePixelAlpha
+     * @covers ::getImagePixelInfo
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Invalid coordinates: "1, 1". Format is "<w>x<h>", no spaces allowed.
+     */
+    public function testThrowsExceptionWhenAssertingImagePixelAlphaWithInvalidCoordinate() {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/transparency.png'))
+        );
+
+        $this->context
+            ->requestPath('/path')
+            ->assertImagePixelAlpha('1, 1', '1');
+    }
 }
