@@ -1316,9 +1316,9 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     /**
      * @covers ::requestPaths
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Table is missing "path" key.
+     * @expectedExceptionMessage Missing or empty "path" key.
      */
-    public function testThrowsExceptionWhenRequestingPathWithMissingPath() {
+    public function testThrowsExceptionWhenBulkRequestingWithMissingPath() {
         $this->context->requestPaths(new TableNode([
             ['method'],
             ['GET'],
@@ -1328,12 +1328,252 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     /**
      * @covers ::requestPaths
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Table is missing "method" key.
+     * @expectedExceptionMessage Both "sign request" and "access token" can not be set to "yes".
      */
-    public function testThrowsExceptionWhenRequestingPathWithMissingMethod() {
+    public function testThrowsExceptionWhenBulkRequestingAndUsingBothAccessTokenAndSignature() {
         $this->context->requestPaths(new TableNode([
-            ['path'],
-            ['/path'],
+            ['path',  'access token', 'sign request'],
+            ['/path', 'yes',          'yes'         ]
         ]));
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForBulkRequests() {
+        return [
+            'single request with no options' => [
+                'table' => new TableNode([
+                    ['path'],
+                    ['/path']
+                ]),
+                'requests' => [
+                    [
+                        'path' => '/path',
+                        'method' => 'GET',
+                        'query' => '',
+                        'requestBody' => '',
+                    ],
+                ],
+            ],
+            'append access token' => [
+                'table' => new TableNode([
+                    ['path',  'access token'],
+                    ['/path', 'yes']
+                ]),
+                'requests' => [
+                    [
+                        'path' => '/path',
+                        'method' => 'GET',
+                        'query' => 'publicKey=publicKey&accessToken=582386896ffacd2c34a39476f0fa71ac9e6b22f079482ea7ee687e15826b08ef',
+                        'requestBody' => '',
+                    ],
+                ],
+            ],
+            'add transformation' => [
+                'table' => new TableNode([
+                    ['path',  'transformation'],
+                    ['/path', 'border']
+                ]),
+                'requests' => [
+                    [
+                        'path' => '/path',
+                        'method' => 'GET',
+                        'query' => 't%5B0%5D=border',
+                        'requestBody' => '',
+                    ],
+                ],
+            ],
+            'set request body' => [
+                'table' => new TableNode([
+                    ['path',  'request body'],
+                    ['/path', 'some data']
+                ]),
+                'requests' => [
+                    [
+                        'path' => '/path',
+                        'method' => 'GET',
+                        'query' => '',
+                        'requestBody' => 'some data',
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForBulkRequests
+     * @covers ::requestPaths
+     * @param TableNode $table
+     * @param array $requests
+     */
+    public function testCanBulkRequest(TableNode $table, array $requests) {
+        for ($i = 0; $i < count($table->getRows()) - 1; $i++) {
+            $this->mockHandler->append(new Response(200));
+        }
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->setPublicAndPrivateKey('publicKey', 'privateKey')
+                ->requestPaths($table)
+        );
+
+        foreach ($requests as $i => $data) {
+            $this->assertSame($data['path'], $this->history[$i]['request']->getUri()->getPath());
+            $this->assertSame($data['method'], $this->history[$i]['request']->getMethod());
+            $this->assertSame($data['query'], $this->history[$i]['request']->getUri()->getQuery());
+            $this->assertSame($data['requestBody'], (string) $this->history[$i]['request']->getBody());
+        }
+    }
+
+    /**
+     * @covers ::requestPaths
+     */
+    public function testCanBulkRequestWithPreviouslyAddedImage() {
+        $this->mockHandler->append(
+            // Response from adding image
+            new Response(200, [], json_encode(['imageIdentifier' => 'imageId'])),
+
+            // Bulk responses
+            new Response(200),
+            new Response(200),
+            new Response(200)
+        );
+
+        $requests = new TableNode([
+            ['path',                   'method', 'transformation', 'extension', 'access token'],
+            ['previously added image', '',       'border',         '',          'yes'         ],
+            ['previously added image', 'HEAD',   'thumbnail',      '',          'yes'         ],
+            ['previously added image', '',       'strip',          'gif',       'yes'         ],
+        ]);
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->setPublicAndPrivateKey('publicKey', 'privateKey')
+                ->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user')
+                ->requestPaths($requests)
+        );
+
+        $this->assertCount(
+            4,
+            $this->history,
+            sprintf('Expected exactly 3 requests, got %d.', count($this->history))
+        );
+
+        $this->assertSame('GET', $this->history[1]['request']->getMethod());
+        $this->assertSame('/users/user/images/imageId', $this->history[1]['request']->getUri()->getPath());
+        $this->assertSame('t%5B0%5D=border&publicKey=publicKey&accessToken=ec92fc446856c31b43facd62617f23c84d44e013ab3fff66db050291242f73e5', $this->history[1]['request']->getUri()->getQuery());
+
+        $this->assertSame('HEAD', $this->history[2]['request']->getMethod());
+        $this->assertSame('/users/user/images/imageId', $this->history[2]['request']->getUri()->getPath());
+        $this->assertSame('t%5B0%5D=thumbnail&publicKey=publicKey&accessToken=2b2eb39e7b8542fe0ca68f9c7c005759b0c4e05eb036fb46358c7e00dc9df141', $this->history[2]['request']->getUri()->getQuery());
+
+        $this->assertSame('GET', $this->history[3]['request']->getMethod());
+        $this->assertSame('/users/user/images/imageId.gif', $this->history[3]['request']->getUri()->getPath());
+        $this->assertSame('t%5B0%5D=strip&publicKey=publicKey&accessToken=5064e745998642e65c559c5ce5566f33926bcd18c041f10d93f602320c0d3c50', $this->history[3]['request']->getUri()->getQuery());
+    }
+
+    /**
+     * @covers ::requestPaths
+     */
+    public function testCanBulkRequestWithSignedRequests() {
+        $requests = new TableNode([
+            ['path',   'method', 'sign request'],
+            ['/path1', '',       'yes'         ],
+            ['/path2', 'GET',    ''            ],
+            ['/path3', 'HEAD',   'yes'         ],
+        ]);
+        $publicKey = 'publicKey';
+        $privateKey = 'privateKey';
+
+        $this->mockHandler->append(
+            new Response(200),
+            new Response(200),
+            new Response(200)
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->setPublicAndPrivateKey($publicKey, $privateKey)
+                ->requestPaths($requests)
+        );
+
+        $this->assertCount(
+            3,
+            $this->history,
+            sprintf('Expected exactly 1 request, got %d.', count($this->history))
+        );
+
+        $this->assertSame('GET', $this->history[0]['request']->getMethod());
+        $this->assertSame('/path1', $this->history[0]['request']->getUri()->getPath());
+        $this->assertRegExp(
+            '/^publicKey=publicKey&signature=[a-z0-9]{64}&timestamp=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
+            $this->history[0]['request']->getUri()->getQuery()
+        );
+
+        $this->assertSame('GET', $this->history[1]['request']->getMethod());
+        $this->assertSame('/path2', $this->history[1]['request']->getUri()->getPath());
+        $this->assertEmpty($this->history[1]['request']->getUri()->getQuery());
+
+        $this->assertSame('HEAD', $this->history[2]['request']->getMethod());
+        $this->assertSame('/path3', $this->history[2]['request']->getUri()->getPath());
+        $this->assertRegExp(
+            '/^publicKey=publicKey&signature=[a-z0-9]{64}&timestamp=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
+            $this->history[2]['request']->getUri()->getQuery()
+        );
+    }
+
+    /**
+     * @covers ::requestPaths
+     */
+    public function testCanBulkRequestWithMetadataOfPreviouslyAddedImage() {
+        $this->mockHandler->append(
+            // Response of adding image
+            new Response(200, [], json_encode(['imageIdentifier' => 'imageId'])),
+
+            // Response of adding metadata
+            new Response(200, [], json_encode(['foo' => 'bar'])),
+
+            // Responses to bulk requests
+            new Response(200),
+            new Response(200)
+        );
+
+        $requests = new TableNode([
+            ['path',                               'method', 'access token'],
+            ['metadata of previously added image', '',       'yes'         ],
+            ['metadata of previously added image', 'HEAD',   'yes'         ],
+        ]);
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->setPublicAndPrivateKey('publicKey', 'privateKey')
+                ->addUserImageToImbo(
+                    FIXTURES_DIR . '/image1.png',
+                    'user',
+                    new PyStringNode(['{"foo": "bar"}'], 1)
+                )
+                ->requestPaths($requests)
+        );
+
+        $this->assertCount(
+            4,
+            $this->history,
+            sprintf('Expected exactly 3 requests, got %d.', count($this->history))
+        );
+
+        $this->assertSame('GET', $this->history[2]['request']->getMethod());
+        $this->assertSame('/users/user/images/imageId/metadata', $this->history[2]['request']->getUri()->getPath());
+        $this->assertSame('publicKey=publicKey&accessToken=78ed8225148fb3cc09d61ccd133831ef36e4bbd8ee757d6ff1378c65067d7775', $this->history[2]['request']->getUri()->getQuery());
+
+        $this->assertSame('HEAD', $this->history[3]['request']->getMethod());
+        $this->assertSame('/users/user/images/imageId/metadata', $this->history[3]['request']->getUri()->getPath());
+        $this->assertSame('publicKey=publicKey&accessToken=78ed8225148fb3cc09d61ccd133831ef36e4bbd8ee757d6ff1378c65067d7775', $this->history[3]['request']->getUri()->getQuery());
     }
 }

@@ -15,6 +15,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 use Behat\Gherkin\Node\TableNode;
@@ -916,14 +917,17 @@ class FeatureContext extends ApiContext {
      * @When I request:
      */
     public function requestPaths(TableNode $table) {
+        // Store these as they need to be reset bewteen each run for all requests to have the same
+        // starting point
+        $originalRequest = clone $this->request;
+        $originalRequestOptions = $this->requestOptions;
+
         foreach ($table as $row) {
-            foreach (['path', 'method'] as $key) {
-                if (!isset($row[$key])) {
-                    throw new InvalidArgumentException(sprintf('Table is missing "%s" key.', $key));
-                }
+            if (empty($row['path'])) {
+                throw new InvalidArgumentException('Missing or empty "path" key.');
             }
 
-            $method = $row['method'] ?: 'GET';
+            $method = !empty($row['method']) ? $row['method'] : 'GET';
             $path = $row['path'];
 
             if (!empty($row['transformation'])) {
@@ -962,6 +966,10 @@ class FeatureContext extends ApiContext {
             } else {
                 $this->requestPath($path, $method);
             }
+
+            // Reset the request and request options between every run
+            $this->request = $originalRequest;
+            $this->requestOptions = $originalRequestOptions;
         }
 
         return $this;
