@@ -38,7 +38,7 @@ Feature: Imbo enables caching of transformations
         When I request:
             | path                   | transformation                   | extension | method | access token |
             | previously added image | crop:width=50,height=60,x=1,y=10 | jpg       | GET    | yes          |
-            | previously added image |                                  | jpg       | GET    | yes          |
+            | previously added image | crop:width=50,height=60,x=1,y=10 | jpg       | GET    | yes          |
 
         Then the last 2 responses match:
             | response | status line | header name                | header value | image width | image height |
