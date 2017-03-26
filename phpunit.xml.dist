@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit colors="false" bootstrap="bootstrap.php">
+<phpunit colors="false" bootstrap="tests/phpunit/bootstrap.php">
   <testsuites>
     <testsuite name="imbo-unit">
-      <directory>unit</directory>
+      <directory>tests/phpunit/unit</directory>
     </testsuite>
     <testsuite name="imbo-integration">
-      <directory>integration</directory>
+      <directory>tests/phpunit/integration</directory>
     </testsuite>
   </testsuites>
 
@@ -22,6 +22,18 @@
     <var name="BACKBLAZE_B2_BUCKET" value="" />
     <var name="BACKBLAZE_B2_BUCKET_ID" value="" />
   </php>
+
+  <filter>
+    <whitelist addUncoveredFilesFromWhitelist="true">
+      <directory suffix=".php">src</directory>
+      <file>tests/behat/features/bootstrap/FeatureContext.php</file>
+      <exclude>
+        <directory suffix="Interface.php">src</directory>
+        <file>src/Exception.php</file>
+        <file>src/Version.php</file>
+      </exclude>
+    </whitelist>
+  </filter>
 
   <groups>
     <exclude>
