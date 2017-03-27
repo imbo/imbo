@@ -54,6 +54,10 @@ class Watermark extends Transformation implements InputSizeConstraint {
      * - "top-right": Places the watermark in the top right corner
      * - "bottom-left": Places the watermark in the bottom left corner
      * - "bottom-right": Places the watermark in the bottom right corner
+     * - "bottom": Places the watermark in the bottom center
+     * - "top": Places the watermark in the top center
+     * - "right": Places the watermark in the right center
+     * - "left": Places the watermark in the left center
      * - "center": Places the watermark in the center of the image
      *
      * @var string
@@ -156,6 +160,16 @@ class Watermark extends Transformation implements InputSizeConstraint {
             $y = $image->getHeight() - $height + $y;
         } else if ($position === 'center') {
             $x = ($image->getWidth() / 2) - ($width / 2) + $x;
+            $y = ($image->getHeight() / 2) - ($height / 2) + $y;
+        } else if ($position === 'bottom') {
+            $x = ($image->getWidth() / 2) - ($width / 2) + $x;
+            $y = $image->getHeight() - $height + $y;
+        } else if ($position === 'top') {
+            $x = ($image->getWidth() / 2) - ($width / 2) + $x;
+        } else if ($position === 'left') {
+            $y = ($image->getHeight() / 2) - ($height / 2) + $y;
+        } else if ($position === 'right') {
+            $x = $image->getWidth() - $width + $x;
             $y = ($image->getHeight() / 2) - ($height / 2) + $y;
         }
 
