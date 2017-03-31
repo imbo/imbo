@@ -81,6 +81,7 @@
       "mkdir build/docs"
     ],
     "test-phpunit": "vendor/bin/phpunit --verbose",
+    "test-phpunit-coverage": "vendor/bin/phpunit --verbose --coverage-html build/coverage",
     "test-behat": "vendor/bin/behat --strict",
     "test": [
       "@test-phpunit",
