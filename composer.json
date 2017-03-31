@@ -78,9 +78,7 @@
       "mkdir build",
       "mkdir build/coverage",
       "mkdir build/logs",
-      "mkdir build/docs",
-      "mkdir build/code-browser",
-      "mkdir build/pdepend"
+      "mkdir build/docs"
     ],
     "test-phpunit": "vendor/bin/phpunit --verbose",
     "test-behat": "vendor/bin/behat --strict",
