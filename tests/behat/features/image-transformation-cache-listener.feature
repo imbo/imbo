@@ -14,7 +14,7 @@ Feature: Imbo enables caching of transformations
             | previously added image | jpg       | GET    | yes          |
             | previously added image | jpg       | GET    | yes          |
 
-        Then the last 2 responses match:
+        Then the last responses match:
             | response | status line | header name                | header value |
             | 1        | 200 OK      | content-type               | image/jpeg   |
             | 1        |             | X-Imbo-TransformationCache | Miss         |
@@ -27,7 +27,7 @@ Feature: Imbo enables caching of transformations
             | previously added image | png       | GET    | yes          |
             | previously added image | png       | GET    | yes          |
 
-        Then the last 2 responses match:
+        Then the last responses match:
             | response | status line | header name                | header value | checksum                         |
             | 1        | 200 OK      | content-type               | image/png    | fc7d2d06993047a0b5056e8fac4462a2 |
             | 1        |             | X-Imbo-TransformationCache | Miss         |                                  |
@@ -40,7 +40,7 @@ Feature: Imbo enables caching of transformations
             | previously added image | crop:width=50,height=60,x=1,y=10 | jpg       | GET    | yes          |
             | previously added image | crop:width=50,height=60,x=1,y=10 | jpg       | GET    | yes          |
 
-        Then the last 2 responses match:
+        Then the last responses match:
             | response | status line | header name                | header value | image width | image height |
             | 1        | 200 OK      | content-type               | image/jpeg   | 50          | 60           |
             | 1        |             | X-Imbo-TransformationCache | Miss         |             |              |
@@ -55,7 +55,7 @@ Feature: Imbo enables caching of transformations
             | previously added image |           | DELETE | yes          |              |
             | previously added image | jpg       | GET    |              | yes          |
 
-        Then the last 4 responses match:
+        Then the last responses match:
             | response | status line         | header name                | header value |
             | 1        | 200 OK              | content-type               | image/jpeg   |
             | 1        |                     | X-Imbo-TransformationCache | Miss         |

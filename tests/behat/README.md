@@ -59,7 +59,7 @@ Then the response has a :directive cache-control directive
 Then the response does not have a :directive cache-control directive
 Then the last :num :headerName response headers are the same
 Then the last :num :headerName response headers are not the same
-Then the last :num responses match: <TableNode>
+Then the last responses match: <TableNode>
 Then the image should not have any :prefix properties
 Then the response body size is :expectedSize
 ```

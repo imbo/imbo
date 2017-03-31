@@ -2076,4 +2076,685 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
             ->requestPath('/path')
             ->assertImagePixelAlpha('1, 1', '1');
     }
+
+    /**
+     * @covers ::assertAclRuleWithIdDoesNotExist
+     * @expectedException Assert\InvalidArgumentException
+     * @expectedExceptionMessage ACL rule "someId" with public key "publicKey" still exists. Expected "404 Access rule not found", got "200 OK".
+     */
+    public function testThrowsExceptionWhenAssertingThatAclRuleWithIdDoesNotExistWhenItDoesExist() {
+        $this->mockHandler->append(new Response(200, [], '', '1.1', 'OK'));
+        $this->context->assertAclRuleWithIdDoesNotExist('publicKey', 'someId');
+    }
+
+    /**
+     * @covers ::assertAclRuleWithIdDoesNotExist
+     */
+    public function testCanAssertThatAclRuleWithIdDoesNotExist() {
+        $this->mockHandler->append(new Response(404, [], '', '1.1', 'Access rule not found'));
+        $this->assertSame(
+            $this->context,
+            $this->context->assertAclRuleWithIdDoesNotExist('publicKey', 'someId')
+        );
+
+        $this->assertCount(
+            1,
+            $this->history,
+            sprintf('Expected exactly 1 request, got %d.', count($this->history))
+        );
+
+        $this->assertSame(
+            '/keys/publicKey/access/someId',
+            $this->history[0]['request']->getUri()->getPath()
+        );
+    }
+
+    /**
+     * @covers ::assertPublicKeyDoesNotExist
+     * @expectedException Assert\InvalidArgumentException
+     * @expectedExceptionMessage Public key "publicKey" still exists. Expected "404 Public key not found", got "200 OK".
+     */
+    public function testThrowsExceptionWhenAssertingThatPublicKeyDoesNotExistWhenItDoes() {
+        $this->mockHandler->append(new Response(200, [], '', '1.1', 'OK'));
+        $this->context->assertPublicKeyDoesNotExist('publicKey');
+    }
+
+    /**
+     * @covers ::assertPublicKeyDoesNotExist
+     */
+    public function testCanAssertThatPublicKeyDoesNotExist() {
+        $this->mockHandler->append(new Response(404, [], '', '1.1', 'Public key not found'));
+        $this->assertSame(
+            $this->context,
+            $this->context->assertPublicKeyDoesNotExist('publicKey', 'someId')
+        );
+
+        $this->assertCount(
+            1,
+            $this->history,
+            sprintf('Expected exactly 1 request, got %d.', count($this->history))
+        );
+
+        $this->assertSame('/keys/publicKey', $this->history[0]['request']->getUri()->getPath());
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getCacheabilityData() {
+        return [
+            'cacheable, expect cacheable' => [
+                'cacheable' => true,
+                'expected' => true,
+            ],
+            'not cacheable, expect not cacheable' => [
+                'cacheable' => false,
+                'expected' => false,
+            ],
+            'cacheable, expect not cacheable' => [
+                'cacheable' => true,
+                'expected' => false,
+                'exceptionMessage' => 'Response was not supposed to be cacheable, but it is.',
+            ],
+            'not cacheable, expect cacheable' => [
+                'cacheable' => false,
+                'expected' => true,
+                'exceptionMessage' => 'Response was supposed to be cacheble, but it\'s not.',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getCacheabilityData
+     * @covers ::__construct
+     * @covers ::assertCacheability
+     * @param boolean $actual
+     * @param boolean $expected
+     * @param string $exceptionMessage
+     */
+    public function testCanAssertResponseCacheability($actual, $expected, $exceptionMessage = null) {
+        $this->cacheUtil
+            ->expects($this->once())
+            ->method('isCacheable')
+            ->with($this->isInstanceOf('GuzzleHttp\Psr7\Response'))
+            ->will($this->returnValue($actual));
+
+        $this->mockHandler->append(new Response(200));
+        $this->context->requestPath('/path');
+
+        if ($exceptionMessage) {
+            $this->expectException('Assert\InvalidArgumentException');
+            $this->expectExceptionMessage($exceptionMessage);
+            $this->context->assertCacheability($expected);
+        } else {
+            $this->assertSame(
+                $this->context,
+                $this->context->assertCacheability($expected)
+            );
+        }
+    }
+
+    /**
+     * @covers ::assertMaxAge
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Response does not have a cache-control header.
+     */
+    public function testThrowsExceptionWhenAssertingMaxAgeAndResponseDoesNotHaveCacheControlHeader() {
+        $this->mockHandler->append(new Response(200));
+        $this->context
+            ->requestPath('/path')
+            ->assertMaxAge(123);
+    }
+
+    /**
+     * @covers ::assertMaxAge
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Response cache-control header does not include a max-age directive: "private".
+     */
+    public function testThrowsExceptionWhenAssertingMaxAgeAndResponseCacheControlHeaderDoesNotHaveMaxAgeDirective() {
+        $this->mockHandler->append(new Response(200, ['cache-control' => 'private']));
+        $this->context
+            ->requestPath('/path')
+            ->assertMaxAge(123);
+    }
+
+    /**
+     * @covers ::assertMaxAge
+     */
+    public function testCanAssertResponseMaxAge() {
+        $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=600']));
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertMaxAge(600)
+        );
+    }
+
+    /**
+     * @covers ::assertMaxAge
+     * @expectedException Assert\InvalidArgumentException
+     * @expectedExceptionMessage The max-age directive in the cache-control header is not correct. Expected 123, got 456. Complete cache-control header: "private, max-age=456".
+     */
+    public function testAssertingResponseMaxAgeCanFail() {
+        $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=456']));
+        $this->context
+            ->requestPath('/path')
+            ->assertMaxAge(123);
+    }
+
+    /**
+     * @covers ::assertResponseHasCacheControlDirective
+     */
+    public function testCanAssertThatASpecificCacheControlDirectiveExists() {
+        $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=600, must-revalidate']));
+        $this->context->requestPath('/path');
+        foreach (['private', 'max-age', 'must-revalidate'] as $directive) {
+            $this->assertSame(
+                $this->context,
+                $this->context
+                    ->assertResponseHasCacheControlDirective($directive)
+            );
+        }
+    }
+
+    /**
+     * @covers ::assertResponseHasCacheControlDirective
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Response does not have a cache-control header.
+     */
+    public function testThrowsExceptionWhenAssertingCacheControlHeaderDirectiveWhenResponseDoesNotHaveACacheControlHeader() {
+        $this->mockHandler->append(new Response(200));
+        $this->context
+            ->requestPath('/path')
+            ->assertResponseHasCacheControlDirective('must-revalidate');
+    }
+
+    /**
+     * @covers ::assertResponseHasCacheControlDirective
+     * @expectedException Assert\InvalidArgumentException
+     * @expectedExceptionMessage The cache-control header does not contain the "must-revalidate" directive. Complete cache-control header: "private, max-age=600".
+     */
+    public function testThrowsExceptionWhenAssertingThatACacheControlDirectiveExistsWhenItDoesNot() {
+        $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=600']));
+        $this->context
+            ->requestPath('/path')
+            ->assertResponseHasCacheControlDirective('must-revalidate');
+    }
+
+    /**
+     * @covers ::assertResponseDoesNotHaveCacheControlDirective
+     */
+    public function testCanAssertThatASpecificCacheControlDirectiveDoesNotExists() {
+        $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=600, must-revalidate']));
+        $this->context->requestPath('/path');
+        foreach (['public', 'no-cache', 'no-store'] as $directive) {
+            $this->assertSame(
+                $this->context,
+                $this->context
+                    ->assertResponseDoesNotHaveCacheControlDirective($directive)
+            );
+        }
+    }
+
+    /**
+     * @covers ::assertResponseDoesNotHaveCacheControlDirective
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Response does not have a cache-control header.
+     */
+    public function testThrowsExceptionWhenAssertingResponseDoesNotHaveCacheControlHeaderDirectiveWhenResponseDoesNotHaveACacheControlHeader() {
+        $this->mockHandler->append(new Response(200));
+        $this->context
+            ->requestPath('/path')
+            ->assertResponseDoesNotHaveCacheControlDirective('must-revalidate');
+    }
+
+    /**
+     * @covers ::assertResponseDoesNotHaveCacheControlDirective
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage The cache-control header contains the "max-age" directive when it should not. Complete cache-control header: "private, max-age=600, must-revalidate".
+     */
+    public function testThrowsExceptionWhenAssertingThatACacheControlDirectiveDoesNotExistWhenItDoes() {
+        $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=600, must-revalidate']));
+        $this->context
+            ->requestPath('/path')
+            ->assertResponseDoesNotHaveCacheControlDirective('max-age');
+    }
+
+    /**
+     * @covers ::assertLastResponseHeaders
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Need to compare at least 2 responses.
+     */
+    public function testThrowsExceptionWhenAssertingTheLastResponseHeadersAndOnlyOneResponseExist() {
+        $this->mockHandler->append(new Response(200));
+        $this->context
+            ->requestPath('/path')
+            ->assertLastResponseHeaders(1, 'content-length');
+    }
+
+    /**
+     * @covers ::assertLastResponseHeaders
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Not enough responses in the history. Need at least 4, there are currently 2.
+     */
+    public function testThrowsExceptionWhenAssertingTheLastResponseHeadersAndThereIsNotEnoughResponses() {
+        $this->mockHandler->append(new Response(200), new Response(200));
+        $this->context
+            ->requestPath('/path')
+            ->requestPath('/anotherPath')
+            ->assertLastResponseHeaders(4, 'content-length');
+    }
+
+    /**
+     * @covers ::assertLastResponseHeaders
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage The "content-length" header is not present in all of the last 3 response headers.
+     */
+    public function testThrowsExceptionWhenAssertingLastResponseHeadersAndHeaderIsNotPresentInAllResponses() {
+        $this->mockHandler->append(
+            new Response(200, ['content-length' => 123]),
+            new Response(200, ['content-length' => 123]),
+            new Response(200)
+        );
+        $this->context
+            ->requestPath('/path1')
+            ->requestPath('/path2')
+            ->requestPath('/path3')
+            ->assertLastResponseHeaders(3, 'content-length');
+    }
+
+    /**
+     * @covers ::assertLastResponseHeaders
+     */
+    public function testCanAssertLastResponesHeadersForUniqueness() {
+        $this->mockHandler->append(
+            new Response(200, ['content-length' => 123]),
+            new Response(200, ['content-length' => 456]),
+            new Response(200, ['content-length' => 789])
+        );
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path1')
+                ->requestPath('/path2')
+                ->requestPath('/path3')
+                ->assertLastResponseHeaders(3, 'content-length', true)
+        );
+    }
+
+    /**
+     * @covers ::assertLastResponseHeaders
+     */
+    public function testCanAssertLastResponesHeadersForNonUniqueness() {
+        $this->mockHandler->append(
+            new Response(200, ['content-length' => 123]),
+            new Response(200, ['content-length' => 123]),
+            new Response(200, ['content-length' => 123])
+        );
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path1')
+                ->requestPath('/path2')
+                ->requestPath('/path3')
+                ->assertLastResponseHeaders(3, 'content-length')
+        );
+    }
+
+    /**
+     * @covers ::assertLastResponseHeaders
+     * @expectedException Assert\InvalidArgumentException
+     * @expectedExceptionMessage Expected 3 unique values, got 2. Values compared:
+     */
+    public function testCanAssertingLastResponesHeadersForUniquenessCanFail() {
+        $this->mockHandler->append(
+            new Response(200, ['content-length' => 123]),
+            new Response(200, ['content-length' => 456]),
+            new Response(200, ['content-length' => 456])
+        );
+        $this->context
+            ->requestPath('/path1')
+            ->requestPath('/path2')
+            ->requestPath('/path3')
+            ->assertLastResponseHeaders(3, 'content-length', true);
+    }
+
+    /**
+     * @covers ::assertLastResponseHeaders
+     * @expectedException Assert\InvalidArgumentException
+     * @expectedExceptionMessage Expected all values to be the same. Values compared:
+     */
+    public function testCanAssertingLastResponesHeadersForNonUniquenessCanFail() {
+        $this->mockHandler->append(
+            new Response(200, ['content-length' => 123]),
+            new Response(200, ['content-length' => 123]),
+            new Response(200, ['content-length' => 456])
+        );
+        $this->context
+            ->requestPath('/path1')
+            ->requestPath('/path2')
+            ->requestPath('/path3')
+            ->assertLastResponseHeaders(3, 'content-length');
+    }
+
+    /**
+     * @covers ::assertResponseBodySize
+     */
+    public function testCanAssertResponseBodySize() {
+        $this->mockHandler->append(new Response(200, [], 'some string'));
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertResponseBodySize(11)
+        );
+    }
+
+    /**
+     * @covers ::assertResponseBodySize
+     * @expectedException Assert\InvalidArgumentException
+     * @expectedExceptionMessage Expected response body size: 123, actual: 11.
+     */
+    public function testAssertingResponseBodySizeCanFail() {
+        $this->mockHandler->append(new Response(200, [], 'some string'));
+        $this->context
+            ->requestPath('/path')
+            ->assertResponseBodySize(123);
+    }
+
+    /**
+     * @covers ::assertLastResponsesMatch
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Missing response column
+     */
+    public function testThrowsExceptionWhenMatchingResponsesWithNoResponseKeyInTable() {
+        $this->context->assertLastResponsesMatch(new TableNode([['num'], ['3']]));
+    }
+
+    /**
+     * @covers ::assertLastResponsesMatch
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Not enough transactions in the history. Needs at least 3, actual: 2.
+     */
+    public function testThrowsExceptionWhenMatchingMoreResponsesThanWhatIsPresentInTheHistory() {
+        $this->mockHandler->append(new Response(200), new Response(200));
+        $this->context
+            ->requestPath('/path')
+            ->requestPath('/path')
+            ->assertLastResponsesMatch(new TableNode([
+                ['response'],
+                ['3'],
+            ]));
+    }
+
+    /**
+     * @covers ::assertLastResponsesMatch
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Each row must refer to a response by using the "response" column.
+     */
+    public function testThrowsExceptionWhenMatchingResponsesAndARowIsMissingResponseNumber() {
+        $this->mockHandler->append(new Response(200), new Response(200));
+        $this->context
+            ->requestPath('/path')
+            ->requestPath('/path')
+            ->assertLastResponsesMatch(new TableNode([
+                ['response'],
+                ['1'],
+                [''],
+            ]));
+    }
+
+    /**
+     * @covers ::assertLastResponsesMatch
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Invalid column name: "foobar".
+     */
+    public function testThrowsExceptionWhenMatchingResponsesAndAnInvalidColumnIsUsed() {
+        $this->mockHandler->append(new Response(200));
+        $this->context
+            ->requestPath('/path')
+            ->assertLastResponsesMatch(new TableNode([
+                ['response', 'foobar'],
+                ['1',        'baz'   ],
+            ]));
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForMatchingSeveralResponses() {
+        return [
+            'status line' => [
+                'responses' => [
+                    new Response(200),
+                    new Response(204),
+                    new Response(404),
+                    new Response(500),
+                ],
+                'match' => new TableNode([
+                    ['response', 'status line'              ],
+                    ['1',        '200 OK'                   ],
+                    ['2',        '204 No Content'           ],
+                    ['3',        '404 Not Found'            ],
+                    ['4',        '500 Internal Server Error'],
+                ]),
+            ],
+            'headers' => [
+                'responses' => [
+                    new Response(200, [
+                        'content-type' => 'application/json',
+                        'content-length' => 13,
+                    ], '{"foo":"bar"}'),
+                    new Response(200, [
+                        'x-imbo-foo' => 'bar',
+                    ], '{"foo":"bar"}'),
+                ],
+                'match' => new TableNode([
+                    ['response', 'header name',    'header value'    ],
+                    ['1',        'content-type',   'application/json'],
+                    ['1',        'content-length', '13'              ],
+                    ['2',        'x-imbo-foo',     'bar'             ],
+                ]),
+            ],
+            'checksum' => [
+                'responses' => [
+                    new Response(200, [], '{"foo":"bar"}'),
+                    new Response(200, [], '{"bar":"foo"}'),
+                ],
+                'match' => new TableNode([
+                    ['response', 'checksum'                        ],
+                    ['1',        '9bb58f26192e4ba00f01e2e7b136bbd8'],
+                    ['2',        'e561e07998cff8eca9f3acc8a2fdb12f'],
+                ]),
+            ],
+            'image width / height' => [
+                'responses' => [
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png'))
+                ],
+                'match' => new TableNode([
+                    ['response', 'image width', 'image height'],
+                    ['1',        1024,          256           ],
+                    ['2',        256,           1024          ],
+                ]),
+            ],
+            'body is' => [
+                'responses' => [
+                    new Response(200, [], '{"foo":"bar"}'),
+                    new Response(200, [], '{"bar":"foo"}'),
+                ],
+                'match' => new TableNode([
+                    ['response', 'body is'      ],
+                    ['1',        '{"foo":"bar"}'],
+                    ['2',        '{"bar":"foo"}'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForMatchingSeveralResponses
+     * @covers ::assertLastResponsesMatch
+     * @param Response[] $responses
+     * @param TableNode $table
+     */
+    public function testCanMatchResponses(array $responses, TableNode $table) {
+        $this->mockHandler->append(...$responses);
+
+        for ($i = 0; $i < count($responses); $i++) {
+            $this->context->requestPath('/path');
+        }
+
+        $this->assertSame(
+            $this->context,
+            $this->context->assertLastResponsesMatch($table)
+        );
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getDataForMatchingSeveralResponsesWhenFailing() {
+        return [
+            'status line' => [
+                'responses' => [
+                    new Response(200),
+                    new Response(201),
+                ],
+                'match' => new TableNode([
+                    ['response', 'status line'   ],
+                    ['1',        '200 OK'        ],
+                    ['2',        '204 No Content'],
+                ]),
+                'exceptionMessage' => 'Incorrect status line in response 2, expected "204 No Content", got: "201 Created".',
+            ],
+            'headers' => [
+                'responses' => [
+                    new Response(200, [
+                        'content-type' => 'application/json',
+                    ], '{"foo":"bar"}'),
+                    new Response(200, [
+                        'x-imbo-foo' => 'bar',
+                    ], '{"foo":"bar"}'),
+                ],
+                'match' => new TableNode([
+                    ['response', 'header name',    'header value'    ],
+                    ['1',        'content-type',   'application/json'],
+                    ['2',        'x-imbo-foo',     'foobar'          ],
+                ]),
+                'exceptionMessage' => 'Incorrect "x-imbo-foo" header value in response 2, expected "foobar", got: "bar".',
+            ],
+            'checksum' => [
+                'responses' => [
+                    new Response(200, [], '{"foo":"bar"}'),
+                    new Response(200, [], '{"bar":"foo"}'),
+                ],
+                'match' => new TableNode([
+                    ['response', 'checksum'                        ],
+                    ['1',        '9bb58f26192e4ba00f01e2e7b136bbd8'],
+                    ['2',        '9bb58f26192e4ba00f01e2e7b136bbd8'],
+                ]),
+                'exceptionMessage' => 'Incorrect checksum in response 2, expected "9bb58f26192e4ba00f01e2e7b136bbd8", got: "e561e07998cff8eca9f3acc8a2fdb12f".',
+            ],
+            'image width / height (failure on width)' => [
+                'responses' => [
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png'))
+                ],
+                'match' => new TableNode([
+                    ['response', 'image width', 'image height'],
+                    ['1',        1024,          256           ],
+                    ['2',        255,           1024          ],
+                ]),
+                'exceptionMessage' => 'Expected image in response 2 to be 255 pixel(s) wide, actual: 256.',
+            ],
+            'image width / height (failure on height)' => [
+                'responses' => [
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png'))
+                ],
+                'match' => new TableNode([
+                    ['response', 'image width', 'image height'],
+                    ['1',        1024,          256           ],
+                    ['2',        256,           1023          ],
+                ]),
+                'exceptionMessage' => 'Expected image in response 2 to be 1023 pixel(s) high, actual: 1024.',
+            ],
+            'body is' => [
+                'responses' => [
+                    new Response(200, [], '{"foo":"bar"}'),
+                    new Response(200, [], '{"bar":"foo"}'),
+                ],
+                'match' => new TableNode([
+                    ['response', 'body is'         ],
+                    ['1',        '{"foo":"bar"}'   ],
+                    ['2',        '{"bar":"foobar"}'],
+                ]),
+                'exceptionMessage' => 'Incorrect response body for request 2, expected "{"bar":"foobar"}", got: "{"bar":"foo"}".',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForMatchingSeveralResponsesWhenFailing
+     * @covers ::assertLastResponsesMatch
+     * @expectedException Assert\InvalidArgumentException
+     * @param Response[] $responses
+     * @param TableNode $table
+     * @param string $exceptionMessage
+     */
+    public function testAssertLastResponsesMatchCanFail(array $responses, TableNode $table, $exceptionMessage) {
+        $this->mockHandler->append(...$responses);
+
+        for ($i = 0; $i < count($responses); $i++) {
+            $this->context->requestPath('/path');
+        }
+
+        $this->expectExceptionMessage($exceptionMessage);
+        $this->context->assertLastResponsesMatch($table);
+    }
+
+    /**
+     * @covers ::assertImageProperties
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Imagick could not read response body: "no decode delegate for this image format
+     */
+    public function testThrowsExceptionWhenAssertingImagePropertiesAndResponseDoesNotContainAValidImage() {
+        $this->mockHandler->append(new Response(200, [], 'foobar'));
+        $this->context
+            ->requestPath('/path')
+            ->assertImageProperties('prefix');
+    }
+
+    /**
+     * @covers ::assertImageProperties
+     */
+    public function testCanAssertThatImageDoesNotHaveAnyPropertiesWithASpecificPrefix() {
+        $this->mockHandler->append(new Response(200, [], file_get_contents(FIXTURES_DIR . '/image.png')));
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImageProperties('foobar')
+        );
+    }
+
+    /**
+     * @covers ::assertImageProperties
+     * @expectedException Imbo\BehatApiExtension\Exception\AssertionFailedException
+     * @expectedExceptionMessage Image properties have not been properly stripped. Did not expect properties that starts with "png", found: "png:
+     */
+    public function testAssertingThatImageDoesNotHaveAnyPropertiesWithASpecificPrefixCanFail() {
+        $this->mockHandler->append(new Response(200, [], file_get_contents(FIXTURES_DIR . '/image.png')));
+        $this->context
+            ->requestPath('/path')
+            ->assertImageProperties('png');
+    }
 }

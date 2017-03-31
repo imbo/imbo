@@ -114,9 +114,11 @@ class FeatureContext extends ApiContext {
      * @param CacheUtil $cacheUtil
      */
     public function __construct(CacheUtil $cacheUtil = null) {
+        // @codeCoverageIgnoreStart
         if ($cacheUtil === null) {
             $cacheUtil = new CacheUtil();
         }
+        // @codeCoverageIgnoreEnd
 
         $this->cacheUtil = $cacheUtil;
     }
@@ -577,6 +579,7 @@ class FeatureContext extends ApiContext {
      *                                  does not return an array.
      * @return self
      *
+     * @codeCoverageIgnore
      * @Given I prime the database with :fixture
      */
     public function primeDatabase($fixture) {
@@ -736,7 +739,7 @@ class FeatureContext extends ApiContext {
         }
 
         $imageIdentifier = $this->imageIdentifiers[$path];
-        $user = $this->getImboUserByLocalImagePath($path);
+        $user = explode('/', ltrim($this->imageUrls[$path], '/'))[1];
         $params = array_merge(json_decode((string) $params, true), [
             'imageIdentifier' => $imageIdentifier,
         ]);
@@ -1201,7 +1204,7 @@ class FeatureContext extends ApiContext {
      *
      * @Then the ACL rule under public key :publicKey with ID :aclId no longer exists
      */
-    public function aclRuleWithIdShouldNotExist($publicKey, $aclId) {
+    public function assertAclRuleWithIdDoesNotExist($publicKey, $aclId) {
         // Append an access token with the current public / private keys, and request the given
         // ACL rule
         $this
@@ -1219,7 +1222,9 @@ class FeatureContext extends ApiContext {
             $expectedStatusLine,
             $actualStatusLine,
             sprintf(
-                'ACL rule still exists. Expected "%s", got "%s".',
+                'ACL rule "%s" with public key "%s" still exists. Expected "%s", got "%s".',
+                $aclId,
+                $publicKey,
                 $expectedStatusLine,
                 $actualStatusLine
             )
@@ -1254,7 +1259,8 @@ class FeatureContext extends ApiContext {
             $expectedStatusLine,
             $actualStatusLine,
             sprintf(
-                'Public key still exists. Expected "%s", got "%s".',
+                'Public key "%s" still exists. Expected "%s", got "%s".',
+                $publicKey,
                 $expectedStatusLine,
                 $actualStatusLine
             )
@@ -1409,12 +1415,12 @@ class FeatureContext extends ApiContext {
      *
      * @Then /^the last ([\d]+) "([^"]+)" response headers are (not )?the same$/
      */
-    public function assertLastResponseHeadersAreNotTheSame($num, $header, $unique = false) {
+    public function assertLastResponseHeaders($num, $header, $unique = false) {
         $num = (int) $num;
 
         if ($num < 2) {
             throw new InvalidArgumentException(sprintf(
-                'Need to compare at least 2 responses, got %d.',
+                'Need to compare at least 2 responses.',
                 $num
             ));
         }
@@ -1486,19 +1492,26 @@ class FeatureContext extends ApiContext {
      * - (int) image width: Match the width of the image in the request with this value
      * - (int) image height: Match the height of the image in the reqeust with this value
      *
-     * @param int $num The number of responses to match
      * @param TableNode $table The data to match against
-     * @throws RuntimeException|InvalidArgumentException|OutOfBoundsException
+     * @throws RuntimeException|InvalidArgumentException
      * @return self
      *
-     * @Then the last :num responses match:
+     * @Then the last responses match:
      */
-    public function theLastResponsesMatch($num, TableNode $table) {
-        $num = (int) $num;
+    public function assertLastResponsesMatch(TableNode $table) {
+        $num = array_map(function($num) {
+            return (int) $num;
+        }, array_column($table->getColumnsHash(), 'response'));
+
+        if (!$num) {
+            throw new InvalidArgumentException('Missing response column');
+        }
+
+        $num = max($num);
 
         if (count($this->history) < $num) {
             throw new RuntimeException(sprintf(
-                'Not enough requests in the history. Needs at least %d, actual: %d.',
+                'Not enough transactions in the history. Needs at least %d, actual: %d.',
                 $num,
                 count($this->history))
             );
@@ -1521,32 +1534,23 @@ class FeatureContext extends ApiContext {
             'image height',
         ];
 
-        foreach ($table as $i => $row) {
-            foreach (array_keys($row) as $key) {
-                if (!in_array($key, $validKeys)) {
-                    throw new InvalidArgumentException(sprintf(
-                        'Found invalid key in row %d: "%s".',
-                        $i + 1,
-                        $key
-                    ));
-                }
+        foreach (array_keys($table->getColumnsHash()[0]) as $column) {
+            if (!in_array($column, $validKeys)) {
+                throw new InvalidArgumentException(sprintf(
+                    'Invalid column name: "%s".',
+                    $column
+                ));
             }
+        }
 
-            if (!isset($row['response']) || empty($row['response'])) {
+        foreach ($table as $i => $row) {
+            if (empty($row['response'])) {
                 throw new InvalidArgumentException(
                     'Each row must refer to a response by using the "response" column.'
                 );
             }
 
             $index = $row['response'] - 1;
-
-            if (!isset($responses[$index])) {
-                throw new OutOfBoundsException(sprintf(
-                    'Invalid response number: %d.',
-                    $row['response']
-                ));
-            }
-
             $response = $responses[$index];
 
             if (!empty($row['status line'])) {
@@ -1604,7 +1608,7 @@ class FeatureContext extends ApiContext {
             }
 
             if (!empty($row['image width']) || !empty($row['image height'])) {
-                list($actualWidth, $actualHeight) = getimagesizefromstring((string) $this->response->getBody());
+                list($actualWidth, $actualHeight) = getimagesizefromstring((string) $response->getBody());
 
                 if (!empty($row['image width'])) {
                     Assertion::same(
@@ -1654,14 +1658,22 @@ class FeatureContext extends ApiContext {
      * Assert that the image does not have any properties with a specific prefix
      *
      * @param string $prefix
-     * @throws AssertionFailedException
+     * @throws AssertionFailedException|RuntimeException
      * @return self
      *
      * @Then the image should not have any :prefix properties
      */
     public function assertImageProperties($prefix) {
         $imagick = new Imagick();
-        $imagick->readImageBlob((string) $this->response->getBody());
+
+        try {
+            $imagick->readImageBlob((string) $this->response->getBody());
+        } catch (ImagickException $e) {
+            throw new RuntimeException(sprintf(
+                'Imagick could not read response body: "%s".',
+                $e->getMessage()
+            ));
+        }
 
         foreach ($imagick->getImageProperties() as $key => $value) {
             if (strpos($key, $prefix) === 0) {
@@ -1690,7 +1702,7 @@ class FeatureContext extends ApiContext {
         Assertion::same(
             $actualSize = strlen((string) $this->response->getBody()),
             (int) $expectedSize,
-            sprintf('Expected response body size: %d, actual: %d', $expectedSize, $actualSize)
+            sprintf('Expected response body size: %d, actual: %d.', $expectedSize, $actualSize)
         );
 
         return $this;
@@ -1737,23 +1749,6 @@ class FeatureContext extends ApiContext {
             'color' => $hexColor,
             'alpha' => (float) $pixel->getColorValue(Imagick::COLOR_ALPHA),
         ];
-    }
-
-    /**
-     * Get the Imbo user based on a local file path that have been added to Imbo
-     *
-     * @param string $localPath
-     * @throws InvalidArgumentException
-     * @return string
-     */
-    private function getImboUserByLocalImagePath($localPath) {
-        if (!isset($this->imageUrls[$localPath])) {
-            throw new InvalidArgumentException(sprintf(
-                'No image exists for path: "%s".', $localPath
-            ));
-        }
-
-        return explode('/', ltrim($this->imageUrls[$localPath], '/'))[1];
     }
 
     /**

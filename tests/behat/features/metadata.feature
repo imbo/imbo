@@ -24,7 +24,7 @@ Feature: Imbo provides a metadata endpoint
             | metadata of previously added image | PUT    |              | yes          | {"foo": {"bar": "value", "exif:foo": "value2"}}                                                                                                               |
             | metadata of previously added image | PUT    |              | yes          | {"html":"<div class=\"fat-text foo\">It's cool<!-- comment --></div>","json":"{\"foo\":\"bar\"}","norwegian":"\u00c5tte karer m\u00f8ter \u00e6rlige Erlend"} |
 
-        Then the last 13 responses match:
+        Then the last responses match:
             | response | status line                                                                 | body is                                                                                                                                                        | header name  | header value     |
             | 1        | 200 OK                                                                      | {}                                                                                                                                                             | Content-Type | application/json |
             | 2        | 200 OK                                                                      | {"foo":"bar"}                                                                                                                                                  | Content-Type | application/json |
