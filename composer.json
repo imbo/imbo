@@ -44,7 +44,7 @@
     "imbo/imbo-phpcs-standard": "^1.4",
     "phpdocumentor/phpdocumentor": "^2.9",
     "cwhite92/b2-sdk-php": "^1.2",
-    "imbo/behat-api-extension": "2.0.x-dev",
+    "imbo/behat-api-extension": "^2.0",
     "micheh/psr7-cache": "^0.5"
   },
   "suggest": {
