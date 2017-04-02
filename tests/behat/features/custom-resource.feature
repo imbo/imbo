@@ -7,7 +7,7 @@ Feature: Imbo supports custom resources
         Given the "Accept" request header is "application/json"
         And Imbo uses the "custom-routes-and-resources.php" configuration
         When I request "/custom/1234567"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """
@@ -17,7 +17,7 @@ Feature: Imbo supports custom resources
     Scenario: Request a custom route with a closure returning the resource in the configuration
         Given Imbo uses the "custom-routes-and-resources.php" configuration
         When I request "/custom.json"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """
@@ -27,7 +27,7 @@ Feature: Imbo supports custom resources
     Scenario: Request a custom route with a closure returning the resource in the configuration using PUT
         Given Imbo uses the "custom-routes-and-resources.php" configuration
         When I request "/custom.json" using HTTP "PUT"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
         And the response body is:
            """

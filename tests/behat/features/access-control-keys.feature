@@ -7,63 +7,100 @@ Feature: Imbo provides a keys endpoint
         Given Imbo uses the "access-control-mutable.php" configuration
         And I prime the database with "access-control-mutable.php"
 
-    Scenario Outline: Fetch access control rules for a public key
+    Scenario: Fetch access control rules for a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
-        And I include an access token in the query
-        When I request "/keys/master-pubkey/access.<extension>"
-        Then I should get a response with "200 OK"
-        And the "Content-Type" response header is "<content-type>"
-        And the response body matches:
-        """
-        <response>
-        """
-        Examples:
-            | extension | content-type     | response |
-            | json      | application/json | #^\[{"id":".*?","resources":\["keys\.put","keys\.head","keys\.delete","accessrule\.get","accessrule\.head","accessrule\.delete","accessrules\.get","accessrules\.head","accessrules\.post"],"users":\[]},{"id":".*?","group":"something","users":\["some-user"]}]$# |
+        And I include an access token in the query string
+        When I request "/keys/master-pubkey/access.json"
+        Then the response status line is "200 OK"
+        And the "Content-Type" response header is "application/json"
+        And the response body contains JSON:
+            """
+            [
+              {
+                "id": "@regExp(/[a-z0-9]+/)",
+                "resources":
+                [
+                  "keys.put",
+                  "keys.head",
+                  "keys.delete",
+                  "accessrule.get",
+                  "accessrule.head",
+                  "accessrule.delete",
+                  "accessrules.get",
+                  "accessrules.head",
+                  "accessrules.post"
+                ],
+                "users": "@arrayLength(0)"
+              },
+              {
+                "id": "@regExp(/[a-z0-9]+/)",
+                "group": "something",
+                "users":
+                [
+                  "some-user"
+                ]
+              }
+            ]
+            """
 
-    Scenario Outline: Fetch access control rules for a public key that has access to all users
+    Scenario: Fetch access control rules for a public key that has access to all users
         Given I use "master-pubkey" and "master-privkey" for public and private keys
-        And I include an access token in the query
-        When I request "/keys/wildcarded/access.<extension>"
-        Then I should get a response with "200 OK"
-        And the "Content-Type" response header is "<content-type>"
-        And the response body matches:
-        """
-        <response>
-        """
-        Examples:
-            | extension | content-type     | response |
-            | json      | application/json | #^\[{"id":".*?","group":"user-stats","users":"\*"}\]$# |
+        And I include an access token in the query string
+        When I request "/keys/wildcarded/access.json"
+        Then the response status line is "200 OK"
+        And the "Content-Type" response header is "application/json"
+        And the response body contains JSON:
+            """
+            [
+              {
+                "id": "@regExp(/[a-z0-9]+/)",
+                "group": "user-stats",
+                "users": "*"
+              }
+            ]
+            """
 
-    Scenario Outline: Fetch access control rules with expanded groups
+    Scenario: Fetch access control rules with expanded groups
         Given I use "master-pubkey" and "master-privkey" for public and private keys
-        And I include an access token in the query
-        When I request "/keys/group-based/access.<extension>?expandGroups=1"
-        Then I should get a response with "200 OK"
-        And the "Content-Type" response header is "<content-type>"
-        And the response body matches:
-        """
-        <response>
-        """
-        Examples:
-            | extension | content-type     | response |
-            | json      | application/json | #^\[{"id":".*?","group":"user-stats","users":\["user1"\],"resources":\["user\.get","user\.head"]}]$# |
+        Given I include an access token in the query string
+        When I request "/keys/group-based/access.json?expandGroups=1"
+        Then the response status line is "200 OK"
+        And the "Content-Type" response header is "application/json"
+        And the response body contains JSON:
+            """
+            [
+              {
+                "id": "@regExp(/[a-z0-9]+/)",
+                "group": "user-stats",
+                "users":
+                [
+                  "user1"
+                ],
+                "resources":
+                [
+                  "user.get",
+                  "user.head"
+                ]
+              }
+            ]
+            """
 
     Scenario: Create a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
-        And the request body contains:
-        """
-        {"privateKey":"the-private-key"}
-        """
         And I sign the request
+        And the request body is:
+            """
+            {"privateKey":"the-private-key"}
+            """
         When I request "/keys/the-public-key" using HTTP "PUT"
-        Then I should get a response with "201 Created"
+        Then the response status line is "201 Created"
 
     Scenario Outline: Check if a public key exist
         Given I use "acl-creator" and "someprivkey" for public and private keys
-        And I include an access token in the query
+        Given I include an access token in the query string
         When I request "/keys/<pubkey>" using HTTP "HEAD"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
+
         Examples:
             | pubkey       | status                   |
             | foobar       | 200 OK                   |
@@ -71,127 +108,137 @@ Feature: Imbo provides a keys endpoint
 
     Scenario: Update the private key for an existing public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
-        And the request body contains:
-        """
-        {"privateKey":"new-private-key"}
-        """
         And I sign the request
+        And the request body is:
+            """
+            {"privateKey":"new-private-key"}
+            """
         When I request "/keys/master-pubkey" using HTTP "PUT"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
 
     Scenario: Create new public key without having access to the keys resource
         Given I use "foobar" and "barfoo" for public and private keys
-        And the request body contains:
-        """
-        {"privateKey":"moo"}
-        """
         And I sign the request
+        And the request body is:
+            """
+            {"privateKey":"moo"}
+            """
         When I request "/keys/some-new-pubkey" using HTTP "PUT"
-        Then I should get a response with "400 Permission denied (public key)"
+        Then the response status line is "400 Permission denied (public key)"
 
     Scenario Outline: Add access rules for a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
-        And the request body contains:
-        """
-        <body>
-        """
         And I sign the request
+        And the request body is:
+            """
+            <body>
+            """
         When I request "/keys/foobar/access" using HTTP "POST"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
+
         Examples:
-        | body                                                                                                   | status                                                                 |
-        |                                                                                                        | 400 No access rule data provided                                       |
-        | {}                                                                                                     | 400 Neither group nor resources found in rule                          |
-        | {"group":"existing-group"}                                                                             | 400 Users not specified in rule                                        |
-        | {"group":"non-existant-group"}                                                                         | 400 Group 'non-existant-group' does not exist                          |
-        | {"resources":"images.get"}                                                                             | 400 Illegal value in resources array. String array expected            |
-        | {"resources":[123]}                                                                                    | 400 Illegal value in resources array. String array expected            |
-        | {"resources":["images.get"]}                                                                           | 400 Users not specified in rule                                        |
-        | {"resources":["images.get"],"users":"foobar"}                                                          | 400 Illegal value for users property. Allowed: '*' or array with users |
-        | {"foo":"bar","bar":"foo"}                                                                              | 400 Found unknown properties in rule: [foo, bar]                       |
-        | [{"resources":["images.get"],"users":["user1"]}]                                                       | 200 OK                                                                 |
-        | {"group":"existing-group","users":["user1", "user5"]}                                                  | 200 OK                                                                 |
+            | body                                                                                                   | status                                                                 |
+            |                                                                                                        | 400 No access rule data provided                                       |
+            | {}                                                                                                     | 400 Neither group nor resources found in rule                          |
+            | {"group":"existing-group"}                                                                             | 400 Users not specified in rule                                        |
+            | {"group":"non-existant-group"}                                                                         | 400 Group 'non-existant-group' does not exist                          |
+            | {"resources":"images.get"}                                                                             | 400 Illegal value in resources array. String array expected            |
+            | {"resources":[123]}                                                                                    | 400 Illegal value in resources array. String array expected            |
+            | {"resources":["images.get"]}                                                                           | 400 Users not specified in rule                                        |
+            | {"resources":["images.get"],"users":"foobar"}                                                          | 400 Illegal value for users property. Allowed: '*' or array with users |
+            | {"foo":"bar","bar":"foo"}                                                                              | 400 Found unknown properties in rule: [foo, bar]                       |
+            | [{"resources":["images.get"],"users":["user1"]}]                                                       | 200 OK                                                                 |
+            | {"group":"existing-group","users":["user1", "user5"]}                                                  | 200 OK                                                                 |
 
     Scenario: Get an access control rule
-        And I use "master-pubkey" and "master-privkey" for public and private keys
-        And I include an access token in the query
+        Given I use "master-pubkey" and "master-privkey" for public and private keys
+        And I include an access token in the query string
         When I request "/keys/foobar/access/100000000000000000001337" using HTTP "GET"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
 
     Scenario: Delete an access control rule
-        And I use "master-pubkey" and "master-privkey" for public and private keys
+        Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I sign the request
         When I request "/keys/foobar/access/100000000000000000001337" using HTTP "DELETE"
-        Then I should get a response with "200 OK"
-        And the ACL rule under public key "foobar" with ID "100000000000000000001337" should not exist
+        Then the response status line is "200 OK"
+        And the ACL rule under public key "foobar" with ID "100000000000000000001337" no longer exists
 
     Scenario: Delete a public key
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I sign the request
         When I request "/keys/foobar" using HTTP "DELETE"
-        Then I should get a response with "200 OK"
-        And the "foobar" public key should not exist
+        Then the response status line is "200 OK"
+        And the "foobar" public key no longer exists
 
     Scenario Outline: The keys resource supports PUT, HEAD and DELETE only
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I authenticate using "<auth-method>"
-        And the request body contains:
-        """
-        <body>
-        """
+        And the request body is:
+            """
+            <body>
+            """
         When I request "/keys/foobar" using HTTP "<method>"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
 
         Examples:
-            | method | auth-method  | body                             | status                 |
-            | GET    | access-token |                                  | 405 Method not allowed |
-            | HEAD   | access-token |                                  | 200 OK                 |
-            | POST   | signature    |                                  | 405 Method not allowed |
-            | PUT    | signature    | {"privateKey":"the-private-key"} | 200 OK                 |
-            | DELETE | signature    |                                  | 200 OK                 |
+            | method | auth-method         | body                             | status                 |
+            | GET    | access-token        |                                  | 405 Method not allowed |
+            | HEAD   | access-token        |                                  | 200 OK                 |
+            | POST   | signature           |                                  | 405 Method not allowed |
+            | PUT    | signature           | {"privateKey":"the-private-key"} | 200 OK                 |
+            | DELETE | signature           |                                  | 200 OK                 |
+            | POST   | signature (headers) |                                  | 405 Method not allowed |
+            | PUT    | signature (headers) | {"privateKey":"the-private-key"} | 200 OK                 |
+            | DELETE | signature (headers) |                                  | 200 OK                 |
 
     Scenario Outline: The access rules resource supports GET, HEAD and POST only
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I authenticate using "<auth-method>"
-        And the request body contains:
-        """
-        <body>
-        """
+        And the request body is:
+            """
+            <body>
+            """
         When I request "/keys/master-pubkey/access" using HTTP "<method>"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
 
         Examples:
-            | method | auth-method  | body                                             | status                 |
-            | GET    | access-token |                                                  | 200 OK                 |
-            | HEAD   | access-token |                                                  | 200 OK                 |
-            | POST   | signature    | [{"resources":["images.get"],"users":["user1"]}] | 200 OK                 |
-            | PUT    | signature    |                                                  | 405 Method not allowed |
-            | DELETE | signature    |                                                  | 405 Method not allowed |
+            | method | auth-method         | body                                             | status                 |
+            | GET    | access-token        |                                                  | 200 OK                 |
+            | HEAD   | access-token        |                                                  | 200 OK                 |
+            | POST   | signature           | [{"resources":["images.get"],"users":["user1"]}] | 200 OK                 |
+            | PUT    | signature           |                                                  | 405 Method not allowed |
+            | DELETE | signature           |                                                  | 405 Method not allowed |
+            | POST   | signature (headers) | [{"resources":["images.get"],"users":["user1"]}] | 200 OK                 |
+            | PUT    | signature (headers) |                                                  | 405 Method not allowed |
+            | DELETE | signature (headers) |                                                  | 405 Method not allowed |
 
     Scenario Outline: The access rule resource supports GET, HEAD and POST only
         Given I use "master-pubkey" and "master-privkey" for public and private keys
         And I authenticate using "<auth-method>"
         When I request "/keys/foobar/access/100000000000000000001337" using HTTP "<method>"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
 
         Examples:
-            | method | auth-method  | body                          | status                 |
-            | GET    | access-token |                               | 200 OK                 |
-            | HEAD   | access-token |                               | 200 OK                 |
-            | POST   | signature    | [{"resources":[],"users":[]}] | 405 Method not allowed |
-            | PUT    | signature    |                               | 405 Method not allowed |
-            | DELETE | signature    |                               | 200 OK                 |
+            | method | auth-method         | body                          | status                 |
+            | GET    | access-token        |                               | 200 OK                 |
+            | HEAD   | access-token        |                               | 200 OK                 |
+            | POST   | signature           | [{"resources":[],"users":[]}] | 405 Method not allowed |
+            | PUT    | signature           |                               | 405 Method not allowed |
+            | DELETE | signature           |                               | 200 OK                 |
+            | POST   | signature (headers) | [{"resources":[],"users":[]}] | 405 Method not allowed |
+            | PUT    | signature (headers) |                               | 405 Method not allowed |
+            | DELETE | signature (headers) |                               | 200 OK                 |
 
     Scenario Outline: Operations on an immutable access control provider
         Given Imbo uses the "access-control.php" configuration
         And I use "valid-pubkey" and "foobar" for public and private keys
         And I authenticate using "<auth-method>"
-        And the request body contains:
-        """
-        <body>
-        """
+        And the request body is:
+            """
+            <body>
+            """
         When I request "<uri>" using HTTP "<method>"
-        Then I should get a response with "<status>"
+        Then the response status line is "<status>"
 
         Examples:
             | uri                         | method | auth-method  | body                          | status                                  |

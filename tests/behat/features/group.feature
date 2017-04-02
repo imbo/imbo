@@ -6,31 +6,32 @@ Feature: Imbo provides a group endpoint
     Background:
         Given Imbo uses the "access-control.php" configuration
 
-    Scenario Outline: Fetch resources of a group
+    Scenario: Fetch resources of a group
         Given I use "valid-group-pubkey" and "foobar" for public and private keys
-        And I include an access token in the query
-        When I request "/groups/images-read.<extension>"
-        Then I should get a response with "200 OK"
-        And the "Content-Type" response header is "<content-type>"
-        And the response body matches:
-        """
-        <response>
-        """
-        Examples:
-            | extension | content-type     | response |
-            | json      | application/json | #^{"name":"images-read","resources":\["images\.get","images\.head"]}$# |
+        And I include an access token in the query string
+        When I request "/groups/images-read.json"
+        Then the response status line is "200 OK"
+        And the "Content-Type" response header is "application/json"
+        And the response body contains JSON:
+            """
+            {
+              "name": "images-read",
+              "resources": ["images.get", "images.head"]
+            }
+            """
 
     Scenario Outline: Create a resource group with invalid data
         Given Imbo uses the "access-control-mutable.php" configuration
         And I prime the database with "access-control-mutable.php"
         And I use "acl-creator" and "someprivkey" for public and private keys
-        And the request body contains:
+        And I sign the request
+        And the request body is:
           """
           <data>
           """
-        And I sign the request
         When I request "/groups/read-images" using HTTP "PUT"
-        Then I should get a response with "<response>"
+        Then the response status line is "<response>"
+
         Examples:
             | data               | response                                                           |
             |                    | 400 Invalid data. Array of resource strings is expected            |
@@ -43,25 +44,25 @@ Feature: Imbo provides a group endpoint
         Given Imbo uses the "access-control-mutable.php" configuration
         And I prime the database with "access-control-mutable.php"
         And I use "acl-creator" and "someprivkey" for public and private keys
-        And the request body contains:
+        And I sign the request
+        And the request body is:
           """
           ["images.get"]
           """
-        And I sign the request
         When I request "/groups/read-images" using HTTP "PUT"
-        Then I should get a response with "201 Created"
+        Then the response status line is "201 Created"
 
     Scenario: Update a resource group
         Given Imbo uses the "access-control-mutable.php" configuration
         And I prime the database with "access-control-mutable.php"
         And I use "acl-creator" and "someprivkey" for public and private keys
-        And the request body contains:
+        And I sign the request
+        And the request body is:
           """
           ["images.get", "images.head"]
           """
-        And I sign the request
         When I request "/groups/existing-group" using HTTP "PUT"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
 
     Scenario: Delete a resource group
         Given Imbo uses the "access-control-mutable.php" configuration
@@ -69,33 +70,33 @@ Feature: Imbo provides a group endpoint
         And I use "acl-creator" and "someprivkey" for public and private keys
         And I sign the request
         When I request "/groups/existing-group" using HTTP "DELETE"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
 
     Scenario: Delete a resource group that has access-control rules that depends on it
         Given Imbo uses the "access-control-mutable.php" configuration
         And I prime the database with "access-control-mutable.php"
-        And I use "acl-creator" and "someprivkey" for public and private keys
+        And I use "master-pubkey" and "master-privkey" for public and private keys
         And I sign the request
         When I request "/groups/user-stats" using HTTP "DELETE"
-        Then I should get a response with "200 OK"
-        And the ACL rule under public key "group-based" with ID "100000000000000000001942" should not exist anymore
+        Then the response status line is "200 OK"
+        And the ACL rule under public key "group-based" with ID "100000000000000000001942" no longer exists
 
     Scenario: Delete a resource group with an immutable access control adapter
         Given I use "valid-group-pubkey" and "foobar" for public and private keys
         And I sign the request
         When I request "/groups/groups-read" using HTTP "DELETE"
-        Then I should get a response with "405 Access control adapter is immutable"
+        Then the response status line is "405 Access control adapter is immutable"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Access control adapter is immutable" and the error code is "0"
 
     Scenario: Update a resource group with an immutable access control adapter
         Given I use "valid-group-pubkey" and "foobar" for public and private keys
-        And the request body contains:
+        And I sign the request
+        And the request body is:
           """
           ["images.get"]
           """
-        And I sign the request
         When I request "/groups/groups-read" using HTTP "PUT"
-        Then I should get a response with "405 Access control adapter is immutable"
+        Then the response status line is "405 Access control adapter is immutable"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Access control adapter is immutable" and the error code is "0"

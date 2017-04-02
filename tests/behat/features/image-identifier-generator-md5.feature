@@ -5,28 +5,38 @@ Feature: Imbo supports generation of md5 image identifiers
 
     Background:
         Given Imbo uses the "image-identifier-md5.php" configuration
-        And "tests/phpunit/Fixtures/image1.png" exists in Imbo
 
     Scenario: Add a new image
-        Given I use "publickey" and "privatekey" for public and private keys
+        Given I use "publicKey" and "privateKey" for public and private keys
         And I sign the request
-        And I attach "tests/phpunit/Fixtures/image.jpg" to the request body
+        And the request body contains "tests/phpunit/Fixtures/image.jpg"
         When I request "/users/user/images" using HTTP "POST"
-        Then I should get a response with "201 Created"
+        Then the response status line is "201 Created"
         And the "Content-Type" response header is "application/json"
-        And the response body matches:
-          """
-          /{"imageIdentifier":"f3210f1bb34bfbfa432cc3560be40761".*}/
-          """
+        And the response body contains JSON:
+            """
+            {
+              "imageIdentifier": "f3210f1bb34bfbfa432cc3560be40761",
+              "width": 665,
+              "height": 463,
+              "extension": "jpg"
+            }
+            """
 
     Scenario: Add an image that already exists
-        Given I use "publickey" and "privatekey" for public and private keys
+        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
+        And I use "publicKey" and "privateKey" for public and private keys
         And I sign the request
-        And I attach "tests/phpunit/Fixtures/image1.png" to the request body
+        And the request body contains "tests/phpunit/Fixtures/image1.png"
         When I request "/users/user/images" using HTTP "POST"
-        Then I should get a response with "200 OK"
+        Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
-        And the response body matches:
-          """
-          /{"imageIdentifier":"fc7d2d06993047a0b5056e8fac4462a2".*}/
-          """
+        And the response body contains JSON:
+            """
+            {
+              "imageIdentifier": "fc7d2d06993047a0b5056e8fac4462a2",
+              "width": 599,
+              "height": 417,
+              "extension": "png"
+            }
+            """

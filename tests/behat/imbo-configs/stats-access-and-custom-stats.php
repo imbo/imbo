@@ -8,35 +8,40 @@
  * distributed with this source code.
  */
 
+use Imbo\EventListener\StatsAccess;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\EventManager\EventInterface;
+
+/**
+ * Enable the stats access event listener, using a HTTP request header to set the allowed range of
+ * IPs, and optionally a custom IP for the client which will override $_SERVER['REMOTE_ADDR'].
+ *
+ * Also add some custom stats that will be included in the response from the stats endpoint
+ */
+
 // Rewrite the client IP when a custom header exists
 if (isset($_SERVER['HTTP_X_CLIENT_IP'])) {
     // Overwrite the default client IP
     $_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_X_CLIENT_IP'];
 }
 
-/**
- * Enable the stats access event listener, using query parameter values to set the allowed range
- * of IP's, and optionally a custom IP for the client.
- *
- * Also add some custom stats that will be included in the response from the stats endpoint
- */
 return [
     'eventListeners' => [
-        'statsAccess' => function() {
+        'statsAccess' => function(Request $request, Response $response) {
             $statsAllow = [];
 
-            if (!empty($_GET['statsAllow'])) {
-                // Set the range
-                $statsAllow = explode(',', $_GET['statsAllow']);
+            if (!empty($_SERVER['HTTP_X_IMBO_STATS_ALLOWED_BY'])) {
+                $statsAllow = explode(',', $_SERVER['HTTP_X_IMBO_STATS_ALLOWED_BY']);
             }
 
-            return new Imbo\EventListener\StatsAccess([
+            return new StatsAccess([
                 'allow' => $statsAllow,
             ]);
         },
         'customStats' => [
             'events' => ['stats.get'],
-            'callback' => function($event) {
+            'callback' => function(EventInterface $event) {
                 // Fetch the model from the response
                 $model = $event->getResponse()->getModel();
 

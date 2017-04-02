@@ -36,15 +36,16 @@
   "require-dev": {
     "mikey179/vfsStream": "^1.5.0",
     "phpunit/phpunit": "^5.6",
-    "behat/behat": "^2.0",
-    "guzzle/guzzle": "^3.9.3",
+    "behat/behat": "^3.2",
     "phploc/phploc": "^3.0",
     "sebastian/phpcpd": "^2.0",
     "phpmd/phpmd": "^2.4",
     "squizlabs/php_codesniffer": "^2.7",
     "imbo/imbo-phpcs-standard": "^1.4",
     "phpdocumentor/phpdocumentor": "^2.9",
-    "cwhite92/b2-sdk-php": "^1.2"
+    "cwhite92/b2-sdk-php": "^1.2",
+    "imbo/behat-api-extension": "^2.0",
+    "micheh/psr7-cache": "^0.5"
   },
   "suggest": {
     "ext-mongo": "Enables usage of MongoDB and GridFS as database and store. Recommended version: >=1.4.0",
@@ -77,12 +78,11 @@
       "mkdir build",
       "mkdir build/coverage",
       "mkdir build/logs",
-      "mkdir build/docs",
-      "mkdir build/code-browser",
-      "mkdir build/pdepend"
+      "mkdir build/docs"
     ],
-    "test-phpunit": "vendor/bin/phpunit --verbose -c tests/phpunit",
-    "test-behat": "vendor/bin/behat --strict --config tests/behat/behat.yml",
+    "test-phpunit": "vendor/bin/phpunit --verbose",
+    "test-phpunit-coverage": "vendor/bin/phpunit --verbose --coverage-html build/coverage",
+    "test-behat": "vendor/bin/behat --strict",
     "test": [
       "@test-phpunit",
       "@test-behat"
@@ -107,6 +107,7 @@
     "docs": [
       "cd docs; make spelling",
       "cd docs; make html"
-    ]
+    ],
+    "start-httpd-for-behat-tests": "php -S localhost:8080 -t ./public tests/behat/router.php > build/logs/httpd.log 2>&1 &"
   }
 }

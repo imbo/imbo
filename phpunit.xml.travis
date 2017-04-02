@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit colors="false" bootstrap="bootstrap.php">
+<phpunit colors="false" bootstrap="tests/phpunit/bootstrap.php">
   <testsuites>
     <testsuite name="imbo-unit">
-      <directory>unit</directory>
+      <directory>tests/phpunit/unit</directory>
     </testsuite>
     <testsuite name="imbo-integration">
-      <directory>integration</directory>
+      <directory>tests/phpunit/integration</directory>
     </testsuite>
   </testsuites>
 

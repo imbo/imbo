@@ -8,16 +8,18 @@
  * distributed with this source code.
  */
 
-use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
-    Imbo\Resource;
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
+use Imbo\Resource;
+use Imbo\Database\MongoDB;
+use Imbo\Storage\GridFS;
 
 // Default config for testing
 $testConfig = [
     'accessControl' => function() {
         return new ArrayAdapter([
             [
-                'publicKey' => 'publickey',
-                'privateKey' => 'privatekey',
+                'publicKey' => 'publicKey',
+                'privateKey' => 'privateKey',
                 'acl' => [[
                     'resources' => Resource::getReadWriteResources(),
                     'users' => ['user', 'other-user'],
@@ -25,7 +27,7 @@ $testConfig = [
             ],
             [
                 'publicKey' => 'unpriviledged',
-                'privateKey' => 'privatekey',
+                'privateKey' => 'privateKey',
                 'acl' => [[
                     'resources' => Resource::getReadWriteResources(),
                     'users' => ['user'],
@@ -43,13 +45,13 @@ $testConfig = [
     },
 
     'database' => function() {
-        return new Imbo\Database\MongoDB([
+        return new MongoDB([
             'databaseName' => 'imbo_testing',
         ]);
     },
 
     'storage' => function() {
-        return new Imbo\Storage\GridFS([
+        return new GridFS([
             'databaseName' => 'imbo_testing',
         ]);
     },
@@ -58,11 +60,11 @@ $testConfig = [
 // Default Imbo config
 $defaultConfig = require __DIR__ . '/../../../config/config.default.php';
 
-// Custom test config, if any, specified in the X-Imbo-Test-Config HTTP request header
-if (isset($_SERVER['HTTP_X_IMBO_TEST_CONFIG'])) {
-    $customConfig = require __DIR__ . '/' . basename($_SERVER['HTTP_X_IMBO_TEST_CONFIG']);
-} else {
-    $customConfig = [];
+// Custom test config, if any, specified in the X-Imbo-Test-Config-File HTTP request header
+$customConfig = [];
+
+if (isset($_SERVER['HTTP_X_IMBO_TEST_CONFIG_FILE'])) {
+    $customConfig = require __DIR__ . '/' . basename($_SERVER['HTTP_X_IMBO_TEST_CONFIG_FILE']);
 }
 
 // Return the merged configuration, having the custom config overwrite the default testing config,

@@ -6,3 +6,5 @@ docs/_build
 *.log
 public/.htaccess
 .idea
+behat.yml
+phpunit.xml

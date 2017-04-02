@@ -37,12 +37,16 @@ before_install:
 
 before_script:
   - phpenv config-rm xdebug.ini
+  - echo 'always_populate_raw_post_data = -1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - composer self-update
+  - composer lint
+  - composer prepare
   - composer install --prefer-dist
+  - composer start-httpd-for-behat-tests
 
 script:
-  - ./vendor/bin/phpunit --verbose -c tests/phpunit/phpunit.xml.travis
-  - ./vendor/bin/behat --strict --profile no-cc --config tests/behat/behat.yml
+  - ./vendor/bin/phpunit --verbose -c phpunit.xml.travis --stop-on-failure
+  - ./vendor/bin/behat --strict --stop-on-failure
 
 after_failure:
   - echo "Tests failed - httpd log follows"
