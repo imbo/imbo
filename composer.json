@@ -45,7 +45,9 @@
     "imbo/behat-api-extension": "^2.0",
     "micheh/psr7-cache": "^0.5",
     "doctrine/dbal": "^2.5",
-    "aws/aws-sdk-php": "^3.19"
+    "aws/aws-sdk-php": "^3.19",
+    "imbo/behat-api-extension": "^2.0",
+    "micheh/psr7-cache": "^0.5"
   },
   "suggest": {
     "ext-mongo": "Enables usage of MongoDB and GridFS as database and store. Recommended version: >=1.4.0",
