@@ -20,7 +20,7 @@ use PHPUnit_Framework_MockObject_Stub_Return as ReturnValue;
  */
 return [
     'database' => function(Request $request, Response $response) {
-        $adapter = (new Generator())->createMock('Imbo\Database\DatabaseInterface');
+        $adapter = (new Generator())->getMock('Imbo\Database\DatabaseInterface');
         $adapter
             ->expects(new Any())
             ->method('getStatus')
@@ -30,7 +30,7 @@ return [
     },
 
     'storage' => function(Request $request, Response $response) {
-        $adapter = (new Generator())->createMock('Imbo\Storage\StorageInterface');
+        $adapter = (new Generator())->getMock('Imbo\Storage\StorageInterface');
         $adapter
             ->expects(new Any())
             ->method('getStatus')
