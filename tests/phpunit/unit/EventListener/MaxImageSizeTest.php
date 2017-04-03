@@ -74,11 +74,11 @@ class MaxImageSizeTest extends ListenerTests {
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
 
         if ($willTrigger) {
-            $maxSize = $this->getMock('Imbo\Image\Transformation\MaxSize');
+            $maxSize = $this->createMock('Imbo\Image\Transformation\MaxSize');
             $maxSize->expects($this->once())->method('setImage')->will($this->returnSelf());
             $maxSize->expects($this->once())->method('transform')->with(['width' => $maxWidth, 'height' => $maxHeight]);
 
-            $transformationManager = $this->getMock('Imbo\Image\TransformationManager');
+            $transformationManager = $this->createMock('Imbo\Image\TransformationManager');
             $transformationManager
                 ->expects($this->once())
                 ->method('getTransformation')

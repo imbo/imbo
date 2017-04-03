@@ -26,7 +26,7 @@ class CropTest extends \PHPUnit_Framework_TestCase {
      */
     public function testThrowsExceptionWhenWidthIsMissing() {
         $transformation = new Crop();
-        $transformation->setImage($this->getMock('Imbo\Model\Image'));
+        $transformation->setImage($this->createMock('Imbo\Model\Image'));
         $transformation->transform(['height' => 123]);
     }
 
@@ -38,7 +38,7 @@ class CropTest extends \PHPUnit_Framework_TestCase {
      */
     public function testThrowsExceptionWhenHeightIsMissing() {
         $transformation = new Crop();
-        $transformation->setImage($this->getMock('Imbo\Model\Image'));
+        $transformation->setImage($this->createMock('Imbo\Model\Image'));
         $transformation->transform(['width' => 123]);
     }
 

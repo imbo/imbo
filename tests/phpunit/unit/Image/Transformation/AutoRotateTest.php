@@ -38,7 +38,7 @@ class AutoRotateTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Image\Transformation\AutoRotate::transform
      */
     public function testWillRotateWhenNeeded() {
-        $imagick = $this->getMock('Imagick');
+        $imagick = $this->createMock('Imagick');
         $imagick->expects($this->once())->method('getImageOrientation')->will($this->returnValue(
             Imagick::ORIENTATION_TOPRIGHT
         ));
@@ -47,7 +47,7 @@ class AutoRotateTest extends \PHPUnit_Framework_TestCase {
 
         $transformation = new AutoRotate();
         $transformation->setImagick($imagick);
-        $transformation->setImage($this->getMock('Imbo\Model\Image'));
+        $transformation->setImage($this->createMock('Imbo\Model\Image'));
         $transformation->transform([]);
     }
 }

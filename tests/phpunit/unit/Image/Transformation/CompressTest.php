@@ -50,11 +50,11 @@ class CompressTest extends \PHPUnit_Framework_TestCase {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/gif'));
 
-        $imagick = $this->getMock('Imagick');
+        $imagick = $this->createMock('Imagick');
         $imagick->expects($this->never())->method('setImageCompressionQuality');
 
         $this->transformation->setImagick($imagick)->setImage($image)->transform(['level' => 40]);
-        $this->transformation->compress($this->getMock('Imbo\EventManager\EventInterface'));
+        $this->transformation->compress($this->createMock('Imbo\EventManager\EventInterface'));
     }
 
     public function testDoesNotApplyCompressionWhenLevelIsNotSet() {
@@ -62,7 +62,7 @@ class CompressTest extends \PHPUnit_Framework_TestCase {
         $imagick->expects($this->never())->method('setImageCompressionQuality');
 
         $this->transformation->setImagick($imagick)->compress(
-            $this->getMock('Imbo\EventManager\Event')
+            $this->createMock('Imbo\EventManager\Event')
         );
     }
 

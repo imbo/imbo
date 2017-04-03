@@ -33,9 +33,9 @@ class TransformationManagerTest extends \PHPUnit_Framework_TestCase {
         $this->query = new ParameterBag([]);
         $this->request = new Request();
         $this->request->query = $this->query;
-        $this->event = $this->getMock('Imbo\EventManager\Event');
-        $this->image = $this->getMock('Imbo\Model\Image');
-        $this->response = $this->getMock('Imbo\Http\Response\Response');
+        $this->event = $this->createMock('Imbo\EventManager\Event');
+        $this->image = $this->createMock('Imbo\Model\Image');
+        $this->response = $this->createMock('Imbo\Http\Response\Response');
 
         $this->response->expects($this->any())->method('getModel')->will($this->returnValue($this->image));
 

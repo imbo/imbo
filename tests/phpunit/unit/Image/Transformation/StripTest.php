@@ -35,10 +35,10 @@ class StripTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testReloadsImageIfNewerImagick() {
-        $image = $this->getMock('Imbo\Model\Image');
+        $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        $imagick = $this->getMock('Imagick');
+        $imagick = $this->createMock('Imagick');
         $imagick->expects($this->once())->method('getImageBlob')->will($this->returnValue('foo'));
         $imagick->expects($this->once())->method('clear');
         $imagick->expects($this->once())->method('readImageBlob')->with('foo');

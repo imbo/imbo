@@ -28,7 +28,7 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
         $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('getMetadata')->will($this->returnValue([]));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getDatabase')->will($this->returnValue($database));
 
         $image->expects($this->never())->method('hasBeenTransformed');
@@ -45,7 +45,7 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
         $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('getMetadata')->will($this->returnValue(['poi' => 'wat']));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getDatabase')->will($this->returnValue($database));
 
         $image->expects($this->never())->method('hasBeenTransformed');
@@ -66,7 +66,7 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
             'poi' => [['foo' => 'bar']]
         ]));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getDatabase')->will($this->returnValue($database));
 
         $image->expects($this->never())->method('hasBeenTransformed');
@@ -102,7 +102,7 @@ class DrawPoisTest extends \PHPUnit_Framework_TestCase {
             ]]
         ]));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getDatabase')->will($this->returnValue($database));
 
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);

@@ -73,7 +73,7 @@ class ImageVariationsTest extends ListenerTests {
         $this->eventManager = $this->createMock('Imbo\EventManager\EventManager');
         $this->imageStorage = $this->createMock('Imbo\Storage\StorageInterface');
 
-        $this->imagick = $this->getMock('Imagick');
+        $this->imagick = $this->createMock('Imagick');
 
         $this->config = require __DIR__ . '/../../../../config/config.default.php';
         $this->transformationManager = new TransformationManager();
@@ -482,7 +482,7 @@ class ImageVariationsTest extends ListenerTests {
 
         $this->imageModel->method('getWidth')->willReturn(2048);
 
-        $this->transformation = $this->getMock('Imbo\Image\Transformation\Transformation');
+        $this->transformation = $this->createMock('Imbo\Image\Transformation\Transformation');
         $this->transformation->expects($this->any())->method('setImage')->will($this->returnSelf());
         $this->transformation
             ->expects($this->at(1))
@@ -553,7 +553,7 @@ class ImageVariationsTest extends ListenerTests {
     public function testGenerateVariationsTriggersWarningOnTransformationException() {
         $this->imageModel->method('getWidth')->willReturn(1024);
 
-        $this->transformation = $this->getMock('Imbo\Image\Transformation\Transformation');
+        $this->transformation = $this->createMock('Imbo\Image\Transformation\Transformation');
         $this->transformation->expects($this->any())->method('setImage')->will($this->returnSelf());
         $this->transformation->expects($this->at(1))
             ->method('transform')

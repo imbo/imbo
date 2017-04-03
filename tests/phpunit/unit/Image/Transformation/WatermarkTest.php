@@ -66,12 +66,12 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase {
         $request = $this->createMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getUser')->will($this->returnValue('someuser'));
 
-        $event = $this->getMock('Imbo\EventManager\Event');
+        $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getStorage')->will($this->returnValue($storage));
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
 
         $this->transformation
-            ->setImage($this->getMock('Imbo\Model\Image'))
+            ->setImage($this->createMock('Imbo\Model\Image'))
             ->setEvent($event)
             ->transform(['img' => 'foobar']);
     }

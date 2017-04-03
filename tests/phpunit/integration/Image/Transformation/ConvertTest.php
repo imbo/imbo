@@ -37,7 +37,7 @@ class ConvertTest extends TransformationTests {
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
         $this->getTransformation()
-            ->setEvent($this->getMock('Imbo\EventManager\Event'))
+            ->setEvent($this->createMock('Imbo\EventManager\Event'))
             ->setImage($image)
             ->setImagick($imagick)
             ->transform(['type' => 'gif']);

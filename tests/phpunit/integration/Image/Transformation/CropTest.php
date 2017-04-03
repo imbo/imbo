@@ -60,7 +60,7 @@ class CropTest extends TransformationTests {
         $imagick->readImageBlob($blob);
 
         $this->getTransformation()
-             ->setEvent($this->getMock('Imbo\EventManager\Event'))
+             ->setEvent($this->createMock('Imbo\EventManager\Event'))
              ->setImagick($imagick)
              ->setImage($image)
              ->transform($params);

@@ -350,11 +350,11 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
                      ->method('trigger')
                      ->with('image.transformed', ['image' => $image]);
 
-        $convert = $this->getMock('Imbo\Image\Transformation\Convert');
+        $convert = $this->createMock('Imbo\Image\Transformation\Convert');
         $convert->expects($this->once())->method('setImage')->will($this->returnSelf());
         $convert->expects($this->once())->method('transform')->with(['type' => 'png']);
 
-        $transformationManager = $this->getMock('Imbo\Image\TransformationManager');
+        $transformationManager = $this->createMock('Imbo\Image\TransformationManager');
         $transformationManager
             ->expects($this->once())
             ->method('getTransformation')
