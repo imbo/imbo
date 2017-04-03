@@ -12,6 +12,7 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\StorageException,
     Imbo\Exception\TransformationException,
+    Imbo\Helpers\Imagick as ImagickHelper,
     Imbo\Image\InputSizeConstraint,
     Imagick,
     ImagickException;
