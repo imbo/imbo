@@ -110,7 +110,6 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $this->adapter->insertImage($user, $imageIdentifier, $image, false);
     }
 
-
     /**
      * @expectedException Imbo\Exception\DatabaseException
      * @expectedExceptionCode 404

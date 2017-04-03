@@ -99,24 +99,19 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($user, $imageIdentifier, Image $image, $updateIfDuplicate = true)
-    {
+    public function insertImage($user, $imageIdentifier, Image $image, $updateIfDuplicate = true) {
         $now = time();
 
-        if ($added = $image->getAddedDate())
-        {
+        if ($added = $image->getAddedDate()) {
             $added = $added->getTimestamp();
         }
 
-        if ($updated = $image->getUpdatedDate())
-        {
+        if ($updated = $image->getUpdatedDate()) {
             $updated = $updated->getTimestamp();
         }
 
-        if ($updateIfDuplicate && $this->imageExists($user, $imageIdentifier))
-        {
-            try
-            {
+        if ($updateIfDuplicate && $this->imageExists($user, $imageIdentifier)) {
+            try {
                 $this->getImageCollection()->update(
                     ['user' => $user, 'imageIdentifier' => $imageIdentifier],
                     ['$set' => ['updated' => $now]],
@@ -124,8 +119,7 @@ class MongoDB implements DatabaseInterface {
                 );
 
                 return true;
-            } catch (MongoException $e)
-            {
+            } catch (MongoException $e) {
                 throw new DatabaseException('Unable to save image data', 500, $e);
             }
         }

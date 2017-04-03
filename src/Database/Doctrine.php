@@ -86,22 +86,18 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($user, $imageIdentifier, Image $image, $updateIfDuplicate = true)
-    {
+    public function insertImage($user, $imageIdentifier, Image $image, $updateIfDuplicate = true) {
         $now = time();
 
-        if ($added = $image->getAddedDate())
-        {
+        if ($added = $image->getAddedDate()) {
             $added = $added->getTimestamp();
         }
 
-        if ($updated = $image->getUpdatedDate())
-        {
+        if ($updated = $image->getUpdatedDate()) {
             $updated = $updated->getTimestamp();
         }
 
-        if ($updateIfDuplicate && $id = $this->getImageId($user, $imageIdentifier))
-        {
+        if ($updateIfDuplicate && $id = $this->getImageId($user, $imageIdentifier)) {
             return (boolean)$this->getConnection()->update($this->tableNames['imageinfo'], [
                 'updated' => $now,
             ], [
@@ -109,8 +105,7 @@ class Doctrine implements DatabaseInterface {
             ]);
         }
 
-        try
-        {
+        try {
             $result = $this->getConnection()->insert($this->tableNames['imageinfo'], [
                 'size' => $image->getFilesize(),
                 'user' => $user,
