@@ -51,13 +51,11 @@
   },
   "suggest": {
     "ext-mongo": "Enables usage of MongoDB and GridFS as database and store. Recommended version: >=1.4.0",
-    "imbo/imbo-metadata-cache": "Enabled caching of metadata through an event listener. Recommended version >=1.0.0",
-    "mongodb/mongodb": "Enables usage of the new MongoDB extension using the PHP MongoDB driver library. Recommended version: >=1.0.0",
-    "doctrine/dbal": "Enables usage of Doctrine for database storage (MySQL/Postgres/etc.) Recommended version: >=2.5",
-    "ext-memcached": "Enables usage of the Memcached cache adapter for custom event listeners. Recommended version: >=2.0.0",
-    "doctrine/dbal": "Enables usage of using RDMS for storing data (and optionally images). Recommended version: >=2.3",
-    "aws/aws-sdk-php": "Enables usage of the AWS S3 storage adapter. Recommended version == 3.19",
-    "cwhite92/b2-sdk-php": "Enables usage of the Backblaze B2 storage adapter. Recommended version >= 1.2.0"
+    "imbo/imbo-metadata-cache": "Enabled caching of metadata through an event listener. Recommended version ^1.0",
+    "mongodb/mongodb": "Enables usage of the new MongoDB extension using the PHP MongoDB driver library. Recommended version: ^1.0",
+    "doctrine/dbal": "Enables usage of Doctrine for database storage (MySQL/Postgres/etc.) Recommended version: ^2.5",
+    "aws/aws-sdk-php": "Enables usage of the AWS S3 storage adapter. Recommended version ^3.19",
+    "cwhite92/b2-sdk-php": "Enables usage of the Backblaze B2 storage adapter. Recommended version ^1.2"
   },
   "autoload": {
     "psr-4": {
