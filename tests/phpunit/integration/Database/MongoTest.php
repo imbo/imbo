@@ -42,7 +42,7 @@ class MongoTest extends DatabaseTests {
         $client = new MongoClient();
         $client->dropDatabase($this->databaseName);
         $client->selectCollection($this->databaseName, 'image')->createIndex(
-            array('user' => 1, 'imageIdentifier' => 1),
+            ['user' => 1, 'imageIdentifier' => 1],
             ['unique' => true]
         );
 
