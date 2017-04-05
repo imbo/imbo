@@ -157,8 +157,13 @@ class Mongo implements DatabaseInterface {
         try {
             $this->getImageCollection()->insertOne($data);
         } catch (MongoException $e) {
-            if (strpos($e->getMessage(), 'E11000 duplicate key error') === 0) {
-                throw new DuplicateImageIdentifierException('Duplicate image identifier when attempting to insert image into DB.', 503);
+            foreach ($e->getWriteResult()->getWriteErrors() as $error) {
+                if ($error->getCode() === 11000) {
+                    throw new DuplicateImageIdentifierException(
+                        'Duplicate image identifier when attempting to insert image into DB.',
+                        503
+                    );
+                }
             }
 
             throw new DatabaseException('Unable to save image data', 500, $e);
