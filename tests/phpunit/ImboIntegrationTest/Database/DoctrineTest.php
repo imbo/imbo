@@ -21,16 +21,19 @@ use Imbo\Database\Doctrine,
  */
 class DoctrineTest extends DatabaseTests {
     /**
-     * @var PDO
+     * Path to the database file
+     *
+     * @var string
      */
-    private $pdo;
+    private $dbPath = '/tmp/imbo-database-doctrine-integration-test.sql';
 
     /**
      * @see ImboIntegrationTest\Database\DatabaseTests::getAdapter()
      */
     protected function getAdapter() {
         return new Doctrine([
-            'pdo' => $this->pdo,
+            'path' => $this->dbPath,
+            'driver' => 'pdo_sqlite',
         ]);
     }
 
@@ -48,9 +51,13 @@ class DoctrineTest extends DatabaseTests {
         }
 
         // Create tmp tables
-        $this->pdo = new PDO('sqlite::memory:');
-        $this->pdo->query("
-            CREATE TABLE IF NOT EXISTS imageinfo (
+        $pdo = new PDO(sprintf('sqlite:%s', $this->dbPath));
+        $pdo->query("DROP TABLE IF EXISTS imageinfo");
+        $pdo->query("DROP TABLE IF EXISTS metadata");
+        $pdo->query("DROP TABLE IF EXISTS shorturl");
+        $pdo->query("DROP INDEX IF EXISTS shorturlparams");
+        $pdo->query("
+            CREATE TABLE imageinfo (
                 id INTEGER PRIMARY KEY NOT NULL,
                 user TEXT NOT NULL,
                 imageIdentifier TEXT NOT NULL,
@@ -66,16 +73,16 @@ class DoctrineTest extends DatabaseTests {
                 UNIQUE (user,imageIdentifier)
             )
         ");
-        $this->pdo->query("
-            CREATE TABLE IF NOT EXISTS metadata (
+        $pdo->query("
+            CREATE TABLE metadata (
                 id INTEGER PRIMARY KEY NOT NULL,
                 imageId KEY INTEGER NOT NULL,
                 tagName TEXT NOT NULL,
                 tagValue TEXT NOT NULL
             )
         ");
-        $this->pdo->query("
-            CREATE TABLE IF NOT EXISTS shorturl (
+        $pdo->query("
+            CREATE TABLE shorturl (
                 shortUrlId TEXT PRIMARY KEY NOT NULL,
                 user TEXT NOT NULL,
                 imageIdentifier TEXT NOT NULL,
@@ -83,7 +90,7 @@ class DoctrineTest extends DatabaseTests {
                 query TEXT NOT NULL
             )
         ");
-        $this->pdo->query("
+        $pdo->query("
             CREATE INDEX shorturlparams ON shorturl (
                 user,
                 imageIdentifier,
@@ -93,18 +100,5 @@ class DoctrineTest extends DatabaseTests {
         ");
 
         parent::setUp();
-    }
-
-    public function tearDown() {
-        if ($this->pdo instanceof PDO) {
-            $this->pdo->query("DROP TABLE IF EXISTS imageinfo");
-            $this->pdo->query("DROP TABLE IF EXISTS metadata");
-            $this->pdo->query("DROP TABLE IF EXISTS shorturl");
-            $this->pdo->query("DROP INDEX IF EXISTS shorturlparams");
-        }
-
-        $this->pdo = null;
-
-        parent::tearDown();
     }
 }

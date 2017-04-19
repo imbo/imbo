@@ -27,14 +27,6 @@ use Imbo\Model\Image,
 /**
  * Doctrine 2 database driver
  *
- * Parameters for this driver:
- *
- * - <pre>(string) dbname</pre> Name of the database to connect to
- * - <pre>(string) user</pre> Username to use when connecting
- * - <pre>(string) password</pre> Password to use when connecting
- * - <pre>(string) host</pre> Hostname to use when connecting
- * - <pre>(string) driver</pre> Which driver to use
- *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
  */
@@ -44,13 +36,7 @@ class Doctrine implements DatabaseInterface {
      *
      * @var array
      */
-    private $params = [
-        'dbname'   => null,
-        'user'     => null,
-        'password' => null,
-        'host'     => null,
-        'driver'   => null,
-    ];
+    private $params = [];
 
     /**
      * Default table names for the database
@@ -84,9 +70,26 @@ class Doctrine implements DatabaseInterface {
      * @param Connection $connection Optional connection instance. Primarily used for testing
      */
     public function __construct(array $params, Connection $connection = null) {
-        $this->params = array_merge($this->params, $params);
+        $this->params = $params;
+
+        if (isset($this->params['pdo'])) {
+            trigger_error(
+                sprintf(
+                    'The usage of pdo in the configuration array for %s is deprecated and will be removed in Imbo-3.x',
+                    __CLASS__
+                ),
+                E_USER_DEPRECATED
+            );
+        }
 
         if ($connection !== null) {
+            trigger_error(
+                sprintf(
+                    'Specifying a connection instance in %s is deprecated and will be removed in Imbo-3.x',
+                    __CLASS__
+                ),
+                E_USER_DEPRECATED
+            );
             $this->setConnection($connection);
         }
     }

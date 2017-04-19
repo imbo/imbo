@@ -11,9 +11,9 @@
 namespace ImboUnitTest\Database;
 
 use Imbo\Database\Doctrine,
-    Doctrine\DBAL\Connection,
-    PDOException,
-    ReflectionMethod;
+    PDO,
+    ReflectionMethod,
+    Doctrine\DBAL\DriverManager;
 
 /**
  * @covers Imbo\Database\Doctrine
@@ -28,63 +28,17 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
     private $driver;
 
     /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
      * Set up the driver
      */
     public function setUp() {
-        if (!class_exists('Doctrine\DBAL\Connection')) {
-            $this->markTestSkipped('Doctrine is required to run this test');
-        }
-
-        $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
-        $this->driver = new Doctrine([], $this->connection);
+        $this->driver = new Doctrine([]);
     }
 
     /**
      * Tear down the driver
      */
     public function tearDown() {
-        $this->connection = null;
         $this->driver = null;
-    }
-
-    /**
-     * @covers Imbo\Database\Doctrine::getStatus
-     */
-    public function testGetStatusWhenDatabaseIsAlreadyConnected() {
-        $this->connection->expects($this->once())->method('isConnected')->will($this->returnValue(true));
-        $this->assertTrue($this->driver->getStatus());
-    }
-
-    /**
-     * @covers Imbo\Database\Doctrine::getStatus
-     */
-    public function testGetStatusWhenDatabaseIsNotConnectedAndCanConnect() {
-        $this->connection->expects($this->once())->method('isConnected')->will($this->returnValue(false));
-        $this->connection->expects($this->once())->method('connect')->will($this->returnValue(true));
-        $this->assertTrue($this->driver->getStatus());
-    }
-
-    /**
-     * @covers Imbo\Database\Doctrine::getStatus
-     */
-    public function testGetStatusWhenDatabaseIsNotConnectedAndCanNotConnect() {
-        $this->connection->expects($this->once())->method('isConnected')->will($this->returnValue(false));
-        $this->connection->expects($this->once())->method('connect')->will($this->returnValue(false));
-        $this->assertFalse($this->driver->getStatus());
-    }
-
-    /**
-     * @covers Imbo\Database\Doctrine::getStatus
-     */
-    public function testGetStatusWhenDatabaseIsNotConnectedAndConnectThrowsAnException() {
-        $this->connection->expects($this->once())->method('isConnected')->will($this->returnValue(false));
-        $this->connection->expects($this->once())->method('connect')->will($this->throwException(new PDOException()));
-        $this->assertFalse($this->driver->getStatus());
     }
 
     /**
@@ -193,5 +147,21 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
         ];
         $method->invokeArgs($this->driver, [&$metadata, &$result]);
         $this->assertSame($result, $normalizedMetadata);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Deprecated
+     * @expectedExceptionMessage The usage of pdo in the configuration array for Imbo\Database\Doctrine is deprecated and will be removed in Imbo-3.x
+     */
+    public function testUsageOfPdoInParametersIsDeprecated() {
+        new Doctrine(['pdo' => new PDO('sqlite::memory:')]);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Deprecated
+     * @expectedExceptionMessage Specifying a connection instance in Imbo\Database\Doctrine is deprecated and will be removed in Imbo-3.x
+     */
+    public function testUsageOfConnectionInConstructor() {
+        new Doctrine([], DriverManager::getConnection(['pdo' => new PDO('sqlite::memory:')]));
     }
 }
