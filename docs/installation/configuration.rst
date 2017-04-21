@@ -443,7 +443,7 @@ Examples
 
 Here are some examples on how to use the Doctrine adapter in the configuration file:
 
-1) Use a PDO instance to connect to a SQLite database:
+1) Connect to a SQLite database:
 
 .. code-block:: php
 
@@ -453,14 +453,15 @@ Here are some examples on how to use the Doctrine adapter in the configuration f
 
         'storage' => function() {
             return new Imbo\Storage\Doctrine([
-                'pdo' => new PDO('sqlite:/path/to/database'),
+                'path' => '/path/to/database',
+                'driver' => 'pdo_sqlite',
             ]);
         },
 
         // ...
     ];
 
-2) Connect to a MySQL database using PDO:
+2) Connect to a MySQL database:
 
 .. code-block:: php
 
@@ -480,6 +481,8 @@ Here are some examples on how to use the Doctrine adapter in the configuration f
 
         // ...
     ];
+
+.. warning:: Connecting to a database by specifying a PDO instance in the ``pdo`` element of the configuration array is deprecated as of Imbo v2.3, and will be removed in Imbo v3.
 
 .. _filesystem-storage-adapter:
 
