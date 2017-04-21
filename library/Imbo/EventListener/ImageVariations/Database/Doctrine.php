@@ -18,15 +18,6 @@ use Doctrine\DBAL\Configuration,
 /**
  * Doctrine 2 database driver for the image variations
  *
- * Valid parameters for this driver:
- *
- * - <pre>(string) dbname</pre> Name of the database to connect to
- * - <pre>(string) user</pre> Username to use when connecting
- * - <pre>(string) password</pre> Password to use when connecting
- * - <pre>(string) host</pre> Hostname to use when connecting
- * - <pre>(string) driver</pre> Which driver to use
- * - <pre>(PDO) pdo</pre> PDO adapter to use, as an alternative to specifying the above
- *
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Database
  */
@@ -37,12 +28,6 @@ class Doctrine implements DatabaseInterface {
      * @var array
      */
     private $params = [
-        'dbname'    => null,
-        'user'      => null,
-        'password'  => null,
-        'host'      => null,
-        'driver'    => null,
-        'pdo'       => null,
         'tableName' => 'imagevariations',
     ];
 
@@ -59,12 +44,27 @@ class Doctrine implements DatabaseInterface {
      * @param array $params Parameters for the driver
      * @param Connection $connection Optional connection instance
      */
-    public function __construct(array $params = null, Connection $connection = null) {
-        if ($params !== null) {
-            $this->params = array_merge($this->params, $params);
+    public function __construct(array $params, Connection $connection = null) {
+        $this->params = array_merge($this->params, $params);
+
+        if (isset($this->params['pdo'])) {
+            trigger_error(
+                sprintf(
+                    'The usage of pdo in the configuration array for %s is deprecated and will be removed in Imbo-3.x',
+                    __CLASS__
+                ),
+                E_USER_DEPRECATED
+            );
         }
 
         if ($connection !== null) {
+            trigger_error(
+                sprintf(
+                    'Specifying a connection instance in %s is deprecated and will be removed in Imbo-3.x',
+                    __CLASS__
+                ),
+                E_USER_DEPRECATED
+            );
             $this->setConnection($connection);
         }
     }

@@ -21,16 +21,19 @@ use Imbo\EventListener\ImageVariations\Database\Doctrine,
  */
 class DoctrineTest extends DatabaseTests {
     /**
-     * @var PDO
+     * Path to the database file
+     *
+     * @var string
      */
-    private $pdo;
+    private $dbPath = '/tmp/imbo-eventlistener-imagevariations-database-integration-test.sql';
 
     /**
      * @see ImboIntegrationTest\EventListener\ImageVariations\Database\DatabaseTests::getAdapter()
      */
     protected function getAdapter() {
         return new Doctrine([
-            'pdo' => $this->pdo,
+            'path' => $this->dbPath,
+            'driver' => 'pdo_sqlite',
         ]);
     }
 
@@ -52,9 +55,10 @@ class DoctrineTest extends DatabaseTests {
         }
 
         // Create tmp tables
-        $this->pdo = new PDO('sqlite::memory:');
-        $this->pdo->query('
-            CREATE TABLE IF NOT EXISTS imagevariations (
+        $pdo = new PDO(sprintf('sqlite:%s', $this->dbPath));
+        $pdo->query("DROP TABLE IF EXISTS imagevariations");
+        $pdo->query('
+            CREATE TABLE imagevariations (
                 user TEXT NOT NULL,
                 imageIdentifier TEXT NOT NULL,
                 width INTEGER NOT NULL,
@@ -65,17 +69,5 @@ class DoctrineTest extends DatabaseTests {
         ');
 
         parent::setUp();
-    }
-
-    /**
-     * Clean up after each run
-     */
-    public function tearDown() {
-        if ($this->pdo) {
-            $this->pdo->query('DROP TABLE IF EXISTS imagevariations');
-            $this->pdo = null;
-        }
-
-        parent::tearDown();
     }
 }
