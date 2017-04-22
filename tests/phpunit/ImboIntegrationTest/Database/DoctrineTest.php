@@ -25,7 +25,7 @@ class DoctrineTest extends DatabaseTests {
      *
      * @var string
      */
-    private $dbPath = '/tmp/imbo-database-doctrine-integration-test.sql';
+    private $dbPath;
 
     /**
      * @see ImboIntegrationTest\Database\DatabaseTests::getAdapter()
@@ -49,6 +49,8 @@ class DoctrineTest extends DatabaseTests {
         if (!class_exists('Doctrine\DBAL\DriverManager')) {
             $this->markTestSkipped('Doctrine is required to run this test');
         }
+
+        $this->dbPath = tempnam(sys_get_temp_dir(), 'imbo-integration-test');
 
         // Create tmp tables
         $pdo = new PDO(sprintf('sqlite:%s', $this->dbPath));
@@ -100,5 +102,13 @@ class DoctrineTest extends DatabaseTests {
         ");
 
         parent::setUp();
+    }
+
+    /**
+     * Remove the database file
+     */
+    public function tearDown() {
+        unlink($this->dbPath);
+        parent::tearDown();
     }
 }

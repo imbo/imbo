@@ -25,7 +25,7 @@ class DoctrineTest extends StorageTests {
      *
      * @var string
      */
-    private $dbPath = '/tmp/imbo-eventlistener-imagevariations-storage-doctrine-integration-test.sql';
+    private $dbPath;
 
     /**
      * @see ImboIntegrationTest\EventListener\ImageVariations\Storage\StorageTests::getAdapter()
@@ -53,6 +53,8 @@ class DoctrineTest extends StorageTests {
             $this->markTestSkipped('Doctrine is required to run this test');
         }
 
+        $this->dbPath = tempnam(sys_get_temp_dir(), 'imbo-integration-test');
+
         // Create tmp tables
         $pdo = new PDO(sprintf('sqlite:%s', $this->dbPath));
         $pdo->query("DROP TABLE IF EXISTS storage_image_variations");
@@ -67,5 +69,13 @@ class DoctrineTest extends StorageTests {
         ');
 
         parent::setUp();
+    }
+
+    /**
+     * Remove the database file
+     */
+    public function tearDown() {
+        unlink($this->dbPath);
+        parent::tearDown();
     }
 }

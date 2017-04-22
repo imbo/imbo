@@ -25,8 +25,7 @@ class DoctrineTest extends StorageTests {
      *
      * @var string
      */
-    private $dbPath = '/tmp/imbo-storage-doctrine-integration-test.sql';
-
+    private $dbPath;
 
     /**
      * @see ImboIntegrationTest\Storage\StorageTests::getDriver()
@@ -51,6 +50,8 @@ class DoctrineTest extends StorageTests {
             $this->markTestSkipped('Doctrine is required to run this test');
         }
 
+        $this->dbPath = tempnam(sys_get_temp_dir(), 'imbo-integration-test');
+
         // Create tmp tables
         $pdo = new PDO(sprintf('sqlite:%s', $this->dbPath));
         $pdo->query("DROP TABLE IF EXISTS storage_images");
@@ -65,5 +66,13 @@ class DoctrineTest extends StorageTests {
         ");
 
         parent::setUp();
+    }
+
+    /**
+     * Remove the database file
+     */
+    public function tearDown() {
+        unlink($this->dbPath);
+        parent::tearDown();
     }
 }
