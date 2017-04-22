@@ -18,6 +18,8 @@ use Doctrine\DBAL\Configuration,
 /**
  * Doctrine 2 database driver for the image variations
  *
+ * Refer to http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest for configuration parameters
+ *
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Database
  */

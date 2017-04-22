@@ -17,6 +17,8 @@ use Doctrine\DBAL\Configuration,
 /**
  * Doctrine 2 image variations storage driver
  *
+ * Refer to http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest for configuration parameters
+ *
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Storage
  */

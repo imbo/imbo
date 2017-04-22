@@ -21,6 +21,8 @@ use Imbo\Exception\StorageException,
 /**
  * Doctrine 2 storage driver
  *
+ * Refer to http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest for configuration parameters
+ *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Storage
  */
