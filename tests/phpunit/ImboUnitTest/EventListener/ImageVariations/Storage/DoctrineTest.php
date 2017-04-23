@@ -11,6 +11,8 @@
 namespace ImboUnitTest\EventListener\ImageVariations\Storage;
 
 use Imbo\EventListener\ImageVariations\Storage\Doctrine;
+use PDO;
+use Doctrine\DBAL\DriverManager;
 
 /**
  * @covers Imbo\EventListener\ImageVariations\Storage\Doctrine
@@ -20,14 +22,18 @@ use Imbo\EventListener\ImageVariations\Storage\Doctrine;
  */
 class DoctrineTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @covers Imbo\EventListener\ImageVariations\Storage\Doctrine::__construct
-     * @covers Imbo\EventListener\ImageVariations\Storage\Doctrine::setConnection
+     * @expectedException PHPUnit_Framework_Error_Deprecated
+     * @expectedExceptionMessage The usage of pdo in the configuration array for Imbo\EventListener\ImageVariations\Storage\Doctrine is deprecated and will be removed in Imbo-3.x
      */
-    public function testCanSetConnection() {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
-        $connection->expects($this->once())->method('insert')->will($this->returnValue(false));
+    public function testUsageOfPdoInParametersIsDeprecated() {
+        new Doctrine(['pdo' => new PDO('sqlite::memory:')]);
+    }
 
-        $adapter = new Doctrine([], $connection);
-        $this->assertFalse($adapter->storeImageVariation('key', 'img', 'blob', 1942));
+    /**
+     * @expectedException PHPUnit_Framework_Error_Deprecated
+     * @expectedExceptionMessage Specifying a connection instance in Imbo\EventListener\ImageVariations\Storage\Doctrine is deprecated and will be removed in Imbo-3.x
+     */
+    public function testUsageOfConnectionInConstructor() {
+        new Doctrine([], DriverManager::getConnection(['pdo' => new PDO('sqlite::memory:')]));
     }
 }

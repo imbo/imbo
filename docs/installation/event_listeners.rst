@@ -420,7 +420,7 @@ The event listener supports for following configuration parameters:
             // ...
         ];
 
-    The Doctrine adapter is an alternative for storing both metadata and variation data. This adapter uses the `Doctrine Database Abstraction Layer <http://www.doctrine-project.org/projects/dbal.html>`_. When using this adapter you need to create the required tables in the RDBMS first, as specified in the :ref:`database-setup` section. Note that you can either pass a PDO instance (as the ``pdo`` parameter) or specify connection details. Example usage:
+    The Doctrine adapter is an alternative for storing both metadata and variation data. This adapter uses the `Doctrine Database Abstraction Layer <http://www.doctrine-project.org/projects/dbal.html>`_. When using this adapter you need to create the required tables in the RDBMS first, as specified in the :ref:`database-setup` section. Example usage:
 
     .. code-block:: php
 
@@ -438,11 +438,8 @@ The event listener supports for following configuration parameters:
                                 'user'      => 'imbo_rw',
                                 'password'  => 'imbo_password',
                                 'host'      => 'localhost',
-                                'driver'    => 'mysql',
-                                'tableName' => 'imagevariations',
-
-                                // OR, pass a PDO instance
-                                'pdo'       => null,
+                                'driver'    => 'pdo_mysql',
+                                'tableName' => 'imagevariations', // Default value, can be omitted
                             ]
                         ],
                         'storage' => [
@@ -455,6 +452,8 @@ The event listener supports for following configuration parameters:
 
             // ...
         ];
+
+    .. warning:: Connecting to a database by specifying a PDO instance in the ``pdo`` element of the configuration array is deprecated as of Imbo v2.3, and will be removed in Imbo v3.
 
     The third option for the storage adapter is the Filesystem adapter. It's fairly straightforward and uses a similar algorithm when generating file names as the :ref:`filesystem-storage-adapter` storage adapter. Example usage:
 
