@@ -18,6 +18,14 @@ Below are the changes you need to be aware of when upgrading to Imbo-3.0.0.
     :local:
     :depth: 2
 
+Doctrine-based storage adapters have been removed
++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The following storage adapters have been removed:
+
+- ``Imbo\Storage\Doctrine``
+- ``Imbo\EventListener\ImageVariations\Storage\Doctrine``
+
 XML-support has been removed
 ++++++++++++++++++++++++++++
 

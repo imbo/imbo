@@ -345,7 +345,7 @@ The event listener has two roles, one is to generate the variations when new ima
 
 Imbo ships with MongoDB and Doctrine adapters for storing metadata about these variations. If you want to use a different database, you can implement the ``Imbo\EventListener\ImageVariations\Database\DatabaseInterface`` interface and set the name of the class in the configuration of the event listener.
 
-In the same way, Imbo ships three different adapters for storing the actual image variation data (the downscaled images): GridFS, Doctrine and Filesystem. See examples of their configuration below.
+In the same way, Imbo ships two different adapters for storing the actual image variation data (the downscaled images): GridFS and Filesystem. See examples of their configuration below.
 
 The event listener supports for following configuration parameters:
 
@@ -494,7 +494,7 @@ The event listener supports for following configuration parameters:
             // ...
         ];
 
-    The Doctrine adapter is an alternative for storing both metadata and variation data. This adapter uses the `Doctrine Database Abstraction Layer <http://www.doctrine-project.org/projects/dbal.html>`_. When using this adapter you need to create the required tables in the RDBMS first, as specified in the :ref:`database-setup` section. Note that you can either pass a PDO instance (as the ``pdo`` parameter) or specify connection details. Example usage:
+    The Doctrine adapter is an alternative for storing metadata. This adapter uses the `Doctrine Database Abstraction Layer <http://www.doctrine-project.org/projects/dbal.html>`_. When using this adapter you need to create the required tables in the RDBMS first, as specified in the :ref:`database-setup` section. Example usage:
 
     .. code-block:: php
 
@@ -513,15 +513,11 @@ The event listener supports for following configuration parameters:
                                 'password'  => 'imbo_password',
                                 'host'      => 'localhost',
                                 'driver'    => 'mysql',
-                                'tableName' => 'imagevariations',
-
-                                // OR, pass a PDO instance
-                                'pdo'       => null,
+                                'tableName' => 'imagevariations', // Default value, can be omitted
                             ]
                         ],
                         'storage' => [
-                            'adapter' => 'Imbo\EventListener\ImageVariations\Storage\Doctrine',
-                            'params' => [] // Same as above
+                            'adapter' => 'Imbo\EventListener\ImageVariations\Storage\GridFS',
                         ],
                     ],
                 ],
@@ -530,7 +526,7 @@ The event listener supports for following configuration parameters:
             // ...
         ];
 
-    The third option for the storage adapter is the Filesystem adapter. It's fairly straightforward and uses a similar algorithm when generating file names as the :ref:`filesystem-storage-adapter` storage adapter. Example usage:
+    The other option for the storage adapter is the Filesystem adapter. It's fairly straightforward and uses a similar algorithm when generating file names as the :ref:`filesystem-storage-adapter` storage adapter. Example usage:
 
     .. code-block:: php
 

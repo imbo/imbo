@@ -34,22 +34,6 @@ CREATE TABLE IF NOT EXISTS `shorturl` (
     KEY `params` (`user`,`imageIdentifier`,`extension`,`query`(255))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
-CREATE TABLE IF NOT EXISTS `storage_images` (
-    `user` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-    `imageIdentifier` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-    `data` blob NOT NULL,
-    `updated` int(10) unsigned NOT NULL,
-    PRIMARY KEY (`user`,`imageIdentifier`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
-
-CREATE TABLE IF NOT EXISTS `storage_image_variations` (
-    `user` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-    `imageIdentifier` varchar(255) COLLATE utf8_danish_ci NOT NULL,
-    `width` int(10) unsigned NOT NULL,
-    `data` blob NOT NULL,
-    PRIMARY KEY (`user`,`imageIdentifier`,`width`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
-
 CREATE TABLE IF NOT EXISTS `imagevariations` (
     `user` varchar(255) COLLATE utf8_danish_ci NOT NULL,
     `imageIdentifier` varchar(255) COLLATE utf8_danish_ci NOT NULL,

@@ -173,12 +173,8 @@ MySQL
 .. literalinclude:: ../../setup/doctrine.mysql.sql
     :language: sql
 
-The ``storage_images`` table is only needed if you plan on storing the actual images in the database as well.
-
 SQLite
 ~~~~~~
 
 .. literalinclude:: ../../setup/doctrine.sqlite.sql
     :language: sql
-
-The ``storage_images`` table is only needed if you plan on storing the actual images in the database as well.
