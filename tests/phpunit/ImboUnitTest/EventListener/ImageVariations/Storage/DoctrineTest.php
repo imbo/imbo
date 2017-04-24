@@ -23,17 +23,9 @@ use Doctrine\DBAL\DriverManager;
 class DoctrineTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException PHPUnit_Framework_Error_Deprecated
-     * @expectedExceptionMessage The usage of pdo in the configuration array for Imbo\EventListener\ImageVariations\Storage\Doctrine is deprecated and will be removed in Imbo-3.x
+     * @expectedExceptionMessage The Imbo\EventListener\ImageVariations\Storage\Doctrine adapter is deprectaed and will be removed in Imbo-3.x
      */
-    public function testUsageOfPdoInParametersIsDeprecated() {
-        new Doctrine(['pdo' => new PDO('sqlite::memory:')]);
-    }
-
-    /**
-     * @expectedException PHPUnit_Framework_Error_Deprecated
-     * @expectedExceptionMessage Specifying a connection instance in Imbo\EventListener\ImageVariations\Storage\Doctrine is deprecated and will be removed in Imbo-3.x
-     */
-    public function testUsageOfConnectionInConstructor() {
-        new Doctrine([], DriverManager::getConnection(['pdo' => new PDO('sqlite::memory:')]));
+    public function testAdapterIsDeprecated() {
+        new Doctrine([]);
     }
 }

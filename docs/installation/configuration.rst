@@ -433,8 +433,10 @@ Examples
         // ...
     ];
 
-Doctrine
-++++++++
+Doctrine (deprecated)
++++++++++++++++++++++
+
+.. warning:: This adapter is deprecated as of Imbo v2.3, and will be removed in Imbo v3.
 
 This adapter uses the `Doctrine Database Abstraction Layer <http://www.doctrine-project.org/projects/dbal.html>`_. The options you pass to the constructor of this adapter is passed to the underlying classes, so have a look at the Doctrine DBAL documentation over at `doctrine-project.org <http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html>`_. When using this adapter you need to create the required tables in the RDBMS first, as specified in the :ref:`database-setup` section.
 
@@ -481,8 +483,6 @@ Here are some examples on how to use the Doctrine adapter in the configuration f
 
         // ...
     ];
-
-.. warning:: Connecting to a database by specifying a PDO instance in the ``pdo`` element of the configuration array is deprecated as of Imbo v2.3, and will be removed in Imbo v3.
 
 .. _filesystem-storage-adapter:
 
