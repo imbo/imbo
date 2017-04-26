@@ -55,7 +55,7 @@ class Doctrine implements StorageInterface {
 
         trigger_error(
             sprintf(
-                'The %s adapter is deprectaed and will be removed in Imbo-3.x',
+                'The %s adapter is deprecated and will be removed in Imbo-3.x',
                 __CLASS__
             ),
             E_USER_DEPRECATED
