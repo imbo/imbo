@@ -23,17 +23,9 @@ use Imbo\Storage\Doctrine,
 class DoctrineTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException PHPUnit_Framework_Error_Deprecated
-     * @expectedExceptionMessage The usage of pdo in the configuration array for Imbo\Storage\Doctrine is deprecated and will be removed in Imbo-3.x
+     * @expectedExceptionMessage The Imbo\Storage\Doctrine adapter is deprecated and will be removed in Imbo-3.x
      */
-    public function testUsageOfPdoInParametersIsDeprecated() {
-        new Doctrine(['pdo' => new PDO('sqlite::memory:')]);
-    }
-
-    /**
-     * @expectedException PHPUnit_Framework_Error_Deprecated
-     * @expectedExceptionMessage Specifying a connection instance in Imbo\Storage\Doctrine is deprecated and will be removed in Imbo-3.x
-     */
-    public function testUsageOfConnectionInConstructor() {
-        new Doctrine([], DriverManager::getConnection(['pdo' => new PDO('sqlite::memory:')]));
+    public function testAdapterIsDeprecated() {
+        new Doctrine([]);
     }
 }

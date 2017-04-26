@@ -53,24 +53,15 @@ class Doctrine implements StorageInterface {
     public function __construct(array $params, Connection $connection = null) {
         $this->params = $params;
 
-        if (isset($this->params['pdo'])) {
-            trigger_error(
-                sprintf(
-                    'The usage of pdo in the configuration array for %s is deprecated and will be removed in Imbo-3.x',
-                    __CLASS__
-                ),
-                E_USER_DEPRECATED
-            );
-        }
+        trigger_error(
+            sprintf(
+                'The %s adapter is deprecated and will be removed in Imbo-3.x',
+                __CLASS__
+            ),
+            E_USER_DEPRECATED
+        );
 
         if ($connection !== null) {
-            trigger_error(
-                sprintf(
-                    'Specifying a connection instance in %s is deprecated and will be removed in Imbo-3.x',
-                    __CLASS__
-                ),
-                E_USER_DEPRECATED
-            );
             $this->setConnection($connection);
         }
     }

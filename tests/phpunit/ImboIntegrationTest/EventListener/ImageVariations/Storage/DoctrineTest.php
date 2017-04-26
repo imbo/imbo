@@ -31,10 +31,16 @@ class DoctrineTest extends StorageTests {
      * @see ImboIntegrationTest\EventListener\ImageVariations\Storage\StorageTests::getAdapter()
      */
     protected function getAdapter() {
-        return new Doctrine([
+        \PHPUnit_Framework_Error_Deprecated::$enabled = false;
+
+        $adapter = @new Doctrine([
             'path' => $this->dbPath,
             'driver' => 'pdo_sqlite',
         ]);
+
+        \PHPUnit_Framework_Error_Deprecated::$enabled = true;
+
+        return $adapter;
     }
 
     /**

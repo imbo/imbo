@@ -271,7 +271,7 @@ The event listener has two roles, one is to generate the variations when new ima
 
 Imbo ships with MongoDB and Doctrine adapters for storing metadata about these variations. If you want to use a different database, you can implement the ``Imbo\EventListener\ImageVariations\Database\DatabaseInterface`` interface and set the name of the class in the configuration of the event listener.
 
-In the same way, Imbo ships three different adapters for storing the actual image variation data (the downscaled images): GridFS, Doctrine and Filesystem. See examples of their configuration below.
+In the same way, Imbo ships three different adapters for storing the actual image variation data (the downscaled images): GridFS, Doctrine (deprecated) and Filesystem. See examples of their configuration below.
 
 The event listener supports for following configuration parameters:
 
@@ -454,6 +454,7 @@ The event listener supports for following configuration parameters:
         ];
 
     .. warning:: Connecting to a database by specifying a PDO instance in the ``pdo`` element of the configuration array is deprecated as of Imbo v2.3, and will be removed in Imbo v3.
+    .. warning:: The Doctrine-based storage adapter is deprecated as of Imbo v2.3, and will be removed in Imbo v3.
 
     The third option for the storage adapter is the Filesystem adapter. It's fairly straightforward and uses a similar algorithm when generating file names as the :ref:`filesystem-storage-adapter` storage adapter. Example usage:
 
