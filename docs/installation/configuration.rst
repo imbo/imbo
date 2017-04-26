@@ -472,54 +472,6 @@ Examples
         // ...
     ];
 
-Doctrine
-++++++++
-
-This adapter uses the `Doctrine Database Abstraction Layer <http://www.doctrine-project.org/projects/dbal.html>`_. The options you pass to the constructor of this adapter is passed to the underlying classes, so have a look at the Doctrine DBAL documentation over at `doctrine-project.org <http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html>`_. When using this adapter you need to create the required tables in the RDBMS first, as specified in the :ref:`database-setup` section.
-
-Examples
-^^^^^^^^
-
-Here are some examples on how to use the Doctrine adapter in the configuration file:
-
-1) Use a PDO instance to connect to a SQLite database:
-
-.. code-block:: php
-
-    <?php
-    return [
-        // ...
-
-        'storage' => function() {
-            return new Imbo\Storage\Doctrine([
-                'pdo' => new PDO('sqlite:/path/to/database'),
-            ]);
-        },
-
-        // ...
-    ];
-
-2) Connect to a MySQL database using PDO:
-
-.. code-block:: php
-
-    <?php
-    return [
-        // ...
-
-        'storage' => function() {
-            return new Imbo\Storage\Doctrine([
-                'dbname'   => 'database',
-                'user'     => 'username',
-                'password' => 'password',
-                'host'     => 'hostname',
-                'driver'   => 'pdo_mysql',
-            ]);
-        },
-
-        // ...
-    ];
-
 .. _filesystem-storage-adapter:
 
 Filesystem

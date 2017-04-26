@@ -36,22 +36,6 @@ CREATE INDEX shorturlparams ON shorturl (
     query
 );
 
-CREATE TABLE IF NOT EXISTS storage_images (
-    user TEXT NOT NULL,
-    imageIdentifier TEXT NOT NULL,
-    data BLOB NOT NULL,
-    updated INTEGER NOT NULL,
-    PRIMARY KEY (user,imageIdentifier)
-);
-
-CREATE TABLE IF NOT EXISTS storage_image_variations (
-    user TEXT NOT NULL,
-    imageIdentifier TEXT NOT NULL,
-    width INTEGER NOT NULL,
-    data BLOB NOT NULL,
-    PRIMARY KEY (user,imageIdentifier,width)
-);
-
 CREATE TABLE IF NOT EXISTS imagevariations (
     user TEXT NOT NULL,
     imageIdentifier TEXT NOT NULL,
