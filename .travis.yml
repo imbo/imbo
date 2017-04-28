@@ -15,6 +15,7 @@ services:
   - mongodb
   - memcached
 before_install:
+  - pecl list
   - sudo add-apt-repository -y ppa:moti-p/cc
   - sudo apt-get update
   - sudo apt-get -y --reinstall install imagemagick
