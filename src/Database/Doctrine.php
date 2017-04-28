@@ -119,13 +119,11 @@ class Doctrine implements DatabaseInterface {
                 'checksum' => $image->getChecksum(),
                 'originalChecksum' => $image->getOriginalChecksum(),
             ]);
-        } catch (DBALException $e) {
-            // The DBALException wraps the actual PDO exception, so we'll have to inspect that one..
-            if (($e->getPrevious()->getCode() == '23000') && (strpos($e->getPrevious()->getMessage(), 'Integrity constraint violation') !== false)) {
-                throw new DuplicateImageIdentifierException('Duplicate image identifier when attempting to insert image into DB.', 503);
-            }
-
-            throw $e;
+        } catch (UniqueConstraintViolationException $e) {
+            throw new DuplicateImageIdentifierException(
+                'Duplicate image identifier when attempting to insert image into DB.',
+                503
+            );
         }
 
         return (boolean) $result;
