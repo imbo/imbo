@@ -37,27 +37,24 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
      * Set up the driver
      */
     public function setUp() {
-        $this->driver =
-        $this->getMockBuilder(Doctrine::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getConnection'])
-            ->getMock();
+        $this->driver = $this->getMockBuilder(Doctrine::class)
+                             ->disableOriginalConstructor()
+                             ->setMethods(['getConnection'])
+                             ->getMock();
 
         $this->connection = $this->createMock(Connection::class);
-        $this->driver
-            ->expects($this->any())
-            ->method('getConnection')
-            ->willReturn($this->connection);
+        $this->driver->expects($this->any())
+                     ->method('getConnection')
+                     ->willReturn($this->connection);
     }
 
     /**
      * @covers Imbo\Database\Doctrine::getStatus
      */
     public function testGetStatusWhenDatabaseIsAlreadyConnected() {
-        $this->connection
-            ->expects($this->once())
-            ->method('isConnected')
-            ->willReturn(true);
+        $this->connection->expects($this->any())
+                         ->method('isConnected')
+                         ->willReturn(true);
 
         $this->assertTrue($this->driver->getStatus());
     }
@@ -66,14 +63,13 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Database\Doctrine::getStatus
      */
     public function testGetStatusWhenDatabaseIsNotConnectedAndCanConnect() {
-        $this->connection
-            ->expects($this->once())
-            ->method('isConnected')
-            ->willReturn(false);
-        $this->connection
-            ->expects($this->once())
-            ->method('connect')
-            ->willReturn(true);
+        $this->connection->expects($this->any())
+                         ->method('isConnected')
+                         ->willReturn(false);
+
+        $this->connection->expects($this->any())
+                         ->method('connect')
+                         ->willReturn(true);
 
         $this->assertTrue($this->driver->getStatus());
     }
@@ -82,15 +78,13 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Database\Doctrine::getStatus
      */
     public function testGetStatusWhenDatabaseIsNotConnectedAndCanNotConnect() {
-        $this->connection
-            ->expects($this->once())
-            ->method('isConnected')
-            ->will($this->returnValue(false));
+        $this->connection->expects($this->any())
+                         ->method('isConnected')
+                         ->will($this->returnValue(false));
 
-        $this->connection
-            ->expects($this->once())
-            ->method('connect')
-            ->will($this->returnValue(false));
+        $this->connection->expects($this->any())
+                         ->method('connect')
+                         ->will($this->returnValue(false));
 
         $this->assertFalse($this->driver->getStatus());
     }
@@ -99,15 +93,13 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\Database\Doctrine::getStatus
      */
     public function testGetStatusWhenDatabaseIsNotConnectedAndConnectThrowsAnException() {
-        $this->connection
-            ->expects($this->once())
-            ->method('isConnected')
-            ->will($this->returnValue(false));
+        $this->connection->expects($this->any())
+                         ->method('isConnected')
+                         ->will($this->returnValue(false));
 
-        $this->connection
-            ->expects($this->once())
-            ->method('connect')
-            ->will($this->throwException(new DBALException()));
+        $this->connection->expects($this->any())
+                         ->method('connect')
+                         ->will($this->throwException(new DBALException()));
 
         $this->assertFalse($this->driver->getStatus());
     }
