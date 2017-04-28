@@ -11,6 +11,7 @@
 namespace ImboUnitTest\EventListener\ImageVariations\Database;
 
 use Imbo\EventListener\ImageVariations\Database\Doctrine;
+use PDO;
 
 /**
  * @covers Imbo\EventListener\ImageVariations\Database\Doctrine
@@ -21,14 +22,10 @@ use Imbo\EventListener\ImageVariations\Database\Doctrine;
 class DoctrineTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\EventListener\ImageVariations\Database\Doctrine::__construct
-     * @covers Imbo\EventListener\ImageVariations\Database\Doctrine::setConnection
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The usage of 'pdo' in the configuration for Imbo\EventListener\ImageVariations\Database\Doctrine is not allowed, use 'driver' instead
      */
-    public function testCanSetConnection() {
-        $connection = $this->createMock('Doctrine\DBAL\Connection');
-        $connection->expects($this->once())->method('insert')->will($this->returnValue(false));
-
-        $adapter = new Doctrine([], $connection);
-
-        $this->assertFalse($adapter->storeImageVariationMetadata('key', 'img', 1337, 1942));
+    public function testThrowsExceptionWhenUsingPdoInConfiguration() {
+        new Doctrine(['pdo' => new PDO('sqlite::memory:')]);
     }
 }
