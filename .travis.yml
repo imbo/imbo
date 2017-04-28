@@ -14,6 +14,7 @@ branches:
   only:
     - develop
     - master
+    - imbo-2.x
 services:
   - mongodb
   - memcached
