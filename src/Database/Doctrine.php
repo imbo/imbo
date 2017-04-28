@@ -68,6 +68,7 @@ class Doctrine implements DatabaseInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
+     * @throws InvalidArgumentException
      */
     public function __construct(array $params) {
         if (isset($params['pdo'])) {
