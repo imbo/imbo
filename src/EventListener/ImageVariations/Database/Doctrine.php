@@ -118,18 +118,6 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * Set the connection instance
-     *
-     * @param Connection $connection The connection instance
-     * @return self
-     */
-    private function setConnection(Connection $connection) {
-        $this->connection = $connection;
-
-        return $this;
-    }
-
-    /**
      * Get the Doctrine connection
      *
      * @return Connection
