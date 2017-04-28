@@ -9,6 +9,7 @@
  */
 
 namespace Imbo\Resource;
+
 use Imbo\EventManager\EventInterface,
     Imbo\Exception\DuplicateImageIdentifierException,
     Imbo\Exception\ImageException,
