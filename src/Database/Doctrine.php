@@ -18,21 +18,15 @@ use Imbo\Model\Image,
     Imbo\Exception,
     Doctrine\DBAL\DriverManager,
     Doctrine\DBAL\Connection,
+    Doctrine\DBAL\DBALException,
     PDO,
-    PDOException,
     DateTime,
     DateTimeZone;
 
 /**
  * Doctrine 2 database driver
  *
- * Parameters for this driver:
- *
- * - <pre>(string) dbname</pre> Name of the database to connect to
- * - <pre>(string) user</pre> Username to use when connecting
- * - <pre>(string) password</pre> Password to use when connecting
- * - <pre>(string) host</pre> Hostname to use when connecting
- * - <pre>(string) driver</pre> Which driver to use
+ * Refer to http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest for configuration parameters
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
@@ -43,13 +37,7 @@ class Doctrine implements DatabaseInterface {
      *
      * @var array
      */
-    private $params = [
-        'dbname'   => null,
-        'user'     => null,
-        'password' => null,
-        'host'     => null,
-        'driver'   => null,
-    ];
+    private $params = [];
 
     /**
      * Default table names for the database
@@ -80,14 +68,16 @@ class Doctrine implements DatabaseInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param Connection $connection Optional connection instance. Primarily used for testing
      */
-    public function __construct(array $params, Connection $connection = null) {
-        $this->params = array_merge($this->params, $params);
-
-        if ($connection !== null) {
-            $this->setConnection($connection);
+    public function __construct(array $params) {
+        if (isset($params['pdo'])) {
+            throw new InvalidArgumentException(sprintf(
+                "The usage of 'pdo' in the configuration for %s is not allowed, use 'driver' instead",
+                __CLASS__
+            ), 500);
         }
+
+        $this->params = $params;
     }
 
     /**
@@ -497,7 +487,7 @@ class Doctrine implements DatabaseInterface {
             $connection = $this->getConnection();
 
             return $connection->isConnected() || $connection->connect();
-        } catch (PDOException $e) {
+        } catch (DBALException $e) {
             return false;
         }
     }
@@ -624,23 +614,11 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
-     * Set the connection instance
-     *
-     * @param Connection $connection The connection instance
-     * @return self
-     */
-    private function setConnection(Connection $connection) {
-        $this->connection = $connection;
-
-        return $this;
-    }
-
-    /**
      * Get the Doctrine connection
      *
      * @return Connection
      */
-    private function getConnection() {
+    protected function getConnection() {
         if ($this->connection === null) {
             $this->connection = DriverManager::getConnection($this->params);
         }

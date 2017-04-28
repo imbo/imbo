@@ -10,7 +10,8 @@
 
 namespace Imbo\EventListener\ImageVariations\Database;
 
-use Doctrine\DBAL\Configuration,
+use Imbo\Exception\InvalidArgumentException,
+    Doctrine\DBAL\Configuration,
     Doctrine\DBAL\DriverManager,
     Doctrine\DBAL\Connection,
     PDO;
@@ -18,14 +19,7 @@ use Doctrine\DBAL\Configuration,
 /**
  * Doctrine 2 database driver for the image variations
  *
- * Valid parameters for this driver:
- *
- * - <pre>(string) dbname</pre> Name of the database to connect to
- * - <pre>(string) user</pre> Username to use when connecting
- * - <pre>(string) password</pre> Password to use when connecting
- * - <pre>(string) host</pre> Hostname to use when connecting
- * - <pre>(string) driver</pre> Which driver to use
- * - <pre>(PDO) pdo</pre> PDO adapter to use, as an alternative to specifying the above
+ * Refer to http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest for configuration parameters
  *
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Database
@@ -37,12 +31,6 @@ class Doctrine implements DatabaseInterface {
      * @var array
      */
     private $params = [
-        'dbname'    => null,
-        'user'      => null,
-        'password'  => null,
-        'host'      => null,
-        'driver'    => null,
-        'pdo'       => null,
         'tableName' => 'imagevariations',
     ];
 
@@ -57,16 +45,17 @@ class Doctrine implements DatabaseInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param Connection $connection Optional connection instance
+     * @throws InvalidArgumentException
      */
-    public function __construct(array $params = null, Connection $connection = null) {
-        if ($params !== null) {
-            $this->params = array_merge($this->params, $params);
+    public function __construct(array $params) {
+        if (isset($params['pdo'])) {
+            throw new InvalidArgumentException(sprintf(
+                "The usage of 'pdo' in the configuration for %s is not allowed, use 'driver' instead",
+                __CLASS__
+            ), 500);
         }
 
-        if ($connection !== null) {
-            $this->setConnection($connection);
-        }
+        $this->params = array_merge($this->params, $params);
     }
 
     /**
