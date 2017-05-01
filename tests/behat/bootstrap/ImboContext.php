@@ -266,7 +266,14 @@ class ImboContext extends RESTContext {
      */
     public function theWidthOfTheImageIs($value, $size) {
         $image = (string) $this->getLastResponse()->getBody();
-        $size = (int) $size;
+        $diff = 0;
+
+        if (($pos = strpos($size, '±')) !== false) {
+            $diff = (int) substr($size, $pos + 2); // ± is two bytes
+            $size = (int) substr($size, 0, $pos);
+        } else {
+            $size = (int) $size;
+        }
 
         $info = getimagesizefromstring($image);
 
@@ -276,7 +283,20 @@ class ImboContext extends RESTContext {
             $index = 1;
         }
 
-        assertSame($size, $info[$index], 'Incorrect ' . $value . ', expected ' . $size . ', got ' . $info[$index]);
+        if ($diff) {
+            $errorMessage = sprintf(
+                'Expected %s to be between %d and %d inclusive, got %d',
+                $value,
+                $size - $diff,
+                $size + $diff,
+                $info[$index]
+            );
+
+            assertLessThanOrEqual($size + $diff, $info[$index], $errorMessage);
+            assertGreaterThanOrEqual($size - $diff, $info[$index], $errorMessage);
+        } else {
+            assertSame($size, $info[$index], 'Incorrect ' . $value . ', expected ' . $size . ', got ' . $info[$index]);
+        }
     }
 
     /**

@@ -77,8 +77,8 @@ Feature: Imbo enables dynamic transformations of images
             | strip                                                                                             | 599   | 417    |
             | thumbnail                                                                                         | 50    | 50     |
             | thumbnail:width=40,height=30                                                                      | 40    | 30     |
-            | thumbnail:width=40,height=40,fit=inset                                                            | 40    | 27     |
-            | thumbnail:width=10,height=70,fit=inset                                                            | 10    | 6      |
+            | thumbnail:width=40,height=40,fit=inset                                                            | 40    | 27±1   |
+            | thumbnail:width=10,height=70,fit=inset                                                            | 10    | 6±1    |
             | transpose                                                                                         | 417   | 599    |
             | transverse                                                                                        | 417   | 599    |
             | graythumb:width=40,height=40                                                                      | 40    | 40     |

@@ -51,7 +51,8 @@ class ThumbnailTest extends TransformationTests {
             'only fit (inset)' => [
                 'params' => ['fit' => 'inset'],
                 'width'  => 50,
-                'height' => 34
+                'height' => 34,
+                'diff'   => 1,
             ],
             'only fit (outbound)' => [
                 'params' => ['fit' => 'outbound'],
@@ -61,7 +62,8 @@ class ThumbnailTest extends TransformationTests {
             'all params (inset)' => [
                 'params' => ['width' => 123, 'height' => 456, 'fit' => 'inset'],
                 'width'  => 123,
-                'height' => 85
+                'height' => 85,
+                'diff'   => 1,
             ],
             'all params (outbound)' => [
                 'params' => ['width' => 123, 'height' => 456, 'fit' => 'outbound'],
@@ -75,10 +77,14 @@ class ThumbnailTest extends TransformationTests {
      * @dataProvider getThumbnailParams
      * @covers Imbo\Image\Transformation\Thumbnail::transform
      */
-    public function testCanTransformImage($params, $width, $height) {
+    public function testCanTransformImage($params, $width, $height, $diff = 0) {
         $image = $this->getMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));
-        $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
+        $image->expects($this->once())->method('setWidth')->with($this->callback(function($actual) use ($width, $diff) {
+            return ($actual >= ($width - $diff)) && ($actual <= ($width + $diff));
+        }))->will($this->returnValue($image));
+        $image->expects($this->once())->method('setHeight')->with($this->callback(function($actual) use ($height, $diff) {
+            return ($actual >= ($height - $diff)) && ($actual <= ($height + $diff));
+        }))->will($this->returnValue($image));
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 
         $event = $this->getMock('Imbo\EventManager\Event');

@@ -1,10 +1,6 @@
 language: php
 php:
   - 5.6
-  - 7.0
-matrix:
-  allow_failures:
-    - php: 7.0
 notifications:
   irc:
     use_notice: true
@@ -14,22 +10,23 @@ branches:
   only:
     - develop
     - master
+    - imbo-2.x
 services:
   - mongodb
   - memcached
 before_install:
+  - pecl list
   - sudo add-apt-repository -y ppa:moti-p/cc
   - sudo apt-get update
   - sudo apt-get -y --reinstall install imagemagick
-  - printf "\n" | pecl install --force mongo
-  - printf "\n" | pecl install --force mongodb
-  - printf "\n" | pecl install --force memcached-2.2.0
-  - printf "\n" | pecl install apcu-4.0.10
-  - printf "\n" | pecl install imagick-3.4.0RC2
+  - printf "\n" | pecl install mongo-1.6.14
+  - printf "\n" | pecl install memcached-2.2.0
+  - printf "\n" | pecl install imagick-3.4.3
+  - pecl list
 before_script:
   - phpenv config-add tests/travis-php.ini
   - composer self-update
-  - composer -n --no-ansi install --dev --prefer-source
+  - composer -n install --prefer-source
 script:
   - ./vendor/bin/phpunit --verbose -c tests/phpunit/phpunit.xml.travis
   - ./vendor/bin/behat --strict --profile no-cc --config tests/behat/behat.yml
