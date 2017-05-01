@@ -19,9 +19,9 @@ before_install:
   - sudo add-apt-repository -y ppa:moti-p/cc
   - sudo apt-get update
   - sudo apt-get -y --reinstall install imagemagick
-  - printf "\n" | pecl install mongo-1.6.14
-  - printf "\n" | pecl install memcached-2.2.0
-  - printf "\n" | pecl install imagick-3.4.3
+  - printf "\n" | pecl install mongo-1.6
+  - printf "\n" | pecl install memcached-2.2
+  - printf "\n" | pecl install imagick-3.4
   - pecl list
 before_script:
   - phpenv config-add tests/travis-php.ini
