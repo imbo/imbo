@@ -1093,7 +1093,7 @@ class FeatureContext extends ApiContext {
         $this->requireResponse();
 
         $match = [];
-        preg_match('/^(?<width>[\d]+(±[\d]+)?)?x(?<height>[\d]+(±[\d]+)?)?$/', $dimension, $match);
+        preg_match('/^(?<width>[\d]+(±[\d]+)?)x(?<height>[\d]+(±[\d]+)?)$/', $dimension, $match);
 
         if (!$match) {
             throw new InvalidArgumentException(sprintf(
