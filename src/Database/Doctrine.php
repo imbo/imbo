@@ -122,8 +122,11 @@ class Doctrine implements DatabaseInterface {
         } catch (UniqueConstraintViolationException $e) {
             throw new DuplicateImageIdentifierException(
                 'Duplicate image identifier when attempting to insert image into DB.',
-                503
+                503,
+                $e
             );
+        } catch (DBALException $e) {
+            throw new DatabaseException('Unable to save image data', 500, $e);
         }
 
         return (boolean) $result;
