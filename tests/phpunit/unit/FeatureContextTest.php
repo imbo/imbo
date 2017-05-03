@@ -1743,6 +1743,82 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getApproximateImageWidths() {
+        return [
+            ['598±1'],
+            ['600±1'],
+            ['589±10'],
+            ['609±10'],
+        ];
+    }
+
+    /**
+     * @dataProvider getApproximateImageWidths
+     * @dovers ::assertImageWidth
+     * @param string $approximateWidth
+     */
+    public function testCanAssertApproximateImageWidth($approximateWidth) {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImageWidth($approximateWidth)
+        );
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getApproximateImageWidthsForFailure() {
+        return [
+            [
+                'approximateWidth' => '597±1',
+                'exceptionMessage' => 'Expected image width to be between 596 and 598 inclusive, got 599.',
+            ],
+            [
+                'approximateWidth' => '601±1',
+                'exceptionMessage' => 'Expected image width to be between 600 and 602 inclusive, got 599.',
+            ],
+            [
+                'approximateWidth' => '588±10',
+                'exceptionMessage' => 'Expected image width to be between 578 and 598 inclusive, got 599.',
+            ],
+            [
+                'approximateWidth' => '610±10',
+                'exceptionMessage' => 'Expected image width to be between 600 and 620 inclusive, got 599.',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getApproximateImageWidthsForFailure
+     * @dovers ::assertImageWidth
+     * @expectedException Assert\InvalidArgumentException
+     * @param string $approximateWidth
+     * @param string $exceptionMessage
+     */
+    public function testAssertingApproximateImageWidthCanFail($approximateWidth, $exceptionMessage) {
+        $this->expectExceptionMessage($exceptionMessage);
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+        );
+
+        $this->context
+            ->requestPath('/path')
+            ->assertImageWidth($approximateWidth);
+    }
+
+    /**
      * @covers ::assertImageHeight
      * @expectedException Assert\InvalidArgumentException
      * @expectedExceptionMessage Incorrect image height, expected 123, got 417.
@@ -1774,6 +1850,82 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
                 ->requestPath('/path')
                 ->assertImageHeight(417)
         );
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getApproximateImageHeights() {
+        return [
+            ['416±1'],
+            ['418±1'],
+            ['407±10'],
+            ['427±10'],
+        ];
+    }
+
+    /**
+     * @dataProvider getApproximateImageHeights
+     * @dovers ::assertImageHeight
+     * @param string $approximateHeight
+     */
+    public function testCanAssertApproximateImageHeight($approximateHeight) {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertImageHeight($approximateHeight)
+        );
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getApproximateImageHeightsForFailure() {
+        return [
+            [
+                'approximateHeight' => '415±1',
+                'exceptionMessage' => 'Expected image height to be between 414 and 416 inclusive, got 417.',
+            ],
+            [
+                'approximateHeight' => '419±1',
+                'exceptionMessage' => 'Expected image height to be between 418 and 420 inclusive, got 417.',
+            ],
+            [
+                'approximateHeight' => '406±10',
+                'exceptionMessage' => 'Expected image height to be between 396 and 416 inclusive, got 417.',
+            ],
+            [
+                'approximateHeight' => '428±10',
+                'exceptionMessage' => 'Expected image height to be between 418 and 438 inclusive, got 417.',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getApproximateImageHeightsForFailure
+     * @dovers ::assertImageHeight
+     * @expectedException Assert\InvalidArgumentException
+     * @param string $approximateHeight
+     * @param string $exceptionMessage
+     */
+    public function testAssertingApproximateImageHeightCanFail($approximateHeight, $exceptionMessage) {
+        $this->expectExceptionMessage($exceptionMessage);
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+        );
+
+        $this->context
+            ->requestPath('/path')
+            ->assertImageHeight($approximateHeight);
     }
 
     /**
