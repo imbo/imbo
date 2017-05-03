@@ -15,10 +15,12 @@ use Imbo\Model\Image,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     Imbo\Exception\InvalidArgumentException,
+    Imbo\Exception\DuplicateImageIdentifierException,
     Imbo\Exception,
     Doctrine\DBAL\DriverManager,
     Doctrine\DBAL\Connection,
     Doctrine\DBAL\DBALException,
+    Doctrine\DBAL\Exception\UniqueConstraintViolationException,
     PDO,
     DateTime,
     DateTimeZone;
@@ -84,7 +86,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($user, $imageIdentifier, Image $image) {
+    public function insertImage($user, $imageIdentifier, Image $image, $updateIfDuplicate = true) {
         $now = time();
 
         if ($added = $image->getAddedDate()) {
@@ -95,27 +97,39 @@ class Doctrine implements DatabaseInterface {
             $updated = $updated->getTimestamp();
         }
 
-        if ($id = $this->getImageId($user, $imageIdentifier)) {
-            return (boolean) $this->getConnection()->update($this->tableNames['imageinfo'], [
+        if ($updateIfDuplicate && $id = $this->getImageId($user, $imageIdentifier)) {
+            return (boolean)$this->getConnection()->update($this->tableNames['imageinfo'], [
                 'updated' => $now,
             ], [
                 'id' => $id
             ]);
         }
 
-        return (boolean) $this->getConnection()->insert($this->tableNames['imageinfo'], [
-            'size'             => $image->getFilesize(),
-            'user'             => $user,
-            'imageIdentifier'  => $imageIdentifier,
-            'extension'        => $image->getExtension(),
-            'mime'             => $image->getMimeType(),
-            'added'            => $added ?: $now,
-            'updated'          => $updated ?: $now,
-            'width'            => $image->getWidth(),
-            'height'           => $image->getHeight(),
-            'checksum'         => $image->getChecksum(),
-            'originalChecksum' => $image->getOriginalChecksum(),
-        ]);
+        try {
+            $result = $this->getConnection()->insert($this->tableNames['imageinfo'], [
+                'size' => $image->getFilesize(),
+                'user' => $user,
+                'imageIdentifier' => $imageIdentifier,
+                'extension' => $image->getExtension(),
+                'mime' => $image->getMimeType(),
+                'added' => $added ?: $now,
+                'updated' => $updated ?: $now,
+                'width' => $image->getWidth(),
+                'height' => $image->getHeight(),
+                'checksum' => $image->getChecksum(),
+                'originalChecksum' => $image->getOriginalChecksum(),
+            ]);
+        } catch (UniqueConstraintViolationException $e) {
+            throw new DuplicateImageIdentifierException(
+                'Duplicate image identifier when attempting to insert image into DB.',
+                503,
+                $e
+            );
+        } catch (DBALException $e) {
+            throw new DatabaseException('Unable to save image data', 500, $e);
+        }
+
+        return (boolean) $result;
     }
 
     /**

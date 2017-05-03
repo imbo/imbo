@@ -11,6 +11,8 @@
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface,
+    Imbo\Exception\DuplicateImageIdentifierException,
+    Imbo\Exception\ImageException,
     Imbo\Model;
 
 /**
@@ -60,15 +62,52 @@ class Images implements ResourceInterface {
     /**
      * Handle POST requests
      *
-     * @param EventInterface
+     * @param EventInterface $event
      */
     public function addImage(EventInterface $event) {
-        $event->getManager()->trigger('db.image.insert');
-        $event->getManager()->trigger('storage.image.insert');
-
         $request = $event->getRequest();
         $response = $event->getResponse();
         $image = $request->getImage();
+
+        // attempt to store the image in the underlying database
+        $maxAttempts = 100;
+        $config = $event->getConfig();
+
+        // retrieve and instantiate if necessary the image identifier generator
+        $imageIdentifierGenerator = $config['imageIdentifierGenerator'];
+
+        if (is_callable($imageIdentifierGenerator) &&
+            !($imageIdentifierGenerator instanceof GeneratorInterface)) {
+            $imageIdentifierGenerator = $imageIdentifierGenerator();
+        }
+
+        for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+            try {
+                $image->setImageIdentifier($imageIdentifierGenerator->generate($image));
+                $event->getManager()->trigger('db.image.insert', ['updateIfDuplicate' => $imageIdentifierGenerator->isDeterministic()]);
+                break;
+            } catch (DuplicateImageIdentifierException $exception) {
+                // the image identifier already exists - or was created before we inserted
+                // so we retry the event to get the last submitted image
+                if ($imageIdentifierGenerator->isDeterministic()) {
+                    $event->getManager()->trigger('db.image.insert', ['updateIfDuplicate' => $imageIdentifierGenerator->isDeterministic()]);
+                }
+
+                continue;
+            }
+        }
+
+        // Image Identifier generation failed - throw exception to get us out of this state
+        if ($attempt === $maxAttempts) {
+            $e = new ImageException('Failed to generate unique image identifier', 503);
+            $e->setImboErrorCode(ImageException::IMAGE_IDENTIFIER_GENERATION_FAILED);
+
+            // Tell the client it's OK to retry later
+            $event->getResponse()->headers->set('Retry-After', 1);
+            throw $e;
+        }
+
+        $event->getManager()->trigger('storage.image.insert');
 
         $model = new Model\ArrayModel();
         $model->setData([
@@ -80,5 +119,4 @@ class Images implements ResourceInterface {
 
         $response->setModel($model);
     }
-
 }

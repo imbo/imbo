@@ -34,10 +34,11 @@ interface DatabaseInterface {
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier Image identifier
      * @param Image $image The image to insert
+     * @param boolean $updateIfDuplicate Whether we should use an update statement if the image id exists, otherwise it'll result in an exception
      * @return boolean Returns true on success or false on failure
      * @throws DatabaseException
      */
-    function insertImage($user, $imageIdentifier, Image $image);
+    function insertImage($user, $imageIdentifier, Image $image, $updateIfDuplicate = true);
 
     /**
      * Delete an image from the database

@@ -14,6 +14,7 @@ use Imbo\Model\Image,
     Imbo\Model\Images,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
+    Imbo\Exception\DuplicateImageIdentifierException,
     Imbo\Helpers\BSONToArray,
     MongoDB\Client as MongoClient,
     MongoDB\Driver\Manager,
@@ -114,7 +115,7 @@ class Mongo implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($user, $imageIdentifier, Image $image) {
+    public function insertImage($user, $imageIdentifier, Image $image, $updateIfDuplicate = true) {
         $now = time();
 
         if ($added = $image->getAddedDate()) {
@@ -125,7 +126,7 @@ class Mongo implements DatabaseInterface {
             $updated = $updated->getTimestamp();
         }
 
-        if ($this->imageExists($user, $imageIdentifier)) {
+        if ($updateIfDuplicate && $this->imageExists($user, $imageIdentifier)) {
             try {
                 $this->getImageCollection()->updateOne(
                     ['user' => $user, 'imageIdentifier' => $imageIdentifier],
@@ -156,6 +157,15 @@ class Mongo implements DatabaseInterface {
         try {
             $this->getImageCollection()->insertOne($data);
         } catch (MongoException $e) {
+            foreach ($e->getWriteResult()->getWriteErrors() as $error) {
+                if ($error->getCode() === 11000) {
+                    throw new DuplicateImageIdentifierException(
+                        'Duplicate image identifier when attempting to insert image into DB.',
+                        503
+                    );
+                }
+            }
+
             throw new DatabaseException('Unable to save image data', 500, $e);
         }
 
