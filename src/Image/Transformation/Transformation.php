@@ -38,6 +38,13 @@ abstract class Transformation implements ListenerInterface {
     protected $event;
 
     /**
+     * Image instance
+     *
+     * @var Image
+     */
+    protected $image;
+
+    /**
      * Set the Imagick instance
      *
      * @param Imagick $imagick An Imagick instance
@@ -98,7 +105,7 @@ abstract class Transformation implements ListenerInterface {
         if (is_callable([$this->imagick, 'getQuantumRange'])) {
             $quantumRange = $this->imagick->getQuantumRange();
         } else {
-            $quantumRange = \Imagick::getQuantumRange();
+            $quantumRange = Imagick::getQuantumRange();
         }
 
         return $quantumRange['quantumRangeLong'];
