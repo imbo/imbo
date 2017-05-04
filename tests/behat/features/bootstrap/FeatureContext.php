@@ -1049,7 +1049,7 @@ class FeatureContext extends ApiContext {
     /**
      * Assert the width of the image in the current response
      *
-     * @param int $width
+     * @param int|string $width
      * @return self
      *
      * @Then the image width is :width
@@ -1057,15 +1057,8 @@ class FeatureContext extends ApiContext {
     public function assertImageWidth($width) {
         $this->requireResponse();
 
-        $width = (int) $width;
-
-        list($actualWidth) = getimagesizefromstring((string) $this->response->getBody());
-
-        Assertion::same(
-            $width,
-            $actualWidth,
-            sprintf('Incorrect image width, expected %d, got %d.', $width, $actualWidth)
-        );
+        $size = getimagesizefromstring((string) $this->response->getBody());
+        $this->validateImageDimensions($size[0], null, $width);
 
         return $this;
     }
@@ -1073,7 +1066,7 @@ class FeatureContext extends ApiContext {
     /**
      * Assert the height of image in the current response
      *
-     * @param int $height
+     * @param int|string $height
      * @return self
      *
      * @Then the image height is :height
@@ -1081,16 +1074,8 @@ class FeatureContext extends ApiContext {
     public function assertImageHeight($height) {
         $this->requireResponse();
 
-        $height = (int) $height;
-
-        list($actualWidth, $actualHeight) = getimagesizefromstring((string) $this->response->getBody());
-        unset($actualWidth);
-
-        Assertion::same(
-            $height,
-            $actualHeight,
-            sprintf('Incorrect image height, expected %d, got %d.', $height, $actualHeight)
-        );
+        $size = getimagesizefromstring((string) $this->response->getBody());
+        $this->validateImageDimensions(null, $size[1], null, $height);
 
         return $this;
     }
@@ -1108,7 +1093,7 @@ class FeatureContext extends ApiContext {
         $this->requireResponse();
 
         $match = [];
-        preg_match('/^(?<width>[\d]+)x(?<height>[\d]+)$/', $dimension, $match);
+        preg_match('/^(?<width>[\d]+(±[\d]+)?)x(?<height>[\d]+(±[\d]+)?)$/', $dimension, $match);
 
         if (!$match) {
             throw new InvalidArgumentException(sprintf(
@@ -1117,22 +1102,8 @@ class FeatureContext extends ApiContext {
             ));
         }
 
-        $width = (int) $match['width'];
-        $height = (int) $match['height'];
-
-        list($actualWidth, $actualHeight) = getimagesizefromstring((string) $this->response->getBody());
-
-        Assertion::same(
-            $width,
-            $actualWidth,
-            sprintf('Incorrect image width, expected %d, got %d.', $width, $actualWidth)
-        );
-
-        Assertion::same(
-            $height,
-            $actualHeight,
-            sprintf('Incorrect image height, expected %d, got %d.', $height, $actualHeight)
-        );
+        $size = getimagesizefromstring((string) $this->response->getBody());
+        $this->validateImageDimensions($size[0], $size[1], $match['width'], $match['height']);
 
         return $this;
     }
@@ -1608,17 +1579,17 @@ class FeatureContext extends ApiContext {
             }
 
             if (!empty($row['image width']) || !empty($row['image height'])) {
-                list($actualWidth, $actualHeight) = getimagesizefromstring((string) $response->getBody());
+                $size = getimagesizefromstring((string) $response->getBody());
 
                 if (!empty($row['image width'])) {
                     Assertion::same(
                         (int) $row['image width'],
-                        $actualWidth,
+                        $size[0],
                         sprintf(
                             'Expected image in response %d to be %d pixel(s) wide, actual: %d.',
                             $row['response'],
                             $row['image width'],
-                            $actualWidth
+                            $size[0]
                         )
                     );
                 }
@@ -1626,12 +1597,12 @@ class FeatureContext extends ApiContext {
                 if (!empty($row['image height'])) {
                     Assertion::same(
                         (int) $row['image height'],
-                        $actualHeight,
+                        $size[1],
                         sprintf(
                             'Expected image in response %d to be %d pixel(s) high, actual: %d.',
                             $row['response'],
                             $row['image height'],
-                            $actualHeight
+                            $size[1]
                         )
                     );
                 }
@@ -1783,5 +1754,77 @@ class FeatureContext extends ApiContext {
         throw new RuntimeException(
             'Could not find any response in the history with an image identifier.'
         );
+    }
+
+    /**
+     * Assert image dimensions
+     *
+     * @param int $actualWidth The actual width of the image
+     * @param int $actualHeight The actual height of the image
+     * @param int|string $expectedWidth Expected width of the image
+     * @param int|string $expectedHeight Expected height of the image
+     */
+    private function validateImageDimensions($actualWidth = null, $actualHeight = null, $expectedWidth = null, $expectedHeight = null) {
+        $actualWidth = (int) $actualWidth;
+        $actualHeight = (int) $actualHeight;
+        $expectedWidthDiff = $expectedHeightDiff = 0;
+
+        if (($pos = strpos($expectedWidth, '±')) !== false) {
+            $expectedWidthDiff = (int) substr($expectedWidth, $pos + 2); // ± is two bytes
+            $expectedWidth = (int) substr($expectedWidth, 0, $pos);
+        } else {
+            $expectedWidth = (int) $expectedWidth;
+        }
+
+        if (($pos = strpos($expectedHeight, '±')) !== false) {
+            $expectedHeightDiff = (int) substr($expectedHeight, $pos + 2); // ± is two bytes
+            $expectedHeight = (int) substr($expectedHeight, 0, $pos);
+        } else {
+            $expectedHeight = (int) $expectedHeight;
+        }
+
+        if ($actualWidth && $expectedWidth) {
+            if ($expectedWidthDiff) {
+                Assertion::between(
+                    $actualWidth,
+                    $expectedWidth - $expectedWidthDiff,
+                    $expectedWidth + $expectedWidthDiff,
+                    sprintf(
+                        'Expected image width to be between %d and %d inclusive, got %d.',
+                        $expectedWidth - $expectedWidthDiff,
+                        $expectedWidth + $expectedWidthDiff,
+                        $actualWidth
+                    )
+                );
+            } else {
+                Assertion::same(
+                    $expectedWidth,
+                    $actualWidth,
+                    sprintf('Incorrect image width, expected %d, got %d.', $expectedWidth, $actualWidth)
+                );
+            }
+        }
+
+        if ($actualHeight && $expectedHeight) {
+            if ($expectedHeightDiff) {
+                Assertion::between(
+                    $actualHeight,
+                    $expectedHeight - $expectedHeightDiff,
+                    $expectedHeight + $expectedHeightDiff,
+                    sprintf(
+                        'Expected image height to be between %d and %d inclusive, got %d.',
+                        $expectedHeight - $expectedHeightDiff,
+                        $expectedHeight + $expectedHeightDiff,
+                        $actualHeight
+                    )
+                );
+            } else {
+                Assertion::same(
+                    $expectedHeight,
+                    $actualHeight,
+                    sprintf('Incorrect image height, expected %d, got %d.', $expectedHeight, $actualHeight)
+                );
+            }
+        }
     }
 }
