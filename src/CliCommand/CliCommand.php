@@ -33,7 +33,7 @@ abstract class CliCommand extends Command {
      */
     public function getConfig() {
         if ($this->config === null) {
-            $this->config = require 'config/config.default.php';
+            $this->config = require __DIR__ . '/../../config/config.default.php';
         }
 
         return $this->config;
