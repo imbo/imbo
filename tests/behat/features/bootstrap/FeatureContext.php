@@ -999,7 +999,7 @@ class FeatureContext extends ApiContext {
             ));
         }
 
-        return $this->requestPath(sprintf('/s/%s', $body['id']));
+        return $this->requestPath(sprintf('/s/%s', $body['id']), 'GET');
     }
 
     /**
@@ -1180,7 +1180,7 @@ class FeatureContext extends ApiContext {
         // ACL rule
         $this
             ->appendAccessToken()
-            ->requestPath(sprintf('/keys/%s/access/%s', $publicKey, $aclId));
+            ->requestPath(sprintf('/keys/%s/access/%s', $publicKey, $aclId), 'GET');
 
         $expectedStatusLine = '404 Access rule not found';
         $actualStatusLine = sprintf(
