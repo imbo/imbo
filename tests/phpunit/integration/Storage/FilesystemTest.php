@@ -57,7 +57,7 @@ class FilesystemTest extends StorageTests {
      * @expectedExceptionCode 507
      */
     public function testStoringEmptyDataFails() {
-        $this->getDriverActive()->store($this->getUser(), "this_identifier_left_empty", "");
+        $this->getDriverActive()->store($this->getUser(), 'this_identifier_left_empty', '');
     }
 
     /**
