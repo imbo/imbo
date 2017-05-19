@@ -11,7 +11,7 @@
 namespace ImboIntegrationTest\Storage;
 
 use Imbo\Storage\GridFS,
-    MongoClient;
+    MongoDB\Client;
 
 /**
  * @covers Imbo\Storage\GridFS
@@ -25,32 +25,32 @@ class GridFSTest extends StorageTests {
      *
      * @var string
      */
-    private $testDbName = 'imboGridFSIntegrationTest';
+    private $databaseName = 'imboGridFSIntegrationTest';
 
     /**
      * @see ImboIntegrationTest\Storage\StorageTests::getDriver()
      */
     protected function getDriver() {
         return new GridFS([
-            'databaseName' => $this->testDbName,
+            'databaseName' => $this->databaseName,
         ]);
     }
 
     public function setUp() {
-        if (!class_exists('MongoClient')) {
-            $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
+        if (!class_exists('MongoDB\Driver\Manager') || !class_exists('MongoDB\Client')) {
+            $this->markTestSkipped('pecl/mongodb and mongodb/mongodb are both required to run this test');
         }
 
-        $client = new MongoClient();
-        $client->selectDB($this->testDbName)->drop();
+        $client = new Client();
+        $client->dropDatabase($this->databaseName);
 
         parent::setUp();
     }
 
     public function tearDown() {
-        if (class_exists('MongoClient')) {
-            $client = new MongoClient();
-            $client->selectDB($this->testDbName)->drop();
+        if (class_exists('MongoDB\Client')) {
+            $client = new Client();
+            $client->dropDatabase($this->databaseName);
         }
 
         parent::tearDown();
@@ -61,7 +61,7 @@ class GridFSTest extends StorageTests {
      */
     public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() {
         $storage = new GridFS([
-            'server' => 'foobar',
+            'uri' => 'mongodb://localhost:1',
         ]);
         $this->assertFalse($storage->getStatus());
     }
