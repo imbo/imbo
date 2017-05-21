@@ -14,7 +14,7 @@ use Imbo\Exception\StorageException,
     MongoDB\Client,
     MongoDB\GridFS\Database,
     MongoDB\GridFS\Bucket,
-    MongoDB\Driver\Exception\Exception as MongoException,
+    MongoDB\Driver\Exception\Exception as MongoDBException,
     MongoDB\Driver\Command,
     DateTime,
     DateTimeZone;
@@ -22,14 +22,14 @@ use Imbo\Exception\StorageException,
 /**
  * GridFS (MongoDB) storage driver for images
  *
- * Parameters for this driver:
+ * Valid parameters for this driver:
  *
- * - `uri`: MongoDB connection string. Defaults to 'mongodb://localhost:27017'
- * - `uriOptions`: Additional connection string options. Defaults to []
- * - `clientOptions`: Driver-specific options for the internal MongoDB client. Defaults to
- *                    ['connect' => true, 'connectTimeoutMS' => 1000]
- * - `databaseName`: Name of the database to connect to
- * - `bucketOptions`: Options for the internal Bucket instance. Defaults to []
+ * - `string uri`: MongoDB connection string. Defaults to 'mongodb://localhost:27017'
+ * - `array uriOptions`: Additional connection string options. Defaults to []
+ * - `array clientOptions`: Driver-specific options for the internal MongoDB client. Defaults to
+ *                          ['connect' => true, 'connectTimeoutMS' => 1000]
+ * - `string databaseName`: Name of the database to connect to. Defaults to 'imbo_storage'
+ * - `array bucketOptions`: Options for the internal Bucket instance. Defaults to []
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Storage
@@ -70,8 +70,6 @@ class GridFS implements StorageInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param Client $client MongoDB client instance
-     * @param Bucket $bucket Bucket instance
      */
     public function __construct(array $params = null) {
         if ($params !== null) {
@@ -84,7 +82,7 @@ class GridFS implements StorageInterface {
                 $this->params['uriOptions'],
                 $this->params['clientOptions']
             );
-        } catch (MongoException $e) {
+        } catch (MongoDBException $e) {
             throw new StorageException('Could not connect to database', 500, $e);
         }
 
@@ -114,8 +112,8 @@ class GridFS implements StorageInterface {
             return true;
         }
 
-        $result = $this->bucket->uploadFromStream(
-            $user . '.' . $imageIdentifier,
+        $this->bucket->uploadFromStream(
+            $this->getImageFilename($user, $imageIdentifier),
             $this->createStream($imageData),
             [
                 'metadata' => [
@@ -146,11 +144,13 @@ class GridFS implements StorageInterface {
      * {@inheritdoc}
      */
     public function getImage($user, $imageIdentifier) {
-        if (($file = $this->getImageObject($user, $imageIdentifier)) === false) {
-            throw new StorageException('File not found', 404);
+        try {
+            return stream_get_contents($this->bucket->openDownloadStreamByName(
+                $this->getImageFilename($user, $imageIdentifier)
+            ));
+        } catch (MongoDBException $e) {
+            throw new StorageException('File not found', 404, $e);
         }
-
-        return stream_get_contents($this->bucket->openDownloadStream($file['_id']));
     }
 
     /**
@@ -161,36 +161,30 @@ class GridFS implements StorageInterface {
             throw new StorageException('File not found', 404);
         }
 
-        $timestamp = $file['metadata']->getArrayCopy()['updated'];
-
-        return new DateTime('@' . $timestamp, new DateTimeZone('UTC'));
+        return new DateTime(sprintf('@%d', $file['metadata']['updated']), new DateTimeZone('UTC'));
     }
 
     /**
      * {@inheritdoc}
-     * @fixed
      */
     public function getStatus() {
         try {
             return $this->client
                 ->getManager()
                 ->executeCommand($this->params['databaseName'], new Command(['ping' => 1]));
-        } catch (MongoException $e) {
+        } catch (MongoDBException $e) {
             return false;
         }
     }
 
     /**
      * {@inheritdoc}
-     * @fixed
      */
     public function imageExists($user, $imageIdentifier) {
-        $cursor = $this->bucket->findOne([
+        return null !== $this->bucket->findOne([
             'metadata.user' => $user,
             'metadata.imageIdentifier' => $imageIdentifier
         ]);
-
-        return $cursor !== null;
     }
 
     /**
@@ -201,17 +195,10 @@ class GridFS implements StorageInterface {
      * @return boolean|array Returns false if the file does not exist or the file as an array otherwise
      */
     protected function getImageObject($user, $imageIdentifier) {
-        $cursor = $this->bucket->find([
+        return $this->bucket->findOne([
             'metadata.user' => $user,
             'metadata.imageIdentifier' => $imageIdentifier,
-        ], ['limit' => 1]);
-
-        foreach ($cursor as $file) {
-            // Return first entry
-            return $file->getArrayCopy();
-        }
-
-        return false;
+        ]) ?: false;
     }
 
     /**
@@ -226,5 +213,16 @@ class GridFS implements StorageInterface {
         rewind($stream);
 
         return $stream;
+    }
+
+    /**
+     * Get the image filename
+     *
+     * @param string $user
+     * @param string $imageIdentifier
+     * @return string
+     */
+    private function getImageFilename($user, $imageIdentifier) {
+        return sprintf('%s.%s', $user, $imageIdentifier);
     }
 }
