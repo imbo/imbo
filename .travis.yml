@@ -27,11 +27,11 @@ services:
   - mongodb
 
 before_install:
-  - sudo add-apt-repository -y ppa:moti-p/cc
   - sudo apt-get update
-  - sudo apt-get -y --reinstall install imagemagick
-  - printf "\n" | pecl install --force mongodb
-  - printf "\n" | pecl install imagick-3.4.0RC2
+  - sudo apt-get -y install imagemagick
+  - pecl list
+  - printf "\n" | pecl install mongodb
+  - printf "\n" | pecl install imagick
 
 before_script:
   - phpenv config-rm xdebug.ini
