@@ -27,8 +27,9 @@ services:
   - mongodb
 
 before_install:
-  - sudo apt-get update
   - pecl list
+  - sudo apt-get update
+  - sudo apt-get -y install imagemagick
   - printf "\n" | pecl install --force mongodb
   - printf "\n" | pecl install imagick
 
