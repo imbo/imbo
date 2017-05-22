@@ -1,5 +1,6 @@
 <?php
 use Imbo\Resource;
+use MongoDB\BSON\ObjectId as MongoId;
 
 return [
     'accesscontrol' => [

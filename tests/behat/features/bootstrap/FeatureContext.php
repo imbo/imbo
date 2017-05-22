@@ -196,8 +196,7 @@ class FeatureContext extends ApiContext {
      * @codeCoverageIgnore
      */
     public static function prepare(BeforeScenarioScope $scope) {
-        $mongo = new MongoClient();
-        $mongo->imbo_testing->drop();
+        (new MongoDB\Client())->imbo_testing->drop();
 
         $cachePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'imbo-behat-image-transformation-cache';
 
@@ -597,7 +596,7 @@ class FeatureContext extends ApiContext {
             ));
         }
 
-        $mongo = (new MongoClient())->imbo_testing;
+        $mongoDB = (new MongoDB\Client())->imbo_testing;
 
         $fixtures = require $fixturePath;
 
@@ -609,10 +608,10 @@ class FeatureContext extends ApiContext {
         }
 
         foreach ($fixtures as $collection => $data) {
-            $mongo->$collection->drop();
+            $mongoDB->$collection->drop();
 
             if ($data) {
-                $mongo->$collection->batchInsert($data);
+                $mongoDB->$collection->insertMany($data);
             }
         }
     }

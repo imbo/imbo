@@ -11,8 +11,7 @@
 namespace ImboIntegrationTest\EventListener\ImageVariations\Storage;
 
 use Imbo\EventListener\ImageVariations\Storage\GridFS,
-    MongoClient,
-    MongoException;
+    MongoDB\Client;
 
 /**
  * @covers Imbo\EventListener\ImageVariations\Storage\GridFS
@@ -21,6 +20,11 @@ use Imbo\EventListener\ImageVariations\Storage\GridFS,
  * @group mongodb
  */
 class GridFSTest extends StorageTests {
+    /**
+     * Name of the test db
+     *
+     * @var string
+     */
     private $databaseName = 'imboGridFSIntegrationTest';
 
     /**
@@ -36,12 +40,11 @@ class GridFSTest extends StorageTests {
      * Make sure we have the mongo extension available and drop the test database just in case
      */
     public function setUp() {
-        if (!extension_loaded('mongo') || !class_exists('MongoClient')) {
-            $this->markTestSkipped('pecl/mongo >= 1.3.0 is required to run this test');
+        if (!class_exists('MongoDB\Driver\Manager') || !class_exists('MongoDB\Client')) {
+            $this->markTestSkipped('pecl/mongodb and mongodb/mongodb are both required to run this test');
         }
 
-        $client = new MongoClient();
-        $client->selectDB($this->databaseName)->drop();
+        (new Client())->dropDatabase($this->databaseName);
 
         parent::setUp();
     }
@@ -50,9 +53,8 @@ class GridFSTest extends StorageTests {
      * Drop the test database after each test
      */
     public function tearDown() {
-        if (extension_loaded('mongo') && class_exists('MongoClient')) {
-            $client = new MongoClient();
-            $client->selectDB($this->databaseName)->drop();
+        if (!class_exists('MongoDB\Driver\Manager') || !class_exists('MongoDB\Client')) {
+            (new Client())->dropDatabase($this->databaseName);
         }
 
         parent::tearDown();

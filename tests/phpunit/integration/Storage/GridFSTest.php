@@ -41,16 +41,14 @@ class GridFSTest extends StorageTests {
             $this->markTestSkipped('pecl/mongodb and mongodb/mongodb are both required to run this test');
         }
 
-        $client = new Client();
-        $client->dropDatabase($this->databaseName);
+        (new Client())->dropDatabase($this->databaseName);
 
         parent::setUp();
     }
 
     public function tearDown() {
         if (class_exists('MongoDB\Client')) {
-            $client = new Client();
-            $client->dropDatabase($this->databaseName);
+            (new Client())->dropDatabase($this->databaseName);
         }
 
         parent::tearDown();
