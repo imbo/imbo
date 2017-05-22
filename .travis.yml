@@ -28,9 +28,7 @@ services:
 
 before_install:
   - sudo apt-get update
-  - sudo apt-get -y install imagemagick
   - pecl list
-  - printf "\n" | pecl install mongodb
   - printf "\n" | pecl install imagick
 
 before_script:
