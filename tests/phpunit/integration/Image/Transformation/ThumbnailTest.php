@@ -62,7 +62,8 @@ class ThumbnailTest extends TransformationTests {
             'all params (inset)' => [
                 'params' => ['width' => 123, 'height' => 456, 'fit' => 'inset'],
                 'width'  => 123,
-                'height' => 85
+                'height' => 85,
+                'diff'   => 1,
             ],
             'all params (outbound)' => [
                 'params' => ['width' => 123, 'height' => 456, 'fit' => 'outbound'],
