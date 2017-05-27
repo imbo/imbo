@@ -3,7 +3,7 @@
 Configuration
 =============
 
-Imbo ships with a default configuration file that will be automatically loaded. You will have to create one or more configuration files of your own that will be automatically merged with the default configuration by Imbo. The location of these files depends on the :ref:`installation method <installation>` you choose. You should never have to edit the default configuration file provided by Imbo.
+Imbo ships with a default configuration file that will be automatically loaded. You will have to create one or more configuration files of your own that will be automatically merged with the default configuration by Imbo. You should never have to edit the default configuration file provided by Imbo.
 
 The configuration file(s) you need to create should simply return arrays with configuration data. All available configuration options are covered in this chapter.
 
@@ -16,9 +16,9 @@ The configuration file(s) you need to create should simply return arrays with co
 Using callables in configuration
 --------------------------------
 
-Imbo supports providing callables for certain configuration options. In Imbo 2 these are the :ref:`accessControl <access-control-configuration>`, :ref:`database <database-configuration>`, :ref:`eventListeners[name] <event-listeners-configuration>`, :ref:`resource <resource-configuration>` and :ref:`storage <storage-configuration>` options, while Imbo 3 adds callable support for :ref:`transformationPresets <transformation-presets-configuration>`. The callable receives two arguments (`$request` and `$response`) which map to the active request and response objects.
+Imbo supports callables for certain configuration options: :ref:`accessControl <access-control-configuration>`, :ref:`database <database-configuration>`, :ref:`eventListeners[name] <event-listeners-configuration>`, :ref:`resource <resource-configuration>`, :ref:`storage <storage-configuration>` and :ref:`transformationPresets <transformation-presets-configuration>`. The callable receives two arguments (``$request`` and ``$response``) which map to the active request and response objects.
 
-By using a callable you can extend Imbo with custom logic for most configuration options (or provide the ``$request`` or ``$response`` objects to your implementing class), such as switching storage modules based on which user performed the request.
+By using a callable you can extend Imbo with custom logic for most configuration options (or provide the ``$request`` or ``$response`` objects to your implementing class), such as switching storage modules based on which user performed the request. Using callables will also delay the instantiation of the classes until they are first accessed, instead of when the configuration files are loaded.
 
 
 .. _access-control-configuration:
@@ -34,20 +34,20 @@ Public keys can be configured to have varying degrees of access. For instance, y
 
 Specifying a long list of resources can get tedious, so Imbo also supports ``resource groups`` - basically just a list of different resources. When creating access rules for a public key, these can be used instead of specifying specific resources.
 
-For the private keys you can for instance use a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images (given the public key it belongs to has write access). Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want. The key itself will never be a part of the payload sent to/from the server.
+For the private keys you can for instance use a `SHA-256`_ hash of a random value. The private key is used by clients to sign requests, and if you accidentally give away your private key users can use it to delete all your images (given the public key it belongs to has write access). Make sure not to generate a private key that is easy to guess (like for instance the MD5 or SHA-256 hash of the public key). Imbo does not require the private key to be in a specific format, so you can also use regular passwords if you want. The key itself should **never** be a part of the payload sent to/from the server.
 
-Imbo ships with a small command line tool that can be used to generate private keys for you using the `openssl_random_pseudo_bytes <http://php.net/openssl_random_pseudo_bytes>`_ function. The tool is located in the ``bin`` directory of the Imbo installation:
+Imbo ships with a small command line tool that can be used to generate private keys for you using PHP's `openssl_random_pseudo_bytes`_ function. The tool is located in the ``bin`` directory of the Imbo installation:
 
 .. code-block:: bash
 
     $ ./bin/imbo generate-private-key
     3b98dde5f67989a878b8b268d82f81f0858d4f1954597cc713ae161cdffcc84a
 
-The private key can be changed whenever you want as long as you remember to change it in both the server configuration and in the client you use. The user can not be changed easily as database and storage adapters use it when storing/fetching images and metadata.
+Both the public and private key can be changed whenever you want as long as you remember to change them in both the server configuration and in the client you use. The user can not be changed easily as database and storage adapters use it when storing/fetching images and metadata.
 
-Access control is managed by ``adapters``. The simplest adapter is the ``SimpleArrayAdapter``, which has a number of trade-offs in favor of being easy to set up. Mainly, it expects the public key to have the same name as the user it should have access to, and that the public key should be given full read+write access to all resources belonging to that user.
+Access control is managed by ``adapters``. The simplest adapter is the ``Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter``, which has a number of trade-offs in favor of being easy to set up. Mainly, it expects the public key to have the same name as the user it should have access to, and that the public key should be given full read+write access to all resources belonging to that user.
 
-.. warning::
+.. note::
     It's not recommended that you use the same public key for both read and write operations. Read on to see how you can create different public keys for read and read/write access.
 
 The adapter is set up using the ``accessControl`` key in your configuration file:
@@ -58,109 +58,97 @@ The adapter is set up using the ``accessControl`` key in your configuration file
     return [
         // ...
 
-        'accessControl' => function() {
-            return new Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter([
-                'some-user' => 'my-super-secret-private-key',
-                'other-user' => 'other-super-secret-private-key',
-            ]);
-        },
+        'accessControl' => new Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter([
+            'some-user' => 'my-super-secret-private-key',
+            'other-user' => 'other-super-secret-private-key',
+        ]),
 
         // ...
     ];
 
-It's usually a good idea to have separate public keys for read-only and read+write operations. You can achieve this by using a more flexible access control adapter, such as the ``ArrayAdapter``:
+It's usually a good idea to have separate public keys for read-only and read+write operations. You can achieve this by using a more flexible access control adapter, such as the ``Imbo\Auth\AccessControl\Adapter\ArrayAdapter``:
 
 .. code-block:: php
 
     <?php
-    use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
-        Imbo\Resource;
-
     return [
         // ...
 
-        'accessControl' => function() {
-            return new ArrayAdapter([
-                [
-                    'publicKey'  => 'some-read-only-pubkey',
-                    'privateKey' => 'some-private-key',
-                    'acl' => [[
-                        'resources' => Resource::getReadOnlyResources(),
-                        'users' => ['some-user']
-                    ]]
-                ],
-                [
-                    'publicKey'  => 'some-read-write-pubkey',
-                    'privateKey' => 'some-other-private-key',
-                    'acl' => [[
-                        'resources' => Resource::getReadWriteResources(),
-                        'users' => ['some-user']
-                    ]]
-                ]
-            ]);
-        }
+        'accessControl' => new Imbo\Auth\AccessControl\Adapter\ArrayAdapter([
+            [
+                'publicKey' => 'some-read-only-pubkey',
+                'privateKey' => 'some-private-key',
+                'acl' => [[
+                    'resources' => Imbo\Resource::getReadOnlyResources(),
+                    'users' => ['some-user']
+                ]]
+            ],
+            [
+                'publicKey' => 'some-read-write-pubkey',
+                'privateKey' => 'some-other-private-key',
+                'acl' => [[
+                    'resources' => Imbo\Resource::getReadWriteResources(),
+                    'users' => ['some-user']
+                ]]
+            ]
+        ]),
 
         // ...
     ];
 
-As you can see, the ``ArrayAdapter`` is much more flexible than the ``SimpleArrayAdapter``. The above example only shows part of this flexibility. You can also provide resource groups and multiple access control rules per public key. The following example shows this more clearly:
+As you can see, the ``Imbo\Auth\AccessControl\Adapter\ArrayAdapter`` is much more flexible than the ``Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter``. The above example only shows part of this flexibility. You can also provide resource groups and multiple access control rules per public key. The following example shows this more clearly:
 
 .. code-block:: php
 
     <?php
-    use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
-        Imbo\Resource
-
     return [
         // ...
 
-        'accessControl' => function() {
-            return new ArrayAdapter([
-                [
-                    // A unique public key matching the following regular expression: [A-Za-z0-9_-]{1,}
-                    'publicKey'  => 'some-pubkey',
+        'accessControl' => new Imbo\Auth\AccessControl\Adapter\ArrayAdapter([
+            [
+                // A unique public key matching the following regular expression: [A-Za-z0-9_-]{1,}
+                'publicKey' => 'some-pubkey',
 
-                    // Some form of private key
-                    'privateKey' => 'some-private-key',
+                // Some form of private key
+                'privateKey' => 'some-private-key',
 
-                    // Array of rules for this public key
-                    'acl' => [
-                        [
-                            // An array of different resource names that the public key should have
-                            // access to - see AdapterInterface::RESOURCE_* for available options.
-                            'resources' => Resource::getReadOnlyResources(),
+                // Array of rules for this public key
+                'acl' => [
+                    [
+                        // An array of different resource names that the public key should have
+                        // access to - see AdapterInterface::RESOURCE_* for available options.
+                        'resources' => Imbo\Resource::getReadOnlyResources(),
 
-                            // Names of the users which the public key should have access to.
-                            'users' => ['some', 'users'],
-                        ],
+                        // Names of the users which the public key should have access to.
+                        'users' => ['some', 'users'],
+                    ],
 
-                        // Multiple rules can be applied in order to make a single public key have
-                        // different access rights on different users
-                        [
-                            'resources' => Resource::getReadWriteResources(),
-                            'users' => ['different-user'],
-                        ],
+                    // Multiple rules can be applied in order to make a single public key have
+                    // different access rights on different users
+                    [
+                        'resources' => Imbo\Resource::getReadWriteResources(),
+                        'users' => ['different-user'],
+                    ],
 
-                        // You can also specify resource groups instead of explicitly setting them like
-                        // in the above examples. Note that you cannot specify both resources and group
-                        // in the same rule.
-                        [
-                            'group' => 'read-stats',
-                            'users' => ['user1', 'user2']
-                        ]
+                    // You can also specify resource groups instead of explicitly setting them like
+                    // in the above examples. Note that you cannot specify both resources and group
+                    // in the same rule.
+                    [
+                        'group' => 'read-stats',
+                        'users' => ['user1', 'user2']
                     ]
                 ]
-            ], [
-                // Second argument to the ArrayAdapter being the available resource groups
-                // Format: 'name' => ['resource1', 'resource2']
-                'read-stats' => ['user.get', 'user.head', 'user.options'],
-            ]);
-        },
+            ]
+        ], [
+            // Second argument to the ArrayAdapter being the available resource groups
+            // Format: 'name' => ['resource1', 'resource2']
+            'read-stats' => ['user.get', 'user.head', 'user.options'],
+        ]),
 
         // ...
     ];
 
-Imbo also ships with a MongoDB access control adapter, which is mutable. This means you can manipulate the access control rules on the fly, using Imbo's API. The adapter uses PHP's `mongo extension <http://pecl.php.net/package/mongo>`_. The following parameters are supported:
+Imbo also ships with a MongoDB access control adapter, which is mutable. This means you can manipulate the access control rules on the fly, using Imbo's API. The adapter uses the `MongoDB PECL extension`_ and the `MongoDB PHP library`_. The following parameters are supported:
 
 ``databaseName``
     Name of the database to use. Defaults to ``imbo``.
@@ -169,7 +157,7 @@ Imbo also ships with a MongoDB access control adapter, which is mutable. This me
     The server string to use when connecting. Defaults to ``mongodb://localhost:27017``.
 
 ``options``
-    Options passed to the underlying adapter. Defaults to ``['connect' => true, 'timeout' => 1000]``. See the `manual for the MongoClient constructor <http://www.php.net/manual/en/mongoclient.construct.php>`_ for available options.
+    Options passed to the underlying adapter. Defaults to ``['connect' => true, 'timeout' => 1000]``. See the manual for the `MongoDB PHP library`_ for more information.
 
 .. code-block:: php
 
@@ -177,11 +165,7 @@ Imbo also ships with a MongoDB access control adapter, which is mutable. This me
     return [
         // ...
 
-        'accessControl' => function() {
-            return new Imbo\Auth\AccessControl\Adapter\MongoDB([
-                'databaseName' => 'imbo-acl'
-            ]);
-        },
+        'accessControl' => new Imbo\Auth\AccessControl\Adapter\MongoDB(),
 
         // ...
     ];
@@ -203,17 +187,7 @@ In the default configuration file the :ref:`default-database-adapter` database a
     return [
         // ...
 
-        'database' => function() {
-            return new Imbo\Database\MongoDB([
-                'databaseName' => 'imbo',
-            ]);
-        },
-
-        // or
-
-        'database' => new Imbo\Database\MongoDB([
-            'databaseName' => 'imbo',
-        ]),
+        'database' => new Imbo\Database\MongoDB(),
 
         // ...
     );
@@ -229,14 +203,10 @@ Below you will find documentation on the different database adapters Imbo ships 
 Doctrine
 ++++++++
 
-This adapter uses the `Doctrine Database Abstraction Layer <http://www.doctrine-project.org/projects/dbal.html>`_. The options you pass to the constructor of this adapter is passed to the underlying classes, so have a look at the Doctrine DBAL documentation over at `doctrine-project.org <http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html>`_. When using this adapter you need to create the required tables in the RDBMS first, as specified in the :ref:`database-setup` section.
+This adapter uses the `Doctrine Database Abstraction Layer`_. The options you pass to the constructor of this adapter is passed to the underlying classes, so have a look at the documentation for Doctrine DBAL. When using this adapter you need to create the required tables in the RDBMS first, as specified in the :ref:`database-setup` section.
 
-Examples
-^^^^^^^^
-
-Here are some examples on how to use the Doctrine adapter in the configuration file:
-
-1) Use a `PDO <http://php.net/pdo,>`_ instance to connect to a SQLite database:
+Example
+^^^^^^^
 
 .. code-block:: php
 
@@ -244,32 +214,13 @@ Here are some examples on how to use the Doctrine adapter in the configuration f
     return [
         // ...
 
-        'database' => function() {
-            return new Imbo\Database\Doctrine([
-                'pdo' => new PDO('sqlite:/path/to/database'),
-            ]);
-        },
-
-        // ...
-    ];
-
-2) Connect to a MySQL database using PDO:
-
-.. code-block:: php
-
-    <?php
-    return [
-        // ...
-
-        'database' => function() {
-            return new Imbo\Database\Doctrine([
-                'dbname'   => 'database',
-                'user'     => 'username',
-                'password' => 'password',
-                'host'     => 'hostname',
-                'driver'   => 'pdo_mysql',
-            ]);
-        },
+        'database' => new Imbo\Database\Doctrine([
+            'dbname' => 'database',
+            'user' => 'username',
+            'password' => 'password',
+            'host' => 'hostname',
+            'driver' => 'pdo_mysql'
+        ]),
 
         // ...
     ];
@@ -280,7 +231,7 @@ Here are some examples on how to use the Doctrine adapter in the configuration f
 MongoDB
 +++++++
 
-This adapter uses PHP's `mongo extension <http://pecl.php.net/package/mongo>`_ to store data in `MongoDB <http://www.mongodb.org/>`_. The following parameters are supported:
+This adapter use the `MongoDB PECL extension`_ and the `MongoDB PHP library`_ to store data in `MongoDB`_. The following parameters are supported:
 
 ``databaseName``
     Name of the database to use. Defaults to ``imbo``.
@@ -289,7 +240,7 @@ This adapter uses PHP's `mongo extension <http://pecl.php.net/package/mongo>`_ t
     The server string to use when connecting. Defaults to ``mongodb://localhost:27017``.
 
 ``options``
-    Options passed to the underlying adapter. Defaults to ``['connect' => true, 'timeout' => 1000]``. See the `manual for the MongoClient constructor <http://www.php.net/manual/en/mongoclient.construct.php>`_ for available options.
+    Options passed to the underlying adapter. Defaults to ``['connect' => true, 'timeout' => 1000]``. See the manual for the `MongoDB PHP library`_ for more information.
 
 Examples
 ^^^^^^^^
@@ -302,14 +253,12 @@ Examples
     return [
         // ...
 
-        'database' => function() {
-            return new Imbo\Database\MongoDB();
-        },
+        'database' => new Imbo\Database\MongoDB(),
 
         // ...
     ];
 
-2) Connect to a `replica set <http://www.mongodb.org/display/DOCS/Replica+Sets>`_:
+2) Connect to a `MongoDB replica set`_:
 
 .. code-block:: php
 
@@ -317,22 +266,12 @@ Examples
     return [
         // ...
 
-        'database' => function() {
-            return new Imbo\Database\MongoDB([
-                'server' => 'mongodb://server1,server2,server3',
-                'options' => [
-                    'replicaSet' => 'nameOfReplicaSet',
-                ],
-            ]);
-        },
+        'database' => new Imbo\Database\MongoDB([
+            'server' => 'mongodb://server1,server2,server3/?replicaSet=nameOfReplicaSet',
+        ]),
 
         // ...
     ];
-
-Mongo
-+++++
-
-This adapter uses PHP's `mongodb extension <http://pecl.php.net/package/mongodb>`_. It can be configured in the same was as the :ref:`mongodb-database-adapter` adapter.
 
 Custom database adapter
 +++++++++++++++++++++++
@@ -345,11 +284,7 @@ If you need to create your own database adapter you need to create a class that 
     return [
         // ...
 
-        'database' => function() {
-            return new My\Custom\Adapter([
-                'some' => 'option',
-            ]);
-        },
+        'database' => new My\Custom\DatabaseAdapter(),
 
         // ...
     ];
@@ -371,14 +306,6 @@ In the default configuration file the :ref:`default-storage-adapter` storage ada
     return [
         // ...
 
-        'storage' => function() {
-            return new Imbo\Storage\Filesystem([
-                'dataDir' => '/path/to/images',
-            ]);
-        },
-
-        // or
-
         'storage' => new Imbo\Storage\Filesystem([
             'dataDir' => '/path/to/images',
         ]),
@@ -397,19 +324,19 @@ Below you will find documentation on the different storage adapters Imbo ships w
 Amazon Simple Storage Service
 +++++++++++++++++++++++++++++
 
-This adapter stores your images in a bucket in the Amazon Simple Storage Service (S3). The parameters are:
+This adapter stores your images in a bucket in `Amazon S3`_. The parameters are:
 
 ``key``
-    Your AWS access key
+    Your AWS access key.
 
 ``secret``
-    Your AWS secret key
+    Your AWS secret key.
 
 ``bucket``
-    The name of the bucket you want to store your images in. Imbo will **not** create this for you.
+    The name of the bucket you want to store your images in. Imbo will **not** create this for you automatically.
 
 ``region``
-    The name of the region your bucket resides in. Required for Imbo 3.
+    The name of the region your bucket resides in.
 
 This adapter creates subdirectories in the bucket in the same fashion as the :ref:`Filesystem storage adapter <filesystem-storage-adapter>` stores the files on the local filesystem.
 
@@ -422,14 +349,12 @@ Examples
     return [
         // ...
 
-        'storage' => function() {
-            new Imbo\Storage\S3([
-                'key' => '<aws access key>',
-                'secret' => '<aws secret key>',
-                'bucket' => 'my-imbo-bucket',
-                'region' => 'eu-central-1',
-            ]);
-        },
+        'storage' => new Imbo\Storage\S3([
+            'key' => '<aws access key>',
+            'secret' => '<aws secret key>',
+            'bucket' => 'my-imbo-bucket',
+            'region' => 'eu-central-1',
+        ]),
 
         // ...
     ];
@@ -437,7 +362,7 @@ Examples
 Backblaze B2 Cloud Storage
 ++++++++++++++++++++++++++
 
-This adapter stores your images in a bucket in the `Backblaze B2 Cloud Storage <https://www.backblaze.com/b2/cloud-storage.html>`_. The parameters are:
+This adapter stores your images in a bucket in the `Backblaze B2 Cloud Storage`_. The parameters are:
 
 ``accountId``
     Your B2 account ID.
@@ -460,14 +385,12 @@ Examples
     return [
         // ...
 
-        'storage' => function() {
-            new Imbo\Storage\B2([
-                'accountId' => '<b2 account ID>',
-                'applicationKey' => '<b2 application key>',
-                'bucket' => 'my-imbo-bucket',
-                'bucketId' => '<bucket ID>',
-            ]);
-        },
+        'storage' => new Imbo\Storage\B2([
+            'accountId' => '<b2 account ID>',
+            'applicationKey' => '<b2 application key>',
+            'bucket' => 'my-imbo-bucket',
+            'bucketId' => '<bucket ID>',
+        ]),
 
         // ...
     ];
@@ -495,11 +418,9 @@ Examples
     return [
         // ...
 
-        'storage' => function() {
-            new Imbo\Storage\Filesystem([
-                'dataDir' => '/path/to/images',
-            ]);
-        },
+        'storage' => new Imbo\Storage\Filesystem([
+            'dataDir' => '/path/to/images',
+        ]),
 
         // ...
     ];
@@ -510,16 +431,16 @@ Examples
 GridFS
 ++++++
 
-The GridFS adapter is used to store the images in MongoDB using the `GridFS specification <http://www.mongodb.org/display/DOCS/GridFS>`_. This adapter has the following parameters:
+The GridFS adapter is used to store the images in MongoDB using `GridFS`_. This adapter has the following parameters:
 
 ``databaseName``
     The name of the database to store the images in. Defaults to ``imbo_storage``.
 
 ``server``
-    The server string to use when connecting to MongoDB. Defaults to ``mongodb://localhost:27017``
+    The server string to use when connecting to MongoDB. Defaults to ``mongodb://localhost:27017``.
 
 ``options``
-    Options passed to the underlying adapter. Defaults to ``['connect' => true, 'timeout' => 1000]``. See the `manual for the MongoClient constructor <http://www.php.net/manual/en/mongoclient.construct.php>`_ for available options.
+    Options passed to the underlying adapter. Defaults to ``['connect' => true, 'timeout' => 1000]``. See the manual for the `MongoDB PHP library`_ for available options.
 
 Examples
 ^^^^^^^^
@@ -532,9 +453,7 @@ Examples
     return [
         // ...
 
-        'storage' => function() {
-            return new Imbo\Storage\GridFS();
-        },
+        'storage' => new Imbo\Storage\GridFS(),
 
         // ...
     ];
@@ -547,14 +466,9 @@ Examples
     return [
         // ...
 
-        'storage' => function() {
-            return new Imbo\Storage\GridFS([
-                'server' => 'mongodb://server1,server2,server3',
-                'options' => [
-                    'replicaSet' => 'nameOfReplicaSet',
-                ],
-            ]);
-        },
+        'storage' => new Imbo\Storage\GridFS([
+            'server' => 'mongodb://server1,server2,server3/?replicaSet=nameOfReplicaSet',
+        ]),
 
         // ...
     ];
@@ -570,11 +484,7 @@ If you need to create your own storage adapter you need to create a class that i
     return [
         // ...
 
-        'storage' => function() {
-            return new My\Custom\Adapter([
-                'some' => 'option',
-            ]);
-        },
+        'storage' => new My\Custom\StorageAdapter(),
 
         // ...
     ];
@@ -588,20 +498,37 @@ Image identifier generation - ``imageIdentifierGenerator``
 
 By default, Imbo will generate a random string of characters as the image identifier for added images. These are in the RegExp range ``[A-Za-z0-9_-]`` and by default, the identifier will be 12 characters long.
 
-You can easily change the generation process to a different method. Imbo currently ships with two generators:
+You can easily change the generation process to a different method.
 
-RandomString
-++++++++++++
+.. contents::
+    :local:
+    :depth: 1
+
+Random string
++++++++++++++
 
 The default, as stated above. This generator has the following parameters:
 
 ``length``
     The length of the randomly generated string. Defaults to ``12``.
 
-Uuid
+Usage:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'imageIdentifierGenerator' => new Imbo\Image\Identifier\Generator\RandomString(),
+
+        // ...
+    ];
+
+UUID
 ++++
 
-Generates 36-character v4 UUIDs, for instance ``f47ac10b-58cc-4372-a567-0e02b2c3d479``. This generator does not have any parameters.
+Generates 36-character v4 `UUID`_\s, for instance ``f47ac10b-58cc-4372-a567-0e02b2c3d479``. This generator does not have any parameters.
 
 Usage:
 
@@ -654,7 +581,7 @@ By default, Imbo will do content negotiation for images. In other words, if a re
 
 If what you want is for images to be delivered in the format they were uploaded in, you can set ``contentNegotiateImages`` to ``false`` in the configuration. This will also ensure Imbo does not include ``Accept`` in the ``Vary``-header for image requests, which will make caching behind reverse proxies more efficient.
 
-You are still able to convert between formats by specifying an extension when requesting the image (`.jpg`, `.png`, `.gif` etc).
+You are still able to convert between formats by specifying an extension when requesting the image (``.jpg``, ``.png``, ``.gif`` etc).
 
 .. _configuration-rethrow-exceptions:
 
@@ -1177,3 +1104,15 @@ The index resource (:ref:`index-resource`) simply lists some URLs related to the
 
         // ...
     ];
+
+.. _SHA-256: https://en.wikipedia.org/wiki/SHA-2
+.. _openssl_random_pseudo_bytes: https://php.net/openssl_random_pseudo_bytes
+.. _MongoDB PECL extension: https://pecl.php.net/package/mongodb
+.. _MongoDB PHP library: https://docs.mongodb.com/php-library
+.. _Doctrine Database Abstraction Layer: http://www.doctrine-project.org/projects/dbal.html
+.. _MongoDB: https://www.mongodb.org/
+.. _MongoDB replica set: https://docs.mongodb.com/manual/replication/
+.. _Backblaze B2 Cloud Storage: https://www.backblaze.com/b2/cloud-storage.html
+.. _GridFS: https://docs.mongodb.com/manual/core/gridfs/
+.. _Amazon S3: https://aws.amazon.com/s3/
+.. _UUID: https://en.wikipedia.org/wiki/Universally_unique_identifier
