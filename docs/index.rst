@@ -40,4 +40,3 @@ Extending/customizing Imbo
     develop/custom_adapters
     develop/image_transformations
     develop/contributing
-
