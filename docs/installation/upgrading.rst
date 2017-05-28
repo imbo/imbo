@@ -16,6 +16,11 @@ Below are the changes you need to be aware of when upgrading to Imbo-3.0.0.
     :local:
     :depth: 2
 
+MD5 image identifier generator has been removed
++++++++++++++++++++++++++++++++++++++++++++++++
+
+The ``Imbo\Image\Identifier\Generator\Md5`` image identifier generator has been removed from Imbo-3. Use ``Imbo\Image\Identifier\Generator\RandomString`` (default) or ``Imbo\Image\Identifier\Generator\Uuid`` instead.
+
 Removed storage and database adapters
 +++++++++++++++++++++++++++++++++++++
 
