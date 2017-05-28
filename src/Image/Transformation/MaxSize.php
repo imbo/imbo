@@ -65,8 +65,6 @@ class MaxSize extends Transformation implements InputSizeConstraint {
      * @return array|boolean
      */
     protected function calculateSize(array $params, array $imageSize) {
-        $image = $this->image;
-
         $maxWidth = !empty($params['width']) ? (int) $params['width'] : 0;
         $maxHeight = !empty($params['height']) ? (int) $params['height'] : 0;
 
