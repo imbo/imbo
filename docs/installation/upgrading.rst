@@ -3,9 +3,7 @@
 Upgrading Imbo
 ==============
 
-Depending on the :ref:`installation method <installation>` you chose, upgrading Imbo can be done quite easily. If you went for the :ref:`recommended version <using-composer>` you will only have to bump the version number in your custom ``composer.json`` file and run ``composer update``.
-
-If you did a :ref:`git clone <git-clone>` you could simply do a ``git pull`` to update your working copy.
+Upgrading Imbo can be done quite easily. All you need to do is to bump the version number in your ``composer.json`` file and run ``composer update``. See :ref:`installation` on how to install Imbo.
 
 From time to time Imbo will introduce new features or fix bugs that might require you to update the contents of the database you choose to use. This chapter will contain all information you need to keep your installation up to date. Each of the following sections include the necessary steps you need to execute when upgrading to the different versions.
 
@@ -18,13 +16,29 @@ Below are the changes you need to be aware of when upgrading to Imbo-3.0.0.
     :local:
     :depth: 2
 
-Doctrine-based storage adapters have been removed
-+++++++++++++++++++++++++++++++++++++++++++++++++
+Removed storage and database adapters
++++++++++++++++++++++++++++++++++++++
 
-The following storage adapters have been removed:
+The following storage and database adapters have been removed from Imbo-3:
 
+- ``Imbo\Database\Mongo``
 - ``Imbo\Storage\Doctrine``
+- ``Imbo\Auth\AccessControl\Adapter\Mongo``
+- ``Imbo\EventListener\ImageVariations\Database\Mongo``
 - ``Imbo\EventListener\ImageVariations\Storage\Doctrine``
+
+MongoDB and GridFS adapters have been updated
++++++++++++++++++++++++++++++++++++++++++++++
+
+The following adapters have been updated to use the new `MongoDB PECL extension`_ and the `MongoDB PHP library`_:
+
+- ``Imbo\Database\MongoDB``
+- ``Imbo\Storage\GridFS``
+- ``Imbo\Auth\AccessControl\Adapter\MongoDB``
+- ``Imbo\EventListener\ImageVariations\Database\MongoDB``
+- ``Imbo\EventListener\ImageVariations\Storage\GridFS``
+
+Because of this the configuration parameters for the adapters have also been updated. Refer to the :ref:`configuration` section for more information on how to configure the adapters.
 
 XML-support has been removed
 ++++++++++++++++++++++++++++
@@ -218,3 +232,6 @@ Short image URLs
 ++++++++++++++++
 
 In versions prior to Imbo-1.2.0 short image URLs were created automatically whenever a user agent requested the image resource (with or without transformations), and sent in the response as the ``X-Imbo-ShortUrl`` header. This no longer done automatically. Refer to the :ref:`shorturls-resource` section for more information on how to generate short URLs from this version on.
+
+.. _MongoDB PECL extension: https://pecl.php.net/package/mongodb
+.. _MongoDB PHP library: https://packagist.org/packages/mongodb/mongodb

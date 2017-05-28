@@ -298,9 +298,9 @@ class ImageTransformationCache implements ListenerInterface {
     protected function getCacheKey(Request $request) {
         $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
-        $accept = $request->headers->get('Accept', '*/*');
+        $accept = explode(',', $request->headers->get('Accept', '*/*'));
 
-        $accept = array_filter(explode(',', $accept), function(&$value) {
+        $accept = array_filter(array_map(function($value) {
             // Trim whitespace
             $value = trim($value);
 
@@ -311,6 +311,8 @@ class ImageTransformationCache implements ListenerInterface {
                 $value = substr($value, 0, $pos);
             }
 
+            return $value;
+        }, $accept), function($value) {
             // Keep values starting with "*/" or "image/"
             return ($value[0] === '*' && $value[1] === '/') || substr($value, 0, 6) === 'image/';
         });

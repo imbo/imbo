@@ -49,9 +49,21 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
         $width = 200;
         $blob = file_get_contents(FIXTURES_DIR . '/colors.png');
 
-        $this->assertNull($this->adapter->getImageVariation($key, $id, $width));
-        $this->assertTrue($this->adapter->storeImageVariation($key, $id, $blob, $width));
-        $this->assertSame($blob, $this->adapter->getImageVariation($key, $id, $width));
+        $this->assertNull(
+            $this->adapter->getImageVariation($key, $id, $width),
+            'Image variation should not exist'
+        );
+
+        $this->assertTrue(
+            $this->adapter->storeImageVariation($key, $id, $blob, $width),
+            'Count not store image variation'
+        );
+
+        $this->assertSame(
+            $blob,
+            $this->adapter->getImageVariation($key, $id, $width),
+            'Image variation data out of sync'
+        );
     }
 
     public function testCanDeleteOneOrMoreImageVariations() {
@@ -59,9 +71,20 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
         $id  = 'imageId';
         $blob = file_get_contents(FIXTURES_DIR . '/colors.png');
 
-        $this->assertTrue($this->adapter->storeImageVariation($key, $id, $blob, 100));
-        $this->assertTrue($this->adapter->storeImageVariation($key, $id, 'blob2', 200));
-        $this->assertTrue($this->adapter->storeImageVariation($key, $id, 'blob3', 300));
+        $this->assertTrue(
+            $this->adapter->storeImageVariation($key, $id, $blob, 100),
+            'Could not store 1st image variation'
+        );
+
+        $this->assertTrue(
+            $this->adapter->storeImageVariation($key, $id, 'blob2', 200),
+            'Could not store 2nd image variation'
+        );
+
+        $this->assertTrue(
+            $this->adapter->storeImageVariation($key, $id, 'blob3', 300),
+            'Could not store 3rd image variation'
+        );
 
         $this->assertSame($blob, $this->adapter->getImageVariation($key, $id, 100));
         $this->assertSame('blob2', $this->adapter->getImageVariation($key, $id, 200));

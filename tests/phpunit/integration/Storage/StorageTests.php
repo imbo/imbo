@@ -10,6 +10,8 @@
 
 namespace ImboIntegrationTest\Storage;
 
+use DateTime;
+
 /**
  * @group integration
  * @group storage
@@ -87,19 +89,48 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
     }
 
     public function testStoreAndGetImage() {
-        $this->assertTrue($this->driver->store($this->user, $this->imageIdentifier, $this->imageData));
-        $this->assertSame($this->imageData, $this->driver->getImage($this->user, $this->imageIdentifier));
+        $this->assertTrue(
+            $this->driver->store($this->user, $this->imageIdentifier, $this->imageData),
+            'Could not store initial image'
+        );
+
+        $this->assertSame(
+            $this->imageData,
+            $this->driver->getImage($this->user, $this->imageIdentifier),
+            'Image data is out of sync'
+        );
     }
 
     public function testStoreSameImageTwice() {
-        $this->assertTrue($this->driver->store($this->user, $this->imageIdentifier, $this->imageData));
-        $lastModified1 = $this->driver->getLastModified($this->user, $this->imageIdentifier);
+        $this->assertTrue(
+            $this->driver->store($this->user, $this->imageIdentifier, $this->imageData),
+            'Could not store initial image'
+        );
+
+        $this->assertInstanceOf(
+            DateTime::class,
+            $lastModified1 = $this->driver->getLastModified($this->user, $this->imageIdentifier),
+            'Last modified of the first image is not a DateTime instance'
+        );
+
         clearstatcache();
         sleep(1);
-        $this->assertTrue($this->driver->store($this->user, $this->imageIdentifier, $this->imageData));
-        $lastModified2 = $this->driver->getLastModified($this->user, $this->imageIdentifier);
 
-        $this->assertTrue($lastModified2 > $lastModified1);
+        $this->assertTrue(
+            $this->driver->store($this->user, $this->imageIdentifier, $this->imageData),
+            'Could not store image a second time'
+        );
+
+        $this->assertInstanceOf(
+            DateTime::class,
+            $lastModified2 = $this->driver->getLastModified($this->user, $this->imageIdentifier),
+            'Last modified of the second image is not a DateTime instance'
+        );
+
+        $this->assertTrue(
+            $lastModified2 > $lastModified1,
+            'Last modification timestamp of second image is not greater than the one of the first image'
+        );
     }
 
     /**
@@ -107,8 +138,16 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionCode 404
      */
     public function testStoreDeleteAndGetImage() {
-        $this->assertTrue($this->driver->store($this->user, $this->imageIdentifier, $this->imageData));
-        $this->assertTrue($this->driver->delete($this->user, $this->imageIdentifier));
+        $this->assertTrue(
+            $this->driver->store($this->user, $this->imageIdentifier, $this->imageData),
+            'Could not store initial image'
+        );
+
+        $this->assertTrue(
+            $this->driver->delete($this->user, $this->imageIdentifier),
+            'Could not delete image'
+        );
+
         $this->driver->getImage($this->user, $this->imageIdentifier);
     }
 
@@ -137,13 +176,31 @@ abstract class StorageTests extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetLastModified() {
-        $this->assertTrue($this->driver->store($this->user, $this->imageIdentifier, $this->imageData));
-        $this->assertInstanceOf('DateTime', $this->driver->getLastModified($this->user, $this->imageIdentifier));
+        $this->assertTrue(
+            $this->driver->store($this->user, $this->imageIdentifier, $this->imageData),
+            'Could not store initial image'
+        );
+        $this->assertInstanceOf(
+            DateTime::class,
+            $this->driver->getLastModified($this->user, $this->imageIdentifier),
+            'Last modification is not an instance of DateTime'
+        );
     }
 
     public function testCanCheckIfImageAlreadyExists() {
-        $this->assertFalse($this->driver->imageExists($this->user, $this->imageIdentifier));
-        $this->driver->store($this->user, $this->imageIdentifier, $this->imageData);
-        $this->assertTrue($this->driver->imageExists($this->user, $this->imageIdentifier));
+        $this->assertFalse(
+            $this->driver->imageExists($this->user, $this->imageIdentifier),
+            'Image is not supposed to exist'
+        );
+
+        $this->assertTrue(
+            $this->driver->store($this->user, $this->imageIdentifier, $this->imageData),
+            'Could not store image'
+        );
+
+        $this->assertTrue(
+            $this->driver->imageExists($this->user, $this->imageIdentifier),
+            'Image does not exist'
+        );
     }
 }

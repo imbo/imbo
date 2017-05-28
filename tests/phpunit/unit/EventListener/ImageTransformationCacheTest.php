@@ -161,6 +161,7 @@ class ImageTransformationCacheTest extends ListenerTests {
 
         $this->assertTrue(file_exists($fullPath));
         $this->listener->loadFromCache($this->event);
+        clearstatcache();
         $this->assertFalse(file_exists($fullPath));
     }
 

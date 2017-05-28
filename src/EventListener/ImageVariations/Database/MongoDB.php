@@ -11,9 +11,9 @@
 namespace Imbo\EventListener\ImageVariations\Database;
 
 use Imbo\Exception\DatabaseException,
-    MongoClient,
-    MongoCollection,
-    MongoException;
+    MongoDB\Client as MongoClient,
+    MonboDB\Collection as MongoCollection,
+    MongoDB\Driver\Exception\Exception as MongoException;
 
 /**
  * MongoDB database driver for the image variations
@@ -84,7 +84,7 @@ class MongoDB implements DatabaseInterface {
      */
     public function storeImageVariationMetadata($user, $imageIdentifier, $width, $height) {
         try {
-            $this->getCollection()->insert([
+            $this->getCollection()->insertOne([
                 'added' => time(),
                 'user' => $user,
                 'imageIdentifier'  => $imageIdentifier,
@@ -110,16 +110,19 @@ class MongoDB implements DatabaseInterface {
             ],
         ];
 
-        $cursor = $this->getCollection()
-            ->find($query, [
-                '_id' => false,
-                'width' => true,
-                'height' => true,
-            ])
-            ->limit(1)
-            ->sort(['width' => 1]);
+        $result = $this->getCollection()
+            ->findOne($query, [
+                'projection' => [
+                    '_id' => false,
+                    'width' => true,
+                    'height' => true,
+                ],
+                'sort' => [
+                    'width' => 1,
+                ],
+            ]);
 
-        return $cursor->getNext();
+        return $result ? $result->getArrayCopy() : null;
     }
 
     /**
@@ -135,7 +138,7 @@ class MongoDB implements DatabaseInterface {
             $query['width'] = $width;
         }
 
-        $this->getCollection()->remove($query);
+        $this->getCollection()->deleteMany($query);
 
         return true;
     }

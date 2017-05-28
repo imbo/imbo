@@ -1,4 +1,5 @@
 language: php
+dist: trusty
 
 cache:
   directories:
@@ -7,10 +8,6 @@ cache:
 php:
   - 5.6
   - 7.0
-
-matrix:
-  allow_failures:
-    - php: 7.0
 
 notifications:
   irc:
@@ -22,18 +19,15 @@ branches:
   only:
     - develop
     - master
-    - imbo-3.0
 
 services:
   - mongodb
 
 before_install:
-  - sudo add-apt-repository -y ppa:moti-p/cc
-  - sudo apt-get update
-  - sudo apt-get -y --reinstall install imagemagick
-  - printf "\n" | pecl install --force mongo
+  - pecl list
+  - php -i
   - printf "\n" | pecl install --force mongodb
-  - printf "\n" | pecl install imagick-3.4.0RC2
+  - printf "\n" | pecl install imagick
 
 before_script:
   - phpenv config-rm xdebug.ini
@@ -45,8 +39,8 @@ before_script:
   - composer start-httpd-for-behat-tests
 
 script:
-  - ./vendor/bin/phpunit --verbose -c phpunit.xml.travis --stop-on-failure
-  - ./vendor/bin/behat --strict --stop-on-failure
+  - ./vendor/bin/phpunit --verbose -c phpunit.xml.travis
+  - ./vendor/bin/behat --strict
 
 after_failure:
   - echo "Tests failed - httpd log follows"

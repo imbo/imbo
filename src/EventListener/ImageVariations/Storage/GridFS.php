@@ -11,38 +11,41 @@
 namespace Imbo\EventListener\ImageVariations\Storage;
 
 use Imbo\Exception\StorageException,
-    MongoClient,
-    MongoGridFS,
-    MongoException;
+    MongoDB\Client,
+    MongoDB\GridFS\Database,
+    MongoDB\GridFS\Bucket,
+    MongoDB\Driver\Exception\Exception as MongoDBException;
 
 /**
  * GridFS (MongoDB) database driver for the image variations
  *
  * Valid parameters for this driver:
  *
- * - (string) databaseName Name of the database. Defaults to 'imbo_imagevariation_storage'
- * - (string) server The server string to use when connecting to MongoDB. Defaults to
- *                   'mongodb://localhost:27017'
- * - (array) options Options to use when creating the Mongo client instance. Defaults to
- *                   ['connect' => true, 'connectTimeoutMS' => 1000].
+ * - `string uri`: MongoDB connection string. Defaults to 'mongodb://localhost:27017'
+ * - `array uriOptions`: Additional connection string options. Defaults to []
+ * - `array clientOptions`: Driver-specific options for the internal MongoDB client. Defaults to
+ *                          ['connect' => true, 'connectTimeoutMS' => 1000]
+ * - `string databaseName`: Name of the database to connect to. Defaults to 'imbo_imagevariation_storage'
+ * - `array bucketOptions`: Options for the internal Bucket instance. Defaults to []
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Storage
  */
 class GridFS implements StorageInterface {
     /**
-     * Mongo client instance
-     *
-     * @var MongoClient
+     * @var Client
      */
     private $mongoClient;
 
     /**
-     * The grid instance
-     *
-     * @var MongoGridFS
+     * @var Database
      */
-    private $grid;
+    private $database;
+
+    /**
+     * @var Bucket
+     */
+    private $bucket;
 
     /**
      * Parameters for the driver
@@ -50,12 +53,14 @@ class GridFS implements StorageInterface {
      * @var array
      */
     private $params = [
-        // Database name
+        'uri' => 'mongodb://localhost:27017',
+        'uriOptions' => [],
+        'clientOptions' => [
+            'connect' => true,
+            'connectTimeoutMS' => 1000,
+        ],
         'databaseName' => 'imbo_imagevariation_storage',
-
-        // Server string and ctor options
-        'server'  => 'mongodb://localhost:27017',
-        'options' => ['connect' => true, 'connectTimeoutMS' => 1000],
+        'bucketOptions' => [],
     ];
 
     /**
@@ -65,30 +70,41 @@ class GridFS implements StorageInterface {
      * @param MongoClient $client Mongo client instance
      * @param MongoGridFS $grid MongoGridFS instance
      */
-    public function __construct(array $params = null, MongoClient $client = null, MongoGridFS $grid = null) {
+    public function __construct(array $params = null) {
         if ($params !== null) {
             $this->params = array_replace_recursive($this->params, $params);
         }
 
-        if ($client !== null) {
-            $this->mongoClient = $client;
+        try {
+            $this->client = new Client(
+                $this->params['uri'],
+                $this->params['uriOptions'],
+                $this->params['clientOptions']
+            );
+        } catch (MongoDBException $e) {
+            throw new StorageException('Could not connect to database', 500, $e);
         }
 
-        if ($grid !== null) {
-            $this->grid = $grid;
-        }
+        $this->database = $this->client->selectDatabase($this->params['databaseName']);
+        $this->bucket = $this->database->selectGridFSBucket($this->params['bucketOptions']);
     }
 
     /**
      * {@inheritdoc}
      */
     public function storeImageVariation($user, $imageIdentifier, $blob, $width) {
-        $this->getGrid()->storeBytes($blob, [
-            'added' => time(),
-            'user' => $user,
-            'imageIdentifier' => $imageIdentifier,
-            'width' => (int) $width,
-        ]);
+        $this->bucket->uploadFromStream(
+            $this->getImageFilename($user, $imageIdentifier, (int) $width),
+            $this->createStream($blob),
+            [
+                'metadata' => [
+                    'added' => time(),
+                    'user' => $user,
+                    'imageIdentifier' => $imageIdentifier,
+                    'width' => (int) $width,
+                ],
+            ]
+        );
 
         return true;
     }
@@ -97,65 +113,58 @@ class GridFS implements StorageInterface {
      * {@inheritdoc}
      */
     public function getImageVariation($user, $imageIdentifier, $width) {
-        $file = $this->getGrid()->findOne([
-            'user' => $user,
-            'imageIdentifier' => $imageIdentifier,
-            'width' => (int) $width,
-        ]);
-
-        return $file ? $file->getBytes() : null;
+        try {
+            return stream_get_contents($this->bucket->openDownloadStreamByName(
+                $this->getImageFilename($user, $imageIdentifier, (int) $width)
+            ));
+        } catch (MongoDBException $e) {
+            return null;
+        }
     }
 
     /**
      * {@inheritdoc}
      */
     public function deleteImageVariations($user, $imageIdentifier, $width = null) {
-        $query = [
-            'user' => $user,
-            'imageIdentifier' => $imageIdentifier
+        $filter = [
+            'metadata.user' => $user,
+            'metadata.imageIdentifier' => $imageIdentifier
         ];
 
         if ($width !== null) {
-            $query['width'] = $width;
+            $filter['metadata.width'] = (int) $width;
         }
 
-        $this->getGrid()->remove($query);
+        foreach ($this->bucket->find($filter) as $file) {
+            $this->bucket->delete($file['_id']);
+        }
 
         return true;
     }
 
     /**
-     * Get the grid instance
+     * Create a stream for a string
      *
-     * @return MongoGridFS
+     * @param string $data The string to use in the stream
+     * @return resource
      */
-    protected function getGrid() {
-        if ($this->grid === null) {
-            try {
-                $database = $this->getMongoClient()->selectDB($this->params['databaseName']);
-                $this->grid = $database->getGridFS();
-            } catch (MongoException $e) {
-                throw new StorageException('Could not connect to database', 500, $e);
-            }
-        }
+    private function createStream($data) {
+        $stream = fopen('php://temp', 'w+b');
+        fwrite($stream, $data);
+        rewind($stream);
 
-        return $this->grid;
+        return $stream;
     }
 
     /**
-     * Get the mongo client instance
+     * Get the image variation filename
      *
-     * @return MongoClient
+     * @param string $user
+     * @param string $imageIdentifier
+     * @param int $width
+     * @return string
      */
-    protected function getMongoClient() {
-        if ($this->mongoClient === null) {
-            try {
-                $this->mongoClient = new MongoClient($this->params['server'], $this->params['options']);
-            } catch (MongoException $e) {
-                throw new StorageException('Could not connect to database', 500, $e);
-            }
-        }
-
-        return $this->mongoClient;
+    private function getImageFilename($user, $imageIdentifier, $width) {
+        return sprintf('%s.%s.%d', $user, $imageIdentifier, (int) $width);
     }
 }

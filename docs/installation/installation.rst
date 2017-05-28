@@ -3,14 +3,7 @@
 Installation
 ============
 
-To install Imbo on the server you can choose between two different methods, :ref:`Composer <using-composer>` (recommended) or :ref:`git clone <git-clone>`.
-
-.. _using-composer:
-
-Using composer
---------------
-
-The recommended way of installing Imbo is by creating a ``composer.json`` file for your installation, and then install Imbo and optional 3rd party plug-ins via `Composer <https://getcomposer.org>`_. You will need the following directory structure for this method to work::
+To install Imbo on the server you should use `Composer`_. Create a ``composer.json`` file for your installation, and install Imbo and optional 3rd party plug-ins via the ``composer`` binary. First, you will need the following directory structure::
 
     /path/to/install/composer.json
     /path/to/install/config/
@@ -22,22 +15,24 @@ where the ``composer.json`` file can contain:
     {
       "name": "yourname/imbo",
       "require": {
-        "imbo/imbo": "dev-master"
+        "imbo/imbo": "^3.0"
       }
     }
 
 and the ``config/`` directory contains one or more configuration files that will be merged with the :ref:`default configuration <configuration>`. Imbo will load **all** ``.php`` files in this directory, and the ones returning an array will be used as configuration.
 
-If you want to install 3rd party plug-ins and/or for instance the Doctrine DBAL library simply add these to the ``require`` object in your ``composer.json``:
+If you want to install 3rd party plug-ins and/or for instance the Doctrine DBAL library and the MongoDB PHP library simply add these to the ``require`` object in your ``composer.json`` file:
 
 .. code-block:: json
 
     {
       "name": "yourname/imbo",
       "require": {
-        "imbo/imbo": "dev-master",
+        "imbo/imbo": "^3.0",
         "rexxars/imbo-hipsta": "dev-master",
-        "doctrine/dbal": "2.*"
+        "imbo/imbo": "^3.0",
+        "doctrine/dbal": "^2.5",
+        "mongodb/mongodb": "^1.1"
       }
     }
 
@@ -48,14 +43,13 @@ If some of the 3rd party plug-ins provide configuration files, you can link to t
     cd /path/to/install/config
     ln -s ../vendor/rexxars/imbo-hipsta/config/config.php 01-imbo-hipsta.php
 
-To be able to control the order that Imbo will use when loading the configuration files you should prefix them with a number, like ``01`` in the example above. Lower numbers will be loaded first, meaning that configuration files with higher numbers will override settings set in configuration files with a lower number.
+To be able to control the order that Imbo uses when loading the configuration files you should prefix them with a number, like ``01`` in the example above. Lower numbers will be loaded first, meaning that configuration files with higher numbers will override settings set in configuration files with a lower number.
 
 When you have created the ``composer.json`` file you can install Imbo with Composer:
 
 .. code-block:: bash
 
-    curl -s https://getcomposer.org/installer | php
-    php composer.phar install -o --no-dev
+    composer install -o --no-dev
 
 After composer has finished installing Imbo and optional dependencies the Imbo installation will reside in ``/path/to/install/vendor/imbo/imbo``. The correct web server document root in this case would be ``/path/to/install/vendor/imbo/imbo/public``.
 
@@ -63,40 +57,21 @@ If you later want to update Imbo you can bump the version number you have specif
 
 .. code-block:: bash
 
-    php composer.phar update -o --no-dev
+    composer update -o --no-dev
 
-Regarding the Imbo version you are about to install you can use ``dev-master`` for the latest released version, or you can use a specific version if you want to (recommended). Head over to `Packagist <https://packagist.org/packages/imbo/imbo>`_ to see the available versions. If you're more of a YOLO type of person you can use ``dev-develop`` for the latest development version. If you choose to use the ``dev-develop`` branch, expect things to break from time to time.
+Regarding the Imbo version you are about to install you can use ``dev-master`` for the latest released version, or you can use a specific version if you want to (recommended). Head over to `Imbo on Packagist`_ to see the available versions. If you're more of a YOLO type of person you can use ``dev-develop`` for the latest development version. If you choose to use the ``dev-develop`` branch, expect things to break from time to time.
 
-Imbo strives to keep full BC in minor and patch releases, but breaking changes can occur. The most secure way to install one or more Imbo servers is to specify a specific version (for instance ``1.2.0``) in your ``composer.json`` file. Read the `ChangeLog <https://github.com/imbo/imbo/blob/develop/ChangeLog.markdown>`_ and the :doc:`upgrading` chapter before doing an upgrade.
-
-.. _git-clone:
-
-Using git clone
----------------
-
-You can also install Imbo directly via git, and then use Composer to install the dependencies:
-
-.. code-block:: bash
-
-    mkdir /path/to/install; cd /path/to/install
-    git clone https://github.com/imbo/imbo.git
-    cd imbo
-    curl -s https://getcomposer.org/installer | php
-    php composer.phar install -o --no-dev
-
-In this case the correct web server document root would be ``/path/to/install/imbo/public``. Remember to checkout the correct branch after cloning the repository to get the version you want, for instance ``git checkout master``. If you use this method of installation you will have to modify Imbo's ``composer.json`` to install 3rd party libraries. You will also have to place your own ``config.php`` configuration file in the same directory as the default Imbo configuration file, which in the above example would be the ``/path/to/install/imbo/config`` directory.
-
-If you want to contribute to Imbo, this is the obvious installation method. Read more about this in the :doc:`../develop/contributing` chapter.
+Imbo strives to keep full :abbr:`BC (Backwards Compatibility)` in minor and patch releases, but breaking changes can occur. The most secure way to install one or more Imbo servers is to specify a specific version (for instance ``3.0.0``, or by using `semver`_: ``^3.0``) in your ``composer.json`` file. Read the `Imbo ChangeLog`_ and the :doc:`upgrading` chapter before doing an upgrade.
 
 Web server configuration
 ------------------------
 
-After installing Imbo by using one of the methods mentioned above you will have to configure the web server you want to use. Imbo ships with sample configuration files for `Apache <http://httpd.apache.org/>`_ and `Nginx <http://nginx.org/>`_ that can be used with a few minor adjustments. Both configuration files assume the httpd runs on port 80. If you use `Varnish <https://www.varnish-cache.org/>`_ or some other HTTP accelerator simply change the port number to the port that your httpd listens to.
+After installing Imbo you will have to configure the web server you want to use. Imbo ships with sample configuration files for `Apache`_, `Nginx`_ and `Lighttpd`_ that can be used with a few minor adjustments. All configuration files assume the httpd runs on port 80. If you use `Varnish`_ or some other HTTP accelerator simply change the port number to the port that your httpd listens to.
 
 Apache
 ~~~~~~
 
-You will need to enable `mod_rewrite <http://httpd.apache.org/docs/current/mod/mod_rewrite.html>`_ if you want to use Imbo with Apache. Below is an example on how to configure Apache for Imbo:
+You will need to enable `mod_rewrite`_ if you want to use Imbo with Apache. Below is an example on how to configure Apache for Imbo:
 
 .. literalinclude:: ../../config/imbo.apache.conf.dist
 
@@ -105,7 +80,7 @@ You will need to update ``ServerName`` to match the host name you will use for I
 Nginx
 ~~~~~
 
-Below is an example on how to configure Nginx for Imbo. This example uses PHP via `FastCGI <http://www.fastcgi.com/>`_:
+Below is an example on how to configure Nginx for Imbo. This example uses PHP via `FastCGI`_:
 
 .. literalinclude:: ../../config/imbo.nginx.conf.dist
 
@@ -125,9 +100,9 @@ This example requires the ``mod_rewrite`` module to be loaded.
 Varnish
 ~~~~~~~
 
-Imbo strives to follow the `HTTP Protocol <http://www.ietf.org/rfc/rfc2616.txt>`_, and can because of this easily leverage `Varnish <https://www.varnish-cache.org/>`_.
+Imbo strives to follow the `HTTP Protocol`_, and can because of this easily leverage `Varnish`_.
 
-The only required configuration you need in your `VCL <https://www.varnish-cache.org/docs/3.0/reference/vcl.html>`_ is a default backend:
+The only required configuration you need in your `VCL`_ is a default backend:
 
 .. code-block:: console
 
@@ -138,7 +113,7 @@ The only required configuration you need in your `VCL <https://www.varnish-cache
 
 where ``.host`` and ``.port`` is where Varnish can reach your web server.
 
-If you use the same host name (or a sub-domain) for your Imbo installation as other services, that in turn uses `Cookies <http://en.wikipedia.org/wiki/HTTP_cookie>`_, you might want the VCL to ignore these Cookies for the requests made against your Imbo installation (unless you have implemented event listeners for Imbo that uses Cookies). To achieve this you can put the following snippet into your VCL file:
+If you use the same host name (or a sub-domain) for your Imbo installation as other services, that in turn uses `Cookies`_, you might want the VCL to ignore these Cookies for the requests made against your Imbo installation (unless you have implemented event listeners for Imbo that uses Cookies). To achieve this you can put the following snippet into your VCL file:
 
 .. code-block:: console
 
@@ -178,3 +153,17 @@ SQLite
 
 .. literalinclude:: ../../setup/doctrine.sqlite.sql
     :language: sql
+
+.. _Composer: https://getcomposer.org
+.. _Imbo on Packagist: https://packagist.org/packages/imbo/imbo
+.. _semver: http://semver.org/
+.. _Imbo ChangeLog: https://github.com/imbo/imbo/blob/develop/ChangeLog.markdown
+.. _Apache: https://httpd.apache.org/
+.. _Nginx: https://nginx.org/
+.. _Lighttpd: https://www.lighttpd.net/
+.. _Varnish: https://www.varnish-cache.org/
+.. _mod_rewrite: https://httpd.apache.org/docs/current/mod/mod_rewrite.html
+.. _FastCGI: https://www.fastcgi.com/
+.. _HTTP Protocol: https://www.ietf.org/rfc/rfc2616.txt
+.. _VCL: https://www.varnish-cache.org/docs/3.0/reference/vcl.html
+.. _Cookies: https://en.wikipedia.org/wiki/HTTP_cookie

@@ -39,6 +39,8 @@ ETag
 Uuid
 gaussian
 Mongo
+mongo
+mongodb
 callables
 Backblaze
 rethrow
