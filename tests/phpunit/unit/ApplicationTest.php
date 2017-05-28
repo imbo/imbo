@@ -168,6 +168,17 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $this->expectOutputRegex('|^{.*}$|');
         $this->application->run(require __DIR__ . '/../../../config/config.default.php');
     }
+
+    /**
+     * @covers Imbo\Application::run
+     * @expectedException Imbo\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The "transformations" configuration key must be specified as an array
+     */
+    public function testThrowsExceptionIfTransformationsIsSetAndIsNotAnArray() {
+        $defaultConfig = require __DIR__ . '/../../../config/config.default.php';
+        $defaultConfig['transformations'] = function() {};
+        $this->application->run($defaultConfig);
+    }
 }
 
 class TestListener implements ListenerInterface {

@@ -84,7 +84,10 @@ class Application {
 
         // Create a new image transformation manager
         $transformationManager = new TransformationManager();
-        if (isset($config['transformations']) && is_array($config['transformations'])) {
+
+        if (isset($config['transformations']) && !is_array($config['transformations'])) {
+            throw new InvalidArgumentException('The "transformations" configuration key must be specified as an array', 500);
+        } else if (isset($config['transformations']) && is_array($config['transformations'])) {
             $transformationManager->addTransformations($config['transformations']);
         }
 
