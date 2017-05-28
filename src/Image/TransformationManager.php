@@ -296,6 +296,11 @@ class TransformationManager implements ListenerInterface {
         ];
     }
 
+    /**
+     * Adjust image transformations
+     *
+     * @param EventInterface $event
+     */
     public function adjustImageTransformations(EventInterface $event) {
         // If the image has not stepped through any input size transformations,
         // we don't set any ratio, and it should be safe to assume no transformations
