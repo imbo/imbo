@@ -155,17 +155,17 @@ class Histogram extends Transformation {
             // transformations
             $this->imagick->transparentPaintImage('black', 0, 0, false);
             $this->imagick->setImageFormat('png');
-
-            // Store the new image
-            $size = $this->imagick->getImageGeometry();
-            $image = $this->image;
-            $image->setWidth($size['width'])
-                  ->setHeight($size['height'])
-                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         } catch (ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        // Store the new image
+        $size = $this->imagick->getImageGeometry();
+        $image = $this->image;
+        $image->setWidth($size['width'])
+              ->setHeight($size['height'])
+              ->hasBeenTransformed(true);
     }
 }

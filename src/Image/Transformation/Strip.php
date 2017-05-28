@@ -26,16 +26,16 @@ class Strip extends Transformation {
     public function transform(array $params) {
         try {
             $this->imagick->stripImage();
-
-            // In newer versions of Imagick, it seems we need to clear and re-read
-            // the data to properly clear the properties
-            $data = $this->imagick->getImageBlob();
-            $this->imagick->clear();
-            $this->imagick->readImageBlob($data);
-
-            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        // In newer versions of Imagick, it seems we need to clear and re-read
+        // the data to properly clear the properties
+        $data = $this->imagick->getImageBlob();
+        $this->imagick->clear();
+        $this->imagick->readImageBlob($data);
+
+        $this->image->hasBeenTransformed(true);
     }
 }

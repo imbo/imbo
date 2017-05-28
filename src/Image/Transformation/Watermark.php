@@ -96,38 +96,39 @@ class Watermark extends Transformation implements InputSizeConstraint {
                 $imageIdentifier
             );
 
-            $watermark = new Imagick();
-            $watermark->readImageBlob($watermarkData);
-            $watermarkSize = $watermark->getImageGeometry();
-
-            // we can't use ->setImageOpacity here as it also affects the alpha channel, generating a "ghost" area
-            // around any masked area. By using evaluateImage we multiply existing alpha values instead, allowing us
-            // to retain any existing transparency.
-            if ($opacity < 1) {
-                // if there's no alpha channel already, we have to enable it before calculating transparency
-                if (!$watermark->getImageAlphaChannel()) {
-                    try {
-                        $watermark->setImageAlphaChannel(Imagick::ALPHACHANNEL_ACTIVATE);
-                    } catch (ImagickException $e) {
-                        // there's a bug in Imagemagick < 6.8.0-4 which throws an exception even if the value was set
-                        // https://imagemagick.org/discourse-server/viewtopic.php?t=22152
-                        $version = ImagickHelper::getInstalledVersion();
-
-                        if (version_compare($version, '6.8.0-4', '>=')) {
-                            // rethrow exception if we're on 6.8.0-4 or newer.
-                            throw $e;
-                        }
-                    }
-                }
-
-                $watermark->evaluateImage(Imagick::EVALUATE_MULTIPLY, $opacity, Imagick::CHANNEL_ALPHA);
-            }
         } catch (StorageException $e) {
             if ($e->getCode() == 404) {
                 throw new TransformationException('Watermark image not found', 400);
             }
 
             throw $e;
+        }
+
+        $watermark = new Imagick();
+        $watermark->readImageBlob($watermarkData);
+        $watermarkSize = $watermark->getImageGeometry();
+
+        // we can't use ->setImageOpacity here as it also affects the alpha channel, generating a "ghost" area
+        // around any masked area. By using evaluateImage we multiply existing alpha values instead, allowing us
+        // to retain any existing transparency.
+        if ($opacity < 1) {
+            // if there's no alpha channel already, we have to enable it before calculating transparency
+            if (!$watermark->getImageAlphaChannel()) {
+                try {
+                    $watermark->setImageAlphaChannel(Imagick::ALPHACHANNEL_ACTIVATE);
+                } catch (ImagickException $e) {
+                    // there's a bug in Imagemagick < 6.8.0-4 which throws an exception even if the value was set
+                    // https://imagemagick.org/discourse-server/viewtopic.php?t=22152
+                    $version = ImagickHelper::getInstalledVersion();
+
+                    if (version_compare($version, '6.8.0-4', '>=')) {
+                        // rethrow exception if we're on 6.8.0-4 or newer.
+                        throw $e;
+                    }
+                }
+            }
+
+            $watermark->evaluateImage(Imagick::EVALUATE_MULTIPLY, $opacity, Imagick::CHANNEL_ALPHA);
         }
 
         // Should we resize the watermark?
@@ -161,10 +162,11 @@ class Watermark extends Transformation implements InputSizeConstraint {
         // Now make a composite
         try {
             $this->imagick->compositeImage($watermark, Imagick::COMPOSITE_OVER, $x, $y);
-            $image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $image->hasBeenTransformed(true);
     }
 
     /**

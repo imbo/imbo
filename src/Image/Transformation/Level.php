@@ -68,12 +68,11 @@ class Level extends Transformation {
         }
 
         try {
-            $quantumRange = $this->getQuantumRange();
-
-            $this->imagick->levelImage(0, (float) $gamma, $quantumRange, $channel);
-            $this->image->hasBeenTransformed(true);
+            $this->imagick->levelImage(0, (float) $gamma, $this->getQuantumRange(), $channel);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $this->image->hasBeenTransformed(true);
     }
 }

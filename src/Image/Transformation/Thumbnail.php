@@ -58,16 +58,15 @@ class Thumbnail extends Transformation implements InputSizeConstraint {
             } else {
                 $this->imagick->cropThumbnailImage($width, $height);
             }
-
-            $size = $this->imagick->getImageGeometry();
-
-            $this->image
-                ->setWidth($size['width'])
-                ->setHeight($size['height'])
-                ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $size = $this->imagick->getImageGeometry();
+
+        $this->image->setWidth($size['width'])
+                    ->setHeight($size['height'])
+                    ->hasBeenTransformed(true);
     }
 
     /**

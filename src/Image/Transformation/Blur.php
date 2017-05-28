@@ -80,11 +80,11 @@ class Blur extends Transformation {
             } else {
                 $this->imagick->gaussianBlurImage($radius, $sigma);
             }
-
-            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $this->image->hasBeenTransformed(true);
     }
 
     /**
@@ -101,10 +101,11 @@ class Blur extends Transformation {
 
         try {
             $this->imagick->motionBlurImage($radius, $sigma, $angle);
-            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $this->image->hasBeenTransformed(true);
     }
 
     /**
@@ -119,9 +120,10 @@ class Blur extends Transformation {
 
         try {
             $this->imagick->radialBlurImage($angle);
-            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $this->image->hasBeenTransformed(true);
     }
 }

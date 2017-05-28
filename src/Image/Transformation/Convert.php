@@ -31,23 +31,23 @@ class Convert extends Transformation {
             throw new TransformationException('Missing required parameter: type', 400);
         }
 
-        $image = $this->image;
         $type = $params['type'];
 
-        if ($image->getExtension() === $type) {
+        if ($this->image->getExtension() === $type) {
             // The requested extension is the same as the image, no conversion is needed
             return;
         }
 
         try {
             $this->imagick->setImageFormat($type);
-            $mimeType = array_search($type, Image::$mimeTypes);
-
-            $image->setMimeType($mimeType)
-                  ->setExtension($type)
-                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $mimeType = array_search($type, Image::$mimeTypes);
+
+        $this->image->setMimeType($mimeType)
+                    ->setExtension($type)
+                    ->hasBeenTransformed(true);
     }
 }

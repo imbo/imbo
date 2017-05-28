@@ -60,10 +60,11 @@ class Compress extends Transformation implements ListenerInterface {
             // which usually results in a smaller file size, as for JPEG's, a high level means a
             // higher quality, resulting in a larger file size.
             $this->imagick->setImageCompressionQuality($this->level);
-            $image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $image->hasBeenTransformed(true);
     }
 
     /**

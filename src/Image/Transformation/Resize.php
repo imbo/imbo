@@ -37,16 +37,15 @@ class Resize extends Transformation implements InputSizeConstraint {
 
         try {
             $this->imagick->thumbnailImage($size['width'], $size['height']);
-
-            $newSize = $this->imagick->getImageGeometry();
-
-            $this->image
-                 ->setWidth($newSize['width'])
-                 ->setHeight($newSize['height'])
-                 ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $newSize = $this->imagick->getImageGeometry();
+
+        $this->image->setWidth($newSize['width'])
+                    ->setHeight($newSize['height'])
+                    ->hasBeenTransformed(true);
     }
 
     /**

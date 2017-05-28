@@ -48,10 +48,10 @@ class Vignette extends Transformation {
 
         try {
             $this->imagick->compositeImage($vignette, Imagick::COMPOSITE_MULTIPLY, 0, 0);
-
-            $image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $image->hasBeenTransformed(true);
     }
 }

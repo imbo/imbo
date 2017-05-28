@@ -37,23 +37,22 @@ class Rotate extends Transformation implements InputSizeConstraint {
             throw new TransformationException('Missing required parameter: angle', 400);
         }
 
-        $image = $this->image;
         $angle = (int) $params['angle'];
         $bg = !empty($params['bg']) ? $this->formatColor($params['bg']) : $this->bg;
 
         try {
             $this->imagick->rotateImage($bg, $angle);
-
-            $size = $this->imagick->getImageGeometry();
-
-            $image->setWidth($size['width'])
-                  ->setHeight($size['height'])
-                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         } catch (ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $size = $this->imagick->getImageGeometry();
+
+        $this->image->setWidth($size['width'])
+                    ->setHeight($size['height'])
+                    ->hasBeenTransformed(true);
     }
 
     /**

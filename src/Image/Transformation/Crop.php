@@ -58,15 +58,15 @@ class Crop extends Transformation implements RegionExtractor, InputSizeConstrain
             );
 
             $this->imagick->setImagePage(0, 0, 0, 0);
-            $size = $this->imagick->getImageGeometry();
-
-            $this->image
-                 ->setWidth($size['width'])
-                 ->setHeight($size['height'])
-                 ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $size = $this->imagick->getImageGeometry();
+
+        $this->image->setWidth($size['width'])
+                    ->setHeight($size['height'])
+                    ->hasBeenTransformed(true);
     }
 
     /**

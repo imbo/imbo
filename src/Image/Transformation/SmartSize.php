@@ -50,10 +50,14 @@ class SmartSize extends Transformation {
         try {
             $this->imagick->cropImage($crop['width'], $crop['height'], $crop['x'], $crop['y']);
             $this->imagick->setImagePage(0, 0, 0, 0);
-            $this->resize($params['width'], $params['height']);
+            $this->imagick->thumbnailImage($params['width'], $params['height']);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $this->image->setWidth($params['width'])
+                    ->setHeight($params['height'])
+                    ->hasBeenTransformed(true);
     }
 
     /**
@@ -200,21 +204,6 @@ class SmartSize extends Transformation {
             default:
                 return 1.25;
         }
-    }
-
-    /**
-     * Resize the image
-     *
-     * @param int $targetWidth The resize target width
-     * @param int $tartHeight The resize target height
-     */
-    private function resize($targetWidth, $targetHeight) {
-        $this->imagick->thumbnailImage($targetWidth, $targetHeight);
-
-        $this->image
-             ->setWidth($targetWidth)
-             ->setHeight($targetHeight)
-             ->hasBeenTransformed(true);
     }
 
     /**

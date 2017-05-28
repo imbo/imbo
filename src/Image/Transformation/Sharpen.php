@@ -75,9 +75,10 @@ class Sharpen extends Transformation {
 
         try {
             $this->imagick->unsharpMaskImage($radius, $sigma, $gain, $threshold);
-            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $this->image->hasBeenTransformed(true);
     }
 }

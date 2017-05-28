@@ -38,16 +38,16 @@ class MaxSize extends Transformation implements InputSizeConstraint {
 
         try {
             $this->imagick->thumbnailImage($newSize['width'], $newSize['height']);
-
-            $size = $this->imagick->getImageGeometry();
-
-            $this->image
-                 ->setWidth($size['width'])
-                 ->setHeight($size['height'])
-                 ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $size = $this->imagick->getImageGeometry();
+
+        $this->image
+             ->setWidth($size['width'])
+             ->setHeight($size['height'])
+             ->hasBeenTransformed(true);
     }
 
     /**

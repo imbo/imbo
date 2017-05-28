@@ -72,11 +72,11 @@ class DrawPois extends Transformation {
                     );
                 }
             }
-
-            $this->image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $this->image->hasBeenTransformed(true);
     }
 
     /**
