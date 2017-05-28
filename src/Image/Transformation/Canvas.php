@@ -153,7 +153,7 @@ class Canvas extends Transformation implements InputSizeConstraint {
     public function getMinimumInputSize(array $params, array $imageSize) {
         // Since we're modifying the input image in a way that alters the size and content,
         // we can't make any further optimizations on the input size.
-        return false;
+        return InputSizeConstraint::STOP_RESOLVING;
     }
 
     /**

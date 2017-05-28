@@ -125,7 +125,7 @@ class TransformationManagerTest extends \PHPUnit_Framework_TestCase {
      */
     public function testSkipsTransformationsThatReturnNullAsMinInputSize() {
         $this->query->set('t', ['maxSize:width=10000']);
-        $this->assertFalse($this->manager->getMinimumImageInputSize($this->event));
+        $this->assertFalse($result = $this->manager->getMinimumImageInputSize($this->event));
     }
 
     /**

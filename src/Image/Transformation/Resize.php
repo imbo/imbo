@@ -31,7 +31,7 @@ class Resize extends Transformation implements InputSizeConstraint {
         ]);
 
         // Fall back if there is no need to resize
-        if (!$size) {
+        if (!is_array($size)) {
             return;
         }
 
@@ -78,7 +78,7 @@ class Resize extends Transformation implements InputSizeConstraint {
 
         if ($width === $originalWidth && $height === $originalHeight) {
             // Resize params match the current image size, no need for any resizing
-            return;
+            return InputSizeConstraint::NO_TRANSFORMATION;
         }
 
         // Calculate width or height if not both have been specified

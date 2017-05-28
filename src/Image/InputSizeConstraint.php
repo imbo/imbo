@@ -21,20 +21,25 @@ namespace Imbo\Image;
  * @package Image
  */
 interface InputSizeConstraint {
+    const NO_TRANSFORMATION = 0;
+    const STOP_RESOLVING = 1;
+
     /**
      * Get the minimum input size that this transformation can accept as input, given the
-     * parameters provided. A transformation can return `null` if it has no preference
-     * about the input size, or `false` if the minimum input size can't be calculated.
+     * parameters provided. A transformation can return InputSizeConstraint::NO_TRANSFORMATION if it
+     * has no preference about the input size, or InputSizeConstraint::STOP_RESOLVING if the minimum
+     * input size can't be calculated.
      *
-     * Note that returning `false` will stop the transformation manager from trying to
-     * find a smaller minimum input size for the transformations that follow the current,
-     * which is what you want if for instance an image is rotated in an angle which makes
+     * Note that returning InputSizeConstraint::STOP_RESOLVING will stop the transformation manager
+     * from trying to find a smaller minimum input size for the transformations that follow the
+     * current, which is what you want if for instance an image is rotated in an angle which makes
      * calculation of the resulting image hard - due to other transformations being applied
      * further down the transformation chain.
      *
      * @param array $params Transformation parameters
      * @param array $imageSize Size of the image
-     * @return array Array containing `width` and `height`
+     * @return int|array Array containing `width` and `height` or one of the constants defined in
+     *                   this interface
      */
     public function getMinimumInputSize(array $params, array $imageSize);
 

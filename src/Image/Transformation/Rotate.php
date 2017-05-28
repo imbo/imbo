@@ -70,6 +70,6 @@ class Rotate extends Transformation implements InputSizeConstraint {
             return ['rotation' => (int) $params['angle']];
         }
 
-        return false;
+        return InputSizeConstraint::STOP_RESOLVING;
     }
 }

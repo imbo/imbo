@@ -12,6 +12,7 @@ namespace Imbo\Image;
 
 use Imbo\Image\Transformation\Transformation,
     Imbo\Exception\TransformationException,
+    Imbo\Exception\InvalidArgumentException,
     Imbo\EventManager\EventInterface,
     Imbo\EventListener\Initializer\InitializerInterface,
     Imbo\EventListener\ListenerInterface;
@@ -187,6 +188,7 @@ class TransformationManager implements ListenerInterface {
      * of the input image.
      *
      * @param  EventInterface $event The event that triggered this calculation
+     * @throws InvalidArgumentException
      * @return array|boolean `false` if we need the full size of the input image, array otherwise
      */
     public function getMinimumImageInputSize(EventInterface $event) {
@@ -202,6 +204,7 @@ class TransformationManager implements ListenerInterface {
         $flipDimensions = false;
         $minimum = ['width' => $image->getWidth(), 'height' => $image->getHeight(), 'index' => 0];
         $inputSize = ['width' => $image->getWidth(), 'height' => $image->getHeight()];
+
         foreach ($transformations as $i => $transformation) {
             $params = $transformation['params'];
 
@@ -223,14 +226,12 @@ class TransformationManager implements ListenerInterface {
             if ($handler instanceof InputSizeConstraint) {
                 $minSize = $handler->setImage($image)->getMinimumInputSize($params, $inputSize);
 
-                // Transformations can return `null` if no transformation will occur,
-                // or `false` if we should stop the minimum input size resolving because
-                // the transformation can't be predicted or calculated in advance
-                // (for instance if it needs access to the Imagick instance)
-                if ($minSize === null) {
+                if ($minSize === InputSizeConstraint::NO_TRANSFORMATION) {
                     continue;
-                } else if ($minSize === false) {
+                } else if ($minSize === InputSizeConstraint::STOP_RESOLVING) {
                     break;
+                } else if (!is_array($minSize)) {
+                    throw new InvalidArgumentException('Invalid return value from getMinimumInputSize', 500);
                 }
 
                 // Check that the calculated value contains a width (some only return rotation)

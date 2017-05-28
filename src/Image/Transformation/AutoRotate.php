@@ -110,6 +110,6 @@ class AutoRotate extends Transformation implements InputSizeConstraint {
         // We don't have an imagick instance at this point in the flow, so we don't have any way to
         // determine if the image should be rotated. Return false to signal that we can't make any
         // assumptions on the input size from this point on.
-        return false;
+        return InputSizeConstraint::STOP_RESOLVING;
     }
 }

@@ -173,7 +173,7 @@ class Watermark extends Transformation implements InputSizeConstraint {
      * {@inheritdoc}
      */
     public function getMinimumInputSize(array $params, array $imageSize) {
-        return null;
+        return InputSizeConstraint::NO_TRANSFORMATION;
     }
 
     /**

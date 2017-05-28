@@ -11,7 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Image\RegionExtractor,
-    Imbo\Image\InputSizeConstraint,
     Imbo\Exception\TransformationException,
     ImagickException;
 

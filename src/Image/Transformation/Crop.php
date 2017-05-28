@@ -126,7 +126,7 @@ class Crop extends Transformation implements RegionExtractor, InputSizeConstrain
      * {@inheritdoc}
      */
     public function getMinimumInputSize(array $params, array $imageSize) {
-        return null;
+        return InputSizeConstraint::NO_TRANSFORMATION;
     }
 
     /**

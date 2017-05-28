@@ -87,8 +87,8 @@ class Border extends Transformation implements InputSizeConstraint {
         $size = $this->imagick->getImageGeometry();
 
         $this->image->setWidth($size['width'])
-                ->setHeight($size['height'])
-                ->hasBeenTransformed(true);
+                    ->setHeight($size['height'])
+                    ->hasBeenTransformed(true);
     }
 
     /**
@@ -160,7 +160,7 @@ class Border extends Transformation implements InputSizeConstraint {
      * {@inheritdoc}
      */
     public function getMinimumInputSize(array $params, array $imageSize) {
-        return null;
+        return InputSizeConstraint::NO_TRANSFORMATION;
     }
 
     /**
