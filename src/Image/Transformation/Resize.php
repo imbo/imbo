@@ -31,7 +31,7 @@ class Resize extends Transformation implements InputSizeConstraint {
         ]);
 
         // Fall back if there is no need to resize
-        if (!is_array($size)) {
+        if (!$size) {
             return;
         }
 
@@ -52,7 +52,7 @@ class Resize extends Transformation implements InputSizeConstraint {
      * {@inheritdoc}
      */
     public function getMinimumInputSize(array $params, array $imageSize) {
-        return $this->calculateSize($params, $imageSize);
+        return $this->calculateSize($params, $imageSize) ?: InputSizeConstraint::NO_TRANSFORMATION;
     }
 
     /**
@@ -78,7 +78,7 @@ class Resize extends Transformation implements InputSizeConstraint {
 
         if ($width === $originalWidth && $height === $originalHeight) {
             // Resize params match the current image size, no need for any resizing
-            return InputSizeConstraint::NO_TRANSFORMATION;
+            return;
         }
 
         // Calculate width or height if not both have been specified

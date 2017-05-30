@@ -32,7 +32,7 @@ class MaxSize extends Transformation implements InputSizeConstraint {
         ]);
 
         // No need to transform? Fall back
-        if (!is_array($newSize)) {
+        if (!$newSize) {
             return;
         }
 
@@ -44,17 +44,16 @@ class MaxSize extends Transformation implements InputSizeConstraint {
 
         $size = $this->imagick->getImageGeometry();
 
-        $this->image
-             ->setWidth($size['width'])
-             ->setHeight($size['height'])
-             ->hasBeenTransformed(true);
+        $this->image->setWidth($size['width'])
+                    ->setHeight($size['height'])
+                    ->hasBeenTransformed(true);
     }
 
     /**
      * {@inheritdoc}
      */
     public function getMinimumInputSize(array $params, array $imageSize) {
-        return $this->calculateSize($params, $imageSize);
+        return $this->calculateSize($params, $imageSize) ?: InputSizeConstraint::NO_TRANSFORMATION;
     }
 
     /**
@@ -86,7 +85,7 @@ class MaxSize extends Transformation implements InputSizeConstraint {
         // Is the original image smaller than the specified parameters?
         if ($sourceWidth <= $width && $sourceHeight <= $height) {
             // Original image is smaller than the max-parameters, don't transform
-            return InputSizeConstraint::NO_TRANSFORMATION;
+            return;
         }
 
         return ['width' => $width, 'height' => $height];
